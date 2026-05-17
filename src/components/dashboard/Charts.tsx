@@ -44,7 +44,7 @@ const tooltipStyle = {
 
 function Card({ title, subtitle, action, children, className = "" }: any) {
   return (
-    <div className={`rounded-2xl bg-card border border-border p-5 shadow-[var(--shadow-soft)] ${className}`}>
+    <div className={`rounded-xl bg-card border border-border p-4 shadow-[var(--shadow-soft)] ${className}`}>
       <div className="flex items-start justify-between mb-4">
         <div>
           <h3 className="font-display font-semibold tracking-tight">{title}</h3>
@@ -71,7 +71,7 @@ function Tabs() {
 export function HeadcountChart() {
   return (
     <Card title="Headcount Trends" subtitle="New hires vs. exits across the year" action={<Tabs />} className="xl:col-span-2">
-      <div className="h-72">
+      <div className="h-44">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={headcount} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
             <defs>
@@ -101,7 +101,7 @@ export function DepartmentChart() {
   const total = departments.reduce((a, b) => a + b.value, 0);
   return (
     <Card title="Department Split" subtitle="Workforce distribution by department">
-      <div className="relative h-56">
+      <div className="relative h-44">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie data={departments} dataKey="value" innerRadius={64} outerRadius={92} paddingAngle={3} stroke="none">
@@ -134,7 +134,7 @@ export function DepartmentChart() {
 export function AttendanceChart() {
   return (
     <Card title="Weekly Attendance" subtitle="Present · Remote · On Leave" className="xl:col-span-2">
-      <div className="h-64">
+      <div className="h-52">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={attendance} margin={{ top: 5, right: 10, left: -10, bottom: 0 }} barCategoryGap={18}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
@@ -155,7 +155,7 @@ export function AttendanceChart() {
 export function GoalsRadial() {
   return (
     <Card title="Performance Goals" subtitle="Q2 completion across teams">
-      <div className="relative h-56">
+      <div className="relative h-44">
         <ResponsiveContainer width="100%" height="100%">
           <RadialBarChart innerRadius="70%" outerRadius="100%" data={goals} startAngle={210} endAngle={-30}>
             <RadialBar background={{ fill: "var(--muted)" }} dataKey="value" cornerRadius={20} />

@@ -40,7 +40,7 @@ const initials = (n: string) => n.split(" ").map((s) => s[0]).slice(0, 2).join("
 
 export function LeaveRequests() {
   return (
-    <div className="rounded-2xl bg-card border border-border shadow-[var(--shadow-soft)] xl:col-span-2">
+    <div className="rounded-xl bg-card border border-border shadow-[var(--shadow-soft)] xl:col-span-2">
       <div className="flex items-center justify-between p-5 border-b border-border">
         <div>
           <h3 className="font-display font-semibold tracking-tight">Pending Approvals</h3>
@@ -90,7 +90,7 @@ export function LeaveRequests() {
 
 export function UpcomingEvents() {
   return (
-    <div className="rounded-2xl bg-card border border-border p-5 shadow-[var(--shadow-soft)]">
+    <div className="rounded-xl bg-card border border-border p-4 shadow-[var(--shadow-soft)]">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="font-display font-semibold tracking-tight">Upcoming</h3>
@@ -119,7 +119,7 @@ export function UpcomingEvents() {
 
 export function RecruitmentPipeline() {
   return (
-    <div className="rounded-2xl bg-card border border-border p-5 shadow-[var(--shadow-soft)] xl:col-span-3">
+    <div className="rounded-xl bg-card border border-border p-4 shadow-[var(--shadow-soft)] xl:col-span-3">
       <div className="flex items-center justify-between mb-5">
         <div>
           <h3 className="font-display font-semibold tracking-tight">Recruitment Pipeline</h3>
