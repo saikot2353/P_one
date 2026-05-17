@@ -80,6 +80,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "CRIPTON HRIS" },
+      { name: "twitter:description", content: "Modern HR management software for high-performing teams." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/05484a77-948f-46d7-a418-7e21a7ec3b5c/id-preview-327f3108--896dc413-e37e-4671-9344-6489d69a3e7d.lovable.app-1778999534611.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/05484a77-948f-46d7-a418-7e21a7ec3b5c/id-preview-327f3108--896dc413-e37e-4671-9344-6489d69a3e7d.lovable.app-1778999534611.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
