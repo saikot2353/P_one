@@ -47,7 +47,7 @@ function Card({ title, subtitle, action, children, className = "" }: any) {
     <div className={`rounded-xl bg-card border border-border p-4 shadow-[var(--shadow-soft)] ${className}`}>
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h3 className="font-display font-semibold tracking-tight">{title}</h3>
+          <h3 className="font-semibold tracking-tight text-[13px]">{title}</h3>
           {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
         </div>
         {action}
@@ -112,7 +112,7 @@ export function DepartmentChart() {
         </ResponsiveContainer>
         <div className="absolute inset-0 grid place-items-center pointer-events-none">
           <div className="text-center">
-            <div className="text-2xl font-display font-bold">{total.toLocaleString()}</div>
+            <div className="text-xl font-bold">{total.toLocaleString()}</div>
             <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Employees</div>
           </div>
         </div>
@@ -163,7 +163,7 @@ export function GoalsRadial() {
         </ResponsiveContainer>
         <div className="absolute inset-0 grid place-items-center pointer-events-none">
           <div className="text-center">
-            <div className="text-3xl font-display font-bold">78%</div>
+            <div className="text-2xl font-bold">78%</div>
             <div className="text-[11px] uppercase tracking-wider text-muted-foreground mt-1">Completed</div>
           </div>
         </div>
