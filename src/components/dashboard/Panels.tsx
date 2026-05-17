@@ -40,10 +40,10 @@ const initials = (n: string) => n.split(" ").map((s) => s[0]).slice(0, 2).join("
 
 export function LeaveRequests() {
   return (
-    <div className="rounded-2xl bg-card border border-border shadow-[var(--shadow-soft)] xl:col-span-2">
+    <div className="rounded-xl bg-card border border-border shadow-[var(--shadow-soft)] xl:col-span-2">
       <div className="flex items-center justify-between p-5 border-b border-border">
         <div>
-          <h3 className="font-display font-semibold tracking-tight">Pending Approvals</h3>
+          <h3 className="font-semibold tracking-tight text-[13px]">Pending Approvals</h3>
           <p className="text-xs text-muted-foreground mt-0.5">Leave requests awaiting your action</p>
         </div>
         <button className="text-xs font-medium text-primary inline-flex items-center gap-1 hover:underline">
@@ -90,10 +90,10 @@ export function LeaveRequests() {
 
 export function UpcomingEvents() {
   return (
-    <div className="rounded-2xl bg-card border border-border p-5 shadow-[var(--shadow-soft)]">
+    <div className="rounded-xl bg-card border border-border p-4 shadow-[var(--shadow-soft)]">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="font-display font-semibold tracking-tight">Upcoming</h3>
+          <h3 className="font-semibold tracking-tight text-[13px]">Upcoming</h3>
           <p className="text-xs text-muted-foreground mt-0.5">Events & milestones this week</p>
         </div>
         <button className="text-xs text-muted-foreground hover:text-foreground">Calendar →</button>
@@ -105,7 +105,7 @@ export function UpcomingEvents() {
             <li key={i} className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/60 transition-colors">
               <div className={`size-10 rounded-xl grid place-items-center ${e.tint}`}><Icon className="size-5" /></div>
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-medium truncate">{e.title}</div>
+                <div className="text-[12px] font-medium truncate">{e.title}</div>
                 <div className="text-xs text-muted-foreground">{e.date}</div>
               </div>
               <button className="text-xs text-primary font-medium hover:underline">View</button>
@@ -119,10 +119,10 @@ export function UpcomingEvents() {
 
 export function RecruitmentPipeline() {
   return (
-    <div className="rounded-2xl bg-card border border-border p-5 shadow-[var(--shadow-soft)] xl:col-span-3">
+    <div className="rounded-xl bg-card border border-border p-4 shadow-[var(--shadow-soft)] xl:col-span-3">
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h3 className="font-display font-semibold tracking-tight">Recruitment Pipeline</h3>
+          <h3 className="font-semibold tracking-tight text-[13px]">Recruitment Pipeline</h3>
           <p className="text-xs text-muted-foreground mt-0.5">Active openings and candidate progress</p>
         </div>
         <div className="flex items-center gap-2">
