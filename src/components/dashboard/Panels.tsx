@@ -40,45 +40,50 @@ const initials = (n: string) => n.split(" ").map((s) => s[0]).slice(0, 2).join("
 
 export function LeaveRequests() {
   return (
-    <div className="rounded-xl bg-card border border-border shadow-[var(--shadow-soft)] xl:col-span-2">
-      <div className="flex items-center justify-between p-5 border-b border-border">
+    <div className="rounded-2xl bg-card border border-border/70 shadow-xs xl:col-span-2 overflow-hidden transition-all duration-300 hover:shadow-md hover:border-border/95 relative group">
+      <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary/10 via-primary/30 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="flex items-center justify-between p-5 border-b border-border/55">
         <div>
-          <h3 className="font-semibold tracking-tight text-[13px]">Pending Approvals</h3>
-          <p className="text-xs text-muted-foreground mt-0.5">Leave requests awaiting your action</p>
+          <h3 className="font-bold tracking-tight text-[13px] text-foreground">Pending Approvals</h3>
+          <p className="text-xs text-muted-foreground/80 mt-0.5">Leave requests awaiting your action</p>
         </div>
-        <button className="text-xs font-medium text-primary inline-flex items-center gap-1 hover:underline">
+        <button className="text-xs font-semibold text-primary inline-flex items-center gap-1 hover:underline hover:opacity-90 transition-opacity">
           View all <ArrowUpRight className="size-3.5" />
         </button>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-left text-[11px] uppercase tracking-wider text-muted-foreground">
-              <th className="px-5 py-3 font-medium">Employee</th>
-              <th className="px-5 py-3 font-medium">Type</th>
-              <th className="px-5 py-3 font-medium">Period</th>
-              <th className="px-5 py-3 font-medium">Status</th>
-              <th className="px-5 py-3 font-medium w-8"></th>
+            <tr className="text-left text-[10px] uppercase tracking-wider text-muted-foreground/60 border-b border-border/30 bg-muted/30">
+              <th className="px-5 py-3.5 font-bold">Employee</th>
+              <th className="px-5 py-3.5 font-bold">Type</th>
+              <th className="px-5 py-3.5 font-bold">Period</th>
+              <th className="px-5 py-3.5 font-bold">Status</th>
+              <th className="px-5 py-3.5 font-bold w-8"></th>
             </tr>
           </thead>
           <tbody>
             {requests.map((r, i) => (
-              <tr key={i} className="border-t border-border hover:bg-muted/50 transition-colors">
-                <td className="px-5 py-3">
+              <tr key={i} className="border-t border-border/45 hover:bg-muted/40 transition-colors">
+                <td className="px-5 py-3.5">
                   <div className="flex items-center gap-3">
-                    <div className="size-9 rounded-full bg-gradient-to-br from-primary/80 to-primary-glow grid place-items-center text-xs font-semibold text-primary-foreground">
+                    <div className="size-9 rounded-xl bg-gradient-to-br from-primary/95 to-primary-glow grid place-items-center text-xs font-bold text-primary-foreground shadow-xs">
                       {initials(r.name)}
                     </div>
                     <div>
-                      <div className="font-medium">{r.name}</div>
-                      <div className="text-xs text-muted-foreground">{r.role}</div>
+                      <div className="font-semibold text-foreground text-xs">{r.name}</div>
+                      <div className="text-[11px] text-muted-foreground/90 font-medium">{r.role}</div>
                     </div>
                   </div>
                 </td>
-                <td className="px-5 py-3 text-muted-foreground">{r.type}</td>
-                <td className="px-5 py-3 text-muted-foreground">{r.days}</td>
-                <td className="px-5 py-3"><StatusPill status={r.status} /></td>
-                <td className="px-5 py-3"><button className="text-muted-foreground hover:text-foreground"><MoreHorizontal className="size-4" /></button></td>
+                <td className="px-5 py-3.5 text-muted-foreground text-xs font-medium">{r.type}</td>
+                <td className="px-5 py-3.5 text-muted-foreground text-xs font-medium">{r.days}</td>
+                <td className="px-5 py-3.5"><StatusPill status={r.status} /></td>
+                <td className="px-5 py-3.5">
+                  <button className="text-muted-foreground/70 hover:text-foreground p-1 rounded-md hover:bg-muted transition duration-200">
+                    <MoreHorizontal className="size-4" />
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -90,25 +95,26 @@ export function LeaveRequests() {
 
 export function UpcomingEvents() {
   return (
-    <div className="rounded-xl bg-card border border-border p-4 shadow-[var(--shadow-soft)]">
-      <div className="flex items-center justify-between mb-4">
+    <div className="rounded-2xl bg-card border border-border/70 p-5 shadow-xs transition-all duration-300 hover:shadow-md hover:border-border/95 relative group">
+      <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary/10 via-primary/30 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="flex items-center justify-between mb-5">
         <div>
-          <h3 className="font-semibold tracking-tight text-[13px]">Upcoming</h3>
-          <p className="text-xs text-muted-foreground mt-0.5">Events & milestones this week</p>
+          <h3 className="font-bold tracking-tight text-[13px] text-foreground">Upcoming</h3>
+          <p className="text-xs text-muted-foreground/80 mt-0.5">Events & milestones this week</p>
         </div>
-        <button className="text-xs text-muted-foreground hover:text-foreground">Calendar →</button>
+        <button className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors duration-200">Calendar →</button>
       </div>
-      <ul className="space-y-3">
+      <ul className="space-y-3.5">
         {events.map((e, i) => {
           const Icon = e.icon;
           return (
-            <li key={i} className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/60 transition-colors">
-              <div className={`size-10 rounded-xl grid place-items-center ${e.tint}`}><Icon className="size-5" /></div>
+            <li key={i} className="flex items-center gap-3.5 p-3 rounded-xl hover:bg-muted/50 transition-all duration-200 group/evt border border-transparent hover:border-border/40">
+              <div className={`size-10 rounded-xl grid place-items-center transition-transform duration-300 group-hover/evt:scale-105 shadow-2xs ${e.tint}`}><Icon className="size-5" /></div>
               <div className="min-w-0 flex-1">
-                <div className="text-[12px] font-medium truncate">{e.title}</div>
-                <div className="text-xs text-muted-foreground">{e.date}</div>
+                <div className="text-[12px] font-semibold text-foreground truncate">{e.title}</div>
+                <div className="text-xs text-muted-foreground/80 font-medium mt-0.5">{e.date}</div>
               </div>
-              <button className="text-xs text-primary font-medium hover:underline">View</button>
+              <button className="text-xs text-primary font-bold hover:underline opacity-0 group-hover/evt:opacity-100 transition-opacity duration-200">View</button>
             </li>
           );
         })}
@@ -119,33 +125,35 @@ export function UpcomingEvents() {
 
 export function RecruitmentPipeline() {
   return (
-    <div className="rounded-xl bg-card border border-border p-4 shadow-[var(--shadow-soft)] xl:col-span-3">
+    <div className="rounded-2xl bg-card border border-border/70 p-5 shadow-xs transition-all duration-300 hover:shadow-md hover:border-border/95 relative group xl:col-span-3">
+      <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary/10 via-primary/30 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h3 className="font-semibold tracking-tight text-[13px]">Recruitment Pipeline</h3>
-          <p className="text-xs text-muted-foreground mt-0.5">Active openings and candidate progress</p>
+          <h3 className="font-bold tracking-tight text-[13px] text-foreground">Recruitment Pipeline</h3>
+          <p className="text-xs text-muted-foreground/80 mt-0.5">Active openings and candidate progress</p>
         </div>
         <div className="flex items-center gap-2">
-          <button className="text-xs font-medium px-3 h-8 rounded-lg border border-border hover:bg-muted">Export</button>
-          <button className="text-xs font-medium px-3 h-8 rounded-lg bg-primary text-primary-foreground hover:opacity-90">+ New Job</button>
+          <button className="text-xs font-semibold px-3 h-8.5 rounded-lg border border-border/60 hover:bg-muted transition duration-200">Export</button>
+          <button className="text-xs font-semibold px-3.5 h-8.5 rounded-lg bg-gradient-to-br from-primary to-primary-glow text-primary-foreground shadow-sm hover:shadow-md hover:opacity-95 transition-all duration-300 hover:-translate-y-0.5">+ New Job</button>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {recruitment.map((r, i) => (
-          <div key={i} className="rounded-xl border border-border p-4 hover:border-primary/40 hover:shadow-[var(--shadow-soft)] transition">
+          <div key={i} className="group/pip rounded-xl border border-border/60 p-4.5 hover:border-primary/45 hover:shadow-xs hover:-translate-y-0.5 transition-all duration-300 bg-background/40">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <div className="font-medium">{r.role}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">{r.dept} · {r.applicants} applicants</div>
+                <div className="font-semibold text-foreground text-xs tracking-tight">{r.role}</div>
+                <div className="text-[11px] text-muted-foreground/90 font-medium mt-1">{r.dept} · {r.applicants} applicants</div>
               </div>
-              <span className="text-[10px] px-2 py-1 rounded-full bg-accent text-accent-foreground font-medium">{r.stage}</span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-accent border border-accent-foreground/5 text-accent-foreground font-semibold tracking-tight">{r.stage}</span>
             </div>
-            <div className="mt-4">
-              <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1.5">
-                <span>Pipeline progress</span><span className="font-medium text-foreground">{r.pct}%</span>
+            <div className="mt-4.5">
+              <div className="flex items-center justify-between text-[10px] text-muted-foreground/85 font-medium mb-1.5">
+                <span>Pipeline progress</span>
+                <span className="font-bold text-foreground">{r.pct}%</span>
               </div>
-              <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                <div className="h-full rounded-full bg-gradient-to-r from-primary to-primary-glow" style={{ width: `${r.pct}%` }} />
+              <div className="h-1.5 rounded-full bg-muted overflow-hidden border border-border/10">
+                <div className="h-full rounded-full bg-gradient-to-r from-primary to-primary-glow transition-all duration-500 group-hover/pip:shadow-[0_0_8px_var(--primary-glow)]" style={{ width: `${r.pct}%` }} />
               </div>
             </div>
           </div>

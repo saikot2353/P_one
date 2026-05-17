@@ -9,8 +9,110 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PersonnelListRouteImport } from './routes/personnel-list'
+import { Route as PersonnelApprovalRouteImport } from './routes/personnel-approval'
+import { Route as PendingManualAttendanceRouteImport } from './routes/pending-manual-attendance'
+import { Route as ManualAttendanceRouteImport } from './routes/manual-attendance'
+import { Route as LeaveListRouteImport } from './routes/leave-list'
+import { Route as LeaveApproveRouteImport } from './routes/leave-approve'
+import { Route as LeaveApplicationRouteImport } from './routes/leave-application'
+import { Route as KpiTaskNameRouteImport } from './routes/kpi-task-name'
+import { Route as KpiSettingRouteImport } from './routes/kpi-setting'
+import { Route as KpiAssessmentWorkflowRouteImport } from './routes/kpi-assessment-workflow'
+import { Route as EmployeeJobCardRouteImport } from './routes/employee-job-card'
+import { Route as EarnLeaveWorkflowRouteImport } from './routes/earn-leave-workflow'
+import { Route as EarnLeaveSubmitRouteImport } from './routes/earn-leave-submit'
+import { Route as EarnLeaveProcessRouteImport } from './routes/earn-leave-process'
+import { Route as CreateRosterRouteImport } from './routes/create-roster'
+import { Route as CompanyHolidayRouteImport } from './routes/company-holiday'
+import { Route as AddEmployeeRouteImport } from './routes/add-employee'
 import { Route as IndexRouteImport } from './routes/index'
 
+const PersonnelListRoute = PersonnelListRouteImport.update({
+  id: '/personnel-list',
+  path: '/personnel-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PersonnelApprovalRoute = PersonnelApprovalRouteImport.update({
+  id: '/personnel-approval',
+  path: '/personnel-approval',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PendingManualAttendanceRoute = PendingManualAttendanceRouteImport.update({
+  id: '/pending-manual-attendance',
+  path: '/pending-manual-attendance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManualAttendanceRoute = ManualAttendanceRouteImport.update({
+  id: '/manual-attendance',
+  path: '/manual-attendance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaveListRoute = LeaveListRouteImport.update({
+  id: '/leave-list',
+  path: '/leave-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaveApproveRoute = LeaveApproveRouteImport.update({
+  id: '/leave-approve',
+  path: '/leave-approve',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaveApplicationRoute = LeaveApplicationRouteImport.update({
+  id: '/leave-application',
+  path: '/leave-application',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KpiTaskNameRoute = KpiTaskNameRouteImport.update({
+  id: '/kpi-task-name',
+  path: '/kpi-task-name',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KpiSettingRoute = KpiSettingRouteImport.update({
+  id: '/kpi-setting',
+  path: '/kpi-setting',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KpiAssessmentWorkflowRoute = KpiAssessmentWorkflowRouteImport.update({
+  id: '/kpi-assessment-workflow',
+  path: '/kpi-assessment-workflow',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmployeeJobCardRoute = EmployeeJobCardRouteImport.update({
+  id: '/employee-job-card',
+  path: '/employee-job-card',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EarnLeaveWorkflowRoute = EarnLeaveWorkflowRouteImport.update({
+  id: '/earn-leave-workflow',
+  path: '/earn-leave-workflow',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EarnLeaveSubmitRoute = EarnLeaveSubmitRouteImport.update({
+  id: '/earn-leave-submit',
+  path: '/earn-leave-submit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EarnLeaveProcessRoute = EarnLeaveProcessRouteImport.update({
+  id: '/earn-leave-process',
+  path: '/earn-leave-process',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreateRosterRoute = CreateRosterRouteImport.update({
+  id: '/create-roster',
+  path: '/create-roster',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompanyHolidayRoute = CompanyHolidayRouteImport.update({
+  id: '/company-holiday',
+  path: '/company-holiday',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AddEmployeeRoute = AddEmployeeRouteImport.update({
+  id: '/add-employee',
+  path: '/add-employee',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +121,270 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/add-employee': typeof AddEmployeeRoute
+  '/company-holiday': typeof CompanyHolidayRoute
+  '/create-roster': typeof CreateRosterRoute
+  '/earn-leave-process': typeof EarnLeaveProcessRoute
+  '/earn-leave-submit': typeof EarnLeaveSubmitRoute
+  '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
+  '/employee-job-card': typeof EmployeeJobCardRoute
+  '/kpi-assessment-workflow': typeof KpiAssessmentWorkflowRoute
+  '/kpi-setting': typeof KpiSettingRoute
+  '/kpi-task-name': typeof KpiTaskNameRoute
+  '/leave-application': typeof LeaveApplicationRoute
+  '/leave-approve': typeof LeaveApproveRoute
+  '/leave-list': typeof LeaveListRoute
+  '/manual-attendance': typeof ManualAttendanceRoute
+  '/pending-manual-attendance': typeof PendingManualAttendanceRoute
+  '/personnel-approval': typeof PersonnelApprovalRoute
+  '/personnel-list': typeof PersonnelListRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/add-employee': typeof AddEmployeeRoute
+  '/company-holiday': typeof CompanyHolidayRoute
+  '/create-roster': typeof CreateRosterRoute
+  '/earn-leave-process': typeof EarnLeaveProcessRoute
+  '/earn-leave-submit': typeof EarnLeaveSubmitRoute
+  '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
+  '/employee-job-card': typeof EmployeeJobCardRoute
+  '/kpi-assessment-workflow': typeof KpiAssessmentWorkflowRoute
+  '/kpi-setting': typeof KpiSettingRoute
+  '/kpi-task-name': typeof KpiTaskNameRoute
+  '/leave-application': typeof LeaveApplicationRoute
+  '/leave-approve': typeof LeaveApproveRoute
+  '/leave-list': typeof LeaveListRoute
+  '/manual-attendance': typeof ManualAttendanceRoute
+  '/pending-manual-attendance': typeof PendingManualAttendanceRoute
+  '/personnel-approval': typeof PersonnelApprovalRoute
+  '/personnel-list': typeof PersonnelListRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/add-employee': typeof AddEmployeeRoute
+  '/company-holiday': typeof CompanyHolidayRoute
+  '/create-roster': typeof CreateRosterRoute
+  '/earn-leave-process': typeof EarnLeaveProcessRoute
+  '/earn-leave-submit': typeof EarnLeaveSubmitRoute
+  '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
+  '/employee-job-card': typeof EmployeeJobCardRoute
+  '/kpi-assessment-workflow': typeof KpiAssessmentWorkflowRoute
+  '/kpi-setting': typeof KpiSettingRoute
+  '/kpi-task-name': typeof KpiTaskNameRoute
+  '/leave-application': typeof LeaveApplicationRoute
+  '/leave-approve': typeof LeaveApproveRoute
+  '/leave-list': typeof LeaveListRoute
+  '/manual-attendance': typeof ManualAttendanceRoute
+  '/pending-manual-attendance': typeof PendingManualAttendanceRoute
+  '/personnel-approval': typeof PersonnelApprovalRoute
+  '/personnel-list': typeof PersonnelListRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/add-employee'
+    | '/company-holiday'
+    | '/create-roster'
+    | '/earn-leave-process'
+    | '/earn-leave-submit'
+    | '/earn-leave-workflow'
+    | '/employee-job-card'
+    | '/kpi-assessment-workflow'
+    | '/kpi-setting'
+    | '/kpi-task-name'
+    | '/leave-application'
+    | '/leave-approve'
+    | '/leave-list'
+    | '/manual-attendance'
+    | '/pending-manual-attendance'
+    | '/personnel-approval'
+    | '/personnel-list'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/add-employee'
+    | '/company-holiday'
+    | '/create-roster'
+    | '/earn-leave-process'
+    | '/earn-leave-submit'
+    | '/earn-leave-workflow'
+    | '/employee-job-card'
+    | '/kpi-assessment-workflow'
+    | '/kpi-setting'
+    | '/kpi-task-name'
+    | '/leave-application'
+    | '/leave-approve'
+    | '/leave-list'
+    | '/manual-attendance'
+    | '/pending-manual-attendance'
+    | '/personnel-approval'
+    | '/personnel-list'
+  id:
+    | '__root__'
+    | '/'
+    | '/add-employee'
+    | '/company-holiday'
+    | '/create-roster'
+    | '/earn-leave-process'
+    | '/earn-leave-submit'
+    | '/earn-leave-workflow'
+    | '/employee-job-card'
+    | '/kpi-assessment-workflow'
+    | '/kpi-setting'
+    | '/kpi-task-name'
+    | '/leave-application'
+    | '/leave-approve'
+    | '/leave-list'
+    | '/manual-attendance'
+    | '/pending-manual-attendance'
+    | '/personnel-approval'
+    | '/personnel-list'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AddEmployeeRoute: typeof AddEmployeeRoute
+  CompanyHolidayRoute: typeof CompanyHolidayRoute
+  CreateRosterRoute: typeof CreateRosterRoute
+  EarnLeaveProcessRoute: typeof EarnLeaveProcessRoute
+  EarnLeaveSubmitRoute: typeof EarnLeaveSubmitRoute
+  EarnLeaveWorkflowRoute: typeof EarnLeaveWorkflowRoute
+  EmployeeJobCardRoute: typeof EmployeeJobCardRoute
+  KpiAssessmentWorkflowRoute: typeof KpiAssessmentWorkflowRoute
+  KpiSettingRoute: typeof KpiSettingRoute
+  KpiTaskNameRoute: typeof KpiTaskNameRoute
+  LeaveApplicationRoute: typeof LeaveApplicationRoute
+  LeaveApproveRoute: typeof LeaveApproveRoute
+  LeaveListRoute: typeof LeaveListRoute
+  ManualAttendanceRoute: typeof ManualAttendanceRoute
+  PendingManualAttendanceRoute: typeof PendingManualAttendanceRoute
+  PersonnelApprovalRoute: typeof PersonnelApprovalRoute
+  PersonnelListRoute: typeof PersonnelListRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/personnel-list': {
+      id: '/personnel-list'
+      path: '/personnel-list'
+      fullPath: '/personnel-list'
+      preLoaderRoute: typeof PersonnelListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/personnel-approval': {
+      id: '/personnel-approval'
+      path: '/personnel-approval'
+      fullPath: '/personnel-approval'
+      preLoaderRoute: typeof PersonnelApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pending-manual-attendance': {
+      id: '/pending-manual-attendance'
+      path: '/pending-manual-attendance'
+      fullPath: '/pending-manual-attendance'
+      preLoaderRoute: typeof PendingManualAttendanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manual-attendance': {
+      id: '/manual-attendance'
+      path: '/manual-attendance'
+      fullPath: '/manual-attendance'
+      preLoaderRoute: typeof ManualAttendanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leave-list': {
+      id: '/leave-list'
+      path: '/leave-list'
+      fullPath: '/leave-list'
+      preLoaderRoute: typeof LeaveListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leave-approve': {
+      id: '/leave-approve'
+      path: '/leave-approve'
+      fullPath: '/leave-approve'
+      preLoaderRoute: typeof LeaveApproveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leave-application': {
+      id: '/leave-application'
+      path: '/leave-application'
+      fullPath: '/leave-application'
+      preLoaderRoute: typeof LeaveApplicationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kpi-task-name': {
+      id: '/kpi-task-name'
+      path: '/kpi-task-name'
+      fullPath: '/kpi-task-name'
+      preLoaderRoute: typeof KpiTaskNameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kpi-setting': {
+      id: '/kpi-setting'
+      path: '/kpi-setting'
+      fullPath: '/kpi-setting'
+      preLoaderRoute: typeof KpiSettingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kpi-assessment-workflow': {
+      id: '/kpi-assessment-workflow'
+      path: '/kpi-assessment-workflow'
+      fullPath: '/kpi-assessment-workflow'
+      preLoaderRoute: typeof KpiAssessmentWorkflowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/employee-job-card': {
+      id: '/employee-job-card'
+      path: '/employee-job-card'
+      fullPath: '/employee-job-card'
+      preLoaderRoute: typeof EmployeeJobCardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/earn-leave-workflow': {
+      id: '/earn-leave-workflow'
+      path: '/earn-leave-workflow'
+      fullPath: '/earn-leave-workflow'
+      preLoaderRoute: typeof EarnLeaveWorkflowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/earn-leave-submit': {
+      id: '/earn-leave-submit'
+      path: '/earn-leave-submit'
+      fullPath: '/earn-leave-submit'
+      preLoaderRoute: typeof EarnLeaveSubmitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/earn-leave-process': {
+      id: '/earn-leave-process'
+      path: '/earn-leave-process'
+      fullPath: '/earn-leave-process'
+      preLoaderRoute: typeof EarnLeaveProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/create-roster': {
+      id: '/create-roster'
+      path: '/create-roster'
+      fullPath: '/create-roster'
+      preLoaderRoute: typeof CreateRosterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/company-holiday': {
+      id: '/company-holiday'
+      path: '/company-holiday'
+      fullPath: '/company-holiday'
+      preLoaderRoute: typeof CompanyHolidayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/add-employee': {
+      id: '/add-employee'
+      path: '/add-employee'
+      fullPath: '/add-employee'
+      preLoaderRoute: typeof AddEmployeeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,7 +397,34 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AddEmployeeRoute: AddEmployeeRoute,
+  CompanyHolidayRoute: CompanyHolidayRoute,
+  CreateRosterRoute: CreateRosterRoute,
+  EarnLeaveProcessRoute: EarnLeaveProcessRoute,
+  EarnLeaveSubmitRoute: EarnLeaveSubmitRoute,
+  EarnLeaveWorkflowRoute: EarnLeaveWorkflowRoute,
+  EmployeeJobCardRoute: EmployeeJobCardRoute,
+  KpiAssessmentWorkflowRoute: KpiAssessmentWorkflowRoute,
+  KpiSettingRoute: KpiSettingRoute,
+  KpiTaskNameRoute: KpiTaskNameRoute,
+  LeaveApplicationRoute: LeaveApplicationRoute,
+  LeaveApproveRoute: LeaveApproveRoute,
+  LeaveListRoute: LeaveListRoute,
+  ManualAttendanceRoute: ManualAttendanceRoute,
+  PendingManualAttendanceRoute: PendingManualAttendanceRoute,
+  PersonnelApprovalRoute: PersonnelApprovalRoute,
+  PersonnelListRoute: PersonnelListRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
