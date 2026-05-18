@@ -413,6 +413,94 @@ function AddEmployeePage() {
     }
   };
 
+  const getTabCompletionPercentage = (tabId: string): number => {
+    switch (tabId) {
+      case "personal_identity": {
+        const fields = [
+          form.nameEng,
+          form.nameBng,
+          form.dob,
+          form.nid,
+          form.fatherNameEng,
+          form.motherNameEng,
+          form.personalContact,
+          form.personalEmail,
+          form.presVillageEng,
+          form.emergencyName,
+          form.emergencyContact,
+          form.ref1Name,
+          form.ref1Contact,
+        ];
+        const filled = fields.filter(Boolean).length;
+        return Math.round((filled / fields.length) * 100);
+      }
+      case "financial_employment": {
+        const fields = [
+          form.gross,
+          form.bankName,
+          form.bankAccount,
+          form.bankBranch,
+          form.routingNumber,
+          form.paymentMode,
+          form.jobDescription,
+          form.keyDeliverables,
+          form.reportingLine,
+        ];
+        const filled = fields.filter(Boolean).length;
+        return Math.round((filled / fields.length) * 100);
+      }
+      case "career_qualifications": {
+        let score = 0;
+        if (educationList.length > 0) score += 40;
+        if (experienceList.length > 0) score += 30;
+        if (certifications.length > 0) score += 15;
+        if (trainingList.length > 0) score += 15;
+        return Math.min(100, score);
+      }
+      case "family_dependents": {
+        const nomineeFields = [
+          form.nomineeName,
+          form.nomineeRelation,
+          form.nomineeNid,
+          form.nomineeContact,
+          form.nomineeShare,
+          form.nomineeAddress,
+        ];
+        const nomineeFilled = nomineeFields.filter(Boolean).length;
+        const nomineeScore = Math.round((nomineeFilled / nomineeFields.length) * 70);
+        const dependentScore = dependents.length > 0 ? 30 : 0;
+        return Math.min(100, nomineeScore + dependentScore);
+      }
+      case "verification_documents": {
+        const verFields = [
+          form.verifiedBy,
+          form.verificationNotes,
+          form.verificationDate,
+        ];
+        const verFilled = verFields.filter(Boolean).length;
+        const verScore = Math.round((verFilled / verFields.length) * 30);
+        
+        const scanFields = [
+          form.picture,
+          form.signature,
+          form.nidScan,
+          form.certificateScan,
+        ];
+        const scanFilled = scanFields.filter(Boolean).length;
+        const scanScore = Math.round((scanFilled / scanFields.length) * 40);
+        
+        const otherScore = otherDocs.length > 0 ? 30 : 0;
+        return Math.min(100, verScore + scanScore + otherScore);
+      }
+      default:
+        return 0;
+    }
+  };
+
+  const overallPercentage = Math.round(
+    TABS.reduce((acc, tab) => acc + getTabCompletionPercentage(tab.id), 0) / TABS.length
+  );
+
   const ActiveIcon = TABS.find(t => t.id === activeTab)?.icon || User;
 
   return (
@@ -457,11 +545,29 @@ function AddEmployeePage() {
               <div className="px-3 py-2 text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/50 border-b border-border/20 mb-1.5 sticky top-0 bg-card z-10">
                 Form Directories
               </div>
+
+              {/* Overall Form Completion Progress Widget */}
+              <div className="p-3 bg-muted/20 border border-border/40 rounded-xl mb-4 space-y-2">
+                <div className="flex items-center justify-between text-[10px] font-black uppercase text-foreground tracking-wider">
+                  <span>Profile Completion</span>
+                  <span className="text-primary font-black text-xs">{overallPercentage}%</span>
+                </div>
+                <div className="h-2 w-full bg-muted border border-border/20 rounded-full overflow-hidden relative">
+                  <div 
+                    className="h-full bg-gradient-to-r from-primary to-primary-glow transition-all duration-500 rounded-full" 
+                    style={{ width: `${overallPercentage}%` }} 
+                  />
+                </div>
+                <p className="text-[9px] text-muted-foreground/80 leading-relaxed">
+                  Fill in the required fields to complete the employee profile.
+                </p>
+              </div>
               
               {TABS.map((tab, idx) => {
                 const TabIcon = tab.icon;
                 const completed = isTabCompleted(tab.id);
                 const isActive = activeTab === tab.id;
+                const percentage = getTabCompletionPercentage(tab.id);
                 
                 return (
                   <button
@@ -481,9 +587,22 @@ function AddEmployeePage() {
                       <TabIcon className="size-4 shrink-0" />
                       <span className="truncate">{idx + 1}. {tab.label}</span>
                     </div>
-                    {completed && (
-                      <Check className={`size-3.5 shrink-0 ${isActive ? "text-primary-foreground" : "text-emerald-500 stroke-[3]"}`} />
-                    )}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-md ${
+                        isActive 
+                          ? "bg-primary-foreground/15 text-primary-foreground" 
+                          : percentage === 100 
+                            ? "bg-emerald-500/10 text-emerald-500" 
+                            : percentage > 40 
+                              ? "bg-amber-500/10 text-amber-500" 
+                              : "bg-rose-500/10 text-rose-500"
+                      }`}>
+                        {percentage}%
+                      </span>
+                      {completed && (
+                        <Check className={`size-3.5 shrink-0 ${isActive ? "text-primary-foreground" : "text-emerald-500 stroke-[3]"}`} />
+                      )}
+                    </div>
                   </button>
                 );
               })}
@@ -562,7 +681,7 @@ function AddEmployeePage() {
                           <User className="size-4.5 text-primary" />
                           Personal & Identity Registry
                         </h2>
-                        <p className="text-[11px] text-muted-foreground mt-0.5">Please complete all 6 subsections of this profile directory dossier.</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">Please fill in all 6 steps to complete the profile.</p>
                       </div>
                       
                       {/* Sub-step indicator pill */}
@@ -3521,7 +3640,7 @@ function AddEmployeePage() {
             </div>
             <div className="space-y-1">
               <h2 className="text-base font-extrabold text-foreground leading-tight">Digital Profile Created!</h2>
-              <p className="text-xs text-muted-foreground">The employee dossier has been successfully committed to the database.</p>
+              <p className="text-xs text-muted-foreground">The employee profile has been successfully saved to the database.</p>
             </div>
 
             <div className="w-full bg-muted/20 border border-border/30 rounded-xl p-4.5 text-left text-xs space-y-2">
