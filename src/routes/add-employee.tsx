@@ -192,10 +192,10 @@ function AddEmployeePage() {
 
   // Dynamic lists for multi-value tabs
   const [educationList, setEducationList] = useState<any[]>([
-    { degree: "Bachelor of Science (B.Sc)", institute: "IIT University of Dhaka", passingYear: "2022", resultGpa: "3.85" }
+    { degree: "Bachelor of Science (B.Sc)", institute: "IIT University of Dhaka", passingYear: "2022", resultGpa: "3.85", attachment: "" }
   ]);
   const [experienceList, setExperienceList] = useState<any[]>([
-    { company: "Pakiza Software Limited", designation: "Software Engineer", fromDate: "2023-01-01", toDate: "2025-02-28", leavingReason: "Career Growth" }
+    { company: "Pakiza Software Limited", designation: "Software Engineer", fromDate: "2023-01-01", toDate: "2025-02-28", leavingReason: "Career Growth", attachment: "" }
   ]);
   const [certifications, setCertifications] = useState<any[]>([
     { certificateName: "AWS Certified Solutions Architect", organization: "Amazon Web Services", issueDate: "2024-06-15", expiryDate: "2027-06-15", credentialId: "AWS-102938" }
@@ -223,14 +223,23 @@ function AddEmployeePage() {
     setEducationList(prev => prev.map((item, i) => i === index ? { ...item, [field]: value } : item));
   };
   const addEduRow = () => {
-    setEducationList(prev => [...prev, { degree: "Bachelor of Science (B.Sc)", institute: "", passingYear: "", resultGpa: "" }]);
+    setEducationList(prev => [...prev, { degree: "Bachelor of Science (B.Sc)", institute: "", passingYear: "", resultGpa: "", attachment: "" }]);
   };
 
   const handleExpChange = (index: number, field: string, value: string) => {
     setExperienceList(prev => prev.map((item, i) => i === index ? { ...item, [field]: value } : item));
   };
   const addExpRow = () => {
-    setExperienceList(prev => [...prev, { company: "", designation: "", fromDate: "", toDate: "", leavingReason: "" }]);
+    setExperienceList(prev => [...prev, { company: "", designation: "", fromDate: "", toDate: "", leavingReason: "", attachment: "" }]);
+  };
+
+  const triggerRowMockUpload = (listType: "education" | "experience", index: number) => {
+    const mockFileName = `uploaded_${listType}_scan_${index + 1}.pdf`;
+    if (listType === "education") {
+      setEducationList(prev => prev.map((item, i) => i === index ? { ...item, attachment: mockFileName } : item));
+    } else {
+      setExperienceList(prev => prev.map((item, i) => i === index ? { ...item, attachment: mockFileName } : item));
+    }
   };
 
   const handleCertChange = (index: number, field: string, value: string) => {
@@ -501,6 +510,74 @@ function AddEmployeePage() {
     TABS.reduce((acc, tab) => acc + getTabCompletionPercentage(tab.id), 0) / TABS.length
   );
 
+  const getSubSectionCompletionPercentage = (subId: string): number => {
+    switch (subId) {
+      case "primary_placement": {
+        const fields = [
+          form.nameEng,
+          form.nameBng,
+          form.dob,
+          form.gender,
+          form.religion,
+          form.blood,
+          form.maritalStatus,
+          form.education,
+        ];
+        const filled = fields.filter(Boolean).length;
+        return Math.round((filled / fields.length) * 100);
+      }
+      case "legal_kinship": {
+        const fields = [
+          form.nid,
+          form.fatherNameEng,
+          form.motherNameEng,
+        ];
+        const filled = fields.filter(Boolean).length;
+        return Math.round((filled / fields.length) * 100);
+      }
+      case "address_contact": {
+        const fields = [
+          form.personalContact,
+          form.personalEmail,
+          form.presVillageEng,
+          form.presUpazila,
+          form.presDistrict,
+        ];
+        const filled = fields.filter(Boolean).length;
+        return Math.round((filled / fields.length) * 100);
+      }
+      case "picture_uploads": {
+        const fields = [
+          form.picture,
+          form.signature,
+          form.nidScan,
+        ];
+        const filled = fields.filter(Boolean).length;
+        return Math.round((filled / fields.length) * 100);
+      }
+      case "emergency_contact": {
+        const fields = [
+          form.emergencyName,
+          form.emergencyRelation,
+          form.emergencyContact,
+          form.emergencyAddress,
+        ];
+        const filled = fields.filter(Boolean).length;
+        return Math.round((filled / fields.length) * 100);
+      }
+      case "references": {
+        const fields = [
+          form.ref1Name,
+          form.ref1Contact,
+        ];
+        const filled = fields.filter(Boolean).length;
+        return Math.round((filled / fields.length) * 100);
+      }
+      default:
+        return 0;
+    }
+  };
+
   const ActiveIcon = TABS.find(t => t.id === activeTab)?.icon || User;
 
   return (
@@ -617,90 +694,31 @@ function AddEmployeePage() {
 
             {/* Core Form Card Section */}
             <div className="lg:col-span-3 bg-card border border-border/80 rounded-2xl p-6 md:p-8 shadow-xs min-h-[600px] flex flex-col gap-6">
-              
-              {/* Premium Top Navigation Dropdown (Active on both desktop and mobile for easy rapid jumping!) */}
-              <div className="relative">
-                <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/60 block mb-1.5">Quick Directory Switcher</label>
-                <button
-                  type="button"
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-border bg-muted/20 hover:bg-muted/40 text-xs font-bold text-foreground transition-all duration-200"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <ActiveIcon className="size-4.5 text-primary" />
-                    <span className="text-sm font-extrabold">{TABS.find(t => t.id === activeTab)?.label}</span>
-                  </div>
-                  <ChevronDown className="size-4 text-muted-foreground/60 transition-transform duration-200" style={{ transform: isDropdownOpen ? 'rotate(180deg)' : 'none' }} />
-                </button>
-                
-                {isDropdownOpen && (
-                  <>
-                    <div className="fixed inset-0 z-30" onClick={() => setIsDropdownOpen(false)} />
-                    <div className="absolute left-0 right-0 mt-1.5 rounded-2xl bg-card border border-border shadow-xl py-2 z-40 max-h-72 overflow-y-auto pr-1 animate-in fade-in slide-in-from-top-1 duration-150 scrollbar-thin">
-                      {TABS.map((tab, idx) => {
-                        const TabIcon = tab.icon;
-                        const isSelected = activeTab === tab.id;
-                        return (
-                          <button
-                            key={tab.id}
-                            type="button"
-                            onClick={() => {
-                              setActiveTab(tab.id);
-                              setIsDropdownOpen(false);
-                            }}
-                            className={`w-full flex items-center justify-between px-4.5 py-2.5 hover:bg-muted/75 text-left text-xs font-semibold transition-all ${
-                              isSelected
-                                ? "text-primary bg-primary/5 font-extrabold"
-                                : "text-foreground/80"
-                            }`}
-                          >
-                            <div className="flex items-center gap-3">
-                              <TabIcon className={`size-4.5 ${isSelected ? "text-primary animate-pulse" : "text-muted-foreground/60"}`} />
-                              <span>{idx + 1}. {tab.label}</span>
-                            </div>
-                            {isSelected && <Check className="size-4 text-primary stroke-[3]" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </>
-                )}
-              </div>
-
-              <div className="border-b border-border/20 w-full" />
 
               {/* TAB 1: PERSONAL & IDENTITY (CONSOLIDATED) */}
               {activeTab === "personal_identity" && (
                 <div className="space-y-6 animate-in fade-in duration-200 text-foreground">
                   
-                  {/* Premium Multi-step Wizard Sub-navigation */}
-                  <div className="bg-card border border-border/60 rounded-2xl p-4 shadow-sm">
-                    <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
-                      <div>
-                        <h2 className="text-sm font-extrabold text-foreground uppercase tracking-wider flex items-center gap-2">
-                          <User className="size-4.5 text-primary" />
-                          Personal & Identity Registry
-                        </h2>
-                        <p className="text-[11px] text-muted-foreground mt-0.5">Please fill in all 6 steps to complete the profile.</p>
-                      </div>
+                  {/* Premium, High-fidelity Progress Stepper Timeline */}
+                  <div className="bg-card border border-border/60 rounded-2xl p-5 shadow-xs overflow-x-auto scrollbar-thin">
+                    <div className="min-w-[650px] relative flex items-center justify-between px-6 py-3">
                       
-                      {/* Sub-step indicator pill */}
-                      <span className="text-[10px] font-extrabold bg-primary/10 text-primary border border-primary/20 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                        Step {subSection === "primary_placement" ? "1" : subSection === "legal_kinship" ? "2" : subSection === "address_contact" ? "3" : subSection === "picture_uploads" ? "4" : subSection === "emergency_contact" ? "5" : "6"} of 6
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 mt-4">
+                      {/* Horizontal connecting track line behind the dots */}
+                      <div className="absolute top-[26px] left-[55px] right-[55px] h-[3px] bg-muted/60 border-t border-b border-border/20 z-0" />
+                      
                       {[
-                        { id: "primary_placement", label: "1. Placement", icon: User, desc: "Personal & Job" },
-                        { id: "legal_kinship", label: "2. Kinship & ID", icon: Users, desc: "NID & Family" },
-                        { id: "address_contact", label: "3. Address & Contact", icon: MapPin, desc: "Reachability" },
-                        { id: "picture_uploads", label: "4. Upload Scans", icon: Camera, desc: "Portraits & NID" },
-                        { id: "emergency_contact", label: "5. Emergency", icon: PhoneCall, desc: "Alternate Reach" },
-                        { id: "references", label: "6. References", icon: Heart, desc: "Referee details" },
-                      ].map((step, index) => {
+                        { id: "primary_placement", label: "Placement", icon: User, desc: "Personal & Job" },
+                        { id: "legal_kinship", label: "Kinship", icon: Users, desc: "NID & Family" },
+                        { id: "address_contact", label: "Contact", icon: MapPin, desc: "Reachability" },
+                        { id: "picture_uploads", label: "Scans", icon: Camera, desc: "Portraits & NID" },
+                        { id: "emergency_contact", label: "Emergency", icon: PhoneCall, desc: "Alternate Reach" },
+                        { id: "references", label: "References", icon: Heart, desc: "Referee details" },
+                      ].map((step, idx) => {
                         const StepIcon = step.icon;
                         const isSelected = subSection === step.id;
+                        const subPercentage = getSubSectionCompletionPercentage(step.id);
+                        const isCompleted = subPercentage === 100;
+                        
                         return (
                           <button
                             key={step.id}
@@ -709,20 +727,49 @@ function AddEmployeePage() {
                               setSubSection(step.id);
                               window.scrollTo({ top: 0, behavior: 'smooth' });
                             }}
-                            className={`flex flex-col items-start p-3 rounded-xl border text-left transition-all duration-300 relative overflow-hidden group ${
-                              isSelected
-                                ? "border-primary bg-primary/5 text-primary shadow-xs"
-                                : "border-border/60 bg-muted/10 hover:bg-muted text-muted-foreground hover:text-foreground"
-                            }`}
+                            className="relative z-10 flex flex-col items-center gap-2 group transition-all duration-300 focus:outline-none shrink-0"
+                            style={{ width: "90px" }}
                           >
-                            {isSelected && (
-                              <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-primary to-primary-glow" />
-                            )}
-                            <div className="flex items-center gap-2 mb-1 w-full">
-                              <StepIcon className={`size-4 group-hover:scale-110 transition duration-200 ${isSelected ? "text-primary" : "text-muted-foreground/60"}`} />
-                              <span className="text-[10px] font-extrabold uppercase tracking-wide truncate">{step.label}</span>
+                            {/* Circle Stepper Dot/Bubble */}
+                            <div className={`size-[42px] rounded-full flex items-center justify-center border-2 transition-all duration-300 relative ${
+                              isSelected
+                                ? "bg-primary text-primary-foreground border-primary shadow-[0_0_15px_var(--primary)] scale-110"
+                                : isCompleted
+                                  ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.2)]"
+                                  : "bg-card text-muted-foreground border-border/80 hover:border-muted-foreground/60"
+                            }`}>
+                              {isCompleted ? (
+                                <Check className="size-[18px] stroke-[3]" />
+                              ) : (
+                                <StepIcon className="size-[17px]" />
+                              )}
+                              
+                              {/* Pulsing neon highlight around active bubble */}
+                              {isSelected && (
+                                <div className="absolute inset-[-4px] rounded-full border-2 border-primary/40 animate-ping opacity-60 pointer-events-none" />
+                              )}
                             </div>
-                            <span className="text-[9px] text-muted-foreground/80 truncate font-medium max-w-full">{step.desc}</span>
+                            
+                            {/* Text labels and percentages */}
+                            <div className="text-center space-y-1.5 w-full min-w-[120px]">
+                              <span className={`text-[10px] font-black uppercase tracking-wider block transition-colors duration-200 ${
+                                isSelected ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                              }`}>
+                                {idx + 1}. {step.label}
+                              </span>
+                              
+                              <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full inline-block transition-all duration-200 ${
+                                isSelected
+                                  ? "bg-primary/10 text-primary border border-primary/20"
+                                  : isCompleted
+                                    ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/10"
+                                    : subPercentage > 0
+                                      ? "bg-amber-500/10 text-amber-600 border border-amber-500/10"
+                                      : "bg-rose-500/10 text-rose-600 border border-rose-500/10"
+                              }`}>
+                                {subPercentage}%
+                              </span>
+                            </div>
                           </button>
                         );
                       })}
@@ -2491,8 +2538,9 @@ function AddEmployeePage() {
                         <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
                           <th className="px-4 py-3 min-w-[200px]">Degree / Exam Title</th>
                           <th className="px-4 py-3">Institution Name</th>
-                          <th className="px-4 py-3 w-[120px] text-center">Passing Year</th>
-                          <th className="px-4 py-3 w-[120px] text-center">Result / GPA</th>
+                          <th className="px-4 py-3 w-[100px] text-center">Passing Year</th>
+                          <th className="px-4 py-3 w-[100px] text-center">Result / GPA</th>
+                          <th className="px-4 py-3 w-[170px] text-center">Attachment (Optional)</th>
                           <th className="px-4 py-3 w-[60px] text-right">Action</th>
                         </tr>
                       </thead>
@@ -2540,6 +2588,29 @@ function AddEmployeePage() {
                                 placeholder="e.g. 3.85"
                               />
                             </td>
+                            <td className="px-4 py-2 text-center">
+                              {edu.attachment ? (
+                                <div className="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg gap-1.5 max-w-[150px] mx-auto animate-in fade-in duration-200">
+                                  <span className="text-[10px] font-mono font-bold text-emerald-600 truncate">{edu.attachment}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEduChange(index, "attachment", "")}
+                                    className="text-rose-500 hover:text-rose-600 font-black text-[10px] shrink-0"
+                                    title="Remove certificate attachment"
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => triggerRowMockUpload("education", index)}
+                                  className="h-7 px-2.5 rounded-lg border border-dashed border-primary/30 hover:border-primary hover:bg-primary/5 text-primary text-[10px] font-bold flex items-center justify-center gap-1 mx-auto transition duration-200"
+                                >
+                                  <Upload className="size-3 text-primary/75" /> Upload File
+                                </button>
+                              )}
+                            </td>
                             <td className="px-4 py-2 text-right">
                               <button
                                 type="button"
@@ -2553,7 +2624,7 @@ function AddEmployeePage() {
                         ))}
                         {educationList.length === 0 && (
                           <tr>
-                            <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground text-xs italic">
+                            <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground text-xs italic">
                               No academic credentials logged yet. Click the button below to add your first qualification.
                             </td>
                           </tr>
@@ -2592,9 +2663,10 @@ function AddEmployeePage() {
                         <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
                           <th className="px-4 py-3">Organization / Company</th>
                           <th className="px-4 py-3">Designation</th>
-                          <th className="px-4 py-3 w-[150px] text-center">From Date</th>
-                          <th className="px-4 py-3 w-[150px] text-center">To Date</th>
+                          <th className="px-4 py-3 w-[120px] text-center">From Date</th>
+                          <th className="px-4 py-3 w-[120px] text-center">To Date</th>
                           <th className="px-4 py-3">Reason for Leaving</th>
+                          <th className="px-4 py-3 w-[170px] text-center">Attachment (Optional)</th>
                           <th className="px-4 py-3 w-[60px] text-right">Action</th>
                         </tr>
                       </thead>
@@ -2644,6 +2716,29 @@ function AddEmployeePage() {
                                 placeholder="e.g. Career Growth"
                               />
                             </td>
+                            <td className="px-4 py-2 text-center">
+                              {exp.attachment ? (
+                                <div className="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg gap-1.5 max-w-[150px] mx-auto animate-in fade-in duration-200">
+                                  <span className="text-[10px] font-mono font-bold text-emerald-600 truncate">{exp.attachment}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleExpChange(index, "attachment", "")}
+                                    className="text-rose-500 hover:text-rose-600 font-black text-[10px] shrink-0"
+                                    title="Remove experience attachment"
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => triggerRowMockUpload("experience", index)}
+                                  className="h-7 px-2.5 rounded-lg border border-dashed border-primary/30 hover:border-primary hover:bg-primary/5 text-primary text-[10px] font-bold flex items-center justify-center gap-1 mx-auto transition duration-200"
+                                >
+                                  <Upload className="size-3 text-primary/75" /> Upload File
+                                </button>
+                              )}
+                            </td>
                             <td className="px-4 py-2 text-right">
                               <button
                                 type="button"
@@ -2657,7 +2752,7 @@ function AddEmployeePage() {
                         ))}
                         {experienceList.length === 0 && (
                           <tr>
-                            <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground text-xs italic">
+                            <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground text-xs italic">
                               No prior work experience logged. Click the button below to add your first job history.
                             </td>
                           </tr>
