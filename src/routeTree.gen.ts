@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProposeIncrementRouteImport } from './routes/propose-increment'
 import { Route as PersonnelListRouteImport } from './routes/personnel-list'
 import { Route as PersonnelApprovalRouteImport } from './routes/personnel-approval'
 import { Route as PendingManualAttendanceRouteImport } from './routes/pending-manual-attendance'
@@ -19,15 +20,32 @@ import { Route as LeaveApplicationRouteImport } from './routes/leave-application
 import { Route as KpiTaskNameRouteImport } from './routes/kpi-task-name'
 import { Route as KpiSettingRouteImport } from './routes/kpi-setting'
 import { Route as KpiAssessmentWorkflowRouteImport } from './routes/kpi-assessment-workflow'
+import { Route as IncrementSummaryRouteImport } from './routes/increment-summary'
+import { Route as IncrementReportRouteImport } from './routes/increment-report'
+import { Route as IncrementQueuelistRouteImport } from './routes/increment-queuelist'
+import { Route as IncrementMultipleRouteImport } from './routes/increment-multiple'
+import { Route as IncrementListRouteImport } from './routes/increment-list'
+import { Route as IncrementHistoryRouteImport } from './routes/increment-history'
+import { Route as IncrementGadgetRouteImport } from './routes/increment-gadget'
+import { Route as IncrementRouteImport } from './routes/increment'
+import { Route as FinalApproveIncrementRouteImport } from './routes/final-approve-increment'
+import { Route as EvaluationProposeRouteImport } from './routes/evaluation-propose'
 import { Route as EmployeeJobCardRouteImport } from './routes/employee-job-card'
 import { Route as EarnLeaveWorkflowRouteImport } from './routes/earn-leave-workflow'
 import { Route as EarnLeaveSubmitRouteImport } from './routes/earn-leave-submit'
 import { Route as EarnLeaveProcessRouteImport } from './routes/earn-leave-process'
 import { Route as CreateRosterRouteImport } from './routes/create-roster'
 import { Route as CompanyHolidayRouteImport } from './routes/company-holiday'
+import { Route as ApproveIncrementHrRouteImport } from './routes/approve-increment-hr'
+import { Route as ApproveIncrementGadgetRouteImport } from './routes/approve-increment-gadget'
 import { Route as AddEmployeeRouteImport } from './routes/add-employee'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ProposeIncrementRoute = ProposeIncrementRouteImport.update({
+  id: '/propose-increment',
+  path: '/propose-increment',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PersonnelListRoute = PersonnelListRouteImport.update({
   id: '/personnel-list',
   path: '/personnel-list',
@@ -78,6 +96,56 @@ const KpiAssessmentWorkflowRoute = KpiAssessmentWorkflowRouteImport.update({
   path: '/kpi-assessment-workflow',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IncrementSummaryRoute = IncrementSummaryRouteImport.update({
+  id: '/increment-summary',
+  path: '/increment-summary',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IncrementReportRoute = IncrementReportRouteImport.update({
+  id: '/increment-report',
+  path: '/increment-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IncrementQueuelistRoute = IncrementQueuelistRouteImport.update({
+  id: '/increment-queuelist',
+  path: '/increment-queuelist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IncrementMultipleRoute = IncrementMultipleRouteImport.update({
+  id: '/increment-multiple',
+  path: '/increment-multiple',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IncrementListRoute = IncrementListRouteImport.update({
+  id: '/increment-list',
+  path: '/increment-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IncrementHistoryRoute = IncrementHistoryRouteImport.update({
+  id: '/increment-history',
+  path: '/increment-history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IncrementGadgetRoute = IncrementGadgetRouteImport.update({
+  id: '/increment-gadget',
+  path: '/increment-gadget',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IncrementRoute = IncrementRouteImport.update({
+  id: '/increment',
+  path: '/increment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FinalApproveIncrementRoute = FinalApproveIncrementRouteImport.update({
+  id: '/final-approve-increment',
+  path: '/final-approve-increment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EvaluationProposeRoute = EvaluationProposeRouteImport.update({
+  id: '/evaluation-propose',
+  path: '/evaluation-propose',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmployeeJobCardRoute = EmployeeJobCardRouteImport.update({
   id: '/employee-job-card',
   path: '/employee-job-card',
@@ -108,6 +176,16 @@ const CompanyHolidayRoute = CompanyHolidayRouteImport.update({
   path: '/company-holiday',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApproveIncrementHrRoute = ApproveIncrementHrRouteImport.update({
+  id: '/approve-increment-hr',
+  path: '/approve-increment-hr',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApproveIncrementGadgetRoute = ApproveIncrementGadgetRouteImport.update({
+  id: '/approve-increment-gadget',
+  path: '/approve-increment-gadget',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AddEmployeeRoute = AddEmployeeRouteImport.update({
   id: '/add-employee',
   path: '/add-employee',
@@ -122,12 +200,24 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/add-employee': typeof AddEmployeeRoute
+  '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
+  '/approve-increment-hr': typeof ApproveIncrementHrRoute
   '/company-holiday': typeof CompanyHolidayRoute
   '/create-roster': typeof CreateRosterRoute
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
+  '/evaluation-propose': typeof EvaluationProposeRoute
+  '/final-approve-increment': typeof FinalApproveIncrementRoute
+  '/increment': typeof IncrementRoute
+  '/increment-gadget': typeof IncrementGadgetRoute
+  '/increment-history': typeof IncrementHistoryRoute
+  '/increment-list': typeof IncrementListRoute
+  '/increment-multiple': typeof IncrementMultipleRoute
+  '/increment-queuelist': typeof IncrementQueuelistRoute
+  '/increment-report': typeof IncrementReportRoute
+  '/increment-summary': typeof IncrementSummaryRoute
   '/kpi-assessment-workflow': typeof KpiAssessmentWorkflowRoute
   '/kpi-setting': typeof KpiSettingRoute
   '/kpi-task-name': typeof KpiTaskNameRoute
@@ -138,16 +228,29 @@ export interface FileRoutesByFullPath {
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
   '/personnel-list': typeof PersonnelListRoute
+  '/propose-increment': typeof ProposeIncrementRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/add-employee': typeof AddEmployeeRoute
+  '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
+  '/approve-increment-hr': typeof ApproveIncrementHrRoute
   '/company-holiday': typeof CompanyHolidayRoute
   '/create-roster': typeof CreateRosterRoute
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
+  '/evaluation-propose': typeof EvaluationProposeRoute
+  '/final-approve-increment': typeof FinalApproveIncrementRoute
+  '/increment': typeof IncrementRoute
+  '/increment-gadget': typeof IncrementGadgetRoute
+  '/increment-history': typeof IncrementHistoryRoute
+  '/increment-list': typeof IncrementListRoute
+  '/increment-multiple': typeof IncrementMultipleRoute
+  '/increment-queuelist': typeof IncrementQueuelistRoute
+  '/increment-report': typeof IncrementReportRoute
+  '/increment-summary': typeof IncrementSummaryRoute
   '/kpi-assessment-workflow': typeof KpiAssessmentWorkflowRoute
   '/kpi-setting': typeof KpiSettingRoute
   '/kpi-task-name': typeof KpiTaskNameRoute
@@ -158,17 +261,30 @@ export interface FileRoutesByTo {
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
   '/personnel-list': typeof PersonnelListRoute
+  '/propose-increment': typeof ProposeIncrementRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/add-employee': typeof AddEmployeeRoute
+  '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
+  '/approve-increment-hr': typeof ApproveIncrementHrRoute
   '/company-holiday': typeof CompanyHolidayRoute
   '/create-roster': typeof CreateRosterRoute
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
+  '/evaluation-propose': typeof EvaluationProposeRoute
+  '/final-approve-increment': typeof FinalApproveIncrementRoute
+  '/increment': typeof IncrementRoute
+  '/increment-gadget': typeof IncrementGadgetRoute
+  '/increment-history': typeof IncrementHistoryRoute
+  '/increment-list': typeof IncrementListRoute
+  '/increment-multiple': typeof IncrementMultipleRoute
+  '/increment-queuelist': typeof IncrementQueuelistRoute
+  '/increment-report': typeof IncrementReportRoute
+  '/increment-summary': typeof IncrementSummaryRoute
   '/kpi-assessment-workflow': typeof KpiAssessmentWorkflowRoute
   '/kpi-setting': typeof KpiSettingRoute
   '/kpi-task-name': typeof KpiTaskNameRoute
@@ -179,18 +295,31 @@ export interface FileRoutesById {
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
   '/personnel-list': typeof PersonnelListRoute
+  '/propose-increment': typeof ProposeIncrementRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/add-employee'
+    | '/approve-increment-gadget'
+    | '/approve-increment-hr'
     | '/company-holiday'
     | '/create-roster'
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
     | '/employee-job-card'
+    | '/evaluation-propose'
+    | '/final-approve-increment'
+    | '/increment'
+    | '/increment-gadget'
+    | '/increment-history'
+    | '/increment-list'
+    | '/increment-multiple'
+    | '/increment-queuelist'
+    | '/increment-report'
+    | '/increment-summary'
     | '/kpi-assessment-workflow'
     | '/kpi-setting'
     | '/kpi-task-name'
@@ -201,16 +330,29 @@ export interface FileRouteTypes {
     | '/pending-manual-attendance'
     | '/personnel-approval'
     | '/personnel-list'
+    | '/propose-increment'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/add-employee'
+    | '/approve-increment-gadget'
+    | '/approve-increment-hr'
     | '/company-holiday'
     | '/create-roster'
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
     | '/employee-job-card'
+    | '/evaluation-propose'
+    | '/final-approve-increment'
+    | '/increment'
+    | '/increment-gadget'
+    | '/increment-history'
+    | '/increment-list'
+    | '/increment-multiple'
+    | '/increment-queuelist'
+    | '/increment-report'
+    | '/increment-summary'
     | '/kpi-assessment-workflow'
     | '/kpi-setting'
     | '/kpi-task-name'
@@ -221,16 +363,29 @@ export interface FileRouteTypes {
     | '/pending-manual-attendance'
     | '/personnel-approval'
     | '/personnel-list'
+    | '/propose-increment'
   id:
     | '__root__'
     | '/'
     | '/add-employee'
+    | '/approve-increment-gadget'
+    | '/approve-increment-hr'
     | '/company-holiday'
     | '/create-roster'
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
     | '/employee-job-card'
+    | '/evaluation-propose'
+    | '/final-approve-increment'
+    | '/increment'
+    | '/increment-gadget'
+    | '/increment-history'
+    | '/increment-list'
+    | '/increment-multiple'
+    | '/increment-queuelist'
+    | '/increment-report'
+    | '/increment-summary'
     | '/kpi-assessment-workflow'
     | '/kpi-setting'
     | '/kpi-task-name'
@@ -241,17 +396,30 @@ export interface FileRouteTypes {
     | '/pending-manual-attendance'
     | '/personnel-approval'
     | '/personnel-list'
+    | '/propose-increment'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AddEmployeeRoute: typeof AddEmployeeRoute
+  ApproveIncrementGadgetRoute: typeof ApproveIncrementGadgetRoute
+  ApproveIncrementHrRoute: typeof ApproveIncrementHrRoute
   CompanyHolidayRoute: typeof CompanyHolidayRoute
   CreateRosterRoute: typeof CreateRosterRoute
   EarnLeaveProcessRoute: typeof EarnLeaveProcessRoute
   EarnLeaveSubmitRoute: typeof EarnLeaveSubmitRoute
   EarnLeaveWorkflowRoute: typeof EarnLeaveWorkflowRoute
   EmployeeJobCardRoute: typeof EmployeeJobCardRoute
+  EvaluationProposeRoute: typeof EvaluationProposeRoute
+  FinalApproveIncrementRoute: typeof FinalApproveIncrementRoute
+  IncrementRoute: typeof IncrementRoute
+  IncrementGadgetRoute: typeof IncrementGadgetRoute
+  IncrementHistoryRoute: typeof IncrementHistoryRoute
+  IncrementListRoute: typeof IncrementListRoute
+  IncrementMultipleRoute: typeof IncrementMultipleRoute
+  IncrementQueuelistRoute: typeof IncrementQueuelistRoute
+  IncrementReportRoute: typeof IncrementReportRoute
+  IncrementSummaryRoute: typeof IncrementSummaryRoute
   KpiAssessmentWorkflowRoute: typeof KpiAssessmentWorkflowRoute
   KpiSettingRoute: typeof KpiSettingRoute
   KpiTaskNameRoute: typeof KpiTaskNameRoute
@@ -262,10 +430,18 @@ export interface RootRouteChildren {
   PendingManualAttendanceRoute: typeof PendingManualAttendanceRoute
   PersonnelApprovalRoute: typeof PersonnelApprovalRoute
   PersonnelListRoute: typeof PersonnelListRoute
+  ProposeIncrementRoute: typeof ProposeIncrementRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/propose-increment': {
+      id: '/propose-increment'
+      path: '/propose-increment'
+      fullPath: '/propose-increment'
+      preLoaderRoute: typeof ProposeIncrementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/personnel-list': {
       id: '/personnel-list'
       path: '/personnel-list'
@@ -336,6 +512,76 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KpiAssessmentWorkflowRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/increment-summary': {
+      id: '/increment-summary'
+      path: '/increment-summary'
+      fullPath: '/increment-summary'
+      preLoaderRoute: typeof IncrementSummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/increment-report': {
+      id: '/increment-report'
+      path: '/increment-report'
+      fullPath: '/increment-report'
+      preLoaderRoute: typeof IncrementReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/increment-queuelist': {
+      id: '/increment-queuelist'
+      path: '/increment-queuelist'
+      fullPath: '/increment-queuelist'
+      preLoaderRoute: typeof IncrementQueuelistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/increment-multiple': {
+      id: '/increment-multiple'
+      path: '/increment-multiple'
+      fullPath: '/increment-multiple'
+      preLoaderRoute: typeof IncrementMultipleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/increment-list': {
+      id: '/increment-list'
+      path: '/increment-list'
+      fullPath: '/increment-list'
+      preLoaderRoute: typeof IncrementListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/increment-history': {
+      id: '/increment-history'
+      path: '/increment-history'
+      fullPath: '/increment-history'
+      preLoaderRoute: typeof IncrementHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/increment-gadget': {
+      id: '/increment-gadget'
+      path: '/increment-gadget'
+      fullPath: '/increment-gadget'
+      preLoaderRoute: typeof IncrementGadgetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/increment': {
+      id: '/increment'
+      path: '/increment'
+      fullPath: '/increment'
+      preLoaderRoute: typeof IncrementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/final-approve-increment': {
+      id: '/final-approve-increment'
+      path: '/final-approve-increment'
+      fullPath: '/final-approve-increment'
+      preLoaderRoute: typeof FinalApproveIncrementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/evaluation-propose': {
+      id: '/evaluation-propose'
+      path: '/evaluation-propose'
+      fullPath: '/evaluation-propose'
+      preLoaderRoute: typeof EvaluationProposeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/employee-job-card': {
       id: '/employee-job-card'
       path: '/employee-job-card'
@@ -378,6 +624,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompanyHolidayRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/approve-increment-hr': {
+      id: '/approve-increment-hr'
+      path: '/approve-increment-hr'
+      fullPath: '/approve-increment-hr'
+      preLoaderRoute: typeof ApproveIncrementHrRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/approve-increment-gadget': {
+      id: '/approve-increment-gadget'
+      path: '/approve-increment-gadget'
+      fullPath: '/approve-increment-gadget'
+      preLoaderRoute: typeof ApproveIncrementGadgetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/add-employee': {
       id: '/add-employee'
       path: '/add-employee'
@@ -398,12 +658,24 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AddEmployeeRoute: AddEmployeeRoute,
+  ApproveIncrementGadgetRoute: ApproveIncrementGadgetRoute,
+  ApproveIncrementHrRoute: ApproveIncrementHrRoute,
   CompanyHolidayRoute: CompanyHolidayRoute,
   CreateRosterRoute: CreateRosterRoute,
   EarnLeaveProcessRoute: EarnLeaveProcessRoute,
   EarnLeaveSubmitRoute: EarnLeaveSubmitRoute,
   EarnLeaveWorkflowRoute: EarnLeaveWorkflowRoute,
   EmployeeJobCardRoute: EmployeeJobCardRoute,
+  EvaluationProposeRoute: EvaluationProposeRoute,
+  FinalApproveIncrementRoute: FinalApproveIncrementRoute,
+  IncrementRoute: IncrementRoute,
+  IncrementGadgetRoute: IncrementGadgetRoute,
+  IncrementHistoryRoute: IncrementHistoryRoute,
+  IncrementListRoute: IncrementListRoute,
+  IncrementMultipleRoute: IncrementMultipleRoute,
+  IncrementQueuelistRoute: IncrementQueuelistRoute,
+  IncrementReportRoute: IncrementReportRoute,
+  IncrementSummaryRoute: IncrementSummaryRoute,
   KpiAssessmentWorkflowRoute: KpiAssessmentWorkflowRoute,
   KpiSettingRoute: KpiSettingRoute,
   KpiTaskNameRoute: KpiTaskNameRoute,
@@ -414,6 +686,7 @@ const rootRouteChildren: RootRouteChildren = {
   PendingManualAttendanceRoute: PendingManualAttendanceRoute,
   PersonnelApprovalRoute: PersonnelApprovalRoute,
   PersonnelListRoute: PersonnelListRoute,
+  ProposeIncrementRoute: ProposeIncrementRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

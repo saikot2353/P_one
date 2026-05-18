@@ -88,6 +88,22 @@ const nav: NavItem[] = [
     ]
   },
   {
+    label: "Evaluation",
+    icon: ClipboardCheck,
+    subitems: [
+      { label: "Increment Configurator", to: "/increment-gadget" },
+      { label: "Evaluation Propose", to: "/evaluation-propose" },
+      { label: "Propose Increment", to: "/propose-increment" },
+      { label: "Increment Summary", to: "/increment-summary" },
+      { label: "Approve Increment Gadget", to: "/approve-increment-gadget" },
+      { label: "Increment Queue List", to: "/increment-queuelist" },
+      { label: "Approve Increment (HR)", to: "/approve-increment-hr" },
+      { label: "Approve Increment", to: "/final-approve-increment" },
+      { label: "Increment List", to: "/increment-list" },
+      { label: "Increment History", to: "/increment-history" },
+    ]
+  },
+  {
     label: "Manage Shift",
     icon: Clock,
     active: true,
@@ -123,15 +139,6 @@ const nav: NavItem[] = [
       { label: "Company Rules", to: "/" },
       { label: "Benefits Policy", to: "/" },
       { label: "Conduct Policy", to: "/" },
-    ]
-  },
-  {
-    label: "Evaluation",
-    icon: ClipboardCheck,
-    subitems: [
-      { label: "Self Appraisals", to: "/" },
-      { label: "Manager Reviews", to: "/" },
-      { label: "Peer Feedback", to: "/" },
     ]
   },
 
@@ -205,17 +212,11 @@ export function Sidebar() {
 
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
-    let foundActive = false;
     nav.forEach(item => {
       if (item.subitems && item.subitems.some(sub => sub.to !== "/" && sub.to === currentPath)) {
         initial[item.label] = true;
-        foundActive = true;
       }
     });
-    // Fall back to opening Personnel Info by default on root or no matching routes
-    if (!foundActive) {
-      initial["Personnel Info"] = true;
-    }
     return initial;
   });
 
@@ -241,7 +242,7 @@ export function Sidebar() {
         <div className="px-2.5 pb-2 text-[9px] font-extrabold uppercase tracking-widest text-sidebar-foreground/45">Workspace</div>
         {nav.map((item) => {
           const Icon = item.icon;
-          
+
           // Determine parent active state dynamically: active if its route is active OR any of its subitems is active
           const isParentActive = item.to === currentPath || (item.subitems && item.subitems.some(sub => sub.to !== "/" && sub.to === currentPath));
 
@@ -295,7 +296,7 @@ export function Sidebar() {
               <div
                 className={[
                   "overflow-hidden transition-all duration-300 space-y-0.5 pl-3.5 bg-sidebar-accent/25 rounded-xl",
-                  isOpen ? "max-h-96 opacity-100 py-1.5 mt-0.5" : "max-h-0 opacity-0"
+                  isOpen ? "max-h-[600px] opacity-100 py-1.5 mt-0.5" : "max-h-0 opacity-0"
                 ].join(" ")}
               >
                 {item.subitems.map((sub) => {

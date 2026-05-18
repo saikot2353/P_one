@@ -50,6 +50,7 @@ export function StatCards() {
       {stats.map((s) => {
         const Icon = s.icon;
         const t = tintMap[s.tint];
+        const gradId = `g-${s.label.replace(/[^a-zA-Z0-9]/g, "-")}`;
         return (
           <div
             key={s.label}
@@ -74,12 +75,12 @@ export function StatCards() {
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={s.data} margin={{ top: 8, left: 0, right: 0, bottom: 0 }}>
                   <defs>
-                    <linearGradient id={`g-${s.label.replace(/\s+/g, "-")}`} x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor={t.stroke} stopOpacity={0.4} />
                       <stop offset="100%" stopColor={t.stroke} stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <Area type="monotone" dataKey="v" stroke={t.stroke} strokeWidth={2} fill={`url(#g-${s.label.replace(/\s+/g, "-")})`} />
+                  <Area type="monotone" dataKey="v" stroke={t.stroke} strokeWidth={2} fill={`url(#${gradId})`} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
