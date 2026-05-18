@@ -382,23 +382,29 @@ function ApproveIncrementHRPage() {
               <div className="flex items-center gap-2">
                 <button 
                   onClick={handleApproveSelected}
-                  className="h-8.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[10px] rounded-lg shadow-2xs transition uppercase tracking-wider flex items-center gap-1.5"
+                  className="h-8 pl-2 pr-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-[0.97] text-white font-semibold text-[10px] rounded-lg shadow-xs flex items-center gap-2 transition-all duration-200 uppercase tracking-wider border border-emerald-500/10"
                 >
-                  <Check className="size-3.5" />
+                  <span className="p-0.5 bg-white/20 rounded-md text-white shadow-3xs flex items-center justify-center">
+                    <Check className="size-3" />
+                  </span>
                   <span>Approve Selected</span>
                 </button>
                 <button 
                   onClick={handleUndoSelected}
-                  className="h-8.5 px-4 bg-amber-500 hover:bg-amber-600 text-white font-black text-[10px] rounded-lg shadow-2xs transition uppercase tracking-wider flex items-center gap-1.5"
+                  className="h-8 pl-2 pr-3.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 active:scale-[0.97] text-white font-semibold text-[10px] rounded-lg shadow-xs flex items-center gap-2 transition-all duration-200 uppercase tracking-wider border border-amber-500/10"
                 >
-                  <X className="size-3.5" />
+                  <span className="p-0.5 bg-white/20 rounded-md text-white shadow-3xs flex items-center justify-center">
+                    <X className="size-3" />
+                  </span>
                   <span>Undo Selected</span>
                 </button>
                 <button 
                   onClick={() => alert("Generating HR printable executive board PDF...")}
-                  className="h-8.5 px-4 bg-sky-600 hover:bg-sky-700 text-white font-black text-[10px] rounded-lg shadow-2xs transition uppercase tracking-wider flex items-center gap-1.5"
+                  className="h-8 pl-2 pr-3.5 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 active:scale-[0.97] text-white font-semibold text-[10px] rounded-lg shadow-xs flex items-center gap-2 transition-all duration-200 uppercase tracking-wider border border-slate-600/30"
                 >
-                  <Eye className="size-3.5" />
+                  <span className="p-0.5 bg-white/10 rounded-md text-white shadow-3xs flex items-center justify-center">
+                    <Eye className="size-3" />
+                  </span>
                   <span>View(PDF)</span>
                 </button>
               </div>

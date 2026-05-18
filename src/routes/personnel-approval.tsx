@@ -1154,7 +1154,7 @@ function PersonnelApprovalPage() {
                 </button>
                 <button
                   type="submit"
-                  className="h-9.5 px-6 bg-[#1e88e5] hover:bg-[#1565c0] text-white font-extrabold text-xs rounded-lg transition uppercase tracking-wider"
+                  className="h-9.5 px-6 bg-primary hover:bg-primary-glow text-primary-foreground font-semibold text-xs rounded-lg transition uppercase tracking-wider shadow-sm"
                 >
                   Save Override Changes
                 </button>

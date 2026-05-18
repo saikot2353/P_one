@@ -1411,20 +1411,17 @@ function ManualAttendancePage() {
                     />
                   </div>
                 </div>
-
               </div>
-
-              {/* Modal Footer */}
               <div className="px-6 py-4 border-t border-border/60 flex items-center justify-between bg-muted/20">
-                {/* Close Button (Left side, orange!) */}
+                {/* Close Button (Left side, neutral!) */}
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="h-9 px-5 bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs rounded-lg transition duration-150 uppercase tracking-wider shadow-sm"
+                  className="h-9 px-5 bg-card border border-border/50 hover:bg-muted text-muted-foreground font-semibold text-xs rounded-lg transition duration-150 uppercase tracking-wider"
                 >
                   Close
                 </button>
 
-                {/* Reset & Submit Buttons (Right side, text & green!) */}
+                {/* Reset & Submit Buttons (Right side, text & primary!) */}
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => {
@@ -1439,7 +1436,7 @@ function ManualAttendancePage() {
                   </button>
                   <button
                     onClick={handleModalSubmit}
-                    className="h-9 px-5 bg-[#72b043] hover:bg-[#629c36] text-white font-extrabold text-xs rounded-lg transition duration-150 uppercase tracking-wider shadow-sm"
+                    className="h-9 px-5 bg-primary hover:bg-primary-glow text-primary-foreground font-semibold text-xs rounded-lg transition duration-150 uppercase tracking-wider shadow-sm"
                   >
                     Submit
                   </button>

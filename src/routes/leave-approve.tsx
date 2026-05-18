@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  ChevronRight, ArrowLeft, Search, FileSpreadsheet, Printer, FileDown, CheckCircle2, XCircle, Info
+  ChevronRight, ArrowLeft, Search, FileSpreadsheet, Printer, FileDown, CheckCircle2, XCircle, Info, Check, X
 } from "lucide-react";
 
 export const Route = createFileRoute("/leave-approve")({
@@ -354,7 +354,7 @@ function LeaveApprovePage() {
               <div className="lg:col-span-4 flex justify-end pt-2 border-t border-slate-100 dark:border-slate-800/40">
                 <button
                   type="submit"
-                  className="h-10 px-10 bg-[#4caf50] hover:bg-[#43a047] text-white font-extrabold text-xs rounded-xl shadow-xs transition uppercase tracking-wider"
+                  className="h-10 px-10 bg-primary hover:bg-primary-glow text-primary-foreground font-semibold text-xs rounded-xl shadow-xs transition uppercase tracking-wider shadow-sm"
                 >
                   Search
                 </button>
@@ -372,18 +372,22 @@ function LeaveApprovePage() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleApproveSelected}
-                  className="h-9 px-5 bg-[#4caf50] hover:bg-[#43a047] text-white font-extrabold text-[10.5px] rounded-lg shadow-xs flex items-center gap-1.5 transition uppercase tracking-wider"
+                  className="h-8 pl-2 pr-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-[0.97] text-white font-semibold text-[10px] rounded-lg shadow-xs flex items-center gap-2 transition-all duration-200 uppercase tracking-wider border border-emerald-500/10"
                 >
-                  <CheckCircle2 className="size-4" />
+                  <span className="p-0.5 bg-white/20 rounded-md text-white shadow-3xs flex items-center justify-center">
+                    <Check className="size-3" />
+                  </span>
                   <span>Approve Selected</span>
                 </button>
                 
                 <button
                   onClick={handleRejectSelected}
-                  className="h-9 px-5 bg-[#f44336] hover:bg-[#e53935] text-white font-extrabold text-[10.5px] rounded-lg shadow-xs flex items-center gap-1.5 transition uppercase tracking-wider"
+                  className="h-8 pl-2 pr-3.5 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 active:scale-[0.97] text-white font-semibold text-[10px] rounded-lg shadow-xs flex items-center gap-2 transition-all duration-200 uppercase tracking-wider border border-rose-500/10"
                 >
-                  <XCircle className="size-4" />
-                  <span>Rejected Selected</span>
+                  <span className="p-0.5 bg-white/20 rounded-md text-white shadow-3xs flex items-center justify-center">
+                    <X className="size-3" />
+                  </span>
+                  <span>Reject Selected</span>
                 </button>
               </div>
 
@@ -510,7 +514,7 @@ function LeaveApprovePage() {
                 <button className="px-3.5 h-8 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-400 hover:bg-slate-50 cursor-not-allowed">
                   Previous
                 </button>
-                <button className="size-8 rounded-lg bg-[#4caf50] text-white flex items-center justify-center font-black">
+                <button className="size-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-black">
                   1
                 </button>
                 <button className="px-3.5 h-8 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-400 hover:bg-slate-50 cursor-not-allowed">

@@ -177,7 +177,7 @@ function CompanyHolidayPage() {
             
             <button
               onClick={() => setIsModalOpen(true)}
-              className="h-9 px-5 bg-[#1e88e5] hover:bg-[#1565c0] text-white font-extrabold text-xs rounded-lg shadow-sm flex items-center gap-2 transition uppercase tracking-wider"
+              className="h-9 px-5 bg-primary hover:bg-primary-glow text-primary-foreground font-semibold text-xs rounded-lg shadow-sm flex items-center gap-2 transition uppercase tracking-wider"
             >
               <Plus className="size-4" />
               <span>Add Holiday</span>
