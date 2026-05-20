@@ -2,27 +2,18 @@ import { useState } from "react";
 import {
   User, Gift, DollarSign, Camera, GraduationCap, History, Award, BookOpen, Users,
   PhoneCall, FileSignature, Heart, Baby, FileText, FileDown, ShieldCheck, Laptop,
-  ChevronDown, Check, MapPin, Briefcase, UserCog, Clock, FileClock, ArrowUpRight, UserPlus
+  ChevronDown, Check, MapPin, Briefcase, UserCog, Clock, FileClock, ArrowUpRight, UserPlus, TrendingUp
 } from "lucide-react";
+import { rawIncrementRecords } from "@/routes/increment-history-data";
 
 export const DETAIL_TABS = [
-  { id: "basic", label: "Basic Info", icon: User },
-  { id: "allowance", label: "Allowance", icon: Gift },
-  { id: "salary_others", label: "Salary & others", icon: DollarSign },
-  { id: "picture_upload", label: "Picture Upload", icon: Camera },
-  { id: "education", label: "Education", icon: GraduationCap },
-  { id: "job_experience", label: "Job Experience", icon: History },
-  { id: "professional_certificate", label: "Professional Certificate", icon: Award },
-  { id: "training", label: "Training", icon: BookOpen },
-  { id: "involvement", label: "Involvement", icon: Users },
-  { id: "emergency_contact", label: "Emergency Contact", icon: PhoneCall },
-  { id: "nominee_form", label: "Nominee Form", icon: FileSignature },
-  { id: "reference", label: "Reference", icon: Heart },
-  { id: "dependent", label: "Dependent", icon: Baby },
-  { id: "job_description", label: "Job Description", icon: FileText },
-  { id: "others_docx", label: "Others Docx", icon: FileDown },
-  { id: "employee_verification", label: "Employee Verification", icon: ShieldCheck },
-  { id: "employee_equipment", label: "Employee Equipment", icon: Laptop },
+  { id: "personal_identity", label: "Personal & Identity", icon: User },
+  { id: "qualifications_experience", label: "Qualifications & Experience", icon: GraduationCap },
+  { id: "allowance_salary", label: "Allowance & Salary Details", icon: DollarSign },
+  { id: "statutory_nominee", label: "Statutory Nominee Hub", icon: FileSignature },
+  { id: "corporate_assets", label: "Corporate Assets Vault", icon: Laptop },
+  { id: "hr_verification", label: "HR Verification & Audit", icon: ShieldCheck },
+  { id: "increment_history", label: "Increment History", icon: TrendingUp },
 ];
 
 interface EmployeeDetailTabsProps {
@@ -30,8 +21,11 @@ interface EmployeeDetailTabsProps {
 }
 
 export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
-  const [activeDetailTab, setActiveDetailTab] = useState("basic");
+  const [activeDetailTab, setActiveDetailTab] = useState("personal_identity");
   const [isDetailDropdownOpen, setIsDetailDropdownOpen] = useState(false);
+  const [subSection, setSubSection] = useState("primary_placement");
+
+  const incRecord = rawIncrementRecords.find(r => r.empId === selectedEmp.id);
 
   // Dynamic fields calculated realistically from available employee properties
   const grossNum = parseFloat(selectedEmp.gross) || 30000;
@@ -43,83 +37,39 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
   const pfVal = (grossNum * 0.60 * 0.10).toFixed(2);
   const festivalBonusVal = basicVal;
 
-  // Helper to parse dates in DD/MM/YYYY or YYYY-MM-DD format
-  const parseEmpDate = (dateStr: string) => {
-    if (!dateStr) return new Date();
-    if (dateStr.includes("-")) return new Date(dateStr);
-    const [d, m, y] = dateStr.split("/");
-    return new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
-  };
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" });
-  };
-
-  const joinDateObj = parseEmpDate(selectedEmp.joinDate);
-  
-  // Salary configuration date (1 month after join)
-  const salaryDate = new Date(joinDateObj);
-  salaryDate.setMonth(salaryDate.getMonth() + 1);
-
-  // Increment date (6 months after join)
-  const incrementDate = new Date(joinDateObj);
-  incrementDate.setMonth(incrementDate.getMonth() + 6);
-
-  // Promotion date (12 months after join)
-  const promotionDate = new Date(joinDateObj);
-  promotionDate.setMonth(promotionDate.getMonth() + 12);
-
-  const timelineMilestones = [
-    {
-      type: "Join",
-      title: "Join",
-      date: formatDate(joinDateObj),
-      icon: UserPlus,
-      iconColor: "text-blue-500 bg-blue-500/10 border-blue-500/20",
-      badge: "Join",
-      description: `Officially joined CRIPTON HRIS as ${selectedEmp.title} in the ${selectedEmp.dept} department.`,
-      metaLabel: "Primary Assignment",
-      metaValue: selectedEmp.type
-    },
-    {
-      type: "Salary",
-      title: "Salary Setup",
-      date: formatDate(salaryDate),
-      icon: DollarSign,
-      iconColor: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
-      badge: "Salary",
-      description: `Initial gross salary package successfully allocated and payroll ledger created.`,
-      metaLabel: "Gross Wage",
-      metaValue: `৳${grossNum.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`
-    },
-    {
-      type: "Increment",
-      title: "Increment",
-      date: formatDate(incrementDate),
-      icon: ArrowUpRight,
-      iconColor: "text-amber-500 bg-amber-500/10 border-amber-500/20",
-      badge: "Increment",
-      description: `Granted a 12% performance-based salary increment following the mid-year lifecycle audit.`,
-      metaLabel: "New Gross",
-      metaValue: `৳${(grossNum * 1.12).toLocaleString("en-IN", { minimumFractionDigits: 0 })} (+৳${(grossNum * 0.12).toLocaleString("en-IN", { minimumFractionDigits: 0 })})`
-    },
-    {
-      type: "Promotion",
-      title: "Promotion",
-      date: formatDate(promotionDate),
-      icon: Briefcase,
-      iconColor: "text-indigo-500 bg-indigo-500/10 border-indigo-500/20",
-      badge: "Promotion",
-      description: `Formally elevated in corporate rank for exceptional leadership and core operational deliverables.`,
-      metaLabel: "New Designation",
-      metaValue: `Senior ${selectedEmp.title}`
+  const getSubSectionCompletionPercentage = (subId: string): number => {
+    switch (subId) {
+      case "primary_placement": {
+        const fields = [
+          selectedEmp.name,
+          selectedEmp.gender,
+          selectedEmp.dob,
+          selectedEmp.blood,
+        ];
+        const filled = fields.filter(Boolean).length;
+        return Math.round((filled / fields.length) * 100);
+      }
+      case "legal_kinship":
+        return 100;
+      case "address_contact": {
+        const fields = [
+          selectedEmp.email,
+          selectedEmp.officeMob || "—",
+        ];
+        const filled = fields.filter(val => val && val !== "—").length;
+        return Math.round((filled / fields.length) * 100);
+      }
+      case "picture_uploads":
+        return 100;
+      case "emergency_contact":
+        return 100;
+      case "references":
+        return 100;
+      default:
+        return 0;
     }
-  ];
+  };
 
-  const emailLocal = selectedEmp.email || "employee@pakizasoftware.com";
-  const personalEmailVal = emailLocal.replace("pakizasoftware.com", "gmail.com").replace("pakizatvl.com", "gmail.com");
-
-  // Derived personal details
   const nameBngVal = selectedEmp.name === "Tahmid Afsar Shapno" ? "তাহমিদ আফসার স্বপন" :
                      selectedEmp.name === "Sohanur Rahman Sohan" ? "সোহানুর রহমান সোহান" :
                      selectedEmp.name === "Easin Mia" ? "ইয়াসিন মিয়া" :
@@ -132,8 +82,6 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
   const motherNameBng = "সুলতানা বেগম";
   const spouseNameEng = selectedEmp.gender === "Female" ? "Mohammad Karim" : "—";
   const spouseNameBng = selectedEmp.gender === "Female" ? "মোহাম্মদ করিম" : "—";
-  const spouseNid = spouseNameEng !== "—" ? "4401928374" : "—";
-  const spouseContact = spouseNameEng !== "—" ? "+880 1712-998877" : "—";
 
   const nomineeName = selectedEmp.gender === "Female" ? "Abdur Rahman" : "Fatema Begum";
   const ref1Name = "Dr. Mohammad Kaykobad";
@@ -141,20 +89,13 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
   const ref1Org = "BUET";
   const ref1Contact = "+880 1711-223344";
 
-  const jobDesc = `Primary roles encompass corporate planning, database schemas, payroll system scalability, and technical team coordination inside ${selectedEmp.dept}.`;
-
-  const otherDocsList = [
-    { docTitle: "Police Clearance Certificate", docType: "PDF", docFile: "police_clearance.pdf" },
-    { docTitle: "NDA & Compliance Declaration", docType: "PDF", docFile: "nda_signed.pdf" }
-  ];
-
   const laptopAsset = `COMP-${selectedEmp.id.slice(0,4)}-992`;
   const accessCard = `RFID-${selectedEmp.id.slice(6)}`;
 
   return (
     <div className="flex flex-col w-full">
-      {/* Quick macOS styled Dropdown Switcher (just like screenshot!) */}
-      <div className="px-6 py-4 bg-muted/10 border-b border-border/20 flex flex-col md:flex-row md:items-center justify-between gap-4 relative">
+      {/* Quick macOS styled Dropdown Switcher (Mobile Only) */}
+      <div className="px-6 py-4 bg-muted/10 border-b border-border/20 flex flex-col md:hidden justify-between gap-4 relative">
         <div className="w-full md:max-w-xs relative z-30">
           <label className="text-[9px] font-extrabold uppercase tracking-widest text-muted-foreground/60 block mb-1">Select Directory</label>
           <button
@@ -217,222 +158,519 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
         </div>
       </div>
 
-      {/* Horizontal Directory Tabs for Desktop */}
-      <div className="flex border-b border-border/40 bg-muted/20 px-6 overflow-x-auto whitespace-nowrap scrollbar-none gap-2">
-        {DETAIL_TABS.map((tab, idx) => {
-          const TabIcon = tab.icon;
-          const isSelected = activeDetailTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => {
-                setActiveDetailTab(tab.id);
-              }}
-              className={`flex items-center gap-2 py-3 px-4 text-xs font-bold transition-all border-b-2 -mb-[1px] shrink-0 ${
-                isSelected
-                  ? "border-primary text-primary font-extrabold"
-                  : "border-transparent text-muted-foreground/80 hover:text-foreground"
-              }`}
-            >
-              <TabIcon className="size-3.5 shrink-0" />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
+      {/* Horizontal Directory Tabs for Desktop - STUNNING PILL DESIGN */}
+      <div className="hidden md:block px-6 py-3 border-b border-border/40 bg-gradient-to-r from-muted/20 via-background to-muted/20">
+        <div className="flex bg-card/60 backdrop-blur-md border border-border/60 rounded-xl p-1.5 overflow-x-auto whitespace-nowrap scrollbar-none gap-1 shadow-sm">
+          {DETAIL_TABS.map((tab, idx) => {
+            const TabIcon = tab.icon;
+            const isSelected = activeDetailTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveDetailTab(tab.id)}
+                className={`flex items-center gap-2 py-2 px-4 rounded-lg text-[11px] font-extrabold transition-all duration-300 shrink-0 ${
+                  isSelected
+                    ? "bg-primary text-primary-foreground shadow-md ring-1 ring-primary/20 scale-[1.02]"
+                    : "bg-transparent text-muted-foreground/80 hover:bg-muted hover:text-foreground"
+                }`}
+              >
+                <TabIcon className={`size-3.5 shrink-0 ${isSelected ? "animate-pulse" : ""}`} />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Tab Content Panels */}
-      {activeDetailTab === "basic" && (
-        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh]">
-          {/* Primary Identity */}
-          <div className="space-y-3">
-            <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
-              <User className="size-3.5" /> Primary Identity
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-muted/10 border border-border/30 rounded-xl p-4">
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase">Emp ID (System)</div>
-                <div className="text-xs font-extrabold text-foreground">{selectedEmp.id}</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase">Emp ID (Comp.)</div>
-                <div className="text-xs font-extrabold text-foreground">{selectedEmp.offcId || "—"}</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase">Name (English)</div>
-                <div className="text-xs font-extrabold text-foreground">{selectedEmp.name}</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase">Name (Bangla)</div>
-                <div className="text-xs font-bold text-foreground">{nameBngVal}</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase">Gender</div>
-                <div className="text-xs font-bold text-foreground">{selectedEmp.gender}</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase">Marital Status</div>
-                <div className="text-xs font-bold text-foreground">{selectedEmp.maritalStatus || "Single"}</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase">Date of Birth</div>
-                <div className="text-xs font-bold text-foreground">{selectedEmp.dob}</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase">Blood Group</div>
-                <div className="text-xs font-bold text-foreground">
-                  <span className="inline-flex items-center justify-center px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30">
-                    {selectedEmp.blood}
-                  </span>
+      {/* 1. PERSONAL & IDENTITY TAB (CONSOLIDATED WITH PROGRESS STEPPER) */}
+      {activeDetailTab === "personal_identity" && (
+        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh] scrollbar-thin">
+          
+          {/* Stepper Navigation */}
+          <div className="bg-card border border-border/60 rounded-2xl p-4 shadow-xs overflow-x-auto scrollbar-thin">
+            <div className="min-w-[580px] relative flex items-center justify-between px-6 py-2">
+              <div className="absolute top-[22px] left-[45px] right-[45px] h-[3px] bg-muted/60 border-t border-b border-border/20 z-0" />
+              
+              {[
+                { id: "primary_placement", label: "Placement", icon: User },
+                { id: "legal_kinship", label: "Kinship", icon: Users },
+                { id: "address_contact", label: "Contact", icon: MapPin },
+                { id: "picture_uploads", label: "Scans", icon: Camera },
+                { id: "emergency_contact", label: "Emergency", icon: PhoneCall },
+                { id: "references", label: "References", icon: Heart },
+              ].map((step, idx) => {
+                const StepIcon = step.icon;
+                const isSelected = subSection === step.id;
+                const subPercentage = getSubSectionCompletionPercentage(step.id);
+                const isCompleted = subPercentage === 100;
+                
+                return (
+                  <button
+                    key={step.id}
+                    type="button"
+                    onClick={() => setSubSection(step.id)}
+                    className="relative z-10 flex flex-col items-center gap-1.5 group transition-all duration-300 focus:outline-none shrink-0"
+                    style={{ width: "80px" }}
+                  >
+                    <div className={`size-9 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative ${
+                      isSelected
+                        ? "bg-primary text-primary-foreground border-primary shadow-[0_0_12px_var(--primary)] scale-110"
+                        : isCompleted
+                          ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.2)]"
+                          : "bg-card text-muted-foreground border-border/80 hover:border-muted-foreground/60"
+                    }`}>
+                      {isCompleted ? (
+                        <Check className="size-4 stroke-[3]" />
+                      ) : (
+                        <StepIcon className="size-4" />
+                      )}
+                      {isSelected && (
+                        <div className="absolute inset-[-3px] rounded-full border border-primary/40 animate-ping opacity-60 pointer-events-none" />
+                      )}
+                    </div>
+                    <div className="text-center space-y-1 w-full min-w-[100px]">
+                      <span className={`text-[9px] font-black uppercase tracking-wide block transition-colors duration-200 ${
+                        isSelected ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                      }`}>
+                        {idx + 1}. {step.label}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Sub-panels */}
+          {subSection === "primary_placement" && (
+            <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="bg-muted/10 border border-border/30 rounded-xl p-4 space-y-3">
+                <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/20 pb-1.5">
+                  <User className="size-3.5" /> Primary Identity & Placement Details
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  <div className="space-y-0.5">
+                    <div className="text-[9px] font-bold text-muted-foreground uppercase">Emp ID (System)</div>
+                    <div className="text-xs font-extrabold text-foreground">{selectedEmp.id}</div>
+                  </div>
+                  <div className="space-y-0.5">
+                    <div className="text-[9px] font-bold text-muted-foreground uppercase">Emp ID (Comp.)</div>
+                    <div className="text-xs font-extrabold text-foreground">{selectedEmp.offcId || "—"}</div>
+                  </div>
+                  <div className="space-y-0.5">
+                    <div className="text-[9px] font-bold text-muted-foreground uppercase">Name (English)</div>
+                    <div className="text-xs font-extrabold text-foreground">{selectedEmp.name}</div>
+                  </div>
+                  <div className="space-y-0.5">
+                    <div className="text-[9px] font-bold text-muted-foreground uppercase">Name (Bangla)</div>
+                    <div className="text-xs font-bold text-foreground">{nameBngVal}</div>
+                  </div>
+                  <div className="space-y-0.5">
+                    <div className="text-[9px] font-bold text-muted-foreground uppercase">Gender</div>
+                    <div className="text-xs font-bold text-foreground">{selectedEmp.gender}</div>
+                  </div>
+                  <div className="space-y-0.5">
+                    <div className="text-[9px] font-bold text-muted-foreground uppercase">Marital Status</div>
+                    <div className="text-xs font-bold text-foreground">{selectedEmp.maritalStatus || "Single"}</div>
+                  </div>
+                  <div className="space-y-0.5">
+                    <div className="text-[9px] font-bold text-muted-foreground uppercase">Date of Birth</div>
+                    <div className="text-xs font-bold text-foreground">{selectedEmp.dob}</div>
+                  </div>
+                  <div className="space-y-0.5">
+                    <div className="text-[9px] font-bold text-muted-foreground uppercase">Blood Group</div>
+                    <div className="text-xs font-bold text-foreground">
+                      <span className="inline-flex items-center justify-center px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30">
+                        {selectedEmp.blood}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="space-y-0.5">
+                    <div className="text-[9px] font-bold text-muted-foreground uppercase">Religion</div>
+                    <div className="text-xs font-bold text-foreground">Islam</div>
+                  </div>
                 </div>
               </div>
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase">Religion</div>
-                <div className="text-xs font-bold text-foreground">Islam</div>
-              </div>
             </div>
-          </div>
+          )}
 
-          {/* Legal Documents */}
-          <div className="space-y-3">
-            <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
-              <FileText className="size-3.5" /> Legal Documents & NIDs
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-muted/10 border border-border/30 rounded-xl p-4 font-mono">
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase font-sans">National ID (NID)</div>
-                <div className="text-xs font-bold text-foreground">1928374659201</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase font-sans">Passport Number</div>
-                <div className="text-xs font-bold text-foreground font-mono">DC-0928371</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase font-sans">Driving License</div>
-                <div className="text-xs font-bold text-foreground font-mono">DL-9921-X3</div>
-              </div>
-            </div>
-          </div>
+          {subSection === "legal_kinship" && (
+            <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="bg-muted/10 border border-border/30 rounded-xl p-4 space-y-4">
+                <div>
+                  <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/20 pb-1.5 mb-3">
+                    <FileText className="size-3.5" /> Legal Documents & Parents' Names
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono">
+                    <div className="space-y-0.5">
+                      <div className="text-[9px] font-bold text-muted-foreground uppercase font-sans">National ID (NID)</div>
+                      <div className="text-xs font-bold text-foreground">1928374659201</div>
+                    </div>
+                    <div className="space-y-0.5">
+                      <div className="text-[9px] font-bold text-muted-foreground uppercase font-sans">Passport Number</div>
+                      <div className="text-xs font-bold text-foreground">DC-0928371</div>
+                    </div>
+                    <div className="space-y-0.5">
+                      <div className="text-[9px] font-bold text-muted-foreground uppercase font-sans">Driving License</div>
+                      <div className="text-xs font-bold text-foreground">DL-9921-X3</div>
+                    </div>
+                  </div>
+                </div>
 
-          {/* Family details */}
-          <div className="space-y-3">
-            <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
-              <Heart className="size-3.5" /> Family & Spousal Details
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-muted/10 border border-border/30 rounded-xl p-4">
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase">Father Name</div>
-                <div className="text-xs font-bold text-foreground">{fatherNameEng} ({fatherNameBng})</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase">Mother Name</div>
-                <div className="text-xs font-bold text-foreground">{motherNameEng} ({motherNameBng})</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase">Spouse Name</div>
-                <div className="text-xs font-bold text-foreground">{spouseNameEng} ({spouseNameBng})</div>
+                <div className="border-t border-border/20 pt-3">
+                  <h5 className="text-[9px] font-extrabold uppercase text-muted-foreground mb-3 tracking-wide">Family Lineage Details</h5>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="space-y-0.5">
+                      <div className="text-[9px] font-bold text-muted-foreground uppercase">Father Name</div>
+                      <div className="text-xs font-bold text-foreground">{fatherNameEng}</div>
+                    </div>
+                    <div className="space-y-0.5">
+                      <div className="text-[9px] font-bold text-muted-foreground uppercase">Mother Name</div>
+                      <div className="text-xs font-bold text-foreground">{motherNameEng}</div>
+                    </div>
+                    <div className="space-y-0.5">
+                      <div className="text-[9px] font-bold text-muted-foreground uppercase">Spouse Name</div>
+                      <div className="text-xs font-bold text-foreground">{spouseNameEng}</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
-          {/* Addresses */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-muted/5 border border-border/30 rounded-xl p-4 space-y-3">
-              <div className="text-xs font-extrabold uppercase text-primary tracking-wider flex items-center gap-1 border-b border-border/20 pb-1">
-                <MapPin className="size-3.5" /> Present Address
-              </div>
-              <div className="text-xs space-y-1.5 font-medium text-foreground/80 leading-relaxed">
-                <div><span className="text-[9px] font-bold text-muted-foreground uppercase mr-1">Division:</span> Dhaka</div>
-                <div><span className="text-[9px] font-bold text-muted-foreground uppercase mr-1">District:</span> Dhaka</div>
-                <div><span className="text-[9px] font-bold text-muted-foreground uppercase mr-1">Upazila:</span> Mirpur</div>
-                <div><span className="text-[9px] font-bold text-muted-foreground uppercase mr-1">Village:</span> Vill # Dhopapara, Road # 12</div>
-              </div>
-            </div>
+          {subSection === "address_contact" && (
+            <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-muted/10 border border-border/30 rounded-xl p-4 space-y-3">
+                  <div className="text-xs font-extrabold uppercase text-primary tracking-wider flex items-center gap-1 border-b border-border/20 pb-1">
+                    <MapPin className="size-3.5" /> Present Address
+                  </div>
+                  <div className="text-xs space-y-1.5 font-semibold text-foreground/80 leading-relaxed">
+                    <div><span className="text-[9px] font-bold text-muted-foreground uppercase mr-1">Division:</span> Dhaka</div>
+                    <div><span className="text-[9px] font-bold text-muted-foreground uppercase mr-1">District:</span> Dhaka</div>
+                    <div><span className="text-[9px] font-bold text-muted-foreground uppercase mr-1">Upazila:</span> Mirpur</div>
+                    <div><span className="text-[9px] font-bold text-muted-foreground uppercase mr-1">Village:</span> Vill # Dhopapara, Road # 12</div>
+                  </div>
+                </div>
 
-            <div className="bg-muted/5 border border-border/30 rounded-xl p-4 space-y-3">
-              <div className="text-xs font-extrabold uppercase text-primary tracking-wider flex items-center gap-1 border-b border-border/20 pb-1">
-                <MapPin className="size-3.5" /> Permanent Address
-              </div>
-              <div className="text-xs space-y-1.5 font-medium text-foreground/80 leading-relaxed">
-                <div><span className="text-[9px] font-bold text-muted-foreground uppercase mr-1">Division:</span> Dhaka</div>
-                <div><span className="text-[9px] font-bold text-muted-foreground uppercase mr-1">District:</span> Dhaka</div>
-                <div><span className="text-[9px] font-bold text-muted-foreground uppercase mr-1">Upazila:</span> Mirpur</div>
-                <div><span className="text-[9px] font-bold text-muted-foreground uppercase mr-1">Village:</span> Vill # Dhopapara, Road # 12</div>
+                <div className="bg-muted/10 border border-border/30 rounded-xl p-4 space-y-3">
+                  <div className="text-xs font-extrabold uppercase text-primary tracking-wider flex items-center gap-1 border-b border-border/20 pb-1">
+                    <MapPin className="size-3.5" /> Permanent Address
+                  </div>
+                  <div className="text-xs space-y-1.5 font-semibold text-foreground/80 leading-relaxed">
+                    <div><span className="text-[9px] font-bold text-muted-foreground uppercase mr-1">Division:</span> Dhaka</div>
+                    <div><span className="text-[9px] font-bold text-muted-foreground uppercase mr-1">District:</span> Dhaka</div>
+                    <div><span className="text-[9px] font-bold text-muted-foreground uppercase mr-1">Upazila:</span> Mirpur</div>
+                    <div><span className="text-[9px] font-bold text-muted-foreground uppercase mr-1">Village:</span> Vill # Dhopapara, Road # 12</div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
+
+          {subSection === "picture_uploads" && (
+            <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="border border-border/50 bg-card rounded-xl p-3 flex flex-col items-center justify-center text-center gap-2">
+                  <div className="size-14 rounded-full bg-primary/10 text-primary border border-primary/20 flex items-center justify-center">
+                    <User className="size-7" />
+                  </div>
+                  <div className="text-[10px] font-bold text-foreground">Portrait Photo</div>
+                  <span className="text-[8px] font-extrabold text-emerald-500 uppercase font-mono bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">Uploaded</span>
+                </div>
+                <div className="border border-border/50 bg-card rounded-xl p-3 flex flex-col items-center justify-center text-center gap-2">
+                  <div className="size-14 rounded-full bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 flex items-center justify-center">
+                    <FileSignature className="size-7" />
+                  </div>
+                  <div className="text-[10px] font-bold text-foreground">Signature Scan</div>
+                  <span className="text-[8px] font-extrabold text-emerald-500 uppercase font-mono bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">Uploaded</span>
+                </div>
+                <div className="border border-border/50 bg-card rounded-xl p-3 flex flex-col items-center justify-center text-center gap-2">
+                  <div className="size-14 rounded-lg bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center">
+                    <FileText className="size-7" />
+                  </div>
+                  <div className="text-[10px] font-bold text-foreground">NID scan (PDF)</div>
+                  <span className="text-[8px] font-extrabold text-emerald-500 uppercase font-mono bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">Uploaded</span>
+                </div>
+                <div className="border border-border/50 bg-card rounded-xl p-3 flex flex-col items-center justify-center text-center gap-2">
+                  <div className="size-14 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center">
+                    <GraduationCap className="size-7" />
+                  </div>
+                  <div className="text-[10px] font-bold text-foreground">Graduation Cert</div>
+                  <span className="text-[8px] font-extrabold text-emerald-500 uppercase font-mono bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">Uploaded</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {subSection === "emergency_contact" && (
+            <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-muted/10 border border-border/30 rounded-xl p-4">
+                <div className="space-y-0.5">
+                  <div className="text-[9px] font-bold text-muted-foreground uppercase">Contact Person</div>
+                  <div className="text-xs font-extrabold text-foreground">Mohammad Abdur Rahman</div>
+                </div>
+                <div className="space-y-0.5">
+                  <div className="text-[9px] font-bold text-muted-foreground uppercase">Relationship</div>
+                  <div className="text-xs font-bold text-foreground">Father</div>
+                </div>
+                <div className="space-y-0.5 font-mono">
+                  <div className="text-[9px] font-bold text-muted-foreground uppercase font-sans">Primary Phone</div>
+                  <div className="text-xs font-extrabold text-foreground">+880 1750-021154</div>
+                </div>
+                <div className="space-y-0.5 sm:col-span-3">
+                  <div className="text-[9px] font-bold text-muted-foreground uppercase">Residential Address</div>
+                  <div className="text-xs font-semibold text-foreground/80 leading-relaxed">House 12, Road 4, Sector 6, Uttara, Dhaka</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {subSection === "references" && (
+            <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 border border-border bg-card rounded-xl space-y-2">
+                  <div className="text-[9px] font-extrabold uppercase text-primary tracking-wider border-b border-border/10 pb-1">Referee 1</div>
+                  <div className="space-y-1">
+                    <h4 className="text-xs font-extrabold text-foreground">{ref1Name}</h4>
+                    <div className="text-[10px] font-bold text-muted-foreground">{ref1Designation} | {ref1Org}</div>
+                    <div className="text-[10px] font-semibold text-muted-foreground/60 font-mono">{ref1Contact}</div>
+                  </div>
+                </div>
+                <div className="p-4 border border-border bg-card rounded-xl space-y-2">
+                  <div className="text-[9px] font-extrabold uppercase text-indigo-500 tracking-wider border-b border-border/10 pb-1">Referee 2</div>
+                  <div className="space-y-1">
+                    <h4 className="text-xs font-extrabold text-foreground">Easin Mia</h4>
+                    <div className="text-[10px] font-bold text-indigo-500">Senior Operations Lead | Pakiza Group</div>
+                    <div className="text-[10px] font-semibold text-muted-foreground/60 font-mono">+880 1324-726766</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
       )}
 
-      {/* 2. ALLOWANCE TAB */}
-      {activeDetailTab === "allowance" && (
-        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh]">
+      {/* 2. QUALIFICATIONS & EXPERIENCE TAB */}
+      {activeDetailTab === "qualifications_experience" && (
+        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh] scrollbar-thin">
+          
+          {/* Section A: Academic Credentials */}
+          <div className="space-y-3">
+            <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
+              <GraduationCap className="size-3.5" /> Academic Credentials & Qualifications
+            </h4>
+            <div className="border border-border/40 rounded-xl overflow-hidden text-xs">
+              <table className="w-full border-collapse text-left">
+                <thead>
+                  <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
+                    <th className="px-4 py-3">Degree Title</th>
+                    <th className="px-4 py-3">Institution Name</th>
+                    <th className="px-4 py-3 font-mono">Passing Year</th>
+                    <th className="px-4 py-3 text-center font-mono">GPA / Result</th>
+                    <th className="px-4 py-3 text-center font-mono">Uploaded Document</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/20 font-semibold text-foreground/80">
+                  {selectedEmp.name === "Tahmid Afsar Shapno" ? (
+                    <>
+                      <tr className="hover:bg-muted/5">
+                        <td className="px-4 py-3 text-primary">Master of Science (M.Sc)</td>
+                        <td className="px-4 py-3">IIT University of Dhaka</td>
+                        <td className="px-4 py-3 font-mono">2022</td>
+                        <td className="px-4 py-3 text-center font-mono">3.92</td>
+                        <td className="px-4 py-3 text-center">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-[9px] font-bold">
+                            <Check className="size-3" /> msc_certificate.pdf
+                          </span>
+                        </td>
+                      </tr>
+                      <tr className="hover:bg-muted/5">
+                        <td className="px-4 py-3 text-primary">Bachelor of Science (B.Sc)</td>
+                        <td className="px-4 py-3">University of Dhaka</td>
+                        <td className="px-4 py-3 font-mono">2020</td>
+                        <td className="px-4 py-3 text-center font-mono">3.85</td>
+                        <td className="px-4 py-3 text-center">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-[9px] font-bold">
+                            <Check className="size-3" /> bsc_certificate.pdf
+                          </span>
+                        </td>
+                      </tr>
+                    </>
+                  ) : (
+                    <>
+                      <tr className="hover:bg-muted/5">
+                        <td className="px-4 py-3 text-primary">Bachelor of Business Admin (BBA)</td>
+                        <td className="px-4 py-3">National University</td>
+                        <td className="px-4 py-3 font-mono">2021</td>
+                        <td className="px-4 py-3 text-center font-mono">3.45</td>
+                        <td className="px-4 py-3 text-center">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-[9px] font-bold">
+                            <Check className="size-3" /> bba_degree_scan.pdf
+                          </span>
+                        </td>
+                      </tr>
+                    </>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Section B: Job Experiences */}
+          <div className="space-y-3 pt-2">
+            <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
+              <History className="size-3.5" /> Prior Job Experiences
+            </h4>
+            <div className="grid grid-cols-1 gap-3.5">
+              {selectedEmp.name === "Tahmid Afsar Shapno" ? (
+                <>
+                  <div className="flex items-center justify-between p-4 border border-border bg-card rounded-xl">
+                    <div className="flex gap-4">
+                      <div className="size-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 border border-primary/20">
+                        <Briefcase className="size-4.5" />
+                      </div>
+                      <div className="space-y-0.5">
+                        <h4 className="text-xs font-extrabold text-foreground">Asst. Manager — Business Innovation</h4>
+                        <div className="text-[10px] font-bold text-primary uppercase">Pakiza Software Limited</div>
+                        <div className="text-[9px] font-semibold text-muted-foreground/60 font-mono">2023-08-01 — Present</div>
+                      </div>
+                    </div>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-[9px] font-bold">
+                      <Check className="size-3" /> pakiza_noc.pdf
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between p-4 border border-border bg-card rounded-xl">
+                    <div className="flex gap-4">
+                      <div className="size-10 rounded-full bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0 border border-indigo-500/20">
+                        <Briefcase className="size-4.5" />
+                      </div>
+                      <div className="space-y-0.5">
+                        <h4 className="text-xs font-extrabold text-foreground">Senior Software Engineer</h4>
+                        <div className="text-[10px] font-bold text-indigo-500 uppercase">Brain Station 23 Ltd</div>
+                        <div className="text-[9px] font-semibold text-muted-foreground/60 font-mono">2021-03-15 — 2023-07-31</div>
+                      </div>
+                    </div>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-[9px] font-bold">
+                      <Check className="size-3" /> bs23_experience_letter.pdf
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-center justify-between p-4 border border-border bg-card rounded-xl">
+                  <div className="flex gap-4">
+                    <div className="size-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 border border-primary/20">
+                      <Briefcase className="size-4.5" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <h4 className="text-xs font-extrabold text-foreground">{selectedEmp.title} — Admin Operations</h4>
+                      <div className="text-[10px] font-bold text-primary uppercase">Pakiza Software Limited</div>
+                      <div className="text-[9px] font-semibold text-muted-foreground/60 font-mono">{selectedEmp.joinDate} — Present</div>
+                    </div>
+                  </div>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-[9px] font-bold">
+                    <Check className="size-3" /> experience_letter.pdf
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Section C: Professional Certificates & Trainings */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <div className="p-4 border border-border bg-card rounded-xl space-y-2">
+              <h5 className="text-[10px] font-extrabold uppercase text-primary tracking-wider border-b border-border/10 pb-1 flex items-center gap-1">
+                <Award className="size-3.5" /> Professional Certifications
+              </h5>
+              <div className="space-y-1">
+                <h4 className="text-xs font-extrabold text-foreground">AWS Certified Solutions Architect</h4>
+                <div className="text-[10px] font-bold text-muted-foreground">Amazon Web Services</div>
+                <div className="text-[9px] font-semibold text-muted-foreground/60 font-mono">ID: AWS-9928173</div>
+              </div>
+            </div>
+            <div className="p-4 border border-border bg-card rounded-xl space-y-2">
+              <h5 className="text-[10px] font-extrabold uppercase text-primary tracking-wider border-b border-border/10 pb-1 flex items-center gap-1">
+                <BookOpen className="size-3.5" /> In-Service Corporate Trainings
+              </h5>
+              <div className="space-y-1">
+                <h4 className="text-xs font-extrabold text-foreground">Information Security & ISO 27001 Auditor</h4>
+                <div className="text-[10px] font-bold text-muted-foreground">Pakiza Internal Audit Team</div>
+                <div className="text-[9px] font-semibold text-muted-foreground/60 font-mono">Completed: 12/04/2024</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* 3. ALLOWANCE & SALARY DETAILS */}
+      {activeDetailTab === "allowance_salary" && (
+        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh] scrollbar-thin">
+          
+          {/* Allowances */}
           <div className="space-y-3">
             <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-500 flex items-center gap-1.5 border-b border-emerald-500/30 pb-1.5">
               <Gift className="size-3.5" /> Active Allowances & Compensation Pools
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-emerald-500/5 border border-emerald-500/15 rounded-xl p-4">
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">Gross Salary</div>
+              <div className="space-y-0.5">
+                <div className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">Gross Salary</div>
                 <div className="text-sm font-extrabold text-emerald-700 dark:text-emerald-300 font-mono">
                   ৳{grossNum.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 </div>
               </div>
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase">House Rent Allowance</div>
+              <div className="space-y-0.5">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase">House Rent (25%)</div>
                 <div className="text-xs font-bold text-foreground font-mono">
                   ৳{parseFloat(houseRentVal).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 </div>
               </div>
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase">Medical Allowance</div>
+              <div className="space-y-0.5">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase">Medical (8%)</div>
                 <div className="text-xs font-bold text-foreground font-mono">
                   ৳{parseFloat(medicalVal).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 </div>
               </div>
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase">Conveyance Allowance</div>
+              <div className="space-y-0.5">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase">Conveyance (4%)</div>
                 <div className="text-xs font-bold text-foreground font-mono">
                   ৳{parseFloat(conveyanceVal).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 </div>
               </div>
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase">Food Allowance</div>
+              <div className="space-y-0.5">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase">Food (3%)</div>
                 <div className="text-xs font-bold text-foreground font-mono">
                   ৳{parseFloat(foodVal).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 </div>
               </div>
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase">Special Perks Pool</div>
+              <div className="space-y-0.5">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase">Special Perks Pool</div>
                 <div className="text-xs font-bold text-foreground font-mono">৳5,000.00</div>
               </div>
             </div>
           </div>
-        </div>
-      )}
 
-      {/* 3. SALARY & OTHERS TAB */}
-      {activeDetailTab === "salary_others" && (
-        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh]">
-          <div className="space-y-4">
+          {/* Core Salary Configurations & Bank Mapping */}
+          <div className="space-y-4 pt-2">
             <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
               <DollarSign className="size-3.5" /> Core Salary Configurations & Bank Mapping
             </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-muted/10 border border-border/30 rounded-xl p-4">
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase">Basic Salary (60%)</div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-muted/10 border border-border/30 rounded-xl p-4">
+              <div className="space-y-0.5">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase">Basic Salary (60%)</div>
                 <div className="text-xs font-bold text-foreground font-mono">
                   ৳{parseFloat(basicVal).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 </div>
               </div>
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase">Provident Fund (10%)</div>
+              <div className="space-y-0.5">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase">Provident Fund (10%)</div>
                 <div className="text-xs font-bold text-foreground font-mono">
                   ৳{parseFloat(pfVal).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 </div>
               </div>
-              <div className="space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase">Festival Bonus Pool</div>
+              <div className="space-y-0.5">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase">Festival Bonus Pool</div>
                 <div className="text-xs font-bold text-foreground font-mono">
                   ৳{parseFloat(festivalBonusVal).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 </div>
@@ -461,521 +699,270 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
               </div>
             </div>
           </div>
+
         </div>
       )}
 
-      {/* 4. PICTURE UPLOAD TAB */}
-      {activeDetailTab === "picture_upload" && (
-        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh]">
-          <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
-            <Camera className="size-3.5" /> Employee Image Dossier
-          </h4>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="border border-border/50 bg-card rounded-xl p-3 flex flex-col items-center justify-center text-center gap-2">
-              <div className="size-16 rounded-full bg-primary/10 text-primary border border-primary/20 flex items-center justify-center">
-                <User className="size-8" />
+      {/* 4. STATUTORY NOMINEE HUB */}
+      {activeDetailTab === "statutory_nominee" && (
+        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh] scrollbar-thin">
+          
+          {/* Nominee details */}
+          <div className="space-y-3">
+            <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
+              <FileSignature className="size-3.5" /> Legal Nominee Declarations
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 bg-muted/10 border border-border/30 rounded-xl p-4">
+              <div className="space-y-0.5">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase">Nominee Name</div>
+                <div className="text-xs font-extrabold text-foreground">{nomineeName}</div>
               </div>
-              <div className="text-[10px] font-bold text-foreground">Portrait Photo</div>
-              <span className="text-[8px] font-extrabold text-emerald-500 uppercase font-mono">Uploaded</span>
-            </div>
-            <div className="border border-border/50 bg-card rounded-xl p-3 flex flex-col items-center justify-center text-center gap-2">
-              <div className="size-16 rounded-full bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 flex items-center justify-center">
-                <FileSignature className="size-8" />
+              <div className="space-y-0.5">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase">Relationship</div>
+                <div className="text-xs font-bold text-foreground">{selectedEmp.gender === "Female" ? "Father" : "Mother"}</div>
               </div>
-              <div className="text-[10px] font-bold text-foreground">Signature Scan</div>
-              <span className="text-[8px] font-extrabold text-emerald-500 uppercase font-mono">Uploaded</span>
-            </div>
-            <div className="border border-border/50 bg-card rounded-xl p-3 flex flex-col items-center justify-center text-center gap-2">
-              <div className="size-16 rounded-lg bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center">
-                <FileText className="size-8" />
+              <div className="space-y-0.5 font-mono">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase font-sans">Share Percentage</div>
+                <div className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400">100% Share</div>
               </div>
-              <div className="text-[10px] font-bold text-foreground">NID scan (PDF)</div>
-              <span className="text-[8px] font-extrabold text-emerald-500 uppercase font-mono">Uploaded</span>
-            </div>
-            <div className="border border-border/50 bg-card rounded-xl p-3 flex flex-col items-center justify-center text-center gap-2">
-              <div className="size-16 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center">
-                <GraduationCap className="size-8" />
+              <div className="space-y-0.5 font-mono">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase font-sans">NID / Birth Cert</div>
+                <div className="text-xs font-bold text-foreground">19658293740291</div>
               </div>
-              <div className="text-[10px] font-bold text-foreground">Graduation Cert</div>
-              <span className="text-[8px] font-extrabold text-emerald-500 uppercase font-mono">Uploaded</span>
+              <div className="space-y-0.5 sm:col-span-4">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase">Permanent Address</div>
+                <div className="text-xs font-semibold text-foreground/80 leading-relaxed">Village: Voroshakathi, Post: Hawlader, Barishal, Bangladesh</div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
 
-      {/* 5. EDUCATION TAB */}
-      {activeDetailTab === "education" && (
-        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh]">
-          <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
-            <GraduationCap className="size-3.5" /> Academic Credentials & Qualifications
-          </h4>
-          <div className="border border-border/40 rounded-xl overflow-hidden text-xs">
-            <table className="w-full border-collapse text-left">
-              <thead>
-                <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
-                  <th className="px-4 py-3">Degree Title</th>
-                  <th className="px-4 py-3">Institution Name</th>
-                  <th className="px-4 py-3 font-mono">Passing Year</th>
-                  <th className="px-4 py-3 text-center font-mono">GPA / Result</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/20 font-semibold text-foreground/80">
-                {selectedEmp.name === "Tahmid Afsar Shapno" ? (
-                  <>
+          {/* Dependents list */}
+          <div className="space-y-3 pt-2">
+            <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
+              <Baby className="size-3.5" /> Family Dependents Registry
+            </h4>
+            <div className="border border-border/40 rounded-xl overflow-hidden text-xs">
+              <table className="w-full border-collapse text-left">
+                <thead>
+                  <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
+                    <th className="px-4 py-3">Dependent Name</th>
+                    <th className="px-4 py-3">Relationship</th>
+                    <th className="px-4 py-3 font-mono">DOB</th>
+                    <th className="px-4 py-3 font-mono">NID / Birth Cert No</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/20 font-semibold text-foreground/80">
+                  {selectedEmp.maritalStatus === "Married" ? (
                     <tr className="hover:bg-muted/5">
-                      <td className="px-4 py-3 text-primary">Master of Science (M.Sc)</td>
-                      <td className="px-4 py-3">IIT University of Dhaka</td>
-                      <td className="px-4 py-3 font-mono">2022</td>
-                      <td className="px-4 py-3 text-center font-mono">3.92</td>
+                      <td className="px-4 py-3 text-primary">Sara Afsar</td>
+                      <td className="px-4 py-3">Spouse</td>
+                      <td className="px-4 py-3 font-mono">12/04/2001</td>
+                      <td className="px-4 py-3 font-mono">1988273645021</td>
                     </tr>
+                  ) : (
                     <tr className="hover:bg-muted/5">
-                      <td className="px-4 py-3 text-primary">Bachelor of Science (B.Sc)</td>
-                      <td className="px-4 py-3">University of Dhaka</td>
-                      <td className="px-4 py-3 font-mono">2020</td>
-                      <td className="px-4 py-3 text-center font-mono">3.85</td>
+                      <td className="px-4 py-3 text-primary">Mohammad Abdur Rahman</td>
+                      <td className="px-4 py-3">Parent</td>
+                      <td className="px-4 py-3 font-mono">15/08/1960</td>
+                      <td className="px-4 py-3 font-mono">1938472619802</td>
                     </tr>
-                  </>
-                ) : (
-                  <>
-                    <tr className="hover:bg-muted/5">
-                      <td className="px-4 py-3 text-primary">Bachelor of Business Admin (BBA)</td>
-                      <td className="px-4 py-3">National University</td>
-                      <td className="px-4 py-3 font-mono">2021</td>
-                      <td className="px-4 py-3 text-center font-mono">3.45</td>
-                    </tr>
-                    <tr className="hover:bg-muted/5">
-                      <td className="px-4 py-3 text-primary">Higher Secondary Certificate (HSC)</td>
-                      <td className="px-4 py-3">Dhaka College</td>
-                      <td className="px-4 py-3 font-mono">2017</td>
-                      <td className="px-4 py-3 text-center font-mono">4.80</td>
-                    </tr>
-                  </>
-                )}
-              </tbody>
-            </table>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
+
         </div>
       )}
 
-      {/* 6. JOB EXPERIENCE TAB */}
-      {activeDetailTab === "job_experience" && (
-        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh]">
-          <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
-            <History className="size-3.5" /> Career History & Timeline
-          </h4>
+      {/* 5. CORPORATE ASSETS VAULT */}
+      {activeDetailTab === "corporate_assets" && (
+        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh] scrollbar-thin">
+          
+          <div className="space-y-3">
+            <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
+              <Laptop className="size-3.5" /> Corporate Assets Assignment
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-muted/10 border border-border/30 rounded-xl p-4">
+              <div className="space-y-0.5">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase">Assigned Device</div>
+                <div className="text-xs font-extrabold text-foreground">Apple MacBook Pro 16"</div>
+              </div>
+              <div className="space-y-0.5 font-mono">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase font-sans">Laptop Asset ID</div>
+                <div className="text-xs font-extrabold text-primary font-mono text-emerald-600 dark:text-emerald-400">{laptopAsset}</div>
+              </div>
+              <div className="space-y-0.5 font-mono">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase font-sans">Access Card RFID</div>
+                <div className="text-xs font-extrabold text-foreground font-mono">{accessCard}</div>
+              </div>
+              <div className="space-y-0.5">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase">Corporate Mobile Device</div>
+                <div className="text-xs font-semibold text-foreground">iPhone 15 Pro (Asset MOB-2026)</div>
+              </div>
+              <div className="space-y-0.5 font-mono">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase font-sans">SIM/Number Allocated</div>
+                <div className="text-xs font-bold text-foreground font-sans">+880 1750-021154</div>
+              </div>
+              <div className="space-y-0.5 font-mono">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase font-sans">Issued Date</div>
+                <div className="text-xs font-bold text-foreground">{selectedEmp.joinDate}</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* 6. HR VERIFICATION & AUDIT */}
+      {activeDetailTab === "hr_verification" && (
+        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh] scrollbar-thin">
+          
+          <div className="space-y-3">
+            <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-500 flex items-center gap-1.5 border-b border-emerald-500/30 pb-1.5">
+              <ShieldCheck className="size-3.5" /> Official HR Audit Clearance
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-muted/10 border border-border/30 rounded-xl p-4">
+              <div className="space-y-0.5">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase">Background Status</div>
+                <div>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-extrabold border border-emerald-500/25">
+                    <span className="size-1 rounded-full bg-emerald-500 animate-ping" /> Verified & Cleared
+                  </span>
+                </div>
+              </div>
+              <div className="space-y-0.5">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase">Cleared By Auditor</div>
+                <div className="text-xs font-extrabold text-foreground">HR Compliance Team</div>
+              </div>
+              <div className="space-y-0.5 font-mono">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase font-sans">Clearance Date</div>
+                <div className="text-xs font-bold text-foreground">{selectedEmp.joinDate}</div>
+              </div>
+              <div className="space-y-0.5 sm:col-span-3 pt-2 border-t border-border/20 mt-2">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase">Verification Findings</div>
+                <p className="text-xs font-semibold text-foreground/80 leading-relaxed mt-1">All academic credentials validated. National ID and background databases checked. Corporate reference verification reports cleared successfully with no flags raised.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* 7. INCREMENT HISTORY */}
+      {activeDetailTab === "increment_history" && (
+        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh] scrollbar-thin">
+          
           <div className="space-y-4">
-            {selectedEmp.name === "Tahmid Afsar Shapno" ? (
-              <>
-                <div className="flex gap-4 p-4 border border-border bg-card rounded-xl">
-                  <div className="size-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 border border-primary/20">
-                    <Briefcase className="size-4.5" />
-                  </div>
-                  <div className="space-y-1">
-                    <h4 className="text-xs font-extrabold text-foreground">Asst. Manager — Business Innovation</h4>
-                    <div className="text-[10px] font-bold text-primary uppercase">Pakiza Software Limited</div>
-                    <div className="text-[9px] font-bold text-muted-foreground/60 font-mono">2023-08-01 — Present</div>
-                  </div>
-                </div>
-                <div className="flex gap-4 p-4 border border-border bg-card rounded-xl">
-                  <div className="size-10 rounded-full bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0 border border-indigo-500/20">
-                    <Briefcase className="size-4.5" />
-                  </div>
-                  <div className="space-y-1">
-                    <h4 className="text-xs font-extrabold text-foreground">Senior Software Engineer</h4>
-                    <div className="text-[10px] font-bold text-indigo-500 uppercase">Brain Station 23 Ltd</div>
-                    <div className="text-[9px] font-bold text-muted-foreground/60 font-mono">2021-03-15 — 2023-07-31</div>
-                  </div>
-                </div>
-              </>
+            <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
+              <TrendingUp className="size-3.5" /> Increment & Promotion History
+            </h4>
+            
+            {!incRecord ? (
+              <div className="p-8 text-center border border-border/40 rounded-xl bg-muted/10">
+                <History className="size-8 mx-auto text-muted-foreground/40 mb-3" />
+                <p className="text-xs font-semibold text-muted-foreground">No increment history found for this employee.</p>
+              </div>
             ) : (
-              <div className="flex gap-4 p-4 border border-border bg-card rounded-xl">
-                <div className="size-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 border border-primary/20">
-                  <Briefcase className="size-4.5" />
+              <div className="space-y-6">
+                {/* Summary Metrics */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+                    <span className="text-[9px] font-black uppercase text-primary/80 mb-1 tracking-widest">Joining Salary</span>
+                    <span className="text-base font-black text-primary font-mono">৳{incRecord.salaryJoining.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+                    <span className="text-[9px] font-black uppercase text-emerald-600 dark:text-emerald-400 mb-1 tracking-widest">Current Gross</span>
+                    <span className="text-base font-black text-emerald-600 dark:text-emerald-400 font-mono">৳{incRecord.salaryGross.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+                    <span className="text-[9px] font-black uppercase text-indigo-600 dark:text-indigo-400 mb-1 tracking-widest">Total Increment</span>
+                    <span className="text-base font-black text-indigo-600 dark:text-indigo-400 font-mono">৳{(incRecord.salaryGross - incRecord.salaryJoining).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+                    <span className="text-[9px] font-black uppercase text-amber-600 dark:text-amber-400 mb-1 tracking-widest">Promotions</span>
+                    <span className="text-base font-black text-amber-600 dark:text-amber-400 font-mono">{incRecord.total.includes("(P)") || incRecord.total.split("(")[1]?.replace(")","") || "0"}</span>
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <h4 className="text-xs font-extrabold text-foreground">{selectedEmp.title} — Admin Operations</h4>
-                  <div className="text-[10px] font-bold text-primary uppercase font-mono">Pakiza Software Limited</div>
-                  <div className="text-[9px] font-bold text-muted-foreground/60 font-mono">{selectedEmp.joinDate} — Present</div>
+
+                {/* Yearly Timeline Table */}
+                <div className="border border-border/40 rounded-xl overflow-hidden shadow-xs">
+                  <table className="w-full text-left text-xs whitespace-nowrap">
+                    <thead>
+                      <tr className="bg-muted/40 border-b border-border/40 text-[9px] font-black uppercase tracking-wider text-muted-foreground/80">
+                        <th className="px-4 py-3">Year</th>
+                        <th className="px-4 py-3 text-right">Increment Amount</th>
+                        <th className="px-4 py-3 text-center">Promotion Status</th>
+                        <th className="px-4 py-3 text-right">Running Gross</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/20 font-semibold">
+                      {[
+                        { year: "2014", inc: incRecord.inc2014 },
+                        { year: "2015", inc: incRecord.inc2015 },
+                        { year: "2016", inc: incRecord.inc2016 },
+                        { year: "2017", inc: incRecord.inc2017 },
+                        { year: "2018", inc: incRecord.inc2018 },
+                        { year: "2019", inc: incRecord.inc2019 },
+                        { year: "2020", inc: incRecord.inc2020 },
+                        { year: "2021", inc: incRecord.inc2021 },
+                        { year: "2022", inc: incRecord.inc2022 },
+                        { year: "2023", inc: incRecord.inc2023 },
+                        { year: "2024", inc: incRecord.inc2024 },
+                        { year: "2025", inc: incRecord.inc2025 },
+                      ]
+                      .filter(y => y.inc && y.inc !== "0" && y.inc.trim() !== "")
+                      .map((item, index, arr) => {
+                        const isPromo = item.inc.includes("(P)");
+                        const val = parseFloat(item.inc.replace("(P)", "").replace(/,/g, "")) || 0;
+                        
+                        // Calculate running gross (simplified assumption)
+                        let runningGross = incRecord.salaryJoining;
+                        for (let i = 0; i <= index; i++) {
+                           const pastVal = parseFloat(arr[i].inc.replace("(P)", "").replace(/,/g, "")) || 0;
+                           runningGross += pastVal;
+                        }
+
+                        return (
+                          <tr key={item.year} className="hover:bg-muted/10 transition-colors group">
+                            <td className="px-4 py-3 font-black text-foreground">
+                              {item.year}
+                            </td>
+                            <td className="px-4 py-3 text-right text-emerald-600 dark:text-emerald-400 font-mono font-bold">
+                              +৳{val.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              {isPromo ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/20 text-[9px] font-black uppercase">
+                                  <Award className="size-3" /> Promoted
+                                </span>
+                              ) : (
+                                <span className="text-[10px] text-muted-foreground/50">-</span>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 text-right font-mono font-bold text-primary">
+                              ৳{runningGross.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                      {(!incRecord.total || incRecord.total.startsWith("0")) && (
+                        <tr>
+                          <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground text-xs font-semibold">
+                            No increments received yet.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
+
               </div>
             )}
           </div>
         </div>
       )}
 
-      {/* 7. PROFESSIONAL CERTIFICATE */}
-      {activeDetailTab === "professional_certificate" && (
-        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh]">
-          <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
-            <Award className="size-3.5" /> Professional Certifications
-          </h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-4 border border-border bg-card rounded-xl space-y-1 relative">
-              <div className="inline-flex px-2 py-0.5 rounded bg-primary/10 text-primary text-[9px] font-extrabold uppercase font-mono">Verified</div>
-              <h4 className="text-xs font-extrabold text-foreground">AWS Certified Solutions Architect</h4>
-              <div className="text-[10px] font-bold text-muted-foreground">Amazon Web Services</div>
-              <div className="text-[9px] font-semibold text-muted-foreground/60 font-mono">ID: AWS-9928173</div>
-            </div>
-            <div className="p-4 border border-border bg-card rounded-xl space-y-1 relative">
-              <div className="inline-flex px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-500 text-[9px] font-extrabold uppercase font-mono">Verified</div>
-              <h4 className="text-xs font-extrabold text-foreground">HR Management Professional (PHRi)</h4>
-              <div className="text-[10px] font-bold text-indigo-500">HR Certification Institute</div>
-              <div className="text-[9px] font-semibold text-muted-foreground/60 font-mono">ID: HRCI-8819028</div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 8. TRAINING TAB */}
-      {activeDetailTab === "training" && (
-        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh]">
-          <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
-            <BookOpen className="size-3.5" /> Professional Corporate Trainings
-          </h4>
-          <div className="border border-border/40 rounded-xl overflow-hidden text-xs">
-            <table className="w-full border-collapse text-left">
-              <thead>
-                <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
-                  <th className="px-4 py-3">Training Title</th>
-                  <th className="px-4 py-3">Institution Name</th>
-                  <th className="px-4 py-3">Duration</th>
-                  <th className="px-4 py-3 font-mono">Date</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/20 font-semibold text-foreground/80">
-                <tr className="hover:bg-muted/5">
-                  <td className="px-4 py-3 text-primary">Information Security & ISO 27001 Auditor</td>
-                  <td className="px-4 py-3">Pakiza Internal Audit Team</td>
-                  <td className="px-4 py-3">1 Week</td>
-                  <td className="px-4 py-3 font-mono">12/04/2024</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* 9. INVOLVEMENT TAB */}
-      {activeDetailTab === "involvement" && (
-        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh]">
-          <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
-            <Users className="size-3.5" /> Organizational Committees & Involvements
-          </h4>
-          <div className="p-4 border border-border bg-card rounded-xl space-y-1.5">
-            <h4 className="text-xs font-extrabold text-foreground">ISO 27001 Certification Task Force</h4>
-            <div className="text-[10px] font-bold text-primary uppercase">Technical Lead | 6 Months</div>
-            <p className="text-[11px] text-muted-foreground/80 leading-relaxed">Assigned to configure the enterprise digital dossier access vaults and ensure total credential security protocols.</p>
-          </div>
-        </div>
-      )}
-
-      {/* 10. EMERGENCY CONTACT TAB */}
-      {activeDetailTab === "emergency_contact" && (
-        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh]">
-          <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-rose-500 flex items-center gap-1.5 border-b border-rose-500/30 pb-1.5">
-            <PhoneCall className="size-3.5 animate-pulse" /> Emergency Contact Info
-          </h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-muted/10 border border-border/30 rounded-xl p-4">
-            <div className="space-y-1">
-              <div className="text-[10px] font-bold text-muted-foreground uppercase">Contact Person</div>
-              <div className="text-xs font-extrabold text-foreground">Mohammad Abdur Rahman</div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-[10px] font-bold text-muted-foreground uppercase">Relationship</div>
-              <div className="text-xs font-bold text-foreground">Father</div>
-            </div>
-            <div className="space-y-1 font-mono">
-              <div className="text-[10px] font-bold text-muted-foreground uppercase font-sans">Primary Phone</div>
-              <div className="text-xs font-extrabold text-foreground">+880 1750-021154</div>
-            </div>
-            <div className="space-y-1 sm:col-span-2 md:col-span-3">
-              <div className="text-[10px] font-bold text-muted-foreground uppercase">Residential Address</div>
-              <div className="text-xs font-semibold text-foreground/80 leading-relaxed">House 12, Road 4, Sector 6, Uttara, Dhaka</div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 11. NOMINEE TAB */}
-      {activeDetailTab === "nominee_form" && (
-        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh]">
-          <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
-            <FileSignature className="size-3.5" /> Legal Nominee Declarations
-          </h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-muted/10 border border-border/30 rounded-xl p-4">
-            <div className="space-y-1">
-              <div className="text-[10px] font-bold text-muted-foreground uppercase">Nominee Name</div>
-              <div className="text-xs font-extrabold text-foreground">{nomineeName}</div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-[10px] font-bold text-muted-foreground uppercase">Relationship</div>
-              <div className="text-xs font-bold text-foreground">{selectedEmp.gender === "Female" ? "Father" : "Mother"}</div>
-            </div>
-            <div className="space-y-1 font-mono">
-              <div className="text-[10px] font-bold text-muted-foreground uppercase font-sans">Share Percentage</div>
-              <div className="text-xs font-extrabold text-primary font-mono text-emerald-600 dark:text-emerald-400">100% Share</div>
-            </div>
-            <div className="space-y-1 font-mono">
-              <div className="text-[10px] font-bold text-muted-foreground uppercase font-sans">NID / Birth Cert</div>
-              <div className="text-xs font-bold text-foreground">19658293740291</div>
-            </div>
-            <div className="space-y-1 sm:col-span-2 md:col-span-3">
-              <div className="text-[10px] font-bold text-muted-foreground uppercase">Permanent Address</div>
-              <div className="text-xs font-semibold text-foreground/80 leading-relaxed">Village: Voroshakathi, Post: Hawlader, Barishal, Bangladesh</div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 12. REFERENCE TAB */}
-      {activeDetailTab === "reference" && (
-        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh]">
-          <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
-            <Heart className="size-3.5" /> Corporate References Check
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 border border-border bg-card rounded-xl space-y-2">
-              <div className="text-[9px] font-extrabold uppercase text-primary tracking-wider border-b border-border/10 pb-1">Referee 1</div>
-              <div className="space-y-1">
-                <h4 className="text-xs font-extrabold text-foreground">{ref1Name}</h4>
-                <div className="text-[10px] font-bold text-muted-foreground">{ref1Designation} | {ref1Org}</div>
-                <div className="text-[10px] font-semibold text-muted-foreground/60 font-mono">{ref1Contact}</div>
-              </div>
-            </div>
-            <div className="p-4 border border-border bg-card rounded-xl space-y-2">
-              <div className="text-[9px] font-extrabold uppercase text-indigo-500 tracking-wider border-b border-border/10 pb-1">Referee 2</div>
-              <div className="space-y-1">
-                <h4 className="text-xs font-extrabold text-foreground">Easin Mia</h4>
-                <div className="text-[10px] font-bold text-indigo-500">Senior Operations Lead | Pakiza Group</div>
-                <div className="text-[10px] font-semibold text-muted-foreground/60 font-mono">+880 1324-726766</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 13. DEPENDENT TAB */}
-      {activeDetailTab === "dependent" && (
-        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh]">
-          <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
-            <Baby className="size-3.5" /> Family Dependents Registry
-          </h4>
-          <div className="border border-border/40 rounded-xl overflow-hidden text-xs">
-            <table className="w-full border-collapse text-left">
-              <thead>
-                <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
-                  <th className="px-4 py-3">Dependent Name</th>
-                  <th className="px-4 py-3">Relationship</th>
-                  <th className="px-4 py-3 font-mono">DOB</th>
-                  <th className="px-4 py-3 font-mono">NID / Birth Cert No</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/20 font-semibold text-foreground/80">
-                {selectedEmp.maritalStatus === "Married" ? (
-                  <tr className="hover:bg-muted/5">
-                    <td className="px-4 py-3 text-primary">Sara Afsar</td>
-                    <td className="px-4 py-3">Spouse</td>
-                    <td className="px-4 py-3 font-mono">12/04/2001</td>
-                    <td className="px-4 py-3 font-mono">1988273645021</td>
-                  </tr>
-                ) : (
-                  <tr className="hover:bg-muted/5">
-                    <td className="px-4 py-3 text-primary">Mohammad Abdur Rahman</td>
-                    <td className="px-4 py-3">Parent</td>
-                    <td className="px-4 py-3 font-mono">15/08/1960</td>
-                    <td className="px-4 py-3 font-mono">1938472619802</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* 14. JOB DESCRIPTION TAB */}
-      {activeDetailTab === "job_description" && (
-        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh]">
-          <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
-            <FileText className="size-3.5" /> Corporate Job Description & Charter
-          </h4>
-          <div className="space-y-4 bg-muted/10 border border-border/30 rounded-xl p-4 text-xs font-semibold leading-relaxed text-foreground/90">
-            <div>
-              <div className="text-[9px] font-extrabold uppercase text-muted-foreground mb-1">Key Duties & Responsibilities</div>
-              <div>{jobDesc}</div>
-            </div>
-            <div className="border-t border-border/20 pt-3">
-              <div className="text-[9px] font-extrabold uppercase text-muted-foreground mb-1">Primary Deliverables (KPIs)</div>
-              <div>Scalable backend coding, Git repository sync, secure corporate asset protection, DB query normalization.</div>
-            </div>
-            <div className="border-t border-border/20 pt-3">
-              <div className="text-[9px] font-extrabold uppercase text-muted-foreground mb-1">Primary Reporting Authority</div>
-              <div className="text-primary font-extrabold">Tahmid Afsar Shapno (Director of Engineering)</div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 15. OTHERS DOCX TAB */}
-      {activeDetailTab === "others_docx" && (
-        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh]">
-          <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
-            <FileDown className="size-3.5" /> Supporting PDFs & Digital Attachments
-          </h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {otherDocsList.map((doc, idx) => (
-              <div key={idx} className="p-4 border border-border/60 bg-muted/5 rounded-xl flex items-center justify-between text-xs">
-                <div className="flex items-center gap-3">
-                  <div className="size-9 rounded bg-primary/10 text-primary flex items-center justify-center border border-primary/20 shrink-0">
-                    <FileText className="size-4.5" />
-                  </div>
-                  <div>
-                    <h4 className="font-extrabold text-foreground truncate max-w-[120px]">{doc.docTitle}</h4>
-                    <span className="text-[8px] font-extrabold text-primary uppercase font-mono">{doc.docType} File</span>
-                  </div>
-                </div>
-                <span className="text-[8px] font-extrabold text-emerald-500 uppercase font-mono">Linked</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 16. EMPLOYEE VERIFICATION TAB */}
-      {activeDetailTab === "employee_verification" && (
-        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh]">
-          <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-500 flex items-center gap-1.5 border-b border-emerald-500/30 pb-1.5">
-            <ShieldCheck className="size-3.5 animate-pulse" /> Official HR Audit Clearance
-          </h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-muted/10 border border-border/30 rounded-xl p-4">
-            <div className="space-y-1">
-              <div className="text-[10px] font-bold text-muted-foreground uppercase">Background Status</div>
-              <div>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-extrabold border border-emerald-500/25">
-                  <span className="size-1 rounded-full bg-emerald-500 animate-ping" /> Verified & Cleared
-                </span>
-              </div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-[10px] font-bold text-muted-foreground uppercase">Cleared By Auditor</div>
-              <div className="text-xs font-extrabold text-foreground">HR Compliance Team</div>
-            </div>
-            <div className="space-y-1 font-mono">
-              <div className="text-[10px] font-bold text-muted-foreground uppercase font-sans">Clearance Date</div>
-              <div className="text-xs font-bold text-foreground">{selectedEmp.joinDate}</div>
-            </div>
-            <div className="space-y-1 sm:col-span-2 md:col-span-3">
-              <div className="text-[10px] font-bold text-muted-foreground uppercase">Verification Findings</div>
-              <p className="text-xs font-semibold text-foreground/80 leading-relaxed">All academic credentials validated. National ID and background databases checked. Corporate reference verification reports cleared successfully with no flags raised.</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 17. EMPLOYEE EQUIPMENT TAB */}
-      {activeDetailTab === "employee_equipment" && (
-        <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh]">
-          <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
-            <Laptop className="size-3.5" /> Corporate Assets Assignment
-          </h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-muted/10 border border-border/30 rounded-xl p-4">
-            <div className="space-y-1">
-              <div className="text-[10px] font-bold text-muted-foreground uppercase">Assigned Device</div>
-              <div className="text-xs font-extrabold text-foreground">Apple MacBook Pro 16"</div>
-            </div>
-            <div className="space-y-1 font-mono">
-              <div className="text-[10px] font-bold text-muted-foreground uppercase font-sans">Laptop Asset ID</div>
-              <div className="text-xs font-extrabold text-primary font-mono text-emerald-600 dark:text-emerald-400">{laptopAsset}</div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-[10px] font-bold text-muted-foreground uppercase">Access Card RFID</div>
-              <div className="text-xs font-extrabold text-foreground font-mono">{accessCard}</div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-[10px] font-bold text-muted-foreground uppercase">Corporate Mobile Device</div>
-              <div className="text-xs font-semibold text-foreground">iPhone 15 Pro (Asset MOB-2026)</div>
-            </div>
-            <div className="space-y-1 font-mono">
-              <div className="text-[10px] font-bold text-muted-foreground uppercase font-sans">SIM/Number Allocated</div>
-              <div className="text-xs font-bold text-foreground font-sans">+880 1750-021154</div>
-            </div>
-            <div className="space-y-1 font-mono">
-              <div className="text-[10px] font-bold text-muted-foreground uppercase font-sans">Issued Date</div>
-              <div className="text-xs font-bold text-foreground">{selectedEmp.joinDate}</div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 18. TIMELINE TAB (fallback / special render) */}
-      {activeDetailTab === "timeline" && (
-        <div className="p-6 overflow-y-auto max-h-[62vh] relative">
-          <div className="absolute left-[30px] md:left-1/2 top-8 bottom-8 w-0.5 -translate-x-1/2 bg-gradient-to-b from-primary/80 via-primary/30 to-border/30" />
-          <div className="space-y-8 relative">
-            {timelineMilestones.map((milestone, idx) => {
-              const IconComponent = milestone.icon;
-              const isEven = idx % 2 === 0;
-
-              return (
-                <div key={idx} className="flex flex-col md:flex-row items-start md:items-center relative">
-                  <div className="absolute left-3.5 md:left-1/2 -translate-x-1/2 z-10 flex items-center justify-center">
-                    <div className={`size-8 rounded-full border flex items-center justify-center bg-card shadow-xs ${milestone.iconColor}`}>
-                      <IconComponent className="size-4 animate-pulse" />
-                    </div>
-                  </div>
-
-                  <div className="w-full md:flex">
-                    <div className={`hidden md:flex md:w-1/2 pr-10 justify-end ${!isEven ? "opacity-0 pointer-events-none select-none" : ""}`}>
-                      {isEven && (
-                        <div className="bg-card border border-border/80 rounded-xl p-4 shadow-2xs max-w-md w-full relative group hover:border-primary/40 transition duration-200">
-                          <div className="absolute right-[-6px] top-1/2 -translate-y-1/2 size-2.5 rotate-45 bg-card border-t border-r border-border/80 group-hover:border-primary/40 transition duration-200" />
-                          <div className="flex items-center justify-between gap-2 border-b border-border/20 pb-2 mb-2">
-                            <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary bg-primary/10 px-2 py-0.5 rounded">
-                              {milestone.badge}
-                            </span>
-                            <span className="text-[10px] font-bold text-muted-foreground/80">{milestone.date}</span>
-                          </div>
-                          <h4 className="text-xs font-extrabold text-foreground">{milestone.title}</h4>
-                          <p className="text-[11px] text-muted-foreground/90 mt-1.5 leading-relaxed">
-                            {milestone.description}
-                          </p>
-                          {milestone.metaValue && (
-                            <div className="mt-3 pt-2.5 border-t border-border/30 flex items-center justify-between text-[10px]">
-                              <span className="text-muted-foreground font-semibold uppercase">{milestone.metaLabel}:</span>
-                              <span className="font-extrabold text-foreground bg-muted/40 px-2 py-0.5 rounded">{milestone.metaValue}</span>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className={`w-full md:w-1/2 pl-12 md:pl-10 flex justify-start ${isEven ? "md:hidden" : ""}`}>
-                      <div className="bg-card border border-border/80 rounded-xl p-4 shadow-2xs max-w-md w-full relative group hover:border-primary/40 transition duration-200">
-                        <div className="absolute left-[-6px] top-1/2 -translate-y-1/2 size-2.5 rotate-45 bg-card border-b border-l border-border/80 group-hover:border-primary/40 transition duration-200" />
-                        <div className="flex items-center justify-between gap-2 border-b border-border/20 pb-2 mb-2">
-                          <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary bg-primary/10 px-2 py-0.5 rounded">
-                            {milestone.badge}
-                          </span>
-                          <span className="text-[10px] font-bold text-muted-foreground/80">{milestone.date}</span>
-                        </div>
-                        <h4 className="text-xs font-extrabold text-foreground">{milestone.title}</h4>
-                        <p className="text-[11px] text-muted-foreground/90 mt-1.5 leading-relaxed">
-                          {milestone.description}
-                        </p>
-                        {milestone.metaValue && (
-                          <div className="mt-3 pt-2.5 border-t border-border/30 flex items-center justify-between text-[10px]">
-                            <span className="text-muted-foreground font-semibold uppercase">{milestone.metaLabel}:</span>
-                            <span className="font-extrabold text-foreground bg-muted/40 px-2 py-0.5 rounded">{milestone.metaValue}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

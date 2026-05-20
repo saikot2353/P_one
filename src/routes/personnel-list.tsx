@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
+import { EmployeeDetailTabs } from "@/components/dashboard/employee-detail-tabs";
 import {
   Search, FileDown, Printer, FileText, ChevronRight, UserPlus, Eye, Edit3, X, SlidersHorizontal,
   ChevronDown, MapPin, Phone, Mail, Calendar, User, Heart, Briefcase, DollarSign, EyeOff, LayoutGrid, Check,
@@ -20,7 +21,7 @@ export const Route = createFileRoute("/personnel-list")({
 });
 
 // Full employee mock dataset matching your exact search text output!
-const employeesData = [
+export const employeesData = [
   {
     id: "2023043910",
     offcId: "—",
@@ -365,7 +366,7 @@ const defaultColumns = {
 
 function PersonnelListPage() {
   const [employees, setEmployees] = useState(employeesData);
-  const [selectedEmp, setSelectedEmp] = useState<typeof employeesData[0] | null>(null);
+  const navigate = useNavigate();
 
   // Selection & Action Hub States
   const [selectedEmpIds, setSelectedEmpIds] = useState<string[]>([]);
@@ -1044,17 +1045,13 @@ function PersonnelListPage() {
                 </thead>
                 <tbody className="divide-y divide-border/45">
                   {filteredEmployees.map((e, index) => {
-                    const isSelected = selectedEmp?.id === e.id;
-                    // Define fully solid background classes to prevent text bleed-through when scrolling horizontally
-                    const stickyCellBgClass = isSelected
-                      ? "bg-[#f1f5f9] dark:bg-[#1e293b] group-hover:bg-[#e2e8f0] dark:group-hover:bg-[#334155]"
-                      : "bg-card group-hover:bg-[#f8fafc] dark:group-hover:bg-[#1e293b]";
+                    const stickyCellBgClass = "bg-card group-hover:bg-[#f8fafc] dark:group-hover:bg-[#1e293b]";
                     
                     return (
                       <tr 
                         key={e.id}
-                        onClick={() => setSelectedEmp(e)}
-                        className={`group transition-all cursor-pointer ${isSelected ? "bg-[#f1f5f9] dark:bg-[#1e293b]" : "hover:bg-[#f8fafc] dark:hover:bg-[#1e293b]"}`}
+                        onClick={() => navigate({ to: '/employee-detail/$id', params: { id: e.id } })}
+                        className={`group transition-all cursor-pointer hover:bg-[#f8fafc] dark:hover:bg-[#1e293b]`}
                       >
                         {/* Sticky left Action & Checkbox Column cell */}
                         <td className={`sticky left-0 ${stickyCellBgClass} px-2 py-2 border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[110px] min-w-[110px] max-w-[110px] transition-all`} onClick={(event) => event.stopPropagation()}>
@@ -1067,14 +1064,14 @@ function PersonnelListPage() {
                             />
                             <button 
                               className="size-6 bg-amber-500 text-white rounded hover:bg-amber-600 transition flex items-center justify-center shadow-2xs"
-                              onClick={() => setSelectedEmp(e)}
+                              onClick={() => navigate({ to: '/employee-detail/$id', params: { id: e.id } })}
                               title="Quick Sheet"
                             >
                               <FileText className="size-3" />
                             </button>
                             <button 
                               className="size-6 border border-border hover:bg-muted text-muted-foreground hover:text-primary rounded transition flex items-center justify-center"
-                              onClick={() => setSelectedEmp(e)}
+                              onClick={() => navigate({ to: '/employee-detail/$id', params: { id: e.id } })}
                               title="View File"
                             >
                               <Eye className="size-3" />
@@ -1190,55 +1187,6 @@ function PersonnelListPage() {
           </div>
         </div>
 
-        {/* HIGH-FIDELITY DIGITAL FILE MODAL FOR THE SELECTED EMPLOYEE */}
-        {selectedEmp && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="relative w-full max-w-4xl bg-card border border-border/80 shadow-2xl rounded-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
-              
-              {/* Header card banner */}
-              <div className="relative p-6 border-b border-border/40 bg-gradient-to-br from-primary/5 via-transparent to-muted/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <button 
-                  onClick={() => setSelectedEmp(null)}
-                  className="absolute right-4 top-4 p-1.5 rounded-lg border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition duration-150 animate-in spin-in-90 duration-200"
-                >
-                  <X className="size-4" />
-                </button>
-
-                <div className="flex items-center gap-4">
-                  <div className="size-14 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-extrabold text-lg shadow-sm">
-                    {selectedEmp.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
-                  </div>
-                  <div>
-                    <h3 className="text-base font-extrabold text-foreground tracking-tight flex items-center gap-1.5">
-                      {selectedEmp.name}
-                      <span className="text-[10px] font-extrabold uppercase tracking-widest bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-2 py-0.5 rounded">
-                        Active
-                      </span>
-                    </h3>
-                    <p className="text-xs text-muted-foreground/80 font-semibold">{selectedEmp.title}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* RENDER COMPONENT HERE */}
-              <EmployeeDetailTabs selectedEmp={selectedEmp} />
-
-              {/* Action Footer */}
-              <div className="flex items-center justify-end gap-3 p-6 border-t border-border/40 bg-muted/5">
-                <button 
-                  onClick={() => setSelectedEmp(null)}
-                  className="h-10 px-5 rounded-xl border border-border hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground transition duration-200"
-                >
-                  Close Folder
-                </button>
-                <button className="h-10 px-5 rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs font-bold shadow-md hover:shadow-lg hover:opacity-95 transition-all">
-                  Edit Digital File
-                </button>
-              </div>
-
-            </div>
-          </div>
-        )}
       </main>
     </div>
   );

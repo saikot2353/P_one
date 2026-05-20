@@ -5,7 +5,7 @@ import { Topbar } from "@/components/dashboard/Topbar";
 import {
   User, MapPin, Briefcase, DollarSign, Plus, Check, Mail, Phone,
   Calendar, Heart, FileText, CheckCircle2, ChevronRight, ArrowLeft, ArrowRight, Save, X, Info,
-  Gift, Camera, Upload, GraduationCap, History, Award, BookOpen, Users, PhoneCall, FileSignature, 
+  Gift, Camera, Upload, GraduationCap, History, Award, BookOpen, Users, PhoneCall, FileSignature,
   Baby, ShieldCheck, Laptop, HelpCircle, FileDown, ShieldAlert, Eye, Trash2, Edit3, Trash, ChevronDown, CreditCard
 } from "lucide-react";
 
@@ -173,7 +173,7 @@ function AddEmployeePage() {
     // 14. Job Description
     jobDescription: "Senior Software Engineer responsible for building high-scale payroll and HR modules using modern web technologies.",
     keyDeliverables: "Fullstack web app development, Git source code management, DB schema optimization.",
-    reportingLine: "Tahmid Afsar Shapno (Director of Engineering)",
+    reportingLine: "Tahmid Afsar Shapno (Head Of Department)",
 
     // 16. Employee Verification
     verificationStatus: "Verified",
@@ -488,7 +488,7 @@ function AddEmployeePage() {
         ];
         const verFilled = verFields.filter(Boolean).length;
         const verScore = Math.round((verFilled / verFields.length) * 30);
-        
+
         const scanFields = [
           form.picture,
           form.signature,
@@ -497,7 +497,7 @@ function AddEmployeePage() {
         ];
         const scanFilled = scanFields.filter(Boolean).length;
         const scanScore = Math.round((scanFilled / scanFields.length) * 40);
-        
+
         const otherScore = otherDocs.length > 0 ? 30 : 0;
         return Math.min(100, verScore + scanScore + otherScore);
       }
@@ -591,7 +591,7 @@ function AddEmployeePage() {
 
         {/* Form Body Scrollpane */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6 xl:p-8 space-y-6">
-          
+
           {/* Top Panel Breadcrumbs and Title Card */}
           <div className="bg-card border border-border/80 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1.5">
@@ -616,7 +616,7 @@ function AddEmployeePage() {
           </div>
 
           <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-            
+
             {/* Step Selection Left Navigation Card (Scrollable list of all 17 options) */}
             <div className="lg:col-span-1 bg-card border border-border/80 rounded-2xl p-4 shadow-xs space-y-1 max-h-[82vh] overflow-y-auto scrollbar-thin">
               <div className="px-3 py-2 text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/50 border-b border-border/20 mb-1.5 sticky top-0 bg-card z-10">
@@ -630,22 +630,22 @@ function AddEmployeePage() {
                   <span className="text-primary font-black text-xs">{overallPercentage}%</span>
                 </div>
                 <div className="h-2 w-full bg-muted border border-border/20 rounded-full overflow-hidden relative">
-                  <div 
-                    className="h-full bg-gradient-to-r from-primary to-primary-glow transition-all duration-500 rounded-full" 
-                    style={{ width: `${overallPercentage}%` }} 
+                  <div
+                    className="h-full bg-gradient-to-r from-primary to-primary-glow transition-all duration-500 rounded-full"
+                    style={{ width: `${overallPercentage}%` }}
                   />
                 </div>
                 <p className="text-[9px] text-muted-foreground/80 leading-relaxed">
                   Fill in the required fields to complete the employee profile.
                 </p>
               </div>
-              
+
               {TABS.map((tab, idx) => {
                 const TabIcon = tab.icon;
                 const completed = isTabCompleted(tab.id);
                 const isActive = activeTab === tab.id;
                 const percentage = getTabCompletionPercentage(tab.id);
-                
+
                 return (
                   <button
                     key={tab.id}
@@ -654,26 +654,24 @@ function AddEmployeePage() {
                       setActiveTab(tab.id);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left text-xs font-bold transition-all duration-200 ${
-                      isActive
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left text-xs font-bold transition-all duration-200 ${isActive
                         ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
                         : "hover:bg-muted text-muted-foreground hover:text-foreground"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-2.5 truncate">
                       <TabIcon className="size-4 shrink-0" />
                       <span className="truncate">{idx + 1}. {tab.label}</span>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-md ${
-                        isActive 
-                          ? "bg-primary-foreground/15 text-primary-foreground" 
-                          : percentage === 100 
-                            ? "bg-emerald-500/10 text-emerald-500" 
-                            : percentage > 40 
-                              ? "bg-amber-500/10 text-amber-500" 
+                      <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-md ${isActive
+                          ? "bg-primary-foreground/15 text-primary-foreground"
+                          : percentage === 100
+                            ? "bg-emerald-500/10 text-emerald-500"
+                            : percentage > 40
+                              ? "bg-amber-500/10 text-amber-500"
                               : "bg-rose-500/10 text-rose-500"
-                      }`}>
+                        }`}>
                         {percentage}%
                       </span>
                       {completed && (
@@ -698,14 +696,14 @@ function AddEmployeePage() {
               {/* TAB 1: PERSONAL & IDENTITY (CONSOLIDATED) */}
               {activeTab === "personal_identity" && (
                 <div className="space-y-6 animate-in fade-in duration-200 text-foreground">
-                  
+
                   {/* Premium, High-fidelity Progress Stepper Timeline */}
                   <div className="bg-card border border-border/60 rounded-2xl p-5 shadow-xs overflow-x-auto scrollbar-thin">
                     <div className="min-w-[650px] relative flex items-center justify-between px-6 py-3">
-                      
+
                       {/* Horizontal connecting track line behind the dots */}
                       <div className="absolute top-[26px] left-[55px] right-[55px] h-[3px] bg-muted/60 border-t border-b border-border/20 z-0" />
-                      
+
                       {[
                         { id: "primary_placement", label: "Placement", icon: User, desc: "Personal & Job" },
                         { id: "legal_kinship", label: "Kinship", icon: Users, desc: "NID & Family" },
@@ -718,7 +716,7 @@ function AddEmployeePage() {
                         const isSelected = subSection === step.id;
                         const subPercentage = getSubSectionCompletionPercentage(step.id);
                         const isCompleted = subPercentage === 100;
-                        
+
                         return (
                           <button
                             key={step.id}
@@ -731,42 +729,39 @@ function AddEmployeePage() {
                             style={{ width: "90px" }}
                           >
                             {/* Circle Stepper Dot/Bubble */}
-                            <div className={`size-[42px] rounded-full flex items-center justify-center border-2 transition-all duration-300 relative ${
-                              isSelected
+                            <div className={`size-[42px] rounded-full flex items-center justify-center border-2 transition-all duration-300 relative ${isSelected
                                 ? "bg-primary text-primary-foreground border-primary shadow-[0_0_15px_var(--primary)] scale-110"
                                 : isCompleted
                                   ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.2)]"
                                   : "bg-card text-muted-foreground border-border/80 hover:border-muted-foreground/60"
-                            }`}>
+                              }`}>
                               {isCompleted ? (
                                 <Check className="size-[18px] stroke-[3]" />
                               ) : (
                                 <StepIcon className="size-[17px]" />
                               )}
-                              
+
                               {/* Pulsing neon highlight around active bubble */}
                               {isSelected && (
                                 <div className="absolute inset-[-4px] rounded-full border-2 border-primary/40 animate-ping opacity-60 pointer-events-none" />
                               )}
                             </div>
-                            
+
                             {/* Text labels and percentages */}
                             <div className="text-center space-y-1.5 w-full min-w-[120px]">
-                              <span className={`text-[10px] font-black uppercase tracking-wider block transition-colors duration-200 ${
-                                isSelected ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
-                              }`}>
+                              <span className={`text-[10px] font-black uppercase tracking-wider block transition-colors duration-200 ${isSelected ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                                }`}>
                                 {idx + 1}. {step.label}
                               </span>
-                              
-                              <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full inline-block transition-all duration-200 ${
-                                isSelected
+
+                              <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full inline-block transition-all duration-200 ${isSelected
                                   ? "bg-primary/10 text-primary border border-primary/20"
                                   : isCompleted
                                     ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/10"
                                     : subPercentage > 0
                                       ? "bg-amber-500/10 text-amber-600 border border-amber-500/10"
                                       : "bg-rose-500/10 text-rose-600 border border-rose-500/10"
-                              }`}>
+                                }`}>
                                 {subPercentage}%
                               </span>
                             </div>
@@ -802,9 +797,8 @@ function AddEmployeePage() {
                               type="text"
                               value={form.nameEng}
                               onChange={e => handleChange("nameEng", e.target.value)}
-                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full ${
-                                errors.nameEng ? "border-rose-400" : "border-border"
-                              }`}
+                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full ${errors.nameEng ? "border-rose-400" : "border-border"
+                                }`}
                               placeholder="e.g. Tahmid Afsar Shapno"
                             />
                           </div>
@@ -830,9 +824,8 @@ function AddEmployeePage() {
                               type="date"
                               value={form.dob}
                               onChange={e => handleChange("dob", e.target.value)}
-                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full ${
-                                errors.dob ? "border-rose-400" : "border-border"
-                              }`}
+                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full ${errors.dob ? "border-rose-400" : "border-border"
+                                }`}
                             />
                           </div>
 
@@ -845,9 +838,8 @@ function AddEmployeePage() {
                               <select
                                 value={form.gender}
                                 onChange={e => handleChange("gender", e.target.value)}
-                                className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-bold focus:outline-none w-full appearance-none pr-10 ${
-                                  errors.gender ? "border-rose-400" : "border-border"
-                                }`}
+                                className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-bold focus:outline-none w-full appearance-none pr-10 ${errors.gender ? "border-rose-400" : "border-border"
+                                  }`}
                               >
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
@@ -1013,9 +1005,8 @@ function AddEmployeePage() {
                               <select
                                 value={form.dept}
                                 onChange={e => handleChange("dept", e.target.value)}
-                                className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-bold focus:outline-none w-full appearance-none pr-10 ${
-                                  errors.dept ? "border-rose-400" : "border-border"
-                                }`}
+                                className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-bold focus:outline-none w-full appearance-none pr-10 ${errors.dept ? "border-rose-400" : "border-border"
+                                  }`}
                               >
                                 <option value="Supply Chain">Supply Chain</option>
                                 <option value="Implementation & Business Analysis">Implementation & Business Analysis</option>
@@ -1037,9 +1028,8 @@ function AddEmployeePage() {
                               <select
                                 value={form.title}
                                 onChange={e => handleChange("title", e.target.value)}
-                                className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-bold focus:outline-none w-full appearance-none pr-10 ${
-                                  errors.title ? "border-rose-400" : "border-border"
-                                }`}
+                                className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-bold focus:outline-none w-full appearance-none pr-10 ${errors.title ? "border-rose-400" : "border-border"
+                                  }`}
                               >
                                 <option value="Executive">Executive</option>
                                 <option value="Office Executive">Office Executive</option>
@@ -1360,9 +1350,8 @@ function AddEmployeePage() {
                               type="text"
                               value={form.nid}
                               onChange={e => handleChange("nid", e.target.value)}
-                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full font-mono ${
-                                errors.nid ? "border-rose-400" : "border-border"
-                              }`}
+                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full font-mono ${errors.nid ? "border-rose-400" : "border-border"
+                                }`}
                               placeholder="10 or 17 digit NID number"
                             />
                           </div>
@@ -1483,7 +1472,7 @@ function AddEmployeePage() {
                               <Heart className="size-4 text-rose-500 fill-rose-500 animate-pulse" />
                               <h4 className="text-xs font-extrabold text-foreground uppercase tracking-widest">Matrimonial Spouse Information</h4>
                             </div>
-                            
+
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
                               {/* Spouse Name Eng */}
                               <div className="space-y-1.5">
@@ -1584,7 +1573,7 @@ function AddEmployeePage() {
                               <p className="text-[11px] text-muted-foreground">Physical residence history, active mailing postage, and permanent voter tracks.</p>
                             </div>
                           </div>
-                          
+
                           {/* Same as present address checkbox */}
                           <label className="flex items-center gap-2 cursor-pointer select-none bg-muted/40 border border-border/30 hover:bg-muted/70 px-3 py-1.5 rounded-xl transition duration-200">
                             <input
@@ -1598,7 +1587,7 @@ function AddEmployeePage() {
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                          
+
                           {/* Present Address Block */}
                           <div className="space-y-4">
                             <div className="flex items-center gap-2 border-b border-border/20 pb-2">
@@ -1654,9 +1643,9 @@ function AddEmployeePage() {
                               <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center justify-between">
                                   <span>Upazila</span>
-                                  <button 
-                                    type="button" 
-                                    onClick={() => setAddingField("presUpazila")} 
+                                  <button
+                                    type="button"
+                                    onClick={() => setAddingField("presUpazila")}
                                     className="text-[9px] font-extrabold text-amber-500 hover:text-amber-600 transition flex items-center gap-0.5"
                                   >
                                     <Plus className="size-2.5 stroke-[3]" /> Add
@@ -1678,9 +1667,9 @@ function AddEmployeePage() {
                               <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center justify-between">
                                   <span>PostOffice</span>
-                                  <button 
-                                    type="button" 
-                                    onClick={() => setAddingField("presPostOffice")} 
+                                  <button
+                                    type="button"
+                                    onClick={() => setAddingField("presPostOffice")}
                                     className="text-[9px] font-extrabold text-amber-500 hover:text-amber-600 transition flex items-center gap-0.5"
                                   >
                                     <Plus className="size-2.5 stroke-[3]" /> Add
@@ -1764,7 +1753,7 @@ function AddEmployeePage() {
                                 </div>
                               </div>
                             </div>
-                            
+
                             <div className="bg-muted/10 border border-border/30 rounded-xl p-3.5">
                               <span className="text-[8px] font-black text-muted-foreground/75 uppercase tracking-widest block mb-1">Mailing Dispatch preview</span>
                               <span className="text-xs font-bold text-foreground block truncate">{form.presVillageEng || "Dhopapara"}, Road {form.presRoad || "N/A"}, {form.presUpazila}, {form.presDistrict}, {form.presCountry}</span>
@@ -1835,9 +1824,9 @@ function AddEmployeePage() {
                                 <div className="space-y-1">
                                   <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center justify-between">
                                     <span>Upazila</span>
-                                    <button 
-                                      type="button" 
-                                      onClick={() => setAddingField("permUpazila")} 
+                                    <button
+                                      type="button"
+                                      onClick={() => setAddingField("permUpazila")}
                                       className="text-[9px] font-extrabold text-amber-500 hover:text-amber-600 transition flex items-center gap-0.5"
                                     >
                                       <Plus className="size-2.5 stroke-[3]" /> Add
@@ -1859,9 +1848,9 @@ function AddEmployeePage() {
                                 <div className="space-y-1">
                                   <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center justify-between">
                                     <span>PostOffice</span>
-                                    <button 
-                                      type="button" 
-                                      onClick={() => setAddingField("permPostOffice")} 
+                                    <button
+                                      type="button"
+                                      onClick={() => setAddingField("permPostOffice")}
                                       className="text-[9px] font-extrabold text-amber-500 hover:text-amber-600 transition flex items-center gap-0.5"
                                     >
                                       <Plus className="size-2.5 stroke-[3]" /> Add
@@ -1950,8 +1939,8 @@ function AddEmployeePage() {
                             <div className="bg-muted/10 border border-border/30 rounded-xl p-3.5">
                               <span className="text-[8px] font-black text-muted-foreground/75 uppercase tracking-widest block mb-1">Legal Dossier dispatch preview</span>
                               <span className="text-xs font-bold text-foreground block truncate">
-                                {form.sameAsPresent 
-                                  ? `${form.presVillageEng || "Dhopapara"}, Road ${form.presRoad || "N/A"}, ${form.presUpazila}, ${form.presDistrict}, ${form.presCountry}` 
+                                {form.sameAsPresent
+                                  ? `${form.presVillageEng || "Dhopapara"}, Road ${form.presRoad || "N/A"}, ${form.presUpazila}, ${form.presDistrict}, ${form.presCountry}`
                                   : `${form.permVillageEng || "Khalilgonj"}, Road ${form.permRoad || "N/A"}, ${form.permUpazila}, ${form.permDistrict}, ${form.permCountry}`}
                               </span>
                             </div>
@@ -2077,7 +2066,7 @@ function AddEmployeePage() {
               {/* TAB 2: FINANCIAL & EMPLOYMENT (CONSOLIDATED COMPENSATION & DISBURSEMENT) */}
               {activeTab === "financial_employment" && (
                 <div className="space-y-8 animate-in fade-in duration-200">
-                  
+
                   {/* Unified Compensation & Perks Grid */}
                   <div className="space-y-5">
                     <div className="border-b border-border/30 pb-3 flex items-center gap-2">
@@ -2086,7 +2075,7 @@ function AddEmployeePage() {
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                      
+
                       {/* Left Block: Base Compensation & Automated Breakdown Splits */}
                       <div className="lg:col-span-7 space-y-5 bg-card border border-border/60 rounded-2xl p-5 shadow-2xs">
                         <div className="border-b border-border/30 pb-2.5">
@@ -2105,9 +2094,8 @@ function AddEmployeePage() {
                                 type="number"
                                 value={form.gross}
                                 onChange={e => handleChange("gross", e.target.value)}
-                                className={`h-10 pl-7.5 pr-3.5 rounded-xl border bg-primary/5 text-sm font-extrabold font-mono text-primary focus:outline-none focus:ring-1 focus:ring-primary w-full ${
-                                  errors.gross ? "border-rose-400" : "border-border/80"
-                                }`}
+                                className={`h-10 pl-7.5 pr-3.5 rounded-xl border bg-primary/5 text-sm font-extrabold font-mono text-primary focus:outline-none focus:ring-1 focus:ring-primary w-full ${errors.gross ? "border-rose-400" : "border-border/80"
+                                  }`}
                                 placeholder="e.g. 45000"
                               />
                             </div>
@@ -2400,7 +2388,7 @@ function AddEmployeePage() {
                         <h4 className="text-xs font-extrabold text-foreground uppercase tracking-wider">Employee Portrait</h4>
                         <p className="text-[10px] text-muted-foreground">Premium front portrait, clean background. Max 2MB.</p>
                       </div>
-                      
+
                       {uploadProgress.picture !== undefined && uploadProgress.picture < 100 && (
                         <div className="w-full bg-muted rounded-full h-1.5 mt-2">
                           <div className="bg-primary h-1.5 rounded-full transition-all" style={{ width: `${uploadProgress.picture}%` }}></div>
