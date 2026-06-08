@@ -248,7 +248,7 @@ export function Sidebar() {
           <div className="text-[9px] uppercase tracking-[0.25em] font-bold text-sidebar-primary">HRIS</div>
         </div>
       </div>
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-none">
         <div className="px-2.5 pb-2 text-[9px] font-extrabold uppercase tracking-widest text-sidebar-foreground/45">Workspace</div>
         {nav.map((item) => {
           const Icon = item.icon;
