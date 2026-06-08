@@ -33,6 +33,8 @@ interface AttendanceDay {
   inTime?: string;
   outTime?: string;
   dayName: string;
+  leaveType?: string;
+  holidayName?: string;
 }
 
 // Dummy data for June 2026 (Starts on Monday)
@@ -101,6 +103,8 @@ const generateYearlyDummyData = (year: number) => {
       let status: AttendanceStatus = "Present";
       let inTime: string | undefined;
       let outTime: string | undefined;
+      let leaveType: string | undefined;
+      let holidayName: string | undefined;
       
       if (dayOfWeek === 5 || dayOfWeek === 6) {
         status = "Weekend";
@@ -113,12 +117,14 @@ const generateYearlyDummyData = (year: number) => {
           status = "Absent";
         } else if (rand < 0.1) {
           status = "Leave";
+          leaveType = Math.random() > 0.5 ? "Sick Leave" : "Casual Leave";
         } else if (rand < 0.15) {
           status = "Late";
           inTime = "09:45 AM";
           outTime = "06:05 PM";
         } else if (rand < 0.18) {
           status = "Holiday";
+          holidayName = "Public Holiday";
         } else {
           status = "Present";
           // Randomize slightly around 9 to 6
@@ -129,7 +135,7 @@ const generateYearlyDummyData = (year: number) => {
         }
       }
       
-      days.push({ date: i, status, inTime, outTime, dayName });
+      days.push({ date: i, status, inTime, outTime, dayName, leaveType, holidayName });
     }
     monthsData.push({ monthName: monthNames[month], days, emptyCells: Array(firstDay).fill(null) });
   }
@@ -548,17 +554,36 @@ export default function MyAttendancePage() {
                                 className={`relative group w-7 h-7 mx-auto rounded-[8px] flex items-center justify-center text-[10px] transition-all duration-200 ${cellStyles} ${interactiveClass}`}
                               >
                                 {day.date}
-                                {day.status !== "Future" && day.status !== "Weekend" && (day.inTime || day.outTime) && (
+                                {day.status !== "Future" && day.status !== "Weekend" && (
                                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[100] flex flex-col items-center">
                                     <div className="bg-slate-900 text-white text-[9px] px-2 py-1.5 rounded shadow-xl whitespace-nowrap border border-slate-700 font-mono tracking-tight flex flex-col gap-0.5">
-                                      <div className="flex justify-between gap-3">
-                                        <span className="text-slate-400 font-sans">In:</span> 
-                                        <span className="font-bold text-emerald-400">{day.inTime || "—"}</span>
-                                      </div>
-                                      <div className="flex justify-between gap-3">
-                                        <span className="text-slate-400 font-sans">Out:</span> 
-                                        <span className="font-bold text-rose-400">{day.outTime || "—"}</span>
-                                      </div>
+                                      {(day.status === "Present" || day.status === "Late") && (
+                                        <>
+                                          <div className="flex justify-between gap-3">
+                                            <span className="text-slate-400 font-sans">In:</span> 
+                                            <span className="font-bold text-emerald-400">{day.inTime || "—"}</span>
+                                          </div>
+                                          <div className="flex justify-between gap-3">
+                                            <span className="text-slate-400 font-sans">Out:</span> 
+                                            <span className="font-bold text-rose-400">{day.outTime || "—"}</span>
+                                          </div>
+                                        </>
+                                      )}
+                                      {day.status === "Absent" && (
+                                        <div className="font-bold text-rose-400 text-center font-sans tracking-wide">
+                                          Absent
+                                        </div>
+                                      )}
+                                      {day.status === "Leave" && (
+                                        <div className="font-bold text-blue-400 text-center font-sans tracking-wide">
+                                          {day.leaveType || "Leave"}
+                                        </div>
+                                      )}
+                                      {day.status === "Holiday" && (
+                                        <div className="font-bold text-purple-400 text-center font-sans tracking-wide">
+                                          {day.holidayName || "Holiday"}
+                                        </div>
+                                      )}
                                     </div>
                                     <div className="w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[4px] border-t-slate-900 -mt-[1px]"></div>
                                   </div>
