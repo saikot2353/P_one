@@ -5,7 +5,7 @@ import {
   Users, RefreshCw, FileText, BarChart3, ClipboardCheck,
   CalendarDays, CalendarX, ShieldAlert, Fingerprint, Timer,
   CreditCard, Cpu, ShieldCheck, Lightbulb, Settings,
-  LifeBuoy, ChevronDown, ChevronRight, File
+  LifeBuoy, ChevronDown, ChevronRight, File, Briefcase
 } from "lucide-react";
 
 interface SubItem {
@@ -23,6 +23,16 @@ interface NavItem {
 
 const nav: NavItem[] = [
   { label: "Dashboard", to: "/", icon: LayoutDashboard },
+  {
+    label: "SSP",
+    icon: Briefcase,
+    subitems: [
+      { label: "New Requisition", to: "/ssp-new-requisition" },
+      { label: "My Requisition", to: "/ssp-my-requisition" },
+      { label: "Approval", to: "/ssp-approval" },
+      { label: "Attendance", to: "/ssp-attendance" },
+    ]
+  },
   {
     label: "Configure",
     icon: SlidersHorizontal,

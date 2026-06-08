@@ -3,6 +3,7 @@ import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { EmployeeDetailTabs } from "@/components/dashboard/employee-detail-tabs";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import {
   Search, FileDown, Printer, FileText, ChevronRight, UserPlus, Eye, Edit3, X, SlidersHorizontal,
   ChevronDown, MapPin, Phone, Mail, Calendar, User, Heart, Briefcase, DollarSign, EyeOff, LayoutGrid, Check,
@@ -608,14 +609,12 @@ function PersonnelListPage() {
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Employee Type</label>
                   <div className="relative">
-                    <select
+                    <SearchableSelect
                       value={empTypeFilter}
-                      onChange={(e) => setEmpTypeFilter(e.target.value)}
-                      className="w-full h-9.5 pl-3 pr-8 rounded-xl bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition-all appearance-none font-semibold text-foreground/80 cursor-pointer"
-                    >
-                      {empTypesList.map(type => <option key={type} value={type}>{type === "ALL" ? "All Types" : type}</option>)}
-                    </select>
-                    <ChevronDown className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
+                      onChange={setEmpTypeFilter}
+                      options={empTypesList.map(type => ({ value: type, label: type === "ALL" ? "All Types" : type }))}
+                      placeholder="Select type..."
+                    />
                   </div>
                 </div>
 
@@ -623,14 +622,12 @@ function PersonnelListPage() {
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Department</label>
                   <div className="relative">
-                    <select
+                    <SearchableSelect
                       value={deptFilter}
-                      onChange={(e) => setDeptFilter(e.target.value)}
-                      className="w-full h-9.5 pl-3 pr-8 rounded-xl bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition-all appearance-none font-semibold text-foreground/80 cursor-pointer"
-                    >
-                      {departmentsList.map(dept => <option key={dept} value={dept}>{dept === "ALL" ? "All Departments" : dept}</option>)}
-                    </select>
-                    <ChevronDown className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
+                      onChange={setDeptFilter}
+                      options={departmentsList.map(dept => ({ value: dept, label: dept === "ALL" ? "All Departments" : dept }))}
+                      placeholder="Select department..."
+                    />
                   </div>
                 </div>
 
@@ -638,14 +635,12 @@ function PersonnelListPage() {
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Section</label>
                   <div className="relative">
-                    <select
+                    <SearchableSelect
                       value={sectFilter}
-                      onChange={(e) => setSectFilter(e.target.value)}
-                      className="w-full h-9.5 pl-3 pr-8 rounded-xl bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition-all appearance-none font-semibold text-foreground/80 cursor-pointer"
-                    >
-                      {sectionsList.map(sect => <option key={sect} value={sect}>{sect === "ALL" ? "All Sections" : sect}</option>)}
-                    </select>
-                    <ChevronDown className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
+                      onChange={setSectFilter}
+                      options={sectionsList.map(sect => ({ value: sect, label: sect === "ALL" ? "All Sections" : sect }))}
+                      placeholder="Select section..."
+                    />
                   </div>
                 </div>
 
@@ -653,14 +648,12 @@ function PersonnelListPage() {
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Designation</label>
                   <div className="relative">
-                    <select
+                    <SearchableSelect
                       value={designationFilter}
-                      onChange={(e) => setDesignationFilter(e.target.value)}
-                      className="w-full h-9.5 pl-3 pr-8 rounded-xl bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition-all appearance-none font-semibold text-foreground/80 cursor-pointer"
-                    >
-                      {designationsList.map(des => <option key={des} value={des}>{des === "ALL" ? "All Designations" : des}</option>)}
-                    </select>
-                    <ChevronDown className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
+                      onChange={setDesignationFilter}
+                      options={designationsList.map(des => ({ value: des, label: des === "ALL" ? "All Designations" : des }))}
+                      placeholder="Select designation..."
+                    />
                   </div>
                 </div>
 
@@ -668,17 +661,17 @@ function PersonnelListPage() {
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Working Status</label>
                   <div className="relative">
-                    <select
+                    <SearchableSelect
                       value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
-                      className="w-full h-9.5 pl-3 pr-8 rounded-xl bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition-all appearance-none font-semibold text-foreground/80 cursor-pointer"
-                    >
-                      <option value="ALL">All Status</option>
-                      <option value="Working">Working</option>
-                      <option value="On Leave">On Leave</option>
-                      <option value="Resigned">Resigned</option>
-                    </select>
-                    <ChevronDown className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
+                      onChange={setStatusFilter}
+                      options={[
+                        { value: "ALL", label: "All Status" },
+                        { value: "Working", label: "Working" },
+                        { value: "On Leave", label: "On Leave" },
+                        { value: "Resigned", label: "Resigned" }
+                      ]}
+                      placeholder="Select status..."
+                    />
                   </div>
                 </div>
 
@@ -686,16 +679,16 @@ function PersonnelListPage() {
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Employment Status</label>
                   <div className="relative">
-                    <select
+                    <SearchableSelect
                       value={empStatusFilter}
-                      onChange={(e) => setEmpStatusFilter(e.target.value)}
-                      className="w-full h-9.5 pl-3 pr-8 rounded-xl bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition-all appearance-none font-semibold text-foreground/80 cursor-pointer"
-                    >
-                      <option value="ALL">All Statuses</option>
-                      <option value="Probation">Probation</option>
-                      <option value="Permanent">Permanent</option>
-                    </select>
-                    <ChevronDown className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
+                      onChange={setEmpStatusFilter}
+                      options={[
+                        { value: "ALL", label: "All Statuses" },
+                        { value: "Probation", label: "Probation" },
+                        { value: "Permanent", label: "Permanent" }
+                      ]}
+                      placeholder="Select status..."
+                    />
                   </div>
                 </div>
 

@@ -9,6 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SspRequestManualAttendanceRouteImport } from './routes/ssp-request-manual-attendance'
+import { Route as SspNewRequisitionRouteImport } from './routes/ssp-new-requisition'
+import { Route as SspMyRequisitionRouteImport } from './routes/ssp-my-requisition'
+import { Route as SspMyAttendanceRouteImport } from './routes/ssp-my-attendance'
+import { Route as SspLeaveRequisitionRouteImport } from './routes/ssp-leave-requisition'
+import { Route as SspIctRequisitionRouteImport } from './routes/ssp-ict-requisition'
+import { Route as SspAttendanceRouteImport } from './routes/ssp-attendance'
+import { Route as SspApproveManualAttendanceRouteImport } from './routes/ssp-approve-manual-attendance'
+import { Route as SspApprovalRouteImport } from './routes/ssp-approval'
 import { Route as ProposeIncrementRouteImport } from './routes/propose-increment'
 import { Route as PersonnelListRouteImport } from './routes/personnel-list'
 import { Route as PersonnelApprovalRouteImport } from './routes/personnel-approval'
@@ -42,6 +51,53 @@ import { Route as AddEmployeeRouteImport } from './routes/add-employee'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EmployeeDetailIdRouteImport } from './routes/employee-detail.$id'
 
+const SspRequestManualAttendanceRoute =
+  SspRequestManualAttendanceRouteImport.update({
+    id: '/ssp-request-manual-attendance',
+    path: '/ssp-request-manual-attendance',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SspNewRequisitionRoute = SspNewRequisitionRouteImport.update({
+  id: '/ssp-new-requisition',
+  path: '/ssp-new-requisition',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SspMyRequisitionRoute = SspMyRequisitionRouteImport.update({
+  id: '/ssp-my-requisition',
+  path: '/ssp-my-requisition',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SspMyAttendanceRoute = SspMyAttendanceRouteImport.update({
+  id: '/ssp-my-attendance',
+  path: '/ssp-my-attendance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SspLeaveRequisitionRoute = SspLeaveRequisitionRouteImport.update({
+  id: '/ssp-leave-requisition',
+  path: '/ssp-leave-requisition',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SspIctRequisitionRoute = SspIctRequisitionRouteImport.update({
+  id: '/ssp-ict-requisition',
+  path: '/ssp-ict-requisition',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SspAttendanceRoute = SspAttendanceRouteImport.update({
+  id: '/ssp-attendance',
+  path: '/ssp-attendance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SspApproveManualAttendanceRoute =
+  SspApproveManualAttendanceRouteImport.update({
+    id: '/ssp-approve-manual-attendance',
+    path: '/ssp-approve-manual-attendance',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SspApprovalRoute = SspApprovalRouteImport.update({
+  id: '/ssp-approval',
+  path: '/ssp-approval',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProposeIncrementRoute = ProposeIncrementRouteImport.update({
   id: '/propose-increment',
   path: '/propose-increment',
@@ -235,6 +291,15 @@ export interface FileRoutesByFullPath {
   '/personnel-approval': typeof PersonnelApprovalRoute
   '/personnel-list': typeof PersonnelListRoute
   '/propose-increment': typeof ProposeIncrementRoute
+  '/ssp-approval': typeof SspApprovalRoute
+  '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
+  '/ssp-attendance': typeof SspAttendanceRoute
+  '/ssp-ict-requisition': typeof SspIctRequisitionRoute
+  '/ssp-leave-requisition': typeof SspLeaveRequisitionRoute
+  '/ssp-my-attendance': typeof SspMyAttendanceRoute
+  '/ssp-my-requisition': typeof SspMyRequisitionRoute
+  '/ssp-new-requisition': typeof SspNewRequisitionRoute
+  '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
 }
 export interface FileRoutesByTo {
@@ -269,6 +334,15 @@ export interface FileRoutesByTo {
   '/personnel-approval': typeof PersonnelApprovalRoute
   '/personnel-list': typeof PersonnelListRoute
   '/propose-increment': typeof ProposeIncrementRoute
+  '/ssp-approval': typeof SspApprovalRoute
+  '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
+  '/ssp-attendance': typeof SspAttendanceRoute
+  '/ssp-ict-requisition': typeof SspIctRequisitionRoute
+  '/ssp-leave-requisition': typeof SspLeaveRequisitionRoute
+  '/ssp-my-attendance': typeof SspMyAttendanceRoute
+  '/ssp-my-requisition': typeof SspMyRequisitionRoute
+  '/ssp-new-requisition': typeof SspNewRequisitionRoute
+  '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
 }
 export interface FileRoutesById {
@@ -304,6 +378,15 @@ export interface FileRoutesById {
   '/personnel-approval': typeof PersonnelApprovalRoute
   '/personnel-list': typeof PersonnelListRoute
   '/propose-increment': typeof ProposeIncrementRoute
+  '/ssp-approval': typeof SspApprovalRoute
+  '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
+  '/ssp-attendance': typeof SspAttendanceRoute
+  '/ssp-ict-requisition': typeof SspIctRequisitionRoute
+  '/ssp-leave-requisition': typeof SspLeaveRequisitionRoute
+  '/ssp-my-attendance': typeof SspMyAttendanceRoute
+  '/ssp-my-requisition': typeof SspMyRequisitionRoute
+  '/ssp-new-requisition': typeof SspNewRequisitionRoute
+  '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
 }
 export interface FileRouteTypes {
@@ -340,6 +423,15 @@ export interface FileRouteTypes {
     | '/personnel-approval'
     | '/personnel-list'
     | '/propose-increment'
+    | '/ssp-approval'
+    | '/ssp-approve-manual-attendance'
+    | '/ssp-attendance'
+    | '/ssp-ict-requisition'
+    | '/ssp-leave-requisition'
+    | '/ssp-my-attendance'
+    | '/ssp-my-requisition'
+    | '/ssp-new-requisition'
+    | '/ssp-request-manual-attendance'
     | '/employee-detail/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -374,6 +466,15 @@ export interface FileRouteTypes {
     | '/personnel-approval'
     | '/personnel-list'
     | '/propose-increment'
+    | '/ssp-approval'
+    | '/ssp-approve-manual-attendance'
+    | '/ssp-attendance'
+    | '/ssp-ict-requisition'
+    | '/ssp-leave-requisition'
+    | '/ssp-my-attendance'
+    | '/ssp-my-requisition'
+    | '/ssp-new-requisition'
+    | '/ssp-request-manual-attendance'
     | '/employee-detail/$id'
   id:
     | '__root__'
@@ -408,6 +509,15 @@ export interface FileRouteTypes {
     | '/personnel-approval'
     | '/personnel-list'
     | '/propose-increment'
+    | '/ssp-approval'
+    | '/ssp-approve-manual-attendance'
+    | '/ssp-attendance'
+    | '/ssp-ict-requisition'
+    | '/ssp-leave-requisition'
+    | '/ssp-my-attendance'
+    | '/ssp-my-requisition'
+    | '/ssp-new-requisition'
+    | '/ssp-request-manual-attendance'
     | '/employee-detail/$id'
   fileRoutesById: FileRoutesById
 }
@@ -443,11 +553,83 @@ export interface RootRouteChildren {
   PersonnelApprovalRoute: typeof PersonnelApprovalRoute
   PersonnelListRoute: typeof PersonnelListRoute
   ProposeIncrementRoute: typeof ProposeIncrementRoute
+  SspApprovalRoute: typeof SspApprovalRoute
+  SspApproveManualAttendanceRoute: typeof SspApproveManualAttendanceRoute
+  SspAttendanceRoute: typeof SspAttendanceRoute
+  SspIctRequisitionRoute: typeof SspIctRequisitionRoute
+  SspLeaveRequisitionRoute: typeof SspLeaveRequisitionRoute
+  SspMyAttendanceRoute: typeof SspMyAttendanceRoute
+  SspMyRequisitionRoute: typeof SspMyRequisitionRoute
+  SspNewRequisitionRoute: typeof SspNewRequisitionRoute
+  SspRequestManualAttendanceRoute: typeof SspRequestManualAttendanceRoute
   EmployeeDetailIdRoute: typeof EmployeeDetailIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/ssp-request-manual-attendance': {
+      id: '/ssp-request-manual-attendance'
+      path: '/ssp-request-manual-attendance'
+      fullPath: '/ssp-request-manual-attendance'
+      preLoaderRoute: typeof SspRequestManualAttendanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ssp-new-requisition': {
+      id: '/ssp-new-requisition'
+      path: '/ssp-new-requisition'
+      fullPath: '/ssp-new-requisition'
+      preLoaderRoute: typeof SspNewRequisitionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ssp-my-requisition': {
+      id: '/ssp-my-requisition'
+      path: '/ssp-my-requisition'
+      fullPath: '/ssp-my-requisition'
+      preLoaderRoute: typeof SspMyRequisitionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ssp-my-attendance': {
+      id: '/ssp-my-attendance'
+      path: '/ssp-my-attendance'
+      fullPath: '/ssp-my-attendance'
+      preLoaderRoute: typeof SspMyAttendanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ssp-leave-requisition': {
+      id: '/ssp-leave-requisition'
+      path: '/ssp-leave-requisition'
+      fullPath: '/ssp-leave-requisition'
+      preLoaderRoute: typeof SspLeaveRequisitionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ssp-ict-requisition': {
+      id: '/ssp-ict-requisition'
+      path: '/ssp-ict-requisition'
+      fullPath: '/ssp-ict-requisition'
+      preLoaderRoute: typeof SspIctRequisitionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ssp-attendance': {
+      id: '/ssp-attendance'
+      path: '/ssp-attendance'
+      fullPath: '/ssp-attendance'
+      preLoaderRoute: typeof SspAttendanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ssp-approve-manual-attendance': {
+      id: '/ssp-approve-manual-attendance'
+      path: '/ssp-approve-manual-attendance'
+      fullPath: '/ssp-approve-manual-attendance'
+      preLoaderRoute: typeof SspApproveManualAttendanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ssp-approval': {
+      id: '/ssp-approval'
+      path: '/ssp-approval'
+      fullPath: '/ssp-approval'
+      preLoaderRoute: typeof SspApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/propose-increment': {
       id: '/propose-increment'
       path: '/propose-increment'
@@ -707,6 +889,15 @@ const rootRouteChildren: RootRouteChildren = {
   PersonnelApprovalRoute: PersonnelApprovalRoute,
   PersonnelListRoute: PersonnelListRoute,
   ProposeIncrementRoute: ProposeIncrementRoute,
+  SspApprovalRoute: SspApprovalRoute,
+  SspApproveManualAttendanceRoute: SspApproveManualAttendanceRoute,
+  SspAttendanceRoute: SspAttendanceRoute,
+  SspIctRequisitionRoute: SspIctRequisitionRoute,
+  SspLeaveRequisitionRoute: SspLeaveRequisitionRoute,
+  SspMyAttendanceRoute: SspMyAttendanceRoute,
+  SspMyRequisitionRoute: SspMyRequisitionRoute,
+  SspNewRequisitionRoute: SspNewRequisitionRoute,
+  SspRequestManualAttendanceRoute: SspRequestManualAttendanceRoute,
   EmployeeDetailIdRoute: EmployeeDetailIdRoute,
 }
 export const routeTree = rootRouteImport
