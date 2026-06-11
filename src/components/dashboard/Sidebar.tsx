@@ -114,6 +114,15 @@ const nav: NavItem[] = [
     ]
   },
   {
+    label: "e-Recruitment",
+    icon: UserPlus,
+    subitems: [
+      { label: "e-Recuritment Form", to: "/recruitment-basic-entry" },
+      { label: "List", to: "/recruitment-basic-list" },
+      { label: "Approved List", to: "/recruitment-assessment-list" },
+    ],
+  },
+  {
     label: "IE Recruitment",
     icon: UserPlus,
     subitems: [

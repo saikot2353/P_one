@@ -286,6 +286,7 @@ function BasicInfoListPage() {
                           <div className="flex items-center justify-center gap-2">
                             {canEdit ? (
                               <button
+                                onClick={() => router.navigate({ to: `/recruitment-basic-entry?id=${item.empIdTemp}` as any })}
                                 title="Edit candidate"
                                 className="w-7 h-7 rounded border border-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition flex items-center justify-center shadow-2xs"
                               >

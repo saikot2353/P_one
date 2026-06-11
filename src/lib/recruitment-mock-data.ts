@@ -152,9 +152,136 @@ export const initializeRecruitmentMockData = (forceReset = false) => {
 
   // ─── 9. CANDIDATES (15 rows) ─────────────────────────────────────────────────
   set("recruitment_candidates", [
-    { empIdTemp: "PAL000001", nameEng: "Md. Karim Hossain",   nameBng: "মোঃ করিম হোসেন",     employeeType: "Worker", department: "RMG Operation", section: "Sewing",   designation: "Operator",        unit: "Unit-6", line: "52",  doj: "2026-08-16", dob: "1994-04-15", personalContact: "01634846914", assessStatus: "IE Pending",   grade: "" },
-    { empIdTemp: "PAL000002", nameEng: "Fatema Begum",         nameBng: "ফাতেমা বেগম",          employeeType: "Worker", department: "RMG Operation", section: "Cutting",  designation: "Cutter",          unit: "Unit-6", line: "12",  doj: "2026-08-17", dob: "1995-05-10", personalContact: "01700000001", assessStatus: "HR Approved",  grade: "B" },
-    { empIdTemp: "PAL000003", nameEng: "Md. Rakibul Islam",    nameBng: "মোঃ রাকিবুল ইসলাম",   employeeType: "Staff",  department: "Quality Control",section: "Inspection",designation: "QC Inspector",    unit: "Unit-6", line: "QC1", doj: "2026-08-18", dob: "1992-02-20", personalContact: "01800000002", assessStatus: "HR Pending",   grade: "" },
+    { 
+      empIdTemp: "PAL000001", 
+      nameEng: "Md. Karim Hossain",   
+      nameBng: "মোঃ করিম হোসেন",     
+      employeeType: "Worker", 
+      department: "RMG Operation", 
+      section: "Sewing",   
+      designation: "Operator",        
+      unit: "Unit-6", 
+      line: "52",  
+      doj: "2026-08-16", 
+      dob: "1994-04-15", 
+      personalContact: "01634846914", 
+      personalEmail: "karim.hossain@example.com",
+      religion: "Islam",
+      maritalStatus: "Married",
+      nidNumber: "5534893420",
+      birthReg: "1994261548002341",
+      fatherNameEng: "Md. Abdul Latif",
+      fatherNameBng: "মোঃ আব্দুল লতিফ",
+      motherNameEng: "Mst. Kulsum Begum",
+      motherNameBng: "মোসাঃ কুলসুম বেগম",
+      emergencyContact: "01711223344",
+      contactPerson: "Md. Abdul Latif",
+      relationship: "Father",
+      presentAddress: "House: 12, Road: 4, Sector: 11, Uttara, Dhaka, Bangladesh",
+      permanentAddress: "Village: Ramnagar, PO: Ramnagar, Thana: Hathazari, District: Chattogram, Bangladesh",
+      academics: [
+        { id: "1", title: "SSC (Vocational)", institution: "Gazipur High School", year: "2010", result: "GPA 4.50" },
+        { id: "2", title: "Trade Certificate in Sewing", institution: "VTI Gazipur", year: "2012", result: "First Class" }
+      ],
+      experiences: [
+        { id: "1", company: "Ananta Garments Ltd", designation: "Junior Operator", from: "2013-01-10", to: "2016-12-15", reason: "Salary Increment & Better Career Prospects" },
+        { id: "2", company: "Standard Group Ltd", designation: "Sewing Operator", from: "2017-02-01", to: "2025-05-30", reason: "Relocated closer to home address" }
+      ],
+      nominee: {
+        name: "Mst. Salma Khatun",
+        relation: "Wife",
+        nidReg: "8893482341",
+        contact: "01999888777"
+      },
+      assessStatus: "IE Pending",   
+      grade: "" 
+    },
+    { 
+      empIdTemp: "PAL000002", 
+      nameEng: "Fatema Begum",         
+      nameBng: "ফাতেমা বেগম",          
+      employeeType: "Worker", 
+      department: "RMG Operation", 
+      section: "Cutting",  
+      designation: "Cutter",          
+      unit: "Unit-6", 
+      line: "12",  
+      doj: "2026-08-17", 
+      dob: "1995-05-10", 
+      personalContact: "01700000001", 
+      personalEmail: "fatema.begum@example.com",
+      religion: "Islam",
+      maritalStatus: "Single",
+      nidNumber: "3489234120",
+      birthReg: "1995261548002999",
+      fatherNameEng: "Md. Abul Hossain",
+      fatherNameBng: "মোঃ আবুল হোসেন",
+      motherNameEng: "Mst. Rehana Begum",
+      motherNameBng: "মোসাঃ রেহানা বেগম",
+      emergencyContact: "01811223344",
+      contactPerson: "Md. Abul Hossain",
+      relationship: "Father",
+      presentAddress: "House: 45, Road: 1, Block: A, Tongi, Gazipur, Bangladesh",
+      permanentAddress: "Village: Tongi Bazar, PO: Tongi, Thana: Gazipur Sadar, District: Gazipur, Bangladesh",
+      academics: [
+        { id: "1", title: "SSC", institution: "Tongi Girls High School", year: "2011", result: "GPA 3.80" }
+      ],
+      experiences: [
+        { id: "1", company: "Ha-Meem Group", designation: "Helper (Cutting)", from: "2014-06-01", to: "2018-08-15", reason: "Promoted to Cutter in other factory" }
+      ],
+      nominee: {
+        name: "Md. Abul Hossain",
+        relation: "Father",
+        nidReg: "3489234120",
+        contact: "01811223344"
+      },
+      assessStatus: "HR Approved",  
+      grade: "B" 
+    },
+    { 
+      empIdTemp: "PAL000003", 
+      nameEng: "Md. Rakibul Islam",    
+      nameBng: "মোঃ রাকিবুল ইসলাম",   
+      employeeType: "Staff",  
+      department: "Quality Control",
+      section: "Inspection",
+      designation: "QC Inspector",    
+      unit: "Unit-6", 
+      line: "QC1", 
+      doj: "2026-08-18", 
+      dob: "1992-02-20", 
+      personalContact: "01800000002", 
+      personalEmail: "rakibul.qc@example.com",
+      religion: "Islam",
+      maritalStatus: "Married",
+      nidNumber: "4589234122",
+      birthReg: "1992261548002888",
+      fatherNameEng: "Md. Altaf Ali",
+      fatherNameBng: "মোঃ আলতাফ আলী",
+      motherNameEng: "Mst. Shahnaz Parvin",
+      motherNameBng: "মোসাঃ শাহনাজ পারভীন",
+      emergencyContact: "01911223344",
+      contactPerson: "Mst. Shahnaz Parvin",
+      relationship: "Mother",
+      presentAddress: "House: 3, Road: 14, Sector: 4, Uttara, Dhaka, Bangladesh",
+      permanentAddress: "Village: Joydebpur, PO: Joydebpur, Thana: Gazipur Sadar, District: Gazipur, Bangladesh",
+      academics: [
+        { id: "1", title: "HSC", institution: "Joydebpur Govt College", year: "2010", result: "GPA 4.00" },
+        { id: "2", title: "Diploma in textile", institution: "Dhaka Polytechnic", year: "2014", result: "GPA 3.65" }
+      ],
+      experiences: [
+        { id: "1", company: "DBL Group Ltd", designation: "Quality Assistant", from: "2015-05-10", to: "2020-04-12", reason: "Joined as Inspector elsewhere" },
+        { id: "2", company: "Pacific Jeans Ltd", designation: "QC Inspector", from: "2020-06-01", to: "2025-12-30", reason: "Personal relocation" }
+      ],
+      nominee: {
+        name: "Mst. Lima Akter",
+        relation: "Wife",
+        nidReg: "9903482344",
+        contact: "01999777666"
+      },
+      assessStatus: "HR Pending",   
+      grade: "" 
+    },
     { empIdTemp: "PAL000004", nameEng: "Rahima Khatun",        nameBng: "রাহিমা খাতুন",         employeeType: "Worker", department: "RMG Operation", section: "Finishing",designation: "Iron Man",        unit: "Unit-6", line: "F-1", doj: "2026-08-19", dob: "1990-12-05", personalContact: "01900000003", assessStatus: "IE Pending",   grade: "" },
     { empIdTemp: "PAL000005", nameEng: "Md. Sohel Rana",       nameBng: "মোঃ সোহেল রানা",       employeeType: "Worker", department: "RMG Operation", section: "Sewing",   designation: "Operator",        unit: "Unit-6", line: "53",  doj: "2026-08-20", dob: "1996-07-22", personalContact: "01500000004", assessStatus: "HR Rejected",  grade: "" },
     { empIdTemp: "PAL000006", nameEng: "Roksana Akhter",       nameBng: "রোকসানা আক্তার",       employeeType: "Worker", department: "RMG Operation", section: "Sewing",   designation: "Helper",          unit: "Unit-6", line: "54",  doj: "2026-08-21", dob: "1998-03-11", personalContact: "01600000005", assessStatus: "IE Pending",   grade: "" },

@@ -59,6 +59,7 @@ import { Route as AddEmployeeRouteImport } from './routes/add-employee'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RecruitmentIeAssessmentIdRouteImport } from './routes/recruitment-ie-assessment.$id'
 import { Route as RecruitmentHrAssessmentIdRouteImport } from './routes/recruitment-hr-assessment.$id'
+import { Route as RecruitmentDetailIdRouteImport } from './routes/recruitment-detail.$id'
 import { Route as EmployeeDetailIdRouteImport } from './routes/employee-detail.$id'
 
 const SspRequestManualAttendanceRoute =
@@ -318,6 +319,11 @@ const RecruitmentHrAssessmentIdRoute =
     path: '/recruitment-hr-assessment/$id',
     getParentRoute: () => rootRouteImport,
   } as any)
+const RecruitmentDetailIdRoute = RecruitmentDetailIdRouteImport.update({
+  id: '/recruitment-detail/$id',
+  path: '/recruitment-detail/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmployeeDetailIdRoute = EmployeeDetailIdRouteImport.update({
   id: '/employee-detail/$id',
   path: '/employee-detail/$id',
@@ -374,6 +380,7 @@ export interface FileRoutesByFullPath {
   '/ssp-new-requisition': typeof SspNewRequisitionRoute
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
+  '/recruitment-detail/$id': typeof RecruitmentDetailIdRoute
   '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
   '/recruitment-ie-assessment/$id': typeof RecruitmentIeAssessmentIdRoute
 }
@@ -427,6 +434,7 @@ export interface FileRoutesByTo {
   '/ssp-new-requisition': typeof SspNewRequisitionRoute
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
+  '/recruitment-detail/$id': typeof RecruitmentDetailIdRoute
   '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
   '/recruitment-ie-assessment/$id': typeof RecruitmentIeAssessmentIdRoute
 }
@@ -481,6 +489,7 @@ export interface FileRoutesById {
   '/ssp-new-requisition': typeof SspNewRequisitionRoute
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
+  '/recruitment-detail/$id': typeof RecruitmentDetailIdRoute
   '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
   '/recruitment-ie-assessment/$id': typeof RecruitmentIeAssessmentIdRoute
 }
@@ -536,6 +545,7 @@ export interface FileRouteTypes {
     | '/ssp-new-requisition'
     | '/ssp-request-manual-attendance'
     | '/employee-detail/$id'
+    | '/recruitment-detail/$id'
     | '/recruitment-hr-assessment/$id'
     | '/recruitment-ie-assessment/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -589,6 +599,7 @@ export interface FileRouteTypes {
     | '/ssp-new-requisition'
     | '/ssp-request-manual-attendance'
     | '/employee-detail/$id'
+    | '/recruitment-detail/$id'
     | '/recruitment-hr-assessment/$id'
     | '/recruitment-ie-assessment/$id'
   id:
@@ -642,6 +653,7 @@ export interface FileRouteTypes {
     | '/ssp-new-requisition'
     | '/ssp-request-manual-attendance'
     | '/employee-detail/$id'
+    | '/recruitment-detail/$id'
     | '/recruitment-hr-assessment/$id'
     | '/recruitment-ie-assessment/$id'
   fileRoutesById: FileRoutesById
@@ -696,6 +708,7 @@ export interface RootRouteChildren {
   SspNewRequisitionRoute: typeof SspNewRequisitionRoute
   SspRequestManualAttendanceRoute: typeof SspRequestManualAttendanceRoute
   EmployeeDetailIdRoute: typeof EmployeeDetailIdRoute
+  RecruitmentDetailIdRoute: typeof RecruitmentDetailIdRoute
   RecruitmentHrAssessmentIdRoute: typeof RecruitmentHrAssessmentIdRoute
   RecruitmentIeAssessmentIdRoute: typeof RecruitmentIeAssessmentIdRoute
 }
@@ -1052,6 +1065,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RecruitmentHrAssessmentIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/recruitment-detail/$id': {
+      id: '/recruitment-detail/$id'
+      path: '/recruitment-detail/$id'
+      fullPath: '/recruitment-detail/$id'
+      preLoaderRoute: typeof RecruitmentDetailIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/employee-detail/$id': {
       id: '/employee-detail/$id'
       path: '/employee-detail/$id'
@@ -1112,6 +1132,7 @@ const rootRouteChildren: RootRouteChildren = {
   SspNewRequisitionRoute: SspNewRequisitionRoute,
   SspRequestManualAttendanceRoute: SspRequestManualAttendanceRoute,
   EmployeeDetailIdRoute: EmployeeDetailIdRoute,
+  RecruitmentDetailIdRoute: RecruitmentDetailIdRoute,
   RecruitmentHrAssessmentIdRoute: RecruitmentHrAssessmentIdRoute,
   RecruitmentIeAssessmentIdRoute: RecruitmentIeAssessmentIdRoute,
 }
