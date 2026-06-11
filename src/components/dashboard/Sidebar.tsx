@@ -5,7 +5,7 @@ import {
   Users, RefreshCw, FileText, BarChart3, ClipboardCheck,
   CalendarDays, CalendarX, ShieldAlert, Fingerprint, Timer,
   CreditCard, Cpu, ShieldCheck, Lightbulb, Settings,
-  LifeBuoy, ChevronDown, ChevronRight, File, Briefcase
+  LifeBuoy, ChevronDown, ChevronRight, File, Briefcase, UserPlus
 } from "lucide-react";
 
 interface SubItem {
@@ -112,6 +112,19 @@ const nav: NavItem[] = [
       { label: "Increment List", to: "/increment-list" },
       { label: "Increment History", to: "/increment-history" },
     ]
+  },
+  {
+    label: "e-Recruitment",
+    icon: UserPlus,
+    subitems: [
+      { label: "Organization Setting", to: "/recruitment-basic-setup" },
+      { label: "Basic Entry Form", to: "/recruitment-basic-entry" },
+      { label: "Basic Info List", to: "/recruitment-basic-info-list" },
+      { label: "IE Configuration", to: "/recruitment-configuration" },
+      { label: "IE Assessment", to: "/recruitment-ie-list" },
+      { label: "HR Assessment", to: "/recruitment-hr-list" },
+      { label: "Assessment List", to: "/recruitment-assessment-list" },
+    ],
   },
   {
     label: "Manage Shift",

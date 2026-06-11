@@ -18,6 +18,14 @@ import { Route as SspIctRequisitionRouteImport } from './routes/ssp-ict-requisit
 import { Route as SspAttendanceRouteImport } from './routes/ssp-attendance'
 import { Route as SspApproveManualAttendanceRouteImport } from './routes/ssp-approve-manual-attendance'
 import { Route as SspApprovalRouteImport } from './routes/ssp-approval'
+import { Route as RecruitmentIeListRouteImport } from './routes/recruitment-ie-list'
+import { Route as RecruitmentHrListRouteImport } from './routes/recruitment-hr-list'
+import { Route as RecruitmentConfigurationRouteImport } from './routes/recruitment-configuration'
+import { Route as RecruitmentBasicSetupRouteImport } from './routes/recruitment-basic-setup'
+import { Route as RecruitmentBasicListRouteImport } from './routes/recruitment-basic-list'
+import { Route as RecruitmentBasicInfoListRouteImport } from './routes/recruitment-basic-info-list'
+import { Route as RecruitmentBasicEntryRouteImport } from './routes/recruitment-basic-entry'
+import { Route as RecruitmentAssessmentListRouteImport } from './routes/recruitment-assessment-list'
 import { Route as ProposeIncrementRouteImport } from './routes/propose-increment'
 import { Route as PersonnelListRouteImport } from './routes/personnel-list'
 import { Route as PersonnelApprovalRouteImport } from './routes/personnel-approval'
@@ -49,6 +57,8 @@ import { Route as ApproveIncrementHrRouteImport } from './routes/approve-increme
 import { Route as ApproveIncrementGadgetRouteImport } from './routes/approve-increment-gadget'
 import { Route as AddEmployeeRouteImport } from './routes/add-employee'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RecruitmentIeAssessmentIdRouteImport } from './routes/recruitment-ie-assessment.$id'
+import { Route as RecruitmentHrAssessmentIdRouteImport } from './routes/recruitment-hr-assessment.$id'
 import { Route as EmployeeDetailIdRouteImport } from './routes/employee-detail.$id'
 
 const SspRequestManualAttendanceRoute =
@@ -98,6 +108,49 @@ const SspApprovalRoute = SspApprovalRouteImport.update({
   path: '/ssp-approval',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecruitmentIeListRoute = RecruitmentIeListRouteImport.update({
+  id: '/recruitment-ie-list',
+  path: '/recruitment-ie-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecruitmentHrListRoute = RecruitmentHrListRouteImport.update({
+  id: '/recruitment-hr-list',
+  path: '/recruitment-hr-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecruitmentConfigurationRoute =
+  RecruitmentConfigurationRouteImport.update({
+    id: '/recruitment-configuration',
+    path: '/recruitment-configuration',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const RecruitmentBasicSetupRoute = RecruitmentBasicSetupRouteImport.update({
+  id: '/recruitment-basic-setup',
+  path: '/recruitment-basic-setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecruitmentBasicListRoute = RecruitmentBasicListRouteImport.update({
+  id: '/recruitment-basic-list',
+  path: '/recruitment-basic-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecruitmentBasicInfoListRoute =
+  RecruitmentBasicInfoListRouteImport.update({
+    id: '/recruitment-basic-info-list',
+    path: '/recruitment-basic-info-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const RecruitmentBasicEntryRoute = RecruitmentBasicEntryRouteImport.update({
+  id: '/recruitment-basic-entry',
+  path: '/recruitment-basic-entry',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecruitmentAssessmentListRoute =
+  RecruitmentAssessmentListRouteImport.update({
+    id: '/recruitment-assessment-list',
+    path: '/recruitment-assessment-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ProposeIncrementRoute = ProposeIncrementRouteImport.update({
   id: '/propose-increment',
   path: '/propose-increment',
@@ -253,6 +306,18 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecruitmentIeAssessmentIdRoute =
+  RecruitmentIeAssessmentIdRouteImport.update({
+    id: '/recruitment-ie-assessment/$id',
+    path: '/recruitment-ie-assessment/$id',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const RecruitmentHrAssessmentIdRoute =
+  RecruitmentHrAssessmentIdRouteImport.update({
+    id: '/recruitment-hr-assessment/$id',
+    path: '/recruitment-hr-assessment/$id',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const EmployeeDetailIdRoute = EmployeeDetailIdRouteImport.update({
   id: '/employee-detail/$id',
   path: '/employee-detail/$id',
@@ -291,6 +356,14 @@ export interface FileRoutesByFullPath {
   '/personnel-approval': typeof PersonnelApprovalRoute
   '/personnel-list': typeof PersonnelListRoute
   '/propose-increment': typeof ProposeIncrementRoute
+  '/recruitment-assessment-list': typeof RecruitmentAssessmentListRoute
+  '/recruitment-basic-entry': typeof RecruitmentBasicEntryRoute
+  '/recruitment-basic-info-list': typeof RecruitmentBasicInfoListRoute
+  '/recruitment-basic-list': typeof RecruitmentBasicListRoute
+  '/recruitment-basic-setup': typeof RecruitmentBasicSetupRoute
+  '/recruitment-configuration': typeof RecruitmentConfigurationRoute
+  '/recruitment-hr-list': typeof RecruitmentHrListRoute
+  '/recruitment-ie-list': typeof RecruitmentIeListRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
   '/ssp-attendance': typeof SspAttendanceRoute
@@ -301,6 +374,8 @@ export interface FileRoutesByFullPath {
   '/ssp-new-requisition': typeof SspNewRequisitionRoute
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
+  '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
+  '/recruitment-ie-assessment/$id': typeof RecruitmentIeAssessmentIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -334,6 +409,14 @@ export interface FileRoutesByTo {
   '/personnel-approval': typeof PersonnelApprovalRoute
   '/personnel-list': typeof PersonnelListRoute
   '/propose-increment': typeof ProposeIncrementRoute
+  '/recruitment-assessment-list': typeof RecruitmentAssessmentListRoute
+  '/recruitment-basic-entry': typeof RecruitmentBasicEntryRoute
+  '/recruitment-basic-info-list': typeof RecruitmentBasicInfoListRoute
+  '/recruitment-basic-list': typeof RecruitmentBasicListRoute
+  '/recruitment-basic-setup': typeof RecruitmentBasicSetupRoute
+  '/recruitment-configuration': typeof RecruitmentConfigurationRoute
+  '/recruitment-hr-list': typeof RecruitmentHrListRoute
+  '/recruitment-ie-list': typeof RecruitmentIeListRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
   '/ssp-attendance': typeof SspAttendanceRoute
@@ -344,6 +427,8 @@ export interface FileRoutesByTo {
   '/ssp-new-requisition': typeof SspNewRequisitionRoute
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
+  '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
+  '/recruitment-ie-assessment/$id': typeof RecruitmentIeAssessmentIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -378,6 +463,14 @@ export interface FileRoutesById {
   '/personnel-approval': typeof PersonnelApprovalRoute
   '/personnel-list': typeof PersonnelListRoute
   '/propose-increment': typeof ProposeIncrementRoute
+  '/recruitment-assessment-list': typeof RecruitmentAssessmentListRoute
+  '/recruitment-basic-entry': typeof RecruitmentBasicEntryRoute
+  '/recruitment-basic-info-list': typeof RecruitmentBasicInfoListRoute
+  '/recruitment-basic-list': typeof RecruitmentBasicListRoute
+  '/recruitment-basic-setup': typeof RecruitmentBasicSetupRoute
+  '/recruitment-configuration': typeof RecruitmentConfigurationRoute
+  '/recruitment-hr-list': typeof RecruitmentHrListRoute
+  '/recruitment-ie-list': typeof RecruitmentIeListRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
   '/ssp-attendance': typeof SspAttendanceRoute
@@ -388,6 +481,8 @@ export interface FileRoutesById {
   '/ssp-new-requisition': typeof SspNewRequisitionRoute
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
+  '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
+  '/recruitment-ie-assessment/$id': typeof RecruitmentIeAssessmentIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -423,6 +518,14 @@ export interface FileRouteTypes {
     | '/personnel-approval'
     | '/personnel-list'
     | '/propose-increment'
+    | '/recruitment-assessment-list'
+    | '/recruitment-basic-entry'
+    | '/recruitment-basic-info-list'
+    | '/recruitment-basic-list'
+    | '/recruitment-basic-setup'
+    | '/recruitment-configuration'
+    | '/recruitment-hr-list'
+    | '/recruitment-ie-list'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
     | '/ssp-attendance'
@@ -433,6 +536,8 @@ export interface FileRouteTypes {
     | '/ssp-new-requisition'
     | '/ssp-request-manual-attendance'
     | '/employee-detail/$id'
+    | '/recruitment-hr-assessment/$id'
+    | '/recruitment-ie-assessment/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -466,6 +571,14 @@ export interface FileRouteTypes {
     | '/personnel-approval'
     | '/personnel-list'
     | '/propose-increment'
+    | '/recruitment-assessment-list'
+    | '/recruitment-basic-entry'
+    | '/recruitment-basic-info-list'
+    | '/recruitment-basic-list'
+    | '/recruitment-basic-setup'
+    | '/recruitment-configuration'
+    | '/recruitment-hr-list'
+    | '/recruitment-ie-list'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
     | '/ssp-attendance'
@@ -476,6 +589,8 @@ export interface FileRouteTypes {
     | '/ssp-new-requisition'
     | '/ssp-request-manual-attendance'
     | '/employee-detail/$id'
+    | '/recruitment-hr-assessment/$id'
+    | '/recruitment-ie-assessment/$id'
   id:
     | '__root__'
     | '/'
@@ -509,6 +624,14 @@ export interface FileRouteTypes {
     | '/personnel-approval'
     | '/personnel-list'
     | '/propose-increment'
+    | '/recruitment-assessment-list'
+    | '/recruitment-basic-entry'
+    | '/recruitment-basic-info-list'
+    | '/recruitment-basic-list'
+    | '/recruitment-basic-setup'
+    | '/recruitment-configuration'
+    | '/recruitment-hr-list'
+    | '/recruitment-ie-list'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
     | '/ssp-attendance'
@@ -519,6 +642,8 @@ export interface FileRouteTypes {
     | '/ssp-new-requisition'
     | '/ssp-request-manual-attendance'
     | '/employee-detail/$id'
+    | '/recruitment-hr-assessment/$id'
+    | '/recruitment-ie-assessment/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -553,6 +678,14 @@ export interface RootRouteChildren {
   PersonnelApprovalRoute: typeof PersonnelApprovalRoute
   PersonnelListRoute: typeof PersonnelListRoute
   ProposeIncrementRoute: typeof ProposeIncrementRoute
+  RecruitmentAssessmentListRoute: typeof RecruitmentAssessmentListRoute
+  RecruitmentBasicEntryRoute: typeof RecruitmentBasicEntryRoute
+  RecruitmentBasicInfoListRoute: typeof RecruitmentBasicInfoListRoute
+  RecruitmentBasicListRoute: typeof RecruitmentBasicListRoute
+  RecruitmentBasicSetupRoute: typeof RecruitmentBasicSetupRoute
+  RecruitmentConfigurationRoute: typeof RecruitmentConfigurationRoute
+  RecruitmentHrListRoute: typeof RecruitmentHrListRoute
+  RecruitmentIeListRoute: typeof RecruitmentIeListRoute
   SspApprovalRoute: typeof SspApprovalRoute
   SspApproveManualAttendanceRoute: typeof SspApproveManualAttendanceRoute
   SspAttendanceRoute: typeof SspAttendanceRoute
@@ -563,6 +696,8 @@ export interface RootRouteChildren {
   SspNewRequisitionRoute: typeof SspNewRequisitionRoute
   SspRequestManualAttendanceRoute: typeof SspRequestManualAttendanceRoute
   EmployeeDetailIdRoute: typeof EmployeeDetailIdRoute
+  RecruitmentHrAssessmentIdRoute: typeof RecruitmentHrAssessmentIdRoute
+  RecruitmentIeAssessmentIdRoute: typeof RecruitmentIeAssessmentIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -628,6 +763,62 @@ declare module '@tanstack/react-router' {
       path: '/ssp-approval'
       fullPath: '/ssp-approval'
       preLoaderRoute: typeof SspApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recruitment-ie-list': {
+      id: '/recruitment-ie-list'
+      path: '/recruitment-ie-list'
+      fullPath: '/recruitment-ie-list'
+      preLoaderRoute: typeof RecruitmentIeListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recruitment-hr-list': {
+      id: '/recruitment-hr-list'
+      path: '/recruitment-hr-list'
+      fullPath: '/recruitment-hr-list'
+      preLoaderRoute: typeof RecruitmentHrListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recruitment-configuration': {
+      id: '/recruitment-configuration'
+      path: '/recruitment-configuration'
+      fullPath: '/recruitment-configuration'
+      preLoaderRoute: typeof RecruitmentConfigurationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recruitment-basic-setup': {
+      id: '/recruitment-basic-setup'
+      path: '/recruitment-basic-setup'
+      fullPath: '/recruitment-basic-setup'
+      preLoaderRoute: typeof RecruitmentBasicSetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recruitment-basic-list': {
+      id: '/recruitment-basic-list'
+      path: '/recruitment-basic-list'
+      fullPath: '/recruitment-basic-list'
+      preLoaderRoute: typeof RecruitmentBasicListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recruitment-basic-info-list': {
+      id: '/recruitment-basic-info-list'
+      path: '/recruitment-basic-info-list'
+      fullPath: '/recruitment-basic-info-list'
+      preLoaderRoute: typeof RecruitmentBasicInfoListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recruitment-basic-entry': {
+      id: '/recruitment-basic-entry'
+      path: '/recruitment-basic-entry'
+      fullPath: '/recruitment-basic-entry'
+      preLoaderRoute: typeof RecruitmentBasicEntryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recruitment-assessment-list': {
+      id: '/recruitment-assessment-list'
+      path: '/recruitment-assessment-list'
+      fullPath: '/recruitment-assessment-list'
+      preLoaderRoute: typeof RecruitmentAssessmentListRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/propose-increment': {
@@ -847,6 +1038,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/recruitment-ie-assessment/$id': {
+      id: '/recruitment-ie-assessment/$id'
+      path: '/recruitment-ie-assessment/$id'
+      fullPath: '/recruitment-ie-assessment/$id'
+      preLoaderRoute: typeof RecruitmentIeAssessmentIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recruitment-hr-assessment/$id': {
+      id: '/recruitment-hr-assessment/$id'
+      path: '/recruitment-hr-assessment/$id'
+      fullPath: '/recruitment-hr-assessment/$id'
+      preLoaderRoute: typeof RecruitmentHrAssessmentIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/employee-detail/$id': {
       id: '/employee-detail/$id'
       path: '/employee-detail/$id'
@@ -889,6 +1094,14 @@ const rootRouteChildren: RootRouteChildren = {
   PersonnelApprovalRoute: PersonnelApprovalRoute,
   PersonnelListRoute: PersonnelListRoute,
   ProposeIncrementRoute: ProposeIncrementRoute,
+  RecruitmentAssessmentListRoute: RecruitmentAssessmentListRoute,
+  RecruitmentBasicEntryRoute: RecruitmentBasicEntryRoute,
+  RecruitmentBasicInfoListRoute: RecruitmentBasicInfoListRoute,
+  RecruitmentBasicListRoute: RecruitmentBasicListRoute,
+  RecruitmentBasicSetupRoute: RecruitmentBasicSetupRoute,
+  RecruitmentConfigurationRoute: RecruitmentConfigurationRoute,
+  RecruitmentHrListRoute: RecruitmentHrListRoute,
+  RecruitmentIeListRoute: RecruitmentIeListRoute,
   SspApprovalRoute: SspApprovalRoute,
   SspApproveManualAttendanceRoute: SspApproveManualAttendanceRoute,
   SspAttendanceRoute: SspAttendanceRoute,
@@ -899,6 +1112,8 @@ const rootRouteChildren: RootRouteChildren = {
   SspNewRequisitionRoute: SspNewRequisitionRoute,
   SspRequestManualAttendanceRoute: SspRequestManualAttendanceRoute,
   EmployeeDetailIdRoute: EmployeeDetailIdRoute,
+  RecruitmentHrAssessmentIdRoute: RecruitmentHrAssessmentIdRoute,
+  RecruitmentIeAssessmentIdRoute: RecruitmentIeAssessmentIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
