@@ -114,7 +114,7 @@ const nav: NavItem[] = [
     ]
   },
   {
-    label: "e-Recruitment",
+    label: "IE Recruitment",
     icon: UserPlus,
     subitems: [
       { label: "Organization Setting", to: "/recruitment-basic-setup" },
@@ -251,7 +251,7 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="hidden lg:flex w-64 shrink-0 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300">
+    <aside className="hidden lg:flex w-64 h-screen sticky top-0 shrink-0 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300">
       <div className="px-5 py-4 flex items-center gap-2.5 border-b border-sidebar-border/80">
         <div className="size-8.5 rounded-xl bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center font-extrabold text-primary-foreground shadow-[0_4px_12px_oklch(0.48_0.19_255/0.25)] text-sm tracking-tight transition-transform duration-300 hover:rotate-6">
           C

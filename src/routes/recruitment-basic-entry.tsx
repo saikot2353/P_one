@@ -127,12 +127,10 @@ function SectionHeader({
 
 function PhotoUploader({
   label,
-  accentColor,
-  icon,
+  isSignature = false,
 }: {
   label: string;
-  accentColor: string;
-  icon: React.ReactNode;
+  isSignature?: boolean;
 }) {
   const [preview, setPreview] = useState<string | null>(null);
   const [camMode, setCamMode] = useState(false);
@@ -148,76 +146,76 @@ function PhotoUploader({
   };
 
   return (
-    <div className="flex flex-col gap-3">
-      <div
-        className={`relative rounded-2xl border-2 ${accentColor} bg-card overflow-hidden shadow-2xs`}
-        style={{ width: 220, minHeight: 280 }}
-      >
-        {/* Header */}
-        <div className={`flex items-center gap-2 px-3 py-2 border-b border-border/30 ${accentColor.replace("border-", "bg-").replace("-400", "-50/80")}`}>
-          <div className="text-muted-foreground">{icon}</div>
-          <span className="text-[11px] font-black uppercase tracking-wider text-foreground/80">{label}</span>
-        </div>
+    <div className="flex-1 min-w-[280px] bg-muted/10 border border-border/60 rounded-2xl p-5 space-y-4 transition-all hover:shadow-xs">
+      <div className="flex items-center justify-between pb-2 border-b border-border/30">
+        <span className="text-[11px] font-bold uppercase tracking-wider text-foreground/80">{label}</span>
+        {preview && (
+          <span className="inline-flex items-center gap-1 text-[9px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-200">
+            <CheckCircle2 className="size-2.5" /> Loaded
+          </span>
+        )}
+      </div>
 
-        {/* Image Area */}
+      <div className="flex flex-col sm:flex-row gap-4 items-center">
+        {/* Upload/Preview Zone */}
         <div
-          className="relative bg-muted/40 flex items-center justify-center cursor-pointer group"
-          style={{ height: 180 }}
           onClick={() => fileRef.current?.click()}
+          className={`relative shrink-0 overflow-hidden border-2 border-dashed border-border/80 hover:border-primary/50 bg-card hover:bg-muted/10 transition-all duration-300 cursor-pointer flex items-center justify-center group
+            ${isSignature ? "w-64 h-24 rounded-xl" : "w-32 h-32 rounded-2xl"}`}
         >
           {preview ? (
             <img src={preview} alt={label} className="w-full h-full object-cover" />
           ) : (
-            <div className="flex flex-col items-center gap-2 text-muted-foreground/50 group-hover:text-primary/50 transition-colors">
-              <Upload className="size-8 stroke-[1.5]" />
-              <span className="text-[9px] font-black uppercase tracking-wider">Click to Upload</span>
-              <span className="text-[9px] text-muted-foreground/60">JPG / PNG / Webcam</span>
+            <div className="flex flex-col items-center gap-1.5 text-muted-foreground/50 group-hover:text-primary/70 text-center p-2">
+              <Upload className="size-6 stroke-[1.8]" />
+              <span className="text-[9px] font-bold uppercase tracking-wider">Browse File</span>
+              <span className="text-[8px] text-muted-foreground/60">Max 2MB (JPG/PNG)</span>
             </div>
           )}
           {preview && (
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <span className="text-white text-xs font-bold">Change Photo</span>
+              <span className="text-white text-[10px] font-bold">Replace File</span>
             </div>
           )}
         </div>
 
-        {/* Controls */}
-        <div className="p-2 space-y-2">
-          <div className="flex gap-1.5">
+        {/* Options and Controls */}
+        <div className="flex-1 w-full space-y-2.5">
+          <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
+            {isSignature 
+              ? "Upload a clear digital signature image. Ensure background is white or transparent."
+              : "Upload a passport-sized color photo of the candidate (minimum 200x200px format)."}
+          </p>
+          <div className="flex flex-wrap gap-2">
             <button
+              type="button"
               onClick={() => fileRef.current?.click()}
-              className="flex-1 flex items-center justify-center gap-1 h-8 rounded-lg bg-muted hover:bg-primary/10 hover:text-primary border border-border/40 text-foreground/70 text-[10px] font-bold transition-all"
+              className="flex-1 min-w-[80px] h-8 rounded-lg bg-card border border-border/80 hover:border-primary/30 hover:bg-primary/5 text-foreground/80 hover:text-primary text-[10px] font-bold transition-all shadow-3xs"
             >
-              <Upload className="size-3" />
-              Upload
+              Select Image
             </button>
-            <button
-              onClick={() => setCamMode(!camMode)}
-              className={`flex-1 flex items-center justify-center gap-1 h-8 rounded-lg border text-[10px] font-bold transition-all
-                ${camMode ? "bg-primary text-primary-foreground border-primary" : "bg-muted hover:bg-primary/10 hover:text-primary border-border/40 text-foreground/70"}`}
-            >
-              <Camera className="size-3" />
-              Webcam
-            </button>
+            {!isSignature && (
+              <button
+                type="button"
+                onClick={() => setCamMode(!camMode)}
+                className={`h-8 px-3 rounded-lg border text-[10px] font-bold transition-all
+                  ${camMode ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border/80 hover:border-primary/30 hover:bg-primary/5 text-foreground/80 hover:text-primary"}`}
+              >
+                <Camera className="size-3.5 inline mr-1" /> Webcam
+              </button>
+            )}
+            {preview && (
+              <button
+                type="button"
+                onClick={() => { setPreview(null); if (fileRef.current) fileRef.current.value = ""; }}
+                className="h-8 px-2.5 rounded-lg bg-red-50 hover:bg-red-100 border border-red-150 text-red-600 text-[10px] font-bold transition-all"
+              >
+                <Trash2 className="size-3.5" />
+              </button>
+            )}
           </div>
-          {preview && (
-            <button
-              onClick={() => { setPreview(null); if (fileRef.current) fileRef.current.value = ""; }}
-              className="w-full flex items-center justify-center gap-1 h-7 rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 text-[10px] font-bold transition-all"
-            >
-              <Trash2 className="size-3" />
-              Remove Photo
-            </button>
-          )}
         </div>
       </div>
-
-      {preview && (
-        <div className="flex items-center gap-1.5 text-green-600 text-[10px] font-bold">
-          <CheckCircle2 className="size-3.5" />
-          Photo uploaded
-        </div>
-      )}
 
       <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
     </div>
@@ -375,7 +373,7 @@ function RecruitmentBasicEntry() {
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
                 <ChevronRight className="size-3" />
-                <span>e-Recruitment</span>
+                <span>IE Recruitment</span>
                 <ChevronRight className="size-3" />
                 <span className="text-primary font-black">Basic Entry Form</span>
               </div>
@@ -638,16 +636,13 @@ function RecruitmentBasicEntry() {
               subtitle="Upload photo & signature — JPG/PNG or Webcam"
             />
             <div className="p-6">
-              <div className="flex flex-wrap gap-8">
+              <div className="flex flex-col md:flex-row gap-6">
                 <PhotoUploader
                   label="Employee Photo"
-                  accentColor="border-blue-500/20"
-                  icon={<User className="size-3.5" />}
                 />
                 <PhotoUploader
                   label="Employee Signature"
-                  accentColor="border-emerald-500/20"
-                  icon={<Upload className="size-3.5" />}
+                  isSignature={true}
                 />
               </div>
             </div>

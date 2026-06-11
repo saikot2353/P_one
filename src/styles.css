@@ -166,3 +166,12 @@
   h1, h2, h3, h4, h5 { font-family: var(--font-display); letter-spacing: -0.015em; }
 }
 
+/* Scrollbar Utility to Hide Scrollbars */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+

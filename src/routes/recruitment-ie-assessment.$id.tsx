@@ -187,7 +187,7 @@ function IEAssessmentPage() {
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
                 <ChevronRight className="size-3" />
-                <span>e-Recruitment</span>
+                <span>IE Recruitment</span>
                 <ChevronRight className="size-3" />
                 <Link to="/recruitment-ie-list" className="hover:text-primary transition-colors">IE Assessment</Link>
                 <ChevronRight className="size-3" />

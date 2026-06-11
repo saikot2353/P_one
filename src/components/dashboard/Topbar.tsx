@@ -50,12 +50,12 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Assessment Workflow", parent: "KPI", to: "/kpi-assessment-workflow" },
   { label: "Approval", parent: "Personnel Info", to: "/personnel-approval" },
   { label: "Statutory Compliance Audit", parent: "Compliance", to: "/" },
-  // e-Recruitment
-  { label: "Recruitment Basic ID Setup", parent: "e-Recruitment", to: "/recruitment-basic-setup", description: "Define recruitment rules and temp ID setup" },
-  { label: "Recruitment Basic Entry Form", parent: "e-Recruitment", to: "/recruitment-basic-entry", description: "Register new candidate profiles temporarily" },
-  { label: "Recruitment Basic Info List", parent: "e-Recruitment", to: "/recruitment-basic-list", description: "View directory of registered temp profiles" },
-  { label: "Recruitment Configuration Settings", parent: "e-Recruitment", to: "/recruitment-configuration", description: "Manage SMV banks, machine list, operations etc." },
-  { label: "Recruitment Assessment List", parent: "e-Recruitment", to: "/recruitment-assessment-list", description: "Floor evaluation and HR approval workflow" },
+  // IE Recruitment
+  { label: "Recruitment Basic ID Setup", parent: "IE Recruitment", to: "/recruitment-basic-setup", description: "Define recruitment rules and temp ID setup" },
+  { label: "Recruitment Basic Entry Form", parent: "IE Recruitment", to: "/recruitment-basic-entry", description: "Register new candidate profiles temporarily" },
+  { label: "Recruitment Basic Info List", parent: "IE Recruitment", to: "/recruitment-basic-list", description: "View directory of registered temp profiles" },
+  { label: "Recruitment Configuration Settings", parent: "IE Recruitment", to: "/recruitment-configuration", description: "Manage SMV banks, machine list, operations etc." },
+  { label: "Recruitment Assessment List", parent: "IE Recruitment", to: "/recruitment-assessment-list", description: "Floor evaluation and HR approval workflow" },
 ];
 
 // Dynamically fetch search category visual icon
@@ -78,7 +78,7 @@ function getCategoryIcon(parent: string) {
     case "Processes": return Cpu;
     case "Compliance": return ComplianceIcon;
     case "Idea Share": return Lightbulb;
-    case "e-Recruitment": return UserPlus;
+    case "IE Recruitment": return UserPlus;
     default: return LayoutDashboard;
   }
 }

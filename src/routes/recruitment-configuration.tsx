@@ -195,7 +195,7 @@ function RecruitmentConfiguration() {
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
                 <ChevronRight className="size-3" />
-                <span>e-Recruitment</span>
+                <span>IE Recruitment</span>
                 <ChevronRight className="size-3" />
                 <span className="text-primary font-black">Configuration Matrices</span>
               </div>
@@ -275,53 +275,53 @@ function RecruitmentConfiguration() {
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse" style={{minWidth: activeTab === "grade_vs_grade" ? "1200px" : activeTab === "multi_ss" ? "1100px" : activeTab === "smv_bank" ? "900px" : "700px"}}>
-                <thead className="bg-[#f1f5f9] dark:bg-[#0f172a] text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
+                <thead className="bg-[#f8fafc] dark:bg-[#0f172a] text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
                   <tr>
-                    <th className="px-4 py-3 w-12 text-center sticky left-0 bg-[#f1f5f9] dark:bg-[#0f172a] z-10 border-r border-border/30">SL</th>
-                    <th className="px-4 py-3 w-28 text-center sticky left-12 bg-[#f1f5f9] dark:bg-[#0f172a] z-10 border-r border-border/30">Actions</th>
+                    <th className="px-4 py-3.5 w-12 text-center sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] z-10 border-r border-border/30">SL</th>
+                    <th className="px-4 py-3.5 w-28 text-center sticky left-12 bg-[#f8fafc] dark:bg-[#0f172a] z-10 border-r border-border/30">Actions</th>
                     
-                    {activeTab === "op_name" && <th className="px-4 py-3 min-w-[320px]">Operation Name</th>}
+                    {activeTab === "op_name" && <th className="px-4 py-3.5 min-w-[320px] border-r border-border/30">Operation Name</th>}
                     {activeTab === "mc_name" && (
-                      <><th className="px-4 py-3 min-w-[240px]">M/C Full Name</th><th className="px-4 py-3 min-w-[100px]">Short Name</th></>
+                      <><th className="px-4 py-3.5 min-w-[240px] border-r border-border/30">M/C Full Name</th><th className="px-4 py-3.5 min-w-[100px] border-r border-border/30">Short Name</th></>
                     )}
-                    {activeTab === "op_grade" && <th className="px-4 py-3 min-w-[160px]">Operation Grade</th>}
-                    {activeTab === "measurement" && <th className="px-4 py-3 min-w-[200px]">Measurement (MP) Name</th>}
+                    {activeTab === "op_grade" && <th className="px-4 py-3.5 min-w-[160px] border-r border-border/30">Operation Grade</th>}
+                    {activeTab === "measurement" && <th className="px-4 py-3.5 min-w-[200px] border-r border-border/30">Measurement (MP) Name</th>}
                     {activeTab === "smv_bank" && (
-                      <><th className="px-4 py-3 min-w-[240px]">Operation Name</th><th className="px-4 py-3 min-w-[100px]">M/C Name</th><th className="px-4 py-3 min-w-[110px]">Op. Grade</th><th className="px-4 py-3 min-w-[110px]">Measurement</th><th className="px-4 py-3 min-w-[80px]">SMV</th></>
+                      <><th className="px-4 py-3.5 min-w-[240px] border-r border-border/30">Operation Name</th><th className="px-4 py-3.5 min-w-[100px] border-r border-border/30">M/C Name</th><th className="px-4 py-3.5 min-w-[110px] border-r border-border/30">Op. Grade</th><th className="px-4 py-3.5 min-w-[110px] border-r border-border/30">Measurement</th><th className="px-4 py-3.5 min-w-[80px] border-r border-border/30">SMV</th></>
                     )}
                     {activeTab === "eff_grade" && (
-                      <><th className="px-4 py-3 min-w-[120px]">Eff. From (%)</th><th className="px-4 py-3 min-w-[120px]">Eff. To (%)</th><th className="px-4 py-3 min-w-[120px]">Grade Point</th></>
+                      <><th className="px-4 py-3.5 min-w-[120px] border-r border-border/30">Eff. From (%)</th><th className="px-4 py-3.5 min-w-[120px] border-r border-border/30">Eff. To (%)</th><th className="px-4 py-3.5 min-w-[120px] border-r border-border/30">Grade Point</th></>
                     )}
                     {activeTab === "grade_vs_grade" && (
-                      <><th className="px-4 py-3 min-w-[140px]">GP From</th><th className="px-4 py-3 min-w-[140px]">GP To</th><th className="px-4 py-3 min-w-[80px]">Grade</th><th className="px-4 py-3 min-w-[120px]">Salary From</th><th className="px-4 py-3 min-w-[120px]">Salary To</th><th className="px-4 py-3 min-w-[100px]">Govt. Grade</th><th className="px-4 py-3 min-w-[110px]">Valid From</th><th className="px-4 py-3 min-w-[110px]">Valid To</th><th className="px-4 py-3 min-w-[100px]">Remarks</th></>
+                      <><th className="px-4 py-3.5 min-w-[140px] border-r border-border/30">GP From</th><th className="px-4 py-3.5 min-w-[140px] border-r border-border/30">GP To</th><th className="px-4 py-3.5 min-w-[80px] border-r border-border/30">Grade</th><th className="px-4 py-3.5 min-w-[120px] border-r border-border/30">Salary From</th><th className="px-4 py-3.5 min-w-[120px] border-r border-border/30">Salary To</th><th className="px-4 py-3.5 min-w-[100px] border-r border-border/30">Govt. Grade</th><th className="px-4 py-3.5 min-w-[110px] border-r border-border/30">Valid From</th><th className="px-4 py-3.5 min-w-[110px] border-r border-border/30">Valid To</th><th className="px-4 py-3.5 min-w-[100px] border-r border-border/30">Remarks</th></>
                     )}
                     {activeTab === "multi_ss" && (
-                      <><th className="px-4 py-3 min-w-[100px]">Grade Point</th><th className="px-4 py-3 min-w-[100px]">Op. Grade</th><th className="px-4 py-3 min-w-[130px]">Min Op. Count</th><th className="px-4 py-3 min-w-[100px]">M/C Type</th><th className="px-4 py-3 min-w-[70px]">Eff%</th><th className="px-4 py-3 min-w-[90px]">Add Amt</th><th className="px-4 py-3 min-w-[110px]">Valid. Remarks</th><th className="px-4 py-3 min-w-[110px]">Remarks</th><th className="px-4 py-3 min-w-[110px]">Valid From</th><th className="px-4 py-3 min-w-[110px]">Valid To</th></>
+                      <><th className="px-4 py-3.5 min-w-[100px] border-r border-border/30">Grade Point</th><th className="px-4 py-3.5 min-w-[100px] border-r border-border/30">Op. Grade</th><th className="px-4 py-3.5 min-w-[130px] border-r border-border/30">Min Op. Count</th><th className="px-4 py-3.5 min-w-[100px] border-r border-border/30">M/C Type</th><th className="px-4 py-3.5 min-w-[70px] border-r border-border/30">Eff%</th><th className="px-4 py-3.5 min-w-[90px] border-r border-border/30">Add Amt</th><th className="px-4 py-3.5 min-w-[110px] border-r border-border/30">Valid. Remarks</th><th className="px-4 py-3.5 min-w-[110px] border-r border-border/30">Remarks</th><th className="px-4 py-3.5 min-w-[110px] border-r border-border/30">Valid From</th><th className="px-4 py-3.5 min-w-[110px] border-r border-border/30">Valid To</th></>
                     )}
-
-                    <th className="px-4 py-3 min-w-[180px] text-primary/80"><span className="flex items-center gap-1"><UserCog className="size-3.5" /> Created By</span></th>
-                    <th className="px-4 py-3 min-w-[180px] text-primary/80"><span className="flex items-center gap-1"><CalendarClock className="size-3.5" /> Updated By</span></th>
+ 
+                    <th className="px-4 py-3.5 min-w-[180px] text-primary/80 border-r border-border/30"><span className="flex items-center gap-1"><UserCog className="size-3.5" /> Created By</span></th>
+                    <th className="px-4 py-3.5 min-w-[180px] text-primary/80"><span className="flex items-center gap-1"><CalendarClock className="size-3.5" /> Updated By</span></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/20 text-foreground">
+                <tbody className="divide-y divide-border/30 text-foreground">
                   {currentData.map((item, idx) => {
                     const isEven = idx % 2 === 0;
                     const rowBgClass = isEven 
-                      ? "bg-background" 
-                      : "bg-[#fafafa] dark:bg-[#151f30]";
+                      ? "bg-white dark:bg-[#0f172a]" 
+                      : "bg-[#f8fafc] dark:bg-[#131d30]";
                     const stickyCellBgClass = isEven 
-                      ? "bg-background group-hover:bg-[#f1f5f9] dark:group-hover:bg-[#1c283d]" 
-                      : "bg-[#fafafa] dark:bg-[#151f30] group-hover:bg-[#f1f5f9] dark:group-hover:bg-[#1c283d]";
-
+                      ? "bg-white dark:bg-[#0f172a] group-hover:bg-[#f1f5f9] dark:group-hover:bg-[#1c283d]" 
+                      : "bg-[#f8fafc] dark:bg-[#131d30] group-hover:bg-[#f1f5f9] dark:group-hover:bg-[#1c283d]";
+ 
                     return (
-                      <tr key={item.id} className={`group hover:bg-primary/5 transition-colors ${rowBgClass}`}>
-                        <td className={`px-4 py-3 text-center text-muted-foreground font-bold sticky left-0 ${stickyCellBgClass} z-10 border-r border-border/30 w-12 min-w-[48px] max-w-[48px]`}>{idx + 1}</td>
-                        <td className={`px-4 py-3 sticky left-12 ${stickyCellBgClass} z-10 border-r border-border/30 w-28 min-w-[112px] max-w-[112px]`}>
-                          <div className="flex items-center justify-center gap-1.5">
+                      <tr key={item.id} className={`group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all cursor-pointer ${rowBgClass}`}>
+                        <td className={`px-4 py-3 text-center text-slate-500 font-bold sticky left-0 ${stickyCellBgClass} z-10 border-r border-border/30 w-12 min-w-[48px] max-w-[48px] transition-all`}>{idx + 1}</td>
+                        <td className={`px-4 py-3 sticky left-12 ${stickyCellBgClass} z-10 border-r border-border/30 w-28 min-w-[112px] max-w-[112px] transition-all`} onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center justify-center gap-2">
                             <button 
                               title="Edit record"
                               onClick={() => handleOpenModal(item)} 
-                              className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/35 hover:bg-blue-500 hover:text-white text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900/40 transition-all"
+                              className="w-7 h-7 rounded border border-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition flex items-center justify-center shadow-2xs"
                             >
                               <Edit className="size-3.5" />
                             </button>
@@ -329,7 +329,7 @@ function RecruitmentConfiguration() {
                               <button 
                                 title="Delete record"
                                 onClick={() => handleDelete(item.id)} 
-                                className="p-1.5 rounded-lg bg-red-50 dark:bg-red-950/35 hover:bg-red-500 hover:text-white text-red-500 dark:text-red-400 border border-red-200 dark:border-red-900/40 transition-all"
+                                className="w-7 h-7 rounded border border-slate-200 bg-white dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-950/30 hover:border-red-200 text-red-500 dark:text-red-400 transition flex items-center justify-center shadow-2xs"
                               >
                                 <Trash2 className="size-3.5" />
                               </button>
@@ -337,30 +337,30 @@ function RecruitmentConfiguration() {
                           </div>
                         </td>
                         
-                        {activeTab === "op_name" && <td className="px-4 py-3 font-semibold text-foreground">{item.opName}</td>}
+                        {activeTab === "op_name" && <td className="px-4 py-3 font-semibold text-foreground border-r border-border/30">{item.opName}</td>}
                         {activeTab === "mc_name" && (
-                          <><td className="px-4 py-3 font-semibold">{item.mcFullName}</td><td className="px-4 py-3"><span className="bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-400 text-[10px] font-black px-2 py-0.5 rounded">{item.mcName}</span></td></>
+                          <><td className="px-4 py-3 font-semibold border-r border-border/30">{item.mcFullName}</td><td className="px-4 py-3 border-r border-border/30"><span className="bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-400 text-[10px] font-black px-2 py-0.5 rounded">{item.mcName}</span></td></>
                         )}
                         {activeTab === "op_grade" && (
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-3 border-r border-border/30">
                             <span className="bg-violet-100 text-violet-800 dark:bg-violet-950/40 dark:text-violet-400 text-[11px] font-black px-2.5 py-0.5 rounded-full">{item.grade}</span>
                           </td>
                         )}
-                        {activeTab === "measurement" && <td className="px-4 py-3 font-mono font-semibold">{item.name}</td>}
+                        {activeTab === "measurement" && <td className="px-4 py-3 font-mono font-semibold border-r border-border/30">{item.name}</td>}
                         {activeTab === "smv_bank" && (
-                          <><td className="px-4 py-3 font-semibold text-[11px]">{item.opName}</td><td className="px-4 py-3"><span className="bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-400 text-[10px] font-black px-2 py-0.5 rounded">{item.mcName}</span></td><td className="px-4 py-3"><span className="bg-violet-100 text-violet-800 dark:bg-violet-950/40 dark:text-violet-400 text-[10px] font-black px-2 py-0.5 rounded-full">{item.opGrade}</span></td><td className="px-4 py-3 font-mono text-[11px]">{item.meas}</td><td className="px-4 py-3 font-mono font-black text-primary">{item.smvValue}</td></>
+                          <><td className="px-4 py-3 font-semibold text-[11px] border-r border-border/30">{item.opName}</td><td className="px-4 py-3 border-r border-border/30"><span className="bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-400 text-[10px] font-black px-2 py-0.5 rounded">{item.mcName}</span></td><td className="px-4 py-3 border-r border-border/30"><span className="bg-violet-100 text-violet-800 dark:bg-violet-950/40 dark:text-violet-400 text-[10px] font-black px-2 py-0.5 rounded-full">{item.opGrade}</span></td><td className="px-4 py-3 font-mono text-[11px] border-r border-border/30">{item.meas}</td><td className="px-4 py-3 font-mono font-black text-primary border-r border-border/30">{item.smvValue}</td></>
                         )}
                         {activeTab === "eff_grade" && (
-                          <><td className="px-4 py-3 font-mono">{item.effFrom}%</td><td className="px-4 py-3 font-mono">{item.effTo}%</td><td className="px-4 py-3"><span className="bg-green-100 text-green-800 dark:bg-green-950/40 dark:text-green-400 font-black text-[11px] px-2.5 py-0.5 rounded-full">{item.point}</span></td></>
+                          <><td className="px-4 py-3 font-mono border-r border-border/30">{item.effFrom}%</td><td className="px-4 py-3 font-mono border-r border-border/30">{item.effTo}%</td><td className="px-4 py-3 border-r border-border/30"><span className="bg-green-100 text-green-800 dark:bg-green-950/40 dark:text-green-400 font-black text-[11px] px-2.5 py-0.5 rounded-full">{item.point}</span></td></>
                         )}
                         {activeTab === "grade_vs_grade" && (
-                          <><td className="px-4 py-3 font-mono">{item.pointFrom}</td><td className="px-4 py-3 font-mono">{item.pointTo}</td><td className="px-4 py-3"><span className="bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400 font-black text-[11px] px-2.5 py-0.5 rounded">{item.grade}</span></td><td className="px-4 py-3 font-mono">{item.salaryFrom && `৳${Number(item.salaryFrom).toLocaleString()}`}</td><td className="px-4 py-3 font-mono">{item.salaryTo && `৳${Number(item.salaryTo).toLocaleString()}`}</td><td className="px-4 py-3 text-[11px]">{item.govtGrade}</td><td className="px-4 py-3 text-[11px]">{item.validityFrom}</td><td className="px-4 py-3 text-[11px]">{item.validityTo}</td><td className="px-4 py-3">{item.remarks && <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${item.remarks === "Current" ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400" : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"}`}>{item.remarks}</span>}</td></>
+                          <><td className="px-4 py-3 font-mono border-r border-border/30">{item.pointFrom}</td><td className="px-4 py-3 font-mono border-r border-border/30">{item.pointTo}</td><td className="px-4 py-3 border-r border-border/30"><span className="bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400 font-black text-[11px] px-2.5 py-0.5 rounded">{item.grade}</span></td><td className="px-4 py-3 font-mono border-r border-border/30">{item.salaryFrom && `৳${Number(item.salaryFrom).toLocaleString()}`}</td><td className="px-4 py-3 font-mono border-r border-border/30">{item.salaryTo && `৳${Number(item.salaryTo).toLocaleString()}`}</td><td className="px-4 py-3 text-[11px] border-r border-border/30">{item.govtGrade}</td><td className="px-4 py-3 text-[11px] border-r border-border/30">{item.validityFrom}</td><td className="px-4 py-3 text-[11px] border-r border-border/30">{item.validityTo}</td><td className="px-4 py-3 border-r border-border/30">{item.remarks && <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${item.remarks === "Current" ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400" : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"}`}>{item.remarks}</span>}</td></>
                         )}
                         {activeTab === "multi_ss" && (
-                          <><td className="px-4 py-3 font-mono font-bold">{item.point}</td><td className="px-4 py-3"><span className="bg-violet-100 text-violet-800 dark:bg-violet-950/40 dark:text-violet-400 text-[10px] font-black px-2 py-0.5 rounded-full">{item.opGrade}</span></td><td className="px-4 py-3 font-mono">{item.minOpCount}</td><td className="px-4 py-3"><span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${item.mcType === "Same" ? "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-455" : "bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-400"}`}>{item.mcType}</span></td><td className="px-4 py-3 font-mono font-bold text-green-700 dark:text-green-400">{item.eff}%</td><td className="px-4 py-3 font-mono">৳{item.addAmt}</td><td className="px-4 py-3 text-[11px]">{item.validityRemarks}</td><td className="px-4 py-3 text-[11px]">{item.remarks}</td><td className="px-4 py-3 text-[11px]">{item.validityFrom}</td><td className="px-4 py-3 text-[11px]">{item.validityTo}</td></>
+                          <><td className="px-4 py-3 font-mono font-bold border-r border-border/30">{item.point}</td><td className="px-4 py-3 border-r border-border/30"><span className="bg-violet-100 text-violet-800 dark:bg-violet-950/40 dark:text-violet-400 text-[10px] font-black px-2 py-0.5 rounded-full">{item.opGrade}</span></td><td className="px-4 py-3 font-mono border-r border-border/30">{item.minOpCount}</td><td className="px-4 py-3 border-r border-border/30"><span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${item.mcType === "Same" ? "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-455" : "bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-400"}`}>{item.mcType}</span></td><td className="px-4 py-3 font-mono font-bold text-green-700 dark:text-green-400 border-r border-border/30">{item.eff}%</td><td className="px-4 py-3 font-mono border-r border-border/30">৳{item.addAmt}</td><td className="px-4 py-3 text-[11px] border-r border-border/30">{item.validityRemarks}</td><td className="px-4 py-3 text-[11px] border-r border-border/30">{item.remarks}</td><td className="px-4 py-3 text-[11px] border-r border-border/30">{item.validityFrom}</td><td className="px-4 py-3 text-[11px] border-r border-border/30">{item.validityTo}</td></>
                         )}
-
-                        <td className="px-4 py-3 text-[10px] text-muted-foreground whitespace-nowrap">{item.createdBy}</td>
+ 
+                        <td className="px-4 py-3 text-[10px] text-muted-foreground border-r border-border/30 whitespace-nowrap">{item.createdBy}</td>
                         <td className="px-4 py-3 text-[10px] text-muted-foreground whitespace-nowrap">{item.updatedBy || "—"}</td>
                       </tr>
                     );

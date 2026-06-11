@@ -17,14 +17,14 @@ export const Route = createFileRoute("/recruitment-ie-list")({
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
-    "IE Pending":   "bg-amber-100 text-amber-800 border-amber-200",
-    "IE Submitted": "bg-blue-100 text-blue-800 border-blue-200",
-    "HR Pending":   "bg-purple-100 text-purple-800 border-purple-200",
-    "HR Approved":  "bg-green-100 text-green-800 border-green-200",
-    "HR Rejected":  "bg-red-100 text-red-800 border-red-200",
+    "IE Pending":    "bg-[#fef3c7] text-[#b45309] border-[#fde68a]", // Amber
+    "IE Submitted":  "bg-[#eff6ff] text-[#1d4ed8] border-[#bfdbfe]", // Blue
+    "HR Pending":    "bg-[#faf5ff] text-[#7e22ce] border-[#e9d5ff]", // Purple
+    "HR Approved":   "bg-[#ecfdf5] text-[#047857] border-[#a7f3d0]", // Green/Emerald
+    "HR Rejected":   "bg-[#fdf2f2] text-[#b91c1c] border-[#fde8e8]", // Red
   };
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black border whitespace-nowrap ${map[status] || "bg-muted text-muted-foreground border-border"}`}>
+    <span className={`inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold border whitespace-nowrap ${map[status] || "bg-slate-50 text-slate-600 border-slate-200"}`}>
       {status}
     </span>
   );
@@ -96,7 +96,7 @@ function IEAssessmentListPage() {
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
                 <ChevronRight className="size-3" />
-                <span>e-Recruitment</span>
+                <span>IE Recruitment</span>
                 <ChevronRight className="size-3" />
                 <span className="text-primary font-black">IE Assessment</span>
               </div>
@@ -203,63 +203,83 @@ function IEAssessmentListPage() {
           {/* Table */}
           <div className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs" style={{ minWidth: "1100px" }}>
-                <thead className="bg-muted/60 text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
-                  <tr>
-                    <th className="px-4 py-3 w-10 text-center">#</th>
-                    <th className="px-4 py-3 w-20 text-center">Execute</th>
-                    <th className="px-4 py-3 min-w-[110px]">Emp ID</th>
-                    <th className="px-4 py-3 min-w-[100px]">Status</th>
-                    <th className="px-4 py-3 min-w-[160px]">Name</th>
-                    <th className="px-4 py-3 min-w-[80px]">Emp Type</th>
-                    <th className="px-4 py-3 min-w-[140px]">Department</th>
-                    <th className="px-4 py-3 min-w-[100px]">Section</th>
-                    <th className="px-4 py-3 min-w-[120px]">Designation</th>
-                    <th className="px-4 py-3 min-w-[90px]">Job Nature</th>
-                    <th className="px-4 py-3 min-w-[70px]">Unit</th>
-                    <th className="px-4 py-3 min-w-[60px]">Line</th>
-                    <th className="px-4 py-3 min-w-[60px]">Grade</th>
-                    <th className="px-4 py-3 min-w-[100px]">DOJ</th>
-                    <th className="px-4 py-3 min-w-[100px]">DOB</th>
-                    <th className="px-4 py-3 min-w-[120px]">Contact No</th>
+              <table className="w-full text-left text-xs border-collapse" style={{ minWidth: "1100px" }}>
+                <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
+                  <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
+                    <th className="px-4 py-3.5 w-12 text-center border-r border-border/30">#</th>
+                    <th className="px-4 py-3.5 w-20 text-center border-r border-border/30">Execute</th>
+                    <th className="px-4 py-3.5 min-w-[110px] border-r border-border/30">Emp ID</th>
+                    <th className="px-4 py-3.5 min-w-[100px] border-r border-border/30 text-center">Status</th>
+                    <th className="px-4 py-3.5 min-w-[180px] border-r border-border/30">Name</th>
+                    <th className="px-4 py-3.5 min-w-[80px] border-r border-border/30">Emp Type</th>
+                    <th className="px-4 py-3.5 min-w-[140px] border-r border-border/30">Department</th>
+                    <th className="px-4 py-3.5 min-w-[100px] border-r border-border/30">Section</th>
+                    <th className="px-4 py-3.5 min-w-[120px] border-r border-border/30">Designation</th>
+                    <th className="px-4 py-3.5 min-w-[90px] border-r border-border/30">Job Nature</th>
+                    <th className="px-4 py-3.5 min-w-[70px] border-r border-border/30">Unit</th>
+                    <th className="px-4 py-3.5 min-w-[60px] border-r border-border/30">Line</th>
+                    <th className="px-4 py-3.5 min-w-[60px] border-r border-border/30">Grade</th>
+                    <th className="px-4 py-3.5 min-w-[100px] border-r border-border/30">DOJ</th>
+                    <th className="px-4 py-3.5 min-w-[100px] border-r border-border/30">DOB</th>
+                    <th className="px-4 py-3.5 min-w-[120px]">Contact No</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/20">
-                  {filteredCandidates.map((item, idx) => (
-                    <tr key={item.empIdTemp} className={`hover:bg-primary/5 transition-colors ${idx % 2 === 0 ? "bg-background" : "bg-muted/10"}`}>
-                      <td className="px-4 py-2.5 text-center text-muted-foreground font-bold">{idx + 1}</td>
-                      <td className="px-4 py-2.5 text-center">
-                        <button
-                          onClick={() => router.navigate({ to: `/recruitment-ie-assessment/${item.empIdTemp}` })}
-                          title="Start IE Assessment"
-                          className="p-1.5 rounded-lg bg-primary/10 hover:bg-primary text-primary hover:text-white border border-primary/20 transition-all"
-                        >
-                          <PlayCircle className="size-4" />
-                        </button>
-                      </td>
-                      <td className="px-4 py-2.5 font-mono font-bold text-primary text-[11px]">{item.empIdTemp}</td>
-                      <td className="px-4 py-2.5"><StatusBadge status={item.assessStatus} /></td>
-                      <td className="px-4 py-2.5 font-semibold">{item.nameEng}</td>
-                      <td className="px-4 py-2.5"><span className="text-[10px] font-bold bg-muted px-1.5 py-0.5 rounded">{item.employeeType}</span></td>
-                      <td className="px-4 py-2.5">{item.department}</td>
-                      <td className="px-4 py-2.5">{item.section}</td>
-                      <td className="px-4 py-2.5">{item.designation}</td>
-                      <td className="px-4 py-2.5 text-muted-foreground">Permanent</td>
-                      <td className="px-4 py-2.5">{item.unit}</td>
-                      <td className="px-4 py-2.5">{item.line}</td>
-                      <td className="px-4 py-2.5">{item.grade ? <span className="font-black text-[11px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">{item.grade}</span> : <span className="text-muted-foreground/40">—</span>}</td>
-                      <td className="px-4 py-2.5 font-mono text-[11px]">{item.doj}</td>
-                      <td className="px-4 py-2.5 font-mono text-[11px]">{item.dob}</td>
-                      <td className="px-4 py-2.5 font-mono text-[11px]">{item.personalContact}</td>
-                    </tr>
-                  ))}
+                <tbody className="divide-y divide-border/30 text-foreground">
+                  {filteredCandidates.map((item, idx) => {
+                    const isEven = idx % 2 === 0;
+                    const rowBgClass = isEven 
+                      ? "bg-white dark:bg-[#0f172a]" 
+                      : "bg-[#f8fafc] dark:bg-[#131d30]";
+                    
+                    return (
+                      <tr key={item.empIdTemp} className={`hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all cursor-pointer ${rowBgClass}`}>
+                        <td className="px-4 py-3 text-center text-slate-500 font-bold border-r border-border/30">{idx + 1}</td>
+                        <td className="px-4 py-3 text-center border-r border-border/30" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex justify-center">
+                            <button
+                              onClick={() => router.navigate({ to: `/recruitment-ie-assessment/${item.empIdTemp}` })}
+                              title="Start IE Assessment"
+                              className="w-7 h-7 rounded border border-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition flex items-center justify-center shadow-2xs"
+                            >
+                              <PlayCircle className="size-4 text-primary" />
+                            </button>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 font-bold text-[#2563eb] border-r border-border/30">{item.empIdTemp}</td>
+                        <td className="px-4 py-3 border-r border-border/30 text-center"><StatusBadge status={item.assessStatus} /></td>
+                        <td className="px-4 py-3 border-r border-border/30">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-950/40 text-[11px] font-bold text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-100/50 dark:border-blue-900/30 shrink-0 shadow-2xs">
+                              {item.nameEng.split(" ").map((s: string) => s[0]).slice(0,2).join("").toUpperCase()}
+                            </div>
+                            <span className="truncate max-w-[150px] font-bold text-slate-800 dark:text-slate-200">{item.nameEng}</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 border-r border-border/30"><span className="text-[10px] font-bold bg-muted px-1.5 py-0.5 rounded">{item.employeeType}</span></td>
+                        <td className="px-4 py-3 border-r border-border/30">{item.department}</td>
+                        <td className="px-4 py-3 border-r border-border/30">{item.section}</td>
+                        <td className="px-4 py-3 border-r border-border/30 font-semibold">{item.designation}</td>
+                        <td className="px-4 py-3 border-r border-border/30 text-muted-foreground/80">Permanent</td>
+                        <td className="px-4 py-3 border-r border-border/30">{item.unit}</td>
+                        <td className="px-4 py-3 border-r border-border/30">{item.line}</td>
+                        <td className="px-4 py-3 border-r border-border/30">
+                          {item.grade ? <span className="font-black text-[10px] bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400 px-1.5 py-0.5 rounded">{item.grade}</span> : <span className="text-muted-foreground/45">—</span>}
+                        </td>
+                        <td className="px-4 py-3 border-r border-border/30 font-mono text-[11px] text-muted-foreground/80">{item.doj}</td>
+                        <td className="px-4 py-3 border-r border-border/30 font-mono text-[11px] text-muted-foreground/80">{item.dob}</td>
+                        <td className="px-4 py-3 font-mono text-[11px] text-muted-foreground/90">{item.personalContact}</td>
+                      </tr>
+                    );
+                  })}
                   {filteredCandidates.length === 0 && (
-                    <tr><td colSpan={16} className="px-4 py-16 text-center">
-                      <div className="flex flex-col items-center gap-2">
-                        <ClipboardCheck className="size-10 text-muted-foreground/30" />
-                        <div className="text-sm font-bold text-muted-foreground">No pending IE candidates</div>
-                      </div>
-                    </td></tr>
+                    <tr>
+                      <td colSpan={16} className="px-4 py-16 text-center">
+                        <div className="flex flex-col items-center gap-2">
+                          <ClipboardCheck className="size-10 text-muted-foreground/30" />
+                          <div className="text-sm font-bold text-muted-foreground">No pending IE candidates</div>
+                        </div>
+                      </td>
+                    </tr>
                   )}
                 </tbody>
               </table>
