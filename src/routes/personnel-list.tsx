@@ -369,6 +369,22 @@ function PersonnelListPage() {
   const [employees, setEmployees] = useState(employeesData);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const synced = localStorage.getItem("recruitment_synced_employees");
+      if (synced) {
+        try {
+          const parsed = JSON.parse(synced);
+          if (parsed && parsed.length > 0) {
+            setEmployees([...parsed, ...employeesData]);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+  }, []);
+
   // Selection & Action Hub States
   const [selectedEmpIds, setSelectedEmpIds] = useState<string[]>([]);
   const [activeDocGenerating, setActiveDocGenerating] = useState<string | null>(null);
