@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Check, ChevronDown } from "lucide-react"
+import { Check, ChevronDown, Search } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import {
@@ -47,14 +47,15 @@ export function SearchableSelect({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "flex w-full items-center justify-between h-9.5 px-3 rounded-xl bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition-all font-semibold text-foreground/80 cursor-pointer hover:bg-muted/80",
+            "flex w-full items-center justify-between h-10 px-3 rounded-xl bg-background border border-border/80 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-sm transition-all text-foreground cursor-pointer hover:border-primary/50 text-left",
             className
           )}
         >
-          <span className="truncate">
-            {selectedOption ? selectedOption.label : placeholder}
+          <span className="flex items-center gap-2 truncate">
+            <Search className="size-3.5 text-muted-foreground/60 shrink-0" />
+            <span>{selectedOption ? selectedOption.label : placeholder}</span>
           </span>
-          <ChevronDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
+          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50 text-muted-foreground" />
         </button>
       </PopoverTrigger>
       <PopoverContent 
