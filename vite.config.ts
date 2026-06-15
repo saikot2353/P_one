@@ -31,12 +31,8 @@ export default defineConfig(({ command, mode }) => {
       tsconfigPaths({ projects: ["./tsconfig.json"] }),
       tailwindcss(),
       tanstackStart(),
-      command === "build" && nitro(),
       react(),
       mode === "development" && componentTagger(),
     ].filter(Boolean),
-    ssr: {
-      noExternal: ['tslib', 'react-remove-scroll']
-    }
   };
 });
