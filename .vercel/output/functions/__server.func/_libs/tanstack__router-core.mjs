@@ -4285,8 +4285,8 @@ export {
   resolveManifestAssetLink as t,
   transformReadableStreamWithRouter as u,
   transformPipeableStreamWithRouter as v,
-  defineHandlerCallback as w,
-  getNormalizedURL as x,
-  getOrigin as y,
-  attachRouterServerSsrUtils as z
+  getNormalizedURL as w,
+  getOrigin as x,
+  attachRouterServerSsrUtils as y,
+  defineHandlerCallback as z
 };
