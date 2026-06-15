@@ -50,9 +50,10 @@ interface Area {
 
 interface CompanyMapping {
   sl: number;
-  sourceCompany: string;
-  targetCompany: string;
-  isActive: "Active" | "Inactive";
+  name: string;
+  main: string;
+  relayDuty: string;
+  checked?: boolean;
 }
 
 interface Department {
@@ -105,7 +106,17 @@ const DEFAULT_AREAS: Area[] = [
 ];
 
 const DEFAULT_MAPPINGS: CompanyMapping[] = [
-  { sl: 1, sourceCompany: "Pakiza Knit Composite Ltd", targetCompany: "Pakiza Technovation Limited", isActive: "Active" }
+  { sl: 1, name: "Embroidery", main: "RMG Operations", relayDuty: "", checked: false },
+  { sl: 2, name: "Rotary Sample (AOP)", main: "All over Printing", relayDuty: "", checked: false },
+  { sl: 3, name: "Product Management", main: "Product Management", relayDuty: "", checked: false },
+  { sl: 4, name: "Cutting Quality", main: "Quality Assurance Department", relayDuty: "", checked: false },
+  { sl: 5, name: "AOP Fabric Store", main: "Material Control Department", relayDuty: "", checked: false },
+  { sl: 6, name: "Dyes & Chemical Store (FD)", main: "Material Control Department", relayDuty: "", checked: false },
+  { sl: 7, name: "Embroidery Quality", main: "Embroidery", relayDuty: "", checked: false },
+  { sl: 8, name: "Quality (RMG)", main: "Quality Assurance Department", relayDuty: "", checked: false },
+  { sl: 9, name: "Administration", main: "Administration", relayDuty: "", checked: false },
+  { sl: 10, name: "Rotary Engraving (AOP)", main: "All over Printing", relayDuty: "", checked: false },
+  { sl: 11, name: "Stenter (AOP)", main: "All over Printing", relayDuty: "", checked: false }
 ];
 
 const DEFAULT_DEPARTMENTS: Department[] = [
@@ -223,9 +234,9 @@ function StructureSetupPage() {
   const [areaIsActive, setAreaIsActive] = useState<"Active" | "Inactive">("Active");
 
   // Form states - Mapping
-  const [mapSource, setMapSource] = useState("");
-  const [mapTarget, setMapTarget] = useState("");
-  const [mapIsActive, setMapIsActive] = useState<"Active" | "Inactive">("Active");
+  const [mapName, setMapName] = useState("");
+  const [mapMain, setMapMain] = useState("");
+  const [mapRelayDuty, setMapRelayDuty] = useState("");
 
   // Form states - Department
   const [depCode, setDepCode] = useState("");
@@ -279,9 +290,9 @@ function StructureSetupPage() {
       setAreaIsActive(item?.isActive || "Active");
     } else if (activeTab === "mapping") {
       const item = mappings.find(m => m.sl === sl);
-      setMapSource(item?.sourceCompany || orgs[0]?.nameEng || "");
-      setMapTarget(item?.targetCompany || orgs[1]?.nameEng || "");
-      setMapIsActive(item?.isActive || "Active");
+      setMapName(item?.name || "");
+      setMapMain(item?.main || "");
+      setMapRelayDuty(item?.relayDuty || "");
     } else if (activeTab === "department") {
       const item = departments.find(d => d.sl === sl);
       setDepCode(item?.code || "");
@@ -375,13 +386,13 @@ function StructureSetupPage() {
       setAreas(nextList);
       localStorage.setItem("hris_areas", JSON.stringify(nextList));
     } else if (activeTab === "mapping") {
-      if (!mapSource || !mapTarget) { toast.error("Both Source and Target companies are required."); return; }
+      if (!mapName || !mapMain) { toast.error("Name and Main group are required."); return; }
       let nextList = [...mappings];
       if (editSl !== null) {
-        nextList = mappings.map(m => m.sl === editSl ? { ...m, sourceCompany: mapSource, targetCompany: mapTarget, isActive: mapIsActive } : m);
+        nextList = mappings.map(m => m.sl === editSl ? { ...m, name: mapName, main: mapMain, relayDuty: mapRelayDuty } : m);
       } else {
         const sl = mappings.length > 0 ? Math.max(...mappings.map(m => m.sl)) + 1 : 1;
-        nextList.push({ sl, sourceCompany: mapSource, targetCompany: mapTarget, isActive: mapIsActive });
+        nextList.push({ sl, name: mapName, main: mapMain, relayDuty: mapRelayDuty, checked: false });
       }
       setMappings(nextList);
       localStorage.setItem("hris_company_mappings", JSON.stringify(nextList));
@@ -623,35 +634,112 @@ function StructureSetupPage() {
               )}
 
               {activeTab === "mapping" && (
-                <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "800px" }}>
-                  <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
-                    <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">#</th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">Actions</th>
-                      <th className="px-5 py-4 min-w-[250px]">Source Company</th>
-                      <th className="px-5 py-4 min-w-[250px]">Target Company</th>
-                      <th className="px-5 py-4 w-[120px] text-center">IsActive</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/30 text-foreground">
-                    {mappings.filter(m => (m.sourceCompany || "").toLowerCase().includes(searchQuery.toLowerCase())).map((item, idx) => (
-                      <tr key={item.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
-                        <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
-                        <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
-                          <div className="flex items-center justify-center gap-3">
-                            <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition"><Pencil className="size-4" /></button>
-                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition"><Trash2 className="size-4" /></button>
-                          </div>
-                        </td>
-                        <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">{item.sourceCompany}</td>
-                        <td className="px-5 py-3.5 font-normal text-slate-800 dark:text-slate-200">{item.targetCompany}</td>
-                        <td className="px-5 py-3.5 text-center">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}>{item.isActive}</span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <div className="p-6 bg-card">
+                  {/* Custom Header for Mapping */}
+                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-border/40">
+                    <div className="space-y-4">
+                      <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">Pakiza Software Limited</h2>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider block">Mapping For</label>
+                        <select className="bg-transparent border-0 border-b border-emerald-500/80 outline-none pb-0.5 text-sm font-bold text-slate-800 dark:text-slate-100 pr-8 cursor-pointer">
+                          <option value="section">Section</option>
+                          <option value="department">Department</option>
+                          <option value="unit">Unit</option>
+                          <option value="line">Line</option>
+                          <option value="area">Area</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="Search..."
+                          value={searchQuery}
+                          onChange={e => setSearchQuery(e.target.value)}
+                          className="bg-transparent border border-slate-200 dark:border-slate-700 rounded-sm px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground w-64 outline-none focus:border-primary"
+                        />
+                      </div>
+                      <button
+                        onClick={() => {
+                          toast.success("Mappings submitted successfully!");
+                          localStorage.setItem("hris_company_mappings", JSON.stringify(mappings));
+                        }}
+                        className="bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs px-6 py-2.5 rounded-sm shadow-sm transition-all"
+                      >
+                        SUBMIT
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Redesigned Mapping Table */}
+                  <div className="overflow-x-auto mt-4">
+                    <table className="w-full text-left text-xs border-collapse whitespace-nowrap">
+                      <thead className="bg-[#cbd5e1] dark:bg-slate-800 text-slate-750 dark:text-slate-200 uppercase font-bold text-[10px]">
+                        <tr>
+                          <th className="px-4 py-3 w-[40px] text-center">
+                            <input
+                              type="checkbox"
+                              checked={mappings.length > 0 && mappings.every(m => m.checked)}
+                              onChange={e => {
+                                const checked = e.target.checked;
+                                setMappings(mappings.map(m => ({ ...m, checked })));
+                              }}
+                              className="rounded border-slate-350 text-primary focus:ring-primary size-3.5"
+                            />
+                          </th>
+                          <th className="px-4 py-3 w-[60px] text-center text-slate-500 font-bold">SL</th>
+                          <th className="px-4 py-3 text-slate-600 dark:text-slate-300 font-bold">Name</th>
+                          <th className="px-4 py-3 text-slate-600 dark:text-slate-300 font-bold">Main</th>
+                          <th className="px-4 py-3 text-slate-600 dark:text-slate-300 font-bold w-[250px]">Relay Duty</th>
+                          <th className="px-4 py-3 w-[80px] text-center text-slate-600 dark:text-slate-300 font-bold">Del</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-200">
+                        {mappings
+                          .filter(m => (m.name || "").toLowerCase().includes(searchQuery.toLowerCase()) || (m.main || "").toLowerCase().includes(searchQuery.toLowerCase()))
+                          .map((item, idx) => (
+                            <tr key={item.sl} className={`${idx % 2 === 0 ? "bg-white dark:bg-slate-900" : "bg-slate-50 dark:bg-slate-800/40"} hover:bg-slate-100/50 transition-colors`}>
+                              <td className="px-4 py-3 text-center">
+                                <input
+                                  type="checkbox"
+                                  checked={!!item.checked}
+                                  onChange={e => {
+                                    const checked = e.target.checked;
+                                    setMappings(mappings.map(m => m.sl === item.sl ? { ...m, checked } : m));
+                                  }}
+                                  className="rounded border-slate-350 text-primary focus:ring-primary size-3.5"
+                                />
+                              </td>
+                              <td className="px-4 py-3 text-center text-slate-500 font-normal">{idx + 1}</td>
+                              <td className="px-4 py-3 font-semibold text-slate-800 dark:text-slate-100">{item.name}</td>
+                              <td className="px-4 py-3 text-slate-600 dark:text-slate-350">{item.main}</td>
+                              <td className="px-4 py-3">
+                                <input
+                                  type="text"
+                                  value={item.relayDuty || ""}
+                                  onChange={e => {
+                                    const val = e.target.value;
+                                    setMappings(mappings.map(m => m.sl === item.sl ? { ...m, relayDuty: val } : m));
+                                  }}
+                                  className="h-8 w-full max-w-[220px] bg-white dark:bg-slate-950 border border-slate-250 dark:border-slate-700 rounded px-2.5 text-xs outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-foreground"
+                                />
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                <button
+                                  type="button"
+                                  onClick={() => handleDelete(item.sl)}
+                                  className="text-slate-400 hover:text-red-500 font-bold transition text-sm px-2"
+                                >
+                                  X
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               )}
 
               {activeTab === "department" && (
@@ -913,27 +1001,16 @@ function StructureSetupPage() {
                 {activeTab === "mapping" && (
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Source Company *</label>
-                      <select value={mapSource} onChange={e => setMapSource(e.target.value)} className={insetSelectClass}>
-                        {orgs.map(o => (
-                          <option key={o.sl} value={o.nameEng}>{o.nameEng}</option>
-                        ))}
-                      </select>
+                      <label className={insetLabelClass}>Name *</label>
+                      <input type="text" placeholder="e.g. Embroidery" value={mapName} onChange={e => setMapName(e.target.value)} className={insetInputClass} required />
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Target Company *</label>
-                      <select value={mapTarget} onChange={e => setMapTarget(e.target.value)} className={insetSelectClass}>
-                        {orgs.map(o => (
-                          <option key={o.sl} value={o.nameEng}>{o.nameEng}</option>
-                        ))}
-                      </select>
+                      <label className={insetLabelClass}>Main *</label>
+                      <input type="text" placeholder="e.g. RMG Operations" value={mapMain} onChange={e => setMapMain(e.target.value)} className={insetInputClass} required />
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>IsActive *</label>
-                      <select value={mapIsActive} onChange={e => setMapIsActive(e.target.value as any)} className={insetSelectClass}>
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                      </select>
+                      <label className={insetLabelClass}>Relay Duty</label>
+                      <input type="text" placeholder="Relay Duty value" value={mapRelayDuty} onChange={e => setMapRelayDuty(e.target.value)} className={insetInputClass} />
                     </div>
                   </div>
                 )}

@@ -355,39 +355,39 @@ function ERecruitmentForm() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-foreground transition-colors duration-300 flex flex-col">
-      {/* Premium Public Header */}
-      <header className="bg-card border-b border-border/80 sticky top-0 z-40 backdrop-blur-md bg-opacity-95 shadow-xs">
-        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-gradient-to-tr from-primary to-primary-glow flex items-center justify-center text-primary-foreground shadow-sm">
-              <UserPlus className="size-5" />
-            </div>
-            <div>
-              <span className="text-[10px] font-black text-primary uppercase tracking-widest leading-none block">Cripton HRIS</span>
-              <h1 className="text-sm font-extrabold tracking-tight text-foreground leading-none mt-1">Public Career Portal</h1>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-1.5">
-            <ShieldCheck className="size-4.5 text-emerald-600 dark:text-emerald-400" />
-            <div className="text-left">
-              <p className="text-[9px] font-black uppercase text-emerald-800 dark:text-emerald-400 leading-none">Security Active</p>
-              <p className="text-[8px] text-emerald-600 dark:text-emerald-500 font-semibold mt-0.5 leading-none">SSL Encrypted</p>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
+      <Sidebar />
+      <main className="flex-1 min-w-0 flex flex-col relative">
+        <Topbar />
 
-      {/* Main Container */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-8">
-        <div className="space-y-6">
+        <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-[1400px] mx-auto w-full">
+
+          {/* Breadcrumb & Header */}
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
+                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <ChevronRight className="size-3" />
+                <span>Recruitment</span>
+                <ChevronRight className="size-3" />
+                <span className="text-primary font-black">e-Recruitment Form</span>
+              </div>
+              <h1 className="text-xl font-black text-foreground tracking-tight flex items-center gap-2">
+                <UserPlus className="size-5.5 text-primary" />
+                <span>e-Recruitment Application Form</span>
+              </h1>
+            </div>
+            <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/25 rounded-xl px-3 py-2 shadow-2xs">
+              <ShieldCheck className="size-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold">Security Active (SSL Encrypted)</span>
+            </div>
+          </div>
 
           {/* Intro Card */}
           <div className="bg-card rounded-lg border border-border/80 p-6 shadow-xs relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl" />
             <div className="space-y-1.5 z-10 relative">
-              <h2 className="text-xl font-extrabold text-foreground tracking-tight">Employment Application Form</h2>
+              <h2 className="text-xl font-extrabold text-foreground tracking-tight text-primary">Employment Application Portal</h2>
               <p className="text-xs text-muted-foreground font-medium max-w-3xl leading-relaxed">
                 Please complete the application form below with your correct personal, contact, academic, and professional details. Fields marked with <span className="text-red-500 font-bold">*</span> are mandatory.
               </p>
