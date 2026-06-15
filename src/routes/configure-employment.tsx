@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
-import { 
+import {
   ChevronRight, Search, Plus, Pencil, Trash2, X,
   FileSpreadsheet, Printer, FileText, UserCheck, Shield,
-  Award, Globe, Heart, MapPin, Briefcase
+  Award, Globe, Heart, MapPin, Briefcase, SlidersHorizontal, GripVertical
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -113,8 +113,43 @@ interface PlaceInBD {
 // Defaults
 // ----------------------------------------------------
 const DEFAULT_DESIGNATIONS: DesignationGroup[] = [
-  { sl: 1, name: "Sr. Operator", nameBng: "", shortName: "SO", isActive: "Active" },
-  { sl: 2, name: "Asst. Supervisor", nameBng: "", shortName: "AS", isActive: "Active" }
+  { sl: 1, name: "Managing Director", nameBng: "ব্যবস্থাপনা পরিচালক", shortName: "MD", isActive: "Active" },
+  { sl: 2, name: "Executive Director", nameBng: "নির্বাহী পরিচালক", shortName: "ED", isActive: "Active" },
+  { sl: 3, name: "Director", nameBng: "পরিচালক", shortName: "DIR", isActive: "Active" },
+  { sl: 4, name: "General Manager", nameBng: "মহাব্যবস্থাপক", shortName: "GM", isActive: "Active" },
+  { sl: 5, name: "Deputy General Manager", nameBng: "উপ-মহাব্যবস্থাপক", shortName: "DGM", isActive: "Active" },
+  { sl: 6, name: "Assistant General Manager", nameBng: "সহকারী মহাব্যবস্থাপক", shortName: "AGM", isActive: "Active" },
+  { sl: 7, name: "Manager", nameBng: "ব্যবস্থাপক", shortName: "MGR", isActive: "Active" },
+  { sl: 8, name: "Deputy Manager", nameBng: "উপ-ব্যবস্থাপক", shortName: "DMGR", isActive: "Active" },
+  { sl: 9, name: "Assistant Manager", nameBng: "সহকারী ব্যবস্থাপক", shortName: "AMGR", isActive: "Active" },
+  { sl: 10, name: "Senior Executive", nameBng: "সিনিয়র এক্সিকিউটিভ", shortName: "SR.EXE", isActive: "Active" },
+  { sl: 11, name: "Executive", nameBng: "এক্সিকিউটিভ", shortName: "EXE", isActive: "Active" },
+  { sl: 12, name: "Junior Executive", nameBng: "জুনিয়র এক্সিকিউটিভ", shortName: "JR.EXE", isActive: "Active" }
+];
+
+const DEFAULT_DESIGNATIONS_POOL = [
+  "Managing Director",
+  "Executive Director",
+  "Director",
+  "General Manager",
+  "Deputy General Manager",
+  "Assistant General Manager",
+  "Manager",
+  "Deputy Manager",
+  "Assistant Manager",
+  "Senior Executive",
+  "Executive",
+  "Junior Executive",
+  "Senior Officer",
+  "Officer",
+  "Junior Officer",
+  "Senior Supervisor",
+  "Supervisor",
+  "Asst. Supervisor",
+  "Line Leader",
+  "Operator",
+  "Asst. Operator",
+  "Helper"
 ];
 
 const DEFAULT_JOB_TITLES: JobTitle[] = [
@@ -171,6 +206,16 @@ function EmploymentSetupPage() {
   const [religions, setReligions] = useState<Religion[]>([]);
   const [places, setPlaces] = useState<PlaceInBD[]>([]);
 
+  // Reorder modal states
+  const [isReorderModalOpen, setIsReorderModalOpen] = useState(false);
+  const [tempDesignations, setTempDesignations] = useState<DesignationGroup[]>([]);
+
+  // Fresh Reorder modal states
+  const [isFreshOrderModalOpen, setIsFreshOrderModalOpen] = useState(false);
+  const [availableList, setAvailableList] = useState<string[]>([]);
+  const [orderedList, setOrderedList] = useState<string[]>([]);
+  const [availableSearchQuery, setAvailableSearchQuery] = useState("");
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
@@ -196,7 +241,10 @@ function EmploymentSetupPage() {
     };
 
     // Designation Group
-    const designationsData = safeParse("hris_designations", DEFAULT_DESIGNATIONS, "name");
+    let designationsData = safeParse("hris_designations", DEFAULT_DESIGNATIONS, "name");
+    if (designationsData.length <= 2) {
+      designationsData = DEFAULT_DESIGNATIONS;
+    }
     setDesignations(designationsData);
     localStorage.setItem("hris_designations", JSON.stringify(designationsData));
 
@@ -559,12 +607,38 @@ function EmploymentSetupPage() {
                 Job & Employee Configuration
               </h1>
             </div>
-            <button 
-              onClick={() => openForm(null)}
-              className="h-10 px-5 rounded-lg bg-primary text-primary-foreground font-black text-xs hover:bg-primary/90 transition-all shadow-sm flex items-center justify-center gap-2 uppercase tracking-wide"
-            >
-              <Plus className="size-4 animate-bounce" /> Add New Record
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3">
+              {activeTab === "designationGroup" && (
+                <>
+                  <button
+                    onClick={() => {
+                      setAvailableList(DEFAULT_DESIGNATIONS_POOL);
+                      setOrderedList([]);
+                      setAvailableSearchQuery("");
+                      setIsFreshOrderModalOpen(true);
+                    }}
+                    className="h-10 px-5 rounded-lg border border-[#e2e8f0] dark:border-slate-800 bg-[#f8fafc] dark:bg-[#0f172a] hover:bg-[#cbd5e1] dark:hover:bg-slate-800 text-[#0f172a] dark:text-slate-200 font-extrabold text-xs transition-all shadow-sm flex items-center justify-center gap-2 uppercase tracking-wide cursor-pointer border-dashed"
+                  >
+                    <Briefcase className="size-4 text-primary" /> Fresh Designation Order
+                  </button>
+                  <button
+                    onClick={() => {
+                      setTempDesignations(designations);
+                      setIsReorderModalOpen(true);
+                    }}
+                    className="h-10 px-5 rounded-lg border border-border/80 bg-card text-foreground font-black text-xs hover:bg-muted transition-all shadow-sm flex items-center justify-center gap-2 uppercase tracking-wide cursor-pointer"
+                  >
+                    <SlidersHorizontal className="size-4" /> Reorder Designations
+                  </button>
+                </>
+              )}
+              <button
+                onClick={() => openForm(null)}
+                className="h-10 px-5 rounded-lg bg-primary text-primary-foreground font-black text-xs hover:bg-primary/90 transition-all shadow-sm flex items-center justify-center gap-2 uppercase tracking-wide cursor-pointer"
+              >
+                <Plus className="size-4 animate-bounce" /> Add New Record
+              </button>
+            </div>
           </div>
 
           {/* Horizontal Master Tabs */}
@@ -579,11 +653,10 @@ function EmploymentSetupPage() {
                     setActiveTab(tab.type);
                     setSearchQuery("");
                   }}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                    isActive 
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all ${isActive
                       ? "bg-primary text-primary-foreground shadow-sm"
                       : "bg-card border border-border/85 hover:bg-muted text-muted-foreground hover:text-foreground"
-                  }`}
+                    }`}
                 >
                   <TabIcon className="size-4" />
                   {tab.label}
@@ -596,8 +669,8 @@ function EmploymentSetupPage() {
           <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs flex flex-col md:flex-row gap-3 items-center justify-between">
             <div className="flex items-center gap-2 bg-muted/65 border border-border/40 rounded-lg px-3 py-1.5 w-full md:w-80">
               <Search className="size-4 text-muted-foreground/70" />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder={`Search ${tabsList.find(t => t.type === activeTab)?.label}...`}
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
@@ -606,19 +679,19 @@ function EmploymentSetupPage() {
             </div>
 
             <div className="flex items-center gap-2 w-full md:w-auto justify-end">
-              <button 
+              <button
                 onClick={() => toast.success("Exporting to Excel...")}
                 className="h-9.5 px-3 rounded-lg border border-border/60 hover:bg-muted font-bold text-xs text-muted-foreground flex items-center gap-1.5 transition-all uppercase"
               >
                 <FileSpreadsheet className="size-4 text-emerald-600" /> EXCEL
               </button>
-              <button 
+              <button
                 onClick={() => window.print()}
                 className="h-9.5 px-3 rounded-lg border border-border/60 hover:bg-muted font-bold text-xs text-muted-foreground flex items-center gap-1.5 transition-all uppercase"
               >
                 <Printer className="size-4 text-blue-600" /> PRINT
               </button>
-              <button 
+              <button
                 onClick={() => toast.success("Generating PDF...")}
                 className="h-9.5 px-3 rounded-lg border border-border/60 hover:bg-muted font-bold text-xs text-muted-foreground flex items-center gap-1.5 transition-all uppercase"
               >
@@ -630,7 +703,7 @@ function EmploymentSetupPage() {
           {/* Master Table Router */}
           <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
-              
+
               {activeTab === "designationGroup" && (
                 <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "800px" }}>
                   <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
@@ -953,7 +1026,7 @@ function EmploymentSetupPage() {
         {isFormOpen && (
           <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
             <div className="bg-card border border-border/80 w-full max-w-xl rounded-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
-              
+
               {/* Modal Header */}
               <div className="px-6 py-4.5 border-b border-border/50 bg-[#f8fafc] dark:bg-[#0f172a] flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
@@ -966,7 +1039,7 @@ function EmploymentSetupPage() {
                     </h2>
                   </div>
                 </div>
-                <button 
+                <button
                   onClick={() => setIsFormOpen(false)}
                   className="size-8.5 rounded-xl hover:bg-muted/80 flex items-center justify-center transition-colors text-muted-foreground hover:text-foreground border border-border/20"
                 >
@@ -976,7 +1049,7 @@ function EmploymentSetupPage() {
 
               {/* Modal Form Body */}
               <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
-                
+
                 {activeTab === "designationGroup" && (
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>
@@ -1290,6 +1363,387 @@ function EmploymentSetupPage() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+        {/* Designation Group Reordering Modal */}
+        {isReorderModalOpen && (
+          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-350">
+            <div className="bg-card border border-border/80 w-full max-w-2xl rounded-lg shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-300">
+
+              {/* Header */}
+              <div className="px-6 py-5 border-b border-border/40 bg-gradient-to-r from-muted/50 via-card to-muted/30 dark:from-[#0f172a] dark:to-[#1e293b] flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="size-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary border border-primary/20 shadow-inner">
+                    <SlidersHorizontal className="size-5.5" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-extrabold tracking-tight text-foreground">
+                      Reorder Designation Groups
+                    </h2>
+                    <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">
+                      Drag and drop to set hierarchical/display order of designation groups.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsReorderModalOpen(false)}
+                  className="size-9 rounded-xl hover:bg-muted/80 flex items-center justify-center transition-all text-muted-foreground hover:text-foreground border border-border/30 hover:border-border/60 hover:scale-105"
+                >
+                  <X className="size-4.5" />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                <div className="flex items-center justify-between text-xs font-black uppercase tracking-wider text-muted-foreground">
+                  <span>Designation Hierarchy</span>
+                  <span className="text-[10px] text-primary normal-case">Top of list has higher precedence (e.g. MD at #1)</span>
+                </div>
+
+                <div className="space-y-2 max-h-[450px] overflow-y-auto pr-1">
+                  {tempDesignations.map((des, index) => (
+                    <div
+                      key={des.name}
+                      draggable
+                      onDragStart={(e) => {
+                        e.dataTransfer.setData("text/plain", index.toString());
+                        e.dataTransfer.effectAllowed = "move";
+                        e.currentTarget.classList.add("opacity-30", "border-primary");
+                      }}
+                      onDragEnd={(e) => {
+                        e.currentTarget.classList.remove("opacity-30", "border-primary");
+                      }}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = "move";
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        const fromIndex = parseInt(e.dataTransfer.getData("text/plain"), 10);
+                        if (isNaN(fromIndex) || fromIndex === index) return;
+                        const updated = [...tempDesignations];
+                        const [movedItem] = updated.splice(fromIndex, 1);
+                        updated.splice(index, 0, movedItem);
+                        setTempDesignations(updated);
+                      }}
+                      className="flex items-center justify-between p-3.5 bg-card hover:bg-muted/20 border border-border/85 hover:border-primary/45 rounded-xl transition-all duration-200 shadow-sm cursor-grab active:cursor-grabbing group/item"
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <div className="text-muted-foreground/30 group-hover/item:text-primary transition-colors cursor-grab p-1 hover:bg-muted rounded">
+                          <GripVertical className="size-4" />
+                        </div>
+                        <div className="size-6 rounded-lg bg-primary/10 border border-primary/15 text-primary flex items-center justify-center text-[10px] font-black font-mono">
+                          {index + 1}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-100">{des.name}</span>
+                          {des.nameBng && (
+                            <span className="text-[9px] text-muted-foreground mt-0.5">{des.nameBng}</span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-muted text-muted-foreground uppercase font-mono">
+                          {des.shortName || "N/A"}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-semibold border ${des.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-650 border-red-500/20"}`}>
+                          {des.isActive}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="border-t border-border/40 pt-5 flex items-center justify-between gap-3 bg-gradient-to-r from-muted/30 to-muted/10 dark:from-[#0f172a] dark:to-[#121b2e] p-6">
+                <button
+                  type="button"
+                  onClick={() => setIsReorderModalOpen(false)}
+                  className="h-10.5 px-6 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-extrabold text-xs transition-all uppercase tracking-wider border border-border/50"
+                >
+                  CANCEL
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const finalized = tempDesignations.map((item, idx) => ({
+                      ...item,
+                      sl: idx + 1
+                    }));
+                    setDesignations(finalized);
+                    localStorage.setItem("hris_designations", JSON.stringify(finalized));
+                    toast.success("Designation hierarchy ordered successfully!");
+                    setIsReorderModalOpen(false);
+                  }}
+                  className="h-10.5 px-9 rounded-xl text-white font-black text-xs shadow-md hover:shadow-lg transition-all uppercase tracking-wider flex items-center gap-2 bg-[#2ecc71] hover:bg-[#27ae60] active:scale-98"
+                >
+                  SAVE ORDER
+                </button>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {/* Fresh Designation Order Modal */}
+        {isFreshOrderModalOpen && (
+          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-300">
+            <div className="bg-card border border-border/80 w-full max-w-5xl rounded-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-300">
+
+              {/* Header */}
+              <div className="px-6 py-5 border-b border-border/40 bg-gradient-to-r from-muted/50 via-card to-muted/30 dark:from-[#0f172a] dark:to-[#1e293b] flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="size-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary border border-primary/20 shadow-inner">
+                    <Briefcase className="size-5.5 animate-pulse" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-extrabold tracking-tight text-foreground">
+                      Fresh Designation Setup
+                    </h2>
+                    <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">
+                      Drag designations from Left (Available Pool) to Right (Ordered List) to set up your hierarchy.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsFreshOrderModalOpen(false)}
+                  className="size-9 rounded-xl hover:bg-muted/80 flex items-center justify-center transition-all text-muted-foreground hover:text-foreground border border-border/30 hover:border-border/60 hover:scale-105"
+                >
+                  <X className="size-4.5" />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="flex-1 overflow-y-auto p-6 lg:p-8 grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+
+                {/* Left Side: Available Pool */}
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = "move";
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const source = e.dataTransfer.getData("source");
+                    if (source === "ordered") {
+                      const fromIndex = parseInt(e.dataTransfer.getData("index"), 10);
+                      if (isNaN(fromIndex)) return;
+                      const item = orderedList[fromIndex];
+                      setOrderedList(orderedList.filter((_, idx) => idx !== fromIndex));
+                      if (!availableList.includes(item)) {
+                        setAvailableList([...availableList, item]);
+                      }
+                      toast.success(`Moved back: ${item}`);
+                    }
+                  }}
+                  className="md:col-span-5 flex flex-col bg-muted/20 dark:bg-slate-900/50 border border-border/80 rounded-lg p-5 space-y-4 shadow-xs"
+                >
+                  <div className="border-b border-border/40 pb-3 flex justify-between items-center">
+                    <div>
+                      <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">Available Pool</h3>
+                      <p className="text-[9px] text-muted-foreground/80 mt-0.5 font-semibold">Drag from here, or double-click to add.</p>
+                    </div>
+                    <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-border/45 font-extrabold text-slate-500 font-mono">
+                      {availableList.length} items
+                    </span>
+                  </div>
+
+                  {/* Search Bar */}
+                  <div className="flex items-center gap-2 bg-card border border-border/80 rounded-xl px-3 py-2 shadow-xs mb-1">
+                    <Search className="size-3.5 text-muted-foreground/60" />
+                    <input
+                      type="text"
+                      placeholder="Search available designations..."
+                      value={availableSearchQuery}
+                      onChange={e => setAvailableSearchQuery(e.target.value)}
+                      className="bg-transparent border-0 outline-none text-xs w-full text-foreground placeholder:text-muted-foreground/60 font-semibold p-0 focus:ring-0"
+                    />
+                    {availableSearchQuery && (
+                      <button
+                        onClick={() => setAvailableSearchQuery("")}
+                        className="text-muted-foreground hover:text-foreground cursor-pointer"
+                      >
+                        <X className="size-3" />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="space-y-2 overflow-y-auto max-h-[400px] flex-1 pr-2 scrollbar-thin">
+                    {availableList.filter(des => des.toLowerCase().includes(availableSearchQuery.toLowerCase())).length === 0 ? (
+                      <div className="flex flex-col items-center justify-center h-full text-center py-12 text-slate-400">
+                        <p className="text-xs text-muted-foreground font-bold italic">
+                          {availableList.length === 0 ? "All designations selected!" : "No matches found"}
+                        </p>
+                      </div>
+                    ) : (
+                      availableList
+                        .filter(des => des.toLowerCase().includes(availableSearchQuery.toLowerCase()))
+                        .map((des) => (
+                          <div
+                            key={des}
+                            draggable
+                            onDragStart={(e) => {
+                              e.dataTransfer.setData("source", "available");
+                              e.dataTransfer.setData("value", des);
+                              e.dataTransfer.effectAllowed = "move";
+                            }}
+                            onDoubleClick={() => {
+                              setAvailableList(availableList.filter(d => d !== des));
+                              setOrderedList([...orderedList, des]);
+                              toast.success(`Added: ${des}`);
+                            }}
+                            className="p-3 bg-card hover:bg-primary/5 hover:text-primary border border-border/80 hover:border-primary/45 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-200 transition duration-200 shadow-xs cursor-grab select-none hover:shadow hover:-translate-y-0.5 active:scale-98"
+                          >
+                            {des}
+                          </div>
+                        ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Middle: Drag indicators / guide */}
+                <div className="md:col-span-2 flex flex-col items-center justify-center gap-6 py-4 md:py-0 select-none">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 bg-muted px-2.5 py-1 rounded-md border border-border/60">
+                    Interactions
+                  </span>
+                  <div className="hidden md:flex flex-col gap-4 items-center">
+                    <div className="flex flex-col items-center gap-1.5 bg-card border border-border/80 p-2.5 rounded-xl shadow-xs w-28 text-center">
+                      <div className="flex items-center justify-center size-7 rounded-lg bg-primary/10 text-primary font-black text-xs">➔</div>
+                      <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wide">Drag & Drop</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1.5 bg-card border border-border/80 p-2.5 rounded-xl shadow-xs w-28 text-center">
+                      <div className="flex items-center justify-center size-7 rounded-lg bg-emerald-500/10 text-emerald-600 font-black text-xs">⇄</div>
+                      <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wide">Double Click</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Side: Ordered List */}
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = "move";
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const source = e.dataTransfer.getData("source");
+                    if (source === "available") {
+                      const val = e.dataTransfer.getData("value");
+                      if (val && !orderedList.includes(val)) {
+                        setOrderedList([...orderedList, val]);
+                        setAvailableList(availableList.filter(d => d !== val));
+                        toast.success(`Added: ${val}`);
+                      }
+                    }
+                  }}
+                  className="md:col-span-5 flex flex-col bg-muted/20 dark:bg-slate-900/50 border border-border/80 rounded-lg p-5 space-y-4 shadow-xs"
+                >
+                  <div className="border-b border-border/40 pb-3 flex justify-between items-center">
+                    <div>
+                      <h3 className="text-xs font-black uppercase tracking-wider text-primary">Hierarchy Order</h3>
+                      <p className="text-[9px] text-muted-foreground/80 mt-0.5 font-semibold">Drag items to sort. Double-click to remove.</p>
+                    </div>
+                    <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20 font-black text-primary font-mono">
+                      {orderedList.length} selected
+                    </span>
+                  </div>
+
+                  <div className="space-y-2 overflow-y-auto max-h-[400px] flex-1 pr-2 scrollbar-thin flex flex-col justify-start">
+                    {orderedList.length === 0 ? (
+                      <div className="flex-1 flex flex-col items-center justify-center text-center py-12 text-slate-400">
+                        <Briefcase className="size-8 text-slate-350 mb-2.5 animate-pulse" />
+                        <p className="text-xs font-bold text-slate-700 dark:text-slate-300">List is empty</p>
+                        <p className="text-[9px] text-muted-foreground/70 mt-1 max-w-[200px]">Drag designations here to start building the hierarchy.</p>
+                      </div>
+                    ) : (
+                      orderedList.map((des, index) => (
+                        <div
+                          key={des}
+                          draggable
+                          onDragStart={(e) => {
+                            e.dataTransfer.setData("source", "ordered");
+                            e.dataTransfer.setData("index", index.toString());
+                            e.dataTransfer.effectAllowed = "move";
+                          }}
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                          }}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            const source = e.dataTransfer.getData("source");
+                            if (source === "ordered") {
+                              const fromIndex = parseInt(e.dataTransfer.getData("index"), 10);
+                              if (isNaN(fromIndex) || fromIndex === index) return;
+                              const updated = [...orderedList];
+                              const [movedItem] = updated.splice(fromIndex, 1);
+                              updated.splice(index, 0, movedItem);
+                              setOrderedList(updated);
+                            }
+                          }}
+                          onDoubleClick={() => {
+                            setOrderedList(orderedList.filter(d => d !== des));
+                            if (!availableList.includes(des)) {
+                              setAvailableList([...availableList, des]);
+                            }
+                            toast.success(`Removed: ${des}`);
+                          }}
+                          className="flex items-center gap-3 p-3 bg-card border border-border/80 hover:border-primary/45 rounded-xl transition duration-150 cursor-grab hover:shadow-xs group/item"
+                        >
+                          <div className="text-muted-foreground/30 group-hover/item:text-primary transition-colors cursor-grab">
+                            <GripVertical className="size-4" />
+                          </div>
+                          <div className="size-5.5 rounded-lg bg-primary/10 border border-primary/15 text-primary flex items-center justify-center text-[9px] font-black font-mono">
+                            {index + 1}
+                          </div>
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-100">{des}</span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Footer */}
+              <div className="border-t border-border/40 pt-5 flex items-center justify-between gap-3 bg-gradient-to-r from-muted/30 to-muted/10 dark:from-[#0f172a] dark:to-[#121b2e] p-6">
+                <button
+                  type="button"
+                  onClick={() => setIsFreshOrderModalOpen(false)}
+                  className="h-10.5 px-6 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-extrabold text-xs transition-all uppercase tracking-wider border border-border/50"
+                >
+                  CANCEL
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (orderedList.length === 0) {
+                      toast.error("Please add at least one designation to the ordered list");
+                      return;
+                    }
+                    const finalized = orderedList.map((name, index) => {
+                      const existing = designations.find(d => d.name === name);
+                      return {
+                        sl: index + 1,
+                        name,
+                        nameBng: existing?.nameBng || "",
+                        shortName: existing?.shortName || name.split(" ").map(w => w[0]).join("").toUpperCase().substring(0, 4),
+                        isActive: existing?.isActive || "Active"
+                      };
+                    });
+                    setDesignations(finalized);
+                    localStorage.setItem("hris_designations", JSON.stringify(finalized));
+                    toast.success("Fresh designation hierarchy saved successfully!");
+                    setIsFreshOrderModalOpen(false);
+                  }}
+                  className="h-10.5 px-9 rounded-xl text-white font-black text-xs shadow-md hover:shadow-lg transition-all uppercase tracking-wider flex items-center gap-2 bg-[#2ecc71] hover:bg-[#27ae60] active:scale-98"
+                >
+                  SAVE HIERARCHY
+                </button>
+              </div>
+
             </div>
           </div>
         )}

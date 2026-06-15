@@ -5,9 +5,10 @@ import { Topbar } from "@/components/dashboard/Topbar";
 import {
   ChevronRight, Search, Plus, Pencil, Trash2, X,
   FileSpreadsheet, Printer, FileText, Building2, MapPin,
-  Layers, Users2, Grid, HelpCircle
+  Layers, Users2, Grid, HelpCircle, Briefcase, SlidersHorizontal, GripVertical
 } from "lucide-react";
 import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/configure-structure")({
   head: () => ({
@@ -139,6 +140,28 @@ const DEFAULT_LINES: Line[] = [
   { sl: 2, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 02", lineBng: "লাইন ০২", sortOrder: 2, isActive: "Active" }
 ];
 
+const DEFAULT_DESIGNATIONS = [
+  "Software Engineer",
+  "Senior Software Engineer",
+  "Lead Engineer",
+  "HR Executive",
+  "HR Manager",
+  "HR Director",
+  "UI/UX Designer",
+  "Product Manager",
+  "QA Engineer",
+  "DevOps Engineer",
+  "Marketing Executive",
+  "Sales Representative",
+  "Office Assistant",
+  "Executive Director",
+  "Managing Director",
+  "Accountant",
+  "Finance Manager",
+  "Operations Manager",
+  "Receptionist"
+];
+
 function StructureSetupPage() {
   const [activeTab, setActiveTab] = useState<TabType>("company");
   const [searchQuery, setSearchQuery] = useState("");
@@ -151,6 +174,14 @@ function StructureSetupPage() {
   const [sections, setSections] = useState<Section[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
   const [lines, setLines] = useState<Line[]>([]);
+
+  // Designation assignment state
+  const [deptDesignations, setDeptDesignations] = useState<Record<number, string[]>>({});
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [assigningDept, setAssigningDept] = useState<Department | null>(null);
+  const [tempDesignations, setTempDesignations] = useState<string[]>([]);
+  const [selectedNewDesignation, setSelectedNewDesignation] = useState("");
+  const [customDesignation, setCustomDesignation] = useState("");
 
   // Load from LocalStorage
   useEffect(() => {
@@ -207,6 +238,23 @@ function StructureSetupPage() {
     const linesData = safeParse("hris_lines", DEFAULT_LINES);
     setLines(linesData);
     localStorage.setItem("hris_lines", JSON.stringify(linesData));
+
+    // Load Department Designations
+    const deptDesignationsData = localStorage.getItem("hris_dept_designations");
+    if (deptDesignationsData) {
+      try {
+        setDeptDesignations(JSON.parse(deptDesignationsData));
+      } catch (e) {
+        setDeptDesignations({});
+      }
+    } else {
+      const initial: Record<number, string[]> = {
+        1: ["HR Director", "HR Manager", "HR Executive"],
+        2: ["Lead Engineer", "Senior Software Engineer", "Software Engineer", "UI/UX Designer"]
+      };
+      setDeptDesignations(initial);
+      localStorage.setItem("hris_dept_designations", JSON.stringify(initial));
+    }
   }, []);
 
   // Shared Modal controls
@@ -505,8 +553,8 @@ function StructureSetupPage() {
                     setSearchQuery("");
                   }}
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all ${isActive
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "bg-card border border-border/85 hover:bg-muted text-muted-foreground hover:text-foreground"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "bg-card border border-border/85 hover:bg-muted text-muted-foreground hover:text-foreground"
                     }`}
                 >
                   <TabIcon className="size-4" />
@@ -747,7 +795,7 @@ function StructureSetupPage() {
                   <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
                     <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
                       <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">#</th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">Actions</th>
+                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[140px] text-center border-r border-border/30 z-20">Actions</th>
                       <th className="px-5 py-4 w-[120px]">Code</th>
                       <th className="px-5 py-4 min-w-[200px]">Department (Eng)</th>
                       <th className="px-5 py-4 min-w-[200px]">Department (Bng)</th>
@@ -761,8 +809,21 @@ function StructureSetupPage() {
                         <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
                         <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
                           <div className="flex items-center justify-center gap-3">
-                            <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition"><Pencil className="size-4" /></button>
-                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition"><Trash2 className="size-4" /></button>
+                            <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition" title="Edit Department"><Pencil className="size-4" /></button>
+                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition" title="Delete Department"><Trash2 className="size-4" /></button>
+                            <button
+                              onClick={() => {
+                                setAssigningDept(item);
+                                setTempDesignations(deptDesignations[item.sl] || []);
+                                setSelectedNewDesignation("");
+                                setCustomDesignation("");
+                                setIsAssignModalOpen(true);
+                              }}
+                              className="text-blue-500 hover:text-blue-600 transition-colors"
+                              title="Assign Designations"
+                            >
+                              <Briefcase className="size-4" />
+                            </button>
                           </div>
                         </td>
                         <td className="px-5 py-3.5 font-normal font-mono">{item.code || "—"}</td>
@@ -1152,6 +1213,247 @@ function StructureSetupPage() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+        {/* Designation Assignment Modal */}
+        {isAssignModalOpen && assigningDept && (
+          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-300">
+            <div className="bg-card border border-border/80 w-full max-w-4xl rounded-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-300">
+
+              {/* Modal Header */}
+              <div className="px-6 py-5 border-b border-border/40 bg-gradient-to-r from-muted/50 via-card to-muted/30 dark:from-[#0f172a] dark:to-[#1e293b] flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="size-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary border border-primary/20 shadow-inner">
+                    <SlidersHorizontal className="size-5.5" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-extrabold tracking-tight text-foreground flex items-center gap-2">
+                      Assign & Order Designations
+                    </h2>
+                    <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">
+                      Department: <span className="text-primary font-black px-2 py-0.5 rounded-md bg-primary/10 border border-primary/15">{assigningDept.nameEng} ({assigningDept.code})</span>
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsAssignModalOpen(false)}
+                  className="size-9 rounded-xl hover:bg-muted/80 flex items-center justify-center transition-all text-muted-foreground hover:text-foreground border border-border/30 hover:border-border/60 hover:scale-105"
+                >
+                  <X className="size-4.5" />
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="flex-1 overflow-y-auto p-6 lg:p-8 grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8">
+
+                {/* Left Column: Designation selection & custom addition */}
+                <div className="md:col-span-5 space-y-5">
+                  <div className="bg-muted/20 dark:bg-slate-900/50 border border-border/80 rounded-lg p-5 space-y-5 shadow-xs">
+                    <div className="border-b border-border/40 pb-2.5">
+                      <h3 className="text-xs font-black uppercase tracking-wider text-primary">Add New Designations</h3>
+                      <p className="text-[10px] text-muted-foreground mt-1 font-medium">Select existing templates or register custom ones.</p>
+                    </div>
+
+                    <div className="space-y-4">
+                      {/* Pre-defined select dropdown */}
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Choose Existing</label>
+                        <select
+                          value={selectedNewDesignation}
+                          onChange={e => {
+                            const val = e.target.value;
+                            setSelectedNewDesignation(val);
+                            if (val && !tempDesignations.includes(val)) {
+                              setTempDesignations([...tempDesignations, val]);
+                              setSelectedNewDesignation("");
+                              toast.success(`Added: ${val}`);
+                            }
+                          }}
+                          className={`${insetSelectClass} font-bold text-slate-800 dark:text-slate-100`}
+                        >
+                          <option value="">-- Click to select --</option>
+                          {DEFAULT_DESIGNATIONS.filter(des => !tempDesignations.includes(des)).map((des, index) => (
+                            <option key={index} value={des}>{des}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="relative flex py-1 items-center">
+                        <div className="flex-grow border-t border-border/30"></div>
+                        <span className="flex-shrink mx-4 text-[10px] text-slate-400 font-extrabold uppercase tracking-widest">OR</span>
+                        <div className="flex-grow border-t border-border/30"></div>
+                      </div>
+
+                      {/* Custom designation field */}
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Register Custom</label>
+                        <div className="flex items-center gap-2 mt-1">
+                          <input
+                            type="text"
+                            placeholder="Type custom name..."
+                            value={customDesignation}
+                            onChange={e => setCustomDesignation(e.target.value)}
+                            className={`${insetInputClass} flex-1 font-semibold text-slate-800 dark:text-slate-100`}
+                            onKeyDown={e => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                if (customDesignation.trim()) {
+                                  const val = customDesignation.trim();
+                                  if (!tempDesignations.includes(val)) {
+                                    setTempDesignations([...tempDesignations, val]);
+                                    setCustomDesignation("");
+                                    toast.success(`Added custom: ${val}`);
+                                  } else {
+                                    toast.warning(`${val} is already added`);
+                                  }
+                                }
+                              }
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (customDesignation.trim()) {
+                                const val = customDesignation.trim();
+                                if (!tempDesignations.includes(val)) {
+                                  setTempDesignations([...tempDesignations, val]);
+                                  setCustomDesignation("");
+                                  toast.success(`Added custom: ${val}`);
+                                } else {
+                                  toast.warning(`${val} is already added`);
+                                }
+                              }
+                            }}
+                            className="h-8 px-3.5 rounded-lg bg-primary hover:bg-primary/95 text-primary-foreground font-black text-[10px] transition-all shadow-sm active:scale-95"
+                          >
+                            ADD
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column: Drag and Drop list */}
+                <div className="md:col-span-7 flex flex-col space-y-3">
+                  <div className="flex items-center justify-between border-b border-border/40 pb-2">
+                    <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                      <span>Assigned List</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 font-extrabold text-slate-500 font-mono">
+                        {tempDesignations.length} items
+                      </span>
+                    </h3>
+                    {tempDesignations.length > 0 && (
+                      <button
+                        onClick={() => {
+                          if (confirm("Remove all assigned designations?")) {
+                            setTempDesignations([]);
+                          }
+                        }}
+                        className="text-[10px] font-extrabold text-red-500 hover:text-red-650 transition uppercase tracking-wider"
+                      >
+                        Clear All
+                      </button>
+                    )}
+                  </div>
+
+                  {tempDesignations.length === 0 ? (
+                    <div className="flex-1 border-2 border-dashed border-border/80 rounded-lg p-10 flex flex-col items-center justify-center text-center bg-muted/10 min-h-[260px]">
+                      <div className="size-12 rounded-lg bg-muted flex items-center justify-center mb-3">
+                        <Briefcase className="size-6 text-muted-foreground/45 animate-pulse" />
+                      </div>
+                      <p className="text-xs text-muted-foreground font-bold">No designations assigned</p>
+                      <p className="text-[10px] text-muted-foreground/60 mt-1 max-w-[280px]">Use the left panel to pick templates or register custom designations.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1 flex-1">
+                      {tempDesignations.map((des, index) => {
+                        return (
+                          <div
+                            key={des}
+                            draggable
+                            onDragStart={(e) => {
+                              e.dataTransfer.setData("text/plain", index.toString());
+                              e.dataTransfer.effectAllowed = "move";
+                              e.currentTarget.classList.add("opacity-30", "border-primary");
+                            }}
+                            onDragEnd={(e) => {
+                              e.currentTarget.classList.remove("opacity-30", "border-primary");
+                            }}
+                            onDragOver={(e) => {
+                              e.preventDefault();
+                              e.dataTransfer.dropEffect = "move";
+                            }}
+                            onDrop={(e) => {
+                              e.preventDefault();
+                              const fromIndex = parseInt(e.dataTransfer.getData("text/plain"), 10);
+                              if (isNaN(fromIndex) || fromIndex === index) return;
+                              const updated = [...tempDesignations];
+                              const [movedItem] = updated.splice(fromIndex, 1);
+                              updated.splice(index, 0, movedItem);
+                              setTempDesignations(updated);
+                            }}
+                            className="flex items-center justify-between p-3.5 bg-card hover:bg-muted/20 border border-border/85 hover:border-primary/45 rounded-xl transition-all duration-200 shadow-sm cursor-grab active:cursor-grabbing group/item hover:shadow-md"
+                          >
+                            <div className="flex items-center gap-3">
+                              {/* Grip Handle */}
+                              <div className="text-muted-foreground/30 group-hover/item:text-primary transition-colors cursor-grab p-1 hover:bg-muted rounded">
+                                <GripVertical className="size-4" />
+                              </div>
+                              {/* Number Badge */}
+                              <div className="size-6 rounded-lg bg-primary/10 border border-primary/15 text-primary flex items-center justify-center text-[10px] font-black font-mono">
+                                {index + 1}
+                              </div>
+                              <span className="text-xs font-bold text-slate-800 dark:text-slate-100">{des}</span>
+                            </div>
+
+                            <button
+                              onClick={() => {
+                                setTempDesignations(tempDesignations.filter(d => d !== des));
+                                toast.success(`Removed: ${des}`);
+                              }}
+                              className="size-7.5 rounded-lg hover:bg-red-500/10 flex items-center justify-center transition-all text-muted-foreground hover:text-red-500 border border-transparent hover:border-red-500/20 active:scale-95"
+                              title="Remove designation"
+                            >
+                              <X className="size-3.5" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+              </div>
+
+              {/* Modal Footer */}
+              <div className="border-t border-border/40 pt-5 flex items-center justify-between gap-3 bg-gradient-to-r from-muted/30 to-muted/10 dark:from-[#0f172a] dark:to-[#121b2e] p-6">
+                <button
+                  type="button"
+                  onClick={() => setIsAssignModalOpen(false)}
+                  className="h-10.5 px-6 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-extrabold text-xs transition-all uppercase tracking-wider border border-border/50"
+                >
+                  CANCEL
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const updated = {
+                      ...deptDesignations,
+                      [assigningDept.sl]: tempDesignations
+                    };
+                    setDeptDesignations(updated);
+                    localStorage.setItem("hris_dept_designations", JSON.stringify(updated));
+                    toast.success("Designations assigned and ordered successfully!");
+                    setIsAssignModalOpen(false);
+                  }}
+                  className="h-10.5 px-9 rounded-xl text-white font-black text-xs shadow-md hover:shadow-lg transition-all uppercase tracking-wider flex items-center gap-2 bg-[#2ecc71] hover:bg-[#27ae60] active:scale-98"
+                >
+                  SAVE CHANGES
+                </button>
+              </div>
+
             </div>
           </div>
         )}
