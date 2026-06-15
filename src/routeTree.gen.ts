@@ -36,6 +36,11 @@ import { Route as LeaveApproveRouteImport } from './routes/leave-approve'
 import { Route as LeaveApplicationRouteImport } from './routes/leave-application'
 import { Route as KpiTaskNameRouteImport } from './routes/kpi-task-name'
 import { Route as KpiSettingRouteImport } from './routes/kpi-setting'
+import { Route as KpiSelfAssessmentRouteImport } from './routes/kpi-self-assessment'
+import { Route as KpiReportRouteImport } from './routes/kpi-report'
+import { Route as KpiPeerReviewRouteImport } from './routes/kpi-peer-review'
+import { Route as KpiDashboardRouteImport } from './routes/kpi-dashboard'
+import { Route as KpiCyclesRouteImport } from './routes/kpi-cycles'
 import { Route as KpiAssessmentWorkflowRouteImport } from './routes/kpi-assessment-workflow'
 import { Route as IncrementSummaryRouteImport } from './routes/increment-summary'
 import { Route as IncrementReportRouteImport } from './routes/increment-report'
@@ -207,6 +212,31 @@ const KpiTaskNameRoute = KpiTaskNameRouteImport.update({
 const KpiSettingRoute = KpiSettingRouteImport.update({
   id: '/kpi-setting',
   path: '/kpi-setting',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KpiSelfAssessmentRoute = KpiSelfAssessmentRouteImport.update({
+  id: '/kpi-self-assessment',
+  path: '/kpi-self-assessment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KpiReportRoute = KpiReportRouteImport.update({
+  id: '/kpi-report',
+  path: '/kpi-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KpiPeerReviewRoute = KpiPeerReviewRouteImport.update({
+  id: '/kpi-peer-review',
+  path: '/kpi-peer-review',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KpiDashboardRoute = KpiDashboardRouteImport.update({
+  id: '/kpi-dashboard',
+  path: '/kpi-dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KpiCyclesRoute = KpiCyclesRouteImport.update({
+  id: '/kpi-cycles',
+  path: '/kpi-cycles',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KpiAssessmentWorkflowRoute = KpiAssessmentWorkflowRouteImport.update({
@@ -401,6 +431,11 @@ export interface FileRoutesByFullPath {
   '/increment-report': typeof IncrementReportRoute
   '/increment-summary': typeof IncrementSummaryRoute
   '/kpi-assessment-workflow': typeof KpiAssessmentWorkflowRoute
+  '/kpi-cycles': typeof KpiCyclesRoute
+  '/kpi-dashboard': typeof KpiDashboardRoute
+  '/kpi-peer-review': typeof KpiPeerReviewRoute
+  '/kpi-report': typeof KpiReportRoute
+  '/kpi-self-assessment': typeof KpiSelfAssessmentRoute
   '/kpi-setting': typeof KpiSettingRoute
   '/kpi-task-name': typeof KpiTaskNameRoute
   '/leave-application': typeof LeaveApplicationRoute
@@ -462,6 +497,11 @@ export interface FileRoutesByTo {
   '/increment-report': typeof IncrementReportRoute
   '/increment-summary': typeof IncrementSummaryRoute
   '/kpi-assessment-workflow': typeof KpiAssessmentWorkflowRoute
+  '/kpi-cycles': typeof KpiCyclesRoute
+  '/kpi-dashboard': typeof KpiDashboardRoute
+  '/kpi-peer-review': typeof KpiPeerReviewRoute
+  '/kpi-report': typeof KpiReportRoute
+  '/kpi-self-assessment': typeof KpiSelfAssessmentRoute
   '/kpi-setting': typeof KpiSettingRoute
   '/kpi-task-name': typeof KpiTaskNameRoute
   '/leave-application': typeof LeaveApplicationRoute
@@ -524,6 +564,11 @@ export interface FileRoutesById {
   '/increment-report': typeof IncrementReportRoute
   '/increment-summary': typeof IncrementSummaryRoute
   '/kpi-assessment-workflow': typeof KpiAssessmentWorkflowRoute
+  '/kpi-cycles': typeof KpiCyclesRoute
+  '/kpi-dashboard': typeof KpiDashboardRoute
+  '/kpi-peer-review': typeof KpiPeerReviewRoute
+  '/kpi-report': typeof KpiReportRoute
+  '/kpi-self-assessment': typeof KpiSelfAssessmentRoute
   '/kpi-setting': typeof KpiSettingRoute
   '/kpi-task-name': typeof KpiTaskNameRoute
   '/leave-application': typeof LeaveApplicationRoute
@@ -587,6 +632,11 @@ export interface FileRouteTypes {
     | '/increment-report'
     | '/increment-summary'
     | '/kpi-assessment-workflow'
+    | '/kpi-cycles'
+    | '/kpi-dashboard'
+    | '/kpi-peer-review'
+    | '/kpi-report'
+    | '/kpi-self-assessment'
     | '/kpi-setting'
     | '/kpi-task-name'
     | '/leave-application'
@@ -648,6 +698,11 @@ export interface FileRouteTypes {
     | '/increment-report'
     | '/increment-summary'
     | '/kpi-assessment-workflow'
+    | '/kpi-cycles'
+    | '/kpi-dashboard'
+    | '/kpi-peer-review'
+    | '/kpi-report'
+    | '/kpi-self-assessment'
     | '/kpi-setting'
     | '/kpi-task-name'
     | '/leave-application'
@@ -709,6 +764,11 @@ export interface FileRouteTypes {
     | '/increment-report'
     | '/increment-summary'
     | '/kpi-assessment-workflow'
+    | '/kpi-cycles'
+    | '/kpi-dashboard'
+    | '/kpi-peer-review'
+    | '/kpi-report'
+    | '/kpi-self-assessment'
     | '/kpi-setting'
     | '/kpi-task-name'
     | '/leave-application'
@@ -771,6 +831,11 @@ export interface RootRouteChildren {
   IncrementReportRoute: typeof IncrementReportRoute
   IncrementSummaryRoute: typeof IncrementSummaryRoute
   KpiAssessmentWorkflowRoute: typeof KpiAssessmentWorkflowRoute
+  KpiCyclesRoute: typeof KpiCyclesRoute
+  KpiDashboardRoute: typeof KpiDashboardRoute
+  KpiPeerReviewRoute: typeof KpiPeerReviewRoute
+  KpiReportRoute: typeof KpiReportRoute
+  KpiSelfAssessmentRoute: typeof KpiSelfAssessmentRoute
   KpiSettingRoute: typeof KpiSettingRoute
   KpiTaskNameRoute: typeof KpiTaskNameRoute
   LeaveApplicationRoute: typeof LeaveApplicationRoute
@@ -993,6 +1058,41 @@ declare module '@tanstack/react-router' {
       path: '/kpi-setting'
       fullPath: '/kpi-setting'
       preLoaderRoute: typeof KpiSettingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kpi-self-assessment': {
+      id: '/kpi-self-assessment'
+      path: '/kpi-self-assessment'
+      fullPath: '/kpi-self-assessment'
+      preLoaderRoute: typeof KpiSelfAssessmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kpi-report': {
+      id: '/kpi-report'
+      path: '/kpi-report'
+      fullPath: '/kpi-report'
+      preLoaderRoute: typeof KpiReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kpi-peer-review': {
+      id: '/kpi-peer-review'
+      path: '/kpi-peer-review'
+      fullPath: '/kpi-peer-review'
+      preLoaderRoute: typeof KpiPeerReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kpi-dashboard': {
+      id: '/kpi-dashboard'
+      path: '/kpi-dashboard'
+      fullPath: '/kpi-dashboard'
+      preLoaderRoute: typeof KpiDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kpi-cycles': {
+      id: '/kpi-cycles'
+      path: '/kpi-cycles'
+      fullPath: '/kpi-cycles'
+      preLoaderRoute: typeof KpiCyclesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kpi-assessment-workflow': {
@@ -1251,6 +1351,11 @@ const rootRouteChildren: RootRouteChildren = {
   IncrementReportRoute: IncrementReportRoute,
   IncrementSummaryRoute: IncrementSummaryRoute,
   KpiAssessmentWorkflowRoute: KpiAssessmentWorkflowRoute,
+  KpiCyclesRoute: KpiCyclesRoute,
+  KpiDashboardRoute: KpiDashboardRoute,
+  KpiPeerReviewRoute: KpiPeerReviewRoute,
+  KpiReportRoute: KpiReportRoute,
+  KpiSelfAssessmentRoute: KpiSelfAssessmentRoute,
   KpiSettingRoute: KpiSettingRoute,
   KpiTaskNameRoute: KpiTaskNameRoute,
   LeaveApplicationRoute: LeaveApplicationRoute,

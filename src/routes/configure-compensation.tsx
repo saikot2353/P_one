@@ -84,23 +84,118 @@ interface BonusSetting {
 // Defaults
 // ----------------------------------------------------
 const DEFAULT_ALLOWANCES: AllowanceRate[] = [
-  { sl: 1, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "ALL", department: "All Departments", subDepartment: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 10000, salaryTo: 100000, rateFor: "Holiday", basedOn: "Basic", rate: 1.5, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" }
+  { sl: 1, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "ALL", department: "All Departments", subDepartment: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 10000, salaryTo: 100000, rateFor: "Holiday", basedOn: "Basic", rate: 1.5, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
+  { sl: 2, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Operator", department: "Production Dept", subDepartment: "Sewing Section", designation: "Operator", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 8000, salaryTo: 16000, rateFor: "Overtime", basedOn: "Basic", rate: 2.0, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
+  { sl: 3, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Helper", department: "Production Dept", subDepartment: "Sewing Section", designation: "Helper", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 8000, salaryTo: 10000, rateFor: "Overtime", basedOn: "Basic", rate: 2.0, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
+  { sl: 4, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Staff", department: "Quality Assurance", subDepartment: "Inspection", designation: "QC Inspector", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 12000, salaryTo: 25000, rateFor: "Overtime", basedOn: "Gross", rate: 1.5, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
+  { sl: 5, company: "Pakiza Knit Composite Ltd", area: "Head Office", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Officer", department: "HR & Admin", subDepartment: "Admin Support", designation: "HR Executive", workingHourFrom: "09:00", workingHourTo: "18:00", salaryFrom: 20000, salaryTo: 35000, rateFor: "Holiday", basedOn: "Flat Rate", rate: 1000, divByHour: "No", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
+  { sl: 6, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Operator", department: "Production Dept", subDepartment: "Cutting Section", designation: "Cutter", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 9000, salaryTo: 15000, rateFor: "Overtime", basedOn: "Basic", rate: 2.0, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
+  { sl: 7, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "ALL", department: "Maintenance Dept", subDepartment: "Machine Repairs", designation: "Electrician", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 10000, salaryTo: 22000, rateFor: "Night Shift", basedOn: "Flat Rate", rate: 150, divByHour: "No", getAfterReq: "Yes", getAfterReqRate: 4, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
+  { sl: 8, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Worker", department: "Washing Department", subDepartment: "Washing Lab", designation: "Operator", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 8500, salaryTo: 14000, rateFor: "Overtime", basedOn: "Basic", rate: 2.0, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
+  { sl: 9, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Security Guard", department: "Security & Safety", subDepartment: "Fire & Safety Wing", designation: "Security Guard", workingHourFrom: "06:00", workingHourTo: "18:00", salaryFrom: 9500, salaryTo: 15000, rateFor: "Holiday", basedOn: "Flat Rate", rate: 500, divByHour: "No", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
+  { sl: 10, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Worker", department: "Packaging & Carton", subDepartment: "Carton Box Maker", designation: "Helper", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 8000, salaryTo: 9500, rateFor: "Overtime", basedOn: "Basic", rate: 2.0, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
+  { sl: 11, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "ALL", department: "Store & Inventory", subDepartment: "Yarn Store", designation: "Store Executive", workingHourFrom: "08:30", workingHourTo: "17:30", salaryFrom: 15000, salaryTo: 28000, rateFor: "Overtime", basedOn: "Gross", rate: 1.5, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
+  { sl: 12, company: "Pakiza Knit Composite Ltd", area: "Head Office", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Officer", department: "Finance & Accounts", subDepartment: "Accounts Payable", designation: "Senior Accountant", workingHourFrom: "09:00", workingHourTo: "18:00", salaryFrom: 30000, salaryTo: 55000, rateFor: "Holiday", basedOn: "Flat Rate", rate: 1500, divByHour: "No", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
+  { sl: 13, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Driver", department: "Logistics & Supply", subDepartment: "Central Warehouse", designation: "Heavy Vehicle Driver", workingHourFrom: "08:00", workingHourTo: "18:00", salaryFrom: 12000, salaryTo: 20000, rateFor: "Holiday", basedOn: "Flat Rate", rate: 800, divByHour: "No", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
+  { sl: 14, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Casual", department: "Production Dept", subDepartment: "Sewing Section", designation: "Helper", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 8000, salaryTo: 9000, rateFor: "Overtime", basedOn: "Basic", rate: 2.0, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
+  { sl: 15, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Apprentice", department: "Production Dept", subDepartment: "Sewing Section", designation: "Trainee Operator", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 6000, salaryTo: 8000, rateFor: "Overtime", basedOn: "Basic", rate: 1.5, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
+  { sl: 16, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "ALL", department: "Engineering & Utility", subDepartment: "Power House", designation: "Boiler Operator", workingHourFrom: "08:00", workingHourTo: "16:00", salaryFrom: 11000, salaryTo: 22000, rateFor: "Night Shift", basedOn: "Flat Rate", rate: 200, divByHour: "No", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
+  { sl: 17, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Permanent", department: "Quality Assurance", subDepartment: "Inspection", designation: "QC Inspector", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 10000, salaryTo: 18000, rateFor: "Overtime", basedOn: "Basic", rate: 2.0, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
+  { sl: 18, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Staff", department: "Production Dept", subDepartment: "Sample Section", designation: "Pattern Maker", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 15000, salaryTo: 28000, rateFor: "Overtime", basedOn: "Gross", rate: 1.5, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
+  { sl: 19, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "ALL", department: "Production Dept", subDepartment: "Sewing Section", designation: "Line Leader", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 12000, salaryTo: 20000, rateFor: "Attendance Bonus", basedOn: "Flat Rate", rate: 500, divByHour: "No", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
+  { sl: 20, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Supervisor", department: "Production Dept", subDepartment: "Sewing Section", designation: "Supervisor", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 15000, salaryTo: 25000, rateFor: "Overtime", basedOn: "Basic", rate: 2.0, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" }
 ];
 
 const DEFAULT_TIFFIN: TiffinRate[] = [
-  { sl: 1, employeeType: "ALL", rate: 50, isActive: "Active" }
+  { sl: 1, employeeType: "ALL", rate: 50, isActive: "Active" },
+  { sl: 2, employeeType: "Permanent", rate: 55, isActive: "Active" },
+  { sl: 3, employeeType: "Casual", rate: 45, isActive: "Active" },
+  { sl: 4, employeeType: "Contractual", rate: 60, isActive: "Active" },
+  { sl: 5, employeeType: "Apprentice", rate: 40, isActive: "Active" },
+  { sl: 6, employeeType: "Part-Time", rate: 50, isActive: "Active" },
+  { sl: 7, employeeType: "Intern", rate: 60, isActive: "Active" },
+  { sl: 8, employeeType: "Temporary", rate: 45, isActive: "Active" },
+  { sl: 9, employeeType: "Seasonal", rate: 45, isActive: "Active" },
+  { sl: 10, employeeType: "Outsourced", rate: 50, isActive: "Active" },
+  { sl: 11, employeeType: "Consultant", rate: 70, isActive: "Active" },
+  { sl: 12, employeeType: "Freelance", rate: 70, isActive: "Active" },
+  { sl: 13, employeeType: "Daily Wager", rate: 40, isActive: "Active" },
+  { sl: 14, employeeType: "Project-Based", rate: 60, isActive: "Active" },
+  { sl: 15, employeeType: "Advisory Staff", rate: 80, isActive: "Active" },
+  { sl: 16, employeeType: "Trainee", rate: 45, isActive: "Active" },
+  { sl: 17, employeeType: "Shift-Worker", rate: 55, isActive: "Active" },
+  { sl: 18, employeeType: "On-Call Staff", rate: 50, isActive: "Active" },
+  { sl: 19, employeeType: "Retainer Contract", rate: 65, isActive: "Active" },
+  { sl: 20, employeeType: "Guest Expert", rate: 75, isActive: "Active" }
 ];
 
 const DEFAULT_LUNCH: LunchRate[] = [
-  { sl: 1, employeeType: "ALL", rate: 80, isActive: "Active" }
+  { sl: 1, employeeType: "ALL", rate: 80, isActive: "Active" },
+  { sl: 2, employeeType: "Permanent", rate: 85, isActive: "Active" },
+  { sl: 3, employeeType: "Casual", rate: 75, isActive: "Active" },
+  { sl: 4, employeeType: "Contractual", rate: 90, isActive: "Active" },
+  { sl: 5, employeeType: "Apprentice", rate: 70, isActive: "Active" },
+  { sl: 6, employeeType: "Part-Time", rate: 80, isActive: "Active" },
+  { sl: 7, employeeType: "Intern", rate: 90, isActive: "Active" },
+  { sl: 8, employeeType: "Temporary", rate: 75, isActive: "Active" },
+  { sl: 9, employeeType: "Seasonal", rate: 75, isActive: "Active" },
+  { sl: 10, employeeType: "Outsourced", rate: 80, isActive: "Active" },
+  { sl: 11, employeeType: "Consultant", rate: 100, isActive: "Active" },
+  { sl: 12, employeeType: "Freelance", rate: 100, isActive: "Active" },
+  { sl: 13, employeeType: "Daily Wager", rate: 70, isActive: "Active" },
+  { sl: 14, employeeType: "Project-Based", rate: 90, isActive: "Active" },
+  { sl: 15, employeeType: "Advisory Staff", rate: 120, isActive: "Active" },
+  { sl: 16, employeeType: "Trainee", rate: 75, isActive: "Active" },
+  { sl: 17, employeeType: "Shift-Worker", rate: 85, isActive: "Active" },
+  { sl: 18, employeeType: "On-Call Staff", rate: 80, isActive: "Active" },
+  { sl: 19, employeeType: "Retainer Contract", rate: 95, isActive: "Active" },
+  { sl: 20, employeeType: "Guest Expert", rate: 110, isActive: "Active" }
 ];
 
 const DEFAULT_CONVEYANCE: ConveyanceSetup[] = [
-  { sl: 1, employeeType: "ALL", amount: 1500, isActive: "Active" }
+  { sl: 1, employeeType: "ALL", amount: 1500, isActive: "Active" },
+  { sl: 2, employeeType: "Permanent", amount: 1600, isActive: "Active" },
+  { sl: 3, employeeType: "Casual", amount: 1200, isActive: "Active" },
+  { sl: 4, employeeType: "Contractual", amount: 2000, isActive: "Active" },
+  { sl: 5, employeeType: "Apprentice", amount: 1000, isActive: "Active" },
+  { sl: 6, employeeType: "Part-Time", amount: 1500, isActive: "Active" },
+  { sl: 7, employeeType: "Intern", amount: 1800, isActive: "Active" },
+  { sl: 8, employeeType: "Temporary", amount: 1200, isActive: "Active" },
+  { sl: 9, employeeType: "Seasonal", amount: 1200, isActive: "Active" },
+  { sl: 10, employeeType: "Outsourced", amount: 1400, isActive: "Active" },
+  { sl: 11, employeeType: "Consultant", amount: 2500, isActive: "Active" },
+  { sl: 12, employeeType: "Freelance", amount: 2500, isActive: "Active" },
+  { sl: 13, employeeType: "Daily Wager", amount: 800, isActive: "Active" },
+  { sl: 14, employeeType: "Project-Based", amount: 2000, isActive: "Active" },
+  { sl: 15, employeeType: "Advisory Staff", amount: 3500, isActive: "Active" },
+  { sl: 16, employeeType: "Trainee", amount: 1100, isActive: "Active" },
+  { sl: 17, employeeType: "Shift-Worker", amount: 1600, isActive: "Active" },
+  { sl: 18, employeeType: "On-Call Staff", amount: 1500, isActive: "Active" },
+  { sl: 19, employeeType: "Retainer Contract", amount: 2200, isActive: "Active" },
+  { sl: 20, employeeType: "Guest Expert", amount: 3000, isActive: "Active" }
 ];
 
 const DEFAULT_BONUSES: BonusSetting[] = [
-  { sl: 1, employeeType: "ALL", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 50, isActive: "Active" }
+  { sl: 1, employeeType: "ALL", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 50, isActive: "Active" },
+  { sl: 2, employeeType: "Permanent", daysFrom: 365, daysTo: 9999, basedOn: "Basic", bonusPercent: 100, isActive: "Active" },
+  { sl: 3, employeeType: "Casual", daysFrom: 180, daysTo: 365, basedOn: "Gross", bonusPercent: 30, isActive: "Active" },
+  { sl: 4, employeeType: "Contractual", daysFrom: 90, daysTo: 365, basedOn: "Basic", bonusPercent: 40, isActive: "Active" },
+  { sl: 5, employeeType: "Apprentice", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 20, isActive: "Active" },
+  { sl: 6, employeeType: "Part-Time", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 30, isActive: "Active" },
+  { sl: 7, employeeType: "Intern", daysFrom: 90, daysTo: 180, basedOn: "Gross", bonusPercent: 25, isActive: "Active" },
+  { sl: 8, employeeType: "Temporary", daysFrom: 180, daysTo: 365, basedOn: "Gross", bonusPercent: 30, isActive: "Active" },
+  { sl: 9, employeeType: "Seasonal", daysFrom: 90, daysTo: 180, basedOn: "Basic", bonusPercent: 20, isActive: "Active" },
+  { sl: 10, employeeType: "Outsourced", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 35, isActive: "Active" },
+  { sl: 11, employeeType: "Consultant", daysFrom: 180, daysTo: 365, basedOn: "Gross", bonusPercent: 50, isActive: "Active" },
+  { sl: 12, employeeType: "Freelance", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 40, isActive: "Active" },
+  { sl: 13, employeeType: "Daily Wager", daysFrom: 90, daysTo: 180, basedOn: "Basic", bonusPercent: 15, isActive: "Active" },
+  { sl: 14, employeeType: "Project-Based", daysFrom: 180, daysTo: 365, basedOn: "Gross", bonusPercent: 45, isActive: "Active" },
+  { sl: 15, employeeType: "Advisory Staff", daysFrom: 365, daysTo: 9999, basedOn: "Gross", bonusPercent: 80, isActive: "Active" },
+  { sl: 16, employeeType: "Trainee", daysFrom: 90, daysTo: 180, basedOn: "Basic", bonusPercent: 20, isActive: "Active" },
+  { sl: 17, employeeType: "Shift-Worker", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 55, isActive: "Active" },
+  { sl: 18, employeeType: "On-Call Staff", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 40, isActive: "Active" },
+  { sl: 19, employeeType: "Retainer Contract", daysFrom: 180, daysTo: 365, basedOn: "Gross", bonusPercent: 40, isActive: "Active" },
+  { sl: 20, employeeType: "Guest Expert", daysFrom: 90, daysTo: 365, basedOn: "Basic", bonusPercent: 50, isActive: "Active" }
 ];
 
 function CompensationSetupPage() {
@@ -128,7 +223,12 @@ function CompensationSetupPage() {
       if (!saved) return defaultVal;
       try {
         const parsed = JSON.parse(saved);
-        return Array.isArray(parsed) ? parsed : defaultVal;
+        if (!Array.isArray(parsed)) return defaultVal;
+        // Override if stored array is shorter than default to force load expanded mock data
+        if (parsed.length < defaultVal.length) {
+          return defaultVal;
+        }
+        return parsed;
       } catch (e) {
         return defaultVal;
       }

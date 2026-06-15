@@ -49,14 +49,49 @@ interface PolicyNameItem {
 // Defaults
 // ----------------------------------------------------
 const DEFAULT_LEAVES: LeaveSetting[] = [
-  { sl: 1, company: "", leaveType: "CL", isEarnLeave: "No", leaveQty: 10, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "No", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" },
-  { sl: 2, company: "", leaveType: "EL", isEarnLeave: "Yes", leaveQty: 18, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "No", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" },
-  { sl: 3, company: "Pakiza Knit Composite Ltd", leaveType: "Injury", isEarnLeave: "No", leaveQty: 45, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "No", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" }
+  { sl: 1, company: "Pakiza Knit Composite Ltd", leaveType: "Casual Leave (CL)", isEarnLeave: "No", leaveQty: 10, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "No", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" },
+  { sl: 2, company: "Pakiza Knit Composite Ltd", leaveType: "Earn Leave (EL)", isEarnLeave: "Yes", leaveQty: 18, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "No", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" },
+  { sl: 3, company: "Pakiza Knit Composite Ltd", leaveType: "Sick Leave (SL)", isEarnLeave: "No", leaveQty: 14, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "No", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" },
+  { sl: 4, company: "Pakiza Knit Composite Ltd", leaveType: "Maternity Leave (ML)", isEarnLeave: "No", leaveQty: 112, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "Yes", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" },
+  { sl: 5, company: "Pakiza Knit Composite Ltd", leaveType: "Paternity Leave (PL)", isEarnLeave: "No", leaveQty: 7, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "No", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" },
+  { sl: 6, company: "Pakiza Knit Composite Ltd", leaveType: "Compensatory Leave", isEarnLeave: "No", leaveQty: 5, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "No", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" },
+  { sl: 7, company: "Pakiza Knit Composite Ltd", leaveType: "Special Leave", isEarnLeave: "No", leaveQty: 10, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "No", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" },
+  { sl: 8, company: "Pakiza Knit Composite Ltd", leaveType: "Study Leave", isEarnLeave: "No", leaveQty: 30, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "No", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" },
+  { sl: 9, company: "Pakiza Knit Composite Ltd", leaveType: "Unpaid Leave (LWP)", isEarnLeave: "No", leaveQty: 90, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "No", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" },
+  { sl: 10, company: "Pakiza Knit Composite Ltd", leaveType: "Festival Special Leave", isEarnLeave: "No", leaveQty: 3, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "No", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" },
+  { sl: 11, company: "Pakiza Knit Composite Ltd", leaveType: "Hajj Leave", isEarnLeave: "No", leaveQty: 40, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "Yes", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" },
+  { sl: 12, company: "Pakiza Knit Composite Ltd", leaveType: "Marriage Leave", isEarnLeave: "No", leaveQty: 5, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "No", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" },
+  { sl: 13, company: "Pakiza Knit Composite Ltd", leaveType: "Bereavement Leave", isEarnLeave: "No", leaveQty: 3, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "No", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" },
+  { sl: 14, company: "Pakiza Knit Composite Ltd", leaveType: "Injury Leave", isEarnLeave: "No", leaveQty: 45, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "No", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" },
+  { sl: 15, company: "Pakiza Knit Composite Ltd", leaveType: "Quarantine Leave", isEarnLeave: "No", leaveQty: 14, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "No", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" },
+  { sl: 16, company: "Pakiza Knit Composite Ltd", leaveType: "Emergency Medical", isEarnLeave: "No", leaveQty: 10, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "No", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" },
+  { sl: 17, company: "Pakiza Knit Composite Ltd", leaveType: "Advance Leave", isEarnLeave: "No", leaveQty: 5, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "No", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" },
+  { sl: 18, company: "Pakiza Knit Composite Ltd", leaveType: "Annual Leave", isEarnLeave: "Yes", leaveQty: 15, cfQty: 5, countBasedOnJoinDate: "Yes", holidayCount: "No", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" },
+  { sl: 19, company: "Pakiza Knit Composite Ltd", leaveType: "Pooja Special Leave", isEarnLeave: "No", leaveQty: 3, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "No", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" },
+  { sl: 20, company: "Pakiza Knit Composite Ltd", leaveType: "Christmas Leave", isEarnLeave: "No", leaveQty: 3, cfQty: 0, countBasedOnJoinDate: "No", holidayCount: "No", leaveOnPresent: "No", splitMonthly: "No", maxLeaveInMonth: "", isActive: "Active" }
 ];
 
 const DEFAULT_POLICIES: PolicyNameItem[] = [
   { sl: 1, name: "Attendance Standard Policy", description: "Late-in and early-out guidelines", isActive: "Active" },
-  { sl: 2, name: "Code of Conduct", description: "Standard ethical behavioral rules", isActive: "Active" }
+  { sl: 2, name: "Code of Conduct", description: "Standard ethical behavioral rules", isActive: "Active" },
+  { sl: 3, name: "Overtime (OT) Policy", description: "Regulations regarding extra hours calculation", isActive: "Active" },
+  { sl: 4, name: "Safety & Fire Protection", description: "Emergency exit and safety procedures", isActive: "Active" },
+  { sl: 5, name: "Anti-Harassment Policy", description: "Preventing workplace harassment and bullying", isActive: "Active" },
+  { sl: 6, name: "Mobile Phone Usage Policy", description: "Rules regarding personal devices on shop floor", isActive: "Active" },
+  { sl: 7, name: "Shift Rotation Policy", description: "Rules for roster schedule changing", isActive: "Active" },
+  { sl: 8, name: "Deduction and Fine Policy", description: "Guidelines for unauthorized absence", isActive: "Active" },
+  { sl: 9, name: "Uniform & Dress Code", description: "Standard company attire rules", isActive: "Active" },
+  { sl: 10, name: "Maternity Benefit Policy", description: "Legal leave and payment benefits guide", isActive: "Active" },
+  { sl: 11, name: "Performance Bonus Rules", description: "Incentive parameters based on efficiency", isActive: "Active" },
+  { sl: 12, name: "Data Security Policy", description: "Handling of company confidential files", isActive: "Active" },
+  { sl: 13, name: "Leave Encashment Rules", description: "Rules to convert unused EL to cash", isActive: "Active" },
+  { sl: 14, name: "Substance Abuse Policy", description: "Zero tolerance for drugs and alcohol", isActive: "Active" },
+  { sl: 15, name: "IT Assets Policy", description: "Proper usage guidelines for laptop/PCs", isActive: "Active" },
+  { sl: 16, name: "Grievance Redressal", description: "Standard mechanism for worker complaints", isActive: "Active" },
+  { sl: 17, name: "Welfare Fund Policy", description: "Rules regarding worker emergency financial aid", isActive: "Active" },
+  { sl: 18, name: "Festival Bonus Policy", description: "Eligibility criteria for festive allowances", isActive: "Active" },
+  { sl: 19, name: "Environmental & Waste Policy", description: "Sustainability guidelines for disposal", isActive: "Active" },
+  { sl: 20, name: "Workplace Health & Hygiene", description: "Medical center and washroom hygiene standard", isActive: "Active" }
 ];
 
 function PoliciesSetupPage() {
@@ -81,7 +116,12 @@ function PoliciesSetupPage() {
       if (!saved) return defaultVal;
       try {
         const parsed = JSON.parse(saved);
-        return Array.isArray(parsed) ? parsed : defaultVal;
+        if (!Array.isArray(parsed)) return defaultVal;
+        // Override if stored array is shorter than default to force load expanded mock data
+        if (parsed.length < defaultVal.length) {
+          return defaultVal;
+        }
+        return parsed;
       } catch (e) {
         return defaultVal;
       }

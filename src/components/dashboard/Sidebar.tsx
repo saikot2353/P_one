@@ -85,12 +85,17 @@ const nav: NavItem[] = [
     ]
   },
   {
-    label: "KPI",
+    label: "KPI Performance",
     icon: BarChart3,
     subitems: [
-      { label: "Task Name", to: "/kpi-task-name" },
-      { label: "KPI Setting", to: "/kpi-setting" },
+      { label: "Dashboard", to: "/kpi-dashboard" },
+      { label: "Cycles", to: "/kpi-cycles" },
+      { label: "Criteria Setup", to: "/kpi-task-name" },
+      { label: "Grade Bands", to: "/kpi-setting" },
+      { label: "My Self-Assessment", to: "/kpi-self-assessment" },
+      { label: "360° Peer Review", to: "/kpi-peer-review" },
       { label: "Assessment Workflow", to: "/kpi-assessment-workflow" },
+      { label: "KPI Reports", to: "/kpi-report" },
     ]
   },
   {

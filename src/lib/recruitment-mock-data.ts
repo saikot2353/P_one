@@ -1,5 +1,5 @@
 // Version key — bump this to force-refresh stale localStorage data
-const DATA_VERSION = "v6";
+const DATA_VERSION = "v7";
 
 export const initializeRecruitmentMockData = (forceReset = false) => {
   if (typeof window === "undefined") return;
@@ -27,7 +27,7 @@ export const initializeRecruitmentMockData = (forceReset = false) => {
   const set = (key: string, data: any) =>
     localStorage.setItem(key, JSON.stringify(data));
 
-  // ─── 1. OPERATION NAMES (10 rows) ───────────────────────────────────────────
+  // ─── 1. OPERATION NAMES (20 rows) ───────────────────────────────────────────
   set("recruitment_config_operations", [
     { id: "1",  opName: "Attach Neck Rib - Tube, No Fold",  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
     { id: "2",  opName: "Attach Back Rise",                  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
@@ -41,9 +41,17 @@ export const initializeRecruitmentMockData = (forceReset = false) => {
     { id: "10", opName: "Label Attach",                      createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
     { id: "11", opName: "Shoulder Join",                     createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
     { id: "12", opName: "Pocket Attach",                     createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "13", opName: "Front Rise Join",                   createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "14", opName: "Waistband Attach",                  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "15", opName: "Yoke Join",                         createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "16", opName: "Inseam Overlock",                   createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "17", opName: "Bottom Piping",                     createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "18", opName: "Zipper Sewing",                     createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "19", opName: "Back Pocket Join",                  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "20", opName: "Button Hole Stitch",                createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" }
   ]);
 
-  // ─── 2. M/C NAMES (10 rows) ─────────────────────────────────────────────────
+  // ─── 2. M/C NAMES (20 rows) ─────────────────────────────────────────────────
   set("recruitment_config_machines", [
     { id: "1",  mcFullName: "Single Needle Lock Stitch",  mcName: "SNLS",   createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
     { id: "2",  mcFullName: "Overlock 4 Thread",          mcName: "OL-4TH", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
@@ -57,10 +65,17 @@ export const initializeRecruitmentMockData = (forceReset = false) => {
     { id: "10", mcFullName: "Snap Button Attach",         mcName: "SBA",    createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
     { id: "11", mcFullName: "Linking Machine",            mcName: "LM",     createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
     { id: "12", mcFullName: "Safety Stitch Machine",      mcName: "SS",     createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "13", mcFullName: "Multi Needle Chain Stitch",   mcName: "MNCS",   createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "14", mcFullName: "Double Needle Lock Stitch",   mcName: "DNLS",   createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "15", mcFullName: "Zig-Zag Stitch Machine",      mcName: "ZZS",    createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "16", mcFullName: "Rib Cut Machine",             mcName: "RCM",    createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "17", mcFullName: "Pattern Sewer Automatic",     mcName: "PSA",    createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "18", mcFullName: "Fusing Machine",              mcName: "FM",     createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "19", mcFullName: "Hot Air Seam Sealing",        mcName: "HAS",    createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "20", mcFullName: "Laser Cutting Machine",       mcName: "LCM",    createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" }
   ]);
 
-  // ─── 3. OPERATION GRADES (10 rows) — THE ROOT CAUSE FIX ─────────────────────
-  // All grades used in SMV Bank and Multi/SS MUST exist here
+  // ─── 3. OPERATION GRADES (20 rows) ──────────────────────────────────────────
   set("recruitment_config_op_grades", [
     { id: "1",  grade: "P",   createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
     { id: "2",  grade: "P1",  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
@@ -74,9 +89,17 @@ export const initializeRecruitmentMockData = (forceReset = false) => {
     { id: "10", grade: "C",   createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
     { id: "11", grade: "C-",  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
     { id: "12", grade: "H",   createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "13", grade: "D",   createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "14", grade: "E",   createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "15", grade: "P2",  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "16", grade: "P3",  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "17", grade: "A2",  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "18", grade: "B2",  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "19", grade: "C2",  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "20", grade: "Special", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" }
   ]);
 
-  // ─── 4. MEASUREMENT (MP) (10 rows) — now with descriptive names ──────────────
+  // ─── 4. MEASUREMENT (MP) (20 rows) ──────────────────────────────────────────
   set("recruitment_config_measurements", [
     { id: "1",  name: "44 CM",  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
     { id: "2",  name: "12 CM",  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
@@ -90,9 +113,17 @@ export const initializeRecruitmentMockData = (forceReset = false) => {
     { id: "10", name: "18 CM",  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
     { id: "11", name: "28 CM",  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
     { id: "12", name: "36 CM",  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "13", name: "40 CM",  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "14", name: "15 CM",  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "15", name: "25 CM",  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "16", name: "30 CM",  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "17", name: "45 CM",  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "18", name: "60 CM",  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "19", name: "70 CM",  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "20", name: "80 CM",  createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" }
   ]);
 
-  // ─── 5. SMV BANK (12 rows) — all opGrade/mcName/meas values match above ─────
+  // ─── 5. SMV BANK (20 rows) ──────────────────────────────────────────────────
   set("recruitment_config_smv_bank", [
     { id: "1",  opName: "Attach Neck Rib - Tube, No Fold", mcName: "OL-4TH", opGrade: "P",   meas: "44 CM", smvValue: "0.26", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
     { id: "2",  opName: "Attach Back Rise",                 mcName: "SNLS",   opGrade: "P1",  meas: "12 CM", smvValue: "0.30", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
@@ -106,37 +137,65 @@ export const initializeRecruitmentMockData = (forceReset = false) => {
     { id: "10", opName: "Label Attach",                     mcName: "SNLS",   opGrade: "C-",  meas: "12 CM", smvValue: "0.15", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
     { id: "11", opName: "Shoulder Join",                    mcName: "OL-4TH", opGrade: "P",   meas: "28 CM", smvValue: "0.32", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
     { id: "12", opName: "Pocket Attach",                    mcName: "SNLS",   opGrade: "B-",  meas: "36 CM", smvValue: "0.38", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "13", opName: "Front Rise Join",                  mcName: "OL-5TH", opGrade: "A",   meas: "20 CM", smvValue: "0.36", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "14", opName: "Waistband Attach",                 mcName: "KS",     opGrade: "A+",  meas: "80 CM", smvValue: "0.68", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "15", opName: "Yoke Join",                        mcName: "DNLS",   opGrade: "B+",  meas: "40 CM", smvValue: "0.41", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "16", opName: "Inseam Overlock",                  mcName: "OL-4TH", opGrade: "B",   meas: "70 CM", smvValue: "0.48", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "17", opName: "Bottom Piping",                    mcName: "FL-3TH", opGrade: "B-",  meas: "30 CM", smvValue: "0.39", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "18", opName: "Zipper Sewing",                    mcName: "SNLS",   opGrade: "A-",  meas: "15 CM", smvValue: "0.52", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "19", opName: "Back Pocket Join",                 mcName: "SNLS",   opGrade: "B",   meas: "25 CM", smvValue: "0.33", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "20", opName: "Button Hole Stitch",               mcName: "BH",     opGrade: "C+",  meas: "10 CM", smvValue: "0.19", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" }
   ]);
 
-  // ─── 6. EFF. GRADE POINT (10 rows) ──────────────────────────────────────────
+  // ─── 6. EFF. GRADE POINT (20 rows) ──────────────────────────────────────────
   set("recruitment_config_eff_grades", [
     { id: "1",  effFrom: "0.00",   effTo: "39.99",  point: "0.00", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
-    { id: "2",  effFrom: "40.00",  effTo: "49.99",  point: "1.00", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
-    { id: "3",  effFrom: "50.00",  effTo: "59.99",  point: "2.00", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
-    { id: "4",  effFrom: "60.00",  effTo: "69.99",  point: "3.00", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
-    { id: "5",  effFrom: "70.00",  effTo: "79.99",  point: "4.00", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
-    { id: "6",  effFrom: "80.00",  effTo: "89.99",  point: "4.50", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
-    { id: "7",  effFrom: "90.00",  effTo: "100.00", point: "5.00", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
-    { id: "8",  effFrom: "100.01", effTo: "110.00", point: "5.50", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
-    { id: "9",  effFrom: "110.01", effTo: "120.00", point: "6.00", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
-    { id: "10", effFrom: "120.01", effTo: "200.00", point: "7.00", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "2",  effFrom: "40.00",  effTo: "44.99",  point: "1.00", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "3",  effFrom: "45.00",  effTo: "49.99",  point: "1.50", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "4",  effFrom: "50.00",  effTo: "54.99",  point: "2.00", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "5",  effFrom: "55.00",  effTo: "59.99",  point: "2.50", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "6",  effFrom: "60.00",  effTo: "64.99",  point: "3.00", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "7",  effFrom: "65.00",  effTo: "69.99",  point: "3.50", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "8",  effFrom: "70.00",  effTo: "74.99",  point: "4.00", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "9",  effFrom: "75.00",  effTo: "79.99",  point: "4.25", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "10", effFrom: "80.00",  effTo: "84.99",  point: "4.50", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "11", effFrom: "85.00",  effTo: "89.99",  point: "4.75", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "12", effFrom: "90.00",  effTo: "94.99",  point: "5.00", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "13", effFrom: "95.00",  effTo: "99.99",  point: "5.25", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "14", effFrom: "100.00", effTo: "104.99", point: "5.50", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "15", effFrom: "105.00", effTo: "109.99", point: "5.75", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "16", effFrom: "110.00", effTo: "114.99", point: "6.00", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "17", effFrom: "115.00", effTo: "119.99", point: "6.25", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "18", effFrom: "120.00", effTo: "129.99", point: "6.50", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "19", effFrom: "130.00", effTo: "149.99", point: "7.00", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "20", effFrom: "150.00", effTo: "200.00", point: "8.00", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" }
   ]);
 
-  // ─── 7. GRADE POINTS VS GRADE (10 rows) ─────────────────────────────────────
+  // ─── 7. GRADE POINTS VS GRADE (20 rows) ─────────────────────────────────────
   set("recruitment_config_grade_vs_grade", [
-    { id: "1",  pointFrom: "0.00", pointTo: "1.99",  grade: "H",       salaryFrom: "12500", salaryTo: "12500", govtGrade: "Grade-4", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Hold" },
-    { id: "2",  pointFrom: "2.00", pointTo: "2.99",  grade: "C",       salaryFrom: "13000", salaryTo: "13500", govtGrade: "Grade-4", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
-    { id: "3",  pointFrom: "3.00", pointTo: "3.49",  grade: "C+",      salaryFrom: "13501", salaryTo: "14000", govtGrade: "Grade-3", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
-    { id: "4",  pointFrom: "3.50", pointTo: "3.99",  grade: "B-",      salaryFrom: "14001", salaryTo: "14200", govtGrade: "Grade-3", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
-    { id: "5",  pointFrom: "4.00", pointTo: "4.49",  grade: "B",       salaryFrom: "14201", salaryTo: "14500", govtGrade: "Grade-3", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
-    { id: "6",  pointFrom: "4.50", pointTo: "4.99",  grade: "B+",      salaryFrom: "14501", salaryTo: "15000", govtGrade: "Grade-2", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
-    { id: "7",  pointFrom: "5.00", pointTo: "5.49",  grade: "A-",      salaryFrom: "15001", salaryTo: "15500", govtGrade: "Grade-2", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
-    { id: "8",  pointFrom: "5.50", pointTo: "5.99",  grade: "A",       salaryFrom: "15501", salaryTo: "16000", govtGrade: "Grade-1", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
-    { id: "9",  pointFrom: "6.00", pointTo: "6.99",  grade: "A+",      salaryFrom: "16001", salaryTo: "17000", govtGrade: "Grade-1", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
-    { id: "10", pointFrom: "7.00", pointTo: "10.00", grade: "Special", salaryFrom: "17001", salaryTo: "20000", govtGrade: "Grade-1", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
+    { id: "1",  pointFrom: "0.00", pointTo: "0.99",  grade: "H",       salaryFrom: "12000", salaryTo: "12000", govtGrade: "Grade-4", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Hold" },
+    { id: "2",  pointFrom: "1.00", pointTo: "1.49",  grade: "E",       salaryFrom: "12200", salaryTo: "12400", govtGrade: "Grade-4", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
+    { id: "3",  pointFrom: "1.50", pointTo: "1.99",  grade: "D",       salaryFrom: "12500", salaryTo: "12900", govtGrade: "Grade-4", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
+    { id: "4",  pointFrom: "2.00", pointTo: "2.49",  grade: "C-",      salaryFrom: "13000", salaryTo: "13200", govtGrade: "Grade-4", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
+    { id: "5",  pointFrom: "2.50", pointTo: "2.99",  grade: "C",       salaryFrom: "13300", salaryTo: "13500", govtGrade: "Grade-4", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
+    { id: "6",  pointFrom: "3.00", pointTo: "3.24",  grade: "C+",      salaryFrom: "13600", salaryTo: "13800", govtGrade: "Grade-3", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
+    { id: "7",  pointFrom: "3.25", pointTo: "3.49",  grade: "B-",      salaryFrom: "13900", salaryTo: "14100", govtGrade: "Grade-3", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
+    { id: "8",  pointFrom: "3.50", pointTo: "3.74",  grade: "B",       salaryFrom: "14200", salaryTo: "14400", govtGrade: "Grade-3", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
+    { id: "9",  pointFrom: "3.75", pointTo: "3.99",  grade: "B+",      salaryFrom: "14500", salaryTo: "14700", govtGrade: "Grade-2", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
+    { id: "10", pointFrom: "4.00", pointTo: "4.24",  grade: "A-",      salaryFrom: "14800", salaryTo: "15000", govtGrade: "Grade-2", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
+    { id: "11", pointFrom: "4.25", pointTo: "4.49",  grade: "A",       salaryFrom: "15100", salaryTo: "15400", govtGrade: "Grade-1", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
+    { id: "12", pointFrom: "4.50", pointTo: "4.74",  grade: "A+",      salaryFrom: "15500", salaryTo: "15900", govtGrade: "Grade-1", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
+    { id: "13", pointFrom: "4.75", pointTo: "4.99",  grade: "Special", salaryFrom: "16000", salaryTo: "16500", govtGrade: "Grade-1", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
+    { id: "14", pointFrom: "5.00", pointTo: "5.24",  grade: "Grade A", salaryFrom: "16600", salaryTo: "17000", govtGrade: "Grade-1", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
+    { id: "15", pointFrom: "5.25", pointTo: "5.49",  grade: "Grade S", salaryFrom: "17100", salaryTo: "17500", govtGrade: "Grade-1", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
+    { id: "16", pointFrom: "5.50", pointTo: "5.74",  grade: "Ex-1",    salaryFrom: "17600", salaryTo: "18000", govtGrade: "Grade-1", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
+    { id: "17", pointFrom: "5.75", pointTo: "5.99",  grade: "Ex-2",    salaryFrom: "18100", salaryTo: "18500", govtGrade: "Grade-1", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
+    { id: "18", pointFrom: "6.00", pointTo: "6.49",  grade: "Ex-3",    salaryFrom: "18600", salaryTo: "19000", govtGrade: "Grade-1", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
+    { id: "19", pointFrom: "6.50", pointTo: "6.99",  grade: "Master",  salaryFrom: "19100", salaryTo: "20000", govtGrade: "Grade-1", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" },
+    { id: "20", pointFrom: "7.00", pointTo: "10.00", grade: "Supreme", salaryFrom: "20100", salaryTo: "25000", govtGrade: "Grade-1", validityFrom: "2026-01-01", validityTo: "2029-12-31", remarks: "Current" }
   ]);
 
-  // ─── 8. MULTI/SS (10 rows) — all opGrade values match op_grades above ────────
+  // ─── 8. MULTI/SS (20 rows) ──────────────────────────────────────────────────
   set("recruitment_config_multi_ss_v2", [
     { id: "1",  point: "5.00", opGrade: "P",   minOpCount: "2",   mcType: "Different", eff: "90",  addAmt: "500",  validityRemarks: "Current", remarks: "Multi Task",    validityFrom: "2026-01-01", validityTo: "2029-12-31", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
     { id: "2",  point: "5.00", opGrade: "P1",  minOpCount: "1,1", mcType: "Same",      eff: "90",  addAmt: "500",  validityRemarks: "Current", remarks: "Special SS",    validityFrom: "2026-01-01", validityTo: "2029-12-31", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
@@ -148,9 +207,19 @@ export const initializeRecruitmentMockData = (forceReset = false) => {
     { id: "8",  point: "4.80", opGrade: "B+",  minOpCount: "2",   mcType: "Different", eff: "88",  addAmt: "450",  validityRemarks: "Current", remarks: "Adv Multi",     validityFrom: "2026-01-01", validityTo: "2029-12-31", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
     { id: "9",  point: "6.50", opGrade: "A+",  minOpCount: "4",   mcType: "Different", eff: "100", addAmt: "1000", validityRemarks: "Current", remarks: "Master Multi",  validityFrom: "2026-01-01", validityTo: "2029-12-31", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
     { id: "10", point: "3.00", opGrade: "C-",  minOpCount: "2",   mcType: "Same",      eff: "70",  addAmt: "100",  validityRemarks: "Current", remarks: "Trainee Multi", validityFrom: "2026-01-01", validityTo: "2029-12-31", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "11", point: "4.20", opGrade: "B",   minOpCount: "2",   mcType: "Same",      eff: "82",  addAmt: "250",  validityRemarks: "Current", remarks: "L1 Multi",      validityFrom: "2026-01-01", validityTo: "2029-12-31", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "12", point: "5.10", opGrade: "A-",  minOpCount: "2",   mcType: "Same",      eff: "91",  addAmt: "550",  validityRemarks: "Current", remarks: "L2 Special",    validityFrom: "2026-01-01", validityTo: "2029-12-31", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "13", point: "4.40", opGrade: "B-",  minOpCount: "3",   mcType: "Different", eff: "84",  addAmt: "350",  validityRemarks: "Current", remarks: "L3 Standard",   validityFrom: "2026-01-01", validityTo: "2029-12-31", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "14", point: "3.80", opGrade: "C",   minOpCount: "2",   mcType: "Different", eff: "78",  addAmt: "150",  validityRemarks: "Current", remarks: "Helper Multi A", validityFrom: "2026-01-01", validityTo: "2029-12-31", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "15", point: "3.90", opGrade: "C+",  minOpCount: "2",   mcType: "Same",      eff: "79",  addAmt: "180",  validityRemarks: "Current", remarks: "Helper Multi B", validityFrom: "2026-01-01", validityTo: "2029-12-31", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "16", point: "6.20", opGrade: "A",   minOpCount: "3",   mcType: "Same",      eff: "96",  addAmt: "850",  validityRemarks: "Current", remarks: "Senior Multi",  validityFrom: "2026-01-01", validityTo: "2029-12-31", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "17", point: "5.80", opGrade: "A-",  minOpCount: "4",   mcType: "Different", eff: "92",  addAmt: "700",  validityRemarks: "Current", remarks: "Supervisor Multi", validityFrom: "2026-01-01", validityTo: "2029-12-31", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "18", point: "4.70", opGrade: "B+",  minOpCount: "3",   mcType: "Same",      eff: "87",  addAmt: "420",  validityRemarks: "Current", remarks: "Assembly Multi", validityFrom: "2026-01-01", validityTo: "2029-12-31", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "19", point: "5.30", opGrade: "B",   minOpCount: "2",   mcType: "Different", eff: "89",  addAmt: "520",  validityRemarks: "Current", remarks: "RMG Specialist", validityFrom: "2026-01-01", validityTo: "2029-12-31", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" },
+    { id: "20", point: "7.20", opGrade: "Special", minOpCount: "3", mcType: "Different", eff: "100", addAmt: "1200", validityRemarks: "Current", remarks: "Supreme Multi", validityFrom: "2026-01-01", validityTo: "2029-12-31", createdBy: "MTS 01/01/2026 09:00:00 AM", updatedBy: "" }
   ]);
 
-  // ─── 9. CANDIDATES (15 rows) ─────────────────────────────────────────────────
+  // ─── 9. CANDIDATES (20 rows) ─────────────────────────────────────────────────
   set("recruitment_candidates", [
     { 
       empIdTemp: "PAL000001", 
@@ -787,6 +856,171 @@ export const initializeRecruitmentMockData = (forceReset = false) => {
       assessStatus: "HR Approved",  
       grade: "B+" 
     },
+    { 
+      empIdTemp: "PAL000016", 
+      nameEng: "Sultana Razia",        
+      nameBng: "সুলতানা রাজিয়া",       
+      employeeType: "Worker", 
+      department: "RMG Operation", 
+      section: "Sewing",   
+      designation: "Helper",          
+      unit: "Unit-6", 
+      line: "60",  
+      doj: "2026-08-31", 
+      dob: "1997-11-20", 
+      personalContact: "01700000015", 
+      personalEmail: "razia.helper@example.com",
+      religion: "Islam",
+      maritalStatus: "Single",
+      nidNumber: "7289234135",
+      birthReg: "1997261548001555",
+      fatherNameEng: "Md. Rafiqul Islam",
+      fatherNameBng: "মোঃ রফিকুল ইসলাম",
+      motherNameEng: "Mst. Salma Begum",
+      motherNameBng: "মোসাঃ সালমা বেগম",
+      emergencyContact: "01811223355",
+      contactPerson: "Md. Rafiqul Islam",
+      relationship: "Father",
+      presentAddress: "House: 9, Road: 1, Block: A, Savar, Dhaka",
+      permanentAddress: "Village: Savar, District: Dhaka",
+      academics: [{ id: "1", title: "Class 8 Pass", institution: "Savar School", year: "2012", result: "Pass" }],
+      experiences: [{ id: "1", company: "Epic Group", designation: "Helper", from: "2015-01-01", to: "2020-12-31", reason: "Salary increment" }],
+      nominee: { name: "Mst. Salma Begum", relation: "Mother", nidReg: "7289234135", contact: "01811223355" },
+      assessStatus: "IE Pending",   
+      grade: "" 
+    },
+    { 
+      empIdTemp: "PAL000017", 
+      nameEng: "Md. Abu Sayeed",       
+      nameBng: "মোঃ আবু সাঈদ",        
+      employeeType: "Worker", 
+      department: "RMG Operation", 
+      section: "Sewing",   
+      designation: "Operator",        
+      unit: "Unit-6", 
+      line: "61",  
+      doj: "2026-09-01", 
+      dob: "1995-04-18", 
+      personalContact: "01800000016", 
+      personalEmail: "sayeed.sewing@example.com",
+      religion: "Islam",
+      maritalStatus: "Married",
+      nidNumber: "8289234136",
+      birthReg: "1995261548001444",
+      fatherNameEng: "Md. Abdul Mazid",
+      fatherNameBng: "মোঃ আব্দুল মজিদ",
+      motherNameEng: "Mst. Sufia Khatun",
+      motherNameBng: "মোসাঃ সুফিয়া খাতুন",
+      emergencyContact: "01911223356",
+      contactPerson: "Mst. Sufia Khatun",
+      relationship: "Mother",
+      presentAddress: "House: 15, Road: 2, Block: B, Tongi, Gazipur",
+      permanentAddress: "Village: Tongi, District: Gazipur",
+      academics: [{ id: "1", title: "SSC", institution: "Tongi High School", year: "2010", result: "GPA 3.40" }],
+      experiences: [{ id: "1", company: "Dird Group", designation: "Junior Operator", from: "2012-03-01", to: "2019-12-31", reason: "Salary scale" }],
+      nominee: { name: "Mst. Lipi Akter", relation: "Wife", nidReg: "8289234136", contact: "01911223356" },
+      assessStatus: "HR Pending",   
+      grade: "" 
+    },
+    { 
+      empIdTemp: "PAL000018", 
+      nameEng: "Mst. Lipi Khatun",     
+      nameBng: "মোসাঃ লিপি খাতুন",     
+      employeeType: "Worker", 
+      department: "RMG Operation", 
+      section: "Finishing",
+      designation: "Folder",          
+      unit: "Unit-6", 
+      line: "F-4", 
+      doj: "2026-09-02", 
+      dob: "1996-06-25", 
+      personalContact: "01900000017", 
+      personalEmail: "lipi.folder@example.com",
+      religion: "Islam",
+      maritalStatus: "Single",
+      nidNumber: "9289234137",
+      birthReg: "1996261548001333",
+      fatherNameEng: "Md. Milon Mia",
+      fatherNameBng: "মোঃ মিলন মিয়া",
+      motherNameEng: "Mst. Jahanara Begum",
+      motherNameBng: "মোসাঃ জাহানারা বেগম",
+      emergencyContact: "01511223357",
+      contactPerson: "Md. Milon Mia",
+      relationship: "Father",
+      presentAddress: "House: 5, Road: 4, Sector: 12, Uttara, Dhaka",
+      permanentAddress: "Village: Uttara, District: Dhaka",
+      academics: [{ id: "1", title: "SSC", institution: "Uttara School", year: "2011", result: "GPA 3.10" }],
+      experiences: [{ id: "1", company: "KDS Group", designation: "Helper", from: "2013-02-15", to: "2018-08-30", reason: "Promotion opportunities" }],
+      nominee: { name: "Mst. Jahanara Begum", relation: "Mother", nidReg: "9289234137", contact: "01511223357" },
+      assessStatus: "IE Pending",   
+      grade: "" 
+    },
+    { 
+      empIdTemp: "PAL000019", 
+      nameEng: "Md. Al-Amin",          
+      nameBng: "মোঃ আল-আমিন",          
+      employeeType: "Worker", 
+      department: "RMG Operation", 
+      section: "Cutting",  
+      designation: "Cutter",          
+      unit: "Unit-6", 
+      line: "15",  
+      doj: "2026-09-03", 
+      dob: "1993-02-14", 
+      personalContact: "01500000018", 
+      personalEmail: "alamin.cutter@example.com",
+      religion: "Islam",
+      maritalStatus: "Married",
+      nidNumber: "1389234138",
+      birthReg: "1993261548001222",
+      fatherNameEng: "Md. Hazrat Ali",
+      fatherNameBng: "মোঃ হযরত আলী",
+      motherNameEng: "Mst. Saleha Begum",
+      motherNameBng: "মোসাঃ সালেহা বেগম",
+      emergencyContact: "01611223358",
+      contactPerson: "Md. Hazrat Ali",
+      relationship: "Father",
+      presentAddress: "House: 14, Road: 1, Block: C, Tongi, Gazipur",
+      permanentAddress: "Village: Tongi, District: Gazipur",
+      academics: [{ id: "1", title: "SSC", institution: "Tongi School", year: "2009", result: "GPA 3.65" }],
+      experiences: [{ id: "1", company: "Simco Group", designation: "Helper (Cutting)", from: "2011-04-10", to: "2017-12-15", reason: "Promoted to Cutter" }],
+      nominee: { name: "Mst. Jesmin Akter", relation: "Wife", nidReg: "1389234138", contact: "01611223358" },
+      assessStatus: "HR Pending",   
+      grade: "" 
+    },
+    { 
+      empIdTemp: "PAL000020", 
+      nameEng: "Mst. Kohinoor Akter",  
+      nameBng: "মোসাঃ কোহিনূর আক্তার",  
+      employeeType: "Worker", 
+      department: "RMG Operation", 
+      section: "Sewing",   
+      designation: "Operator",        
+      unit: "Unit-6", 
+      line: "62",  
+      doj: "2026-09-04", 
+      dob: "1995-08-20", 
+      personalContact: "01600000019", 
+      personalEmail: "kohinoor.sewing@example.com",
+      religion: "Islam",
+      maritalStatus: "Married",
+      nidNumber: "2389234139",
+      birthReg: "1995261548001111",
+      fatherNameEng: "Md. Hanif Mia",
+      fatherNameBng: "মোঃ হানিফ মিয়া",
+      motherNameEng: "Mst. Kulsum Begum",
+      motherNameBng: "মোসাঃ কুলসুম বেগম",
+      emergencyContact: "01711223359",
+      contactPerson: "Md. Hanif Mia",
+      relationship: "Father",
+      presentAddress: "House: 20, Road: 3, Block: B, Savar, Dhaka",
+      permanentAddress: "Village: Savar, District: Dhaka",
+      academics: [{ id: "1", title: "SSC", institution: "Savar Model School", year: "2010", result: "GPA 3.80" }],
+      experiences: [{ id: "1", company: "Envoy Textiles", designation: "Operator", from: "2012-05-15", to: "2021-09-30", reason: "Relocation to Savar" }],
+      nominee: { name: "Md. Rahim Uddin", relation: "Husband", nidReg: "2389234139", contact: "01711223359" },
+      assessStatus: "IE Pending",   
+      grade: "" 
+    }
   ]);
 
   // Mark this version as seeded

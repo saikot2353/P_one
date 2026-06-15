@@ -124,7 +124,17 @@ const DEFAULT_DESIGNATIONS: DesignationGroup[] = [
   { sl: 9, name: "Assistant Manager", nameBng: "সহকারী ব্যবস্থাপক", shortName: "AMGR", isActive: "Active" },
   { sl: 10, name: "Senior Executive", nameBng: "সিনিয়র এক্সিকিউটিভ", shortName: "SR.EXE", isActive: "Active" },
   { sl: 11, name: "Executive", nameBng: "এক্সিকিউটিভ", shortName: "EXE", isActive: "Active" },
-  { sl: 12, name: "Junior Executive", nameBng: "জুনিয়র এক্সিকিউটিভ", shortName: "JR.EXE", isActive: "Active" }
+  { sl: 12, name: "Junior Executive", nameBng: "জুনিয়র এক্সিকিউটিভ", shortName: "JR.EXE", isActive: "Active" },
+  { sl: 13, name: "Senior Officer", nameBng: "সিনিয়র অফিসার", shortName: "SR.OFF", isActive: "Active" },
+  { sl: 14, name: "Officer", nameBng: "অফিসার", shortName: "OFF", isActive: "Active" },
+  { sl: 15, name: "Junior Officer", nameBng: "জুনিয়র অফিসার", shortName: "JR.OFF", isActive: "Active" },
+  { sl: 16, name: "Senior Supervisor", nameBng: "সিনিয়র সুপারভাইজার", shortName: "SR.SUP", isActive: "Active" },
+  { sl: 17, name: "Supervisor", nameBng: "সুপারভাইজার", shortName: "SUP", isActive: "Active" },
+  { sl: 18, name: "Asst. Supervisor", nameBng: "সহকারী সুপারভাইজার", shortName: "ASST.SUP", isActive: "Active" },
+  { sl: 19, name: "Line Leader", nameBng: "লাইন লিডার", shortName: "LL", isActive: "Active" },
+  { sl: 20, name: "Senior Operator", nameBng: "সিনিয়র অপারেটর", shortName: "SR.OP", isActive: "Active" },
+  { sl: 21, name: "Operator", nameBng: "অপারেটর", shortName: "OP", isActive: "Active" },
+  { sl: 22, name: "Helper", nameBng: "হেলপার", shortName: "HLP", isActive: "Active" }
 ];
 
 const DEFAULT_DESIGNATIONS_POOL = [
@@ -153,12 +163,49 @@ const DEFAULT_DESIGNATIONS_POOL = [
 ];
 
 const DEFAULT_JOB_TITLES: JobTitle[] = [
-  { sl: 1, designationGroup: "Sr. Operator", code: "", titleEng: "Sr. Welder", titleBng: "সিনিঃ ওয়েল্ডার", empType: "ALL", lunchBill: "", attnBill: "", ifterBill: "", schedule: "", kajerDhoron: "ওয়েল্ডিং করে জোড়া দেওয়া", jobNature: "Select...", grade: "ALL", otType: "", sortOrder: 1, isActive: "Active" }
+  { sl: 1, designationGroup: "Sr. Operator", code: "JT001", titleEng: "Sr. Welder", titleBng: "সিনিঃ ওয়েল্ডার", empType: "ALL", lunchBill: "", attnBill: "", ifterBill: "", schedule: "", kajerDhoron: "ওয়েল্ডিং করে জোড়া দেওয়া", jobNature: "Direct", grade: "Grade 3", otType: "", sortOrder: 1, isActive: "Active" },
+  { sl: 2, designationGroup: "Operator", code: "JT002", titleEng: "Sewing Machine Operator", titleBng: "সেলাই মেশিন অপারেটর", empType: "ALL", lunchBill: "", attnBill: "", ifterBill: "", schedule: "", kajerDhoron: "গার্মেন্টস সেলাই করা", jobNature: "Direct", grade: "Grade 5", otType: "", sortOrder: 2, isActive: "Active" },
+  { sl: 3, designationGroup: "Officer", code: "JT003", titleEng: "Software Engineer", titleBng: "সফটওয়্যার ইঞ্জিনিয়ার", empType: "ALL", lunchBill: "", attnBill: "", ifterBill: "", schedule: "", kajerDhoron: "সফটওয়্যার তৈরি করা", jobNature: "Indirect", grade: "Grade 2", otType: "", sortOrder: 3, isActive: "Active" },
+  { sl: 4, designationGroup: "Officer", code: "JT004", titleEng: "Quality Inspector", titleBng: "কোয়ালিটি পরিদর্শক", empType: "ALL", lunchBill: "", attnBill: "", ifterBill: "", schedule: "", kajerDhoron: "পণ্যের মান পরীক্ষা করা", jobNature: "Direct", grade: "Grade 6", otType: "", sortOrder: 4, isActive: "Active" },
+  { sl: 5, designationGroup: "Officer", code: "JT005", titleEng: "Fabric Pattern Maker", titleBng: "প্যাটার্ন মেকার", empType: "ALL", lunchBill: "", attnBill: "", ifterBill: "", schedule: "", kajerDhoron: "ডিজাইন অনুযায়ী কাপড়ের ছাঁচ তৈরি", jobNature: "Direct", grade: "Grade 4", otType: "", sortOrder: 5, isActive: "Active" },
+  { sl: 6, designationGroup: "Senior Officer", code: "JT006", titleEng: "Senior Accountant", titleBng: "সিনিয়র অ্যাকাউন্ট্যান্ট", empType: "ALL", lunchBill: "", attnBill: "", ifterBill: "", schedule: "", kajerDhoron: "হিসাব নিকাশ পরীক্ষা করা", jobNature: "Indirect", grade: "Grade 1", otType: "", sortOrder: 6, isActive: "Active" },
+  { sl: 7, designationGroup: "Executive", code: "JT007", titleEng: "HR Executive", titleBng: "এইচআর এক্সিকিউটিভ", empType: "ALL", lunchBill: "", attnBill: "", ifterBill: "", schedule: "", kajerDhoron: "লোকবল ও অফিস ব্যবস্থাপনা", jobNature: "Indirect", grade: "Grade 2", otType: "", sortOrder: 7, isActive: "Active" },
+  { sl: 8, designationGroup: "Lead Engineer", code: "JT008", titleEng: "Lead Designer", titleBng: "লিড ডিজাইনার", empType: "ALL", lunchBill: "", attnBill: "", ifterBill: "", schedule: "", kajerDhoron: "পোশাকের ডিজাইন ডিজাইন করা", jobNature: "Indirect", grade: "Grade 1", otType: "", sortOrder: 8, isActive: "Active" },
+  { sl: 9, designationGroup: "Supervisor", code: "JT009", titleEng: "Production Coordinator", titleBng: "উৎপাদন সমন্বয়ক", empType: "ALL", lunchBill: "", attnBill: "", ifterBill: "", schedule: "", kajerDhoron: "উৎপাদন লক্ষ্যমাত্রা নিশ্চিত করা", jobNature: "Direct", grade: "Grade 3", otType: "", sortOrder: 9, isActive: "Active" },
+  { sl: 10, designationGroup: "Junior Executive", code: "JT010", titleEng: "Store Executive", titleBng: "স্টোর এক্সিকিউটিভ", empType: "ALL", lunchBill: "", attnBill: "", ifterBill: "", schedule: "", kajerDhoron: "স্টোর ইনভেন্টরি তদারকি করা", jobNature: "Indirect", grade: "Grade 4", otType: "", sortOrder: 10, isActive: "Active" },
+  { sl: 11, designationGroup: "Operator", code: "JT011", titleEng: "Machine Mechanic", titleBng: "যন্ত্র মেকানিক", empType: "ALL", lunchBill: "", attnBill: "", ifterBill: "", schedule: "", kajerDhoron: "মেশিন মেরামত ও রক্ষণাবেক্ষণ", jobNature: "Direct", grade: "Grade 4", otType: "", sortOrder: 11, isActive: "Active" },
+  { sl: 12, designationGroup: "Senior Supervisor", code: "JT012", titleEng: "Security Inspector", titleBng: "নিরাপত্তা পরিদর্শক", empType: "ALL", lunchBill: "", attnBill: "", ifterBill: "", schedule: "", kajerDhoron: "ফ্যাক্টরি নিরাপত্তা পর্যবেক্ষণ", jobNature: "Indirect", grade: "Grade 4", otType: "", sortOrder: 12, isActive: "Active" },
+  { sl: 13, designationGroup: "Officer", code: "JT013", titleEng: "Executive Chef", titleBng: "প্রধান বাবুর্চি", empType: "ALL", lunchBill: "", attnBill: "", ifterBill: "", schedule: "", kajerDhoron: "ক্যান্টিনের রান্নার কাজ তদারকি", jobNature: "Indirect", grade: "Grade 5", otType: "", sortOrder: 13, isActive: "Active" },
+  { sl: 14, designationGroup: "Operator", code: "JT014", titleEng: "Heavy Vehicle Driver", titleBng: "ভারী যানবাহন চালক", empType: "ALL", lunchBill: "", attnBill: "", ifterBill: "", schedule: "", kajerDhoron: "পরিবহন ও মালামাল বহন করা", jobNature: "Indirect", grade: "Grade 5", otType: "", sortOrder: 14, isActive: "Active" },
+  { sl: 15, designationGroup: "Junior Officer", code: "JT015", titleEng: "CAD Operator", titleBng: "ক্যাড অপারেটর", empType: "ALL", lunchBill: "", attnBill: "", ifterBill: "", schedule: "", kajerDhoron: "ডিজিটাল প্যাটার্ন তৈরি করা", jobNature: "Direct", grade: "Grade 4", otType: "", sortOrder: 15, isActive: "Active" },
+  { sl: 16, designationGroup: "Officer", code: "JT016", titleEng: "Sales Executive", titleBng: "বিক্রয় নির্বাহী", empType: "ALL", lunchBill: "", attnBill: "", ifterBill: "", schedule: "", kajerDhoron: "অর্ডার সংগ্রহ ও মার্কেটিং", jobNature: "Indirect", grade: "Grade 3", otType: "", sortOrder: 16, isActive: "Active" },
+  { sl: 17, designationGroup: "Junior Officer", code: "JT017", titleEng: "Customer Support Agent", titleBng: "গ্রাহক সেবা প্রতিনিধি", empType: "ALL", lunchBill: "", attnBill: "", ifterBill: "", schedule: "", kajerDhoron: "গ্রাহকের সমস্যার সমাধান করা", jobNature: "Indirect", grade: "Grade 5", otType: "", sortOrder: 17, isActive: "Active" },
+  { sl: 18, designationGroup: "Helper", code: "JT018", titleEng: "Office Assistant", titleBng: "অফিস সহকারী", empType: "ALL", lunchBill: "", attnBill: "", ifterBill: "", schedule: "", kajerDhoron: "ফাইল ও চা সরবরাহ করা", jobNature: "Indirect", grade: "Grade 7", otType: "", sortOrder: 18, isActive: "Active" },
+  { sl: 19, designationGroup: "Operator", code: "JT019", titleEng: "Electrician", titleBng: "ইলেকট্রিশিয়ান", empType: "ALL", lunchBill: "", attnBill: "", ifterBill: "", schedule: "", kajerDhoron: "বৈদ্যুতিক লাইন ও যন্ত্র সংযোগ", jobNature: "Indirect", grade: "Grade 5", otType: "", sortOrder: 19, isActive: "Active" },
+  { sl: 20, designationGroup: "Officer", code: "JT020", titleEng: "Logistics Officer", titleBng: "লজিস্টিকস অফিসার", empType: "ALL", lunchBill: "", attnBill: "", ifterBill: "", schedule: "", kajerDhoron: "পণ্য শিপমেন্ট ও সরবরাহ তদারকি", jobNature: "Indirect", grade: "Grade 3", otType: "", sortOrder: 20, isActive: "Active" }
 ];
 
 const DEFAULT_EMPLOYEE_TYPES: EmployeeType[] = [
   { sl: 1, code: "PER", nameEng: "Permanent", nameBng: "স্থায়ী", shortName: "PER", isOfficer: "No", isWorker: "Yes", isActive: "Active" },
-  { sl: 2, code: "PROB", nameEng: "Probation", nameBng: "শিক্ষানবিস", shortName: "PROB", isOfficer: "No", isWorker: "Yes", isActive: "Active" }
+  { sl: 2, code: "PROB", nameEng: "Probation", nameBng: "শিক্ষানবিস", shortName: "PROB", isOfficer: "No", isWorker: "Yes", isActive: "Active" },
+  { sl: 3, code: "CAS", nameEng: "Casual", nameBng: "নৈমিত্তিক", shortName: "CAS", isOfficer: "No", isWorker: "Yes", isActive: "Active" },
+  { sl: 4, code: "CON", nameEng: "Contractual", nameBng: "চুক্তিভিত্তিক", shortName: "CON", isOfficer: "Yes", isWorker: "No", isActive: "Active" },
+  { sl: 5, code: "APP", nameEng: "Apprentice", nameBng: "শিক্ষানবিস শ্রমিক", shortName: "APP", isOfficer: "No", isWorker: "Yes", isActive: "Active" },
+  { sl: 6, code: "PT", nameEng: "Part-Time", nameBng: "খণ্ডকালীন", shortName: "PT", isOfficer: "Yes", isWorker: "Yes", isActive: "Active" },
+  { sl: 7, code: "INT", nameEng: "Intern", nameBng: "ইন্টার্ন", shortName: "INT", isOfficer: "Yes", isWorker: "No", isActive: "Active" },
+  { sl: 8, code: "TEMP", nameEng: "Temporary", nameBng: "অস্থায়ী", shortName: "TEMP", isOfficer: "No", isWorker: "Yes", isActive: "Active" },
+  { sl: 9, code: "SEA", nameEng: "Seasonal", nameBng: "মৌসুমী", shortName: "SEA", isOfficer: "No", isWorker: "Yes", isActive: "Active" },
+  { sl: 10, code: "OUT", nameEng: "Outsourced", nameBng: "বহিরাগত", shortName: "OUT", isOfficer: "No", isWorker: "Yes", isActive: "Active" },
+  { sl: 11, code: "CNS", nameEng: "Consultant", nameBng: "পরামর্শক", shortName: "CNS", isOfficer: "Yes", isWorker: "No", isActive: "Active" },
+  { sl: 12, code: "FL", nameEng: "Freelance", nameBng: "মুক্ত পেশাজীবী", shortName: "FL", isOfficer: "Yes", isWorker: "No", isActive: "Active" },
+  { sl: 13, code: "DW", nameEng: "Daily Wager", nameBng: "দৈনিক মজুরি", shortName: "DW", isOfficer: "No", isWorker: "Yes", isActive: "Active" },
+  { sl: 14, code: "PROJ", nameEng: "Project-Based", nameBng: "প্রকল্প ভিত্তিক", shortName: "PROJ", isOfficer: "Yes", isWorker: "Yes", isActive: "Active" },
+  { sl: 15, code: "ADV", nameEng: "Advisory Staff", nameBng: "উপদেষ্টা", shortName: "ADV", isOfficer: "Yes", isWorker: "No", isActive: "Active" },
+  { sl: 16, code: "TRN", nameEng: "Trainee", nameBng: "প্রশিক্ষণার্থী", shortName: "TRN", isOfficer: "Yes", isWorker: "Yes", isActive: "Active" },
+  { sl: 17, code: "SHF", nameEng: "Shift-Worker", nameBng: "শিফট কর্মী", shortName: "SHF", isOfficer: "No", isWorker: "Yes", isActive: "Active" },
+  { sl: 18, code: "ONC", nameEng: "On-Call Staff", nameBng: "অন-কল কর্মী", shortName: "ONC", isOfficer: "No", isWorker: "Yes", isActive: "Active" },
+  { sl: 19, code: "RET", nameEng: "Retainer Contract", nameBng: "রিটেইনার", shortName: "RET", isOfficer: "Yes", isWorker: "No", isActive: "Active" },
+  { sl: 20, code: "GST", nameEng: "Guest Lecturer / expert", nameBng: "অতিথি বিশেষজ্ঞ", shortName: "GST", isOfficer: "Yes", isWorker: "No", isActive: "Active" }
 ];
 
 const DEFAULT_GRADES: Grade[] = [
@@ -168,28 +215,112 @@ const DEFAULT_GRADES: Grade[] = [
   { sl: 4, grade: "Grade 4", gradeBng: "গ্রেড ৪", basic: 9500, houseRent: 4750, medical: 1500, transport: 1000, food: 1500, other: 0, total: 18250, isActive: "Active" },
   { sl: 5, grade: "Grade 5", gradeBng: "গ্রেড ৫", basic: 8800, houseRent: 4400, medical: 1500, transport: 1000, food: 1500, other: 0, total: 17200, isActive: "Active" },
   { sl: 6, grade: "Grade 6", gradeBng: "গ্রেড ৬", basic: 8400, houseRent: 4200, medical: 1500, transport: 1000, food: 1500, other: 0, total: 16600, isActive: "Active" },
-  { sl: 7, grade: "Grade 7", gradeBng: "গ্রেড ৭", basic: 8000, houseRent: 4000, medical: 1500, transport: 1000, food: 1500, other: 0, total: 16000, isActive: "Active" }
+  { sl: 7, grade: "Grade 7", gradeBng: "গ্রেড ৭", basic: 8000, houseRent: 4000, medical: 1500, transport: 1000, food: 1500, other: 0, total: 16000, isActive: "Active" },
+  { sl: 8, grade: "Grade 8", gradeBng: "গ্রেড ৮", basic: 7500, houseRent: 3750, medical: 1500, transport: 1000, food: 1500, other: 0, total: 15250, isActive: "Active" },
+  { sl: 9, grade: "Grade 9", gradeBng: "গ্রেড ৯", basic: 7000, houseRent: 3500, medical: 1500, transport: 1000, food: 1500, other: 0, total: 14500, isActive: "Active" },
+  { sl: 10, grade: "Grade 10", gradeBng: "গ্রেড ১০", basic: 6500, houseRent: 3250, medical: 1500, transport: 1000, food: 1500, other: 0, total: 13750, isActive: "Active" },
+  { sl: 11, grade: "Grade 11", gradeBng: "গ্রেড ১১", basic: 6000, houseRent: 3000, medical: 1500, transport: 1000, food: 1500, other: 0, total: 13000, isActive: "Active" },
+  { sl: 12, grade: "Grade 12", gradeBng: "গ্রেড ১২", basic: 5500, houseRent: 2750, medical: 1500, transport: 1000, food: 1500, other: 0, total: 12250, isActive: "Active" },
+  { sl: 13, grade: "Grade 13", gradeBng: "গ্রেড ১৩", basic: 5000, houseRent: 2500, medical: 1500, transport: 1000, food: 1500, other: 0, total: 11500, isActive: "Active" },
+  { sl: 14, grade: "Grade 14", gradeBng: "গ্রেড ১৪", basic: 4500, houseRent: 2250, medical: 1500, transport: 1000, food: 1500, other: 0, total: 10750, isActive: "Active" },
+  { sl: 15, grade: "Grade 15", gradeBng: "গ্রেড ১৫", basic: 4000, houseRent: 2000, medical: 1500, transport: 1000, food: 1500, other: 0, total: 10000, isActive: "Active" },
+  { sl: 16, grade: "Grade 16", gradeBng: "গ্রেড ১৬", basic: 3800, houseRent: 1900, medical: 1500, transport: 1000, food: 1500, other: 0, total: 9700, isActive: "Active" },
+  { sl: 17, grade: "Grade 17", gradeBng: "গ্রেড ১৭", basic: 3600, houseRent: 1800, medical: 1500, transport: 1000, food: 1500, other: 0, total: 9400, isActive: "Active" },
+  { sl: 18, grade: "Grade 18", gradeBng: "গ্রেড ১৮", basic: 3400, houseRent: 1700, medical: 1500, transport: 1000, food: 1500, other: 0, total: 9100, isActive: "Active" },
+  { sl: 19, grade: "Grade 19", gradeBng: "গ্রেড ১৯", basic: 3200, houseRent: 1600, medical: 1500, transport: 1000, food: 1500, other: 0, total: 8800, isActive: "Active" },
+  { sl: 20, grade: "Grade 20", gradeBng: "গ্রেড ২০", basic: 3000, houseRent: 1500, medical: 1500, transport: 1000, food: 1500, other: 0, total: 8500, isActive: "Active" }
 ];
 
 const DEFAULT_NATURES: JobNature[] = [
   { sl: 1, name: "Direct", isActive: "Active" },
-  { sl: 2, name: "Indirect", isActive: "Active" }
+  { sl: 2, name: "Indirect", isActive: "Active" },
+  { sl: 3, name: "Contractual", isActive: "Active" },
+  { sl: 4, name: "Hourly", isActive: "Active" },
+  { sl: 5, name: "Retainer", isActive: "Active" },
+  { sl: 6, name: "Piece-Rate", isActive: "Active" },
+  { sl: 7, name: "Commission-Based", isActive: "Active" },
+  { sl: 8, name: "Fixed Term", isActive: "Active" },
+  { sl: 9, name: "Advisory Nature", isActive: "Active" },
+  { sl: 10, name: "Remote Option", isActive: "Active" },
+  { sl: 11, name: "Hybrid Schedule", isActive: "Active" },
+  { sl: 12, name: "Project Driven", isActive: "Active" },
+  { sl: 13, name: "Shift Dependent", isActive: "Active" },
+  { sl: 14, name: "Supervisory", isActive: "Active" },
+  { sl: 15, name: "Operational", isActive: "Active" },
+  { sl: 16, name: "Managerial", isActive: "Active" },
+  { sl: 17, name: "Executive Nature", isActive: "Active" },
+  { sl: 18, name: "Technical Specialty", isActive: "Active" },
+  { sl: 19, name: "Administrative", isActive: "Active" },
+  { sl: 20, name: "Support Service", isActive: "Active" }
 ];
 
 const DEFAULT_COUNTRIES: Country[] = [
-  { sl: 1, code: "BD", nameEng: "Bangladesh", nameBng: "বাংলাদেশ", shortName: "BD", nationality: "Bangladeshi", isActive: "Active" }
+  { sl: 1, code: "BD", nameEng: "Bangladesh", nameBng: "বাংলাদেশ", shortName: "BD", nationality: "Bangladeshi", isActive: "Active" },
+  { sl: 2, code: "IN", nameEng: "India", nameBng: "ভারত", shortName: "IND", nationality: "Indian", isActive: "Active" },
+  { sl: 3, code: "PK", nameEng: "Pakistan", nameBng: "পাকিস্তান", shortName: "PAK", nationality: "Pakistani", isActive: "Active" },
+  { sl: 4, code: "LK", nameEng: "Sri Lanka", nameBng: "শ্রীলঙ্কা", shortName: "LKA", nationality: "Sri Lankan", isActive: "Active" },
+  { sl: 5, code: "NP", nameEng: "Nepal", nameBng: "নেপাল", shortName: "NPL", nationality: "Nepalese", isActive: "Active" },
+  { sl: 6, code: "BT", nameEng: "Bhutan", nameBng: "ভুটান", shortName: "BTN", nationality: "Bhutanese", isActive: "Active" },
+  { sl: 7, code: "MV", nameEng: "Maldives", nameBng: "মালদ্বীপ", shortName: "MDV", nationality: "Maldivian", isActive: "Active" },
+  { sl: 8, code: "US", nameEng: "United States", nameBng: "মার্কিন যুক্তরাষ্ট্র", shortName: "USA", nationality: "American", isActive: "Active" },
+  { sl: 9, code: "GB", nameEng: "United Kingdom", nameBng: "যুক্তরাজ্য", shortName: "GBR", nationality: "British", isActive: "Active" },
+  { sl: 10, code: "CA", nameEng: "Canada", nameBng: "কানাডা", shortName: "CAN", nationality: "Canadian", isActive: "Active" },
+  { sl: 11, code: "AU", nameEng: "Australia", nameBng: "অস্ট্রেলিয়া", shortName: "AUS", nationality: "Australian", isActive: "Active" },
+  { sl: 12, code: "DE", nameEng: "Germany", nameBng: "জার্মানি", shortName: "DEU", nationality: "German", isActive: "Active" },
+  { sl: 13, code: "JP", nameEng: "Japan", nameBng: "জাপান", shortName: "JPN", nationality: "Japanese", isActive: "Active" },
+  { sl: 14, code: "SG", nameEng: "Singapore", nameBng: "সিঙ্গাপুর", shortName: "SGP", nationality: "Singaporean", isActive: "Active" },
+  { sl: 15, code: "MY", nameEng: "Malaysia", nameBng: "মালয়েশিয়া", shortName: "MYS", nationality: "Malaysian", isActive: "Active" },
+  { sl: 16, code: "SA", nameEng: "Saudi Arabia", nameBng: "সৌদি আরব", shortName: "SAU", nationality: "Saudi", isActive: "Active" },
+  { sl: 17, code: "AE", nameEng: "United Arab Emirates", nameBng: "সংযুক্ত আরব আমিরাত", shortName: "ARE", nationality: "Emirati", isActive: "Active" },
+  { sl: 18, code: "CN", nameEng: "China", nameBng: "চীন", shortName: "CHN", nationality: "Chinese", isActive: "Active" },
+  { sl: 19, code: "FR", nameEng: "France", nameBng: "ফ্রান্স", shortName: "FRA", nationality: "French", isActive: "Active" },
+  { sl: 20, code: "IT", nameEng: "Italy", nameBng: "ইতালি", shortName: "ITA", nationality: "Italian", isActive: "Active" }
 ];
 
 const DEFAULT_RELIGIONS: Religion[] = [
   { sl: 1, code: "IS", religionName: "Islam", religionNameBng: "ইসলাম", isActive: "Active" },
   { sl: 2, code: "HI", religionName: "Hinduism", religionNameBng: "সনাতন", isActive: "Active" },
   { sl: 3, code: "BU", religionName: "Buddhism", religionNameBng: "বৌদ্ধধর্ম", isActive: "Active" },
-  { sl: 4, code: "CH", religionName: "Christianity", religionNameBng: "খ্রিস্টধর্ম", isActive: "Active" }
+  { sl: 4, code: "CH", religionName: "Christianity", religionNameBng: "খ্রিস্টধর্ম", isActive: "Active" },
+  { sl: 5, code: "JD", religionName: "Judaism", religionNameBng: "ইহুদি ধর্ম", isActive: "Active" },
+  { sl: 6, code: "SK", religionName: "Sikhism", religionNameBng: "শিখ ধর্ম", isActive: "Active" },
+  { sl: 7, code: "ST", religionName: "Shinto", religionNameBng: "শিন্টো ধর্ম", isActive: "Active" },
+  { sl: 8, code: "TA", religionName: "Taoism", religionNameBng: "তাওবাদ", isActive: "Active" },
+  { sl: 9, code: "CF", religionName: "Confucianism", religionNameBng: "কনফুসীয় ধর্ম", isActive: "Active" },
+  { sl: 10, code: "BH", religionName: "Bahai", religionNameBng: "বাহাই ধর্ম", isActive: "Active" },
+  { sl: 11, code: "JN", religionName: "Jainism", religionNameBng: "জৈন ধর্ম", isActive: "Active" },
+  { sl: 12, code: "ZR", religionName: "Zoroastrianism", religionNameBng: "জরথুস্ট্রীয় ধর্ম", isActive: "Active" },
+  { sl: 13, code: "AG", religionName: "Agnosticism", religionNameBng: "অজ্ঞেয়বাদ", isActive: "Active" },
+  { sl: 14, code: "AT", religionName: "Atheism", religionNameBng: "নাস্তিক্যবাদ", isActive: "Active" },
+  { sl: 15, code: "TR", religionName: "Traditional / Folk", religionNameBng: "ঐতিহ্যবাহী লোকধর্ম", isActive: "Active" },
+  { sl: 16, code: "OT", religionName: "Others", religionNameBng: "অন্যান্য", isActive: "Active" },
+  { sl: 17, code: "SC", religionName: "Secular", religionNameBng: "ধর্মনিরপেক্ষ", isActive: "Active" },
+  { sl: 18, code: "SP", religionName: "Spiritualism", religionNameBng: "আধ্যাত্মিকতা", isActive: "Active" },
+  { sl: 19, code: "TC", religionName: "Traditional Chinese", religionNameBng: "ঐতিহ্যবাহী চীনা ধর্ম", isActive: "Active" },
+  { sl: 20, code: "DR", religionName: "Druze", religionNameBng: "দ্রুজ ধর্ম", isActive: "Active" }
 ];
 
 const DEFAULT_PLACES: PlaceInBD[] = [
   { sl: 1, code: "DH", nameEng: "Dhaka", nameBng: "ঢাকা", shortName: "DH", isActive: "Active" },
-  { sl: 2, code: "GA", nameEng: "Gazipur", nameBng: "গাজীপুর", shortName: "GA", isActive: "Active" }
+  { sl: 2, code: "GA", nameEng: "Gazipur", nameBng: "গাজীপুর", shortName: "GA", isActive: "Active" },
+  { sl: 3, code: "NY", nameEng: "Narayanganj", nameBng: "নারায়ণগঞ্জ", shortName: "NY", isActive: "Active" },
+  { sl: 4, code: "NS", nameEng: "Narsingdi", nameBng: "নরসিংদী", shortName: "NS", isActive: "Active" },
+  { sl: 5, code: "CO", nameEng: "Comilla", nameBng: "কুমিল্লা", shortName: "CO", isActive: "Active" },
+  { sl: 6, code: "CH", nameEng: "Chittagong", nameBng: "চট্টগ্রাম", shortName: "CH", isActive: "Active" },
+  { sl: 7, code: "SY", nameEng: "Sylhet", nameBng: "সিলেট", shortName: "SY", isActive: "Active" },
+  { sl: 8, code: "RA", nameEng: "Rajshahi", nameBng: "রাজশাহী", shortName: "RA", isActive: "Active" },
+  { sl: 9, code: "KH", nameEng: "Khulna", nameBng: "খুলনা", shortName: "KH", isActive: "Active" },
+  { sl: 10, code: "BA", nameEng: "Barisal", nameBng: "বরিশাল", shortName: "BA", isActive: "Active" },
+  { sl: 11, code: "RN", nameEng: "Rangpur", nameBng: "রংপুর", shortName: "RN", isActive: "Active" },
+  { sl: 12, code: "MY", nameEng: "Mymensingh", nameBng: "ময়মনসিংহ", shortName: "MY", isActive: "Active" },
+  { sl: 13, code: "CX", nameEng: "Cox's Bazar", nameBng: "কক্সবাজার", shortName: "CX", isActive: "Active" },
+  { sl: 14, code: "BO", nameEng: "Bogra", nameBng: "বগুড়া", shortName: "BO", isActive: "Active" },
+  { sl: 15, code: "JE", nameEng: "Jessore", nameBng: "যশোর", shortName: "JE", isActive: "Active" },
+  { sl: 16, code: "TA", nameEng: "Tangail", nameBng: "টাঙ্গাইল", shortName: "TA", isActive: "Active" },
+  { sl: 17, code: "FE", nameEng: "Feni", nameBng: "ফেনী", shortName: "FE", isActive: "Active" },
+  { sl: 18, code: "DI", nameEng: "Dinajpur", nameBng: "দিনাজপুর", shortName: "DI", isActive: "Active" },
+  { sl: 19, code: "KU", nameEng: "Kushtia", nameBng: "কুষ্টিয়া", shortName: "KU", isActive: "Active" },
+  { sl: 20, code: "PA", nameEng: "Pabna", nameBng: "পাবনা", shortName: "PA", isActive: "Active" }
 ];
 
 function EmploymentSetupPage() {
@@ -232,6 +363,10 @@ function EmploymentSetupPage() {
         const parsed = JSON.parse(saved);
         if (!Array.isArray(parsed)) return defaultVal;
         if (requiredKey && parsed.length > 0 && parsed[0] && !(requiredKey in parsed[0])) {
+          return defaultVal;
+        }
+        // Force override if length is smaller than defaultVal to ensure expanded list is loaded
+        if (parsed.length < defaultVal.length) {
           return defaultVal;
         }
         return parsed;

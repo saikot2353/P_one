@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -114,6 +115,60 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const versionKey = "hris_master_data_version_v11";
+      if (localStorage.getItem(versionKey) !== "true") {
+        const keysToClear = [
+          "hris_organizations",
+          "hris_areas",
+          "hris_company_mappings",
+          "hris_departments",
+          "hris_sections",
+          "hris_units",
+          "hris_lines",
+          "hris_designations",
+          "hris_job_titles",
+          "hris_employee_types",
+          "hris_grades",
+          "hris_job_natures",
+          "hris_countries",
+          "hris_religions",
+          "hris_places_in_bd",
+          "hris_educational_qualifications",
+          "hris_educational_institutions",
+          "hris_educational_results",
+          "hris_training_categories",
+          "hris_shifts",
+          "hris_ot_config",
+          "hris_abnormal_shifts",
+          "hris_attendance_bonus_policy",
+          "hris_leave_settings",
+          "hris_policy_names",
+          "hris_allowance_rates",
+          "hris_tiffin_rates",
+          "hris_lunch_rates",
+          "hris_conveyance_setups",
+          "hris_bonus_settings",
+          "recruitment_config_operations",
+          "recruitment_config_machines",
+          "recruitment_config_op_grades",
+          "recruitment_config_measurements",
+          "recruitment_config_smv_bank",
+          "recruitment_config_eff_grades",
+          "recruitment_config_grade_vs_grade",
+          "recruitment_config_multi_ss_v2",
+          "recruitment_candidates",
+          "recruitment_data_version",
+          "recruitment_synced_employees"
+        ];
+        keysToClear.forEach(key => localStorage.removeItem(key));
+        localStorage.setItem(versionKey, "true");
+        window.location.reload();
+      }
+    }
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

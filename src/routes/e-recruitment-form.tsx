@@ -22,7 +22,13 @@ import {
   FileText,
   ShieldCheck,
   Mail,
-  Heart
+  Heart,
+  Cpu,
+  Scan,
+  Loader2,
+  Sparkles,
+  X,
+  Check
 } from "lucide-react";
 
 export const Route = createFileRoute("/e-recruitment-form")({
@@ -160,6 +166,400 @@ const countryOptions = [{ value: "Bangladesh", label: "Bangladesh" }];
 function ERecruitmentForm() {
   const router = useRouter();
   const [copyAddress, setCopyAddress] = useState(false);
+
+  // NID OCR Scanner States
+  const [isNidScanning, setIsNidScanning] = useState(false);
+  const [nidScanProgress, setNidScanProgress] = useState(0);
+  const [nidScanStep, setNidScanStep] = useState(0);
+  const [showNidOcrModal, setShowNidOcrModal] = useState(false);
+  const [showNidScannerModal, setShowNidScannerModal] = useState(false);
+  const [scanDocumentType, setScanDocumentType] = useState("");
+  const [rawOcrText, setRawOcrText] = useState("");
+  const [nidFrontImage, setNidFrontImage] = useState<File | null>(null);
+  const [nidBackImage, setNidBackImage] = useState<File | null>(null);
+  const [nidFrontPreview, setNidFrontPreview] = useState<string | null>(null);
+  const [nidBackPreview, setNidBackPreview] = useState<string | null>(null);
+  const [extractedNid, setExtractedNid] = useState({
+    nameEng: "",
+    nameBng: "",
+    fatherNameEng: "",
+    fatherNameBng: "",
+    motherNameEng: "",
+    motherNameBng: "",
+    nid: "",
+    dob: "",
+    gender: "Male",
+    religion: "Islam",
+    blood: "B (+ve)",
+    presVillageEng: "",
+    presVillageBng: "",
+    presRoad: "",
+    presDistrict: "",
+    presDivision: "",
+    presUpazila: "",
+    presPostOffice: "",
+  });
+
+  const parseNidText = (text: string) => {
+    const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+    
+    let nameEng = "";
+    let nameBng = "";
+    let fatherNameBng = "";
+    let motherNameBng = "";
+    let nid = "";
+    let dob = "";
+    let gender = "Male";
+    let bloodGroup = "";
+    let addressLines: string[] = [];
+
+    // Pass 1: Extract NID Number
+    const digitNormalized = text.replace(/[lI]/g, "1").replace(/O/g, "0").replace(/S(?=\d)/g, "5");
+    const nidMatch = digitNormalized.match(/\b(\d[\d\s]{8,18}\d)\b/);
+    if (nidMatch) {
+      nid = nidMatch[1].replace(/\s/g, "");
+      if (![10, 13, 17].includes(nid.length)) {
+        const strictMatch = digitNormalized.match(/\b(\d{10}|\d{13}|\d{17})\b/);
+        nid = strictMatch ? strictMatch[1] : nid;
+      }
+    }
+
+    // Pass 2: Extract Date of Birth
+    for (const line of lines) {
+      if (/(place of birth|জন্মস্থান|birthplace)/i.test(line)) continue;
+      if (/(date of birth|dob|birth date|জন্ম তারিখ)/i.test(line)) {
+        const afterColon = line.split(/[:]\s*/);
+        if (afterColon.length > 1) {
+          const dateStr = afterColon.slice(1).join(":").trim();
+          if (dateStr.length > 3) dob = dateStr;
+        }
+        if (!dob) {
+          const inlineDate = line.match(/(\d{1,2}\s+[A-Za-z]{3,}\s+\d{4})/);
+          if (inlineDate) dob = inlineDate[1];
+        }
+        continue;
+      }
+      if (!dob) {
+        const standaloneDate = line.match(/^(\d{1,2}\s+[A-Za-z]{3,}\s+\d{4})$/);
+        if (standaloneDate) dob = standaloneDate[1];
+      }
+    }
+
+    // Pass 3: Extract structured fields
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const lineLower = line.toLowerCase();
+
+      if (/(^name\b|^nane\b|^mame\b)/i.test(lineLower) && !/(father|mother|spouse|পিতা|মাতা)/i.test(lineLower)) {
+        const parts = line.split(/[:]\s*/);
+        if (parts.length > 1 && parts.slice(1).join(":").trim().length > 1) {
+          nameEng = parts.slice(1).join(":").trim();
+        } else if (i + 1 < lines.length && /^[A-Z\s\.]+$/.test(lines[i + 1].trim())) {
+          nameEng = lines[i + 1].trim();
+        }
+      }
+
+      if (/নাম/.test(line) && !/(পিতা|মাতা|স্বামী|স্ত্রী)/.test(line)) {
+        const parts = line.split(/[:]\s*/);
+        if (parts.length > 1 && parts.slice(1).join(":").trim().length > 1) {
+          nameBng = parts.slice(1).join(":").trim();
+        } else if (i + 1 < lines.length) {
+          nameBng = lines[i + 1].trim();
+        }
+      }
+
+      if (/পিতা/.test(line)) {
+        const parts = line.split(/[:]\s*/);
+        if (parts.length > 1 && parts.slice(1).join(":").trim().length > 1) {
+          fatherNameBng = parts.slice(1).join(":").trim();
+        } else if (i + 1 < lines.length) {
+          fatherNameBng = lines[i + 1].trim();
+        }
+      }
+
+      if (/মাতা/.test(line)) {
+        const parts = line.split(/[:]\s*/);
+        if (parts.length > 1 && parts.slice(1).join(":").trim().length > 1) {
+          motherNameBng = parts.slice(1).join(":").trim();
+        } else if (i + 1 < lines.length) {
+          motherNameBng = lines[i + 1].trim();
+        }
+      }
+
+      if (/(ঠিকানা|address)/i.test(line)) {
+        const parts = line.split(/ঠিকানা[:]\s*/i);
+        let addrStart = "";
+        if (parts.length > 1) {
+          addrStart = parts.slice(1).join(":").trim();
+        } else {
+          const engParts = line.split(/address[:]\s*/i);
+          if (engParts.length > 1) addrStart = engParts.slice(1).join(":").trim();
+        }
+        if (addrStart) addressLines.push(addrStart);
+        
+        for (let j = i + 1; j < lines.length && j <= i + 4; j++) {
+          const nextLine = lines[j];
+          if (/(^name|^নাম|^পিতা|^মাতা|^date|^জন্ম|^blood|^রক্তের|^id\s*no|^national)/i.test(nextLine)) break;
+          if (nextLine.length > 3) {
+            addressLines.push(nextLine);
+          }
+        }
+      }
+
+      if (/(blood|রক্তের)/i.test(line)) {
+        const parts = line.split(/[:]\s*/);
+        if (parts.length > 1) {
+          let bg = parts.slice(1).join(":").trim().toUpperCase().replace(/\s/g, "");
+          if (bg.includes("AB+") || bg.includes("AB(+")) bloodGroup = "AB (+ve)";
+          else if (bg.includes("AB-") || bg.includes("AB(-")) bloodGroup = "AB (-ve)";
+          else if (bg.includes("A+") || bg.includes("A(+")) bloodGroup = "A (+ve)";
+          else if (bg.includes("A-") || bg.includes("A(-")) bloodGroup = "A (-ve)";
+          else if (bg.includes("B+") || bg.includes("B(+")) bloodGroup = "B (+ve)";
+          else if (bg.includes("B-") || bg.includes("B(-")) bloodGroup = "B (-ve)";
+          else if (bg.includes("O+") || bg.includes("O(+")) bloodGroup = "O (+ve)";
+          else if (bg.includes("O-") || bg.includes("O(-")) bloodGroup = "O (-ve)";
+        }
+      }
+
+      if (/(female|মহিলা)/i.test(line)) {
+        gender = "Female";
+      }
+    }
+
+    if (!nameEng) {
+      const allCapsLine = lines.find(l =>
+        /^[A-Z][A-Z\s\.]{4,}$/.test(l.trim()) &&
+        !/(FATHER|MOTHER|BLOOD|NID|DATE|BIRTH|GOVERNMENT|REPUBLIC|NATIONAL|CARD|BANGLADESH)/i.test(l)
+      );
+      if (allCapsLine) nameEng = allCapsLine.trim();
+    }
+
+    if (!motherNameBng) {
+      const dobLineIdx = lines.findIndex(l => /(date of birth|dob|জন্ম তারিখ)/i.test(l) && !/(place|জন্মস্থান)/i.test(l));
+      if (dobLineIdx !== -1 && dobLineIdx + 1 < lines.length) {
+        const nextLine = lines[dobLineIdx + 1].trim();
+        if (nextLine.length > 3 && !/(id|nid|blood|address|ঠিকানা|রক্তের|national|\d{5,})/i.test(nextLine)) {
+          motherNameBng = nextLine;
+        }
+      }
+    }
+
+    if (!dob) {
+      const anyDate = text.match(/(\d{1,2}\s+[A-Za-z]{3,}\s+\d{4})/);
+      if (anyDate) dob = anyDate[1];
+    }
+
+    if (dob) {
+      const monthMap: Record<string, string> = {
+        jan: "01", feb: "02", mar: "03", apr: "04", may: "05", jun: "06",
+        jul: "07", aug: "08", sep: "09", oct: "10", nov: "11", dec: "12",
+        january: "01", february: "02", march: "03", april: "04", june: "06",
+        july: "07", august: "08", september: "09", october: "10", november: "11", december: "12"
+      };
+      const match1 = dob.match(/(\d{1,2})[\s\-\/]+([a-zA-Z]{3,})[\s\-\/]+(\d{4})/);
+      const match2 = dob.match(/(\d{4})[\s\-\/]+(\d{1,2})[\s\-\/]+(\d{1,2})/);
+      const match3 = dob.match(/(\d{1,2})[\-\/](\d{1,2})[\-\/](\d{4})/);
+
+      if (match1) {
+        const day = match1[1].padStart(2, "0");
+        const monthKey = match1[2].toLowerCase().substring(0, 3);
+        const month = monthMap[monthKey] || monthMap[match1[2].toLowerCase()] || "01";
+        const year = match1[3];
+        dob = `${year}-${month}-${day}`;
+      } else if (match2) {
+        dob = `${match2[1]}-${match2[2].padStart(2, "0")}-${match2[3].padStart(2, "0")}`;
+      } else if (match3) {
+        dob = `${match3[3]}-${match3[2].padStart(2, "0")}-${match3[1].padStart(2, "0")}`;
+      } else {
+        const dObj = new Date(dob);
+        if (!isNaN(dObj.getTime())) {
+          const offset = dObj.getTimezoneOffset() * 60000;
+          dob = new Date(dObj.getTime() - offset).toISOString().slice(0, 10);
+        } else {
+          dob = "";
+        }
+      }
+    }
+
+    const fullAddress = addressLines.join(", ").replace(/,\s*,/g, ",").replace(/\s+/g, " ").trim();
+    const cleanEngName = (val: string) => val.replace(/(name|nane|mame)[:\-\s]*/ig, "").replace(/[^a-zA-Z\s\.]/g, "").trim();
+    const cleanBngLabel = (val: string, label: string) => val.replace(new RegExp(`${label}[:\\-\\s]*`, "ig"), "").trim();
+
+    return {
+      nameEng: cleanEngName(nameEng) || "",
+      nameBng: cleanBngLabel(nameBng, "নাম") || "",
+      fatherNameEng: "",
+      fatherNameBng: cleanBngLabel(fatherNameBng, "পিতা") || "",
+      motherNameEng: "",
+      motherNameBng: cleanBngLabel(motherNameBng, "মাতা") || "",
+      blood: bloodGroup || "",
+      nid: nid || "",
+      dob: dob || "",
+      gender,
+      religion: "Islam",
+      presVillageEng: fullAddress || "",
+      presVillageBng: fullAddress || "",
+      presRoad: "",
+      presDistrict: "",
+      presDivision: "",
+      presUpazila: "",
+      presPostOffice: "",
+    };
+  };
+
+  const handleRealNidUpload = async () => {
+    if (!nidFrontImage) return;
+
+    setIsNidScanning(true);
+    setNidScanProgress(5);
+    setNidScanStep(1);
+
+    try {
+      const resizeImage = (f: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            img.onload = () => {
+              const canvas = document.createElement("canvas");
+              let width = img.width;
+              let height = img.height;
+              const maxDim = 1024; 
+              
+              if (width > maxDim || height > maxDim) {
+                if (width > height) {
+                  height = Math.round((height * maxDim) / width);
+                  width = maxDim;
+                } else {
+                  width = Math.round((width * maxDim) / height);
+                  height = maxDim;
+                }
+              }
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext("2d");
+              if (ctx) {
+                ctx.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL("image/jpeg", 0.9));
+              } else {
+                resolve(e.target?.result as string);
+              }
+            };
+            if (typeof e.target?.result === "string") {
+              img.src = e.target.result;
+            }
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(f);
+        });
+      };
+
+      const processFile = async (file: File) => {
+        const optimizedImageBase64 = await resizeImage(file);
+        const formData = new FormData();
+        formData.append("apikey", "K85293260888957");
+        formData.append("base64Image", optimizedImageBase64);
+        formData.append("language", "ben");
+        formData.append("detectOrientation", "true");
+        formData.append("scale", "true");
+        formData.append("OCREngine", "3");
+
+        const res = await fetch("https://api.ocr.space/parse/image", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        if (data && data.ParsedResults && data.ParsedResults.length > 0) {
+          return data.ParsedResults[0].ParsedText || "";
+        } else if (data && data.ErrorMessage) {
+          throw new Error(Array.isArray(data.ErrorMessage) ? data.ErrorMessage.join(", ") : data.ErrorMessage);
+        }
+        return "";
+      };
+
+      setNidScanProgress(15);
+      setNidScanStep(2);
+
+      setNidScanProgress(30);
+      setNidScanStep(3);
+      let combinedText = await processFile(nidFrontImage);
+
+      if (nidBackImage) {
+         setNidScanProgress(55);
+         setNidScanStep(3);
+         const backText = await processFile(nidBackImage);
+         combinedText += "\n" + backText;
+      }
+
+      setNidScanProgress(80);
+      setNidScanStep(4);
+
+      if (!combinedText || combinedText.trim() === "") {
+        throw new Error("Could not extract any text. Please ensure the image is clear.");
+      }
+
+      setNidScanProgress(100);
+
+      setTimeout(() => {
+        setIsNidScanning(false);
+        const extracted = parseNidText(combinedText);
+        setExtractedNid(extracted);
+        setRawOcrText(combinedText);
+        setShowNidScannerModal(false);
+        setShowNidOcrModal(true);
+      }, 400);
+
+    } catch (err: any) {
+      console.error("OCR Scanning failed: ", err);
+      setNidScanProgress(100);
+      setTimeout(() => {
+        setIsNidScanning(false);
+        setExtractedNid({
+          nameEng: "Upload Completed",
+          nameBng: "",
+          fatherNameEng: "",
+          fatherNameBng: "",
+          motherNameEng: "",
+          motherNameBng: "",
+          nid: "",
+          dob: "",
+          gender: "Male",
+          religion: "Islam",
+          blood: "B (+ve)",
+          presVillageEng: "",
+          presVillageBng: "",
+          presRoad: "",
+          presDistrict: "",
+          presDivision: "",
+          presUpazila: "",
+          presPostOffice: "",
+        });
+        setRawOcrText(`OCR Error: ${err?.message || "Unknown error"}\n\nModal loaded in safe input mode. Please enter the details manually below.`);
+        setShowNidScannerModal(false);
+        setShowNidOcrModal(true);
+      }, 400);
+    }
+  };
+
+  const handleAutofill = () => {
+    if (extractedNid.nameEng) setNameEng(extractedNid.nameEng);
+    if (extractedNid.nameBng) setNameBng(extractedNid.nameBng);
+    if (extractedNid.dob) setDob(extractedNid.dob);
+    if (extractedNid.religion) {
+      const religionVal = extractedNid.religion.toLowerCase();
+      if (religionVal.includes("islam")) setReligion("Islam");
+      else if (religionVal.includes("hindu")) setReligion("Hindu");
+      else if (religionVal.includes("christian")) setReligion("Christian");
+      else if (religionVal.includes("buddhist") || religionVal.includes("buddhism")) setReligion("Buddhist");
+      else setReligion("Other");
+    }
+    if (extractedNid.nid) setNidNumber(extractedNid.nid);
+    if (extractedNid.fatherNameBng) setFatherBng(extractedNid.fatherNameBng);
+    if (extractedNid.motherNameBng) setMotherBng(extractedNid.motherNameBng);
+    if (extractedNid.presVillageEng) setPresVillage(extractedNid.presVillageEng);
+    
+    setShowNidOcrModal(false);
+  };
 
   // Candidate Photo Preview
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -391,6 +791,37 @@ function ERecruitmentForm() {
               <p className="text-xs text-muted-foreground font-medium max-w-3xl leading-relaxed">
                 Please complete the application form below with your correct personal, contact, academic, and professional details. Fields marked with <span className="text-red-500 font-bold">*</span> are mandatory.
               </p>
+            </div>
+          </div>
+
+          {/* AI NID OCR Scanner Widget */}
+          <div className="bg-card border border-border/80 rounded-xl p-5 md:p-6 shadow-xs relative overflow-hidden transition-all duration-300 hover:border-primary/20 bg-gradient-to-br from-card to-primary/5">
+            <div className="absolute top-0 right-0 p-3 opacity-[0.03] text-primary pointer-events-none">
+              <Cpu className="size-24" />
+            </div>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
+              <div className="space-y-1.5 max-w-xl">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-wider border border-primary/20">
+                  <Sparkles className="size-3" /> AI Smart Utility
+                </div>
+                <h3 className="text-sm font-extrabold text-foreground tracking-tight">
+                  Autofill with Smart Document Scan
+                </h3>
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  Upload a scanned copy or picture of your National ID, Passport, Birth Certificate, or Driving License. Our smart AI extractor will instantly parse your name, parent details, date of birth, document number, gender, and address so you don't have to enter them manually.
+                </p>
+              </div>
+              
+              {/* Control Panel */}
+              <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setShowNidScannerModal(true)}
+                  className="h-10 px-6 rounded-xl text-xs font-black shadow-lg bg-primary text-primary-foreground hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 group"
+                >
+                  <Scan className="size-4 group-hover:rotate-12 transition-transform" /> Open Smart Scanner
+                </button>
+              </div>
             </div>
           </div>
 
@@ -827,6 +1258,411 @@ function ERecruitmentForm() {
 
         </div>
       </main>
+
+      {/* AI NID OCR SCANNER MODAL OVERLAY */}
+      {showNidOcrModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-300">
+          <div className="bg-card border border-border/80 rounded-2xl shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto flex flex-col gap-5 animate-in zoom-in-95 duration-200">
+            
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-border/30 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
+                  <Sparkles className="size-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wider">
+                    AI NID OCR Extracted Information
+                  </h3>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    Review and verify the details extracted from the National ID card image.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowNidOcrModal(false)}
+                className="size-8 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            {/* Modal Body - Editable Fields */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 overflow-y-auto max-h-[65vh] pr-1.5">
+              
+              {/* Left Column: Image Preview & Raw OCR Log */}
+              <div className="lg:col-span-1 space-y-4">
+                {nidFrontPreview ? (
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1.5">
+                      <Camera className="size-3.5 text-primary" /> Scanned Document Previews
+                    </label>
+                    <div className="flex flex-col gap-3">
+                      <div className="border border-border/80 rounded-xl overflow-hidden bg-muted/20 relative aspect-video flex items-center justify-center p-1.5 shadow-sm">
+                        <img src={nidFrontPreview} alt="Front Side" className="object-contain max-h-32 w-full rounded-lg" />
+                      </div>
+                      {nidBackPreview && (
+                        <div className="border border-border/80 rounded-xl overflow-hidden bg-muted/20 relative aspect-video flex items-center justify-center p-1.5 shadow-sm">
+                          <img src={nidBackPreview} alt="Back Side" className="object-contain max-h-32 w-full rounded-lg" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="border border-dashed border-border/80 rounded-xl p-4 text-center text-[10px] text-muted-foreground bg-muted/10 space-y-2">
+                    <div className="size-8 rounded-full bg-primary/5 text-primary flex items-center justify-center mx-auto">
+                      <Sparkles className="size-4" />
+                    </div>
+                    <span className="block font-bold">Mock Profiler Mode</span>
+                    <span className="block text-[9px] text-muted-foreground/75">Pre-populated simulation database loaded.</span>
+                  </div>
+                )}
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1.5">
+                    <Cpu className="size-3.5 text-primary" /> Raw OCR Text Console
+                  </label>
+                  <textarea
+                    readOnly
+                    value={rawOcrText}
+                    className="h-60 w-full p-2.5 rounded-xl bg-muted/40 border border-border/50 text-[9px] font-mono text-muted-foreground/80 resize-none focus:outline-none scrollbar-thin"
+                    placeholder="Raw scanned text log will appear here..."
+                  />
+                </div>
+              </div>
+
+              {/* Right Column: Editable fields */}
+              <div className="lg:col-span-2 space-y-6">
+                
+                {/* Category 1: Names & Identity */}
+                <div className="space-y-4">
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-primary border-b border-border/20 pb-1">
+                    1. Names & Identity Details
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Name (English)</label>
+                      <input
+                        type="text"
+                        value={extractedNid.nameEng}
+                        onChange={(e) => setExtractedNid(prev => ({ ...prev, nameEng: e.target.value }))}
+                        className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary w-full"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Name (Bangla)</label>
+                      <input
+                        type="text"
+                        value={extractedNid.nameBng}
+                        onChange={(e) => setExtractedNid(prev => ({ ...prev, nameBng: e.target.value }))}
+                        className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary w-full"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Father's Name (Bng)</label>
+                      <input
+                        type="text"
+                        value={extractedNid.fatherNameBng}
+                        onChange={(e) => setExtractedNid(prev => ({ ...prev, fatherNameBng: e.target.value }))}
+                        className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary w-full"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Mother's Name (Bng)</label>
+                      <input
+                        type="text"
+                        value={extractedNid.motherNameBng}
+                        onChange={(e) => setExtractedNid(prev => ({ ...prev, motherNameBng: e.target.value }))}
+                        className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary w-full"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Category 2: Legal Registry */}
+                <div className="space-y-4">
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-primary border-b border-border/20 pb-1">
+                    2. National Registry & Demographics
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                    <div className="sm:col-span-2 space-y-1">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">NID Number</label>
+                      <input
+                        type="text"
+                        value={extractedNid.nid}
+                        onChange={(e) => setExtractedNid(prev => ({ ...prev, nid: e.target.value }))}
+                        className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary w-full font-mono"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Date of Birth</label>
+                      <input
+                        type="date"
+                        value={extractedNid.dob}
+                        onChange={(e) => setExtractedNid(prev => ({ ...prev, dob: e.target.value }))}
+                        className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary w-full"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Gender</label>
+                      <select
+                        value={extractedNid.gender}
+                        onChange={(e) => setExtractedNid(prev => ({ ...prev, gender: e.target.value }))}
+                        className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary w-full"
+                      >
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Category 3: Address Mapping */}
+                <div className="space-y-4">
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-primary border-b border-border/20 pb-1">
+                    3. Address Coordinates
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Village / Street (English)</label>
+                      <input
+                        type="text"
+                        value={extractedNid.presVillageEng}
+                        onChange={(e) => setExtractedNid(prev => ({ ...prev, presVillageEng: e.target.value }))}
+                        className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary w-full"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex justify-end gap-3 border-t border-border/30 pt-4 mt-2">
+              <button
+                type="button"
+                onClick={() => setShowNidOcrModal(false)}
+                className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-muted-foreground hover:bg-muted transition duration-200"
+              >
+                Discard
+              </button>
+              <button
+                type="button"
+                onClick={handleAutofill}
+                className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-black shadow-md hover:opacity-95 transition duration-200 flex items-center justify-center gap-1.5"
+              >
+                <Check className="size-4" /> Confirm & Autofill Profile
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* NID Scanner Modal */}
+      {showNidScannerModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-background/80 backdrop-blur-sm transition-opacity"
+            onClick={() => !isNidScanning && setShowNidScannerModal(false)}
+          />
+          <div className="relative w-full max-w-3xl bg-card border border-border/80 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border/50 bg-muted/20">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 text-primary rounded-lg">
+                  <Scan className="size-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-foreground uppercase tracking-wider">Smart Document Scanner</h3>
+                  <p className="text-[11px] text-muted-foreground font-medium">Upload both sides of the document for AI data extraction</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowNidScannerModal(false)}
+                disabled={isNidScanning}
+                className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors disabled:opacity-50"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 md:p-8 flex flex-col gap-8 bg-gradient-to-b from-transparent to-muted/10">
+              
+              {/* Document Type Selector */}
+              {!isNidScanning && (
+                <div className="flex flex-col items-center justify-center space-y-3">
+                  <span className="text-xs font-black uppercase tracking-widest text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
+                    Step 1: Select Document Type
+                  </span>
+                  <select 
+                    className="h-11 px-4 rounded-xl bg-card border border-border/60 text-sm font-bold outline-none focus:border-primary shadow-xs min-w-[280px] text-center"
+                    value={scanDocumentType}
+                    onChange={(e) => setScanDocumentType(e.target.value)}
+                  >
+                    <option value="" disabled>-- Select Document --</option>
+                    <option value="NID">National ID (NID)</option>
+                    <option value="Passport">Passport</option>
+                    <option value="Birth_Certificate">Birth Certificate</option>
+                    <option value="Driving_License">Driving License</option>
+                  </select>
+                </div>
+              )}
+
+              {/* Upload Zones */}
+              {scanDocumentType && !isNidScanning && (
+                <div className="flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-300">
+                  <div className="flex items-center justify-center mb-6">
+                     <span className="text-xs font-black uppercase tracking-widest text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
+                      Step 2: Upload Images
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {/* Front Side Upload */}
+                    <div 
+                      className={`relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-2xl transition-all duration-200 ${nidFrontImage ? 'border-emerald-500 bg-emerald-500/5' : 'border-border hover:border-primary/50 hover:bg-muted/30 cursor-pointer group'}`}
+                      onClick={() => !nidFrontImage && document.getElementById("modal-front-input")?.click()}
+                    >
+                      <input
+                        type="file"
+                        id="modal-front-input"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (f) {
+                            setNidFrontImage(f);
+                            setNidFrontPreview(URL.createObjectURL(f));
+                          }
+                        }}
+                      />
+                      {nidFrontPreview ? (
+                        <div className="relative w-full h-[140px] rounded-lg overflow-hidden shadow-sm">
+                          <img src={nidFrontPreview} alt="Front Preview" className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); setNidFrontImage(null); setNidFrontPreview(null); }}
+                              className="px-4 py-2 bg-rose-500 text-white text-xs font-bold rounded-lg shadow-lg flex items-center gap-2"
+                            >
+                              <Trash2 className="size-3.5" /> Remove
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center text-center gap-3">
+                          <div className="p-3 bg-primary/10 text-primary rounded-full group-hover:scale-110 transition-transform">
+                            <Upload className="size-6" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-foreground">Front Side</p>
+                            <p className="text-[10px] text-muted-foreground mt-1">Click to browse</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Back Side Upload */}
+                    <div 
+                      className={`relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-2xl transition-all duration-200 ${nidBackImage ? 'border-emerald-500 bg-emerald-500/5' : 'border-border hover:border-primary/50 hover:bg-muted/30 cursor-pointer group'}`}
+                      onClick={() => !nidBackImage && document.getElementById("modal-back-input")?.click()}
+                    >
+                      <input
+                        type="file"
+                        id="modal-back-input"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (f) {
+                            setNidBackImage(f);
+                            setNidBackPreview(URL.createObjectURL(f));
+                          }
+                        }}
+                      />
+                      {nidBackPreview ? (
+                        <div className="relative w-full h-[140px] rounded-lg overflow-hidden shadow-sm">
+                          <img src={nidBackPreview} alt="Back Preview" className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); setNidBackImage(null); setNidBackPreview(null); }}
+                              className="px-4 py-2 bg-rose-500 text-white text-xs font-bold rounded-lg shadow-lg flex items-center gap-2"
+                            >
+                              <Trash2 className="size-3.5" /> Remove
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center text-center gap-3">
+                          <div className="p-3 bg-primary/10 text-primary rounded-full group-hover:scale-110 transition-transform">
+                            <Upload className="size-6" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-foreground">Back Side</p>
+                            <p className="text-[10px] text-muted-foreground mt-1">Click to browse</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Scanning Animation UI */}
+              {isNidScanning && (
+                <div className="flex flex-col items-center justify-center py-8 space-y-6 animate-in zoom-in-95 duration-500">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse" />
+                    <div className="relative p-6 bg-card border border-primary/30 rounded-2xl shadow-[0_0_30px_rgba(var(--primary-glow),0.15)] flex flex-col items-center gap-4">
+                      <div className="relative flex items-center justify-center size-20">
+                        <svg className="absolute inset-0 w-full h-full -rotate-90">
+                          <circle className="text-muted/50 stroke-current" strokeWidth="4" cx="40" cy="40" r="36" fill="transparent" />
+                          <circle className="text-primary stroke-current transition-all duration-300 ease-in-out" strokeWidth="4" strokeLinecap="round" strokeDasharray="226.2" strokeDashoffset={226.2 - (226.2 * nidScanProgress) / 100} cx="40" cy="40" r="36" fill="transparent" />
+                        </svg>
+                        <Cpu className="size-8 text-primary animate-pulse" />
+                      </div>
+                      <div className="text-center space-y-1">
+                        <h4 className="text-xs font-black uppercase tracking-wider text-primary">
+                          {nidScanStep === 1 && "Initializing AI Engine..."}
+                          {nidScanStep === 2 && "Optimizing Images for Transfer..."}
+                          {nidScanStep === 3 && "Running Deep-Learning OCR..."}
+                          {nidScanStep === 4 && "Structuring Semantic Fields..."}
+                        </h4>
+                        <p className="text-[10px] font-bold text-muted-foreground">{nidScanProgress}% Completed</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 border-t border-border/50 bg-muted/10 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowNidScannerModal(false)}
+                disabled={isNidScanning}
+                className="h-10 px-6 rounded-xl text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={!scanDocumentType || !nidFrontImage || isNidScanning}
+                onClick={handleRealNidUpload}
+                className={`h-10 px-8 rounded-xl text-xs font-black shadow-lg transition-all duration-200 flex items-center justify-center gap-2 ${!scanDocumentType || !nidFrontImage || isNidScanning ? "bg-muted text-muted-foreground cursor-not-allowed opacity-70" : "bg-primary text-primary-foreground hover:scale-[1.02] active:scale-[0.98]"}`}
+              >
+                {isNidScanning ? (
+                  <><Loader2 className="size-4 animate-spin" /> Processing...</>
+                ) : (
+                  <><Sparkles className="size-4" /> Start Scan</>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -98,12 +98,47 @@ interface Line {
 // ----------------------------------------------------
 const DEFAULT_ORGS: Organization[] = [
   { sl: 1, code: "1000", nameEng: "Pakiza Knit Composite Ltd", nameBng: "পাকিজা নিট কম্পোজিট লিঃ", shortName: "PKCL", addressEng: "House# 97, Road# 11/A, Dhanmondi, Dhaka-1209", addressBng: "", isActive: "Active" },
-  { sl: 2, code: "2000", nameEng: "Pakiza Technovation Limited", nameBng: "পাকিজা টেকনোভেশন লিমিটেড", shortName: "PTL", addressEng: "Dhanmondi, Dhaka", addressBng: "", isActive: "Active" }
+  { sl: 2, code: "2000", nameEng: "Pakiza Technovation Limited", nameBng: "পাকিজা টেকনোভেশন লিমিটেড", shortName: "PTL", addressEng: "Dhanmondi, Dhaka", addressBng: "", isActive: "Active" },
+  { sl: 3, code: "3000", nameEng: "Pakiza Spinning Mills Ltd", nameBng: "পাকিজা স্পিনিং মিলস লিঃ", shortName: "PSML", addressEng: "Narsingdi, Bangladesh", addressBng: "", isActive: "Active" },
+  { sl: 4, code: "4000", nameEng: "Pakiza Woven Fashion Ltd", nameBng: "পাকিজা ওভেন ফ্যাশন লিঃ", shortName: "PWFL", addressEng: "Savar, Dhaka", addressBng: "", isActive: "Active" },
+  { sl: 5, code: "5000", nameEng: "Pakiza Dyeing & Printing", nameBng: "পাকিজা ডাইং এন্ড প্রিন্টিং", shortName: "PDPL", addressEng: "Tongipara, Gazipur", addressBng: "", isActive: "Active" },
+  { sl: 6, code: "6000", nameEng: "Pakiza Garments Ltd", nameBng: "পাকিজা গার্মেন্টস লিঃ", shortName: "PGL", addressEng: "Ashulia, Savar", addressBng: "", isActive: "Active" },
+  { sl: 7, code: "7000", nameEng: "Pakiza Logistics Ltd", nameBng: "পাকিজা লজিস্টিকস লিঃ", shortName: "PLL", addressEng: "Tejgaon, Dhaka", addressBng: "", isActive: "Active" },
+  { sl: 8, code: "8000", nameEng: "Pakiza Apparels Ltd", nameBng: "পাকিজা অ্যাপারেলস লিঃ", shortName: "PAL", addressEng: "Narayanganj", addressBng: "", isActive: "Active" },
+  { sl: 9, code: "9000", nameEng: "Pakiza Cotton Mills Ltd", nameBng: "পাকিজা কটন মিলস লিঃ", shortName: "PCML", addressEng: "Comilla", addressBng: "", isActive: "Active" },
+  { sl: 10, code: "1100", nameEng: "Pakiza Texturizing Ltd", nameBng: "পাকিজা টেক্সচারাইজিং লিঃ", shortName: "PTXL", addressEng: "Gazipur", addressBng: "", isActive: "Active" },
+  { sl: 12, code: "1200", nameEng: "Pakiza Fabrics Ltd", nameBng: "পাকিজা ফ্যাব্রিকস লিঃ", shortName: "PFL", addressEng: "Narsingdi", addressBng: "", isActive: "Active" },
+  { sl: 13, code: "1300", nameEng: "Pakiza Retail Venture Ltd", nameBng: "পাকিজা রিটেল ভেঞ্চার", shortName: "PRVL", addressEng: "Gulshan, Dhaka", addressBng: "", isActive: "Active" },
+  { sl: 14, code: "1400", nameEng: "Pakiza Real Estate Ltd", nameBng: "পাকিজা রিয়েল এস্টেট", shortName: "PREL", addressEng: "Uttara, Dhaka", addressBng: "", isActive: "Active" },
+  { sl: 15, code: "1500", nameEng: "Pakiza Agro Industries Ltd", nameBng: "পাকিজা এগ্রো ইন্ডাস্ট্রিজ", shortName: "PAIL", addressEng: "Mymensingh", addressBng: "", isActive: "Active" },
+  { sl: 16, code: "1600", nameEng: "Pakiza Power & Energy Ltd", nameBng: "পাকিজা পাওয়ার এন্ড এনার্জি", shortName: "PPEL", addressEng: "Chittagong", addressBng: "", isActive: "Active" },
+  { sl: 17, code: "1700", nameEng: "Pakiza Packaging Limited", nameBng: "পাকিজা প্যাকেজিং লিমিটেড", shortName: "PPL", addressEng: "Kaliakair, Gazipur", addressBng: "", isActive: "Active" },
+  { sl: 18, code: "1800", nameEng: "Pakiza Chemical Ind Ltd", nameBng: "পাকিজা কেমিক্যালস", shortName: "PCIL", addressEng: "Keraniganj, Dhaka", addressBng: "", isActive: "Active" },
+  { sl: 19, code: "1900", nameEng: "Pakiza Trading House Ltd", nameBng: "পাকিজা ট্রেডিং হাউস", shortName: "PTHL", addressEng: "Motijheel, Dhaka", addressBng: "", isActive: "Active" },
+  { sl: 20, code: "2100", nameEng: "Pakiza Software Lab Ltd", nameBng: "পাকিজা সফটওয়্যার ল্যাব", shortName: "PSLL", addressEng: "Mirpur, Dhaka", addressBng: "", isActive: "Active" }
 ];
 
 const DEFAULT_AREAS: Area[] = [
   { sl: 1, code: "01", companyName: "Pakiza Knit Composite Ltd", nameEng: "PAL-Fabric Dyeing", nameBng: "", shortName: "PAL-FD", addressEng: "Narsingdi", addressBng: "", purchase: "", isActive: "Active" },
-  { sl: 2, code: "02", companyName: "Pakiza Knit Composite Ltd", nameEng: "Head Office", nameBng: "", shortName: "HO", addressEng: "Dhanmondi, Dhaka", addressBng: "", purchase: "", isActive: "Active" }
+  { sl: 2, code: "02", companyName: "Pakiza Knit Composite Ltd", nameEng: "Head Office", nameBng: "", shortName: "HO", addressEng: "Dhanmondi, Dhaka", addressBng: "", purchase: "", isActive: "Active" },
+  { sl: 3, code: "03", companyName: "Pakiza Knit Composite Ltd", nameEng: "Savar Cutting Unit", nameBng: "", shortName: "SCU", addressEng: "Savar, Dhaka", addressBng: "", purchase: "", isActive: "Active" },
+  { sl: 4, code: "04", companyName: "Pakiza Knit Composite Ltd", nameEng: "Savar Sewing Unit", nameBng: "", shortName: "SSU", addressEng: "Savar, Dhaka", addressBng: "", purchase: "", isActive: "Active" },
+  { sl: 5, code: "05", companyName: "Pakiza Knit Composite Ltd", nameEng: "Savar Finishing Unit", nameBng: "", shortName: "SFU", addressEng: "Savar, Dhaka", addressBng: "", purchase: "", isActive: "Active" },
+  { sl: 6, code: "06", companyName: "Pakiza Knit Composite Ltd", nameEng: "Narsingdi Spinning", nameBng: "", shortName: "NSP", addressEng: "Narsingdi", addressBng: "", purchase: "", isActive: "Active" },
+  { sl: 7, code: "07", companyName: "Pakiza Knit Composite Ltd", nameEng: "Narsingdi Yarn Dyeing", nameBng: "", shortName: "NYD", addressEng: "Narsingdi", addressBng: "", purchase: "", isActive: "Active" },
+  { sl: 8, code: "08", companyName: "Pakiza Knit Composite Ltd", nameEng: "Tongipara Dyeing Unit", nameBng: "", shortName: "TDU", addressEng: "Tongipara, Gazipur", addressBng: "", purchase: "", isActive: "Active" },
+  { sl: 9, code: "09", companyName: "Pakiza Knit Composite Ltd", nameEng: "Ashulia Printing Unit", nameBng: "", shortName: "APU", addressEng: "Ashulia, Savar", addressBng: "", purchase: "", isActive: "Active" },
+  { sl: 10, code: "10", companyName: "Pakiza Knit Composite Ltd", nameEng: "Narayanganj Apparels", nameBng: "", shortName: "NJA", addressEng: "Narayanganj", addressBng: "", purchase: "", isActive: "Active" },
+  { sl: 11, code: "11", companyName: "Pakiza Knit Composite Ltd", nameEng: "Comilla Spinning Unit", nameBng: "", shortName: "CSU", addressEng: "Comilla", addressBng: "", purchase: "", isActive: "Active" },
+  { sl: 12, code: "12", companyName: "Pakiza Knit Composite Ltd", nameEng: "Gazipur Texturizing", nameBng: "", shortName: "GTL", addressEng: "Gazipur", addressBng: "", purchase: "", isActive: "Active" },
+  { sl: 13, code: "13", companyName: "Pakiza Knit Composite Ltd", nameEng: "Narsingdi Weaving", nameBng: "", shortName: "NWV", addressEng: "Narsingdi", addressBng: "", purchase: "", isActive: "Active" },
+  { sl: 14, code: "14", companyName: "Pakiza Knit Composite Ltd", nameEng: "Gulshan Showroom", nameBng: "", shortName: "GSR", addressEng: "Gulshan, Dhaka", addressBng: "", purchase: "", isActive: "Active" },
+  { sl: 15, code: "15", companyName: "Pakiza Knit Composite Ltd", nameEng: "Uttara Warehouse", nameBng: "", shortName: "UWH", addressEng: "Uttara, Dhaka", addressBng: "", purchase: "", isActive: "Active" },
+  { sl: 16, code: "16", companyName: "Pakiza Knit Composite Ltd", nameEng: "Mymensingh Feed Mill", nameBng: "", shortName: "MFM", addressEng: "Mymensingh", addressBng: "", purchase: "", isActive: "Active" },
+  { sl: 17, code: "17", companyName: "Pakiza Knit Composite Ltd", nameEng: "Chittagong Port Depot", nameBng: "", shortName: "CPD", addressEng: "Chittagong", addressBng: "", purchase: "", isActive: "Active" },
+  { sl: 18, code: "18", companyName: "Pakiza Knit Composite Ltd", nameEng: "Kaliakair Packaging", nameBng: "", shortName: "KKP", addressEng: "Kaliakair, Gazipur", addressBng: "", purchase: "", isActive: "Active" },
+  { sl: 19, code: "19", companyName: "Pakiza Knit Composite Ltd", nameEng: "Keraniganj Chemical Depot", nameBng: "", shortName: "KCD", addressEng: "Keraniganj, Dhaka", addressBng: "", purchase: "", isActive: "Active" },
+  { sl: 20, code: "20", companyName: "Pakiza Knit Composite Ltd", nameEng: "Motijheel Sales Office", nameBng: "", shortName: "MSO", addressEng: "Motijheel, Dhaka", addressBng: "", purchase: "", isActive: "Active" }
 ];
 
 const DEFAULT_MAPPINGS: CompanyMapping[] = [
@@ -117,27 +152,108 @@ const DEFAULT_MAPPINGS: CompanyMapping[] = [
   { sl: 8, name: "Quality (RMG)", main: "Quality Assurance Department", relayDuty: "", checked: false },
   { sl: 9, name: "Administration", main: "Administration", relayDuty: "", checked: false },
   { sl: 10, name: "Rotary Engraving (AOP)", main: "All over Printing", relayDuty: "", checked: false },
-  { sl: 11, name: "Stenter (AOP)", main: "All over Printing", relayDuty: "", checked: false }
+  { sl: 11, name: "Stenter (AOP)", main: "All over Printing", relayDuty: "", checked: false },
+  { sl: 12, name: "Sample Sewing", main: "RMG Operations", relayDuty: "", checked: false },
+  { sl: 13, name: "Washing & Dyeing", main: "Finishing Operations", relayDuty: "", checked: false },
+  { sl: 14, name: "Yarn Dyeing Lab", main: "Quality Assurance Department", relayDuty: "", checked: false },
+  { sl: 15, name: "Mechanical Maintenance", main: "Engineering Department", relayDuty: "", checked: false },
+  { sl: 16, name: "Electrical Support", main: "Engineering Department", relayDuty: "", checked: false },
+  { sl: 17, name: "CAD/CAM Design", main: "Product Management", relayDuty: "", checked: false },
+  { sl: 18, name: "Finished Goods Store", main: "Material Control Department", relayDuty: "", checked: false },
+  { sl: 19, name: "Utility Support Team", main: "Engineering Department", relayDuty: "", checked: false },
+  { sl: 20, name: "Security & Safety Squad", main: "Administration", relayDuty: "", checked: false }
 ];
 
 const DEFAULT_DEPARTMENTS: Department[] = [
   { sl: 1, code: "HR", nameEng: "HR & Admin", nameBng: "এইচআর ও এডমিন", shortName: "HR", isActive: "Active" },
-  { sl: 2, code: "IT", nameEng: "Information Technology", nameBng: "তথ্য প্রযুক্তি", shortName: "IT", isActive: "Active" }
+  { sl: 2, code: "IT", nameEng: "Information Technology", nameBng: "তথ্য প্রযুক্তি", shortName: "IT", isActive: "Active" },
+  { sl: 3, code: "FIN", nameEng: "Finance & Accounts", nameBng: "অর্থ ও হিসাব", shortName: "FIN", isActive: "Active" },
+  { sl: 4, code: "PROD", nameEng: "Production Dept", nameBng: "উৎপাদন বিভাগ", shortName: "PROD", isActive: "Active" },
+  { sl: 5, code: "MKT", nameEng: "Marketing & Sales", nameBng: "বিপণন ও বিক্রয়", shortName: "MKT", isActive: "Active" },
+  { sl: 6, code: "LOG", nameEng: "Logistics & Supply", nameBng: "লজিস্টিকস ও সরবরাহ", shortName: "LOG", isActive: "Active" },
+  { sl: 7, code: "QA", nameEng: "Quality Assurance", nameBng: "মান নিয়ন্ত্রণ", shortName: "QA", isActive: "Active" },
+  { sl: 8, code: "PLAN", nameEng: "Planning & Control", nameBng: "পরিকল্পনা ও নিয়ন্ত্রণ", shortName: "PLAN", isActive: "Active" },
+  { sl: 9, code: "ENG", nameEng: "Engineering & Utility", nameBng: "প্রকৌশল ও ইউটিলিটি", shortName: "ENG", isActive: "Active" },
+  { sl: 10, code: "COMM", nameEng: "Commercial Department", nameBng: "কমার্শিয়াল বিভাগ", shortName: "COMM", isActive: "Active" },
+  { sl: 11, code: "PROC", nameEng: "Procurement & Purchase", nameBng: "ক্রয় ও সংগ্রহ", shortName: "PROC", isActive: "Active" },
+  { sl: 12, code: "RND", nameEng: "Research & Development", nameBng: "গবেষণা ও উন্নয়ন", shortName: "RND", isActive: "Active" },
+  { sl: 13, code: "SEC", nameEng: "Security & Safety", nameBng: "নিরাপত্তা ও সেফটি", shortName: "SEC", isActive: "Active" },
+  { sl: 14, code: "MAIN", nameEng: "Maintenance Dept", nameBng: "রক্ষণাবেক্ষণ", shortName: "MAIN", isActive: "Active" },
+  { sl: 15, code: "WASH", nameEng: "Washing Department", nameBng: "ওয়াশিং বিভাগ", shortName: "WASH", isActive: "Active" },
+  { sl: 16, code: "PACK", nameEng: "Packaging & Carton", nameBng: "প্যাকেজিং বিভাগ", shortName: "PACK", isActive: "Active" },
+  { sl: 17, code: "CAD", nameEng: "CAD Design Section", nameBng: "ক্যাড ডিজাইন", shortName: "CAD", isActive: "Active" },
+  { sl: 18, code: "STORE", nameEng: "Store & Inventory", nameBng: "স্টোর ও ইনভেন্টরি", shortName: "STORE", isActive: "Active" },
+  { sl: 19, code: "LEGAL", nameEng: "Legal & Compliance", nameBng: "আইন ও কমপ্লায়েন্স", shortName: "COMP", isActive: "Active" },
+  { sl: 20, code: "PR", nameEng: "Public Relations", nameBng: "জনসংযোগ বিভাগ", shortName: "PR", isActive: "Active" }
 ];
 
 const DEFAULT_SECTIONS: Section[] = [
   { sl: 1, departmentName: "HR & Admin", code: "ADM", nameEng: "Admin Support", nameBng: "", shortName: "AS", isActive: "Active" },
-  { sl: 2, departmentName: "Information Technology", code: "DEV", nameEng: "Software Development", nameBng: "", shortName: "SD", isActive: "Active" }
+  { sl: 2, departmentName: "Information Technology", code: "DEV", nameEng: "Software Development", nameBng: "", shortName: "SD", isActive: "Active" },
+  { sl: 3, departmentName: "Finance & Accounts", code: "ACC", nameEng: "Accounts Payable", nameBng: "", shortName: "AP", isActive: "Active" },
+  { sl: 4, departmentName: "Production Dept", code: "SEW", nameEng: "Sewing Section", nameBng: "", shortName: "SEW", isActive: "Active" },
+  { sl: 5, departmentName: "Marketing & Sales", code: "DOM", nameEng: "Domestic Sales", nameBng: "", shortName: "DS", isActive: "Active" },
+  { sl: 6, departmentName: "Logistics & Supply", code: "WH", nameEng: "Central Warehouse", nameBng: "", shortName: "CW", isActive: "Active" },
+  { sl: 7, departmentName: "Quality Assurance", code: "IQC", nameEng: "Incoming Quality", nameBng: "", shortName: "IQC", isActive: "Active" },
+  { sl: 8, departmentName: "Planning & Control", code: "SCH", nameEng: "Production Scheduling", nameBng: "", shortName: "SCH", isActive: "Active" },
+  { sl: 9, departmentName: "Engineering & Utility", code: "PWR", nameEng: "Power House", nameBng: "", shortName: "PH", isActive: "Active" },
+  { sl: 10, departmentName: "Commercial Department", code: "EXP", nameEng: "Export Logistics", nameBng: "", shortName: "EXP", isActive: "Active" },
+  { sl: 11, departmentName: "Procurement & Purchase", code: "LCP", nameEng: "Local Purchase", nameBng: "", shortName: "LP", isActive: "Active" },
+  { sl: 12, departmentName: "Research & Development", code: "SMP", nameEng: "Sample Section", nameBng: "", shortName: "SMP", isActive: "Active" },
+  { sl: 13, departmentName: "Security & Safety", code: "FIRE", nameEng: "Fire & Safety Wing", nameBng: "", shortName: "FSW", isActive: "Active" },
+  { sl: 14, departmentName: "Maintenance Dept", code: "MCH", nameEng: "Machine Repairs", nameBng: "", shortName: "MR", isActive: "Active" },
+  { sl: 15, departmentName: "Washing Department", code: "DYE", nameEng: "Washing Lab", nameBng: "", shortName: "WL", isActive: "Active" },
+  { sl: 16, departmentName: "Packaging & Carton", code: "BOX", nameEng: "Carton Box Maker", nameBng: "", shortName: "CBM", isActive: "Active" },
+  { sl: 17, departmentName: "CAD Design Section", code: "CADS", nameEng: "Pattern Making", nameBng: "", shortName: "PM", isActive: "Active" },
+  { sl: 18, departmentName: "Store & Inventory", code: "YS", nameEng: "Yarn Store", nameBng: "", shortName: "YS", isActive: "Active" },
+  { sl: 19, departmentName: "Legal & Compliance", code: "CMPL", nameEng: "Social Compliance", nameBng: "", shortName: "SC", isActive: "Active" },
+  { sl: 20, departmentName: "Public Relations", code: "CSR", nameEng: "CSR Initiatives", nameBng: "", shortName: "CSR", isActive: "Active" }
 ];
 
 const DEFAULT_UNITS: Unit[] = [
   { sl: 1, nameEng: "Accessories Store", nameBng: "অ্যাক্সেসরিজ স্টোর", sortOrder: 1, isActive: "Active" },
-  { sl: 2, nameEng: "Admin", nameBng: "এডমিন", sortOrder: 2, isActive: "Active" }
+  { sl: 2, nameEng: "Admin Unit", nameBng: "এডমিন ইউনিট", sortOrder: 2, isActive: "Active" },
+  { sl: 3, nameEng: "Cutting Unit", nameBng: "কাটিং ইউনিট", sortOrder: 3, isActive: "Active" },
+  { sl: 4, nameEng: "Sewing Unit A", nameBng: "সেলাই ইউনিট এ", sortOrder: 4, isActive: "Active" },
+  { sl: 5, nameEng: "Sewing Unit B", nameBng: "সেলাই ইউনিট বি", sortOrder: 5, isActive: "Active" },
+  { sl: 6, nameEng: "Finishing Unit", nameBng: "ফিনিশিং ইউনিট", sortOrder: 6, isActive: "Active" },
+  { sl: 7, nameEng: "Ironing Unit", nameBng: "ইস্ত্রি ইউনিট", sortOrder: 7, isActive: "Active" },
+  { sl: 8, nameEng: "Packaging Unit", nameBng: "প্যাকেজিং ইউনিট", sortOrder: 8, isActive: "Active" },
+  { sl: 9, nameEng: "Fabric Inspection", nameBng: "ফ্যাব্রিক পরিদর্শন", sortOrder: 9, isActive: "Active" },
+  { sl: 10, nameEng: "Yarn Inspection", nameBng: "সুতা পরিদর্শন", sortOrder: 10, isActive: "Active" },
+  { sl: 11, nameEng: "Dyes Lab Unit", nameBng: "ডাইস ল্যাব ইউনিট", sortOrder: 11, isActive: "Active" },
+  { sl: 12, nameEng: "Boiler Station", nameBng: "বয়লার স্টেশন", sortOrder: 12, isActive: "Active" },
+  { sl: 13, nameEng: "Generator Station", nameBng: "জেনারেটর স্টেশন", sortOrder: 13, isActive: "Active" },
+  { sl: 14, nameEng: "Wastewater Treatment", nameBng: "বর্জ্য জল শোধনাগার", sortOrder: 14, isActive: "Active" },
+  { sl: 15, nameEng: "Export Warehouse", nameBng: "রপ্তানি গুদাম", sortOrder: 15, isActive: "Active" },
+  { sl: 16, nameEng: "Local Delivery Depot", nameBng: "স্থানীয় বিতরণ ডিপো", sortOrder: 16, isActive: "Active" },
+  { sl: 17, nameEng: "Quality Control Lab", nameBng: "গুণমান নিয়ন্ত্রণ ল্যাব", sortOrder: 17, isActive: "Active" },
+  { sl: 18, nameEng: "Design Studio", nameBng: "ডিজাইন স্টুডিও", sortOrder: 18, isActive: "Active" },
+  { sl: 19, nameEng: "Sample Room Unit", nameBng: "নমুনা ঘর ইউনিট", sortOrder: 19, isActive: "Active" },
+  { sl: 20, nameEng: "Maintenance Workshop", nameBng: "রক্ষণাবেক্ষণ কর্মশালা", sortOrder: 20, isActive: "Active" }
 ];
 
 const DEFAULT_LINES: Line[] = [
   { sl: 1, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 01", lineBng: "লাইন ০১", sortOrder: 1, isActive: "Active" },
-  { sl: 2, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 02", lineBng: "লাইন ০২", sortOrder: 2, isActive: "Active" }
+  { sl: 2, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 02", lineBng: "লাইন ০২", sortOrder: 2, isActive: "Active" },
+  { sl: 3, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 03", lineBng: "লাইন ০৩", sortOrder: 3, isActive: "Active" },
+  { sl: 4, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 04", lineBng: "লাইন ০৪", sortOrder: 4, isActive: "Active" },
+  { sl: 5, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 05", lineBng: "লাইন ০৫", sortOrder: 5, isActive: "Active" },
+  { sl: 6, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 06", lineBng: "লাইন ০৬", sortOrder: 6, isActive: "Active" },
+  { sl: 7, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 07", lineBng: "লাইন ০৭", sortOrder: 7, isActive: "Active" },
+  { sl: 8, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 08", lineBng: "লাইন ০৮", sortOrder: 8, isActive: "Active" },
+  { sl: 9, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 09", lineBng: "লাইন ০৯", sortOrder: 9, isActive: "Active" },
+  { sl: 10, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 10", lineBng: "লাইন ১০", sortOrder: 10, isActive: "Active" },
+  { sl: 11, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 11", lineBng: "লাইন ১১", sortOrder: 11, isActive: "Active" },
+  { sl: 12, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 12", lineBng: "লাইন ১২", sortOrder: 12, isActive: "Active" },
+  { sl: 13, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 13", lineBng: "লাইন ১৩", sortOrder: 13, isActive: "Active" },
+  { sl: 14, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 14", lineBng: "লাইন ১৪", sortOrder: 14, isActive: "Active" },
+  { sl: 15, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 15", lineBng: "লাইন ১৫", sortOrder: 15, isActive: "Active" },
+  { sl: 16, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 16", lineBng: "লাইন ১৬", sortOrder: 16, isActive: "Active" },
+  { sl: 17, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 17", lineBng: "লাইন ১৭", sortOrder: 17, isActive: "Active" },
+  { sl: 18, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 18", lineBng: "লাইন ১৮", sortOrder: 18, isActive: "Active" },
+  { sl: 19, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 19", lineBng: "লাইন ১৯", sortOrder: 19, isActive: "Active" },
+  { sl: 20, companyName: "Pakiza Knit Composite Ltd", lineEng: "Line 20", lineBng: "লাইন ২০", sortOrder: 20, isActive: "Active" }
 ];
 
 const DEFAULT_DESIGNATIONS = [
@@ -198,7 +314,12 @@ function StructureSetupPage() {
       if (!saved) return defaultVal;
       try {
         const parsed = JSON.parse(saved);
-        return Array.isArray(parsed) ? parsed : defaultVal;
+        if (!Array.isArray(parsed)) return defaultVal;
+        // Override if length is less than default to populate expanded list
+        if (parsed.length < defaultVal.length) {
+          return defaultVal;
+        }
+        return parsed;
       } catch (e) {
         return defaultVal;
       }

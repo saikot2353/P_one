@@ -3,160 +3,139 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  FileSpreadsheet, Printer, FileDown, Plus, Search, Trash2, Edit2, CheckCircle, ChevronRight, BarChart3, X
+  ChevronRight, Plus, Search, Edit3, Trash2, X, CheckCircle2,
+  BarChart3, AlertCircle, Target, Layers, Filter
 } from "lucide-react";
+import {
+  type KpiCriteria, type ScoringRubric,
+  loadKpiCriteria, saveKpiCriteria,
+  getCategoryBg, CATEGORY_LIST, DEPARTMENT_LIST
+} from "@/lib/kpi-data";
 
 export const Route = createFileRoute("/kpi-task-name")({
   head: () => ({
     meta: [
-      { title: "KPI Task Name Registry — CRIPTON" },
-      { name: "description", content: "Management and configuration of Key Performance Indicators (KPIs) and operational criteria." },
+      { title: "KPI Criteria Setup — CRIPTON" },
+      { name: "description", content: "Configure weighted KPI evaluation criteria with categories, scoring rubrics, and department assignments." },
     ],
   }),
-  component: KpiTaskNamePage,
+  component: KpiCriteriaSetupPage,
 });
 
-interface KpiTask {
-  id: string;
-  department: string;
-  criteriaName: string;
-  criteriaDetail: string;
-  status: "Active" | "Inactive";
-}
-
-const initialTasks: KpiTask[] = [
-  {
-    id: "KPI-001",
-    department: "All Departments",
-    criteriaName: "Decision Making/ Problem Solving",
-    criteriaDetail: "Measures effectiveness in understanding problems and making timely practical decisions, best suited for the business.",
-    status: "Active"
-  },
-  {
-    id: "KPI-002",
-    department: "All Departments",
-    criteriaName: "Independent Action",
-    criteriaDetail: "Takes initiative, solves problems independently, makes decisions without needing step-by-step guidance, seeks solutions instead of waiting for instructions, accepts responsibility for actions taken.",
-    status: "Active"
-  },
-  {
-    id: "KPI-003",
-    department: "All Departments",
-    criteriaName: "Leadership",
-    criteriaDetail: "Influence, guide, and support others toward achieving goals — whether in a formal leadership role or through informal influence.",
-    status: "Active"
-  },
-  {
-    id: "KPI-004",
-    department: "All Departments",
-    criteriaName: "Dependability",
-    criteriaDetail: "Delivers quality work on time, can be trusted to follow instructions accurately, requires minimal supervision, is consistent and reliable in their duties, is accountable for their actions and mistakes.",
-    status: "Active"
-  },
-  {
-    id: "KPI-005",
-    department: "All Departments",
-    criteriaName: "Teamwork",
-    criteriaDetail: "The ability to inspire subordinates & others with collaboration effort to achieve a common goal / complete a task.",
-    status: "Active"
-  },
-  {
-    id: "KPI-006",
-    department: "All Departments",
-    criteriaName: "Verbal & Written Communication",
-    criteriaDetail: "The ability to communicate effectively & efficiently within the organization & out of organization.",
-    status: "Active"
-  },
-  {
-    id: "KPI-007",
-    department: "All Departments",
-    criteriaName: "Knowledge of law & SOP",
-    criteriaDetail: "KPI evaluates how well an employee understands and applies relevant legal regulations, industry standards, and internal procedures in their daily work.",
-    status: "Active"
-  },
-  {
-    id: "KPI-008",
-    department: "All Departments",
-    criteriaName: "Loyalty of company",
-    criteriaDetail: "KPI measures how committed an employee is to the organization's mission, values, and long-term success.",
-    status: "Active"
-  }
-];
-
-function KpiTaskNamePage() {
-  const [tasks, setTasks] = useState<KpiTask[]>(initialTasks);
+function KpiCriteriaSetupPage() {
+  const [criteria, setCriteria] = useState<KpiCriteria[]>(() => loadKpiCriteria());
   const [searchQuery, setSearchQuery] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editTask, setEditTask] = useState<KpiTask | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [showModal, setShowModal] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
-  // Form states
-  const [dept, setDept] = useState("All Departments");
-  const [name, setName] = useState("");
-  const [detail, setDetail] = useState("");
-  const [status, setStatus] = useState<"Active" | "Inactive">("Active");
+  // Form state
+  const [form, setForm] = useState<{
+    category: KpiCriteria["category"];
+    criteriaName: string;
+    criteriaDetail: string;
+    weight: number;
+    maxScore: number;
+    scoringRubric: ScoringRubric;
+    department: string;
+    status: "Active" | "Inactive";
+  }>({
+    category: "Core Competency",
+    criteriaName: "",
+    criteriaDetail: "",
+    weight: 5,
+    maxScore: 10,
+    scoringRubric: { excellent: "", good: "", average: "", poor: "" },
+    department: "All Departments",
+    status: "Active"
+  });
 
-  // Filtering
-  const filteredTasks = useMemo(() => {
-    return tasks.filter(t => {
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        return (
-          t.criteriaName.toLowerCase().includes(q) ||
-          t.criteriaDetail.toLowerCase().includes(q) ||
-          t.department.toLowerCase().includes(q)
-        );
-      }
-      return true;
+  // Computed
+  const totalWeight = useMemo(() => criteria.reduce((s, c) => s + c.weight, 0), [criteria]);
+  const activeCount = useMemo(() => criteria.filter(c => c.status === "Active").length, [criteria]);
+
+  const filtered = useMemo(() => {
+    let list = criteria;
+    if (activeCategory !== "All") {
+      list = list.filter(c => c.category === activeCategory);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(c =>
+        c.criteriaName.toLowerCase().includes(q) ||
+        c.criteriaDetail.toLowerCase().includes(q) ||
+        c.category.toLowerCase().includes(q)
+      );
+    }
+    return list;
+  }, [criteria, activeCategory, searchQuery]);
+
+  // Category weight breakdown
+  const categoryWeights = useMemo(() => {
+    const map: Record<string, number> = {};
+    CATEGORY_LIST.forEach(cat => {
+      map[cat] = criteria.filter(c => c.category === cat).reduce((s, c) => s + c.weight, 0);
     });
-  }, [tasks, searchQuery]);
+    return map;
+  }, [criteria]);
 
-  // Form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const openAddModal = () => {
+    setEditId(null);
+    setForm({
+      category: "Core Competency", criteriaName: "", criteriaDetail: "",
+      weight: 5, maxScore: 10,
+      scoringRubric: { excellent: "", good: "", average: "", poor: "" },
+      department: "All Departments", status: "Active"
+    });
+    setShowModal(true);
+  };
+
+  const openEditModal = (item: KpiCriteria) => {
+    setEditId(item.id);
+    setForm({
+      category: item.category,
+      criteriaName: item.criteriaName,
+      criteriaDetail: item.criteriaDetail,
+      weight: item.weight,
+      maxScore: item.maxScore,
+      scoringRubric: { ...item.scoringRubric },
+      department: item.department,
+      status: item.status
+    });
+    setShowModal(true);
+  };
+
+  const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !detail.trim()) {
-      alert("Please fill in all fields!");
+    if (!form.criteriaName.trim() || !form.criteriaDetail.trim()) {
+      alert("Please fill in all required fields!");
       return;
     }
 
-    if (editTask) {
-      setTasks(prev => prev.map(t => t.id === editTask.id ? { ...t, department: dept, criteriaName: name, criteriaDetail: detail, status } : t));
+    let updated: KpiCriteria[];
+    if (editId) {
+      updated = criteria.map(c => c.id === editId ? { ...c, ...form } : c);
     } else {
-      const newTask: KpiTask = {
-        id: `KPI-${String(tasks.length + 1).padStart(3, "0")}`,
-        department: dept,
-        criteriaName: name,
-        criteriaDetail: detail,
-        status
-      };
-      setTasks(prev => [newTask, ...prev]);
+      const newId = `KPI-${String(criteria.length + 1).padStart(3, "0")}`;
+      updated = [...criteria, { id: newId, ...form }];
     }
-
-    // Reset
-    setIsModalOpen(false);
-    setEditTask(null);
-    setName("");
-    setDetail("");
-    setDept("All Departments");
-    setStatus("Active");
-  };
-
-  const handleEdit = (task: KpiTask) => {
-    setEditTask(task);
-    setName(task.criteriaName);
-    setDetail(task.criteriaDetail);
-    setDept(task.department);
-    setStatus(task.status);
-    setIsModalOpen(true);
+    setCriteria(updated);
+    saveKpiCriteria(updated);
+    setShowModal(false);
   };
 
   const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this KPI criteria from the registry?")) {
-      setTasks(prev => prev.filter(t => t.id !== id));
-    }
+    const updated = criteria.filter(c => c.id !== id);
+    setCriteria(updated);
+    saveKpiCriteria(updated);
+    setDeleteConfirm(null);
   };
 
-  const handlePrint = () => {
-    window.print();
+  const handleToggleStatus = (id: string) => {
+    const updated = criteria.map(c => c.id === id ? { ...c, status: c.status === "Active" ? "Inactive" as const : "Active" as const } : c);
+    setCriteria(updated);
+    saveKpiCriteria(updated);
   };
 
   return (
@@ -167,135 +146,231 @@ function KpiTaskNamePage() {
 
         <div className="p-4 md:p-6 xl:p-8 space-y-6">
 
-          {/* Breadcrumbs and Title Card */}
-          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
+          {/* Header */}
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
                 <ChevronRight className="size-2.5" />
                 <span className="text-muted-foreground/75">KPI</span>
                 <ChevronRight className="size-2.5" />
-                <span className="text-primary font-semibold">Task Name</span>
+                <span className="text-primary font-semibold">Criteria Setup</span>
               </div>
               <h1 className="text-xl font-black text-foreground flex items-center gap-2">
-                <BarChart3 className="size-5.5 text-primary animate-pulse" />
-                <span>KPI Task Name Setup</span>
+                <Target className="size-5.5 text-primary" />
+                <span>KPI Criteria Setup</span>
               </h1>
+              <p className="text-xs text-muted-foreground mt-1">Configure weighted evaluation criteria with scoring rubrics and category assignments</p>
             </div>
 
             <button
-              onClick={() => {
-                setEditTask(null);
-                setName("");
-                setDetail("");
-                setDept("All Departments");
-                setStatus("Active");
-                setIsModalOpen(true);
-              }}
-              className="h-9 px-5 bg-[#1e88e5] hover:bg-[#1565c0] text-white font-extrabold text-xs rounded-lg shadow-sm flex items-center gap-2 transition uppercase tracking-wider"
+              onClick={openAddModal}
+              className="h-9 px-5 bg-[#1e88e5] hover:bg-[#1565c0] text-white font-extrabold text-xs rounded-lg shadow-sm flex items-center gap-2 transition uppercase tracking-wider shrink-0"
             >
               <Plus className="size-4" />
-              <span>Add KPI Criteria</span>
+              <span>Add Criteria</span>
             </button>
           </div>
 
-          {/* Quick Metrics */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 print:hidden">
-            {[
-              { label: "TOTAL CRITERIA", val: `${tasks.length} KPIs`, desc: "Active performance metrics", color: "text-primary bg-primary/5 border-primary/10" },
-              { label: "ALL DEPARTMENTS", val: "Shared", desc: "Applicable company-wide", color: "text-emerald-500 bg-emerald-500/5 border-emerald-500/10" },
-              { label: "ACTIVE CRITERIA", val: `${tasks.filter(t => t.status === "Active").length} Metrics`, desc: "Live in evaluation workflows", color: "text-blue-500 bg-blue-500/5 border-blue-500/10" }
-            ].map((st, idx) => (
-              <div key={idx} className={`p-4 rounded-lg border bg-card ${st.color} shadow-xs space-y-1 transition duration-200 hover:scale-[1.01]`}>
-                <span className="text-[9px] font-black tracking-wider uppercase opacity-75">{st.label}</span>
-                <div className="text-xl font-black">{st.val}</div>
-                <div className="text-[10px] opacity-60 font-semibold">{st.desc}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Spreadsheet Table Container */}
+          {/* Weight Distribution Summary */}
           <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
-
-            {/* Utilities Toolbar */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/30 pb-4 print:hidden">
-              <div className="flex items-center gap-1.5 select-none">
-                <button className="h-8.5 px-4 rounded-lg border border-border/70 hover:bg-muted font-bold text-xs text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition">
-                  <FileSpreadsheet className="size-3.5 text-emerald-500" />
-                  <span>EXCEL</span>
-                </button>
-                <button
-                  onClick={handlePrint}
-                  className="h-8.5 px-4 rounded-lg border border-border/70 hover:bg-muted font-bold text-xs text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition"
-                >
-                  <Printer className="size-3.5 text-blue-500" />
-                  <span>PRINT</span>
-                </button>
-                <button className="h-8.5 px-4 rounded-lg border border-border/70 hover:bg-muted font-bold text-xs text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition">
-                  <FileDown className="size-3.5 text-rose-500" />
-                  <span>PDF</span>
-                </button>
-              </div>
-
-              {/* Text Search */}
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-black text-foreground uppercase tracking-wider flex items-center gap-2">
+                <Layers className="size-4 text-primary" />
+                Weight Distribution
+              </h3>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-muted-foreground">Search:</span>
-                <div className="relative w-56 sm:w-64">
-                  <Search className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search KPI name, details..."
-                    className="w-full h-8 pl-9 pr-3 rounded-lg bg-muted border border-border/40 focus:border-primary focus:bg-card focus:ring-1 focus:ring-primary/20 outline-none text-xs transition duration-200"
-                  />
-                </div>
+                <span className={`text-xs font-black px-3 py-1 rounded-lg border ${totalWeight === 100
+                    ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                    : "bg-red-500/10 text-red-600 border-red-500/20 animate-pulse"
+                  }`}>
+                  Total: {totalWeight}%
+                </span>
+                {totalWeight !== 100 && (
+                  <span className="text-[10px] font-bold text-red-500 flex items-center gap-1">
+                    <AlertCircle className="size-3" />
+                    Must equal 100%
+                  </span>
+                )}
               </div>
             </div>
 
-            {/* Table layout matching Image 1 */}
-            <div className="overflow-x-auto border border-border/50 rounded-xl">
-              <table className="w-full border-collapse text-[11px] text-left">
+            {/* Visual bar */}
+            <div className="h-8 rounded-lg overflow-hidden flex bg-muted/30 border border-border/30">
+              {CATEGORY_LIST.map(cat => {
+                const w = categoryWeights[cat] || 0;
+                if (w === 0) return null;
+                const colors: Record<string, string> = {
+                  "Core Competency": "bg-blue-500",
+                  "Technical": "bg-violet-500",
+                  "Behavioral": "bg-amber-500",
+                  "Organizational": "bg-emerald-500"
+                };
+                return (
+                  <div
+                    key={cat}
+                    className={`${colors[cat]} flex items-center justify-center text-white text-[10px] font-black transition-all duration-500`}
+                    style={{ width: `${Math.min(w, 100)}%` }}
+                    title={`${cat}: ${w}%`}
+                  >
+                    {w >= 8 ? `${cat.split(" ")[0]} ${w}%` : `${w}%`}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Category cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {CATEGORY_LIST.map(cat => {
+                const w = categoryWeights[cat] || 0;
+                const count = criteria.filter(c => c.category === cat).length;
+                const colors: Record<string, string> = {
+                  "Core Competency": "border-blue-500/20 bg-blue-500/5",
+                  "Technical": "border-violet-500/20 bg-violet-500/5",
+                  "Behavioral": "border-amber-500/20 bg-amber-500/5",
+                  "Organizational": "border-emerald-500/20 bg-emerald-500/5"
+                };
+                return (
+                  <div key={cat} className={`p-3 rounded-xl border ${colors[cat]} space-y-1`}>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">{cat}</span>
+                    <div className="flex items-end gap-2">
+                      <span className="text-lg font-black text-foreground">{w}%</span>
+                      <span className="text-[10px] font-bold text-muted-foreground mb-0.5">{count} criteria</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Stats row */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs">
+              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">Total Criteria</span>
+              <p className="text-2xl font-black text-foreground mt-1">{criteria.length}</p>
+            </div>
+            <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs">
+              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">Active</span>
+              <p className="text-2xl font-black text-emerald-600 mt-1">{activeCount}</p>
+            </div>
+            <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs">
+              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">Inactive</span>
+              <p className="text-2xl font-black text-amber-600 mt-1">{criteria.length - activeCount}</p>
+            </div>
+            <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs">
+              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">Max Score Each</span>
+              <p className="text-2xl font-black text-primary mt-1">10</p>
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs flex flex-col sm:flex-row items-center gap-4">
+            <div className="flex items-center gap-1.5">
+              <Filter className="size-3.5 text-muted-foreground" />
+              <span className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Filter:</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {["All", ...CATEGORY_LIST].map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`h-7 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all duration-150 border ${activeCategory === cat
+                      ? "bg-[#1e88e5] text-white border-[#1e88e5] shadow-sm"
+                      : "bg-card text-muted-foreground border-border/40 hover:bg-muted/50"
+                    }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            <div className="ml-auto relative">
+              <Search className="size-3.5 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search criteria..."
+                className="h-8 w-56 pl-8 pr-3 rounded-lg bg-muted/50 border border-border/40 text-xs font-semibold outline-none focus:border-[#1e88e5] transition"
+              />
+            </div>
+          </div>
+
+          {/* Table */}
+          <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-left">
                 <thead>
-                  <tr className="bg-[#f1f5f9] dark:bg-[#0f172a] text-foreground font-bold border-b border-border/50 select-none whitespace-nowrap">
-                    <th className="px-4 py-3 font-extrabold text-center w-24 border-r border-border/30">Status</th>
-                    <th className="px-4 py-3 font-extrabold w-48 border-r border-border/30">Department</th>
-                    <th className="px-4 py-3 font-extrabold w-64 border-r border-border/30">Criteria Name</th>
-                    <th className="px-4 py-3 font-extrabold border-r border-border/30">Criteria Detail</th>
+                  <tr className="bg-muted/30 border-b border-border/40 text-[9.5px] uppercase font-black tracking-wider text-muted-foreground/60">
+                    <th className="px-4 py-3 text-center w-12">#</th>
+                    <th className="px-4 py-3 w-28">Category</th>
+                    <th className="px-4 py-3">Criteria Name</th>
+                    <th className="px-4 py-3 text-center w-20">Weight</th>
+                    <th className="px-4 py-3 text-center w-20">Max Score</th>
+                    <th className="px-4 py-3 w-36">Department</th>
+                    <th className="px-4 py-3 text-center w-20">Status</th>
+                    <th className="px-4 py-3 text-center w-24">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/30 font-sans text-xs">
-                  {filteredTasks.map((row) => (
-                    <tr key={row.id} className="hover:bg-[#f8fafc] dark:hover:bg-[#1e293b] transition duration-75">
-                      <td className="px-4 py-3.5 border-r border-border/20 text-center print:hidden flex items-center justify-center gap-2">
-                        <button
-                          onClick={() => handleEdit(row)}
-                          className="p-1 hover:bg-primary/10 text-amber-500 rounded transition"
-                          title="Edit Criteria"
-                        >
-                          <Edit2 className="size-3.5" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(row.id)}
-                          className="p-1 hover:bg-rose-500/10 text-rose-500 rounded transition"
-                          title="Delete Criteria"
-                        >
-                          <Trash2 className="size-3.5" />
-                        </button>
-                        <span className={`inline-flex items-center gap-1 font-bold px-2 py-0.5 rounded text-[9.5px] ${row.status === "Active" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" : "bg-slate-500/10 text-slate-400 border border-slate-500/20"}`}>
-                          <span>{row.status}</span>
+                <tbody className="divide-y divide-border/20">
+                  {filtered.map((item, idx) => (
+                    <tr key={item.id} className="hover:bg-muted/20 transition duration-100 group">
+                      <td className="px-4 py-3 text-center text-xs font-mono text-muted-foreground/50 font-bold">{idx + 1}</td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase border ${getCategoryBg(item.category)}`}>
+                          {item.category.split(" ")[0]}
                         </span>
                       </td>
-                      <td className="px-4 py-3.5 font-bold text-foreground/80 border-r border-border/20">{row.department}</td>
-                      <td className="px-4 py-3.5 font-black text-foreground border-r border-border/20">{row.criteriaName}</td>
-                      <td className="px-4 py-3.5 text-muted-foreground leading-relaxed border-r border-border/20">{row.criteriaDetail}</td>
+                      <td className="px-4 py-3">
+                        <span className="text-xs font-bold text-foreground block">{item.criteriaName}</span>
+                        <span className="text-[10px] text-muted-foreground/70 block mt-0.5 max-w-md truncate">{item.criteriaDetail}</span>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className="text-xs font-black text-primary">{item.weight}%</span>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className="text-xs font-bold text-foreground/70">{item.maxScore}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="text-[10px] font-semibold text-muted-foreground">{item.department}</span>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          onClick={() => handleToggleStatus(item.id)}
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase border cursor-pointer transition hover:opacity-80 ${item.status === "Active"
+                              ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                              : "bg-slate-500/10 text-slate-500 border-slate-500/20"
+                            }`}
+                        >
+                          {item.status === "Active" && <CheckCircle2 className="size-2.5" />}
+                          {item.status}
+                        </button>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition">
+                          <button
+                            onClick={() => openEditModal(item)}
+                            className="size-7 rounded-lg bg-[#1e88e5]/10 text-[#1e88e5] hover:bg-[#1e88e5]/20 grid place-items-center transition"
+                            title="Edit"
+                          >
+                            <Edit3 className="size-3" />
+                          </button>
+                          <button
+                            onClick={() => setDeleteConfirm(item.id)}
+                            className="size-7 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 grid place-items-center transition"
+                            title="Delete"
+                          >
+                            <Trash2 className="size-3" />
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
 
-                  {filteredTasks.length === 0 && (
+                  {filtered.length === 0 && (
                     <tr>
-                      <td colSpan={4} className="px-4 py-16 text-center text-muted-foreground font-semibold">
-                        No performance criteria found matching query parameters.
+                      <td colSpan={8} className="text-center py-12 text-xs font-bold text-muted-foreground">
+                        No criteria found matching your search.
                       </td>
                     </tr>
                   )}
@@ -303,62 +378,55 @@ function KpiTaskNamePage() {
               </table>
             </div>
 
-            <div className="flex justify-between items-center text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wider pt-2">
-              <span>Showing 1 to {filteredTasks.length} of {filteredTasks.length} entries</span>
-              <div className="flex items-center gap-1">
-                <button className="px-3 py-1 rounded bg-muted hover:bg-muted/80">Previous</button>
-                <span className="px-3 py-1 rounded bg-primary text-white">1</span>
-                <button className="px-3 py-1 rounded bg-muted hover:bg-muted/80">Next</button>
-              </div>
+            <div className="px-4 py-3 border-t border-border/30 text-[11px] font-semibold text-muted-foreground flex items-center justify-between">
+              <span>Showing {filtered.length} of {criteria.length} criteria</span>
+              <span>Total Weight: <span className={`font-black ${totalWeight === 100 ? "text-emerald-600" : "text-red-500"}`}>{totalWeight}%</span></span>
             </div>
-
           </div>
 
         </div>
       </main>
 
-      {/* Add/Edit Modal Dialog */}
-      {isModalOpen && (
+      {/* ADD / EDIT MODAL */}
+      {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-lg rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200">
+          <div className="bg-card w-full max-w-2xl rounded-xl border border-border/80 shadow-2xl relative animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
             <button
-              onClick={() => setIsModalOpen(false)}
-              className="absolute right-4 top-4 p-1 text-muted-foreground/60 hover:text-foreground hover:bg-muted rounded-lg transition"
+              onClick={() => setShowModal(false)}
+              className="absolute right-4 top-4 p-1.5 text-muted-foreground/60 hover:text-foreground hover:bg-muted rounded-lg transition z-10"
             >
               <X className="size-5" />
             </button>
 
-            <h3 className="text-base font-black text-foreground flex items-center gap-2 border-b border-border/40 pb-3.5 mb-5">
-              <BarChart3 className="size-5 text-primary" />
-              <span>{editTask ? "Edit Performance KPI" : "Create KPI Criteria"}</span>
-            </h3>
+            <div className="p-6 border-b border-border/30">
+              <h3 className="text-base font-black text-foreground flex items-center gap-2">
+                <Target className="size-5 text-primary" />
+                {editId ? "Edit KPI Criteria" : "Add New KPI Criteria"}
+              </h3>
+              <p className="text-[11px] text-muted-foreground mt-1">Define criteria with weight, rubric, and department assignment</p>
+            </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 text-xs font-semibold">
-              <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleSave} className="p-6 space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Target Department</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Category *</label>
                   <select
-                    value={dept}
-                    onChange={(e) => setDept(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none"
+                    value={form.category}
+                    onChange={(e) => setForm(p => ({ ...p, category: e.target.value as KpiCriteria["category"] }))}
+                    className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5]"
                   >
-                    <option value="All Departments">All Departments</option>
-                    <option value="Business Innovation">Business Innovation</option>
-                    <option value="Project Resource & Strategy">Project Resource & Strategy</option>
-                    <option value="Finance & Accounts">Finance & Accounts</option>
-                    <option value="Operations & HR">Operations & HR</option>
+                    {CATEGORY_LIST.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Status</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Department</label>
                   <select
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value as any)}
-                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none"
+                    value={form.department}
+                    onChange={(e) => setForm(p => ({ ...p, department: e.target.value }))}
+                    className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5]"
                   >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
+                    {DEPARTMENT_LIST.map(d => <option key={d} value={d}>{d}</option>)}
                   </select>
                 </div>
               </div>
@@ -368,37 +436,103 @@ function KpiTaskNamePage() {
                 <input
                   type="text"
                   required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Technical Problem Solving"
-                  className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary focus:bg-card transition"
+                  value={form.criteriaName}
+                  onChange={(e) => setForm(p => ({ ...p, criteriaName: e.target.value }))}
+                  placeholder="e.g., Decision Making & Problem Solving"
+                  className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5]"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Criteria Detail *</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase">Description *</label>
                 <textarea
                   required
-                  value={detail}
-                  onChange={(e) => setDetail(e.target.value)}
-                  placeholder="Comprehensive description of how performance in this criteria is graded..."
-                  className="w-full h-24 p-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary focus:bg-card resize-none"
+                  value={form.criteriaDetail}
+                  onChange={(e) => setForm(p => ({ ...p, criteriaDetail: e.target.value }))}
+                  placeholder="Detailed description of what this criteria measures..."
+                  className="w-full h-20 p-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none resize-none focus:border-[#1e88e5]"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-border/30 mt-5">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Weight (%) *</label>
+                  <input
+                    type="number"
+                    required
+                    min={1}
+                    max={50}
+                    value={form.weight}
+                    onChange={(e) => setForm(p => ({ ...p, weight: parseInt(e.target.value) || 0 }))}
+                    className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold font-mono outline-none focus:border-[#1e88e5]"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Max Score</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={form.maxScore}
+                    onChange={(e) => setForm(p => ({ ...p, maxScore: parseInt(e.target.value) || 10 }))}
+                    className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold font-mono outline-none focus:border-[#1e88e5]"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Status</label>
+                  <select
+                    value={form.status}
+                    onChange={(e) => setForm(p => ({ ...p, status: e.target.value as "Active" | "Inactive" }))}
+                    className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5]"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Scoring Rubric */}
+              <div className="border-t border-border/30 pt-4 space-y-3">
+                <span className="text-[11px] font-black text-primary uppercase tracking-wider flex items-center gap-1.5">
+                  <BarChart3 className="size-3.5" />
+                  Scoring Rubric
+                </span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {(["excellent", "good", "average", "poor"] as const).map(level => {
+                    const colors: Record<string, string> = {
+                      excellent: "border-l-emerald-500",
+                      good: "border-l-blue-500",
+                      average: "border-l-amber-500",
+                      poor: "border-l-red-500"
+                    };
+                    return (
+                      <div key={level} className={`space-y-1 border-l-2 ${colors[level]} pl-3`}>
+                        <label className="text-[9px] font-extrabold uppercase text-muted-foreground tracking-wider capitalize">{level}</label>
+                        <textarea
+                          value={form.scoringRubric[level]}
+                          onChange={(e) => setForm(p => ({ ...p, scoringRubric: { ...p.scoringRubric, [level]: e.target.value } }))}
+                          placeholder={`Describe ${level} performance...`}
+                          className="w-full h-14 p-2 rounded-lg bg-muted/30 border border-border/30 text-[10.5px] font-semibold outline-none resize-none focus:border-[#1e88e5]"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-border/30">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="h-9 px-4 rounded-lg border border-border/60 hover:bg-muted font-bold text-xs transition uppercase"
+                  onClick={() => setShowModal(false)}
+                  className="h-9 px-5 border border-border/40 text-muted-foreground font-bold text-xs rounded-lg hover:bg-muted/50 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="h-9 px-6 bg-primary hover:bg-primary/95 text-white font-extrabold text-xs rounded-lg transition uppercase tracking-wider"
+                  className="h-9 px-6 bg-[#1e88e5] hover:bg-[#1565c0] text-white font-extrabold text-xs rounded-lg shadow-sm transition uppercase tracking-wider"
                 >
-                  {editTask ? "Save Changes" : "Save Criteria"}
+                  {editId ? "Update Criteria" : "Save Criteria"}
                 </button>
               </div>
             </form>
@@ -406,6 +540,36 @@ function KpiTaskNamePage() {
         </div>
       )}
 
+      {/* DELETE CONFIRM */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
+          <div className="bg-card w-full max-w-sm rounded-xl border border-border/80 shadow-2xl p-6 animate-in zoom-in-95 duration-200 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="size-10 rounded-xl bg-red-500/10 grid place-items-center">
+                <Trash2 className="size-5 text-red-500" />
+              </div>
+              <div>
+                <h4 className="text-sm font-black text-foreground">Delete Criteria</h4>
+                <p className="text-[11px] text-muted-foreground">This action cannot be undone.</p>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                className="h-8 px-4 border border-border/40 text-muted-foreground font-bold text-xs rounded-lg hover:bg-muted/50 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(deleteConfirm)}
+                className="h-8 px-4 bg-red-500 hover:bg-red-600 text-white font-extrabold text-xs rounded-lg shadow-sm transition uppercase"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

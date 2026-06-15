@@ -73,19 +73,95 @@ interface AttendanceBonusPolicy {
 // Defaults
 // ----------------------------------------------------
 const DEFAULT_SHIFTS: Shift[] = [
-  { sl: 1, nameEng: "RMG-PIP", nameBng: "আরএমজি-পিআইপি", startTime: "08:00:00", endTime: "17:00:00", lateTime: "08:05:00", startTimeFrom: "06:30:00", endTimeTo: "10:30:00", lateCount: "Yes", sortOrder: 33, isActive: "Active", isRotate: "No", rotationCriteria: "", shiftChangeDay: "", isLateDeduction: "No", deductionFrom: "", deductionPer: "", deductionAfterDay: "" }
+  { sl: 1, nameEng: "General Shift", nameBng: "সাধারণ শিফট", startTime: "09:00:00", endTime: "18:00:00", lateTime: "09:15:00", startTimeFrom: "07:30:00", endTimeTo: "11:30:00", lateCount: "Yes", sortOrder: 1, isActive: "Active", isRotate: "No", rotationCriteria: "", shiftChangeDay: "", isLateDeduction: "No", deductionFrom: "", deductionPer: "", deductionAfterDay: "" },
+  { sl: 2, nameEng: "Morning Roster", nameBng: "সকাল শিফট", startTime: "06:00:00", endTime: "14:00:00", lateTime: "06:05:00", startTimeFrom: "05:00:00", endTimeTo: "08:00:00", lateCount: "Yes", sortOrder: 2, isActive: "Active", isRotate: "Yes", rotationCriteria: "Weekly", shiftChangeDay: "Friday", isLateDeduction: "No", deductionFrom: "", deductionPer: "", deductionAfterDay: "" },
+  { sl: 3, nameEng: "Evening Roster", nameBng: "সন্ধ্যা শিফট", startTime: "14:00:00", endTime: "22:00:00", lateTime: "14:05:00", startTimeFrom: "13:00:00", endTimeTo: "16:00:00", lateCount: "Yes", sortOrder: 3, isActive: "Active", isRotate: "Yes", rotationCriteria: "Weekly", shiftChangeDay: "Friday", isLateDeduction: "No", deductionFrom: "", deductionPer: "", deductionAfterDay: "" },
+  { sl: 4, nameEng: "Night Roster", nameBng: "রাত শিফট", startTime: "22:00:00", endTime: "06:00:00", lateTime: "22:05:00", startTimeFrom: "21:00:00", endTimeTo: "23:59:00", lateCount: "Yes", sortOrder: 4, isActive: "Active", isRotate: "Yes", rotationCriteria: "Weekly", shiftChangeDay: "Friday", isLateDeduction: "No", deductionFrom: "", deductionPer: "", deductionAfterDay: "" },
+  { sl: 5, nameEng: "RMG-PIP", nameBng: "আরএমজি-পিআইপি", startTime: "08:00:00", endTime: "17:00:00", lateTime: "08:05:00", startTimeFrom: "06:30:00", endTimeTo: "10:30:00", lateCount: "Yes", sortOrder: 5, isActive: "Active", isRotate: "No", rotationCriteria: "", shiftChangeDay: "", isLateDeduction: "No", deductionFrom: "", deductionPer: "", deductionAfterDay: "" },
+  { sl: 6, nameEng: "Support Shift A", nameBng: "সহায়তা শিফট এ", startTime: "08:00:00", endTime: "16:00:00", lateTime: "08:10:00", startTimeFrom: "07:00:00", endTimeTo: "10:00:00", lateCount: "Yes", sortOrder: 6, isActive: "Active", isRotate: "No", rotationCriteria: "", shiftChangeDay: "", isLateDeduction: "No", deductionFrom: "", deductionPer: "", deductionAfterDay: "" },
+  { sl: 7, nameEng: "Support Shift B", nameBng: "সহায়তা শিফট বি", startTime: "16:00:00", endTime: "23:59:00", lateTime: "16:10:00", startTimeFrom: "15:00:00", endTimeTo: "18:00:00", lateCount: "Yes", sortOrder: 7, isActive: "Active", isRotate: "No", rotationCriteria: "", shiftChangeDay: "", isLateDeduction: "No", deductionFrom: "", deductionPer: "", deductionAfterDay: "" },
+  { sl: 8, nameEng: "Security Shift Day", nameBng: "নিরাপত্তা দিন", startTime: "06:00:00", endTime: "18:00:00", lateTime: "06:05:00", startTimeFrom: "05:00:00", endTimeTo: "08:00:00", lateCount: "Yes", sortOrder: 8, isActive: "Active", isRotate: "No", rotationCriteria: "", shiftChangeDay: "", isLateDeduction: "No", deductionFrom: "", deductionPer: "", deductionAfterDay: "" },
+  { sl: 9, nameEng: "Security Shift Night", nameBng: "নিরাপত্তা রাত", startTime: "18:00:00", endTime: "06:00:00", lateTime: "18:05:00", startTimeFrom: "17:00:00", endTimeTo: "20:00:00", lateCount: "Yes", sortOrder: 9, isActive: "Active", isRotate: "No", rotationCriteria: "", shiftChangeDay: "", isLateDeduction: "No", deductionFrom: "", deductionPer: "", deductionAfterDay: "" },
+  { sl: 10, nameEng: "Part-time Morning", nameBng: "খন্ডকালীন সকাল", startTime: "08:00:00", endTime: "12:00:00", lateTime: "08:15:00", startTimeFrom: "07:00:00", endTimeTo: "09:30:00", lateCount: "Yes", sortOrder: 10, isActive: "Active", isRotate: "No", rotationCriteria: "", shiftChangeDay: "", isLateDeduction: "No", deductionFrom: "", deductionPer: "", deductionAfterDay: "" },
+  { sl: 11, nameEng: "Part-time Evening", nameBng: "খন্ডকালীন সন্ধ্যা", startTime: "14:00:00", endTime: "18:00:00", lateTime: "14:15:00", startTimeFrom: "13:00:00", endTimeTo: "15:30:00", lateCount: "Yes", sortOrder: 11, isActive: "Active", isRotate: "No", rotationCriteria: "", shiftChangeDay: "", isLateDeduction: "No", deductionFrom: "", deductionPer: "", deductionAfterDay: "" },
+  { sl: 12, nameEng: "IT Support Shift", nameBng: "আইটি সাপোর্ট", startTime: "09:00:00", endTime: "18:00:00", lateTime: "09:10:00", startTimeFrom: "08:00:00", endTimeTo: "11:00:00", lateCount: "Yes", sortOrder: 12, isActive: "Active", isRotate: "No", rotationCriteria: "", shiftChangeDay: "", isLateDeduction: "No", deductionFrom: "", deductionPer: "", deductionAfterDay: "" },
+  { sl: 13, nameEng: "Admin Shift", nameBng: "প্রশাসন শিফট", startTime: "09:30:00", endTime: "18:30:00", lateTime: "09:45:00", startTimeFrom: "08:00:00", endTimeTo: "11:30:00", lateCount: "Yes", sortOrder: 13, isActive: "Active", isRotate: "No", rotationCriteria: "", shiftChangeDay: "", isLateDeduction: "No", deductionFrom: "", deductionPer: "", deductionAfterDay: "" },
+  { sl: 14, nameEng: "Weekend Support", nameBng: "সাপ্তাহিক সহায়তা", startTime: "10:00:00", endTime: "16:00:00", lateTime: "10:15:00", startTimeFrom: "09:00:00", endTimeTo: "12:00:00", lateCount: "Yes", sortOrder: 14, isActive: "Active", isRotate: "No", rotationCriteria: "", shiftChangeDay: "", isLateDeduction: "No", deductionFrom: "", deductionPer: "", deductionAfterDay: "" },
+  { sl: 15, nameEng: "Overtime Special", nameBng: "ওভারটাইম বিশেষ", startTime: "18:00:00", endTime: "22:00:00", lateTime: "18:05:00", startTimeFrom: "17:30:00", endTimeTo: "19:00:00", lateCount: "No", sortOrder: 15, isActive: "Active", isRotate: "No", rotationCriteria: "", shiftChangeDay: "", isLateDeduction: "No", deductionFrom: "", deductionPer: "", deductionAfterDay: "" },
+  { sl: 16, nameEng: "Maintenance Shift", nameBng: "রক্ষণাবেক্ষণ", startTime: "07:30:00", endTime: "16:30:00", lateTime: "07:45:00", startTimeFrom: "06:30:00", endTimeTo: "09:00:00", lateCount: "Yes", sortOrder: 16, isActive: "Active", isRotate: "No", rotationCriteria: "", shiftChangeDay: "", isLateDeduction: "No", deductionFrom: "", deductionPer: "", deductionAfterDay: "" },
+  { sl: 17, nameEng: "Loading-Unloading", nameBng: "লোডিং-আনলোডিং", startTime: "12:00:00", endTime: "20:00:00", lateTime: "12:10:00", startTimeFrom: "11:00:00", endTimeTo: "14:00:00", lateCount: "Yes", sortOrder: 17, isActive: "Active", isRotate: "No", rotationCriteria: "", shiftChangeDay: "", isLateDeduction: "No", deductionFrom: "", deductionPer: "", deductionAfterDay: "" },
+  { sl: 18, nameEng: "Executive Flexi Shift", nameBng: "নির্বাহী নমনীয়", startTime: "10:00:00", endTime: "19:00:00", lateTime: "10:30:00", startTimeFrom: "08:30:00", endTimeTo: "12:00:00", lateCount: "Yes", sortOrder: 18, isActive: "Active", isRotate: "No", rotationCriteria: "", shiftChangeDay: "", isLateDeduction: "No", deductionFrom: "", deductionPer: "", deductionAfterDay: "" },
+  { sl: 19, nameEng: "Store & Inventory", nameBng: "স্টোর ও ইনভেন্টরি", startTime: "08:30:00", endTime: "17:30:00", lateTime: "08:45:00", startTimeFrom: "07:30:00", endTimeTo: "10:00:00", lateCount: "Yes", sortOrder: 19, isActive: "Active", isRotate: "No", rotationCriteria: "", shiftChangeDay: "", isLateDeduction: "No", deductionFrom: "", deductionPer: "", deductionAfterDay: "" },
+  { sl: 20, nameEng: "Factory Roster E", nameBng: "ফ্যাক্টরি রোস্টার ই", startTime: "14:30:00", endTime: "22:30:00", lateTime: "14:35:00", startTimeFrom: "13:30:00", endTimeTo: "16:00:00", lateCount: "Yes", sortOrder: 20, isActive: "Active", isRotate: "Yes", rotationCriteria: "Weekly", shiftChangeDay: "Friday", isLateDeduction: "No", deductionFrom: "", deductionPer: "", deductionAfterDay: "" }
 ];
 
 const DEFAULT_OT_CONFIGS: OtConfig[] = [
-  { sl: 1, employeeType: "ALL", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" }
+  { sl: 1, employeeType: "ALL", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" },
+  { sl: 2, employeeType: "Operator", otCalculationType: "Basic Ratio", bufferMinutes: 10, isActive: "Active" },
+  { sl: 3, employeeType: "Supervisor", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" },
+  { sl: 4, employeeType: "Admin staff", otCalculationType: "Flat Hour", bufferMinutes: 30, isActive: "Active" },
+  { sl: 5, employeeType: "Permanent Worker", otCalculationType: "Gross Ratio", bufferMinutes: 15, isActive: "Active" },
+  { sl: 6, employeeType: "Casual Worker", otCalculationType: "Flat Hour", bufferMinutes: 10, isActive: "Active" },
+  { sl: 7, employeeType: "Probationary Worker", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" },
+  { sl: 8, employeeType: "Contractual Staff", otCalculationType: "Basic Ratio", bufferMinutes: 20, isActive: "Active" },
+  { sl: 9, employeeType: "Support Staff", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" },
+  { sl: 10, employeeType: "Technical Team", otCalculationType: "Gross Ratio", bufferMinutes: 15, isActive: "Active" },
+  { sl: 11, employeeType: "Security Guard", otCalculationType: "Flat Hour", bufferMinutes: 10, isActive: "Active" },
+  { sl: 12, employeeType: "Office Runner", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" },
+  { sl: 13, employeeType: "Company Driver", otCalculationType: "Flat Hour", bufferMinutes: 20, isActive: "Active" },
+  { sl: 14, employeeType: "Kitchen Chef", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" },
+  { sl: 15, employeeType: "Store Keeper", otCalculationType: "Gross Ratio", bufferMinutes: 15, isActive: "Active" },
+  { sl: 16, employeeType: "Quality Inspector", otCalculationType: "Basic Ratio", bufferMinutes: 10, isActive: "Active" },
+  { sl: 17, employeeType: "Senior Welder", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" },
+  { sl: 18, employeeType: "Helper", otCalculationType: "Flat Hour", bufferMinutes: 10, isActive: "Active" },
+  { sl: 19, employeeType: "Senior Executive", otCalculationType: "Flat Hour", bufferMinutes: 30, isActive: "Active" },
+  { sl: 20, employeeType: "Junior Officer", otCalculationType: "Flat Hour", bufferMinutes: 20, isActive: "Active" }
 ];
 
 const DEFAULT_ABNORMAL_SHIFTS: AbnormalShift[] = [
-  { sl: 1, shiftName: "Night Shift Extra", date: "2026-06-20", reason: "Product Launch", isActive: "Active" }
+  { sl: 1, shiftName: "Night Shift Extra", date: "2026-06-20", reason: "Product Launch", isActive: "Active" },
+  { sl: 2, shiftName: "Ramadan Early Shift", date: "2026-03-15", reason: "Holy Ramadan Special Hours", isActive: "Active" },
+  { sl: 3, shiftName: "Durga Puja Shift", date: "2026-10-18", reason: "Festival Special Schedule", isActive: "Active" },
+  { sl: 4, shiftName: "New Year Eve Roster", date: "2026-12-31", reason: "Year-end Operations Adjustments", isActive: "Active" },
+  { sl: 5, shiftName: "Machine Maintenance Shift", date: "2026-07-05", reason: "Quarterly Plant Maintenance", isActive: "Active" },
+  { sl: 6, shiftName: "Annual Auditing Shift", date: "2026-08-12", reason: "Financial Audit Support", isActive: "Active" },
+  { sl: 7, shiftName: "Annual Inventory Count", date: "2026-09-30", reason: "Store Stocktaking Operations", isActive: "Active" },
+  { sl: 8, shiftName: "ERP Migration Shift", date: "2026-05-10", reason: "IT System Upgrades & Transition", isActive: "Active" },
+  { sl: 9, shiftName: "Special Heavy Load Roster", date: "2026-11-22", reason: "Bulk Order Processing Rush", isActive: "Active" },
+  { sl: 10, shiftName: "VIP Delegation Visit Shift", date: "2026-06-25", reason: "Buyer Group Inspection Setup", isActive: "Active" },
+  { sl: 11, shiftName: "Contingency Backup Run", date: "2026-04-18", reason: "Disaster Recovery Drill", isActive: "Active" },
+  { sl: 12, shiftName: "Safety Drill & Training Day", date: "2026-07-15", reason: "Compliance Safety Program", isActive: "Active" },
+  { sl: 13, shiftName: "Year-end Closing Duty", date: "2026-06-30", reason: "Financial Year-end Adjustments", isActive: "Active" },
+  { sl: 14, shiftName: "Winter Special Roster", date: "2026-01-15", reason: "Foggy Weather Shift Adjustment", isActive: "Active" },
+  { sl: 15, shiftName: "Urgent Shipping Shift", date: "2026-09-05", reason: "Air Shipment Deadline Rush", isActive: "Active" },
+  { sl: 16, shiftName: "Server Upgrade Window", date: "2026-08-20", reason: "Database Maintenance Window", isActive: "Active" },
+  { sl: 17, shiftName: "Black Friday Prep Shift", date: "2026-11-25", reason: "E-Commerce Dispatch Load", isActive: "Active" },
+  { sl: 18, shiftName: "Cyclone Alert Backup", date: "2026-05-28", reason: "Weather Contingency Standby", isActive: "Active" },
+  { sl: 19, shiftName: "Plant Renovation Crew", date: "2026-02-12", reason: "Infrastructure Enhancement", isActive: "Active" },
+  { sl: 20, shiftName: "Lead Time Reduction Shift", date: "2026-04-05", reason: "Fast-track Sample Production", isActive: "Active" }
 ];
 
 const DEFAULT_ATTN_BONUS_POLICIES: AttendanceBonusPolicy[] = [
-  { sl: 1, name: "General Worker Policy", allowedLateDays: 3, allowedAbsentDays: 0, bonusAmount: 500, isActive: "Active" }
+  { sl: 1, name: "General Worker Policy", allowedLateDays: 3, allowedAbsentDays: 0, bonusAmount: 500, isActive: "Active" },
+  { sl: 2, name: "Senior Staff Policy", allowedLateDays: 2, allowedAbsentDays: 0, bonusAmount: 1000, isActive: "Active" },
+  { sl: 3, name: "Officer Bonus Policy", allowedLateDays: 1, allowedAbsentDays: 0, bonusAmount: 1500, isActive: "Active" },
+  { sl: 4, name: "Eid Special Attendance", allowedLateDays: 0, allowedAbsentDays: 0, bonusAmount: 2000, isActive: "Active" },
+  { sl: 5, name: "Ramadan Punctuality Policy", allowedLateDays: 4, allowedAbsentDays: 0, bonusAmount: 800, isActive: "Active" },
+  { sl: 6, name: "Monsoon Regularity Bonus", allowedLateDays: 5, allowedAbsentDays: 0, bonusAmount: 600, isActive: "Active" },
+  { sl: 7, name: "Winter Shift Incentive", allowedLateDays: 3, allowedAbsentDays: 0, bonusAmount: 700, isActive: "Active" },
+  { sl: 8, name: "Night Shift Attendance Bonus", allowedLateDays: 2, allowedAbsentDays: 0, bonusAmount: 1200, isActive: "Active" },
+  { sl: 9, name: "Perfect Month Award", allowedLateDays: 0, allowedAbsentDays: 0, bonusAmount: 2500, isActive: "Active" },
+  { sl: 10, name: "Quarterly Regularity Bonus", allowedLateDays: 6, allowedAbsentDays: 0, bonusAmount: 3000, isActive: "Active" },
+  { sl: 11, name: "Basic Attendance Support", allowedLateDays: 5, allowedAbsentDays: 1, bonusAmount: 300, isActive: "Active" },
+  { sl: 12, name: "Operator Incentive Plan", allowedLateDays: 3, allowedAbsentDays: 0, bonusAmount: 650, isActive: "Active" },
+  { sl: 13, name: "Helper Punctuality Plan", allowedLateDays: 4, allowedAbsentDays: 0, bonusAmount: 450, isActive: "Active" },
+  { sl: 14, name: "Security Attendance Bonus", allowedLateDays: 1, allowedAbsentDays: 0, bonusAmount: 850, isActive: "Active" },
+  { sl: 15, name: "Support Staff Reward", allowedLateDays: 3, allowedAbsentDays: 0, bonusAmount: 400, isActive: "Active" },
+  { sl: 16, name: "IT & Maintenance Incentive", allowedLateDays: 2, allowedAbsentDays: 0, bonusAmount: 1100, isActive: "Active" },
+  { sl: 17, name: "Driver Regularity Bonus", allowedLateDays: 2, allowedAbsentDays: 0, bonusAmount: 900, isActive: "Active" },
+  { sl: 18, name: "Store Keepers Bonus Scheme", allowedLateDays: 3, allowedAbsentDays: 0, bonusAmount: 750, isActive: "Active" },
+  { sl: 19, name: "Executive Regularity Policy", allowedLateDays: 2, allowedAbsentDays: 0, bonusAmount: 1350, isActive: "Active" },
+  { sl: 20, name: "Technical Team Punctuality", allowedLateDays: 2, allowedAbsentDays: 0, bonusAmount: 1250, isActive: "Active" }
 ];
 
 function TimeSetupPage() {
@@ -112,7 +188,12 @@ function TimeSetupPage() {
       if (!saved) return defaultVal;
       try {
         const parsed = JSON.parse(saved);
-        return Array.isArray(parsed) ? parsed : defaultVal;
+        if (!Array.isArray(parsed)) return defaultVal;
+        // If stored data has fewer items than defaultVal, override it to ensure expanded list is loaded
+        if (parsed.length < defaultVal.length) {
+          return defaultVal;
+        }
+        return parsed;
       } catch (e) {
         return defaultVal;
       }

@@ -45,9 +45,14 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Department Budget Allocator", parent: "Budget", to: "/" },
   { label: "Expense Claims Clearance", parent: "Budget", to: "/" },
   { label: "Branch Transfer Registry", parent: "Transfer", to: "/" },
-  { label: "Task Name", parent: "KPI", to: "/kpi-task-name" },
-  { label: "KPI Setting", parent: "KPI", to: "/kpi-setting" },
-  { label: "Assessment Workflow", parent: "KPI", to: "/kpi-assessment-workflow" },
+  { label: "KPI Dashboard", parent: "KPI", to: "/kpi-dashboard", description: "Organization-wide KPI analytics" },
+  { label: "KPI Cycles", parent: "KPI", to: "/kpi-cycles", description: "Manage appraisal periods" },
+  { label: "KPI Criteria Setup", parent: "KPI", to: "/kpi-task-name", description: "Configure KPI criteria" },
+  { label: "Grade Bands", parent: "KPI", to: "/kpi-setting", description: "Configure scoring ranges" },
+  { label: "My Self-Assessment", parent: "KPI", to: "/kpi-self-assessment", description: "Employee self-evaluation" },
+  { label: "360° Peer Review", parent: "KPI", to: "/kpi-peer-review", description: "Evaluate your peers" },
+  { label: "Assessment Workflow", parent: "KPI", to: "/kpi-assessment-workflow", description: "Appraisal approval workflow" },
+  { label: "KPI Reports", parent: "KPI", to: "/kpi-report", description: "Export performance reports" },
   { label: "Approval", parent: "Personnel Info", to: "/personnel-approval" },
   { label: "Statutory Compliance Audit", parent: "Compliance", to: "/" },
   // IE Recruitment
@@ -344,6 +349,62 @@ export function Topbar() {
           ) : (
             <Moon className="size-4.5 text-primary transition-transform duration-300 hover:-rotate-12" />
           )}
+        </button>
+        <button
+          onClick={() => {
+            if (confirm("Are you sure you want to reset all mock data to the latest 20-row defaults? This will overwrite custom edits.")) {
+              const keysToClear = [
+                "hris_organizations",
+                "hris_areas",
+                "hris_company_mappings",
+                "hris_departments",
+                "hris_sections",
+                "hris_units",
+                "hris_lines",
+                "hris_designations",
+                "hris_job_titles",
+                "hris_employee_types",
+                "hris_grades",
+                "hris_job_natures",
+                "hris_countries",
+                "hris_religions",
+                "hris_places_in_bd",
+                "hris_educational_qualifications",
+                "hris_educational_institutions",
+                "hris_educational_results",
+                "hris_training_categories",
+                "hris_shifts",
+                "hris_ot_config",
+                "hris_abnormal_shifts",
+                "hris_attendance_bonus_policy",
+                "hris_leave_settings",
+                "hris_policy_names",
+                "hris_allowance_rates",
+                "hris_tiffin_rates",
+                "hris_lunch_rates",
+                "hris_conveyance_setups",
+                "hris_bonus_settings",
+                "recruitment_config_operations",
+                "recruitment_config_machines",
+                "recruitment_config_op_grades",
+                "recruitment_config_measurements",
+                "recruitment_config_smv_bank",
+                "recruitment_config_eff_grades",
+                "recruitment_config_grade_vs_grade",
+                "recruitment_config_multi_ss_v2",
+                "recruitment_candidates",
+                "recruitment_data_version",
+                "recruitment_synced_employees"
+              ];
+              keysToClear.forEach(key => localStorage.removeItem(key));
+              localStorage.setItem("hris_master_data_version_v11", "true");
+              window.location.reload();
+            }
+          }}
+          className="relative size-9 grid place-items-center rounded-lg hover:bg-muted text-foreground/80 hover:text-foreground transition-colors duration-200"
+          title="Reset All Mock Data to 20 Rows Default"
+        >
+          <RefreshCw className="size-4.5 text-primary hover:rotate-180 transition-transform duration-500" />
         </button>
         <button className="relative size-9 grid place-items-center rounded-lg hover:bg-muted text-foreground/80 hover:text-foreground transition-colors duration-200">
           <MessagesSquare className="size-4.5" />

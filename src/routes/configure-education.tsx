@@ -51,12 +51,26 @@ interface TrainingCategory {
 // Defaults
 // ----------------------------------------------------
 const DEFAULT_QUALIFICATIONS: Qualification[] = [
-  { sl: 1, education: "Alim", isActive: "Active" },
-  { sl: 2, education: "B.A", isActive: "Active" },
-  { sl: 3, education: "B.B.A", isActive: "Active" },
-  { sl: 4, education: "B.B.S", isActive: "Active" },
-  { sl: 5, education: "B.Com", isActive: "Active" },
-  { sl: 6, education: "B.S.S", isActive: "Active" }
+  { sl: 1, education: "SSC", isActive: "Active" },
+  { sl: 2, education: "HSC", isActive: "Active" },
+  { sl: 3, education: "Alim", isActive: "Active" },
+  { sl: 4, education: "Dakhil", isActive: "Active" },
+  { sl: 5, education: "B.A", isActive: "Active" },
+  { sl: 6, education: "B.B.A", isActive: "Active" },
+  { sl: 7, education: "B.B.S", isActive: "Active" },
+  { sl: 8, education: "B.Com", isActive: "Active" },
+  { sl: 9, education: "B.S.S", isActive: "Active" },
+  { sl: 10, education: "B.Sc", isActive: "Active" },
+  { sl: 11, education: "M.A", isActive: "Active" },
+  { sl: 12, education: "M.B.A", isActive: "Active" },
+  { sl: 13, education: "M.B.S", isActive: "Active" },
+  { sl: 14, education: "M.S.S", isActive: "Active" },
+  { sl: 15, education: "M.Sc", isActive: "Active" },
+  { sl: 16, education: "M.Phil", isActive: "Active" },
+  { sl: 17, education: "Ph.D", isActive: "Active" },
+  { sl: 18, education: "Diploma in Engineering", isActive: "Active" },
+  { sl: 19, education: "Diploma in Textile", isActive: "Active" },
+  { sl: 20, education: "LLB", isActive: "Active" }
 ];
 
 const DEFAULT_INSTITUTIONS: Institution[] = [
@@ -67,7 +81,19 @@ const DEFAULT_INSTITUTIONS: Institution[] = [
   { sl: 5, education: "University of Chittagong", isActive: "Active" },
   { sl: 6, education: "Jahangirnagar University", isActive: "Active" },
   { sl: 7, education: "Jagannath University", isActive: "Active" },
-  { sl: 8, education: "Shahjalal University of Science and Technology", isActive: "Active" }
+  { sl: 8, education: "Shahjalal University of Science and Technology", isActive: "Active" },
+  { sl: 9, education: "Khulna University", isActive: "Active" },
+  { sl: 10, education: "North South University", isActive: "Active" },
+  { sl: 11, education: "BRAC University", isActive: "Active" },
+  { sl: 12, education: "American International University-Bangladesh (AIUB)", isActive: "Active" },
+  { sl: 13, education: "Independent University, Bangladesh (IUB)", isActive: "Active" },
+  { sl: 14, education: "East West University", isActive: "Active" },
+  { sl: 15, education: "Daffodil International University", isActive: "Active" },
+  { sl: 16, education: "United International University", isActive: "Active" },
+  { sl: 17, education: "Ahsanullah University of Science and Technology", isActive: "Active" },
+  { sl: 18, education: "Dhaka College", isActive: "Active" },
+  { sl: 19, education: "Eden Mohila College", isActive: "Active" },
+  { sl: 20, education: "Tejgaon College", isActive: "Active" }
 ];
 
 const DEFAULT_RESULTS: ResultItem[] = [
@@ -79,15 +105,41 @@ const DEFAULT_RESULTS: ResultItem[] = [
   { sl: 6, result: "D (Grade)", isActive: "Active" },
   { sl: 7, result: "First Division", isActive: "Active" },
   { sl: 8, result: "Second Division", isActive: "Active" },
-  { sl: 9, result: "Third Division", isActive: "Active" }
+  { sl: 9, result: "Third Division", isActive: "Active" },
+  { sl: 10, result: "GPA 5.00", isActive: "Active" },
+  { sl: 11, result: "GPA 4.00 - 4.99", isActive: "Active" },
+  { sl: 12, result: "GPA 3.00 - 3.99", isActive: "Active" },
+  { sl: 13, result: "GPA 2.00 - 2.99", isActive: "Active" },
+  { sl: 14, result: "CGPA 3.75 - 4.00", isActive: "Active" },
+  { sl: 15, result: "CGPA 3.50 - 3.74", isActive: "Active" },
+  { sl: 16, result: "CGPA 3.25 - 3.49", isActive: "Active" },
+  { sl: 17, result: "CGPA 3.00 - 3.24", isActive: "Active" },
+  { sl: 18, result: "CGPA 2.50 - 2.99", isActive: "Active" },
+  { sl: 19, result: "CGPA 2.00 - 2.49", isActive: "Active" },
+  { sl: 20, result: "Pass", isActive: "Active" }
 ];
 
 const DEFAULT_TRAININGS: TrainingCategory[] = [
   { sl: 1, name: "WPC Meeting.", isActive: "Active" },
-  { sl: 2, name: "Leave and Procudure.", isActive: "Active" },
+  { sl: 2, name: "Leave and Procedure.", isActive: "Active" },
   { sl: 3, name: "OHS (Occupation Health & Safety)", isActive: "Active" },
-  { sl: 4, name: "Overtime Calculation & Procudure.", isActive: "Active" },
-  { sl: 5, name: "Labour Law for the Worker.", isActive: "Active" }
+  { sl: 4, name: "Overtime Calculation & Procedure.", isActive: "Active" },
+  { sl: 5, name: "Labour Law for the Worker.", isActive: "Active" },
+  { sl: 6, name: "First Aid & Emergency Response", isActive: "Active" },
+  { sl: 7, name: "Fire Safety & Extinguisher Operation", isActive: "Active" },
+  { sl: 8, name: "Quality Control & Product Standards", isActive: "Active" },
+  { sl: 9, name: "Advanced Excel & Data Analysis", isActive: "Active" },
+  { sl: 10, name: "Machine Maintenance & Safety Protocols", isActive: "Active" },
+  { sl: 11, name: "ISO 9001:2015 Awareness", isActive: "Active" },
+  { sl: 12, name: "Chemical Hazards & MSDS Handling", isActive: "Active" },
+  { sl: 13, name: "Team Building & Effective Leadership", isActive: "Active" },
+  { sl: 14, name: "Communication Skills in Workplace", isActive: "Active" },
+  { sl: 15, name: "Software Tools & IT Systems", isActive: "Active" },
+  { sl: 16, name: "Compliance & Ethical Standards", isActive: "Active" },
+  { sl: 17, name: "Supply Chain & Material Control", isActive: "Active" },
+  { sl: 18, name: "Customer Support & Service Excellence", isActive: "Active" },
+  { sl: 19, name: "Gender Equality & Harassment Prevention", isActive: "Active" },
+  { sl: 20, name: "Waste Management & Sustainability", isActive: "Active" }
 ];
 
 function EducationSetupPage() {
@@ -116,6 +168,10 @@ function EducationSetupPage() {
         const parsed = JSON.parse(saved);
         if (!Array.isArray(parsed)) return defaultVal;
         if (requiredKey && parsed.length > 0 && parsed[0] && !(requiredKey in parsed[0])) {
+          return defaultVal;
+        }
+        // If stored data has fewer items than defaultVal, override it to ensure expanded list is loaded
+        if (parsed.length < defaultVal.length) {
           return defaultVal;
         }
         return parsed;
