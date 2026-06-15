@@ -33,7 +33,7 @@ export default defineConfig(({ command, mode }) => {
       tanstackStart(),
       command === "build" && nitro({
         externals: {
-          traceInclude: ["node_modules/tslib/**/*"]
+          inline: ["tslib"]
         }
       }),
       react(),
