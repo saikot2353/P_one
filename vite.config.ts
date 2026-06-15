@@ -7,8 +7,13 @@ import { componentTagger } from "lovable-tagger";
 import { nitro } from "nitro/vite";
 import path from "path";
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ command, mode }) => {
   return {
+    server: {
+      port: 3000,
+      host: true,
+      strictPort: true,
+    },
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
@@ -34,7 +39,7 @@ export default defineConfig(({ mode }) => {
           }
         }
       }),
-      nitro(),
+      command === "build" && nitro(),
       react(),
       mode === "development" && componentTagger(),
     ].filter(Boolean),
