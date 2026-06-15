@@ -31,6 +31,11 @@ export default defineConfig(({ command, mode }) => {
       tsconfigPaths({ projects: ["./tsconfig.json"] }),
       tailwindcss(),
       tanstackStart(),
+      command === "build" && nitro({
+        externals: {
+          traceInclude: ["node_modules/tslib/**/*"]
+        }
+      }),
       react(),
       mode === "development" && componentTagger(),
     ].filter(Boolean),
