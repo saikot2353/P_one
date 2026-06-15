@@ -4,7 +4,7 @@ import {
   PhoneCall, FileSignature, Heart, Baby, FileText, FileDown, ShieldCheck, Laptop,
   ChevronDown, Check, MapPin, Briefcase, UserCog, Clock, FileClock, ArrowUpRight, UserPlus, TrendingUp
 } from "lucide-react";
-import { rawIncrementRecords } from "@/routes/increment-history-data";
+import { rawIncrementRecords } from "@/routes/-increment-history-data";
 
 export const DETAIL_TABS = [
   { id: "personal_identity", label: "Personal & Identity", icon: User },
