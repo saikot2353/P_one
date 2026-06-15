@@ -182,7 +182,7 @@ function IEAssessmentPage() {
         <div className="p-4 md:p-6 lg:p-8 space-y-5 max-w-[1400px] mx-auto w-full">
 
           {/* ── Page Header ── */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -212,7 +212,7 @@ function IEAssessmentPage() {
           </div>
 
           {/* ── Candidate Info Card ── */}
-          <div className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden">
+          <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
             <div className="flex items-center gap-3 px-5 py-3 border-b border-border/50 bg-muted/30">
               <User className="size-4 text-muted-foreground" />
               <h2 className="text-[11px] font-black text-foreground/70 uppercase tracking-widest">Candidate Information</h2>
@@ -232,7 +232,7 @@ function IEAssessmentPage() {
           </div>
 
           {/* ── Skill Details Table ── */}
-          <div className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden">
+          <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
             <div className="flex items-center justify-between px-5 py-3 border-b border-border/50 bg-muted/30">
               <div className="flex items-center gap-3">
                 <TrendingUp className="size-4 text-muted-foreground" />
@@ -258,7 +258,7 @@ function IEAssessmentPage() {
                     </th>
                     <th className="px-3 py-3 text-left text-[10px] font-black text-muted-foreground uppercase tracking-wide min-w-[90px]">M/C</th>
                     <th className="px-3 py-3 text-left text-[10px] font-black text-muted-foreground uppercase tracking-wide w-[80px]">Meas.</th>
-                    {["CT1","CT2","CT3","CT4","CT5"].map(ct => (
+                    {["CT1", "CT2", "CT3", "CT4", "CT5"].map(ct => (
                       <th key={ct} className="px-2 py-3 text-center text-[10px] font-black text-muted-foreground uppercase tracking-wide w-14">
                         {ct}
                         <span className="block text-[9px] font-normal text-muted-foreground/60 normal-case">sec</span>
@@ -305,7 +305,7 @@ function IEAssessmentPage() {
                             {measurements.map(m => <option key={m.id} value={m.name}>{m.name}</option>)}
                           </select>
                         </td>
-                        {["ct1","ct2","ct3","ct4","ct5"].map(ct => (
+                        {["ct1", "ct2", "ct3", "ct4", "ct5"].map(ct => (
                           <td key={ct} className="px-2 py-2.5">
                             <input type="text" value={(skill as any)[ct]} onChange={e => handleSkillChange(idx, ct, e.target.value)} className={inputCls} />
                           </td>
@@ -343,7 +343,7 @@ function IEAssessmentPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
             {/* Summary Cards */}
-            <div className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden">
+            <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
               <div className="flex items-center gap-3 px-5 py-3 border-b border-border/50 bg-muted/30">
                 <Award className="size-4 text-muted-foreground" />
                 <h2 className="text-[11px] font-black text-foreground/70 uppercase tracking-widest">Assessment Summary</h2>
@@ -392,7 +392,7 @@ function IEAssessmentPage() {
             </div>
 
             {/* IE Recommendation */}
-            <div className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden">
+            <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
               <div className="flex items-center gap-3 px-5 py-3 border-b border-border/50 bg-muted/30">
                 <Briefcase className="size-4 text-muted-foreground" />
                 <h2 className="text-[11px] font-black text-foreground/70 uppercase tracking-widest">IE Recommendation</h2>
@@ -434,7 +434,7 @@ function IEAssessmentPage() {
           </div>
 
           {/* ── Formula Reference (Collapsible) ── */}
-          <div className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden">
+          <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
             <button
               onClick={() => setShowFormulas(v => !v)}
               className="w-full flex items-center justify-between px-5 py-3 hover:bg-muted/30 transition-colors"
@@ -465,7 +465,7 @@ function IEAssessmentPage() {
           </div>
 
           {/* ── Submit Footer ── */}
-          <div className="bg-card rounded-2xl border border-border/80 shadow-xs p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="bg-card rounded-lg border border-border/80 shadow-xs p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-[11px] text-muted-foreground">
               Submitting will change status from <strong className="text-amber-600">IE Pending</strong> → <strong className="text-violet-600">HR Pending</strong>
             </p>

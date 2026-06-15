@@ -4,17 +4,17 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { SearchableSelect } from "@/components/ui/searchable-select";
-import { 
-  ChevronRight, 
+import {
+  ChevronRight,
   ChevronLeft,
-  Search, 
-  Printer, 
-  FileText, 
-  Eye, 
+  Search,
+  Printer,
+  FileText,
+  Eye,
   Table as TableIcon,
-  X, 
-  CheckCircle2, 
-  Clock, 
+  X,
+  CheckCircle2,
+  Clock,
   CornerUpRight,
   MessageSquare,
   User,
@@ -278,11 +278,11 @@ export default function SSPApprovalPage() {
       <Sidebar />
       <main className="flex-1 min-w-0 flex flex-col overflow-hidden">
         <Topbar />
-        
+
         <div className="flex-1 flex flex-col p-4 xl:p-6 gap-3.5 overflow-hidden bg-slate-50/50 dark:bg-slate-950/10">
-          
+
           {/* Header Block */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl px-5 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-lg px-5 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
             <div className="space-y-0.5">
               <div className="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -305,10 +305,10 @@ export default function SSPApprovalPage() {
 
           {/* KPI Dashboard Summary Row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 shrink-0">
-            
+
             {/* Total Requisitions */}
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm flex items-center gap-3">
-              <div className="size-8.5 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 shrink-0 border border-slate-100 dark:border-slate-700">
+              <div className="size-8.5 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 shrink-0 border border-slate-100 dark:border-slate-700">
                 <FolderOpen className="size-4" />
               </div>
               <div>
@@ -319,7 +319,7 @@ export default function SSPApprovalPage() {
 
             {/* Approved */}
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm flex items-center gap-3">
-              <div className="size-8.5 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0 border border-emerald-100 dark:border-emerald-800">
+              <div className="size-8.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0 border border-emerald-100 dark:border-emerald-800">
                 <CheckCircle2 className="size-4" />
               </div>
               <div>
@@ -330,7 +330,7 @@ export default function SSPApprovalPage() {
 
             {/* Pending */}
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm flex items-center gap-3">
-              <div className="size-8.5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0 border border-amber-100 dark:border-amber-800">
+              <div className="size-8.5 rounded-lg bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0 border border-amber-100 dark:border-amber-800">
                 <Clock className="size-4" />
               </div>
               <div>
@@ -341,7 +341,7 @@ export default function SSPApprovalPage() {
 
             {/* Rejected */}
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm flex items-center gap-3">
-              <div className="size-8.5 rounded-2xl bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0 border border-rose-100 dark:border-rose-800">
+              <div className="size-8.5 rounded-lg bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0 border border-rose-100 dark:border-rose-800">
                 <XCircle className="size-4" />
               </div>
               <div>
@@ -353,16 +353,16 @@ export default function SSPApprovalPage() {
           </div>
 
           {/* Smart Filters (Dynamic layout grid, compact) */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-3 shadow-sm shrink-0 space-y-3">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-3 shadow-sm shrink-0 space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-x-3.5 gap-y-2.5">
-              
+
               <div className="space-y-0.5">
                 <label className="text-[8.5px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Approver</label>
                 <SearchableSelect
                   value={approver}
                   onChange={setApprover}
                   options={approverOptions}
-                  className="h-8 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-[11px] font-semibold text-slate-800 dark:text-slate-200"
+                  className="h-8 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-[11px] font-semibold text-slate-800 dark:text-slate-200"
                 />
               </div>
 
@@ -372,7 +372,7 @@ export default function SSPApprovalPage() {
                   value={location}
                   onChange={setLocation}
                   options={locationOptions}
-                  className="h-8 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-[11px] font-semibold text-slate-800 dark:text-slate-200"
+                  className="h-8 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-[11px] font-semibold text-slate-800 dark:text-slate-200"
                 />
               </div>
 
@@ -382,7 +382,7 @@ export default function SSPApprovalPage() {
                   value={docType}
                   onChange={setDocType}
                   options={docTypeOptions}
-                  className="h-8 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-[11px] font-semibold text-slate-800 dark:text-slate-200"
+                  className="h-8 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-[11px] font-semibold text-slate-800 dark:text-slate-200"
                 />
               </div>
 
@@ -392,14 +392,14 @@ export default function SSPApprovalPage() {
                   value={dateType}
                   onChange={setDateType}
                   options={dateTypeOptions}
-                  className="h-8 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-[11px] font-semibold text-slate-800 dark:text-slate-200"
+                  className="h-8 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-[11px] font-semibold text-slate-800 dark:text-slate-200"
                 />
               </div>
 
               {/* Date From & To in a combined card */}
               <div className="space-y-0.5 xl:col-span-2">
                 <label className="text-[8.5px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Date Period</label>
-                <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-0.5">
+                <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-0.5">
                   <input
                     type="date"
                     value={dateFrom}
@@ -419,20 +419,19 @@ export default function SSPApprovalPage() {
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-slate-100 dark:border-slate-800">
-              
+
               {/* Monochromatic Status Filter Pills */}
-              <div className="flex items-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-0.5 shadow-inner">
+              <div className="flex items-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-0.5 shadow-inner">
                 {(["All", "Approved", "Pending", "Rejected"] as const).map(filter => {
                   const isActive = statusFilter === filter;
                   return (
                     <button
                       key={filter}
                       onClick={() => setStatusFilter(filter)}
-                      className={`px-2.5 py-1 text-[9px] font-bold rounded transition-all uppercase tracking-wider ${
-                        isActive 
-                          ? "bg-white dark:bg-slate-600 text-slate-900 dark:text-white shadow-sm" 
+                      className={`px-2.5 py-1 text-[9px] font-bold rounded transition-all uppercase tracking-wider ${isActive
+                          ? "bg-white dark:bg-slate-600 text-slate-900 dark:text-white shadow-sm"
                           : "text-slate-500 dark:text-slate-400 hover:bg-white/40 dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-slate-200"
-                      }`}
+                        }`}
                     >
                       {filter}
                     </button>
@@ -448,11 +447,11 @@ export default function SSPApprovalPage() {
                     value={reqNumSearch}
                     onChange={e => setReqNumSearch(e.target.value)}
                     placeholder="Req Number..."
-                    className="h-7.5 pl-8 pr-3 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs font-semibold focus:outline-none text-slate-800 dark:text-slate-200"
+                    className="h-7.5 pl-8 pr-3 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none text-slate-800 dark:text-slate-200"
                   />
                 </div>
-                
-                <button className="h-7.5 px-4 bg-slate-800 hover:bg-slate-900 dark:bg-slate-200 dark:hover:bg-slate-100 text-white dark:text-slate-900 rounded-2xl text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1 shadow-sm cursor-pointer">
+
+                <button className="h-7.5 px-4 bg-slate-800 hover:bg-slate-900 dark:bg-slate-200 dark:hover:bg-slate-100 text-white dark:text-slate-900 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1 shadow-sm cursor-pointer">
                   <Search className="size-3" /> Search
                 </button>
               </div>
@@ -461,30 +460,30 @@ export default function SSPApprovalPage() {
           </div>
 
           {/* Action Toolbar & Requisitions List Table Card */}
-          <div className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-2xl overflow-hidden flex flex-col min-h-0">
-            
+          <div className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-lg overflow-hidden flex flex-col min-h-0">
+
             {/* Toolbar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/20 shrink-0">
               <div className="flex items-center gap-1.5">
-                <button className="h-8 px-3 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1 bg-white dark:bg-slate-900 cursor-pointer shadow-sm">
+                <button className="h-8 px-3 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1 bg-white dark:bg-slate-900 cursor-pointer shadow-sm">
                   <TableIcon className="size-3.5 text-emerald-600 dark:text-emerald-400" /> EXCEL
                 </button>
-                <button className="h-8 px-3 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1 bg-white dark:bg-slate-900 cursor-pointer shadow-sm">
+                <button className="h-8 px-3 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1 bg-white dark:bg-slate-900 cursor-pointer shadow-sm">
                   <Printer className="size-3.5 text-slate-500 dark:text-slate-400" /> PRINT
                 </button>
-                <button className="h-8 px-3 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1 bg-white dark:bg-slate-900 cursor-pointer shadow-sm">
+                <button className="h-8 px-3 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1 bg-white dark:bg-slate-900 cursor-pointer shadow-sm">
                   <FileText className="size-3.5 text-rose-500 dark:text-rose-400" /> PDF
                 </button>
               </div>
 
               <div className="relative w-48">
                 <Search className="absolute left-2.5 top-2 size-3.5 text-slate-400 dark:text-slate-500" />
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={globalSearch}
                   onChange={e => setGlobalSearch(e.target.value)}
                   placeholder="Quick Search..."
-                  className="h-7.5 w-full pl-8.5 pr-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs font-semibold focus:outline-none focus:border-slate-400 text-slate-800 dark:text-slate-200"
+                  className="h-7.5 w-full pl-8.5 pr-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:border-slate-400 text-slate-800 dark:text-slate-200"
                 />
               </div>
             </div>
@@ -509,13 +508,13 @@ export default function SSPApprovalPage() {
                     <tr key={row.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                       <td className="px-5 py-2">
                         <div className="flex items-center gap-1.5">
-                          <button 
-                            onClick={() => handleOpenModal(row)} 
-                            className="size-7 rounded-2xl bg-white dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-all flex items-center justify-center cursor-pointer shadow-sm"
+                          <button
+                            onClick={() => handleOpenModal(row)}
+                            className="size-7 rounded-lg bg-white dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-all flex items-center justify-center cursor-pointer shadow-sm"
                           >
                             <Eye className="size-3.5" />
                           </button>
-                          <button className="size-7 rounded-2xl bg-white dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-all flex items-center justify-center cursor-pointer shadow-sm">
+                          <button className="size-7 rounded-lg bg-white dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-all flex items-center justify-center cursor-pointer shadow-sm">
                             <Printer className="size-3.5" />
                           </button>
                         </div>
@@ -526,11 +525,10 @@ export default function SSPApprovalPage() {
                       <td className="px-5 py-2 text-slate-400 dark:text-slate-500">{row.reqFrom}</td>
                       <td className="px-5 py-2 text-slate-500 dark:text-slate-400">{row.department}</td>
                       <td className="px-5 py-2">
-                        <span className={`px-2 py-0.5 rounded-xl text-[8.5px] font-extrabold uppercase border ${
-                          row.document.includes("Leave") 
-                            ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-900" 
+                        <span className={`px-2 py-0.5 rounded-xl text-[8.5px] font-extrabold uppercase border ${row.document.includes("Leave")
+                            ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-900"
                             : "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-900"
-                        }`}>
+                          }`}>
                           {row.document}
                         </span>
                       </td>
@@ -565,12 +563,12 @@ export default function SSPApprovalPage() {
       {/* Requisition Approval Modal */}
       {selectedReq && (
         <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-          <DialogContent className="max-w-4xl p-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl overflow-hidden gap-0 max-h-[92vh] flex flex-col [&>button]:hidden text-slate-700 dark:text-slate-200">
-            
+          <DialogContent className="max-w-4xl p-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl rounded-lg overflow-hidden gap-0 max-h-[92vh] flex flex-col [&>button]:hidden text-slate-700 dark:text-slate-200">
+
             {/* Modal Header */}
             <div className="px-6 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
-                <div className="size-8.5 rounded-2xl bg-slate-800 dark:bg-slate-700 text-white flex items-center justify-center shrink-0">
+                <div className="size-8.5 rounded-lg bg-slate-800 dark:bg-slate-700 text-white flex items-center justify-center shrink-0">
                   <FileCheck className="size-4.5" />
                 </div>
                 <div>
@@ -578,8 +576,8 @@ export default function SSPApprovalPage() {
                   <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 uppercase tracking-wider font-extrabold">{selectedReq.document}</p>
                 </div>
               </div>
-              <button 
-                onClick={() => setModalOpen(false)} 
+              <button
+                onClick={() => setModalOpen(false)}
                 className="size-7.5 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all cursor-pointer"
               >
                 <X className="size-4" />
@@ -588,7 +586,7 @@ export default function SSPApprovalPage() {
 
             {/* Modal Body */}
             <div className="flex-1 overflow-y-auto p-6 space-y-5">
-              
+
               {/* Requester Profile Summary Card */}
               <div className="bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
@@ -621,7 +619,7 @@ export default function SSPApprovalPage() {
 
               {/* Grid Split */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                
+
                 {/* Requisition Info */}
                 <div className="space-y-2.5">
                   <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
@@ -698,16 +696,15 @@ export default function SSPApprovalPage() {
                   <div className="size-1.5 rounded-full bg-slate-500" />
                   Approval Workflow Signature Chain
                 </h3>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                   {selectedReq.details.signatures.map((sig, idx) => (
-                    <div 
-                      key={idx} 
-                      className={`p-3 border rounded-xl flex items-start gap-2.5 relative ${
-                        sig.status === "Approved" 
-                          ? "bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-800/30 text-emerald-800 dark:text-emerald-400" 
+                    <div
+                      key={idx}
+                      className={`p-3 border rounded-xl flex items-start gap-2.5 relative ${sig.status === "Approved"
+                          ? "bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-800/30 text-emerald-800 dark:text-emerald-400"
                           : "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500"
-                      }`}
+                        }`}
                     >
                       <div className={`mt-0.5 p-1 rounded-full ${sig.status === "Approved" ? "bg-emerald-100 text-emerald-600" : "bg-slate-100 text-slate-400"}`}>
                         <CheckCircle2 className="size-3.5" />
@@ -729,7 +726,7 @@ export default function SSPApprovalPage() {
 
               {/* Comments Section */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-1">
-                
+
                 {/* Input */}
                 <div className="space-y-2.5">
                   <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
@@ -737,16 +734,16 @@ export default function SSPApprovalPage() {
                     Add Decision Comment
                   </h3>
                   <div className="space-y-2">
-                    <textarea 
+                    <textarea
                       value={commentText}
                       onChange={e => setCommentText(e.target.value)}
                       placeholder="Type comment or notes here..."
                       className="w-full h-24 p-3 text-xs font-semibold text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-slate-400 bg-slate-50 dark:bg-slate-950 placeholder:text-slate-400/50 resize-none"
                     />
                     <div className="flex justify-end">
-                      <button 
+                      <button
                         onClick={handleAddComment}
-                        className="h-8 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-2xl text-[10.5px] font-extrabold transition-all flex items-center gap-1 cursor-pointer"
+                        className="h-8 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-[10.5px] font-extrabold transition-all flex items-center gap-1 cursor-pointer"
                       >
                         Post Note
                       </button>
@@ -762,7 +759,7 @@ export default function SSPApprovalPage() {
                   </h3>
                   <div className="border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-950/20 p-3 h-[125px] overflow-y-auto space-y-3">
                     {(commentsHistory[selectedReq.id] || []).map((comm, idx) => (
-                      <div key={idx} className="bg-white dark:bg-slate-900 border border-slate-200 p-2.5 rounded-2xl shadow-sm space-y-1">
+                      <div key={idx} className="bg-white dark:bg-slate-900 border border-slate-200 p-2.5 rounded-lg shadow-sm space-y-1">
                         <div className="flex justify-between items-center text-[9px] font-extrabold">
                           <span className="text-slate-700 dark:text-slate-300">{comm.user}</span>
                           <span className="text-slate-400 dark:text-slate-500 font-mono">{comm.date}</span>
@@ -788,27 +785,27 @@ export default function SSPApprovalPage() {
                 Click action below to execute your requisition decision status.
               </span>
               <div className="flex items-center gap-2">
-                <button 
+                <button
                   onClick={() => setModalOpen(false)}
-                  className="h-8.5 px-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-2xl text-xs font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer"
+                  className="h-8.5 px-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer"
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   onClick={() => setModalOpen(false)}
-                  className="h-8.5 px-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-2xl text-xs font-bold transition-all shadow-3xs flex items-center gap-1 cursor-pointer"
+                  className="h-8.5 px-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-bold transition-all shadow-3xs flex items-center gap-1 cursor-pointer"
                 >
                   <CornerUpRight className="size-3.5" /> Forward
                 </button>
-                <button 
+                <button
                   onClick={() => setModalOpen(false)}
-                  className="h-8.5 px-4 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl text-xs font-bold transition-all shadow-3xs flex items-center gap-1 cursor-pointer"
+                  className="h-8.5 px-4 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold transition-all shadow-3xs flex items-center gap-1 cursor-pointer"
                 >
                   <X className="size-3.5" /> Reject
                 </button>
-                <button 
+                <button
                   onClick={() => setModalOpen(false)}
-                  className="h-8.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-bold transition-all shadow-3xs flex items-center gap-1.5 cursor-pointer"
+                  className="h-8.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all shadow-3xs flex items-center gap-1.5 cursor-pointer"
                 >
                   <CheckCircle2 className="size-3.5" /> Approve
                 </button>

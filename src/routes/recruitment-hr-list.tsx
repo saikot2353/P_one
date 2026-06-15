@@ -69,7 +69,7 @@ function HRAssessmentListPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto w-full">
-          <div className="bg-card rounded-2xl border border-border/85 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-lg border border-border/85 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -85,28 +85,28 @@ function HRAssessmentListPage() {
             </div>
           </div>
 
-          <div className="bg-card rounded-2xl border border-border/80 shadow-xs p-6 space-y-6">
+          <div className="bg-card rounded-lg border border-border/80 shadow-xs p-6 space-y-6">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-primary uppercase">Assess Status *</label><select value={assessStatus} onChange={e=>setAssessStatus(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted text-primary font-bold border border-border/40 text-xs focus:border-primary/80 outline-none"><option value="HR Pending">HR Pending</option><option value="HR Approved">HR Approved</option><option value="HR Rejected">HR Rejected</option><option value="">All</option></select></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-red-500 uppercase">DOJ From *</label><input type="date" value={dojFrom} onChange={e=>setDojFrom(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none" /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-red-500 uppercase">DOJ To *</label><input type="date" value={dojTo} onChange={e=>setDojTo(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none" /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-muted-foreground uppercase">Emp Type</label><select value={empType} onChange={e=>setEmpType(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"><option value="">Select/Multi</option><option value="Office Executive">Office Executive</option><option value="Worker">Worker</option></select></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-muted-foreground uppercase">Department</label><select value={department} onChange={e=>setDepartment(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"><option value="">Select/Multi</option><option value="RMG Production">RMG Production</option></select></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-muted-foreground uppercase">Section</label><select value={section} onChange={e=>setSection(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"><option value="">Select/Multi</option><option value="RMG-Production-IE & Planning">IE & Planning</option></select></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-muted-foreground uppercase">Designation</label><select value={designation} onChange={e=>setDesignation(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"><option value="">Select/Multi</option><option value="Production Operator">Production Operator</option></select></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-muted-foreground uppercase">Unit</label><select value={unit} onChange={e=>setUnit(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"><option value="">Select/Multi</option><option value="Unit-01">Unit-01</option></select></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-muted-foreground uppercase">Line</label><select value={line} onChange={e=>setLine(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"><option value="">Select/Multi</option><option value="Line-04">Line-04</option></select></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-primary uppercase">Assess Status *</label><select value={assessStatus} onChange={e => setAssessStatus(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted text-primary font-bold border border-border/40 text-xs focus:border-primary/80 outline-none"><option value="HR Pending">HR Pending</option><option value="HR Approved">HR Approved</option><option value="HR Rejected">HR Rejected</option><option value="">All</option></select></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-red-500 uppercase">DOJ From *</label><input type="date" value={dojFrom} onChange={e => setDojFrom(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none" /></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-red-500 uppercase">DOJ To *</label><input type="date" value={dojTo} onChange={e => setDojTo(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none" /></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-muted-foreground uppercase">Emp Type</label><select value={empType} onChange={e => setEmpType(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"><option value="">Select/Multi</option><option value="Office Executive">Office Executive</option><option value="Worker">Worker</option></select></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-muted-foreground uppercase">Department</label><select value={department} onChange={e => setDepartment(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"><option value="">Select/Multi</option><option value="RMG Production">RMG Production</option></select></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-muted-foreground uppercase">Section</label><select value={section} onChange={e => setSection(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"><option value="">Select/Multi</option><option value="RMG-Production-IE & Planning">IE & Planning</option></select></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-muted-foreground uppercase">Designation</label><select value={designation} onChange={e => setDesignation(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"><option value="">Select/Multi</option><option value="Production Operator">Production Operator</option></select></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-muted-foreground uppercase">Unit</label><select value={unit} onChange={e => setUnit(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"><option value="">Select/Multi</option><option value="Unit-01">Unit-01</option></select></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-muted-foreground uppercase">Line</label><select value={line} onChange={e => setLine(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"><option value="">Select/Multi</option><option value="Line-04">Line-04</option></select></div>
               <div className="space-y-1.5 flex items-end gap-2">
                 <div className="flex-1 space-y-1.5">
                   <label className="text-[10px] font-bold text-muted-foreground uppercase">Emp ID-Temp</label>
-                  <input type="text" placeholder="Single/Multi" value={empIdTemp} onChange={e=>setEmpIdTemp(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none" />
+                  <input type="text" placeholder="Single/Multi" value={empIdTemp} onChange={e => setEmpIdTemp(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none" />
                 </div>
                 <button onClick={handleSearch} className="h-10 px-4 rounded-xl bg-muted hover:bg-muted/80 text-foreground font-black text-xs transition flex items-center justify-center gap-1.5 shadow-sm border border-border/50">
                   <Search className="size-4 text-primary" /> Search
                 </button>
               </div>
             </div>
-            
+
             {/* Table */}
             <div className="overflow-x-auto border border-border/40 rounded-xl">
               <table className="w-full text-left text-xs whitespace-nowrap">
@@ -163,7 +163,7 @@ function HRAssessmentListPage() {
                 </tbody>
               </table>
             </div>
-            
+
           </div>
         </div>
       </main>

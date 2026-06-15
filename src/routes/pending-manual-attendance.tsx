@@ -123,7 +123,7 @@ function PendingManualAttendancePage() {
   // Custom Calendar & Clock Picker states
   const [activeDatePicker, setActiveDatePicker] = useState<{ id: string; field: string } | null>(null);
   const [activeTimePicker, setActiveTimePicker] = useState<{ id: string; field: string } | null>(null);
-  
+
   // Calendar month state
   const [calendarMonth, setCalendarMonth] = useState(4); // May
   const [calendarYear, setCalendarYear] = useState(2026);
@@ -232,10 +232,10 @@ function PendingManualAttendancePage() {
     return requests.filter(r => {
       // 1. Employee ID filter
       if (searchEmpId.trim() && !r.id.includes(searchEmpId.trim())) return false;
-      
+
       // 2. Department filter
       if (subDept !== "ALL" && r.dept1 !== subDept) return false;
-      
+
       // 3. Status filter
       if (statusRequest !== "ALL Request") {
         const matchStatus = statusRequest === "Pending" ? "Pending" : "Approve";
@@ -316,7 +316,7 @@ function PendingManualAttendancePage() {
     return (
       <div className="w-56 select-none bg-card">
         <div className="flex items-center justify-between border-b border-border/40 pb-2 mb-2">
-          <button 
+          <button
             onClick={(ev) => {
               ev.stopPropagation();
               if (calendarMonth === 0) {
@@ -333,7 +333,7 @@ function PendingManualAttendancePage() {
           <span className="text-[10px] font-black uppercase text-foreground tracking-wider">
             {monthNames[calendarMonth]} {calendarYear}
           </span>
-          <button 
+          <button
             onClick={(ev) => {
               ev.stopPropagation();
               if (calendarMonth === 11) {
@@ -442,7 +442,7 @@ function PendingManualAttendancePage() {
         </div>
 
         <div className="pt-1.5 border-t border-border/30">
-          <button 
+          <button
             onClick={(ev) => {
               ev.stopPropagation();
               handleSelectTime(`${currHr || "09"}:${currMin || "00"}`);
@@ -464,7 +464,7 @@ function PendingManualAttendancePage() {
 
         <div className="p-4 md:p-6 xl:p-8 space-y-6">
           {/* Breadcrumbs and Page Title */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -478,7 +478,7 @@ function PendingManualAttendancePage() {
                 <span>Manual Attendance Approval</span>
               </h1>
             </div>
-            <button 
+            <button
               onClick={() => setRequests(initialPendingList)}
               className="h-10 px-4 rounded-xl border border-border hover:bg-muted text-xs font-bold text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition duration-200"
             >
@@ -488,7 +488,7 @@ function PendingManualAttendancePage() {
           </div>
 
           {/* Top Panel: Criteria Selection */}
-          <div className="bg-card rounded-2xl border border-border/85 p-5 shadow-xs space-y-5">
+          <div className="bg-card rounded-lg border border-border/85 p-5 shadow-xs space-y-5">
             <div className="flex items-center justify-between border-b border-border/40 pb-3">
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary">Criteria Selection</span>
               <span className="text-[9px] font-bold text-muted-foreground/50">Audit Registry</span>
@@ -509,7 +509,7 @@ function PendingManualAttendancePage() {
                   <Calendar className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-primary" />
 
                   {activeDatePicker?.id === "filters" && activeDatePicker?.field === "startDate" && (
-                    <div className="absolute z-50 bg-card border border-border/70 rounded-2xl p-4 shadow-2xl space-y-3 date-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
+                    <div className="absolute z-50 bg-card border border-border/70 rounded-lg p-4 shadow-2xl space-y-3 date-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
                       {renderCalendarMarkup()}
                     </div>
                   )}
@@ -530,7 +530,7 @@ function PendingManualAttendancePage() {
                   <Calendar className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-primary" />
 
                   {activeDatePicker?.id === "filters" && activeDatePicker?.field === "endDate" && (
-                    <div className="absolute z-50 bg-card border border-border/70 rounded-2xl p-4 shadow-2xl space-y-3 date-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
+                    <div className="absolute z-50 bg-card border border-border/70 rounded-lg p-4 shadow-2xl space-y-3 date-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
                       {renderCalendarMarkup()}
                     </div>
                   )}
@@ -541,7 +541,7 @@ function PendingManualAttendancePage() {
               <div className="space-y-1">
                 <label className="text-[10px] font-bold text-muted-foreground uppercase">Employee Type</label>
                 <div className="relative">
-                  <select 
+                  <select
                     value={empType}
                     onChange={(e) => setEmpType(e.target.value)}
                     className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
@@ -558,7 +558,7 @@ function PendingManualAttendancePage() {
               <div className="space-y-1">
                 <label className="text-[10px] font-bold text-muted-foreground uppercase">Sub Department</label>
                 <div className="relative">
-                  <select 
+                  <select
                     value={subDept}
                     onChange={(e) => setSubDept(e.target.value)}
                     className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
@@ -577,7 +577,7 @@ function PendingManualAttendancePage() {
               <div className="space-y-1">
                 <label className="text-[10px] font-bold text-muted-foreground uppercase">Job Title</label>
                 <div className="relative">
-                  <select 
+                  <select
                     value={jobTitle}
                     onChange={(e) => setJobTitle(e.target.value)}
                     className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
@@ -595,7 +595,7 @@ function PendingManualAttendancePage() {
               <div className="space-y-1">
                 <label className="text-[10px] font-bold text-muted-foreground uppercase">Unit</label>
                 <div className="relative">
-                  <select 
+                  <select
                     value={unit}
                     onChange={(e) => setUnit(e.target.value)}
                     className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
@@ -612,7 +612,7 @@ function PendingManualAttendancePage() {
               <div className="space-y-1">
                 <label className="text-[10px] font-bold text-muted-foreground uppercase">Line</label>
                 <div className="relative">
-                  <select 
+                  <select
                     value={line}
                     onChange={(e) => setLine(e.target.value)}
                     className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
@@ -641,7 +641,7 @@ function PendingManualAttendancePage() {
               <div className="space-y-1">
                 <label className="text-[10px] font-bold text-muted-foreground uppercase">Status</label>
                 <div className="relative">
-                  <select 
+                  <select
                     value={statusRequest}
                     onChange={(e) => setStatusRequest(e.target.value)}
                     className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
@@ -665,8 +665,8 @@ function PendingManualAttendancePage() {
           </div>
 
           {/* Spreadsheet Datagrid Block */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
-            
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
+
             {/* Utilities Actions & Table Search */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/30 pb-4">
               <div className="flex items-center gap-1.5 select-none">
@@ -707,8 +707,8 @@ function PendingManualAttendancePage() {
                   <tr className="bg-[#f1f5f9] dark:bg-[#0f172a] text-foreground font-bold border-b border-border/50 select-none whitespace-nowrap">
                     {/* Fixed Left Header Columns */}
                     <th className="sticky left-0 bg-[#f1f5f9] dark:bg-[#0f172a] px-4 py-3 text-center border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[60px] min-w-[60px] max-w-[60px]">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         checked={isAllSelected}
                         onChange={toggleSelectAll}
                         className="rounded border-border/60 text-primary focus:ring-primary/15 cursor-pointer animate-pulse"
@@ -718,7 +718,7 @@ function PendingManualAttendancePage() {
                     <th className="sticky left-[100px] bg-[#f1f5f9] dark:bg-[#0f172a] px-4 py-3 font-extrabold border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[120px] min-w-[120px] max-w-[120px]">Reason</th>
                     <th className="sticky left-[220px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-3 font-extrabold border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[90px] min-w-[90px] max-w-[90px]">Emp ID</th>
                     <th className="sticky left-[310px] bg-[#f1f5f9] dark:bg-[#0f172a] px-4 py-3 font-extrabold border-r border-border/40 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[160px] min-w-[160px] max-w-[160px]">Name</th>
-                    
+
                     {/* Scrolling Columns */}
                     <th className="px-4 py-3 font-extrabold w-48 bg-[#f1f5f9] dark:bg-[#0f172a]">Department</th>
                     <th className="px-4 py-3 font-extrabold w-48 bg-[#f1f5f9] dark:bg-[#0f172a]">Designation</th>
@@ -738,7 +738,7 @@ function PendingManualAttendancePage() {
                       : "bg-card group-hover:bg-[#f8fafc] dark:group-hover:bg-[#1e293b]";
 
                     return (
-                      <tr 
+                      <tr
                         key={r.id}
                         className={[
                           "group hover:bg-[#f8fafc] dark:hover:bg-[#1e293b] transition duration-150 whitespace-nowrap",
@@ -748,13 +748,13 @@ function PendingManualAttendancePage() {
                         {/* 1. Selector + Pencil Action Column (Sticky Left) */}
                         <td className={`sticky left-0 ${stickyCellBgClass} px-4 py-2.5 border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[60px] min-w-[60px] max-w-[60px] transition-all`}>
                           <div className="flex items-center justify-between gap-1">
-                            <input 
-                              type="checkbox" 
+                            <input
+                              type="checkbox"
                               checked={isSelected}
                               onChange={() => toggleSelectRow(r.id)}
                               className="rounded border-border/60 text-primary focus:ring-primary/15 cursor-pointer"
                             />
-                            <button 
+                            <button
                               onClick={() => handleStartEdit(r)}
                               className="p-1 rounded text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/20 transition"
                               title="Edit Punch Log"
@@ -806,21 +806,21 @@ function PendingManualAttendancePage() {
                           <div className="grid grid-cols-12 gap-x-1">
                             <span className="col-span-3 text-muted-foreground/70 font-semibold">By</span>
                             <span className="col-span-9 font-bold text-foreground/90">: {r.systemBy}</span>
-                            
+
                             <span className="col-span-3 text-muted-foreground/70 font-semibold">Date</span>
                             <span className="col-span-9 font-bold text-foreground/90">: {r.systemDate}</span>
-                            
+
                             <span className="col-span-3 text-muted-foreground/70 font-semibold">Info</span>
                             <span className="col-span-9 font-semibold text-primary/80 truncate">: {r.systemInfo}</span>
-                            
+
                             <span className="col-span-3 text-muted-foreground/70 font-semibold">HOD</span>
                             <span className="col-span-9 font-bold">
                               : <span className={r.hodStatus === "Approve" ? "text-emerald-500" : "text-amber-500"}>{r.hodStatus}</span>
                             </span>
-                            
+
                             <span className="col-span-3 text-muted-foreground/70 font-semibold">HRD</span>
                             <span className="col-span-9 font-bold text-amber-500">: {r.hrdStatus}</span>
-                            
+
                             <span className="col-span-3 text-muted-foreground/70 font-semibold">MD</span>
                             <span className="col-span-9 font-bold text-amber-500">: {r.mdStatus}</span>
                           </div>
@@ -848,7 +848,7 @@ function PendingManualAttendancePage() {
               <span className="text-[10px] font-bold text-muted-foreground/75 uppercase tracking-wider">
                 Showing 1 to {filteredRequests.length} of {requests.length} entries
               </span>
-              
+
               <div className="flex items-center gap-2">
                 {/* DELETE red button exactly matching Pakiza style! */}
                 <button
@@ -875,14 +875,14 @@ function PendingManualAttendancePage() {
         {/* Dynamic Inline edit modal */}
         {editingRequest && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-            <div className="bg-card text-foreground rounded-2xl border border-border shadow-2xl max-w-lg w-full overflow-hidden animate-in zoom-in-95 duration-200">
-              
+            <div className="bg-card text-foreground rounded-lg border border-border shadow-2xl max-w-lg w-full overflow-hidden animate-in zoom-in-95 duration-200">
+
               <div className="px-5 py-4 border-b border-border/60 flex items-center justify-between bg-muted/30">
                 <h2 className="text-xs font-black text-foreground flex items-center gap-1.5 tracking-wide uppercase">
                   <Pencil className="size-4 text-primary" />
                   <span>Edit Pending Manual Request</span>
                 </h2>
-                <button 
+                <button
                   onClick={() => setEditingRequest(null)}
                   className="size-7 rounded-lg hover:bg-muted text-muted-foreground/60 hover:text-foreground flex items-center justify-center transition"
                 >
@@ -919,7 +919,7 @@ function PendingManualAttendancePage() {
                       <Clock className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-primary" />
 
                       {activeTimePicker?.id === "edit" && activeTimePicker?.field === "inTime" && (
-                        <div className="absolute z-50 bg-card border border-border/70 rounded-2xl p-4 shadow-2xl space-y-3 time-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
+                        <div className="absolute z-50 bg-card border border-border/70 rounded-lg p-4 shadow-2xl space-y-3 time-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
                           {renderTimeClockMarkup()}
                         </div>
                       )}
@@ -942,7 +942,7 @@ function PendingManualAttendancePage() {
                       <Clock className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-primary" />
 
                       {activeTimePicker?.id === "edit" && activeTimePicker?.field === "outTime" && (
-                        <div className="absolute z-50 bg-card border border-border/70 rounded-2xl p-4 shadow-2xl space-y-3 time-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
+                        <div className="absolute z-50 bg-card border border-border/70 rounded-lg p-4 shadow-2xl space-y-3 time-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
                           {renderTimeClockMarkup()}
                         </div>
                       )}

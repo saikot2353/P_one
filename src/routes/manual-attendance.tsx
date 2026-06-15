@@ -391,7 +391,7 @@ function ManualAttendancePage() {
     return (
       <div className="w-56 select-none bg-card">
         <div className="flex items-center justify-between border-b border-border/40 pb-2 mb-2">
-          <button 
+          <button
             onClick={(ev) => {
               ev.stopPropagation();
               if (calendarMonth === 0) {
@@ -408,7 +408,7 @@ function ManualAttendancePage() {
           <span className="text-[10px] font-black uppercase text-foreground tracking-wider">
             {monthNames[calendarMonth]} {calendarYear}
           </span>
-          <button 
+          <button
             onClick={(ev) => {
               ev.stopPropagation();
               if (calendarMonth === 11) {
@@ -423,12 +423,12 @@ function ManualAttendancePage() {
             <ChevronRight className="size-3.5" />
           </button>
         </div>
-        
+
         {/* Days grid */}
         <div className="grid grid-cols-7 gap-1 text-[9px] font-bold text-center text-muted-foreground uppercase pb-1 tracking-wider border-b border-border/30 mb-1">
           <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
         </div>
-        
+
         <div className="grid grid-cols-7 gap-0.5 text-center">
           {renderCalendarDays}
         </div>
@@ -440,7 +440,7 @@ function ManualAttendancePage() {
   const renderTimeClockMarkup = () => {
     const hours = ["08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"];
     const minutes = ["00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55"];
-    
+
     // Determine active values to highlight currently selected
     let activeVal = "";
     if (activeTimePicker) {
@@ -458,7 +458,7 @@ function ManualAttendancePage() {
         }
       }
     }
-    
+
     const [currHr, currMin] = activeVal ? activeVal.split(":") : ["09", "00"];
 
     return (
@@ -575,7 +575,7 @@ function ManualAttendancePage() {
 
         {/* Custom Actions */}
         <div className="pt-1.5 border-t border-border/30">
-          <button 
+          <button
             onClick={(ev) => {
               ev.stopPropagation();
               handleSelectTime(`${currHr || "09"}:${currMin || "00"}`);
@@ -597,7 +597,7 @@ function ManualAttendancePage() {
 
         <div className="p-4 md:p-6 xl:p-8 space-y-6">
           {/* Breadcrumb and Header */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -612,7 +612,7 @@ function ManualAttendancePage() {
               </h1>
             </div>
             <div className="flex items-center gap-2.5">
-              <button 
+              <button
                 onClick={() => setEmployees(initialEmployees)}
                 className="h-10 px-4 rounded-xl border border-border hover:bg-muted text-xs font-bold text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition duration-200"
               >
@@ -624,9 +624,9 @@ function ManualAttendancePage() {
 
           {/* Upper Panels / Filters Block */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            
+
             {/* CARD 1: Filters & Criteria (Left Panel - Span 2 Columns) */}
-            <div className="xl:col-span-2 bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-5">
+            <div className="xl:col-span-2 bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-5">
               <div className="flex items-center justify-between border-b border-border/40 pb-3">
                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary"> Roster Criteria Selection</span>
                 <span className="text-[9px] font-bold text-muted-foreground/50">Core HRIS Engine</span>
@@ -679,10 +679,10 @@ function ManualAttendancePage() {
                       className="w-full h-9 px-3 pl-8.5 rounded-lg bg-muted border border-border/40 text-xs font-bold outline-none cursor-pointer text-primary"
                     />
                     <Calendar className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-primary" />
-                    
+
                     {/* Inline Calendar Popover exactly under field! */}
                     {activeDatePicker?.id === "filter" && activeDatePicker?.field === "date" && (
-                      <div className="absolute z-50 bg-card border border-border/70 rounded-2xl p-4 shadow-2xl space-y-3 date-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
+                      <div className="absolute z-50 bg-card border border-border/70 rounded-lg p-4 shadow-2xl space-y-3 date-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
                         {renderCalendarMarkup()}
                       </div>
                     )}
@@ -788,12 +788,12 @@ function ManualAttendancePage() {
 
             {/* CARD 2 & 3: Bulk and Search Configs (Right Side Panels) */}
             <div className="flex flex-col gap-6">
-              
+
               {/* Green-Border Roster Bulk Action Card */}
-              <div className="bg-card rounded-2xl border-2 border-emerald-500/30 p-5 shadow-sm space-y-4.5 relative overflow-hidden">
+              <div className="bg-card rounded-lg border-2 border-emerald-500/30 p-5 shadow-sm space-y-4.5 relative overflow-hidden">
                 {/* Dynamic corner splash */}
                 <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-bl-full pointer-events-none" />
-                
+
                 <div className="flex items-center gap-2 border-b border-border/40 pb-2.5">
                   <div className="size-5 rounded bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold text-[10px]">✔</div>
                   <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Roster Bulk Setup</span>
@@ -813,10 +813,10 @@ function ManualAttendancePage() {
                         className="w-full h-8 pl-8 px-2 rounded bg-muted border border-border/40 text-[11px] font-mono outline-none cursor-pointer text-emerald-600 dark:text-emerald-400 font-bold"
                       />
                       <Clock className="size-3 absolute left-2.5 top-1/2 -translate-y-1/2 text-emerald-500" />
-                      
+
                       {/* Inline TimePicker exactly under bulk In Time! */}
                       {activeTimePicker?.id === "bulk" && activeTimePicker?.field === "inTime" && (
-                        <div className="absolute z-50 bg-card border border-border/70 rounded-2xl p-4 shadow-2xl space-y-3 time-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
+                        <div className="absolute z-50 bg-card border border-border/70 rounded-lg p-4 shadow-2xl space-y-3 time-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
                           {renderTimeClockMarkup()}
                         </div>
                       )}
@@ -835,10 +835,10 @@ function ManualAttendancePage() {
                         className="w-full h-8 pl-8 px-2 rounded bg-muted border border-border/40 text-[11px] font-mono outline-none cursor-pointer text-emerald-600 dark:text-emerald-400 font-bold"
                       />
                       <Calendar className="size-3 absolute left-2.5 top-1/2 -translate-y-1/2 text-emerald-500" />
-                      
+
                       {/* Inline Calendar exactly under bulk Out Date! */}
                       {activeDatePicker?.id === "bulk" && activeDatePicker?.field === "outDate" && (
-                        <div className="absolute z-50 bg-card border border-border/70 rounded-2xl p-4 shadow-2xl space-y-3 date-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
+                        <div className="absolute z-50 bg-card border border-border/70 rounded-lg p-4 shadow-2xl space-y-3 date-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
                           {renderCalendarMarkup()}
                         </div>
                       )}
@@ -861,7 +861,7 @@ function ManualAttendancePage() {
 
                       {/* Inline TimePicker exactly under bulk Out Time! */}
                       {activeTimePicker?.id === "bulk" && activeTimePicker?.field === "outTime" && (
-                        <div className="absolute z-50 bg-card border border-border/70 rounded-2xl p-4 shadow-2xl space-y-3 time-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
+                        <div className="absolute z-50 bg-card border border-border/70 rounded-lg p-4 shadow-2xl space-y-3 time-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
                           {renderTimeClockMarkup()}
                         </div>
                       )}
@@ -883,8 +883,8 @@ function ManualAttendancePage() {
                 {/* Random addition toggle helper */}
                 <div className="flex items-center justify-between gap-2 pt-1 text-[10px]">
                   <label className="flex items-center gap-2 cursor-pointer text-muted-foreground font-semibold">
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       checked={autoAddMinutes}
                       onChange={(e) => setAutoAddMinutes(e.target.checked)}
                       className="rounded border-border text-emerald-500 focus:ring-emerald-500/10 cursor-pointer"
@@ -906,7 +906,7 @@ function ManualAttendancePage() {
               </div>
 
               {/* Purple-Border Card: Search Configuration */}
-              <div className="bg-card rounded-2xl border-2 border-indigo-500/30 p-5 shadow-sm space-y-3 relative overflow-hidden">
+              <div className="bg-card rounded-lg border-2 border-indigo-500/30 p-5 shadow-sm space-y-3 relative overflow-hidden">
                 {/* Dynamic corner splash */}
                 <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-bl-full pointer-events-none" />
 
@@ -935,8 +935,8 @@ function ManualAttendancePage() {
           </div>
 
           {/* Action Utilities & Datagrid Block */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4 relative">
-            
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4 relative">
+
             {/* Utilities Toolbar */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/30 pb-4">
               <div className="flex items-center gap-1.5">
@@ -974,8 +974,8 @@ function ManualAttendancePage() {
                   <tr className="bg-[#f1f5f9] dark:bg-[#0f172a] text-foreground font-bold border-b border-border/50 select-none whitespace-nowrap">
                     {/* Fixed Sticky Headers */}
                     <th className="sticky left-0 bg-[#f1f5f9] dark:bg-[#0f172a] px-4 py-3 text-center border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[40px] min-w-[40px] max-w-[40px]">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         checked={isAllSelected}
                         onChange={toggleSelectAll}
                         className="rounded border-border/60 text-primary focus:ring-primary/15 cursor-pointer"
@@ -985,7 +985,7 @@ function ManualAttendancePage() {
                     <th className="sticky left-[80px] bg-[#f1f5f9] dark:bg-[#0f172a] px-4 py-3 font-extrabold border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[140px] min-w-[140px] max-w-[140px]">Reason</th>
                     <th className="sticky left-[220px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-3 font-extrabold border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[100px] min-w-[100px] max-w-[100px]">Emp ID</th>
                     <th className="sticky left-[320px] bg-[#f1f5f9] dark:bg-[#0f172a] px-4 py-3 font-extrabold border-r border-border/40 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[160px] min-w-[160px] max-w-[160px]">Name</th>
-                    
+
                     {/* Horizontal Scrolling Headers */}
                     <th className="px-4 py-3 font-extrabold w-40 bg-[#f1f5f9] dark:bg-[#0f172a]">Department</th>
                     <th className="px-4 py-3 font-extrabold w-36 bg-[#f1f5f9] dark:bg-[#0f172a]">Designation</th>
@@ -1009,7 +1009,7 @@ function ManualAttendancePage() {
                       : "bg-card group-hover:bg-[#f8fafc] dark:group-hover:bg-[#1e293b]";
 
                     return (
-                      <tr 
+                      <tr
                         key={e.id}
                         className={[
                           "group hover:bg-[#f8fafc] dark:hover:bg-[#1e293b] transition duration-150 whitespace-nowrap",
@@ -1018,8 +1018,8 @@ function ManualAttendancePage() {
                       >
                         {/* 1. Selector Checkbox (Sticky Left) */}
                         <td className={`sticky left-0 ${stickyCellBgClass} px-4 py-2.5 text-center border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[40px] min-w-[40px] max-w-[40px] transition-all`}>
-                          <input 
-                            type="checkbox" 
+                          <input
+                            type="checkbox"
                             checked={isSelected}
                             onChange={() => toggleSelectRow(e.id)}
                             className="rounded border-border/60 text-primary focus:ring-primary/15 cursor-pointer"
@@ -1071,10 +1071,10 @@ function ManualAttendancePage() {
                               onClick={() => setActiveDatePicker({ id: e.id, field: "inDate" })}
                               className="w-full h-7 px-1 rounded border border-border/30 bg-muted/40 font-mono outline-none focus:border-primary text-[10.5px] text-center cursor-pointer hover:bg-muted"
                             />
-                            
+
                             {/* Inline Calendar popover centered strictly close to this row's In Date input! */}
                             {activeDatePicker?.id === e.id && activeDatePicker?.field === "inDate" && (
-                              <div className="absolute z-50 bg-card border border-border/70 rounded-2xl p-4 shadow-2xl space-y-3 date-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
+                              <div className="absolute z-50 bg-card border border-border/70 rounded-lg p-4 shadow-2xl space-y-3 date-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
                                 {renderCalendarMarkup()}
                               </div>
                             )}
@@ -1095,7 +1095,7 @@ function ManualAttendancePage() {
 
                             {/* Inline TimePicker exactly close to this row's In Time input! */}
                             {activeTimePicker?.id === e.id && activeTimePicker?.field === "inTime" && (
-                              <div className="absolute z-50 bg-card border border-border/70 rounded-2xl p-4 shadow-2xl space-y-3 time-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
+                              <div className="absolute z-50 bg-card border border-border/70 rounded-lg p-4 shadow-2xl space-y-3 time-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
                                 {renderTimeClockMarkup()}
                               </div>
                             )}
@@ -1115,7 +1115,7 @@ function ManualAttendancePage() {
 
                             {/* Inline Calendar exactly close to this row's Out Date input! */}
                             {activeDatePicker?.id === e.id && activeDatePicker?.field === "outDate" && (
-                              <div className="absolute z-50 bg-card border border-border/70 rounded-2xl p-4 shadow-2xl space-y-3 date-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
+                              <div className="absolute z-50 bg-card border border-border/70 rounded-lg p-4 shadow-2xl space-y-3 date-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
                                 {renderCalendarMarkup()}
                               </div>
                             )}
@@ -1136,7 +1136,7 @@ function ManualAttendancePage() {
 
                             {/* Inline TimePicker exactly close to this row's Out Time input! */}
                             {activeTimePicker?.id === e.id && activeTimePicker?.field === "outTime" && (
-                              <div className="absolute z-50 bg-card border border-border/70 rounded-2xl p-4 shadow-2xl space-y-3 time-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
+                              <div className="absolute z-50 bg-card border border-border/70 rounded-lg p-4 shadow-2xl space-y-3 time-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
                                 {renderTimeClockMarkup()}
                               </div>
                             )}
@@ -1150,11 +1150,11 @@ function ManualAttendancePage() {
 
                         {/* 16. Dynamic Status Badge */}
                         <td className="px-3 py-2.5 text-center">
-                          <span 
+                          <span
                             className={[
                               "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase",
-                              e.status === "Present" 
-                                ? "bg-emerald-500/10 text-emerald-500" 
+                              e.status === "Present"
+                                ? "bg-emerald-500/10 text-emerald-500"
                                 : "bg-rose-500/10 text-rose-500"
                             ].join(" ")}
                           >
@@ -1208,7 +1208,7 @@ function ManualAttendancePage() {
         </div>
 
         {/* Floating Green Circle Add Button - Fires the gorgeous popup modal! */}
-        <button 
+        <button
           onClick={() => setIsModalOpen(true)}
           className="fixed bottom-6 right-6 size-12.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg flex items-center justify-center transition duration-200 hover:scale-110 z-40"
           title="Add Manual Attendance Entry"
@@ -1219,15 +1219,15 @@ function ManualAttendancePage() {
         {/* High-Fidelity Manual Attendance Popup Modal Overlay (Matches your layout precisely!) */}
         {isModalOpen && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-            <div className="bg-card text-foreground rounded-2xl border border-border shadow-2xl max-w-4xl w-full overflow-hidden animate-in zoom-in-95 duration-200">
-              
+            <div className="bg-card text-foreground rounded-lg border border-border shadow-2xl max-w-4xl w-full overflow-hidden animate-in zoom-in-95 duration-200">
+
               {/* Modal Header */}
               <div className="px-6 py-4.5 border-b border-border/60 flex items-center justify-between bg-muted/30">
                 <h2 className="text-sm font-black text-foreground flex items-center gap-2 tracking-wide uppercase">
                   <Fingerprint className="size-4.5 text-primary animate-pulse" />
                   <span>Manual Attendance Entry</span>
                 </h2>
-                <button 
+                <button
                   onClick={() => setIsModalOpen(false)}
                   className="size-7 rounded-lg hover:bg-muted text-muted-foreground/60 hover:text-foreground flex items-center justify-center transition"
                 >
@@ -1237,7 +1237,7 @@ function ManualAttendancePage() {
 
               {/* Modal Body */}
               <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                
+
                 {/* Left Column */}
                 <div className="space-y-4">
                   {/* Date Input */}
@@ -1257,7 +1257,7 @@ function ManualAttendancePage() {
 
                       {/* Inline Calendar inside modal field relative container! */}
                       {activeDatePicker?.id === "modal" && activeDatePicker?.field === "date" && (
-                        <div className="absolute z-50 bg-card border border-border/70 rounded-2xl p-4 shadow-2xl space-y-3 date-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
+                        <div className="absolute z-50 bg-card border border-border/70 rounded-lg p-4 shadow-2xl space-y-3 date-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
                           {renderCalendarMarkup()}
                         </div>
                       )}
@@ -1341,7 +1341,7 @@ function ManualAttendancePage() {
 
                       {/* Inline TimePicker inside modal In Time! */}
                       {activeTimePicker?.id === "modal" && activeTimePicker?.field === "inTime" && (
-                        <div className="absolute z-50 bg-card border border-border/70 rounded-2xl p-4 shadow-2xl space-y-3 time-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
+                        <div className="absolute z-50 bg-card border border-border/70 rounded-lg p-4 shadow-2xl space-y-3 time-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
                           {renderTimeClockMarkup()}
                         </div>
                       )}
@@ -1365,7 +1365,7 @@ function ManualAttendancePage() {
 
                       {/* Inline Calendar inside modal Out Date! */}
                       {activeDatePicker?.id === "modal" && activeDatePicker?.field === "outDate" && (
-                        <div className="absolute z-50 bg-card border border-border/70 rounded-2xl p-4 shadow-2xl space-y-3 date-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
+                        <div className="absolute z-50 bg-card border border-border/70 rounded-lg p-4 shadow-2xl space-y-3 date-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
                           {renderCalendarMarkup()}
                         </div>
                       )}
@@ -1390,7 +1390,7 @@ function ManualAttendancePage() {
 
                       {/* Inline TimePicker inside modal Out Time! */}
                       {activeTimePicker?.id === "modal" && activeTimePicker?.field === "outTime" && (
-                        <div className="absolute z-50 bg-card border border-border/70 rounded-2xl p-4 shadow-2xl space-y-3 time-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
+                        <div className="absolute z-50 bg-card border border-border/70 rounded-lg p-4 shadow-2xl space-y-3 time-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
                           {renderTimeClockMarkup()}
                         </div>
                       )}

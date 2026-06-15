@@ -45,7 +45,7 @@ function RecruitmentBasicSetup() {
         <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-6xl mx-auto w-full">
 
           {/* Page Header */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -70,12 +70,12 @@ function RecruitmentBasicSetup() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
             {/* Panel 1: Applicability & Operations Rules */}
-            <div className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden flex flex-col">
+            <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden flex flex-col">
               <div className="flex items-center gap-3 px-5 py-4 border-b border-border/50 bg-muted/20">
                 <Sliders className="size-4 text-primary" />
                 <h2 className="text-[11px] font-bold text-foreground/70 uppercase tracking-widest">Workflow Applicability</h2>
               </div>
-              
+
               <div className="p-6 space-y-6 flex-1">
                 {/* Rule A: Basic Form is Applicable */}
                 <div className="space-y-2.5">
@@ -115,7 +115,7 @@ function RecruitmentBasicSetup() {
                         onClick={() => setAssessmentApplicable(v)}
                         className={`flex items-center justify-center gap-2 h-11 rounded-xl border text-sm font-bold transition-all duration-200
                           ${assessmentApplicable === v
-                            ? v === "No" 
+                            ? v === "No"
                               ? "bg-amber-500/10 border-amber-500/35 text-amber-600 dark:text-amber-400 shadow-2xs"
                               : "bg-primary/10 border-primary text-primary shadow-2xs"
                             : "border-border/80 bg-background text-muted-foreground hover:border-primary/30 hover:text-foreground"}`}
@@ -150,7 +150,7 @@ function RecruitmentBasicSetup() {
             </div>
 
             {/* Panel 2: Target Employee Types & Temp ID */}
-            <div className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden flex flex-col">
+            <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden flex flex-col">
               <div className="flex items-center gap-3 px-5 py-4 border-b border-border/50 bg-muted/20">
                 <Users className="size-4 text-primary" />
                 <h2 className="text-[11px] font-bold text-foreground/70 uppercase tracking-widest">Scope & Temp ID Config</h2>
@@ -247,7 +247,7 @@ function RecruitmentBasicSetup() {
           </div>
 
           {/* Form Action Controls Footer */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex items-center justify-between gap-4">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex items-center justify-between gap-4">
             <p className="text-[10px] text-muted-foreground font-semibold">
               Changes applied here will affect the recruitment module and basic registration forms.
             </p>

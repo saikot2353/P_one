@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
-import { 
+import {
   Sparkles, ChevronRight, Plus, X, Trash2, Edit, Tag, Cpu, Award, Ruler, Database, Percent, TrendingUp, Layers, Search, CheckCircle2, UserCog, CalendarClock
 } from "lucide-react";
 import { initializeRecruitmentMockData } from "@/lib/recruitment-mock-data";
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/recruitment-configuration")({
 
 function RecruitmentConfiguration() {
   const isSysAdmin = true;
-  
+
   const [activeTab, setActiveTab] = useState("op_name");
   const [searchQuery, setSearchQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -33,7 +33,7 @@ function RecruitmentConfiguration() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       initializeRecruitmentMockData();
-      
+
       setOperations(JSON.parse(localStorage.getItem("recruitment_config_operations") || "[]"));
       setMachines(JSON.parse(localStorage.getItem("recruitment_config_machines") || "[]"));
       setOpGrades(JSON.parse(localStorage.getItem("recruitment_config_op_grades") || "[]"));
@@ -136,7 +136,7 @@ function RecruitmentConfiguration() {
       updatedList = editingItem ? multiSs.map(m => m.id === editingItem.id ? payload : m) : [...multiSs, payload];
       saveConfig("recruitment_config_multi_ss_v2", updatedList, setMultiSs);
     }
-    
+
     handleCloseModal();
   };
 
@@ -188,9 +188,9 @@ function RecruitmentConfiguration() {
         <Topbar />
 
         <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto w-full">
-          
+
           {/* Header Panel */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -204,20 +204,20 @@ function RecruitmentConfiguration() {
                 <span>IE Configuration Settings</span>
               </h1>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <div className="relative">
                 <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
-                <input 
-                  type="text" 
-                  placeholder="Search values..." 
+                <input
+                  type="text"
+                  placeholder="Search values..."
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   className="h-10 w-60 pl-9 pr-4 rounded-xl border border-border/80 bg-background text-xs outline-none focus:border-primary transition-all"
                 />
               </div>
-              <button 
-                onClick={() => handleOpenModal()} 
+              <button
+                onClick={() => handleOpenModal()}
                 className="h-10 px-5 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-sm hover:shadow-md hover:bg-primary/95 transition flex items-center gap-2"
               >
                 <Plus className="size-4" /> Add Record
@@ -233,7 +233,7 @@ function RecruitmentConfiguration() {
                 <button
                   key={t.id}
                   onClick={() => setActiveTab(t.id)}
-                  className={`flex flex-col items-center justify-center p-3.5 rounded-2xl border text-center transition-all duration-200 relative group
+                  className={`flex flex-col items-center justify-center p-3.5 rounded-lg border text-center transition-all duration-200 relative group
                     ${isActive
                       ? "bg-primary/10 border-primary text-primary shadow-2xs"
                       : "bg-card border-border/80 text-muted-foreground hover:border-primary/50 hover:text-foreground"}`}
@@ -253,8 +253,8 @@ function RecruitmentConfiguration() {
           </div>
 
           {/* Matrix Content Table Area */}
-          <div className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden">
-            
+          <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
+
             {/* Header info bar */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-border/40 bg-muted/20">
               <div className="flex items-center gap-2">
@@ -274,12 +274,12 @@ function RecruitmentConfiguration() {
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs border-collapse" style={{minWidth: activeTab === "grade_vs_grade" ? "1200px" : activeTab === "multi_ss" ? "1100px" : activeTab === "smv_bank" ? "900px" : "700px"}}>
+              <table className="w-full text-left text-xs border-collapse" style={{ minWidth: activeTab === "grade_vs_grade" ? "1200px" : activeTab === "multi_ss" ? "1100px" : activeTab === "smv_bank" ? "900px" : "700px" }}>
                 <thead className="bg-[#f8fafc] dark:bg-[#0f172a] text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
                   <tr>
                     <th className="px-4 py-3.5 w-12 text-center sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] z-10 border-r border-border/30">SL</th>
                     <th className="px-4 py-3.5 w-28 text-center sticky left-12 bg-[#f8fafc] dark:bg-[#0f172a] z-10 border-r border-border/30">Actions</th>
-                    
+
                     {activeTab === "op_name" && <th className="px-4 py-3.5 min-w-[320px] border-r border-border/30">Operation Name</th>}
                     {activeTab === "mc_name" && (
                       <><th className="px-4 py-3.5 min-w-[240px] border-r border-border/30">M/C Full Name</th><th className="px-4 py-3.5 min-w-[100px] border-r border-border/30">Short Name</th></>
@@ -298,7 +298,7 @@ function RecruitmentConfiguration() {
                     {activeTab === "multi_ss" && (
                       <><th className="px-4 py-3.5 min-w-[100px] border-r border-border/30">Grade Point</th><th className="px-4 py-3.5 min-w-[100px] border-r border-border/30">Op. Grade</th><th className="px-4 py-3.5 min-w-[130px] border-r border-border/30">Min Op. Count</th><th className="px-4 py-3.5 min-w-[100px] border-r border-border/30">M/C Type</th><th className="px-4 py-3.5 min-w-[70px] border-r border-border/30">Eff%</th><th className="px-4 py-3.5 min-w-[90px] border-r border-border/30">Add Amt</th><th className="px-4 py-3.5 min-w-[110px] border-r border-border/30">Valid. Remarks</th><th className="px-4 py-3.5 min-w-[110px] border-r border-border/30">Remarks</th><th className="px-4 py-3.5 min-w-[110px] border-r border-border/30">Valid From</th><th className="px-4 py-3.5 min-w-[110px] border-r border-border/30">Valid To</th></>
                     )}
- 
+
                     <th className="px-4 py-3.5 min-w-[180px] text-primary/80 border-r border-border/30"><span className="flex items-center gap-1"><UserCog className="size-3.5" /> Created By</span></th>
                     <th className="px-4 py-3.5 min-w-[180px] text-primary/80"><span className="flex items-center gap-1"><CalendarClock className="size-3.5" /> Updated By</span></th>
                   </tr>
@@ -306,29 +306,29 @@ function RecruitmentConfiguration() {
                 <tbody className="divide-y divide-border/30 text-foreground">
                   {currentData.map((item, idx) => {
                     const isEven = idx % 2 === 0;
-                    const rowBgClass = isEven 
-                      ? "bg-white dark:bg-[#0f172a]" 
+                    const rowBgClass = isEven
+                      ? "bg-white dark:bg-[#0f172a]"
                       : "bg-[#f8fafc] dark:bg-[#131d30]";
-                    const stickyCellBgClass = isEven 
-                      ? "bg-white dark:bg-[#0f172a] group-hover:bg-[#f1f5f9] dark:group-hover:bg-[#1c283d]" 
+                    const stickyCellBgClass = isEven
+                      ? "bg-white dark:bg-[#0f172a] group-hover:bg-[#f1f5f9] dark:group-hover:bg-[#1c283d]"
                       : "bg-[#f8fafc] dark:bg-[#131d30] group-hover:bg-[#f1f5f9] dark:group-hover:bg-[#1c283d]";
- 
+
                     return (
                       <tr key={item.id} className={`group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all cursor-pointer ${rowBgClass}`}>
                         <td className={`px-4 py-3 text-center text-slate-500 font-bold sticky left-0 ${stickyCellBgClass} z-10 border-r border-border/30 w-12 min-w-[48px] max-w-[48px] transition-all`}>{idx + 1}</td>
                         <td className={`px-4 py-3 sticky left-12 ${stickyCellBgClass} z-10 border-r border-border/30 w-28 min-w-[112px] max-w-[112px] transition-all`} onClick={(e) => e.stopPropagation()}>
                           <div className="flex items-center justify-center gap-2">
-                            <button 
+                            <button
                               title="Edit record"
-                              onClick={() => handleOpenModal(item)} 
+                              onClick={() => handleOpenModal(item)}
                               className="w-7 h-7 rounded border border-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition flex items-center justify-center shadow-2xs"
                             >
                               <Edit className="size-3.5" />
                             </button>
                             {isSysAdmin && (
-                              <button 
+                              <button
                                 title="Delete record"
-                                onClick={() => handleDelete(item.id)} 
+                                onClick={() => handleDelete(item.id)}
                                 className="w-7 h-7 rounded border border-slate-200 bg-white dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-950/30 hover:border-red-200 text-red-500 dark:text-red-400 transition flex items-center justify-center shadow-2xs"
                               >
                                 <Trash2 className="size-3.5" />
@@ -336,7 +336,7 @@ function RecruitmentConfiguration() {
                             )}
                           </div>
                         </td>
-                        
+
                         {activeTab === "op_name" && <td className="px-4 py-3 font-semibold text-foreground border-r border-border/30">{item.opName}</td>}
                         {activeTab === "mc_name" && (
                           <><td className="px-4 py-3 font-semibold border-r border-border/30">{item.mcFullName}</td><td className="px-4 py-3 border-r border-border/30"><span className="bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-400 text-[10px] font-black px-2 py-0.5 rounded">{item.mcName}</span></td></>
@@ -359,7 +359,7 @@ function RecruitmentConfiguration() {
                         {activeTab === "multi_ss" && (
                           <><td className="px-4 py-3 font-mono font-bold border-r border-border/30">{item.point}</td><td className="px-4 py-3 border-r border-border/30"><span className="bg-violet-100 text-violet-800 dark:bg-violet-950/40 dark:text-violet-400 text-[10px] font-black px-2 py-0.5 rounded-full">{item.opGrade}</span></td><td className="px-4 py-3 font-mono border-r border-border/30">{item.minOpCount}</td><td className="px-4 py-3 border-r border-border/30"><span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${item.mcType === "Same" ? "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-455" : "bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-400"}`}>{item.mcType}</span></td><td className="px-4 py-3 font-mono font-bold text-green-700 dark:text-green-400 border-r border-border/30">{item.eff}%</td><td className="px-4 py-3 font-mono border-r border-border/30">৳{item.addAmt}</td><td className="px-4 py-3 text-[11px] border-r border-border/30">{item.validityRemarks}</td><td className="px-4 py-3 text-[11px] border-r border-border/30">{item.remarks}</td><td className="px-4 py-3 text-[11px] border-r border-border/30">{item.validityFrom}</td><td className="px-4 py-3 text-[11px] border-r border-border/30">{item.validityTo}</td></>
                         )}
- 
+
                         <td className="px-4 py-3 text-[10px] text-muted-foreground border-r border-border/30 whitespace-nowrap">{item.createdBy}</td>
                         <td className="px-4 py-3 text-[10px] text-muted-foreground whitespace-nowrap">{item.updatedBy || "—"}</td>
                       </tr>
@@ -403,7 +403,7 @@ function RecruitmentConfiguration() {
             onClick={(e) => { if (e.target === e.currentTarget) handleCloseModal(); }}
           >
             <div
-              className="bg-card w-full rounded-2xl shadow-2xl border border-border/60 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+              className="bg-card w-full rounded-lg shadow-2xl border border-border/60 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150"
               style={{ maxWidth: isWideModal ? 580 : 420, maxHeight: "90vh" }}
             >
               {/* Header */}
@@ -429,7 +429,7 @@ function RecruitmentConfiguration() {
                 {activeTab === "op_name" && (
                   <div className="col-span-2">
                     <label className={lbl}>Operation Name <span className="text-red-500">*</span></label>
-                    <input type="text" value={formData.opName || ""} onChange={e => setFormData({...formData, opName: e.target.value})} className={inp} placeholder="Enter operation name" />
+                    <input type="text" value={formData.opName || ""} onChange={e => setFormData({ ...formData, opName: e.target.value })} className={inp} placeholder="Enter operation name" />
                   </div>
                 )}
 
@@ -438,11 +438,11 @@ function RecruitmentConfiguration() {
                   <>
                     <div className="col-span-2">
                       <label className={lbl}>M/C Full Name <span className="text-red-500">*</span></label>
-                      <input type="text" value={formData.mcFullName || ""} onChange={e => setFormData({...formData, mcFullName: e.target.value})} className={inp} placeholder="e.g. Single Needle Lock Stitch" />
+                      <input type="text" value={formData.mcFullName || ""} onChange={e => setFormData({ ...formData, mcFullName: e.target.value })} className={inp} placeholder="e.g. Single Needle Lock Stitch" />
                     </div>
                     <div className="col-span-2">
                       <label className={lbl}>M/C Short Name <span className="text-red-500">*</span></label>
-                      <input type="text" value={formData.mcName || ""} onChange={e => setFormData({...formData, mcName: e.target.value})} className={inp} placeholder="e.g. SNLS" />
+                      <input type="text" value={formData.mcName || ""} onChange={e => setFormData({ ...formData, mcName: e.target.value })} className={inp} placeholder="e.g. SNLS" />
                     </div>
                   </>
                 )}
@@ -451,7 +451,7 @@ function RecruitmentConfiguration() {
                 {activeTab === "op_grade" && (
                   <div className="col-span-2">
                     <label className={lbl}>Operation Grade <span className="text-red-500">*</span></label>
-                    <input type="text" value={formData.grade || ""} onChange={e => setFormData({...formData, grade: e.target.value})} className={inp} placeholder="e.g. P, P1, A, B+" />
+                    <input type="text" value={formData.grade || ""} onChange={e => setFormData({ ...formData, grade: e.target.value })} className={inp} placeholder="e.g. P, P1, A, B+" />
                   </div>
                 )}
 
@@ -459,7 +459,7 @@ function RecruitmentConfiguration() {
                 {activeTab === "measurement" && (
                   <div className="col-span-2">
                     <label className={lbl}>Measurement (MP) Name <span className="text-red-500">*</span></label>
-                    <input type="text" value={formData.name || ""} onChange={e => setFormData({...formData, name: e.target.value})} className={inp} placeholder="e.g. 44 CM" />
+                    <input type="text" value={formData.name || ""} onChange={e => setFormData({ ...formData, name: e.target.value })} className={inp} placeholder="e.g. 44 CM" />
                   </div>
                 )}
 
@@ -468,35 +468,35 @@ function RecruitmentConfiguration() {
                   <>
                     <div className="col-span-2">
                       <label className={lbl}>Operation Name <span className="text-red-500">*</span></label>
-                      <select value={formData.opName || ""} onChange={e => setFormData({...formData, opName: e.target.value})} className={sel}>
+                      <select value={formData.opName || ""} onChange={e => setFormData({ ...formData, opName: e.target.value })} className={sel}>
                         <option value="">— Select Operation —</option>
                         {operations.map(o => <option key={o.id} value={o.opName}>{o.opName}</option>)}
                       </select>
                     </div>
                     <div>
                       <label className={lbl}>M/C Name <span className="text-red-500">*</span></label>
-                      <select value={formData.mcName || ""} onChange={e => setFormData({...formData, mcName: e.target.value})} className={sel}>
+                      <select value={formData.mcName || ""} onChange={e => setFormData({ ...formData, mcName: e.target.value })} className={sel}>
                         <option value="">— Select M/C —</option>
                         {machines.map(m => <option key={m.id} value={m.mcName}>{m.mcName}</option>)}
                       </select>
                     </div>
                     <div>
                       <label className={lbl}>Operation Grade <span className="text-red-500">*</span></label>
-                      <select value={formData.opGrade || ""} onChange={e => setFormData({...formData, opGrade: e.target.value})} className={sel}>
+                      <select value={formData.opGrade || ""} onChange={e => setFormData({ ...formData, opGrade: e.target.value })} className={sel}>
                         <option value="">— Select Grade —</option>
                         {opGrades.map(og => <option key={og.id} value={og.grade}>{og.grade}</option>)}
                       </select>
                     </div>
                     <div>
                       <label className={lbl}>Measurement (MP) <span className="text-red-500">*</span></label>
-                      <select value={formData.meas || ""} onChange={e => setFormData({...formData, meas: e.target.value})} className={sel}>
+                      <select value={formData.meas || ""} onChange={e => setFormData({ ...formData, meas: e.target.value })} className={sel}>
                         <option value="">— Select Measurement —</option>
                         {measurements.map(m => <option key={m.id} value={m.name}>{m.name}</option>)}
                       </select>
                     </div>
                     <div>
                       <label className={lbl}>SMV Value <span className="text-red-500">*</span></label>
-                      <input type="text" value={formData.smvValue || ""} onChange={e => setFormData({...formData, smvValue: e.target.value})} className={inp} placeholder="e.g. 0.26" />
+                      <input type="text" value={formData.smvValue || ""} onChange={e => setFormData({ ...formData, smvValue: e.target.value })} className={inp} placeholder="e.g. 0.26" />
                     </div>
                   </>
                 )}
@@ -506,15 +506,15 @@ function RecruitmentConfiguration() {
                   <>
                     <div>
                       <label className={lbl}>Efficiency From (%) <span className="text-red-500">*</span></label>
-                      <input type="text" value={formData.effFrom || ""} onChange={e => setFormData({...formData, effFrom: e.target.value})} className={inp} placeholder="e.g. 40.00" />
+                      <input type="text" value={formData.effFrom || ""} onChange={e => setFormData({ ...formData, effFrom: e.target.value })} className={inp} placeholder="e.g. 40.00" />
                     </div>
                     <div>
                       <label className={lbl}>Efficiency To (%) <span className="text-red-500">*</span></label>
-                      <input type="text" value={formData.effTo || ""} onChange={e => setFormData({...formData, effTo: e.target.value})} className={inp} placeholder="e.g. 49.99" />
+                      <input type="text" value={formData.effTo || ""} onChange={e => setFormData({ ...formData, effTo: e.target.value })} className={inp} placeholder="e.g. 49.99" />
                     </div>
                     <div className="col-span-2">
                       <label className={lbl}>Grade Point <span className="text-red-500">*</span></label>
-                      <input type="text" value={formData.point || ""} onChange={e => setFormData({...formData, point: e.target.value})} className={inp} placeholder="e.g. 1.00" />
+                      <input type="text" value={formData.point || ""} onChange={e => setFormData({ ...formData, point: e.target.value })} className={inp} placeholder="e.g. 1.00" />
                     </div>
                   </>
                 )}
@@ -524,45 +524,45 @@ function RecruitmentConfiguration() {
                   <>
                     <div>
                       <label className={lbl}>Validity From <span className="text-red-500">*</span></label>
-                      <input type="date" value={formData.validityFrom || ""} onChange={e => setFormData({...formData, validityFrom: e.target.value})} className={inp} />
+                      <input type="date" value={formData.validityFrom || ""} onChange={e => setFormData({ ...formData, validityFrom: e.target.value })} className={inp} />
                     </div>
                     <div>
                       <label className={lbl}>Validity To <span className="text-red-500">*</span></label>
-                      <input type="date" value={formData.validityTo || ""} onChange={e => setFormData({...formData, validityTo: e.target.value})} className={inp} />
+                      <input type="date" value={formData.validityTo || ""} onChange={e => setFormData({ ...formData, validityTo: e.target.value })} className={inp} />
                     </div>
                     <div>
                       <label className={lbl}>GP From <span className="text-red-500">*</span></label>
-                      <input type="text" value={formData.pointFrom || ""} onChange={e => setFormData({...formData, pointFrom: e.target.value})} className={inp} placeholder="e.g. 2.00" />
+                      <input type="text" value={formData.pointFrom || ""} onChange={e => setFormData({ ...formData, pointFrom: e.target.value })} className={inp} placeholder="e.g. 2.00" />
                     </div>
                     <div>
                       <label className={lbl}>GP To <span className="text-red-500">*</span></label>
-                      <input type="text" value={formData.pointTo || ""} onChange={e => setFormData({...formData, pointTo: e.target.value})} className={inp} placeholder="e.g. 2.99" />
+                      <input type="text" value={formData.pointTo || ""} onChange={e => setFormData({ ...formData, pointTo: e.target.value })} className={inp} placeholder="e.g. 2.99" />
                     </div>
                     <div>
                       <label className={lbl}>Grade <span className="text-red-500">*</span></label>
-                      <select value={formData.grade || ""} onChange={e => setFormData({...formData, grade: e.target.value})} className={sel}>
+                      <select value={formData.grade || ""} onChange={e => setFormData({ ...formData, grade: e.target.value })} className={sel}>
                         <option value="">— Select —</option>
-                        {["A+","A","A-","B+","B","B-","C+","C","H","Special"].map(g => <option key={g} value={g}>{g}</option>)}
+                        {["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "H", "Special"].map(g => <option key={g} value={g}>{g}</option>)}
                       </select>
                     </div>
                     <div>
                       <label className={lbl}>Govt. Grade <span className="text-red-500">*</span></label>
-                      <select value={formData.govtGrade || ""} onChange={e => setFormData({...formData, govtGrade: e.target.value})} className={sel}>
+                      <select value={formData.govtGrade || ""} onChange={e => setFormData({ ...formData, govtGrade: e.target.value })} className={sel}>
                         <option value="">— Select —</option>
-                        {["Grade-1","Grade-2","Grade-3","Grade-4"].map(g => <option key={g} value={g}>{g}</option>)}
+                        {["Grade-1", "Grade-2", "Grade-3", "Grade-4"].map(g => <option key={g} value={g}>{g}</option>)}
                       </select>
                     </div>
                     <div>
                       <label className={lbl}>Salary From <span className="text-red-500">*</span></label>
-                      <input type="text" value={formData.salaryFrom || ""} onChange={e => setFormData({...formData, salaryFrom: e.target.value})} className={inp} placeholder="e.g. 13000" />
+                      <input type="text" value={formData.salaryFrom || ""} onChange={e => setFormData({ ...formData, salaryFrom: e.target.value })} className={inp} placeholder="e.g. 13000" />
                     </div>
                     <div>
                       <label className={lbl}>Salary To <span className="text-red-500">*</span></label>
-                      <input type="text" value={formData.salaryTo || ""} onChange={e => setFormData({...formData, salaryTo: e.target.value})} className={inp} placeholder="e.g. 13500" />
+                      <input type="text" value={formData.salaryTo || ""} onChange={e => setFormData({ ...formData, salaryTo: e.target.value })} className={inp} placeholder="e.g. 13500" />
                     </div>
                     <div className="col-span-2">
                       <label className={lbl}>Remarks</label>
-                      <input type="text" value={formData.remarks || ""} onChange={e => setFormData({...formData, remarks: e.target.value})} className={inp} placeholder="Optional notes" />
+                      <input type="text" value={formData.remarks || ""} onChange={e => setFormData({ ...formData, remarks: e.target.value })} className={inp} placeholder="Optional notes" />
                     </div>
                   </>
                 )}
@@ -572,30 +572,30 @@ function RecruitmentConfiguration() {
                   <>
                     <div>
                       <label className={lbl}>Validity From <span className="text-red-500">*</span></label>
-                      <input type="date" value={formData.validityFrom || ""} onChange={e => setFormData({...formData, validityFrom: e.target.value})} className={inp} />
+                      <input type="date" value={formData.validityFrom || ""} onChange={e => setFormData({ ...formData, validityFrom: e.target.value })} className={inp} />
                     </div>
                     <div>
                       <label className={lbl}>Validity To <span className="text-red-500">*</span></label>
-                      <input type="date" value={formData.validityTo || ""} onChange={e => setFormData({...formData, validityTo: e.target.value})} className={inp} />
+                      <input type="date" value={formData.validityTo || ""} onChange={e => setFormData({ ...formData, validityTo: e.target.value })} className={inp} />
                     </div>
                     <div>
                       <label className={lbl}>Total GP <span className="text-red-500">*</span></label>
-                      <input type="text" value={formData.point || ""} onChange={e => setFormData({...formData, point: e.target.value})} className={inp} placeholder="e.g. 5.00" />
+                      <input type="text" value={formData.point || ""} onChange={e => setFormData({ ...formData, point: e.target.value })} className={inp} placeholder="e.g. 5.00" />
                     </div>
                     <div>
                       <label className={lbl}>Op. Grade <span className="text-red-500">*</span></label>
-                      <select value={formData.opGrade || ""} onChange={e => setFormData({...formData, opGrade: e.target.value})} className={sel}>
+                      <select value={formData.opGrade || ""} onChange={e => setFormData({ ...formData, opGrade: e.target.value })} className={sel}>
                         <option value="">— Select Grade —</option>
                         {opGrades.map(o => <option key={o.id} value={o.grade}>{o.grade}</option>)}
                       </select>
                     </div>
                     <div>
                       <label className={lbl}>Min Op. Count <span className="text-red-500">*</span></label>
-                      <input type="text" value={formData.minOpCount || ""} onChange={e => setFormData({...formData, minOpCount: e.target.value})} className={inp} placeholder="Comma separated, e.g. 2" />
+                      <input type="text" value={formData.minOpCount || ""} onChange={e => setFormData({ ...formData, minOpCount: e.target.value })} className={inp} placeholder="Comma separated, e.g. 2" />
                     </div>
                     <div>
                       <label className={lbl}>M/C Type <span className="text-red-500">*</span></label>
-                      <select value={formData.mcType || ""} onChange={e => setFormData({...formData, mcType: e.target.value})} className={sel}>
+                      <select value={formData.mcType || ""} onChange={e => setFormData({ ...formData, mcType: e.target.value })} className={sel}>
                         <option value="">— Select —</option>
                         <option value="Same">Same</option>
                         <option value="Different">Different</option>
@@ -603,19 +603,19 @@ function RecruitmentConfiguration() {
                     </div>
                     <div>
                       <label className={lbl}>Efficiency % <span className="text-red-500">*</span></label>
-                      <input type="text" value={formData.eff || ""} onChange={e => setFormData({...formData, eff: e.target.value})} className={inp} placeholder="e.g. 90" />
+                      <input type="text" value={formData.eff || ""} onChange={e => setFormData({ ...formData, eff: e.target.value })} className={inp} placeholder="e.g. 90" />
                     </div>
                     <div>
                       <label className={lbl}>Add Amount <span className="text-red-500">*</span></label>
-                      <input type="text" value={formData.addAmt || ""} onChange={e => setFormData({...formData, addAmt: e.target.value})} className={inp} placeholder="e.g. 500" />
+                      <input type="text" value={formData.addAmt || ""} onChange={e => setFormData({ ...formData, addAmt: e.target.value })} className={inp} placeholder="e.g. 500" />
                     </div>
                     <div>
                       <label className={lbl}>Validity Remarks</label>
-                      <input type="text" value={formData.validityRemarks || ""} onChange={e => setFormData({...formData, validityRemarks: e.target.value})} className={inp} placeholder="e.g. Current" />
+                      <input type="text" value={formData.validityRemarks || ""} onChange={e => setFormData({ ...formData, validityRemarks: e.target.value })} className={inp} placeholder="e.g. Current" />
                     </div>
                     <div>
                       <label className={lbl}>Remarks</label>
-                      <input type="text" value={formData.remarks || ""} onChange={e => setFormData({...formData, remarks: e.target.value})} className={inp} placeholder="Optional notes" />
+                      <input type="text" value={formData.remarks || ""} onChange={e => setFormData({ ...formData, remarks: e.target.value })} className={inp} placeholder="Optional notes" />
                     </div>
                   </>
                 )}

@@ -43,7 +43,7 @@ function SummaryCard({
 function HRAssessmentPage() {
   const router = useRouter();
   const { id } = Route.useParams();
-  
+
   const [candidate, setCandidate] = useState<any>(null);
   const [ieData, setIeData] = useState<any>(null);
 
@@ -76,7 +76,7 @@ function HRAssessmentPage() {
           setIeData(fallbackIeData);
           setHrDesignation(fallbackIeData.ieDesignation || "Operator");
           setProposedSalary(fallbackIeData.maxPossibleSalary || "0.00");
-          
+
           if (found.hrEvaluation) {
             setProposedSalary(found.hrEvaluation.proposedSalary);
             setHrDesignation(found.hrEvaluation.hrDesignation);
@@ -153,7 +153,7 @@ function HRAssessmentPage() {
         <div className="p-4 md:p-6 lg:p-8 space-y-5 max-w-[1400px] mx-auto w-full">
 
           {/* ── Page Header ── */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -171,9 +171,9 @@ function HRAssessmentPage() {
             </div>
             <div className="flex items-center gap-2">
               <span className={`text-[11px] font-bold border rounded-lg px-3 py-1.5 
-                ${candidate.assessStatus === "HR Approved" ? "bg-emerald-50 text-emerald-700 border-emerald-200" 
-                  : candidate.assessStatus === "HR Rejected" ? "bg-rose-50 text-rose-700 border-rose-200" 
-                  : "bg-purple-50 text-purple-700 border-purple-200"}`}>
+                ${candidate.assessStatus === "HR Approved" ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                  : candidate.assessStatus === "HR Rejected" ? "bg-rose-50 text-rose-700 border-rose-200"
+                    : "bg-purple-50 text-purple-700 border-purple-200"}`}>
                 Status: <strong>{candidate.assessStatus}</strong>
               </span>
               <Link
@@ -186,7 +186,7 @@ function HRAssessmentPage() {
           </div>
 
           {/* ── Candidate Info Card ── */}
-          <div className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden">
+          <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
             <div className="flex items-center gap-3 px-5 py-3 border-b border-border/50 bg-muted/30">
               <User className="size-4 text-muted-foreground" />
               <h2 className="text-[11px] font-black text-foreground/70 uppercase tracking-widest">Candidate Information</h2>
@@ -206,7 +206,7 @@ function HRAssessmentPage() {
           </div>
 
           {/* ── Skill Details Table (Readonly) ── */}
-          <div className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden">
+          <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
             <div className="flex items-center gap-3 px-5 py-3 border-b border-border/50 bg-muted/30">
               <TrendingUp className="size-4 text-muted-foreground" />
               <h2 className="text-[11px] font-black text-foreground/70 uppercase tracking-widest">Skill Evaluation Results</h2>
@@ -219,7 +219,7 @@ function HRAssessmentPage() {
                     <th className="px-4 py-3.5 min-w-[200px] border-r border-border/30">Operation Name</th>
                     <th className="px-4 py-3.5 min-w-[90px] border-r border-border/30 text-center">M/C</th>
                     <th className="px-4 py-3.5 w-[80px] border-r border-border/30 text-center">Meas.</th>
-                    {["CT1","CT2","CT3","CT4","CT5"].map(ct => (
+                    {["CT1", "CT2", "CT3", "CT4", "CT5"].map(ct => (
                       <th key={ct} className="px-2 py-3.5 text-center w-14 border-r border-border/30">{ct} (s)</th>
                     ))}
                     <th className="px-4 py-3.5 text-center w-24 border-r border-border/30 text-blue-600/80">Capacity</th>
@@ -259,7 +259,7 @@ function HRAssessmentPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
             {/* Assessment Summary (Readonly) */}
-            <div className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden">
+            <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
               <div className="flex items-center gap-3 px-5 py-3 border-b border-border/50 bg-muted/30">
                 <Award className="size-4 text-muted-foreground" />
                 <h2 className="text-[11px] font-black text-foreground/70 uppercase tracking-widest">Assessment Summary</h2>
@@ -308,7 +308,7 @@ function HRAssessmentPage() {
             </div>
 
             {/* IE Recommendation (Readonly Info) */}
-            <div className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden">
+            <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
               <div className="flex items-center gap-3 px-5 py-3 border-b border-border/50 bg-muted/30">
                 <Briefcase className="size-4 text-muted-foreground" />
                 <h2 className="text-[11px] font-black text-foreground/70 uppercase tracking-widest">IE Recommendation</h2>
@@ -328,7 +328,7 @@ function HRAssessmentPage() {
             </div>
 
             {/* HR Recommendation (Interactive) */}
-            <div className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden">
+            <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
               <div className="flex items-center gap-3 px-5 py-3 border-b border-border/50 bg-muted/30">
                 <ShieldAlert className="size-4 text-muted-foreground" />
                 <h2 className="text-[11px] font-black text-foreground/70 uppercase tracking-widest">HR Recommendation</h2>
@@ -373,7 +373,7 @@ function HRAssessmentPage() {
 
           {/* ── Submit Footer / Signature Blocks ── */}
           {!isViewOnly ? (
-            <div className="bg-card rounded-2xl border border-border/80 shadow-xs p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="bg-card rounded-lg border border-border/80 shadow-xs p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
               <p className="text-[11px] text-muted-foreground">
                 Approval promotes candidate to <strong className="text-emerald-600">HR Approved</strong> and registers them in Personnel List.
               </p>
@@ -399,7 +399,7 @@ function HRAssessmentPage() {
               </div>
             </div>
           ) : (
-            <div className="bg-card rounded-2xl border border-border/80 shadow-xs p-8 space-y-8">
+            <div className="bg-card rounded-lg border border-border/80 shadow-xs p-8 space-y-8">
               <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest pb-4 border-b border-border/40">
                 <span>Evaluation Completed</span>
               </div>

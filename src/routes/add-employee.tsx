@@ -727,7 +727,7 @@ function AddEmployeePage() {
         {/* Form Body Scrollpane */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6 xl:p-8 space-y-6">
           {/* Top Panel Breadcrumbs and Title Card */}
-          <div className="bg-card border border-border/80 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="bg-card border border-border/80 rounded-lg p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1.5">
               <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">
                 <Link to="/" className="hover:text-primary transition-colors">
@@ -755,7 +755,7 @@ function AddEmployeePage() {
 
           <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
             {/* Step Selection Left Navigation Card (Scrollable list of all 17 options) */}
-            <div className="lg:col-span-1 bg-card border border-border/80 rounded-2xl p-4 shadow-xs space-y-1 max-h-[82vh] overflow-y-auto scrollbar-thin">
+            <div className="lg:col-span-1 bg-card border border-border/80 rounded-lg p-4 shadow-xs space-y-1 max-h-[82vh] overflow-y-auto scrollbar-thin">
               <div className="px-3 py-2 text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/50 border-b border-border/20 mb-1.5 sticky top-0 bg-card z-10">
                 Form Directories
               </div>
@@ -791,11 +791,10 @@ function AddEmployeePage() {
                       setActiveTab(tab.id);
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left text-xs font-bold transition-all duration-200 ${
-                      isActive
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left text-xs font-bold transition-all duration-200 ${isActive
                         ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
                         : "hover:bg-muted text-muted-foreground hover:text-foreground"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-2.5 truncate">
                       <TabIcon className="size-4 shrink-0" />
@@ -805,15 +804,14 @@ function AddEmployeePage() {
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
                       <span
-                        className={`text-[10px] font-black px-1.5 py-0.5 rounded-md ${
-                          isActive
+                        className={`text-[10px] font-black px-1.5 py-0.5 rounded-md ${isActive
                             ? "bg-primary-foreground/15 text-primary-foreground"
                             : percentage === 100
                               ? "bg-emerald-500/10 text-emerald-500"
                               : percentage > 40
                                 ? "bg-amber-500/10 text-amber-500"
                                 : "bg-rose-500/10 text-rose-500"
-                        }`}
+                          }`}
                       >
                         {percentage}%
                       </span>
@@ -839,12 +837,12 @@ function AddEmployeePage() {
             </div>
 
             {/* Core Form Card Section */}
-            <div className="lg:col-span-3 bg-card border border-border/80 rounded-2xl p-6 md:p-8 shadow-xs min-h-[600px] flex flex-col gap-6">
+            <div className="lg:col-span-3 bg-card border border-border/80 rounded-lg p-6 md:p-8 shadow-xs min-h-[600px] flex flex-col gap-6">
               {/* TAB 1: PERSONAL & IDENTITY (CONSOLIDATED) */}
               {activeTab === "personal_identity" && (
                 <div className="space-y-6 animate-in fade-in duration-200 text-foreground">
                   {/* Premium, High-fidelity Progress Stepper Timeline */}
-                  <div className="bg-card border border-border/60 rounded-2xl p-5 shadow-xs overflow-x-auto scrollbar-thin">
+                  <div className="bg-card border border-border/60 rounded-lg p-5 shadow-xs overflow-x-auto scrollbar-thin">
                     <div className="min-w-[650px] relative flex items-center justify-between px-6 py-3">
                       {/* Horizontal connecting track line behind the dots */}
                       <div className="absolute top-[26px] left-[55px] right-[55px] h-[3px] bg-muted/60 border-t border-b border-border/20 z-0" />
@@ -905,13 +903,12 @@ function AddEmployeePage() {
                           >
                             {/* Circle Stepper Dot/Bubble */}
                             <div
-                              className={`size-[42px] rounded-full flex items-center justify-center border-2 transition-all duration-300 relative ${
-                                isSelected
+                              className={`size-[42px] rounded-full flex items-center justify-center border-2 transition-all duration-300 relative ${isSelected
                                   ? "bg-primary text-primary-foreground border-primary shadow-[0_0_15px_var(--primary)] scale-110"
                                   : isCompleted
                                     ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.2)]"
                                     : "bg-card text-muted-foreground border-border/80 hover:border-muted-foreground/60"
-                              }`}
+                                }`}
                             >
                               {isCompleted ? (
                                 <Check className="size-[18px] stroke-[3]" />
@@ -928,25 +925,23 @@ function AddEmployeePage() {
                             {/* Text labels and percentages */}
                             <div className="text-center space-y-1.5 w-full min-w-[120px]">
                               <span
-                                className={`text-[10px] font-black uppercase tracking-wider block transition-colors duration-200 ${
-                                  isSelected
+                                className={`text-[10px] font-black uppercase tracking-wider block transition-colors duration-200 ${isSelected
                                     ? "text-primary"
                                     : "text-muted-foreground group-hover:text-foreground"
-                                }`}
+                                  }`}
                               >
                                 {idx + 1}. {step.label}
                               </span>
 
                               <span
-                                className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full inline-block transition-all duration-200 ${
-                                  isSelected
+                                className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full inline-block transition-all duration-200 ${isSelected
                                     ? "bg-primary/10 text-primary border border-primary/20"
                                     : isCompleted
                                       ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/10"
                                       : subPercentage > 0
                                         ? "bg-amber-500/10 text-amber-600 border border-amber-500/10"
                                         : "bg-rose-500/10 text-rose-600 border border-rose-500/10"
-                                }`}
+                                  }`}
                               >
                                 {subPercentage}%
                               </span>
@@ -961,7 +956,7 @@ function AddEmployeePage() {
                   {subSection === "primary_placement" && (
                     <div className="space-y-6 animate-in fade-in duration-200">
                       {/* Card 1: Core Specifications */}
-                      <div className="bg-card border border-border/60 rounded-2xl p-6 shadow-2xs relative overflow-hidden transition-all duration-300 hover:border-emerald-500/20">
+                      <div className="bg-card border border-border/60 rounded-lg p-6 shadow-2xs relative overflow-hidden transition-all duration-300 hover:border-emerald-500/20">
                         <div className="absolute top-0 left-0 h-full w-1.5 bg-emerald-500" />
                         <div className="flex items-center gap-3 border-b border-border/30 pb-4 mb-5">
                           <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
@@ -987,9 +982,8 @@ function AddEmployeePage() {
                               type="text"
                               value={form.nameEng}
                               onChange={(e) => handleChange("nameEng", e.target.value)}
-                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full ${
-                                errors.nameEng ? "border-rose-400" : "border-border"
-                              }`}
+                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full ${errors.nameEng ? "border-rose-400" : "border-border"
+                                }`}
                               placeholder="e.g. Tahmid Afsar Shapno"
                             />
                           </div>
@@ -1017,9 +1011,8 @@ function AddEmployeePage() {
                               type="date"
                               value={form.dob}
                               onChange={(e) => handleChange("dob", e.target.value)}
-                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full ${
-                                errors.dob ? "border-rose-400" : "border-border"
-                              }`}
+                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full ${errors.dob ? "border-rose-400" : "border-border"
+                                }`}
                             />
                           </div>
 
@@ -1031,7 +1024,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.gender}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "Male", label: "Male" },
                                   { value: "Female", label: "Female" },
@@ -1049,7 +1042,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.religion}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "Islam", label: "Islam" },
                                   { value: "Hinduism", label: "Hinduism" },
@@ -1069,7 +1062,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.blood}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "A (+ve)", label: "A (+ve)" },
                                   { value: "A (-ve)", label: "A (-ve)" },
@@ -1092,7 +1085,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.maritalStatus}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "Single", label: "Single" },
                                   { value: "Married", label: "Married" },
@@ -1111,7 +1104,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.education}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   {
                                     value: "Bachelor of Science (B.Sc)",
@@ -1131,7 +1124,7 @@ function AddEmployeePage() {
                       </div>
 
                       {/* Card 2: Corporate Placement Mapping */}
-                      <div className="bg-card border border-border/60 rounded-2xl p-6 shadow-2xs relative overflow-hidden transition-all duration-300 hover:border-indigo-500/20">
+                      <div className="bg-card border border-border/60 rounded-lg p-6 shadow-2xs relative overflow-hidden transition-all duration-300 hover:border-indigo-500/20">
                         <div className="absolute top-0 left-0 h-full w-1.5 bg-indigo-500" />
                         <div className="flex items-center gap-3 border-b border-border/30 pb-4 mb-5">
                           <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-500">
@@ -1209,7 +1202,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.dept}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "Supply Chain", label: "Supply Chain" },
                                   {
@@ -1236,7 +1229,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.title}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "Executive", label: "Executive" },
                                   { value: "Office Executive", label: "Office Executive" },
@@ -1260,7 +1253,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.empType}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "Office Executive", label: "Office Executive" },
                                   { value: "Factory worker", label: "Factory worker" },
@@ -1278,7 +1271,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.workingArea}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "PSL-Operation", label: "PSL-Operation" },
                                   { value: "Head Office", label: "Head Office" },
@@ -1297,7 +1290,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.sect}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "ALL", label: "ALL" },
                                   { value: "Software Development", label: "Software Development" },
@@ -1317,7 +1310,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.jobNature}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "ALL", label: "ALL" },
                                   { value: "Full-Time", label: "Full-Time" },
@@ -1336,7 +1329,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.unit}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "ALL", label: "ALL" },
                                   { value: "Unit 1", label: "Unit 1" },
@@ -1355,7 +1348,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.line}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "ALL", label: "ALL" },
                                   { value: "Line A", label: "Line A" },
@@ -1374,7 +1367,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.grade}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "ALL", label: "None" },
                                   { value: "Grade A", label: "Grade A" },
@@ -1394,7 +1387,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.shift}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "General Shift", label: "General Shift" },
                                   { value: "Night Shift", label: "Night Shift" },
@@ -1412,7 +1405,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.empStatus}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "Probation", label: "Probation" },
                                   { value: "Permanent", label: "Permanent" },
@@ -1430,7 +1423,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.probationPeriod}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "N/A", label: "N/A" },
                                   { value: "3", label: "3" },
@@ -1449,7 +1442,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.holiday}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "N/A", label: "N/A" },
                                   { value: "Friday", label: "Friday" },
@@ -1468,7 +1461,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.setManager}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   {
                                     value: "Mamunoor Rashid (DGM), Head Office",
@@ -1489,7 +1482,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.recruitmentType}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "New", label: "New" },
                                   { value: "Re-appointment", label: "Re-appointment" },
@@ -1554,7 +1547,7 @@ function AddEmployeePage() {
                   {subSection === "legal_kinship" && (
                     <div className="space-y-6 animate-in fade-in duration-200">
                       {/* Card 3: Legal Identification Credentials */}
-                      <div className="bg-card border border-border/60 rounded-2xl p-6 shadow-2xs relative overflow-hidden transition-all duration-300 hover:border-violet-500/20">
+                      <div className="bg-card border border-border/60 rounded-lg p-6 shadow-2xs relative overflow-hidden transition-all duration-300 hover:border-violet-500/20">
                         <div className="absolute top-0 left-0 h-full w-1.5 bg-violet-500" />
                         <div className="flex items-center gap-3 border-b border-border/30 pb-4 mb-5">
                           <div className="p-2 rounded-xl bg-violet-500/10 text-violet-500">
@@ -1581,9 +1574,8 @@ function AddEmployeePage() {
                               type="text"
                               value={form.nid}
                               onChange={(e) => handleChange("nid", e.target.value)}
-                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full font-mono ${
-                                errors.nid ? "border-rose-400" : "border-border"
-                              }`}
+                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full font-mono ${errors.nid ? "border-rose-400" : "border-border"
+                                }`}
                               placeholder="10 or 17 digit NID number"
                             />
                           </div>
@@ -1647,7 +1639,7 @@ function AddEmployeePage() {
                       </div>
 
                       {/* Card 4: Parental & Kinship Context */}
-                      <div className="bg-card border border-border/60 rounded-2xl p-6 shadow-2xs relative overflow-hidden transition-all duration-300 hover:border-amber-500/20">
+                      <div className="bg-card border border-border/60 rounded-lg p-6 shadow-2xs relative overflow-hidden transition-all duration-300 hover:border-amber-500/20">
                         <div className="absolute top-0 left-0 h-full w-1.5 bg-amber-500" />
                         <div className="flex items-center gap-3 border-b border-border/30 pb-4 mb-5">
                           <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500">
@@ -1827,7 +1819,7 @@ function AddEmployeePage() {
                   {subSection === "address_contact" && (
                     <div className="space-y-6 animate-in fade-in duration-200">
                       {/* Card 5: Residential Address Directory */}
-                      <div className="bg-card border border-border/60 rounded-2xl p-6 shadow-2xs relative overflow-hidden transition-all duration-300 hover:border-rose-500/20">
+                      <div className="bg-card border border-border/60 rounded-lg p-6 shadow-2xs relative overflow-hidden transition-all duration-300 hover:border-rose-500/20">
                         <div className="absolute top-0 left-0 h-full w-1.5 bg-rose-500" />
                         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/30 pb-4 mb-5">
                           <div className="flex items-center gap-3">
@@ -1877,7 +1869,7 @@ function AddEmployeePage() {
                                 <div className="relative">
                                   <SearchableSelect
                                     value={form.presDivision}
-                                    onChange={() => {}}
+                                    onChange={() => { }}
                                     options={[
                                       { value: "Dhaka", label: "Dhaka" },
                                       { value: "Rangpur", label: "Rangpur" },
@@ -1900,7 +1892,7 @@ function AddEmployeePage() {
                                 <div className="relative">
                                   <SearchableSelect
                                     value={form.presDistrict}
-                                    onChange={() => {}}
+                                    onChange={() => { }}
                                     options={[
                                       { value: "Dhaka", label: "Dhaka" },
                                       { value: "Kurigram", label: "Kurigram" },
@@ -1930,7 +1922,7 @@ function AddEmployeePage() {
                                 <div className="relative">
                                   <SearchableSelect
                                     value={form.presUpazila}
-                                    onChange={() => {}}
+                                    onChange={() => { }}
                                     options={upazilas.map((u) => ({ value: u, label: u }))}
                                   />
                                 </div>
@@ -1951,7 +1943,7 @@ function AddEmployeePage() {
                                 <div className="relative">
                                   <SearchableSelect
                                     value={form.presPostOffice}
-                                    onChange={() => {}}
+                                    onChange={() => { }}
                                     options={postOffices.map((p) => ({ value: p, label: p }))}
                                   />
                                 </div>
@@ -2021,7 +2013,7 @@ function AddEmployeePage() {
                                 <div className="relative">
                                   <SearchableSelect
                                     value={form.presCountry}
-                                    onChange={() => {}}
+                                    onChange={() => { }}
                                     options={[
                                       { value: "Bangladesh", label: "Bangladesh" },
                                       { value: "India", label: "India" },
@@ -2053,7 +2045,7 @@ function AddEmployeePage() {
                             </div>
 
                             {form.sameAsPresent ? (
-                              <div className="h-[318px] border border-dashed border-border rounded-2xl flex flex-col items-center justify-center p-6 gap-3 bg-muted/5">
+                              <div className="h-[318px] border border-dashed border-border rounded-lg flex flex-col items-center justify-center p-6 gap-3 bg-muted/5">
                                 <CheckCircle2 className="size-10 text-emerald-500 animate-bounce" />
                                 <div className="text-center">
                                   <p className="text-xs font-extrabold text-foreground">
@@ -2075,7 +2067,7 @@ function AddEmployeePage() {
                                   <div className="relative">
                                     <SearchableSelect
                                       value={form.permDivision}
-                                      onChange={() => {}}
+                                      onChange={() => { }}
                                       options={[
                                         { value: "Dhaka", label: "Dhaka" },
                                         { value: "Rangpur", label: "Rangpur" },
@@ -2098,7 +2090,7 @@ function AddEmployeePage() {
                                   <div className="relative">
                                     <SearchableSelect
                                       value={form.permDistrict}
-                                      onChange={() => {}}
+                                      onChange={() => { }}
                                       options={[
                                         { value: "Dhaka", label: "Dhaka" },
                                         { value: "Kurigram", label: "Kurigram" },
@@ -2128,7 +2120,7 @@ function AddEmployeePage() {
                                   <div className="relative">
                                     <SearchableSelect
                                       value={form.permUpazila}
-                                      onChange={() => {}}
+                                      onChange={() => { }}
                                       options={upazilas.map((u) => ({ value: u, label: u }))}
                                     />
                                   </div>
@@ -2149,7 +2141,7 @@ function AddEmployeePage() {
                                   <div className="relative">
                                     <SearchableSelect
                                       value={form.permPostOffice}
-                                      onChange={() => {}}
+                                      onChange={() => { }}
                                       options={postOffices.map((p) => ({ value: p, label: p }))}
                                     />
                                   </div>
@@ -2219,7 +2211,7 @@ function AddEmployeePage() {
                                   <div className="relative">
                                     <SearchableSelect
                                       value={form.permCountry}
-                                      onChange={() => {}}
+                                      onChange={() => { }}
                                       options={[
                                         { value: "Bangladesh", label: "Bangladesh" },
                                         { value: "India", label: "India" },
@@ -2247,7 +2239,7 @@ function AddEmployeePage() {
                       </div>
 
                       {/* Card 6: Contact & Reachability */}
-                      <div className="bg-card border border-border/60 rounded-2xl p-6 shadow-2xs relative overflow-hidden transition-all duration-300 hover:border-sky-500/20">
+                      <div className="bg-card border border-border/60 rounded-lg p-6 shadow-2xs relative overflow-hidden transition-all duration-300 hover:border-sky-500/20">
                         <div className="absolute top-0 left-0 h-full w-1.5 bg-sky-500" />
                         <div className="flex items-center gap-3 border-b border-border/30 pb-4 mb-5">
                           <div className="p-2 rounded-xl bg-sky-500/10 text-sky-500">
@@ -2390,7 +2382,7 @@ function AddEmployeePage() {
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                       {/* Left Block: Base Compensation & Automated Breakdown Splits */}
-                      <div className="lg:col-span-7 space-y-5 bg-card border border-border/60 rounded-2xl p-5 shadow-2xs">
+                      <div className="lg:col-span-7 space-y-5 bg-card border border-border/60 rounded-lg p-5 shadow-2xs">
                         <div className="border-b border-border/30 pb-2.5">
                           <h3 className="text-xs font-extrabold text-primary uppercase tracking-wider">
                             Base Salary & Standard Splits
@@ -2414,9 +2406,8 @@ function AddEmployeePage() {
                                 type="number"
                                 value={form.gross}
                                 onChange={(e) => handleChange("gross", e.target.value)}
-                                className={`h-10 pl-7.5 pr-3.5 rounded-xl border bg-primary/5 text-sm font-extrabold font-mono text-primary focus:outline-none focus:ring-1 focus:ring-primary w-full ${
-                                  errors.gross ? "border-rose-400" : "border-border/80"
-                                }`}
+                                className={`h-10 pl-7.5 pr-3.5 rounded-xl border bg-primary/5 text-sm font-extrabold font-mono text-primary focus:outline-none focus:ring-1 focus:ring-primary w-full ${errors.gross ? "border-rose-400" : "border-border/80"
+                                  }`}
                                 placeholder="e.g. 45000"
                               />
                             </div>
@@ -2539,7 +2530,7 @@ function AddEmployeePage() {
                       </div>
 
                       {/* Right Block: Supplementary Perks & Dynamic Deductions */}
-                      <div className="lg:col-span-5 space-y-5 bg-card border border-border/60 rounded-2xl p-5 shadow-2xs flex flex-col justify-between">
+                      <div className="lg:col-span-5 space-y-5 bg-card border border-border/60 rounded-lg p-5 shadow-2xs flex flex-col justify-between">
                         <div>
                           <div className="border-b border-border/30 pb-2.5 mb-4">
                             <h3 className="text-xs font-extrabold text-foreground uppercase tracking-wider">
@@ -2695,7 +2686,7 @@ function AddEmployeePage() {
                   </div>
 
                   {/* Disbursement Routing (Bank Details) */}
-                  <div className="space-y-5 bg-card border border-border/60 rounded-2xl p-5 shadow-2xs">
+                  <div className="space-y-5 bg-card border border-border/60 rounded-lg p-5 shadow-2xs">
                     <div className="border-b border-border/30 pb-2.5 flex items-center gap-2">
                       <CreditCard className="size-4.5 text-primary" />
                       <div>
@@ -2715,7 +2706,7 @@ function AddEmployeePage() {
                         </label>
                         <SearchableSelect
                           value={form.paymentMode}
-                          onChange={() => {}}
+                          onChange={() => { }}
                           options={[
                             { value: "Bank Transfer", label: "Bank Transfer" },
                             { value: "Cash", label: "Cash payment" },
@@ -2794,7 +2785,7 @@ function AddEmployeePage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Portrait Upload */}
-                    <div className="border border-border/60 bg-muted/10 rounded-2xl p-5 flex flex-col items-center justify-center text-center gap-4.5 relative overflow-hidden min-h-[220px]">
+                    <div className="border border-border/60 bg-muted/10 rounded-lg p-5 flex flex-col items-center justify-center text-center gap-4.5 relative overflow-hidden min-h-[220px]">
                       <div className="size-14 rounded-full bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
                         <User className="size-6" />
                       </div>
@@ -2844,7 +2835,7 @@ function AddEmployeePage() {
                     </div>
 
                     {/* Signature Upload */}
-                    <div className="border border-border/60 bg-muted/10 rounded-2xl p-5 flex flex-col items-center justify-center text-center gap-4.5 relative overflow-hidden min-h-[220px]">
+                    <div className="border border-border/60 bg-muted/10 rounded-lg p-5 flex flex-col items-center justify-center text-center gap-4.5 relative overflow-hidden min-h-[220px]">
                       <div className="size-14 rounded-full bg-indigo-500/10 text-indigo-500 flex items-center justify-center border border-indigo-500/20">
                         <FileSignature className="size-6" />
                       </div>
@@ -2894,7 +2885,7 @@ function AddEmployeePage() {
                     </div>
 
                     {/* NID Card Scan */}
-                    <div className="border border-border/60 bg-muted/10 rounded-2xl p-5 flex flex-col items-center justify-center text-center gap-4.5 relative overflow-hidden min-h-[220px]">
+                    <div className="border border-border/60 bg-muted/10 rounded-lg p-5 flex flex-col items-center justify-center text-center gap-4.5 relative overflow-hidden min-h-[220px]">
                       <div className="size-14 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20">
                         <FileText className="size-6" />
                       </div>
@@ -2944,7 +2935,7 @@ function AddEmployeePage() {
                     </div>
 
                     {/* Academic Degree Scan */}
-                    <div className="border border-border/60 bg-muted/10 rounded-2xl p-5 flex flex-col items-center justify-center text-center gap-4.5 relative overflow-hidden min-h-[220px]">
+                    <div className="border border-border/60 bg-muted/10 rounded-lg p-5 flex flex-col items-center justify-center text-center gap-4.5 relative overflow-hidden min-h-[220px]">
                       <div className="size-14 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/20">
                         <GraduationCap className="size-6" />
                       </div>
@@ -3031,7 +3022,7 @@ function AddEmployeePage() {
                   </div>
 
                   {/* Inline Spreadsheet Table */}
-                  <div className="border border-border/40 rounded-2xl overflow-hidden mt-4 bg-card/30 backdrop-blur-xs">
+                  <div className="border border-border/40 rounded-lg overflow-hidden mt-4 bg-card/30 backdrop-blur-xs">
                     <table className="w-full border-collapse text-left text-xs">
                       <thead>
                         <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
@@ -3052,7 +3043,7 @@ function AddEmployeePage() {
                             <td className="px-4 py-2">
                               <SearchableSelect
                                 value={edu.degree}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "Secondary (SSC)", label: "Secondary School (SSC)" },
                                   {
@@ -3184,7 +3175,7 @@ function AddEmployeePage() {
                   </div>
 
                   {/* Inline Spreadsheet Table */}
-                  <div className="border border-border/40 rounded-2xl overflow-hidden mt-4 bg-card/30 backdrop-blur-xs">
+                  <div className="border border-border/40 rounded-lg overflow-hidden mt-4 bg-card/30 backdrop-blur-xs">
                     <table className="w-full border-collapse text-left text-xs">
                       <thead>
                         <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
@@ -3329,7 +3320,7 @@ function AddEmployeePage() {
                   </div>
 
                   {/* Inline Spreadsheet Table */}
-                  <div className="border border-border/40 rounded-2xl overflow-hidden mt-4 bg-card/30 backdrop-blur-xs">
+                  <div className="border border-border/40 rounded-lg overflow-hidden mt-4 bg-card/30 backdrop-blur-xs">
                     <table className="w-full border-collapse text-left text-xs">
                       <thead>
                         <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
@@ -3443,7 +3434,7 @@ function AddEmployeePage() {
                   </div>
 
                   {/* Inline Spreadsheet Table */}
-                  <div className="border border-border/40 rounded-2xl overflow-hidden mt-4 bg-card/30 backdrop-blur-xs">
+                  <div className="border border-border/40 rounded-lg overflow-hidden mt-4 bg-card/30 backdrop-blur-xs">
                     <table className="w-full border-collapse text-left text-xs">
                       <thead>
                         <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
@@ -3557,7 +3548,7 @@ function AddEmployeePage() {
                   </div>
 
                   {/* Inline Spreadsheet Table */}
-                  <div className="border border-border/40 rounded-2xl overflow-hidden mt-4 bg-card/30 backdrop-blur-xs">
+                  <div className="border border-border/40 rounded-lg overflow-hidden mt-4 bg-card/30 backdrop-blur-xs">
                     <table className="w-full border-collapse text-left text-xs">
                       <thead>
                         <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
@@ -3690,7 +3681,7 @@ function AddEmployeePage() {
                     </h2>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 bg-muted/10 border border-border/30 rounded-2xl p-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 bg-muted/10 border border-border/30 rounded-lg p-5">
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
                         Contact Person Name <span className="text-rose-500 font-bold">*</span>
@@ -3710,7 +3701,7 @@ function AddEmployeePage() {
                       </label>
                       <SearchableSelect
                         value={form.emergencyRelation}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         options={[
                           { value: "Father", label: "Father" },
                           { value: "Mother", label: "Mother" },
@@ -3808,7 +3799,7 @@ function AddEmployeePage() {
                     </h2>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 bg-muted/10 border border-border/30 rounded-2xl p-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 bg-muted/10 border border-border/30 rounded-lg p-5">
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
                         Nominee Full Name <span className="text-rose-500 font-bold">*</span>
@@ -3827,7 +3818,7 @@ function AddEmployeePage() {
                       </label>
                       <SearchableSelect
                         value={form.nomineeRelation}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         options={[
                           { value: "Mother", label: "Mother" },
                           { value: "Father", label: "Father" },
@@ -3905,7 +3896,7 @@ function AddEmployeePage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Reference 1 */}
-                    <div className="border border-border bg-muted/15 rounded-2xl p-5 space-y-4">
+                    <div className="border border-border bg-muted/15 rounded-lg p-5 space-y-4">
                       <h3 className="text-xs font-extrabold text-primary uppercase tracking-widest border-b border-border/20 pb-2">
                         Primary Reference
                       </h3>
@@ -3950,7 +3941,7 @@ function AddEmployeePage() {
                     </div>
 
                     {/* Reference 2 */}
-                    <div className="border border-border bg-muted/15 rounded-2xl p-5 space-y-4">
+                    <div className="border border-border bg-muted/15 rounded-lg p-5 space-y-4">
                       <h3 className="text-xs font-extrabold text-indigo-500 uppercase tracking-widest border-b border-border/20 pb-2">
                         Secondary Reference
                       </h3>
@@ -4031,7 +4022,7 @@ function AddEmployeePage() {
                   </div>
 
                   {/* Inline Spreadsheet Table */}
-                  <div className="border border-border/40 rounded-2xl overflow-hidden mt-4 bg-card/30 backdrop-blur-xs">
+                  <div className="border border-border/40 rounded-lg overflow-hidden mt-4 bg-card/30 backdrop-blur-xs">
                     <table className="w-full border-collapse text-left text-xs">
                       <thead>
                         <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
@@ -4060,7 +4051,7 @@ function AddEmployeePage() {
                             <td className="px-4 py-2">
                               <SearchableSelect
                                 value={dep.depRelation}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "Child", label: "Child (Son/Daughter)" },
                                   { value: "Spouse", label: "Spouse (Husband/Wife)" },
@@ -4159,7 +4150,7 @@ function AddEmployeePage() {
                     </h2>
                   </div>
 
-                  <div className="space-y-5 bg-muted/10 border border-border/30 rounded-2xl p-5">
+                  <div className="space-y-5 bg-muted/10 border border-border/30 rounded-lg p-5">
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-muted-foreground uppercase">
                         Key Roles & Responsibilities
@@ -4225,7 +4216,7 @@ function AddEmployeePage() {
                   </div>
 
                   {/* Inline Spreadsheet Table */}
-                  <div className="border border-border/40 rounded-2xl overflow-hidden mt-4 bg-card/30 backdrop-blur-xs">
+                  <div className="border border-border/40 rounded-lg overflow-hidden mt-4 bg-card/30 backdrop-blur-xs">
                     <table className="w-full border-collapse text-left text-xs">
                       <thead>
                         <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
@@ -4253,7 +4244,7 @@ function AddEmployeePage() {
                             <td className="px-4 py-2">
                               <SearchableSelect
                                 value={doc.docType}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "PDF", label: "PDF Document" },
                                   { value: "DOCX", label: "Microsoft Word (DOCX)" },
@@ -4324,14 +4315,14 @@ function AddEmployeePage() {
                     </h2>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 bg-muted/10 border border-border/30 rounded-2xl p-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 bg-muted/10 border border-border/30 rounded-lg p-5">
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-muted-foreground uppercase">
                         Background Check Status
                       </label>
                       <SearchableSelect
                         value={form.verificationStatus}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         options={[
                           { value: "Verified", label: "Verified & Cleared" },
                           { value: "Pending", label: "Pending Audit" },
@@ -4407,7 +4398,7 @@ function AddEmployeePage() {
                     </h2>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 bg-muted/10 border border-border/30 rounded-2xl p-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 bg-muted/10 border border-border/30 rounded-lg p-5">
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-muted-foreground uppercase">
                         Laptop Brand & Model
@@ -4514,7 +4505,7 @@ function AddEmployeePage() {
       {/* CUSTOM ADD OPTION MODAL OVERLAY */}
       {addingField && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-card border border-border/80 rounded-2xl shadow-2xl p-5 w-full max-w-sm overflow-hidden flex flex-col gap-4 animate-in zoom-in-95 duration-200">
+          <div className="bg-card border border-border/80 rounded-lg shadow-2xl p-5 w-full max-w-sm overflow-hidden flex flex-col gap-4 animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between border-b border-border/30 pb-2.5">
               <h3 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
                 Add Custom {addingField.includes("Upazila") ? "Upazila/Thana" : "Post Office"}
@@ -4560,7 +4551,7 @@ function AddEmployeePage() {
       {/* SAVE SUCCESS DIALOG OVERLAY */}
       {showSuccessModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-card border border-border/80 rounded-2xl shadow-2xl p-6 w-full max-w-md overflow-hidden flex flex-col items-center text-center gap-4 animate-in zoom-in-95 duration-200">
+          <div className="bg-card border border-border/80 rounded-lg shadow-2xl p-6 w-full max-w-md overflow-hidden flex flex-col items-center text-center gap-4 animate-in zoom-in-95 duration-200">
             <div className="size-16 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/20 shadow-xs animate-bounce">
               <CheckCircle2 className="size-8 animate-pulse" />
             </div>

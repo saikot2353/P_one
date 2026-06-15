@@ -119,9 +119,9 @@ function KpiSettingPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 xl:p-8 space-y-6">
-          
+
           {/* Breadcrumbs */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -135,7 +135,7 @@ function KpiSettingPage() {
                 <span>KPI Band Settings</span>
               </h1>
             </div>
-            
+
             <button
               onClick={() => {
                 setEditSetting(null);
@@ -159,7 +159,7 @@ function KpiSettingPage() {
               { label: "MAX POINTS LIMIT", val: "100 Points", desc: "Highest evaluation index", color: "text-emerald-500 bg-emerald-500/5 border-emerald-500/10" },
               { label: "HIGHEST RATING", val: "Very Excellent", desc: "Grade score >= 95", color: "text-blue-500 bg-blue-500/5 border-blue-500/10" }
             ].map((st, idx) => (
-              <div key={idx} className={`p-4 rounded-2xl border bg-card ${st.color} shadow-xs space-y-1 transition duration-200 hover:scale-[1.01]`}>
+              <div key={idx} className={`p-4 rounded-lg border bg-card ${st.color} shadow-xs space-y-1 transition duration-200 hover:scale-[1.01]`}>
                 <span className="text-[9px] font-black tracking-wider uppercase opacity-75">{st.label}</span>
                 <div className="text-xl font-black">{st.val}</div>
                 <div className="text-[10px] opacity-60 font-semibold">{st.desc}</div>
@@ -168,8 +168,8 @@ function KpiSettingPage() {
           </div>
 
           {/* Grade configuration list */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
-            
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
+
             {/* Utilities Toolbar */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/30 pb-4 print:hidden">
               <div className="flex items-center gap-1.5 select-none">
@@ -273,7 +273,7 @@ function KpiSettingPage() {
       {/* Add/Edit Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-md rounded-2xl border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200">
+          <div className="bg-card w-full max-w-md rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200">
             <button
               onClick={() => setIsModalOpen(false)}
               className="absolute right-4 top-4 p-1 text-muted-foreground/60 hover:text-foreground hover:bg-muted rounded-lg transition"

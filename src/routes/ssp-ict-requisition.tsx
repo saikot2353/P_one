@@ -95,7 +95,7 @@ export default function ICTRequisitionPage() {
         <Topbar />
 
         <div className="flex-1 overflow-hidden flex flex-col px-6 py-4 gap-3">
-          
+
           {/* Breadcrumb */}
           <div className="flex items-center gap-1.5 text-[10.5px] text-muted-foreground">
             <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
@@ -108,20 +108,20 @@ export default function ICTRequisitionPage() {
           </div>
 
           <div className="flex-1 flex gap-5 min-h-0">
-            
+
             {/* ── LEFT: Form Card ───────────────────────────── */}
             <div className="flex-1 bg-card border border-border/60 rounded-xl shadow-sm flex flex-col overflow-hidden max-w-2xl">
-              
+
               {/* Header with Tabs */}
               <div className="px-5 py-3 border-b border-border/50 bg-muted/20 flex items-center justify-between shrink-0">
-                <div className="flex bg-muted/50 p-1 rounded-2xl border border-border/40">
-                  <button 
+                <div className="flex bg-muted/50 p-1 rounded-lg border border-border/40">
+                  <button
                     onClick={() => setMode("service")}
                     className={`px-4 py-1.5 text-[12px] font-bold rounded-xl transition-all ${mode === "service" ? "bg-white shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"}`}
                   >
                     ICT Service
                   </button>
-                  <button 
+                  <button
                     onClick={() => setMode("store")}
                     className={`px-4 py-1.5 text-[12px] font-bold rounded-xl transition-all ${mode === "store" ? "bg-white shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"}`}
                   >
@@ -132,7 +132,7 @@ export default function ICTRequisitionPage() {
 
               {/* Form Body */}
               <div className="flex-1 overflow-y-auto px-5 py-5 flex flex-col justify-between">
-                
+
                 {mode === "service" && (
                   <div className="space-y-5">
                     <Field label="Product" required>
@@ -198,9 +198,9 @@ export default function ICTRequisitionPage() {
 
                 {/* Add Button */}
                 <div className="pt-6">
-                  <button 
+                  <button
                     onClick={mode === "service" ? handleAddService : handleAddStore}
-                    className="h-9 px-6 bg-blue-500 hover:bg-blue-600 text-white text-[12px] font-semibold rounded-2xl transition-all shadow-sm flex items-center gap-2"
+                    className="h-9 px-6 bg-blue-500 hover:bg-blue-600 text-white text-[12px] font-semibold rounded-lg transition-all shadow-sm flex items-center gap-2"
                   >
                     <Plus className="size-3.5" />
                     ADD
@@ -211,7 +211,7 @@ export default function ICTRequisitionPage() {
 
             {/* ── RIGHT: List + Submit ────────────────── */}
             <div className="flex-[1.5] flex flex-col gap-4 shrink-0 overflow-hidden">
-              
+
               {/* Table Card */}
               <div className="flex-1 bg-card border border-border/60 rounded-xl shadow-sm overflow-hidden flex flex-col">
                 <div className="px-4 py-3 border-b border-border/50 bg-muted/20">
@@ -305,7 +305,7 @@ export default function ICTRequisitionPage() {
                     </div>
                   </div>
 
-                  <button className="h-10 px-8 bg-primary hover:bg-primary/90 text-primary-foreground text-[12px] font-semibold rounded-2xl transition-all shadow-sm active:scale-[0.98] flex items-center gap-2 shrink-0">
+                  <button className="h-10 px-8 bg-primary hover:bg-primary/90 text-primary-foreground text-[12px] font-semibold rounded-lg transition-all shadow-sm active:scale-[0.98] flex items-center gap-2 shrink-0">
                     <CheckCircle2 className="size-4" />
                     SUBMIT
                   </button>

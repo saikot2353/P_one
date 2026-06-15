@@ -43,7 +43,7 @@ export function RequestManualAttendanceModal({ open, onOpenChange, selectedDate 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl p-0 bg-white dark:bg-slate-900 border border-border/40 dark:border-slate-800 shadow-2xl rounded-2xl overflow-hidden gap-0 [&>button]:hidden text-foreground">
+      <DialogContent className="max-w-xl p-0 bg-white dark:bg-slate-900 border border-border/40 dark:border-slate-800 shadow-2xl rounded-lg overflow-hidden gap-0 [&>button]:hidden text-foreground">
 
         {/* Header */}
         <div className="px-6 py-4 border-b border-border/30 flex items-center justify-between bg-muted/10 dark:bg-slate-900 shrink-0">
@@ -113,7 +113,7 @@ export function RequestManualAttendanceModal({ open, onOpenChange, selectedDate 
           </p>
           <button
             onClick={() => onOpenChange(false)}
-            className="h-9 px-6 bg-primary hover:bg-primary/90 text-primary-foreground text-[12px] font-semibold rounded-2xl transition-all shadow-sm flex items-center gap-2"
+            className="h-9 px-6 bg-primary hover:bg-primary/90 text-primary-foreground text-[12px] font-semibold rounded-lg transition-all shadow-sm flex items-center gap-2"
           >
             <CheckCircle2 className="size-3.5" />
             Submit Request

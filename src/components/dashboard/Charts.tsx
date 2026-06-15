@@ -56,7 +56,7 @@ function CustomTooltip({ active, payload, label }: any) {
 
 function Card({ title, subtitle, action, children, className = "" }: any) {
   return (
-    <div className={`group rounded-2xl bg-card border border-border/70 p-5 shadow-xs transition-all duration-300 hover:shadow-md hover:border-border/95 relative overflow-hidden ${className}`}>
+    <div className={`group rounded-lg bg-card border border-border/70 p-5 shadow-xs transition-all duration-300 hover:shadow-md hover:border-border/95 relative overflow-hidden ${className}`}>
       {/* Dynamic top gradient line to give a premium feel */}
       <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary/10 via-primary/30 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       <div className="flex items-start justify-between mb-5">
@@ -78,9 +78,8 @@ function Tabs() {
       {items.map((i, idx) => (
         <button
           key={i}
-          className={`text-[10px] font-semibold px-2.5 py-1 rounded-md transition-all ${
-            idx === 2 ? "bg-card text-primary font-bold shadow-xs" : "text-muted-foreground hover:text-foreground"
-          }`}
+          className={`text-[10px] font-semibold px-2.5 py-1 rounded-md transition-all ${idx === 2 ? "bg-card text-primary font-bold shadow-xs" : "text-muted-foreground hover:text-foreground"
+            }`}
         >
           {i}
         </button>

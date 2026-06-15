@@ -71,10 +71,10 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
   };
 
   const nameBngVal = selectedEmp.name === "Tahmid Afsar Shapno" ? "তাহমিদ আফসার স্বপন" :
-                     selectedEmp.name === "Sohanur Rahman Sohan" ? "সোহানুর রহমান সোহান" :
-                     selectedEmp.name === "Easin Mia" ? "ইয়াসিন মিয়া" :
-                     selectedEmp.name === "Jannatul Maowa" ? "জান্নাতুল মাওয়া" :
-                     selectedEmp.name + " (বাংলা)";
+    selectedEmp.name === "Sohanur Rahman Sohan" ? "সোহানুর রহমান সোহান" :
+      selectedEmp.name === "Easin Mia" ? "ইয়াসিন মিয়া" :
+        selectedEmp.name === "Jannatul Maowa" ? "জান্নাতুল মাওয়া" :
+          selectedEmp.name + " (বাংলা)";
 
   const fatherNameEng = "Mohammad Abdur Rahman";
   const fatherNameBng = "মোহাম্মদ আবদুর রহমান";
@@ -89,7 +89,7 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
   const ref1Org = "BUET";
   const ref1Contact = "+880 1711-223344";
 
-  const laptopAsset = `COMP-${selectedEmp.id.slice(0,4)}-992`;
+  const laptopAsset = `COMP-${selectedEmp.id.slice(0, 4)}-992`;
   const accessCard = `RFID-${selectedEmp.id.slice(6)}`;
 
   return (
@@ -112,7 +112,7 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
             </div>
             <ChevronDown className="size-3.5 text-muted-foreground/60 transition-transform duration-200" style={{ transform: isDetailDropdownOpen ? 'rotate(180deg)' : 'none' }} />
           </button>
-          
+
           {isDetailDropdownOpen && (
             <>
               <div className="fixed inset-0 z-20" onClick={() => setIsDetailDropdownOpen(false)} />
@@ -128,11 +128,10 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
                         setActiveDetailTab(tab.id);
                         setIsDetailDropdownOpen(false);
                       }}
-                      className={`w-full flex items-center justify-between px-3.5 py-2.5 hover:bg-muted/75 text-left text-xs font-semibold transition-all ${
-                        isSelected
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 hover:bg-muted/75 text-left text-xs font-semibold transition-all ${isSelected
                           ? "text-primary bg-primary/5 font-extrabold"
                           : "text-foreground/80"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-2">
                         <TabIcon className={`size-3.5 ${isSelected ? "text-primary animate-pulse" : "text-muted-foreground/60"}`} />
@@ -168,11 +167,10 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
               <button
                 key={tab.id}
                 onClick={() => setActiveDetailTab(tab.id)}
-                className={`flex items-center gap-2 py-2 px-4 rounded-lg text-[11px] font-extrabold transition-all duration-300 shrink-0 ${
-                  isSelected
+                className={`flex items-center gap-2 py-2 px-4 rounded-lg text-[11px] font-extrabold transition-all duration-300 shrink-0 ${isSelected
                     ? "bg-primary text-primary-foreground shadow-md ring-1 ring-primary/20 scale-[1.02]"
                     : "bg-transparent text-muted-foreground/80 hover:bg-muted hover:text-foreground"
-                }`}
+                  }`}
               >
                 <TabIcon className={`size-3.5 shrink-0 ${isSelected ? "animate-pulse" : ""}`} />
                 <span>{tab.label}</span>
@@ -185,12 +183,12 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
       {/* 1. PERSONAL & IDENTITY TAB (CONSOLIDATED WITH PROGRESS STEPPER) */}
       {activeDetailTab === "personal_identity" && (
         <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh] scrollbar-thin">
-          
+
           {/* Stepper Navigation */}
-          <div className="bg-card border border-border/60 rounded-2xl p-4 shadow-xs overflow-x-auto scrollbar-thin">
+          <div className="bg-card border border-border/60 rounded-lg p-4 shadow-xs overflow-x-auto scrollbar-thin">
             <div className="min-w-[580px] relative flex items-center justify-between px-6 py-2">
               <div className="absolute top-[22px] left-[45px] right-[45px] h-[3px] bg-muted/60 border-t border-b border-border/20 z-0" />
-              
+
               {[
                 { id: "primary_placement", label: "Placement", icon: User },
                 { id: "legal_kinship", label: "Kinship", icon: Users },
@@ -203,7 +201,7 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
                 const isSelected = subSection === step.id;
                 const subPercentage = getSubSectionCompletionPercentage(step.id);
                 const isCompleted = subPercentage === 100;
-                
+
                 return (
                   <button
                     key={step.id}
@@ -212,13 +210,12 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
                     className="relative z-10 flex flex-col items-center gap-1.5 group transition-all duration-300 focus:outline-none shrink-0"
                     style={{ width: "80px" }}
                   >
-                    <div className={`size-9 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative ${
-                      isSelected
+                    <div className={`size-9 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative ${isSelected
                         ? "bg-primary text-primary-foreground border-primary shadow-[0_0_12px_var(--primary)] scale-110"
                         : isCompleted
                           ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.2)]"
                           : "bg-card text-muted-foreground border-border/80 hover:border-muted-foreground/60"
-                    }`}>
+                      }`}>
                       {isCompleted ? (
                         <Check className="size-4 stroke-[3]" />
                       ) : (
@@ -229,9 +226,8 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
                       )}
                     </div>
                     <div className="text-center space-y-1 w-full min-w-[100px]">
-                      <span className={`text-[9px] font-black uppercase tracking-wide block transition-colors duration-200 ${
-                        isSelected ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
-                      }`}>
+                      <span className={`text-[9px] font-black uppercase tracking-wide block transition-colors duration-200 ${isSelected ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                        }`}>
                         {idx + 1}. {step.label}
                       </span>
                     </div>
@@ -455,7 +451,7 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
       {/* 2. QUALIFICATIONS & EXPERIENCE TAB */}
       {activeDetailTab === "qualifications_experience" && (
         <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh] scrollbar-thin">
-          
+
           {/* Section A: Academic Credentials */}
           <div className="space-y-3">
             <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
@@ -607,7 +603,7 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
       {/* 3. ALLOWANCE & SALARY DETAILS */}
       {activeDetailTab === "allowance_salary" && (
         <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh] scrollbar-thin">
-          
+
           {/* Allowances */}
           <div className="space-y-3">
             <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-500 flex items-center gap-1.5 border-b border-emerald-500/30 pb-1.5">
@@ -706,7 +702,7 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
       {/* 4. STATUTORY NOMINEE HUB */}
       {activeDetailTab === "statutory_nominee" && (
         <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh] scrollbar-thin">
-          
+
           {/* Nominee details */}
           <div className="space-y-3">
             <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
@@ -778,7 +774,7 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
       {/* 5. CORPORATE ASSETS VAULT */}
       {activeDetailTab === "corporate_assets" && (
         <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh] scrollbar-thin">
-          
+
           <div className="space-y-3">
             <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
               <Laptop className="size-3.5" /> Corporate Assets Assignment
@@ -817,7 +813,7 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
       {/* 6. HR VERIFICATION & AUDIT */}
       {activeDetailTab === "hr_verification" && (
         <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh] scrollbar-thin">
-          
+
           <div className="space-y-3">
             <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-500 flex items-center gap-1.5 border-b border-emerald-500/30 pb-1.5">
               <ShieldCheck className="size-3.5" /> Official HR Audit Clearance
@@ -852,12 +848,12 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
       {/* 7. INCREMENT HISTORY */}
       {activeDetailTab === "increment_history" && (
         <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh] scrollbar-thin">
-          
+
           <div className="space-y-4">
             <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
               <TrendingUp className="size-3.5" /> Increment & Promotion History
             </h4>
-            
+
             {!incRecord ? (
               <div className="p-8 text-center border border-border/40 rounded-xl bg-muted/10">
                 <History className="size-8 mx-auto text-muted-foreground/40 mb-3" />
@@ -881,7 +877,7 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
                   </div>
                   <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4 flex flex-col items-center justify-center text-center">
                     <span className="text-[9px] font-black uppercase text-amber-600 dark:text-amber-400 mb-1 tracking-widest">Promotions</span>
-                    <span className="text-base font-black text-amber-600 dark:text-amber-400 font-mono">{incRecord.total.includes("(P)") || incRecord.total.split("(")[1]?.replace(")","") || "0"}</span>
+                    <span className="text-base font-black text-amber-600 dark:text-amber-400 font-mono">{incRecord.total.includes("(P)") || incRecord.total.split("(")[1]?.replace(")", "") || "0"}</span>
                   </div>
                 </div>
 
@@ -911,41 +907,41 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
                         { year: "2024", inc: incRecord.inc2024 },
                         { year: "2025", inc: incRecord.inc2025 },
                       ]
-                      .filter(y => y.inc && y.inc !== "0" && y.inc.trim() !== "")
-                      .map((item, index, arr) => {
-                        const isPromo = item.inc.includes("(P)");
-                        const val = parseFloat(item.inc.replace("(P)", "").replace(/,/g, "")) || 0;
-                        
-                        // Calculate running gross (simplified assumption)
-                        let runningGross = incRecord.salaryJoining;
-                        for (let i = 0; i <= index; i++) {
-                           const pastVal = parseFloat(arr[i].inc.replace("(P)", "").replace(/,/g, "")) || 0;
-                           runningGross += pastVal;
-                        }
+                        .filter(y => y.inc && y.inc !== "0" && y.inc.trim() !== "")
+                        .map((item, index, arr) => {
+                          const isPromo = item.inc.includes("(P)");
+                          const val = parseFloat(item.inc.replace("(P)", "").replace(/,/g, "")) || 0;
 
-                        return (
-                          <tr key={item.year} className="hover:bg-muted/10 transition-colors group">
-                            <td className="px-4 py-3 font-black text-foreground">
-                              {item.year}
-                            </td>
-                            <td className="px-4 py-3 text-right text-emerald-600 dark:text-emerald-400 font-mono font-bold">
-                              +৳{val.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              {isPromo ? (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/20 text-[9px] font-black uppercase">
-                                  <Award className="size-3" /> Promoted
-                                </span>
-                              ) : (
-                                <span className="text-[10px] text-muted-foreground/50">-</span>
-                              )}
-                            </td>
-                            <td className="px-4 py-3 text-right font-mono font-bold text-primary">
-                              ৳{runningGross.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                            </td>
-                          </tr>
-                        );
-                      })}
+                          // Calculate running gross (simplified assumption)
+                          let runningGross = incRecord.salaryJoining;
+                          for (let i = 0; i <= index; i++) {
+                            const pastVal = parseFloat(arr[i].inc.replace("(P)", "").replace(/,/g, "")) || 0;
+                            runningGross += pastVal;
+                          }
+
+                          return (
+                            <tr key={item.year} className="hover:bg-muted/10 transition-colors group">
+                              <td className="px-4 py-3 font-black text-foreground">
+                                {item.year}
+                              </td>
+                              <td className="px-4 py-3 text-right text-emerald-600 dark:text-emerald-400 font-mono font-bold">
+                                +৳{val.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                {isPromo ? (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/20 text-[9px] font-black uppercase">
+                                    <Award className="size-3" /> Promoted
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] text-muted-foreground/50">-</span>
+                                )}
+                              </td>
+                              <td className="px-4 py-3 text-right font-mono font-bold text-primary">
+                                ৳{runningGross.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       {(!incRecord.total || incRecord.total.startsWith("0")) && (
                         <tr>
                           <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground text-xs font-semibold">

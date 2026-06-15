@@ -200,7 +200,7 @@ function EarnLeaveSubmitPage() {
         <div className="p-4 md:p-6 lg:p-8 space-y-6">
 
           {/* Breadcrumb and Page Header */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -214,7 +214,7 @@ function EarnLeaveSubmitPage() {
                 <span>Earn Leave Submit</span>
               </h1>
             </div>
-            
+
             <div className="text-[10px] font-extrabold uppercase bg-primary/10 text-primary px-4 py-2 rounded-full border border-primary/20 select-none">
               Fiscal Cycle: {year}
             </div>
@@ -229,9 +229,9 @@ function EarnLeaveSubmitPage() {
           )}
 
           {/* Configuration Filter Panel */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-xs">
+          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-xs">
             <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-4 text-xs font-bold font-sans">
-              
+
               {/* Year */}
               <div className="space-y-1.5">
                 <label className="text-[10px] text-slate-400 uppercase">Year</label>
@@ -333,10 +333,10 @@ function EarnLeaveSubmitPage() {
           </div>
 
           {/* Action Row & Utility Controls */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm space-y-5">
-            
+          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm space-y-5">
+
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              
+
               {/* Submit Selected action */}
               <div className="flex items-center gap-3">
                 <button
@@ -350,7 +350,7 @@ function EarnLeaveSubmitPage() {
 
               {/* Spreadsheet download utilities & Grid Search input */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                
+
                 <div className="flex items-center gap-1.5">
                   <button className="h-8.5 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 font-extrabold text-[11px] text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition">
                     <FileSpreadsheet className="size-3.5 text-emerald-500" />
@@ -410,7 +410,7 @@ function EarnLeaveSubmitPage() {
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {filteredRows.map((row) => {
                     const isSelected = selectedIds.has(row.id);
-                    
+
                     let statusColor = "bg-amber-100 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400";
                     if (row.status === "Submitted") {
                       statusColor = "bg-blue-100 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400";
@@ -420,7 +420,7 @@ function EarnLeaveSubmitPage() {
 
                     return (
                       <tr key={row.id} className="hover:bg-slate-50/55 dark:hover:bg-slate-900/40 transition duration-75 whitespace-nowrap">
-                        
+
                         {/* Checkbox */}
                         <td className="px-3 py-3 text-center border-r border-slate-100 dark:border-slate-800/50">
                           <input

@@ -8,16 +8,16 @@ interface LeaveApplicationModalProps {
 
 export function LeaveApplicationModal({ open, onOpenChange }: LeaveApplicationModalProps) {
   const details = [
-    ["Type", "Sick Leave"],       ["From", "04/04/2026"],
+    ["Type", "Sick Leave"], ["From", "04/04/2026"],
     ["Category", "Full Day Leave"], ["To", "04/04/2026"],
-    ["Documents", "—"],           ["Duration", "1 Day"],
-    ["Contact", "01750021154"],   ["Responsible", "Md. Anik Islam (Dy. Manager)"],
+    ["Documents", "—"], ["Duration", "1 Day"],
+    ["Contact", "01750021154"], ["Responsible", "Md. Anik Islam (Dy. Manager)"],
     ["Address", "Jahangirnagar University"], ["Purpose", "Semester Final Exam"],
   ];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl p-0 bg-white border border-border/40 shadow-2xl rounded-2xl overflow-hidden gap-0 max-h-[95vh] [&>button]:hidden">
+      <DialogContent className="max-w-3xl p-0 bg-white border border-border/40 shadow-2xl rounded-lg overflow-hidden gap-0 max-h-[95vh] [&>button]:hidden">
 
         {/* Header */}
         <div className="px-6 py-4 border-b border-border/30 flex items-center justify-between bg-muted/10 shrink-0">

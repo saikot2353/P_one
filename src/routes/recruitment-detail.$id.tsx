@@ -3,7 +3,7 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  ArrowLeft, CheckCircle2, XCircle, User, GraduationCap, Briefcase, MapPin, Heart, Info, Phone, Calendar, Mail, FileText, Landmark
+  ArrowLeft, CheckCircle2, XCircle, User, GraduationCap, Briefcase, MapPin, Heart, Info, Phone, Calendar, Mail, FileText, Landmark, ChevronRight
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -52,26 +52,54 @@ interface Candidate {
   };
 }
 
+function SectionHeader({
+  icon,
+  title,
+  subtitle,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  subtitle?: string;
+}) {
+  return (
+    <div className="flex items-center gap-2.5 border-b border-border/20 pb-3 mb-4">
+      <div className="size-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+        {icon}
+      </div>
+      <div>
+        <h3 className="text-xs font-black uppercase text-foreground/80 tracking-wider">{title}</h3>
+        {subtitle && <p className="text-[10px] text-muted-foreground mt-0.5">{subtitle}</p>}
+      </div>
+    </div>
+  );
+}
+
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
-    "IE Pending":    "bg-amber-100 text-amber-800 border-amber-200",
-    "IE Submitted":  "bg-blue-100 text-blue-800 border-blue-200",
-    "HR Pending":    "bg-purple-100 text-purple-800 border-purple-200",
-    "HR Approved":   "bg-emerald-100 text-emerald-800 border-emerald-200",
-    "HR Rejected":   "bg-rose-100 text-rose-800 border-rose-200",
+    "Pending":  "bg-purple-100 text-purple-800 border-purple-200",
+    "Approved": "bg-emerald-100 text-emerald-800 border-emerald-200",
+    "Rejected": "bg-rose-100 text-rose-800 border-rose-200",
   };
+
+  let displayStatus = "Pending";
+  if (status && status.includes("Approved")) {
+    displayStatus = "Approved";
+  } else if (status && status.includes("Rejected")) {
+    displayStatus = "Rejected";
+  }
+
   return (
-    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border whitespace-nowrap ${map[status] || "bg-slate-50 text-slate-655 border-slate-200"}`}>
-      {status}
+    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider border whitespace-nowrap ${map[displayStatus] || "bg-slate-50 text-slate-200 border-slate-200"}`}>
+      {displayStatus}
     </span>
   );
 }
 
 function DetailRow({ label, value }: { label: string; value?: string }) {
   return (
-    <div className="space-y-1 bg-muted/5 border border-border/40 p-3 rounded-xl hover:bg-muted/10 transition-colors">
-      <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">{label}</p>
-      <p className="text-sm font-bold text-foreground truncate">{value || "—"}</p>
+    <div className="flex items-center justify-between py-2 border-b border-border/10 text-xs hover:bg-muted/10 px-1.5 rounded transition-colors duration-150">
+      <span className="font-semibold text-muted-foreground">{label}</span>
+      <span className="font-bold text-foreground text-right truncate max-w-[65%]">{value || "—"}</span>
     </div>
   );
 }
@@ -193,193 +221,193 @@ function RecruitmentDetailPage() {
   return (
     <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
       <Sidebar />
-      <main className="flex-1 min-w-0 flex flex-col relative">
+      <main className="flex-1 min-w-0 flex flex-col relative overflow-hidden">
         <Topbar />
 
-        <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-5xl mx-auto w-full pb-28">
+        <div className="p-4 md:p-6 space-y-4 overflow-y-auto h-full pb-24">
           
-          {/* Breadcrumbs & Actions Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
-                <ChevronRight className="size-3" />
-                <span>e-Recruitment</span>
-                <ChevronRight className="size-3" />
-                <Link to="/recruitment-basic-list" className="hover:text-primary transition-colors">Queue</Link>
-                <ChevronRight className="size-3" />
-                <span className="text-primary font-black">{id}</span>
-              </div>
-              <h1 className="text-xl font-black text-foreground tracking-tight flex items-center gap-2">
-                <span>Dossier: {candidate.nameEng}</span>
-              </h1>
-            </div>
-            <Link
-              to="/recruitment-basic-list"
-              className="inline-flex items-center justify-center gap-1.5 h-9.5 px-4 rounded-xl border border-border/80 hover:bg-muted text-muted-foreground hover:text-foreground text-xs font-bold transition-all shadow-3xs"
-            >
-              <ArrowLeft className="size-4" /> Back to Queue
-            </Link>
-          </div>
-
-          {/* Candidate Card Banner */}
-          <div className="bg-card rounded-3xl border border-border/80 p-6 flex flex-col md:flex-row gap-6 items-center shadow-2xs relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full blur-3xl" />
-            
-            {candidate.photo ? (
+          {/* Top Breadcrumb & Actions */}
+          <div className="bg-card rounded-xl border border-border/60 p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-3xs">
+            <div className="flex items-center gap-3">
               <img 
-                src={candidate.photo} 
+                src={candidate.photo || `https://images.unsplash.com/photo-${candidate.empIdTemp === "PAL000002" || candidate.empIdTemp === "PAL000004" || candidate.empIdTemp === "PAL000006" || candidate.empIdTemp === "PAL000008" || candidate.empIdTemp === "PAL000010" || candidate.empIdTemp === "PAL000012" || candidate.empIdTemp === "PAL000014" ? "1494790108377-be9c29b29330" : "1535713875002-d1d0cf377fde"}?auto=format&fit=crop&w=120&h=120&q=80`} 
                 alt={candidate.nameEng} 
-                className="size-28 rounded-2xl border border-border/60 object-cover shadow-sm z-10"
+                className="size-11 rounded-full border border-border/60 object-cover shadow-xs"
               />
-            ) : (
-              <div className="size-28 rounded-2xl border border-border/60 bg-muted/30 flex items-center justify-center text-muted-foreground/45 z-10 shrink-0">
-                <User className="size-12" />
+              <div>
+                <h1 className="text-sm font-extrabold tracking-tight text-foreground flex items-center gap-2">
+                  {candidate.nameEng}
+                  <StatusBadge status={candidate.assessStatus} />
+                </h1>
+                <p className="text-[10px] font-semibold text-muted-foreground">ID: {candidate.empIdTemp} — {candidate.designation}</p>
               </div>
-            )}
+            </div>
 
-            <div className="text-center md:text-left space-y-2 z-10 flex-1">
-              <div className="flex flex-col md:flex-row md:items-center gap-2">
-                <h2 className="text-xl font-black text-foreground tracking-tight">{candidate.nameEng}</h2>
-                <StatusBadge status={candidate.assessStatus} />
-              </div>
-              <p className="text-xs font-semibold text-muted-foreground">{candidate.nameBng || "বাংলা নাম নেই"}</p>
-              <div className="flex flex-wrap justify-center md:justify-start gap-4 text-[10.5px] font-bold text-muted-foreground/80">
-                <span className="flex items-center gap-1.5"><Calendar className="size-3.5 text-primary" /> DOB: {candidate.dob || "—"}</span>
-                <span className="flex items-center gap-1.5"><Mail className="size-3.5 text-primary" /> {candidate.personalEmail || "—"}</span>
-              </div>
+            <div className="flex items-center gap-3">
+              <Link
+                to="/recruitment-basic-list"
+                className="h-8 px-3 rounded-lg border border-border/80 bg-card hover:bg-muted text-[11px] font-bold shadow-3xs flex items-center gap-1.5 transition"
+              >
+                <ArrowLeft className="size-3.5" /> Back to Queue
+              </Link>
             </div>
           </div>
 
-          {/* Dossier Tabs/Sections */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Unified Compact Dashboard Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
-            {/* Block 1: Identification & Credentials */}
-            <div className="bg-card rounded-2xl border border-border/80 shadow-3xs overflow-hidden flex flex-col">
-              <SectionHeader icon={<Info className="size-4" />} title="Personal & Identity Dossier" />
-              <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
-                <DetailRow label="Religion" value={candidate.religion} />
-                <DetailRow label="Marital Status" value={candidate.maritalStatus} />
-                <DetailRow label="National ID (NID)" value={candidate.nidNumber} />
-                <DetailRow label="Birth Registration No" value={candidate.birthReg} />
-                <DetailRow label="Father Name (ENG)" value={candidate.fatherNameEng} />
-                <DetailRow label="Father Name (BNG)" value={candidate.fatherNameBng} />
-                <DetailRow label="Mother Name (ENG)" value={candidate.motherNameEng} />
-                <DetailRow label="Mother Name (BNG)" value={candidate.motherNameBng} />
-              </div>
-            </div>
-
-            {/* Block 2: Contacts & References */}
-            <div className="bg-card rounded-2xl border border-border/80 shadow-3xs overflow-hidden flex flex-col">
-              <SectionHeader icon={<Phone className="size-4" />} title="Contact & References" />
-              <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
-                <DetailRow label="Personal Contact No" value={candidate.personalContact} />
-                <DetailRow label="Emergency Contact No" value={candidate.emergencyContact} />
-                <DetailRow label="Emergency Reference Name" value={candidate.contactPerson} />
-                <DetailRow label="Relationship" value={candidate.relationship} />
-              </div>
-            </div>
-
-          </div>
-
-          {/* Address Details */}
-          <div className="bg-card rounded-2xl border border-border/80 shadow-3xs overflow-hidden">
-            <SectionHeader icon={<MapPin className="size-4" />} title="Address Registration Coordinates" />
-            <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div className="bg-muted/10 border border-border/60 rounded-xl p-4.5 space-y-2">
-                <p className="text-[10px] font-black uppercase text-primary tracking-widest flex items-center gap-1.5">
-                  <MapPin className="size-4" /> Present Address
-                </p>
-                <p className="text-xs font-semibold text-foreground/80 leading-relaxed">{candidate.presentAddress || "—"}</p>
-              </div>
-              <div className="bg-muted/10 border border-border/60 rounded-xl p-4.5 space-y-2">
-                <p className="text-[10px] font-black uppercase text-primary tracking-widest flex items-center gap-1.5">
-                  <MapPin className="size-4" /> Permanent Address
-                </p>
-                <p className="text-xs font-semibold text-foreground/80 leading-relaxed">{candidate.permanentAddress || "—"}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Academic Profile */}
-          <div className="bg-card rounded-2xl border border-border/80 shadow-3xs overflow-hidden">
-            <SectionHeader icon={<GraduationCap className="size-4" />} title="Academic Profile" />
-            <div className="p-5">
-              {candidate.academics && candidate.academics.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {candidate.academics.map((ac: any, i: number) => (
-                    <div key={ac.id || i} className="flex items-center justify-between border border-border/50 bg-muted/5 p-4 rounded-xl">
-                      <div>
-                        <p className="text-xs font-black text-foreground">{ac.title || "—"}</p>
-                        <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">{ac.institution || "—"}</p>
-                      </div>
-                      <div className="text-right text-[10px] font-bold">
-                        <p className="text-primary">GPA: {ac.result || "—"}</p>
-                        <p className="text-muted-foreground/75 font-mono mt-0.5">{ac.year || "—"}</p>
-                      </div>
-                    </div>
-                  ))}
+            {/* Left Hand: Personal & Contacts & Nominee */}
+            <div className="space-y-4">
+              
+              {/* Personal Details */}
+              <div className="bg-card rounded-xl border border-border/60 p-4 shadow-3xs">
+                <SectionHeader icon={<Info className="size-4" />} title="Personal & Identity Dossier" />
+                <div className="space-y-1">
+                  <DetailRow label="Candidate Name (ENG)" value={candidate.nameEng} />
+                  <DetailRow label="Candidate Name (BNG)" value={candidate.nameBng} />
+                  <DetailRow label="Date of Birth (DOB)" value={candidate.dob} />
+                  <DetailRow label="Religion" value={candidate.religion} />
+                  <DetailRow label="Marital Status" value={candidate.maritalStatus} />
+                  <DetailRow label="National ID (NID)" value={candidate.nidNumber} />
+                  <DetailRow label="Birth Registration No" value={candidate.birthReg} />
+                  <DetailRow label="Father Name (ENG)" value={candidate.fatherNameEng} />
+                  <DetailRow label="Father Name (BNG)" value={candidate.fatherNameBng} />
+                  <DetailRow label="Mother Name (ENG)" value={candidate.motherNameEng} />
+                  <DetailRow label="Mother Name (BNG)" value={candidate.motherNameBng} />
                 </div>
-              ) : (
-                <p className="text-xs text-muted-foreground/75 italic">No academic qualifications listed.</p>
-              )}
-            </div>
-          </div>
-
-          {/* Job History Timeline */}
-          <div className="bg-card rounded-2xl border border-border/80 shadow-3xs overflow-hidden">
-            <SectionHeader icon={<Briefcase className="size-4" />} title="Job Experience Timeline" />
-            <div className="p-5">
-              {candidate.experiences && candidate.experiences.length > 0 ? (
-                <div className="space-y-3">
-                  {candidate.experiences.map((exp: any, i: number) => (
-                    <div key={exp.id || i} className="border border-border/50 bg-muted/5 p-4.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div className="space-y-1">
-                        <p className="text-xs font-black text-foreground">{exp.company || "—"}</p>
-                        <p className="text-[10px] text-muted-foreground font-semibold">Designation: <strong className="text-foreground">{exp.designation || "—"}</strong></p>
-                      </div>
-                      <div className="text-left sm:text-right text-[10px] font-bold space-y-1">
-                        <p className="text-primary font-mono">{exp.from || "—"} to {exp.to || "—"}</p>
-                        <p className="text-muted-foreground/75 font-semibold">Leaving Reason: {exp.reason || "—"}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-xs text-muted-foreground/75 italic">No job experience history declared.</p>
-              )}
-            </div>
-          </div>
-
-          {/* Nominee Declaration Dossier */}
-          {candidate.nominee && (
-            <div className="bg-card rounded-2xl border border-border/80 shadow-3xs overflow-hidden">
-              <SectionHeader icon={<Heart className="size-4" />} title="Nominee Declaration Dossier" />
-              <div className="p-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                <DetailRow label="Nominee Full Name" value={candidate.nominee.name} />
-                <DetailRow label="Relationship" value={candidate.nominee.relation} />
-                <DetailRow label="NID / Birth Reg" value={candidate.nominee.nidReg} />
-                <DetailRow label="Nominee Contact No" value={candidate.nominee.contact} />
               </div>
+
+              {/* Contacts & emergency References */}
+              <div className="bg-card rounded-xl border border-border/60 p-4 shadow-3xs">
+                <SectionHeader icon={<Phone className="size-4" />} title="Contact & Reachability Channels" />
+                <div className="space-y-1">
+                  <DetailRow label="Personal Contact No" value={candidate.personalContact} />
+                  <DetailRow label="Personal Email Address" value={candidate.personalEmail} />
+                  <DetailRow label="Emergency Contact No" value={candidate.emergencyContact} />
+                  <DetailRow label="Emergency Contact Name" value={candidate.contactPerson} />
+                  <DetailRow label="Relationship" value={candidate.relationship} />
+                </div>
+              </div>
+
+              {/* Nominee Declaration */}
+              {candidate.nominee && (
+                <div className="bg-card rounded-xl border border-border/60 p-4 shadow-3xs">
+                  <SectionHeader icon={<Heart className="size-4" />} title="Nominee Declaration Dossier" />
+                  <div className="space-y-1">
+                    <DetailRow label="Nominee Full Name" value={candidate.nominee.name} />
+                    <DetailRow label="Relationship" value={candidate.nominee.relation} />
+                    <DetailRow label="Nominee NID / Birth Reg" value={candidate.nominee.nidReg} />
+                    <DetailRow label="Nominee Contact Number" value={candidate.nominee.contact} />
+                  </div>
+                </div>
+              )}
+
             </div>
-          )}
+
+            {/* Right Hand: Qualification, Experiences & Addresses */}
+            <div className="space-y-4">
+
+              {/* Academic Profile */}
+              <div className="bg-card rounded-xl border border-border/60 p-4 shadow-3xs">
+                <SectionHeader icon={<GraduationCap className="size-4" />} title="Academic Qualifications" />
+                <div className="border border-border/30 rounded-lg overflow-hidden mt-2">
+                  <table className="w-full text-left text-xs bg-card">
+                    <thead>
+                      <tr className="border-b border-border/30 bg-muted/20 text-[9px] uppercase font-bold text-muted-foreground/75">
+                        <th className="px-3 py-1.5">Exam Title</th>
+                        <th className="px-3 py-1.5">Institution</th>
+                        <th className="px-3 py-1.5 text-center">Year</th>
+                        <th className="px-3 py-1.5 text-right">Result</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/25">
+                      {candidate.academics && candidate.academics.length > 0 ? (
+                        candidate.academics.map((ac: any, idx: number) => (
+                          <tr key={ac.id || idx} className="hover:bg-muted/10">
+                            <td className="px-3 py-2 font-bold text-foreground">{ac.title}</td>
+                            <td className="px-3 py-2 font-semibold text-muted-foreground">{ac.institution}</td>
+                            <td className="px-3 py-2 text-center font-mono">{ac.year}</td>
+                            <td className="px-3 py-2 text-right font-bold text-primary">{ac.result}</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={4} className="text-center py-3 italic text-muted-foreground">No academic profiles declared.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Job History Timeline */}
+              <div className="bg-card rounded-xl border border-border/60 p-4 shadow-3xs">
+                <SectionHeader icon={<Briefcase className="size-4" />} title="Prior Job Experience Timeline" />
+                <div className="border border-border/30 rounded-lg overflow-hidden mt-2">
+                  <table className="w-full text-left text-xs bg-card">
+                    <thead>
+                      <tr className="border-b border-border/30 bg-muted/20 text-[9px] uppercase font-bold text-muted-foreground/75">
+                        <th className="px-3 py-1.5">Company Name</th>
+                        <th className="px-3 py-1.5">Designation</th>
+                        <th className="px-3 py-1.5 text-center">Duration</th>
+                        <th className="px-3 py-1.5 text-right">Leaving Reason</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/25">
+                      {candidate.experiences && candidate.experiences.length > 0 ? (
+                        candidate.experiences.map((exp: any, idx: number) => (
+                          <tr key={exp.id || idx} className="hover:bg-muted/10">
+                            <td className="px-3 py-2 font-bold text-foreground">{exp.company}</td>
+                            <td className="px-3 py-2 font-semibold text-muted-foreground">{exp.designation}</td>
+                            <td className="px-3 py-2 text-center font-mono whitespace-nowrap text-[10px]">{exp.from} to {exp.to}</td>
+                            <td className="px-3 py-2 text-right font-medium text-muted-foreground italic truncate max-w-[150px]">{exp.reason}</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={4} className="text-center py-3 italic text-muted-foreground">No experience history declared.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Address Coordinates */}
+              <div className="bg-card rounded-xl border border-border/60 p-4 shadow-3xs">
+                <SectionHeader icon={<MapPin className="size-4" />} title="Registered Address Coordinates" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2 text-xs">
+                  <div className="bg-muted/10 border border-border/30 rounded-lg p-2.5">
+                    <p className="text-[9px] font-bold uppercase text-primary mb-1 flex items-center gap-1"><MapPin className="size-3" /> Present Address</p>
+                    <p className="text-foreground/80 leading-normal font-medium">{candidate.presentAddress || "—"}</p>
+                  </div>
+                  <div className="bg-muted/10 border border-border/30 rounded-lg p-2.5">
+                    <p className="text-[9px] font-bold uppercase text-primary mb-1 flex items-center gap-1"><MapPin className="size-3" /> Permanent Address</p>
+                    <p className="text-foreground/80 leading-normal font-medium">{candidate.permanentAddress || "—"}</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
 
           {/* Floating Footer Action Bar */}
-          <div className="fixed bottom-0 left-0 lg:left-64 right-0 bg-background/85 backdrop-blur-md border-t border-border/60 p-4 flex items-center justify-center z-30 shadow-lg">
-            <div className="max-w-5xl w-full flex gap-4">
+          <div className="fixed bottom-0 left-0 lg:left-64 right-0 bg-background/90 backdrop-blur-md border-t border-border/60 p-3 flex items-center justify-center z-30 shadow-lg">
+            <div className="w-full px-4 md:px-6 flex gap-3">
               <button
                 type="button"
                 onClick={handleReject}
-                className="flex-1 flex items-center justify-center gap-1.5 h-11 bg-rose-50 border border-rose-200 hover:bg-rose-100 text-rose-600 font-bold rounded-xl text-xs transition"
+                className="flex-1 flex items-center justify-center gap-1.5 h-9 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 font-bold rounded-lg text-xs transition active:scale-[0.99]"
               >
                 <XCircle className="size-4" /> Reject Applicant
               </button>
               <button
                 type="button"
                 onClick={handleApprove}
-                className="flex-1 flex items-center justify-center gap-1.5 h-11 bg-primary text-primary-foreground hover:opacity-90 font-black rounded-xl text-xs shadow-md transition"
+                className="flex-1 flex items-center justify-center gap-1.5 h-9 bg-primary text-primary-foreground hover:opacity-95 font-bold rounded-lg text-xs shadow-sm transition active:scale-[0.99]"
               >
-                <CheckCircle2 className="size-4" /> Approve &amp; Onboard to Personnel List
+                <CheckCircle2 className="size-4" /> Approve &amp; Onboard
               </button>
             </div>
           </div>

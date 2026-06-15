@@ -107,7 +107,7 @@ function ProposeIncrementPage() {
     return records.filter(row => {
       if (approveStatus !== "ALL" && row.status !== approveStatus) return false;
       if (subDept !== "ALL" && row.department !== subDept) return false;
-      
+
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         return row.name.toLowerCase().includes(q) || row.empId.includes(q) || row.designation.toLowerCase().includes(q);
@@ -156,7 +156,7 @@ function ProposeIncrementPage() {
         <div className="p-4 md:p-6 lg:p-8 space-y-6">
 
           {/* Breadcrumbs */}
-          <div className="bg-card rounded-2xl border border-border/85 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-lg border border-border/85 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -173,7 +173,7 @@ function ProposeIncrementPage() {
           </div>
 
           {/* PARAMETRIC FILTERS ROW */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
               <div className="space-y-1">
                 <label className="text-[9px] font-bold text-muted-foreground uppercase">Year</label>
@@ -260,8 +260,8 @@ function ProposeIncrementPage() {
           </div>
 
           {/* ACTIVE ROSTER DATAGRID */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
-            
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
+
             {/* Table Export Actions Bar */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-3 border-b border-border/20">
               <div className="flex items-center gap-2">
@@ -281,7 +281,7 @@ function ProposeIncrementPage() {
 
               <div className="flex items-center gap-2">
                 <span className="text-[11px] font-bold text-muted-foreground uppercase whitespace-nowrap">Search:</span>
-                <input 
+                <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -321,15 +321,15 @@ function ProposeIncrementPage() {
                     return (
                       <tr key={row.empId} className="hover:bg-muted/40 transition">
                         <td className="px-3 py-3 text-center flex items-center justify-center gap-1.5">
-                          <button 
-                            onClick={() => handleOpenEdit(row)} 
+                          <button
+                            onClick={() => handleOpenEdit(row)}
                             className="p-1 hover:bg-primary/10 text-primary rounded transition"
                             title="Edit Proposal"
                           >
                             <PenTool className="size-3.5" />
                           </button>
-                          <button 
-                            onClick={() => handleDeleteRow(row.empId)} 
+                          <button
+                            onClick={() => handleDeleteRow(row.empId)}
                             className="p-1 hover:bg-rose-500/10 text-rose-500 rounded transition"
                             title="Delete Proposal"
                           >
@@ -380,7 +380,7 @@ function ProposeIncrementPage() {
         {/* Dynamic Edit Modal Popover */}
         {editingRow && (
           <div className="fixed inset-0 bg-background/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-            <div className="bg-card border border-border rounded-2xl w-full max-w-md p-6 shadow-xl space-y-4 animate-in zoom-in-95 duration-250">
+            <div className="bg-card border border-border rounded-lg w-full max-w-md p-6 shadow-xl space-y-4 animate-in zoom-in-95 duration-250">
               <div className="flex items-center justify-between pb-3 border-b border-border/20">
                 <h3 className="text-sm font-black text-foreground flex items-center gap-1.5 uppercase">
                   <Sparkles className="size-4.5 text-primary" />
@@ -407,7 +407,7 @@ function ProposeIncrementPage() {
 
                 <div className="space-y-1 pt-2">
                   <label className="text-[10px] font-bold text-muted-foreground uppercase">Propose Increment Amount (৳)</label>
-                  <input 
+                  <input
                     type="number"
                     value={editProposeInc}
                     onChange={e => setEditProposeInc(Number(e.target.value))}
@@ -417,7 +417,7 @@ function ProposeIncrementPage() {
 
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold text-muted-foreground uppercase">Propose Promotion Designation</label>
-                  <input 
+                  <input
                     type="text"
                     value={editProposeProm}
                     onChange={e => setEditProposeProm(e.target.value)}
@@ -427,7 +427,7 @@ function ProposeIncrementPage() {
 
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold text-muted-foreground uppercase">Remarks / Justification</label>
-                  <textarea 
+                  <textarea
                     rows={2}
                     value={editRemarks}
                     onChange={e => setEditRemarks(e.target.value)}

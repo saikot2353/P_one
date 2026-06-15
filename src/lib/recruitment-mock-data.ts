@@ -1,5 +1,5 @@
 // Version key — bump this to force-refresh stale localStorage data
-const DATA_VERSION = "v4";
+const DATA_VERSION = "v6";
 
 export const initializeRecruitmentMockData = (forceReset = false) => {
   if (typeof window === "undefined") return;
@@ -282,18 +282,511 @@ export const initializeRecruitmentMockData = (forceReset = false) => {
       assessStatus: "HR Pending",   
       grade: "" 
     },
-    { empIdTemp: "PAL000004", nameEng: "Rahima Khatun",        nameBng: "রাহিমা খাতুন",         employeeType: "Worker", department: "RMG Operation", section: "Finishing",designation: "Iron Man",        unit: "Unit-6", line: "F-1", doj: "2026-08-19", dob: "1990-12-05", personalContact: "01900000003", assessStatus: "IE Pending",   grade: "" },
-    { empIdTemp: "PAL000005", nameEng: "Md. Sohel Rana",       nameBng: "মোঃ সোহেল রানা",       employeeType: "Worker", department: "RMG Operation", section: "Sewing",   designation: "Operator",        unit: "Unit-6", line: "53",  doj: "2026-08-20", dob: "1996-07-22", personalContact: "01500000004", assessStatus: "HR Rejected",  grade: "" },
-    { empIdTemp: "PAL000006", nameEng: "Roksana Akhter",       nameBng: "রোকসানা আক্তার",       employeeType: "Worker", department: "RMG Operation", section: "Sewing",   designation: "Helper",          unit: "Unit-6", line: "54",  doj: "2026-08-21", dob: "1998-03-11", personalContact: "01600000005", assessStatus: "IE Pending",   grade: "" },
-    { empIdTemp: "PAL000007", nameEng: "Md. Jahangir Alam",    nameBng: "মোঃ জাহাঙ্গীর আলম",   employeeType: "Worker", department: "RMG Operation", section: "Sewing",   designation: "Operator",        unit: "Unit-6", line: "55",  doj: "2026-08-22", dob: "1993-09-30", personalContact: "01700000006", assessStatus: "HR Approved",  grade: "A-" },
-    { empIdTemp: "PAL000008", nameEng: "Nasrin Sultana",       nameBng: "নাসরিন সুলতানা",       employeeType: "Worker", department: "RMG Operation", section: "Finishing",designation: "Folder",          unit: "Unit-6", line: "F-2", doj: "2026-08-23", dob: "1997-01-14", personalContact: "01800000007", assessStatus: "IE Pending",   grade: "" },
-    { empIdTemp: "PAL000009", nameEng: "Md. Abul Kashem",      nameBng: "মোঃ আবুল কাশেম",       employeeType: "Worker", department: "RMG Operation", section: "Cutting",  designation: "Spreader",        unit: "Unit-6", line: "13",  doj: "2026-08-24", dob: "1991-11-08", personalContact: "01900000008", assessStatus: "HR Pending",   grade: "" },
-    { empIdTemp: "PAL000010", nameEng: "Mariam Akter",         nameBng: "মরিয়ম আক্তার",        employeeType: "Worker", department: "RMG Operation", section: "Sewing",   designation: "Operator",        unit: "Unit-6", line: "56",  doj: "2026-08-25", dob: "1999-06-19", personalContact: "01500000009", assessStatus: "IE Pending",   grade: "" },
-    { empIdTemp: "PAL000011", nameEng: "Md. Saiful Islam",     nameBng: "মোঃ সাইফুল ইসলাম",    employeeType: "Worker", department: "RMG Operation", section: "Sewing",   designation: "Operator",        unit: "Unit-6", line: "57",  doj: "2026-08-26", dob: "1994-08-25", personalContact: "01600000010", assessStatus: "HR Approved",  grade: "C+" },
-    { empIdTemp: "PAL000012", nameEng: "Halima Begum",         nameBng: "হালিমা বেগম",           employeeType: "Worker", department: "RMG Operation", section: "Sewing",   designation: "Helper",          unit: "Unit-6", line: "58",  doj: "2026-08-27", dob: "1996-02-14", personalContact: "01700000011", assessStatus: "IE Pending",   grade: "" },
-    { empIdTemp: "PAL000013", nameEng: "Md. Nur Islam",        nameBng: "মোঃ নুর ইসলাম",        employeeType: "Worker", department: "RMG Operation", section: "Finishing",designation: "Poly Man",        unit: "Unit-6", line: "F-3", doj: "2026-08-28", dob: "1995-10-02", personalContact: "01800000012", assessStatus: "HR Pending",   grade: "" },
-    { empIdTemp: "PAL000014", nameEng: "Shirin Akter",         nameBng: "শিরিন আক্তার",         employeeType: "Worker", department: "RMG Operation", section: "Sewing",   designation: "Operator",        unit: "Unit-6", line: "59",  doj: "2026-08-29", dob: "1992-05-18", personalContact: "01900000013", assessStatus: "IE Pending",   grade: "" },
-    { empIdTemp: "PAL000015", nameEng: "Md. Shahidullah",      nameBng: "মোঃ শহীদুল্লাহ",       employeeType: "Worker", department: "RMG Operation", section: "Cutting",  designation: "Numbering Man",   unit: "Unit-6", line: "14",  doj: "2026-08-30", dob: "1998-12-09", personalContact: "01500000014", assessStatus: "HR Approved",  grade: "B+" },
+    { 
+      empIdTemp: "PAL000004", 
+      nameEng: "Rahima Khatun",        
+      nameBng: "রাহিমা খাতুন",         
+      employeeType: "Worker", 
+      department: "RMG Operation", 
+      section: "Finishing",
+      designation: "Iron Man",        
+      unit: "Unit-6", 
+      line: "F-1", 
+      doj: "2026-08-19", 
+      dob: "1990-12-05", 
+      personalContact: "01900000003", 
+      personalEmail: "rahima.khatun@example.com",
+      religion: "Islam",
+      maritalStatus: "Married",
+      nidNumber: "4189234123",
+      birthReg: "1990261548002777",
+      fatherNameEng: "Md. Sofiullah",
+      fatherNameBng: "মোঃ সফিউল্লাহ",
+      motherNameEng: "Mst. Razia Begum",
+      motherNameBng: "মোসাঃ রাজিয়া বেগম",
+      emergencyContact: "01511223344",
+      contactPerson: "Md. Sofiullah",
+      relationship: "Father",
+      presentAddress: "House: 15, Road: 2, Block: C, Mirpur-1, Dhaka, Bangladesh",
+      permanentAddress: "Village: Mirpur, PO: Mirpur, Thana: Mirpur, District: Dhaka, Bangladesh",
+      academics: [
+        { id: "1", title: "Class 8 Pass", institution: "Mirpur Primary School", year: "2005", result: "Pass" }
+      ],
+      experiences: [
+        { id: "1", company: "Palmal Group", designation: "Iron helper", from: "2008-01-01", to: "2015-12-31", reason: "Promoted to Iron Man" }
+      ],
+      nominee: {
+        name: "Md. Kamal Hossain",
+        relation: "Husband",
+        nidReg: "8893482348",
+        contact: "01511223344"
+      },
+      assessStatus: "IE Pending",   
+      grade: "" 
+    },
+    { 
+      empIdTemp: "PAL000005", 
+      nameEng: "Md. Sohel Rana",       
+      nameBng: "মোঃ সোহেল রানা",       
+      employeeType: "Worker", 
+      department: "RMG Operation", 
+      section: "Sewing",   
+      designation: "Operator",        
+      unit: "Unit-6", 
+      line: "53",  
+      doj: "2026-08-20", 
+      dob: "1996-07-22", 
+      personalContact: "01500000004", 
+      personalEmail: "sohel.rana@example.com",
+      religion: "Islam",
+      maritalStatus: "Single",
+      nidNumber: "5189234124",
+      birthReg: "1996261548002666",
+      fatherNameEng: "Md. Akbar Ali",
+      fatherNameBng: "মোঃ আকবর আলী",
+      motherNameEng: "Mst. Morjina Begum",
+      motherNameBng: "মোসাঃ মর্জিনা বেগম",
+      emergencyContact: "01611223344",
+      contactPerson: "Md. Akbar Ali",
+      relationship: "Father",
+      presentAddress: "House: 8, Road: 5, Sector: 6, Uttara, Dhaka, Bangladesh",
+      permanentAddress: "Village: Sreepur, PO: Sreepur, Thana: Sreepur, District: Gazipur, Bangladesh",
+      academics: [
+        { id: "1", title: "SSC", institution: "Sreepur Pilot High School", year: "2012", result: "GPA 3.50" }
+      ],
+      experiences: [
+        { id: "1", company: "Epyllion Group", designation: "Junior Operator", from: "2014-03-01", to: "2020-08-30", reason: "Career growth" }
+      ],
+      nominee: {
+        name: "Mst. Morjina Begum",
+        relation: "Mother",
+        nidReg: "5189234124",
+        contact: "01611223344"
+      },
+      assessStatus: "HR Rejected",  
+      grade: "" 
+    },
+    { 
+      empIdTemp: "PAL000006", 
+      nameEng: "Roksana Akhter",       
+      nameBng: "রোকসানা আক্তার",       
+      employeeType: "Worker", 
+      department: "RMG Operation", 
+      section: "Sewing",   
+      designation: "Helper",          
+      unit: "Unit-6", 
+      line: "54",  
+      doj: "2026-08-21", 
+      dob: "1998-03-11", 
+      personalContact: "01600000005", 
+      personalEmail: "roksana.helper@example.com",
+      religion: "Islam",
+      maritalStatus: "Single",
+      nidNumber: "6189234125",
+      birthReg: "1998261548002555",
+      fatherNameEng: "Md. Abdur Rahim",
+      fatherNameBng: "মোঃ আব্দুর রহিম",
+      motherNameEng: "Mst. Rahima Begum",
+      motherNameBng: "মোসাঃ রহিমা বেগম",
+      emergencyContact: "01711223345",
+      contactPerson: "Md. Abdur Rahim",
+      relationship: "Father",
+      presentAddress: "House: 20, Road: 3, Block: B, Tongi, Gazipur, Bangladesh",
+      permanentAddress: "Village: Tongi, PO: Tongi, Thana: Gazipur, District: Gazipur, Bangladesh",
+      academics: [
+        { id: "1", title: "Class 8 Pass", institution: "Tongi Primary School", year: "2013", result: "Pass" }
+      ],
+      experiences: [
+        { id: "1", company: "Viyellatex Group", designation: "Helper", from: "2018-05-15", to: "2024-04-10", reason: "Salary issue" }
+      ],
+      nominee: {
+        name: "Mst. Rahima Begum",
+        relation: "Mother",
+        nidReg: "6189234125",
+        contact: "01711223345"
+      },
+      assessStatus: "IE Pending",   
+      grade: "" 
+    },
+    { 
+      empIdTemp: "PAL000007", 
+      nameEng: "Md. Jahangir Alam",    
+      nameBng: "মোঃ জাহাঙ্গীর আলম",   
+      employeeType: "Worker", 
+      department: "RMG Operation", 
+      section: "Sewing",   
+      designation: "Operator",        
+      unit: "Unit-6", 
+      line: "55",  
+      doj: "2026-08-22", 
+      dob: "1993-09-30", 
+      personalContact: "01700000006", 
+      personalEmail: "jahangir.operator@example.com",
+      religion: "Islam",
+      maritalStatus: "Married",
+      nidNumber: "7189234126",
+      birthReg: "1993261548002444",
+      fatherNameEng: "Md. Mofiz Uddin",
+      fatherNameBng: "মোঃ মফিজ উদ্দিন",
+      motherNameEng: "Mst. Sakhina Khatun",
+      motherNameBng: "মোসাঃ সখিনা খাতুন",
+      emergencyContact: "01811223346",
+      contactPerson: "Mst. Sakhina Khatun",
+      relationship: "Mother",
+      presentAddress: "House: 11, Road: 1, Block: D, Savar, Dhaka, Bangladesh",
+      permanentAddress: "Village: Savar, PO: Savar, Thana: Savar, District: Dhaka, Bangladesh",
+      academics: [
+        { id: "1", title: "SSC", institution: "Savar High School", year: "2009", result: "GPA 3.90" }
+      ],
+      experiences: [
+        { id: "1", company: "Dekko Group", designation: "Junior Operator", from: "2010-06-01", to: "2015-12-30", reason: "Better Salary" },
+        { id: "2", company: "Sterling Group", designation: "Sewing Operator", from: "2016-01-05", to: "2024-08-15", reason: "Relocation" }
+      ],
+      nominee: {
+        name: "Mst. Kohinoor Begum",
+        relation: "Wife",
+        nidReg: "7189234126",
+        contact: "01811223346"
+      },
+      assessStatus: "HR Approved",  
+      grade: "A-" 
+    },
+    { 
+      empIdTemp: "PAL000008", 
+      nameEng: "Nasrin Sultana",       
+      nameBng: "নাসরিন সুলতানা",       
+      employeeType: "Worker", 
+      department: "RMG Operation", 
+      section: "Finishing",
+      designation: "Folder",          
+      unit: "Unit-6", 
+      line: "F-2", 
+      doj: "2026-08-23", 
+      dob: "1997-01-14", 
+      personalContact: "01800000007", 
+      personalEmail: "nasrin.folder@example.com",
+      religion: "Islam",
+      maritalStatus: "Single",
+      nidNumber: "8189234127",
+      birthReg: "1997261548002333",
+      fatherNameEng: "Md. Sirajul Islam",
+      fatherNameBng: "মোঃ সিরাজুল ইসলাম",
+      motherNameEng: "Mst. Rokeya Begum",
+      motherNameBng: "মোসাঃ রোকেয়া বেগম",
+      emergencyContact: "01911223347",
+      contactPerson: "Md. Sirajul Islam",
+      relationship: "Father",
+      presentAddress: "House: 31, Road: 8, Sector: 10, Uttara, Dhaka, Bangladesh",
+      permanentAddress: "Village: Uttara, PO: Uttara, Thana: Uttara, District: Dhaka, Bangladesh",
+      academics: [
+        { id: "1", title: "SSC", institution: "Uttara Girls High School", year: "2013", result: "GPA 3.40" }
+      ],
+      experiences: [
+        { id: "1", company: "Hamid Fabrics", designation: "Helper", from: "2015-02-10", to: "2020-11-20", reason: "Salary Increment" }
+      ],
+      nominee: {
+        name: "Md. Sirajul Islam",
+        relation: "Father",
+        nidReg: "8189234127",
+        contact: "01911223347"
+      },
+      assessStatus: "IE Pending",   
+      grade: "" 
+    },
+    { 
+      empIdTemp: "PAL000009", 
+      nameEng: "Md. Abul Kashem",      
+      nameBng: "মোঃ আবুল কাশেম",       
+      employeeType: "Worker", 
+      department: "RMG Operation", 
+      section: "Cutting",  
+      designation: "Spreader",        
+      unit: "Unit-6", 
+      line: "13",  
+      doj: "2026-08-24", 
+      dob: "1991-11-08", 
+      personalContact: "01900000008", 
+      personalEmail: "kashem.cutter@example.com",
+      religion: "Islam",
+      maritalStatus: "Married",
+      nidNumber: "9189234128",
+      birthReg: "1991261548002222",
+      fatherNameEng: "Md. Nurul Islam",
+      fatherNameBng: "মোঃ নুরুল ইসলাম",
+      motherNameEng: "Mst. Fatema Khatun",
+      motherNameBng: "মোসাঃ ফাতেমা খাতুন",
+      emergencyContact: "01511223348",
+      contactPerson: "Mst. Fatema Khatun",
+      relationship: "Mother",
+      presentAddress: "House: 6, Road: 2, Block: E, Tongi, Gazipur, Bangladesh",
+      permanentAddress: "Village: Tongi Bazar, PO: Tongi, Thana: Gazipur, District: Gazipur, Bangladesh",
+      academics: [
+        { id: "1", title: "SSC", institution: "Tongi High School", year: "2007", result: "GPA 3.20" }
+      ],
+      experiences: [
+        { id: "1", company: "Mohammadi Group", designation: "Helper (Cutting)", from: "2008-05-12", to: "2016-04-18", reason: "Promoted to Spreader" }
+      ],
+      nominee: {
+        name: "Mst. Sabina Akter",
+        relation: "Wife",
+        nidReg: "9189234128",
+        contact: "01511223348"
+      },
+      assessStatus: "HR Pending",   
+      grade: "" 
+    },
+    { 
+      empIdTemp: "PAL000010", 
+      nameEng: "Mariam Akter",         
+      nameBng: "মরিয়ম আক্তার",        
+      employeeType: "Worker", 
+      department: "RMG Operation", 
+      section: "Sewing",   
+      designation: "Operator",        
+      unit: "Unit-6", 
+      line: "56",  
+      doj: "2026-08-25", 
+      dob: "1999-06-19", 
+      personalContact: "01500000009", 
+      personalEmail: "mariam.sewing@example.com",
+      religion: "Islam",
+      maritalStatus: "Single",
+      nidNumber: "1289234129",
+      birthReg: "1999261548002111",
+      fatherNameEng: "Md. Lokman Hakim",
+      fatherNameBng: "মোঃ লোকমান হাকিম",
+      motherNameEng: "Mst. Amena Begum",
+      motherNameBng: "মোসাঃ আমেনা বেগম",
+      emergencyContact: "01611223349",
+      contactPerson: "Md. Lokman Hakim",
+      relationship: "Father",
+      presentAddress: "House: 4, Road: 7, Sector: 3, Uttara, Dhaka, Bangladesh",
+      permanentAddress: "Village: Uttara, PO: Uttara, Thana: Uttara, District: Dhaka, Bangladesh",
+      academics: [
+        { id: "1", title: "SSC", institution: "Uttara Model School", year: "2015", result: "GPA 4.10" }
+      ],
+      experiences: [
+        { id: "1", company: "Dysin Group", designation: "Helper", from: "2016-07-01", to: "2021-12-30", reason: "Promoted to Operator" }
+      ],
+      nominee: {
+        name: "Md. Lokman Hakim",
+        relation: "Father",
+        nidReg: "1289234129",
+        contact: "01611223349"
+      },
+      assessStatus: "IE Pending",   
+      grade: "" 
+    },
+    { 
+      empIdTemp: "PAL000011", 
+      nameEng: "Md. Saiful Islam",     
+      nameBng: "মোঃ সাইফুল ইসলাম",    
+      employeeType: "Worker", 
+      department: "RMG Operation", 
+      section: "Sewing",   
+      designation: "Operator",        
+      unit: "Unit-6", 
+      line: "57",  
+      doj: "2026-08-26", 
+      dob: "1994-08-25", 
+      personalContact: "01600000010", 
+      personalEmail: "saiful.operator@example.com",
+      religion: "Islam",
+      maritalStatus: "Married",
+      nidNumber: "2289234130",
+      birthReg: "1994261548002000",
+      fatherNameEng: "Md. Shamsul Alam",
+      fatherNameBng: "মোঃ শামসুল আলম",
+      motherNameEng: "Mst. Jahanara Begum",
+      motherNameBng: "মোসাঃ জাহানারা বেগম",
+      emergencyContact: "01711223350",
+      contactPerson: "Mst. Jahanara Begum",
+      relationship: "Mother",
+      presentAddress: "House: 18, Road: 4, Savar, Dhaka, Bangladesh",
+      permanentAddress: "Village: Savar, PO: Savar, Thana: Savar, District: Dhaka, Bangladesh",
+      academics: [
+        { id: "1", title: "SSC", institution: "Savar Pilot School", year: "2010", result: "GPA 3.60" }
+      ],
+      experiences: [
+        { id: "1", company: "Fakir Apparels", designation: "Junior Operator", from: "2011-01-15", to: "2018-09-30", reason: "Better prospects" }
+      ],
+      nominee: {
+        name: "Mst. Rina Akter",
+        relation: "Wife",
+        nidReg: "2289234130",
+        contact: "01711223350"
+      },
+      assessStatus: "HR Approved",  
+      grade: "C+" 
+    },
+    { 
+      empIdTemp: "PAL000012", 
+      nameEng: "Halima Begum",         
+      nameBng: "হালিমা বেগম",           
+      employeeType: "Worker", 
+      department: "RMG Operation", 
+      section: "Sewing",   
+      designation: "Helper",          
+      unit: "Unit-6", 
+      line: "58",  
+      doj: "2026-08-27", 
+      dob: "1996-02-14", 
+      personalContact: "01700000011", 
+      personalEmail: "halima.helper@example.com",
+      religion: "Islam",
+      maritalStatus: "Single",
+      nidNumber: "3289234131",
+      birthReg: "1996261548001999",
+      fatherNameEng: "Md. Hanif Ali",
+      fatherNameBng: "মোঃ হানিফ আলী",
+      motherNameEng: "Mst. Sahida Begum",
+      motherNameBng: "মোসাঃ শাহিদা বেগম",
+      emergencyContact: "01811223351",
+      contactPerson: "Md. Hanif Ali",
+      relationship: "Father",
+      presentAddress: "House: 22, Road: 2, Block: F, Tongi, Gazipur, Bangladesh",
+      permanentAddress: "Village: Tongi, PO: Tongi, Thana: Gazipur, District: Gazipur, Bangladesh",
+      academics: [
+        { id: "1", title: "Class 8 Pass", institution: "Tongi Girls School", year: "2011", result: "Pass" }
+      ],
+      experiences: [
+        { id: "1", company: "Nassa Group", designation: "Helper", from: "2013-05-10", to: "2020-03-12", reason: "Personal problem" }
+      ],
+      nominee: {
+        name: "Md. Hanif Ali",
+        relation: "Father",
+        nidReg: "3289234131",
+        contact: "01811223351"
+      },
+      assessStatus: "IE Pending",   
+      grade: "" 
+    },
+    { 
+      empIdTemp: "PAL000013", 
+      nameEng: "Md. Nur Islam",        
+      nameBng: "মোঃ নুর ইসলাম",        
+      employeeType: "Worker", 
+      department: "RMG Operation", 
+      section: "Finishing",
+      designation: "Poly Man",        
+      unit: "Unit-6", 
+      line: "F-3", 
+      doj: "2026-08-28", 
+      dob: "1995-10-02", 
+      personalContact: "01800000012", 
+      personalEmail: "nur.finishing@example.com",
+      religion: "Islam",
+      maritalStatus: "Single",
+      nidNumber: "4289234132",
+      birthReg: "1995261548001888",
+      fatherNameEng: "Md. Mozammel Hoque",
+      fatherNameBng: "মোঃ মোজাম্মেল হক",
+      motherNameEng: "Mst. Morjina Khatun",
+      motherNameBng: "মোসাঃ মর্জিনা খাতুন",
+      emergencyContact: "01911223352",
+      contactPerson: "Md. Mozammel Hoque",
+      relationship: "Father",
+      presentAddress: "House: 14, Road: 5, Sector: 9, Uttara, Dhaka, Bangladesh",
+      permanentAddress: "Village: Uttara, PO: Uttara, Thana: Uttara, District: Dhaka, Bangladesh",
+      academics: [
+        { id: "1", title: "SSC", institution: "Uttara High School", year: "2011", result: "GPA 3.45" }
+      ],
+      experiences: [
+        { id: "1", company: "Hameem Group", designation: "Poly Helper", from: "2012-08-01", to: "2019-12-30", reason: "Promoted to Poly Man" }
+      ],
+      nominee: {
+        name: "Md. Mozammel Hoque",
+        relation: "Father",
+        nidReg: "4289234132",
+        contact: "01911223352"
+      },
+      assessStatus: "HR Pending",   
+      grade: "" 
+    },
+    { 
+      empIdTemp: "PAL000014", 
+      nameEng: "Shirin Akter",         
+      nameBng: "শিরিন আক্তার",         
+      employeeType: "Worker", 
+      department: "RMG Operation", 
+      section: "Sewing",   
+      designation: "Operator",        
+      unit: "Unit-6", 
+      line: "59",  
+      doj: "2026-08-29", 
+      dob: "1992-05-18", 
+      personalContact: "01900000013", 
+      personalEmail: "shirin.sewing@example.com",
+      religion: "Islam",
+      maritalStatus: "Married",
+      nidNumber: "5289234133",
+      birthReg: "1992261548001777",
+      fatherNameEng: "Md. Abul Kalam",
+      fatherNameBng: "মোঃ আবুল কালাম",
+      motherNameEng: "Mst. Fatema Begum",
+      motherNameBng: "মোসাঃ ফাতেমা বেগম",
+      emergencyContact: "01511223353",
+      contactPerson: "Md. Abul Kalam",
+      relationship: "Father",
+      presentAddress: "House: 25, Road: 1, Savar, Dhaka, Bangladesh",
+      permanentAddress: "Village: Savar, PO: Savar, Thana: Savar, District: Dhaka, Bangladesh",
+      academics: [
+        { id: "1", title: "SSC", institution: "Savar Govt School", year: "2008", result: "GPA 3.80" }
+      ],
+      experiences: [
+        { id: "1", company: "Interstop Apparels", designation: "Operator", from: "2010-04-10", to: "2021-08-15", reason: "Family issues" }
+      ],
+      nominee: {
+        name: "Md. Rafiqul Islam",
+        relation: "Husband",
+        nidReg: "5289234133",
+        contact: "01511223353"
+      },
+      assessStatus: "IE Pending",   
+      grade: "" 
+    },
+    { 
+      empIdTemp: "PAL000015", 
+      nameEng: "Md. Shahidullah",      
+      nameBng: "মোঃ শহীদুল্লাহ",       
+      employeeType: "Worker", 
+      department: "RMG Operation", 
+      section: "Cutting",  
+      designation: "Numbering Man",   
+      unit: "Unit-6", 
+      line: "14",  
+      doj: "2026-08-30", 
+      dob: "1998-12-09", 
+      personalContact: "01500000014", 
+      personalEmail: "shahid.cutter@example.com",
+      religion: "Islam",
+      maritalStatus: "Single",
+      nidNumber: "6289234134",
+      birthReg: "1998261548001666",
+      fatherNameEng: "Md. Abdus Sobhan",
+      fatherNameBng: "মোঃ আব্দুস সোবহান",
+      motherNameEng: "Mst. Laila Begum",
+      motherNameBng: "মোসাঃ লায়লা বেগম",
+      emergencyContact: "01611223354",
+      contactPerson: "Md. Abdus Sobhan",
+      relationship: "Father",
+      presentAddress: "House: 16, Road: 3, Block: G, Tongi, Gazipur, Bangladesh",
+      permanentAddress: "Village: Tongi Bazar, PO: Tongi, Thana: Gazipur, District: Gazipur, Bangladesh",
+      academics: [
+        { id: "1", title: "SSC", institution: "Tongi Pilot High School", year: "2014", result: "GPA 3.95" }
+      ],
+      experiences: [
+        { id: "1", company: "Ha-Meem Group", designation: "Cutting Helper", from: "2015-06-01", to: "2022-12-15", reason: "Promoted to Numbering Man" }
+      ],
+      nominee: {
+        name: "Md. Abdus Sobhan",
+        relation: "Father",
+        nidReg: "6289234134",
+        contact: "01611223354"
+      },
+      assessStatus: "HR Approved",  
+      grade: "B+" 
+    },
   ]);
 
   // Mark this version as seeded

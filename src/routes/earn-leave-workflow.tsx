@@ -219,7 +219,7 @@ function EarnLeaveWorkflowPage() {
         <div className="p-4 md:p-6 lg:p-8 space-y-6">
 
           {/* Breadcrumb Header */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -233,7 +233,7 @@ function EarnLeaveWorkflowPage() {
                 <span>Earn Leave Workflow Panel</span>
               </h1>
             </div>
-            
+
             <button
               onClick={handleResetWorkflow}
               className="px-4 py-2 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-xl text-[10px] font-extrabold text-slate-500 flex items-center gap-1.5 transition uppercase"
@@ -244,20 +244,18 @@ function EarnLeaveWorkflowPage() {
           </div>
 
           {/* Gorgeous Visual Workflow Stepper Panel */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-xs space-y-5">
+          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-xs space-y-5">
             <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Accrual clearance status:</h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              
+
               {/* Step 1: Submit */}
-              <div className={`p-4 rounded-2xl border-2 flex items-center gap-3 transition-all duration-300 ${
-                currentStep === 1
+              <div className={`p-4 rounded-lg border-2 flex items-center gap-3 transition-all duration-300 ${currentStep === 1
                   ? "bg-amber-500/5 border-amber-500 text-amber-900 dark:text-amber-300"
                   : "bg-emerald-500/5 border-emerald-500/20 text-emerald-700 dark:text-emerald-400"
-              }`}>
-                <div className={`size-8 rounded-xl flex items-center justify-center font-black text-xs ${
-                  currentStep === 1 ? "bg-amber-500 text-white" : "bg-emerald-500 text-white"
                 }`}>
+                <div className={`size-8 rounded-xl flex items-center justify-center font-black text-xs ${currentStep === 1 ? "bg-amber-500 text-white" : "bg-emerald-500 text-white"
+                  }`}>
                   1
                 </div>
                 <div>
@@ -270,20 +268,18 @@ function EarnLeaveWorkflowPage() {
               </div>
 
               {/* Step 2: Check */}
-              <div className={`p-4 rounded-2xl border-2 flex items-center gap-3 transition-all duration-300 ${
-                currentStep === 2
+              <div className={`p-4 rounded-lg border-2 flex items-center gap-3 transition-all duration-300 ${currentStep === 2
                   ? "bg-amber-500/5 border-amber-500 text-amber-900 dark:text-amber-300"
                   : currentStep > 2
                     ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-700 dark:text-emerald-400"
                     : "bg-slate-100/40 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 opacity-60 text-slate-400"
-              }`}>
-                <div className={`size-8 rounded-xl flex items-center justify-center font-black text-xs ${
-                  currentStep === 2
+                }`}>
+                <div className={`size-8 rounded-xl flex items-center justify-center font-black text-xs ${currentStep === 2
                     ? "bg-amber-500 text-white"
                     : currentStep > 2
                       ? "bg-emerald-500 text-white"
                       : "bg-slate-200 dark:bg-slate-800 text-slate-400"
-                }`}>
+                  }`}>
                   {currentStep < 2 ? <Lock className="size-3.5" /> : "2"}
                 </div>
                 <div>
@@ -296,16 +292,14 @@ function EarnLeaveWorkflowPage() {
               </div>
 
               {/* Step 3: Approve (HRD) */}
-              <div className={`p-4 rounded-2xl border-2 flex items-center gap-3 transition-all duration-300 ${
-                currentStep === 3
+              <div className={`p-4 rounded-lg border-2 flex items-center gap-3 transition-all duration-300 ${currentStep === 3
                   ? "bg-amber-500/5 border-amber-500 text-amber-900 dark:text-amber-300"
                   : "bg-slate-100/40 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 opacity-60 text-slate-400"
-              }`}>
-                <div className={`size-8 rounded-xl flex items-center justify-center font-black text-xs ${
-                  currentStep === 3
+                }`}>
+                <div className={`size-8 rounded-xl flex items-center justify-center font-black text-xs ${currentStep === 3
                     ? "bg-amber-500 text-white"
                     : "bg-slate-200 dark:bg-slate-800 text-slate-400"
-                }`}>
+                  }`}>
                   {currentStep < 3 ? <Lock className="size-3.5" /> : "3"}
                 </div>
                 <div>
@@ -320,17 +314,16 @@ function EarnLeaveWorkflowPage() {
           </div>
 
           {/* Sequential Active Action Buttons Panel */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs flex flex-col md:flex-row md:items-center gap-4">
-            
+          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs flex flex-col md:flex-row md:items-center gap-4">
+
             {/* Step 1 Submit Button */}
             <button
               onClick={handleLevel1Submit}
               disabled={currentStep !== 1}
-              className={`h-11 px-8 rounded-xl font-extrabold text-xs flex items-center justify-center gap-2 transition uppercase tracking-wider shadow-xs ${
-                currentStep === 1
+              className={`h-11 px-8 rounded-xl font-extrabold text-xs flex items-center justify-center gap-2 transition uppercase tracking-wider shadow-xs ${currentStep === 1
                   ? "bg-amber-500 hover:bg-amber-600 text-white cursor-pointer"
                   : "bg-slate-100 dark:bg-slate-900 text-slate-400 cursor-not-allowed opacity-50"
-              }`}
+                }`}
             >
               <Unlock className="size-4" />
               <span>Step 1: Submit Ledger</span>
@@ -342,11 +335,10 @@ function EarnLeaveWorkflowPage() {
             <button
               onClick={handleLevel2Check}
               disabled={currentStep !== 2}
-              className={`h-11 px-8 rounded-xl font-extrabold text-xs flex items-center justify-center gap-2 transition uppercase tracking-wider shadow-xs ${
-                currentStep === 2
+              className={`h-11 px-8 rounded-xl font-extrabold text-xs flex items-center justify-center gap-2 transition uppercase tracking-wider shadow-xs ${currentStep === 2
                   ? "bg-[#1e88e5] hover:bg-[#1565c0] text-white cursor-pointer"
                   : "bg-slate-100 dark:bg-slate-900 text-slate-400 cursor-not-allowed opacity-50"
-              }`}
+                }`}
             >
               {currentStep < 2 ? <Lock className="size-4" /> : <Unlock className="size-4" />}
               <span>Step 2: Verify & Check</span>
@@ -358,11 +350,10 @@ function EarnLeaveWorkflowPage() {
             <button
               onClick={handleLevel3Approve}
               disabled={currentStep !== 3}
-              className={`h-11 px-8 rounded-xl font-extrabold text-xs flex items-center justify-center gap-2 transition uppercase tracking-wider shadow-xs ${
-                currentStep === 3
+              className={`h-11 px-8 rounded-xl font-extrabold text-xs flex items-center justify-center gap-2 transition uppercase tracking-wider shadow-xs ${currentStep === 3
                   ? "bg-[#4caf50] hover:bg-[#43a047] text-white cursor-pointer animate-pulse"
                   : "bg-slate-100 dark:bg-slate-900 text-slate-400 cursor-not-allowed opacity-50"
-              }`}
+                }`}
             >
               {currentStep < 3 ? <Lock className="size-4" /> : <Unlock className="size-4" />}
               <span>Step 3: Authorize (HRD)</span>
@@ -371,9 +362,9 @@ function EarnLeaveWorkflowPage() {
           </div>
 
           {/* Configuration Filter Panel */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-xs">
+          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-xs">
             <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-4 text-xs font-bold font-sans">
-              
+
               {/* Year */}
               <div className="space-y-1.5">
                 <label className="text-[10px] text-slate-400 uppercase">Year</label>
@@ -475,17 +466,17 @@ function EarnLeaveWorkflowPage() {
           </div>
 
           {/* Action Row & Utility Controls */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm space-y-5">
-            
+          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm space-y-5">
+
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              
+
               <div className="text-xs font-black text-slate-700 dark:text-slate-300">
                 Workflow Step Details Ledger
               </div>
 
               {/* Spreadsheet download utilities & Grid Search input */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                
+
                 <div className="flex items-center gap-1.5">
                   <button className="h-8.5 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 font-extrabold text-[11px] text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition">
                     <FileSpreadsheet className="size-3.5 text-emerald-500" />
@@ -545,7 +536,7 @@ function EarnLeaveWorkflowPage() {
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {filteredRows.map((row) => {
                     const isSelected = selectedIds.has(row.id);
-                    
+
                     let statusColor = "bg-amber-100 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400";
                     if (row.status === "Submitted") {
                       statusColor = "bg-blue-100 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400";
@@ -557,7 +548,7 @@ function EarnLeaveWorkflowPage() {
 
                     return (
                       <tr key={row.id} className="hover:bg-slate-50/55 dark:hover:bg-slate-900/40 transition duration-75 whitespace-nowrap">
-                        
+
                         {/* Checkbox */}
                         <td className="px-3 py-3 text-center border-r border-slate-100 dark:border-slate-800/50">
                           <input

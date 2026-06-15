@@ -54,7 +54,7 @@ export function StatCards() {
         return (
           <div
             key={s.label}
-            className={`group relative overflow-hidden rounded-2xl border p-5 ring-1 ${t.ring} ${t.card} transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`}
+            className={`group relative overflow-hidden rounded-lg border p-5 ring-1 ${t.ring} ${t.card} transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`}
           >
             <div className="flex items-start justify-between gap-3 relative z-10">
               <div className="min-w-0">

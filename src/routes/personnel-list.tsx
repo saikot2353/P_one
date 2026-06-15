@@ -8,7 +8,7 @@ import {
   Search, FileDown, Printer, FileText, ChevronRight, UserPlus, Eye, Edit3, X, SlidersHorizontal,
   ChevronDown, MapPin, Phone, Mail, Calendar, User, Heart, Briefcase, DollarSign, EyeOff, LayoutGrid, Check,
   TrendingUp, ArrowUpRight, FileSignature, ShieldCheck, CreditCard, UserCheck, UserCog, Clock, CalendarRange,
-  CalendarHeart, Power, FileClock, Sparkles, AlertCircle, RefreshCw
+  CalendarHeart, Power, FileClock, Sparkles, AlertCircle, RefreshCw, Info
 } from "lucide-react";
 
 export const Route = createFileRoute("/personnel-list")({
@@ -366,7 +366,7 @@ const defaultColumns = {
 };
 
 function PersonnelListPage() {
-  const [employees, setEmployees] = useState(employeesData);
+  const [employees, setEmployees] = useState<any[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -376,20 +376,128 @@ function PersonnelListPage() {
         try {
           const parsed = JSON.parse(synced);
           if (parsed && parsed.length > 0) {
-            setEmployees([...parsed, ...employeesData]);
+            const merged = [...parsed];
+            employeesData.forEach(d => {
+              if (!merged.some(m => m.id === d.id)) {
+                merged.push(d);
+              }
+            });
+            setEmployees(merged);
+            localStorage.setItem("recruitment_synced_employees", JSON.stringify(merged));
+          } else {
+            localStorage.setItem("recruitment_synced_employees", JSON.stringify(employeesData));
+            setEmployees(employeesData);
           }
         } catch (e) {
           console.error(e);
+          setEmployees(employeesData);
         }
+      } else {
+        localStorage.setItem("recruitment_synced_employees", JSON.stringify(employeesData));
+        setEmployees(employeesData);
       }
     }
   }, []);
+
+  // Rejoin & Resign/Terminate States
+  const [resignModalEmp, setResignModalEmp] = useState<any | null>(null);
+  const [resignStatus, setResignStatus] = useState<"Resigned" | "Terminated">("Resigned");
+  const [resignDate, setResignDate] = useState("");
+  const [resignRemarks, setResignRemarks] = useState("");
+
+  const [rejoinModalEmp, setRejoinModalEmp] = useState<any | null>(null);
+  const [newEmpId, setNewEmpId] = useState("");
+  const [newJoinDate, setNewJoinDate] = useState("");
+  const [newDesignation, setNewDesignation] = useState("");
+  const [newDept, setNewDept] = useState("");
+  const [newSect, setNewSect] = useState("");
+  const [newEmpType, setNewEmpType] = useState("");
+  const [newGrade, setNewGrade] = useState("");
+  const [newShift, setNewShift] = useState("");
+  const [newBasic, setNewBasic] = useState("");
+  const [newGross, setNewGross] = useState("");
+  const [rejoinRemarks, setRejoinRemarks] = useState("");
+
+  const handleResignSubmit = () => {
+    if (!resignModalEmp) return;
+    const updated = employees.map(emp => {
+      if (emp.id === resignModalEmp.id) {
+        return {
+          ...emp,
+          status: resignStatus,
+          acStatus: "Inactive",
+          resignDate: resignDate || new Date().toLocaleDateString('en-GB'),
+          resignRemarks: resignRemarks
+        };
+      }
+      return emp;
+    });
+    setEmployees(updated);
+    localStorage.setItem("recruitment_synced_employees", JSON.stringify(updated));
+    setResignModalEmp(null);
+    setResignRemarks("");
+    setResignDate("");
+
+    setBulkActionMessage(`${resignModalEmp.name} has been successfully marked as ${resignStatus.toLowerCase()}.`);
+    setTimeout(() => setBulkActionMessage(null), 4500);
+  };
+
+  const handleRejoinSubmit = () => {
+    if (!rejoinModalEmp) return;
+    if (employees.some(emp => emp.id === newEmpId)) {
+      alert("Employee ID already exists!");
+      return;
+    }
+
+    const newEmp = {
+      ...rejoinModalEmp,
+      id: newEmpId,
+      joinDate: newJoinDate || new Date().toLocaleDateString('en-GB'),
+      status: "Working",
+      acStatus: "Active",
+      title: newDesignation,
+      dept: newDept,
+      sect: newSect,
+      type: newEmpType,
+      empStatus: newEmpType === "Permanent" ? "Permanent" : "Probation",
+      grade: newGrade,
+      shift: newShift,
+      basic: newBasic,
+      gross: newGross,
+      rejoinRef: rejoinModalEmp.id,
+      rejoinRemarks: rejoinRemarks,
+      confirmDate: "",
+      holiday: "—",
+      rejoinedTo: undefined // clear rejoin pointer for the active record
+    };
+
+    const updated = employees.map(emp => {
+      if (emp.id === rejoinModalEmp.id) {
+        return {
+          ...emp,
+          rejoinedTo: newEmpId
+        };
+      }
+      return emp;
+    });
+
+    updated.unshift(newEmp);
+
+    setEmployees(updated);
+    localStorage.setItem("recruitment_synced_employees", JSON.stringify(updated));
+    setRejoinModalEmp(null);
+    setRejoinRemarks("");
+
+    setBulkActionMessage(`${rejoinModalEmp.name} has rejoined successfully with new Employee ID: ${newEmpId}.`);
+    setTimeout(() => setBulkActionMessage(null), 4500);
+  };
+
 
   // Selection & Action Hub States
   const [selectedEmpIds, setSelectedEmpIds] = useState<string[]>([]);
   const [activeDocGenerating, setActiveDocGenerating] = useState<string | null>(null);
   const [bulkActionMessage, setBulkActionMessage] = useState<string | null>(null);
-  
+
   // Filter States
   const [searchQuery, setSearchQuery] = useState("");
   const [empIdFilter, setEmpIdFilter] = useState("");
@@ -417,7 +525,7 @@ function PersonnelListPage() {
       // 1. Text Search Bar (Filters across Name, ID, Email, Role)
       if (searchQuery.trim() !== "") {
         const q = searchQuery.toLowerCase();
-        const matchesQuery = 
+        const matchesQuery =
           e.name.toLowerCase().includes(q) ||
           e.id.includes(q) ||
           e.email.toLowerCase().includes(q) ||
@@ -435,7 +543,14 @@ function PersonnelListPage() {
       if (deptFilter !== "ALL" && e.dept !== deptFilter) return false;
       if (sectFilter !== "ALL" && e.sect !== sectFilter) return false;
       if (empTypeFilter !== "ALL" && e.type !== empTypeFilter) return false;
-      if (statusFilter !== "ALL" && e.status !== statusFilter) return false;
+
+      // Bypass default 'Working' status filter when actively searching by name/ID
+      if (searchQuery.trim() === "" && empIdFilter.trim() === "") {
+        if (statusFilter !== "ALL" && e.status !== statusFilter) return false;
+      } else {
+        if (statusFilter !== "ALL" && statusFilter !== "Working" && e.status !== statusFilter) return false;
+      }
+
       if (empStatusFilter !== "ALL" && e.empStatus !== empStatusFilter) return false;
       if (designationFilter !== "ALL" && e.title !== designationFilter) return false;
 
@@ -466,9 +581,9 @@ function PersonnelListPage() {
   };
 
   const toggleSelectEmp = (id: string) => {
-    setSelectedEmpIds(prev => 
-      prev.includes(id) 
-        ? prev.filter(item => item !== id) 
+    setSelectedEmpIds(prev =>
+      prev.includes(id)
+        ? prev.filter(item => item !== id)
         : [...prev, id]
     );
   };
@@ -482,7 +597,7 @@ function PersonnelListPage() {
         const emp = employees.find(e => e.id === id);
         return emp ? emp.name : id;
       }).join(", ");
-      
+
       setBulkActionMessage(`Generated ${docName} successfully for: ${targetNames.length > 55 ? targetNames.substring(0, 52) + "..." : targetNames}`);
       setTimeout(() => setBulkActionMessage(null), 4500);
     }, 1200);
@@ -493,7 +608,7 @@ function PersonnelListPage() {
       const emp = employees.find(e => e.id === id);
       return emp ? emp.name : id;
     }).join(", ");
-    
+
     setBulkActionMessage(`Bulk action [${actionName}] applied successfully to: ${targetNames.length > 55 ? targetNames.substring(0, 52) + "..." : targetNames}`);
     setTimeout(() => setBulkActionMessage(null), 4500);
   };
@@ -523,12 +638,12 @@ function PersonnelListPage() {
       <Sidebar />
       <main className="flex-1 min-w-0 flex flex-col relative">
         <Topbar />
-        
+
         {/* Main Content Area */}
-        <div className="p-4 md:p-6 xl:p-8 space-y-6">
-          
+        <div className="p-4 md:p-6 xl:p-8 space-y-2">
+
           {/* Breadcrumb and Page Header */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -542,18 +657,18 @@ function PersonnelListPage() {
                 <h1 className="text-xl font-extrabold tracking-tight text-foreground">Personnel List</h1>
               </div>
             </div>
-            
+
             {/* Quick Metrics Bar */}
             <div className="flex items-center gap-3 flex-wrap">
-              <div className="bg-card border border-border/70 rounded-xl px-3.5 py-1.5 shadow-2xs hover:shadow-xs transition duration-200">
-                <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80">Total Employees</div>
-                <div className="text-sm font-extrabold text-foreground mt-0.5">{employees.length}</div>
+              <div className="bg-card border border-border/70 rounded-lg px-3.5 py-2 shadow-2xs hover:shadow-xs transition duration-200 flex items-center gap-2">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/85">Total Employees:</div>
+                <div className="text-xs font-extrabold text-foreground">{employees.length}</div>
               </div>
-              <div className="bg-[oklch(0.98_0.02_160)] dark:bg-[oklch(0.20_0.035_165)] border border-[oklch(0.62_0.16_155/0.2)] rounded-xl px-3.5 py-1.5 shadow-2xs">
-                <div className="text-[9px] font-bold uppercase tracking-wider text-success/90">Working</div>
-                <div className="text-sm font-extrabold text-success mt-0.5">{employees.filter(e => e.status === "Working").length}</div>
+              <div className="bg-[oklch(0.98_0.02_160)] dark:bg-[oklch(0.20_0.035_165)] border border-[oklch(0.62_0.16_155/0.2)] rounded-lg px-3.5 py-2 shadow-2xs flex items-center gap-2">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-success/95">Working:</div>
+                <div className="text-xs font-extrabold text-success">{employees.filter(e => e.status === "Working").length}</div>
               </div>
-              <button 
+              <button
                 onClick={() => window.open("/add-employee", "_blank")}
                 className="h-9.5 px-4 rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs font-semibold shadow-xs hover:shadow-sm hover:opacity-95 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-1.5"
               >
@@ -563,21 +678,40 @@ function PersonnelListPage() {
           </div>
 
           {/* Collapsible Advanced Filters Section */}
-          <div className="bg-card rounded-2xl border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300">
+          <div className="bg-card rounded-lg border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300">
             <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-primary/10 via-primary/45 to-primary/10" />
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border/40">
-              <button 
+            <div className="flex items-center justify-between px-5 py-3 border-b border-border/40 bg-muted/10">
+              <button
                 onClick={() => setIsFilterCollapsed(!isFilterCollapsed)}
-                className="flex items-center gap-2 text-xs font-bold text-foreground/90 hover:text-primary transition-colors"
+                className="flex items-center gap-2.5 text-xs font-semibold text-foreground/90 hover:text-primary transition-colors"
               >
-                <SlidersHorizontal className="size-4 text-primary" />
+                <div className="size-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary shadow-2xs">
+                  <SlidersHorizontal className="size-3.5 text-primary" />
+                </div>
                 <span>Advanced Search Filters</span>
+                {(() => {
+                  const activeCount = [
+                    empIdFilter !== "",
+                    deptFilter !== "ALL",
+                    sectFilter !== "ALL",
+                    empTypeFilter !== "ALL",
+                    statusFilter !== "Working",
+                    empStatusFilter !== "ALL",
+                    designationFilter !== "ALL"
+                  ].filter(Boolean).length;
+
+                  return activeCount > 0 ? (
+                    <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[9px] font-medium bg-primary text-primary-foreground">
+                      {activeCount} active
+                    </span>
+                  ) : null;
+                })()}
                 <ChevronDown className={`size-3.5 text-muted-foreground/60 transition-transform duration-300 ${isFilterCollapsed ? "-rotate-90" : ""}`} />
               </button>
-              {(!isFilterCollapsed && (empIdFilter || deptFilter !== "ALL" || sectFilter !== "ALL" || empTypeFilter !== "ALL" || statusFilter !== "ALL" || empStatusFilter !== "ALL" || designationFilter !== "ALL")) && (
-                <button 
+              {(!isFilterCollapsed && (empIdFilter || deptFilter !== "ALL" || sectFilter !== "ALL" || empTypeFilter !== "ALL" || statusFilter !== "Working" || empStatusFilter !== "ALL" || designationFilter !== "ALL")) && (
+                <button
                   onClick={resetFilters}
-                  className="text-[10px] font-bold text-destructive hover:underline"
+                  className="text-[10px] font-medium text-rose-500 hover:text-rose-600 hover:underline"
                 >
                   Clear All Filters
                 </button>
@@ -586,7 +720,7 @@ function PersonnelListPage() {
 
             <div className={`transition-all duration-300 overflow-hidden ${isFilterCollapsed ? "max-h-0 opacity-0" : "max-h-[600px] opacity-100 p-5"}`}>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4.5">
-                
+
                 {/* Employee ID search list */}
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75 flex items-center justify-between">
@@ -684,7 +818,8 @@ function PersonnelListPage() {
                         { value: "ALL", label: "All Status" },
                         { value: "Working", label: "Working" },
                         { value: "On Leave", label: "On Leave" },
-                        { value: "Resigned", label: "Resigned" }
+                        { value: "Resigned", label: "Resigned" },
+                        { value: "Terminated", label: "Terminated" }
                       ]}
                       placeholder="Select status..."
                     />
@@ -729,23 +864,23 @@ function PersonnelListPage() {
           )}
 
           {/* Personnel Operations & Document Hub */}
-          <div className="bg-card rounded-2xl border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300">
+          <div className="bg-card rounded-lg border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300">
             <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-emerald-500 via-primary to-indigo-500" />
-            
+
             {selectedEmpIds.length === 0 ? (
-              <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-5 bg-card">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-5 bg-gradient-to-r from-card via-muted/5 to-card">
                 <div className="flex items-center gap-3">
-                  <div className="size-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                  <div className="size-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-2xs">
                     <Sparkles className="size-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-extrabold text-foreground">Personnel Operations & Document Center</h3>
-                    <p className="text-xs text-muted-foreground/80 mt-0.5">Generate statutory letters, print certificates, and manage employee profiles in bulk.</p>
+                    <h3 className="text-sm font-semibold text-foreground">Personnel Operations & Document Center</h3>
+                    <p className="text-xs text-muted-foreground/80 mt-0.5 font-normal">Generate statutory letters, print certificates, and manage employee profiles in bulk.</p>
                   </div>
                 </div>
-                <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold shadow-2xs">
-                  <AlertCircle className="size-4 text-amber-500 shrink-0 animate-bounce" />
-                  <span>Select employees below to unlock document printing & status updates</span>
+                <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-indigo-500/5 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-normal shadow-3xs">
+                  <Info className="size-3.5 text-indigo-500 shrink-0" />
+                  <span>Select employees in the table below to activate bulk tools & printing</span>
                 </div>
               </div>
             ) : (
@@ -758,7 +893,7 @@ function PersonnelListPage() {
                     </span>
                     <h3 className="text-xs font-extrabold text-foreground tracking-tight">Active Operations & Print Console</h3>
                   </div>
-                  <button 
+                  <button
                     onClick={() => setSelectedEmpIds([])}
                     className="text-[10px] font-extrabold text-muted-foreground hover:text-primary transition"
                   >
@@ -768,7 +903,7 @@ function PersonnelListPage() {
 
                 {/* Operations Grid */}
                 <div className="grid grid-cols-1 xl:grid-cols-12 gap-5">
-                  
+
                   {/* Left Console: Documents Grid */}
                   <div className="xl:col-span-8 space-y-4">
                     <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/80 uppercase tracking-widest">
@@ -777,7 +912,7 @@ function PersonnelListPage() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      
+
                       {/* Column A: Letters & Agreements */}
                       <div className="space-y-2 bg-muted/15 border border-border/20 rounded-xl p-3.5">
                         <div className="text-[10px] font-extrabold text-foreground/90 uppercase tracking-wider pb-1.5 border-b border-border/30 flex items-center gap-1.5">
@@ -929,11 +1064,11 @@ function PersonnelListPage() {
           </div>
 
           {/* Data Grid Card Container */}
-          <div className="bg-card rounded-2xl border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300">
-            
+          <div className="bg-card rounded-lg border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300">
+
             {/* Toolbar Header */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-5 border-b border-border/40">
-              
+
               {/* Export Buttons */}
               <div className="flex items-center gap-2">
                 <button className="h-8.5 px-3 rounded-lg border border-border/60 hover:bg-muted text-xs font-semibold text-foreground/80 hover:text-foreground transition duration-200 flex items-center gap-1.5">
@@ -965,7 +1100,7 @@ function PersonnelListPage() {
 
                 {/* Column Configuration Selector */}
                 <div className="relative col-selector-container">
-                  <button 
+                  <button
                     onClick={() => setIsColSelectorOpen(!isColSelectorOpen)}
                     className="h-8.5 px-3 rounded-lg border border-border/60 hover:bg-muted text-xs font-bold text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition duration-200"
                   >
@@ -973,12 +1108,12 @@ function PersonnelListPage() {
                     <span>Columns</span>
                     <ChevronDown className="size-3 text-muted-foreground/60" />
                   </button>
-                  
+
                   {isColSelectorOpen && (
                     <div className="absolute right-0 mt-1.5 w-56 rounded-xl bg-card border border-border/80 shadow-lg p-3 z-30 animate-in fade-in slide-in-from-top-1 duration-150">
                       <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/30">
                         <span className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Show Columns</span>
-                        <button 
+                        <button
                           onClick={() => setVisibleCols(defaultColumns)}
                           className="text-[9px] font-bold text-primary hover:underline"
                         >
@@ -1013,21 +1148,21 @@ function PersonnelListPage() {
                 <thead>
                   <tr className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/60 bg-muted/40 border-b border-border/40">
                     {/* Fixed Actions and Checkbox Column */}
-                    <th className="sticky left-0 bg-[#f1f5f9] dark:bg-[#0f172a] px-2 py-4 font-bold border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[110px] min-w-[110px] max-w-[110px]">
+                    <th className="sticky left-0 bg-[#f1f5f9] dark:bg-[#0f172a] px-2 py-4 font-bold border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[130px] min-w-[130px] max-w-[130px]">
                       <div className="flex items-center gap-2">
-                        <input 
-                          type="checkbox" 
+                        <input
+                          type="checkbox"
                           checked={filteredEmployees.length > 0 && selectedEmpIds.length === filteredEmployees.length}
                           onChange={toggleSelectAll}
-                          className="rounded border-border text-primary focus:ring-primary/20 cursor-pointer" 
+                          className="rounded border-border text-primary focus:ring-primary/20 cursor-pointer"
                         />
                         <span>∇</span>
                       </div>
                     </th>
                     {/* Fixed Sticky Header for ID and Name */}
-                    <th className="sticky left-[110px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-4 font-bold border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[100px] min-w-[100px] max-w-[100px]">Emp ID</th>
-                    <th className="sticky left-[210px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-4 font-bold border-r border-border/40 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[180px] min-w-[180px] max-w-[180px]">Name</th>
-                    
+                    <th className="sticky left-[130px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-4 font-bold border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[100px] min-w-[100px] max-w-[100px]">Emp ID</th>
+                    <th className="sticky left-[230px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-4 font-bold border-r border-border/40 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[180px] min-w-[180px] max-w-[180px]">Name</th>
+
                     {/* Standard Configurable headers */}
                     {visibleCols.empIdOffc && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Emp ID(Offc)</th>}
                     {visibleCols.employeeType && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Employee Type</th>}
@@ -1055,117 +1190,177 @@ function PersonnelListPage() {
                 <tbody className="divide-y divide-border/45">
                   {filteredEmployees.map((e, index) => {
                     const stickyCellBgClass = "bg-card group-hover:bg-[#f8fafc] dark:group-hover:bg-[#1e293b]";
-                    
+
                     return (
-                      <tr 
+                      <tr
                         key={e.id}
                         onClick={() => navigate({ to: '/employee-detail/$id', params: { id: e.id } })}
                         className={`group transition-all cursor-pointer hover:bg-[#f8fafc] dark:hover:bg-[#1e293b]`}
                       >
                         {/* Sticky left Action & Checkbox Column cell */}
-                        <td className={`sticky left-0 ${stickyCellBgClass} px-2 py-2 border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[110px] min-w-[110px] max-w-[110px] transition-all`} onClick={(event) => event.stopPropagation()}>
+                        <td className={`sticky left-0 ${stickyCellBgClass} px-2 py-2 border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[130px] min-w-[130px] max-w-[130px] transition-all`} onClick={(event) => event.stopPropagation()}>
                           <div className="flex items-center gap-1.5 justify-center">
-                            <input 
-                              type="checkbox" 
+                            <input
+                              type="checkbox"
                               checked={selectedEmpIds.includes(e.id)}
                               onChange={() => toggleSelectEmp(e.id)}
-                              className="rounded border-border text-primary focus:ring-primary/20 cursor-pointer" 
+                              className="rounded border-border text-primary focus:ring-primary/20 cursor-pointer"
                             />
-                            <button 
-                              className="size-6 bg-amber-500 text-white rounded hover:bg-amber-600 transition flex items-center justify-center shadow-2xs"
+                            <button
+                              className="size-6 rounded-lg bg-amber-500/10 text-amber-600 border border-amber-500/20 hover:bg-amber-500 hover:text-white transition flex items-center justify-center shadow-3xs"
                               onClick={() => navigate({ to: '/employee-detail/$id', params: { id: e.id } })}
                               title="Quick Sheet"
                             >
                               <FileText className="size-3" />
                             </button>
-                            <button 
-                              className="size-6 border border-border hover:bg-muted text-muted-foreground hover:text-primary rounded transition flex items-center justify-center"
+                            <button
+                              className="size-6 rounded-lg bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 hover:bg-indigo-500 hover:text-white transition flex items-center justify-center shadow-3xs"
                               onClick={() => navigate({ to: '/employee-detail/$id', params: { id: e.id } })}
                               title="View File"
                             >
                               <Eye className="size-3" />
                             </button>
-                            <button 
-                              className="size-6 border border-border hover:bg-muted text-muted-foreground hover:text-primary rounded transition flex items-center justify-center"
-                              title="Edit Info"
-                            >
-                              <Edit3 className="size-3" />
-                            </button>
+
+                            {(!e.status || e.status === "Working" || e.status === "On Leave") ? (
+                              <button
+                                className="size-6 rounded-lg bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500 hover:text-white transition flex items-center justify-center shadow-3xs"
+                                onClick={() => {
+                                  setResignModalEmp(e);
+                                  setResignStatus("Resigned");
+                                  setResignRemarks("");
+                                  setResignDate(new Date().toISOString().split('T')[0]);
+                                }}
+                                title="Resign / Terminate"
+                              >
+                                <Power className="size-3" />
+                              </button>
+                            ) : !e.rejoinedTo ? (
+                              <button
+                                className="size-6 rounded-lg bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition flex items-center justify-center shadow-3xs"
+                                onClick={() => {
+                                  setRejoinModalEmp(e);
+                                  setNewEmpId(e.id + "R");
+                                  setNewJoinDate(new Date().toISOString().split('T')[0]);
+                                  setNewDesignation(e.title || "");
+                                  setNewDept(e.dept || "");
+                                  setNewSect(e.sect || "");
+                                  setNewEmpType(e.type || "Permanent");
+                                  setNewGrade(e.grade || "None");
+                                  setNewShift(e.shift || "General Shift");
+                                  setNewBasic(e.basic || "0.00");
+                                  setNewGross(e.gross || "0.00");
+                                  setRejoinRemarks("");
+                                }}
+                                title="Rejoin Employee"
+                              >
+                                <UserPlus className="size-3" />
+                              </button>
+                            ) : (
+                              <button
+                                className="size-6 rounded-lg bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 cursor-not-allowed flex items-center justify-center shadow-3xs"
+                                title={`Rejoined as ID: ${e.rejoinedTo}`}
+                                disabled
+                              >
+                                <UserCheck className="size-3" />
+                              </button>
+                            )}
                           </div>
                         </td>
 
                         {/* Sticky left Emp ID & Name cells */}
-                        <td className={`sticky left-[110px] ${stickyCellBgClass} px-3 py-3.5 font-bold text-primary border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[100px] min-w-[100px] max-w-[100px] transition-all`}>
+                        <td className={`sticky left-[130px] ${stickyCellBgClass} px-3 py-3.5 font-medium text-primary border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[100px] min-w-[100px] max-w-[100px] transition-all`}>
                           {e.id}
                         </td>
-                        <td className={`sticky left-[210px] ${stickyCellBgClass} px-3 py-3.5 font-semibold text-foreground border-r border-border/40 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[180px] min-w-[180px] max-w-[180px] transition-all`}>
-                        <div className="flex items-center gap-2">
-                          <div className="size-6.5 rounded-lg bg-primary/10 text-[9px] font-bold text-primary flex items-center justify-center shadow-2xs">
-                            {e.name.split(" ").map(s => s[0]).slice(0,2).join("")}
+                        <td className={`sticky left-[230px] ${stickyCellBgClass} px-3 py-3.5 font-medium text-foreground border-r border-border/40 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[180px] min-w-[180px] max-w-[180px] transition-all`}>
+                          <div className="flex items-center gap-2">
+                            <div className="size-6.5 rounded-lg bg-primary/10 text-[9px] font-bold text-primary flex items-center justify-center shadow-2xs animate-pulse">
+                              {e.name.split(" ").map(s => s[0]).slice(0, 2).join("")}
+                            </div>
+                            <div className="flex flex-col min-w-0">
+                              <span className="truncate max-w-[120px] font-medium text-foreground">{e.name}</span>
+                              <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+                                {e.status && e.status !== "Working" && (
+                                  <span className={`text-[8px] px-1.5 py-0.5 rounded leading-none ${e.status === "Resigned" ? "bg-amber-500/10 text-amber-500 border border-amber-500/20" :
+                                      e.status === "Terminated" ? "bg-rose-500/10 text-rose-500 border border-rose-500/20" :
+                                        "bg-blue-500/10 text-blue-500 border border-blue-500/20"
+                                    }`}>
+                                    {e.status}
+                                  </span>
+                                )}
+                                {e.rejoinedTo && (
+                                  <span className="text-[8px] px-1.5 py-0.5 rounded leading-none bg-purple-500/10 text-purple-500 border border-purple-500/20" title={`Rejoined as ID: ${e.rejoinedTo}`}>
+                                    Rejoined
+                                  </span>
+                                )}
+                                {e.rejoinRef && (
+                                  <span className="text-[8px] px-1.5 py-0.5 rounded leading-none bg-indigo-500/10 text-indigo-500 border border-indigo-500/20" title={`Rejoined from ID: ${e.rejoinRef}`}>
+                                    Rejoined Emp
+                                  </span>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                          <span className="truncate max-w-[120px]">{e.name}</span>
-                        </div>
-                      </td>
+                        </td>
 
-                      {/* Configurable Cells */}
-                      {visibleCols.empIdOffc && <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.offcId}</td>}
-                      {visibleCols.employeeType && <td className="px-5 py-3.5 text-foreground/85 font-medium">{e.type}</td>}
-                      {visibleCols.dept && <td className="px-5 py-3.5 text-foreground/80 font-medium">{e.dept}</td>}
-                      {visibleCols.section && <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.sect}</td>}
-                      {visibleCols.jobTitle && <td className="px-5 py-3.5 font-semibold text-foreground">{e.title}</td>}
-                      {visibleCols.unit && <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.unit}</td>}
-                      {visibleCols.line && <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.line}</td>}
-                      {visibleCols.grade && <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.grade}</td>}
-                      {visibleCols.shift && <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.shift}</td>}
-                      {visibleCols.shiftStart && <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.shiftStart}</td>}
-                      {visibleCols.joinDate && <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.joinDate}</td>}
-                      
-                      {visibleCols.blood && (
-                        <td className="px-5 py-3.5 text-center">
-                          <span className="inline-flex items-center justify-center px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30">
-                            {e.blood}
-                          </span>
-                        </td>
-                      )}
-                      
-                      {visibleCols.basic && (
-                        <td className="px-5 py-3.5 text-right font-mono font-semibold text-foreground/90">
-                          ৳{parseFloat(e.basic).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                        </td>
-                      )}
-                      {visibleCols.gross && (
-                        <td className="px-5 py-3.5 text-right font-mono font-bold text-primary">
-                          ৳{parseFloat(e.gross).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                        </td>
-                      )}
-                      
-                      {visibleCols.email && <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.email}</td>}
-                      {visibleCols.officeMob && <td className="px-5 py-3.5 text-muted-foreground/90 font-medium font-mono">{e.officeMob}</td>}
-                      {visibleCols.gender && <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.gender}</td>}
-                      {visibleCols.dob && <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.dob}</td>}
-                      
-                      {visibleCols.empStatus && (
-                        <td className="px-5 py-3.5">
-                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${e.empStatus === "Permanent" ? "bg-success/15 text-success" : "bg-warning/15 text-warning"}`}>
-                            <span className={`size-1.5 rounded-full ${e.empStatus === "Permanent" ? "bg-success" : "bg-warning animate-pulse"}`} />
-                            {e.empStatus}
-                          </span>
-                        </td>
-                      )}
+                        {/* Configurable Cells */}
+                        {visibleCols.empIdOffc && <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.offcId}</td>}
+                        {visibleCols.employeeType && <td className="px-5 py-3.5 text-foreground/85 font-medium">{e.type}</td>}
+                        {visibleCols.dept && <td className="px-5 py-3.5 text-foreground/80 font-medium">{e.dept}</td>}
+                        {visibleCols.section && <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.sect}</td>}
+                        {visibleCols.jobTitle && <td className="px-5 py-3.5 font-semibold text-foreground">{e.title}</td>}
+                        {visibleCols.unit && <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.unit}</td>}
+                        {visibleCols.line && <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.line}</td>}
+                        {visibleCols.grade && <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.grade}</td>}
+                        {visibleCols.shift && <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.shift}</td>}
+                        {visibleCols.shiftStart && <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.shiftStart}</td>}
+                        {visibleCols.joinDate && <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.joinDate}</td>}
 
-                      {visibleCols.village && <td className="px-5 py-3.5 text-muted-foreground/80 font-medium truncate max-w-[150px]" title={e.village}>{e.village}</td>}
-                      
-                      {visibleCols.acStatus && (
-                        <td className="px-5 py-3.5 text-center">
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-500">
-                            <span className="size-1 rounded-full bg-emerald-500 animate-ping" />
-                            {e.acStatus}
-                          </span>
-                        </td>
-                      )}
-                    </tr>
-                  );
-                })}
+                        {visibleCols.blood && (
+                          <td className="px-5 py-3.5 text-center">
+                            <span className="inline-flex items-center justify-center px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30">
+                              {e.blood}
+                            </span>
+                          </td>
+                        )}
+
+                        {visibleCols.basic && (
+                          <td className="px-5 py-3.5 text-right font-mono font-semibold text-foreground/90">
+                            ৳{parseFloat(e.basic).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                          </td>
+                        )}
+                        {visibleCols.gross && (
+                          <td className="px-5 py-3.5 text-right font-mono font-bold text-primary">
+                            ৳{parseFloat(e.gross).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                          </td>
+                        )}
+
+                        {visibleCols.email && <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.email}</td>}
+                        {visibleCols.officeMob && <td className="px-5 py-3.5 text-muted-foreground/90 font-medium font-mono">{e.officeMob}</td>}
+                        {visibleCols.gender && <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.gender}</td>}
+                        {visibleCols.dob && <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.dob}</td>}
+
+                        {visibleCols.empStatus && (
+                          <td className="px-5 py-3.5">
+                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${e.empStatus === "Permanent" ? "bg-success/15 text-success" : "bg-warning/15 text-warning"}`}>
+                              <span className={`size-1.5 rounded-full ${e.empStatus === "Permanent" ? "bg-success" : "bg-warning animate-pulse"}`} />
+                              {e.empStatus}
+                            </span>
+                          </td>
+                        )}
+
+                        {visibleCols.village && <td className="px-5 py-3.5 text-muted-foreground/80 font-medium truncate max-w-[150px]" title={e.village}>{e.village}</td>}
+
+                        {visibleCols.acStatus && (
+                          <td className="px-5 py-3.5 text-center">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-500">
+                              <span className="size-1 rounded-full bg-emerald-500 animate-ping" />
+                              {e.acStatus}
+                            </span>
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })}
                   {filteredEmployees.length === 0 && (
                     <tr>
                       <td colSpan={30} className="px-5 py-12 text-center text-muted-foreground">
@@ -1195,6 +1390,224 @@ function PersonnelListPage() {
 
           </div>
         </div>
+
+        {/* Resign / Terminate Modal */}
+        {resignModalEmp && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-card w-full max-w-md border border-border rounded-lg shadow-xl overflow-hidden p-6 space-y-4 animate-in zoom-in-95 duration-200">
+              <div className="flex items-center justify-between border-b border-border/40 pb-3">
+                <h3 className="text-sm font-bold text-foreground">Resign / Terminate Employee</h3>
+                <button onClick={() => setResignModalEmp(null)} className="text-muted-foreground hover:text-foreground">
+                  <X className="size-4" />
+                </button>
+              </div>
+
+              <div className="text-xs text-muted-foreground">
+                You are updating the status of <span className="font-semibold text-foreground">{resignModalEmp.name}</span> (ID: {resignModalEmp.id}).
+              </div>
+
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Action Type</label>
+                  <select
+                    value={resignStatus}
+                    onChange={(e) => setResignStatus(e.target.value as any)}
+                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition duration-200"
+                  >
+                    <option value="Resigned">Resigned</option>
+                    <option value="Terminated">Terminated</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Effective Date</label>
+                  <input
+                    type="date"
+                    value={resignDate}
+                    onChange={(e) => setResignDate(e.target.value)}
+                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition duration-200"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Remarks / Reason</label>
+                  <textarea
+                    value={resignRemarks}
+                    onChange={(e) => setResignRemarks(e.target.value)}
+                    placeholder="Enter reason or notes..."
+                    rows={3}
+                    className="w-full p-3 rounded-lg bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition duration-200 resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/40">
+                <button
+                  onClick={() => setResignModalEmp(null)}
+                  className="h-8.5 px-4 rounded-xl border border-border/60 hover:bg-muted text-xs font-semibold text-foreground/80 hover:text-foreground transition duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleResignSubmit}
+                  className="h-8.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-xs transition duration-200"
+                >
+                  Confirm Action
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Rejoin Modal */}
+        {rejoinModalEmp && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-card w-full max-w-lg border border-border rounded-lg shadow-xl overflow-hidden p-6 space-y-4 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-border/40 pb-3">
+                <h3 className="text-sm font-bold text-foreground">Rejoin / Re-employ Employee</h3>
+                <button onClick={() => setRejoinModalEmp(null)} className="text-muted-foreground hover:text-foreground">
+                  <X className="size-4" />
+                </button>
+              </div>
+
+              <div className="text-xs text-muted-foreground bg-primary/5 p-3 rounded-xl border border-primary/10">
+                Rejoining will create a <span className="font-semibold text-foreground">new employment profile</span> with a new Employee ID for <span className="font-semibold text-foreground">{rejoinModalEmp.name}</span>. The old files, documents, and history will be connected automatically.
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">New Employee ID</label>
+                  <input
+                    type="text"
+                    value={newEmpId}
+                    onChange={(e) => setNewEmpId(e.target.value)}
+                    placeholder="e.g. 202610291"
+                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition duration-200"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">New Joining Date</label>
+                  <input
+                    type="date"
+                    value={newJoinDate}
+                    onChange={(e) => setNewJoinDate(e.target.value)}
+                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition duration-200"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Designation / Title</label>
+                  <input
+                    type="text"
+                    value={newDesignation}
+                    onChange={(e) => setNewDesignation(e.target.value)}
+                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition duration-200"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Department</label>
+                  <input
+                    type="text"
+                    value={newDept}
+                    onChange={(e) => setNewDept(e.target.value)}
+                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition duration-200"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Section</label>
+                  <input
+                    type="text"
+                    value={newSect}
+                    onChange={(e) => setNewSect(e.target.value)}
+                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition duration-200"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Employee Type</label>
+                  <select
+                    value={newEmpType}
+                    onChange={(e) => setNewEmpType(e.target.value)}
+                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition duration-200"
+                  >
+                    <option value="Permanent">Permanent</option>
+                    <option value="Probation">Probation</option>
+                    <option value="Contractual">Contractual</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Grade</label>
+                  <input
+                    type="text"
+                    value={newGrade}
+                    onChange={(e) => setNewGrade(e.target.value)}
+                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition duration-200"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Shift</label>
+                  <input
+                    type="text"
+                    value={newShift}
+                    onChange={(e) => setNewShift(e.target.value)}
+                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition duration-200"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Basic Salary</label>
+                  <input
+                    type="text"
+                    value={newBasic}
+                    onChange={(e) => setNewBasic(e.target.value)}
+                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition duration-200 font-mono"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Gross Salary</label>
+                  <input
+                    type="text"
+                    value={newGross}
+                    onChange={(e) => setNewGross(e.target.value)}
+                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition duration-200 font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Rejoin Notes / Remarks</label>
+                <textarea
+                  value={rejoinRemarks}
+                  onChange={(e) => setRejoinRemarks(e.target.value)}
+                  placeholder="Enter any additional notes..."
+                  rows={2}
+                  className="w-full p-3 rounded-lg bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition duration-200 resize-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/40">
+                <button
+                  onClick={() => setRejoinModalEmp(null)}
+                  className="h-8.5 px-4 rounded-xl border border-border/60 hover:bg-muted text-xs font-semibold text-foreground/80 hover:text-foreground transition duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleRejoinSubmit}
+                  className="h-8.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition duration-200"
+                >
+                  Confirm Rejoin
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
       </main>
     </div>

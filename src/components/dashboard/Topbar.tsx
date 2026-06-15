@@ -4,7 +4,8 @@ import {
   Bell, Search, MessagesSquare, Sun, Moon, CornerDownLeft,
   UserRound, Fingerprint, CalendarDays, CalendarX, Clock, Coins, Users,
   RefreshCw, FileText, BarChart3, ClipboardCheck, ShieldAlert, Timer,
-  CreditCard, Cpu, ShieldCheck as ComplianceIcon, Lightbulb, LayoutDashboard, UserPlus
+  CreditCard, Cpu, ShieldCheck as ComplianceIcon, Lightbulb, LayoutDashboard, UserPlus,
+  SlidersHorizontal
 } from "lucide-react";
 import avatarImg from "./avatar.png";
 
@@ -22,7 +23,6 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Manpower Basic Form", parent: "Personnel Info", to: "/" },
   { label: "Manpower Basic List", parent: "Personnel Info", to: "/" },
   { label: "Personnel QR Scanner", parent: "Personnel Info", to: "/" },
-  { label: "Salary Pay Scale Builder", parent: "Personnel Info", to: "/" },
   // Attendance
   { label: "Manual Attendance Entry", parent: "Attendance", to: "/manual-attendance", description: "Insert and record manual logs" },
   { label: "Manual Attendance Approval", parent: "Attendance", to: "/pending-manual-attendance", description: "Verify pending manual logs" },
@@ -56,6 +56,38 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Recruitment Basic Info List", parent: "IE Recruitment", to: "/recruitment-basic-list", description: "View directory of registered temp profiles" },
   { label: "Recruitment Configuration Settings", parent: "IE Recruitment", to: "/recruitment-configuration", description: "Manage SMV banks, machine list, operations etc." },
   { label: "Recruitment Assessment List", parent: "IE Recruitment", to: "/recruitment-assessment-list", description: "Floor evaluation and HR approval workflow" },
+  // Configure
+  { label: "Company Settings Setup", parent: "Configure", to: "/configure-structure?tab=company", description: "Configure global enterprise HR settings and validation rules." },
+  { label: "Organization Setup", parent: "Configure", to: "/configure-structure?tab=company", description: "Configure organization settings" },
+  { label: "Area Name Setup", parent: "Configure", to: "/configure-structure?tab=area", description: "Configure area names" },
+  { label: "Company Mapping Setup", parent: "Configure", to: "/configure-structure?tab=mapping", description: "Configure company mapping" },
+  { label: "Employee Type Setup", parent: "Configure", to: "/configure-employment?tab=empType", description: "Configure employee types" },
+  { label: "Department Setup", parent: "Configure", to: "/configure-structure?tab=department", description: "Configure department settings" },
+  { label: "Section Setup", parent: "Configure", to: "/configure-structure?tab=section", description: "Configure section settings" },
+  { label: "Designation Group Setup", parent: "Configure", to: "/configure-employment?tab=designationGroup", description: "Configure designation groups" },
+  { label: "Job Title Setup", parent: "Configure", to: "/configure-employment?tab=jobTitle", description: "Configure job titles" },
+  { label: "Grade Setup", parent: "Configure", to: "/configure-employment?tab=grade", description: "Configure grade settings" },
+  { label: "Shift Setup", parent: "Configure", to: "/configure-time?tab=shift", description: "Configure shifts" },
+  { label: "Unit Setup", parent: "Configure", to: "/configure-structure?tab=unit", description: "Configure units" },
+  { label: "Line Setup", parent: "Configure", to: "/configure-structure?tab=line", description: "Configure lines" },
+  { label: "Country Setup", parent: "Configure", to: "/configure-employment?tab=country", description: "Configure countries" },
+  { label: "Religion Setup", parent: "Configure", to: "/configure-employment?tab=religion", description: "Configure religion settings" },
+  { label: "Bonus Setting", parent: "Configure", to: "/configure-compensation?tab=bonus", description: "Configure bonus settings" },
+  { label: "Educational Qualification Setup", parent: "Configure", to: "/configure-education?tab=qualification", description: "Configure educational qualifications" },
+  { label: "Education Institution Setup", parent: "Configure", to: "/configure-education?tab=institution", description: "Configure educational institutions" },
+  { label: "Education Result Setup", parent: "Configure", to: "/configure-education?tab=result", description: "Configure education results" },
+  { label: "Training Category Setup", parent: "Configure", to: "/configure-education?tab=training", description: "Configure training categories" },
+  { label: "Leave Setting Setup", parent: "Configure", to: "/configure-policies?tab=leave", description: "Configure leave settings" },
+  { label: "Allowance Rate Setup", parent: "Configure", to: "/configure-compensation?tab=allowance", description: "Configure allowance rates" },
+  { label: "Tiffin Rate Setup", parent: "Configure", to: "/configure-compensation?tab=tiffin", description: "Configure tiffin rates" },
+  { label: "Lunch Rate Setup", parent: "Configure", to: "/configure-compensation?tab=lunch", description: "Configure lunch rates" },
+  { label: "Policy Name Setup", parent: "Configure", to: "/configure-policies?tab=policy", description: "Configure policies" },
+  { label: "OT Configuration Setup", parent: "Configure", to: "/configure-time?tab=ot", description: "Configure overtime settings" },
+  { label: "Place In BD Setup", parent: "Configure", to: "/configure-employment?tab=place", description: "Configure Bangladeshi locations" },
+  { label: "Conveyance Setup", parent: "Configure", to: "/configure-compensation?tab=conveyance", description: "Configure conveyance rates" },
+  { label: "Abnormal Shift Setup", parent: "Configure", to: "/configure-time?tab=abnormal", description: "Configure abnormal shifts" },
+  { label: "Attendance Bonus Policy Setup", parent: "Configure", to: "/configure-time?tab=bonus", description: "Configure attendance bonuses" },
+  { label: "Job Nature Setup", parent: "Configure", to: "/configure-employment?tab=nature", description: "Configure job natures" },
 ];
 
 // Dynamically fetch search category visual icon
@@ -79,6 +111,7 @@ function getCategoryIcon(parent: string) {
     case "Compliance": return ComplianceIcon;
     case "Idea Share": return Lightbulb;
     case "IE Recruitment": return UserPlus;
+    case "Configure": return SlidersHorizontal;
     default: return LayoutDashboard;
   }
 }
@@ -120,7 +153,7 @@ export function Topbar() {
       // Show default active system paths for Quick Access
       return searchableMenus.filter(m => m.to !== "/").slice(0, 5);
     }
-    return searchableMenus.filter(item => 
+    return searchableMenus.filter(item =>
       item.label.toLowerCase().includes(q) ||
       item.parent.toLowerCase().includes(q) ||
       (item.description && item.description.toLowerCase().includes(q))
@@ -191,7 +224,7 @@ export function Topbar() {
         <p className="text-[11px] text-muted-foreground/90 font-medium font-sans">Here's what's happening across your organization today.</p>
       </div>
       <div className="ml-auto flex items-center gap-2.5">
-        
+
         {/* Interactive Global Menu Search Container */}
         <div className="relative hidden md:block global-search-container">
           <div className="relative group">
@@ -210,8 +243,8 @@ export function Topbar() {
 
           {/* Search Result Popover List */}
           {isSearchOpen && (
-            <div className="absolute right-0 top-11.5 w-[390px] bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.12)] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-              
+            <div className="absolute right-0 top-11.5 w-[390px] bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-lg shadow-[0_20px_50px_rgba(0,0,0,0.12)] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+
               {/* Header inside popover */}
               <div className="px-4 py-3 bg-slate-50/50 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800/60 flex items-center justify-between text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                 <span className="flex items-center gap-1.5">
@@ -236,34 +269,30 @@ export function Topbar() {
                         setIsSearchOpen(false);
                         setSearchQuery("");
                       }}
-                      className={`w-full group text-left flex items-center gap-3 p-2.5 rounded-xl transition duration-150 border ${
-                        isFocused
+                      className={`w-full group text-left flex items-center gap-3 p-2.5 rounded-xl transition duration-150 border ${isFocused
                           ? "bg-primary/[0.08] dark:bg-primary/[0.12] border-primary/20 text-primary"
                           : "hover:bg-slate-50/70 dark:hover:bg-slate-900/40 border-transparent text-slate-700 dark:text-slate-350"
-                      }`}
+                        }`}
                     >
                       {/* Left: Beautiful visually distinct Category Icon Box */}
-                      <div className={`size-8 rounded-lg flex items-center justify-center border shrink-0 transition-transform duration-300 ${
-                        isFocused ? "scale-105" : ""
-                      } ${
-                        isActiveRoute 
-                          ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400" 
+                      <div className={`size-8 rounded-lg flex items-center justify-center border shrink-0 transition-transform duration-300 ${isFocused ? "scale-105" : ""
+                        } ${isActiveRoute
+                          ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
                           : "bg-slate-100 border-slate-200/40 text-slate-400 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-500"
-                      }`}>
+                        }`}>
                         <CategoryIcon className="size-4" />
                       </div>
-                      
+
                       {/* Middle: Text details */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="text-[11px] font-black tracking-tight leading-none">
                             {item.label}
                           </span>
-                          <span className={`px-1.5 py-0.2 rounded text-[7.5px] font-black uppercase tracking-wider scale-90 ${
-                            isActiveRoute 
-                              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" 
+                          <span className={`px-1.5 py-0.2 rounded text-[7.5px] font-black uppercase tracking-wider scale-90 ${isActiveRoute
+                              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                               : "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500"
-                          }`}>
+                            }`}>
                             {item.parent}
                           </span>
                         </div>
@@ -319,7 +348,7 @@ export function Topbar() {
         <button className="relative size-9 grid place-items-center rounded-lg hover:bg-muted text-foreground/80 hover:text-foreground transition-colors duration-200">
           <MessagesSquare className="size-4.5" />
         </button>
-        
+
         {/* Notification Bell with 0 Badge */}
         <div className="relative flex items-center mr-1">
           <button className="relative size-9 grid place-items-center rounded-lg hover:bg-muted text-foreground/80 hover:text-foreground transition-colors duration-200">
@@ -337,10 +366,10 @@ export function Topbar() {
             <div className="text-[9px] font-bold text-muted-foreground/85 mt-0.5">Pakiza Software Limited (PSL-Operation)</div>
           </div>
           <div className="size-9 rounded-full overflow-hidden border border-border/80 shadow-2xs flex-shrink-0 bg-muted">
-            <img 
-              src={avatarImg} 
-              alt="Tahmid Afsar" 
-              className="size-full object-cover" 
+            <img
+              src={avatarImg}
+              alt="Tahmid Afsar"
+              className="size-full object-cover"
             />
           </div>
         </div>

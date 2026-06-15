@@ -9,7 +9,7 @@ interface GeneralStoreRequisitionModalProps {
 export function GeneralStoreRequisitionModal({ open, onOpenChange }: GeneralStoreRequisitionModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl p-0 bg-white border border-border/40 shadow-2xl rounded-2xl overflow-hidden gap-0 max-h-[95vh] [&>button]:hidden">
+      <DialogContent className="max-w-3xl p-0 bg-white border border-border/40 shadow-2xl rounded-lg overflow-hidden gap-0 max-h-[95vh] [&>button]:hidden">
 
         {/* Header */}
         <div className="px-6 py-4 border-b border-border/30 flex items-center justify-between bg-muted/10 shrink-0">
@@ -107,7 +107,7 @@ export function GeneralStoreRequisitionModal({ open, onOpenChange }: GeneralStor
           {/* Action Footer */}
           <div className="pt-2 border-t border-border/30 flex justify-between items-center">
             <p className="text-[11px] text-muted-foreground/60 italic">No comments recorded.</p>
-            <button className="h-9 px-6 bg-blue-500 hover:bg-blue-600 text-white rounded-2xl text-[11px] font-bold transition-colors shadow-sm flex items-center gap-1.5">
+            <button className="h-9 px-6 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-[11px] font-bold transition-colors shadow-sm flex items-center gap-1.5">
               <CheckCircle2 className="size-3.5" />
               MARK AS RECEIVED
             </button>

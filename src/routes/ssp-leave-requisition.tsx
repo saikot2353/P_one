@@ -220,7 +220,7 @@ export default function LeaveRequisitionPage() {
                 <p className="text-[10.5px] text-muted-foreground">
                   Fields marked with <span className="text-rose-400 font-bold">*</span> are required
                 </p>
-                <button className="h-9 px-6 bg-primary hover:bg-primary/90 text-primary-foreground text-[12px] font-semibold rounded-2xl transition-all shadow-sm hover:shadow-md active:scale-[0.98] flex items-center gap-2">
+                <button className="h-9 px-6 bg-primary hover:bg-primary/90 text-primary-foreground text-[12px] font-semibold rounded-lg transition-all shadow-sm hover:shadow-md active:scale-[0.98] flex items-center gap-2">
                   <CheckCircle2 className="size-3.5" />
                   Submit Requisition
                 </button>
@@ -241,7 +241,7 @@ export default function LeaveRequisitionPage() {
                   {balances.map(b => {
                     const pct = Math.round((b.enjoyed / b.assigned) * 100);
                     return (
-                      <div key={b.type} className="p-3 rounded-2xl bg-muted/20 border border-border/40 hover:bg-muted/30 transition-colors">
+                      <div key={b.type} className="p-3 rounded-lg bg-muted/20 border border-border/40 hover:bg-muted/30 transition-colors">
                         <div className="flex justify-between items-baseline mb-1.5">
                           <span className="text-[12px] font-semibold text-foreground">{b.type}</span>
                           <span className="text-[11px] font-bold text-emerald-600">{b.balance} left</span>

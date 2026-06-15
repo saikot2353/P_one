@@ -33,7 +33,7 @@ export default function ApproveManualAttendancePage() {
         <Topbar />
 
         <div className="flex-1 overflow-hidden flex flex-col px-6 py-4 gap-3 bg-slate-50/50 dark:bg-slate-950/20">
-          
+
           {/* Breadcrumb */}
           <div className="flex items-center gap-1.5 text-[10.5px] text-muted-foreground">
             <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
@@ -44,7 +44,7 @@ export default function ApproveManualAttendancePage() {
           </div>
 
           <div className="flex-1 bg-card border border-border/60 rounded-xl shadow-sm flex flex-col overflow-hidden">
-            
+
             {/* Filter Bar */}
             <div className="p-4 border-b border-border/50 bg-slate-50 dark:bg-slate-900 flex items-center gap-4 shrink-0">
               <div className="w-64">
@@ -52,7 +52,7 @@ export default function ApproveManualAttendancePage() {
                   value={department}
                   onChange={setDepartment}
                   options={deptOptions}
-                  className="h-9 px-3 text-[12px] font-medium bg-white dark:bg-slate-900 border border-border/70 dark:border-slate-800 rounded-2xl focus:border-primary/60 text-foreground"
+                  className="h-9 px-3 text-[12px] font-medium bg-white dark:bg-slate-900 border border-border/70 dark:border-slate-800 rounded-lg focus:border-primary/60 text-foreground"
                 />
               </div>
               <div className="relative w-64">
@@ -62,7 +62,7 @@ export default function ApproveManualAttendancePage() {
                   placeholder="Search Employee..."
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  className="w-full h-9 pl-9 pr-3 text-[12px] font-medium bg-white dark:bg-slate-900 border border-border/70 dark:border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/60 transition-all text-foreground"
+                  className="w-full h-9 pl-9 pr-3 text-[12px] font-medium bg-white dark:bg-slate-900 border border-border/70 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/60 transition-all text-foreground"
                 />
               </div>
             </div>
@@ -97,10 +97,10 @@ export default function ApproveManualAttendancePage() {
                       </td>
                       <td className="px-5 py-3">
                         <div className="flex items-center justify-end gap-2">
-                          <button className="p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-2xl transition-colors cursor-pointer" title="Reject">
+                          <button className="p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors cursor-pointer" title="Reject">
                             <XCircle className="size-4.5" />
                           </button>
-                          <button className="p-1.5 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-2xl transition-colors cursor-pointer" title="Approve">
+                          <button className="p-1.5 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition-colors cursor-pointer" title="Approve">
                             <CheckCircle2 className="size-4.5" />
                           </button>
                         </div>

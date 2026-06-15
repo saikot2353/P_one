@@ -174,7 +174,7 @@ function PersonnelApprovalPage() {
   const [selectedCandidate, setSelectedCandidate] = useState<PendingCandidate | null>(null);
   const [candidateDetailsModal, setCandidateDetailsModal] = useState<PendingCandidate | null>(null);
   const [rejectCandidateModal, setRejectCandidateModal] = useState<PendingCandidate | null>(null);
-  
+
   // Tab 1 Form states
   const [generatedEmpId, setGeneratedEmpId] = useState("");
   const [joiningStatus, setJoiningStatus] = useState<"Probation" | "Permanent">("Probation");
@@ -185,7 +185,7 @@ function PersonnelApprovalPage() {
   const [selectedEmployee, setSelectedEmployee] = useState<EmployeeStatusRecord | null>(null);
   const [selectedApproveEmp, setSelectedApproveEmp] = useState<EmployeeStatusRecord | null>(null);
   const [selectedRejectEmp, setSelectedRejectEmp] = useState<EmployeeStatusRecord | null>(null);
-  
+
   // Tab 2 Form states
   const [confirmDate, setConfirmDate] = useState("01/11/2023");
   const [newEmploymentType, setNewEmploymentType] = useState<"Probation" | "Permanent" | "Contractual">("Permanent");
@@ -263,7 +263,7 @@ function PersonnelApprovalPage() {
     }
 
     setCandidates(prev => prev.map(c => c.id === selectedCandidate.id ? { ...c, status: "Approved", approvedEmpId: generatedEmpId } : c));
-    
+
     const newEmp: EmployeeStatusRecord = {
       empId: generatedEmpId,
       name: selectedCandidate.name,
@@ -272,8 +272,8 @@ function PersonnelApprovalPage() {
       joiningDate: selectedCandidate.joiningDate,
       defaultHoliday: "Friday",
       bloodGroup: selectedCandidate.name.includes("Shapno") ? "AB (+ve)" : "O (+ve)",
-      basic: selectedCandidate.gross * 0.6,
-      gross: selectedCandidate.gross,
+      basic: selectedCandidate.grossSalary * 0.6,
+      gross: selectedCandidate.grossSalary,
       email: selectedCandidate.email,
       phone: selectedCandidate.phone,
       gender: "Male",
@@ -386,9 +386,9 @@ function PersonnelApprovalPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 xl:p-8 space-y-6">
-          
+
           {/* Breadcrumb Header Title */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -416,19 +416,17 @@ function PersonnelApprovalPage() {
                 setSearchQuery("");
                 setFilterStatus("pending");
               }}
-              className={`pb-4 text-xs font-black uppercase tracking-widest cursor-pointer relative transition duration-150 flex items-center gap-2.5 ${
-                activeTab === "approval"
+              className={`pb-4 text-xs font-black uppercase tracking-widest cursor-pointer relative transition duration-150 flex items-center gap-2.5 ${activeTab === "approval"
                   ? "text-primary font-black"
                   : "text-muted-foreground/70 hover:text-foreground font-extrabold"
-              }`}
+                }`}
             >
               <UserCheck className="size-4" />
               <span>Employee Approval</span>
-              <span className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-black transition-all ${
-                activeTab === "approval"
+              <span className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-black transition-all ${activeTab === "approval"
                   ? "bg-primary text-primary-foreground shadow-xs"
                   : "bg-muted text-muted-foreground/80"
-              }`}>
+                }`}>
                 {stats.pendingApp}
               </span>
               {activeTab === "approval" && (
@@ -442,19 +440,17 @@ function PersonnelApprovalPage() {
                 setSearchQuery("");
                 setFilterStatus("pending");
               }}
-              className={`pb-4 text-xs font-black uppercase tracking-widest cursor-pointer relative transition duration-150 flex items-center gap-2.5 ${
-                activeTab === "status"
+              className={`pb-4 text-xs font-black uppercase tracking-widest cursor-pointer relative transition duration-150 flex items-center gap-2.5 ${activeTab === "status"
                   ? "text-primary font-black"
                   : "text-muted-foreground/70 hover:text-foreground font-extrabold"
-              }`}
+                }`}
             >
               <ArrowRightLeft className="size-4" />
               <span>Change Employment Status</span>
-              <span className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-black transition-all ${
-                activeTab === "status"
+              <span className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-black transition-all ${activeTab === "status"
                   ? "bg-primary text-primary-foreground shadow-xs"
                   : "bg-muted text-muted-foreground/80"
-              }`}>
+                }`}>
                 {stats.pendingConversion}
               </span>
               {activeTab === "status" && (
@@ -465,40 +461,38 @@ function PersonnelApprovalPage() {
 
           {/* Tab 1 Content: Employee Approval List */}
           {activeTab === "approval" && (
-            <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-200">
-              
+            <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-200">
+
               {/* Header and Search & Status Filter Toggle */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/30 pb-4">
                 <div className="flex items-center gap-4 flex-wrap">
                   <span className="text-[10.5px] font-black text-foreground uppercase tracking-widest block">
                     Awaiting Hires
                   </span>
-                  
+
                   {/* Status Toggle (Pending / Approved) */}
                   <div className="flex items-center gap-1 bg-muted/80 p-0.5 rounded-lg border border-border/40 select-none">
                     <button
                       onClick={() => setFilterStatus("pending")}
-                      className={`px-3 py-1.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider transition duration-150 cursor-pointer ${
-                        filterStatus === "pending"
+                      className={`px-3 py-1.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider transition duration-150 cursor-pointer ${filterStatus === "pending"
                           ? "bg-card text-primary shadow-xs border border-border/40"
                           : "text-muted-foreground hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       Pending ({candidates.filter(c => c.status !== "Approved" && c.status !== "Rejected").length})
                     </button>
                     <button
                       onClick={() => setFilterStatus("approved")}
-                      className={`px-3 py-1.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider transition duration-150 cursor-pointer ${
-                        filterStatus === "approved"
+                      className={`px-3 py-1.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider transition duration-150 cursor-pointer ${filterStatus === "approved"
                           ? "bg-card text-primary shadow-xs border border-border/40"
                           : "text-muted-foreground hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       Approved ({candidates.filter(c => c.status === "Approved" || c.status === "Rejected").length})
                     </button>
                   </div>
                 </div>
-                
+
                 <div className="relative w-full sm:w-64">
                   <Search className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
                   <input
@@ -538,15 +532,14 @@ function PersonnelApprovalPage() {
                           {row.grossSalary.toLocaleString("en-US", { minimumFractionDigits: 2 })} BDT
                         </td>
                         <td className="px-4 py-3 text-center border-r border-border/20">
-                          <span className={`inline-flex items-center gap-1 font-bold px-2 py-0.5 rounded text-[9px] ${
-                            row.status === "Approved"
+                          <span className={`inline-flex items-center gap-1 font-bold px-2 py-0.5 rounded text-[9px] ${row.status === "Approved"
                               ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
                               : row.status === "Rejected"
-                              ? "bg-rose-500/10 text-rose-500 border border-rose-500/20"
-                              : row.status === "Draft/Review"
-                              ? "bg-slate-500/10 text-slate-500 border border-slate-500/20"
-                              : "bg-blue-500/10 text-[#1e88e5] border border-[#1e88e5]/20 animate-pulse"
-                          }`}>
+                                ? "bg-rose-500/10 text-rose-500 border border-rose-500/20"
+                                : row.status === "Draft/Review"
+                                  ? "bg-slate-500/10 text-slate-500 border border-slate-500/20"
+                                  : "bg-blue-500/10 text-[#1e88e5] border border-[#1e88e5]/20 animate-pulse"
+                            }`}>
                             <span>{row.status}</span>
                           </span>
                         </td>
@@ -569,7 +562,7 @@ function PersonnelApprovalPage() {
                                 <Check className="size-3" />
                                 <span>Approve</span>
                               </button>
-                              
+
                               <button
                                 onClick={() => setRejectCandidateModal(row)}
                                 className="h-7 px-2.5 rounded-lg bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 transition-all duration-150 shrink-0 select-none cursor-pointer shadow-2xs shadow-rose-500/5"
@@ -607,40 +600,38 @@ function PersonnelApprovalPage() {
 
           {/* Tab 2 Content: Change Employment Status */}
           {activeTab === "status" && (
-            <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-200">
-              
+            <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-200">
+
               {/* Header and Search & Status Filter Toggle */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/30 pb-4">
                 <div className="flex items-center gap-4 flex-wrap">
                   <span className="text-[10.5px] font-black text-foreground uppercase tracking-widest block">
                     Conversions
                   </span>
-                  
+
                   {/* Status Toggle (Pending / Approved) */}
                   <div className="flex items-center gap-1 bg-muted/80 p-0.5 rounded-lg border border-border/40 select-none">
                     <button
                       onClick={() => setFilterStatus("pending")}
-                      className={`px-3 py-1.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider transition duration-150 cursor-pointer ${
-                        filterStatus === "pending"
+                      className={`px-3 py-1.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider transition duration-150 cursor-pointer ${filterStatus === "pending"
                           ? "bg-card text-primary shadow-xs border border-border/40"
                           : "text-muted-foreground hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       Pending ({employees.filter(e => e.conversionStatus === "Pending").length})
                     </button>
                     <button
                       onClick={() => setFilterStatus("approved")}
-                      className={`px-3 py-1.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider transition duration-150 cursor-pointer ${
-                        filterStatus === "approved"
+                      className={`px-3 py-1.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider transition duration-150 cursor-pointer ${filterStatus === "approved"
                           ? "bg-card text-primary shadow-xs border border-border/40"
                           : "text-muted-foreground hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       Approved ({employees.filter(e => e.conversionStatus === "Approved" || e.conversionStatus === "Rejected").length})
                     </button>
                   </div>
                 </div>
-                
+
                 <div className="relative w-full sm:w-64">
                   <Search className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
                   <input
@@ -676,11 +667,10 @@ function PersonnelApprovalPage() {
                         <td className="px-4 py-3 font-bold text-foreground/80 border-r border-border/20">{row.department}</td>
                         <td className="px-4 py-3 font-semibold text-muted-foreground border-r border-border/20">{row.jobTitle}</td>
                         <td className="px-4 py-3 text-center border-r border-border/20">
-                          <span className={`inline-flex items-center font-bold px-2 py-0.5 rounded text-[9.5px] ${
-                            row.employmentStatus === "Permanent"
+                          <span className={`inline-flex items-center font-bold px-2 py-0.5 rounded text-[9.5px] ${row.employmentStatus === "Permanent"
                               ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/25"
                               : "bg-amber-500/10 text-amber-600 border border-amber-500/25 font-extrabold animate-pulse"
-                          }`}>
+                            }`}>
                             {row.employmentStatus}
                           </span>
                         </td>
@@ -688,16 +678,15 @@ function PersonnelApprovalPage() {
                           {row.confirmationDate || <span className="text-muted-foreground/40 italic">Awaiting</span>}
                         </td>
                         <td className="px-4 py-3 text-center border-r border-border/20">
-                          <span className={`inline-flex items-center gap-1 font-bold px-2 py-0.5 rounded text-[9px] ${
-                            row.workingStatus === "Working"
+                          <span className={`inline-flex items-center gap-1 font-bold px-2 py-0.5 rounded text-[9px] ${row.workingStatus === "Working"
                               ? "bg-emerald-500/5 text-emerald-500 border border-emerald-500/15"
                               : "bg-rose-500/5 text-rose-500 border border-rose-500/15"
-                          }`}>
+                            }`}>
                             <span>{row.workingStatus}</span>
                           </span>
                         </td>
                         <td className="px-4 py-2 text-center flex items-center justify-center gap-2">
-                          
+
                           {row.conversionStatus === "Pending" ? (
                             <div className="flex items-center gap-1.5">
                               <button
@@ -761,7 +750,7 @@ function PersonnelApprovalPage() {
       {/* Tab 1 Modal: Candidate Details Verification */}
       {candidateDetailsModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-lg rounded-2xl border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
+          <div className="bg-card w-full max-w-lg rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
             <button
               onClick={() => setCandidateDetailsModal(null)}
               className="absolute right-4 top-4 p-1 text-muted-foreground/60 hover:text-foreground hover:bg-muted rounded-lg transition"
@@ -835,7 +824,7 @@ function PersonnelApprovalPage() {
       {/* Tab 1 Modal: Candidate Approval Form */}
       {selectedCandidate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-md rounded-2xl border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
+          <div className="bg-card w-full max-w-md rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
             <button
               onClick={() => setSelectedCandidate(null)}
               className="absolute right-4 top-4 p-1 text-muted-foreground/60 hover:text-foreground hover:bg-muted rounded-lg transition"
@@ -904,7 +893,7 @@ function PersonnelApprovalPage() {
       {/* Tab 1 Modal: Candidate Rejection Dialog Form */}
       {rejectCandidateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-md rounded-2xl border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
+          <div className="bg-card w-full max-w-md rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
             <button
               onClick={() => setRejectCandidateModal(null)}
               className="absolute right-4 top-4 p-1 text-muted-foreground/60 hover:text-foreground hover:bg-muted rounded-lg transition"
@@ -960,7 +949,7 @@ function PersonnelApprovalPage() {
       {/* Tab 2 Modal: Approve Conversion Request to Permanent Type */}
       {selectedApproveEmp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-md rounded-2xl border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
+          <div className="bg-card w-full max-w-md rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
             <button
               onClick={() => setSelectedApproveEmp(null)}
               className="absolute right-4 top-4 p-1 text-muted-foreground/60 hover:text-foreground hover:bg-muted rounded-lg transition"
@@ -1020,7 +1009,7 @@ function PersonnelApprovalPage() {
       {/* Tab 2 Modal: Decline Conversion Request to Permanent Type */}
       {selectedRejectEmp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-md rounded-2xl border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
+          <div className="bg-card w-full max-w-md rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
             <button
               onClick={() => setSelectedRejectEmp(null)}
               className="absolute right-4 top-4 p-1 text-muted-foreground/60 hover:text-foreground hover:bg-muted rounded-lg transition"
@@ -1078,7 +1067,7 @@ function PersonnelApprovalPage() {
       {/* Tab 2 Modal: Admin Override Manual Status Changer */}
       {selectedEmployee && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-md rounded-2xl border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
+          <div className="bg-card w-full max-w-md rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
             <button
               onClick={() => setSelectedEmployee(null)}
               className="absolute right-4 top-4 p-1 text-muted-foreground/60 hover:text-foreground hover:bg-muted rounded-lg transition"

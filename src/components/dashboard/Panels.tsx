@@ -40,7 +40,7 @@ const initials = (n: string) => n.split(" ").map((s) => s[0]).slice(0, 2).join("
 
 export function LeaveRequests() {
   return (
-    <div className="rounded-2xl bg-card border border-border/70 shadow-xs xl:col-span-2 overflow-hidden transition-all duration-300 hover:shadow-md hover:border-border/95 relative group">
+    <div className="rounded-lg bg-card border border-border/70 shadow-xs xl:col-span-2 overflow-hidden transition-all duration-300 hover:shadow-md hover:border-border/95 relative group">
       <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary/10 via-primary/30 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       <div className="flex items-center justify-between p-5 border-b border-border/55">
         <div>
@@ -95,7 +95,7 @@ export function LeaveRequests() {
 
 export function UpcomingEvents() {
   return (
-    <div className="rounded-2xl bg-card border border-border/70 p-5 shadow-xs transition-all duration-300 hover:shadow-md hover:border-border/95 relative group">
+    <div className="rounded-lg bg-card border border-border/70 p-5 shadow-xs transition-all duration-300 hover:shadow-md hover:border-border/95 relative group">
       <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary/10 via-primary/30 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       <div className="flex items-center justify-between mb-5">
         <div>
@@ -125,7 +125,7 @@ export function UpcomingEvents() {
 
 export function RecruitmentPipeline() {
   return (
-    <div className="rounded-2xl bg-card border border-border/70 p-5 shadow-xs transition-all duration-300 hover:shadow-md hover:border-border/95 relative group xl:col-span-3">
+    <div className="rounded-lg bg-card border border-border/70 p-5 shadow-xs transition-all duration-300 hover:shadow-md hover:border-border/95 relative group xl:col-span-3">
       <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary/10 via-primary/30 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       <div className="flex items-center justify-between mb-5">
         <div>

@@ -4,7 +4,7 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { rawQueueRecords, QueueRecord } from "./increment-queue-data";
 import {
-  Search, FileSpreadsheet, Printer, FileDown, Plus, Info, 
+  Search, FileSpreadsheet, Printer, FileDown, Plus, Info,
   Sparkles, X, Eye, ArrowUpDown, Filter, ChevronDown, ChevronRight, Check,
   LayoutGrid, SlidersHorizontal, EyeOff, FileText, FileClock,
   TrendingUp, DollarSign, UserCog, Edit, Settings, ArrowRight, Sparkle, Calendar, Banknote, Briefcase,
@@ -88,7 +88,7 @@ function IncrementQueueListPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEmpIds, setSelectedEmpIds] = useState<string[]>([]);
   const [editingRecord, setEditingRecord] = useState<QueueRecord | null>(null);
-  
+
   // Tab control state inside the Edit Configurator Modal
   const [modalActiveTab, setModalActiveTab] = useState<"schedule" | "adjust" | "allowances" | "promotion">("schedule");
 
@@ -112,7 +112,7 @@ function IncrementQueueListPage() {
   const [editIncBy, setEditIncBy] = useState("Gross");
   const [editCalBy, setEditCalBy] = useState("Fixed");
   const [editArrear, setEditArrear] = useState(false);
-  
+
   const [editIncrementVal, setEditIncrementVal] = useState("5000");
   const [editIncBasic, setEditIncBasic] = useState("3000");
   const [editIncGross, setEditIncGross] = useState("5000");
@@ -121,7 +121,7 @@ function IncrementQueueListPage() {
   const [editMedical, setEditMedical] = useState("600");
   const [editConveyance, setEditConveyance] = useState("500");
   const [editFood, setEditFood] = useState("400");
-  
+
   const [editPromType, setEditPromType] = useState("ALL");
   const [editPromJobTitle, setEditPromJobTitle] = useState("ALL");
   const [editNewGrade, setEditNewGrade] = useState("--Select--");
@@ -130,7 +130,7 @@ function IncrementQueueListPage() {
   const handleStartEdit = (row: QueueRecord) => {
     setEditingRecord(row);
     setModalActiveTab("schedule");
-    
+
     // Default preset setup
     setEditYear("2026");
     setEditMonth("May");
@@ -139,7 +139,7 @@ function IncrementQueueListPage() {
     setEditIncBy("Gross");
     setEditCalBy("Fixed");
     setEditArrear(false);
-    
+
     setEditIncrementVal("5000");
     setEditIncBasic(Math.round(5000 * 0.6).toString());
     setEditIncGross("5000");
@@ -148,7 +148,7 @@ function IncrementQueueListPage() {
     setEditMedical("500");
     setEditConveyance("500");
     setEditFood("500");
-    
+
     setEditPromType("ALL");
     setEditPromJobTitle("ALL");
     setEditNewGrade("--Select--");
@@ -161,7 +161,7 @@ function IncrementQueueListPage() {
     const incNum = parseFloat(editIncrementVal) || 0;
     const prevGross = editingRecord.prevGross || editingRecord.grossAfterInc || 30000;
     const prevBasic = prevGross * 0.6;
-    
+
     let computedGrossInc = 0;
     let computedBasicInc = 0;
 
@@ -201,7 +201,7 @@ function IncrementQueueListPage() {
     if (!editingRecord) return;
 
     const parsedGrossVal = parseFloat(editIncGross) || 0;
-    
+
     setQueueRecords(prev => prev.map(item => {
       if (item.sl === editingRecord.sl) {
         const currentGross = item.prevGross || item.grossAfterInc || 30000;
@@ -245,8 +245,8 @@ function IncrementQueueListPage() {
   }, [queueRecords]);
 
   const sectionsList = useMemo(() => {
-    const filteredDepts = department === "All Departments" 
-      ? queueRecords 
+    const filteredDepts = department === "All Departments"
+      ? queueRecords
       : queueRecords.filter(r => r.department === department);
     const sections = new Set(filteredDepts.map(r => r.section));
     return Array.from(sections).sort();
@@ -309,9 +309,9 @@ function IncrementQueueListPage() {
   };
 
   const toggleSelectEmp = (empId: string) => {
-    setSelectedEmpIds(prev => 
-      prev.includes(empId) 
-        ? prev.filter(item => item !== empId) 
+    setSelectedEmpIds(prev =>
+      prev.includes(empId)
+        ? prev.filter(item => item !== empId)
         : [...prev, empId]
     );
   };
@@ -340,7 +340,7 @@ function IncrementQueueListPage() {
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      list = list.filter(r => 
+      list = list.filter(r =>
         r.empId.toLowerCase().includes(q) ||
         r.empName.toLowerCase().includes(q) ||
         r.designation.toLowerCase().includes(q) ||
@@ -353,15 +353,15 @@ function IncrementQueueListPage() {
       list.sort((a, b) => {
         const valA = a[sortField];
         const valB = b[sortField];
-        
+
         if (valA === null) return 1;
         if (valB === null) return -1;
 
         if (typeof valA === "number" && typeof valB === "number") {
           return sortAsc ? valA - valB : valB - valA;
         }
-        return sortAsc 
-          ? String(valA).localeCompare(String(valB)) 
+        return sortAsc
+          ? String(valA).localeCompare(String(valB))
           : String(valB).localeCompare(String(valA));
       });
     }
@@ -372,7 +372,7 @@ function IncrementQueueListPage() {
   const totals = useMemo(() => {
     let totalPending = 0;
     let totalAdjustedVal = 0;
-    
+
     queueRecords.forEach(r => {
       if (r.lastIncAmount) {
         totalAdjustedVal += r.lastIncAmount;
@@ -427,9 +427,9 @@ function IncrementQueueListPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 lg:p-8 space-y-6 print:p-0">
-          
+
           {/* Breadcrumb and Page Header */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -443,7 +443,7 @@ function IncrementQueueListPage() {
                 <h1 className="text-xl font-extrabold tracking-tight text-foreground">Approvals Console</h1>
               </div>
             </div>
-            
+
             {/* Quick Metrics Bar */}
             <div className="flex items-center gap-3 flex-wrap">
               <div className="bg-card border border-border/70 rounded-xl px-3.5 py-1.5 shadow-2xs hover:shadow-xs transition duration-200">
@@ -462,7 +462,7 @@ function IncrementQueueListPage() {
           </div>
 
           {/* Console Tab Selector */}
-          <div className="bg-card rounded-2xl border border-border/80 p-1.5 shadow-2xs flex gap-1 print:hidden">
+          <div className="bg-card rounded-lg border border-border/80 p-1.5 shadow-2xs flex gap-1 print:hidden">
             <button
               onClick={() => setActiveConsoleTab("queue")}
               className={`flex-1 sm:flex-none h-10 px-6 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${activeConsoleTab === "queue" ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground hover:bg-muted/75 hover:text-foreground"}`}
@@ -500,11 +500,11 @@ function IncrementQueueListPage() {
           {/* Tab Rendering Router */}
           {activeConsoleTab === "queue" && (
             <div className="space-y-6">
-              
+
               {/* ⚡ SPONTANEOUS RESPONSIVE & SPACIOUS FILTER HUB */}
-              <div className="bg-card rounded-2xl border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300 print:hidden">
+              <div className="bg-card rounded-lg border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300 print:hidden">
                 <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-primary/10 via-primary/45 to-primary/10" />
-                
+
                 <form onSubmit={handleSearchSubmit} className="p-5 space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-1.5">
@@ -650,7 +650,7 @@ function IncrementQueueListPage() {
               </div>
 
               {/* Action Row & Main Datagrid Container */}
-              <div className="bg-card rounded-2xl border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300">
+              <div className="bg-card rounded-lg border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-5 border-b border-border/40 print:hidden">
                   <div className="flex items-center gap-2">
                     <button
@@ -747,7 +747,7 @@ function IncrementQueueListPage() {
 
           {/* TAB 2: HR ENDORSEMENTS */}
           {activeConsoleTab === "hr" && (
-            <div className="bg-card rounded-2xl border border-border/80 p-6 shadow-xs space-y-4 animate-in fade-in duration-200">
+            <div className="bg-card rounded-lg border border-border/80 p-6 shadow-xs space-y-4 animate-in fade-in duration-200">
               <h3 className="text-sm font-black uppercase tracking-wider text-foreground flex items-center gap-2">
                 <ClipboardCheck className="size-4.5 text-primary" />
                 <span>Pending Human Resource Signatures & Endorsements</span>
@@ -776,7 +776,7 @@ function IncrementQueueListPage() {
 
           {/* TAB 3: EXECUTIVE MD APPROVALS */}
           {activeConsoleTab === "md" && (
-            <div className="bg-card rounded-2xl border border-border/80 p-6 shadow-xs space-y-4 animate-in fade-in duration-200">
+            <div className="bg-card rounded-lg border border-border/80 p-6 shadow-xs space-y-4 animate-in fade-in duration-200">
               <h3 className="text-sm font-black uppercase tracking-wider text-foreground flex items-center gap-2">
                 <CheckCircle2 className="size-4.5 text-primary" />
                 <span>Executive authorizations (Managing Director Final Signoff)</span>
@@ -816,7 +816,7 @@ function IncrementQueueListPage() {
       {editingRecord && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#090d16]/80 backdrop-blur-md p-4 overflow-y-auto animate-in fade-in duration-200">
           <div className="bg-card w-full max-w-6xl rounded-3xl border border-border/80 shadow-2xl relative animate-in zoom-in-95 duration-200 text-foreground overflow-hidden my-4 flex flex-col max-h-[92vh]">
-            
+
             {/* Modal Header */}
             <div className="flex items-center justify-between p-5 border-b border-border/40 bg-muted/20 shrink-0">
               <div className="flex items-center gap-3">
@@ -832,8 +832,8 @@ function IncrementQueueListPage() {
                   </p>
                 </div>
               </div>
-              
-              <button 
+
+              <button
                 onClick={() => setEditingRecord(null)}
                 className="size-8.5 rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition border border-border/40 bg-card"
               >
@@ -843,14 +843,14 @@ function IncrementQueueListPage() {
 
             {/* Scrollable Split-Screen Inner Container */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
-              
+
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                
+
                 {/* LEFT PILLAR (40%): Employee profile dossier & live comparative card */}
                 <div className="lg:col-span-5 space-y-5">
-                  <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs relative overflow-hidden">
+                  <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs relative overflow-hidden">
                     <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-blue-500" />
-                    
+
                     <h3 className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-3.5 flex items-center gap-1.5">
                       <UserCog className="size-4" />
                       <span>Employee Baseline Profile</span>
@@ -878,9 +878,9 @@ function IncrementQueueListPage() {
                     </div>
                   </div>
 
-                  <div className="bg-card rounded-2xl border border-emerald-500/20 p-5 shadow-xs relative overflow-hidden bg-gradient-to-b from-card to-green-500/[0.01]">
+                  <div className="bg-card rounded-lg border border-emerald-500/20 p-5 shadow-xs relative overflow-hidden bg-gradient-to-b from-card to-green-500/[0.01]">
                     <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-green-500" />
-                    
+
                     <h3 className="text-[10px] font-black uppercase tracking-widest text-green-500 mb-3.5 flex items-center gap-1.5">
                       <TrendingUp className="size-4" />
                       <span>Ledger Impact Summary</span>
@@ -922,8 +922,8 @@ function IncrementQueueListPage() {
                 </div>
 
                 {/* RIGHT PILLAR (60%): Segmented Tab configurator console */}
-                <div className="lg:col-span-7 bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden flex flex-col min-h-[460px]">
-                  
+                <div className="lg:col-span-7 bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden flex flex-col min-h-[460px]">
+
                   {/* Tab Selector Bar */}
                   <div className="flex border-b border-border/40 bg-muted/30 shrink-0">
                     <button
@@ -934,7 +934,7 @@ function IncrementQueueListPage() {
                       <Calendar className="size-3.5" />
                       <span className="hidden sm:inline">1. Schedule</span>
                     </button>
-                    
+
                     <button
                       type="button"
                       onClick={() => setModalActiveTab("adjust")}
@@ -965,7 +965,7 @@ function IncrementQueueListPage() {
 
                   {/* Tab Panels content area */}
                   <div className="p-6 flex-1">
-                    
+
                     {/* TAB 1: SCHEDULE */}
                     {modalActiveTab === "schedule" && (
                       <div className="space-y-5 animate-in fade-in duration-200">
@@ -1105,7 +1105,7 @@ function IncrementQueueListPage() {
                         </div>
                         <div className="space-y-1.5">
                           <label className="text-[10px] font-bold text-muted-foreground uppercase">Remarks / Notes</label>
-                          <textarea value={editRemarks} onChange={(e) => setEditRemarks(e.target.value)} rows={4} className="w-full p-3.5 rounded-2xl bg-muted border border-border/40 text-xs font-semibold focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none" />
+                          <textarea value={editRemarks} onChange={(e) => setEditRemarks(e.target.value)} rows={4} className="w-full p-3.5 rounded-lg bg-muted border border-border/40 text-xs font-semibold focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none" />
                         </div>
                       </div>
                     )}

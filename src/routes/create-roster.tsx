@@ -215,7 +215,7 @@ function CreateRosterPage() {
 
         <div className="p-4 md:p-6 xl:p-8 space-y-6">
           {/* Breadcrumbs and Page Title */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -238,9 +238,9 @@ function CreateRosterPage() {
 
           {/* Configuration Grid Panel (Two main cards side by side) */}
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-            
+
             {/* Left Card: General Criteria Selection */}
-            <div className="xl:col-span-8 bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-6">
+            <div className="xl:col-span-8 bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-6">
               <div className="flex items-center justify-between border-b border-border/40 pb-3">
                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary">Roster Generation boundaries</span>
                 <span className="text-[9px] font-bold text-muted-foreground/50">Left Controls</span>
@@ -248,7 +248,7 @@ function CreateRosterPage() {
 
               {/* Roster Criteria Grid */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                
+
                 {/* Employee ID textarea */}
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-bold text-muted-foreground uppercase">Employee ID (Multiple)</label>
@@ -456,7 +456,7 @@ function CreateRosterPage() {
             </div>
 
             {/* Right Card: Day & Weekend Override Selector */}
-            <div className="xl:col-span-4 bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-6">
+            <div className="xl:col-span-4 bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-6">
               <div className="flex items-center justify-between border-b border-border/40 pb-3">
                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary">Day & Weekend Overrides</span>
                 <span className="text-[9px] font-bold text-muted-foreground/50">Right Controls</span>
@@ -531,7 +531,7 @@ function CreateRosterPage() {
           </div>
 
           {/* Bottom Table Card: Generated Scheduler Roster Calendar */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-5">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-5">
             <div className="flex items-center justify-between border-b border-border/30 pb-3">
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary">Roster Schedule Matrix</span>
               <span className="text-[9px] font-bold text-muted-foreground/60">Dynamic Live View (1-31)</span>
@@ -545,7 +545,7 @@ function CreateRosterPage() {
                     <th className="px-3 py-2.5 font-extrabold w-24 border-r border-border/30 text-center">Emp ID</th>
                     <th className="px-3 py-2.5 font-extrabold w-36 border-r border-border/30">Employee Name</th>
                     <th className="px-3 py-2.5 font-extrabold w-28 border-r border-border/30">Sub Dept</th>
-                    
+
                     {/* Render days 1 to 31 columns */}
                     {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
                       <th key={d} className="px-2 py-2.5 font-extrabold text-center w-8 border-r border-border/30">{d}</th>

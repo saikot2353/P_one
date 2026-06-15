@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
@@ -8,7 +8,7 @@ import {
   User, Gift, DollarSign, Camera, GraduationCap, History, Award, BookOpen, Users,
   PhoneCall, FileSignature, Heart, Baby, FileText, FileDown, ShieldCheck, Laptop,
   Check, MapPin, Briefcase, UserCog, Clock, FileClock, ArrowUpRight, UserPlus, TrendingUp,
-  ChevronRight, ArrowLeft
+  ChevronRight, ArrowLeft, CalendarRange, Info, Power, HelpCircle
 } from "lucide-react";
 
 export const Route = createFileRoute('/employee-detail/$id')({
@@ -17,8 +17,102 @@ export const Route = createFileRoute('/employee-detail/$id')({
 
 function EmployeeDetailPage() {
   const { id } = Route.useParams();
-  const selectedEmp = employeesData.find(e => e.id === id) || employeesData[0];
-  const incRecord = rawIncrementRecords.find(r => r.empId === selectedEmp.id);
+
+  const [employees, setEmployees] = useState<any[]>(() => {
+    if (typeof window !== "undefined") {
+      const synced = localStorage.getItem("recruitment_synced_employees");
+      if (synced) {
+        try {
+          const parsed = JSON.parse(synced);
+          if (parsed && parsed.length > 0) {
+            const merged = [...parsed];
+            employeesData.forEach(d => {
+              if (!merged.some(m => m.id === d.id)) {
+                merged.push(d);
+              }
+            });
+            return merged;
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+    return employeesData;
+  });
+
+  const selectedEmp = useMemo(() => {
+    return employees.find(e => e.id === id) || employees[0];
+  }, [id, employees]);
+
+  const incRecord = useMemo(() => {
+    return rawIncrementRecords.find(r => r.empId === selectedEmp.id);
+  }, [selectedEmp.id]);
+
+  const careerTimeline = useMemo(() => {
+    const timeline: any[] = [];
+
+    timeline.push({
+      id: selectedEmp.id,
+      title: selectedEmp.title,
+      dept: selectedEmp.dept,
+      status: selectedEmp.status || "Working",
+      joinDate: selectedEmp.joinDate,
+      resignDate: selectedEmp.resignDate || "Active",
+      isCurrent: true
+    });
+
+    let refId = selectedEmp.rejoinRef;
+    let visited = new Set<string>([selectedEmp.id]);
+    while (refId) {
+      if (visited.has(refId)) break;
+      visited.add(refId);
+
+      const prevEmp = employees.find(e => e.id === refId);
+      if (prevEmp) {
+        timeline.push({
+          id: prevEmp.id,
+          title: prevEmp.title,
+          dept: prevEmp.dept,
+          status: prevEmp.status || "Resigned",
+          joinDate: prevEmp.joinDate,
+          resignDate: prevEmp.resignDate || "—",
+          isCurrent: false
+        });
+        refId = prevEmp.rejoinRef;
+      } else {
+        timeline.push({
+          id: refId,
+          title: "Previous Position",
+          dept: selectedEmp.dept,
+          status: "Resigned",
+          joinDate: "—",
+          resignDate: selectedEmp.joinDate,
+          isCurrent: false
+        });
+        break;
+      }
+    }
+
+    let forwardEmp = employees.find(e => e.rejoinRef === selectedEmp.id);
+    while (forwardEmp) {
+      if (visited.has(forwardEmp.id)) break;
+      visited.add(forwardEmp.id);
+
+      timeline.unshift({
+        id: forwardEmp.id,
+        title: forwardEmp.title,
+        dept: forwardEmp.dept,
+        status: forwardEmp.status || "Working",
+        joinDate: forwardEmp.joinDate,
+        resignDate: forwardEmp.resignDate || "Active",
+        isCurrent: false
+      });
+      forwardEmp = employees.find(e => e.rejoinRef === forwardEmp.id);
+    }
+
+    return timeline;
+  }, [selectedEmp, employees]);
 
   const TABS = [
     { id: "personal", label: "Personal & Identity", icon: User },
@@ -62,7 +156,7 @@ function EmployeeDetailPage() {
         <div className="p-4 md:p-6 xl:p-8 space-y-6 overflow-y-auto h-full scrollbar-thin pb-24">
 
           {/* Top Breadcrumb & Actions */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
                 <Link to="/personnel-list" className="hover:text-primary transition-colors flex items-center gap-1">
@@ -98,8 +192,41 @@ function EmployeeDetailPage() {
             </div>
           </div>
 
+          {/* Rejoined Employee Banner Notification */}
+          {(selectedEmp.rejoinRef || selectedEmp.rejoinedTo || careerTimeline.length > 1) && (
+            <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-lg p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm animate-in fade-in duration-200">
+              <div className="flex items-center gap-3">
+                <div className="size-10 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center">
+                  <CalendarRange className="size-5 shrink-0" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-indigo-600 dark:text-indigo-400">Rejoined Employee Dossier Link</div>
+                  <div className="text-[11px] text-muted-foreground mt-0.5">
+                    This profile is connected to multiple career periods. Viewing: <span className="font-semibold text-foreground font-mono">ID: {selectedEmp.id}</span> ({selectedEmp.joinDate} to {selectedEmp.status === "Working" ? "Present" : selectedEmp.resignDate || "—"}).
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                {careerTimeline.map((period, idx) => (
+                  <Link
+                    key={period.id}
+                    to="/employee-detail/$id"
+                    params={{ id: period.id }}
+                    className={`text-[10px] px-2.5 py-1 rounded-lg border transition duration-150 ${period.id === selectedEmp.id
+                        ? "bg-indigo-500 border-indigo-500 text-white font-medium"
+                        : "bg-card border-border/80 hover:bg-muted text-foreground"
+                      }`}
+                  >
+                    Period {careerTimeline.length - idx}: {period.id}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* TABS NAVIGATION */}
-          <div className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden">
+          <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
             <div className="flex overflow-x-auto scrollbar-none border-b border-border/40 p-1.5 gap-1 bg-muted/10">
               {TABS.map(tab => {
                 const TabIcon = tab.icon;
@@ -166,6 +293,57 @@ function EmployeeDetailPage() {
                       <div className="space-y-0.5"><div className="text-[9px] font-bold text-muted-foreground uppercase">RC Notes</div><div className="text-xs font-bold truncate">Hired via Campus Drive</div></div>
                     </div>
                   </div>
+
+                  {/* Re-employment & Career Timeline History */}
+                  {careerTimeline.length > 1 && (
+                    <div className="space-y-3 pt-2">
+                      <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-500 border-b border-border/20 pb-1.5">Re-employment & Connected Career Timeline</h4>
+                      <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-4">
+                        <div className="relative border-l-2 border-indigo-500/30 ml-4 pl-6 space-y-4 text-xs">
+                          {careerTimeline.map((period, idx) => (
+                            <div key={period.id} className="relative">
+                              {/* Timeline indicator circle */}
+                              <div className={`absolute -left-[31px] top-0.5 size-4.5 rounded-full border-2 flex items-center justify-center ${period.id === selectedEmp.id
+                                  ? "bg-indigo-500 border-indigo-500 text-white animate-pulse"
+                                  : "bg-card border-indigo-500/30 text-indigo-500"
+                                }`}>
+                                <span className="text-[8px] leading-none font-medium">{careerTimeline.length - idx}</span>
+                              </div>
+
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium text-foreground">ID: {period.id}</span>
+                                    {period.id === selectedEmp.id && (
+                                      <span className="text-[8px] bg-indigo-500/15 text-indigo-600 border border-indigo-500/35 px-1 rounded-sm uppercase tracking-wide leading-none font-medium">Currently Viewing</span>
+                                    )}
+                                    <span className={`text-[8px] px-1 rounded-sm uppercase tracking-wide leading-none font-medium ${period.status === "Working" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" : "bg-amber-500/10 text-amber-500 border border-amber-500/20"
+                                      }`}>
+                                      {period.status}
+                                    </span>
+                                  </div>
+                                  <p className="text-[10px] text-muted-foreground mt-0.5">{period.title} — {period.dept}</p>
+                                </div>
+                                <div className="sm:text-right">
+                                  <div className="text-[10px] text-muted-foreground font-mono">Joined: {period.joinDate}</div>
+                                  <div className="text-[10px] text-muted-foreground font-mono">Left: {period.resignDate}</div>
+                                </div>
+                                {period.id !== selectedEmp.id && (
+                                  <Link
+                                    to="/employee-detail/$id"
+                                    params={{ id: period.id }}
+                                    className="text-[10px] text-indigo-500 hover:text-indigo-600 font-medium hover:underline transition self-start sm:self-center"
+                                  >
+                                    Switch Profile &rarr;
+                                  </Link>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* 3. Legal Identification Credentials */}
                   <div className="space-y-3 pt-2">
@@ -276,7 +454,7 @@ function EmployeeDetailPage() {
                         <span className="text-[9px] font-black text-emerald-500 uppercase flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded-full"><Check className="size-3" /> Uploaded</span>
                       </div>
                       <div className="border border-border/50 bg-card rounded-xl p-4 flex flex-col items-center text-center gap-3 shadow-xs">
-                        <div className="size-12 rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center"><FileText className="size-6" /></div>
+                        <div className="size-12 rounded-lg bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center"><FileText className="size-6" /></div>
                         <div>
                           <div className="text-[10px] font-bold">National ID Card</div>
                           <div className="text-[8px] text-muted-foreground">Both sides JPG/PDF</div>
@@ -452,7 +630,7 @@ function EmployeeDetailPage() {
               {activeTab === "qualification" && (
                 <div className="space-y-8 animate-in fade-in duration-300">
                   {/* Category 1: Academic Portfolio */}
-                  <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-2xl p-5 space-y-6">
+                  <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-lg p-5 space-y-6">
                     <div className="flex items-center gap-2.5 border-b border-indigo-500/20 pb-3">
                       <div className="size-8 rounded-full bg-indigo-500/15 text-indigo-500 flex items-center justify-center"><GraduationCap className="size-4.5" /></div>
                       <div>
@@ -499,7 +677,7 @@ function EmployeeDetailPage() {
                   </div>
 
                   {/* Category 2: Career History & Tracks */}
-                  <div className="bg-primary/5 border border-primary/10 rounded-2xl p-5 space-y-6">
+                  <div className="bg-primary/5 border border-primary/10 rounded-lg p-5 space-y-6">
                     <div className="flex items-center gap-2.5 border-b border-primary/20 pb-3">
                       <div className="size-8 rounded-full bg-primary/15 text-primary flex items-center justify-center"><Briefcase className="size-4.5" /></div>
                       <div>
@@ -546,7 +724,7 @@ function EmployeeDetailPage() {
                   </div>
 
                   {/* Category 3: Special Involvements */}
-                  <div className="bg-amber-500/5 border border-amber-500/10 rounded-2xl p-5 space-y-6">
+                  <div className="bg-amber-500/5 border border-amber-500/10 rounded-lg p-5 space-y-6">
                     <div className="flex items-center gap-2.5 border-b border-amber-500/20 pb-3">
                       <div className="size-8 rounded-full bg-amber-500/15 text-amber-600 flex items-center justify-center"><Users className="size-4.5" /></div>
                       <div>
@@ -678,6 +856,40 @@ function EmployeeDetailPage() {
                       </tbody>
                     </table>
                   </div>
+
+                  {/* Connected Documents from Previous Employment Periods */}
+                  {careerTimeline.length > 1 && (
+                    <div className="space-y-3 pt-2">
+                      <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-500 border-b border-border/20 pb-1.5">Connected Documents from Previous Employment Periods</h4>
+                      <div className="border border-border/40 rounded-lg overflow-hidden bg-card divide-y divide-border/20">
+                        {careerTimeline
+                          .filter(period => period.id !== selectedEmp.id)
+                          .map(period => (
+                            <div key={period.id} className="p-3 text-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 hover:bg-muted/5 transition">
+                              <div className="flex items-center gap-2.5">
+                                <div className="size-8 rounded-lg bg-indigo-500/10 text-indigo-500 flex items-center justify-center">
+                                  <FileClock className="size-4 shrink-0" />
+                                </div>
+                                <div>
+                                  <div className="font-medium text-foreground">Archive Dossier for ID: {period.id}</div>
+                                  <div className="text-[9px] text-muted-foreground uppercase font-mono mt-0.5">Joined: {period.joinDate} | Left: {period.resignDate}</div>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2 self-end sm:self-center">
+                                <span className="text-[9px] bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-1.5 py-0.5 rounded-sm uppercase tracking-wide leading-none font-medium">3 Files Attached</span>
+                                <Link
+                                  to="/employee-detail/$id"
+                                  params={{ id: period.id }}
+                                  className="text-[10px] text-indigo-500 hover:text-indigo-600 font-medium hover:underline flex items-center gap-1"
+                                >
+                                  Open Dossier &rarr;
+                                </Link>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Visual Scans Recap */}
                   <div className="space-y-3 pt-2">

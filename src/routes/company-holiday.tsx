@@ -158,9 +158,9 @@ function CompanyHolidayPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 xl:p-8 space-y-6">
-          
+
           {/* Breadcrumbs and Title Card */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -174,7 +174,7 @@ function CompanyHolidayPage() {
                 <span>Company Holiday</span>
               </h1>
             </div>
-            
+
             <button
               onClick={() => setIsModalOpen(true)}
               className="h-9 px-5 bg-primary hover:bg-primary-glow text-primary-foreground font-semibold text-xs rounded-lg shadow-sm flex items-center gap-2 transition uppercase tracking-wider"
@@ -192,7 +192,7 @@ function CompanyHolidayPage() {
               { label: "GOVERNMENT HOLIDAYS", val: `${stats.govtCount} Events`, desc: "Gazetted public holidays", color: "text-amber-500 bg-amber-500/5 border-amber-500/10" },
               { label: "COMPANY SPECIFIC", val: `${stats.companyCount} Events`, desc: "Internal office breaks", color: "text-blue-500 bg-blue-500/5 border-blue-500/10" }
             ].map((st, idx) => (
-              <div key={idx} className={`p-4 rounded-2xl border bg-card ${st.color} shadow-xs space-y-1 transition duration-200 hover:scale-[1.01]`}>
+              <div key={idx} className={`p-4 rounded-lg border bg-card ${st.color} shadow-xs space-y-1 transition duration-200 hover:scale-[1.01]`}>
                 <span className="text-[9px] font-black tracking-wider uppercase opacity-75">{st.label}</span>
                 <div className="text-xl font-black">{st.val}</div>
                 <div className="text-[10px] opacity-60 font-semibold">{st.desc}</div>
@@ -201,7 +201,7 @@ function CompanyHolidayPage() {
           </div>
 
           {/* Filtering Card */}
-          <div className="bg-card rounded-2xl border border-border/85 p-5 shadow-xs space-y-4 print:hidden">
+          <div className="bg-card rounded-lg border border-border/85 p-5 shadow-xs space-y-4 print:hidden">
             <div className="flex items-center justify-between border-b border-border/40 pb-3">
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary">Filter Controls</span>
               <span className="text-[9px] font-bold text-muted-foreground/50">Search Registry</span>
@@ -255,8 +255,8 @@ function CompanyHolidayPage() {
           </div>
 
           {/* Holiday Spreadsheet Registry Card */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
-            
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
+
             {/* Utilities Toolbar */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/30 pb-4 print:hidden">
               <div className="flex items-center gap-1.5 select-none">
@@ -355,7 +355,7 @@ function CompanyHolidayPage() {
       {/* Add Holiday Animated Modal Dialog */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-md rounded-2xl border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200">
+          <div className="bg-card w-full max-w-md rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200">
             <button
               onClick={() => setIsModalOpen(false)}
               className="absolute right-4 top-4 p-1 text-muted-foreground/60 hover:text-foreground hover:bg-muted rounded-lg transition"

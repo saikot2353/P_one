@@ -61,7 +61,7 @@ const mockRecords: ProposeRecord[] = [
 
 function EvaluationProposePage() {
   const router = useRouter();
-  
+
   // Filter States
   const [year, setYear] = useState("2026");
   const [month, setMonth] = useState("Jan");
@@ -116,8 +116,8 @@ function EvaluationProposePage() {
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
         const matchText = row.name.toLowerCase().includes(query) ||
-                          row.empId.toLowerCase().includes(query) ||
-                          row.designation.toLowerCase().includes(query);
+          row.empId.toLowerCase().includes(query) ||
+          row.designation.toLowerCase().includes(query);
         if (!matchText) return false;
       }
       return true;
@@ -158,9 +158,9 @@ function EvaluationProposePage() {
         <Topbar />
 
         <div className="p-4 md:p-6 lg:p-8 space-y-6">
-          
+
           {/* Header Dashboard Card */}
-          <div className="bg-card rounded-2xl border border-border/85 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-lg border border-border/85 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -177,11 +177,11 @@ function EvaluationProposePage() {
           </div>
 
           {/* PARAMETRIC FILTERS ROW */}
-          <form onSubmit={handleSearchSubmit} className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
+          <form onSubmit={handleSearchSubmit} className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-muted-foreground uppercase">Year</label>
-                <select 
+                <select
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
                   className="w-full h-9 px-3 rounded-xl bg-muted border border-border/40 text-xs font-semibold text-foreground"
@@ -194,7 +194,7 @@ function EvaluationProposePage() {
 
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-muted-foreground uppercase">Month</label>
-                <select 
+                <select
                   value={month}
                   onChange={(e) => setMonth(e.target.value)}
                   className="w-full h-9 px-3 rounded-xl bg-muted border border-border/40 text-xs font-semibold text-foreground"
@@ -207,7 +207,7 @@ function EvaluationProposePage() {
 
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-muted-foreground uppercase">Employee Type</label>
-                <select 
+                <select
                   value={empType}
                   onChange={(e) => setEmpType(e.target.value)}
                   className="w-full h-9 px-3 rounded-xl bg-muted border border-border/40 text-xs font-semibold text-foreground"
@@ -221,7 +221,7 @@ function EvaluationProposePage() {
 
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-muted-foreground uppercase">Department</label>
-                <select 
+                <select
                   value={department}
                   onChange={(e) => setDepartment(e.target.value)}
                   className="w-full h-9 px-3 rounded-xl bg-muted border border-border/40 text-xs font-semibold text-foreground"
@@ -236,7 +236,7 @@ function EvaluationProposePage() {
 
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-muted-foreground uppercase">Section</label>
-                <select 
+                <select
                   value={section}
                   onChange={(e) => setSection(e.target.value)}
                   className="w-full h-9 px-3 rounded-xl bg-muted border border-border/40 text-xs font-semibold text-foreground"
@@ -258,7 +258,7 @@ function EvaluationProposePage() {
                   <span>Employee Id (Comma Separator)</span>
                   <span className="text-primary-glow font-semibold lowercase italic">use comma as separator</span>
                 </label>
-                <input 
+                <input
                   type="text"
                   value={empIdInput}
                   onChange={(e) => setEmpIdInput(e.target.value)}
@@ -267,7 +267,7 @@ function EvaluationProposePage() {
                 />
               </div>
 
-              <button 
+              <button
                 type="submit"
                 className="h-9.5 px-8 bg-primary hover:opacity-95 text-primary-foreground font-black text-xs rounded-xl shadow-xs transition uppercase tracking-wider flex items-center justify-center gap-1.5 self-end"
               >
@@ -278,8 +278,8 @@ function EvaluationProposePage() {
           </form>
 
           {/* DATAGRID GRID PANEL */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
-            
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
+
             {/* Table Export Actions Bar */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-3 border-b border-border/20">
               <div className="flex items-center gap-2">
@@ -299,7 +299,7 @@ function EvaluationProposePage() {
 
               <div className="flex items-center gap-2">
                 <span className="text-[11px] font-bold text-muted-foreground uppercase whitespace-nowrap">Search:</span>
-                <input 
+                <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -315,7 +315,7 @@ function EvaluationProposePage() {
                 <thead>
                   <tr className="text-[9.5px] uppercase font-bold tracking-wider text-muted-foreground/60 border-b border-border/30 bg-muted/20">
                     <th className="px-3 py-3 text-center">
-                      <input 
+                      <input
                         type="checkbox"
                         checked={filteredRecords.length > 0 && selectedIds.length === filteredRecords.length}
                         onChange={handleToggleSelectAll}
@@ -346,12 +346,12 @@ function EvaluationProposePage() {
                   {filteredRecords.map((row) => {
                     const isChecked = selectedIds.includes(row.empId);
                     return (
-                      <tr 
-                        key={row.empId} 
+                      <tr
+                        key={row.empId}
                         className={`hover:bg-muted/40 transition duration-150 ${isChecked ? "bg-primary/5 border-l border-primary" : ""}`}
                       >
                         <td className="px-3 py-3 text-center">
-                          <input 
+                          <input
                             type="checkbox"
                             checked={isChecked}
                             onChange={() => handleToggleSelectRow(row.empId)}
@@ -408,7 +408,7 @@ function EvaluationProposePage() {
               </span>
 
               <div className="flex items-center gap-3">
-                <button 
+                <button
                   onClick={handleSubmitAppraisal}
                   className="h-10 px-8 bg-primary hover:opacity-95 text-primary-foreground font-black text-xs rounded-xl shadow-xs transition uppercase tracking-wider flex items-center gap-1.5"
                 >

@@ -4,7 +4,7 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
   ClipboardCheck, ChevronRight, BarChart3, Lock, Unlock, CheckCircle2, ChevronDown, Search, Check,
-  Building, User, TrendingUp, Printer, RefreshCw, Star, AlertCircle
+  Building, User, TrendingUp, Printer, RefreshCw, Star, AlertCircle, X
 } from "lucide-react";
 
 export const Route = createFileRoute("/kpi-assessment-workflow")({
@@ -95,11 +95,10 @@ function SearchableSelect({ options, value, onChange, placeholder = "Select opti
                       onChange(option.value);
                       setIsOpen(false);
                     }}
-                    className={`w-full px-3 py-2 text-left rounded-lg transition duration-100 flex items-center justify-between font-bold ${
-                      isSelected
+                    className={`w-full px-3 py-2 text-left rounded-lg transition duration-100 flex items-center justify-between font-bold ${isSelected
                         ? "bg-[#1e88e5]/10 text-[#1e88e5]"
                         : "text-foreground/80 hover:bg-muted/80 hover:text-foreground"
-                    }`}
+                      }`}
                   >
                     <span className="truncate">{option.label}</span>
                     {isSelected && <Check className="size-3 text-[#1e88e5]" />}
@@ -287,9 +286,9 @@ function KpiAssessmentWorkflowPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 xl:p-8 space-y-6">
-          
+
           {/* Title Header Section */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -313,7 +312,7 @@ function KpiAssessmentWorkflowPage() {
                 <RefreshCw className="size-3.5" />
                 <span>Reset Workflow</span>
               </button>
-              
+
               <button
                 onClick={() => setIsHistoryOpen(true)}
                 className="h-9 px-5 bg-[#1e88e5] hover:bg-[#1565c0] text-white font-extrabold text-xs rounded-lg shadow-sm flex items-center gap-2 transition uppercase tracking-wider"
@@ -325,7 +324,7 @@ function KpiAssessmentWorkflowPage() {
           </div>
 
           {/* Search Selection Card for Appraisal Employee */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs grid grid-cols-1 md:grid-cols-3 gap-5 items-center print:hidden">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs grid grid-cols-1 md:grid-cols-3 gap-5 items-center print:hidden">
             <div className="space-y-1">
               <span className="text-[10px] font-bold text-muted-foreground uppercase block">Appraisal Target Employee</span>
               <SearchableSelect
@@ -334,7 +333,7 @@ function KpiAssessmentWorkflowPage() {
                 onChange={setSelectedEmpId}
               />
             </div>
-            
+
             <div className="flex items-center gap-3 bg-muted/30 px-4 py-2.5 rounded-xl border border-border/40">
               <User className="size-5 text-primary" />
               <div>
@@ -353,7 +352,7 @@ function KpiAssessmentWorkflowPage() {
           </div>
 
           {/* Workflow Stepper Status Banner */}
-          <div className="bg-card rounded-2xl border border-border/80 p-6 shadow-xs print:hidden space-y-4">
+          <div className="bg-card rounded-lg border border-border/80 p-6 shadow-xs print:hidden space-y-4">
             <div className="flex items-center justify-between border-b border-border/30 pb-3">
               <span className="text-[10px] font-black text-primary uppercase tracking-widest flex items-center gap-1.5">
                 <Star className="size-4 animate-spin text-[#1e88e5]" />
@@ -380,22 +379,20 @@ function KpiAssessmentWorkflowPage() {
                 return (
                   <div
                     key={item.step}
-                    className={`p-3.5 rounded-xl border transition-all duration-150 flex items-start gap-3 ${
-                      isActive
+                    className={`p-3.5 rounded-xl border transition-all duration-150 flex items-start gap-3 ${isActive
                         ? "bg-[#1e88e5]/5 border-[#1e88e5] shadow-xs relative"
                         : isCompleted
-                        ? "bg-emerald-500/5 border-emerald-500/20"
-                        : "bg-slate-100/50 dark:bg-slate-900/30 border-border/40 opacity-60"
-                    }`}
+                          ? "bg-emerald-500/5 border-emerald-500/20"
+                          : "bg-slate-100/50 dark:bg-slate-900/30 border-border/40 opacity-60"
+                      }`}
                   >
                     {/* Step Marker Badge */}
-                    <div className={`size-8 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${
-                      isCompleted
+                    <div className={`size-8 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${isCompleted
                         ? "bg-emerald-500 text-white"
                         : isActive
-                        ? "bg-[#1e88e5] text-white"
-                        : "bg-muted text-muted-foreground"
-                    }`}>
+                          ? "bg-[#1e88e5] text-white"
+                          : "bg-muted text-muted-foreground"
+                      }`}>
                       {isCompleted ? <CheckCircle2 className="size-5" /> : item.step}
                     </div>
 
@@ -423,7 +420,7 @@ function KpiAssessmentWorkflowPage() {
           <div className="space-y-6">
 
             {/* STAGE 1: HOD Appraisal (Editable at Step 1, locked otherwise) */}
-            <div className={`bg-card rounded-2xl border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300 ${activeStep !== 1 ? "opacity-75" : "border-[#1e88e5]/40 shadow-[#1e88e5]/5"}`}>
+            <div className={`bg-card rounded-lg border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300 ${activeStep !== 1 ? "opacity-75" : "border-[#1e88e5]/40 shadow-[#1e88e5]/5"}`}>
               {/* Locked overlay banner for stage 1 */}
               {activeStep > 1 && (
                 <div className="absolute top-0 right-0 bg-emerald-500 text-white font-extrabold text-[9px] px-3.5 py-1 uppercase tracking-wider rounded-bl-xl flex items-center gap-1.5 z-10">
@@ -508,7 +505,7 @@ function KpiAssessmentWorkflowPage() {
 
                   <div className="border-t border-border/30 pt-4 space-y-4">
                     <span className="text-[11px] font-black text-[#1e88e5] uppercase tracking-wider block">Recommendation By Reporting HOD</span>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-semibold">
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-bold text-muted-foreground uppercase">HOD Recommendation *</label>
@@ -573,7 +570,7 @@ function KpiAssessmentWorkflowPage() {
             </div>
 
             {/* STAGE 2: HR Review (Locked unless activeStep === 2) */}
-            <div className={`bg-card rounded-2xl border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300 ${activeStep !== 2 ? "opacity-70 bg-slate-50/10" : "border-[#1e88e5]/40 shadow-[#1e88e5]/5"}`}>
+            <div className={`bg-card rounded-lg border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300 ${activeStep !== 2 ? "opacity-70 bg-slate-50/10" : "border-[#1e88e5]/40 shadow-[#1e88e5]/5"}`}>
               {/* Lock Shield */}
               {activeStep < 2 && (
                 <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px] z-20 flex flex-col items-center justify-center gap-2 select-none">
@@ -650,7 +647,7 @@ function KpiAssessmentWorkflowPage() {
             </div>
 
             {/* STAGE 3: Plant Head Review (Locked unless activeStep === 3) */}
-            <div className={`bg-card rounded-2xl border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300 ${activeStep !== 3 ? "opacity-70 bg-slate-50/10" : "border-[#1e88e5]/40 shadow-[#1e88e5]/5"}`}>
+            <div className={`bg-card rounded-lg border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300 ${activeStep !== 3 ? "opacity-70 bg-slate-50/10" : "border-[#1e88e5]/40 shadow-[#1e88e5]/5"}`}>
               {/* Lock Shield */}
               {activeStep < 3 && (
                 <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px] z-20 flex flex-col items-center justify-center gap-2 select-none">
@@ -718,7 +715,7 @@ function KpiAssessmentWorkflowPage() {
             </div>
 
             {/* STAGE 4: Managing Director Review (Locked unless activeStep === 4) */}
-            <div className={`bg-card rounded-2xl border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300 ${activeStep !== 4 ? "opacity-70 bg-slate-50/10" : "border-[#1e88e5]/40 shadow-[#1e88e5]/5"}`}>
+            <div className={`bg-card rounded-lg border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300 ${activeStep !== 4 ? "opacity-70 bg-slate-50/10" : "border-[#1e88e5]/40 shadow-[#1e88e5]/5"}`}>
               {/* Lock Shield */}
               {activeStep < 4 && (
                 <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px] z-20 flex flex-col items-center justify-center gap-2 select-none">
@@ -786,7 +783,7 @@ function KpiAssessmentWorkflowPage() {
             </div>
 
             {/* STAGE 5: Final Evaluation & Appraisal Completion (Locked unless activeStep === 5) */}
-            <div className={`bg-card rounded-2xl border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300 ${activeStep !== 5 ? "opacity-70 bg-slate-50/10" : "border-[#1e88e5]/40 shadow-[#1e88e5]/5"}`}>
+            <div className={`bg-card rounded-lg border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300 ${activeStep !== 5 ? "opacity-70 bg-slate-50/10" : "border-[#1e88e5]/40 shadow-[#1e88e5]/5"}`}>
               {/* Lock Shield */}
               {activeStep < 5 && (
                 <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px] z-20 flex flex-col items-center justify-center gap-2 select-none">
@@ -812,7 +809,7 @@ function KpiAssessmentWorkflowPage() {
               <div className="p-5">
                 <form onSubmit={handleCompleteFinal} className="space-y-5 text-xs font-semibold">
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 items-end">
-                    
+
                     {/* Existing Gross */}
                     <div className="space-y-1.5">
                       <label className="text-[10.5px] font-bold text-muted-foreground uppercase">Existing Gross</label>
@@ -937,7 +934,7 @@ function KpiAssessmentWorkflowPage() {
       {/* Increment History Dialog Pop-up */}
       {isHistoryOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-lg rounded-2xl border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
+          <div className="bg-card w-full max-w-lg rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
             <button
               onClick={() => setIsHistoryOpen(false)}
               className="absolute right-4 top-4 p-1 text-muted-foreground/60 hover:text-foreground hover:bg-muted rounded-lg transition"
@@ -964,7 +961,7 @@ function KpiAssessmentWorkflowPage() {
 
               {/* History Timeline */}
               <div className="relative border-l border-border pl-6 space-y-5 ml-3 font-semibold">
-                
+
                 {/* Year 2025 */}
                 <div className="relative">
                   <div className="absolute -left-8.5 top-0.5 size-5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 grid place-items-center">

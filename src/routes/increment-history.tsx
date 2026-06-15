@@ -4,7 +4,7 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { rawIncrementRecords, RawIncrementRecord } from "./increment-history-data";
 import {
-  Search, FileSpreadsheet, Printer, FileDown, Plus, Info, 
+  Search, FileSpreadsheet, Printer, FileDown, Plus, Info,
   Sparkles, X, Eye, ArrowUpDown, Filter, ChevronDown, ChevronRight, Check,
   LayoutGrid, SlidersHorizontal, EyeOff, FileText, FileClock,
   TrendingUp, DollarSign, UserCog
@@ -99,8 +99,8 @@ function IncrementHistoryPage() {
   }, []);
 
   const sectionsList = useMemo(() => {
-    const filteredDepts = department === "All Departments" 
-      ? rawIncrementRecords 
+    const filteredDepts = department === "All Departments"
+      ? rawIncrementRecords
       : rawIncrementRecords.filter(r => r.department === department);
     const sections = new Set(filteredDepts.map(r => r.section));
     return Array.from(sections).sort();
@@ -145,9 +145,9 @@ function IncrementHistoryPage() {
   };
 
   const toggleSelectEmp = (empId: string) => {
-    setSelectedEmpIds(prev => 
-      prev.includes(empId) 
-        ? prev.filter(item => item !== empId) 
+    setSelectedEmpIds(prev =>
+      prev.includes(empId)
+        ? prev.filter(item => item !== empId)
         : [...prev, empId]
     );
   };
@@ -189,7 +189,7 @@ function IncrementHistoryPage() {
     // 3. Text Search (Matches ID, Name, Designation, Section)
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      list = list.filter(r => 
+      list = list.filter(r =>
         r.empId.toLowerCase().includes(q) ||
         r.empName.toLowerCase().includes(q) ||
         r.designation.toLowerCase().includes(q) ||
@@ -203,12 +203,12 @@ function IncrementHistoryPage() {
       list.sort((a, b) => {
         const valA = a[sortField];
         const valB = b[sortField];
-        
+
         if (typeof valA === "number" && typeof valB === "number") {
           return sortAsc ? valA - valB : valB - valA;
         }
-        return sortAsc 
-          ? String(valA).localeCompare(String(valB)) 
+        return sortAsc
+          ? String(valA).localeCompare(String(valB))
           : String(valB).localeCompare(String(valA));
       });
     }
@@ -230,7 +230,7 @@ function IncrementHistoryPage() {
     if (!val || val === "0" || val === "0.00") {
       return <span className="text-muted-foreground/35 dark:text-slate-700 font-mono text-[10.5px]">—</span>;
     }
-    
+
     // Check for Promotion indicator "(P)"
     const pMatch = val.match(/^(\d+)\(P\)$/);
     if (pMatch) {
@@ -255,7 +255,7 @@ function IncrementHistoryPage() {
     if (!val || val === "0(0)") {
       return <span className="text-muted-foreground/30 dark:text-slate-700 font-mono text-[10.5px]">0</span>;
     }
-    
+
     // Match structure e.g. "37000(1)" or "6000(0)"
     const match = val.match(/^(\d+)\((\d+)\)$/);
     if (match) {
@@ -291,9 +291,9 @@ function IncrementHistoryPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 lg:p-8 space-y-6 print:p-0">
-          
+
           {/* Breadcrumb and Page Header */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -307,7 +307,7 @@ function IncrementHistoryPage() {
                 <h1 className="text-xl font-extrabold tracking-tight text-foreground">Increment HistoryList</h1>
               </div>
             </div>
-            
+
             {/* Quick Metrics Bar (replicated from personnel list) */}
             <div className="flex items-center gap-3 flex-wrap">
               <div className="bg-card border border-border/70 rounded-xl px-3.5 py-1.5 shadow-2xs hover:shadow-xs transition duration-200">
@@ -320,9 +320,9 @@ function IncrementHistoryPage() {
               </div>
               <div className="bg-card border border-border/70 rounded-xl px-3.5 py-1.5 shadow-2xs">
                 <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80">Total Gross Budget</div>
-                <div className="text-sm font-extrabold text-foreground mt-0.5">৳{(totalGrossPayroll/100000).toFixed(1)}L</div>
+                <div className="text-sm font-extrabold text-foreground mt-0.5">৳{(totalGrossPayroll / 100000).toFixed(1)}L</div>
               </div>
-              <Link 
+              <Link
                 to="/propose-increment"
                 className="h-9.5 px-4 rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs font-semibold shadow-xs hover:shadow-sm hover:opacity-95 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-1.5"
               >
@@ -332,7 +332,7 @@ function IncrementHistoryPage() {
           </div>
 
           {/* Tab Selector Hub */}
-          <div className="bg-card rounded-2xl border border-border/80 p-1.5 shadow-2xs flex gap-1 print:hidden">
+          <div className="bg-card rounded-lg border border-border/80 p-1.5 shadow-2xs flex gap-1 print:hidden">
             <button
               onClick={() => setActiveReportsTab("history")}
               className={`flex-1 sm:flex-none h-10 px-6 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${activeReportsTab === "history" ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground hover:bg-muted/75 hover:text-foreground"}`}
@@ -358,468 +358,468 @@ function IncrementHistoryPage() {
 
           {activeReportsTab === "history" && (
             <>
-              <div className="bg-card rounded-2xl border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300 print:hidden">
-            <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-primary/10 via-primary/45 to-primary/10" />
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border/40">
-              <button 
-                onClick={() => setIsFilterCollapsed(!isFilterCollapsed)}
-                className="flex items-center gap-2 text-xs font-bold text-foreground/90 hover:text-primary transition-colors"
-              >
-                <SlidersHorizontal className="size-4 text-primary" />
-                <span>Search Parameters & Filters</span>
-                <ChevronDown className={`size-3.5 text-muted-foreground/60 transition-transform duration-300 ${isFilterCollapsed ? "-rotate-90" : ""}`} />
-              </button>
-              {(!isFilterCollapsed && (department !== "All Departments" || section !== "ALL" || empType !== "ALL")) && (
-                <button 
-                  onClick={resetFilters}
-                  className="text-[10px] font-bold text-destructive hover:underline"
-                >
-                  Clear All Filters
-                </button>
-              )}
-            </div>
-
-            <div className={`transition-all duration-300 overflow-hidden ${isFilterCollapsed ? "max-h-0 opacity-0" : "max-h-[500px] opacity-100 p-5"}`}>
-              <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                
-                {/* Company select */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Company</label>
-                  <div className="relative">
-                    <select
-                      value={company}
-                      onChange={(e) => setCompany(e.target.value)}
-                      className="w-full h-9.5 pl-3 pr-8 rounded-xl bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition-all appearance-none font-semibold text-foreground/80 cursor-pointer"
-                    >
-                      <option value="Pakiza Software Limited">Pakiza Software Limited</option>
-                      <option value="Pakiza Software Limited (PIL-Operation)">Pakiza Software Limited (PIL-Operation)</option>
-                    </select>
-                    <ChevronDown className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
-                  </div>
-                </div>
-
-                {/* Area select */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Area</label>
-                  <div className="relative">
-                    <select
-                      value={area}
-                      onChange={(e) => setArea(e.target.value)}
-                      className="w-full h-9.5 pl-3 pr-8 rounded-xl bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition-all appearance-none font-semibold text-foreground/80 cursor-pointer"
-                    >
-                      <option value="PSL-Operation">PSL-Operation</option>
-                      <option value="PSL-HeadOffice">PSL-HeadOffice</option>
-                    </select>
-                    <ChevronDown className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
-                  </div>
-                </div>
-
-                {/* Employee Type select */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Employee Type</label>
-                  <div className="relative">
-                    <select
-                      value={empType}
-                      onChange={(e) => setEmpType(e.target.value)}
-                      className="w-full h-9.5 pl-3 pr-8 rounded-xl bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition-all appearance-none font-semibold text-foreground/80 cursor-pointer"
-                    >
-                      <option value="ALL">ALL</option>
-                      <option value="Staff">Staff</option>
-                      <option value="Worker">Worker</option>
-                    </select>
-                    <ChevronDown className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
-                  </div>
-                </div>
-
-                {/* Department select */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Department</label>
-                  <div className="relative">
-                    <select
-                      value={department}
-                      onChange={(e) => {
-                        setDepartment(e.target.value);
-                        setSection("ALL"); // Reset section when dept changes
-                      }}
-                      className="w-full h-9.5 pl-3 pr-8 rounded-xl bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition-all appearance-none font-semibold text-foreground/80 cursor-pointer"
-                    >
-                      <option value="All Departments">All Departments</option>
-                      {departmentsList.map(d => (
-                        <option key={d} value={d}>{d}</option>
-                      ))}
-                    </select>
-                    <ChevronDown className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
-                  </div>
-                </div>
-
-                {/* Section select */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Section</label>
-                  <div className="relative">
-                    <select
-                      value={section}
-                      onChange={(e) => setSection(e.target.value)}
-                      className="w-full h-9.5 pl-3 pr-8 rounded-xl bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition-all appearance-none font-semibold text-foreground/80 cursor-pointer"
-                    >
-                      <option value="ALL">ALL</option>
-                      {sectionsList.map(s => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                    </select>
-                    <ChevronDown className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
-                  </div>
-                </div>
-
-                {/* Submit search button */}
-                <div className="col-span-1 md:col-span-2 lg:col-span-5 flex justify-end pt-1 gap-2">
+              <div className="bg-card rounded-lg border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300 print:hidden">
+                <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-primary/10 via-primary/45 to-primary/10" />
+                <div className="flex items-center justify-between px-5 py-4 border-b border-border/40">
                   <button
-                    type="button"
-                    onClick={resetFilters}
-                    className="h-9 px-6 border border-border hover:bg-muted text-muted-foreground hover:text-foreground font-extrabold text-xs rounded-xl transition uppercase tracking-wider"
+                    onClick={() => setIsFilterCollapsed(!isFilterCollapsed)}
+                    className="flex items-center gap-2 text-xs font-bold text-foreground/90 hover:text-primary transition-colors"
                   >
-                    Reset
+                    <SlidersHorizontal className="size-4 text-primary" />
+                    <span>Search Parameters & Filters</span>
+                    <ChevronDown className={`size-3.5 text-muted-foreground/60 transition-transform duration-300 ${isFilterCollapsed ? "-rotate-90" : ""}`} />
                   </button>
-                  <button
-                    type="submit"
-                    className="h-9 px-8 bg-primary hover:opacity-95 text-primary-foreground font-extrabold text-xs rounded-xl shadow-xs transition uppercase tracking-wider flex items-center gap-1.5"
-                  >
-                    <Filter className="size-3.5" />
-                    <span>Search</span>
-                  </button>
-                </div>
-
-              </form>
-            </div>
-          </div>
-
-          {/* Bulk Operations Hub (replicated from personnel list) */}
-          {selectedEmpIds.length > 0 && (
-            <div className="bg-card rounded-2xl border border-primary/25 shadow-xs p-5 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300 print:hidden">
-              <div className="flex items-center justify-between gap-4 pb-3 border-b border-border/40">
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-primary/10 text-primary">
-                    {selectedEmpIds.length} Selected
-                  </span>
-                  <h3 className="text-xs font-extrabold text-foreground tracking-tight">Active Increment History Operations Console</h3>
-                </div>
-                <button 
-                  onClick={() => setSelectedEmpIds([])}
-                  className="text-[10px] font-extrabold text-muted-foreground hover:text-primary transition"
-                >
-                  Clear Selection
-                </button>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                <button
-                  onClick={() => triggerBulkAction("Print Selected Profiles")}
-                  className="flex flex-col items-center justify-center p-3 rounded-xl border border-border/40 bg-card text-center gap-1.5 transition-all hover:scale-102 hover:shadow-2xs text-blue-500 hover:bg-blue-500/5 hover:border-blue-500/30"
-                >
-                  <Printer className="size-4.5" />
-                  <span className="text-[10px] font-bold tracking-tight whitespace-nowrap leading-none">Print Selected</span>
-                </button>
-                <button
-                  onClick={() => triggerBulkAction("Bulk Export PDF Register")}
-                  className="flex flex-col items-center justify-center p-3 rounded-xl border border-border/40 bg-card text-center gap-1.5 transition-all hover:scale-102 hover:shadow-2xs text-rose-500 hover:bg-rose-500/5 hover:border-rose-500/30"
-                >
-                  <FileClock className="size-4.5" />
-                  <span className="text-[10px] font-bold tracking-tight whitespace-nowrap leading-none">PDF Register</span>
-                </button>
-                <button
-                  onClick={() => triggerBulkAction("Consolidated Audit Review")}
-                  className="flex flex-col items-center justify-center p-3 rounded-xl border border-border/40 bg-card text-center gap-1.5 transition-all hover:scale-102 hover:shadow-2xs text-emerald-500 hover:bg-emerald-500/5 hover:border-emerald-500/30"
-                >
-                  <UserCog className="size-4.5" />
-                  <span className="text-[10px] font-bold tracking-tight whitespace-nowrap leading-none">Audit Review</span>
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Action Row & Main Wide Table Panel (replicated from personnel list) */}
-          <div className="bg-card rounded-2xl border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300">
-            
-            {/* Toolbar Header (replicated from personnel list) */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-5 border-b border-border/40 print:hidden">
-              
-              {/* Export Buttons */}
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => alert("Excel payload generation active! 58 records serialized successfully.")}
-                  className="h-8.5 px-3 rounded-lg border border-border/60 hover:bg-muted text-xs font-semibold text-foreground/80 hover:text-foreground transition duration-200 flex items-center gap-1.5"
-                >
-                  <FileSpreadsheet className="size-3.5 text-emerald-500" />
-                  <span>Excel</span>
-                </button>
-                <button
-                  onClick={handlePrint}
-                  className="h-8.5 px-3 rounded-lg border border-border/60 hover:bg-muted text-xs font-semibold text-foreground/80 hover:text-foreground transition duration-200 flex items-center gap-1.5"
-                >
-                  <Printer className="size-3.5 text-primary" />
-                  <span>Print</span>
-                </button>
-                <button
-                  onClick={() => setIsPdfModalOpen(true)}
-                  className="h-8.5 px-3 rounded-lg border border-border/60 hover:bg-muted text-xs font-semibold text-foreground/80 hover:text-foreground transition duration-200 flex items-center gap-1.5"
-                >
-                  <FileDown className="size-3.5 text-rose-500" />
-                  <span>PDF Register</span>
-                </button>
-              </div>
-
-              {/* Toolbar Right: Search Bar & Column Configuration Toggle (replicated from personnel list) */}
-              <div className="flex items-center gap-3 ml-auto w-full md:w-auto">
-                
-                {/* Search query field */}
-                <div className="relative flex-1 md:w-64 lg:w-72">
-                  <Search className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search name, ID, section, designation..."
-                    className="w-full h-8.5 pl-9 pr-3 rounded-lg bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition duration-200"
-                  />
-                </div>
-
-                {/* Column Configuration Selector (replicated from personnel list) */}
-                <div className="relative col-selector-container">
-                  <button 
-                    onClick={() => setIsColSelectorOpen(!isColSelectorOpen)}
-                    className="h-8.5 px-3 rounded-lg border border-border/60 hover:bg-muted text-xs font-bold text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition duration-200"
-                  >
-                    <LayoutGrid className="size-3.5 text-primary" />
-                    <span>Columns</span>
-                    <ChevronDown className="size-3 text-muted-foreground/60" />
-                  </button>
-                  
-                  {isColSelectorOpen && (
-                    <div className="absolute right-0 mt-1.5 w-56 rounded-xl bg-card border border-border/80 shadow-lg p-3 z-30 animate-in fade-in slide-in-from-top-1 duration-150 text-foreground">
-                      <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/30">
-                        <span className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Show Columns</span>
-                        <button 
-                          onClick={() => setVisibleCols(defaultColumns)}
-                          className="text-[9px] font-bold text-primary hover:underline"
-                        >
-                          Reset
-                        </button>
-                      </div>
-                      <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
-                        {Object.keys(defaultColumns).map((colKey) => (
-                          <button
-                            key={colKey}
-                            onClick={() => toggleColumn(colKey as keyof typeof defaultColumns)}
-                            className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-left text-xs hover:bg-muted transition duration-150"
-                          >
-                            <div className={`size-4 rounded-md border flex items-center justify-center transition-all ${visibleCols[colKey as keyof typeof defaultColumns] ? "bg-primary border-primary text-primary-foreground" : "border-border"}`}>
-                              {visibleCols[colKey as keyof typeof defaultColumns] && <Check className="size-2.5 stroke-[3.5]" />}
-                            </div>
-                            <span className="font-medium text-foreground/80 capitalize">
-                              {colKey.replace(/([A-Z])/g, " $1").toLowerCase().replace(/inc (\d+)/g, "Increment ($1)")}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+                  {(!isFilterCollapsed && (department !== "All Departments" || section !== "ALL" || empType !== "ALL")) && (
+                    <button
+                      onClick={resetFilters}
+                      className="text-[10px] font-bold text-destructive hover:underline"
+                    >
+                      Clear All Filters
+                    </button>
                   )}
                 </div>
 
+                <div className={`transition-all duration-300 overflow-hidden ${isFilterCollapsed ? "max-h-0 opacity-0" : "max-h-[500px] opacity-100 p-5"}`}>
+                  <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+
+                    {/* Company select */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Company</label>
+                      <div className="relative">
+                        <select
+                          value={company}
+                          onChange={(e) => setCompany(e.target.value)}
+                          className="w-full h-9.5 pl-3 pr-8 rounded-xl bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition-all appearance-none font-semibold text-foreground/80 cursor-pointer"
+                        >
+                          <option value="Pakiza Software Limited">Pakiza Software Limited</option>
+                          <option value="Pakiza Software Limited (PIL-Operation)">Pakiza Software Limited (PIL-Operation)</option>
+                        </select>
+                        <ChevronDown className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
+                      </div>
+                    </div>
+
+                    {/* Area select */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Area</label>
+                      <div className="relative">
+                        <select
+                          value={area}
+                          onChange={(e) => setArea(e.target.value)}
+                          className="w-full h-9.5 pl-3 pr-8 rounded-xl bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition-all appearance-none font-semibold text-foreground/80 cursor-pointer"
+                        >
+                          <option value="PSL-Operation">PSL-Operation</option>
+                          <option value="PSL-HeadOffice">PSL-HeadOffice</option>
+                        </select>
+                        <ChevronDown className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
+                      </div>
+                    </div>
+
+                    {/* Employee Type select */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Employee Type</label>
+                      <div className="relative">
+                        <select
+                          value={empType}
+                          onChange={(e) => setEmpType(e.target.value)}
+                          className="w-full h-9.5 pl-3 pr-8 rounded-xl bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition-all appearance-none font-semibold text-foreground/80 cursor-pointer"
+                        >
+                          <option value="ALL">ALL</option>
+                          <option value="Staff">Staff</option>
+                          <option value="Worker">Worker</option>
+                        </select>
+                        <ChevronDown className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
+                      </div>
+                    </div>
+
+                    {/* Department select */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Department</label>
+                      <div className="relative">
+                        <select
+                          value={department}
+                          onChange={(e) => {
+                            setDepartment(e.target.value);
+                            setSection("ALL"); // Reset section when dept changes
+                          }}
+                          className="w-full h-9.5 pl-3 pr-8 rounded-xl bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition-all appearance-none font-semibold text-foreground/80 cursor-pointer"
+                        >
+                          <option value="All Departments">All Departments</option>
+                          {departmentsList.map(d => (
+                            <option key={d} value={d}>{d}</option>
+                          ))}
+                        </select>
+                        <ChevronDown className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
+                      </div>
+                    </div>
+
+                    {/* Section select */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Section</label>
+                      <div className="relative">
+                        <select
+                          value={section}
+                          onChange={(e) => setSection(e.target.value)}
+                          className="w-full h-9.5 pl-3 pr-8 rounded-xl bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition-all appearance-none font-semibold text-foreground/80 cursor-pointer"
+                        >
+                          <option value="ALL">ALL</option>
+                          {sectionsList.map(s => (
+                            <option key={s} value={s}>{s}</option>
+                          ))}
+                        </select>
+                        <ChevronDown className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
+                      </div>
+                    </div>
+
+                    {/* Submit search button */}
+                    <div className="col-span-1 md:col-span-2 lg:col-span-5 flex justify-end pt-1 gap-2">
+                      <button
+                        type="button"
+                        onClick={resetFilters}
+                        className="h-9 px-6 border border-border hover:bg-muted text-muted-foreground hover:text-foreground font-extrabold text-xs rounded-xl transition uppercase tracking-wider"
+                      >
+                        Reset
+                      </button>
+                      <button
+                        type="submit"
+                        className="h-9 px-8 bg-primary hover:opacity-95 text-primary-foreground font-extrabold text-xs rounded-xl shadow-xs transition uppercase tracking-wider flex items-center gap-1.5"
+                      >
+                        <Filter className="size-3.5" />
+                        <span>Search</span>
+                      </button>
+                    </div>
+
+                  </form>
+                </div>
               </div>
 
-            </div>
+              {/* Bulk Operations Hub (replicated from personnel list) */}
+              {selectedEmpIds.length > 0 && (
+                <div className="bg-card rounded-lg border border-primary/25 shadow-xs p-5 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300 print:hidden">
+                  <div className="flex items-center justify-between gap-4 pb-3 border-b border-border/40">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-primary/10 text-primary">
+                        {selectedEmpIds.length} Selected
+                      </span>
+                      <h3 className="text-xs font-extrabold text-foreground tracking-tight">Active Increment History Operations Console</h3>
+                    </div>
+                    <button
+                      onClick={() => setSelectedEmpIds([])}
+                      className="text-[10px] font-extrabold text-muted-foreground hover:text-primary transition"
+                    >
+                      Clear Selection
+                    </button>
+                  </div>
 
-            {/* HIGH-FIDELITY DATAGRID TABLE WITH STICKY FIXED LEFT SIDE COLUMNS (replicated from personnel list) */}
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left text-xs whitespace-nowrap">
-                <thead>
-                  <tr className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/60 bg-muted/40 border-b border-border/40">
-                    
-                    {/* Sticky Actions and Checkbox Column */}
-                    <th className="sticky left-0 bg-[#f1f5f9] dark:bg-[#0f172a] px-2 py-4 font-bold border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[110px] min-w-[110px] max-w-[110px] text-center">
-                      <div className="flex items-center gap-2 justify-center">
-                        <input 
-                          type="checkbox" 
-                          checked={filteredRecords.length > 0 && selectedEmpIds.length === filteredRecords.length}
-                          onChange={toggleSelectAll}
-                          className="rounded border-border text-primary focus:ring-primary/20 cursor-pointer" 
-                        />
-                        <span>∇</span>
-                      </div>
-                    </th>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                    <button
+                      onClick={() => triggerBulkAction("Print Selected Profiles")}
+                      className="flex flex-col items-center justify-center p-3 rounded-xl border border-border/40 bg-card text-center gap-1.5 transition-all hover:scale-102 hover:shadow-2xs text-blue-500 hover:bg-blue-500/5 hover:border-blue-500/30"
+                    >
+                      <Printer className="size-4.5" />
+                      <span className="text-[10px] font-bold tracking-tight whitespace-nowrap leading-none">Print Selected</span>
+                    </button>
+                    <button
+                      onClick={() => triggerBulkAction("Bulk Export PDF Register")}
+                      className="flex flex-col items-center justify-center p-3 rounded-xl border border-border/40 bg-card text-center gap-1.5 transition-all hover:scale-102 hover:shadow-2xs text-rose-500 hover:bg-rose-500/5 hover:border-rose-500/30"
+                    >
+                      <FileClock className="size-4.5" />
+                      <span className="text-[10px] font-bold tracking-tight whitespace-nowrap leading-none">PDF Register</span>
+                    </button>
+                    <button
+                      onClick={() => triggerBulkAction("Consolidated Audit Review")}
+                      className="flex flex-col items-center justify-center p-3 rounded-xl border border-border/40 bg-card text-center gap-1.5 transition-all hover:scale-102 hover:shadow-2xs text-emerald-500 hover:bg-emerald-500/5 hover:border-emerald-500/30"
+                    >
+                      <UserCog className="size-4.5" />
+                      <span className="text-[10px] font-bold tracking-tight whitespace-nowrap leading-none">Audit Review</span>
+                    </button>
+                  </div>
+                </div>
+              )}
 
-                    {/* Fixed Sticky Header for ID and Name */}
-                    <th className="sticky left-[110px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-4 font-bold border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[100px] min-w-[100px] max-w-[100px]">Emp ID</th>
-                    <th className="sticky left-[210px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-4 font-bold border-r border-border/40 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[180px] min-w-[180px] max-w-[180px]">Name</th>
-                    
-                    {/* Standard Configurable headers */}
-                    {visibleCols.department && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Department</th>}
-                    {visibleCols.section && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Section</th>}
-                    {visibleCols.designation && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Designation</th>}
-                    {visibleCols.joiningDate && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-center">Joining Date</th>}
-                    {visibleCols.salaryJoining && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-right">Salary(Joining)</th>}
-                    {visibleCols.salaryBasic && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-right">Salary(Basic)</th>}
-                    {visibleCols.salaryGross && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-right">Salary(Gross)</th>}
-                    
-                    {/* Configurable Years */}
-                    {["2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"].map(yr => {
-                      const colKey = `inc${yr}` as keyof typeof defaultColumns;
-                      return visibleCols[colKey] && (
-                        <th key={yr} className="px-4 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-center">
-                          Inc({yr})
-                        </th>
-                      );
-                    })}
+              {/* Action Row & Main Wide Table Panel (replicated from personnel list) */}
+              <div className="bg-card rounded-lg border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300">
 
-                    {visibleCols.total && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-center">Total</th>}
-                    {visibleCols.lastIncDate && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-center">Last Inc Date</th>}
-                    {visibleCols.lastIncAmount && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-right">Last Inc Amount</th>}
-                    {visibleCols.lastPromotion && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-center">Last Promotion</th>}
+                {/* Toolbar Header (replicated from personnel list) */}
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-5 border-b border-border/40 print:hidden">
 
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/45">
-                  {filteredRecords.map((row, idx) => {
-                    const isSelected = selectedRecord?.empId === row.empId;
-                    
-                    // Replicated solid background classes to prevent text bleed-through when scrolling horizontally
-                    const stickyCellBgClass = isSelected
-                      ? "bg-[#f1f5f9] dark:bg-[#1e293b] group-hover:bg-[#e2e8f0] dark:group-hover:bg-[#334155]"
-                      : "bg-card group-hover:bg-[#f8fafc] dark:group-hover:bg-[#1e293b]";
+                  {/* Export Buttons */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => alert("Excel payload generation active! 58 records serialized successfully.")}
+                      className="h-8.5 px-3 rounded-lg border border-border/60 hover:bg-muted text-xs font-semibold text-foreground/80 hover:text-foreground transition duration-200 flex items-center gap-1.5"
+                    >
+                      <FileSpreadsheet className="size-3.5 text-emerald-500" />
+                      <span>Excel</span>
+                    </button>
+                    <button
+                      onClick={handlePrint}
+                      className="h-8.5 px-3 rounded-lg border border-border/60 hover:bg-muted text-xs font-semibold text-foreground/80 hover:text-foreground transition duration-200 flex items-center gap-1.5"
+                    >
+                      <Printer className="size-3.5 text-primary" />
+                      <span>Print</span>
+                    </button>
+                    <button
+                      onClick={() => setIsPdfModalOpen(true)}
+                      className="h-8.5 px-3 rounded-lg border border-border/60 hover:bg-muted text-xs font-semibold text-foreground/80 hover:text-foreground transition duration-200 flex items-center gap-1.5"
+                    >
+                      <FileDown className="size-3.5 text-rose-500" />
+                      <span>PDF Register</span>
+                    </button>
+                  </div>
 
-                    return (
-                      <tr
-                        key={row.sl}
-                        onClick={() => setSelectedRecord(row)}
-                        className={`group transition-all cursor-pointer ${isSelected ? "bg-[#f1f5f9] dark:bg-[#1e293b]" : "hover:bg-[#f8fafc] dark:hover:bg-[#1e293b]"}`}
+                  {/* Toolbar Right: Search Bar & Column Configuration Toggle (replicated from personnel list) */}
+                  <div className="flex items-center gap-3 ml-auto w-full md:w-auto">
+
+                    {/* Search query field */}
+                    <div className="relative flex-1 md:w-64 lg:w-72">
+                      <Search className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search name, ID, section, designation..."
+                        className="w-full h-8.5 pl-9 pr-3 rounded-lg bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition duration-200"
+                      />
+                    </div>
+
+                    {/* Column Configuration Selector (replicated from personnel list) */}
+                    <div className="relative col-selector-container">
+                      <button
+                        onClick={() => setIsColSelectorOpen(!isColSelectorOpen)}
+                        className="h-8.5 px-3 rounded-lg border border-border/60 hover:bg-muted text-xs font-bold text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition duration-200"
                       >
-                        {/* Sticky Left Actions and Checkbox Cell */}
-                        <td className={`sticky left-0 ${stickyCellBgClass} px-2 py-2 border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[110px] min-w-[110px] max-w-[110px] transition-all`} onClick={(event) => event.stopPropagation()}>
-                          <div className="flex items-center gap-1.5 justify-center">
-                            <input 
-                              type="checkbox" 
-                              checked={selectedEmpIds.includes(row.empId)}
-                              onChange={() => toggleSelectEmp(row.empId)}
-                              className="rounded border-border text-primary focus:ring-primary/20 cursor-pointer" 
+                        <LayoutGrid className="size-3.5 text-primary" />
+                        <span>Columns</span>
+                        <ChevronDown className="size-3 text-muted-foreground/60" />
+                      </button>
+
+                      {isColSelectorOpen && (
+                        <div className="absolute right-0 mt-1.5 w-56 rounded-xl bg-card border border-border/80 shadow-lg p-3 z-30 animate-in fade-in slide-in-from-top-1 duration-150 text-foreground">
+                          <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/30">
+                            <span className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Show Columns</span>
+                            <button
+                              onClick={() => setVisibleCols(defaultColumns)}
+                              className="text-[9px] font-bold text-primary hover:underline"
+                            >
+                              Reset
+                            </button>
+                          </div>
+                          <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+                            {Object.keys(defaultColumns).map((colKey) => (
+                              <button
+                                key={colKey}
+                                onClick={() => toggleColumn(colKey as keyof typeof defaultColumns)}
+                                className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-left text-xs hover:bg-muted transition duration-150"
+                              >
+                                <div className={`size-4 rounded-md border flex items-center justify-center transition-all ${visibleCols[colKey as keyof typeof defaultColumns] ? "bg-primary border-primary text-primary-foreground" : "border-border"}`}>
+                                  {visibleCols[colKey as keyof typeof defaultColumns] && <Check className="size-2.5 stroke-[3.5]" />}
+                                </div>
+                                <span className="font-medium text-foreground/80 capitalize">
+                                  {colKey.replace(/([A-Z])/g, " $1").toLowerCase().replace(/inc (\d+)/g, "Increment ($1)")}
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                  </div>
+
+                </div>
+
+                {/* HIGH-FIDELITY DATAGRID TABLE WITH STICKY FIXED LEFT SIDE COLUMNS (replicated from personnel list) */}
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse text-left text-xs whitespace-nowrap">
+                    <thead>
+                      <tr className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/60 bg-muted/40 border-b border-border/40">
+
+                        {/* Sticky Actions and Checkbox Column */}
+                        <th className="sticky left-0 bg-[#f1f5f9] dark:bg-[#0f172a] px-2 py-4 font-bold border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[110px] min-w-[110px] max-w-[110px] text-center">
+                          <div className="flex items-center gap-2 justify-center">
+                            <input
+                              type="checkbox"
+                              checked={filteredRecords.length > 0 && selectedEmpIds.length === filteredRecords.length}
+                              onChange={toggleSelectAll}
+                              className="rounded border-border text-primary focus:ring-primary/20 cursor-pointer"
                             />
-                            <button 
-                              className="size-6 bg-amber-500 text-white rounded hover:bg-amber-600 transition flex items-center justify-center shadow-2xs"
-                              onClick={() => setSelectedRecord(row)}
-                              title="Audit breakdown summary"
-                            >
-                              <FileText className="size-3" />
-                            </button>
-                            <button 
-                              className="size-6 border border-border hover:bg-muted text-muted-foreground hover:text-primary rounded transition flex items-center justify-center"
-                              onClick={() => setSelectedRecord(row)}
-                              title="View Compensation"
-                            >
-                              <Eye className="size-3" />
-                            </button>
+                            <span>∇</span>
                           </div>
-                        </td>
+                        </th>
 
-                        {/* Sticky Left Emp ID and Name Cell */}
-                        <td className={`sticky left-[110px] ${stickyCellBgClass} px-3 py-3.5 font-bold text-primary border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[100px] min-w-[100px] max-w-[100px] transition-all font-mono text-[11px]`}>
-                          {row.empId}
-                        </td>
-                        <td className={`sticky left-[210px] ${stickyCellBgClass} px-3 py-3.5 font-bold text-foreground border-r border-border/40 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[180px] min-w-[180px] max-w-[180px] transition-all`}>
-                          <div className="flex items-center gap-2">
-                            <div className="size-6.5 rounded-lg bg-primary/10 text-[9px] font-bold text-primary flex items-center justify-center shadow-2xs">
-                              {row.empName.split(" ").map(s => s[0]).slice(0,2).join("").toUpperCase()}
-                            </div>
-                            <span className="truncate max-w-[125px]">{row.empName}</span>
-                          </div>
-                        </td>
+                        {/* Fixed Sticky Header for ID and Name */}
+                        <th className="sticky left-[110px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-4 font-bold border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[100px] min-w-[100px] max-w-[100px]">Emp ID</th>
+                        <th className="sticky left-[210px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-4 font-bold border-r border-border/40 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[180px] min-w-[180px] max-w-[180px]">Name</th>
 
-                        {/* Configurable Cells */}
-                        {visibleCols.department && <td className="px-5 py-3.5 text-foreground/80 font-medium">{row.department}</td>}
-                        {visibleCols.section && <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{row.section}</td>}
-                        {visibleCols.designation && <td className="px-5 py-3.5 font-semibold text-foreground">{row.designation}</td>}
-                        {visibleCols.joiningDate && <td className="px-5 py-3.5 text-center font-mono text-muted-foreground/80 font-semibold">{row.joiningDate}</td>}
-                        {visibleCols.salaryJoining && (
-                          <td className="px-5 py-3.5 text-right font-mono font-semibold text-foreground/90">
-                            ৳{row.salaryJoining.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                          </td>
-                        )}
-                        {visibleCols.salaryBasic && (
-                          <td className="px-5 py-3.5 text-right font-mono font-semibold text-foreground/90">
-                            ৳{row.salaryBasic.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                          </td>
-                        )}
-                        {visibleCols.salaryGross && (
-                          <td className="px-5 py-3.5 text-right font-mono font-bold text-primary">
-                            ৳{row.salaryGross.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                          </td>
-                        )}
+                        {/* Standard Configurable headers */}
+                        {visibleCols.department && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Department</th>}
+                        {visibleCols.section && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Section</th>}
+                        {visibleCols.designation && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Designation</th>}
+                        {visibleCols.joiningDate && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-center">Joining Date</th>}
+                        {visibleCols.salaryJoining && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-right">Salary(Joining)</th>}
+                        {visibleCols.salaryBasic && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-right">Salary(Basic)</th>}
+                        {visibleCols.salaryGross && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-right">Salary(Gross)</th>}
 
-                        {/* Years values */}
+                        {/* Configurable Years */}
                         {["2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"].map(yr => {
                           const colKey = `inc${yr}` as keyof typeof defaultColumns;
-                          const rowVal = row[colKey as keyof RawIncrementRecord] as string;
                           return visibleCols[colKey] && (
-                            <td key={yr} className="px-4 py-3.5 text-center">
-                              {renderIncrementCell(rowVal)}
-                            </td>
+                            <th key={yr} className="px-4 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-center">
+                              Inc({yr})
+                            </th>
                           );
                         })}
 
-                        {visibleCols.total && <td className="px-5 py-3.5 text-center">{renderTotalCell(row.total)}</td>}
-                        {visibleCols.lastIncDate && <td className="px-5 py-3.5 text-center font-mono text-muted-foreground/80 font-semibold">{row.lastIncDate || "—"}</td>}
-                        {visibleCols.lastIncAmount && (
-                          <td className="px-5 py-3.5 text-right font-mono font-semibold text-muted-foreground/80">
-                            {row.lastIncAmount ? `৳${parseFloat(row.lastIncAmount).toLocaleString()}` : "—"}
-                          </td>
-                        )}
-                        {visibleCols.lastPromotion && <td className="px-5 py-3.5 text-center font-mono text-muted-foreground/80 font-semibold">{row.lastPromotion || "—"}</td>}
+                        {visibleCols.total && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-center">Total</th>}
+                        {visibleCols.lastIncDate && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-center">Last Inc Date</th>}
+                        {visibleCols.lastIncAmount && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-right">Last Inc Amount</th>}
+                        {visibleCols.lastPromotion && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-center">Last Promotion</th>}
 
                       </tr>
-                    );
-                  })}
+                    </thead>
+                    <tbody className="divide-y divide-border/45">
+                      {filteredRecords.map((row, idx) => {
+                        const isSelected = selectedRecord?.empId === row.empId;
 
-                  {filteredRecords.length === 0 && (
-                    <tr>
-                      <td colSpan={30} className="px-5 py-16 text-center text-muted-foreground">
-                        <div className="flex flex-col items-center justify-center gap-2">
-                          <EyeOff className="size-8 text-muted-foreground/45" />
-                          <span className="font-semibold text-xs">No employees match the specified increment history search parameters.</span>
-                          <button onClick={resetFilters} className="text-[10px] font-bold text-primary hover:underline mt-1">Clear Filters</button>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
+                        // Replicated solid background classes to prevent text bleed-through when scrolling horizontally
+                        const stickyCellBgClass = isSelected
+                          ? "bg-[#f1f5f9] dark:bg-[#1e293b] group-hover:bg-[#e2e8f0] dark:group-hover:bg-[#334155]"
+                          : "bg-card group-hover:bg-[#f8fafc] dark:group-hover:bg-[#1e293b]";
 
-                </tbody>
-              </table>
-            </div>
+                        return (
+                          <tr
+                            key={row.sl}
+                            onClick={() => setSelectedRecord(row)}
+                            className={`group transition-all cursor-pointer ${isSelected ? "bg-[#f1f5f9] dark:bg-[#1e293b]" : "hover:bg-[#f8fafc] dark:hover:bg-[#1e293b]"}`}
+                          >
+                            {/* Sticky Left Actions and Checkbox Cell */}
+                            <td className={`sticky left-0 ${stickyCellBgClass} px-2 py-2 border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[110px] min-w-[110px] max-w-[110px] transition-all`} onClick={(event) => event.stopPropagation()}>
+                              <div className="flex items-center gap-1.5 justify-center">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedEmpIds.includes(row.empId)}
+                                  onChange={() => toggleSelectEmp(row.empId)}
+                                  className="rounded border-border text-primary focus:ring-primary/20 cursor-pointer"
+                                />
+                                <button
+                                  className="size-6 bg-amber-500 text-white rounded hover:bg-amber-600 transition flex items-center justify-center shadow-2xs"
+                                  onClick={() => setSelectedRecord(row)}
+                                  title="Audit breakdown summary"
+                                >
+                                  <FileText className="size-3" />
+                                </button>
+                                <button
+                                  className="size-6 border border-border hover:bg-muted text-muted-foreground hover:text-primary rounded transition flex items-center justify-center"
+                                  onClick={() => setSelectedRecord(row)}
+                                  title="View Compensation"
+                                >
+                                  <Eye className="size-3" />
+                                </button>
+                              </div>
+                            </td>
 
-            {/* Bottom Footer Info (replicated from personnel list) */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 border-t border-border/40 bg-muted/15">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setIsPdfModalOpen(true)}
-                  className="h-8.5 px-4 bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-[10px] rounded-lg shadow-2xs hover:shadow-xs transition uppercase tracking-wider flex items-center gap-1.5"
-                >
-                  <FileDown className="size-3.5" />
-                  <span>View PDF Register</span>
-                </button>
-                <span className="text-[11px] font-semibold text-muted-foreground/80">
-                  Showing {filteredRecords.length > 0 ? 1 : 0} to {filteredRecords.length} of {rawIncrementRecords.length} entries
-                </span>
+                            {/* Sticky Left Emp ID and Name Cell */}
+                            <td className={`sticky left-[110px] ${stickyCellBgClass} px-3 py-3.5 font-bold text-primary border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[100px] min-w-[100px] max-w-[100px] transition-all font-mono text-[11px]`}>
+                              {row.empId}
+                            </td>
+                            <td className={`sticky left-[210px] ${stickyCellBgClass} px-3 py-3.5 font-bold text-foreground border-r border-border/40 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[180px] min-w-[180px] max-w-[180px] transition-all`}>
+                              <div className="flex items-center gap-2">
+                                <div className="size-6.5 rounded-lg bg-primary/10 text-[9px] font-bold text-primary flex items-center justify-center shadow-2xs">
+                                  {row.empName.split(" ").map(s => s[0]).slice(0, 2).join("").toUpperCase()}
+                                </div>
+                                <span className="truncate max-w-[125px]">{row.empName}</span>
+                              </div>
+                            </td>
+
+                            {/* Configurable Cells */}
+                            {visibleCols.department && <td className="px-5 py-3.5 text-foreground/80 font-medium">{row.department}</td>}
+                            {visibleCols.section && <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{row.section}</td>}
+                            {visibleCols.designation && <td className="px-5 py-3.5 font-semibold text-foreground">{row.designation}</td>}
+                            {visibleCols.joiningDate && <td className="px-5 py-3.5 text-center font-mono text-muted-foreground/80 font-semibold">{row.joiningDate}</td>}
+                            {visibleCols.salaryJoining && (
+                              <td className="px-5 py-3.5 text-right font-mono font-semibold text-foreground/90">
+                                ৳{row.salaryJoining.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                              </td>
+                            )}
+                            {visibleCols.salaryBasic && (
+                              <td className="px-5 py-3.5 text-right font-mono font-semibold text-foreground/90">
+                                ৳{row.salaryBasic.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                              </td>
+                            )}
+                            {visibleCols.salaryGross && (
+                              <td className="px-5 py-3.5 text-right font-mono font-bold text-primary">
+                                ৳{row.salaryGross.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                              </td>
+                            )}
+
+                            {/* Years values */}
+                            {["2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"].map(yr => {
+                              const colKey = `inc${yr}` as keyof typeof defaultColumns;
+                              const rowVal = row[colKey as keyof RawIncrementRecord] as string;
+                              return visibleCols[colKey] && (
+                                <td key={yr} className="px-4 py-3.5 text-center">
+                                  {renderIncrementCell(rowVal)}
+                                </td>
+                              );
+                            })}
+
+                            {visibleCols.total && <td className="px-5 py-3.5 text-center">{renderTotalCell(row.total)}</td>}
+                            {visibleCols.lastIncDate && <td className="px-5 py-3.5 text-center font-mono text-muted-foreground/80 font-semibold">{row.lastIncDate || "—"}</td>}
+                            {visibleCols.lastIncAmount && (
+                              <td className="px-5 py-3.5 text-right font-mono font-semibold text-muted-foreground/80">
+                                {row.lastIncAmount ? `৳${parseFloat(row.lastIncAmount).toLocaleString()}` : "—"}
+                              </td>
+                            )}
+                            {visibleCols.lastPromotion && <td className="px-5 py-3.5 text-center font-mono text-muted-foreground/80 font-semibold">{row.lastPromotion || "—"}</td>}
+
+                          </tr>
+                        );
+                      })}
+
+                      {filteredRecords.length === 0 && (
+                        <tr>
+                          <td colSpan={30} className="px-5 py-16 text-center text-muted-foreground">
+                            <div className="flex flex-col items-center justify-center gap-2">
+                              <EyeOff className="size-8 text-muted-foreground/45" />
+                              <span className="font-semibold text-xs">No employees match the specified increment history search parameters.</span>
+                              <button onClick={resetFilters} className="text-[10px] font-bold text-primary hover:underline mt-1">Clear Filters</button>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Bottom Footer Info (replicated from personnel list) */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 border-t border-border/40 bg-muted/15">
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => setIsPdfModalOpen(true)}
+                      className="h-8.5 px-4 bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-[10px] rounded-lg shadow-2xs hover:shadow-xs transition uppercase tracking-wider flex items-center gap-1.5"
+                    >
+                      <FileDown className="size-3.5" />
+                      <span>View PDF Register</span>
+                    </button>
+                    <span className="text-[11px] font-semibold text-muted-foreground/80">
+                      Showing {filteredRecords.length > 0 ? 1 : 0} to {filteredRecords.length} of {rawIncrementRecords.length} entries
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button className="h-8 px-3 rounded-lg border border-border/60 bg-card hover:bg-muted text-xs font-bold text-muted-foreground disabled:opacity-50 transition" disabled>Previous</button>
+                    <button className="h-8 w-8 rounded-lg bg-primary text-primary-foreground text-xs font-bold shadow-2xs">1</button>
+                    <button className="h-8 px-3 rounded-lg border border-border/60 bg-card hover:bg-muted text-xs font-bold text-muted-foreground disabled:opacity-50 transition" disabled>Next</button>
+                  </div>
+                </div>
+
               </div>
-              <div className="flex items-center gap-1">
-                <button className="h-8 px-3 rounded-lg border border-border/60 bg-card hover:bg-muted text-xs font-bold text-muted-foreground disabled:opacity-50 transition" disabled>Previous</button>
-                <button className="h-8 w-8 rounded-lg bg-primary text-primary-foreground text-xs font-bold shadow-2xs">1</button>
-                <button className="h-8 px-3 rounded-lg border border-border/60 bg-card hover:bg-muted text-xs font-bold text-muted-foreground disabled:opacity-50 transition" disabled>Next</button>
-              </div>
-            </div>
-
-          </div>
-          </>
+            </>
           )}
 
           {/* TAB 2: CUMULATIVE SUMMARY (INCREMENT SUMMARY SHEET) */}
           {activeReportsTab === "summary" && (
-            <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4 animate-in fade-in duration-200">
+            <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4 animate-in fade-in duration-200">
               <div className="flex items-center justify-between pb-3 border-b border-border/20">
                 <div>
                   <h3 className="text-xs font-black uppercase text-foreground">Departmental Increment Summary Ledger</h3>
@@ -884,9 +884,9 @@ function IncrementHistoryPage() {
           {/* TAB 3: PARAMETERIZED REPORTS (INCREMENT PROPOSAL REGISTER) */}
           {activeReportsTab === "reports" && (
             <div className="space-y-6 animate-in fade-in duration-200">
-              
+
               {/* Filter Panel */}
-              <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
+              <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
                 <h3 className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-1.5">
                   <Filter className="size-4.5 text-primary" />
                   <span>Report Compilation Parameters</span>
@@ -927,7 +927,7 @@ function IncrementHistoryPage() {
               </div>
 
               {/* Proposals Table */}
-              <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
+              <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-3 border-b border-border/20">
                   <h3 className="text-xs font-black uppercase text-foreground">Compensation Appraisal & Increment Register</h3>
                   <div className="flex items-center gap-2">
@@ -999,8 +999,8 @@ function IncrementHistoryPage() {
       {/* Record details Audit Modal */}
       {selectedRecord && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-lg rounded-2xl border border-border shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-foreground">
-            
+          <div className="bg-card w-full max-w-lg rounded-lg border border-border shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-foreground">
+
             <button
               onClick={() => setSelectedRecord(null)}
               className="absolute right-4 top-4 p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition"
@@ -1014,7 +1014,7 @@ function IncrementHistoryPage() {
             </h3>
 
             <div className="space-y-4 text-xs font-semibold">
-              
+
               {/* Profile card */}
               <div className="p-4 rounded-xl bg-muted border border-border/65 flex items-center gap-3">
                 <div className="size-10 rounded-xl bg-gradient-to-br from-primary to-primary-glow text-white grid place-items-center text-xs font-black shadow-sm">
@@ -1102,8 +1102,8 @@ function IncrementHistoryPage() {
       {/* PDF View Printable Modal */}
       {isPdfModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-5xl rounded-2xl border border-border shadow-2xl p-6 relative flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 text-foreground">
-            
+          <div className="bg-card w-full max-w-5xl rounded-lg border border-border shadow-2xl p-6 relative flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 text-foreground">
+
             <button
               onClick={() => setIsPdfModalOpen(false)}
               className="absolute right-4 top-4 p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition"
@@ -1122,7 +1122,7 @@ function IncrementHistoryPage() {
 
             {/* Scrollable Document Body */}
             <div id="pdf-print-area" className="flex-1 overflow-y-auto p-4 border border-border bg-white text-slate-900 rounded-xl space-y-6">
-              
+
               {/* Document Header */}
               <div className="text-center space-y-1.5 border-b border-slate-200 pb-4">
                 <h2 className="text-lg font-black tracking-tight text-slate-900">PAKIZA SOFTWARE LIMITED</h2>

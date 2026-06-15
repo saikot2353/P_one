@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
-import { 
+import {
   Sparkles, ChevronRight, Search, Plus, Trash2, Edit3, ShieldAlert,
   Eye, CheckCircle2, XCircle, X, User, GraduationCap, Briefcase, MapPin, Heart, Mail, Phone, Calendar, Clock, Info
 } from "lucide-react";
@@ -56,15 +56,21 @@ interface Candidate {
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
-    "IE Pending":    "bg-[#fef3c7] text-[#b45309] border-[#fde68a]", // Amber
-    "IE Submitted":  "bg-[#eff6ff] text-[#1d4ed8] border-[#bfdbfe]", // Blue
-    "HR Pending":    "bg-[#faf5ff] text-[#7e22ce] border-[#e9d5ff]", // Purple
-    "HR Approved":   "bg-[#ecfdf5] text-[#047857] border-[#a7f3d0]", // Green/Emerald
-    "HR Rejected":   "bg-[#fdf2f2] text-[#b91c1c] border-[#fde8e8]", // Red
+    "Pending": "bg-[#faf5ff] text-[#7e22ce] border-[#e9d5ff]", // Purple
+    "Approved": "bg-[#ecfdf5] text-[#047857] border-[#a7f3d0]", // Green/Emerald
+    "Rejected": "bg-[#fdf2f2] text-[#b91c1c] border-[#fde8e8]", // Red
   };
+
+  let displayStatus = "Pending";
+  if (status && status.includes("Approved")) {
+    displayStatus = "Approved";
+  } else if (status && status.includes("Rejected")) {
+    displayStatus = "Rejected";
+  }
+
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${map[status] || "bg-slate-50 text-slate-600 border-slate-200"}`}>
-      {status}
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${map[displayStatus] || "bg-slate-50 text-slate-600 border-slate-200"}`}>
+      {displayStatus}
     </span>
   );
 }
@@ -137,7 +143,7 @@ function BasicInfoListPage() {
 
         <div className="p-4 md:p-6 lg:p-8 space-y-6">
           {/* Header */}
-          <div className="bg-card rounded-2xl border border-border/85 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-lg border border-border/85 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -167,7 +173,7 @@ function BasicInfoListPage() {
           </div>
 
           {/* Directory Data Grid */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
             {/* Search and stats bar */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-3 border-b border-border/20">
               <span className="text-xs font-bold text-muted-foreground">
@@ -212,13 +218,14 @@ function BasicInfoListPage() {
                       <td className="px-4 py-3.5 text-center"><StatusBadge status={c.assessStatus} /></td>
                       <td className="px-4 py-3.5 text-center">
                         <div className="flex items-center justify-center gap-1.5">
-                          <button
-                            onClick={() => setSelectedCandidate(c)}
+                          <Link
+                            to="/recruitment-detail/$id"
+                            params={{ id: c.empIdTemp }}
                             className="h-7 px-3 rounded bg-primary/10 text-primary border border-primary/15 hover:bg-primary/20 flex items-center justify-center gap-1 text-[10px] font-bold transition"
                             title="Review Dossier"
                           >
                             <Eye className="size-3.5" /> Review
-                          </button>
+                          </Link>
                         </div>
                       </td>
                     </tr>
@@ -235,235 +242,6 @@ function BasicInfoListPage() {
             </div>
           </div>
         </div>
-
-        {/* ── HIGH FIDELITY CANDIDATE DETAILED VIEW DRAWER / DRAWER MODAL ── */}
-        {selectedCandidate && (
-          <div className="fixed inset-0 z-50 flex justify-end bg-black/55 backdrop-blur-xs animate-in fade-in duration-200">
-            <div className="w-full max-w-3xl bg-card border-l border-border/80 h-full flex flex-col shadow-2xl animate-in slide-in-from-right duration-300">
-              
-              {/* Header */}
-              <div className="p-5 border-b border-border/50 flex items-center justify-between bg-muted/20">
-                <div className="flex items-center gap-2">
-                  <span className="p-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary">
-                    <User className="size-5" />
-                  </span>
-                  <div>
-                    <h2 className="text-sm font-black text-foreground uppercase tracking-wider">{selectedCandidate.nameEng}</h2>
-                    <p className="text-[10px] text-muted-foreground font-mono">Dossier Code: {selectedCandidate.empIdTemp}</p>
-                  </div>
-                </div>
-                <button 
-                  onClick={() => setSelectedCandidate(null)}
-                  className="size-8 rounded-full border border-border/60 hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition"
-                >
-                  <X className="size-4" />
-                </button>
-              </div>
-
-              {/* Scrollable Content Area */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-none">
-                
-                {/* Visual Identity & Avatar Card */}
-                <div className="flex flex-col sm:flex-row gap-5 items-center bg-muted/10 border border-border/60 p-5 rounded-2xl">
-                  {selectedCandidate.photo ? (
-                    <img 
-                      src={selectedCandidate.photo} 
-                      alt={selectedCandidate.nameEng} 
-                      className="size-24 rounded-xl border border-border object-cover shadow-sm"
-                    />
-                  ) : (
-                    <div className="size-24 rounded-xl border border-border/60 bg-card flex items-center justify-center text-muted-foreground/40 shrink-0">
-                      <User className="size-10" />
-                    </div>
-                  )}
-                  <div className="space-y-2 text-center sm:text-left min-w-0 flex-1">
-                    <h3 className="text-base font-black text-foreground">{selectedCandidate.nameEng}</h3>
-                    <p className="text-xs text-muted-foreground font-bold">{selectedCandidate.nameBng || "বাংলা নাম নেই"}</p>
-                    <div className="flex flex-wrap justify-center sm:justify-start gap-3 text-[10px] font-bold text-muted-foreground/80">
-                      <span className="flex items-center gap-1"><Calendar className="size-3" /> DOB: {selectedCandidate.dob || "—"}</span>
-                      <span className="flex items-center gap-1"><Clock className="size-3" /> Status: {selectedCandidate.assessStatus}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Grid Group 1: Personal Details */}
-                <div className="space-y-3">
-                  <h4 className="text-[10px] font-black uppercase text-primary tracking-widest border-b border-border/30 pb-1 flex items-center gap-1">
-                    <Info className="size-3.5" /> Personal Credentials
-                  </h4>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-2 text-xs">
-                    <div>
-                      <p className="text-[9px] font-black uppercase text-muted-foreground/60">Religion</p>
-                      <p className="font-bold text-foreground">{selectedCandidate.religion || "—"}</p>
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-black uppercase text-muted-foreground/60">Marital Status</p>
-                      <p className="font-bold text-foreground">{selectedCandidate.maritalStatus || "—"}</p>
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-black uppercase text-muted-foreground/60">NID Number</p>
-                      <p className="font-bold text-foreground font-mono">{selectedCandidate.nidNumber || "—"}</p>
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-black uppercase text-muted-foreground/60">Birth Registration No</p>
-                      <p className="font-bold text-foreground font-mono">{selectedCandidate.birthReg || "—"}</p>
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-black uppercase text-muted-foreground/60">Father Name (ENG)</p>
-                      <p className="font-bold text-foreground">{selectedCandidate.fatherNameEng || "—"}</p>
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-black uppercase text-muted-foreground/60">Father Name (BNG)</p>
-                      <p className="font-bold text-foreground">{selectedCandidate.fatherNameBng || "—"}</p>
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-black uppercase text-muted-foreground/60">Mother Name (ENG)</p>
-                      <p className="font-bold text-foreground">{selectedCandidate.motherNameEng || "—"}</p>
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-black uppercase text-muted-foreground/60">Mother Name (BNG)</p>
-                      <p className="font-bold text-foreground">{selectedCandidate.motherNameBng || "—"}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Grid Group 2: Contact Details */}
-                <div className="space-y-3">
-                  <h4 className="text-[10px] font-black uppercase text-primary tracking-widest border-b border-border/30 pb-1 flex items-center gap-1">
-                    <Phone className="size-3.5" /> Contacts & emergency References
-                  </h4>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-2 text-xs">
-                    <div>
-                      <p className="text-[9px] font-black uppercase text-muted-foreground/60">Personal Contact No</p>
-                      <p className="font-bold text-foreground font-mono">{selectedCandidate.personalContact}</p>
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-black uppercase text-muted-foreground/60">Emergency Contact No</p>
-                      <p className="font-bold text-foreground font-mono">{selectedCandidate.emergencyContact || "—"}</p>
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-black uppercase text-muted-foreground/60">Personal Email</p>
-                      <p className="font-bold text-foreground font-mono">{selectedCandidate.personalEmail || "—"}</p>
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-black uppercase text-muted-foreground/60">Emergency Contact Person</p>
-                      <p className="font-bold text-foreground">{selectedCandidate.contactPerson || "—"}</p>
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-black uppercase text-muted-foreground/60">Relationship</p>
-                      <p className="font-bold text-foreground">{selectedCandidate.relationship || "—"}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Grid Group 3: Addresses */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-muted/10 border border-border/60 rounded-xl p-4 space-y-2">
-                    <p className="text-[10px] font-black uppercase text-primary flex items-center gap-1"><MapPin className="size-3.5" /> Present Address</p>
-                    <p className="text-[11.5px] font-semibold text-foreground/80 leading-relaxed">{selectedCandidate.presentAddress || "—"}</p>
-                  </div>
-                  <div className="bg-muted/10 border border-border/60 rounded-xl p-4 space-y-2">
-                    <p className="text-[10px] font-black uppercase text-primary flex items-center gap-1"><MapPin className="size-3.5" /> Permanent Address</p>
-                    <p className="text-[11.5px] font-semibold text-foreground/80 leading-relaxed">{selectedCandidate.permanentAddress || "—"}</p>
-                  </div>
-                </div>
-
-                {/* Academics Section */}
-                <div className="space-y-3">
-                  <h4 className="text-[10px] font-black uppercase text-primary tracking-widest border-b border-border/30 pb-1 flex items-center gap-1">
-                    <GraduationCap className="size-3.5" /> Academic Qualifications
-                  </h4>
-                  {selectedCandidate.academics && selectedCandidate.academics.length > 0 ? (
-                    <div className="space-y-2.5">
-                      {selectedCandidate.academics.map((ac: any, i: number) => (
-                        <div key={ac.id || i} className="flex items-center justify-between border border-border/50 bg-card p-3.5 rounded-xl shadow-3xs">
-                          <div>
-                            <p className="text-xs font-bold text-foreground">{ac.title || "—"}</p>
-                            <p className="text-[10px] text-muted-foreground font-semibold">{ac.institution || "—"}</p>
-                          </div>
-                          <div className="text-right text-[10px] font-bold">
-                            <p className="text-foreground">GPA/Result: {ac.result || "—"}</p>
-                            <p className="text-muted-foreground/75 font-mono">Passing Year: {ac.year || "—"}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-[11px] text-muted-foreground/60 italic font-semibold">No academic credentials declared.</p>
-                  )}
-                </div>
-
-                {/* Job Experiences Section */}
-                <div className="space-y-3">
-                  <h4 className="text-[10px] font-black uppercase text-primary tracking-widest border-b border-border/30 pb-1 flex items-center gap-1">
-                    <Briefcase className="size-3.5" /> Job Experience History
-                  </h4>
-                  {selectedCandidate.experiences && selectedCandidate.experiences.length > 0 ? (
-                    <div className="space-y-2.5">
-                      {selectedCandidate.experiences.map((exp: any, i: number) => (
-                        <div key={exp.id || i} className="border border-border/50 bg-card p-3.5 rounded-xl shadow-3xs space-y-1.5">
-                          <div className="flex items-center justify-between">
-                            <p className="text-xs font-bold text-foreground">{exp.company || "—"}</p>
-                            <p className="text-[10px] font-mono text-muted-foreground">{exp.from || "—"} to {exp.to || "—"}</p>
-                          </div>
-                          <div className="flex justify-between items-center text-[10px] font-bold text-muted-foreground/85">
-                            <p>Designation: <span className="text-foreground">{exp.designation || "—"}</span></p>
-                            <p>Leaving Reason: <span className="text-foreground">{exp.reason || "—"}</span></p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-[11px] text-muted-foreground/60 italic font-semibold">No job experience declared.</p>
-                  )}
-                </div>
-
-                {/* Nominee Section */}
-                {selectedCandidate.nominee && (
-                  <div className="bg-muted/10 border border-border/60 rounded-xl p-4 space-y-3">
-                    <h4 className="text-[10px] font-black uppercase text-primary flex items-center gap-1"><Heart className="size-3.5" /> Nominee Declaration</h4>
-                    <div className="grid grid-cols-2 gap-y-3 gap-x-2 text-xs">
-                      <div>
-                        <p className="text-[9px] font-black uppercase text-muted-foreground/60">Nominee Name</p>
-                        <p className="font-bold text-foreground">{selectedCandidate.nominee.name || "—"}</p>
-                      </div>
-                      <div>
-                        <p className="text-[9px] font-black uppercase text-muted-foreground/60">Relationship</p>
-                        <p className="font-bold text-foreground">{selectedCandidate.nominee.relation || "—"}</p>
-                      </div>
-                      <div>
-                        <p className="text-[9px] font-black uppercase text-muted-foreground/60">NID / Birth Registration</p>
-                        <p className="font-bold text-foreground font-mono">{selectedCandidate.nominee.nidReg || "—"}</p>
-                      </div>
-                      <div>
-                        <p className="text-[9px] font-black uppercase text-muted-foreground/60">Contact Number</p>
-                        <p className="font-bold text-foreground font-mono">{selectedCandidate.nominee.contact || "—"}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-              </div>
-
-              {/* Action Buttons in Drawer Footer */}
-              <div className="p-4 border-t border-border/50 bg-muted/20 flex gap-3">
-                <button
-                  onClick={() => handleReject(selectedCandidate.empIdTemp)}
-                  className="flex-1 flex items-center justify-center gap-1.5 h-11 bg-rose-50 border border-rose-200 hover:bg-rose-100 text-rose-600 font-bold rounded-xl text-xs transition"
-                >
-                  <XCircle className="size-4" /> Reject Candidate
-                </button>
-                <button
-                  onClick={() => handleApprove(selectedCandidate.empIdTemp)}
-                  className="flex-1 flex items-center justify-center gap-1.5 h-11 bg-primary text-primary-foreground hover:opacity-90 font-black rounded-xl text-xs shadow-md transition"
-                >
-                  <CheckCircle2 className="size-4" /> Approve &amp; Move to IE
-                </button>
-              </div>
-
-            </div>
-          </div>
-        )}
 
       </main>
     </div>

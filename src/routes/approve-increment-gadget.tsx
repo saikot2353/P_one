@@ -110,7 +110,7 @@ function ApproveIncrementGadgetPage() {
       if (empType !== "ALL" && row.oldEmpType !== empType) return false;
       // Status filter
       if (status !== "ALL" && row.status !== status) return false;
-      
+
       // EmpId comma separator
       if (empIdInput.trim()) {
         const qids = empIdInput.split(",").map(id => id.trim().toLowerCase());
@@ -222,7 +222,7 @@ function ApproveIncrementGadgetPage() {
         <div className="p-4 md:p-6 lg:p-8 space-y-6">
 
           {/* Breadcrumbs */}
-          <div className="bg-card rounded-2xl border border-border/85 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-lg border border-border/85 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -239,7 +239,7 @@ function ApproveIncrementGadgetPage() {
           </div>
 
           {/* PARAMETRIC FILTERS ROW */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
               <div className="space-y-1">
                 <label className="text-[9px] font-bold text-muted-foreground uppercase">Year (Gadget)</label>
@@ -312,8 +312,8 @@ function ApproveIncrementGadgetPage() {
               </div>
               <div className="space-y-1">
                 <label className="text-[9px] font-bold text-muted-foreground uppercase">EmpId (Comma Separated)</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={empIdInput}
                   onChange={e => setEmpIdInput(e.target.value)}
                   placeholder="Input Comma As Separator"
@@ -345,8 +345,8 @@ function ApproveIncrementGadgetPage() {
           </div>
 
           {/* ACTIVE ROSTER DATAGRID */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
-            
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
+
             {/* Table Export Actions Bar */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-3 border-b border-border/20">
               <div className="flex items-center gap-2">
@@ -366,7 +366,7 @@ function ApproveIncrementGadgetPage() {
 
               <div className="flex items-center gap-2">
                 <span className="text-[11px] font-bold text-muted-foreground uppercase whitespace-nowrap">Search:</span>
-                <input 
+                <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -382,7 +382,7 @@ function ApproveIncrementGadgetPage() {
                 <thead>
                   <tr className="text-[9.5px] uppercase font-bold tracking-wider text-muted-foreground/60 border-b border-border/30 bg-muted/20">
                     <th className="px-3 py-3 text-center">
-                      <input 
+                      <input
                         type="checkbox"
                         checked={filteredRecords.length > 0 && selectedIds.length === filteredRecords.length}
                         onChange={handleSelectAll}
@@ -415,12 +415,12 @@ function ApproveIncrementGadgetPage() {
                   {filteredRecords.map((row, idx) => {
                     const isChecked = selectedIds.includes(row.id);
                     return (
-                      <tr 
-                        key={row.id} 
+                      <tr
+                        key={row.id}
                         className={`hover:bg-muted/40 transition duration-150 ${isChecked ? "bg-primary/5 border-l border-primary" : ""}`}
                       >
                         <td className="px-3 py-3 text-center">
-                          <input 
+                          <input
                             type="checkbox"
                             checked={isChecked}
                             onChange={() => handleToggleRow(row.id)}
@@ -472,10 +472,10 @@ function ApproveIncrementGadgetPage() {
 
             {/* Pagination & Submissions Bar */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-3 border-t border-border/25">
-              
+
               {/* Action buttons matching screenshot 3 bottom left */}
               <div className="flex items-center gap-2">
-                <button 
+                <button
                   onClick={handleApproveSelected}
                   className="h-8 pl-2 pr-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-[0.97] text-white font-semibold text-[10px] rounded-lg shadow-xs flex items-center gap-2 transition-all duration-200 uppercase tracking-wider border border-emerald-500/10"
                 >
@@ -484,7 +484,7 @@ function ApproveIncrementGadgetPage() {
                   </span>
                   <span>Approve Selected</span>
                 </button>
-                <button 
+                <button
                   onClick={handleUndoSelected}
                   className="h-8 pl-2 pr-3.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 active:scale-[0.97] text-white font-semibold text-[10px] rounded-lg shadow-xs flex items-center gap-2 transition-all duration-200 uppercase tracking-wider border border-amber-500/10"
                 >
@@ -493,7 +493,7 @@ function ApproveIncrementGadgetPage() {
                   </span>
                   <span>Undo Selected</span>
                 </button>
-                <button 
+                <button
                   onClick={() => alert("Generating printable PDF dossier ledger...")}
                   className="h-8 pl-2 pr-3.5 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 active:scale-[0.97] text-white font-semibold text-[10px] rounded-lg shadow-xs flex items-center gap-2 transition-all duration-200 uppercase tracking-wider border border-slate-600/30"
                 >

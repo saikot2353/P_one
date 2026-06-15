@@ -51,7 +51,14 @@ import { Route as EmployeeJobCardRouteImport } from './routes/employee-job-card'
 import { Route as EarnLeaveWorkflowRouteImport } from './routes/earn-leave-workflow'
 import { Route as EarnLeaveSubmitRouteImport } from './routes/earn-leave-submit'
 import { Route as EarnLeaveProcessRouteImport } from './routes/earn-leave-process'
+import { Route as ERecruitmentFormRouteImport } from './routes/e-recruitment-form'
 import { Route as CreateRosterRouteImport } from './routes/create-roster'
+import { Route as ConfigureTimeRouteImport } from './routes/configure-time'
+import { Route as ConfigureStructureRouteImport } from './routes/configure-structure'
+import { Route as ConfigurePoliciesRouteImport } from './routes/configure-policies'
+import { Route as ConfigureEmploymentRouteImport } from './routes/configure-employment'
+import { Route as ConfigureEducationRouteImport } from './routes/configure-education'
+import { Route as ConfigureCompensationRouteImport } from './routes/configure-compensation'
 import { Route as CompanyHolidayRouteImport } from './routes/company-holiday'
 import { Route as ApproveIncrementHrRouteImport } from './routes/approve-increment-hr'
 import { Route as ApproveIncrementGadgetRouteImport } from './routes/approve-increment-gadget'
@@ -277,9 +284,44 @@ const EarnLeaveProcessRoute = EarnLeaveProcessRouteImport.update({
   path: '/earn-leave-process',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ERecruitmentFormRoute = ERecruitmentFormRouteImport.update({
+  id: '/e-recruitment-form',
+  path: '/e-recruitment-form',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CreateRosterRoute = CreateRosterRouteImport.update({
   id: '/create-roster',
   path: '/create-roster',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfigureTimeRoute = ConfigureTimeRouteImport.update({
+  id: '/configure-time',
+  path: '/configure-time',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfigureStructureRoute = ConfigureStructureRouteImport.update({
+  id: '/configure-structure',
+  path: '/configure-structure',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfigurePoliciesRoute = ConfigurePoliciesRouteImport.update({
+  id: '/configure-policies',
+  path: '/configure-policies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfigureEmploymentRoute = ConfigureEmploymentRouteImport.update({
+  id: '/configure-employment',
+  path: '/configure-employment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfigureEducationRoute = ConfigureEducationRouteImport.update({
+  id: '/configure-education',
+  path: '/configure-education',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfigureCompensationRoute = ConfigureCompensationRouteImport.update({
+  id: '/configure-compensation',
+  path: '/configure-compensation',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompanyHolidayRoute = CompanyHolidayRouteImport.update({
@@ -336,7 +378,14 @@ export interface FileRoutesByFullPath {
   '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
   '/company-holiday': typeof CompanyHolidayRoute
+  '/configure-compensation': typeof ConfigureCompensationRoute
+  '/configure-education': typeof ConfigureEducationRoute
+  '/configure-employment': typeof ConfigureEmploymentRoute
+  '/configure-policies': typeof ConfigurePoliciesRoute
+  '/configure-structure': typeof ConfigureStructureRoute
+  '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
+  '/e-recruitment-form': typeof ERecruitmentFormRoute
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
@@ -390,7 +439,14 @@ export interface FileRoutesByTo {
   '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
   '/company-holiday': typeof CompanyHolidayRoute
+  '/configure-compensation': typeof ConfigureCompensationRoute
+  '/configure-education': typeof ConfigureEducationRoute
+  '/configure-employment': typeof ConfigureEmploymentRoute
+  '/configure-policies': typeof ConfigurePoliciesRoute
+  '/configure-structure': typeof ConfigureStructureRoute
+  '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
+  '/e-recruitment-form': typeof ERecruitmentFormRoute
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
@@ -445,7 +501,14 @@ export interface FileRoutesById {
   '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
   '/company-holiday': typeof CompanyHolidayRoute
+  '/configure-compensation': typeof ConfigureCompensationRoute
+  '/configure-education': typeof ConfigureEducationRoute
+  '/configure-employment': typeof ConfigureEmploymentRoute
+  '/configure-policies': typeof ConfigurePoliciesRoute
+  '/configure-structure': typeof ConfigureStructureRoute
+  '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
+  '/e-recruitment-form': typeof ERecruitmentFormRoute
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
@@ -501,7 +564,14 @@ export interface FileRouteTypes {
     | '/approve-increment-gadget'
     | '/approve-increment-hr'
     | '/company-holiday'
+    | '/configure-compensation'
+    | '/configure-education'
+    | '/configure-employment'
+    | '/configure-policies'
+    | '/configure-structure'
+    | '/configure-time'
     | '/create-roster'
+    | '/e-recruitment-form'
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
@@ -555,7 +625,14 @@ export interface FileRouteTypes {
     | '/approve-increment-gadget'
     | '/approve-increment-hr'
     | '/company-holiday'
+    | '/configure-compensation'
+    | '/configure-education'
+    | '/configure-employment'
+    | '/configure-policies'
+    | '/configure-structure'
+    | '/configure-time'
     | '/create-roster'
+    | '/e-recruitment-form'
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
@@ -609,7 +686,14 @@ export interface FileRouteTypes {
     | '/approve-increment-gadget'
     | '/approve-increment-hr'
     | '/company-holiday'
+    | '/configure-compensation'
+    | '/configure-education'
+    | '/configure-employment'
+    | '/configure-policies'
+    | '/configure-structure'
+    | '/configure-time'
     | '/create-roster'
+    | '/e-recruitment-form'
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
@@ -664,7 +748,14 @@ export interface RootRouteChildren {
   ApproveIncrementGadgetRoute: typeof ApproveIncrementGadgetRoute
   ApproveIncrementHrRoute: typeof ApproveIncrementHrRoute
   CompanyHolidayRoute: typeof CompanyHolidayRoute
+  ConfigureCompensationRoute: typeof ConfigureCompensationRoute
+  ConfigureEducationRoute: typeof ConfigureEducationRoute
+  ConfigureEmploymentRoute: typeof ConfigureEmploymentRoute
+  ConfigurePoliciesRoute: typeof ConfigurePoliciesRoute
+  ConfigureStructureRoute: typeof ConfigureStructureRoute
+  ConfigureTimeRoute: typeof ConfigureTimeRoute
   CreateRosterRoute: typeof CreateRosterRoute
+  ERecruitmentFormRoute: typeof ERecruitmentFormRoute
   EarnLeaveProcessRoute: typeof EarnLeaveProcessRoute
   EarnLeaveSubmitRoute: typeof EarnLeaveSubmitRoute
   EarnLeaveWorkflowRoute: typeof EarnLeaveWorkflowRoute
@@ -1009,11 +1100,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EarnLeaveProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/e-recruitment-form': {
+      id: '/e-recruitment-form'
+      path: '/e-recruitment-form'
+      fullPath: '/e-recruitment-form'
+      preLoaderRoute: typeof ERecruitmentFormRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/create-roster': {
       id: '/create-roster'
       path: '/create-roster'
       fullPath: '/create-roster'
       preLoaderRoute: typeof CreateRosterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/configure-time': {
+      id: '/configure-time'
+      path: '/configure-time'
+      fullPath: '/configure-time'
+      preLoaderRoute: typeof ConfigureTimeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/configure-structure': {
+      id: '/configure-structure'
+      path: '/configure-structure'
+      fullPath: '/configure-structure'
+      preLoaderRoute: typeof ConfigureStructureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/configure-policies': {
+      id: '/configure-policies'
+      path: '/configure-policies'
+      fullPath: '/configure-policies'
+      preLoaderRoute: typeof ConfigurePoliciesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/configure-employment': {
+      id: '/configure-employment'
+      path: '/configure-employment'
+      fullPath: '/configure-employment'
+      preLoaderRoute: typeof ConfigureEmploymentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/configure-education': {
+      id: '/configure-education'
+      path: '/configure-education'
+      fullPath: '/configure-education'
+      preLoaderRoute: typeof ConfigureEducationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/configure-compensation': {
+      id: '/configure-compensation'
+      path: '/configure-compensation'
+      fullPath: '/configure-compensation'
+      preLoaderRoute: typeof ConfigureCompensationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/company-holiday': {
@@ -1088,7 +1228,14 @@ const rootRouteChildren: RootRouteChildren = {
   ApproveIncrementGadgetRoute: ApproveIncrementGadgetRoute,
   ApproveIncrementHrRoute: ApproveIncrementHrRoute,
   CompanyHolidayRoute: CompanyHolidayRoute,
+  ConfigureCompensationRoute: ConfigureCompensationRoute,
+  ConfigureEducationRoute: ConfigureEducationRoute,
+  ConfigureEmploymentRoute: ConfigureEmploymentRoute,
+  ConfigurePoliciesRoute: ConfigurePoliciesRoute,
+  ConfigureStructureRoute: ConfigureStructureRoute,
+  ConfigureTimeRoute: ConfigureTimeRoute,
   CreateRosterRoute: CreateRosterRoute,
+  ERecruitmentFormRoute: ERecruitmentFormRoute,
   EarnLeaveProcessRoute: EarnLeaveProcessRoute,
   EarnLeaveSubmitRoute: EarnLeaveSubmitRoute,
   EarnLeaveWorkflowRoute: EarnLeaveWorkflowRoute,

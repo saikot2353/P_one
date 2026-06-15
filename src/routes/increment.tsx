@@ -276,7 +276,7 @@ function IncrementConfiguratorPage() {
     setTimeout(() => {
       setIsSubmitting(false);
       showToast(`Increment proposal of ৳${amount.toLocaleString()} submitted successfully for ${activeEmp.name}!`);
-      
+
       // Save proposed item directly to queue local storage
       const newRec = {
         action: "edit",
@@ -375,7 +375,7 @@ function IncrementConfiguratorPage() {
     }
 
     const processed = gadgetEmployees.filter(emp => selectedIds.includes(emp.id));
-    
+
     // Save to custom queue records in local storage
     const existing = localStorage.getItem("custom_increment_queue_records");
     const list = existing ? JSON.parse(existing) : [];
@@ -400,7 +400,7 @@ function IncrementConfiguratorPage() {
         approved: false,
         hrEndorsed: false
       };
-      
+
       // Prevent duplicates in queue
       const existingIdx = list.findIndex((x: any) => x.empId === emp.id);
       if (existingIdx > -1) {
@@ -427,9 +427,9 @@ function IncrementConfiguratorPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 lg:p-8 space-y-6">
-          
+
           {/* Breadcrumb and Page Header */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -443,7 +443,7 @@ function IncrementConfiguratorPage() {
                 <h1 className="text-xl font-extrabold tracking-tight text-foreground">Increment Configurator Workspace</h1>
               </div>
             </div>
-            
+
             {/* Quick stats indicators */}
             <div className="flex items-center gap-3 flex-wrap">
               <div className="bg-card border border-border/70 rounded-xl px-3.5 py-1.5 shadow-2xs">
@@ -469,7 +469,7 @@ function IncrementConfiguratorPage() {
           )}
 
           {/* Tab Selection Hub */}
-          <div className="bg-card rounded-2xl border border-border/80 p-1.5 shadow-2xs flex gap-1 print:hidden">
+          <div className="bg-card rounded-lg border border-border/80 p-1.5 shadow-2xs flex gap-1 print:hidden">
             <button
               onClick={() => setActiveTab("batch")}
               className={`flex-1 sm:flex-none h-10 px-6 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${activeTab === "batch" ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground hover:bg-muted/75 hover:text-foreground"}`}
@@ -498,15 +498,15 @@ function IncrementConfiguratorPage() {
             {/* TAB 1: INCREMENT GADGET BATCH PROCESSING */}
             {activeTab === "batch" && (
               <div className="space-y-6 animate-in fade-in duration-200">
-                
+
                 {/* 11 Filters Configuration Grid (Matched Legacy Screenshot) */}
-                <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs relative overflow-hidden">
+                <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs relative overflow-hidden">
                   <div className="absolute top-0 inset-x-0 h-[2.5px] bg-gradient-to-r from-primary/10 via-primary/45 to-primary/10" />
                   <h3 className="text-xs font-black uppercase tracking-wider text-foreground mb-4 flex items-center gap-1.5">
                     <ListFilter className="size-4.5 text-primary" />
                     <span>Gadget Query & Parametric Filter Console</span>
                   </h3>
-                  
+
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
                     <div className="space-y-1.5">
                       <label className="text-[9px] font-black uppercase text-muted-foreground">Year (Gadget)</label>
@@ -608,7 +608,7 @@ function IncrementConfiguratorPage() {
                 </div>
 
                 {/* Main Datagrid Container */}
-                <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4 overflow-hidden">
+                <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4 overflow-hidden">
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-3 border-b border-border/20">
                     <div className="flex items-center gap-2">
                       <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-primary/10 text-primary">
@@ -758,14 +758,14 @@ function IncrementConfiguratorPage() {
             {/* TAB 2: SINGLE PROPOSAL */}
             {activeTab === "single" && (
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start animate-in fade-in duration-200">
-                
+
                 {/* Proposal Setup Form */}
-                <form onSubmit={handleSingleSubmit} className="lg:col-span-7 bg-card rounded-2xl border border-border/80 p-6 shadow-xs space-y-6">
+                <form onSubmit={handleSingleSubmit} className="lg:col-span-7 bg-card rounded-lg border border-border/80 p-6 shadow-xs space-y-6">
                   <h3 className="text-sm font-black uppercase tracking-wider text-foreground flex items-center gap-2">
                     <Sparkles className="size-4.5 text-primary" />
                     <span>Configure Single Appraised Adjustment</span>
                   </h3>
-                  
+
                   <div className="space-y-2">
                     <label className="text-[10px] text-muted-foreground uppercase font-black">Select Employee *</label>
                     <div className="relative">
@@ -820,7 +820,7 @@ function IncrementConfiguratorPage() {
                       value={remarks}
                       onChange={(e) => setRemarks(e.target.value)}
                       placeholder="Add justifications note..."
-                      className="w-full p-3.5 rounded-2xl bg-muted border border-border/40 text-xs font-semibold focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none"
+                      className="w-full p-3.5 rounded-lg bg-muted border border-border/40 text-xs font-semibold focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none"
                       disabled={isSubmitting}
                     />
                   </div>
@@ -838,9 +838,9 @@ function IncrementConfiguratorPage() {
 
                 {/* Ledger Outlay Visualizer Card */}
                 <div className="lg:col-span-5 space-y-6">
-                  <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs relative overflow-hidden bg-gradient-to-b from-card to-green-500/[0.01]">
+                  <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs relative overflow-hidden bg-gradient-to-b from-card to-green-500/[0.01]">
                     <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-emerald-500" />
-                    
+
                     <h4 className="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-3 flex items-center gap-1.5">
                       <TrendingUp className="size-4 animate-pulse" />
                       <span>Ledger Growth Summary</span>
@@ -885,7 +885,7 @@ function IncrementConfiguratorPage() {
 
             {/* TAB 3: SCALE RULES & PARAMETERS */}
             {activeTab === "rules" && (
-              <form onSubmit={handleSaveRules} className="bg-card rounded-2xl border border-border/80 p-6 shadow-xs space-y-6 animate-in fade-in duration-200">
+              <form onSubmit={handleSaveRules} className="bg-card rounded-lg border border-border/80 p-6 shadow-xs space-y-6 animate-in fade-in duration-200">
                 <h3 className="text-sm font-black uppercase tracking-wider text-foreground flex items-center gap-2">
                   <Sliders className="size-4.5 text-primary" />
                   <span>Statutory Wage Allocation Rules</span>

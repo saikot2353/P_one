@@ -66,7 +66,7 @@ function LeaveApplicationPage() {
   const [year, setYear] = useState("2026");
   const [attendanceBonus, setAttendanceBonus] = useState("Yes");
   const [employeeId, setEmployeeId] = useState("2023043910");
-  
+
   const [leaveType, setLeaveType] = useState("Casual Leave");
   const [leavePayWith, setLeavePayWith] = useState("With Pay");
   const [durationFrom, setDurationFrom] = useState("");
@@ -137,9 +137,9 @@ function LeaveApplicationPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 lg:p-8 space-y-6">
-          
+
           {/* Breadcrumb and Modern Page Header */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -153,7 +153,7 @@ function LeaveApplicationPage() {
                 <span>Leave Application</span>
               </h1>
             </div>
-            
+
             <div className="text-[10px] font-extrabold uppercase bg-primary/10 text-primary px-4 py-2 rounded-full border border-primary/20 select-none">
               Fiscal Calendar Year: {year}
             </div>
@@ -171,11 +171,11 @@ function LeaveApplicationPage() {
 
             {/* Form Section */}
             <div className="xl:col-span-2 space-y-6">
-              
+
               <form onSubmit={handleSubmit} className="space-y-6">
-                
+
                 {/* PART 1: APPLICANT DETAILS */}
-                <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm space-y-5">
+                <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm space-y-5">
                   <div className="flex items-center gap-2.5 border-b border-slate-100 dark:border-slate-800 pb-3">
                     <div className="size-7 rounded-lg bg-primary/10 text-primary grid place-items-center font-bold text-xs">01</div>
                     <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-white">Applicant Information</h3>
@@ -225,8 +225,8 @@ function LeaveApplicationPage() {
 
                   {/* Elegant dynamically fetched employee details */}
                   {matchedEmployee ? (
-                    <div className="p-5 rounded-2xl border border-primary/20 bg-primary/5 dark:bg-primary/[0.02] grid grid-cols-1 md:grid-cols-2 gap-4">
-                      
+                    <div className="p-5 rounded-lg border border-primary/20 bg-primary/5 dark:bg-primary/[0.02] grid grid-cols-1 md:grid-cols-2 gap-4">
+
                       <div className="md:col-span-2 flex items-center gap-3 border-b border-primary/10 pb-3">
                         <div className="size-9 rounded-full bg-primary/20 text-primary grid place-items-center font-bold text-xs">
                           {matchedEmployee.name.split(" ").map(n => n[0]).join("")}
@@ -282,7 +282,7 @@ function LeaveApplicationPage() {
                 </div>
 
                 {/* PART 2: LEAVE PERIOD DETAILS */}
-                <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm space-y-5">
+                <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm space-y-5">
                   <div className="flex items-center gap-2.5 border-b border-slate-100 dark:border-slate-800 pb-3">
                     <div className="size-7 rounded-lg bg-primary/10 text-primary grid place-items-center font-bold text-xs">02</div>
                     <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-white">Leave Schedule & Type</h3>
@@ -354,7 +354,7 @@ function LeaveApplicationPage() {
                 </div>
 
                 {/* PART 3: COVERAGE & LOGISTICS */}
-                <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm space-y-5">
+                <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm space-y-5">
                   <div className="flex items-center gap-2.5 border-b border-slate-100 dark:border-slate-800 pb-3">
                     <div className="size-7 rounded-lg bg-primary/10 text-primary grid place-items-center font-bold text-xs">03</div>
                     <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-white">Coverage & Logistics</h3>
@@ -435,7 +435,7 @@ function LeaveApplicationPage() {
                 </div>
 
                 {/* Submissions Action footer */}
-                <div className="flex justify-end gap-3 p-6 bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm print:hidden">
+                <div className="flex justify-end gap-3 p-6 bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 shadow-sm print:hidden">
                   <button
                     type="button"
                     onClick={() => {
@@ -466,8 +466,8 @@ function LeaveApplicationPage() {
 
             {/* Sidebar Balance summary */}
             <div className="space-y-6">
-              
-              <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm space-y-4">
+
+              <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm space-y-4">
                 <div className="border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center justify-between">
                   <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-white">Leave Ledger Summary</h3>
                   <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -485,7 +485,7 @@ function LeaveApplicationPage() {
                     const percent = (lv.spent / lv.limit) * 100;
 
                     return (
-                      <div key={idx} className="space-y-2 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-900/10 hover:shadow-xs transition duration-200">
+                      <div key={idx} className="space-y-2 p-3.5 rounded-lg border border-slate-100 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-900/10 hover:shadow-xs transition duration-200">
                         <div className="flex items-center justify-between text-xs font-bold text-slate-800 dark:text-slate-200">
                           <span>{lv.label}</span>
                           <span className="font-black text-primary">{remaining} / {lv.limit} Days Left</span>
@@ -504,7 +504,7 @@ function LeaveApplicationPage() {
               </div>
 
               {/* Policy notes card */}
-              <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm space-y-3.5">
+              <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm space-y-3.5">
                 <div className="flex items-center gap-2 text-primary font-bold text-[11px] uppercase tracking-wider">
                   <FileText className="size-4 animate-bounce text-primary" />
                   <span>Leave Regulation Policy</span>

@@ -22,7 +22,7 @@ function NewRequisitionPage() {
       <main className="flex-1 min-w-0 flex flex-col relative">
         <Topbar />
         <div className="p-4 md:p-6 xl:p-8 space-y-6">
-          <div className="bg-card border border-border/80 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="bg-card border border-border/80 rounded-lg p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1.5">
               <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -40,17 +40,17 @@ function NewRequisitionPage() {
               Select an option below to initiate a new requisition request.
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {cards.map(card => (
-              <Link 
-                key={card.title} 
+              <Link
+                key={card.title}
                 to={card.to}
-                className="group relative bg-card border border-border/70 rounded-2xl p-6 shadow-sm hover:shadow-lg hover:border-primary/40 transition-all duration-300 overflow-hidden flex flex-col gap-5 hover:-translate-y-1"
+                className="group relative bg-card border border-border/70 rounded-lg p-6 shadow-sm hover:shadow-lg hover:border-primary/40 transition-all duration-300 overflow-hidden flex flex-col gap-5 hover:-translate-y-1"
               >
                 <div className={`absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r ${card.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
                 <div className="flex items-center justify-between">
-                  <div className={`size-14 rounded-2xl ${card.iconBg} flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3`}>
+                  <div className={`size-14 rounded-lg ${card.iconBg} flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3`}>
                     <card.icon className={`size-6 ${card.iconColor}`} />
                   </div>
                   <div className="size-8 rounded-full bg-muted/50 flex items-center justify-center group-hover:bg-primary/10 transition-colors duration-300">

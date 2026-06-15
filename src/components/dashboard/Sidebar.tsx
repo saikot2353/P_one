@@ -37,11 +37,12 @@ const nav: NavItem[] = [
     label: "Configure",
     icon: SlidersHorizontal,
     subitems: [
-      { label: "Company Settings", to: "/" },
-      { label: "Branch Setup", to: "/" },
-      { label: "Department Setup", to: "/" },
-      { label: "Designation Setup", to: "/" },
-      { label: "System Logs", to: "/" },
+      { label: "Structure Setup", to: "/configure-structure" },
+      { label: "Job & Employee Setup", to: "/configure-employment" },
+      { label: "Shift & Time Rules", to: "/configure-time" },
+      { label: "Allowances & Bonuses", to: "/configure-compensation" },
+      { label: "Education & Training", to: "/configure-education" },
+      { label: "Leave & Policies", to: "/configure-policies" }
     ]
   },
   {
@@ -50,11 +51,6 @@ const nav: NavItem[] = [
     active: true,
     subitems: [
       { label: "Personnel List", to: "/personnel-list" },
-      { label: "Manpower Basic Form", to: "/" },
-      { label: "Manpower Basic List", to: "/" },
-      { label: "Personnel QR", to: "/" },
-      { label: "Salary Pay Scale", to: "/" },
-      { label: "Salary Pay Scale List", to: "/" },
       { label: "Approval", to: "/personnel-approval" },
     ]
   },
@@ -117,7 +113,7 @@ const nav: NavItem[] = [
     label: "e-Recruitment",
     icon: UserPlus,
     subitems: [
-      { label: "e-Recuritment Form", to: "/recruitment-basic-entry" },
+      { label: "e-Recruitment Form", to: "/e-recruitment-form" },
       { label: "List", to: "/recruitment-basic-list" },
       { label: "Approved List", to: "/recruitment-assessment-list" },
     ],
@@ -355,7 +351,7 @@ export function Sidebar() {
         })}
       </nav>
       <div className="p-3 border-t border-sidebar-border/60 space-y-1 bg-sidebar-accent/15">
-        <Link to="/" className="group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-semibold text-sidebar-foreground/85 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all">
+        <Link to="/configure-structure" className="group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-semibold text-sidebar-foreground/85 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all">
           <Settings className="size-3.5 transition-transform duration-300 group-hover:rotate-45" /> Settings
         </Link>
         <Link to="/" className="group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-semibold text-sidebar-foreground/85 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all">

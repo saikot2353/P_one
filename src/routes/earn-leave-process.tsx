@@ -133,16 +133,16 @@ function EarnLeaveProcessPage() {
     }).map((r, index) => {
       // Per Day Amount = Gross / 30 (Rounded to 2 decimal places)
       const perDayAmount = Math.round((r.gross / 30) * 100) / 100;
-      
+
       // Total EL = Earned Days + Earned Days CF - Taken EL
       const totalEl = Math.round((r.earnedDays + r.earnedDaysCf - r.takenEl) * 100) / 100;
-      
+
       // Raw Total Amount = Total EL * Per Day Amount
       const rawTotalAmount = Math.round((totalEl * perDayAmount) * 100) / 100;
-      
+
       // Pay Day = Total EL * (scalePercent / 100)
       const payDay = Math.round((totalEl * (scalePercent / 100)) * 100) / 100;
-      
+
       // Net Pay = Pay Day * Per Day Amount (Rounded to integer as shown in screenshot)
       const netPay = Math.round(payDay * perDayAmount);
 
@@ -178,7 +178,7 @@ function EarnLeaveProcessPage() {
         <div className="p-4 md:p-6 lg:p-8 space-y-6">
 
           {/* Breadcrumb and Header */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -192,7 +192,7 @@ function EarnLeaveProcessPage() {
                 <span>Earn Leave Process</span>
               </h1>
             </div>
-            
+
             <div className="text-[10px] font-extrabold uppercase bg-primary/10 text-primary px-4 py-2 rounded-full border border-primary/20 select-none">
               Fiscal Cycle: {year}
             </div>
@@ -207,9 +207,9 @@ function EarnLeaveProcessPage() {
           )}
 
           {/* Configuration Form Panel */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-xs">
+          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-xs">
             <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-4 text-xs font-bold">
-              
+
               {/* Year */}
               <div className="space-y-1.5">
                 <label className="text-[10px] text-slate-400 uppercase">Year</label>
@@ -332,10 +332,10 @@ function EarnLeaveProcessPage() {
           </div>
 
           {/* Action Row & Utility Controls */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm space-y-5">
-            
+          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm space-y-5">
+
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              
+
               {/* Spreadsheet export buttons */}
               <div className="flex items-center gap-1.5">
                 <button className="h-8.5 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 font-extrabold text-[11px] text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition">

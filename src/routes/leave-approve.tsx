@@ -137,7 +137,7 @@ function LeaveApprovePage() {
     return rows.filter(r => {
       // 1. Dropdown State filter
       if (appliedFilters.stateFilter !== "ALL" && r.status !== appliedFilters.stateFilter) return false;
-      
+
       // 2. Emp ID Multi (comma separated list)
       if (appliedFilters.empIdMulti.trim()) {
         const ids = appliedFilters.empIdMulti.split(",").map(i => i.trim());
@@ -220,7 +220,7 @@ function LeaveApprovePage() {
         <div className="p-4 md:p-6 lg:p-8 space-y-6">
 
           {/* Title Bar containing the back arrow */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs flex flex-col gap-3">
+          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs flex flex-col gap-3">
             <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
               <Link to="/" className="hover:text-primary transition-colors">Home</Link>
               <ChevronRight className="size-2.5" />
@@ -243,9 +243,9 @@ function LeaveApprovePage() {
           </div>
 
           {/* Parameters / Configuration Form Panel */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-xs">
+          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-xs">
             <form onSubmit={handleSearchTrigger} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-4 text-xs font-bold">
-              
+
               {/* Region */}
               <div className="space-y-1.5">
                 <label className="text-[10px] text-slate-400 uppercase">Region</label>
@@ -364,10 +364,10 @@ function LeaveApprovePage() {
           </div>
 
           {/* Action Row & Utility Controls */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm space-y-5">
-            
+          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm space-y-5">
+
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              
+
               {/* Approve / Reject buttons */}
               <div className="flex items-center gap-3">
                 <button
@@ -379,7 +379,7 @@ function LeaveApprovePage() {
                   </span>
                   <span>Approve Selected</span>
                 </button>
-                
+
                 <button
                   onClick={handleRejectSelected}
                   className="h-8 pl-2 pr-3.5 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 active:scale-[0.97] text-white font-semibold text-[10px] rounded-lg shadow-xs flex items-center gap-2 transition-all duration-200 uppercase tracking-wider border border-rose-500/10"
@@ -393,7 +393,7 @@ function LeaveApprovePage() {
 
               {/* Spreadsheet download utilities & Grid Search input */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                
+
                 <div className="flex items-center gap-1.5">
                   <button className="h-8.5 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 font-extrabold text-[11px] text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition">
                     <FileSpreadsheet className="size-3.5 text-emerald-500" />
@@ -452,7 +452,7 @@ function LeaveApprovePage() {
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {filteredRows.map((row) => {
                     const isSelected = selectedIds.has(row.id);
-                    
+
                     let statusBadge = "bg-amber-100 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400";
                     if (row.status === "Approved") {
                       statusBadge = "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400";

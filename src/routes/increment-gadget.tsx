@@ -93,9 +93,9 @@ function IncrementGadgetPage() {
   const [batchGross, setBatchGross] = useState("");
   const [batchIncGross, setBatchIncGross] = useState("");
   const [batchDesignation, setBatchDesignation] = useState("ALL")  // Bangladesh Labor Act Statutory Configs
-  const [bllRatio, setBllRatio] = useState("60"); 
-  const [contributePF, setContributePF] = useState(true); 
-  const [pfRate, setPfRate] = useState(10); 
+  const [bllRatio, setBllRatio] = useState("60");
+  const [contributePF, setContributePF] = useState(true);
+  const [pfRate, setPfRate] = useState(10);
   const [batchEmpType, setBatchEmpType] = useState("ALL");
 
   // Sync Preselected IDs from Propose page on Mount
@@ -156,7 +156,7 @@ function IncrementGadgetPage() {
       if (designation !== "ALL" && emp.designation !== designation) return false;
       // status filter
       if (status !== "ALL" && emp.status !== status) return false;
-      
+
       // EmpId comma separator
       if (empIdFilter.trim()) {
         const qids = empIdFilter.split(",").map(id => id.trim().toLowerCase());
@@ -211,7 +211,7 @@ function IncrementGadgetPage() {
     }
 
     const submissions = calculatedRoster.filter(e => selectedEmpIds.includes(e.id));
-    
+
     // Save custom proposals inside localStorage custom queue list
     const existingSaved = localStorage.getItem("custom_increment_queue_records");
     let currentQueue = [];
@@ -262,7 +262,7 @@ function IncrementGadgetPage() {
         <div className="p-4 md:p-6 lg:p-8 space-y-6">
 
           {/* Header Card */}
-          <div className="bg-card rounded-2xl border border-border/85 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-lg border border-border/85 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -279,7 +279,7 @@ function IncrementGadgetPage() {
           </div>
 
           {/* GADGET CONTROLS PANEL 1: Top parameters */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
               <div className="space-y-1">
                 <label className="text-[9px] font-bold text-muted-foreground uppercase">Year (Gadget)</label>
@@ -334,7 +334,7 @@ function IncrementGadgetPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-border/20">
               <div className="space-y-1">
                 <label className="text-[9px] font-bold text-muted-foreground uppercase">EmpId (Comma Separated)</label>
-                <input 
+                <input
                   type="text"
                   value={empIdFilter}
                   onChange={e => setEmpIdFilter(e.target.value)}
@@ -367,7 +367,7 @@ function IncrementGadgetPage() {
           </div>
 
           {/* BANGLADESH LABOR ACT STATUTORY CONSOLE CARD */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
             <h3 className="text-[10px] font-black text-emerald-600 uppercase tracking-widest flex items-center gap-1.5 border-b border-border/20 pb-2">
               <Sparkles className="size-4 animate-pulse text-emerald-500" />
               <span>Bangladesh Labor Act 2006 — Statutory Compliance Parameters</span>
@@ -377,9 +377,9 @@ function IncrementGadgetPage() {
               {/* Split Ratio Option */}
               <div className="space-y-1.5 p-3.5 bg-emerald-500/5 rounded-xl border border-emerald-500/15">
                 <label className="text-[10px] font-black text-emerald-800 uppercase tracking-wide block">Basic Salary split ratio</label>
-                <select 
-                  value={bllRatio} 
-                  onChange={e => setBllRatio(e.target.value)} 
+                <select
+                  value={bllRatio}
+                  onChange={e => setBllRatio(e.target.value)}
                   className="w-full h-8 px-2.5 rounded-lg bg-card border border-emerald-500/20 text-xs font-extrabold text-emerald-700 outline-none"
                 >
                   <option value="60">60% of Gross (Commercial Executive Standard)</option>
@@ -393,7 +393,7 @@ function IncrementGadgetPage() {
               {/* CPF Options */}
               <div className="space-y-2 p-3.5 bg-emerald-500/5 rounded-xl border border-emerald-500/15 flex flex-col justify-between">
                 <div className="flex items-center gap-2">
-                  <input 
+                  <input
                     type="checkbox"
                     id="cpf-toggle"
                     checked={contributePF}
@@ -406,7 +406,7 @@ function IncrementGadgetPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[9px] font-bold text-emerald-700 uppercase">Contribution Rate:</span>
-                  <input 
+                  <input
                     type="number"
                     value={pfRate}
                     disabled={!contributePF}
@@ -428,7 +428,7 @@ function IncrementGadgetPage() {
           </div>
 
           {/* GADGET CONTROLS PANEL 2: Batch Config Values (Row 2 Filters) */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
             <h3 className="text-[10px] font-black text-primary uppercase tracking-widest flex items-center gap-1.5 border-b border-border/20 pb-2">
               <Sliders className="size-4" />
               <span>Batch Configurations (Applies to Checked Roster Rows)</span>
@@ -446,31 +446,31 @@ function IncrementGadgetPage() {
               </div>
               <div className="space-y-1">
                 <label className="text-[9px] font-bold text-muted-foreground uppercase font-mono">Basic(New)</label>
-                <input 
-                  type="text" 
-                  value={batchBasic} 
+                <input
+                  type="text"
+                  value={batchBasic}
                   disabled
-                  placeholder="60% Auto split" 
+                  placeholder="60% Auto split"
                   className="w-full h-8 px-2.5 rounded-lg bg-muted border border-border/30 text-xs font-semibold text-muted-foreground cursor-not-allowed"
                 />
               </div>
               <div className="space-y-1">
                 <label className="text-[9px] font-bold text-muted-foreground uppercase font-mono">Gross(New)</label>
-                <input 
-                  type="text" 
-                  value={batchGross} 
-                  onChange={e => setBatchGross(e.target.value)} 
-                  placeholder="Set Target Gross..." 
+                <input
+                  type="text"
+                  value={batchGross}
+                  onChange={e => setBatchGross(e.target.value)}
+                  placeholder="Set Target Gross..."
                   className="w-full h-8 px-2.5 rounded-lg bg-muted border border-border/40 text-xs font-semibold text-foreground outline-none"
                 />
               </div>
               <div className="space-y-1">
                 <label className="text-[9px] font-bold text-primary uppercase tracking-wider font-extrabold">Increment Gross</label>
-                <input 
-                  type="text" 
-                  value={batchIncGross} 
-                  onChange={e => setBatchIncGross(e.target.value)} 
-                  placeholder="Increment Gross Value..." 
+                <input
+                  type="text"
+                  value={batchIncGross}
+                  onChange={e => setBatchIncGross(e.target.value)}
+                  placeholder="Increment Gross Value..."
                   className="w-full h-8 px-2.5 rounded-lg bg-muted border border-border/40 text-xs font-extrabold text-foreground outline-none"
                 />
               </div>
@@ -497,8 +497,8 @@ function IncrementGadgetPage() {
           </div>
 
           {/* ACTIVE ROSTER DATAGRID */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
-            
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
+
             {/* Table Export Actions Bar */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-3 border-b border-border/20">
               <div className="flex items-center gap-2">
@@ -518,7 +518,7 @@ function IncrementGadgetPage() {
 
               <div className="flex items-center gap-2">
                 <span className="text-[11px] font-bold text-muted-foreground uppercase whitespace-nowrap">Search:</span>
-                <input 
+                <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -534,7 +534,7 @@ function IncrementGadgetPage() {
                 <thead>
                   <tr className="text-[9.5px] uppercase font-bold tracking-wider text-muted-foreground/60 border-b border-border/30 bg-muted/20">
                     <th className="px-3 py-3 text-center">
-                      <input 
+                      <input
                         type="checkbox"
                         checked={filteredRoster.length > 0 && selectedEmpIds.length === filteredRoster.length}
                         onChange={handleSelectAll}
@@ -570,12 +570,12 @@ function IncrementGadgetPage() {
                   {filteredRoster.map((row, idx) => {
                     const isChecked = selectedEmpIds.includes(row.id);
                     return (
-                      <tr 
-                        key={row.id} 
+                      <tr
+                        key={row.id}
                         className={`hover:bg-muted/40 transition duration-150 ${isChecked ? "bg-primary/5 border-l border-primary" : ""}`}
                       >
                         <td className="px-3 py-3 text-center">
-                          <input 
+                          <input
                             type="checkbox"
                             checked={isChecked}
                             onChange={() => handleToggleRow(row.id)}
@@ -641,7 +641,7 @@ function IncrementGadgetPage() {
               </span>
 
               <div className="flex items-center gap-3">
-                <button 
+                <button
                   onClick={handleSubmitBatch}
                   className="h-10 px-8 bg-primary hover:opacity-95 text-primary-foreground font-black text-xs rounded-xl shadow-xs transition uppercase tracking-wider flex items-center gap-1.5"
                 >

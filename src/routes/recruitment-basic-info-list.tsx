@@ -18,11 +18,11 @@ export const Route = createFileRoute("/recruitment-basic-info-list")({
 // Status badge helper
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
-    "IE Pending":    "bg-[#fef3c7] text-[#b45309] border-[#fde68a]", // Amber
-    "IE Submitted":  "bg-[#eff6ff] text-[#1d4ed8] border-[#bfdbfe]", // Blue
-    "HR Pending":    "bg-[#faf5ff] text-[#7e22ce] border-[#e9d5ff]", // Purple
-    "HR Approved":   "bg-[#ecfdf5] text-[#047857] border-[#a7f3d0]", // Green/Emerald
-    "HR Rejected":   "bg-[#fdf2f2] text-[#b91c1c] border-[#fde8e8]", // Red
+    "IE Pending": "bg-[#fef3c7] text-[#b45309] border-[#fde68a]", // Amber
+    "IE Submitted": "bg-[#eff6ff] text-[#1d4ed8] border-[#bfdbfe]", // Blue
+    "HR Pending": "bg-[#faf5ff] text-[#7e22ce] border-[#e9d5ff]", // Purple
+    "HR Approved": "bg-[#ecfdf5] text-[#047857] border-[#a7f3d0]", // Green/Emerald
+    "HR Rejected": "bg-[#fdf2f2] text-[#b91c1c] border-[#fde8e8]", // Red
   };
   return (
     <span className={`inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold border whitespace-nowrap ${map[status] || "bg-slate-50 text-slate-600 border-slate-200"}`}>
@@ -103,7 +103,7 @@ function BasicInfoListPage() {
         <div className="p-4 md:p-6 lg:p-8 space-y-5 max-w-[1800px] mx-auto w-full">
 
           {/* Header */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -128,7 +128,7 @@ function BasicInfoListPage() {
           </div>
 
           {/* Filters */}
-          <div className="bg-card rounded-2xl border border-border/80 shadow-xs p-5">
+          <div className="bg-card rounded-lg border border-border/80 shadow-xs p-5">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3 mb-4">
               <div className="space-y-1.5">
                 <label className={labelClass}>Assess Status</label>
@@ -204,7 +204,7 @@ function BasicInfoListPage() {
                 <label className={labelClass}>Line</label>
                 <select value={line} onChange={e => setLine(e.target.value)} className={filterClass}>
                   <option value="">All Lines</option>
-                  {["12","13","14","52","53","54","55","56","57","58","59","F-1","F-2","F-3","QC1"].map(l => (
+                  {["12", "13", "14", "52", "53", "54", "55", "56", "57", "58", "59", "F-1", "F-2", "F-3", "QC1"].map(l => (
                     <option key={l} value={l}>{l}</option>
                   ))}
                 </select>
@@ -239,7 +239,7 @@ function BasicInfoListPage() {
           </div>
 
           {/* Table */}
-          <div className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden">
+          <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "1500px" }}>
                 <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
@@ -272,11 +272,11 @@ function BasicInfoListPage() {
                   {filteredCandidates.map((item, idx) => {
                     const canEdit = item.assessStatus === "IE Pending";
                     const isEven = idx % 2 === 0;
-                    const rowBgClass = isEven 
-                      ? "bg-white dark:bg-[#0f172a]" 
+                    const rowBgClass = isEven
+                      ? "bg-white dark:bg-[#0f172a]"
                       : "bg-[#f8fafc] dark:bg-[#131d30]";
-                    const stickyCellBgClass = isEven 
-                      ? "bg-white dark:bg-[#0f172a] group-hover:bg-[#f1f5f9] dark:group-hover:bg-[#1c283d]" 
+                    const stickyCellBgClass = isEven
+                      ? "bg-white dark:bg-[#0f172a] group-hover:bg-[#f1f5f9] dark:group-hover:bg-[#1c283d]"
                       : "bg-[#f8fafc] dark:bg-[#131d30] group-hover:bg-[#f1f5f9] dark:group-hover:bg-[#1c283d]";
 
                     return (
@@ -314,7 +314,7 @@ function BasicInfoListPage() {
                         <td className={`sticky left-[405px] ${stickyCellBgClass} px-5 py-3.5 border-r border-border/40 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[220px] min-w-[220px] max-w-[220px] transition-all`}>
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-950/40 text-[11px] font-bold text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-100/50 dark:border-blue-900/30 shrink-0 shadow-2xs">
-                              {item.nameEng.split(" ").map((s: string) => s[0]).slice(0,2).join("").toUpperCase()}
+                              {item.nameEng.split(" ").map((s: string) => s[0]).slice(0, 2).join("").toUpperCase()}
                             </div>
                             <span className="truncate max-w-[150px] font-bold text-slate-800 dark:text-slate-200">{item.nameEng}</span>
                           </div>

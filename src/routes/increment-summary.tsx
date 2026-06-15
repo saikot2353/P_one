@@ -55,7 +55,7 @@ function IncrementSummaryPage() {
   const [unit, setUnit] = useState("ALL");
   const [line, setLine] = useState("ALL");
   const [gender, setGender] = useState("ALL");
-  
+
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredRecords = useMemo(() => {
@@ -83,7 +83,7 @@ function IncrementSummaryPage() {
         <div className="p-4 md:p-6 lg:p-8 space-y-6">
 
           {/* Breadcrumbs */}
-          <div className="bg-card rounded-2xl border border-border/85 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-lg border border-border/85 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -100,7 +100,7 @@ function IncrementSummaryPage() {
           </div>
 
           {/* PARAMETRIC FILTERS ROW */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
               <div className="space-y-1">
                 <label className="text-[9px] font-bold text-muted-foreground uppercase">Year</label>
@@ -187,8 +187,8 @@ function IncrementSummaryPage() {
           </div>
 
           {/* ACTIVE SUMMARY GRID */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
-            
+          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
+
             {/* Table Export Actions Bar */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-3 border-b border-border/20">
               <div className="flex items-center gap-2">
@@ -208,7 +208,7 @@ function IncrementSummaryPage() {
 
               <div className="flex items-center gap-2">
                 <span className="text-[11px] font-bold text-muted-foreground uppercase whitespace-nowrap">Search:</span>
-                <input 
+                <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}

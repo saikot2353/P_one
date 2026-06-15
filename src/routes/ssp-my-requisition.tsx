@@ -3,12 +3,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { SearchableSelect } from "@/components/ui/searchable-select";
-import { 
-  ChevronRight, 
-  Search, 
-  Printer, 
-  FileText, 
-  Eye, 
+import {
+  ChevronRight,
+  Search,
+  Printer,
+  FileText,
+  Eye,
   Table as TableIcon,
   CalendarRange,
   CheckCircle2,
@@ -98,11 +98,11 @@ export default function MyRequisitionPage() {
       <Sidebar />
       <main className="flex-1 min-w-0 flex flex-col overflow-hidden">
         <Topbar />
-        
+
         <div className="flex-1 flex flex-col p-4 xl:p-6 gap-4 overflow-hidden">
-          
+
           {/* Header Block */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl px-5 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
+          <div className="bg-white border border-slate-200/80 rounded-lg px-5 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
             <div className="space-y-0.5">
               <div className="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -125,10 +125,10 @@ export default function MyRequisitionPage() {
 
           {/* KPI Dashboard Summary Row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 shrink-0">
-            
+
             {/* Total Requisitions */}
             <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-[0_1px_3px_rgba(0,0,0,0.015)] flex items-center gap-3">
-              <div className="size-9 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-555 shrink-0 border border-slate-100">
+              <div className="size-9 rounded-lg bg-slate-50 flex items-center justify-center text-slate-555 shrink-0 border border-slate-100">
                 <FolderOpen className="size-4.5" />
               </div>
               <div>
@@ -139,7 +139,7 @@ export default function MyRequisitionPage() {
 
             {/* Approved */}
             <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-[0_1px_3px_rgba(0,0,0,0.015)] flex items-center gap-3">
-              <div className="size-9 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 border border-emerald-100/40">
+              <div className="size-9 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 border border-emerald-100/40">
                 <CheckCircle2 className="size-4.5" />
               </div>
               <div>
@@ -150,7 +150,7 @@ export default function MyRequisitionPage() {
 
             {/* Pending */}
             <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-[0_1px_3px_rgba(0,0,0,0.015)] flex items-center gap-3">
-              <div className="size-9 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0 border border-amber-100/40">
+              <div className="size-9 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600 shrink-0 border border-amber-100/40">
                 <Clock className="size-4.5" />
               </div>
               <div>
@@ -161,7 +161,7 @@ export default function MyRequisitionPage() {
 
             {/* Rejected */}
             <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-[0_1px_3px_rgba(0,0,0,0.015)] flex items-center gap-3">
-              <div className="size-9 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-600 shrink-0 border border-rose-100/40">
+              <div className="size-9 rounded-lg bg-rose-50 flex items-center justify-center text-rose-600 shrink-0 border border-rose-100/40">
                 <XCircle className="size-4.5" />
               </div>
               <div>
@@ -173,8 +173,8 @@ export default function MyRequisitionPage() {
           </div>
 
           {/* Smart Filters and Navigation Bar */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col xl:flex-row xl:items-center justify-between gap-3 shrink-0">
-            
+          <div className="bg-white border border-slate-200/80 rounded-lg p-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col xl:flex-row xl:items-center justify-between gap-3 shrink-0">
+
             <div className="flex flex-wrap items-center gap-3">
               {/* Requester Select */}
               <div className="flex items-center gap-1.5">
@@ -183,12 +183,12 @@ export default function MyRequisitionPage() {
                   value={requester}
                   onChange={setRequester}
                   options={requesterOptions}
-                  className="h-8 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-semibold px-2"
+                  className="h-8 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold px-2"
                 />
               </div>
 
               {/* Date From & To */}
-              <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-2xl p-0.5 shadow-3xs">
+              <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg p-0.5 shadow-3xs">
                 <input
                   type="date"
                   value={dateFrom}
@@ -207,18 +207,17 @@ export default function MyRequisitionPage() {
 
             {/* Smart Filter Pills (One-click filtering) */}
             <div className="flex items-center gap-3">
-              <div className="flex items-center bg-slate-50 border border-slate-200 rounded-2xl p-0.5 shadow-3xs">
+              <div className="flex items-center bg-slate-50 border border-slate-200 rounded-lg p-0.5 shadow-3xs">
                 {(["All", "Approved", "Pending", "Rejected"] as const).map(filter => {
                   const isActive = statusFilter === filter;
                   return (
                     <button
                       key={filter}
                       onClick={() => setStatusFilter(filter)}
-                      className={`px-2.5 py-1 text-[9px] font-bold rounded transition-all uppercase tracking-wider ${
-                        isActive 
-                          ? "bg-slate-700 text-white shadow-3xs" 
+                      className={`px-2.5 py-1 text-[9px] font-bold rounded transition-all uppercase tracking-wider ${isActive
+                          ? "bg-slate-700 text-white shadow-3xs"
                           : "text-slate-500 hover:bg-white/40 hover:text-slate-800"
-                      }`}
+                        }`}
                     >
                       {filter}
                     </button>
@@ -228,12 +227,12 @@ export default function MyRequisitionPage() {
 
               <div className="relative w-40">
                 <Search className="absolute left-2.5 top-2 size-3 text-slate-400" />
-                <input 
+                <input
                   type="text"
                   value={reqNumber}
                   onChange={e => setReqNumber(e.target.value)}
                   placeholder="Req Number..."
-                  className="h-7.5 pl-8 pr-3 w-full bg-slate-50 border border-slate-200 rounded-2xl text-xs font-semibold focus:outline-none focus:border-slate-400"
+                  className="h-7.5 pl-8 pr-3 w-full bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:border-slate-400"
                 />
               </div>
             </div>
@@ -241,30 +240,30 @@ export default function MyRequisitionPage() {
           </div>
 
           {/* Action Toolbar & Requisitions List Table Card */}
-          <div className="flex-1 bg-white border border-slate-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.03)] rounded-2xl overflow-hidden flex flex-col min-h-0">
-            
+          <div className="flex-1 bg-white border border-slate-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.03)] rounded-lg overflow-hidden flex flex-col min-h-0">
+
             {/* Toolbar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 border-b border-slate-200 bg-slate-50/20 shrink-0">
               <div className="flex items-center gap-1.5">
-                <button className="h-8 px-3 border border-slate-200 rounded-2xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-1 bg-white cursor-pointer shadow-3xs">
+                <button className="h-8 px-3 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-1 bg-white cursor-pointer shadow-3xs">
                   <TableIcon className="size-3.5 text-emerald-600" /> EXCEL
                 </button>
-                <button className="h-8 px-3 border border-slate-200 rounded-2xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-1 bg-white cursor-pointer shadow-3xs">
+                <button className="h-8 px-3 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-1 bg-white cursor-pointer shadow-3xs">
                   <Printer className="size-3.5 text-slate-500" /> PRINT
                 </button>
-                <button className="h-8 px-3 border border-slate-200 rounded-2xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-1 bg-white cursor-pointer shadow-3xs">
+                <button className="h-8 px-3 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-1 bg-white cursor-pointer shadow-3xs">
                   <FileText className="size-3.5 text-rose-500" /> PDF
                 </button>
               </div>
 
               <div className="relative w-48">
                 <Search className="absolute left-2.5 top-2 size-3.5 text-slate-400" />
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={globalSearch}
                   onChange={e => setGlobalSearch(e.target.value)}
                   placeholder="Quick Search..."
-                  className="h-7.5 w-full pl-8.5 pr-3 bg-white border border-slate-200 rounded-2xl text-xs font-semibold focus:outline-none focus:border-slate-400"
+                  className="h-7.5 w-full pl-8.5 pr-3 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:border-slate-400"
                 />
               </div>
             </div>
@@ -287,13 +286,13 @@ export default function MyRequisitionPage() {
                     <tr key={row.id} className="hover:bg-slate-50/20 transition-colors">
                       <td className="px-5 py-2">
                         <div className="flex items-center gap-1.5">
-                          <button 
-                            onClick={row.onClickView} 
-                            className="size-7 rounded-2xl bg-slate-50 hover:bg-slate-900 border border-slate-200 hover:border-slate-900 hover:text-white transition-all flex items-center justify-center cursor-pointer shadow-3xs"
+                          <button
+                            onClick={row.onClickView}
+                            className="size-7 rounded-lg bg-slate-50 hover:bg-slate-900 border border-slate-200 hover:border-slate-900 hover:text-white transition-all flex items-center justify-center cursor-pointer shadow-3xs"
                           >
                             <Eye className="size-3.5" />
                           </button>
-                          <button className="size-7 rounded-2xl bg-slate-50 hover:bg-slate-900 border border-slate-200 hover:border-slate-900 hover:text-white transition-all flex items-center justify-center cursor-pointer shadow-3xs">
+                          <button className="size-7 rounded-lg bg-slate-50 hover:bg-slate-900 border border-slate-200 hover:border-slate-900 hover:text-white transition-all flex items-center justify-center cursor-pointer shadow-3xs">
                             <Printer className="size-3.5" />
                           </button>
                         </div>
@@ -301,11 +300,10 @@ export default function MyRequisitionPage() {
                       <td className="px-5 py-2 font-bold text-slate-800">{row.reqNum}</td>
                       <td className="px-5 py-2 text-slate-500 font-mono">{row.date}</td>
                       <td className="px-5 py-2">
-                        <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border ${
-                          row.status === "Approved" 
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-200/50" 
+                        <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border ${row.status === "Approved"
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200/50"
                             : "bg-amber-50 text-amber-700 border-amber-200/50"
-                        }`}>
+                          }`}>
                           {row.status}
                         </span>
                       </td>

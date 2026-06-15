@@ -119,7 +119,7 @@ export default function RequestManualAttendancePage() {
                 <p className="text-[10.5px] text-muted-foreground">
                   Fields marked with <span className="text-rose-500 font-bold">*</span> are required
                 </p>
-                <button className="h-9 px-6 bg-primary hover:bg-primary/90 text-primary-foreground text-[12px] font-semibold rounded-2xl transition-all shadow-sm hover:shadow-md active:scale-[0.98] flex items-center gap-2 cursor-pointer">
+                <button className="h-9 px-6 bg-primary hover:bg-primary/90 text-primary-foreground text-[12px] font-semibold rounded-lg transition-all shadow-sm hover:shadow-md active:scale-[0.98] flex items-center gap-2 cursor-pointer">
                   <CheckCircle2 className="size-3.5" />
                   Submit Request
                 </button>
@@ -153,11 +153,10 @@ export default function RequestManualAttendancePage() {
                         <td className="px-5 py-3.5 text-muted-foreground">{req.out}</td>
                         <td className="px-5 py-3.5 font-medium">{req.type}</td>
                         <td className="px-5 py-3.5">
-                          <span className={`px-2.5 py-1 rounded-xl text-[10px] font-bold uppercase tracking-wider border ${
-                            req.status === "Approved" 
-                              ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/30" 
+                          <span className={`px-2.5 py-1 rounded-xl text-[10px] font-bold uppercase tracking-wider border ${req.status === "Approved"
+                              ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/30"
                               : "bg-rose-50 dark:bg-rose-950/20 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-900/30"
-                          }`}>
+                            }`}>
                             {req.status}
                           </span>
                         </td>
