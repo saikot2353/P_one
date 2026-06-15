@@ -30,18 +30,13 @@ export default defineConfig(({ command, mode }) => {
     plugins: [
       tsconfigPaths({ projects: ["./tsconfig.json"] }),
       tailwindcss(),
-      tanstackStart({
-        importProtection: {
-          behavior: "error",
-          client: {
-            files: ["**/server/**"],
-            specifiers: ["server-only"]
-          }
-        }
-      }),
+      tanstackStart(),
       command === "build" && nitro(),
       react(),
       mode === "development" && componentTagger(),
     ].filter(Boolean),
+    ssr: {
+      noExternal: ['tslib', 'react-remove-scroll']
+    }
   };
 });
