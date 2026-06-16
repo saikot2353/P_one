@@ -4912,7 +4912,7 @@ function AddEmployeePage() {
       {/* AI NID OCR SCANNER MODAL OVERLAY */}
       {showNidOcrModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-300">
-          <div className="bg-card border border-border/80 rounded-2xl shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto flex flex-col gap-5 animate-in zoom-in-95 duration-200">
+          <div className="bg-card border border-border/80 rounded-2xl shadow-2xl p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto flex flex-col gap-5 animate-in zoom-in-95 duration-200">
             
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-border/30 pb-4">
@@ -4939,10 +4939,10 @@ function AddEmployeePage() {
             </div>
 
             {/* Modal Body - Editable Fields */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 overflow-y-auto max-h-[65vh] pr-1.5">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-y-auto max-h-[65vh] pr-1.5">
               
               {/* Left Column: Image Preview & Raw OCR Log */}
-              <div className="lg:col-span-1 space-y-4">
+              <div className="lg:col-span-5 space-y-4">
                 {nidFrontPreview ? (
                   <div className="space-y-3">
                     <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1.5">
@@ -4983,7 +4983,7 @@ function AddEmployeePage() {
               </div>
 
               {/* Right Column: Editable fields */}
-              <div className="lg:col-span-2 space-y-6">
+              <div className="lg:col-span-7 space-y-6">
                 
                 {/* Category 1: Names & Identity */}
                 <div className="space-y-4">
@@ -5326,25 +5326,25 @@ function AddEmployeePage() {
 
               {/* Scanning Animation UI */}
               {isNidScanning && (
-                <div className="flex flex-col items-center justify-center py-8 space-y-6 animate-in zoom-in-95 duration-500">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse" />
-                    <div className="relative p-6 bg-card border border-primary/30 rounded-2xl shadow-[0_0_30px_rgba(var(--primary-rgb),0.15)] flex flex-col items-center gap-4">
-                      <div className="relative flex items-center justify-center size-20">
-                        <svg className="absolute inset-0 w-full h-full -rotate-90">
-                          <circle className="text-muted/50 stroke-current" strokeWidth="4" cx="40" cy="40" r="36" fill="transparent" />
-                          <circle className="text-primary stroke-current transition-all duration-300 ease-in-out" strokeWidth="4" strokeLinecap="round" strokeDasharray="226.2" strokeDashoffset={226.2 - (226.2 * nidScanProgress) / 100} cx="40" cy="40" r="36" fill="transparent" />
+                <div className="flex flex-col items-center justify-center py-12 w-full animate-in zoom-in-95 duration-500">
+                  <div className="relative w-full max-w-md mx-auto">
+                    <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse scale-90" />
+                    <div className="relative p-8 bg-card border border-primary/30 rounded-2xl shadow-[0_0_40px_rgba(var(--primary-rgb),0.12)] flex flex-col items-center gap-6 text-center">
+                      <div className="relative flex items-center justify-center size-28">
+                        <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
+                          <circle className="text-muted/20 stroke-current" strokeWidth="5" cx="50" cy="50" r="44" fill="transparent" />
+                          <circle className="text-primary stroke-current transition-all duration-300 ease-in-out" strokeWidth="5" strokeLinecap="round" strokeDasharray="276.46" strokeDashoffset={276.46 - (276.46 * nidScanProgress) / 100} cx="50" cy="50" r="44" fill="transparent" />
                         </svg>
-                        <Cpu className="size-8 text-primary animate-pulse" />
+                        <Cpu className="size-10 text-primary animate-pulse" />
                       </div>
-                      <div className="text-center space-y-1">
-                        <h4 className="text-xs font-black uppercase tracking-wider text-primary">
+                      <div className="space-y-1.5">
+                        <h4 className="text-sm font-black uppercase tracking-wider text-primary">
                           {nidScanStep === 1 && "Initializing AI Engine..."}
                           {nidScanStep === 2 && "Optimizing Images for Transfer..."}
                           {nidScanStep === 3 && "Running Deep-Learning OCR..."}
                           {nidScanStep === 4 && "Structuring Semantic Fields..."}
                         </h4>
-                        <p className="text-[10px] font-bold text-muted-foreground">{nidScanProgress}% Completed</p>
+                        <p className="text-xs font-bold text-muted-foreground mt-1.5">{nidScanProgress}% Completed</p>
                       </div>
                     </div>
                   </div>
