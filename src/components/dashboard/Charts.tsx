@@ -121,10 +121,10 @@ export function DepartmentChart() {
   const total = departments.reduce((a, b) => a + b.value, 0);
   return (
     <Card title="Department Split" subtitle="Workforce distribution by department">
-      <div className="relative h-36 mt-1">
+      <div className="relative h-40 mt-1">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <Pie data={departments} dataKey="value" innerRadius={50} outerRadius={70} paddingAngle={4} stroke="none">
+            <Pie data={departments} dataKey="value" innerRadius={55} outerRadius={75} paddingAngle={4} stroke="none">
               {departments.map((d, i) => (
                 <Cell key={i} fill={d.color} className="outline-none filter hover:brightness-105 transition-all duration-300" />
               ))}
@@ -187,7 +187,7 @@ export function AttendanceChart() {
 export function GoalsRadial() {
   return (
     <Card title="Performance Goals" subtitle="Q2 completion across teams">
-      <div className="relative h-36 mt-1">
+      <div className="relative h-40 mt-1">
         <ResponsiveContainer width="100%" height="100%">
           <RadialBarChart innerRadius="75%" outerRadius="96%" data={goals} startAngle={210} endAngle={-30}>
             <RadialBar background={{ fill: "var(--muted)" }} dataKey="value" cornerRadius={20} />

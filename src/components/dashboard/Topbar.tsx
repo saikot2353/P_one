@@ -5,7 +5,7 @@ import {
   UserRound, Fingerprint, CalendarDays, CalendarX, Clock, Coins, Users,
   RefreshCw, FileText, BarChart3, ClipboardCheck, ShieldAlert, Timer,
   CreditCard, Cpu, ShieldCheck as ComplianceIcon, Lightbulb, LayoutDashboard, UserPlus,
-  SlidersHorizontal
+  SlidersHorizontal, Briefcase
 } from "lucide-react";
 import avatarImg from "./avatar.png";
 
@@ -61,6 +61,26 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Recruitment Basic Info List", parent: "IE Recruitment", to: "/recruitment-basic-list", description: "View directory of registered temp profiles" },
   { label: "Recruitment Configuration Settings", parent: "IE Recruitment", to: "/recruitment-configuration", description: "Manage SMV banks, machine list, operations etc." },
   { label: "Recruitment Assessment List", parent: "IE Recruitment", to: "/recruitment-assessment-list", description: "Floor evaluation and HR approval workflow" },
+  // e-Recruitment
+  { label: "e-Recruitment Form", parent: "e-Recruitment", to: "/e-recruitment-form", description: "Digital recruitment form" },
+  { label: "Candidate List", parent: "e-Recruitment", to: "/recruitment-basic-list", description: "List of candidates" },
+  { label: "Approved Candidates", parent: "e-Recruitment", to: "/recruitment-assessment-list", description: "Approved candidates list" },
+  // SSP
+  { label: "New Requisition", parent: "SSP", to: "/ssp-new-requisition", description: "Create a new SSP requisition" },
+  { label: "My Requisition", parent: "SSP", to: "/ssp-my-requisition", description: "View your SSP requisitions" },
+  { label: "SSP Approval", parent: "SSP", to: "/ssp-approval", description: "Approve SSP requests" },
+  { label: "SSP Attendance", parent: "SSP", to: "/ssp-attendance", description: "SSP attendance tracking" },
+  // Evaluation
+  { label: "Increment Configurator", parent: "Evaluation", to: "/increment-gadget", description: "Configure salary increments" },
+  { label: "Evaluation Propose", parent: "Evaluation", to: "/evaluation-propose", description: "Propose evaluation scores" },
+  { label: "Propose Increment", parent: "Evaluation", to: "/propose-increment", description: "Propose salary increments" },
+  { label: "Increment Summary", parent: "Evaluation", to: "/increment-summary", description: "Summary of all increments" },
+  { label: "Approve Increment Gadget", parent: "Evaluation", to: "/approve-increment-gadget", description: "Approval interface for increments" },
+  { label: "Increment Queue List", parent: "Evaluation", to: "/increment-queuelist", description: "Pending increment queue" },
+  { label: "Approve Increment (HR)", parent: "Evaluation", to: "/approve-increment-hr", description: "HR increment approval" },
+  { label: "Final Approve Increment", parent: "Evaluation", to: "/final-approve-increment", description: "Final increment approval" },
+  { label: "Increment List", parent: "Evaluation", to: "/increment-list", description: "List of all increments" },
+  { label: "Increment History", parent: "Evaluation", to: "/increment-history", description: "Historical increment records" },
   // Configure
   { label: "Company Settings Setup", parent: "Configure", to: "/configure-structure?tab=company", description: "Configure global enterprise HR settings and validation rules." },
   { label: "Organization Setup", parent: "Configure", to: "/configure-structure?tab=company", description: "Configure organization settings" },
@@ -116,6 +136,8 @@ function getCategoryIcon(parent: string) {
     case "Compliance": return ComplianceIcon;
     case "Idea Share": return Lightbulb;
     case "IE Recruitment": return UserPlus;
+    case "e-Recruitment": return UserPlus;
+    case "SSP": return Briefcase;
     case "Configure": return SlidersHorizontal;
     default: return LayoutDashboard;
   }
