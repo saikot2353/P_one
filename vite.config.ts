@@ -4,7 +4,6 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
 import { componentTagger } from "lovable-tagger";
-import { nitro } from "nitro/vite";
 import path from "path";
 
 export default defineConfig(({ command, mode }) => {
@@ -27,15 +26,13 @@ export default defineConfig(({ command, mode }) => {
         "@tanstack/query-core"
       ]
     },
+    ssr: {
+      noExternal: ["tslib", "react-remove-scroll", "react-remove-scroll-bar"]
+    },
     plugins: [
       tsconfigPaths({ projects: ["./tsconfig.json"] }),
       tailwindcss(),
       tanstackStart(),
-      command === "build" && nitro({
-        externals: {
-          inline: ["tslib"]
-        }
-      }),
       react(),
       mode === "development" && componentTagger(),
     ].filter(Boolean),
