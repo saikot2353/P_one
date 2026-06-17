@@ -27,10 +27,10 @@ function DashboardPage() {
       <Sidebar />
       <main className="flex-1 min-w-0 flex flex-col">
         <Topbar />
-        <div className="p-4 md:p-6 xl:p-8 space-y-6 lg:space-y-8">
+        <div className="p-3.5 md:p-4.5 lg:p-5 space-y-4 lg:space-y-5">
           {/* Key Metrics Section */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between border-b border-border/40 pb-2">
+          <div className="space-y-2.5">
+            <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
               <div>
                 <h2 className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Workspace Indicators</h2>
                 <p className="text-[10px] text-muted-foreground/60 mt-0.5 font-semibold">Real-time operational overview metrics</p>
@@ -40,41 +40,41 @@ function DashboardPage() {
           </div>
 
           {/* Analytics & Performance Section */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-border/40 pb-2">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
               <div>
                 <h2 className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Overview & Analytics</h2>
                 <p className="text-[10px] text-muted-foreground/60 mt-0.5 font-semibold">Headcount cycles, department allocation splits, and attendance schedules</p>
               </div>
             </div>
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 lg:gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-3.5 lg:gap-4.5">
               <HeadcountChart />
               <DepartmentChart />
             </div>
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 lg:gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-3.5 lg:gap-4.5">
               <AttendanceChart />
               <GoalsRadial />
             </div>
           </div>
 
           {/* Operations & Recruitment Section */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-border/40 pb-2">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
               <div>
                 <h2 className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Operations & Logistics</h2>
                 <p className="text-[10px] text-muted-foreground/60 mt-0.5 font-semibold">Request approvals, milestone tracking, and active recruitment pipelines</p>
               </div>
             </div>
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 lg:gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-3.5 lg:gap-4.5">
               <LeaveRequests />
               <UpcomingEvents />
             </div>
-            <div className="grid grid-cols-1 gap-4 lg:gap-6">
+            <div className="grid grid-cols-1 gap-3.5 lg:gap-4.5">
               <RecruitmentPipeline />
             </div>
           </div>
 
-          <footer className="pt-4 pb-2 text-center text-[10px] font-medium text-muted-foreground/60 border-t border-border/30">
+          <footer className="pt-3 pb-1 text-center text-[10px] font-medium text-muted-foreground/60 border-t border-border/20">
             © 2026 CRIPTON HRIS — crafted with care for modern people teams.
           </footer>
         </div>

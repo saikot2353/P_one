@@ -56,10 +56,10 @@ function CustomTooltip({ active, payload, label }: any) {
 
 function Card({ title, subtitle, action, children, className = "" }: any) {
   return (
-    <div className={`group rounded-lg bg-card border border-border/70 p-5 shadow-xs transition-all duration-300 hover:shadow-md hover:border-border/95 relative overflow-hidden ${className}`}>
+    <div className={`group rounded-lg bg-card border border-border/70 p-4 shadow-xs transition-all duration-300 hover:shadow-md hover:border-border/95 relative overflow-hidden ${className}`}>
       {/* Dynamic top gradient line to give a premium feel */}
       <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary/10 via-primary/30 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      <div className="flex items-start justify-between mb-5">
+      <div className="flex items-start justify-between mb-3.5">
         <div>
           <h3 className="font-bold tracking-tight text-[13px] text-foreground">{title}</h3>
           {subtitle && <p className="text-xs text-muted-foreground/80 mt-0.5">{subtitle}</p>}
@@ -91,7 +91,7 @@ function Tabs() {
 export function HeadcountChart() {
   return (
     <Card title="Headcount Trends" subtitle="New hires vs. exits across the year" action={<Tabs />} className="xl:col-span-2">
-      <div className="h-[315px] mt-3">
+      <div className="h-[230px] mt-2">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={headcount} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
             <defs>
@@ -121,10 +121,10 @@ export function DepartmentChart() {
   const total = departments.reduce((a, b) => a + b.value, 0);
   return (
     <Card title="Department Split" subtitle="Workforce distribution by department">
-      <div className="relative h-44 mt-1">
+      <div className="relative h-36 mt-1">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <Pie data={departments} dataKey="value" innerRadius={64} outerRadius={88} paddingAngle={4} stroke="none">
+            <Pie data={departments} dataKey="value" innerRadius={50} outerRadius={70} paddingAngle={4} stroke="none">
               {departments.map((d, i) => (
                 <Cell key={i} fill={d.color} className="outline-none filter hover:brightness-105 transition-all duration-300" />
               ))}
@@ -134,15 +134,15 @@ export function DepartmentChart() {
         </ResponsiveContainer>
         <div className="absolute inset-0 grid place-items-center pointer-events-none">
           <div className="text-center">
-            <div className="text-2xl font-extrabold tracking-tight text-foreground">{total.toLocaleString()}</div>
-            <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 mt-0.5">Employees</div>
+            <div className="text-xl font-extrabold tracking-tight text-foreground">{total.toLocaleString()}</div>
+            <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80 mt-0.5">Employees</div>
           </div>
         </div>
       </div>
-      <div className="mt-5 space-y-2.5">
+      <div className="mt-3.5 space-y-1.5">
         {departments.map((d) => (
-          <div key={d.name} className="flex items-center gap-3 text-xs p-1.5 rounded-lg hover:bg-muted/50 transition duration-200">
-            <span className="size-2.5 rounded-full ring-2 ring-background shadow-xs" style={{ background: d.color }} />
+          <div key={d.name} className="flex items-center gap-2 text-xs p-1 rounded-lg hover:bg-muted/50 transition duration-200">
+            <span className="size-2 rounded-full ring-2 ring-background shadow-xs" style={{ background: d.color }} />
             <span className="text-foreground font-medium">{d.name}</span>
             <span className="ml-auto font-bold text-foreground">{d.value}</span>
             <span className="text-muted-foreground/80 font-medium w-10 text-right">{Math.round((d.value / total) * 100)}%</span>
@@ -156,7 +156,7 @@ export function DepartmentChart() {
 export function AttendanceChart() {
   return (
     <Card title="Weekly Attendance Trends" subtitle="Active presence and remote engagement tracking" className="xl:col-span-2">
-      <div className="h-[250px] mt-3">
+      <div className="h-[190px] mt-2">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={attendance} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
             <defs>
@@ -187,31 +187,31 @@ export function AttendanceChart() {
 export function GoalsRadial() {
   return (
     <Card title="Performance Goals" subtitle="Q2 completion across teams">
-      <div className="relative h-44 mt-1">
+      <div className="relative h-36 mt-1">
         <ResponsiveContainer width="100%" height="100%">
-          <RadialBarChart innerRadius="70%" outerRadius="96%" data={goals} startAngle={210} endAngle={-30}>
+          <RadialBarChart innerRadius="75%" outerRadius="96%" data={goals} startAngle={210} endAngle={-30}>
             <RadialBar background={{ fill: "var(--muted)" }} dataKey="value" cornerRadius={20} />
           </RadialBarChart>
         </ResponsiveContainer>
         <div className="absolute inset-0 grid place-items-center pointer-events-none">
           <div className="text-center">
-            <div className="text-3xl font-extrabold tracking-tight text-foreground">78%</div>
-            <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 mt-1">Completed</div>
+            <div className="text-2xl font-extrabold tracking-tight text-foreground">78%</div>
+            <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80 mt-0.5">Completed</div>
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-2.5 mt-4 text-center">
-        <div className="rounded-xl bg-muted/65 border border-border/40 p-2.5 hover:bg-muted transition duration-200">
-          <div className="text-sm font-bold text-foreground">142</div>
-          <div className="text-[9px] font-medium text-muted-foreground mt-0.5">Achieved</div>
+      <div className="grid grid-cols-3 gap-2 mt-3.5 text-center">
+        <div className="rounded-xl bg-muted/65 border border-border/40 p-2 hover:bg-muted transition duration-200">
+          <div className="text-xs font-bold text-foreground">142</div>
+          <div className="text-[8px] font-semibold text-muted-foreground mt-0.5">Achieved</div>
         </div>
-        <div className="rounded-xl bg-muted/65 border border-border/40 p-2.5 hover:bg-muted transition duration-200">
-          <div className="text-sm font-bold text-foreground">28</div>
-          <div className="text-[9px] font-medium text-muted-foreground mt-0.5">In progress</div>
+        <div className="rounded-xl bg-muted/65 border border-border/40 p-2 hover:bg-muted transition duration-200">
+          <div className="text-xs font-bold text-foreground">28</div>
+          <div className="text-[8px] font-semibold text-muted-foreground mt-0.5">In progress</div>
         </div>
-        <div className="rounded-xl bg-muted/65 border border-border/40 p-2.5 hover:bg-muted transition duration-200">
-          <div className="text-sm font-bold text-foreground">12</div>
-          <div className="text-[9px] font-medium text-muted-foreground mt-0.5">At risk</div>
+        <div className="rounded-xl bg-muted/65 border border-border/40 p-2 hover:bg-muted transition duration-200">
+          <div className="text-xs font-bold text-foreground">12</div>
+          <div className="text-[8px] font-semibold text-muted-foreground mt-0.5">At risk</div>
         </div>
       </div>
     </Card>
