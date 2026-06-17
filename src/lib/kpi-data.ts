@@ -98,6 +98,20 @@ export interface KpiAssessment {
   mdComments: string;
   mdApproval: string;
 
+  // HOD Proposals
+  hodProposedInc?: number;
+  hodProposedPromotion?: string;
+  hodProposedDesignation?: string;
+
+  // HR Proposals
+  hrProposedInc?: number;
+
+  // Plant Head Proposals
+  plantHeadProposedInc?: number;
+
+  // MD Proposals
+  mdProposedInc?: number;
+
   // Final
   incAmount: number;
   givePromotion: string;

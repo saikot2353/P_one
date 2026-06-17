@@ -9,7 +9,7 @@ import {
 import {
   type KpiAssessment, type KpiCriteria, type GradeBand, type CriteriaScore, type PeerReview,
   loadAssessments, saveAssessments, loadKpiCriteria, loadGradeBands, loadKpiCycles, loadPeerReviews,
-  calculateWeightedScore, getGradeForScore, getCategoryBg
+  loadSelfAssessments, calculateWeightedScore, getGradeForScore, getCategoryBg
 } from "@/lib/kpi-data";
 
 export const Route = createFileRoute("/kpi-assessment-workflow")({
@@ -27,6 +27,7 @@ function KpiAssessmentWorkflowPage() {
   const [criteria] = useState<KpiCriteria[]>(() => loadKpiCriteria());
   const [bands] = useState<GradeBand[]>(() => loadGradeBands());
   const [cycles] = useState(() => loadKpiCycles());
+  const [selfAssessments] = useState(() => loadSelfAssessments());
 
   const [activeCycle, setActiveCycle] = useState(cycles[0]?.id || "");
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,6 +38,10 @@ function KpiAssessmentWorkflowPage() {
 
   const [peerReviews] = useState<PeerReview[]>(() => loadPeerReviews());
   const [show360Modal, setShow360Modal] = useState(false);
+
+  const [viewMode, setViewMode] = useState<"standard" | "bulk">("standard");
+  const [selectedForBulk, setSelectedForBulk] = useState<string[]>([]);
+  const [bulkActionRole, setBulkActionRole] = useState<"PlantHead" | "MD">("PlantHead");
 
   const filteredAssessments = useMemo(() => {
     return assessments.filter(a => {
@@ -55,6 +60,11 @@ function KpiAssessmentWorkflowPage() {
   }, [assessments, activeCycle, searchQuery, statusFilter]);
 
   const activeEmp = useMemo(() => assessments.find(a => a.employeeId === activeEmpId), [assessments, activeEmpId]);
+
+  const activeSelfAssessment = useMemo(() => {
+    if (!activeEmpId) return null;
+    return selfAssessments.find(sa => sa.employeeId === activeEmpId && sa.cycleId === activeCycle);
+  }, [selfAssessments, activeEmpId, activeCycle]);
 
   // Derived values for active employee
   const activeStep = activeEmp ? activeEmp.currentStep : 1;
@@ -139,16 +149,83 @@ function KpiAssessmentWorkflowPage() {
     });
   };
 
+  const handleBulkApprove = () => {
+    if (selectedForBulk.length === 0) {
+      alert("Please select at least one employee.");
+      return;
+    }
+    const updated = assessments.map(a => {
+      if (selectedForBulk.includes(a.employeeId)) {
+        if (bulkActionRole === "PlantHead" && a.currentStep === 3) {
+          return {
+            ...a,
+            currentStep: 4,
+            completedSteps: [...new Set([...a.completedSteps, 3])],
+            plantHeadApproval: "Approved",
+            plantHeadComments: "Bulk approved by Plant Head."
+          };
+        } else if (bulkActionRole === "MD" && a.currentStep === 4) {
+          return {
+            ...a,
+            currentStep: 5,
+            completedSteps: [...new Set([...a.completedSteps, 4])],
+            mdApproval: "Approved",
+            mdComments: "Bulk approved by MD."
+          };
+        }
+      }
+      return a;
+    });
+    setAssessments(updated);
+    saveAssessments(updated);
+    setSelectedForBulk([]);
+    alert(`Successfully bulk approved ${selectedForBulk.length} assessments!`);
+  };
+
   const handleCompleteFinal = (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeEmp) return;
+    const finalInc = activeEmp.incAmount !== undefined && activeEmp.incAmount !== 0 ? activeEmp.incAmount : (activeEmp.mdProposedInc || 0);
+    const newSalary = activeEmp.grossSalary + finalInc;
+    
     handleUpdateActiveEmp({
+      incAmount: finalInc,
+      givePromotion: activeEmp.givePromotion || (activeEmp.hodProposedPromotion || "No"),
+      newDesignation: activeEmp.newDesignation || (activeEmp.hodProposedDesignation || ""),
       completedSteps: [...new Set([...activeEmp.completedSteps, 5])],
       status: "Completed",
       completedAt: new Date().toISOString().split('T')[0],
-      newGrossSalary: activeEmp.grossSalary + (activeEmp.incAmount || 0)
+      newGrossSalary: newSalary
     });
-    alert("KPI Appraisal Assessment Workflow Completed Successfully!");
+
+    // Sync to recruitment_synced_employees database key in local storage
+    const syncedKey = "recruitment_synced_employees";
+    const synced = localStorage.getItem(syncedKey);
+    if (synced) {
+      try {
+        const parsed = JSON.parse(synced);
+        if (Array.isArray(parsed)) {
+          const updatedEmployees = parsed.map((emp: any) => {
+            if (emp.id === activeEmp.employeeId) {
+              const updated = { ...emp };
+              updated.gross = String(newSalary);
+              if (activeEmp.givePromotion === "Yes" && activeEmp.newDesignation) {
+                updated.title = activeEmp.newDesignation;
+              } else if (activeEmp.hodProposedPromotion === "Yes" && activeEmp.hodProposedDesignation) {
+                updated.title = activeEmp.hodProposedDesignation;
+              }
+              return updated;
+            }
+            return emp;
+          });
+          localStorage.setItem(syncedKey, JSON.stringify(updatedEmployees));
+        }
+      } catch (err) {
+        console.error("Failed to sync payroll to recruitment_synced_employees:", err);
+      }
+    }
+
+    alert("KPI Appraisal Assessment Workflow Completed Successfully & Payroll Database Updated!");
   };
 
   // LIST VIEW
@@ -175,124 +252,286 @@ function KpiAssessmentWorkflowPage() {
                 </h1>
                 <p className="text-xs text-muted-foreground mt-1">Multi-step appraisal execution and salary increment recommendations</p>
               </div>
-            </div>
-
-            {/* Filters */}
-            <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs grid grid-cols-1 md:grid-cols-3 gap-5 items-center">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase block">Appraisal Cycle</label>
-                <select 
-                  value={activeCycle}
-                  onChange={(e) => setActiveCycle(e.target.value)}
-                  className="w-full h-10 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5]"
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setViewMode("standard")}
+                  className={`h-9 px-4 text-xs font-bold rounded-lg transition-all ${viewMode === "standard" ? "bg-[#1e88e5] text-white shadow-sm" : "bg-muted/40 text-muted-foreground border border-border/40 hover:bg-muted"}`}
                 >
-                  {cycles.map(c => <option key={c.id} value={c.id}>{c.name} ({c.type})</option>)}
-                </select>
+                  Standard View
+                </button>
+                <button
+                  onClick={() => setViewMode("bulk")}
+                  className={`h-9 px-4 text-xs font-bold rounded-lg transition-all ${viewMode === "bulk" ? "bg-[#1e88e5] text-white shadow-sm" : "bg-muted/40 text-muted-foreground border border-border/40 hover:bg-muted"}`}
+                >
+                  Executive Bulk Approval
+                </button>
               </div>
+            </div>
 
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase block">Status</label>
-                <div className="flex gap-2">
-                  {["All", "Pending", "In Progress", "Completed"].map(status => (
-                    <button
-                      key={status}
-                      onClick={() => setStatusFilter(status)}
-                      className={`flex-1 h-10 rounded-lg text-xs font-bold transition-all ${statusFilter === status ? "bg-[#1e88e5] text-white shadow-sm" : "bg-muted/40 text-muted-foreground border border-border/40 hover:bg-muted"}`}
+            {viewMode === "standard" ? (
+              <>
+                {/* Filters */}
+                <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs grid grid-cols-1 md:grid-cols-3 gap-5 items-center">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase block">Appraisal Cycle</label>
+                    <select 
+                      value={activeCycle}
+                      onChange={(e) => setActiveCycle(e.target.value)}
+                      className="w-full h-10 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5]"
                     >
-                      {status}
-                    </button>
-                  ))}
-                </div>
-              </div>
+                      {cycles.map(c => <option key={c.id} value={c.id}>{c.name} ({c.type})</option>)}
+                    </select>
+                  </div>
 
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase block">Search Employee</label>
-                <div className="relative">
-                  <Search className="size-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
-                    placeholder="Search by name, ID or department..."
-                    className="w-full h-10 pl-9 pr-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-[#1e88e5]"
-                  />
-                </div>
-              </div>
-            </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase block">Status</label>
+                    <div className="flex gap-2">
+                      {["All", "Pending", "In Progress", "Completed"].map(status => (
+                        <button
+                          key={status}
+                          onClick={() => setStatusFilter(status)}
+                          className={`flex-1 h-10 rounded-lg text-xs font-bold transition-all ${statusFilter === status ? "bg-[#1e88e5] text-white shadow-sm" : "bg-muted/40 text-muted-foreground border border-border/40 hover:bg-muted"}`}
+                        >
+                          {status}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-            {/* Employee List Table */}
-            <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse text-left">
-                  <thead>
-                    <tr className="bg-muted/30 border-b border-border/40 text-[9.5px] uppercase font-black tracking-wider text-muted-foreground/60">
-                      <th className="px-4 py-3 text-center w-12">#</th>
-                      <th className="px-4 py-3 w-28">Emp ID</th>
-                      <th className="px-4 py-3">Name & Role</th>
-                      <th className="px-4 py-3">Department</th>
-                      <th className="px-4 py-3 text-center">Score & Grade</th>
-                      <th className="px-4 py-3 text-center w-32">Status</th>
-                      <th className="px-4 py-3 text-center w-36">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/20">
-                    {filteredAssessments.map((item, idx) => {
-                      const gradeColor = bands.find(b => b.id === item.gradeBandId)?.color || "#94a3b8";
-                      return (
-                        <tr key={item.id} className="hover:bg-muted/20 transition duration-100">
-                          <td className="px-4 py-3 text-center text-xs font-mono text-muted-foreground/50 font-bold">{idx + 1}</td>
-                          <td className="px-4 py-3 text-xs font-mono font-bold text-foreground/80">{item.employeeId}</td>
-                          <td className="px-4 py-3">
-                            <span className="text-xs font-black text-foreground block">{item.employeeName}</span>
-                            <span className="text-[10px] text-muted-foreground block font-semibold">{item.designation}</span>
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className="text-xs font-bold text-foreground/80 block">{item.department}</span>
-                            <span className="text-[10px] text-muted-foreground block font-semibold">{item.section}</span>
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            {item.totalWeightedScore > 0 ? (
-                              <div className="flex flex-col items-center gap-1">
-                                <span className="text-xs font-black" style={{ color: gradeColor }}>{item.totalWeightedScore}% ({item.gradeResult})</span>
-                              </div>
-                            ) : (
-                              <span className="text-[10px] font-bold text-muted-foreground">Not Graded</span>
-                            )}
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            <span className={`inline-flex px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase border ${
-                              item.status === "Completed" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" :
-                              item.status === "In Progress" ? "bg-[#1e88e5]/10 text-[#1e88e5] border-[#1e88e5]/20" :
-                              "bg-slate-500/10 text-slate-500 border-slate-500/20"
-                            }`}>
-                              {item.status}
-                            </span>
-                            {item.status === "In Progress" && (
-                              <span className="text-[9px] text-muted-foreground block mt-1 font-semibold">Step {item.currentStep}/5</span>
-                            )}
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            <button
-                              onClick={() => setActiveEmpId(item.employeeId)}
-                              className="h-8 px-4 rounded-lg bg-[#1e88e5]/10 text-[#1e88e5] hover:bg-[#1e88e5] hover:text-white font-extrabold text-[10px] uppercase tracking-wider transition-all"
-                            >
-                              {item.status === "Completed" ? "View" : "Assess"}
-                            </button>
-                          </td>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase block">Search Employee</label>
+                    <div className="relative">
+                      <Search className="size-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                        placeholder="Search by name, ID or department..."
+                        className="w-full h-10 pl-9 pr-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-[#1e88e5]"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Employee List Table */}
+                <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse text-left">
+                      <thead>
+                        <tr className="bg-muted/30 border-b border-border/40 text-[9.5px] uppercase font-black tracking-wider text-muted-foreground/60">
+                          <th className="px-4 py-3 text-center w-12">#</th>
+                          <th className="px-4 py-3 w-28">Emp ID</th>
+                          <th className="px-4 py-3">Name & Role</th>
+                          <th className="px-4 py-3">Department</th>
+                          <th className="px-4 py-3 text-center">Score & Grade</th>
+                          <th className="px-4 py-3 text-center w-32">Status</th>
+                          <th className="px-4 py-3 text-center w-36">Action</th>
                         </tr>
-                      );
-                    })}
-                    {filteredAssessments.length === 0 && (
-                      <tr>
-                        <td colSpan={7} className="text-center py-12 text-xs font-bold text-muted-foreground">
-                          No assessments found matching the criteria.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+                      </thead>
+                      <tbody className="divide-y divide-border/20">
+                        {filteredAssessments.map((item, idx) => {
+                          const gradeColor = bands.find(b => b.id === item.gradeBandId)?.color || "#94a3b8";
+                          return (
+                            <tr key={item.id} className="hover:bg-muted/20 transition duration-100">
+                              <td className="px-4 py-3 text-center text-xs font-mono text-muted-foreground/50 font-bold">{idx + 1}</td>
+                              <td className="px-4 py-3 text-xs font-mono font-bold text-foreground/80">{item.employeeId}</td>
+                              <td className="px-4 py-3">
+                                <span className="text-xs font-black text-foreground block">{item.employeeName}</span>
+                                <span className="text-[10px] text-muted-foreground block font-semibold">{item.designation}</span>
+                              </td>
+                              <td className="px-4 py-3">
+                                <span className="text-xs font-bold text-foreground/80 block">{item.department}</span>
+                                <span className="text-[10px] text-muted-foreground block font-semibold">{item.section}</span>
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                {item.totalWeightedScore > 0 ? (
+                                  <div className="flex flex-col items-center gap-1">
+                                    <span className="text-xs font-black" style={{ color: gradeColor }}>{item.totalWeightedScore}% ({item.gradeResult})</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-[10px] font-bold text-muted-foreground">Not Graded</span>
+                                )}
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                <span className={`inline-flex px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase border ${
+                                  item.status === "Completed" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" :
+                                  item.status === "In Progress" ? "bg-[#1e88e5]/10 text-[#1e88e5] border-[#1e88e5]/20" :
+                                  "bg-slate-500/10 text-slate-500 border-slate-500/20"
+                                }`}>
+                                  {item.status}
+                                </span>
+                                {item.status === "In Progress" && (
+                                  <span className="text-[9px] text-muted-foreground block mt-1 font-semibold">Step {item.currentStep}/5</span>
+                                )}
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                <button
+                                  onClick={() => setActiveEmpId(item.employeeId)}
+                                  className="h-8 px-4 rounded-lg bg-[#1e88e5]/10 text-[#1e88e5] hover:bg-[#1e88e5] hover:text-white font-extrabold text-[10px] uppercase tracking-wider transition-all"
+                                >
+                                  {item.status === "Completed" ? "View" : "Assess"}
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                        {filteredAssessments.length === 0 && (
+                          <tr>
+                            <td colSpan={7} className="text-center py-12 text-xs font-bold text-muted-foreground">
+                              No assessments found matching the criteria.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Bulk Filters */}
+                <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-5">
+                  <div className="flex flex-col sm:flex-row gap-4 flex-1">
+                    <div className="space-y-1.5 flex-1 max-w-xs">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase block">Appraisal Cycle</label>
+                      <select 
+                        value={activeCycle}
+                        onChange={(e) => setActiveCycle(e.target.value)}
+                        className="w-full h-10 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5]"
+                      >
+                        {cycles.map(c => <option key={c.id} value={c.id}>{c.name} ({c.type})</option>)}
+                      </select>
+                    </div>
+                    <div className="space-y-1.5 flex-1 max-w-md">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase block">Choose Your Approval Role</label>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => { setBulkActionRole("PlantHead"); setSelectedForBulk([]); }}
+                          className={`flex-1 h-10 px-3 rounded-lg text-xs font-bold transition-all ${bulkActionRole === "PlantHead" ? "bg-[#1e88e5] text-white shadow-sm" : "bg-muted/40 text-muted-foreground border border-border/40 hover:bg-muted"}`}
+                        >
+                          Plant Head (Stage 3)
+                        </button>
+                        <button
+                          onClick={() => { setBulkActionRole("MD"); setSelectedForBulk([]); }}
+                          className={`flex-1 h-10 px-3 rounded-lg text-xs font-bold transition-all ${bulkActionRole === "MD" ? "bg-[#1e88e5] text-white shadow-sm" : "bg-muted/40 text-muted-foreground border border-border/40 hover:bg-muted"}`}
+                        >
+                          Managing Director (Stage 4)
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-end">
+                    <button
+                      onClick={handleBulkApprove}
+                      disabled={selectedForBulk.length === 0}
+                      className="h-10 px-6 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs uppercase tracking-wider transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+                    >
+                      Bulk Approve Selected ({selectedForBulk.length})
+                    </button>
+                  </div>
+                </div>
+
+                {/* Bulk Employee List Table */}
+                <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse text-left">
+                      <thead>
+                        <tr className="bg-muted/30 border-b border-border/40 text-[9.5px] uppercase font-black tracking-wider text-muted-foreground/60">
+                          <th className="px-4 py-3 text-center w-12">
+                            <input
+                              type="checkbox"
+                              className="rounded border-border/40 focus:ring-[#1e88e5]"
+                              onChange={(e) => {
+                                const targetStep = bulkActionRole === "PlantHead" ? 3 : 4;
+                                const bulkEligible = assessments.filter(a => a.cycleId === activeCycle && a.currentStep === targetStep && a.status !== "Completed");
+                                if (e.target.checked) {
+                                  setSelectedForBulk(bulkEligible.map(a => a.employeeId));
+                                } else {
+                                  setSelectedForBulk([]);
+                                }
+                              }}
+                              checked={(() => {
+                                const targetStep = bulkActionRole === "PlantHead" ? 3 : 4;
+                                const bulkEligible = assessments.filter(a => a.cycleId === activeCycle && a.currentStep === targetStep && a.status !== "Completed");
+                                return bulkEligible.length > 0 && selectedForBulk.length === bulkEligible.length;
+                              })()}
+                            />
+                          </th>
+                          <th className="px-4 py-3 w-28">Emp ID</th>
+                          <th className="px-4 py-3">Name & Role</th>
+                          <th className="px-4 py-3">Department</th>
+                          <th className="px-4 py-3 text-center">HOD Proposed Inc</th>
+                          <th className="px-4 py-3 text-center">HOD Proposed Promotion</th>
+                           <th className="px-4 py-3 text-center">Score & Grade</th>
+                          <th className="px-4 py-3 text-center w-32">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/20">
+                        {(() => {
+                          const targetStep = bulkActionRole === "PlantHead" ? 3 : 4;
+                          const list = assessments.filter(a => a.cycleId === activeCycle && a.currentStep === targetStep && a.status !== "Completed");
+                          if (list.length === 0) {
+                            return (
+                              <tr>
+                                <td colSpan={8} className="text-center py-12 text-xs font-bold text-muted-foreground">
+                                  No pending assessments for this role to bulk approve.
+                                </td>
+                              </tr>
+                            );
+                          }
+                          return list.map((item) => {
+                            const gradeColor = bands.find(b => b.id === item.gradeBandId)?.color || "#94a3b8";
+                            return (
+                              <tr key={item.id} className="hover:bg-muted/20 transition duration-100">
+                                <td className="px-4 py-3 text-center">
+                                  <input
+                                    type="checkbox"
+                                    className="rounded border-border/40 focus:ring-[#1e88e5]"
+                                    checked={selectedForBulk.includes(item.employeeId)}
+                                    onChange={(e) => {
+                                      if (e.target.checked) {
+                                        setSelectedForBulk([...selectedForBulk, item.employeeId]);
+                                      } else {
+                                        setSelectedForBulk(selectedForBulk.filter(id => id !== item.employeeId));
+                                      }
+                                    }}
+                                  />
+                                </td>
+                                <td className="px-4 py-3 text-xs font-mono font-bold text-foreground/80">{item.employeeId}</td>
+                                <td className="px-4 py-3">
+                                  <span className="text-xs font-black text-foreground block">{item.employeeName}</span>
+                                  <span className="text-[10px] text-muted-foreground block font-semibold">{item.designation}</span>
+                                </td>
+                                <td className="px-4 py-3">
+                                  <span className="text-xs font-bold text-foreground/80 block">{item.department}</span>
+                                  <span className="text-[10px] text-muted-foreground block font-semibold">{item.section}</span>
+                                </td>
+                                <td className="px-4 py-3 text-center text-xs font-mono font-bold text-indigo-600">
+                                  ৳{(item.hodProposedInc || 0).toLocaleString()}
+                                </td>
+                                <td className="px-4 py-3 text-center text-xs font-bold">
+                                  {item.hodProposedPromotion === "Yes" ? (
+                                    <span className="text-emerald-600">Yes ({item.hodProposedDesignation})</span>
+                                  ) : "No"}
+                                </td>
+                                <td className="px-4 py-3 text-center">
+                                  <span className="text-xs font-black" style={{ color: gradeColor }}>{item.totalWeightedScore}% ({item.gradeResult})</span>
+                                </td>
+                                <td className="px-4 py-3 text-center">
+                                  <span className="inline-flex px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase border bg-[#1e88e5]/10 text-[#1e88e5] border-[#1e88e5]/20">
+                                    Stage {item.currentStep}
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          });
+                        })()}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </>
+            )}
 
           </div>
         </main>
@@ -471,17 +710,20 @@ function KpiAssessmentWorkflowPage() {
                   <table className="w-full border-collapse text-left">
                     <thead>
                       <tr className="bg-muted/30 text-foreground font-bold border-b border-border/50 text-xs">
-                        <th className="px-4 py-3 font-extrabold w-[35%] border-r border-border/30">Criteria</th>
+                        <th className="px-4 py-3 font-extrabold w-[25%] border-r border-border/30">Criteria</th>
                         <th className="px-3 py-3 font-extrabold text-center w-16 border-r border-border/30">Weight</th>
                         <th className="px-3 py-3 font-extrabold text-center w-16 border-r border-border/30">Max</th>
+                        <th className="px-3 py-3 font-extrabold text-center w-20 border-r border-border/30">Self Score</th>
+                        <th className="px-4 py-3 font-extrabold w-[20%] border-r border-border/30">Self Justification</th>
                         <th className="px-3 py-3 font-extrabold text-center w-24 border-r border-border/30">HOD Score</th>
-                        <th className="px-4 py-3 font-extrabold">Justification / Notes</th>
+                        <th className="px-4 py-3 font-extrabold">HOD Justification / Notes</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border/30 text-xs font-semibold">
                       {criteria.map((item) => {
                         if (item.status !== "Active") return null;
                         const scoreData = activeEmp.criteriaScores.find(s => s.criteriaId === item.id);
+                        const selfScoreData = activeSelfAssessment?.scores.find(s => s.criteriaId === item.id);
                         return (
                           <tr key={item.id} className="hover:bg-muted/20">
                             <td className="px-4 py-3 border-r border-border/20">
@@ -495,6 +737,12 @@ function KpiAssessmentWorkflowPage() {
                               <span className="font-bold text-primary">{item.weight}%</span>
                             </td>
                             <td className="px-3 py-3 text-center border-r border-border/20 text-muted-foreground">{item.maxScore}</td>
+                            <td className="px-3 py-3 text-center border-r border-border/20 text-indigo-600 font-bold font-mono">
+                              {selfScoreData ? selfScoreData.score : "—"}
+                            </td>
+                            <td className="px-4 py-3 border-r border-border/20 text-muted-foreground font-normal italic leading-relaxed">
+                              {selfScoreData ? selfScoreData.justification : "No self-appraisal remark"}
+                            </td>
                             <td className="px-3 py-3 text-center border-r border-border/20">
                               <input
                                 type="number"
@@ -567,6 +815,45 @@ function KpiAssessmentWorkflowPage() {
                         />
                       </div>
                     </div>
+
+                    <div className="border-t border-border/30 pt-4 mt-4 space-y-4">
+                      <span className="text-[11px] font-black text-[#1e88e5] uppercase tracking-wider block">Proposed Increment & Promotion By HOD</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-semibold">
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase">Proposed Increment Amount (BDT)</label>
+                          <input
+                            type="number"
+                            disabled={activeStep !== 1}
+                            value={activeEmp.hodProposedInc || 0}
+                            onChange={(e) => handleUpdateActiveEmp({ hodProposedInc: parseFloat(e.target.value) || 0 })}
+                            className="w-full h-9 px-3 rounded-lg bg-muted/20 border border-border/40 outline-none focus:border-[#1e88e5] font-mono text-xs font-bold disabled:bg-muted/50"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase">Propose Promotion? *</label>
+                          <select
+                            disabled={activeStep !== 1}
+                            value={activeEmp.hodProposedPromotion || "No"}
+                            onChange={(e) => handleUpdateActiveEmp({ hodProposedPromotion: e.target.value })}
+                            className="w-full h-9 px-3 rounded-lg bg-muted/20 border border-border/40 outline-none focus:border-[#1e88e5] text-xs font-bold disabled:bg-muted/50"
+                          >
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                          </select>
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase">Proposed Designation</label>
+                          <input
+                            type="text"
+                            disabled={activeStep !== 1 || activeEmp.hodProposedPromotion !== "Yes"}
+                            value={activeEmp.hodProposedDesignation || ""}
+                            onChange={(e) => handleUpdateActiveEmp({ hodProposedDesignation: e.target.value })}
+                            placeholder="Specify proposed designation..."
+                            className="w-full h-9 px-3 rounded-lg bg-muted/20 border border-border/40 outline-none focus:border-[#1e88e5] text-xs font-bold disabled:bg-muted/50"
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   {activeStep === 1 && (
@@ -590,6 +877,22 @@ function KpiAssessmentWorkflowPage() {
               </div>
               <div className="p-5">
                 <form onSubmit={handleCompleteHr} className="space-y-4 text-xs font-semibold">
+                  {/* HOD Proposal Display */}
+                  <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-xl p-4 mb-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">HOD Proposed Increment</span>
+                      <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 font-mono">৳{(activeEmp.hodProposedInc || 0).toLocaleString()} BDT</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">HOD Proposed Promotion</span>
+                      <span className="text-xs font-black text-indigo-600 dark:text-indigo-400">{activeEmp.hodProposedPromotion || "No"}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">HOD Proposed Designation</span>
+                      <span className="text-xs font-black text-indigo-600 dark:text-indigo-400">{activeEmp.hodProposedDesignation || "—"}</span>
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-muted-foreground uppercase">HRD Strength *</label>
@@ -607,6 +910,19 @@ function KpiAssessmentWorkflowPage() {
                         value={activeEmp.hrdImprovementPlan}
                         onChange={(e) => handleUpdateActiveEmp({ hrdImprovementPlan: e.target.value })}
                         className="w-full h-20 p-3 rounded-lg bg-muted/20 border border-border/40 outline-none resize-none focus:border-[#1e88e5]"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">HRD Recommended Increment Amount (BDT)</label>
+                      <input
+                        type="number"
+                        disabled={activeStep !== 2}
+                        value={activeEmp.hrProposedInc || 0}
+                        onChange={(e) => handleUpdateActiveEmp({ hrProposedInc: parseFloat(e.target.value) || 0 })}
+                        className="w-full h-9 px-3 rounded-lg bg-muted/20 border border-border/40 outline-none focus:border-[#1e88e5] font-mono text-xs font-bold disabled:bg-muted/50"
                       />
                     </div>
                   </div>
@@ -631,14 +947,30 @@ function KpiAssessmentWorkflowPage() {
               </div>
               <div className="p-5">
                 <form onSubmit={handleCompletePlantHead} className="space-y-4 text-xs font-semibold">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Proposal Display */}
+                  <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-xl p-4 mb-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">HOD Proposed Increment</span>
+                      <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 font-mono">৳{(activeEmp.hodProposedInc || 0).toLocaleString()} BDT</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">HOD Proposed Promotion</span>
+                      <span className="text-xs font-black text-indigo-600 dark:text-indigo-400">{activeEmp.hodProposedPromotion || "No"} ({activeEmp.hodProposedDesignation || "—"})</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">HRD Recommended Increment</span>
+                      <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 font-mono">৳{(activeEmp.hrProposedInc || 0).toLocaleString()} BDT</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-muted-foreground uppercase">Decision</label>
                       <select
                         disabled={activeStep !== 3}
                         value={activeEmp.plantHeadApproval}
                         onChange={(e) => handleUpdateActiveEmp({ plantHeadApproval: e.target.value })}
-                        className="w-full h-9 px-3 rounded-lg bg-muted/20 border border-border/40 outline-none"
+                        className="w-full h-9 px-3 rounded-lg bg-muted/20 border border-border/40 outline-none text-xs font-bold"
                       >
                         <option value="Approved">Approved</option>
                         <option value="Approved with Adjustment">Approved with adjustment</option>
@@ -646,12 +978,22 @@ function KpiAssessmentWorkflowPage() {
                       </select>
                     </div>
                     <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Plant Head Recommended Increment (BDT)</label>
+                      <input
+                        type="number"
+                        disabled={activeStep !== 3}
+                        value={activeEmp.plantHeadProposedInc || 0}
+                        onChange={(e) => handleUpdateActiveEmp({ plantHeadProposedInc: parseFloat(e.target.value) || 0 })}
+                        className="w-full h-9 px-3 rounded-lg bg-muted/20 border border-border/40 outline-none focus:border-[#1e88e5] font-mono text-xs font-bold disabled:bg-muted/50"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-muted-foreground uppercase">Comments *</label>
                       <textarea
                         required disabled={activeStep !== 3}
                         value={activeEmp.plantHeadComments}
                         onChange={(e) => handleUpdateActiveEmp({ plantHeadComments: e.target.value })}
-                        className="w-full h-16 p-3 rounded-lg bg-muted/20 border border-border/40 outline-none resize-none focus:border-[#1e88e5]"
+                        className="w-full h-9 p-2.5 rounded-lg bg-muted/20 border border-border/40 outline-none resize-none focus:border-[#1e88e5]"
                       />
                     </div>
                   </div>
@@ -676,14 +1018,34 @@ function KpiAssessmentWorkflowPage() {
               </div>
               <div className="p-5">
                 <form onSubmit={handleCompleteMd} className="space-y-4 text-xs font-semibold">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Proposal Display */}
+                  <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-xl p-4 mb-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">HOD Proposed Increment</span>
+                      <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 font-mono">৳{(activeEmp.hodProposedInc || 0).toLocaleString()} BDT</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">HRD Recommended Increment</span>
+                      <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 font-mono">৳{(activeEmp.hrProposedInc || 0).toLocaleString()} BDT</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Plant Head Recommended</span>
+                      <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 font-mono">৳{(activeEmp.plantHeadProposedInc || 0).toLocaleString()} BDT</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">HOD Proposed Promotion</span>
+                      <span className="text-xs font-black text-indigo-600 dark:text-indigo-400">{activeEmp.hodProposedPromotion || "No"} ({activeEmp.hodProposedDesignation || "—"})</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-muted-foreground uppercase">Decision</label>
                       <select
                         disabled={activeStep !== 4}
                         value={activeEmp.mdApproval}
                         onChange={(e) => handleUpdateActiveEmp({ mdApproval: e.target.value })}
-                        className="w-full h-9 px-3 rounded-lg bg-muted/20 border border-border/40 outline-none"
+                        className="w-full h-9 px-3 rounded-lg bg-muted/20 border border-border/40 outline-none text-xs font-bold"
                       >
                         <option value="Approved">Approved</option>
                         <option value="Adjusted">Adjusted</option>
@@ -691,12 +1053,22 @@ function KpiAssessmentWorkflowPage() {
                       </select>
                     </div>
                     <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">MD Recommended Increment (BDT)</label>
+                      <input
+                        type="number"
+                        disabled={activeStep !== 4}
+                        value={activeEmp.mdProposedInc || 0}
+                        onChange={(e) => handleUpdateActiveEmp({ mdProposedInc: parseFloat(e.target.value) || 0 })}
+                        className="w-full h-9 px-3 rounded-lg bg-muted/20 border border-border/40 outline-none focus:border-[#1e88e5] font-mono text-xs font-bold disabled:bg-muted/50"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-muted-foreground uppercase">MD Directives *</label>
                       <textarea
                         required disabled={activeStep !== 4}
                         value={activeEmp.mdComments}
                         onChange={(e) => handleUpdateActiveEmp({ mdComments: e.target.value })}
-                        className="w-full h-16 p-3 rounded-lg bg-muted/20 border border-border/40 outline-none resize-none focus:border-[#1e88e5]"
+                        className="w-full h-9 p-2.5 rounded-lg bg-muted/20 border border-border/40 outline-none resize-none focus:border-[#1e88e5]"
                       />
                     </div>
                   </div>
@@ -721,6 +1093,26 @@ function KpiAssessmentWorkflowPage() {
               </div>
               <div className="p-5">
                 <form onSubmit={handleCompleteFinal} className="space-y-5 text-xs font-semibold">
+                  {/* Proposal Display */}
+                  <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-xl p-4 mb-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">HOD Proposed Increment</span>
+                      <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 font-mono">৳{(activeEmp.hodProposedInc || 0).toLocaleString()} BDT</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">HRD Recommended Increment</span>
+                      <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 font-mono">৳{(activeEmp.hrProposedInc || 0).toLocaleString()} BDT</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Plant Head Recommended</span>
+                      <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 font-mono">৳{(activeEmp.plantHeadProposedInc || 0).toLocaleString()} BDT</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">MD Recommended Increment</span>
+                      <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 font-mono">৳{(activeEmp.mdProposedInc || 0).toLocaleString()} BDT</span>
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 items-end">
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-muted-foreground uppercase">Current Gross</label>
@@ -732,7 +1124,7 @@ function KpiAssessmentWorkflowPage() {
                       <label className="text-[10px] font-bold text-muted-foreground uppercase">Inc Amount *</label>
                       <input
                         type="number" required disabled={completedSteps.includes(5)}
-                        value={activeEmp.incAmount || ""}
+                        value={activeEmp.incAmount !== undefined && activeEmp.incAmount !== 0 ? activeEmp.incAmount : (activeEmp.mdProposedInc || 0)}
                         onChange={(e) => handleUpdateActiveEmp({ incAmount: parseInt(e.target.value) || 0 })}
                         className="w-full h-9 px-3 rounded-lg border border-border/40 focus:border-[#1e88e5] text-xs font-bold font-mono outline-none"
                       />
@@ -740,7 +1132,7 @@ function KpiAssessmentWorkflowPage() {
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-muted-foreground uppercase">New Gross Salary</label>
                       <div className="w-full h-9 px-3 bg-[#1e88e5]/5 rounded-lg border border-[#1e88e5]/30 flex items-center text-xs font-black font-mono text-[#1e88e5]">
-                        {(activeEmp.grossSalary + (activeEmp.incAmount || 0)).toLocaleString()} BDT
+                        {(activeEmp.grossSalary + (activeEmp.incAmount !== undefined && activeEmp.incAmount !== 0 ? activeEmp.incAmount : (activeEmp.mdProposedInc || 0))).toLocaleString()} BDT
                       </div>
                     </div>
                     <div className="space-y-1.5">

@@ -11,6 +11,7 @@ import {
   PeerReview, loadPeerReviews, savePeerReviews,
   KpiCycle, loadKpiCycles
 } from "@/lib/kpi-data";
+import { employeesData } from "@/routes/personnel-list";
 
 export const Route = createFileRoute("/kpi-peer-review")({
   head: () => ({
@@ -33,10 +34,73 @@ function PeerReviewPage() {
 
   const [evaluatingReview, setEvaluatingReview] = useState<PeerReview | null>(null);
 
+  const [showNominateModal, setShowNominateModal] = useState(false);
+  const [nominatedEmpId, setNominatedEmpId] = useState("");
+  const [employeesList, setEmployeesList] = useState<any[]>([]);
+
   useEffect(() => {
     setPeerReviews(loadPeerReviews());
     setCycles(loadKpiCycles());
+
+    // Load employees list
+    let list: any[] = [];
+    if (typeof window !== "undefined") {
+      const synced = localStorage.getItem("recruitment_synced_employees");
+      if (synced) {
+        try {
+          const parsed = JSON.parse(synced);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            list = [...parsed];
+            employeesData.forEach(d => {
+              if (!list.some(m => m.id === d.id)) {
+                list.push(d);
+              }
+            });
+          }
+        } catch {}
+      }
+    }
+    if (list.length === 0) {
+      list = [...employeesData];
+    }
+    setEmployeesList(list);
   }, []);
+
+  const handleNominatePeer = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!nominatedEmpId) return;
+    const selectedEmp = employeesList.find(emp => emp.id === nominatedEmpId);
+    if (!selectedEmp) return;
+
+    if (peerReviews.some(pr => pr.reviewerId === CURRENT_USER_ID && pr.revieweeId === nominatedEmpId)) {
+      toast.error("You have already nominated or been assigned to review this peer.");
+      return;
+    }
+
+    const newNomination: PeerReview = {
+      id: `PR-NOM-${Date.now()}`,
+      cycleId: "CYC-001",
+      reviewerId: CURRENT_USER_ID,
+      reviewerName: "Tahmid Afsar Shapno",
+      reviewerDesignation: "Asst. Manager",
+      revieweeId: selectedEmp.id,
+      revieweeName: selectedEmp.name,
+      revieweeDesignation: selectedEmp.title || selectedEmp.designation || "Executive",
+      department: selectedEmp.dept || selectedEmp.department || "Business Innovation",
+      ratings: { teamwork: 0, communication: 0, problemSolving: 0, leadership: 0, workEthic: 0 },
+      strengths: "",
+      weaknesses: "",
+      overallComments: "",
+      status: "Pending"
+    };
+
+    const updated = [newNomination, ...peerReviews];
+    setPeerReviews(updated);
+    savePeerReviews(updated);
+    setShowNominateModal(false);
+    setNominatedEmpId("");
+    toast.success("Successfully nominated peer for 360° review!");
+  };
 
   const myPending = peerReviews.filter(pr => pr.reviewerId === CURRENT_USER_ID && pr.status === "Pending");
   const myCompleted = peerReviews.filter(pr => pr.reviewerId === CURRENT_USER_ID && pr.status === "Completed");
@@ -97,7 +161,7 @@ function PeerReviewPage() {
           <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8 space-y-6">
             
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 bg-card p-6 rounded-2xl border border-border/60 shadow-sm relative overflow-hidden">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card p-6 rounded-2xl border border-border/60 shadow-sm relative overflow-hidden">
               <div className="absolute top-0 right-0 p-32 bg-primary/5 rounded-full blur-3xl -z-10 translate-x-1/3 -translate-y-1/2"></div>
               <div>
                 <div className="flex items-center gap-2 mb-2">
@@ -110,6 +174,12 @@ function PeerReviewPage() {
                   Evaluate your peers honestly and constructively. Your feedback helps build a better, more collaborative organization.
                 </p>
               </div>
+              <button
+                onClick={() => setShowNominateModal(true)}
+                className="h-10 px-5 rounded-lg bg-[#1e88e5] text-white font-extrabold text-xs uppercase tracking-wider shadow-sm hover:opacity-90 active:scale-[0.98] transition-all flex items-center gap-2 shrink-0"
+              >
+                <Plus className="size-4" /> Nominate a Peer
+              </button>
             </div>
 
             {/* Dashboard Stats */}
@@ -419,6 +489,62 @@ function PeerReviewPage() {
               )}
             </div>
 
+          </div>
+        </div>
+      )}
+      {/* Nominate Peer Modal */}
+      {showNominateModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200">
+          <div className="bg-card w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-border/80 flex flex-col animate-in slide-in-from-bottom-4 duration-300">
+            <div className="px-6 py-5 border-b border-border/50 bg-gradient-to-r from-muted/50 to-muted/20 flex justify-between items-start">
+              <div>
+                <h2 className="text-lg font-black tracking-tight">Nominate a Peer</h2>
+                <p className="text-xs text-muted-foreground mt-1">Select a colleague to assess for this review cycle.</p>
+              </div>
+              <button
+                onClick={() => { setShowNominateModal(false); setNominatedEmpId(""); }}
+                className="size-8 rounded-full bg-muted/80 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors border border-border"
+              >
+                ×
+              </button>
+            </div>
+            
+            <form onSubmit={handleNominatePeer} className="p-6 space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase block">Colleague *</label>
+                <select
+                  required
+                  value={nominatedEmpId}
+                  onChange={(e) => setNominatedEmpId(e.target.value)}
+                  className="w-full h-10 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5]"
+                >
+                  <option value="">-- Select Colleague --</option>
+                  {employeesList
+                    .filter(emp => emp.id !== CURRENT_USER_ID)
+                    .map(emp => (
+                      <option key={emp.id} value={emp.id}>
+                        {emp.name} ({emp.title || emp.designation} - {emp.dept || emp.department})
+                      </option>
+                    ))}
+                </select>
+              </div>
+              
+              <div className="flex justify-end gap-3 pt-3 border-t border-border/30">
+                <button
+                  type="button"
+                  onClick={() => { setShowNominateModal(false); setNominatedEmpId(""); }}
+                  className="h-9 px-4 rounded-lg border border-border bg-background text-foreground font-bold text-xs hover:bg-muted transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="h-9 px-5 rounded-lg bg-[#1e88e5] text-white font-bold text-xs hover:opacity-90 active:scale-[0.98] transition-all"
+                >
+                  Nominate Peer
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
