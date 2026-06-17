@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
-import { StatCards } from "@/components/dashboard/StatCards";
+import { DailyQuickStats } from "@/components/dashboard/DailyQuickStats";
 import {
   HeadcountChart, DepartmentChart, AttendanceChart, GoalsRadial,
+  TodayAttendancePie, TodayLateAbsentPie, DateWiseOTBar
 } from "@/components/dashboard/Charts";
 import {
   LeaveRequests, UpcomingEvents, RecruitmentPipeline,
@@ -30,20 +31,37 @@ function DashboardPage() {
         <div className="p-3.5 md:p-4.5 lg:p-5 space-y-4 lg:space-y-5">
           {/* Key Metrics Section */}
           <div className="space-y-2.5">
-            <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
+            <div className="flex items-center justify-between border-b border-border/40 pb-1.5 mb-2">
               <div>
-                <h2 className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Workspace Indicators</h2>
-                <p className="text-[10px] text-muted-foreground/60 mt-0.5 font-semibold">Real-time operational overview metrics</p>
+                <h2 className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Daily Quick Stats</h2>
+                <p className="text-[10px] text-muted-foreground/60 mt-0.5 font-semibold">Real-time operational metrics for today</p>
               </div>
             </div>
-            <StatCards />
+            <DailyQuickStats />
           </div>
 
           {/* Analytics & Performance Section */}
           <div className="space-y-3">
             <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
               <div>
-                <h2 className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Overview & Analytics</h2>
+                <h2 className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Today's Presence & Overtime</h2>
+                <p className="text-[10px] text-muted-foreground/60 mt-0.5 font-semibold">Daily attendance statuses and overtime payouts</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5 lg:gap-4.5">
+              <TodayAttendancePie />
+              <TodayLateAbsentPie />
+            </div>
+            <div className="mt-3.5 lg:mt-4.5">
+              <DateWiseOTBar />
+            </div>
+          </div>
+
+          {/* Historical Overview Section */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
+              <div>
+                <h2 className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Historical Overview</h2>
                 <p className="text-[10px] text-muted-foreground/60 mt-0.5 font-semibold">Headcount cycles, department allocation splits, and attendance schedules</p>
               </div>
             </div>

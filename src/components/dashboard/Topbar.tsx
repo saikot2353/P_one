@@ -28,6 +28,7 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Manual Attendance Approval", parent: "Attendance", to: "/pending-manual-attendance", description: "Verify pending manual logs" },
   { label: "Employee Job Card", parent: "Attendance", to: "/employee-job-card", description: "Monthly attendance cards" },
   { label: "Allowance Process", parent: "Attendance", to: "/" },
+  { label: "Allowance Requisition", parent: "Attendance", to: "/" },
   // Roster
   { label: "Create Roster Plan", parent: "Roster", to: "/create-roster", description: "Configure employee roster plans" },
   { label: "Company Holiday Calendar", parent: "Roster", to: "/company-holiday", description: "Manage statutory company holidays" },
@@ -37,14 +38,21 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Leave List Database", parent: "Leave", to: "/leave-list", description: "Historical database of employee leaves" },
   { label: "Earn Leave Process", parent: "Leave", to: "/earn-leave-process", description: "Accrue cash payments for earned leave" },
   { label: "Earn Leave Workflow Center", parent: "Leave", to: "/earn-leave-workflow", description: "Unified Submit/Check/Approve pipeline" },
-  // Shift & Policy placeholders
+  { label: "Earn Leave Process List", parent: "Leave", to: "/", description: "View processed earn leaves" },
+  // Manage Shift
   { label: "Shift Schedule Configurator", parent: "Manage Shift", to: "/" },
   { label: "Shift Rotation Planner", parent: "Manage Shift", to: "/" },
+  { label: "Shift Roster", parent: "Manage Shift", to: "/" },
   { label: "Late Attendance Policy", parent: "Manage Shift", to: "/" },
+  // Budget
   { label: "Annual Budget Tracker", parent: "Budget", to: "/" },
   { label: "Department Budget Allocator", parent: "Budget", to: "/" },
   { label: "Expense Claims Clearance", parent: "Budget", to: "/" },
+  // Transfer
   { label: "Branch Transfer Registry", parent: "Transfer", to: "/" },
+  { label: "Department Transfer", parent: "Transfer", to: "/" },
+  { label: "Transfer History", parent: "Transfer", to: "/" },
+  // KPI
   { label: "KPI Dashboard", parent: "KPI", to: "/kpi-dashboard", description: "Organization-wide KPI analytics" },
   { label: "KPI Cycles", parent: "KPI", to: "/kpi-cycles", description: "Manage appraisal periods" },
   { label: "KPI Criteria Setup", parent: "KPI", to: "/kpi-task-name", description: "Configure KPI criteria" },
@@ -54,13 +62,45 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Assessment Workflow", parent: "KPI", to: "/kpi-assessment-workflow", description: "Appraisal approval workflow" },
   { label: "KPI Reports", parent: "KPI", to: "/kpi-report", description: "Export performance reports" },
   { label: "Approval", parent: "Personnel Info", to: "/personnel-approval" },
+  // Compliance
   { label: "Statutory Compliance Audit", parent: "Compliance", to: "/" },
+  { label: "Tax Reports", parent: "Compliance", to: "/" },
+  { label: "Audit Logs", parent: "Compliance", to: "/" },
+  // HR Policy
+  { label: "Company Rules", parent: "HR Policy", to: "/" },
+  { label: "Benefits Policy", parent: "HR Policy", to: "/" },
+  { label: "Conduct Policy", parent: "HR Policy", to: "/" },
+  // Disciplinary Action
+  { label: "Case Files", parent: "Disciplinary Action", to: "/" },
+  { label: "Warning Letters", parent: "Disciplinary Action", to: "/" },
+  { label: "Show Cause Notices", parent: "Disciplinary Action", to: "/" },
+  // Manage Overtime
+  { label: "Overtime Requests", parent: "Manage Overtime", to: "/" },
+  { label: "OT Calculations", parent: "Manage Overtime", to: "/" },
+  { label: "OT Approvals", parent: "Manage Overtime", to: "/" },
+  // Manage Allowance
+  { label: "Allowance Setup", parent: "Manage Allowance", to: "/" },
+  { label: "Employee Allowance", parent: "Manage Allowance", to: "/" },
+  { label: "Tax Exemption Rules", parent: "Manage Allowance", to: "/" },
+  // Processes
+  { label: "Payroll Processing", parent: "Processes", to: "/" },
+  { label: "End of Month Close", parent: "Processes", to: "/" },
+  { label: "Year End Process", parent: "Processes", to: "/" },
+  // Idea Share
+  { label: "Idea Board", parent: "Idea Share", to: "/" },
+  { label: "Innovation Submissions", parent: "Idea Share", to: "/" },
+  // Event
+  { label: "Upcoming Events", parent: "Event", to: "/" },
+  { label: "Holiday Celebrations", parent: "Event", to: "/" },
+  { label: "Team Building", parent: "Event", to: "/" },
   // IE Recruitment
   { label: "Recruitment Basic ID Setup", parent: "IE Recruitment", to: "/recruitment-basic-setup", description: "Define recruitment rules and temp ID setup" },
   { label: "Recruitment Basic Entry Form", parent: "IE Recruitment", to: "/recruitment-basic-entry", description: "Register new candidate profiles temporarily" },
-  { label: "Recruitment Basic Info List", parent: "IE Recruitment", to: "/recruitment-basic-list", description: "View directory of registered temp profiles" },
+  { label: "Recruitment Basic Info List", parent: "IE Recruitment", to: "/recruitment-basic-info-list", description: "View directory of registered temp profiles" },
   { label: "Recruitment Configuration Settings", parent: "IE Recruitment", to: "/recruitment-configuration", description: "Manage SMV banks, machine list, operations etc." },
   { label: "Recruitment Assessment List", parent: "IE Recruitment", to: "/recruitment-assessment-list", description: "Floor evaluation and HR approval workflow" },
+  { label: "IE Assessment", parent: "IE Recruitment", to: "/recruitment-ie-list", description: "IE evaluation list" },
+  { label: "HR Assessment", parent: "IE Recruitment", to: "/recruitment-hr-list", description: "HR evaluation list" },
   // e-Recruitment
   { label: "e-Recruitment Form", parent: "e-Recruitment", to: "/e-recruitment-form", description: "Digital recruitment form" },
   { label: "Candidate List", parent: "e-Recruitment", to: "/recruitment-basic-list", description: "List of candidates" },
@@ -139,6 +179,7 @@ function getCategoryIcon(parent: string) {
     case "e-Recruitment": return UserPlus;
     case "SSP": return Briefcase;
     case "Configure": return SlidersHorizontal;
+    case "Event": return CalendarDays;
     default: return LayoutDashboard;
   }
 }
@@ -183,7 +224,8 @@ export function Topbar() {
     return searchableMenus.filter(item =>
       item.label.toLowerCase().includes(q) ||
       item.parent.toLowerCase().includes(q) ||
-      (item.description && item.description.toLowerCase().includes(q))
+      (item.description && item.description.toLowerCase().includes(q)) ||
+      item.to.toLowerCase().includes(q)
     );
   }, [searchQuery]);
 

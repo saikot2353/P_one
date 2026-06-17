@@ -1,6 +1,6 @@
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
-  BarChart, Bar, PieChart, Pie, Cell, Legend, RadialBarChart, RadialBar,
+  BarChart, Bar, PieChart, Pie, Cell, Legend, RadialBarChart, RadialBar, LabelList
 } from "recharts";
 
 const headcount = [
@@ -32,6 +32,29 @@ const attendance = [
 
 const goals = [
   { name: "Goals", value: 78, fill: "var(--primary)" },
+];
+
+const todayAttendance = [
+  { name: "Presence", value: 95.86, color: "var(--success)" },
+  { name: "Absence", value: 4.00, color: "var(--destructive)" },
+  { name: "Holiday", value: 0.14, color: "var(--chart-1)" },
+  { name: "Leave", value: 0, color: "var(--warning)" },
+];
+
+const todayLateAbsent = [
+  { name: "Late", value: 58.40, color: "var(--warning)" },
+  { name: "Absence", value: 41.60, color: "var(--destructive)" },
+];
+
+const dateWiseOT = [
+  { date: "10/06", amount: 589045, color: "var(--chart-1)" },
+  { date: "11/06", amount: 665007, color: "var(--chart-2)" },
+  { date: "12/06", amount: 0, color: "var(--chart-3)" },
+  { date: "13/06", amount: 565340, color: "var(--success)" },
+  { date: "14/06", amount: 633920, color: "var(--warning)" },
+  { date: "15/06", amount: 633920, color: "var(--chart-5)" },
+  { date: "16/06", amount: 652071, color: "var(--chart-4)" },
+  { date: "17/06", amount: 0, color: "var(--destructive)" },
 ];
 
 function CustomTooltip({ active, payload, label }: any) {
@@ -213,6 +236,69 @@ export function GoalsRadial() {
           <div className="text-xs font-bold text-foreground">12</div>
           <div className="text-[8px] font-semibold text-muted-foreground mt-0.5">At risk</div>
         </div>
+      </div>
+    </Card>
+  );
+}
+
+export function TodayAttendancePie() {
+  return (
+    <Card title="Today Attendance" subtitle="Presence vs Absence Summary">
+      <div className="relative h-56 mt-2">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie data={todayAttendance} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={85} paddingAngle={3} stroke="var(--background)" strokeWidth={3}>
+              {todayAttendance.map((d, i) => (
+                <Cell key={i} fill={d.color} className="outline-none filter hover:brightness-105 transition-all duration-300" />
+              ))}
+            </Pie>
+            <Tooltip content={<CustomTooltip />} />
+            <Legend iconType="circle" wrapperStyle={{ fontSize: 11, fontWeight: 500 }} />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+    </Card>
+  );
+}
+
+export function TodayLateAbsentPie() {
+  return (
+    <Card title="Today Late & Absent Status" subtitle="Late vs Absent Summary">
+      <div className="relative h-56 mt-2">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie data={todayLateAbsent} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={85} paddingAngle={3} stroke="var(--background)" strokeWidth={3}>
+              {todayLateAbsent.map((d, i) => (
+                <Cell key={i} fill={d.color} className="outline-none filter hover:brightness-105 transition-all duration-300" />
+              ))}
+            </Pie>
+            <Tooltip content={<CustomTooltip />} />
+            <Legend iconType="circle" wrapperStyle={{ fontSize: 11, fontWeight: 500 }} />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+    </Card>
+  );
+}
+
+export function DateWiseOTBar() {
+  return (
+    <Card title="Date Wise OT Summary" subtitle="Total Overtime Amount (BDT) over the last 8 days" className="xl:col-span-full">
+      <div className="h-[280px] mt-4">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={dateWiseOT} margin={{ top: 25, right: 10, left: 10, bottom: 20 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.4} vertical={false} />
+            <XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "var(--muted-foreground)", fontWeight: 600 }} dy={10} />
+            <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} dx={-10} tickFormatter={(val) => `${val / 1000}k`} />
+            <Tooltip content={<CustomTooltip />} />
+            <Bar dataKey="amount" radius={[6, 6, 0, 0]} maxBarSize={45}>
+              {dateWiseOT.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} fillOpacity={0.9} />
+              ))}
+              <LabelList dataKey="amount" position="top" fill="var(--muted-foreground)" fontSize={10} fontWeight="900" formatter={(val: number) => `৳ ${val.toLocaleString()}`} />
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </Card>
   );
