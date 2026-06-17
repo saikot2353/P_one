@@ -6,34 +6,48 @@ import tailwindcss from "@tailwindcss/vite";
 import { componentTagger } from "lovable-tagger";
 import path from "path";
 
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(({ mode }) => {
   return {
     server: {
       port: 3000,
       host: true,
       strictPort: true,
     },
+
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
       },
+
       dedupe: [
         "react",
         "react-dom",
         "react/jsx-runtime",
         "react/jsx-dev-runtime",
         "@tanstack/react-query",
-        "@tanstack/query-core"
-      ]
+        "@tanstack/query-core",
+      ],
     },
+
     ssr: {
-      noExternal: ["tslib", "react-remove-scroll", "react-remove-scroll-bar"]
+      noExternal: [
+        "tslib",
+        "react-remove-scroll",
+        "react-remove-scroll-bar",
+      ],
     },
+
     plugins: [
-      tsconfigPaths({ projects: ["./tsconfig.json"] }),
-      tailwindcss(),
+      tsconfigPaths({
+        projects: ["./tsconfig.json"],
+      }),
+
       tanstackStart(),
+
       react(),
+
+      tailwindcss(),
+
       mode === "development" && componentTagger(),
     ].filter(Boolean),
   };
