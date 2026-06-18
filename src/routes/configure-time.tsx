@@ -4,7 +4,7 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { 
   ChevronRight, Search, Plus, Pencil, Trash2, X,
-  FileSpreadsheet, Printer, FileText, Calendar, Clock, AlertTriangle, Coins
+  FileSpreadsheet, Printer, FileText, Calendar, Clock, AlertTriangle, Coins, SlidersHorizontal
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -173,6 +173,64 @@ function TimeSetupPage() {
   const [otConfigs, setOtConfigs] = useState<OtConfig[]>([]);
   const [abnormalShifts, setAbnormalShifts] = useState<AbnormalShift[]>([]);
   const [attnPolicies, setAttnPolicies] = useState<AttendanceBonusPolicy[]>([]);
+
+  // Shift Info modal state
+  const [isShiftInfoOpen, setIsShiftInfoOpen] = useState(false);
+  const [shiftInfoItem, setShiftInfoItem] = useState<Shift | null>(null);
+  // Shift Info editable fields
+  const [siStartDate, setSiStartDate] = useState("");
+  const [siEndDate, setSiEndDate] = useState("");
+  const [siNameEng, setSiNameEng] = useState("");
+  const [siNameBng, setSiNameBng] = useState("");
+  const [siStartTime, setSiStartTime] = useState("");
+  const [siEndTime, setSiEndTime] = useState("");
+  const [siLateTime, setSiLateTime] = useState("");
+  const [siLateCount, setSiLateCount] = useState<"Yes" | "No">("No");
+  const [siLunchFrom, setSiLunchFrom] = useState("");
+  const [siLunchTo, setSiLunchTo] = useState("");
+  const [siSortOrder, setSiSortOrder] = useState<number>(1);
+  const [siIsActive, setSiIsActive] = useState<"Active" | "Inactive">("Active");
+  const [siIsRotate, setSiIsRotate] = useState<"Yes" | "No">("No");
+  const [siRotationCriteria, setSiRotationCriteria] = useState("");
+  const [siShiftChangeDay, setSiShiftChangeDay] = useState("Select..");
+  const [siIsLateDeduction, setSiIsLateDeduction] = useState<"Yes" | "No">("No");
+  const [siStartTimeFrom, setSiStartTimeFrom] = useState("");
+  const [siEndTimeTo, setSiEndTimeTo] = useState("");;
+
+  // OT Config Info modal state
+  const [isOtInfoOpen, setIsOtInfoOpen] = useState(false);
+  const [otInfoItem, setOtInfoItem] = useState<OtConfig | null>(null);
+  const [oiStartDate, setOiStartDate] = useState("");
+  const [oiEndDate, setOiEndDate] = useState("");
+  const [oiShift, setOiShift] = useState("General");
+  const [oiStartTime, setOiStartTime] = useState("06:11:00");
+  const [oiEndTime, setOiEndTime] = useState("11:59:00");
+  const [oiShiftStartTime, setOiShiftStartTime] = useState("08:00:00");
+  const [oiOtStartTime, setOiOtStartTime] = useState("17:00:00");
+  const [oiOtToleranceUpTo, setOiOtToleranceUpTo] = useState("");
+  const [oiTime2Min, setOiTime2Min] = useState<number>(110);
+  const [oiTime2MaxOt, setOiTime2MaxOt] = useState<number>(2);
+  const [oiTime3Min, setOiTime3Min] = useState<number>(110);
+  const [oiTime3MaxOt, setOiTime3MaxOt] = useState<number>(2);
+  const [oiTime4Min, setOiTime4Min] = useState<number>(0);
+  const [oiTime4MaxOt, setOiTime4MaxOt] = useState<number>(0);
+  const [oiOtAfterWH, setOiOtAfterWH] = useState<"Yes" | "No">("No");
+  const [oiGeneralDeductHour, setOiGeneralDeductHour] = useState<number>(0);
+  const [oiHolidayDeductHour, setOiHolidayDeductHour] = useState<number>(1);
+  const [oiDeductAfter, setOiDeductAfter] = useState<number>(0);
+  const [oiOtRound, setOiOtRound] = useState<"Yes" | "No">("Yes");
+  const [oiRoundSlots, setOiRoundSlots] = useState("0-49,0#50-59,1");
+  const [oiMinOt, setOiMinOt] = useState<number>(0);
+  const [oiMaxOt, setOiMaxOt] = useState<number>(14);
+  const [oiOtType, setOiOtType] = useState("General");
+  const [oiPrayerBrake, setOiPrayerBrake] = useState<"Yes" | "No">("No");
+  const [oiDinnerBrake, setOiDinnerBrake] = useState<"Yes" | "No">("Yes");
+  const [oiDeductionFor, setOiDeductionFor] = useState("Holiday");
+  const [oiTimeFrom, setOiTimeFrom] = useState("14:00:00");
+  const [oiTimeTo, setOiTimeTo] = useState("14:30:00");
+  const [oiDeductMin, setOiDeductMin] = useState<number>(30);
+  const [oiIsActive, setOiIsActive] = useState<"Active" | "Inactive">("Active");
+  const [oiOtStartFromShift, setOiOtStartFromShift] = useState<"Yes" | "No">("Yes");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -493,7 +551,7 @@ function TimeSetupPage() {
                   <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
                     <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
                       <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">#</th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">Actions</th>
+                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[140px] text-center border-r border-border/30 z-20">Actions</th>
                       <th className="px-5 py-4 min-w-[150px]">Name (Eng)</th>
                       <th className="px-5 py-4 min-w-[150px]">Name (Bng)</th>
                       <th className="px-5 py-4 w-[100px]">Start Time</th>
@@ -515,8 +573,36 @@ function TimeSetupPage() {
                         <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
                         <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
                           <div className="flex items-center justify-center gap-3">
-                            <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition"><Pencil className="size-4" /></button>
-                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition"><Trash2 className="size-4" /></button>
+                            <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition" title="Edit"><Pencil className="size-4" /></button>
+                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition" title="Delete"><Trash2 className="size-4" /></button>
+                            <button
+                              onClick={() => {
+                                setShiftInfoItem(item);
+                                setSiStartDate("");
+                                setSiEndDate("");
+                                setSiNameEng(item.nameEng);
+                                setSiNameBng(item.nameBng);
+                                setSiStartTime(item.startTime);
+                                setSiEndTime(item.endTime);
+                                setSiLateTime(item.lateTime);
+                                setSiLateCount(item.lateCount);
+                                setSiLunchFrom("");
+                                setSiLunchTo("");
+                                setSiSortOrder(item.sortOrder);
+                                setSiIsActive(item.isActive);
+                                setSiIsRotate(item.isRotate);
+                                setSiRotationCriteria(item.rotationCriteria);
+                                setSiShiftChangeDay(item.shiftChangeDay || "Select..");
+                                setSiIsLateDeduction(item.isLateDeduction);
+                                setSiStartTimeFrom(item.startTimeFrom);
+                                setSiEndTimeTo(item.endTimeTo);
+                                setIsShiftInfoOpen(true);
+                              }}
+                              className="text-purple-500 hover:text-purple-600 transition-colors"
+                              title="Shift Information"
+                            >
+                              <SlidersHorizontal className="size-4" />
+                            </button>
                           </div>
                         </td>
                         <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">{item.nameEng}</td>
@@ -545,7 +631,7 @@ function TimeSetupPage() {
                   <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
                     <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
                       <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">#</th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">Actions</th>
+                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[140px] text-center border-r border-border/30 z-20">Actions</th>
                       <th className="px-5 py-4 min-w-[200px]">Employee Type</th>
                       <th className="px-5 py-4 min-w-[200px]">OT Calculation Type</th>
                       <th className="px-5 py-4 w-[150px] text-center">Buffer Minutes</th>
@@ -558,8 +644,49 @@ function TimeSetupPage() {
                         <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
                         <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
                           <div className="flex items-center justify-center gap-3">
-                            <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition"><Pencil className="size-4" /></button>
-                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition"><Trash2 className="size-4" /></button>
+                            <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition" title="Edit"><Pencil className="size-4" /></button>
+                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition" title="Delete"><Trash2 className="size-4" /></button>
+                            <button
+                              onClick={() => {
+                                setOtInfoItem(item);
+                                setOiStartDate("");
+                                setOiEndDate("");
+                                setOiShift("General");
+                                setOiStartTime("06:11:00");
+                                setOiEndTime("11:59:00");
+                                setOiShiftStartTime("08:00:00");
+                                setOiOtStartTime("17:00:00");
+                                setOiOtToleranceUpTo("");
+                                setOiTime2Min(110);
+                                setOiTime2MaxOt(2);
+                                setOiTime3Min(110);
+                                setOiTime3MaxOt(2);
+                                setOiTime4Min(0);
+                                setOiTime4MaxOt(0);
+                                setOiOtAfterWH("No");
+                                setOiGeneralDeductHour(0);
+                                setOiHolidayDeductHour(1);
+                                setOiDeductAfter(0);
+                                setOiOtRound("Yes");
+                                setOiRoundSlots("0-49,0#50-59,1");
+                                setOiMinOt(0);
+                                setOiMaxOt(14);
+                                setOiOtType(item.otCalculationType || "General");
+                                setOiPrayerBrake("No");
+                                setOiDinnerBrake("Yes");
+                                setOiDeductionFor("Holiday");
+                                setOiTimeFrom("14:00:00");
+                                setOiTimeTo("14:30:00");
+                                setOiDeductMin(30);
+                                setOiIsActive(item.isActive);
+                                setOiOtStartFromShift("Yes");
+                                setIsOtInfoOpen(true);
+                              }}
+                              className="text-purple-500 hover:text-purple-600 transition-colors"
+                              title="OT Configuration"
+                            >
+                              <SlidersHorizontal className="size-4" />
+                            </button>
                           </div>
                         </td>
                         <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">{item.employeeType}</td>
@@ -867,6 +994,440 @@ function TimeSetupPage() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* Shift Info Modal */}
+        {isShiftInfoOpen && shiftInfoItem && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+            <div className="bg-card border border-border/80 w-full max-w-2xl rounded-lg shadow-2xl flex flex-col max-h-[96vh] overflow-hidden animate-in zoom-in-95 duration-200">
+
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-border/50 bg-[#f8fafc] dark:bg-[#0f172a] flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="size-9 bg-purple-500/10 rounded-xl flex items-center justify-center text-purple-600 border border-purple-500/20">
+                    <SlidersHorizontal className="size-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-black tracking-tight text-foreground">Update Shift Information</h2>
+                    <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">{shiftInfoItem.nameEng}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsShiftInfoOpen(false)}
+                  className="size-8 rounded-xl hover:bg-muted/80 flex items-center justify-center transition-colors text-muted-foreground hover:text-foreground border border-border/20"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="flex-1 overflow-y-auto p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                  {/* Start Date */}
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Start Date *</label>
+                    <input type="date" value={siStartDate} onChange={e => setSiStartDate(e.target.value)} className={insetInputClass} />
+                  </div>
+
+                  {/* End Date */}
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>End Date *</label>
+                    <input type="date" value={siEndDate} onChange={e => setSiEndDate(e.target.value)} className={insetInputClass} />
+                  </div>
+
+                  {/* Name Eng */}
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Name (Eng) *</label>
+                    <input type="text" value={siNameEng} onChange={e => setSiNameEng(e.target.value)} className={insetInputClass} />
+                  </div>
+
+                  {/* Name Bng */}
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Name (Bng)</label>
+                    <input type="text" value={siNameBng} onChange={e => setSiNameBng(e.target.value)} className={insetInputClass} />
+                  </div>
+
+                  {/* Start Time */}
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Start Time *</label>
+                    <input type="text" value={siStartTime} onChange={e => setSiStartTime(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
+                  </div>
+
+                  {/* End Time */}
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>End Time *</label>
+                    <input type="text" value={siEndTime} onChange={e => setSiEndTime(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
+                  </div>
+
+                  {/* Late Time */}
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Late Time *</label>
+                    <input type="text" value={siLateTime} onChange={e => setSiLateTime(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
+                  </div>
+
+                  {/* Late Count */}
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Late Count *</label>
+                    <select value={siLateCount} onChange={e => setSiLateCount(e.target.value as "Yes" | "No")} className={insetSelectClass}>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+
+                  {/* Lunch Break From */}
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Lunch Break From *</label>
+                    <input type="text" value={siLunchFrom} onChange={e => setSiLunchFrom(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
+                  </div>
+
+                  {/* Lunch Break To */}
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Lunch Break To *</label>
+                    <input type="text" value={siLunchTo} onChange={e => setSiLunchTo(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
+                  </div>
+
+                  {/* Sort Order */}
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Sort Order *</label>
+                    <input type="number" value={siSortOrder} onChange={e => setSiSortOrder(Number(e.target.value))} className={insetInputClass} />
+                  </div>
+
+                  {/* IsActive */}
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>IsActive *</label>
+                    <select value={siIsActive} onChange={e => setSiIsActive(e.target.value as "Active" | "Inactive")} className={insetSelectClass}>
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                  </div>
+
+                  {/* Is Rotate */}
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Is Rotate?</label>
+                    <select value={siIsRotate} onChange={e => setSiIsRotate(e.target.value as "Yes" | "No")} className={insetSelectClass}>
+                      <option value="No">No</option>
+                      <option value="Yes">Yes</option>
+                    </select>
+                  </div>
+
+                  {/* Rotation Criteria */}
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Rotation Criteria</label>
+                    <input type="text" value={siRotationCriteria} onChange={e => setSiRotationCriteria(e.target.value)} className={insetInputClass} placeholder="e.g. Weekly" />
+                  </div>
+
+                  {/* Shift Change Day */}
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Shift Change Day</label>
+                    <select value={siShiftChangeDay} onChange={e => setSiShiftChangeDay(e.target.value)} className={insetSelectClass}>
+                      <option value="Select..">Select..</option>
+                      <option value="Saturday">Saturday</option>
+                      <option value="Sunday">Sunday</option>
+                      <option value="Monday">Monday</option>
+                      <option value="Tuesday">Tuesday</option>
+                      <option value="Wednesday">Wednesday</option>
+                      <option value="Thursday">Thursday</option>
+                      <option value="Friday">Friday</option>
+                    </select>
+                  </div>
+
+                  {/* Is Late Deduction */}
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Is Late Deduction?</label>
+                    <select value={siIsLateDeduction} onChange={e => setSiIsLateDeduction(e.target.value as "Yes" | "No")} className={insetSelectClass}>
+                      <option value="No">No</option>
+                      <option value="Yes">Yes</option>
+                    </select>
+                  </div>
+
+                  {/* Start Time From */}
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Start Time From *</label>
+                    <input type="text" value={siStartTimeFrom} onChange={e => setSiStartTimeFrom(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
+                  </div>
+
+                  {/* End Time To */}
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>End Time To *</label>
+                    <input type="text" value={siEndTimeTo} onChange={e => setSiEndTimeTo(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="border-t border-border/50 flex items-center justify-between gap-3 bg-[#f8fafc] dark:bg-[#0f172a] px-6 py-4">
+                <button
+                  type="button"
+                  onClick={() => setIsShiftInfoOpen(false)}
+                  className="h-10 px-6 rounded-lg bg-[#f39c12] hover:bg-[#e67e22] text-white font-black text-xs transition-all uppercase tracking-wider shadow-sm hover:shadow"
+                >
+                  CLOSE
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const updated = shifts.map(s => s.sl === shiftInfoItem.sl
+                      ? { ...s, nameEng: siNameEng, nameBng: siNameBng, startTime: siStartTime, endTime: siEndTime, lateTime: siLateTime, lateCount: siLateCount, startTimeFrom: siStartTimeFrom, endTimeTo: siEndTimeTo, sortOrder: siSortOrder, isActive: siIsActive, isRotate: siIsRotate, rotationCriteria: siRotationCriteria, shiftChangeDay: siShiftChangeDay === "Select.." ? "" : siShiftChangeDay, isLateDeduction: siIsLateDeduction }
+                      : s
+                    );
+                    setShifts(updated);
+                    localStorage.setItem("hris_shifts", JSON.stringify(updated));
+                    toast.success("Shift information updated successfully!");
+                    setIsShiftInfoOpen(false);
+                  }}
+                  className="h-10 px-8 rounded-lg bg-[#27ae60] hover:bg-[#219a52] text-white font-black text-xs shadow-md hover:shadow-lg transition-all uppercase tracking-wider"
+                >
+                  CREATE
+                </button>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {/* OT Configuration Info Modal */}
+        {isOtInfoOpen && otInfoItem && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+            <div className="bg-card border border-border/80 w-full max-w-3xl rounded-lg shadow-2xl flex flex-col max-h-[96vh] overflow-hidden animate-in zoom-in-95 duration-200">
+
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-border/50 bg-[#f8fafc] dark:bg-[#0f172a] flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="size-9 bg-purple-500/10 rounded-xl flex items-center justify-center text-purple-600 border border-purple-500/20">
+                    <SlidersHorizontal className="size-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-black tracking-tight text-foreground">OT Configuration</h2>
+                    <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">{otInfoItem.employeeType}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsOtInfoOpen(false)}
+                  className="size-8 rounded-xl hover:bg-muted/80 flex items-center justify-center transition-colors text-muted-foreground hover:text-foreground border border-border/20"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+
+                {/* Row 1: Start Date / End Date */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Start Date *</label>
+                    <input type="date" value={oiStartDate} onChange={e => setOiStartDate(e.target.value)} className={insetInputClass} />
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>End Date *</label>
+                    <input type="date" value={oiEndDate} onChange={e => setOiEndDate(e.target.value)} className={insetInputClass} />
+                  </div>
+                </div>
+
+                {/* Row 2: Shift / Start Time / End Time / Shift Start Time / OT Start Time / OT Tolerance Up To */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Shift</label>
+                    <select value={oiShift} onChange={e => setOiShift(e.target.value)} className={insetSelectClass}>
+                      <option value="General">General</option>
+                      <option value="Morning Roster">Morning Roster</option>
+                      <option value="Evening Roster">Evening Roster</option>
+                      <option value="Night Roster">Night Roster</option>
+                      <option value="ALL">ALL</option>
+                    </select>
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Start Time *</label>
+                    <input type="text" value={oiStartTime} onChange={e => setOiStartTime(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>End Time *</label>
+                    <input type="text" value={oiEndTime} onChange={e => setOiEndTime(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Shift Start Time *</label>
+                    <input type="text" value={oiShiftStartTime} onChange={e => setOiShiftStartTime(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>OT Start Time *</label>
+                    <input type="text" value={oiOtStartTime} onChange={e => setOiOtStartTime(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>OT Tolerance Up To</label>
+                    <input type="text" value={oiOtToleranceUpTo} onChange={e => setOiOtToleranceUpTo(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
+                  </div>
+                </div>
+
+                {/* Row 3: Time-2 / Time-2 Max OT / Time-3 / Time-3 Max OT / Time-4 / Time-4 Max OT */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Time-2 (Min) *</label>
+                    <input type="number" value={oiTime2Min} onChange={e => setOiTime2Min(Number(e.target.value))} className={insetInputClass} />
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Time-2 Max OT (Min) *</label>
+                    <input type="number" value={oiTime2MaxOt} onChange={e => setOiTime2MaxOt(Number(e.target.value))} className={insetInputClass} />
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Time-3 (Min) *</label>
+                    <input type="number" value={oiTime3Min} onChange={e => setOiTime3Min(Number(e.target.value))} className={insetInputClass} />
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Time-3 Max OT (Min) *</label>
+                    <input type="number" value={oiTime3MaxOt} onChange={e => setOiTime3MaxOt(Number(e.target.value))} className={insetInputClass} />
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Time-4 (Min) *</label>
+                    <input type="number" value={oiTime4Min} onChange={e => setOiTime4Min(Number(e.target.value))} className={insetInputClass} />
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Time-4 Max OT (Min) *</label>
+                    <input type="number" value={oiTime4MaxOt} onChange={e => setOiTime4MaxOt(Number(e.target.value))} className={insetInputClass} />
+                  </div>
+                </div>
+
+                {/* Row 4: OT After WH / General Deduct Hour / Holiday Deduct Hour / Deduct After */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>OT After WH *</label>
+                    <select value={oiOtAfterWH} onChange={e => setOiOtAfterWH(e.target.value as "Yes" | "No")} className={insetSelectClass}>
+                      <option value="No">No</option>
+                      <option value="Yes">Yes</option>
+                    </select>
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>General Deduct Hour *</label>
+                    <input type="number" value={oiGeneralDeductHour} onChange={e => setOiGeneralDeductHour(Number(e.target.value))} className={insetInputClass} />
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Holiday Deduct Hour *</label>
+                    <input type="number" value={oiHolidayDeductHour} onChange={e => setOiHolidayDeductHour(Number(e.target.value))} className={insetInputClass} />
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Deduct After *</label>
+                    <input type="number" value={oiDeductAfter} onChange={e => setOiDeductAfter(Number(e.target.value))} className={insetInputClass} />
+                  </div>
+                </div>
+
+                {/* Row 5: OT Round / Round Slots / Min OT / Max OT */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>OT Round *</label>
+                    <select value={oiOtRound} onChange={e => setOiOtRound(e.target.value as "Yes" | "No")} className={insetSelectClass}>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Round Slots (Use number &amp; Comma) *</label>
+                    <input type="text" value={oiRoundSlots} onChange={e => setOiRoundSlots(e.target.value)} className={insetInputClass} placeholder="0-49,0#50-59,1" />
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Min OT *</label>
+                    <input type="number" value={oiMinOt} onChange={e => setOiMinOt(Number(e.target.value))} className={insetInputClass} />
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Max OT *</label>
+                    <input type="number" value={oiMaxOt} onChange={e => setOiMaxOt(Number(e.target.value))} className={insetInputClass} />
+                  </div>
+                </div>
+
+                {/* Row 6: OT Type */}
+                <div className={insetWrapperClass}>
+                  <label className={insetLabelClass}>OT Type *</label>
+                  <select value={oiOtType} onChange={e => setOiOtType(e.target.value)} className={insetSelectClass}>
+                    <option value="General">General</option>
+                    <option value="Flat Hour">Flat Hour</option>
+                    <option value="Basic Ratio">Basic Ratio</option>
+                    <option value="Gross Ratio">Gross Ratio</option>
+                  </select>
+                </div>
+
+                {/* Row 7: Prayer Brake */}
+                <div className={insetWrapperClass}>
+                  <label className={insetLabelClass}>Prayer Brake</label>
+                  <select value={oiPrayerBrake} onChange={e => setOiPrayerBrake(e.target.value as "Yes" | "No")} className={insetSelectClass}>
+                    <option value="No">No</option>
+                    <option value="Yes">Yes</option>
+                  </select>
+                </div>
+
+                {/* Row 8: Dinner/Others Brake / Deduction For / Time From / Time To / Deduct Min */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Dinner/Others Brake</label>
+                    <select value={oiDinnerBrake} onChange={e => setOiDinnerBrake(e.target.value as "Yes" | "No")} className={insetSelectClass}>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Deduction For</label>
+                    <select value={oiDeductionFor} onChange={e => setOiDeductionFor(e.target.value)} className={insetSelectClass}>
+                      <option value="Holiday">Holiday</option>
+                      <option value="Weekday">Weekday</option>
+                      <option value="All">All</option>
+                    </select>
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Time From *</label>
+                    <input type="text" value={oiTimeFrom} onChange={e => setOiTimeFrom(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Time To *</label>
+                    <input type="text" value={oiTimeTo} onChange={e => setOiTimeTo(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Deduct Min *</label>
+                    <input type="number" value={oiDeductMin} onChange={e => setOiDeductMin(Number(e.target.value))} className={insetInputClass} />
+                  </div>
+                </div>
+
+                {/* Row 9: IsActive / OT Start Time From Shift */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>IsActive *</label>
+                    <select value={oiIsActive} onChange={e => setOiIsActive(e.target.value as "Active" | "Inactive")} className={insetSelectClass}>
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>OT Start Time From Shift *</label>
+                    <select value={oiOtStartFromShift} onChange={e => setOiOtStartFromShift(e.target.value as "Yes" | "No")} className={insetSelectClass}>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Footer */}
+              <div className="border-t border-border/50 flex items-center justify-between gap-3 bg-[#f8fafc] dark:bg-[#0f172a] px-6 py-4">
+                <button
+                  type="button"
+                  onClick={() => setIsOtInfoOpen(false)}
+                  className="h-10 px-6 rounded-lg bg-[#f39c12] hover:bg-[#e67e22] text-white font-black text-xs transition-all uppercase tracking-wider shadow-sm hover:shadow"
+                >
+                  CLOSE
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    toast.success("OT Configuration saved successfully!");
+                    setIsOtInfoOpen(false);
+                  }}
+                  className="h-10 px-8 rounded-lg bg-[#27ae60] hover:bg-[#219a52] text-white font-black text-xs shadow-md hover:shadow-lg transition-all uppercase tracking-wider"
+                >
+                  CREATE
+                </button>
+              </div>
+
             </div>
           </div>
         )}

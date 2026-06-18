@@ -5,7 +5,7 @@ import { Topbar } from "@/components/dashboard/Topbar";
 import {
   ChevronRight, Search, Plus, Pencil, Trash2, X,
   FileSpreadsheet, Printer, FileText, Building2, MapPin,
-  Layers, Users2, Grid, HelpCircle, Briefcase, SlidersHorizontal, GripVertical
+  Layers, Users2, Grid, HelpCircle, Briefcase, SlidersHorizontal, GripVertical, Settings
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -278,6 +278,53 @@ const DEFAULT_DESIGNATIONS = [
   "Receptionist"
 ];
 
+// Company Basic Settings interface
+interface CompanyBasicSettings {
+  companyType: string;
+  ssp: string;
+  encryption: string;
+  companyData: string;
+  companyId: string;
+  joinYearWithId: string;
+  idFormat: string;
+  officeId: string;
+  systemId: string;
+  deptWiseSection: string;
+  employeeEditApproval: string;
+  dashboard: string;
+  absentBasedOnInOut: string;
+  otRequisition: string;
+  ageVerification: string;
+  maxAge: string;
+  minAge: string;
+  minServiceLengthForLeave: string;
+  autoSalaryProcess: string;
+  otRateCalculation: string;
+}
+
+const DEFAULT_COMPANY_SETTINGS: CompanyBasicSettings = {
+  companyType: "Knit",
+  ssp: "Yes",
+  encryption: "No",
+  companyData: "Combined",
+  companyId: "Combined",
+  joinYearWithId: "Yes",
+  idFormat: "000000",
+  officeId: "No",
+  systemId: "Yes",
+  deptWiseSection: "Yes",
+  employeeEditApproval: "Yes",
+  dashboard: "None",
+  absentBasedOnInOut: "No",
+  otRequisition: "Yes",
+  ageVerification: "No",
+  maxAge: "",
+  minAge: "",
+  minServiceLengthForLeave: "",
+  autoSalaryProcess: "No",
+  otRateCalculation: "Regular",
+};
+
 function StructureSetupPage() {
   const [activeTab, setActiveTab] = useState<TabType>("company");
   const [searchQuery, setSearchQuery] = useState("");
@@ -298,6 +345,11 @@ function StructureSetupPage() {
   const [tempDesignations, setTempDesignations] = useState<string[]>([]);
   const [selectedNewDesignation, setSelectedNewDesignation] = useState("");
   const [customDesignation, setCustomDesignation] = useState("");
+
+  // Company Basic Settings state
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [settingsCompany, setSettingsCompany] = useState<Organization | null>(null);
+  const [companySettings, setCompanySettings] = useState<Record<number, CompanyBasicSettings>>({});
 
   // Load from LocalStorage
   useEffect(() => {
@@ -729,7 +781,7 @@ function StructureSetupPage() {
                   <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
                     <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
                       <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">#</th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">Actions</th>
+                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[140px] text-center border-r border-border/30 z-20">Actions</th>
                       <th className="px-5 py-4 w-[120px]">Company Code</th>
                       <th className="px-5 py-4 min-w-[200px]">Company Name (Eng)</th>
                       <th className="px-5 py-4 min-w-[200px]">Company Name (Bng)</th>
@@ -744,8 +796,18 @@ function StructureSetupPage() {
                         <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
                         <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
                           <div className="flex items-center justify-center gap-3">
-                            <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition"><Pencil className="size-4" /></button>
-                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition"><Trash2 className="size-4" /></button>
+                            <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition" title="Edit"><Pencil className="size-4" /></button>
+                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition" title="Delete"><Trash2 className="size-4" /></button>
+                            <button
+                              onClick={() => {
+                                setSettingsCompany(item);
+                                setIsSettingsOpen(true);
+                              }}
+                              className="text-blue-500 hover:text-blue-600 transition-colors"
+                              title="Company Basic Settings"
+                            >
+                              <Settings className="size-4" />
+                            </button>
                           </div>
                         </td>
                         <td className="px-5 py-3.5 font-normal font-mono">{item.code}</td>
@@ -1578,6 +1640,241 @@ function StructureSetupPage() {
             </div>
           </div>
         )}
+
+        {/* Company Basic Settings Modal */}
+        {isSettingsOpen && settingsCompany && (() => {
+          const sl = settingsCompany.sl;
+          const cfg: CompanyBasicSettings = companySettings[sl] ?? { ...DEFAULT_COMPANY_SETTINGS };
+          const update = (field: keyof CompanyBasicSettings, val: string) => {
+            setCompanySettings(prev => ({ ...prev, [sl]: { ...(prev[sl] ?? DEFAULT_COMPANY_SETTINGS), [field]: val } }));
+          };
+          const sel = "w-full bg-transparent border-0 outline-none text-xs font-normal text-foreground cursor-pointer";
+          const lbl = "text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider block mb-0.5";
+          const wrap = "group relative rounded border border-border/70 focus-within:border-primary px-3 py-2 bg-muted/10 focus-within:bg-card transition-all duration-200";
+          const inp = "w-full bg-transparent border-0 outline-none text-xs font-normal text-foreground focus:ring-0 p-0";
+          return (
+            <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+              <div className="bg-card border border-border/80 w-full max-w-3xl rounded-lg shadow-2xl flex flex-col max-h-[96vh] overflow-hidden animate-in zoom-in-95 duration-200">
+
+                {/* Modal Header */}
+                <div className="px-6 py-4 border-b border-border/50 bg-[#f8fafc] dark:bg-[#0f172a] flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="size-9 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-600 border border-blue-500/20">
+                      <Settings className="size-5" />
+                    </div>
+                    <div>
+                      <h2 className="text-sm font-black tracking-tight text-foreground">Company Basic Settings</h2>
+                      <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">{settingsCompany.nameEng}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setIsSettingsOpen(false)}
+                    className="size-8 rounded-xl hover:bg-muted/80 flex items-center justify-center transition-colors text-muted-foreground hover:text-foreground border border-border/20"
+                  >
+                    <X className="size-4" />
+                  </button>
+                </div>
+
+                {/* Modal Body */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-4">
+
+                  {/* Row 1: Company Type */}
+                  <div className={wrap}>
+                    <label className={lbl}>Company Type *</label>
+                    <select value={cfg.companyType} onChange={e => update("companyType", e.target.value)} className={sel}>
+                      <option value="Knit">Knit</option>
+                      <option value="Woven">Woven</option>
+                      <option value="Spinning">Spinning</option>
+                      <option value="Dyeing">Dyeing</option>
+                      <option value="Composite">Composite</option>
+                    </select>
+                  </div>
+
+                  {/* Row 2: SSP / Encryption / Company Data */}
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className={wrap}>
+                      <label className={lbl}>SSP *</label>
+                      <select value={cfg.ssp} onChange={e => update("ssp", e.target.value)} className={sel}>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </select>
+                    </div>
+                    <div className={wrap}>
+                      <label className={lbl}>Encryption *</label>
+                      <select value={cfg.encryption} onChange={e => update("encryption", e.target.value)} className={sel}>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </select>
+                    </div>
+                    <div className={wrap}>
+                      <label className={lbl}>Company Data *</label>
+                      <select value={cfg.companyData} onChange={e => update("companyData", e.target.value)} className={sel}>
+                        <option value="Combined">Combined</option>
+                        <option value="Separate">Separate</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Row 3: Company ID */}
+                  <div className={wrap}>
+                    <label className={lbl}>Company ID *</label>
+                    <select value={cfg.companyId} onChange={e => update("companyId", e.target.value)} className={sel}>
+                      <option value="Combined">Combined</option>
+                      <option value="Separate">Separate</option>
+                    </select>
+                  </div>
+
+                  {/* Row 4: Join Year With ID / ID Format */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className={wrap}>
+                      <label className={lbl}>Join Year With ID *</label>
+                      <select value={cfg.joinYearWithId} onChange={e => update("joinYearWithId", e.target.value)} className={sel}>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </select>
+                    </div>
+                    <div className={wrap}>
+                      <label className={lbl}>ID Format *</label>
+                      <input type="text" value={cfg.idFormat} onChange={e => update("idFormat", e.target.value)} className={inp} placeholder="e.g. 000000" />
+                    </div>
+                  </div>
+
+                  {/* Row 5: Office ID / System ID */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className={wrap}>
+                      <label className={lbl}>Office ID *</label>
+                      <select value={cfg.officeId} onChange={e => update("officeId", e.target.value)} className={sel}>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </select>
+                    </div>
+                    <div className={wrap}>
+                      <label className={lbl}>System ID *</label>
+                      <select value={cfg.systemId} onChange={e => update("systemId", e.target.value)} className={sel}>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Row 6: Dept Wise Section */}
+                  <div className={wrap}>
+                    <label className={lbl}>Dept Wise Section *</label>
+                    <select value={cfg.deptWiseSection} onChange={e => update("deptWiseSection", e.target.value)} className={sel}>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+
+                  {/* Row 7: Employee Edit Approval */}
+                  <div className={wrap}>
+                    <label className={lbl}>Employee Edit Approval *</label>
+                    <select value={cfg.employeeEditApproval} onChange={e => update("employeeEditApproval", e.target.value)} className={sel}>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+
+                  {/* Row 8: Dashboard */}
+                  <div className={wrap}>
+                    <label className={lbl}>Dashboard *</label>
+                    <select value={cfg.dashboard} onChange={e => update("dashboard", e.target.value)} className={sel}>
+                      <option value="None">None</option>
+                      <option value="Basic">Basic</option>
+                      <option value="Advanced">Advanced</option>
+                    </select>
+                  </div>
+
+                  {/* Row 9: Absent Based on In/Out */}
+                  <div className={wrap}>
+                    <label className={lbl}>Absent Based on In/Out *</label>
+                    <select value={cfg.absentBasedOnInOut} onChange={e => update("absentBasedOnInOut", e.target.value)} className={sel}>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+
+                  {/* Row 10: OT Requisition */}
+                  <div className={wrap}>
+                    <label className={lbl}>OT Requisition *</label>
+                    <select value={cfg.otRequisition} onChange={e => update("otRequisition", e.target.value)} className={sel}>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+
+                  {/* Row 11: Age Verification / Max Age / Min Age */}
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className={wrap}>
+                      <label className={lbl}>Age Verification *</label>
+                      <select value={cfg.ageVerification} onChange={e => update("ageVerification", e.target.value)} className={sel}>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </select>
+                    </div>
+                    <div className={wrap}>
+                      <label className={lbl}>Max Age *</label>
+                      <input type="number" value={cfg.maxAge} onChange={e => update("maxAge", e.target.value)} className={inp} placeholder="e.g. 60" />
+                    </div>
+                    <div className={wrap}>
+                      <label className={lbl}>Min Age *</label>
+                      <input type="number" value={cfg.minAge} onChange={e => update("minAge", e.target.value)} className={inp} placeholder="e.g. 18" />
+                    </div>
+                  </div>
+
+                  {/* Row 12: Min Service Length / Auto Salary Process / OT Rate Calculation */}
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className={wrap}>
+                      <label className={lbl}>Min Service Length For Leave (Month)</label>
+                      <input type="number" value={cfg.minServiceLengthForLeave} onChange={e => update("minServiceLengthForLeave", e.target.value)} className={inp} placeholder="e.g. 6" />
+                    </div>
+                    <div className={wrap}>
+                      <label className={lbl}>Auto Salary Process *</label>
+                      <select value={cfg.autoSalaryProcess} onChange={e => update("autoSalaryProcess", e.target.value)} className={sel}>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </select>
+                    </div>
+                    <div className={wrap}>
+                      <label className={lbl}>OT Rate Calculation *</label>
+                      <select value={cfg.otRateCalculation} onChange={e => update("otRateCalculation", e.target.value)} className={sel}>
+                        <option value="Regular">Regular</option>
+                        <option value="Double">Double</option>
+                        <option value="Custom">Custom</option>
+                      </select>
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Modal Footer */}
+                <div className="border-t border-border/50 flex items-center justify-between gap-3 bg-[#f8fafc] dark:bg-[#0f172a] px-6 py-4">
+                  <button
+                    type="button"
+                    onClick={() => setIsSettingsOpen(false)}
+                    className="h-10 px-6 rounded-lg bg-[#f39c12] hover:bg-[#e67e22] text-white font-black text-xs transition-all uppercase tracking-wider shadow-sm hover:shadow"
+                  >
+                    CLOSE
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updated = { ...companySettings, [sl]: cfg };
+                      setCompanySettings(updated);
+                      localStorage.setItem("hris_company_settings", JSON.stringify(updated));
+                      toast.success("Company Basic Settings updated successfully!");
+                      setIsSettingsOpen(false);
+                    }}
+                    className="h-10 px-8 rounded-lg bg-[#e74c3c] hover:bg-[#c0392b] text-white font-black text-xs shadow-md hover:shadow-lg transition-all uppercase tracking-wider"
+                  >
+                    UPDATE
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          );
+        })()}
       </main>
     </div>
   );

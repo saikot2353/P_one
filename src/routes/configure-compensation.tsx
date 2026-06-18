@@ -77,6 +77,8 @@ interface BonusSetting {
   daysTo: number;
   basedOn: string;
   bonusPercent: number;
+  designation: string;
+  includeServiceLength: "Yes" | "No";
   isActive: "Active" | "Inactive";
 }
 
@@ -176,26 +178,26 @@ const DEFAULT_CONVEYANCE: ConveyanceSetup[] = [
 ];
 
 const DEFAULT_BONUSES: BonusSetting[] = [
-  { sl: 1, employeeType: "ALL", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 50, isActive: "Active" },
-  { sl: 2, employeeType: "Permanent", daysFrom: 365, daysTo: 9999, basedOn: "Basic", bonusPercent: 100, isActive: "Active" },
-  { sl: 3, employeeType: "Casual", daysFrom: 180, daysTo: 365, basedOn: "Gross", bonusPercent: 30, isActive: "Active" },
-  { sl: 4, employeeType: "Contractual", daysFrom: 90, daysTo: 365, basedOn: "Basic", bonusPercent: 40, isActive: "Active" },
-  { sl: 5, employeeType: "Apprentice", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 20, isActive: "Active" },
-  { sl: 6, employeeType: "Part-Time", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 30, isActive: "Active" },
-  { sl: 7, employeeType: "Intern", daysFrom: 90, daysTo: 180, basedOn: "Gross", bonusPercent: 25, isActive: "Active" },
-  { sl: 8, employeeType: "Temporary", daysFrom: 180, daysTo: 365, basedOn: "Gross", bonusPercent: 30, isActive: "Active" },
-  { sl: 9, employeeType: "Seasonal", daysFrom: 90, daysTo: 180, basedOn: "Basic", bonusPercent: 20, isActive: "Active" },
-  { sl: 10, employeeType: "Outsourced", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 35, isActive: "Active" },
-  { sl: 11, employeeType: "Consultant", daysFrom: 180, daysTo: 365, basedOn: "Gross", bonusPercent: 50, isActive: "Active" },
-  { sl: 12, employeeType: "Freelance", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 40, isActive: "Active" },
-  { sl: 13, employeeType: "Daily Wager", daysFrom: 90, daysTo: 180, basedOn: "Basic", bonusPercent: 15, isActive: "Active" },
-  { sl: 14, employeeType: "Project-Based", daysFrom: 180, daysTo: 365, basedOn: "Gross", bonusPercent: 45, isActive: "Active" },
-  { sl: 15, employeeType: "Advisory Staff", daysFrom: 365, daysTo: 9999, basedOn: "Gross", bonusPercent: 80, isActive: "Active" },
-  { sl: 16, employeeType: "Trainee", daysFrom: 90, daysTo: 180, basedOn: "Basic", bonusPercent: 20, isActive: "Active" },
-  { sl: 17, employeeType: "Shift-Worker", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 55, isActive: "Active" },
-  { sl: 18, employeeType: "On-Call Staff", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 40, isActive: "Active" },
-  { sl: 19, employeeType: "Retainer Contract", daysFrom: 180, daysTo: 365, basedOn: "Gross", bonusPercent: 40, isActive: "Active" },
-  { sl: 20, employeeType: "Guest Expert", daysFrom: 90, daysTo: 365, basedOn: "Basic", bonusPercent: 50, isActive: "Active" }
+  { sl: 1, employeeType: "ALL", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 50, designation: "ALL", includeServiceLength: "Yes", isActive: "Active" },
+  { sl: 2, employeeType: "Permanent", daysFrom: 365, daysTo: 9999, basedOn: "Basic", bonusPercent: 100, designation: "ALL", includeServiceLength: "Yes", isActive: "Active" },
+  { sl: 3, employeeType: "Casual", daysFrom: 180, daysTo: 365, basedOn: "Gross", bonusPercent: 30, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
+  { sl: 4, employeeType: "Contractual", daysFrom: 90, daysTo: 365, basedOn: "Basic", bonusPercent: 40, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
+  { sl: 5, employeeType: "Apprentice", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 20, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
+  { sl: 6, employeeType: "Part-Time", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 30, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
+  { sl: 7, employeeType: "Intern", daysFrom: 90, daysTo: 180, basedOn: "Gross", bonusPercent: 25, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
+  { sl: 8, employeeType: "Temporary", daysFrom: 180, daysTo: 365, basedOn: "Gross", bonusPercent: 30, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
+  { sl: 9, employeeType: "Seasonal", daysFrom: 90, daysTo: 180, basedOn: "Basic", bonusPercent: 20, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
+  { sl: 10, employeeType: "Outsourced", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 35, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
+  { sl: 11, employeeType: "Consultant", daysFrom: 180, daysTo: 365, basedOn: "Gross", bonusPercent: 50, designation: "ALL", includeServiceLength: "Yes", isActive: "Active" },
+  { sl: 12, employeeType: "Freelance", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 40, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
+  { sl: 13, employeeType: "Daily Wager", daysFrom: 90, daysTo: 180, basedOn: "Basic", bonusPercent: 15, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
+  { sl: 14, employeeType: "Project-Based", daysFrom: 180, daysTo: 365, basedOn: "Gross", bonusPercent: 45, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
+  { sl: 15, employeeType: "Advisory Staff", daysFrom: 365, daysTo: 9999, basedOn: "Gross", bonusPercent: 80, designation: "ALL", includeServiceLength: "Yes", isActive: "Active" },
+  { sl: 16, employeeType: "Trainee", daysFrom: 90, daysTo: 180, basedOn: "Basic", bonusPercent: 20, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
+  { sl: 17, employeeType: "Shift-Worker", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 55, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
+  { sl: 18, employeeType: "On-Call Staff", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 40, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
+  { sl: 19, employeeType: "Retainer Contract", daysFrom: 180, daysTo: 365, basedOn: "Gross", bonusPercent: 40, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
+  { sl: 20, employeeType: "Guest Expert", daysFrom: 90, daysTo: 365, basedOn: "Basic", bonusPercent: 50, designation: "ALL", includeServiceLength: "No", isActive: "Active" }
 ];
 
 function CompensationSetupPage() {
@@ -309,6 +311,8 @@ function CompensationSetupPage() {
   const [bonusDaysTo, setBonusDaysTo] = useState<number>(365);
   const [bonusBasedOn, setBonusBasedOn] = useState("Basic");
   const [bonusPercent, setBonusPercent] = useState<number>(50);
+  const [bonusDesignation, setBonusDesignation] = useState("ALL");
+  const [bonusIncludeServiceLength, setBonusIncludeServiceLength] = useState<"Yes" | "No">("Yes");
   const [bonusIsActive, setBonusIsActive] = useState<"Active" | "Inactive">("Active");
 
   const openForm = (sl: number | null) => {
@@ -359,6 +363,8 @@ function CompensationSetupPage() {
       setBonusDaysTo(item?.daysTo || 365);
       setBonusBasedOn(item?.basedOn || "Basic");
       setBonusPercent(item?.bonusPercent || 50);
+      setBonusDesignation(item?.designation || "ALL");
+      setBonusIncludeServiceLength(item?.includeServiceLength || "Yes");
       setBonusIsActive(item?.isActive || "Active");
     }
     setIsFormOpen(true);
@@ -439,10 +445,10 @@ function CompensationSetupPage() {
     } else if (activeTab === "bonus") {
       let nextList = [...bonuses];
       if (editSl !== null) {
-        nextList = bonuses.map(b => b.sl === editSl ? { ...b, employeeType: bonusEmpType, daysFrom: Number(bonusDaysFrom), daysTo: Number(bonusDaysTo), basedOn: bonusBasedOn, bonusPercent: Number(bonusPercent), isActive: bonusIsActive } : b);
+        nextList = bonuses.map(b => b.sl === editSl ? { ...b, employeeType: bonusEmpType, daysFrom: Number(bonusDaysFrom), daysTo: Number(bonusDaysTo), basedOn: bonusBasedOn, bonusPercent: Number(bonusPercent), designation: bonusDesignation, includeServiceLength: bonusIncludeServiceLength, isActive: bonusIsActive } : b);
       } else {
         const sl = bonuses.length > 0 ? Math.max(...bonuses.map(b => b.sl)) + 1 : 1;
-        nextList.push({ sl, employeeType: bonusEmpType, daysFrom: Number(bonusDaysFrom), daysTo: Number(bonusDaysTo), basedOn: bonusBasedOn, bonusPercent: Number(bonusPercent), isActive: bonusIsActive });
+        nextList.push({ sl, employeeType: bonusEmpType, daysFrom: Number(bonusDaysFrom), daysTo: Number(bonusDaysTo), basedOn: bonusBasedOn, bonusPercent: Number(bonusPercent), designation: bonusDesignation, includeServiceLength: bonusIncludeServiceLength, isActive: bonusIsActive });
       }
       setBonuses(nextList);
       localStorage.setItem("hris_bonus_settings", JSON.stringify(nextList));
@@ -728,11 +734,13 @@ function CompensationSetupPage() {
                     <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
                       <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">#</th>
                       <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">Actions</th>
-                      <th className="px-5 py-4 min-w-[200px]">Employee Type</th>
-                      <th className="px-5 py-4 w-[120px] text-center">Days From</th>
+                      <th className="px-5 py-4 min-w-[180px]">Employee Type</th>
+                      <th className="px-5 py-4 w-[120px] text-center">Days Form</th>
                       <th className="px-5 py-4 w-[120px] text-center">Days To</th>
                       <th className="px-5 py-4 w-[150px]">Based On</th>
                       <th className="px-5 py-4 w-[120px] text-center">Bonus (%)</th>
+                      <th className="px-5 py-4 min-w-[150px]">Designation</th>
+                      <th className="px-5 py-4 w-[160px] text-center">Inc. Service Length</th>
                       <th className="px-5 py-4 w-[120px] text-center">IsActive</th>
                     </tr>
                   </thead>
@@ -751,6 +759,8 @@ function CompensationSetupPage() {
                         <td className="px-5 py-3.5 text-center font-normal font-mono">{item.daysTo}</td>
                         <td className="px-5 py-3.5 font-normal">{item.basedOn}</td>
                         <td className="px-5 py-3.5 text-center font-normal font-mono">{item.bonusPercent}%</td>
+                        <td className="px-5 py-3.5 font-normal">{item.designation || "ALL"}</td>
+                        <td className="px-5 py-3.5 text-center font-normal">{item.includeServiceLength || "Yes"}</td>
                         <td className="px-5 py-3.5 text-center">
                           <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}>{item.isActive}</span>
                         </td>
@@ -960,15 +970,28 @@ function CompensationSetupPage() {
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Employee Type *</label>
-                      <input type="text" value={bonusEmpType} onChange={e => setBonusEmpType(e.target.value)} className={insetInputClass} required />
+                      <select value={bonusEmpType} onChange={e => setBonusEmpType(e.target.value)} className={insetSelectClass} required>
+                        <option value="ALL">ALL</option>
+                        <option value="Worker">Worker</option>
+                        <option value="Permanent">Permanent</option>
+                        <option value="Casual">Casual</option>
+                        <option value="Contractual">Contractual</option>
+                        <option value="Apprentice">Apprentice</option>
+                        <option value="Part-Time">Part-Time</option>
+                        <option value="Intern">Intern</option>
+                        <option value="Temporary">Temporary</option>
+                        <option value="Seasonal">Seasonal</option>
+                        <option value="Outsourced">Outsourced</option>
+                        <option value="Consultant">Consultant</option>
+                      </select>
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Days From *</label>
+                      <label className={insetLabelClass}>Days Form *</label>
                       <input type="number" value={bonusDaysFrom} onChange={e => setBonusDaysFrom(Number(e.target.value))} className={insetInputClass} required />
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Days To *</label>
-                      <input type="number" value={bonusDaysTo} onChange={e => setBonusDaysTo(Number(e.target.value))} className={insetInputClass} required />
+                      <label className={insetLabelClass}>Days To</label>
+                      <input type="number" value={bonusDaysTo} onChange={e => setBonusDaysTo(Number(e.target.value))} className={insetInputClass} />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Based On *</label>
@@ -981,6 +1004,17 @@ function CompensationSetupPage() {
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Bonus (%) *</label>
                       <input type="number" value={bonusPercent} onChange={e => setBonusPercent(Number(e.target.value))} className={insetInputClass} required />
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Designation *</label>
+                      <input type="text" value={bonusDesignation} onChange={e => setBonusDesignation(e.target.value)} className={insetInputClass} placeholder="ALL" />
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Is Include Service Length *</label>
+                      <select value={bonusIncludeServiceLength} onChange={e => setBonusIncludeServiceLength(e.target.value as "Yes" | "No")} className={insetSelectClass}>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </select>
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>IsActive *</label>
