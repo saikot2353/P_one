@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from "react";
+import { Fragment, useState, useMemo, useEffect } from "react";
+import type { ReactNode } from "react";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
@@ -8,7 +9,8 @@ import {
   Search, FileDown, Printer, FileText, ChevronRight, UserPlus, Eye, Edit3, X, SlidersHorizontal,
   ChevronDown, MapPin, Phone, Mail, Calendar, User, Heart, Briefcase, DollarSign, EyeOff, LayoutGrid, Check,
   TrendingUp, ArrowUpRight, FileSignature, ShieldCheck, CreditCard, UserCheck, UserCog, Clock, CalendarRange,
-  CalendarHeart, Power, FileClock, Sparkles, AlertCircle, RefreshCw, Info
+  CalendarHeart, Power, FileClock, Sparkles, AlertCircle, RefreshCw, Info, ArrowUp, ArrowDown, Save, Star,
+  Trash2, RotateCcw
 } from "lucide-react";
 
 export const Route = createFileRoute("/personnel-list")({
@@ -365,6 +367,130 @@ const defaultColumns = {
   acStatus: true,
 };
 
+type ColumnKey = keyof typeof defaultColumns;
+
+type ColumnTemplate = {
+  id: string;
+  name: string;
+  isActive: boolean;
+  isDefault?: boolean;
+  columns: Record<ColumnKey, boolean>;
+  order: ColumnKey[];
+};
+
+const columnStorageKey = "personnel_list_column_templates_v1";
+const defaultColumnOrder = Object.keys(defaultColumns) as ColumnKey[];
+
+const createDefaultColumnTemplate = (): ColumnTemplate => ({
+  id: "default",
+  name: "Default Columns",
+  isActive: true,
+  isDefault: true,
+  columns: { ...defaultColumns },
+  order: [...defaultColumnOrder],
+});
+
+const getColumnLabel = (key: ColumnKey) => {
+  const labels: Record<ColumnKey, string> = {
+    empIdOffc: "Emp ID (Offc)",
+    employeeType: "Employee Type",
+    dept: "Department",
+    section: "Section",
+    jobTitle: "Job Title",
+    unit: "Unit",
+    line: "Line",
+    grade: "Grade",
+    shift: "Shift",
+    shiftStart: "Shift Start",
+    joinDate: "Joining Date",
+    blood: "Blood Group",
+    basic: "Basic",
+    gross: "Gross",
+    email: "Email",
+    officeMob: "Office Mobile",
+    gender: "Gender",
+    dob: "Date of Birth",
+    empStatus: "Employment Status",
+    village: "Per. Village",
+    acStatus: "A/C Status",
+  };
+
+  return labels[key];
+};
+
+const normalizeColumnOrder = (order?: ColumnKey[]) => {
+  const validKeys = new Set(defaultColumnOrder);
+  const cleaned = (order || []).filter((key): key is ColumnKey => validKeys.has(key));
+  return [...cleaned, ...defaultColumnOrder.filter(key => !cleaned.includes(key))];
+};
+
+const normalizeColumnVisibility = (columns?: Partial<Record<ColumnKey, boolean>>) => ({
+  ...defaultColumns,
+  ...(columns || {}),
+});
+
+const columnRenderers: Record<ColumnKey, (employee: any) => ReactNode> = {
+  empIdOffc: (e) => <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.offcId}</td>,
+  employeeType: (e) => <td className="px-5 py-3.5 text-foreground/85 font-medium">{e.type}</td>,
+  dept: (e) => <td className="px-5 py-3.5 text-foreground/80 font-medium">{e.dept}</td>,
+  section: (e) => <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.sect}</td>,
+  jobTitle: (e) => <td className="px-5 py-3.5 font-semibold text-foreground">{e.title}</td>,
+  unit: (e) => <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.unit}</td>,
+  line: (e) => <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.line}</td>,
+  grade: (e) => <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.grade}</td>,
+  shift: (e) => <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.shift}</td>,
+  shiftStart: (e) => <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.shiftStart}</td>,
+  joinDate: (e) => <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.joinDate}</td>,
+  blood: (e) => (
+    <td className="px-5 py-3.5 text-center">
+      <span className="inline-flex items-center justify-center px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30">
+        {e.blood}
+      </span>
+    </td>
+  ),
+  basic: (e) => (
+    <td className="px-5 py-3.5 text-right font-mono font-semibold text-foreground/90">
+      ৳{parseFloat(e.basic).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+    </td>
+  ),
+  gross: (e) => (
+    <td className="px-5 py-3.5 text-right font-mono font-bold text-primary">
+      ৳{parseFloat(e.gross).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+    </td>
+  ),
+  email: (e) => <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.email}</td>,
+  officeMob: (e) => <td className="px-5 py-3.5 text-muted-foreground/90 font-medium font-mono">{e.officeMob}</td>,
+  gender: (e) => <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.gender}</td>,
+  dob: (e) => <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.dob}</td>,
+  empStatus: (e) => (
+    <td className="px-5 py-3.5">
+      <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${e.empStatus === "Permanent" ? "bg-success/15 text-success" : "bg-warning/15 text-warning"}`}>
+        <span className={`size-1.5 rounded-full ${e.empStatus === "Permanent" ? "bg-success" : "bg-warning animate-pulse"}`} />
+        {e.empStatus}
+      </span>
+    </td>
+  ),
+  village: (e) => <td className="px-5 py-3.5 text-muted-foreground/80 font-medium truncate max-w-[150px]" title={e.village}>{e.village}</td>,
+  acStatus: (e) => (
+    <td className="px-5 py-3.5 text-center">
+      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-500">
+        <span className="size-1 rounded-full bg-emerald-500 animate-ping" />
+        {e.acStatus}
+      </span>
+    </td>
+  ),
+};
+
+const getColumnHeaderClass = (key: ColumnKey) => {
+  const alignClass = key === "blood" || key === "acStatus"
+    ? "text-center"
+    : key === "basic" || key === "gross"
+      ? "text-right"
+      : "";
+
+  return `px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] ${alignClass}`;
+};
+
 function PersonnelListPage() {
   const [employees, setEmployees] = useState<any[]>([]);
   const navigate = useNavigate();
@@ -510,7 +636,12 @@ function PersonnelListPage() {
   const [designationFilter, setDesignationFilter] = useState("ALL");
 
   const [isFilterCollapsed, setIsFilterCollapsed] = useState(false);
-  const [visibleCols, setVisibleCols] = useState(defaultColumns);
+  const [visibleCols, setVisibleCols] = useState<Record<ColumnKey, boolean>>({ ...defaultColumns });
+  const [columnOrder, setColumnOrder] = useState<ColumnKey[]>([...defaultColumnOrder]);
+  const [draftVisibleCols, setDraftVisibleCols] = useState<Record<ColumnKey, boolean>>({ ...defaultColumns });
+  const [draftColumnOrder, setDraftColumnOrder] = useState<ColumnKey[]>([...defaultColumnOrder]);
+  const [columnTemplates, setColumnTemplates] = useState<ColumnTemplate[]>([createDefaultColumnTemplate()]);
+  const [templateName, setTemplateName] = useState("");
   const [isColSelectorOpen, setIsColSelectorOpen] = useState(false);
 
   // Dynamic values extracted from dataset to populate dropdowns beautifully
@@ -613,25 +744,193 @@ function PersonnelListPage() {
     setTimeout(() => setBulkActionMessage(null), 4500);
   };
 
-  const toggleColumn = (key: keyof typeof defaultColumns) => {
-    setVisibleCols(prev => ({
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const fallback = [createDefaultColumnTemplate()];
+
+    try {
+      const savedTemplates = localStorage.getItem(columnStorageKey);
+      const parsedTemplates = savedTemplates ? JSON.parse(savedTemplates) : [];
+      const storedTemplates = Array.isArray(parsedTemplates) ? parsedTemplates : [];
+      const customTemplates = storedTemplates
+        .filter((template: any) => template?.id !== "default")
+        .map((template: any) => ({
+          id: String(template.id || `template-${Date.now()}`),
+          name: String(template.name || "Saved Template"),
+          isActive: Boolean(template.isActive),
+          columns: normalizeColumnVisibility(template.columns),
+          order: normalizeColumnOrder(template.order),
+        }));
+      const savedDefault = storedTemplates.find((template: any) => template?.id === "default");
+      const templates = [
+        {
+          ...createDefaultColumnTemplate(),
+          isActive: savedDefault?.isActive ?? !customTemplates.some((template: ColumnTemplate) => template.isActive),
+        },
+        ...customTemplates,
+      ];
+      const normalizedTemplates = templates.some(template => template.isActive)
+        ? templates.map((template, index) => ({ ...template, isActive: template.isActive && templates.findIndex(item => item.isActive) === index }))
+        : fallback;
+      const activeTemplate = normalizedTemplates.find(template => template.isActive) || normalizedTemplates[0];
+
+      setColumnTemplates(normalizedTemplates);
+      setVisibleCols(normalizeColumnVisibility(activeTemplate.columns));
+      setColumnOrder(normalizeColumnOrder(activeTemplate.order));
+      setDraftVisibleCols(normalizeColumnVisibility(activeTemplate.columns));
+      setDraftColumnOrder(normalizeColumnOrder(activeTemplate.order));
+    } catch (error) {
+      console.error(error);
+      setColumnTemplates(fallback);
+      localStorage.setItem(columnStorageKey, JSON.stringify(fallback));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem(columnStorageKey, JSON.stringify(columnTemplates));
+  }, [columnTemplates]);
+
+  const openColumnModal = () => {
+    setDraftVisibleCols({ ...visibleCols });
+    setDraftColumnOrder([...columnOrder]);
+    setIsColSelectorOpen(true);
+  };
+
+  const toggleDraftColumn = (key: ColumnKey) => {
+    setDraftVisibleCols(prev => ({
       ...prev,
       [key]: !prev[key]
     }));
   };
 
-  // Close column selector when clicking outside
-  useEffect(() => {
-    if (!isColSelectorOpen) return;
-    const handleOutsideClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target.closest(".col-selector-container")) {
-        setIsColSelectorOpen(false);
-      }
+  const moveDraftColumn = (key: ColumnKey, direction: "up" | "down") => {
+    setDraftColumnOrder(prev => {
+      const currentIndex = prev.indexOf(key);
+      const nextIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+      if (currentIndex < 0 || nextIndex < 0 || nextIndex >= prev.length) return prev;
+      const next = [...prev];
+      [next[currentIndex], next[nextIndex]] = [next[nextIndex], next[currentIndex]];
+      return next;
+    });
+  };
+
+  const updateDraftSerial = (key: ColumnKey, value: string) => {
+    const serial = Number(value);
+    if (!Number.isFinite(serial)) return;
+
+    setDraftColumnOrder(prev => {
+      const currentIndex = prev.indexOf(key);
+      const nextIndex = Math.min(Math.max(serial - 1, 0), prev.length - 1);
+      if (currentIndex < 0 || currentIndex === nextIndex) return prev;
+
+      const next = [...prev];
+      next.splice(currentIndex, 1);
+      next.splice(nextIndex, 0, key);
+      return next;
+    });
+  };
+
+  const applyColumnConfig = (templates = columnTemplates) => {
+    const columns = normalizeColumnVisibility(draftVisibleCols);
+    const order = normalizeColumnOrder(draftColumnOrder);
+
+    setVisibleCols(columns);
+    setColumnOrder(order);
+    setDraftVisibleCols(columns);
+    setDraftColumnOrder(order);
+    setColumnTemplates(templates.map(template => template.isActive && !template.isDefault ? { ...template, columns, order } : template));
+    setBulkActionMessage("Column arrangement applied successfully.");
+    setTimeout(() => setBulkActionMessage(null), 4500);
+  };
+
+  const activateColumnTemplate = (templateId: string) => {
+    const targetTemplate = columnTemplates.find(template => template.id === templateId);
+    if (!targetTemplate) return;
+
+    const columns = normalizeColumnVisibility(targetTemplate.columns);
+    const order = normalizeColumnOrder(targetTemplate.order);
+    const updatedTemplates = columnTemplates.map(template => ({
+      ...template,
+      isActive: template.id === templateId,
+    }));
+
+    setColumnTemplates(updatedTemplates);
+    setVisibleCols(columns);
+    setColumnOrder(order);
+    setDraftVisibleCols(columns);
+    setDraftColumnOrder(order);
+    setBulkActionMessage(`${targetTemplate.name} template activated.`);
+    setTimeout(() => setBulkActionMessage(null), 4500);
+  };
+
+  const deactivateColumnTemplate = (templateId: string) => {
+    const targetTemplate = columnTemplates.find(template => template.id === templateId);
+    const defaultTemplate = createDefaultColumnTemplate();
+    if (!targetTemplate || targetTemplate.isDefault) return;
+
+    const updatedTemplates = columnTemplates.map(template => ({
+      ...template,
+      isActive: template.id === defaultTemplate.id,
+    }));
+
+    setColumnTemplates(updatedTemplates);
+    setVisibleCols({ ...defaultTemplate.columns });
+    setColumnOrder([...defaultTemplate.order]);
+    setDraftVisibleCols({ ...defaultTemplate.columns });
+    setDraftColumnOrder([...defaultTemplate.order]);
+    setBulkActionMessage(`${targetTemplate.name} template deactivated. Default columns restored.`);
+    setTimeout(() => setBulkActionMessage(null), 4500);
+  };
+
+  const saveColumnTemplate = () => {
+    const name = templateName.trim();
+    if (!name) {
+      setBulkActionMessage("Enter a template name before saving.");
+      setTimeout(() => setBulkActionMessage(null), 4500);
+      return;
+    }
+
+    const columns = normalizeColumnVisibility(draftVisibleCols);
+    const order = normalizeColumnOrder(draftColumnOrder);
+    const newTemplate: ColumnTemplate = {
+      id: `template-${Date.now()}`,
+      name,
+      isActive: true,
+      columns,
+      order,
     };
-    document.addEventListener("click", handleOutsideClick);
-    return () => document.removeEventListener("click", handleOutsideClick);
-  }, [isColSelectorOpen]);
+    const updatedTemplates = columnTemplates.map(template => ({ ...template, isActive: false })).concat(newTemplate);
+
+    setTemplateName("");
+    setColumnTemplates(updatedTemplates);
+    applyColumnConfig(updatedTemplates);
+  };
+
+  const resetDraftColumns = () => {
+    setDraftVisibleCols({ ...defaultColumns });
+    setDraftColumnOrder([...defaultColumnOrder]);
+  };
+
+  const deleteColumnTemplate = (templateId: string) => {
+    const targetTemplate = columnTemplates.find(template => template.id === templateId);
+    if (!targetTemplate || targetTemplate.isDefault) return;
+
+    const remainingTemplates = columnTemplates.filter(template => template.id !== templateId);
+    const updatedTemplates = targetTemplate.isActive
+      ? remainingTemplates.map((template, index) => ({ ...template, isActive: index === 0 }))
+      : remainingTemplates;
+    const activeTemplate = updatedTemplates.find(template => template.isActive) || createDefaultColumnTemplate();
+
+    setColumnTemplates(updatedTemplates);
+    setVisibleCols(normalizeColumnVisibility(activeTemplate.columns));
+    setColumnOrder(normalizeColumnOrder(activeTemplate.order));
+    setDraftVisibleCols(normalizeColumnVisibility(activeTemplate.columns));
+    setDraftColumnOrder(normalizeColumnOrder(activeTemplate.order));
+    setBulkActionMessage(`${targetTemplate.name} template deleted.`);
+    setTimeout(() => setBulkActionMessage(null), 4500);
+  };
 
   return (
     <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
@@ -1099,45 +1398,15 @@ function PersonnelListPage() {
                 </div>
 
                 {/* Column Configuration Selector */}
-                <div className="relative col-selector-container">
+                <div className="relative">
                   <button
-                    onClick={() => setIsColSelectorOpen(!isColSelectorOpen)}
+                    onClick={openColumnModal}
                     className="h-8.5 px-3 rounded-lg border border-border/60 hover:bg-muted text-xs font-bold text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition duration-200"
                   >
                     <LayoutGrid className="size-3.5 text-primary" />
                     <span>Columns</span>
                     <ChevronDown className="size-3 text-muted-foreground/60" />
                   </button>
-
-                  {isColSelectorOpen && (
-                    <div className="absolute right-0 mt-1.5 w-56 rounded-xl bg-card border border-border/80 shadow-lg p-3 z-30 animate-in fade-in slide-in-from-top-1 duration-150">
-                      <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/30">
-                        <span className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Show Columns</span>
-                        <button
-                          onClick={() => setVisibleCols(defaultColumns)}
-                          className="text-[9px] font-bold text-primary hover:underline"
-                        >
-                          Reset
-                        </button>
-                      </div>
-                      <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
-                        {Object.keys(defaultColumns).map((colKey) => (
-                          <button
-                            key={colKey}
-                            onClick={() => toggleColumn(colKey as keyof typeof defaultColumns)}
-                            className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-left text-xs hover:bg-muted transition duration-150"
-                          >
-                            <div className={`size-4 rounded-md border flex items-center justify-center transition-all ${visibleCols[colKey as keyof typeof defaultColumns] ? "bg-primary border-primary text-primary-foreground" : "border-border"}`}>
-                              {visibleCols[colKey as keyof typeof defaultColumns] && <Check className="size-2.5 stroke-[3.5]" />}
-                            </div>
-                            <span className="font-medium text-foreground/80 capitalize">
-                              {colKey.replace(/([A-Z])/g, " $1").toLowerCase()}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
@@ -1164,27 +1433,9 @@ function PersonnelListPage() {
                     <th className="sticky left-[230px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-4 font-bold border-r border-border/40 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[180px] min-w-[180px] max-w-[180px]">Name</th>
 
                     {/* Standard Configurable headers */}
-                    {visibleCols.empIdOffc && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Emp ID(Offc)</th>}
-                    {visibleCols.employeeType && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Employee Type</th>}
-                    {visibleCols.dept && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Department</th>}
-                    {visibleCols.section && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Section</th>}
-                    {visibleCols.jobTitle && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Job Title</th>}
-                    {visibleCols.unit && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Unit</th>}
-                    {visibleCols.line && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Line</th>}
-                    {visibleCols.grade && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Grade</th>}
-                    {visibleCols.shift && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Shift</th>}
-                    {visibleCols.shiftStart && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Shift Start</th>}
-                    {visibleCols.joinDate && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Joining Date</th>}
-                    {visibleCols.blood && <th className="px-5 py-4 font-bold text-center bg-[#f1f5f9] dark:bg-[#0f172a]">Blood Group</th>}
-                    {visibleCols.basic && <th className="px-5 py-4 font-bold text-right bg-[#f1f5f9] dark:bg-[#0f172a]">Basic</th>}
-                    {visibleCols.gross && <th className="px-5 py-4 font-bold text-right bg-[#f1f5f9] dark:bg-[#0f172a]">Gross</th>}
-                    {visibleCols.email && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Email</th>}
-                    {visibleCols.officeMob && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Office Mobile</th>}
-                    {visibleCols.gender && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Gender</th>}
-                    {visibleCols.dob && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Date of Birth</th>}
-                    {visibleCols.empStatus && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Employment Status</th>}
-                    {visibleCols.village && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Per.Village</th>}
-                    {visibleCols.acStatus && <th className="px-5 py-4 font-bold text-center bg-[#f1f5f9] dark:bg-[#0f172a]">A/C Status</th>}
+                    {columnOrder.filter(key => visibleCols[key]).map(key => (
+                      <th key={key} className={getColumnHeaderClass(key)}>{getColumnLabel(key)}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/45">
@@ -1303,61 +1554,9 @@ function PersonnelListPage() {
                         </td>
 
                         {/* Configurable Cells */}
-                        {visibleCols.empIdOffc && <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.offcId}</td>}
-                        {visibleCols.employeeType && <td className="px-5 py-3.5 text-foreground/85 font-medium">{e.type}</td>}
-                        {visibleCols.dept && <td className="px-5 py-3.5 text-foreground/80 font-medium">{e.dept}</td>}
-                        {visibleCols.section && <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.sect}</td>}
-                        {visibleCols.jobTitle && <td className="px-5 py-3.5 font-semibold text-foreground">{e.title}</td>}
-                        {visibleCols.unit && <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.unit}</td>}
-                        {visibleCols.line && <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.line}</td>}
-                        {visibleCols.grade && <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.grade}</td>}
-                        {visibleCols.shift && <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.shift}</td>}
-                        {visibleCols.shiftStart && <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.shiftStart}</td>}
-                        {visibleCols.joinDate && <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.joinDate}</td>}
-
-                        {visibleCols.blood && (
-                          <td className="px-5 py-3.5 text-center">
-                            <span className="inline-flex items-center justify-center px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30">
-                              {e.blood}
-                            </span>
-                          </td>
-                        )}
-
-                        {visibleCols.basic && (
-                          <td className="px-5 py-3.5 text-right font-mono font-semibold text-foreground/90">
-                            ৳{parseFloat(e.basic).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                          </td>
-                        )}
-                        {visibleCols.gross && (
-                          <td className="px-5 py-3.5 text-right font-mono font-bold text-primary">
-                            ৳{parseFloat(e.gross).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                          </td>
-                        )}
-
-                        {visibleCols.email && <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.email}</td>}
-                        {visibleCols.officeMob && <td className="px-5 py-3.5 text-muted-foreground/90 font-medium font-mono">{e.officeMob}</td>}
-                        {visibleCols.gender && <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.gender}</td>}
-                        {visibleCols.dob && <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.dob}</td>}
-
-                        {visibleCols.empStatus && (
-                          <td className="px-5 py-3.5">
-                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${e.empStatus === "Permanent" ? "bg-success/15 text-success" : "bg-warning/15 text-warning"}`}>
-                              <span className={`size-1.5 rounded-full ${e.empStatus === "Permanent" ? "bg-success" : "bg-warning animate-pulse"}`} />
-                              {e.empStatus}
-                            </span>
-                          </td>
-                        )}
-
-                        {visibleCols.village && <td className="px-5 py-3.5 text-muted-foreground/80 font-medium truncate max-w-[150px]" title={e.village}>{e.village}</td>}
-
-                        {visibleCols.acStatus && (
-                          <td className="px-5 py-3.5 text-center">
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-500">
-                              <span className="size-1 rounded-full bg-emerald-500 animate-ping" />
-                              {e.acStatus}
-                            </span>
-                          </td>
-                        )}
+                        {columnOrder.filter(key => visibleCols[key]).map(key => (
+                          <Fragment key={key}>{columnRenderers[key](e)}</Fragment>
+                        ))}
                       </tr>
                     );
                   })}
@@ -1390,6 +1589,194 @@ function PersonnelListPage() {
 
           </div>
         </div>
+
+        {/* Column Arrangement Modal */}
+        {isColSelectorOpen && (
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200"
+            onClick={(event) => {
+              if (event.target === event.currentTarget) setIsColSelectorOpen(false);
+            }}
+          >
+            <div className="bg-card w-full max-w-5xl border border-border rounded-lg shadow-xl overflow-hidden animate-in zoom-in-95 duration-200 max-h-[92vh] flex flex-col">
+              <div className="flex items-center justify-between gap-4 px-5 py-4 border-b border-border/40 bg-muted/15">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <LayoutGrid className="size-4 text-primary" />
+                    <h3 className="text-sm font-bold text-foreground">Column Arrangement</h3>
+                  </div>
+                  <p className="text-xs text-muted-foreground/75 mt-1">Set show/hide status, change serial order, and save reusable templates.</p>
+                </div>
+                <button onClick={() => setIsColSelectorOpen(false)} className="size-8 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center">
+                  <X className="size-4" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] min-h-0 overflow-hidden">
+                <div className="border-b lg:border-b-0 lg:border-r border-border/40 p-4 space-y-4 overflow-y-auto">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Templates</span>
+                      <span className="text-[10px] font-bold text-primary">{columnTemplates.length} saved</span>
+                    </div>
+
+                    <div className="space-y-2">
+                      {columnTemplates.map(template => {
+                        const visibleCount = Object.values(template.columns).filter(Boolean).length;
+
+                        return (
+                          <div
+                            key={template.id}
+                            className={`rounded-xl border p-3 transition ${template.isActive ? "border-primary/45 bg-primary/5" : "border-border/60 bg-muted/15"}`}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-1.5">
+                                  {template.isDefault && <Star className="size-3.5 text-amber-500 fill-amber-500/20" />}
+                                  <span className="text-xs font-extrabold text-foreground truncate">{template.name}</span>
+                                </div>
+                                <div className="text-[10px] text-muted-foreground/75 mt-1">
+                                  {visibleCount} visible, {defaultColumnOrder.length - visibleCount} hidden
+                                </div>
+                              </div>
+                              <span className={`shrink-0 px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${template.isActive ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-muted text-muted-foreground"}`}>
+                                {template.isActive ? "Active" : "Inactive"}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-2 mt-3">
+                              <button
+                                onClick={() => template.isActive && !template.isDefault ? deactivateColumnTemplate(template.id) : activateColumnTemplate(template.id)}
+                                disabled={template.isActive && template.isDefault}
+                                className="h-7 px-3 rounded-lg border border-border/60 bg-card hover:bg-muted text-[10px] font-bold text-foreground/80 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                              >
+                                {template.isActive && !template.isDefault ? "Deactivate" : "Activate"}
+                              </button>
+                              {!template.isDefault && (
+                                <button
+                                  onClick={() => deleteColumnTemplate(template.id)}
+                                  className="h-7 px-2.5 rounded-lg border border-rose-500/20 bg-rose-500/5 hover:bg-rose-500/10 text-rose-500 text-[10px] font-bold transition flex items-center gap-1"
+                                >
+                                  <Trash2 className="size-3" />
+                                  Delete
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-border/50 bg-card p-3 space-y-2">
+                    <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Save Current As Template</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={templateName}
+                        onChange={(event) => setTemplateName(event.target.value)}
+                        placeholder="Template name"
+                        className="w-full h-8.5 px-3 rounded-lg bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition duration-200"
+                      />
+                      <button
+                        onClick={saveColumnTemplate}
+                        className="h-8.5 px-3 rounded-lg bg-primary text-primary-foreground text-xs font-bold shadow-2xs hover:opacity-95 transition flex items-center gap-1.5"
+                      >
+                        <Save className="size-3.5" />
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="min-h-0 flex flex-col">
+                  <div className="grid grid-cols-[72px_1fr_104px_92px] gap-3 px-4 py-3 border-b border-border/40 bg-muted/25 text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                    <span>Serial</span>
+                    <span>Column Name</span>
+                    <span>Show / Hide</span>
+                    <span className="text-right">Move</span>
+                  </div>
+
+                  <div className="overflow-y-auto p-4 space-y-2">
+                    {draftColumnOrder.map((key, index) => (
+                      <div key={key} className="grid grid-cols-[72px_1fr_104px_92px] gap-3 items-center rounded-xl border border-border/50 bg-card hover:bg-muted/20 p-2.5 transition">
+                        <input
+                          type="number"
+                          min={1}
+                          max={draftColumnOrder.length}
+                          value={index + 1}
+                          onChange={(event) => updateDraftSerial(key, event.target.value)}
+                          className="h-8 w-16 px-2 rounded-lg bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs font-bold text-center"
+                        />
+
+                        <div className="min-w-0">
+                          <div className="text-xs font-bold text-foreground truncate">{getColumnLabel(key)}</div>
+                          <div className="text-[10px] text-muted-foreground/70">Configurable personnel field</div>
+                        </div>
+
+                        <button
+                          onClick={() => toggleDraftColumn(key)}
+                          className={`h-8 px-2.5 rounded-lg border text-[10px] font-extrabold transition flex items-center justify-center gap-1.5 ${draftVisibleCols[key] ? "bg-primary/10 border-primary/25 text-primary" : "bg-muted/30 border-border/50 text-muted-foreground"}`}
+                        >
+                          <span className={`size-4 rounded-md border flex items-center justify-center ${draftVisibleCols[key] ? "bg-primary border-primary text-primary-foreground" : "border-border bg-card"}`}>
+                            {draftVisibleCols[key] && <Check className="size-2.5 stroke-[3.5]" />}
+                          </span>
+                          {draftVisibleCols[key] ? "Show" : "Hide"}
+                        </button>
+
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => moveDraftColumn(key, "up")}
+                            disabled={index === 0}
+                            className="size-8 rounded-lg border border-border/60 bg-card hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed text-muted-foreground hover:text-foreground transition flex items-center justify-center"
+                            title="Move up"
+                          >
+                            <ArrowUp className="size-3.5" />
+                          </button>
+                          <button
+                            onClick={() => moveDraftColumn(key, "down")}
+                            disabled={index === draftColumnOrder.length - 1}
+                            className="size-8 rounded-lg border border-border/60 bg-card hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed text-muted-foreground hover:text-foreground transition flex items-center justify-center"
+                            title="Move down"
+                          >
+                            <ArrowDown className="size-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-t border-border/40 bg-muted/15">
+                    <button
+                      onClick={resetDraftColumns}
+                      className="h-8.5 px-4 rounded-xl border border-border/60 bg-card hover:bg-muted text-xs font-bold text-foreground/80 transition flex items-center justify-center gap-1.5"
+                    >
+                      <RotateCcw className="size-3.5 text-primary" />
+                      Reset Default
+                    </button>
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => setIsColSelectorOpen(false)}
+                        className="h-8.5 px-4 rounded-xl border border-border/60 hover:bg-muted text-xs font-semibold text-foreground/80 hover:text-foreground transition duration-200"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={() => {
+                          applyColumnConfig();
+                          setIsColSelectorOpen(false);
+                        }}
+                        className="h-8.5 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-xs hover:opacity-95 transition duration-200"
+                      >
+                        Apply Arrangement
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Resign / Terminate Modal */}
         {resignModalEmp && (
