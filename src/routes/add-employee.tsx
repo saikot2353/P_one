@@ -1214,91 +1214,96 @@ function AddEmployeePage() {
             </button>
           </div>
 
-          <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-            {/* Step Selection Left Navigation Card (Scrollable list of all 17 options) */}
-            <div className="lg:col-span-1 bg-card border border-border/80 rounded-lg p-4 shadow-xs space-y-1 max-h-[82vh] overflow-y-auto scrollbar-thin">
-              <div className="px-3 py-2 text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/50 border-b border-border/20 mb-1.5 sticky top-0 bg-card z-10">
-                Form Directories
+          {/* ===== FORM DIRECTORIES + FORM BODY ===== */}
+          {/* ===== HORIZONTAL PROFILE COMPLETION CARD ===== */}
+          <div className="bg-card border border-border/80 rounded-lg shadow-xs overflow-hidden">
+            {/* Top bar: Overall progress + label */}
+            <div className="px-5 py-3 border-b border-border/40 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/60">Profile Completion</span>
+                <div className="flex items-center gap-2 w-48 sm:w-72">
+                  <div className="flex-1 h-2 bg-muted border border-border/20 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-primary to-primary-glow transition-all duration-500 rounded-full"
+                      style={{ width: `${overallPercentage}%` }}
+                    />
+                  </div>
+                  <span className="text-primary font-black text-xs shrink-0">{overallPercentage}%</span>
+                </div>
               </div>
-
-              {/* Overall Form Completion Progress Widget */}
-              <div className="p-3 bg-muted/20 border border-border/40 rounded-xl mb-4 space-y-2">
-                <div className="flex items-center justify-between text-[10px] font-black uppercase text-foreground tracking-wider">
-                  <span>Profile Completion</span>
-                  <span className="text-primary font-black text-xs">{overallPercentage}%</span>
-                </div>
-                <div className="h-2 w-full bg-muted border border-border/20 rounded-full overflow-hidden relative">
-                  <div
-                    className="h-full bg-gradient-to-r from-primary to-primary-glow transition-all duration-500 rounded-full"
-                    style={{ width: `${overallPercentage}%` }}
-                  />
-                </div>
-                <p className="text-[9px] text-muted-foreground/80 leading-relaxed">
-                  Fill in the required fields to complete the employee profile.
-                </p>
-              </div>
-
-              {TABS.map((tab, idx) => {
-                const TabIcon = tab.icon;
-                const completed = isTabCompleted(tab.id);
-                const isActive = activeTab === tab.id;
-                const percentage = getTabCompletionPercentage(tab.id);
-
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => {
-                      setActiveTab(tab.id);
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left text-xs font-bold transition-all duration-200 ${isActive
-                        ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
-                        : "hover:bg-muted text-muted-foreground hover:text-foreground"
-                      }`}
-                  >
-                    <div className="flex items-center gap-2.5 truncate">
-                      <TabIcon className="size-4 shrink-0" />
-                      <span className="truncate">
-                        {idx + 1}. {tab.label}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <span
-                        className={`text-[10px] font-black px-1.5 py-0.5 rounded-md ${isActive
-                            ? "bg-primary-foreground/15 text-primary-foreground"
-                            : percentage === 100
-                              ? "bg-emerald-500/10 text-emerald-500"
-                              : percentage > 40
-                                ? "bg-amber-500/10 text-amber-500"
-                                : "bg-rose-500/10 text-rose-500"
-                          }`}
-                      >
-                        {percentage}%
-                      </span>
-                      {completed && (
-                        <Check
-                          className={`size-3.5 shrink-0 ${isActive ? "text-primary-foreground" : "text-emerald-500 stroke-[3]"}`}
-                        />
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
-
-              <div className="pt-4 mt-2 border-t border-border/20 px-2 space-y-2">
-                <div className="flex items-start gap-2 bg-muted/30 border border-border/40 p-3 rounded-xl text-[10px] text-muted-foreground leading-relaxed">
-                  <Info className="size-3.5 text-primary shrink-0 mt-0.5" />
-                  <span>
-                    Fields marked with <span className="text-rose-500 font-bold">*</span> are system
-                    mandatory.
-                  </span>
-                </div>
+              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground shrink-0">
+                <Info className="size-3 text-primary" />
+                <span>Fields marked with <span className="text-rose-500 font-bold">*</span> are mandatory.</span>
               </div>
             </div>
 
-            {/* Core Form Card Section */}
-            <div className="lg:col-span-3 bg-card border border-border/80 rounded-lg p-6 md:p-8 shadow-xs min-h-[600px] flex flex-col gap-6">
+            {/* Horizontal scrollable tab row */}
+            <div className="overflow-x-auto scrollbar-thin">
+              <div className="flex items-stretch min-w-max">
+                {TABS.map((tab, idx) => {
+                  const TabIcon = tab.icon;
+                  const completed = isTabCompleted(tab.id);
+                  const isActive = activeTab === tab.id;
+                  const percentage = getTabCompletionPercentage(tab.id);
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => {
+                        setActiveTab(tab.id);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className={`relative flex flex-col items-center justify-center gap-1.5 px-6 py-3.5 text-left text-xs font-bold transition-all duration-200 border-r border-border/30 last:border-r-0 min-w-[160px] group ${
+                        isActive
+                          ? "bg-primary/8 text-primary"
+                          : "hover:bg-muted/60 text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {/* Active indicator line at bottom */}
+                      {isActive && (
+                        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-primary to-primary-glow rounded-t-sm" />
+                      )}
+                      <div className="flex items-center gap-2">
+                        <div className={`size-7 rounded-lg flex items-center justify-center shrink-0 transition-all ${
+                          isActive ? "bg-primary text-primary-foreground shadow-sm" :
+                          completed ? "bg-emerald-500 text-white" :
+                          "bg-muted text-muted-foreground"
+                        }`}>
+                          {completed && !isActive ? <Check className="size-3.5 stroke-[3]" /> : <TabIcon className="size-3.5" />}
+                        </div>
+                        <span className={`font-black text-[11px] ${isActive ? "text-primary" : ""}`}>
+                          {idx + 1}. {tab.label}
+                        </span>
+                      </div>
+                      {/* Per-section mini progress bar */}
+                      <div className="w-full flex items-center gap-2">
+                        <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden border border-border/20">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              percentage === 100 ? "bg-emerald-500" :
+                              percentage > 40 ? "bg-amber-500" :
+                              "bg-rose-400"
+                            }`}
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                        <span className={`text-[10px] font-black shrink-0 ${
+                          isActive ? "text-primary" :
+                          percentage === 100 ? "text-emerald-500" :
+                          percentage > 40 ? "text-amber-500" :
+                          "text-rose-500"
+                        }`}>{percentage}%</span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <form onSubmit={handleSave} className="space-y-0">
+            {/* Core Form Card Section - full width */}
+            <div className="bg-card border border-border/80 rounded-lg p-6 md:p-8 shadow-xs min-h-[600px] flex flex-col gap-6">
               {/* TAB 1: PERSONAL & IDENTITY (CONSOLIDATED) */}
               {activeTab === "personal_identity" && (
                 <div className="space-y-6 animate-in fade-in duration-200 text-foreground">
