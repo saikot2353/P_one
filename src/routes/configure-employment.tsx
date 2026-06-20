@@ -629,7 +629,7 @@ function EmploymentSetupPage() {
       setReligionIsActive(item?.isActive || "Active");
     } else if (activeTab === "place") {
       const item = places.find(p => p.sl === sl);
-      setPlaceType(item?.type || "District");
+      setPlaceType(item?.type || (placeTypeFilter !== "All" ? placeTypeFilter : "Division"));
       setPlaceCode(item?.code || "");
       setPlaceNameEng(item?.nameEng || "");
       setPlaceNameBng(item?.nameBng || "");
@@ -1239,21 +1239,38 @@ function EmploymentSetupPage() {
               {activeTab === "place" && (
                 <div className="space-y-4">
                   {/* Category Type filters */}
-                  <div className="flex flex-wrap items-center gap-1.5 pb-2 border-b border-border/20">
-                    {(["All", "Division", "District", "Upazila", "Post Office"] as const).map((filterVal) => (
-                      <button
-                        key={filterVal}
-                        type="button"
-                        onClick={() => setPlaceTypeFilter(filterVal)}
-                        className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                          placeTypeFilter === filterVal
-                            ? "bg-primary/10 text-primary border border-primary/20 font-black"
-                            : "bg-muted/30 border border-border/30 hover:bg-muted text-muted-foreground hover:text-foreground"
-                        }`}
-                      >
-                        {filterVal === "All" ? "All Places" : filterVal === "Post Office" ? "Post Offices" : filterVal + "s"}
-                      </button>
-                    ))}
+                  <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-border/20">
+                    <div className="inline-flex p-1 bg-muted/40 border border-border/40 rounded-lg gap-1">
+                      {(["All", "Division", "District", "Upazila", "Post Office"] as const).map((filterVal) => {
+                        const count = filterVal === "All"
+                          ? places.length
+                          : places.filter(p => p.type === filterVal).length;
+                        const label = filterVal === "All" ? "All Places" : filterVal === "Post Office" ? "Post Offices" : filterVal + "s";
+                        const isActive = placeTypeFilter === filterVal;
+
+                        return (
+                          <button
+                            key={filterVal}
+                            type="button"
+                            onClick={() => setPlaceTypeFilter(filterVal)}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-semibold transition-all duration-200 cursor-pointer ${
+                              isActive
+                                ? "bg-card text-primary shadow-xs border border-border/10 font-bold"
+                                : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                            }`}
+                          >
+                            <span>{label}</span>
+                            <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold ${
+                              isActive
+                                ? "bg-primary/10 text-primary"
+                                : "bg-muted/80 text-muted-foreground/70"
+                            }`}>
+                              {count}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "900px" }}>
@@ -1646,7 +1663,7 @@ function EmploymentSetupPage() {
                         <select value={placeParentSl} onChange={e => setPlaceParentSl(e.target.value)} className={insetSelectClass} required>
                           <option value="">Select Division...</option>
                           {places.filter(p => p.type === "Division").map(p => (
-                            <option key={p.sl} value={p.sl}>{p.nameEng} ({p.nameBng || p.shortName})</option>
+                            <option key={p.sl} value={String(p.sl)}>{p.nameEng} ({p.nameBng || p.shortName})</option>
                           ))}
                         </select>
                       </div>
@@ -1658,7 +1675,7 @@ function EmploymentSetupPage() {
                         <select value={placeParentSl} onChange={e => setPlaceParentSl(e.target.value)} className={insetSelectClass} required>
                           <option value="">Select District...</option>
                           {places.filter(p => p.type === "District").map(p => (
-                            <option key={p.sl} value={p.sl}>{p.nameEng} ({p.nameBng || p.shortName})</option>
+                            <option key={p.sl} value={String(p.sl)}>{p.nameEng} ({p.nameBng || p.shortName})</option>
                           ))}
                         </select>
                       </div>
@@ -1670,7 +1687,7 @@ function EmploymentSetupPage() {
                         <select value={placeParentSl} onChange={e => setPlaceParentSl(e.target.value)} className={insetSelectClass} required>
                           <option value="">Select Upazila...</option>
                           {places.filter(p => p.type === "Upazila").map(p => (
-                            <option key={p.sl} value={p.sl}>{p.nameEng} ({p.nameBng || p.shortName})</option>
+                            <option key={p.sl} value={String(p.sl)}>{p.nameEng} ({p.nameBng || p.shortName})</option>
                           ))}
                         </select>
                       </div>
