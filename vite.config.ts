@@ -5,6 +5,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
 import { componentTagger } from "lovable-tagger";
 import path from "path";
+import { nitro } from "nitro/vite";
 
 export default defineConfig(({ mode }) => {
   return {
@@ -30,11 +31,7 @@ export default defineConfig(({ mode }) => {
     },
 
     ssr: {
-      noExternal: [
-        "tslib",
-        "react-remove-scroll",
-        "react-remove-scroll-bar",
-      ],
+      noExternal: ["tslib", "react-remove-scroll", "react-remove-scroll-bar"],
     },
 
     plugins: [
@@ -43,6 +40,8 @@ export default defineConfig(({ mode }) => {
       }),
 
       tanstackStart(),
+
+      nitro(),
 
       react(),
 
