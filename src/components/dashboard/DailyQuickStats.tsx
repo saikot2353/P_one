@@ -80,7 +80,7 @@ function StatCard({ s }: { s: any }) {
   const Icon = s.icon;
   const t = tintMap[s.tint as Tint];
   const gradId = `g-${s.label.replace(/[^a-zA-Z0-9]/g, "-")}`;
-  
+
   return (
     <div className={`group relative overflow-hidden rounded-lg border p-3.5 ring-1 ${t.ring} ${t.card} transition-all duration-350 hover:-translate-y-0.5 hover:shadow-md`}>
       <div className="flex items-start justify-between gap-2 relative z-10">
@@ -133,12 +133,12 @@ function MasterCard({ title, children }: { title: string, children: React.ReactN
 export function DailyQuickStats() {
   return (
     <div className="space-y-4">
-      <MasterCard title="Headcount & Movement Overview">
+      <MasterCard title="Headcount & Movement Dashboard">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
           {stats.headcount.map(s => <StatCard key={s.label} s={s} />)}
         </div>
       </MasterCard>
-      
+
       <MasterCard title="Today's Attendance">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
           {/* Attendance Overview Left Column (5/12 grid span) */}
@@ -167,13 +167,13 @@ export function DailyQuickStats() {
             {/* Custom Dual Distribution Progress Bar */}
             <div className="mt-4">
               <div className="flex w-full h-2 rounded-full overflow-hidden bg-muted/60">
-                <div 
-                  className="bg-success transition-all duration-500" 
+                <div
+                  className="bg-success transition-all duration-500"
                   style={{ width: stats.attendance.summary.present.ratio }}
                   title={`Present: ${stats.attendance.summary.present.ratio}`}
                 />
-                <div 
-                  className="bg-destructive transition-all duration-500" 
+                <div
+                  className="bg-destructive transition-all duration-500"
                   style={{ width: stats.attendance.summary.absent.ratio }}
                   title={`Absent: ${stats.attendance.summary.absent.ratio}`}
                 />
@@ -197,7 +197,7 @@ export function DailyQuickStats() {
               const Icon = s.icon;
               const t = tintMap[s.tint as Tint];
               return (
-                <div 
+                <div
                   key={s.label}
                   className={`flex items-center gap-3 p-3 rounded-lg border ring-1 ${t.ring} ${t.card} transition-all duration-300 hover:shadow-xs`}
                 >
@@ -227,8 +227,8 @@ export function DailyQuickStats() {
             const Icon = s.icon;
             const t = tintMap[s.tint as Tint];
             return (
-              <div 
-                key={s.label} 
+              <div
+                key={s.label}
                 className="flex items-center justify-between gap-4 p-4 hover:bg-muted/20 transition-all duration-300"
               >
                 <div className="min-w-0 flex-1">
