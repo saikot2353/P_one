@@ -5,7 +5,8 @@ import {
   Users, RefreshCw, FileText, BarChart3, ClipboardCheck,
   CalendarDays, CalendarX, ShieldAlert, Fingerprint, Timer,
   CreditCard, Cpu, ShieldCheck, Lightbulb, Settings,
-  LifeBuoy, ChevronDown, ChevronRight, File, Briefcase, UserPlus
+  LifeBuoy, ChevronDown, ChevronRight, File, Briefcase, UserPlus,
+  LogOut
 } from "lucide-react";
 
 interface SubItem {
@@ -362,6 +363,18 @@ export function Sidebar() {
         <Link to="/" className="group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-semibold text-sidebar-foreground/85 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all">
           <LifeBuoy className="size-3.5 transition-transform duration-300 group-hover:scale-110" /> Help & Support
         </Link>
+        <button
+          onClick={() => {
+            if (typeof window !== "undefined") {
+              sessionStorage.removeItem("cripton_logged_in");
+              window.location.href = "/login";
+            }
+          }}
+          className="w-full group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-semibold text-sidebar-foreground/85 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all text-left"
+        >
+          <LogOut className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 text-rose-500" />
+          <span className="text-rose-500/90 group-hover:text-rose-500 transition-colors">Log Out</span>
+        </button>
         <div className="mt-3 mx-1 p-3 rounded-xl bg-sidebar-accent/50 border border-sidebar-border hover:border-sidebar-border/80 transition-all duration-300">
           <div className="flex items-center gap-2.5">
             <div className="relative">

@@ -5,6 +5,8 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
+  useNavigate,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -115,6 +117,20 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const navigate = useNavigate();
+  const routerState = useRouterState();
+  const currentPath = routerState.location.pathname;
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const isLoggedIn = sessionStorage.getItem("cripton_logged_in") === "true";
+      const isPublicPath = currentPath === "/login" || currentPath === "/e-recruitment-form";
+
+      if (!isLoggedIn && !isPublicPath) {
+        navigate({ to: "/login" });
+      }
+    }
+  }, [currentPath, navigate]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {

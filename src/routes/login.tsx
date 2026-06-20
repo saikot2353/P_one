@@ -495,6 +495,17 @@ function LoginPage() {
     requestAnimationFrame(() => setMounted(true));
   }, []);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const root = document.documentElement;
+      if (theme === "dark") {
+        root.classList.add("dark");
+      } else {
+        root.classList.remove("dark");
+      }
+    }
+  }, [theme]);
+
   const toggleTheme = useCallback(() => setTheme((t) => (t === "dark" ? "light" : "dark")), []);
 
   const handleLogin = useCallback(async (e: React.FormEvent) => {
@@ -512,6 +523,9 @@ function LoginPage() {
     setIsLoading(true);
     await new Promise((r) => setTimeout(r, 900));
     setIsLoading(false);
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("cripton_logged_in", "true");
+    }
     navigate({ to: "/" });
   }, [selectedCompany, selectedSection, navigate]);
 

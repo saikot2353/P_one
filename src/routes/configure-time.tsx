@@ -47,9 +47,42 @@ interface Shift {
 interface OtConfig {
   sl: number;
   employeeType: string;
+  department: string;
+  section: string;
+  designation: string;
+  unit: string;
   otCalculationType: string;
   bufferMinutes: number;
   isActive: "Active" | "Inactive";
+  startDate?: string;
+  endDate?: string;
+  shift?: string;
+  startTime?: string;
+  endTime?: string;
+  shiftStartTime?: string;
+  otStartTime?: string;
+  otToleranceUpTo?: string;
+  time2Min?: number;
+  time2MaxOt?: number;
+  time3Min?: number;
+  time3MaxOt?: number;
+  time4Min?: number;
+  time4MaxOt?: number;
+  otAfterWH?: "Yes" | "No";
+  generalDeductHour?: number;
+  holidayDeductHour?: number;
+  deductAfter?: number;
+  otRound?: "Yes" | "No";
+  roundSlots?: string;
+  minOt?: number;
+  maxOt?: number;
+  prayerBreak?: "Yes" | "No";
+  dinnerBreak?: "Yes" | "No";
+  deductionFor?: string;
+  timeFrom?: string;
+  timeTo?: string;
+  deductMin?: number;
+  otStartFromShift?: "Yes" | "No";
 }
 
 interface AbnormalShift {
@@ -96,26 +129,26 @@ const DEFAULT_SHIFTS: Shift[] = [
 ];
 
 const DEFAULT_OT_CONFIGS: OtConfig[] = [
-  { sl: 1, employeeType: "ALL", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" },
-  { sl: 2, employeeType: "Operator", otCalculationType: "Basic Ratio", bufferMinutes: 10, isActive: "Active" },
-  { sl: 3, employeeType: "Supervisor", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" },
-  { sl: 4, employeeType: "Admin staff", otCalculationType: "Flat Hour", bufferMinutes: 30, isActive: "Active" },
-  { sl: 5, employeeType: "Permanent Worker", otCalculationType: "Gross Ratio", bufferMinutes: 15, isActive: "Active" },
-  { sl: 6, employeeType: "Casual Worker", otCalculationType: "Flat Hour", bufferMinutes: 10, isActive: "Active" },
-  { sl: 7, employeeType: "Probationary Worker", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" },
-  { sl: 8, employeeType: "Contractual Staff", otCalculationType: "Basic Ratio", bufferMinutes: 20, isActive: "Active" },
-  { sl: 9, employeeType: "Support Staff", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" },
-  { sl: 10, employeeType: "Technical Team", otCalculationType: "Gross Ratio", bufferMinutes: 15, isActive: "Active" },
-  { sl: 11, employeeType: "Security Guard", otCalculationType: "Flat Hour", bufferMinutes: 10, isActive: "Active" },
-  { sl: 12, employeeType: "Office Runner", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" },
-  { sl: 13, employeeType: "Company Driver", otCalculationType: "Flat Hour", bufferMinutes: 20, isActive: "Active" },
-  { sl: 14, employeeType: "Kitchen Chef", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" },
-  { sl: 15, employeeType: "Store Keeper", otCalculationType: "Gross Ratio", bufferMinutes: 15, isActive: "Active" },
-  { sl: 16, employeeType: "Quality Inspector", otCalculationType: "Basic Ratio", bufferMinutes: 10, isActive: "Active" },
-  { sl: 17, employeeType: "Senior Welder", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" },
-  { sl: 18, employeeType: "Helper", otCalculationType: "Flat Hour", bufferMinutes: 10, isActive: "Active" },
-  { sl: 19, employeeType: "Senior Executive", otCalculationType: "Flat Hour", bufferMinutes: 30, isActive: "Active" },
-  { sl: 20, employeeType: "Junior Officer", otCalculationType: "Flat Hour", bufferMinutes: 20, isActive: "Active" }
+  { sl: 1, employeeType: "ALL", department: "All Departments", section: "ALL", designation: "ALL", unit: "ALL", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" },
+  { sl: 2, employeeType: "Operator", department: "Production Dept", section: "Sewing Section", designation: "Operator", unit: "ALL", otCalculationType: "Basic Ratio", bufferMinutes: 10, isActive: "Active" },
+  { sl: 3, employeeType: "Supervisor", department: "Production Dept", section: "Sewing Section", designation: "Supervisor", unit: "ALL", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" },
+  { sl: 4, employeeType: "Admin staff", department: "HR & Admin", section: "ALL", designation: "ALL", unit: "ALL", otCalculationType: "Flat Hour", bufferMinutes: 30, isActive: "Active" },
+  { sl: 5, employeeType: "Permanent Worker", department: "Production Dept", section: "Sewing Section", designation: "Operator", unit: "ALL", otCalculationType: "Gross Ratio", bufferMinutes: 15, isActive: "Active" },
+  { sl: 6, employeeType: "Casual Worker", department: "Production Dept", section: "Sewing Section", designation: "Helper", unit: "ALL", otCalculationType: "Flat Hour", bufferMinutes: 10, isActive: "Active" },
+  { sl: 7, employeeType: "Probationary Worker", department: "Production Dept", section: "Sewing Section", designation: "Helper", unit: "ALL", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" },
+  { sl: 8, employeeType: "Contractual Staff", department: "HR & Admin", section: "ALL", designation: "ALL", unit: "ALL", otCalculationType: "Basic Ratio", bufferMinutes: 20, isActive: "Active" },
+  { sl: 9, employeeType: "Support Staff", department: "HR & Admin", section: "ALL", designation: "ALL", unit: "ALL", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" },
+  { sl: 10, employeeType: "Technical Team", department: "HR & Admin", section: "ALL", designation: "ALL", unit: "ALL", otCalculationType: "Gross Ratio", bufferMinutes: 15, isActive: "Active" },
+  { sl: 11, employeeType: "Security Guard", department: "HR & Admin", section: "ALL", designation: "ALL", unit: "ALL", otCalculationType: "Flat Hour", bufferMinutes: 10, isActive: "Active" },
+  { sl: 12, employeeType: "Office Runner", department: "HR & Admin", section: "ALL", designation: "ALL", unit: "ALL", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" },
+  { sl: 13, employeeType: "Company Driver", department: "HR & Admin", section: "ALL", designation: "ALL", unit: "ALL", otCalculationType: "Flat Hour", bufferMinutes: 20, isActive: "Active" },
+  { sl: 14, employeeType: "HR & Admin", department: "HR & Admin", section: "ALL", designation: "ALL", unit: "ALL", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" },
+  { sl: 15, employeeType: "Store Keeper", department: "HR & Admin", section: "ALL", designation: "ALL", unit: "ALL", otCalculationType: "Gross Ratio", bufferMinutes: 15, isActive: "Active" },
+  { sl: 16, employeeType: "Quality Inspector", department: "Quality Assurance", section: "Inspection", designation: "QC Inspector", unit: "ALL", otCalculationType: "Basic Ratio", bufferMinutes: 10, isActive: "Active" },
+  { sl: 17, employeeType: "Senior Welder", department: "Production Dept", section: "ALL", designation: "ALL", unit: "ALL", otCalculationType: "Flat Hour", bufferMinutes: 15, isActive: "Active" },
+  { sl: 18, employeeType: "Helper", department: "Production Dept", section: "Sewing Section", designation: "Helper", unit: "ALL", otCalculationType: "Flat Hour", bufferMinutes: 10, isActive: "Active" },
+  { sl: 19, employeeType: "Senior Executive", department: "HR & Admin", section: "ALL", designation: "ALL", unit: "ALL", otCalculationType: "Flat Hour", bufferMinutes: 30, isActive: "Active" },
+  { sl: 20, employeeType: "Junior Officer", department: "HR & Admin", section: "ALL", designation: "ALL", unit: "ALL", otCalculationType: "Flat Hour", bufferMinutes: 20, isActive: "Active" }
 ];
 
 const DEFAULT_ABNORMAL_SHIFTS: AbnormalShift[] = [
@@ -200,6 +233,11 @@ function TimeSetupPage() {
   // OT Config Info modal state
   const [isOtInfoOpen, setIsOtInfoOpen] = useState(false);
   const [otInfoItem, setOtInfoItem] = useState<OtConfig | null>(null);
+  const [oiEmployeeType, setOiEmployeeType] = useState("ALL");
+  const [oiDepartment, setOiDepartment] = useState("All Departments");
+  const [oiSection, setOiSection] = useState("ALL");
+  const [oiDesignation, setOiDesignation] = useState("ALL");
+  const [oiUnit, setOiUnit] = useState("ALL");
   const [oiStartDate, setOiStartDate] = useState("");
   const [oiEndDate, setOiEndDate] = useState("");
   const [oiShift, setOiShift] = useState("General");
@@ -223,8 +261,8 @@ function TimeSetupPage() {
   const [oiMinOt, setOiMinOt] = useState<number>(0);
   const [oiMaxOt, setOiMaxOt] = useState<number>(14);
   const [oiOtType, setOiOtType] = useState("General");
-  const [oiPrayerBrake, setOiPrayerBrake] = useState<"Yes" | "No">("No");
-  const [oiDinnerBrake, setOiDinnerBrake] = useState<"Yes" | "No">("Yes");
+  const [oiPrayerBreak, setOiPrayerBreak] = useState<"Yes" | "No">("No");
+  const [oiDinnerBreak, setOiDinnerBreak] = useState<"Yes" | "No">("Yes");
   const [oiDeductionFor, setOiDeductionFor] = useState("Holiday");
   const [oiTimeFrom, setOiTimeFrom] = useState("14:00:00");
   const [oiTimeTo, setOiTimeTo] = useState("14:30:00");
@@ -263,7 +301,13 @@ function TimeSetupPage() {
     localStorage.setItem("hris_shifts", JSON.stringify(shiftsData));
 
     // OT Config
-    const otData = safeParse("hris_ot_config", DEFAULT_OT_CONFIGS);
+    const otData = safeParse("hris_ot_config", DEFAULT_OT_CONFIGS).map(o => ({
+      ...o,
+      department: o.department || "All Departments",
+      section: o.section || "ALL",
+      designation: o.designation || "ALL",
+      unit: o.unit || "ALL"
+    }));
     setOtConfigs(otData);
     localStorage.setItem("hris_ot_config", JSON.stringify(otData));
 
@@ -343,10 +387,45 @@ function TimeSetupPage() {
       setShiftDeductAfterDay(item?.deductionAfterDay || "");
     } else if (activeTab === "ot") {
       const item = otConfigs.find(o => o.sl === sl);
-      setOtEmpType(item?.employeeType || "ALL");
-      setOtCalcType(item?.otCalculationType || "Flat Hour");
-      setOtBuffer(item?.bufferMinutes || 15);
-      setOtIsActive(item?.isActive || "Active");
+      setOtInfoItem(item || ({ sl: 0, employeeType: "ALL", isActive: "Active", otCalculationType: "General" } as any));
+      setOiEmployeeType(item?.employeeType || "ALL");
+      setOiDepartment(item?.department || "All Departments");
+      setOiSection(item?.section || "ALL");
+      setOiDesignation(item?.designation || "ALL");
+      setOiUnit(item?.unit || "ALL");
+      setOiStartDate(item?.startDate || "");
+      setOiEndDate(item?.endDate || "");
+      setOiShift(item?.shift || "General");
+      setOiStartTime(item?.startTime || "06:11:00");
+      setOiEndTime(item?.endTime || "11:59:00");
+      setOiShiftStartTime(item?.shiftStartTime || "08:00:00");
+      setOiOtStartTime(item?.otStartTime || "17:00:00");
+      setOiOtToleranceUpTo(item?.otToleranceUpTo || "");
+      setOiTime2Min(item?.time2Min !== undefined ? item.time2Min : 110);
+      setOiTime2MaxOt(item?.time2MaxOt !== undefined ? item.time2MaxOt : 2);
+      setOiTime3Min(item?.time3Min !== undefined ? item.time3Min : 110);
+      setOiTime3MaxOt(item?.time3MaxOt !== undefined ? item.time3MaxOt : 2);
+      setOiTime4Min(item?.time4Min !== undefined ? item.time4Min : 0);
+      setOiTime4MaxOt(item?.time4MaxOt !== undefined ? item.time4MaxOt : 0);
+      setOiOtAfterWH(item?.otAfterWH || "No");
+      setOiGeneralDeductHour(item?.generalDeductHour !== undefined ? item.generalDeductHour : 0);
+      setOiHolidayDeductHour(item?.holidayDeductHour !== undefined ? item.holidayDeductHour : 1);
+      setOiDeductAfter(item?.deductAfter !== undefined ? item.deductAfter : 0);
+      setOiOtRound(item?.otRound || "Yes");
+      setOiRoundSlots(item?.roundSlots || "0-49,0#50-59,1");
+      setOiMinOt(item?.minOt !== undefined ? item.minOt : 0);
+      setOiMaxOt(item?.maxOt !== undefined ? item.maxOt : 14);
+      setOiOtType(item?.otCalculationType || "General");
+      setOiPrayerBreak(item?.prayerBreak || "No");
+      setOiDinnerBreak(item?.dinnerBreak || "Yes");
+      setOiDeductionFor(item?.deductionFor || "Holiday");
+      setOiTimeFrom(item?.timeFrom || "14:00:00");
+      setOiTimeTo(item?.timeTo || "14:30:00");
+      setOiDeductMin(item?.deductMin !== undefined ? item.deductMin : 30);
+      setOiIsActive(item?.isActive || "Active");
+      setOiOtStartFromShift(item?.otStartFromShift || "Yes");
+      setIsOtInfoOpen(true);
+      return;
     } else if (activeTab === "abnormal") {
       const item = abnormalShifts.find(a => a.sl === sl);
       setAbShiftName(item?.shiftName || "");
@@ -627,69 +706,88 @@ function TimeSetupPage() {
               )}
 
               {activeTab === "ot" && (
-                <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "800px" }}>
+                <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "1200px" }}>
                   <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
                     <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
                       <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">#</th>
                       <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[140px] text-center border-r border-border/30 z-20">Actions</th>
-                      <th className="px-5 py-4 min-w-[200px]">Employee Type</th>
-                      <th className="px-5 py-4 min-w-[200px]">OT Calculation Type</th>
-                      <th className="px-5 py-4 w-[150px] text-center">Buffer Minutes</th>
-                      <th className="px-5 py-4 w-[120px] text-center">IsActive</th>
+                      <th className="px-5 py-4 min-w-[150px]">Employee Type</th>
+                      <th className="px-5 py-4 min-w-[150px]">Department</th>
+                      <th className="px-5 py-4 min-w-[150px]">Section</th>
+                      <th className="px-5 py-4 min-w-[150px]">Designation</th>
+                      <th className="px-5 py-4 min-w-[100px]">Unit</th>
+                      <th className="px-5 py-4 min-w-[155px]">OT Calculation Type</th>
+                      <th className="px-5 py-4 w-[120px] text-center">Buffer Minutes</th>
+                      <th className="px-5 py-4 w-[100px] text-center">IsActive</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/30 text-foreground">
-                    {otConfigs.filter(o => (o.employeeType || "").toLowerCase().includes(searchQuery.toLowerCase())).map((item, idx) => (
+                    {otConfigs.filter(o => 
+                      (o.employeeType || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      (o.department || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      (o.section || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      (o.designation || "").toLowerCase().includes(searchQuery.toLowerCase())
+                    ).map((item, idx) => (
                       <tr key={item.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
                         <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
                         <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
                           <div className="flex items-center justify-center gap-3">
                             <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition" title="Edit"><Pencil className="size-4" /></button>
-                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition" title="Delete"><Trash2 className="size-4" /></button>
+                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-655 transition" title="Delete"><Trash2 className="size-4" /></button>
                             <button
                               onClick={() => {
                                 setOtInfoItem(item);
-                                setOiStartDate("");
-                                setOiEndDate("");
-                                setOiShift("General");
-                                setOiStartTime("06:11:00");
-                                setOiEndTime("11:59:00");
-                                setOiShiftStartTime("08:00:00");
-                                setOiOtStartTime("17:00:00");
-                                setOiOtToleranceUpTo("");
-                                setOiTime2Min(110);
-                                setOiTime2MaxOt(2);
-                                setOiTime3Min(110);
-                                setOiTime3MaxOt(2);
-                                setOiTime4Min(0);
-                                setOiTime4MaxOt(0);
-                                setOiOtAfterWH("No");
-                                setOiGeneralDeductHour(0);
-                                setOiHolidayDeductHour(1);
-                                setOiDeductAfter(0);
-                                setOiOtRound("Yes");
-                                setOiRoundSlots("0-49,0#50-59,1");
-                                setOiMinOt(0);
-                                setOiMaxOt(14);
+                                setOiStartDate(item.startDate || "");
+                                setOiEndDate(item.endDate || "");
+                                setOiShift(item.shift || "General");
+                                setOiStartTime(item.startTime || "06:11:00");
+                                setOiEndTime(item.endTime || "11:59:00");
+                                setOiShiftStartTime(item.shiftStartTime || "08:00:00");
+                                setOiOtStartTime(item.otStartTime || "17:00:00");
+                                setOiOtToleranceUpTo(item.otToleranceUpTo || "");
+                                setOiTime2Min(item.time2Min !== undefined ? item.time2Min : 110);
+                                setOiTime2MaxOt(item.time2MaxOt !== undefined ? item.time2MaxOt : 2);
+                                setOiTime3Min(item.time3Min !== undefined ? item.time3Min : 110);
+                                setOiTime3MaxOt(item.time3MaxOt !== undefined ? item.time3MaxOt : 2);
+                                setOiTime4Min(item.time4Min !== undefined ? item.time4Min : 0);
+                                setOiTime4MaxOt(item.time4MaxOt !== undefined ? item.time4MaxOt : 0);
+                                setOiOtAfterWH(item.otAfterWH || "No");
+                                setOiGeneralDeductHour(item.generalDeductHour !== undefined ? item.generalDeductHour : 0);
+                                setOiHolidayDeductHour(item.holidayDeductHour !== undefined ? item.holidayDeductHour : 1);
+                                setOiDeductAfter(item.deductAfter !== undefined ? item.deductAfter : 0);
+                                setOiOtRound(item.otRound || "Yes");
+                                setOiRoundSlots(item.roundSlots || "0-49,0#50-59,1");
+                                setOiMinOt(item.minOt !== undefined ? item.minOt : 0);
+                                setOiMaxOt(item.maxOt !== undefined ? item.maxOt : 14);
                                 setOiOtType(item.otCalculationType || "General");
-                                setOiPrayerBrake("No");
-                                setOiDinnerBrake("Yes");
-                                setOiDeductionFor("Holiday");
-                                setOiTimeFrom("14:00:00");
-                                setOiTimeTo("14:30:00");
-                                setOiDeductMin(30);
+                                setOiPrayerBreak(item.prayerBreak || "No");
+                                setOiDinnerBreak(item.dinnerBreak || "Yes");
+                                setOiDeductionFor(item.deductionFor || "Holiday");
+                                setOiTimeFrom(item.timeFrom || "14:00:00");
+                                setOiTimeTo(item.timeTo || "14:30:00");
+                                setOiDeductMin(item.deductMin !== undefined ? item.deductMin : 30);
                                 setOiIsActive(item.isActive);
-                                setOiOtStartFromShift("Yes");
+                                setOiOtStartFromShift(item.otStartFromShift || "Yes");
+                                setOiEmployeeType(item.employeeType || "ALL");
+                                setOiDepartment(item.department || "All Departments");
+                                setOiSection(item.section || "ALL");
+                                setOiDesignation(item.designation || "ALL");
+                                setOiUnit(item.unit || "ALL");
+                                setEditSl(item.sl);
                                 setIsOtInfoOpen(true);
                               }}
                               className="text-purple-500 hover:text-purple-600 transition-colors"
-                              title="OT Configuration"
+                              title="OT Configuration Details"
                             >
                               <SlidersHorizontal className="size-4" />
                             </button>
                           </div>
                         </td>
                         <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">{item.employeeType}</td>
+                        <td className="px-5 py-3.5 font-normal text-slate-800 dark:text-slate-200">{item.department}</td>
+                        <td className="px-5 py-3.5 font-normal text-slate-800 dark:text-slate-200">{item.section}</td>
+                        <td className="px-5 py-3.5 font-normal text-slate-800 dark:text-slate-200">{item.designation}</td>
+                        <td className="px-5 py-3.5 font-normal text-slate-800 dark:text-slate-200">{item.unit}</td>
                         <td className="px-5 py-3.5 font-normal text-slate-800 dark:text-slate-200">{item.otCalculationType}</td>
                         <td className="px-5 py-3.5 text-center font-normal font-mono">{item.bufferMinutes} mins</td>
                         <td className="px-5 py-3.5 text-center">
@@ -1216,6 +1314,62 @@ function TimeSetupPage() {
               {/* Body */}
               <div className="flex-1 overflow-y-auto p-6 space-y-4">
 
+                {/* Row 0: Employee Type, Department, Section, Designation, Unit */}
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Employee Type *</label>
+                    <select value={oiEmployeeType} onChange={e => setOiEmployeeType(e.target.value)} className={insetSelectClass}>
+                      <option value="ALL">ALL</option>
+                      <option value="Operator">Operator</option>
+                      <option value="Supervisor">Supervisor</option>
+                      <option value="Helper">Helper</option>
+                      <option value="Admin staff">Admin staff</option>
+                      <option value="Permanent Worker">Permanent Worker</option>
+                      <option value="Casual Worker">Casual Worker</option>
+                    </select>
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Department *</label>
+                    <select value={oiDepartment} onChange={e => setOiDepartment(e.target.value)} className={insetSelectClass}>
+                      <option value="All Departments">All Departments</option>
+                      <option value="Production Dept">Production Dept</option>
+                      <option value="HR & Admin">HR & Admin</option>
+                      <option value="Quality Assurance">Quality Assurance</option>
+                      <option value="Maintenance">Maintenance</option>
+                    </select>
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Section *</label>
+                    <select value={oiSection} onChange={e => setOiSection(e.target.value)} className={insetSelectClass}>
+                      <option value="ALL">ALL</option>
+                      <option value="Sewing Section">Sewing Section</option>
+                      <option value="Finishing Section">Finishing Section</option>
+                      <option value="Cutting Section">Cutting Section</option>
+                      <option value="Inspection">Inspection</option>
+                    </select>
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Designation *</label>
+                    <select value={oiDesignation} onChange={e => setOiDesignation(e.target.value)} className={insetSelectClass}>
+                      <option value="ALL">ALL</option>
+                      <option value="Operator">Operator</option>
+                      <option value="Supervisor">Supervisor</option>
+                      <option value="Helper">Helper</option>
+                      <option value="QC Inspector">QC Inspector</option>
+                      <option value="Executive">Executive</option>
+                    </select>
+                  </div>
+                  <div className={insetWrapperClass}>
+                    <label className={insetLabelClass}>Unit *</label>
+                    <select value={oiUnit} onChange={e => setOiUnit(e.target.value)} className={insetSelectClass}>
+                      <option value="ALL">ALL</option>
+                      <option value="Unit 1">Unit 1</option>
+                      <option value="Unit 2">Unit 2</option>
+                      <option value="Unit 3">Unit 3</option>
+                    </select>
+                  </div>
+                </div>
+
                 {/* Row 1: Start Date / End Date */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className={insetWrapperClass}>
@@ -1347,20 +1501,20 @@ function TimeSetupPage() {
                   </select>
                 </div>
 
-                {/* Row 7: Prayer Brake */}
+                {/* Row 7: Prayer Break */}
                 <div className={insetWrapperClass}>
-                  <label className={insetLabelClass}>Prayer Brake</label>
-                  <select value={oiPrayerBrake} onChange={e => setOiPrayerBrake(e.target.value as "Yes" | "No")} className={insetSelectClass}>
+                  <label className={insetLabelClass}>Prayer Break</label>
+                  <select value={oiPrayerBreak} onChange={e => setOiPrayerBreak(e.target.value as "Yes" | "No")} className={insetSelectClass}>
                     <option value="No">No</option>
                     <option value="Yes">Yes</option>
                   </select>
                 </div>
 
-                {/* Row 8: Dinner/Others Brake / Deduction For / Time From / Time To / Deduct Min */}
+                {/* Row 8: Dinner/Others Break / Deduction For / Time From / Time To / Deduct Min */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Dinner/Others Brake</label>
-                    <select value={oiDinnerBrake} onChange={e => setOiDinnerBrake(e.target.value as "Yes" | "No")} className={insetSelectClass}>
+                    <label className={insetLabelClass}>Dinner/Others Break</label>
+                    <select value={oiDinnerBreak} onChange={e => setOiDinnerBreak(e.target.value as "Yes" | "No")} className={insetSelectClass}>
                       <option value="Yes">Yes</option>
                       <option value="No">No</option>
                     </select>
@@ -1419,12 +1573,64 @@ function TimeSetupPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    toast.success("OT Configuration saved successfully!");
+                    const isNew = !otInfoItem.sl || otInfoItem.sl === 0;
+                    const sl = isNew ? (otConfigs.length > 0 ? Math.max(...otConfigs.map(o => o.sl)) + 1 : 1) : otInfoItem.sl;
+                    
+                    const updatedItem: OtConfig = {
+                      sl,
+                      employeeType: oiEmployeeType,
+                      department: oiDepartment,
+                      section: oiSection,
+                      designation: oiDesignation,
+                      unit: oiUnit,
+                      otCalculationType: oiOtType,
+                      bufferMinutes: 15,
+                      isActive: oiIsActive,
+                      startDate: oiStartDate,
+                      endDate: oiEndDate,
+                      shift: oiShift,
+                      startTime: oiStartTime,
+                      endTime: oiEndTime,
+                      shiftStartTime: oiShiftStartTime,
+                      otStartTime: oiOtStartTime,
+                      otToleranceUpTo: oiOtToleranceUpTo,
+                      time2Min: oiTime2Min,
+                      time2MaxOt: oiTime2MaxOt,
+                      time3Min: oiTime3Min,
+                      time3MaxOt: oiTime3MaxOt,
+                      time4Min: oiTime4Min,
+                      time4MaxOt: oiTime4MaxOt,
+                      otAfterWH: oiOtAfterWH,
+                      generalDeductHour: oiGeneralDeductHour,
+                      holidayDeductHour: oiHolidayDeductHour,
+                      deductAfter: oiDeductAfter,
+                      otRound: oiOtRound,
+                      roundSlots: oiRoundSlots,
+                      minOt: oiMinOt,
+                      maxOt: oiMaxOt,
+                      prayerBreak: oiPrayerBreak,
+                      dinnerBreak: oiDinnerBreak,
+                      deductionFor: oiDeductionFor,
+                      timeFrom: oiTimeFrom,
+                      timeTo: oiTimeTo,
+                      deductMin: oiDeductMin,
+                      otStartFromShift: oiOtStartFromShift,
+                    };
+
+                    let nextList = [...otConfigs];
+                    if (isNew) {
+                      nextList.push(updatedItem);
+                    } else {
+                      nextList = otConfigs.map(o => o.sl === sl ? updatedItem : o);
+                    }
+                    setOtConfigs(nextList);
+                    localStorage.setItem("hris_ot_config", JSON.stringify(nextList));
+                    toast.success(isNew ? "OT Configuration created successfully!" : "OT Configuration updated successfully!");
                     setIsOtInfoOpen(false);
                   }}
                   className="h-10 px-8 rounded-lg bg-[#27ae60] hover:bg-[#219a52] text-white font-black text-xs shadow-md hover:shadow-lg transition-all uppercase tracking-wider"
                 >
-                  CREATE
+                  {(!otInfoItem.sl || otInfoItem.sl === 0) ? "CREATE" : "UPDATE"}
                 </button>
               </div>
 

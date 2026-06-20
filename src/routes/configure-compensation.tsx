@@ -51,9 +51,20 @@ interface AllowanceRate {
 
 interface TiffinRate {
   sl: number;
+  company: string;
+  area: string;
+  applicableFrom: string;
+  applicableTo: string;
   employeeType: string;
-  rate: number;
+  department: string;
+  section: string;
+  designation: string;
+  workingHourFrom: string;
+  workingHourTo: string;
   isActive: "Active" | "Inactive";
+  basedOnTiffin: string;
+  workingShift: string;
+  rate: number;
 }
 
 interface LunchRate {
@@ -109,26 +120,26 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
 ];
 
 const DEFAULT_TIFFIN: TiffinRate[] = [
-  { sl: 1, employeeType: "ALL", rate: 50, isActive: "Active" },
-  { sl: 2, employeeType: "Permanent", rate: 55, isActive: "Active" },
-  { sl: 3, employeeType: "Casual", rate: 45, isActive: "Active" },
-  { sl: 4, employeeType: "Contractual", rate: 60, isActive: "Active" },
-  { sl: 5, employeeType: "Apprentice", rate: 40, isActive: "Active" },
-  { sl: 6, employeeType: "Part-Time", rate: 50, isActive: "Active" },
-  { sl: 7, employeeType: "Intern", rate: 60, isActive: "Active" },
-  { sl: 8, employeeType: "Temporary", rate: 45, isActive: "Active" },
-  { sl: 9, employeeType: "Seasonal", rate: 45, isActive: "Active" },
-  { sl: 10, employeeType: "Outsourced", rate: 50, isActive: "Active" },
-  { sl: 11, employeeType: "Consultant", rate: 70, isActive: "Active" },
-  { sl: 12, employeeType: "Freelance", rate: 70, isActive: "Active" },
-  { sl: 13, employeeType: "Daily Wager", rate: 40, isActive: "Active" },
-  { sl: 14, employeeType: "Project-Based", rate: 60, isActive: "Active" },
-  { sl: 15, employeeType: "Advisory Staff", rate: 80, isActive: "Active" },
-  { sl: 16, employeeType: "Trainee", rate: 45, isActive: "Active" },
-  { sl: 17, employeeType: "Shift-Worker", rate: 55, isActive: "Active" },
-  { sl: 18, employeeType: "On-Call Staff", rate: 50, isActive: "Active" },
-  { sl: 19, employeeType: "Retainer Contract", rate: 65, isActive: "Active" },
-  { sl: 20, employeeType: "Guest Expert", rate: 75, isActive: "Active" }
+  { sl: 1, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "ALL", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 50 },
+  { sl: 2, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Permanent", department: "Production Dept", section: "Sewing Section", designation: "Operator", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 55 },
+  { sl: 3, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Casual", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 45 },
+  { sl: 4, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Contractual", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 60 },
+  { sl: 5, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Apprentice", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 40 },
+  { sl: 6, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Part-Time", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 50 },
+  { sl: 7, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Intern", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 60 },
+  { sl: 8, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Temporary", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 45 },
+  { sl: 9, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Seasonal", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 45 },
+  { sl: 10, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Outsourced", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 50 },
+  { sl: 11, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Consultant", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 70 },
+  { sl: 12, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Freelance", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 70 },
+  { sl: 13, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Daily Wager", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 40 },
+  { sl: 14, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Project-Based", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 60 },
+  { sl: 15, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Advisory Staff", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 80 },
+  { sl: 16, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Trainee", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 45 },
+  { sl: 17, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Shift-Worker", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 55 },
+  { sl: 18, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "On-Call Staff", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 50 },
+  { sl: 19, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Retainer Contract", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 65 },
+  { sl: 20, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Guest Expert", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 75 }
 ];
 
 const DEFAULT_LUNCH: LunchRate[] = [
@@ -291,7 +302,18 @@ function CompensationSetupPage() {
   const [allowanceIsActive, setAllowanceIsActive] = useState<"Active" | "Inactive">("Active");
 
   // Form states - Tiffin Rate
+  const [tiffinCompany, setTiffinCompany] = useState("Aleya Apparels Ltd.");
+  const [tiffinArea, setTiffinArea] = useState("Aleya-Factory");
+  const [tiffinApplicableFrom, setTiffinApplicableFrom] = useState("2026-01-01");
+  const [tiffinApplicableTo, setTiffinApplicableTo] = useState("2026-12-31");
   const [tiffinEmpType, setTiffinEmpType] = useState("ALL");
+  const [tiffinDepartment, setTiffinDepartment] = useState("All Departments");
+  const [tiffinSection, setTiffinSection] = useState("ALL");
+  const [tiffinDesignation, setTiffinDesignation] = useState("ALL");
+  const [tiffinWorkingHourFrom, setTiffinWorkingHourFrom] = useState("08:00");
+  const [tiffinWorkingHourTo, setTiffinWorkingHourTo] = useState("17:00");
+  const [tiffinBasedOn, setTiffinBasedOn] = useState("Hour");
+  const [tiffinWorkingShift, setTiffinWorkingShift] = useState("Day");
   const [tiffinRateVal, setTiffinRateVal] = useState<number>(50);
   const [tiffinIsActive, setTiffinIsActive] = useState<"Active" | "Inactive">("Active");
 
@@ -343,7 +365,18 @@ function CompensationSetupPage() {
       setAllowanceIsActive(item?.isActive || "Active");
     } else if (activeTab === "tiffin") {
       const item = tiffinRates.find(t => t.sl === sl);
+      setTiffinCompany(item?.company || "Aleya Apparels Ltd.");
+      setTiffinArea(item?.area || "Aleya-Factory");
+      setTiffinApplicableFrom(item?.applicableFrom || "2026-01-01");
+      setTiffinApplicableTo(item?.applicableTo || "2026-12-31");
       setTiffinEmpType(item?.employeeType || "ALL");
+      setTiffinDepartment(item?.department || "All Departments");
+      setTiffinSection(item?.section || "ALL");
+      setTiffinDesignation(item?.designation || "ALL");
+      setTiffinWorkingHourFrom(item?.workingHourFrom || "08:00");
+      setTiffinWorkingHourTo(item?.workingHourTo || "17:00");
+      setTiffinBasedOn(item?.basedOnTiffin || "Hour");
+      setTiffinWorkingShift(item?.workingShift || "Day");
       setTiffinRateVal(item?.rate || 50);
       setTiffinIsActive(item?.isActive || "Active");
     } else if (activeTab === "lunch") {
@@ -415,10 +448,42 @@ function CompensationSetupPage() {
     } else if (activeTab === "tiffin") {
       let nextList = [...tiffinRates];
       if (editSl !== null) {
-        nextList = tiffinRates.map(t => t.sl === editSl ? { ...t, employeeType: tiffinEmpType, rate: Number(tiffinRateVal), isActive: tiffinIsActive } : t);
+        nextList = tiffinRates.map(t => t.sl === editSl ? {
+          ...t,
+          company: tiffinCompany,
+          area: tiffinArea,
+          applicableFrom: tiffinApplicableFrom,
+          applicableTo: tiffinApplicableTo,
+          employeeType: tiffinEmpType,
+          department: tiffinDepartment,
+          section: tiffinSection,
+          designation: tiffinDesignation,
+          workingHourFrom: tiffinWorkingHourFrom,
+          workingHourTo: tiffinWorkingHourTo,
+          basedOnTiffin: tiffinBasedOn,
+          workingShift: tiffinWorkingShift,
+          rate: Number(tiffinRateVal),
+          isActive: tiffinIsActive
+        } : t);
       } else {
         const sl = tiffinRates.length > 0 ? Math.max(...tiffinRates.map(t => t.sl)) + 1 : 1;
-        nextList.push({ sl, employeeType: tiffinEmpType, rate: Number(tiffinRateVal), isActive: tiffinIsActive });
+        nextList.push({
+          sl,
+          company: tiffinCompany,
+          area: tiffinArea,
+          applicableFrom: tiffinApplicableFrom,
+          applicableTo: tiffinApplicableTo,
+          employeeType: tiffinEmpType,
+          department: tiffinDepartment,
+          section: tiffinSection,
+          designation: tiffinDesignation,
+          workingHourFrom: tiffinWorkingHourFrom,
+          workingHourTo: tiffinWorkingHourTo,
+          basedOnTiffin: tiffinBasedOn,
+          workingShift: tiffinWorkingShift,
+          rate: Number(tiffinRateVal),
+          isActive: tiffinIsActive
+        });
       }
       setTiffinRates(nextList);
       localStorage.setItem("hris_tiffin_rates", JSON.stringify(nextList));
@@ -633,18 +698,29 @@ function CompensationSetupPage() {
               )}
 
               {activeTab === "tiffin" && (
-                <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "800px" }}>
+                <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "1600px" }}>
                   <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
                     <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">#</th>
+                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">SL</th>
                       <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">Actions</th>
-                      <th className="px-5 py-4 min-w-[300px]">Employee Type</th>
-                      <th className="px-5 py-4 w-[150px] text-right">Tiffin Rate</th>
+                      <th className="px-5 py-4 w-[150px]">Company</th>
+                      <th className="px-5 py-4 w-[120px]">Area</th>
+                      <th className="px-5 py-4 w-[120px] text-center">Applicable From</th>
+                      <th className="px-5 py-4 w-[120px] text-center">Applicable To</th>
+                      <th className="px-5 py-4 w-[120px]">Employee Type</th>
+                      <th className="px-5 py-4 w-[150px]">Department</th>
+                      <th className="px-5 py-4 w-[120px]">Section</th>
+                      <th className="px-5 py-4 w-[120px]">Designation</th>
+                      <th className="px-5 py-4 w-[120px] text-center">Hours From</th>
+                      <th className="px-5 py-4 w-[120px] text-center">Hours To</th>
+                      <th className="px-5 py-4 w-[110px]">Based On</th>
+                      <th className="px-5 py-4 w-[110px]">Working Shift</th>
+                      <th className="px-5 py-4 w-[100px] text-right">Tiffin Rate</th>
                       <th className="px-5 py-4 w-[120px] text-center">IsActive</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/30 text-foreground">
-                    {tiffinRates.filter(t => (t.employeeType || "").toLowerCase().includes(searchQuery.toLowerCase())).map((item, idx) => (
+                    {tiffinRates.filter(t => (t.company || "").toLowerCase().includes(searchQuery.toLowerCase()) || (t.employeeType || "").toLowerCase().includes(searchQuery.toLowerCase())).map((item, idx) => (
                       <tr key={item.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
                         <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
                         <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
@@ -653,7 +729,18 @@ function CompensationSetupPage() {
                             <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition"><Trash2 className="size-4" /></button>
                           </div>
                         </td>
-                        <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">{item.employeeType}</td>
+                        <td className="px-5 py-3.5 font-normal">{item.company || "Aleya Apparels Ltd."}</td>
+                        <td className="px-5 py-3.5 font-normal">{item.area || "Aleya-Factory"}</td>
+                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.applicableFrom || "2026-01-01"}</td>
+                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.applicableTo || "2026-12-31"}</td>
+                        <td className="px-5 py-3.5 font-normal">{item.employeeType}</td>
+                        <td className="px-5 py-3.5 font-normal text-slate-800 dark:text-slate-200">{item.department || "All Departments"}</td>
+                        <td className="px-5 py-3.5 font-normal text-slate-700 dark:text-slate-300">{item.section || "ALL"}</td>
+                        <td className="px-5 py-3.5 font-normal text-slate-800 dark:text-slate-200">{item.designation || "ALL"}</td>
+                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.workingHourFrom || "08:00"}</td>
+                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.workingHourTo || "17:00"}</td>
+                        <td className="px-5 py-3.5 font-normal">{item.basedOnTiffin || "Hour"}</td>
+                        <td className="px-5 py-3.5 font-normal">{item.workingShift || "Day"}</td>
                         <td className="px-5 py-3.5 text-right font-normal font-mono">{item.rate} BDT</td>
                         <td className="px-5 py-3.5 text-center">
                           <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}>{item.isActive}</span>
@@ -907,14 +994,79 @@ function CompensationSetupPage() {
                 )}
 
                 {activeTab === "tiffin" && (
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Employee Type *</label>
-                      <input type="text" value={tiffinEmpType} onChange={e => setTiffinEmpType(e.target.value)} className={insetInputClass} required />
+                      <label className={insetLabelClass}>Company *</label>
+                      <select value={tiffinCompany} onChange={e => setTiffinCompany(e.target.value)} className={insetSelectClass} required>
+                        <option value="Aleya Apparels Ltd.">Aleya Apparels Ltd.</option>
+                        <option value="Pakiza Knit Composite Ltd">Pakiza Knit Composite Ltd</option>
+                        <option value="Cripton Group">Cripton Group</option>
+                      </select>
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Tiffin Rate (BDT) *</label>
-                      <input type="number" value={tiffinRateVal} onChange={e => setTiffinRateVal(Number(e.target.value))} className={insetInputClass} required />
+                      <label className={insetLabelClass}>Area *</label>
+                      <select value={tiffinArea} onChange={e => setTiffinArea(e.target.value)} className={insetSelectClass} required>
+                        <option value="Aleya-Factory">Aleya-Factory</option>
+                        <option value="Pakiza-Factory">Pakiza-Factory</option>
+                        <option value="Factory">Factory</option>
+                        <option value="Head Office">Head Office</option>
+                      </select>
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Applicable From *</label>
+                      <input type="date" value={tiffinApplicableFrom} onChange={e => setTiffinApplicableFrom(e.target.value)} className={insetInputClass} required />
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Applicable To *</label>
+                      <input type="date" value={tiffinApplicableTo} onChange={e => setTiffinApplicableTo(e.target.value)} className={insetInputClass} required />
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Employee Type</label>
+                      <select value={tiffinEmpType} onChange={e => setTiffinEmpType(e.target.value)} className={insetSelectClass}>
+                        <option value="ALL">ALL</option>
+                        <option value="Permanent">Permanent</option>
+                        <option value="Casual">Casual</option>
+                        <option value="Contractual">Contractual</option>
+                        <option value="Operator">Operator</option>
+                        <option value="Helper">Helper</option>
+                        <option value="Staff">Staff</option>
+                      </select>
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Department</label>
+                      <select value={tiffinDepartment} onChange={e => setTiffinDepartment(e.target.value)} className={insetSelectClass}>
+                        <option value="All Departments">All Departments</option>
+                        <option value="Production Dept">Production Dept</option>
+                        <option value="Quality Assurance">Quality Assurance</option>
+                        <option value="HR & Admin">HR & Admin</option>
+                      </select>
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Section</label>
+                      <select value={tiffinSection} onChange={e => setTiffinSection(e.target.value)} className={insetSelectClass}>
+                        <option value="ALL">ALL</option>
+                        <option value="Sewing Section">Sewing Section</option>
+                        <option value="Cutting Section">Cutting Section</option>
+                        <option value="Finishing Section">Finishing Section</option>
+                      </select>
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Designation</label>
+                      <select value={tiffinDesignation} onChange={e => setTiffinDesignation(e.target.value)} className={insetSelectClass}>
+                        <option value="ALL">ALL</option>
+                        <option value="Operator">Operator</option>
+                        <option value="Helper">Helper</option>
+                        <option value="QC Inspector">QC Inspector</option>
+                        <option value="Supervisor">Supervisor</option>
+                      </select>
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Working Hour From</label>
+                      <input type="text" placeholder="e.g. 08:00" value={tiffinWorkingHourFrom} onChange={e => setTiffinWorkingHourFrom(e.target.value)} className={insetInputClass} />
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Working Hour To</label>
+                      <input type="text" placeholder="e.g. 17:00" value={tiffinWorkingHourTo} onChange={e => setTiffinWorkingHourTo(e.target.value)} className={insetInputClass} />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>IsActive *</label>
@@ -922,6 +1074,25 @@ function CompensationSetupPage() {
                         <option value="Active">Active</option>
                         <option value="Inactive">Inactive</option>
                       </select>
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Based On Tiffin *</label>
+                      <select value={tiffinBasedOn} onChange={e => setTiffinBasedOn(e.target.value)} className={insetSelectClass} required>
+                        <option value="Hour">Hour</option>
+                        <option value="Flat">Flat</option>
+                      </select>
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Working Shift</label>
+                      <select value={tiffinWorkingShift} onChange={e => setTiffinWorkingShift(e.target.value)} className={insetSelectClass}>
+                        <option value="Day">Day</option>
+                        <option value="Night">Night</option>
+                        <option value="All">All</option>
+                      </select>
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Rate</label>
+                      <input type="number" placeholder="Rate" value={tiffinRateVal} onChange={e => setTiffinRateVal(Number(e.target.value))} className={insetInputClass} required />
                     </div>
                   </div>
                 )}

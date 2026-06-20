@@ -102,10 +102,12 @@ interface Religion {
 
 interface PlaceInBD {
   sl: number;
+  type: "Division" | "District" | "Upazila" | "Post Office";
   code: string;
   nameEng: string;
   nameBng: string;
   shortName: string;
+  parentSl?: number;
   isActive: "Active" | "Inactive";
 }
 
@@ -301,26 +303,43 @@ const DEFAULT_RELIGIONS: Religion[] = [
 ];
 
 const DEFAULT_PLACES: PlaceInBD[] = [
-  { sl: 1, code: "DH", nameEng: "Dhaka", nameBng: "ঢাকা", shortName: "DH", isActive: "Active" },
-  { sl: 2, code: "GA", nameEng: "Gazipur", nameBng: "গাজীপুর", shortName: "GA", isActive: "Active" },
-  { sl: 3, code: "NY", nameEng: "Narayanganj", nameBng: "নারায়ণগঞ্জ", shortName: "NY", isActive: "Active" },
-  { sl: 4, code: "NS", nameEng: "Narsingdi", nameBng: "নরসিংদী", shortName: "NS", isActive: "Active" },
-  { sl: 5, code: "CO", nameEng: "Comilla", nameBng: "কুমিল্লা", shortName: "CO", isActive: "Active" },
-  { sl: 6, code: "CH", nameEng: "Chittagong", nameBng: "চট্টগ্রাম", shortName: "CH", isActive: "Active" },
-  { sl: 7, code: "SY", nameEng: "Sylhet", nameBng: "সিলেট", shortName: "SY", isActive: "Active" },
-  { sl: 8, code: "RA", nameEng: "Rajshahi", nameBng: "রাজশাহী", shortName: "RA", isActive: "Active" },
-  { sl: 9, code: "KH", nameEng: "Khulna", nameBng: "খুলনা", shortName: "KH", isActive: "Active" },
-  { sl: 10, code: "BA", nameEng: "Barisal", nameBng: "বরিশাল", shortName: "BA", isActive: "Active" },
-  { sl: 11, code: "RN", nameEng: "Rangpur", nameBng: "রংপুর", shortName: "RN", isActive: "Active" },
-  { sl: 12, code: "MY", nameEng: "Mymensingh", nameBng: "ময়মনসিংহ", shortName: "MY", isActive: "Active" },
-  { sl: 13, code: "CX", nameEng: "Cox's Bazar", nameBng: "কক্সবাজার", shortName: "CX", isActive: "Active" },
-  { sl: 14, code: "BO", nameEng: "Bogra", nameBng: "বগুড়া", shortName: "BO", isActive: "Active" },
-  { sl: 15, code: "JE", nameEng: "Jessore", nameBng: "যশোর", shortName: "JE", isActive: "Active" },
-  { sl: 16, code: "TA", nameEng: "Tangail", nameBng: "টাঙ্গাইল", shortName: "TA", isActive: "Active" },
-  { sl: 17, code: "FE", nameEng: "Feni", nameBng: "ফেনী", shortName: "FE", isActive: "Active" },
-  { sl: 18, code: "DI", nameEng: "Dinajpur", nameBng: "দিনাজপুর", shortName: "DI", isActive: "Active" },
-  { sl: 19, code: "KU", nameEng: "Kushtia", nameBng: "কুষ্টিয়া", shortName: "KU", isActive: "Active" },
-  { sl: 20, code: "PA", nameEng: "Pabna", nameBng: "পাবনা", shortName: "PA", isActive: "Active" }
+  // Divisions (101 - 110)
+  { sl: 101, type: "Division", code: "DIV_DH", nameEng: "Dhaka Division", nameBng: "ঢাকা বিভাগ", shortName: "DHD", isActive: "Active" },
+  { sl: 102, type: "Division", code: "DIV_CH", nameEng: "Chattogram Division", nameBng: "চট্টগ্রাম বিভাগ", shortName: "CHD", isActive: "Active" },
+  { sl: 103, type: "Division", code: "DIV_SY", nameEng: "Sylhet Division", nameBng: "সিলেট বিভাগ", shortName: "SYD", isActive: "Active" },
+  { sl: 104, type: "Division", code: "DIV_RA", nameEng: "Rajshahi Division", nameBng: "রাজশাহী বিভাগ", shortName: "RJD", isActive: "Active" },
+
+  // Districts (1 - 20)
+  { sl: 1, type: "District", parentSl: 101, code: "DH", nameEng: "Dhaka", nameBng: "ঢাকা", shortName: "DH", isActive: "Active" },
+  { sl: 2, type: "District", parentSl: 101, code: "GA", nameEng: "Gazipur", nameBng: "গাজীপুর", shortName: "GA", isActive: "Active" },
+  { sl: 3, type: "District", parentSl: 101, code: "NY", nameEng: "Narayanganj", nameBng: "নারায়ণগঞ্জ", shortName: "NY", isActive: "Active" },
+  { sl: 4, type: "District", parentSl: 101, code: "NS", nameEng: "Narsingdi", nameBng: "নরসিংদী", shortName: "NS", isActive: "Active" },
+  { sl: 5, type: "District", parentSl: 101, code: "CO", nameEng: "Comilla", nameBng: "কুমিল্লা", shortName: "CO", isActive: "Active" },
+  { sl: 6, type: "District", parentSl: 102, code: "CH", nameEng: "Chittagong", nameBng: "চট্টগ্রাম", shortName: "CH", isActive: "Active" },
+  { sl: 7, type: "District", parentSl: 103, code: "SY", nameEng: "Sylhet", nameBng: "সিলেট", shortName: "SY", isActive: "Active" },
+  { sl: 8, type: "District", parentSl: 104, code: "RA", nameEng: "Rajshahi", nameBng: "রাজশাহী", shortName: "RA", isActive: "Active" },
+  { sl: 9, type: "District", parentSl: 101, code: "KH", nameEng: "Khulna", nameBng: "খুলনা", shortName: "KH", isActive: "Active" },
+  { sl: 10, type: "District", parentSl: 101, code: "BA", nameEng: "Barisal", nameBng: "বরিশাল", shortName: "BA", isActive: "Active" },
+  { sl: 11, type: "District", parentSl: 101, code: "RN", nameEng: "Rangpur", nameBng: "রংপুর", shortName: "RN", isActive: "Active" },
+  { sl: 12, type: "District", parentSl: 101, code: "MY", nameEng: "Mymensingh", nameBng: "ময়মনসিংহ", shortName: "MY", isActive: "Active" },
+  { sl: 13, type: "District", parentSl: 102, code: "CX", nameEng: "Cox's Bazar", nameBng: "কক্সবাজার", shortName: "CX", isActive: "Active" },
+  { sl: 14, type: "District", parentSl: 104, code: "BO", nameEng: "Bogra", nameBng: "বগুড়া", shortName: "BO", isActive: "Active" },
+  { sl: 15, type: "District", parentSl: 101, code: "JE", nameEng: "Jessore", nameBng: "যশোর", shortName: "JE", isActive: "Active" },
+  { sl: 16, type: "District", parentSl: 101, code: "TA", nameEng: "Tangail", nameBng: "টাঙ্গাইল", shortName: "TA", isActive: "Active" },
+  { sl: 17, type: "District", parentSl: 102, code: "FE", nameEng: "Feni", nameBng: "ফেনী", shortName: "FE", isActive: "Active" },
+  { sl: 18, type: "District", parentSl: 101, code: "DI", nameEng: "Dinajpur", nameBng: "দিনাজপুর", shortName: "DI", isActive: "Active" },
+  { sl: 19, type: "District", parentSl: 101, code: "KU", nameEng: "Kushtia", nameBng: "কুষ্টিয়া", shortName: "KU", isActive: "Active" },
+  { sl: 20, type: "District", parentSl: 104, code: "PA", nameEng: "Pabna", nameBng: "পাবনা", shortName: "PA", isActive: "Active" },
+
+  // Upazilas (201 - 210)
+  { sl: 201, type: "Upazila", parentSl: 1, code: "MIR", nameEng: "Mirpur", nameBng: "মিরপুর", shortName: "MIR", isActive: "Active" },
+  { sl: 202, type: "Upazila", parentSl: 1, code: "UTT", nameEng: "Uttara", nameBng: "উত্তরা", shortName: "UTT", isActive: "Active" },
+  { sl: 203, type: "Upazila", parentSl: 2, code: "GZS", nameEng: "Gazipur Sadar", nameBng: "গাজীপুর সদর", shortName: "GZS", isActive: "Active" },
+
+  // Post Offices (301 - 310)
+  { sl: 301, type: "Post Office", parentSl: 201, code: "1216", nameEng: "Mirpur TSO", nameBng: "মিরপুর টিএসও", shortName: "MTSO", isActive: "Active" },
+  { sl: 302, type: "Post Office", parentSl: 202, code: "1230", nameEng: "Uttara Model Town", nameBng: "উত্তরা মডেল টাউন", shortName: "UMT", isActive: "Active" },
+  { sl: 303, type: "Post Office", parentSl: 203, code: "1700", nameEng: "Gazipur Sadar PO", nameBng: "গাজীপুর সদর পিও", shortName: "GZSPO", isActive: "Active" }
 ];
 
 function EmploymentSetupPage() {
@@ -458,7 +477,12 @@ function EmploymentSetupPage() {
     localStorage.setItem("hris_religions", JSON.stringify(religionsData));
 
     // Places
-    const placesData = safeParse("hris_places_in_bd", DEFAULT_PLACES, "nameEng");
+    const rawPlaces = safeParse("hris_places_in_bd", DEFAULT_PLACES, "nameEng");
+    const placesData = rawPlaces.map((p: any) => ({
+      ...p,
+      type: p.type || "District",
+      parentSl: p.parentSl || undefined
+    }));
     setPlaces(placesData);
     localStorage.setItem("hris_places_in_bd", JSON.stringify(placesData));
   }, []);
@@ -529,11 +553,16 @@ function EmploymentSetupPage() {
   const [religionIsActive, setReligionIsActive] = useState<"Active" | "Inactive">("Active");
 
   // Form states - Place in BD (District)
+  const [placeType, setPlaceType] = useState<"Division" | "District" | "Upazila" | "Post Office">("District");
   const [placeCode, setPlaceCode] = useState("");
   const [placeNameEng, setPlaceNameEng] = useState("");
   const [placeNameBng, setPlaceNameBng] = useState("");
   const [placeShort, setPlaceShort] = useState("");
+  const [placeParentSl, setPlaceParentSl] = useState<string>("");
   const [placeIsActive, setPlaceIsActive] = useState<"Active" | "Inactive">("Active");
+
+  // Filter state for Places
+  const [placeTypeFilter, setPlaceTypeFilter] = useState<"All" | "Division" | "District" | "Upazila" | "Post Office">("All");
 
   const openForm = (sl: number | null) => {
     setEditSl(sl);
@@ -600,10 +629,12 @@ function EmploymentSetupPage() {
       setReligionIsActive(item?.isActive || "Active");
     } else if (activeTab === "place") {
       const item = places.find(p => p.sl === sl);
+      setPlaceType(item?.type || "District");
       setPlaceCode(item?.code || "");
       setPlaceNameEng(item?.nameEng || "");
       setPlaceNameBng(item?.nameBng || "");
       setPlaceShort(item?.shortName || "");
+      setPlaceParentSl(item?.parentSl ? String(item.parentSl) : "");
       setPlaceIsActive(item?.isActive || "Active");
     }
     setIsFormOpen(true);
@@ -731,13 +762,47 @@ function EmploymentSetupPage() {
       setReligions(nextList);
       localStorage.setItem("hris_religions", JSON.stringify(nextList));
     } else if (activeTab === "place") {
-      if (!placeNameEng) { toast.error("District Name is required."); return; }
+      if (!placeNameEng) {
+        toast.error(`${placeType} Name is required.`);
+        return;
+      }
+      
+      let parentSlNum: number | undefined = undefined;
+      if (placeType !== "Division") {
+        if (!placeParentSl) {
+          const parentLabel = 
+            placeType === "District" ? "Division" :
+            placeType === "Upazila" ? "District" : "Upazila";
+          toast.error(`Parent ${parentLabel} is required for a ${placeType}.`);
+          return;
+        }
+        parentSlNum = Number(placeParentSl);
+      }
+
       let nextList = [...places];
       if (editSl !== null) {
-        nextList = places.map(p => p.sl === editSl ? { ...p, code: placeCode, nameEng: placeNameEng, nameBng: placeNameBng, shortName: placeShort, isActive: placeIsActive } : p);
+        nextList = places.map(p => p.sl === editSl ? { 
+          ...p, 
+          type: placeType,
+          code: placeCode, 
+          nameEng: placeNameEng, 
+          nameBng: placeNameBng, 
+          shortName: placeShort, 
+          parentSl: parentSlNum,
+          isActive: placeIsActive 
+        } : p);
       } else {
         const sl = places.length > 0 ? Math.max(...places.map(p => p.sl)) + 1 : 1;
-        nextList.push({ sl, code: placeCode, nameEng: placeNameEng, nameBng: placeNameBng, shortName: placeShort, isActive: placeIsActive });
+        nextList.push({ 
+          sl, 
+          type: placeType,
+          code: placeCode, 
+          nameEng: placeNameEng, 
+          nameBng: placeNameBng, 
+          shortName: placeShort, 
+          parentSl: parentSlNum,
+          isActive: placeIsActive 
+        });
       }
       setPlaces(nextList);
       localStorage.setItem("hris_places_in_bd", JSON.stringify(nextList));
@@ -1172,39 +1237,92 @@ function EmploymentSetupPage() {
               )}
 
               {activeTab === "place" && (
-                <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "800px" }}>
-                  <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
-                    <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">#</th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">Actions</th>
-                      <th className="px-5 py-4 w-[120px]">Code</th>
-                      <th className="px-5 py-4 min-w-[200px]">District Name (Eng)</th>
-                      <th className="px-5 py-4 min-w-[200px]">District Name (Bng)</th>
-                      <th className="px-5 py-4 w-[120px]">Short Name</th>
-                      <th className="px-5 py-4 w-[120px] text-center">IsActive</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/30 text-foreground">
-                    {places.filter(p => (p.nameEng || "").toLowerCase().includes(searchQuery.toLowerCase())).map((item, idx) => (
-                      <tr key={item.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
-                        <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
-                        <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
-                          <div className="flex items-center justify-center gap-3">
-                            <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition"><Pencil className="size-4" /></button>
-                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition"><Trash2 className="size-4" /></button>
-                          </div>
-                        </td>
-                        <td className="px-5 py-3.5 font-normal font-mono">{item.code || "—"}</td>
-                        <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">{item.nameEng}</td>
-                        <td className="px-5 py-3.5 font-normal text-slate-700 dark:text-slate-300">{item.nameBng || "—"}</td>
-                        <td className="px-5 py-3.5 font-normal">{item.shortName || "—"}</td>
-                        <td className="px-5 py-3.5 text-center">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}>{item.isActive}</span>
-                        </td>
-                      </tr>
+                <div className="space-y-4">
+                  {/* Category Type filters */}
+                  <div className="flex flex-wrap items-center gap-1.5 pb-2 border-b border-border/20">
+                    {(["All", "Division", "District", "Upazila", "Post Office"] as const).map((filterVal) => (
+                      <button
+                        key={filterVal}
+                        type="button"
+                        onClick={() => setPlaceTypeFilter(filterVal)}
+                        className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                          placeTypeFilter === filterVal
+                            ? "bg-primary/10 text-primary border border-primary/20 font-black"
+                            : "bg-muted/30 border border-border/30 hover:bg-muted text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {filterVal === "All" ? "All Places" : filterVal === "Post Office" ? "Post Offices" : filterVal + "s"}
+                      </button>
                     ))}
-                  </tbody>
-                </table>
+                  </div>
+
+                  <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "900px" }}>
+                    <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
+                      <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
+                        <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">#</th>
+                        <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">Actions</th>
+                        <th className="px-5 py-4 w-[110px]">Type</th>
+                        <th className="px-5 py-4 w-[120px]">Code</th>
+                        <th className="px-5 py-4 min-w-[200px]">Name (Eng)</th>
+                        <th className="px-5 py-4 min-w-[200px]">Name (Bng)</th>
+                        <th className="px-5 py-4 min-w-[180px]">Belongs To</th>
+                        <th className="px-5 py-4 w-[120px]">Short Name</th>
+                        <th className="px-5 py-4 w-[120px] text-center">IsActive</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/30 text-foreground">
+                      {places
+                        .filter(p => {
+                          const matchesSearch = (p.nameEng || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                                (p.code || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                                (p.type || "").toLowerCase().includes(searchQuery.toLowerCase());
+                          const matchesType = placeTypeFilter === "All" || p.type === placeTypeFilter;
+                          return matchesSearch && matchesType;
+                        })
+                        .map((item, idx) => {
+                          const parent = places.find(p => p.sl === item.parentSl);
+                          return (
+                            <tr key={item.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
+                              <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
+                              <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
+                                <div className="flex items-center justify-center gap-3">
+                                  <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition"><Pencil className="size-4" /></button>
+                                  <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition"><Trash2 className="size-4" /></button>
+                                </div>
+                              </td>
+                              <td className="px-5 py-3.5 font-bold">
+                                <span className={`px-2 py-0.5 rounded text-[10px] uppercase ${
+                                  item.type === "Division" ? "bg-blue-500/10 text-blue-600" :
+                                  item.type === "District" ? "bg-indigo-500/10 text-indigo-600" :
+                                  item.type === "Upazila" ? "bg-violet-500/10 text-violet-600" :
+                                  "bg-pink-500/10 text-pink-600"
+                                }`}>
+                                  {item.type}
+                                </span>
+                              </td>
+                              <td className="px-5 py-3.5 font-normal font-mono">{item.code || "—"}</td>
+                              <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">{item.nameEng}</td>
+                              <td className="px-5 py-3.5 font-normal text-slate-700 dark:text-slate-300">{item.nameBng || "—"}</td>
+                              <td className="px-5 py-3.5 font-normal">
+                                {parent ? (
+                                  <div className="flex flex-col">
+                                    <span className="font-semibold text-slate-800 dark:text-slate-200">{parent.nameEng}</span>
+                                    <span className="text-[9px] text-muted-foreground font-black uppercase tracking-wider">{parent.type}</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-slate-400 font-light">—</span>
+                                )}
+                              </td>
+                              <td className="px-5 py-3.5 font-normal">{item.shortName || "—"}</td>
+                              <td className="px-5 py-3.5 text-center">
+                                <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}>{item.isActive}</span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                  </table>
+                </div>
               )}
 
             </div>
@@ -1510,16 +1628,67 @@ function EmploymentSetupPage() {
                 {activeTab === "place" && (
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>District Code *</label>
-                      <input type="text" placeholder="Code" value={placeCode} onChange={e => setPlaceCode(e.target.value)} className={insetInputClass} required />
+                      <label className={insetLabelClass}>Place Type *</label>
+                      <select value={placeType} onChange={e => {
+                        setPlaceType(e.target.value as any);
+                        setPlaceParentSl(""); 
+                      }} className={insetSelectClass}>
+                        <option value="Division">Division</option>
+                        <option value="District">District</option>
+                        <option value="Upazila">Upazila</option>
+                        <option value="Post Office">Post Office</option>
+                      </select>
+                    </div>
+
+                    {placeType === "District" && (
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Belongs to Division *</label>
+                        <select value={placeParentSl} onChange={e => setPlaceParentSl(e.target.value)} className={insetSelectClass} required>
+                          <option value="">Select Division...</option>
+                          {places.filter(p => p.type === "Division").map(p => (
+                            <option key={p.sl} value={p.sl}>{p.nameEng} ({p.nameBng || p.shortName})</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {placeType === "Upazila" && (
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Belongs to District *</label>
+                        <select value={placeParentSl} onChange={e => setPlaceParentSl(e.target.value)} className={insetSelectClass} required>
+                          <option value="">Select District...</option>
+                          {places.filter(p => p.type === "District").map(p => (
+                            <option key={p.sl} value={p.sl}>{p.nameEng} ({p.nameBng || p.shortName})</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {placeType === "Post Office" && (
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Belongs to Upazila *</label>
+                        <select value={placeParentSl} onChange={e => setPlaceParentSl(e.target.value)} className={insetSelectClass} required>
+                          <option value="">Select Upazila...</option>
+                          {places.filter(p => p.type === "Upazila").map(p => (
+                            <option key={p.sl} value={p.sl}>{p.nameEng} ({p.nameBng || p.shortName})</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>
+                        {placeType === "Post Office" ? "Post Code *" : `${placeType} Code *`}
+                      </label>
+                      <input type="text" placeholder={placeType === "Post Office" ? "Post Code (e.g. 1216)" : "Code"} value={placeCode} onChange={e => setPlaceCode(e.target.value)} className={insetInputClass} required />
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>District Name (Eng) *</label>
-                      <input type="text" placeholder="District (Eng)" value={placeNameEng} onChange={e => setPlaceNameEng(e.target.value)} className={insetInputClass} required />
+                      <label className={insetLabelClass}>{placeType} Name (Eng) *</label>
+                      <input type="text" placeholder={`${placeType} Name (Eng)`} value={placeNameEng} onChange={e => setPlaceNameEng(e.target.value)} className={insetInputClass} required />
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>District Name (Bng)</label>
-                      <input type="text" placeholder="District (Bng)" value={placeNameBng} onChange={e => setPlaceNameBng(e.target.value)} className={insetInputClass} />
+                      <label className={insetLabelClass}>{placeType} Name (Bng)</label>
+                      <input type="text" placeholder={`${placeType} Name (Bng)`} value={placeNameBng} onChange={e => setPlaceNameBng(e.target.value)} className={insetInputClass} />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Short Name</label>
