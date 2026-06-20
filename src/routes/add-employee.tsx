@@ -75,6 +75,7 @@ function AddEmployeePage() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [subSection, setSubSection] = useState("primary_placement");
+  const [qualSubTab, setQualSubTab] = useState("academic");
 
   // Custom addition modal states
   const [addingField, setAddingField] = useState<string | null>(null);
@@ -3260,6 +3261,19 @@ function AddEmployeePage() {
                           placeholder="e.g. 102.120.99827"
                         />
                       </div>
+                      
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                          Routing Number
+                        </label>
+                        <input
+                          type="text"
+                          value={form.routingNumber}
+                          onChange={(e) => handleChange("routingNumber", e.target.value)}
+                          className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full font-mono"
+                          placeholder="e.g. 020260120"
+                        />
+                      </div>
 
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-bold text-muted-foreground uppercase">
@@ -3274,680 +3288,642 @@ function AddEmployeePage() {
                         />
                       </div>
 
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-muted-foreground uppercase">
-                          Routing Number
-                        </label>
-                        <input
-                          type="text"
-                          value={form.routingNumber}
-                          onChange={(e) => handleChange("routingNumber", e.target.value)}
-                          className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full font-mono"
-                          placeholder="e.g. 020260120"
-                        />
+                      <div className              {/* TAB 3: QUALIFICATIONS & EXPERIENCE (CONSOLIDATED TABBED VIEW) */}
+              {activeTab === "career_qualifications" && (
+                <div className="space-y-6 animate-in fade-in duration-200">
+                  {/* Category Pills Navigation */}
+                  <div className="flex flex-wrap items-center gap-2 p-1.5 bg-muted/20 border border-border/40 rounded-xl">
+                    {[
+                      { id: "academic", label: "Academic Qualifications", icon: GraduationCap, count: educationList.length },
+                      { id: "experience", label: "Prior Job Experience", icon: History, count: experienceList.length },
+                      { id: "certifications", label: "Certifications", icon: Award, count: certifications.length },
+                      { id: "training", label: "Training History", icon: BookOpen, count: trainingList.length },
+                      { id: "involvements", label: "Other Involvements", icon: Users, count: involvements.length },
+                    ].map((tab) => {
+                      const TabIcon = tab.icon;
+                      const isSelected = qualSubTab === tab.id;
+                      return (
+                        <button
+                          key={tab.id}
+                          type="button"
+                          onClick={() => setQualSubTab(tab.id)}
+                          className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg transition duration-200 focus:outline-none ${
+                            isSelected
+                              ? "bg-primary text-primary-foreground shadow-xs"
+                              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          }`}
+                        >
+                          <TabIcon className="size-3.5" />
+                          <span>{tab.label}</span>
+                          {tab.count > 0 && (
+                            <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-mono leading-none ${
+                              isSelected ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"
+                            }`}>
+                              {tab.count}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* 1. ACADEMIC QUALIFICATIONS */}
+                  {qualSubTab === "academic" && (
+                    <div className="space-y-4 animate-in fade-in duration-200">
+                      <div className="border-b border-border/30 pb-2.5 flex items-center gap-2">
+                        <GraduationCap className="size-4.5 text-primary" />
+                        <h3 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
+                          Academic Credentials & Qualifications
+                        </h3>
+                      </div>
+
+                      <div className="border border-border/40 rounded-lg overflow-hidden bg-card/30 backdrop-blur-xs">
+                        <table className="w-full border-collapse text-left text-xs">
+                          <thead>
+                            <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
+                              <th className="px-4 py-3 min-w-[200px]">Degree / Exam Title</th>
+                              <th className="px-4 py-3">Institution Name</th>
+                              <th className="px-4 py-3 w-[100px] text-center">Passing Year</th>
+                              <th className="px-4 py-3 w-[100px] text-center">Result / GPA</th>
+                              <th className="px-4 py-3 w-[170px] text-center">Attachment (Optional)</th>
+                              <th className="px-4 py-3 w-[60px] text-right">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-border/20">
+                            {educationList.map((edu, index) => (
+                              <tr
+                                key={index}
+                                className="hover:bg-muted/5 transition-colors font-semibold text-foreground/80"
+                              >
+                                <td className="px-4 py-2">
+                                  <SearchableSelect
+                                    value={edu.degree}
+                                    onChange={() => { }}
+                                    options={[
+                                      { value: "Secondary (SSC)", label: "Secondary School (SSC)" },
+                                      { value: "Higher Secondary (HSC)", label: "Higher Secondary (HSC)" },
+                                      { value: "Bachelor of Science (B.Sc)", label: "Bachelor of Science (B.Sc)" },
+                                      { value: "Master of Science (M.Sc)", label: "Master of Science (M.Sc)" },
+                                      { value: "MBA / Post Grad", label: "Executive MBA / Post Grad" },
+                                      { value: "PhD / Doctorate", label: "PhD / Doctorate Degree" },
+                                    ]}
+                                  />
+                                </td>
+                                <td className="px-4 py-2">
+                                  <input
+                                    type="text"
+                                    value={edu.institute}
+                                    onChange={(e) => handleEduChange(index, "institute", e.target.value)}
+                                    className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
+                                    placeholder="e.g. Dhaka University"
+                                  />
+                                </td>
+                                <td className="px-4 py-2">
+                                  <input
+                                    type="text"
+                                    value={edu.passingYear}
+                                    onChange={(e) => handleEduChange(index, "passingYear", e.target.value)}
+                                    className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full text-center font-mono focus:ring-1 focus:ring-primary focus:border-primary"
+                                    placeholder="e.g. 2022"
+                                  />
+                                </td>
+                                <td className="px-4 py-2">
+                                  <input
+                                    type="text"
+                                    value={edu.resultGpa}
+                                    onChange={(e) => handleEduChange(index, "resultGpa", e.target.value)}
+                                    className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full text-center font-mono focus:ring-1 focus:ring-primary focus:border-primary"
+                                    placeholder="e.g. 3.85"
+                                  />
+                                </td>
+                                <td className="px-4 py-2 text-center">
+                                  {edu.attachment ? (
+                                    <div className="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg gap-1.5 max-w-[150px] mx-auto animate-in fade-in duration-200">
+                                      <span className="text-[10px] font-mono font-bold text-emerald-600 truncate">
+                                        {edu.attachment}
+                                      </span>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleEduChange(index, "attachment", "")}
+                                        className="text-rose-500 hover:text-rose-600 font-black text-[10px] shrink-0"
+                                        title="Remove certificate attachment"
+                                      >
+                                        ✕
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() => triggerRowMockUpload("education", index)}
+                                      className="h-7 px-2.5 rounded-lg border border-dashed border-primary/30 hover:border-primary hover:bg-primary/5 text-primary text-[10px] font-bold flex items-center justify-center gap-1 mx-auto transition duration-200"
+                                    >
+                                      <Upload className="size-3 text-primary/75" /> Upload File
+                                    </button>
+                                  )}
+                                </td>
+                                <td className="px-4 py-2 text-right">
+                                  <button
+                                    type="button"
+                                    onClick={() => setEducationList((prev) => prev.filter((_, i) => i !== index))}
+                                    className="p-1.5 rounded-lg text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 transition"
+                                  >
+                                    <Trash className="size-3.5" />
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                            {educationList.length === 0 && (
+                              <tr>
+                                <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground text-xs italic">
+                                  No academic credentials logged yet. Click the button below to add your first qualification.
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div className="flex justify-start">
+                        <button
+                          type="button"
+                          onClick={addEduRow}
+                          className="h-8.5 px-4 rounded-xl border border-dashed border-primary/40 hover:border-primary bg-primary/5 hover:bg-primary/10 text-primary text-[11px] font-extrabold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-2xs"
+                        >
+                          <Plus className="size-3.5" /> Add Academic Qualification
+                        </button>
                       </div>
                     </div>
-                  </div>
+                  )}
 
-                  <div className="border-t border-border/30 my-8 pt-2" />
-                </div>
-              )}
+                  {/* 2. PRIOR JOB EXPERIENCE */}
+                  {qualSubTab === "experience" && (
+                    <div className="space-y-4 animate-in fade-in duration-200">
+                      <div className="border-b border-border/30 pb-2.5 flex items-center gap-2">
+                        <History className="size-4.5 text-primary" />
+                        <h3 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
+                          Prior Job Experience & Career History
+                        </h3>
+                      </div>
 
-              {/* TAB 3: QUALIFICATIONS & EXPERIENCE (CONSOLIDATED) */}
-              {activeTab === "career_qualifications" && (
-                <div className="space-y-6 animate-in fade-in duration-200">
-                  <div className="border-b border-border/30 pb-3 flex items-center gap-2">
-                    <GraduationCap className="size-4.5 text-primary" />
-                    <h2 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
-                      Academic Credentials & Qualifications
-                    </h2>
-                  </div>
-
-                  {/* Inline Spreadsheet Table */}
-                  <div className="border border-border/40 rounded-lg overflow-hidden mt-4 bg-card/30 backdrop-blur-xs">
-                    <table className="w-full border-collapse text-left text-xs">
-                      <thead>
-                        <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
-                          <th className="px-4 py-3 min-w-[200px]">Degree / Exam Title</th>
-                          <th className="px-4 py-3">Institution Name</th>
-                          <th className="px-4 py-3 w-[100px] text-center">Passing Year</th>
-                          <th className="px-4 py-3 w-[100px] text-center">Result / GPA</th>
-                          <th className="px-4 py-3 w-[170px] text-center">Attachment (Optional)</th>
-                          <th className="px-4 py-3 w-[60px] text-right">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border/20">
-                        {educationList.map((edu, index) => (
-                          <tr
-                            key={index}
-                            className="hover:bg-muted/5 transition-colors font-semibold text-foreground/80"
-                          >
-                            <td className="px-4 py-2">
-                              <SearchableSelect
-                                value={edu.degree}
-                                onChange={() => { }}
-                                options={[
-                                  { value: "Secondary (SSC)", label: "Secondary School (SSC)" },
-                                  {
-                                    value: "Higher Secondary (HSC)",
-                                    label: "Higher Secondary (HSC)",
-                                  },
-                                  {
-                                    value: "Bachelor of Science (B.Sc)",
-                                    label: "Bachelor of Science (B.Sc)",
-                                  },
-                                  {
-                                    value: "Master of Science (M.Sc)",
-                                    label: "Master of Science (M.Sc)",
-                                  },
-                                  { value: "MBA / Post Grad", label: "Executive MBA / Post Grad" },
-                                  { value: "PhD / Doctorate", label: "PhD / Doctorate Degree" },
-                                ]}
-                              />
-                            </td>
-                            <td className="px-4 py-2">
-                              <input
-                                type="text"
-                                value={edu.institute}
-                                onChange={(e) =>
-                                  handleEduChange(index, "institute", e.target.value)
-                                }
-                                className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
-                                placeholder="e.g. Dhaka University"
-                              />
-                            </td>
-                            <td className="px-4 py-2">
-                              <input
-                                type="text"
-                                value={edu.passingYear}
-                                onChange={(e) =>
-                                  handleEduChange(index, "passingYear", e.target.value)
-                                }
-                                className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full text-center font-mono focus:ring-1 focus:ring-primary focus:border-primary"
-                                placeholder="e.g. 2022"
-                              />
-                            </td>
-                            <td className="px-4 py-2">
-                              <input
-                                type="text"
-                                value={edu.resultGpa}
-                                onChange={(e) =>
-                                  handleEduChange(index, "resultGpa", e.target.value)
-                                }
-                                className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full text-center font-mono focus:ring-1 focus:ring-primary focus:border-primary"
-                                placeholder="e.g. 3.85"
-                              />
-                            </td>
-                            <td className="px-4 py-2 text-center">
-                              {edu.attachment ? (
-                                <div className="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg gap-1.5 max-w-[150px] mx-auto animate-in fade-in duration-200">
-                                  <span className="text-[10px] font-mono font-bold text-emerald-600 truncate">
-                                    {edu.attachment}
-                                  </span>
+                      <div className="border border-border/40 rounded-lg overflow-hidden bg-card/30 backdrop-blur-xs">
+                        <table className="w-full border-collapse text-left text-xs">
+                          <thead>
+                            <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
+                              <th className="px-4 py-3">Organization / Company</th>
+                              <th className="px-4 py-3">Designation</th>
+                              <th className="px-4 py-3 w-[120px] text-center">From Date</th>
+                              <th className="px-4 py-3 w-[120px] text-center">To Date</th>
+                              <th className="px-4 py-3">Reason for Leaving</th>
+                              <th className="px-4 py-3 w-[170px] text-center">Attachment (Optional)</th>
+                              <th className="px-4 py-3 w-[60px] text-right">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-border/20">
+                            {experienceList.map((exp, index) => (
+                              <tr
+                                key={index}
+                                className="hover:bg-muted/5 transition-colors font-semibold text-foreground/80"
+                              >
+                                <td className="px-4 py-2">
+                                  <input
+                                    type="text"
+                                    value={exp.company}
+                                    onChange={(e) => handleExpChange(index, "company", e.target.value)}
+                                    className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
+                                    placeholder="e.g. Brain Station 23"
+                                  />
+                                </td>
+                                <td className="px-4 py-2">
+                                  <input
+                                    type="text"
+                                    value={exp.designation}
+                                    onChange={(e) => handleExpChange(index, "designation", e.target.value)}
+                                    className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
+                                    placeholder="e.g. Senior Software Engineer"
+                                  />
+                                </td>
+                                <td className="px-4 py-2 text-center">
+                                  <input
+                                    type="date"
+                                    value={exp.fromDate}
+                                    onChange={(e) => handleExpChange(index, "fromDate", e.target.value)}
+                                    className="h-8 px-2 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
+                                  />
+                                </td>
+                                <td className="px-4 py-2 text-center">
+                                  <input
+                                    type="date"
+                                    value={exp.toDate}
+                                    onChange={(e) => handleExpChange(index, "toDate", e.target.value)}
+                                    className="h-8 px-2 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
+                                  />
+                                </td>
+                                <td className="px-4 py-2">
+                                  <input
+                                    type="text"
+                                    value={exp.leavingReason}
+                                    onChange={(e) => handleExpChange(index, "leavingReason", e.target.value)}
+                                    className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
+                                    placeholder="e.g. Career Growth"
+                                  />
+                                </td>
+                                <td className="px-4 py-2 text-center">
+                                  {exp.attachment ? (
+                                    <div className="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg gap-1.5 max-w-[150px] mx-auto animate-in fade-in duration-200">
+                                      <span className="text-[10px] font-mono font-bold text-emerald-600 truncate">
+                                        {exp.attachment}
+                                      </span>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleExpChange(index, "attachment", "")}
+                                        className="text-rose-500 hover:text-rose-600 font-black text-[10px] shrink-0"
+                                        title="Remove experience attachment"
+                                      >
+                                        ✕
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() => triggerMockUpload("experience", index)}
+                                      className="h-7 px-2.5 rounded-lg border border-dashed border-primary/30 hover:border-primary hover:bg-primary/5 text-primary text-[10px] font-bold flex items-center justify-center gap-1 mx-auto transition duration-200"
+                                    >
+                                      <Upload className="size-3 text-primary/75" /> Upload File
+                                    </button>
+                                  )}
+                                </td>
+                                <td className="px-4 py-2 text-right">
                                   <button
                                     type="button"
-                                    onClick={() => handleEduChange(index, "attachment", "")}
-                                    className="text-rose-500 hover:text-rose-600 font-black text-[10px] shrink-0"
-                                    title="Remove certificate attachment"
+                                    onClick={() => setExperienceList((prev) => prev.filter((_, i) => i !== index))}
+                                    className="p-1.5 rounded-lg text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 transition"
                                   >
-                                    ✕
+                                    <Trash className="size-3.5" />
                                   </button>
-                                </div>
-                              ) : (
-                                <button
-                                  type="button"
-                                  onClick={() => triggerRowMockUpload("education", index)}
-                                  className="h-7 px-2.5 rounded-lg border border-dashed border-primary/30 hover:border-primary hover:bg-primary/5 text-primary text-[10px] font-bold flex items-center justify-center gap-1 mx-auto transition duration-200"
-                                >
-                                  <Upload className="size-3 text-primary/75" /> Upload File
-                                </button>
-                              )}
-                            </td>
-                            <td className="px-4 py-2 text-right">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setEducationList((prev) => prev.filter((_, i) => i !== index))
-                                }
-                                className="p-1.5 rounded-lg text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 transition"
+                                </td>
+                              </tr>
+                            ))}
+                            {experienceList.length === 0 && (
+                              <tr>
+                                <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground text-xs italic">
+                                  No prior work experience logged. Click the button below to add your first job history.
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div className="flex justify-start">
+                        <button
+                          type="button"
+                          onClick={addExpRow}
+                          className="h-8.5 px-4 rounded-xl border border-dashed border-primary/40 hover:border-primary bg-primary/5 hover:bg-primary/10 text-primary text-[11px] font-extrabold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-2xs"
+                        >
+                          <Plus className="size-3.5" /> Add Job Experience Row
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 3. CERTIFICATIONS */}
+                  {qualSubTab === "certifications" && (
+                    <div className="space-y-4 animate-in fade-in duration-200">
+                      <div className="border-b border-border/30 pb-2.5 flex items-center gap-2">
+                        <Award className="size-4.5 text-primary" />
+                        <h3 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
+                          Professional Certifications & Credentials
+                        </h3>
+                      </div>
+
+                      <div className="border border-border/40 rounded-lg overflow-hidden bg-card/30 backdrop-blur-xs">
+                        <table className="w-full border-collapse text-left text-xs">
+                          <thead>
+                            <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
+                              <th className="px-4 py-3">Certificate Title</th>
+                              <th className="px-4 py-3">Issuing Authority / Organization</th>
+                              <th className="px-4 py-3 w-[180px] text-center">Credential ID</th>
+                              <th className="px-4 py-3 w-[150px] text-center">Issue Date</th>
+                              <th className="px-4 py-3 w-[60px] text-right">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-border/20">
+                            {certifications.map((cert, index) => (
+                              <tr
+                                key={index}
+                                className="hover:bg-muted/5 transition-colors font-semibold text-foreground/80"
                               >
-                                <Trash className="size-3.5" />
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                        {educationList.length === 0 && (
-                          <tr>
-                            <td
-                              colSpan={6}
-                              className="px-4 py-8 text-center text-muted-foreground text-xs italic"
-                            >
-                              No academic credentials logged yet. Click the button below to add your
-                              first qualification.
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Add Row Button */}
-                  <div className="flex justify-start mt-2">
-                    <button
-                      type="button"
-                      onClick={addEduRow}
-                      className="h-8.5 px-4 rounded-xl border border-dashed border-primary/40 hover:border-primary bg-primary/5 hover:bg-primary/10 text-primary text-[11px] font-extrabold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-2xs"
-                    >
-                      <Plus className="size-3.5" /> Add Academic Qualification
-                    </button>
-                  </div>
-
-                  <div className="border-t border-border/30 my-8 pt-2" />
-                </div>
-              )}
-
-              {/* SUBSECTION: PRIOR JOB EXPERIENCE */}
-              {activeTab === "career_qualifications" && (
-                <div className="space-y-6 animate-in fade-in duration-200">
-                  <div className="border-b border-border/30 pb-3 flex items-center gap-2">
-                    <History className="size-4.5 text-primary" />
-                    <h2 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
-                      Prior Job Experience & Career History
-                    </h2>
-                  </div>
-
-                  {/* Inline Spreadsheet Table */}
-                  <div className="border border-border/40 rounded-lg overflow-hidden mt-4 bg-card/30 backdrop-blur-xs">
-                    <table className="w-full border-collapse text-left text-xs">
-                      <thead>
-                        <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
-                          <th className="px-4 py-3">Organization / Company</th>
-                          <th className="px-4 py-3">Designation</th>
-                          <th className="px-4 py-3 w-[120px] text-center">From Date</th>
-                          <th className="px-4 py-3 w-[120px] text-center">To Date</th>
-                          <th className="px-4 py-3">Reason for Leaving</th>
-                          <th className="px-4 py-3 w-[170px] text-center">Attachment (Optional)</th>
-                          <th className="px-4 py-3 w-[60px] text-right">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border/20">
-                        {experienceList.map((exp, index) => (
-                          <tr
-                            key={index}
-                            className="hover:bg-muted/5 transition-colors font-semibold text-foreground/80"
-                          >
-                            <td className="px-4 py-2">
-                              <input
-                                type="text"
-                                value={exp.company}
-                                onChange={(e) => handleExpChange(index, "company", e.target.value)}
-                                className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
-                                placeholder="e.g. Brain Station 23"
-                              />
-                            </td>
-                            <td className="px-4 py-2">
-                              <input
-                                type="text"
-                                value={exp.designation}
-                                onChange={(e) =>
-                                  handleExpChange(index, "designation", e.target.value)
-                                }
-                                className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
-                                placeholder="e.g. Senior Software Engineer"
-                              />
-                            </td>
-                            <td className="px-4 py-2 text-center">
-                              <input
-                                type="date"
-                                value={exp.fromDate}
-                                onChange={(e) => handleExpChange(index, "fromDate", e.target.value)}
-                                className="h-8 px-2 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
-                              />
-                            </td>
-                            <td className="px-4 py-2 text-center">
-                              <input
-                                type="date"
-                                value={exp.toDate}
-                                onChange={(e) => handleExpChange(index, "toDate", e.target.value)}
-                                className="h-8 px-2 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
-                              />
-                            </td>
-                            <td className="px-4 py-2">
-                              <input
-                                type="text"
-                                value={exp.leavingReason}
-                                onChange={(e) =>
-                                  handleExpChange(index, "leavingReason", e.target.value)
-                                }
-                                className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
-                                placeholder="e.g. Career Growth"
-                              />
-                            </td>
-                            <td className="px-4 py-2 text-center">
-                              {exp.attachment ? (
-                                <div className="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg gap-1.5 max-w-[150px] mx-auto animate-in fade-in duration-200">
-                                  <span className="text-[10px] font-mono font-bold text-emerald-600 truncate">
-                                    {exp.attachment}
-                                  </span>
+                                <td className="px-4 py-2">
+                                  <input
+                                    type="text"
+                                    value={cert.certificateName}
+                                    onChange={(e) => handleCertChange(index, "certificateName", e.target.value)}
+                                    className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
+                                    placeholder="e.g. AWS Certified Architect"
+                                  />
+                                </td>
+                                <td className="px-4 py-2">
+                                  <input
+                                    type="text"
+                                    value={cert.organization}
+                                    onChange={(e) => handleCertChange(index, "organization", e.target.value)}
+                                    className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
+                                    placeholder="e.g. Amazon Web Services"
+                                  />
+                                </td>
+                                <td className="px-4 py-2">
+                                  <input
+                                    type="text"
+                                    value={cert.credentialId}
+                                    onChange={(e) => handleCertChange(index, "credentialId", e.target.value)}
+                                    className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full text-center font-mono focus:ring-1 focus:ring-primary focus:border-primary"
+                                    placeholder="e.g. AWS-12345"
+                                  />
+                                </td>
+                                <td className="px-4 py-2 text-center">
+                                  <input
+                                    type="date"
+                                    value={cert.issueDate}
+                                    onChange={(e) => handleCertChange(index, "issueDate", e.target.value)}
+                                    className="h-8 px-2 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
+                                  />
+                                </td>
+                                <td className="px-4 py-2 text-right">
                                   <button
                                     type="button"
-                                    onClick={() => handleExpChange(index, "attachment", "")}
-                                    className="text-rose-500 hover:text-rose-600 font-black text-[10px] shrink-0"
-                                    title="Remove experience attachment"
+                                    onClick={() => setCertifications((prev) => prev.filter((_, i) => i !== index))}
+                                    className="p-1.5 rounded-lg text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 transition"
                                   >
-                                    ✕
+                                    <Trash className="size-3.5" />
                                   </button>
-                                </div>
-                              ) : (
-                                <button
-                                  type="button"
-                                  onClick={() => triggerRowMockUpload("experience", index)}
-                                  className="h-7 px-2.5 rounded-lg border border-dashed border-primary/30 hover:border-primary hover:bg-primary/5 text-primary text-[10px] font-bold flex items-center justify-center gap-1 mx-auto transition duration-200"
-                                >
-                                  <Upload className="size-3 text-primary/75" /> Upload File
-                                </button>
-                              )}
-                            </td>
-                            <td className="px-4 py-2 text-right">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setExperienceList((prev) => prev.filter((_, i) => i !== index))
-                                }
-                                className="p-1.5 rounded-lg text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 transition"
+                                </td>
+                              </tr>
+                            ))}
+                            {certifications.length === 0 && (
+                              <tr>
+                                <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground text-xs italic">
+                                  No certification credentials added yet. Click the button below to add your first cert.
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div className="flex justify-start">
+                        <button
+                          type="button"
+                          onClick={addCertRow}
+                          className="h-8.5 px-4 rounded-xl border border-dashed border-primary/40 hover:border-primary bg-primary/5 hover:bg-primary/10 text-primary text-[11px] font-extrabold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-2xs"
+                        >
+                          <Plus className="size-3.5" /> Add Certification Row
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 4. TRAINING HISTORY */}
+                  {qualSubTab === "training" && (
+                    <div className="space-y-4 animate-in fade-in duration-200">
+                      <div className="border-b border-border/30 pb-2.5 flex items-center gap-2">
+                        <BookOpen className="size-4.5 text-primary" />
+                        <h3 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
+                          Professional Training Programs
+                        </h3>
+                      </div>
+
+                      <div className="border border-border/40 rounded-lg overflow-hidden bg-card/30 backdrop-blur-xs">
+                        <table className="w-full border-collapse text-left text-xs">
+                          <thead>
+                            <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
+                              <th className="px-4 py-3">Training Title</th>
+                              <th className="px-4 py-3">Institution / Provider</th>
+                              <th className="px-4 py-3 w-[150px] text-center">Duration</th>
+                              <th className="px-4 py-3 w-[150px] text-center">Completion Date</th>
+                              <th className="px-4 py-3 w-[60px] text-right">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-border/20">
+                            {trainingList.map((t, index) => (
+                              <tr
+                                key={index}
+                                className="hover:bg-muted/5 transition-colors font-semibold text-foreground/80"
                               >
-                                <Trash className="size-3.5" />
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                        {experienceList.length === 0 && (
-                          <tr>
-                            <td
-                              colSpan={7}
-                              className="px-4 py-8 text-center text-muted-foreground text-xs italic"
-                            >
-                              No prior work experience logged. Click the button below to add your
-                              first job history.
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
+                                <td className="px-4 py-2">
+                                  <input
+                                    type="text"
+                                    value={t.trainingTitle}
+                                    onChange={(e) => handleTrainChange(index, "trainingTitle", e.target.value)}
+                                    className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
+                                    placeholder="e.g. Advanced System Architecture"
+                                  />
+                                </td>
+                                <td className="px-4 py-2">
+                                  <input
+                                    type="text"
+                                    value={t.institution}
+                                    onChange={(e) => handleTrainChange(index, "institution", e.target.value)}
+                                    className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
+                                    placeholder="e.g. Coursera"
+                                  />
+                                </td>
+                                <td className="px-4 py-2 text-center">
+                                  <input
+                                    type="text"
+                                    value={t.duration}
+                                    onChange={(e) => handleTrainChange(index, "duration", e.target.value)}
+                                    className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full text-center focus:ring-1 focus:ring-primary focus:border-primary"
+                                    placeholder="e.g. 12 Weeks"
+                                  />
+                                </td>
+                                <td className="px-4 py-2 text-center">
+                                  <input
+                                    type="date"
+                                    value={t.completionDate}
+                                    onChange={(e) => handleTrainChange(index, "completionDate", e.target.value)}
+                                    className="h-8 px-2 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
+                                  />
+                                </td>
+                                <td className="px-4 py-2 text-right">
+                                  <button
+                                    type="button"
+                                    onClick={() => setTrainingList((prev) => prev.filter((_, i) => i !== index))}
+                                    className="p-1.5 rounded-lg text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 transition"
+                                  >
+                                    <Trash className="size-3.5" />
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                            {trainingList.length === 0 && (
+                              <tr>
+                                <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground text-xs italic">
+                                  No training programs logged. Click the button below to add your first training record.
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
 
-                  {/* Add Row Button */}
-                  <div className="flex justify-start mt-2">
-                    <button
-                      type="button"
-                      onClick={addExpRow}
-                      className="h-8.5 px-4 rounded-xl border border-dashed border-primary/40 hover:border-primary bg-primary/5 hover:bg-primary/10 text-primary text-[11px] font-extrabold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-2xs"
-                    >
-                      <Plus className="size-3.5" /> Add Job Experience Row
-                    </button>
-                  </div>
+                      <div className="flex justify-start">
+                        <button
+                          type="button"
+                          onClick={addTrainRow}
+                          className="h-8.5 px-4 rounded-xl border border-dashed border-primary/40 hover:border-primary bg-primary/5 hover:bg-primary/10 text-primary text-[11px] font-extrabold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-2xs"
+                        >
+                          <Plus className="size-3.5" /> Add Training Program Row
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
-                  <div className="border-t border-border/30 my-8 pt-2" />
-                </div>
-              )}
+                  {/* 5. OTHER INVOLVEMENTS */}
+                  {qualSubTab === "involvements" && (
+                    <div className="space-y-4 animate-in fade-in duration-200">
+                      <div className="border-b border-border/30 pb-2.5 flex items-center gap-2">
+                        <Users className="size-4.5 text-primary" />
+                        <h3 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
+                          Organizational Involvements & Committee Commitments
+                        </h3>
+                      </div>
 
-              {/* SUBSECTION: PROFESSIONAL CERTIFICATES */}
-              {activeTab === "career_qualifications" && (
-                <div className="space-y-6 animate-in fade-in duration-200">
-                  <div className="border-b border-border/30 pb-3 flex items-center gap-2">
-                    <Award className="size-4.5 text-primary" />
-                    <h2 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
-                      Professional Certifications & Credentials
-                    </h2>
-                  </div>
-
-                  {/* Inline Spreadsheet Table */}
-                  <div className="border border-border/40 rounded-lg overflow-hidden mt-4 bg-card/30 backdrop-blur-xs">
-                    <table className="w-full border-collapse text-left text-xs">
-                      <thead>
-                        <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
-                          <th className="px-4 py-3">Certificate Title</th>
-                          <th className="px-4 py-3">Issuing Authority / Organization</th>
-                          <th className="px-4 py-3 w-[180px] text-center">Credential ID</th>
-                          <th className="px-4 py-3 w-[150px] text-center">Issue Date</th>
-                          <th className="px-4 py-3 w-[60px] text-right">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border/20">
-                        {certifications.map((cert, index) => (
-                          <tr
-                            key={index}
-                            className="hover:bg-muted/5 transition-colors font-semibold text-foreground/80"
-                          >
-                            <td className="px-4 py-2">
-                              <input
-                                type="text"
-                                value={cert.certificateName}
-                                onChange={(e) =>
-                                  handleCertChange(index, "certificateName", e.target.value)
-                                }
-                                className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
-                                placeholder="e.g. AWS Certified Architect"
-                              />
-                            </td>
-                            <td className="px-4 py-2">
-                              <input
-                                type="text"
-                                value={cert.organization}
-                                onChange={(e) =>
-                                  handleCertChange(index, "organization", e.target.value)
-                                }
-                                className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
-                                placeholder="e.g. Amazon Web Services"
-                              />
-                            </td>
-                            <td className="px-4 py-2">
-                              <input
-                                type="text"
-                                value={cert.credentialId}
-                                onChange={(e) =>
-                                  handleCertChange(index, "credentialId", e.target.value)
-                                }
-                                className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full text-center font-mono focus:ring-1 focus:ring-primary focus:border-primary"
-                                placeholder="e.g. AWS-12345"
-                              />
-                            </td>
-                            <td className="px-4 py-2 text-center">
-                              <input
-                                type="date"
-                                value={cert.issueDate}
-                                onChange={(e) =>
-                                  handleCertChange(index, "issueDate", e.target.value)
-                                }
-                                className="h-8 px-2 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
-                              />
-                            </td>
-                            <td className="px-4 py-2 text-right">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setCertifications((prev) => prev.filter((_, i) => i !== index))
-                                }
-                                className="p-1.5 rounded-lg text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 transition"
+                      <div className="border border-border/40 rounded-lg overflow-hidden bg-card/30 backdrop-blur-xs">
+                        <table className="w-full border-collapse text-left text-xs">
+                          <thead>
+                            <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
+                              <th className="px-4 py-3">Committee / Group Name</th>
+                              <th className="px-4 py-3">Role Played</th>
+                              <th className="px-4 py-3 w-[150px] text-center">Duration</th>
+                              <th className="px-4 py-3">Key Deliverable / Remarks</th>
+                              <th className="px-4 py-3 w-[60px] text-right">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-border/20">
+                            {involvements.map((invol, index) => (
+                              <tr
+                                key={index}
+                                className="hover:bg-muted/5 transition-colors font-semibold text-foreground/80"
                               >
-                                <Trash className="size-3.5" />
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                        {certifications.length === 0 && (
-                          <tr>
-                            <td
-                              colSpan={5}
-                              className="px-4 py-8 text-center text-muted-foreground text-xs italic"
-                            >
-                              No certification credentials added yet. Click the button below to add
-                              your first cert.
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
+                                <td className="px-4 py-2">
+                                  <input
+                                    type="text"
+                                    value={invol.activityName}
+                                    onChange={(e) => handleInvolChange(index, "activityName", e.target.value)}
+                                    className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
+                                    placeholder="e.g. Safety Committee"
+                                  />
+                                </td>
+                                <td className="px-4 py-2">
+                                  <input
+                                    type="text"
+                                    value={invol.role}
+                                    onChange={(e) => handleInvolChange(index, "role", e.target.value)}
+                                    className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
+                                    placeholder="e.g. Committee Secretary"
+                                  />
+                                </td>
+                                <td className="px-4 py-2 text-center">
+                                  <input
+                                    type="text"
+                                    value={invol.duration}
+                                    onChange={(e) => handleInvolChange(index, "duration", e.target.value)}
+                                    className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full text-center focus:ring-1 focus:ring-primary focus:border-primary"
+                                    placeholder="e.g. 6 Months"
+                                  />
+                                </td>
+                                <td className="px-4 py-2">
+                                  <input
+                                    type="text"
+                                    value={invol.description}
+                                    onChange={(e) => handleInvolChange(index, "description", e.target.value)}
+                                    className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
+                                    placeholder="e.g. Supervised emergency drills"
+                                  />
+                                </td>
+                                <td className="px-4 py-2 text-right">
+                                  <button
+                                    type="button"
+                                    onClick={() => setInvolvements((prev) => prev.filter((_, i) => i !== index))}
+                                    className="p-1.5 rounded-lg text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 transition"
+                                  >
+                                    <Trash className="size-3.5" />
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                            {involvements.length === 0 && (
+                              <tr>
+                                <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground text-xs italic">
+                                  No organizational involvements logged. Click the button below to add your first record.
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
 
-                  {/* Add Row Button */}
-                  <div className="flex justify-start mt-2">
-                    <button
-                      type="button"
-                      onClick={addCertRow}
-                      className="h-8.5 px-4 rounded-xl border border-dashed border-primary/40 hover:border-primary bg-primary/5 hover:bg-primary/10 text-primary text-[11px] font-extrabold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-2xs"
-                    >
-                      <Plus className="size-3.5" /> Add Certification Row
-                    </button>
-                  </div>
+                      <div className="flex justify-start">
+                        <button
+                          type="button"
+                          onClick={addInvolRow}
+                          className="h-8.5 px-4 rounded-xl border border-dashed border-primary/40 hover:border-primary bg-primary/5 hover:bg-primary/10 text-primary text-[11px] font-extrabold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-2xs"
+                        >
+                          <Plus className="size-3.5" /> Add Organizational Involvement Row
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
-                  <div className="border-t border-border/30 my-8 pt-2" />
-                </div>
-              )}
-
-              {/* SUBSECTION: PROFESSIONAL TRAINING */}
-              {activeTab === "career_qualifications" && (
-                <div className="space-y-6 animate-in fade-in duration-200">
-                  <div className="border-b border-border/30 pb-3 flex items-center gap-2">
-                    <BookOpen className="size-4.5 text-primary" />
-                    <h2 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
-                      Professional Training Programs
-                    </h2>
-                  </div>
-
-                  {/* Inline Spreadsheet Table */}
-                  <div className="border border-border/40 rounded-lg overflow-hidden mt-4 bg-card/30 backdrop-blur-xs">
-                    <table className="w-full border-collapse text-left text-xs">
-                      <thead>
-                        <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
-                          <th className="px-4 py-3">Training Title</th>
-                          <th className="px-4 py-3">Institution / Provider</th>
-                          <th className="px-4 py-3 w-[150px] text-center">Duration</th>
-                          <th className="px-4 py-3 w-[150px] text-center">Completion Date</th>
-                          <th className="px-4 py-3 w-[60px] text-right">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border/20">
-                        {trainingList.map((t, index) => (
-                          <tr
-                            key={index}
-                            className="hover:bg-muted/5 transition-colors font-semibold text-foreground/80"
-                          >
-                            <td className="px-4 py-2">
-                              <input
-                                type="text"
-                                value={t.trainingTitle}
-                                onChange={(e) =>
-                                  handleTrainChange(index, "trainingTitle", e.target.value)
-                                }
-                                className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
-                                placeholder="e.g. Advanced System Architecture"
-                              />
-                            </td>
-                            <td className="px-4 py-2">
-                              <input
-                                type="text"
-                                value={t.institution}
-                                onChange={(e) =>
-                                  handleTrainChange(index, "institution", e.target.value)
-                                }
-                                className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
-                                placeholder="e.g. Coursera"
-                              />
-                            </td>
-                            <td className="px-4 py-2 text-center">
-                              <input
-                                type="text"
-                                value={t.duration}
-                                onChange={(e) =>
-                                  handleTrainChange(index, "duration", e.target.value)
-                                }
-                                className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full text-center focus:ring-1 focus:ring-primary focus:border-primary"
-                                placeholder="e.g. 12 Weeks"
-                              />
-                            </td>
-                            <td className="px-4 py-2 text-center">
-                              <input
-                                type="date"
-                                value={t.completionDate}
-                                onChange={(e) =>
-                                  handleTrainChange(index, "completionDate", e.target.value)
-                                }
-                                className="h-8 px-2 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
-                              />
-                            </td>
-                            <td className="px-4 py-2 text-right">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setTrainingList((prev) => prev.filter((_, i) => i !== index))
-                                }
-                                className="p-1.5 rounded-lg text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 transition"
-                              >
-                                <Trash className="size-3.5" />
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                        {trainingList.length === 0 && (
-                          <tr>
-                            <td
-                              colSpan={5}
-                              className="px-4 py-8 text-center text-muted-foreground text-xs italic"
-                            >
-                              No training programs logged. Click the button below to add your first
-                              training record.
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Add Row Button */}
-                  <div className="flex justify-start mt-2">
-                    <button
-                      type="button"
-                      onClick={addTrainRow}
-                      className="h-8.5 px-4 rounded-xl border border-dashed border-primary/40 hover:border-primary bg-primary/5 hover:bg-primary/10 text-primary text-[11px] font-extrabold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-2xs"
-                    >
-                      <Plus className="size-3.5" /> Add Training Program Row
-                    </button>
-                  </div>
-
-                  <div className="border-t border-border/30 my-8 pt-2" />
-                </div>
-              )}
-
-              {/* SUBSECTION: ORGANIZATIONAL INVOLVEMENT */}
-              {activeTab === "career_qualifications" && (
-                <div className="space-y-6 animate-in fade-in duration-200">
-                  <div className="border-b border-border/30 pb-3 flex items-center gap-2">
-                    <Users className="size-4.5 text-primary" />
-                    <h2 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
-                      Organizational Involvements & Committee Commitments
-                    </h2>
-                  </div>
-
-                  {/* Inline Spreadsheet Table */}
-                  <div className="border border-border/40 rounded-lg overflow-hidden mt-4 bg-card/30 backdrop-blur-xs">
-                    <table className="w-full border-collapse text-left text-xs">
-                      <thead>
-                        <tr className="bg-muted/40 text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40">
-                          <th className="px-4 py-3">Committee / Group Name</th>
-                          <th className="px-4 py-3">Role Played</th>
-                          <th className="px-4 py-3 w-[150px] text-center">Duration</th>
-                          <th className="px-4 py-3">Key Deliverable / Remarks</th>
-                          <th className="px-4 py-3 w-[60px] text-right">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border/20">
-                        {involvements.map((invol, index) => (
-                          <tr
-                            key={index}
-                            className="hover:bg-muted/5 transition-colors font-semibold text-foreground/80"
-                          >
-                            <td className="px-4 py-2">
-                              <input
-                                type="text"
-                                value={invol.activityName}
-                                onChange={(e) =>
-                                  handleInvolChange(index, "activityName", e.target.value)
-                                }
-                                className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
-                                placeholder="e.g. Safety Committee"
-                              />
-                            </td>
-                            <td className="px-4 py-2">
-                              <input
-                                type="text"
-                                value={invol.role}
-                                onChange={(e) => handleInvolChange(index, "role", e.target.value)}
-                                className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
-                                placeholder="e.g. Committee Secretary"
-                              />
-                            </td>
-                            <td className="px-4 py-2 text-center">
-                              <input
-                                type="text"
-                                value={invol.duration}
-                                onChange={(e) =>
-                                  handleInvolChange(index, "duration", e.target.value)
-                                }
-                                className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full text-center focus:ring-1 focus:ring-primary focus:border-primary"
-                                placeholder="e.g. 6 Months"
-                              />
-                            </td>
-                            <td className="px-4 py-2">
-                              <input
-                                type="text"
-                                value={invol.description}
-                                onChange={(e) =>
-                                  handleInvolChange(index, "description", e.target.value)
-                                }
-                                className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
-                                placeholder="e.g. Supervised emergency drills"
-                              />
-                            </td>
-                            <td className="px-4 py-2 text-right">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setInvolvements((prev) => prev.filter((_, i) => i !== index))
-                                }
-                                className="p-1.5 rounded-lg text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 transition"
-                              >
-                                <Trash className="size-3.5" />
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                        {involvements.length === 0 && (
-                          <tr>
-                            <td
-                              colSpan={5}
-                              className="px-4 py-8 text-center text-muted-foreground text-xs italic"
-                            >
-                              No organizational involvements logged. Click the button below to add
-                              your first record.
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Add Row Button */}
-                  <div className="flex justify-start mt-2">
-                    <button
-                      type="button"
-                      onClick={addInvolRow}
-                      className="h-8.5 px-4 rounded-xl border border-dashed border-primary/40 hover:border-primary bg-primary/5 hover:bg-primary/10 text-primary text-[11px] font-extrabold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-2xs"
-                    >
-                      <Plus className="size-3.5" /> Add Organizational Involvement Row
-                    </button>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-5 border-t border-border/20">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveTab("financial_employment");
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
-                      className="h-10 px-5 rounded-xl bg-muted border border-border text-xs font-bold flex items-center gap-1.5"
-                    >
-                      <ArrowLeft className="size-4" /> Previous Step
-                    </button>
+                  {/* Unified Bottom Action Bar */}
+                  <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-border/20 mt-6">
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toast.success("Progress saved. Exiting...");
+                          window.location.href = "/";
+                        }}
+                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
+                      >
+                        Save and Exit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toast.success("Progress saved as draft successfully!");
+                        }}
+                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
+                      >
+                        Save as Draft
+                      </button>
+                    </div>
                     <button
                       type="button"
                       onClick={() => {
                         setActiveTab("family_dependents");
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
-                      className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md"
+                      className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200"
                     >
-                      Next Step: Family & Dependents <ArrowRight className="size-4" />
+                      Next Section <ArrowRight className="size-4" />
+                    </button>
+                  </div>
+                </div>
+              )}ext-foreground hover:bg-muted/50 transition duration-200"
+                      >
+                        Save as Draft
+                      </button>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab("family_dependents");
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200"
+                    >
+                      Next Section <ArrowRight className="size-4" />
                     </button>
                   </div>
                 </div>
@@ -4046,26 +4022,37 @@ function AddEmployeePage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-5 border-t border-border/20">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSubSection("address_contact");
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
-                      className="h-10 px-5 rounded-xl bg-muted border border-border text-xs font-bold flex items-center gap-1.5"
-                    >
-                      <ArrowLeft className="size-4" /> Previous Section
-                    </button>
+                  <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-border/20 mt-6">
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toast.success("Progress saved. Exiting...");
+                          window.location.href = "/";
+                        }}
+                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
+                      >
+                        Save and Exit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toast.success("Progress saved as draft successfully!");
+                        }}
+                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
+                      >
+                        Save as Draft
+                      </button>
+                    </div>
                     <button
                       type="button"
                       onClick={() => {
                         setSubSection("references");
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
-                      className="h-10 px-5 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md"
+                      className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200"
                     >
-                      Next Section: References <ArrowRight className="size-4" />
+                      Next Section <ArrowRight className="size-4" />
                     </button>
                   </div>
                 </div>
@@ -4268,26 +4255,37 @@ function AddEmployeePage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-5 border-t border-border/20">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSubSection("emergency_contact");
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
-                      className="h-10 px-5 rounded-xl bg-muted border border-border text-xs font-bold flex items-center gap-1.5"
-                    >
-                      <ArrowLeft className="size-4" /> Previous Section
-                    </button>
+                  <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-border/20 mt-6">
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toast.success("Progress saved. Exiting...");
+                          window.location.href = "/";
+                        }}
+                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
+                      >
+                        Save and Exit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toast.success("Progress saved as draft successfully!");
+                        }}
+                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
+                      >
+                        Save as Draft
+                      </button>
+                    </div>
                     <button
                       type="button"
                       onClick={() => {
                         setActiveTab("financial_employment");
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
-                      className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md"
+                      className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200"
                     >
-                      Next Step: Financial & Employment <ArrowRight className="size-4" />
+                      Next Section <ArrowRight className="size-4" />
                     </button>
                   </div>
                 </div>
@@ -4397,26 +4395,37 @@ function AddEmployeePage() {
                     </button>
                   </div>
 
-                  <div className="flex items-center justify-between pt-5 border-t border-border/20">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveTab("career_qualifications");
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
-                      className="h-10 px-5 rounded-xl bg-muted border border-border text-xs font-bold flex items-center gap-1.5"
-                    >
-                      <ArrowLeft className="size-4" /> Previous Step
-                    </button>
+                  <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-border/20 mt-6">
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toast.success("Progress saved. Exiting...");
+                          window.location.href = "/";
+                        }}
+                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
+                      >
+                        Save and Exit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toast.success("Progress saved as draft successfully!");
+                        }}
+                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
+                      >
+                        Save as Draft
+                      </button>
+                    </div>
                     <button
                       type="button"
                       onClick={() => {
                         setActiveTab("verification_documents");
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
-                      className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md"
+                      className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200"
                     >
-                      Next Step: Verification & Docs <ArrowRight className="size-4" />
+                      Next Section <ArrowRight className="size-4" />
                     </button>
                   </div>
                 </div>
@@ -4649,20 +4658,31 @@ function AddEmployeePage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-5 border-t border-border/20">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveTab("family_dependents");
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
-                      className="h-10 px-5 rounded-xl bg-muted border border-border text-xs font-bold flex items-center gap-1.5"
-                    >
-                      <ArrowLeft className="size-4" /> Previous Step
-                    </button>
+                  <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-border/20 mt-6">
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toast.success("Progress saved. Exiting...");
+                          window.location.href = "/";
+                        }}
+                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
+                      >
+                        Save and Exit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toast.success("Progress saved as draft successfully!");
+                        }}
+                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
+                      >
+                        Save as Draft
+                      </button>
+                    </div>
                     <button
                       type="submit"
-                      className="h-10 px-6 rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs font-bold shadow-md hover:shadow-lg flex items-center gap-1.5 shadow-primary/20"
+                      className="h-10 px-6 rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs font-bold shadow-md hover:shadow-lg flex items-center gap-1.5 shadow-primary/20 transition-all duration-200"
                     >
                       <Save className="size-4" /> Save Employee Digital File
                     </button>
@@ -4755,26 +4775,37 @@ function AddEmployeePage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-5 border-t border-border/20">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveTab("personal_identity");
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
-                      className="h-10 px-5 rounded-xl bg-muted border border-border text-xs font-bold flex items-center gap-1.5"
-                    >
-                      <ArrowLeft className="size-4" /> Previous Step
-                    </button>
+                  <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-border/20 mt-6">
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toast.success("Progress saved. Exiting...");
+                          window.location.href = "/";
+                        }}
+                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
+                      >
+                        Save and Exit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toast.success("Progress saved as draft successfully!");
+                        }}
+                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
+                      >
+                        Save as Draft
+                      </button>
+                    </div>
                     <button
                       type="button"
                       onClick={() => {
                         setActiveTab("career_qualifications");
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
-                      className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md"
+                      className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200"
                     >
-                      Next Step: Qualifications & Experience <ArrowRight className="size-4" />
+                      Next Section <ArrowRight className="size-4" />
                     </button>
                   </div>
                 </div>
