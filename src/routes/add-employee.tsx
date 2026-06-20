@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Topbar } from "@/components/dashboard/Topbar";
+import { toast } from "sonner";
 import {
   User,
   MapPin,
@@ -1051,6 +1052,9 @@ function AddEmployeePage() {
           form.emergencyContact,
           form.ref1Name,
           form.ref1Contact,
+          form.picture,
+          form.signature,
+          form.nidScan,
         ];
         const filled = fields.filter(Boolean).length;
         return Math.round((filled / fields.length) * 100);
@@ -1095,14 +1099,10 @@ function AddEmployeePage() {
       case "verification_documents": {
         const verFields = [form.verifiedBy, form.verificationNotes, form.verificationDate];
         const verFilled = verFields.filter(Boolean).length;
-        const verScore = Math.round((verFilled / verFields.length) * 30);
-
-        const scanFields = [form.picture, form.signature, form.nidScan, form.certificateScan];
-        const scanFilled = scanFields.filter(Boolean).length;
-        const scanScore = Math.round((scanFilled / scanFields.length) * 40);
+        const verScore = Math.round((verFilled / verFields.length) * 70);
 
         const otherScore = otherDocs.length > 0 ? 30 : 0;
-        return Math.min(100, verScore + scanScore + otherScore);
+        return Math.min(100, verScore + otherScore);
       }
       default:
         return 0;
@@ -1129,12 +1129,15 @@ function AddEmployeePage() {
           form.fatherNameBng,
           form.motherNameEng,
           form.motherNameBng,
+          form.nid,
+          form.spouseNameEng,
+          form.spouseNameBng,
+          form.spouseNid,
+          form.spouseContactNo,
+          form.picture,
+          form.signature,
+          form.nidScan,
         ];
-        const filled = fields.filter(Boolean).length;
-        return Math.round((filled / fields.length) * 100);
-      }
-      case "legal_kinship": {
-        const fields = [form.nid];
         const filled = fields.filter(Boolean).length;
         return Math.round((filled / fields.length) * 100);
       }
@@ -1146,11 +1149,6 @@ function AddEmployeePage() {
           form.presUpazila,
           form.presDistrict,
         ];
-        const filled = fields.filter(Boolean).length;
-        return Math.round((filled / fields.length) * 100);
-      }
-      case "picture_uploads": {
-        const fields = [form.picture, form.signature, form.nidScan];
         const filled = fields.filter(Boolean).length;
         return Math.round((filled / fields.length) * 100);
       }
@@ -1215,31 +1213,46 @@ function AddEmployeePage() {
           </div>
 
           {/* ===== FORM DIRECTORIES + FORM BODY ===== */}
+          {/* ===== FORM DIRECTORIES + FORM BODY ===== */}
           {/* ===== HORIZONTAL PROFILE COMPLETION CARD ===== */}
-          <div className="bg-card border border-border/80 rounded-lg shadow-xs overflow-hidden">
+          <div className="bg-card border border-border/80 rounded-xl p-5 shadow-xs space-y-4">
             {/* Top bar: Overall progress + label */}
-            <div className="px-5 py-3 border-b border-border/40 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/60">Profile Completion</span>
-                <div className="flex items-center gap-2 w-48 sm:w-72">
-                  <div className="flex-1 h-2 bg-muted border border-border/20 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-primary to-primary-glow transition-all duration-500 rounded-full"
-                      style={{ width: `${overallPercentage}%` }}
-                    />
-                  </div>
-                  <span className="text-primary font-black text-xs shrink-0">{overallPercentage}%</span>
-                </div>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-muted/20 border border-border/30 rounded-xl p-4">
+              <div className="space-y-1">
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary block">Profile Completion Status</span>
+                <p className="text-[10px] text-muted-foreground flex items-center gap-1.5">
+                  <Info className="size-3 text-primary shrink-0" />
+                  <span>Fields marked with <span className="text-rose-500 font-bold">*</span> are mandatory for validation.</span>
+                </p>
               </div>
-              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground shrink-0">
-                <Info className="size-3 text-primary" />
-                <span>Fields marked with <span className="text-rose-500 font-bold">*</span> are mandatory.</span>
+              <div className="flex items-center gap-3 self-start md:self-auto">
+                <div className="relative size-12 flex items-center justify-center shrink-0 bg-card rounded-full border border-border/30 shadow-2xs">
+                  <svg className="size-full transform -rotate-90">
+                    <circle cx="24" cy="24" r="20" className="stroke-muted/40" strokeWidth="3" fill="transparent" />
+                    <circle 
+                      cx="24" 
+                      cy="24" 
+                      r="20" 
+                      className="stroke-primary transition-all duration-500" 
+                      strokeWidth="3.5" 
+                      strokeDasharray={125.6} 
+                      strokeDashoffset={125.6 - (125.6 * overallPercentage) / 100} 
+                      strokeLinecap="round" 
+                      fill="transparent" 
+                    />
+                  </svg>
+                  <span className="absolute text-xs font-black text-primary">{overallPercentage}%</span>
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-xs font-black text-foreground">Overall Progress</span>
+                  <span className="text-[10px] text-muted-foreground block">Completed {TABS.filter(t => isTabCompleted(t.id)).length} of {TABS.length} sections</span>
+                </div>
               </div>
             </div>
 
-            {/* Horizontal scrollable tab row */}
-            <div className="overflow-x-auto scrollbar-thin">
-              <div className="flex items-stretch min-w-max">
+            {/* Horizontal scrollable tab row / Grid on large screens */}
+            <div className="overflow-x-auto scrollbar-none pb-1 md:pb-0">
+              <div className="grid grid-cols-5 gap-2.5 min-w-[760px] md:min-w-0">
                 {TABS.map((tab, idx) => {
                   const TabIcon = tab.icon;
                   const completed = isTabCompleted(tab.id);
@@ -1253,45 +1266,46 @@ function AddEmployeePage() {
                         setActiveTab(tab.id);
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
-                      className={`relative flex flex-col items-center justify-center gap-1.5 px-6 py-3.5 text-left text-xs font-bold transition-all duration-200 border-r border-border/30 last:border-r-0 min-w-[160px] group ${
+                      className={`group text-left p-3.5 rounded-xl border transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[96px] cursor-pointer hover:-translate-y-0.5 ${
                         isActive
-                          ? "bg-primary/8 text-primary"
-                          : "hover:bg-muted/60 text-muted-foreground hover:text-foreground"
+                          ? "bg-primary/8 border-primary/45 shadow-xs"
+                          : "bg-card border-border/80 hover:border-primary/20 hover:bg-muted/10"
                       }`}
                     >
-                      {/* Active indicator line at bottom */}
-                      {isActive && (
-                        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-primary to-primary-glow rounded-t-sm" />
-                      )}
-                      <div className="flex items-center gap-2">
-                        <div className={`size-7 rounded-lg flex items-center justify-center shrink-0 transition-all ${
-                          isActive ? "bg-primary text-primary-foreground shadow-sm" :
-                          completed ? "bg-emerald-500 text-white" :
+                      {/* Top part: Icon + step indicator */}
+                      <div className="flex items-center justify-between gap-2 w-full">
+                        <span className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest">Step 0{idx + 1}</span>
+                        <div className={`size-6 rounded-md flex items-center justify-center transition-all ${
+                          isActive ? "bg-primary text-primary-foreground shadow-xs" :
+                          completed ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" :
                           "bg-muted text-muted-foreground"
                         }`}>
                           {completed && !isActive ? <Check className="size-3.5 stroke-[3]" /> : <TabIcon className="size-3.5" />}
                         </div>
-                        <span className={`font-black text-[11px] ${isActive ? "text-primary" : ""}`}>
-                          {idx + 1}. {tab.label}
+                      </div>
+
+                      {/* Label */}
+                      <div className="mt-2.5">
+                        <span className={`block text-[11px] font-black leading-tight truncate ${isActive ? "text-primary" : "text-foreground"}`}>
+                          {tab.label}
                         </span>
                       </div>
-                      {/* Per-section mini progress bar */}
-                      <div className="w-full flex items-center gap-2">
-                        <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden border border-border/20">
+
+                      {/* Section progress */}
+                      <div className="mt-2.5 w-full flex items-center gap-2">
+                        <div className="flex-1 h-1 bg-muted rounded-full overflow-hidden border border-border/10">
                           <div
                             className={`h-full rounded-full transition-all duration-500 ${
                               percentage === 100 ? "bg-emerald-500" :
-                              percentage > 40 ? "bg-amber-500" :
-                              "bg-rose-400"
+                              percentage > 40 ? "bg-amber-500" : "bg-rose-500"
                             }`}
                             style={{ width: `${percentage}%` }}
                           />
                         </div>
-                        <span className={`text-[10px] font-black shrink-0 ${
+                        <span className={`text-[9px] font-black shrink-0 ${
                           isActive ? "text-primary" :
                           percentage === 100 ? "text-emerald-500" :
-                          percentage > 40 ? "text-amber-500" :
-                          "text-rose-500"
+                          percentage > 40 ? "text-amber-500" : "text-rose-500"
                         }`}>{percentage}%</span>
                       </div>
                     </button>
@@ -1318,25 +1332,13 @@ function AddEmployeePage() {
                           id: "primary_placement",
                           label: "Placement",
                           icon: User,
-                          desc: "Personal & Job",
-                        },
-                        {
-                          id: "legal_kinship",
-                          label: "Kinship",
-                          icon: Users,
-                          desc: "NID & Family",
+                          desc: "Personal, Job & IDs",
                         },
                         {
                           id: "address_contact",
                           label: "Contact",
                           icon: MapPin,
                           desc: "Reachability",
-                        },
-                        {
-                          id: "picture_uploads",
-                          label: "Scans",
-                          icon: Camera,
-                          desc: "Portraits & NID",
                         },
                         {
                           id: "emergency_contact",
@@ -2061,44 +2063,7 @@ function AddEmployeePage() {
                         </div>
                       </div>
 
-                      {/* Bottom action bar */}
-                      <div className="flex items-center justify-between pt-5 border-t border-border/20">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (
-                              window.confirm("Are you sure you want to reset all profile details?")
-                            ) {
-                              setForm((prev) => ({
-                                ...prev,
-                                nameEng: "",
-                                nameBng: "",
-                                dob: "",
-                                offcId: "",
-                              }));
-                            }
-                          }}
-                          className="h-10 px-5 rounded-xl border border-border text-xs font-extrabold text-rose-500 hover:bg-rose-500/5 transition duration-200 flex items-center gap-1.5"
-                        >
-                          <Trash2 className="size-4" /> Reset Details
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSubSection("legal_kinship");
-                            window.scrollTo({ top: 0, behavior: "smooth" });
-                          }}
-                          className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200"
-                        >
-                          Next Section: Kinship & ID <ArrowRight className="size-4" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
 
-                  {/* SUBSECTION: LEGAL CREDENTIALS & KINSHIP */}
-                  {subSection === "legal_kinship" && (
-                    <div className="space-y-6 animate-in fade-in duration-200">
                       {/* Card 3: Legal Identification Credentials */}
                       <div className="bg-card border border-border/60 rounded-lg p-6 shadow-2xs relative overflow-hidden transition-all duration-300 hover:border-violet-500/20">
                         <div className="absolute top-0 left-0 h-full w-1.5 bg-violet-500" />
@@ -2111,8 +2076,7 @@ function AddEmployeePage() {
                               Legal Identification Credentials
                             </h3>
                             <p className="text-[11px] text-muted-foreground">
-                              Government-issued identity cards, license numbers, and professional
-                              indexes.
+                              Government-issued identity cards, license numbers, and professional indexes.
                             </p>
                           </div>
                         </div>
@@ -2127,8 +2091,9 @@ function AddEmployeePage() {
                               type="text"
                               value={form.nid}
                               onChange={(e) => handleChange("nid", e.target.value)}
-                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full font-mono ${errors.nid ? "border-rose-400" : "border-border"
-                                }`}
+                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full font-mono ${
+                                errors.nid ? "border-rose-400" : "border-border"
+                              }`}
                               placeholder="10 or 17 digit NID number"
                             />
                           </div>
@@ -2191,7 +2156,7 @@ function AddEmployeePage() {
                         </div>
                       </div>
 
-                      {/* Card 4: Parental & Kinship Context */}
+                      {/* Card 4: Matrimonial & Spouse Information */}
                       <div className="bg-card border border-border/60 rounded-lg p-6 shadow-2xs relative overflow-hidden transition-all duration-300 hover:border-amber-500/20">
                         <div className="absolute top-0 left-0 h-full w-1.5 bg-amber-500" />
                         <div className="flex items-center gap-3 border-b border-border/30 pb-4 mb-5">
@@ -2200,18 +2165,16 @@ function AddEmployeePage() {
                           </div>
                           <div>
                             <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wider">
-                              Parental & Kinship Context
+                              Matrimonial Context
                             </h3>
                             <p className="text-[11px] text-muted-foreground">
-                              Lineage records, primary parent identifiers, and matrimonial registry.
+                              Matrimonial registry and primary spouse details.
                             </p>
                           </div>
                         </div>
 
-
-                        {/* Married Fields: Conditionally rendered with animated scale-in */}
                         {form.maritalStatus === "Married" ? (
-                          <div className="mt-6 pt-6 border-t border-border/30 space-y-4 animate-in slide-in-from-top-3 duration-250">
+                          <div className="space-y-4 animate-in slide-in-from-top-3 duration-250">
                             <div className="flex items-center gap-2">
                               <Heart className="size-4 text-rose-500 fill-rose-500 animate-pulse" />
                               <h4 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
@@ -2225,13 +2188,13 @@ function AddEmployeePage() {
                                 <label className="text-[10px] font-bold text-muted-foreground uppercase">
                                   Spouse Name (English)
                                 </label>
-                                <input
-                                  type="text"
-                                  value={form.spouseNameEng}
-                                  onChange={(e) => handleChange("spouseNameEng", e.target.value)}
-                                  className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full"
-                                  placeholder="Spouse Legal Name"
-                                />
+                                  <input
+                                    type="text"
+                                    value={form.spouseNameEng}
+                                    onChange={(e) => handleChange("spouseNameEng", e.target.value)}
+                                    className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full"
+                                    placeholder="Spouse Legal Name"
+                                  />
                               </div>
 
                               {/* Spouse Name Bng */}
@@ -2239,13 +2202,13 @@ function AddEmployeePage() {
                                 <label className="text-[10px] font-bold text-muted-foreground uppercase">
                                   Spouse Name (Bengali)
                                 </label>
-                                <input
-                                  type="text"
-                                  value={form.spouseNameBng}
-                                  onChange={(e) => handleChange("spouseNameBng", e.target.value)}
-                                  className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full"
-                                  placeholder="উদা: স্বামী/স্ত্রীর নাম"
-                                />
+                                  <input
+                                    type="text"
+                                    value={form.spouseNameBng}
+                                    onChange={(e) => handleChange("spouseNameBng", e.target.value)}
+                                    className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full"
+                                    placeholder="উদা: স্বামী/স্ত্রীর নাম"
+                                  />
                               </div>
 
                               {/* Spouse NID */}
@@ -2253,13 +2216,13 @@ function AddEmployeePage() {
                                 <label className="text-[10px] font-bold text-muted-foreground uppercase">
                                   Spouse NID
                                 </label>
-                                <input
-                                  type="text"
-                                  value={form.spouseNid}
-                                  onChange={(e) => handleChange("spouseNid", e.target.value)}
-                                  className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full font-mono"
-                                  placeholder="Spouse NID Number"
-                                />
+                                  <input
+                                    type="text"
+                                    value={form.spouseNid}
+                                    onChange={(e) => handleChange("spouseNid", e.target.value)}
+                                    className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full font-mono"
+                                    placeholder="Spouse NID Number"
+                                  />
                               </div>
 
                               {/* Spouse Contact */}
@@ -2267,40 +2230,220 @@ function AddEmployeePage() {
                                 <label className="text-[10px] font-bold text-muted-foreground uppercase">
                                   Spouse Contact No
                                 </label>
-                                <input
-                                  type="text"
-                                  value={form.spouseContactNo}
-                                  onChange={(e) => handleChange("spouseContactNo", e.target.value)}
-                                  className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full font-mono"
-                                  placeholder="Contact Number"
-                                />
+                                  <input
+                                    type="text"
+                                    value={form.spouseContactNo}
+                                    onChange={(e) => handleChange("spouseContactNo", e.target.value)}
+                                    className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full font-mono"
+                                    placeholder="Contact Number"
+                                  />
                               </div>
                             </div>
                           </div>
                         ) : (
-                          <div className="mt-5 p-3 rounded-xl bg-muted/20 border border-border/30 text-[11px] text-muted-foreground flex items-center gap-2">
+                          <div className="p-3 rounded-xl bg-muted/20 border border-border/30 text-[11px] text-muted-foreground flex items-center gap-2">
                             <Info className="size-4 text-muted-foreground/60" />
                             <span>
                               Spouse information fields are hidden because Marital Status is set to{" "}
-                              <strong>{form.maritalStatus || "Single"}</strong>. Change status in
-                              step 1 to enable.
+                              <strong>{form.maritalStatus || "Single"}</strong>.
                             </span>
                           </div>
                         )}
                       </div>
 
+                      {/* Card 5: Scans & Uploads */}
+                      <div className="bg-card border border-border/60 rounded-lg p-6 shadow-2xs relative overflow-hidden transition-all duration-300 hover:border-blue-500/20">
+                        <div className="absolute top-0 left-0 h-full w-1.5 bg-blue-500" />
+                        <div className="flex items-center gap-3 border-b border-border/30 pb-4 mb-5">
+                          <div className="p-2 rounded-xl bg-blue-500/10 text-blue-500">
+                            <Camera className="size-5" />
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wider">
+                              Document & Image Uploads
+                            </h3>
+                            <p className="text-[11px] text-muted-foreground">
+                              Upload portraits, signatures, and ID card scans.
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          {/* Portrait Upload */}
+                          <div className="border border-border/60 bg-muted/10 rounded-lg p-5 flex flex-col items-center justify-center text-center gap-4.5 relative overflow-hidden min-h-[220px]">
+                            <div className="size-14 rounded-full bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
+                              <User className="size-6" />
+                            </div>
+                            <div className="space-y-1">
+                              <h4 className="text-xs font-extrabold text-foreground uppercase tracking-wider">
+                                Employee Portrait
+                              </h4>
+                              <p className="text-[10px] text-muted-foreground">
+                                Premium front portrait. Max 2MB.
+                              </p>
+                            </div>
+
+                            {uploadProgress.picture !== undefined && uploadProgress.picture < 100 && (
+                              <div className="w-full bg-muted rounded-full h-1.5 mt-2">
+                                <div
+                                  className="bg-primary h-1.5 rounded-full transition-all"
+                                  style={{ width: `${uploadProgress.picture}%` }}
+                                ></div>
+                              </div>
+                            )}
+
+                            {form.picture ? (
+                              <div className="absolute inset-0 bg-card/95 flex flex-col items-center justify-center p-4 gap-3 animate-in fade-in">
+                                <div className="size-16 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/30">
+                                  <Check className="size-8" />
+                                </div>
+                                <span className="text-[10px] font-bold text-foreground font-mono">
+                                  {form.picture}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleChange("picture", "")}
+                                  className="text-[9px] font-bold text-rose-500 hover:underline"
+                                >
+                                  Remove file
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => triggerMockUpload("picture")}
+                                className="h-9 px-4 rounded-xl border border-primary/30 hover:bg-primary/5 text-primary text-xs font-bold transition flex items-center gap-1.5"
+                              >
+                                <Upload className="size-3.5" /> Upload Photo
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Signature Upload */}
+                          <div className="border border-border/60 bg-muted/10 rounded-lg p-5 flex flex-col items-center justify-center text-center gap-4.5 relative overflow-hidden min-h-[220px]">
+                            <div className="size-14 rounded-full bg-indigo-500/10 text-indigo-500 flex items-center justify-center border border-indigo-500/20">
+                              <FileSignature className="size-6" />
+                            </div>
+                            <div className="space-y-1">
+                              <h4 className="text-xs font-extrabold text-foreground uppercase tracking-wider">
+                                Authorized Signature
+                              </h4>
+                              <p className="text-[10px] text-muted-foreground">
+                                Digital signature scan. Max 1MB.
+                              </p>
+                            </div>
+
+                            {uploadProgress.signature !== undefined && uploadProgress.signature < 100 && (
+                              <div className="w-full bg-muted rounded-full h-1.5 mt-2">
+                                <div
+                                  className="bg-indigo-500 h-1.5 rounded-full transition-all"
+                                  style={{ width: `${uploadProgress.signature}%` }}
+                                ></div>
+                              </div>
+                            )}
+
+                            {form.signature ? (
+                              <div className="absolute inset-0 bg-card/95 flex flex-col items-center justify-center p-4 gap-3 animate-in fade-in">
+                                <div className="size-16 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/30">
+                                  <Check className="size-8" />
+                                </div>
+                                <span className="text-[10px] font-bold text-foreground font-mono">
+                                  {form.signature}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleChange("signature", "")}
+                                  className="text-[9px] font-bold text-rose-500 hover:underline"
+                                >
+                                  Remove file
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => triggerMockUpload("signature")}
+                                className="h-9 px-4 rounded-xl border border-indigo-500/30 hover:bg-indigo-500/5 text-indigo-500 text-xs font-bold transition flex items-center gap-1.5"
+                              >
+                                <Upload className="size-3.5" /> Upload Signature
+                              </button>
+                            )}
+                          </div>
+
+                          {/* NID Card Scan */}
+                          <div className="border border-border/60 bg-muted/10 rounded-lg p-5 flex flex-col items-center justify-center text-center gap-4.5 relative overflow-hidden min-h-[220px]">
+                            <div className="size-14 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20">
+                              <FileText className="size-6" />
+                            </div>
+                            <div className="space-y-1">
+                              <h4 className="text-xs font-extrabold text-foreground uppercase tracking-wider">
+                                National ID Card Scan
+                              </h4>
+                              <p className="text-[10px] text-muted-foreground">
+                                Scanned NID (both sides). Max 4MB.
+                              </p>
+                            </div>
+
+                            {uploadProgress.nidScan !== undefined && uploadProgress.nidScan < 100 && (
+                              <div className="w-full bg-muted rounded-full h-1.5 mt-2">
+                                <div
+                                  className="bg-amber-500 h-1.5 rounded-full transition-all"
+                                  style={{ width: `${uploadProgress.nidScan}%` }}
+                                ></div>
+                              </div>
+                            )}
+
+                            {form.nidScan ? (
+                              <div className="absolute inset-0 bg-card/95 flex flex-col items-center justify-center p-4 gap-3 animate-in fade-in">
+                                <div className="size-16 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/30">
+                                  <Check className="size-8" />
+                                </div>
+                                <span className="text-[10px] font-bold text-foreground font-mono">
+                                  {form.nidScan}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleChange("nidScan", "")}
+                                  className="text-[9px] font-bold text-rose-500 hover:underline"
+                                >
+                                  Remove file
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => triggerMockUpload("nidScan")}
+                                className="h-9 px-4 rounded-xl border border-amber-500/30 hover:bg-amber-500/5 text-amber-500 text-xs font-bold transition flex items-center gap-1.5"
+                              >
+                                <Upload className="size-3.5" /> Upload NID Scan
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
                       {/* Bottom action bar */}
-                      <div className="flex items-center justify-between pt-5 border-t border-border/20">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSubSection("primary_placement");
-                            window.scrollTo({ top: 0, behavior: "smooth" });
-                          }}
-                          className="h-10 px-5 rounded-xl border border-border text-xs font-extrabold text-muted-foreground hover:bg-muted transition duration-200 flex items-center gap-1.5"
-                        >
-                          <ArrowLeft className="size-4" /> Previous Section
-                        </button>
+                      <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-border/20 mt-6">
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              toast.success("Progress saved. Exiting...");
+                              window.location.href = "/";
+                            }}
+                            className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
+                          >
+                            Save and Exit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              toast.success("Progress saved as draft successfully!");
+                            }}
+                            className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
+                          >
+                            Save as Draft
+                          </button>
+                        </div>
                         <button
                           type="button"
                           onClick={() => {
@@ -2309,11 +2452,11 @@ function AddEmployeePage() {
                           }}
                           className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200"
                         >
-                          Next Section: Contact & Address <ArrowRight className="size-4" />
+                          Next Section <ArrowRight className="size-4" />
                         </button>
                       </div>
-                    </div>
-                  )}
+                      </div>
+                    )}
 
                   {/* SUBSECTION: CONTACT & RESIDENCY */}
                   {subSection === "address_contact" && (
@@ -2708,26 +2851,37 @@ function AddEmployeePage() {
                       </div>
 
                       {/* Bottom action bar */}
-                      <div className="flex items-center justify-between pt-5 border-t border-border/20">
+                      <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-border/20 mt-6">
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              toast.success("Progress saved. Exiting...");
+                              window.location.href = "/";
+                            }}
+                            className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
+                          >
+                            Save and Exit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              toast.success("Progress saved as draft successfully!");
+                            }}
+                            className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
+                          >
+                            Save as Draft
+                          </button>
+                        </div>
                         <button
                           type="button"
                           onClick={() => {
-                            setSubSection("legal_kinship");
-                            window.scrollTo({ top: 0, behavior: "smooth" });
-                          }}
-                          className="h-10 px-5 rounded-xl border border-border text-xs font-extrabold text-muted-foreground hover:bg-muted transition duration-200 flex items-center gap-1.5"
-                        >
-                          <ArrowLeft className="size-4" /> Previous Section
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSubSection("picture_uploads");
+                            setSubSection("emergency_contact");
                             window.scrollTo({ top: 0, behavior: "smooth" });
                           }}
                           className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200"
                         >
-                          Next Section: Upload Scans <ArrowRight className="size-4" />
+                          Next Section <ArrowRight className="size-4" />
                         </button>
                       </div>
                     </div>
@@ -3136,244 +3290,6 @@ function AddEmployeePage() {
                   </div>
 
                   <div className="border-t border-border/30 my-8 pt-2" />
-                </div>
-              )}
-
-              {/* SUBSECTION: PICTURE UPLOAD */}
-              {activeTab === "personal_identity" && subSection === "picture_uploads" && (
-                <div className="space-y-6 animate-in fade-in duration-200">
-                  <div className="border-b border-border/30 pb-3 flex items-center gap-2">
-                    <Camera className="size-4.5 text-primary" />
-                    <h2 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
-                      Document & Image Upload Center
-                    </h2>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Portrait Upload */}
-                    <div className="border border-border/60 bg-muted/10 rounded-lg p-5 flex flex-col items-center justify-center text-center gap-4.5 relative overflow-hidden min-h-[220px]">
-                      <div className="size-14 rounded-full bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
-                        <User className="size-6" />
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="text-xs font-extrabold text-foreground uppercase tracking-wider">
-                          Employee Portrait
-                        </h4>
-                        <p className="text-[10px] text-muted-foreground">
-                          Premium front portrait, clean background. Max 2MB.
-                        </p>
-                      </div>
-
-                      {uploadProgress.picture !== undefined && uploadProgress.picture < 100 && (
-                        <div className="w-full bg-muted rounded-full h-1.5 mt-2">
-                          <div
-                            className="bg-primary h-1.5 rounded-full transition-all"
-                            style={{ width: `${uploadProgress.picture}%` }}
-                          ></div>
-                        </div>
-                      )}
-
-                      {form.picture ? (
-                        <div className="absolute inset-0 bg-card/95 flex flex-col items-center justify-center p-4 gap-3 animate-in fade-in">
-                          <div className="size-16 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/30">
-                            <Check className="size-8" />
-                          </div>
-                          <span className="text-[10px] font-bold text-foreground font-mono">
-                            {form.picture}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => handleChange("picture", "")}
-                            className="text-[9px] font-bold text-rose-500 hover:underline"
-                          >
-                            Remove file
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => triggerMockUpload("picture")}
-                          className="h-9 px-4 rounded-xl border border-primary/30 hover:bg-primary/5 text-primary text-xs font-bold transition flex items-center gap-1.5"
-                        >
-                          <Upload className="size-3.5" /> Upload Portrait Photo
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Signature Upload */}
-                    <div className="border border-border/60 bg-muted/10 rounded-lg p-5 flex flex-col items-center justify-center text-center gap-4.5 relative overflow-hidden min-h-[220px]">
-                      <div className="size-14 rounded-full bg-indigo-500/10 text-indigo-500 flex items-center justify-center border border-indigo-500/20">
-                        <FileSignature className="size-6" />
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="text-xs font-extrabold text-foreground uppercase tracking-wider">
-                          Authorized Signature
-                        </h4>
-                        <p className="text-[10px] text-muted-foreground">
-                          Digital signature scan on clean white sheet. Max 1MB.
-                        </p>
-                      </div>
-
-                      {uploadProgress.signature !== undefined && uploadProgress.signature < 100 && (
-                        <div className="w-full bg-muted rounded-full h-1.5 mt-2">
-                          <div
-                            className="bg-indigo-500 h-1.5 rounded-full transition-all"
-                            style={{ width: `${uploadProgress.signature}%` }}
-                          ></div>
-                        </div>
-                      )}
-
-                      {form.signature ? (
-                        <div className="absolute inset-0 bg-card/95 flex flex-col items-center justify-center p-4 gap-3 animate-in fade-in">
-                          <div className="size-16 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/30">
-                            <Check className="size-8" />
-                          </div>
-                          <span className="text-[10px] font-bold text-foreground font-mono">
-                            {form.signature}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => handleChange("signature", "")}
-                            className="text-[9px] font-bold text-rose-500 hover:underline"
-                          >
-                            Remove file
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => triggerMockUpload("signature")}
-                          className="h-9 px-4 rounded-xl border border-indigo-500/30 hover:bg-indigo-500/5 text-indigo-500 text-xs font-bold transition flex items-center gap-1.5"
-                        >
-                          <Upload className="size-3.5" /> Upload Signature Scan
-                        </button>
-                      )}
-                    </div>
-
-                    {/* NID Card Scan */}
-                    <div className="border border-border/60 bg-muted/10 rounded-lg p-5 flex flex-col items-center justify-center text-center gap-4.5 relative overflow-hidden min-h-[220px]">
-                      <div className="size-14 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20">
-                        <FileText className="size-6" />
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="text-xs font-extrabold text-foreground uppercase tracking-wider">
-                          National ID Card Scan
-                        </h4>
-                        <p className="text-[10px] text-muted-foreground">
-                          Scanned PDF or High-res JPG of both sides. Max 4MB.
-                        </p>
-                      </div>
-
-                      {uploadProgress.nidScan !== undefined && uploadProgress.nidScan < 100 && (
-                        <div className="w-full bg-muted rounded-full h-1.5 mt-2">
-                          <div
-                            className="bg-amber-500 h-1.5 rounded-full transition-all"
-                            style={{ width: `${uploadProgress.nidScan}%` }}
-                          ></div>
-                        </div>
-                      )}
-
-                      {form.nidScan ? (
-                        <div className="absolute inset-0 bg-card/95 flex flex-col items-center justify-center p-4 gap-3 animate-in fade-in">
-                          <div className="size-16 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/30">
-                            <Check className="size-8" />
-                          </div>
-                          <span className="text-[10px] font-bold text-foreground font-mono">
-                            {form.nidScan}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => handleChange("nidScan", "")}
-                            className="text-[9px] font-bold text-rose-500 hover:underline"
-                          >
-                            Remove file
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => triggerMockUpload("nidScan")}
-                          className="h-9 px-4 rounded-xl border border-amber-500/30 hover:bg-amber-500/5 text-amber-500 text-xs font-bold transition flex items-center gap-1.5"
-                        >
-                          <Upload className="size-3.5" /> Upload NID Card Scan
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Academic Degree Scan */}
-                    <div className="border border-border/60 bg-muted/10 rounded-lg p-5 flex flex-col items-center justify-center text-center gap-4.5 relative overflow-hidden min-h-[220px]">
-                      <div className="size-14 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/20">
-                        <GraduationCap className="size-6" />
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="text-xs font-extrabold text-foreground uppercase tracking-wider">
-                          Degree Certificate
-                        </h4>
-                        <p className="text-[10px] text-muted-foreground">
-                          Verified academic graduation degree certificate. Max 5MB.
-                        </p>
-                      </div>
-
-                      {uploadProgress.certificateScan !== undefined &&
-                        uploadProgress.certificateScan < 100 && (
-                          <div className="w-full bg-muted rounded-full h-1.5 mt-2">
-                            <div
-                              className="bg-emerald-500 h-1.5 rounded-full transition-all"
-                              style={{ width: `${uploadProgress.certificateScan}%` }}
-                            ></div>
-                          </div>
-                        )}
-
-                      {form.certificateScan ? (
-                        <div className="absolute inset-0 bg-card/95 flex flex-col items-center justify-center p-4 gap-3 animate-in fade-in">
-                          <div className="size-16 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/30">
-                            <Check className="size-8" />
-                          </div>
-                          <span className="text-[10px] font-bold text-foreground font-mono">
-                            {form.certificateScan}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => handleChange("certificateScan", "")}
-                            className="text-[9px] font-bold text-rose-500 hover:underline"
-                          >
-                            Remove file
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => triggerMockUpload("certificateScan")}
-                          className="h-9 px-4 rounded-xl border border-emerald-500/30 hover:bg-emerald-500/5 text-emerald-500 text-xs font-bold transition flex items-center gap-1.5"
-                        >
-                          <Upload className="size-3.5" /> Upload Certificate Scan
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-5 border-t border-border/20">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSubSection("address_contact");
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
-                      className="h-10 px-5 rounded-xl bg-muted border border-border text-xs font-bold flex items-center gap-1.5"
-                    >
-                      <ArrowLeft className="size-4" /> Previous Section
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSubSection("emergency_contact");
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
-                      className="h-10 px-5 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md"
-                    >
-                      Next Section: Emergency Contact <ArrowRight className="size-4" />
-                    </button>
-                  </div>
                 </div>
               )}
 
@@ -4134,7 +4050,7 @@ function AddEmployeePage() {
                     <button
                       type="button"
                       onClick={() => {
-                        setSubSection("picture_uploads");
+                        setSubSection("address_contact");
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
                       className="h-10 px-5 rounded-xl bg-muted border border-border text-xs font-bold flex items-center gap-1.5"
