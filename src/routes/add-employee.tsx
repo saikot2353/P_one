@@ -4871,7 +4871,7 @@ function AddEmployeePage() {
       {/* CUSTOM ADD OPTION MODAL OVERLAY */}
       {addingField && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-card border border-border/80 rounded-lg shadow-2xl p-5 w-full max-w-sm overflow-hidden flex flex-col gap-4 animate-in zoom-in-95 duration-200">
+          <div className="bg-card border border-border/80 rounded-lg shadow-2xl p-5 w-full max-w-xl overflow-hidden flex flex-col gap-4 animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between border-b border-border/30 pb-2.5">
               <h3 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
                 Add Custom {addingField.includes("Upazila") ? "Upazila/Thana" : "Post Office"}
@@ -5118,7 +5118,7 @@ function AddEmployeePage() {
       {/* SAVE SUCCESS DIALOG OVERLAY */}
       {showSuccessModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-card border border-border/80 rounded-lg shadow-2xl p-6 w-full max-w-md overflow-hidden flex flex-col items-center text-center gap-4 animate-in zoom-in-95 duration-200">
+          <div className="bg-card border border-border/80 rounded-lg shadow-2xl p-6 w-full max-w-2xl overflow-hidden flex flex-col items-center text-center gap-4 animate-in zoom-in-95 duration-200">
             <div className="size-16 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/20 shadow-xs animate-bounce">
               <CheckCircle2 className="size-8 animate-pulse" />
             </div>

@@ -750,7 +750,7 @@ function PersonnelApprovalPage() {
       {/* Tab 1 Modal: Candidate Details Verification */}
       {candidateDetailsModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-lg rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
+          <div className="bg-card w-full max-w-3xl rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
             <button
               onClick={() => setCandidateDetailsModal(null)}
               className="absolute right-4 top-4 p-1 text-muted-foreground/60 hover:text-foreground hover:bg-muted rounded-lg transition"
@@ -824,7 +824,7 @@ function PersonnelApprovalPage() {
       {/* Tab 1 Modal: Candidate Approval Form */}
       {selectedCandidate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-md rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
+          <div className="bg-card w-full max-w-2xl rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
             <button
               onClick={() => setSelectedCandidate(null)}
               className="absolute right-4 top-4 p-1 text-muted-foreground/60 hover:text-foreground hover:bg-muted rounded-lg transition"
@@ -893,7 +893,7 @@ function PersonnelApprovalPage() {
       {/* Tab 1 Modal: Candidate Rejection Dialog Form */}
       {rejectCandidateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-md rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
+          <div className="bg-card w-full max-w-2xl rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
             <button
               onClick={() => setRejectCandidateModal(null)}
               className="absolute right-4 top-4 p-1 text-muted-foreground/60 hover:text-foreground hover:bg-muted rounded-lg transition"
@@ -949,7 +949,7 @@ function PersonnelApprovalPage() {
       {/* Tab 2 Modal: Approve Conversion Request to Permanent Type */}
       {selectedApproveEmp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-md rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
+          <div className="bg-card w-full max-w-2xl rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
             <button
               onClick={() => setSelectedApproveEmp(null)}
               className="absolute right-4 top-4 p-1 text-muted-foreground/60 hover:text-foreground hover:bg-muted rounded-lg transition"
@@ -1009,7 +1009,7 @@ function PersonnelApprovalPage() {
       {/* Tab 2 Modal: Decline Conversion Request to Permanent Type */}
       {selectedRejectEmp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-md rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
+          <div className="bg-card w-full max-w-2xl rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
             <button
               onClick={() => setSelectedRejectEmp(null)}
               className="absolute right-4 top-4 p-1 text-muted-foreground/60 hover:text-foreground hover:bg-muted rounded-lg transition"
@@ -1067,7 +1067,7 @@ function PersonnelApprovalPage() {
       {/* Tab 2 Modal: Admin Override Manual Status Changer */}
       {selectedEmployee && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-md rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
+          <div className="bg-card w-full max-w-2xl rounded-lg border border-border/80 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-xs">
             <button
               onClick={() => setSelectedEmployee(null)}
               className="absolute right-4 top-4 p-1 text-muted-foreground/60 hover:text-foreground hover:bg-muted rounded-lg transition"

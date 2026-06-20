@@ -1781,7 +1781,7 @@ function PersonnelListPage() {
         {/* Resign / Terminate Modal */}
         {resignModalEmp && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-card w-full max-w-md border border-border rounded-lg shadow-xl overflow-hidden p-6 space-y-4 animate-in zoom-in-95 duration-200">
+            <div className="bg-card w-full max-w-2xl border border-border rounded-lg shadow-xl overflow-hidden p-6 space-y-4 animate-in zoom-in-95 duration-200">
               <div className="flex items-center justify-between border-b border-border/40 pb-3">
                 <h3 className="text-sm font-bold text-foreground">Resign / Terminate Employee</h3>
                 <button onClick={() => setResignModalEmp(null)} className="text-muted-foreground hover:text-foreground">
@@ -1849,7 +1849,7 @@ function PersonnelListPage() {
         {/* Rejoin Modal */}
         {rejoinModalEmp && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-card w-full max-w-lg border border-border rounded-lg shadow-xl overflow-hidden p-6 space-y-4 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+            <div className="bg-card w-full max-w-3xl border border-border rounded-lg shadow-xl overflow-hidden p-6 space-y-4 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between border-b border-border/40 pb-3">
                 <h3 className="text-sm font-bold text-foreground">Rejoin / Re-employ Employee</h3>
                 <button onClick={() => setRejoinModalEmp(null)} className="text-muted-foreground hover:text-foreground">

@@ -1467,7 +1467,7 @@ function ERecruitmentForm() {
             className="absolute inset-0 bg-background/80 backdrop-blur-sm transition-opacity"
             onClick={() => !isNidScanning && setShowNidScannerModal(false)}
           />
-          <div className="relative w-full max-w-3xl bg-card border border-border/80 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="relative w-full max-w-4xl bg-card border border-border/80 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-border/50 bg-muted/20">
               <div className="flex items-center gap-3">
