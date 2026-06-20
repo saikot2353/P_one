@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useCallback, useRef } from "react";
+import clientLogo from "../components/dashboard/client_logo.png";
 import {
   Eye, EyeOff, Lock, Mail, User, Building2, LayoutGrid,
   ChevronRight, ChevronDown, Shield, ArrowRight, Check, Fingerprint,
@@ -851,13 +852,23 @@ function LoginPage() {
                 </div>
               </div>
 
-              {/* Header */}
-              <div className="mb-8">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "var(--l-fingerprint-bg)" }}>
-                    <Fingerprint className="w-4.5 h-4.5" style={{ color: "var(--l-accent-solid)" }} />
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--l-secure-text)" }}>Secure Access</span>
+              {/* Client Logo Header */}
+              <div className="flex flex-col items-center text-center mb-8">
+                <div className="w-20 h-20 rounded-2xl flex items-center justify-center p-3 mb-4 shadow-sm border transition-all duration-300"
+                  style={{
+                    background: "var(--l-input-bg)",
+                    borderColor: "var(--l-input-border)",
+                    boxShadow: "0 10px 30px -10px rgba(29, 78, 216, 0.12)",
+                  }}>
+                  <img src={clientLogo} alt="Client Logo" className="w-full h-full object-contain" />
+                </div>
+                <div className="flex items-center gap-2 px-3 py-1 rounded-full mb-3" 
+                  style={{ 
+                    background: "var(--l-fingerprint-bg)",
+                    border: "1px solid var(--l-input-border)"
+                  }}>
+                  <Fingerprint className="w-3.5 h-3.5" style={{ color: "var(--l-accent-solid)" }} />
+                  <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: "var(--l-secure-text)" }}>Secure Gateway</span>
                 </div>
                 <h2 className="text-2xl md:text-3xl font-black tracking-tight mb-2" style={{ color: "var(--l-text-heading)" }}>Welcome back</h2>
                 <p className="text-sm" style={{ color: "var(--l-text-subtitle)" }}>Enter your credentials to access your workspace</p>
