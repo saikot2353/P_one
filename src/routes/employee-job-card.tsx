@@ -463,53 +463,58 @@ function EmployeeJobCardPage() {
       <main className="flex-1 min-w-0 flex flex-col relative">
         <Topbar />
 
-        <div className="p-4 md:p-6 xl:p-8 space-y-6">
+        <div className="p-4 md:p-6 space-y-2">
           {/* Breadcrumbs and Title */}
-          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
+          <div className="bg-card rounded-2xl border border-border/80 p-4 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
             <div>
-              <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
+              <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
                 <ChevronRight className="size-2.5" />
                 <span className="text-muted-foreground/75">Human Resource</span>
                 <ChevronRight className="size-2.5" />
-                <span className="text-primary font-semibold">Employee Job Card</span>
+                <span className="text-primary font-extrabold">Employee Job Card</span>
               </div>
-              <h1 className="text-xl font-black text-foreground flex items-center gap-2">
-                <Fingerprint className="size-5.5 text-primary animate-pulse" />
+              <h1 className="text-xl md:text-2xl font-black text-foreground flex items-center gap-2">
+                <div className="p-1.5 bg-primary/10 rounded-lg border border-primary/20 text-primary">
+                  <Fingerprint className="size-5 text-primary animate-pulse" />
+                </div>
                 <span>Employee Job Card</span>
               </h1>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-muted-foreground bg-muted/60 px-3 py-1 rounded-full border border-border/50">
-                Selected: {multiEmpIds.length} Emps / {selectedMonths.length} Months
+              <span className="text-[10.5px] font-black text-primary bg-primary/10 px-3 py-1.5 rounded-xl border border-primary/20 shadow-xs">
+                Active Selection: {multiEmpIds.length} Emps / {selectedMonths.length} Months
               </span>
             </div>
           </div>
 
-
           {/* Top Panel: Criteria Selection */}
-          <div className="bg-card rounded-lg border border-border/85 p-6 shadow-sm space-y-6 print:hidden">
-            <div className="flex items-center justify-between border-b border-border/40 pb-3">
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary">Job Card Configuration</span>
-              <span className="text-[9px] font-bold text-muted-foreground/50">Filter Boundary</span>
+          <div className="bg-card rounded-2xl border border-border/85 p-5 shadow-sm space-y-4 print:hidden">
+            <div className="flex items-center justify-between border-b border-border/40 pb-2.5">
+              <span className="text-[10px] font-black uppercase tracking-wider text-primary">Job Card Configuration & Filtering</span>
+              <span className="text-[9px] font-bold text-muted-foreground/40">Parametric Filters</span>
             </div>
 
             {/* Grid Container for Layout Balance */}
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
 
               {/* Left Wing: Scope & Active Employees (col-span-3) */}
-              <div className="lg:col-span-3 space-y-5">
+              <div className="lg:col-span-3 space-y-4">
                 {/* 1. Period Selection */}
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Select Months (Multi)</label>
-                  <div className="flex flex-wrap gap-1.5 p-1.5 bg-muted/50 dark:bg-slate-900/40 rounded-xl border border-border/40">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block">Select Months (Multi-Select)</label>
+                  <div className="flex flex-wrap gap-1 p-1 bg-muted/30 dark:bg-slate-900/20 rounded-xl border border-border/40">
                     {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map(m => {
                       const isSelected = selectedMonths.includes(m);
                       return (
                         <button
                           key={m}
                           onClick={() => toggleMonth(m)}
-                          className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all duration-150 ${isSelected ? "bg-[#1e88e5] text-white shadow-sm" : "hover:bg-card text-muted-foreground"}`}
+                          className={`px-2.5 py-1 rounded-lg text-[9.5px] font-black uppercase transition-all duration-150 ${
+                            isSelected 
+                              ? "bg-primary text-white shadow-xs" 
+                              : "hover:bg-card text-muted-foreground hover:text-foreground"
+                          }`}
                         >
                           {m}
                         </button>
@@ -519,10 +524,10 @@ function EmployeeJobCardPage() {
                 </div>
 
                 {/* 2. Unified Company & Region Settings */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {/* Year */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Year</label>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Year</label>
                     <SearchableSelect
                       options={yearOptions}
                       value={selectedYear.toString()}
@@ -531,8 +536,8 @@ function EmployeeJobCardPage() {
                   </div>
 
                   {/* Company */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Company</label>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Company</label>
                     <SearchableSelect
                       options={companyOptions}
                       value={selectedCompany}
@@ -541,8 +546,8 @@ function EmployeeJobCardPage() {
                   </div>
 
                   {/* Area Name */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Area Name</label>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Area Name</label>
                     <SearchableSelect
                       options={areaOptions}
                       value={selectedArea}
@@ -552,21 +557,21 @@ function EmployeeJobCardPage() {
                 </div>
 
                 {/* 3. Active Multi Selected Employees tags display */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Active Selected Employees (Multi)</label>
-                  <div className="min-h-12 p-2 bg-muted/30 dark:bg-slate-900/30 rounded-xl border border-border/40 flex flex-wrap gap-2 items-center">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Active Selection Registry (Multi)</label>
+                  <div className="min-h-10 p-1.5 bg-muted/20 dark:bg-slate-900/10 rounded-xl border border-border/40 flex flex-wrap gap-1.5 items-center">
                     {multiEmpIds.map(id => (
-                      <span key={id} className="inline-flex items-center gap-1.5 bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-lg text-xs font-bold transition-all duration-150 hover:bg-primary/15">
+                      <span key={id} className="inline-flex items-center gap-1 bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 rounded-lg text-[10.5px] font-extrabold transition-all duration-150 hover:bg-primary/15">
                         <span>{id} ({employeeDb[id]?.name || "N/A"})</span>
                         <button
                           onClick={() => handleRemoveEmployee(id)}
-                          className="hover:text-red-500 font-bold ml-1 transition"
+                          className="hover:text-rose-500 font-bold ml-0.5 transition"
                         >
                           <X className="size-3" />
                         </button>
                       </span>
                     ))}
-                    <div className="relative inline-block w-44">
+                    <div className="relative inline-block w-40">
                       <SearchableSelect
                         options={addEmployeeOptions}
                         value=""
@@ -581,13 +586,13 @@ function EmployeeJobCardPage() {
               </div>
 
               {/* Right Wing: Primary Selection & Runtime Engine (col-span-2) */}
-              <div className="lg:col-span-2 flex flex-col justify-between gap-5">
+              <div className="lg:col-span-2 flex flex-col justify-between gap-4">
 
                 {/* 1. Core Selection block */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {/* Type dropdown */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Type</label>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Type</label>
                     <SearchableSelect
                       options={typeOptions}
                       value={selectedType}
@@ -596,8 +601,8 @@ function EmployeeJobCardPage() {
                   </div>
 
                   {/* Primary Employee ID Selection */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Primary Employee</label>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Primary Employee</label>
                     <SearchableSelect
                       options={employeeOptions}
                       value={activeEmpId}
@@ -610,11 +615,11 @@ function EmployeeJobCardPage() {
                 </div>
 
                 {/* 2. Runtime Calculation Subcard */}
-                <div className="p-4 bg-primary/[0.02] dark:bg-primary/[0.01] border border-[#1e88e5]/20 rounded-lg flex-1 flex flex-col justify-center space-y-3">
+                <div className="p-3 bg-primary/[0.02] dark:bg-primary/[0.01] border border-primary/20 rounded-xl flex-1 flex flex-col justify-center space-y-2">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-xs font-bold text-primary tracking-wide">Runtime Evaluation</h4>
-                      <p className="text-[9px] text-muted-foreground mt-0.5">Dynamically evaluate punch logs</p>
+                      <h4 className="text-[11px] font-extrabold text-primary tracking-wide">Runtime Evaluation</h4>
+                      <p className="text-[9px] text-muted-foreground">Dynamically evaluate punch logs</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer select-none">
                       <input
@@ -623,33 +628,33 @@ function EmployeeJobCardPage() {
                         onChange={(e) => setIsRuntimeCal(e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-10 h-5.5 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:bg-white after:border-slate-300 dark:after:border-slate-600 after:border after:rounded-full after:h-4.5 after:w-4.5 after:transition-all peer-checked:bg-[#1e88e5]"></div>
+                      <div className="w-9 h-5 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 dark:after:border-slate-600 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
                     </label>
                   </div>
 
                   {isRuntimeCal && (
-                    <div className="grid grid-cols-2 gap-3 pt-2 border-t border-[#1e88e5]/10">
+                    <div className="grid grid-cols-2 gap-2 pt-1.5 border-t border-primary/10">
                       {/* Shift In Threshold */}
-                      <div className="space-y-1">
-                        <span className="text-[9px] font-bold text-muted-foreground uppercase">Shift In Time</span>
+                      <div className="space-y-0.5">
+                        <span className="text-[9px] font-black text-muted-foreground uppercase">Shift In Time</span>
                         <input
                           type="text"
                           value={shiftInThreshold}
                           onChange={(e) => setShiftInThreshold(e.target.value)}
                           placeholder="e.g. 09:00"
-                          className="w-full h-8 px-2.5 rounded-lg bg-card border border-border/40 text-xs font-bold outline-none focus:border-primary text-primary font-mono"
+                          className="w-full h-8 px-2 rounded-lg bg-card border border-border/40 text-xs font-bold outline-none focus:border-primary text-primary font-mono"
                         />
                       </div>
 
                       {/* Shift Out Threshold */}
-                      <div className="space-y-1">
-                        <span className="text-[9px] font-bold text-muted-foreground uppercase">Shift Out Time</span>
+                      <div className="space-y-0.5">
+                        <span className="text-[9px] font-black text-muted-foreground uppercase">Shift Out Time</span>
                         <input
                           type="text"
                           value={shiftOutThreshold}
                           onChange={(e) => setShiftOutThreshold(e.target.value)}
                           placeholder="e.g. 18:00"
-                          className="w-full h-8 px-2.5 rounded-lg bg-card border border-border/40 text-xs font-bold outline-none focus:border-primary text-primary font-mono"
+                          className="w-full h-8 px-2 rounded-lg bg-card border border-border/40 text-xs font-bold outline-none focus:border-primary text-primary font-mono"
                         />
                       </div>
                     </div>
@@ -659,40 +664,39 @@ function EmployeeJobCardPage() {
             </div>
 
             {/* Dynamic Metadata Summary Card based on primary ID */}
-            <div className="p-5 bg-muted/40 dark:bg-[#0c111e]/25 border border-border/40 rounded-lg grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-4 text-xs font-semibold relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-1 h-full bg-[#1e88e5]"></div>
+            <div className="p-4 bg-gradient-to-r from-primary/[0.04] via-transparent to-transparent border border-border/60 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-[3px] h-full bg-primary" />
+              
+              <div className="flex items-center gap-3">
+                <div className="size-11 rounded-xl bg-gradient-to-tr from-primary to-primary-glow text-white flex items-center justify-center font-black text-sm shadow-md shadow-primary/25">
+                  {activeEmpMetadata.name.split(" ").map(n => n[0]).join("")}
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-foreground">{activeEmpMetadata.name}</h3>
+                  <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                    <span className="text-[9.5px] font-extrabold uppercase bg-primary/10 text-primary border border-primary/25 px-1.5 py-0.5 rounded-md">{activeEmpMetadata.type}</span>
+                    <span className="text-[9.5px] font-bold text-muted-foreground">{activeEmpMetadata.jobTitle} &bull; {activeEmpMetadata.subDept}</span>
+                  </div>
+                </div>
+              </div>
 
-              <div className="pl-2">
-                <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block mb-0.5">Name</span>
-                <span className="text-foreground font-black text-xs block truncate">{activeEmpMetadata.name}</span>
-              </div>
-              <div>
-                <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block mb-0.5">Employee Type</span>
-                <span className="text-foreground font-semibold bg-slate-100 dark:bg-slate-800/80 px-2 py-0.5 rounded-md border border-border/40 inline-block">{activeEmpMetadata.type}</span>
-              </div>
-              <div>
-                <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block mb-0.5">Sub Department</span>
-                <span className="text-foreground font-semibold block truncate">{activeEmpMetadata.subDept}</span>
-              </div>
-              <div>
-                <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block mb-0.5">Job Title</span>
-                <span className="text-foreground font-semibold block truncate">{activeEmpMetadata.jobTitle}</span>
-              </div>
-              <div>
-                <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block mb-0.5">Unit</span>
-                <span className="text-[#1e88e5] font-black bg-[#1e88e5]/5 dark:bg-[#1e88e5]/10 border border-[#1e88e5]/20 px-2.5 py-0.5 rounded-md inline-block">{activeEmpMetadata.unit}</span>
-              </div>
-              <div>
-                <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block mb-0.5">Shift</span>
-                <span className="text-foreground font-semibold block truncate">{activeEmpMetadata.shift}</span>
-              </div>
-              <div>
-                <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block mb-0.5">Shift Start Date</span>
-                <span className="text-foreground font-semibold font-mono bg-muted px-2 py-0.5 rounded-md border border-border/40 inline-block">{activeEmpMetadata.shiftStartDate}</span>
-              </div>
-              <div>
-                <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block mb-0.5">Default Holiday</span>
-                <span className="text-rose-500 font-extrabold bg-rose-500/10 px-2.5 py-0.5 rounded-md border border-rose-500/20 inline-block">{activeEmpMetadata.defaultHoliday}</span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-2 text-xs w-full md:w-auto border-t md:border-t-0 md:border-l border-border/40 pt-3 md:pt-0 md:pl-6">
+                <div>
+                  <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block">Unit</span>
+                  <span className="text-foreground font-black">{activeEmpMetadata.unit}</span>
+                </div>
+                <div>
+                  <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block">Shift</span>
+                  <span className="text-foreground font-semibold">{activeEmpMetadata.shift}</span>
+                </div>
+                <div>
+                  <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block">Shift Start</span>
+                  <span className="text-foreground font-semibold font-mono">{activeEmpMetadata.shiftStartDate}</span>
+                </div>
+                <div>
+                  <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block">Weekly Holiday</span>
+                  <span className="text-rose-500 font-extrabold">{activeEmpMetadata.defaultHoliday}</span>
+                </div>
               </div>
             </div>
 
@@ -700,7 +704,7 @@ function EmployeeJobCardPage() {
             <div className="flex justify-end pt-2 border-t border-border/30">
               <button
                 onClick={handleGetLogs}
-                className="h-10 px-10 bg-[#1e88e5] hover:bg-[#1565c0] text-white font-extrabold text-xs rounded-xl shadow-md shadow-primary/10 hover:shadow-primary/20 transition duration-150 uppercase tracking-widest flex items-center gap-2"
+                className="h-10 px-8 bg-primary hover:bg-primary-glow text-white font-black text-xs rounded-xl shadow-md shadow-primary/10 hover:shadow-primary/20 transition duration-150 uppercase tracking-widest flex items-center gap-2 cursor-pointer"
               >
                 <Fingerprint className="size-4" />
                 <span>Fetch Attendance</span>
@@ -709,56 +713,56 @@ function EmployeeJobCardPage() {
           </div>
 
           {/* Summary Stats Cards Ribbon */}
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 print:hidden">
-            <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs flex items-center gap-3">
-              <div className="size-9 rounded-lg bg-emerald-500/10 text-emerald-500 grid place-items-center font-black text-xs">P</div>
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2 print:hidden">
+            <div className="bg-card rounded-xl border border-border/80 p-3 shadow-xs flex items-center gap-3">
+              <div className="size-8.5 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-black text-xs">P</div>
               <div>
-                <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-0.5">Present Days</span>
+                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">Present Days</span>
                 <span className="text-sm font-black text-foreground">{stats.present}</span>
               </div>
             </div>
 
-            <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs flex items-center gap-3">
-              <div className="size-9 rounded-lg bg-amber-500/10 text-amber-500 grid place-items-center font-black text-xs">L</div>
+            <div className="bg-card rounded-xl border border-border/80 p-3 shadow-xs flex items-center gap-3">
+              <div className="size-8.5 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center font-black text-xs">L</div>
               <div>
-                <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-0.5">Leaves Taken</span>
+                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">Leaves Taken</span>
                 <span className="text-sm font-black text-foreground">{stats.leaves}</span>
               </div>
             </div>
 
-            <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs flex items-center gap-3">
-              <div className="size-9 rounded-lg bg-slate-500/10 text-slate-500 grid place-items-center font-black text-xs">H</div>
+            <div className="bg-card rounded-xl border border-border/80 p-3 shadow-xs flex items-center gap-3">
+              <div className="size-8.5 rounded-lg bg-slate-500/10 text-slate-500 flex items-center justify-center font-black text-xs">H</div>
               <div>
-                <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-0.5">Weekly Holidays</span>
+                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">Weekly Holidays</span>
                 <span className="text-sm font-black text-foreground">{stats.holidays}</span>
               </div>
             </div>
 
-            <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs flex items-center gap-3">
-              <div className="size-9 rounded-lg bg-[#1e88e5]/10 text-[#1e88e5] grid place-items-center font-black text-xs">OT</div>
+            <div className="bg-card rounded-xl border border-border/80 p-3 shadow-xs flex items-center gap-3">
+              <div className="size-8.5 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-black text-xs">OT</div>
               <div>
-                <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-0.5">Overtime Hours</span>
+                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">Overtime Hours</span>
                 <span className="text-sm font-black text-foreground">{stats.totalOt} hrs</span>
               </div>
             </div>
 
             {/* Late Entries Count */}
-            <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs flex items-center gap-3">
-              <div className="size-9 rounded-lg bg-rose-500/10 text-rose-500 grid place-items-center font-black text-xs">LT</div>
+            <div className="bg-card rounded-xl border border-border/80 p-3 shadow-xs flex items-center gap-3">
+              <div className="size-8.5 rounded-lg bg-rose-500/10 text-rose-500 flex items-center justify-center font-black text-xs">LT</div>
               <div>
-                <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-0.5">Late Entries</span>
-                <span className="text-sm font-black text-foreground">
+                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">Late Entries</span>
+                <span className="text-sm font-black text-foreground font-mono">
                   {isRuntimeCal ? stats.lateCount : "—"}
                 </span>
               </div>
             </div>
 
             {/* Early Leaves Count */}
-            <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs flex items-center gap-3">
-              <div className="size-9 rounded-lg bg-purple-500/10 text-purple-500 grid place-items-center font-black text-xs">EL</div>
+            <div className="bg-card rounded-xl border border-border/80 p-3 shadow-xs flex items-center gap-3">
+              <div className="size-8.5 rounded-lg bg-purple-500/10 text-purple-500 flex items-center justify-center font-black text-xs">EL</div>
               <div>
-                <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-0.5">Early Leaves</span>
-                <span className="text-sm font-black text-foreground">
+                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">Early Leaves</span>
+                <span className="text-sm font-black text-foreground font-mono">
                   {isRuntimeCal ? stats.earlyLeaveCount : "—"}
                 </span>
               </div>
@@ -766,7 +770,7 @@ function EmployeeJobCardPage() {
           </div>
 
           {/* Spreadsheet Datagrid Card */}
-          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
+          <div className="bg-card rounded-2xl border border-border/80 p-4 shadow-xs space-y-3">
 
             {/* Utilities Toolbar & Search */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/30 pb-4 print:hidden">

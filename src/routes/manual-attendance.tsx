@@ -595,26 +595,28 @@ function ManualAttendancePage() {
       <main className="flex-1 min-w-0 flex flex-col relative">
         <Topbar />
 
-        <div className="p-4 md:p-6 xl:p-8 space-y-6">
+        <div className="p-4 md:p-6 space-y-2">
           {/* Breadcrumb and Header */}
-          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-2xl border border-border/80 p-4 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
+              <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
                 <ChevronRight className="size-2.5" />
                 <span className="text-muted-foreground/75">Human Resource</span>
                 <ChevronRight className="size-2.5" />
-                <span className="text-primary font-semibold">Manual Attendance</span>
+                <span className="text-primary font-extrabold">Manual Attendance</span>
               </div>
-              <h1 className="text-xl font-black text-foreground flex items-center gap-2">
-                <Fingerprint className="size-5.5 text-primary" />
+              <h1 className="text-xl md:text-2xl font-black text-foreground flex items-center gap-2">
+                <div className="p-1.5 bg-primary/10 rounded-lg border border-primary/20 text-primary">
+                  <Fingerprint className="size-5 text-primary" />
+                </div>
                 <span>Manual Attendance Workspace</span>
               </h1>
             </div>
             <div className="flex items-center gap-2.5">
               <button
                 onClick={() => setEmployees(initialEmployees)}
-                className="h-10 px-4 rounded-xl border border-border hover:bg-muted text-xs font-bold text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition duration-200"
+                className="h-10 px-4 rounded-xl border border-border hover:bg-muted text-xs font-bold text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition duration-200 cursor-pointer"
               >
                 <RefreshCw className="size-3.5 text-primary" />
                 <span>Reset Workspace</span>
@@ -623,24 +625,24 @@ function ManualAttendancePage() {
           </div>
 
           {/* Upper Panels / Filters Block */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-2">
 
             {/* CARD 1: Filters & Criteria (Left Panel - Span 2 Columns) */}
-            <div className="xl:col-span-2 bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-5">
-              <div className="flex items-center justify-between border-b border-border/40 pb-3">
-                <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary"> Roster Criteria Selection</span>
-                <span className="text-[9px] font-bold text-muted-foreground/50">Core HRIS Engine</span>
+            <div className="xl:col-span-2 bg-card rounded-2xl border border-border/80 p-4 shadow-xs space-y-3">
+              <div className="flex items-center justify-between border-b border-border/40 pb-2.5">
+                <span className="text-[10px] font-black uppercase tracking-wider text-primary">Roster Criteria Selection</span>
+                <span className="text-[9px] font-bold text-muted-foreground/45">Core HRIS Engine</span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                 {/* 1. Searching Option */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Searching</label>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Searching</label>
                   <div className="relative">
                     <select
                       value={filterSearching}
                       onChange={(e) => setFilterSearching(e.target.value)}
-                      className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary transition duration-150 appearance-none pr-8 cursor-pointer"
+                      className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary transition duration-150 appearance-none pr-8 cursor-pointer"
                     >
                       <option>Other</option>
                       <option>Employee ID</option>
@@ -651,13 +653,13 @@ function ManualAttendancePage() {
                 </div>
 
                 {/* 2. Status */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Status</label>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Status</label>
                   <div className="relative">
                     <select
                       value={filterStatus}
                       onChange={(e) => setFilterStatus(e.target.value)}
-                      className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary transition duration-150 appearance-none pr-8 cursor-pointer"
+                      className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary transition duration-150 appearance-none pr-8 cursor-pointer"
                     >
                       <option>Absent</option>
                       <option>Present</option>
@@ -668,15 +670,15 @@ function ManualAttendancePage() {
                 </div>
 
                 {/* 3. Date */}
-                <div className="space-y-1.5 relative">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Date</label>
+                <div className="space-y-1 relative">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Date</label>
                   <div className="relative date-picker-trigger">
                     <input
                       type="text"
                       readOnly
                       value={filterDate}
                       onClick={() => setActiveDatePicker({ id: "filter", field: "date" })}
-                      className="w-full h-9 px-3 pl-8.5 rounded-lg bg-muted border border-border/40 text-xs font-bold outline-none cursor-pointer text-primary"
+                      className="w-full h-9 px-3 pl-8.5 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none cursor-pointer text-primary"
                     />
                     <Calendar className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-primary" />
 
@@ -690,24 +692,24 @@ function ManualAttendancePage() {
                 </div>
 
                 {/* 4. Employee Type */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Employee Type</label>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Employee Type</label>
                   <input
                     type="text"
                     value={filterEmpType}
                     onChange={(e) => setFilterEmpType(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary transition duration-150"
+                    className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary transition duration-150"
                   />
                 </div>
 
                 {/* 5. Department */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Department</label>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Department</label>
                   <div className="relative">
                     <select
                       value={filterDept}
                       onChange={(e) => setFilterDept(e.target.value)}
-                      className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary transition duration-150 appearance-none pr-8 cursor-pointer"
+                      className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary transition duration-150 appearance-none pr-8 cursor-pointer"
                     >
                       <option value="ALL">ALL</option>
                       <option value="Accounts & Vat">Accounts & Vat</option>
@@ -722,13 +724,13 @@ function ManualAttendancePage() {
                 </div>
 
                 {/* 6. Unit */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Unit</label>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Unit</label>
                   <div className="relative">
                     <select
                       value={filterUnit}
                       onChange={(e) => setFilterUnit(e.target.value)}
-                      className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary transition duration-150 appearance-none pr-8 cursor-pointer"
+                      className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary transition duration-150 appearance-none pr-8 cursor-pointer"
                     >
                       <option value="ALL">ALL</option>
                       <option value="PSL">PSL</option>
@@ -740,24 +742,24 @@ function ManualAttendancePage() {
                 </div>
 
                 {/* 7. Line */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Line</label>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Line</label>
                   <input
                     type="text"
                     value={filterLine}
                     onChange={(e) => setFilterLine(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary transition duration-150"
+                    className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary transition duration-150"
                   />
                 </div>
 
                 {/* 8. Attendance Type */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Attendance Type</label>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Attendance Type</label>
                   <div className="relative">
                     <select
                       value={filterAttType}
                       onChange={(e) => setFilterAttType(e.target.value)}
-                      className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary transition duration-150 appearance-none pr-8 cursor-pointer"
+                      className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary transition duration-150 appearance-none pr-8 cursor-pointer"
                     >
                       <option>ALL</option>
                       <option>Fingerprint</option>
@@ -768,41 +770,41 @@ function ManualAttendancePage() {
                 </div>
 
                 {/* 9. Reason Input */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Reason</label>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Reason</label>
                   <input
                     type="text"
                     value={filterReason}
                     onChange={(e) => setFilterReason(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary transition duration-150"
+                    className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary transition duration-150"
                   />
                 </div>
               </div>
 
-              <div className="pt-2">
-                <button className="h-9.5 px-6 rounded-lg bg-primary hover:bg-primary-glow text-white font-extrabold text-xs shadow-md transition duration-150 tracking-wider">
-                  SHOW WORKSPACE
+              <div className="pt-1 border-t border-border/30 flex justify-end">
+                <button className="h-9 px-6 rounded-lg bg-primary hover:bg-primary-glow text-white font-black text-xs shadow-xs transition duration-150 tracking-widest cursor-pointer uppercase">
+                  Show Workspace
                 </button>
               </div>
             </div>
 
             {/* CARD 2 & 3: Bulk and Search Configs (Right Side Panels) */}
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-2">
 
-              {/* Green-Border Roster Bulk Action Card */}
-              <div className="bg-card rounded-lg border-2 border-emerald-500/30 p-5 shadow-sm space-y-4.5 relative overflow-hidden">
-                {/* Dynamic corner splash */}
-                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-bl-full pointer-events-none" />
+              {/* Green Roster Bulk Action Card */}
+              <div className="bg-card rounded-2xl border border-border p-4 shadow-xs space-y-2.5 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-[3px] h-full bg-emerald-500" />
+                <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/[0.03] rounded-bl-full pointer-events-none" />
 
-                <div className="flex items-center gap-2 border-b border-border/40 pb-2.5">
-                  <div className="size-5 rounded bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold text-[10px]">✔</div>
-                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Roster Bulk Setup</span>
+                <div className="flex items-center gap-2 border-b border-border/40 pb-2">
+                  <div className="size-5 rounded bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-black text-[10px]">✔</div>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Roster Bulk Setup</span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2">
                   {/* In Time */}
                   <div className="space-y-1 relative">
-                    <label className="text-[9px] font-bold text-muted-foreground uppercase">In Time *</label>
+                    <label className="text-[9px] font-black text-muted-foreground uppercase tracking-wide">In Time *</label>
                     <div className="relative time-picker-trigger">
                       <input
                         type="text"
@@ -810,7 +812,7 @@ function ManualAttendancePage() {
                         value={bulkInTime}
                         onClick={() => setActiveTimePicker({ id: "bulk", field: "inTime" })}
                         placeholder="Select Time"
-                        className="w-full h-8 pl-8 px-2 rounded bg-muted border border-border/40 text-[11px] font-mono outline-none cursor-pointer text-emerald-600 dark:text-emerald-400 font-bold"
+                        className="w-full h-8 pl-8 px-2 rounded-lg bg-muted/40 border border-border/40 text-[11px] font-mono outline-none cursor-pointer text-emerald-600 dark:text-emerald-400 font-bold"
                       />
                       <Clock className="size-3 absolute left-2.5 top-1/2 -translate-y-1/2 text-emerald-500" />
 
@@ -825,14 +827,14 @@ function ManualAttendancePage() {
 
                   {/* Out Date */}
                   <div className="space-y-1 relative">
-                    <label className="text-[9px] font-bold text-muted-foreground uppercase">Out Date *</label>
+                    <label className="text-[9px] font-black text-muted-foreground uppercase tracking-wide">Out Date *</label>
                     <div className="relative date-picker-trigger">
                       <input
                         type="text"
                         readOnly
                         value={bulkOutDate}
                         onClick={() => setActiveDatePicker({ id: "bulk", field: "outDate" })}
-                        className="w-full h-8 pl-8 px-2 rounded bg-muted border border-border/40 text-[11px] font-mono outline-none cursor-pointer text-emerald-600 dark:text-emerald-400 font-bold"
+                        className="w-full h-8 pl-8 px-2 rounded-lg bg-muted/40 border border-border/40 text-[11px] font-mono outline-none cursor-pointer text-emerald-600 dark:text-emerald-400 font-bold"
                       />
                       <Calendar className="size-3 absolute left-2.5 top-1/2 -translate-y-1/2 text-emerald-500" />
 
@@ -847,7 +849,7 @@ function ManualAttendancePage() {
 
                   {/* Out Time */}
                   <div className="space-y-1 relative">
-                    <label className="text-[9px] font-bold text-muted-foreground uppercase">Out Time *</label>
+                    <label className="text-[9px] font-black text-muted-foreground uppercase tracking-wide">Out Time *</label>
                     <div className="relative time-picker-trigger">
                       <input
                         type="text"
@@ -855,7 +857,7 @@ function ManualAttendancePage() {
                         value={bulkOutTime}
                         onClick={() => setActiveTimePicker({ id: "bulk", field: "outTime" })}
                         placeholder="Select Time"
-                        className="w-full h-8 pl-8 px-2 rounded bg-muted border border-border/40 text-[11px] font-mono outline-none cursor-pointer text-emerald-600 dark:text-emerald-400 font-bold"
+                        className="w-full h-8 pl-8 px-2 rounded-lg bg-muted/40 border border-border/40 text-[11px] font-mono outline-none cursor-pointer text-emerald-600 dark:text-emerald-400 font-bold"
                       />
                       <Clock className="size-3 absolute left-2.5 top-1/2 -translate-y-1/2 text-emerald-500" />
 
@@ -870,19 +872,19 @@ function ManualAttendancePage() {
 
                   {/* Adjust Minutes */}
                   <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-muted-foreground uppercase">Adjust Minutes</label>
+                    <label className="text-[9px] font-black text-muted-foreground uppercase tracking-wide">Adjust Minutes</label>
                     <input
                       type="text"
                       value={bulkAdjustMin}
                       onChange={(e) => setBulkAdjustMin(e.target.value)}
-                      className="w-full h-8 px-2.5 rounded bg-muted border border-border/40 text-[11px] font-mono outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition duration-150"
+                      className="w-full h-8 px-2.5 rounded-lg bg-muted/40 border border-border/40 text-[11px] font-mono outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition duration-150"
                     />
                   </div>
                 </div>
 
                 {/* Random addition toggle helper */}
-                <div className="flex items-center justify-between gap-2 pt-1 text-[10px]">
-                  <label className="flex items-center gap-2 cursor-pointer text-muted-foreground font-semibold">
+                <div className="flex items-center justify-between gap-2 pt-1 text-[9.5px]">
+                  <label className="flex items-center gap-1.5 cursor-pointer text-muted-foreground font-semibold">
                     <input
                       type="checkbox"
                       checked={autoAddMinutes}
@@ -891,35 +893,35 @@ function ManualAttendancePage() {
                     />
                     <span>Add sequential +5 mins randomizer</span>
                   </label>
-                  <span className="text-[9px] font-bold text-emerald-500 uppercase">Auto Mode</span>
+                  <span className="text-[9px] font-extrabold text-emerald-500 uppercase">Auto Mode</span>
                 </div>
 
-                <div className="pt-1.5">
+                <div className="pt-1">
                   <button
                     onClick={handleBulkApply}
-                    className="w-full h-8.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-[11px] tracking-wider transition duration-150 flex items-center justify-center gap-1.5 shadow-sm"
+                    className="w-full h-8.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[10px] tracking-wider transition duration-150 flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
                   >
                     <Check className="size-3.5" />
-                    <span>BULK APPLY TO SELECTED ({selectedIds.size})</span>
+                    <span>BULK APPLY ({selectedIds.size})</span>
                   </button>
                 </div>
               </div>
 
-              {/* Purple-Border Card: Search Configuration */}
-              <div className="bg-card rounded-lg border-2 border-indigo-500/30 p-5 shadow-sm space-y-3 relative overflow-hidden">
-                {/* Dynamic corner splash */}
-                <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-bl-full pointer-events-none" />
+              {/* Purple Search Configuration */}
+              <div className="bg-card rounded-2xl border border-border p-4 shadow-xs space-y-2 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-[3px] h-full bg-indigo-500" />
+                <div className="absolute top-0 right-0 w-20 h-20 bg-indigo-500/[0.03] rounded-bl-full pointer-events-none" />
 
-                <div className="flex items-center gap-2 border-b border-border/40 pb-2.5">
-                  <div className="size-5 rounded bg-indigo-500/10 text-indigo-500 flex items-center justify-center font-bold text-[10px]">🔍</div>
-                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Search Configuration</span>
+                <div className="flex items-center gap-2 border-b border-border/40 pb-2">
+                  <div className="size-5 rounded bg-indigo-500/10 text-indigo-500 flex items-center justify-center font-black text-[10px]">🔍</div>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Search Configuration</span>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[9px] font-bold text-muted-foreground uppercase">Search For</label>
+                  <label className="text-[9px] font-black text-muted-foreground uppercase tracking-wide">Search For</label>
                   <div className="relative">
                     <select
-                      className="w-full h-8.5 px-3 rounded bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-indigo-500 appearance-none pr-8 cursor-pointer"
+                      className="w-full h-8.5 px-3 rounded bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-indigo-500 appearance-none pr-8 cursor-pointer"
                     >
                       <option>All</option>
                       <option>Filter Present</option>
@@ -935,7 +937,7 @@ function ManualAttendancePage() {
           </div>
 
           {/* Action Utilities & Datagrid Block */}
-          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4 relative">
+          <div className="bg-card rounded-2xl border border-border/80 p-4 shadow-xs space-y-3 relative">
 
             {/* Utilities Toolbar */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/30 pb-4">
