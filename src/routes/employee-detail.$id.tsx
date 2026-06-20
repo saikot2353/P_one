@@ -627,130 +627,253 @@ function EmployeeDetailPage() {
               )}
 
               {/* 3. QUALIFICATION & EXPERIENCE */}
-              {activeTab === "qualification" && (
-                <div className="space-y-8 animate-in fade-in duration-300">
-                  {/* Category 1: Academic Portfolio */}
-                  <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-lg p-5 space-y-6">
-                    <div className="flex items-center gap-2.5 border-b border-indigo-500/20 pb-3">
-                      <div className="size-8 rounded-full bg-indigo-500/15 text-indigo-500 flex items-center justify-center"><GraduationCap className="size-4.5" /></div>
-                      <div>
-                        <h3 className="text-xs font-black uppercase text-indigo-600 tracking-wider">I. Academic Portfolio</h3>
-                        <p className="text-[10px] text-muted-foreground">Certified academic credentials and structured training programs.</p>
-                      </div>
-                    </div>
+              {activeTab === "qualification" && (() => {
+                const eduList = selectedEmp.educationList || [
+                  { degree: "Bachelor of Science (B.Sc)", institute: "IIT University of Dhaka", passingYear: "2022", resultGpa: "3.85", attachment: "Certificate.pdf" }
+                ];
+                const trainList = selectedEmp.trainingList || [
+                  { trainingTitle: "Advanced System Architecture", institution: "Coursera / Pakiza Software", duration: "12 Weeks", completionDate: "10/03/2024" }
+                ];
+                const expList = selectedEmp.experienceList || [
+                  { company: "Pakiza Software Limited", designation: "Software Engineer", fromDate: "01/01/2023", toDate: "28/02/2025", leavingReason: "Career Growth", attachment: "NOC.pdf" }
+                ];
+                const certList = selectedEmp.certifications || [
+                  { certificateName: "AWS Certified Solutions Architect", organization: "Amazon Web Services", credentialId: "AWS-102938", issueDate: "15/06/2024" }
+                ];
+                const involList = selectedEmp.involvements || [
+                  { activityName: "HRIS Standardization Committee", role: "Technical Lead", duration: "6 Months", description: "Led database migration and performance optimizations" }
+                ];
 
-                    <div className="grid grid-cols-1 gap-6">
-                      {/* Academic Credentials */}
-                      <div className="space-y-3">
-                        <h4 className="text-[10px] font-black uppercase text-foreground/80 flex items-center gap-1.5"><BookOpen className="size-3.5 text-indigo-500" /> Academic Qualifications</h4>
-                        <div className="border border-border/40 rounded-xl overflow-hidden shadow-xs">
-                          <table className="w-full text-left text-xs">
-                            <thead className="bg-muted/40 text-[9px] uppercase font-bold text-muted-foreground border-b border-border/20">
-                              <tr><th className="p-3">Degree / Exam Title</th><th className="p-3">Institution Name</th><th className="p-3">Passing Year</th><th className="p-3">Result / CGPA</th><th className="p-3 text-right">Attachment</th></tr>
-                            </thead>
-                            <tbody className="divide-y divide-border/20 font-semibold bg-card">
-                              <tr className="hover:bg-muted/5">
-                                <td className="p-3 text-indigo-500 font-bold">Bachelor of Science (B.Sc)</td><td className="p-3">IIT University of Dhaka</td><td className="p-3 font-mono">2022</td><td className="p-3 font-mono">3.85</td><td className="p-3 text-right"><span className="text-[9px] font-black text-emerald-500 uppercase flex items-center justify-end gap-1"><Check className="size-3" /> Verified</span></td>
-                              </tr>
-                            </tbody>
-                          </table>
+                return (
+                  <div className="space-y-6 animate-in fade-in duration-300">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                      
+                      {/* LEFT COLUMN: Career timeline & Involvements (7 Cols) */}
+                      <div className="lg:col-span-7 space-y-6">
+                        
+                        {/* Professional Career & Job History */}
+                        <div className="bg-card border border-border/80 rounded-xl p-5 shadow-xs space-y-5">
+                          <div className="flex items-center gap-2.5 border-b border-border/30 pb-3">
+                            <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                              <Briefcase className="size-4.5" />
+                            </div>
+                            <div>
+                              <h3 className="text-xs font-extrabold uppercase tracking-widest text-foreground">Professional Career Timeline</h3>
+                              <p className="text-[10px] text-muted-foreground mt-0.5">Chronological record of verified industrial and job history.</p>
+                            </div>
+                          </div>
+
+                          <div className="relative border-l-2 border-border/50 ml-4.5 pl-6 space-y-6">
+                            {expList.map((exp, index) => (
+                              <div key={index} className="relative group">
+                                {/* Timeline Node Icon */}
+                                <div className="absolute -left-[33px] top-1.5 size-5 rounded-full border-2 border-primary bg-card flex items-center justify-center shadow-xs transition duration-200 group-hover:scale-110">
+                                  <History className="size-3 text-primary" />
+                                </div>
+
+                                <div className="bg-muted/10 border border-border/40 hover:border-primary/20 rounded-xl p-4.5 transition-all duration-300 hover:shadow-2xs space-y-3 relative overflow-hidden">
+                                  <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border/30 pb-2.5">
+                                    <div>
+                                      <h4 className="text-sm font-extrabold text-foreground">{exp.designation}</h4>
+                                      <p className="text-xs font-bold text-muted-foreground mt-0.5">{exp.company}</p>
+                                    </div>
+                                    <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-primary/5 border border-primary/10 text-primary font-mono shrink-0">
+                                      {exp.fromDate} — {exp.toDate}
+                                    </span>
+                                  </div>
+
+                                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-[11px] pt-1">
+                                    <div className="space-y-0.5">
+                                      <span className="text-[9px] font-bold text-muted-foreground/60 uppercase block">Reason for leaving</span>
+                                      <p className="font-semibold text-foreground/80">{exp.leavingReason || "—"}</p>
+                                    </div>
+                                    {exp.attachment && (
+                                      <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 px-2.5 py-1 rounded-lg self-start sm:self-center">
+                                        <Check className="size-3 shrink-0" />
+                                        <span className="text-[10px] font-black uppercase tracking-wider font-mono">NOC Verified</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+
+                            {expList.length === 0 && (
+                              <div className="text-center py-6 text-muted-foreground text-xs italic">
+                                No prior work experience documented.
+                              </div>
+                            )}
+                          </div>
                         </div>
+
+                        {/* Special Committee Involvements */}
+                        <div className="bg-card border border-border/80 rounded-xl p-5 shadow-xs space-y-5">
+                          <div className="flex items-center gap-2.5 border-b border-border/30 pb-3">
+                            <div className="p-2 rounded-lg bg-amber-500/10 text-amber-500">
+                              <Users className="size-4.5" />
+                            </div>
+                            <div>
+                              <h3 className="text-xs font-extrabold uppercase tracking-widest text-foreground">Committee Commitments</h3>
+                              <p className="text-[10px] text-muted-foreground mt-0.5">Internal panel technical leadership and operational duties.</p>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 gap-4">
+                            {involList.map((invol, index) => (
+                              <div key={index} className="bg-amber-500/2 border border-amber-500/15 rounded-xl p-4.5 space-y-3 relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-20 h-20 bg-amber-500/3 rounded-bl-full pointer-events-none group-hover:bg-amber-500/6 transition-colors duration-300" />
+                                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/20 pb-2.5">
+                                  <div>
+                                    <h4 className="text-xs font-extrabold text-foreground">{invol.activityName}</h4>
+                                    <span className="inline-block text-[9px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-600 px-2 py-0.5 rounded mt-1">{invol.role}</span>
+                                  </div>
+                                  <span className="text-[10px] font-extrabold font-mono text-muted-foreground shrink-0">{invol.duration}</span>
+                                </div>
+                                <div className="space-y-1">
+                                  <span className="text-[9px] font-bold text-muted-foreground/60 uppercase block">Deliverables / remarks</span>
+                                  <p className="text-xs font-semibold text-foreground/80 leading-relaxed">{invol.description}</p>
+                                </div>
+                              </div>
+                            ))}
+
+                            {involList.length === 0 && (
+                              <div className="text-center py-6 text-muted-foreground text-xs italic">
+                                No committee commitments documented.
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
                       </div>
 
-                      {/* Professional Training Programs */}
-                      <div className="space-y-3">
-                        <h4 className="text-[10px] font-black uppercase text-foreground/80 flex items-center gap-1.5"><Award className="size-3.5 text-indigo-500" /> Professional Training Programs</h4>
-                        <div className="border border-border/40 rounded-xl overflow-hidden shadow-xs">
-                          <table className="w-full text-left text-xs">
-                            <thead className="bg-muted/40 text-[9px] uppercase font-bold text-muted-foreground border-b border-border/20">
-                              <tr><th className="p-3">Training Title</th><th className="p-3">Institution / Provider</th><th className="p-3">Duration</th><th className="p-3 text-right">Completion Date</th></tr>
-                            </thead>
-                            <tbody className="divide-y divide-border/20 font-semibold bg-card">
-                              <tr className="hover:bg-muted/5">
-                                <td className="p-3 text-indigo-500 font-bold">Advanced System Architecture</td><td className="p-3">Coursera / Pakiza Software</td><td className="p-3">12 Weeks</td><td className="p-3 font-mono text-right">10/03/2024</td>
-                              </tr>
-                            </tbody>
-                          </table>
+                      {/* RIGHT COLUMN: Academics, Certifications & Trainings (5 Cols) */}
+                      <div className="lg:col-span-5 space-y-6">
+                        
+                        {/* Academic Qualifications */}
+                        <div className="bg-card border border-border/80 rounded-xl p-5 shadow-xs space-y-5">
+                          <div className="flex items-center gap-2.5 border-b border-border/30 pb-3">
+                            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-500">
+                              <GraduationCap className="size-4.5" />
+                            </div>
+                            <div>
+                              <h3 className="text-xs font-extrabold uppercase tracking-widest text-foreground">Academic Credentials</h3>
+                              <p className="text-[10px] text-muted-foreground mt-0.5">Verified educational degree qualifications.</p>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 gap-4">
+                            {eduList.map((edu, index) => (
+                              <div key={index} className="bg-indigo-500/2 border border-indigo-500/10 hover:border-indigo-500/25 rounded-xl p-4 transition-all duration-300 hover:shadow-2xs relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-16 h-16 bg-indigo-500/3 rounded-bl-full pointer-events-none group-hover:bg-indigo-500/6 transition-colors duration-300" />
+                                <div className="flex items-start gap-3">
+                                  <div className="space-y-2 flex-1 min-w-0">
+                                    <div className="flex items-center justify-between gap-2">
+                                      <span className="text-[9px] font-extrabold uppercase tracking-wider text-indigo-500">Education Degree</span>
+                                      <span className="text-[9px] font-black text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full uppercase flex items-center gap-1 shrink-0">
+                                        <Check className="size-2.5" /> Verified
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <h4 className="text-xs font-black text-foreground truncate">{edu.degree}</h4>
+                                      <p className="text-[11px] font-bold text-muted-foreground truncate mt-0.5">{edu.institute}</p>
+                                    </div>
+                                    <div className="flex items-center gap-4 text-[10px] font-bold text-muted-foreground font-mono pt-1">
+                                      <span className="flex items-center gap-1">Year: <span className="text-foreground">{edu.passingYear}</span></span>
+                                      <span className="flex items-center gap-1">Result: <span className="text-foreground">{edu.resultGpa}</span></span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+
+                            {eduList.length === 0 && (
+                              <div className="text-center py-6 text-muted-foreground text-xs italic">
+                                No academic credentials documented.
+                              </div>
+                            )}
+                          </div>
                         </div>
+
+                        {/* Professional Certifications */}
+                        <div className="bg-card border border-border/80 rounded-xl p-5 shadow-xs space-y-5">
+                          <div className="flex items-center gap-2.5 border-b border-border/30 pb-3">
+                            <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
+                              <ShieldCheck className="size-4.5" />
+                            </div>
+                            <div>
+                              <h3 className="text-xs font-extrabold uppercase tracking-widest text-foreground">Certifications</h3>
+                              <p className="text-[10px] text-muted-foreground mt-0.5">Professional credentials & technical licenses.</p>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 gap-4">
+                            {certList.map((cert, index) => (
+                              <div key={index} className="bg-emerald-500/2 border border-emerald-500/10 hover:border-emerald-500/25 rounded-xl p-4 transition-all duration-300 hover:shadow-2xs relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/3 rounded-bl-full pointer-events-none group-hover:bg-emerald-500/6 transition-colors duration-300" />
+                                <div className="space-y-2 flex-1 min-w-0">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="text-[9px] font-extrabold uppercase tracking-wider text-emerald-600">{cert.organization}</span>
+                                    <span className="text-[9px] font-bold font-mono text-muted-foreground shrink-0">{cert.issueDate}</span>
+                                  </div>
+                                  <div>
+                                    <h4 className="text-xs font-black text-foreground truncate">{cert.certificateName}</h4>
+                                    <p className="text-[10px] font-bold text-muted-foreground font-mono mt-1 bg-muted/40 px-2 py-0.5 rounded truncate max-w-max">ID: {cert.credentialId}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+
+                            {certList.length === 0 && (
+                              <div className="text-center py-6 text-muted-foreground text-xs italic">
+                                No professional certifications documented.
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Professional Training History */}
+                        <div className="bg-card border border-border/80 rounded-xl p-5 shadow-xs space-y-5">
+                          <div className="flex items-center gap-2.5 border-b border-border/30 pb-3">
+                            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-500">
+                              <BookOpen className="size-4.5" />
+                            </div>
+                            <div>
+                              <h3 className="text-xs font-extrabold uppercase tracking-widest text-foreground">Training History</h3>
+                              <p className="text-[10px] text-muted-foreground mt-0.5">Industrial training & program development.</p>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 gap-4">
+                            {trainList.map((train, index) => (
+                              <div key={index} className="bg-indigo-500/2 border border-indigo-500/10 hover:border-indigo-500/25 rounded-xl p-4 transition-all duration-300 hover:shadow-2xs relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-16 h-16 bg-indigo-500/3 rounded-bl-full pointer-events-none group-hover:bg-indigo-500/6 transition-colors duration-300" />
+                                <div className="space-y-2 flex-1 min-w-0">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="text-[9px] font-extrabold uppercase tracking-wider text-indigo-500">{train.institution}</span>
+                                    <span className="text-[9px] font-extrabold font-mono text-muted-foreground shrink-0">{train.duration}</span>
+                                  </div>
+                                  <div>
+                                    <h4 className="text-xs font-black text-foreground truncate">{train.trainingTitle}</h4>
+                                    <p className="text-[9px] font-bold text-muted-foreground mt-1">Completed: <span className="font-mono text-foreground">{train.completionDate}</span></p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+
+                            {trainList.length === 0 && (
+                              <div className="text-center py-6 text-muted-foreground text-xs italic">
+                                No training programs documented.
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
                       </div>
+
                     </div>
                   </div>
-
-                  {/* Category 2: Career History & Tracks */}
-                  <div className="bg-primary/5 border border-primary/10 rounded-lg p-5 space-y-6">
-                    <div className="flex items-center gap-2.5 border-b border-primary/20 pb-3">
-                      <div className="size-8 rounded-full bg-primary/15 text-primary flex items-center justify-center"><Briefcase className="size-4.5" /></div>
-                      <div>
-                        <h3 className="text-xs font-black uppercase text-primary tracking-wider">II. Professional Career & Job History</h3>
-                        <p className="text-[10px] text-muted-foreground">Prior industrial background, designations, and verified certificates.</p>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-6">
-                      {/* Prior Job Experience */}
-                      <div className="space-y-3">
-                        <h4 className="text-[10px] font-black uppercase text-foreground/80 flex items-center gap-1.5"><History className="size-3.5 text-primary" /> Career History</h4>
-                        <div className="border border-border/40 rounded-xl overflow-hidden shadow-xs">
-                          <table className="w-full text-left text-xs">
-                            <thead className="bg-muted/40 text-[9px] uppercase font-bold text-muted-foreground border-b border-border/20">
-                              <tr><th className="p-3">Organization / Company</th><th className="p-3">Designation</th><th className="p-3">From Date</th><th className="p-3">To Date</th><th className="p-3">Reason for Leaving</th><th className="p-3 text-right">Attachment</th></tr>
-                            </thead>
-                            <tbody className="divide-y divide-border/20 font-semibold bg-card">
-                              <tr className="hover:bg-muted/5">
-                                <td className="p-3 font-bold">Pakiza Software Limited</td><td className="p-3 text-primary">Software Engineer</td><td className="p-3 font-mono">01/01/2023</td><td className="p-3 font-mono">28/02/2025</td><td className="p-3">Career Growth</td><td className="p-3 text-right"><span className="text-[9px] font-black text-emerald-500 uppercase flex items-center justify-end gap-1"><Check className="size-3" /> NOC</span></td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-
-                      {/* Professional Certifications */}
-                      <div className="space-y-3">
-                        <h4 className="text-[10px] font-black uppercase text-foreground/80 flex items-center gap-1.5"><ShieldCheck className="size-3.5 text-primary" /> Professional Certifications & Credentials</h4>
-                        <div className="border border-border/40 rounded-xl overflow-hidden shadow-xs">
-                          <table className="w-full text-left text-xs">
-                            <thead className="bg-muted/40 text-[9px] uppercase font-bold text-muted-foreground border-b border-border/20">
-                              <tr><th className="p-3">Certificate Title</th><th className="p-3">Issuing Authority / Organization</th><th className="p-3">Credential ID</th><th className="p-3 text-right">Issue Date</th></tr>
-                            </thead>
-                            <tbody className="divide-y divide-border/20 font-semibold bg-card">
-                              <tr className="hover:bg-muted/5">
-                                <td className="p-3 text-primary font-bold">AWS Certified Solutions Architect</td><td className="p-3">Amazon Web Services</td><td className="p-3 font-mono text-slate-500">AWS-102938</td><td className="p-3 font-mono text-right">15/06/2024</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Category 3: Special Involvements */}
-                  <div className="bg-amber-500/5 border border-amber-500/10 rounded-lg p-5 space-y-6">
-                    <div className="flex items-center gap-2.5 border-b border-amber-500/20 pb-3">
-                      <div className="size-8 rounded-full bg-amber-500/15 text-amber-600 flex items-center justify-center"><Users className="size-4.5" /></div>
-                      <div>
-                        <h3 className="text-xs font-black uppercase text-amber-600 tracking-wider">III. Committee Commitments & Involvements</h3>
-                        <p className="text-[10px] text-muted-foreground">Internal panels, audit commissions, and technical leadership roles.</p>
-                      </div>
-                    </div>
-
-                    {/* Organizational Involvements */}
-                    <div className="space-y-3">
-                      <div className="border border-border/40 rounded-xl overflow-hidden shadow-xs">
-                        <table className="w-full text-left text-xs">
-                          <thead className="bg-muted/40 text-[9px] uppercase font-bold text-muted-foreground border-b border-border/20">
-                            <tr><th className="p-3">Committee / Group Name</th><th className="p-3">Role Played</th><th className="p-3">Duration</th><th className="p-3 text-right">Key Deliverable / Remarks</th></tr>
-                          </thead>
-                          <tbody className="divide-y divide-border/20 font-semibold bg-card">
-                            <tr className="hover:bg-muted/5">
-                              <td className="p-3 font-extrabold text-foreground">HRIS Standardization Committee</td><td className="p-3 text-amber-600 font-bold">Technical Lead</td><td className="p-3 font-mono">6 Months</td><td className="p-3 text-right text-muted-foreground font-medium">Led database migration and performance optimizations</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+                );
+              })()}
 
               {/* 4. FAMILY & DEPENDENTS */}
               {activeTab === "family" && (
