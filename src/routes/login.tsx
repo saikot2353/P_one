@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
-  Eye, EyeOff, Lock, Mail, Building2, LayoutGrid,
+  Eye, EyeOff, Lock, Mail, User, Building2, LayoutGrid,
   ChevronRight, ChevronDown, Shield, ArrowRight, Check, Fingerprint,
   Zap, Users, BarChart3, Globe, Cpu, Target, Search, Sun, Moon
 } from "lucide-react";
@@ -74,7 +74,7 @@ function AuroraCanvas({ theme }: { theme: Theme }) {
         ctx.lineTo(0, h);
         ctx.closePath();
 
-        const hue = isDark ? 220 + ribbon * 25 : 215 + ribbon * 20;
+        const hue = isDark ? 190 + ribbon * 10 : 190 + ribbon * 8;
         const gradient = ctx.createLinearGradient(0, baseY - amplitude, 0, h);
         if (isDark) {
           gradient.addColorStop(0, `hsla(${hue}, 85%, 65%, 0)`);
@@ -106,7 +106,7 @@ function AuroraCanvas({ theme }: { theme: Theme }) {
           else ctx.lineTo(x, y);
         }
 
-        const streakHue = isDark ? 210 + s * 30 : 220 + s * 25;
+        const streakHue = isDark ? 195 + s * 12 : 195 + s * 10;
         const streakAlpha = isDark ? 0.15 - s * 0.03 : 0.2 - s * 0.04;
         ctx.strokeStyle = `hsla(${streakHue}, 100%, ${isDark ? 75 : 60}%, ${streakAlpha})`;
         ctx.lineWidth = 2 - s * 0.5;
@@ -270,17 +270,17 @@ function PulsingLogo({ size = 48 }: { size?: number }) {
     <div className="relative" style={{ width: size, height: size }}>
       <div
         className="absolute inset-0 rounded-2xl"
-        style={{ background: "linear-gradient(135deg, #4f6ef7, #8b5cf6)", animation: "pulseRing 2.5s ease-in-out infinite", opacity: 0.2 }}
+        style={{ background: "linear-gradient(135deg, #1d4ed8, #3b82f6)", animation: "pulseRing 2.5s ease-in-out infinite", opacity: 0.2 }}
       />
       <div
         className="absolute inset-0 rounded-2xl"
-        style={{ background: "linear-gradient(135deg, #4f6ef7, #8b5cf6)", animation: "pulseRing 2.5s ease-in-out 0.5s infinite", opacity: 0.1 }}
+        style={{ background: "linear-gradient(135deg, #1d4ed8, #3b82f6)", animation: "pulseRing 2.5s ease-in-out 0.5s infinite", opacity: 0.1 }}
       />
       <div
         className="relative w-full h-full rounded-2xl flex items-center justify-center overflow-hidden"
         style={{
-          background: "linear-gradient(135deg, #4f6ef7, #7c3aed)",
-          boxShadow: "0 8px 32px rgba(79, 110, 247, 0.4), inset 0 1px 0 rgba(255,255,255,0.15)",
+          background: "linear-gradient(135deg, #1d4ed8, #0b3c95)",
+          boxShadow: "0 8px 32px rgba(29, 78, 216, 0.4), inset 0 1px 0 rgba(255,255,255,0.15)",
         }}
       >
         <Shield className="text-white" style={{ width: size * 0.5, height: size * 0.5 }} strokeWidth={2.2} />
@@ -475,9 +475,9 @@ function LoginPage() {
   const [mounted, setMounted] = useState(false);
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window !== "undefined") {
-      return (localStorage.getItem("login-theme") as Theme) || "dark";
+      return (localStorage.getItem("login-theme") as Theme) || "light";
     }
-    return "dark";
+    return "light";
   });
 
   useEffect(() => {
@@ -511,18 +511,18 @@ function LoginPage() {
   }, [selectedCompany, selectedSection, navigate]);
 
   const companies = [
-    { id: "cripton-bd", name: "Cripton Group", location: "Dhaka, Bangladesh", employees: "2,450", gradient: "linear-gradient(135deg, #4f6ef7, #3b82f6)" },
-    { id: "cripton-intl", name: "Cripton International", location: "Singapore", employees: "890", gradient: "linear-gradient(135deg, #06b6d4, #0891b2)" },
-    { id: "cripton-tech", name: "Cripton Technologies", location: "Chittagong, BD", employees: "1,120", gradient: "linear-gradient(135deg, #8b5cf6, #7c3aed)" },
+    { id: "cripton-bd", name: "Cripton Group", location: "Dhaka, Bangladesh", employees: "2,450", gradient: "linear-gradient(135deg, #1d4ed8, #3b82f6)" },
+    { id: "cripton-intl", name: "Cripton International", location: "Singapore", employees: "890", gradient: "linear-gradient(135deg, #0e7490, #0891b2)" },
+    { id: "cripton-tech", name: "Cripton Technologies", location: "Chittagong, BD", employees: "1,120", gradient: "linear-gradient(135deg, #2563eb, #1e40af)" },
   ];
 
   const sections = [
-    { id: "hr", name: "Human Resources", icon: Users, desc: "Personnel & payroll", gradient: "linear-gradient(135deg, #3b82f6, #1d4ed8)" },
-    { id: "admin", name: "Administration", icon: Cpu, desc: "System & policies", gradient: "linear-gradient(135deg, #8b5cf6, #6d28d9)" },
-    { id: "finance", name: "Finance & Accounts", icon: BarChart3, desc: "Budget & compensation", gradient: "linear-gradient(135deg, #06b6d4, #0891b2)" },
-    { id: "operations", name: "Operations", icon: Zap, desc: "Factory & workforce", gradient: "linear-gradient(135deg, #f59e0b, #d97706)" },
-    { id: "it", name: "IT Department", icon: Globe, desc: "Infrastructure & support", gradient: "linear-gradient(135deg, #10b981, #059669)" },
-    { id: "recruitment", name: "Recruitment", icon: Target, desc: "Talent acquisition", gradient: "linear-gradient(135deg, #ef4444, #dc2626)" },
+    { id: "hr", name: "Human Resources", icon: Users, desc: "Personnel & payroll", gradient: "linear-gradient(135deg, #2563eb, #1e40af)" },
+    { id: "admin", name: "Administration", icon: Cpu, desc: "System & policies", gradient: "linear-gradient(135deg, #6366f1, #4338ca)" },
+    { id: "finance", name: "Finance & Accounts", icon: BarChart3, desc: "Budget & compensation", gradient: "linear-gradient(135deg, #0891b2, #0e7490)" },
+    { id: "operations", name: "Operations", icon: Zap, desc: "Factory & workforce", gradient: "linear-gradient(135deg, #d97706, #b45309)" },
+    { id: "it", name: "IT Department", icon: Globe, desc: "Infrastructure & support", gradient: "linear-gradient(135deg, #059669, #047857)" },
+    { id: "recruitment", name: "Recruitment", icon: Target, desc: "Talent acquisition", gradient: "linear-gradient(135deg, #dc2626, #b91c1c)" },
   ];
 
   return (
@@ -539,7 +539,7 @@ function LoginPage() {
           --l-panel-bg: #06081a;
           --l-edge-fade: #06081a;
           --l-card-bg: rgba(12, 15, 40, 0.8);
-          --l-card-border-gradient: conic-gradient(from var(--angle, 0deg), #4f6ef7, #8b5cf6, #06b6d4, #4f6ef7);
+          --l-card-border-gradient: conic-gradient(from var(--angle, 0deg), #1d4ed8, #3b82f6, #00b4d8, #1d4ed8);
           --l-text: rgba(230, 240, 255, 0.9);
           --l-text-heading: rgba(240, 245, 255, 0.95);
           --l-text-subtitle: rgba(160, 180, 220, 0.5);
@@ -547,45 +547,45 @@ function LoginPage() {
           --l-muted: rgba(160, 180, 220, 0.4);
           --l-placeholder: rgba(160, 180, 220, 0.35);
           --l-icon-muted: rgba(160, 180, 220, 0.3);
-          --l-icon-active: #6e8efb;
-          --l-accent: rgba(110, 142, 251, 0.6);
-          --l-accent-solid: #6e8efb;
+          --l-icon-active: #3b82f6;
+          --l-accent: rgba(59, 130, 246, 0.6);
+          --l-accent-solid: #3b82f6;
           --l-input-bg: rgba(255, 255, 255, 0.03);
           --l-input-border: rgba(255, 255, 255, 0.07);
           --l-input-focus-bg: rgba(255, 255, 255, 0.06);
-          --l-focus-border: rgba(79, 110, 247, 0.5);
-          --l-focus-shadow: 0 0 0 4px rgba(79, 110, 247, 0.08), 0 0 30px rgba(79, 110, 247, 0.06);
-          --l-icon-glow: drop-shadow(0 0 6px rgba(110, 142, 251, 0.4));
+          --l-focus-border: rgba(59, 130, 246, 0.5);
+          --l-focus-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08), 0 0 30px rgba(59, 130, 246, 0.06);
+          --l-icon-glow: drop-shadow(0 0 6px rgba(59, 130, 246, 0.4));
           --l-divider: rgba(255, 255, 255, 0.04);
-          --l-badge-dot: rgba(79, 110, 247, 0.5);
+          --l-badge-dot: rgba(59, 130, 246, 0.5);
           --l-badge-text: rgba(160, 180, 220, 0.3);
           --l-checkbox-border: rgba(255,255,255,0.1);
           --l-checkbox-bg: rgba(255,255,255,0.03);
-          --l-forgot-color: rgba(110, 142, 251, 0.7);
-          --l-back-color: rgba(110, 142, 251, 0.6);
+          --l-forgot-color: rgba(59, 130, 246, 0.7);
+          --l-back-color: rgba(59, 130, 246, 0.6);
           --l-spinner-track: rgba(255,255,255,0.15);
           --l-spinner-head: #fff;
           --l-step-inactive: rgba(255, 255, 255, 0.08);
           --l-footer-color: rgba(160, 180, 220, 0.2);
           --l-step2-note: rgba(160, 180, 220, 0.25);
-          --l-shape-border: rgba(120, 160, 255, 0.15);
-          --l-shape-fill: linear-gradient(135deg, rgba(100, 140, 255, 0.06), rgba(180, 120, 255, 0.03));
+          --l-shape-border: rgba(59, 130, 246, 0.15);
+          --l-shape-fill: linear-gradient(135deg, rgba(59, 130, 246, 0.06), rgba(6, 182, 212, 0.03));
           --l-stat-label: rgba(180, 200, 255, 0.5);
           --l-left-brand-sub: rgba(160, 180, 255, 0.7);
           --l-left-body: rgba(180, 200, 255, 0.55);
-          --l-radial-glow: radial-gradient(circle, rgba(79, 110, 247, 0.06), transparent 70%);
-          --l-blob1: radial-gradient(circle, rgba(79, 110, 247, 0.25), transparent 70%);
-          --l-blob2: radial-gradient(circle, rgba(139, 92, 246, 0.2), transparent 70%);
+          --l-radial-glow: radial-gradient(circle, rgba(59, 130, 246, 0.06), transparent 70%);
+          --l-blob1: radial-gradient(circle, rgba(59, 130, 246, 0.25), transparent 70%);
+          --l-blob2: radial-gradient(circle, rgba(6, 182, 212, 0.2), transparent 70%);
           --l-dropdown-bg: rgba(14, 17, 45, 0.95);
           --l-dropdown-border: rgba(255, 255, 255, 0.08);
           --l-dropdown-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255,255,255,0.03);
-          --l-selected-bg: rgba(79, 110, 247, 0.1);
+          --l-selected-bg: rgba(59, 130, 246, 0.1);
           --l-hover-bg: rgba(255, 255, 255, 0.04);
           --l-clear-bg: rgba(255,255,255,0.04);
           --l-toggle-bg: rgba(255, 255, 255, 0.05);
           --l-toggle-border: rgba(255, 255, 255, 0.08);
           --l-toggle-shadow: 0 2px 12px rgba(0,0,0,0.2);
-          --l-fingerprint-bg: rgba(79, 110, 247, 0.1);
+          --l-fingerprint-bg: rgba(59, 130, 246, 0.1);
           --l-secure-text: rgba(160, 180, 255, 0.4);
         }
 
@@ -595,7 +595,7 @@ function LoginPage() {
           --l-panel-bg: #f0f2f8;
           --l-edge-fade: #e8edf8;
           --l-card-bg: rgba(255, 255, 255, 0.75);
-          --l-card-border-gradient: conic-gradient(from var(--angle, 0deg), #4f6ef7, #8b5cf6, #06b6d4, #4f6ef7);
+          --l-card-border-gradient: conic-gradient(from var(--angle, 0deg), #1d4ed8, #3b82f6, #00b4d8, #1d4ed8);
           --l-text: rgba(15, 23, 42, 0.9);
           --l-text-heading: rgba(15, 23, 42, 0.95);
           --l-text-subtitle: rgba(71, 85, 105, 0.7);
@@ -603,46 +603,46 @@ function LoginPage() {
           --l-muted: rgba(100, 116, 139, 0.6);
           --l-placeholder: rgba(100, 116, 139, 0.45);
           --l-icon-muted: rgba(100, 116, 139, 0.4);
-          --l-icon-active: #4f6ef7;
-          --l-accent: rgba(79, 110, 247, 0.7);
-          --l-accent-solid: #4f6ef7;
+          --l-icon-active: #1d4ed8;
+          --l-accent: rgba(29, 78, 216, 0.7);
+          --l-accent-solid: #1d4ed8;
           --l-input-bg: rgba(255, 255, 255, 0.6);
           --l-input-border: rgba(100, 116, 139, 0.15);
           --l-input-focus-bg: rgba(255, 255, 255, 0.8);
-          --l-focus-border: rgba(79, 110, 247, 0.45);
-          --l-focus-shadow: 0 0 0 4px rgba(79, 110, 247, 0.08), 0 0 20px rgba(79, 110, 247, 0.05);
-          --l-icon-glow: drop-shadow(0 0 4px rgba(79, 110, 247, 0.25));
+          --l-focus-border: rgba(29, 78, 216, 0.45);
+          --l-focus-shadow: 0 0 0 4px rgba(29, 78, 216, 0.08), 0 0 20px rgba(29, 78, 216, 0.05);
+          --l-icon-glow: drop-shadow(0 0 4px rgba(29, 78, 216, 0.25));
           --l-divider: rgba(100, 116, 139, 0.08);
-          --l-badge-dot: rgba(79, 110, 247, 0.45);
+          --l-badge-dot: rgba(29, 78, 216, 0.45);
           --l-badge-text: rgba(100, 116, 139, 0.45);
           --l-checkbox-border: rgba(100, 116, 139, 0.2);
           --l-checkbox-bg: rgba(255,255,255,0.5);
-          --l-forgot-color: rgba(79, 110, 247, 0.8);
-          --l-back-color: rgba(79, 110, 247, 0.7);
+          --l-forgot-color: rgba(29, 78, 216, 0.8);
+          --l-back-color: rgba(29, 78, 216, 0.7);
           --l-spinner-track: rgba(255,255,255,0.3);
           --l-spinner-head: #fff;
           --l-step-inactive: rgba(100, 116, 139, 0.12);
           --l-footer-color: rgba(100, 116, 139, 0.35);
           --l-step2-note: rgba(100, 116, 139, 0.4);
-          --l-shape-border: rgba(79, 110, 247, 0.12);
-          --l-shape-fill: linear-gradient(135deg, rgba(79, 110, 247, 0.06), rgba(139, 92, 246, 0.04));
+          --l-shape-border: rgba(29, 78, 216, 0.12);
+          --l-shape-fill: linear-gradient(135deg, rgba(29, 78, 216, 0.06), rgba(6, 182, 212, 0.04));
           --l-stat-label: rgba(71, 85, 105, 0.5);
-          --l-left-brand-sub: rgba(79, 110, 247, 0.6);
+          --l-left-brand-sub: rgba(29, 78, 216, 0.6);
           --l-left-body: rgba(71, 85, 105, 0.6);
-          --l-radial-glow: radial-gradient(circle, rgba(79, 110, 247, 0.04), transparent 70%);
-          --l-blob1: radial-gradient(circle, rgba(79, 110, 247, 0.15), transparent 70%);
-          --l-blob2: radial-gradient(circle, rgba(139, 92, 246, 0.1), transparent 70%);
+          --l-radial-glow: radial-gradient(circle, rgba(29, 78, 216, 0.04), transparent 70%);
+          --l-blob1: radial-gradient(circle, rgba(29, 78, 216, 0.15), transparent 70%);
+          --l-blob2: radial-gradient(circle, rgba(6, 182, 212, 0.15), transparent 70%);
           --l-dropdown-bg: rgba(255, 255, 255, 0.95);
           --l-dropdown-border: rgba(100, 116, 139, 0.12);
           --l-dropdown-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(100,116,139,0.05);
-          --l-selected-bg: rgba(79, 110, 247, 0.08);
-          --l-hover-bg: rgba(79, 110, 247, 0.04);
+          --l-selected-bg: rgba(29, 78, 216, 0.08);
+          --l-hover-bg: rgba(29, 78, 216, 0.04);
           --l-clear-bg: rgba(100,116,139,0.06);
           --l-toggle-bg: rgba(255, 255, 255, 0.7);
           --l-toggle-border: rgba(100, 116, 139, 0.12);
           --l-toggle-shadow: 0 2px 12px rgba(0,0,0,0.06);
-          --l-fingerprint-bg: rgba(79, 110, 247, 0.08);
-          --l-secure-text: rgba(79, 110, 247, 0.5);
+          --l-fingerprint-bg: rgba(29, 78, 216, 0.08);
+          --l-secure-text: rgba(29, 78, 216, 0.5);
         }
 
         /* ═══ KEYFRAMES ═══ */
@@ -716,6 +716,7 @@ function LoginPage() {
           -webkit-mask-composite: xor;
           mask-composite: exclude;
           animation: borderRotate 4s linear infinite;
+          pointer-events: none;
         }
         .login-glass-input {
           background: var(--l-input-bg);
@@ -730,12 +731,12 @@ function LoginPage() {
         .btn-shine {
           position: relative;
           overflow: hidden;
-          background: linear-gradient(135deg, #4f6ef7, #7c3aed);
-          box-shadow: 0 8px 32px rgba(79, 110, 247, 0.35);
+          background: linear-gradient(135deg, var(--l-accent-solid), #0b3c95);
+          box-shadow: 0 8px 32px rgba(29, 78, 216, 0.35);
           transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .btn-shine:hover:not(:disabled) {
-          box-shadow: 0 12px 40px rgba(79, 110, 247, 0.5);
+          box-shadow: 0 12px 40px rgba(29, 78, 216, 0.5);
           transform: translateY(-2px);
         }
         .btn-shine:active:not(:disabled) { transform: translateY(0); }
@@ -794,7 +795,7 @@ function LoginPage() {
         <div className="relative z-10 -mt-8">
           <h2 className="text-4xl xl:text-5xl font-black leading-[1.1] tracking-tight mb-4" style={{ color: "var(--l-text-heading)" }}>
             Workforce<br />Intelligence,<br />
-            <span style={{ background: "linear-gradient(135deg, #7ba4ff, #c084fc, #06b6d4)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            <span style={{ background: "linear-gradient(135deg, #1d4ed8, #3b82f6, #06b6d4)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
               <TypeWriter texts={["Reimagined.", "Simplified.", "Amplified.", "Unified."]} />
             </span>
           </h2>
@@ -860,12 +861,12 @@ function LoginPage() {
               {/* Form */}
               <form onSubmit={handleLogin} className="space-y-5">
                 <div>
-                  <label className="block text-[11px] font-bold mb-2 uppercase tracking-wider" style={{ color: "var(--l-label)" }} htmlFor="login-email">Email Address</label>
+                  <label className="block text-[11px] font-bold mb-2 uppercase tracking-wider" style={{ color: "var(--l-label)" }} htmlFor="login-username">User ID</label>
                   <div className="login-glass-input rounded-2xl flex items-center gap-3 px-4 py-3.5">
-                    <Mail className="w-[18px] h-[18px] flex-shrink-0 transition-all duration-400" style={{ color: focusedField === "email" ? "var(--l-icon-active)" : "var(--l-icon-muted)", filter: focusedField === "email" ? "var(--l-icon-glow)" : "none" }} />
-                    <input id="login-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} onFocus={() => setFocusedField("email")} onBlur={() => setFocusedField(null)}
-                      placeholder="you@company.com" className="w-full bg-transparent outline-none text-sm font-medium"
-                      style={{ color: "var(--l-text)", caretColor: "var(--l-accent-solid)" }} autoComplete="email" required />
+                    <User className="w-[18px] h-[18px] flex-shrink-0 transition-all duration-400" style={{ color: focusedField === "email" ? "var(--l-icon-active)" : "var(--l-icon-muted)", filter: focusedField === "email" ? "var(--l-icon-glow)" : "none" }} />
+                    <input id="login-username" type="text" value={email} onChange={(e) => setEmail(e.target.value)} onFocus={() => setFocusedField("email")} onBlur={() => setFocusedField(null)}
+                      placeholder="Enter your User ID" className="w-full bg-transparent outline-none text-sm font-medium"
+                      style={{ color: "var(--l-text)", caretColor: "var(--l-accent-solid)" }} autoComplete="username" required />
                   </div>
                 </div>
 
@@ -954,8 +955,8 @@ function LoginPage() {
               <div key={s} className="h-1.5 rounded-full transition-all duration-600"
                 style={{
                   width: step === s ? 28 : 8,
-                  background: step === s ? "linear-gradient(90deg, #4f6ef7, #8b5cf6)" : "var(--l-step-inactive)",
-                  boxShadow: step === s ? "0 0 12px rgba(79, 110, 247, 0.3)" : "none",
+                  background: step === s ? "linear-gradient(90deg, #1d4ed8, #3b82f6)" : "var(--l-step-inactive)",
+                  boxShadow: step === s ? "0 0 12px rgba(29, 78, 216, 0.3)" : "none",
                 }} />
             ))}
           </div>
