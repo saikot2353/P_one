@@ -116,6 +116,21 @@ function AuroraCanvas({ theme }: { theme: Theme }) {
         ctx.shadowBlur = 0;
       }
 
+      // Floating light dust particles (aurora embers)
+      const numParticles = 25;
+      for (let i = 0; i < numParticles; i++) {
+        const px = ((i * 197.3 + time * 15) % w);
+        const py = (h * 0.9 - ((i * 37.7 + time * 30) % (h * 0.8)));
+        const opacity = Math.sin((py / h) * Math.PI) * (isDark ? 0.08 : 0.15) * (0.6 + 0.4 * Math.sin(time * 2 + i));
+        const r = 1 + (i % 2.5);
+        ctx.beginPath();
+        ctx.arc(px, py, r, 0, Math.PI * 2);
+        ctx.fillStyle = isDark 
+          ? `rgba(100, 180, 255, ${opacity})`
+          : `rgba(29, 78, 216, ${opacity})`;
+        ctx.fill();
+      }
+
       // Stars (dark mode only)
       if (isDark) {
         for (let i = 0; i < 80; i++) {
@@ -213,7 +228,7 @@ function TypeWriter({ texts }: { texts: string[] }) {
       <span
         className="inline-block w-[2px] h-[1em] ml-0.5 align-text-bottom"
         style={{
-          background: "linear-gradient(180deg, #6e8efb, #a777e3)",
+          background: "linear-gradient(180deg, var(--l-accent-solid), var(--l-icon-active))",
           animation: "blink 1s step-end infinite",
         }}
       />
@@ -250,7 +265,7 @@ function AnimatedCounter({ end, suffix, label, delay }: {
       <div
         className="text-2xl font-black"
         style={{
-          background: "linear-gradient(135deg, #7ba4ff, #c084fc)",
+          background: "linear-gradient(135deg, #1d4ed8, #00b4d8)",
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
         }}
@@ -473,22 +488,11 @@ function LoginPage() {
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [transitioning, setTransitioning] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window !== "undefined") {
-      return (localStorage.getItem("login-theme") as Theme) || "light";
-    }
-    return "light";
-  });
+  const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
     requestAnimationFrame(() => setMounted(true));
   }, []);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("login-theme", theme);
-    }
-  }, [theme]);
 
   const toggleTheme = useCallback(() => setTheme((t) => (t === "dark" ? "light" : "dark")), []);
 
@@ -647,8 +651,9 @@ function LoginPage() {
 
         /* ═══ KEYFRAMES ═══ */
         @keyframes floatShape {
-          0%, 100% { transform: translateY(0) scale(1); }
-          50% { transform: translateY(-25px) scale(1.05); }
+          0% { transform: translateY(0) rotate(0deg) scale(1); }
+          50% { transform: translateY(-25px) rotate(6deg) scale(1.03); }
+          100% { transform: translateY(0) rotate(0deg) scale(1); }
         }
         @keyframes blink { 50% { opacity: 0; } }
         @keyframes pulseRing {
