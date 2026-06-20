@@ -495,7 +495,7 @@ function PeerReviewPage() {
       {/* Nominate Peer Modal */}
       {showNominateModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-border/80 flex flex-col animate-in slide-in-from-bottom-4 duration-300">
+          <div className="bg-card w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border border-border/80 flex flex-col animate-in slide-in-from-bottom-4 duration-300">
             <div className="px-6 py-5 border-b border-border/50 bg-gradient-to-r from-muted/50 to-muted/20 flex justify-between items-start">
               <div>
                 <h2 className="text-lg font-black tracking-tight">Nominate a Peer</h2>

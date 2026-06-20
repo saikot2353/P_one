@@ -380,7 +380,7 @@ function ProposeIncrementPage() {
         {/* Dynamic Edit Modal Popover */}
         {editingRow && (
           <div className="fixed inset-0 bg-background/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-            <div className="bg-card border border-border rounded-lg w-full max-w-md p-6 shadow-xl space-y-4 animate-in zoom-in-95 duration-250">
+            <div className="bg-card border border-border rounded-lg w-full max-w-2xl p-6 shadow-xl space-y-4 animate-in zoom-in-95 duration-250">
               <div className="flex items-center justify-between pb-3 border-b border-border/20">
                 <h3 className="text-sm font-black text-foreground flex items-center gap-1.5 uppercase">
                   <Sparkles className="size-4.5 text-primary" />

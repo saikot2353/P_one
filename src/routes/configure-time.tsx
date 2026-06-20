@@ -232,6 +232,7 @@ function TimeSetupPage() {
 
   // OT Config Info modal state
   const [isOtInfoOpen, setIsOtInfoOpen] = useState(false);
+  const [oiModalTab, setOiModalTab] = useState<"general" | "timings" | "slabs" | "rules" | "breaks">("general");
   const [otInfoItem, setOtInfoItem] = useState<OtConfig | null>(null);
   const [oiEmployeeType, setOiEmployeeType] = useState("ALL");
   const [oiDepartment, setOiDepartment] = useState("All Departments");
@@ -1311,254 +1312,305 @@ function TimeSetupPage() {
                 </button>
               </div>
 
+              {/* Tab Navigation */}
+              <div className="flex border-b border-border/50 bg-[#f8fafc]/50 dark:bg-[#0f172a]/30 px-6 py-2 gap-4 select-none">
+                {[
+                  { id: "general", label: "Target & Scope" },
+                  { id: "timings", label: "Shift & Timings" },
+                  { id: "slabs", label: "Overtime Slabs" },
+                  { id: "rules", label: "Rounding & Rules" },
+                  { id: "breaks", label: "Breaks & Deductions" }
+                ].map(t => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setOiModalTab(t.id as any)}
+                    className={`pb-1.5 text-xs font-bold uppercase tracking-wider relative cursor-pointer transition ${
+                      oiModalTab === t.id ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {t.label}
+                    {oiModalTab === t.id && (
+                      <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full animate-in fade-in duration-200" />
+                    )}
+                  </button>
+                ))}
+              </div>
+
               {/* Body */}
               <div className="flex-1 overflow-y-auto p-6 space-y-4">
 
-                {/* Row 0: Employee Type, Department, Section, Designation, Unit */}
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Employee Type *</label>
-                    <select value={oiEmployeeType} onChange={e => setOiEmployeeType(e.target.value)} className={insetSelectClass}>
-                      <option value="ALL">ALL</option>
-                      <option value="Operator">Operator</option>
-                      <option value="Supervisor">Supervisor</option>
-                      <option value="Helper">Helper</option>
-                      <option value="Admin staff">Admin staff</option>
-                      <option value="Permanent Worker">Permanent Worker</option>
-                      <option value="Casual Worker">Casual Worker</option>
-                    </select>
+                {oiModalTab === "general" && (
+                  <div className="space-y-4 animate-in fade-in duration-200">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Employee Type *</label>
+                        <select value={oiEmployeeType} onChange={e => setOiEmployeeType(e.target.value)} className={insetSelectClass}>
+                          <option value="ALL">ALL</option>
+                          <option value="Operator">Operator</option>
+                          <option value="Supervisor">Supervisor</option>
+                          <option value="Helper">Helper</option>
+                          <option value="Admin staff">Admin staff</option>
+                          <option value="Permanent Worker">Permanent Worker</option>
+                          <option value="Casual Worker">Casual Worker</option>
+                        </select>
+                      </div>
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Department *</label>
+                        <select value={oiDepartment} onChange={e => setOiDepartment(e.target.value)} className={insetSelectClass}>
+                          <option value="All Departments">All Departments</option>
+                          <option value="Production Dept">Production Dept</option>
+                          <option value="HR & Admin">HR & Admin</option>
+                          <option value="Quality Assurance">Quality Assurance</option>
+                          <option value="Maintenance">Maintenance</option>
+                        </select>
+                      </div>
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Section *</label>
+                        <select value={oiSection} onChange={e => setOiSection(e.target.value)} className={insetSelectClass}>
+                          <option value="ALL">ALL</option>
+                          <option value="Sewing Section">Sewing Section</option>
+                          <option value="Finishing Section">Finishing Section</option>
+                          <option value="Cutting Section">Cutting Section</option>
+                          <option value="Inspection">Inspection</option>
+                        </select>
+                      </div>
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Designation *</label>
+                        <select value={oiDesignation} onChange={e => setOiDesignation(e.target.value)} className={insetSelectClass}>
+                          <option value="ALL">ALL</option>
+                          <option value="Operator">Operator</option>
+                          <option value="Supervisor">Supervisor</option>
+                          <option value="Helper">Helper</option>
+                          <option value="QC Inspector">QC Inspector</option>
+                          <option value="Executive">Executive</option>
+                        </select>
+                      </div>
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Unit *</label>
+                        <select value={oiUnit} onChange={e => setOiUnit(e.target.value)} className={insetSelectClass}>
+                          <option value="ALL">ALL</option>
+                          <option value="Unit 1">Unit 1</option>
+                          <option value="Unit 2">Unit 2</option>
+                          <option value="Unit 3">Unit 3</option>
+                        </select>
+                      </div>
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>IsActive *</label>
+                        <select value={oiIsActive} onChange={e => setOiIsActive(e.target.value as any)} className={insetSelectClass}>
+                          <option value="Active">Active</option>
+                          <option value="Inactive">Inactive</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Start Date *</label>
+                        <input type="date" value={oiStartDate} onChange={e => setOiStartDate(e.target.value)} className={insetInputClass} />
+                      </div>
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>End Date *</label>
+                        <input type="date" value={oiEndDate} onChange={e => setOiEndDate(e.target.value)} className={insetInputClass} />
+                      </div>
+                    </div>
                   </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Department *</label>
-                    <select value={oiDepartment} onChange={e => setOiDepartment(e.target.value)} className={insetSelectClass}>
-                      <option value="All Departments">All Departments</option>
-                      <option value="Production Dept">Production Dept</option>
-                      <option value="HR & Admin">HR & Admin</option>
-                      <option value="Quality Assurance">Quality Assurance</option>
-                      <option value="Maintenance">Maintenance</option>
-                    </select>
-                  </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Section *</label>
-                    <select value={oiSection} onChange={e => setOiSection(e.target.value)} className={insetSelectClass}>
-                      <option value="ALL">ALL</option>
-                      <option value="Sewing Section">Sewing Section</option>
-                      <option value="Finishing Section">Finishing Section</option>
-                      <option value="Cutting Section">Cutting Section</option>
-                      <option value="Inspection">Inspection</option>
-                    </select>
-                  </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Designation *</label>
-                    <select value={oiDesignation} onChange={e => setOiDesignation(e.target.value)} className={insetSelectClass}>
-                      <option value="ALL">ALL</option>
-                      <option value="Operator">Operator</option>
-                      <option value="Supervisor">Supervisor</option>
-                      <option value="Helper">Helper</option>
-                      <option value="QC Inspector">QC Inspector</option>
-                      <option value="Executive">Executive</option>
-                    </select>
-                  </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Unit *</label>
-                    <select value={oiUnit} onChange={e => setOiUnit(e.target.value)} className={insetSelectClass}>
-                      <option value="ALL">ALL</option>
-                      <option value="Unit 1">Unit 1</option>
-                      <option value="Unit 2">Unit 2</option>
-                      <option value="Unit 3">Unit 3</option>
-                    </select>
-                  </div>
-                </div>
+                )}
 
-                {/* Row 1: Start Date / End Date */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Start Date *</label>
-                    <input type="date" value={oiStartDate} onChange={e => setOiStartDate(e.target.value)} className={insetInputClass} />
+                {oiModalTab === "timings" && (
+                  <div className="space-y-4 animate-in fade-in duration-200">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Shift</label>
+                        <select value={oiShift} onChange={e => setOiShift(e.target.value)} className={insetSelectClass}>
+                          <option value="General">General</option>
+                          <option value="Morning Roster">Morning Roster</option>
+                          <option value="Evening Roster">Evening Roster</option>
+                          <option value="Night Roster">Night Roster</option>
+                          <option value="ALL">ALL</option>
+                        </select>
+                      </div>
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Start Time *</label>
+                        <input type="text" value={oiStartTime} onChange={e => setOiStartTime(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
+                      </div>
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>End Time *</label>
+                        <input type="text" value={oiEndTime} onChange={e => setOiEndTime(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
+                      </div>
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Shift Start Time *</label>
+                        <input type="text" value={oiShiftStartTime} onChange={e => setOiShiftStartTime(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
+                      </div>
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>OT Start Time *</label>
+                        <input type="text" value={oiOtStartTime} onChange={e => setOiOtStartTime(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
+                      </div>
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>OT Tolerance Up To</label>
+                        <input type="text" value={oiOtToleranceUpTo} onChange={e => setOiOtToleranceUpTo(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
+                      </div>
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>OT Start Time From Shift *</label>
+                      <select value={oiOtStartFromShift} onChange={e => setOiOtStartFromShift(e.target.value as "Yes" | "No")} className={insetSelectClass}>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </select>
+                    </div>
                   </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>End Date *</label>
-                    <input type="date" value={oiEndDate} onChange={e => setOiEndDate(e.target.value)} className={insetInputClass} />
-                  </div>
-                </div>
+                )}
 
-                {/* Row 2: Shift / Start Time / End Time / Shift Start Time / OT Start Time / OT Tolerance Up To */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Shift</label>
-                    <select value={oiShift} onChange={e => setOiShift(e.target.value)} className={insetSelectClass}>
-                      <option value="General">General</option>
-                      <option value="Morning Roster">Morning Roster</option>
-                      <option value="Evening Roster">Evening Roster</option>
-                      <option value="Night Roster">Night Roster</option>
-                      <option value="ALL">ALL</option>
-                    </select>
-                  </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Start Time *</label>
-                    <input type="text" value={oiStartTime} onChange={e => setOiStartTime(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
-                  </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>End Time *</label>
-                    <input type="text" value={oiEndTime} onChange={e => setOiEndTime(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
-                  </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Shift Start Time *</label>
-                    <input type="text" value={oiShiftStartTime} onChange={e => setOiShiftStartTime(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
-                  </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>OT Start Time *</label>
-                    <input type="text" value={oiOtStartTime} onChange={e => setOiOtStartTime(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
-                  </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>OT Tolerance Up To</label>
-                    <input type="text" value={oiOtToleranceUpTo} onChange={e => setOiOtToleranceUpTo(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
-                  </div>
-                </div>
+                {oiModalTab === "slabs" && (
+                  <div className="space-y-4 animate-in fade-in duration-200">
+                    <div className="bg-muted/10 p-4 rounded-xl border border-border/60">
+                      <h4 className="text-xs font-black uppercase text-foreground mb-3">Slab 2 Rules</h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className={insetWrapperClass}>
+                          <label className={insetLabelClass}>Time-2 (Min) *</label>
+                          <input type="number" value={oiTime2Min} onChange={e => setOiTime2Min(Number(e.target.value))} className={insetInputClass} />
+                        </div>
+                        <div className={insetWrapperClass}>
+                          <label className={insetLabelClass}>Time-2 Max OT (Min) *</label>
+                          <input type="number" value={oiTime2MaxOt} onChange={e => setOiTime2MaxOt(Number(e.target.value))} className={insetInputClass} />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-muted/10 p-4 rounded-xl border border-border/60">
+                      <h4 className="text-xs font-black uppercase text-foreground mb-3">Slab 3 Rules</h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className={insetWrapperClass}>
+                          <label className={insetLabelClass}>Time-3 (Min) *</label>
+                          <input type="number" value={oiTime3Min} onChange={e => setOiTime3Min(Number(e.target.value))} className={insetInputClass} />
+                        </div>
+                        <div className={insetWrapperClass}>
+                          <label className={insetLabelClass}>Time-3 Max OT (Min) *</label>
+                          <input type="number" value={oiTime3MaxOt} onChange={e => setOiTime3MaxOt(Number(e.target.value))} className={insetInputClass} />
+                        </div>
+                      </div>
+                    </div>
 
-                {/* Row 3: Time-2 / Time-2 Max OT / Time-3 / Time-3 Max OT / Time-4 / Time-4 Max OT */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Time-2 (Min) *</label>
-                    <input type="number" value={oiTime2Min} onChange={e => setOiTime2Min(Number(e.target.value))} className={insetInputClass} />
+                    <div className="bg-muted/10 p-4 rounded-xl border border-border/60">
+                      <h4 className="text-xs font-black uppercase text-foreground mb-3">Slab 4 Rules</h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className={insetWrapperClass}>
+                          <label className={insetLabelClass}>Time-4 (Min) *</label>
+                          <input type="number" value={oiTime4Min} onChange={e => setOiTime4Min(Number(e.target.value))} className={insetInputClass} />
+                        </div>
+                        <div className={insetWrapperClass}>
+                          <label className={insetLabelClass}>Time-4 Max OT (Min) *</label>
+                          <input type="number" value={oiTime4MaxOt} onChange={e => setOiTime4MaxOt(Number(e.target.value))} className={insetInputClass} />
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Time-2 Max OT (Min) *</label>
-                    <input type="number" value={oiTime2MaxOt} onChange={e => setOiTime2MaxOt(Number(e.target.value))} className={insetInputClass} />
-                  </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Time-3 (Min) *</label>
-                    <input type="number" value={oiTime3Min} onChange={e => setOiTime3Min(Number(e.target.value))} className={insetInputClass} />
-                  </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Time-3 Max OT (Min) *</label>
-                    <input type="number" value={oiTime3MaxOt} onChange={e => setOiTime3MaxOt(Number(e.target.value))} className={insetInputClass} />
-                  </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Time-4 (Min) *</label>
-                    <input type="number" value={oiTime4Min} onChange={e => setOiTime4Min(Number(e.target.value))} className={insetInputClass} />
-                  </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Time-4 Max OT (Min) *</label>
-                    <input type="number" value={oiTime4MaxOt} onChange={e => setOiTime4MaxOt(Number(e.target.value))} className={insetInputClass} />
-                  </div>
-                </div>
+                )}
 
-                {/* Row 4: OT After WH / General Deduct Hour / Holiday Deduct Hour / Deduct After */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>OT After WH *</label>
-                    <select value={oiOtAfterWH} onChange={e => setOiOtAfterWH(e.target.value as "Yes" | "No")} className={insetSelectClass}>
-                      <option value="No">No</option>
-                      <option value="Yes">Yes</option>
-                    </select>
+                {oiModalTab === "rules" && (
+                  <div className="space-y-4 animate-in fade-in duration-200">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>OT After WH *</label>
+                        <select value={oiOtAfterWH} onChange={e => setOiOtAfterWH(e.target.value as "Yes" | "No")} className={insetSelectClass}>
+                          <option value="No">No</option>
+                          <option value="Yes">Yes</option>
+                        </select>
+                      </div>
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>OT Round *</label>
+                        <select value={oiOtRound} onChange={e => setOiOtRound(e.target.value as "Yes" | "No")} className={insetSelectClass}>
+                          <option value="Yes">Yes</option>
+                          <option value="No">No</option>
+                        </select>
+                      </div>
+                      <div className={`${insetWrapperClass} sm:col-span-2`}>
+                        <label className={insetLabelClass}>Round Slots (Use number &amp; Comma) *</label>
+                        <input type="text" value={oiRoundSlots} onChange={e => setOiRoundSlots(e.target.value)} className={insetInputClass} placeholder="0-49,0#50-59,1" />
+                      </div>
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Min OT *</label>
+                        <input type="number" value={oiMinOt} onChange={e => setOiMinOt(Number(e.target.value))} className={insetInputClass} />
+                      </div>
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Max OT *</label>
+                        <input type="number" value={oiMaxOt} onChange={e => setOiMaxOt(Number(e.target.value))} className={insetInputClass} />
+                      </div>
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>OT Type *</label>
+                        <select value={oiOtType} onChange={e => setOiOtType(e.target.value)} className={insetSelectClass}>
+                          <option value="General">General</option>
+                          <option value="Flat Hour">Flat Hour</option>
+                          <option value="Basic Ratio">Basic Ratio</option>
+                          <option value="Gross Ratio">Gross Ratio</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="bg-muted/10 p-4 rounded-xl border border-border/60">
+                      <h4 className="text-xs font-black uppercase text-foreground mb-3">OT Deductions</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className={insetWrapperClass}>
+                          <label className={insetLabelClass}>General Deduct Hour *</label>
+                          <input type="number" value={oiGeneralDeductHour} onChange={e => setOiGeneralDeductHour(Number(e.target.value))} className={insetInputClass} />
+                        </div>
+                        <div className={insetWrapperClass}>
+                          <label className={insetLabelClass}>Holiday Deduct Hour *</label>
+                          <input type="number" value={oiHolidayDeductHour} onChange={e => setOiHolidayDeductHour(Number(e.target.value))} className={insetInputClass} />
+                        </div>
+                        <div className={insetWrapperClass}>
+                          <label className={insetLabelClass}>Deduct After *</label>
+                          <input type="number" value={oiDeductAfter} onChange={e => setOiDeductAfter(Number(e.target.value))} className={insetInputClass} />
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>General Deduct Hour *</label>
-                    <input type="number" value={oiGeneralDeductHour} onChange={e => setOiGeneralDeductHour(Number(e.target.value))} className={insetInputClass} />
-                  </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Holiday Deduct Hour *</label>
-                    <input type="number" value={oiHolidayDeductHour} onChange={e => setOiHolidayDeductHour(Number(e.target.value))} className={insetInputClass} />
-                  </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Deduct After *</label>
-                    <input type="number" value={oiDeductAfter} onChange={e => setOiDeductAfter(Number(e.target.value))} className={insetInputClass} />
-                  </div>
-                </div>
+                )}
 
-                {/* Row 5: OT Round / Round Slots / Min OT / Max OT */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>OT Round *</label>
-                    <select value={oiOtRound} onChange={e => setOiOtRound(e.target.value as "Yes" | "No")} className={insetSelectClass}>
-                      <option value="Yes">Yes</option>
-                      <option value="No">No</option>
-                    </select>
-                  </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Round Slots (Use number &amp; Comma) *</label>
-                    <input type="text" value={oiRoundSlots} onChange={e => setOiRoundSlots(e.target.value)} className={insetInputClass} placeholder="0-49,0#50-59,1" />
-                  </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Min OT *</label>
-                    <input type="number" value={oiMinOt} onChange={e => setOiMinOt(Number(e.target.value))} className={insetInputClass} />
-                  </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Max OT *</label>
-                    <input type="number" value={oiMaxOt} onChange={e => setOiMaxOt(Number(e.target.value))} className={insetInputClass} />
-                  </div>
-                </div>
+                {oiModalTab === "breaks" && (
+                  <div className="space-y-4 animate-in fade-in duration-200">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Prayer Break</label>
+                        <select value={oiPrayerBreak} onChange={e => setOiPrayerBreak(e.target.value as "Yes" | "No")} className={insetSelectClass}>
+                          <option value="No">No</option>
+                          <option value="Yes">Yes</option>
+                        </select>
+                      </div>
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Dinner/Others Break</label>
+                        <select value={oiDinnerBreak} onChange={e => setOiDinnerBreak(e.target.value as "Yes" | "No")} className={insetSelectClass}>
+                          <option value="Yes">Yes</option>
+                          <option value="No">No</option>
+                        </select>
+                      </div>
+                    </div>
 
-                {/* Row 6: OT Type */}
-                <div className={insetWrapperClass}>
-                  <label className={insetLabelClass}>OT Type *</label>
-                  <select value={oiOtType} onChange={e => setOiOtType(e.target.value)} className={insetSelectClass}>
-                    <option value="General">General</option>
-                    <option value="Flat Hour">Flat Hour</option>
-                    <option value="Basic Ratio">Basic Ratio</option>
-                    <option value="Gross Ratio">Gross Ratio</option>
-                  </select>
-                </div>
-
-                {/* Row 7: Prayer Break */}
-                <div className={insetWrapperClass}>
-                  <label className={insetLabelClass}>Prayer Break</label>
-                  <select value={oiPrayerBreak} onChange={e => setOiPrayerBreak(e.target.value as "Yes" | "No")} className={insetSelectClass}>
-                    <option value="No">No</option>
-                    <option value="Yes">Yes</option>
-                  </select>
-                </div>
-
-                {/* Row 8: Dinner/Others Break / Deduction For / Time From / Time To / Deduct Min */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Dinner/Others Break</label>
-                    <select value={oiDinnerBreak} onChange={e => setOiDinnerBreak(e.target.value as "Yes" | "No")} className={insetSelectClass}>
-                      <option value="Yes">Yes</option>
-                      <option value="No">No</option>
-                    </select>
+                    <div className="bg-muted/10 p-4 rounded-xl border border-border/60">
+                      <h4 className="text-xs font-black uppercase text-foreground mb-3">Dinner / General Break Deduction details</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className={insetWrapperClass}>
+                          <label className={insetLabelClass}>Deduction For</label>
+                          <select value={oiDeductionFor} onChange={e => setOiDeductionFor(e.target.value)} className={insetSelectClass}>
+                            <option value="Holiday">Holiday</option>
+                            <option value="Weekday">Weekday</option>
+                            <option value="All">All</option>
+                          </select>
+                        </div>
+                        <div className={insetWrapperClass}>
+                          <label className={insetLabelClass}>Time From *</label>
+                          <input type="text" value={oiTimeFrom} onChange={e => setOiTimeFrom(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
+                        </div>
+                        <div className={insetWrapperClass}>
+                          <label className={insetLabelClass}>Time To *</label>
+                          <input type="text" value={oiTimeTo} onChange={e => setOiTimeTo(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
+                        </div>
+                        <div className={insetWrapperClass}>
+                          <label className={insetLabelClass}>Deduct Min *</label>
+                          <input type="number" value={oiDeductMin} onChange={e => setOiDeductMin(Number(e.target.value))} className={insetInputClass} />
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Deduction For</label>
-                    <select value={oiDeductionFor} onChange={e => setOiDeductionFor(e.target.value)} className={insetSelectClass}>
-                      <option value="Holiday">Holiday</option>
-                      <option value="Weekday">Weekday</option>
-                      <option value="All">All</option>
-                    </select>
-                  </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Time From *</label>
-                    <input type="text" value={oiTimeFrom} onChange={e => setOiTimeFrom(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
-                  </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Time To *</label>
-                    <input type="text" value={oiTimeTo} onChange={e => setOiTimeTo(e.target.value)} className={insetInputClass} placeholder="HH:MM:SS" />
-                  </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Deduct Min *</label>
-                    <input type="number" value={oiDeductMin} onChange={e => setOiDeductMin(Number(e.target.value))} className={insetInputClass} />
-                  </div>
-                </div>
-
-                {/* Row 9: IsActive / OT Start Time From Shift */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>IsActive *</label>
-                    <select value={oiIsActive} onChange={e => setOiIsActive(e.target.value as "Active" | "Inactive")} className={insetSelectClass}>
-                      <option value="Active">Active</option>
-                      <option value="Inactive">Inactive</option>
-                    </select>
-                  </div>
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>OT Start Time From Shift *</label>
-                    <select value={oiOtStartFromShift} onChange={e => setOiOtStartFromShift(e.target.value as "Yes" | "No")} className={insetSelectClass}>
-                      <option value="Yes">Yes</option>
-                      <option value="No">No</option>
-                    </select>
-                  </div>
-                </div>
-
+                )}
               </div>
 
               {/* Footer */}
@@ -1570,68 +1622,97 @@ function TimeSetupPage() {
                 >
                   CLOSE
                 </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const isNew = !otInfoItem.sl || otInfoItem.sl === 0;
-                    const sl = isNew ? (otConfigs.length > 0 ? Math.max(...otConfigs.map(o => o.sl)) + 1 : 1) : otInfoItem.sl;
-                    
-                    const updatedItem: OtConfig = {
-                      sl,
-                      employeeType: oiEmployeeType,
-                      department: oiDepartment,
-                      section: oiSection,
-                      designation: oiDesignation,
-                      unit: oiUnit,
-                      otCalculationType: oiOtType,
-                      bufferMinutes: 15,
-                      isActive: oiIsActive,
-                      startDate: oiStartDate,
-                      endDate: oiEndDate,
-                      shift: oiShift,
-                      startTime: oiStartTime,
-                      endTime: oiEndTime,
-                      shiftStartTime: oiShiftStartTime,
-                      otStartTime: oiOtStartTime,
-                      otToleranceUpTo: oiOtToleranceUpTo,
-                      time2Min: oiTime2Min,
-                      time2MaxOt: oiTime2MaxOt,
-                      time3Min: oiTime3Min,
-                      time3MaxOt: oiTime3MaxOt,
-                      time4Min: oiTime4Min,
-                      time4MaxOt: oiTime4MaxOt,
-                      otAfterWH: oiOtAfterWH,
-                      generalDeductHour: oiGeneralDeductHour,
-                      holidayDeductHour: oiHolidayDeductHour,
-                      deductAfter: oiDeductAfter,
-                      otRound: oiOtRound,
-                      roundSlots: oiRoundSlots,
-                      minOt: oiMinOt,
-                      maxOt: oiMaxOt,
-                      prayerBreak: oiPrayerBreak,
-                      dinnerBreak: oiDinnerBreak,
-                      deductionFor: oiDeductionFor,
-                      timeFrom: oiTimeFrom,
-                      timeTo: oiTimeTo,
-                      deductMin: oiDeductMin,
-                      otStartFromShift: oiOtStartFromShift,
-                    };
+                <div className="flex items-center gap-3">
+                  {(() => {
+                    const otSteps = ["general", "timings", "slabs", "rules", "breaks"] as const;
+                    const currentStepIdx = otSteps.indexOf(oiModalTab);
+                    return (
+                      <>
+                        {currentStepIdx > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => setOiModalTab(otSteps[currentStepIdx - 1])}
+                            className="h-10 px-6 rounded-lg bg-gray-500 hover:bg-gray-600 text-white font-black text-xs transition-all uppercase tracking-wider shadow-sm hover:shadow"
+                          >
+                            BACK
+                          </button>
+                        )}
+                        {currentStepIdx < otSteps.length - 1 ? (
+                          <button
+                            type="button"
+                            onClick={() => setOiModalTab(otSteps[currentStepIdx + 1])}
+                            className="h-10 px-6 rounded-lg bg-[#3498db] hover:bg-[#2980b9] text-white font-black text-xs transition-all uppercase tracking-wider shadow-sm hover:shadow"
+                          >
+                            NEXT
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const isNew = !otInfoItem.sl || otInfoItem.sl === 0;
+                              const sl = isNew ? (otConfigs.length > 0 ? Math.max(...otConfigs.map(o => o.sl)) + 1 : 1) : otInfoItem.sl;
+                              
+                              const updatedItem: OtConfig = {
+                                sl,
+                                employeeType: oiEmployeeType,
+                                department: oiDepartment,
+                                section: oiSection,
+                                designation: oiDesignation,
+                                unit: oiUnit,
+                                otCalculationType: oiOtType,
+                                bufferMinutes: 15,
+                                isActive: oiIsActive,
+                                startDate: oiStartDate,
+                                endDate: oiEndDate,
+                                shift: oiShift,
+                                startTime: oiStartTime,
+                                endTime: oiEndTime,
+                                shiftStartTime: oiShiftStartTime,
+                                otStartTime: oiOtStartTime,
+                                otToleranceUpTo: oiOtToleranceUpTo,
+                                time2Min: oiTime2Min,
+                                time2MaxOt: oiTime2MaxOt,
+                                time3Min: oiTime3Min,
+                                time3MaxOt: oiTime3MaxOt,
+                                time4Min: oiTime4Min,
+                                time4MaxOt: oiTime4MaxOt,
+                                otAfterWH: oiOtAfterWH,
+                                generalDeductHour: oiGeneralDeductHour,
+                                holidayDeductHour: oiHolidayDeductHour,
+                                deductAfter: oiDeductAfter,
+                                otRound: oiOtRound,
+                                roundSlots: oiRoundSlots,
+                                minOt: oiMinOt,
+                                maxOt: oiMaxOt,
+                                prayerBreak: oiPrayerBreak,
+                                dinnerBreak: oiDinnerBreak,
+                                deductionFor: oiDeductionFor,
+                                timeFrom: oiTimeFrom,
+                                timeTo: oiTimeTo,
+                                deductMin: oiDeductMin,
+                                otStartFromShift: oiOtStartFromShift,
+                              };
 
-                    let nextList = [...otConfigs];
-                    if (isNew) {
-                      nextList.push(updatedItem);
-                    } else {
-                      nextList = otConfigs.map(o => o.sl === sl ? updatedItem : o);
-                    }
-                    setOtConfigs(nextList);
-                    localStorage.setItem("hris_ot_config", JSON.stringify(nextList));
-                    toast.success(isNew ? "OT Configuration created successfully!" : "OT Configuration updated successfully!");
-                    setIsOtInfoOpen(false);
-                  }}
-                  className="h-10 px-8 rounded-lg bg-[#27ae60] hover:bg-[#219a52] text-white font-black text-xs shadow-md hover:shadow-lg transition-all uppercase tracking-wider"
-                >
-                  {(!otInfoItem.sl || otInfoItem.sl === 0) ? "CREATE" : "UPDATE"}
-                </button>
+                              let nextList = [...otConfigs];
+                              if (isNew) {
+                                nextList.push(updatedItem);
+                              } else {
+                                nextList = otConfigs.map(o => o.sl === sl ? updatedItem : o);
+                              }
+                              setOtConfigs(nextList);
+                              localStorage.setItem("hris_ot_config", JSON.stringify(nextList));
+                              toast.success(isNew ? "OT Configuration created successfully!" : "OT Configuration updated successfully!");
+                              setIsOtInfoOpen(false);
+                            }}
+                            className="h-10 px-8 rounded-lg bg-[#27ae60] hover:bg-[#219a52] text-white font-black text-xs shadow-md hover:shadow-lg transition-all uppercase tracking-wider"
+                          >
+                            {(!otInfoItem.sl || otInfoItem.sl === 0) ? "CREATE" : "UPDATE"}
+                          </button>
+                        )}
+                      </>
+                    );
+                  })()}
+                </div>
               </div>
 
             </div>

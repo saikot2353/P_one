@@ -999,7 +999,7 @@ function IncrementHistoryPage() {
       {/* Record details Audit Modal */}
       {selectedRecord && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-lg rounded-lg border border-border shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-foreground">
+          <div className="bg-card w-full max-w-2xl rounded-lg border border-border shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-foreground">
 
             <button
               onClick={() => setSelectedRecord(null)}

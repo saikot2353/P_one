@@ -289,7 +289,7 @@ function KpiCyclesPage() {
       {/* ADD / EDIT MODAL */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-lg rounded-xl border border-border/80 shadow-2xl relative animate-in zoom-in-95 duration-200">
+          <div className="bg-card w-full max-w-2xl rounded-xl border border-border/80 shadow-2xl relative animate-in zoom-in-95 duration-200">
             <button
               onClick={() => setShowModal(false)}
               className="absolute right-4 top-4 p-1.5 text-muted-foreground/60 hover:text-foreground hover:bg-muted rounded-lg transition z-10"
@@ -416,7 +416,7 @@ function KpiCyclesPage() {
       {/* DELETE CONFIRM */}
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-sm rounded-xl border border-border/80 shadow-2xl p-6 animate-in zoom-in-95 duration-200 space-y-4">
+          <div className="bg-card w-full max-w-xl rounded-xl border border-border/80 shadow-2xl p-6 animate-in zoom-in-95 duration-200 space-y-4">
             <div className="flex items-center gap-3">
               <div className="size-10 rounded-xl bg-red-500/10 grid place-items-center">
                 <Trash2 className="size-5 text-red-500" />

@@ -875,7 +875,7 @@ function PendingManualAttendancePage() {
         {/* Dynamic Inline edit modal */}
         {editingRequest && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-            <div className="bg-card text-foreground rounded-lg border border-border shadow-2xl max-w-lg w-full overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="bg-card text-foreground rounded-lg border border-border shadow-2xl max-w-2xl w-full overflow-hidden animate-in zoom-in-95 duration-200">
 
               <div className="px-5 py-4 border-b border-border/60 flex items-center justify-between bg-muted/30">
                 <h2 className="text-xs font-black text-foreground flex items-center gap-1.5 tracking-wide uppercase">
