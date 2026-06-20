@@ -136,7 +136,7 @@ function LeaveApplicationPage() {
       <main className="flex-1 min-w-0 flex flex-col relative overflow-y-auto">
         <Topbar />
 
-        <div className="p-4 md:p-6 lg:p-8 space-y-6">
+        <div className="p-4 md:p-6 lg:p-8 space-y-2">
 
           {/* Breadcrumb and Modern Page Header */}
           <div className="relative overflow-hidden bg-gradient-to-r from-[#3f51b5]/10 via-[#00bcd4]/10 to-[#9c27b0]/5 dark:from-[#3f51b5]/25 dark:via-[#00bcd4]/20 dark:to-[#9c27b0]/15 rounded-2xl border border-primary/10 p-6 md:p-8 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
@@ -171,12 +171,12 @@ function LeaveApplicationPage() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-2">
 
             {/* Form Section */}
-            <div className="xl:col-span-2 space-y-6">
+            <div className="xl:col-span-2 space-y-2">
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-2">
 
                 {/* PART 1: APPLICANT DETAILS */}
                 <div className="bg-card border border-border/80 rounded-2xl p-6 shadow-xs space-y-5 relative overflow-hidden">
@@ -484,7 +484,7 @@ function LeaveApplicationPage() {
             </div>
 
             {/* Sidebar Balance summary */}
-            <div className="space-y-6">
+            <div className="space-y-2">
 
               <div className="bg-card border border-border/80 rounded-2xl p-6 shadow-xs space-y-5 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-emerald-500/40 to-transparent" />

@@ -101,7 +101,7 @@ export default function ICTRequisitionPage() {
       <main className="flex-1 min-w-0 flex flex-col overflow-hidden">
         <Topbar />
 
-        <div className="flex-1 overflow-hidden flex flex-col px-6 py-4 gap-4">
+        <div className="flex-1 overflow-hidden flex flex-col px-6 py-4 gap-2">
 
           {/* Breadcrumb & Header */}
           <div className="flex items-center justify-between shrink-0">
@@ -120,7 +120,7 @@ export default function ICTRequisitionPage() {
             </span>
           </div>
 
-          <div className="flex-1 flex gap-5 min-h-0 overflow-hidden">
+          <div className="flex-1 flex gap-2 min-h-0 overflow-hidden">
 
             {/* ── LEFT: Form Card ───────────────────────────── */}
             <div className="flex-1 bg-card border border-border/80 rounded-2xl shadow-xs flex flex-col overflow-hidden max-w-2xl relative">
@@ -151,6 +151,30 @@ export default function ICTRequisitionPage() {
 
                 {mode === "service" && (
                   <div className="space-y-5 animate-in fade-in duration-200">
+                    {/* Quick Preset Buttons */}
+                    <div className="space-y-2">
+                      <span className="text-[10px] font-black uppercase text-muted-foreground tracking-wider block">Quick Presets</span>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          { label: "OS Reinstallation", prod: "OS Installation", just: "Operating system is corrupted or sluggish and requires a fresh install" },
+                          { label: "Printer Repair", prod: "Printer Repair", just: "Printer is jamming frequently and failing to output documents" },
+                          { label: "WiFi / IP Issue", prod: "Network Setup", just: "Unable to connect to the corporate network or facing IP conflicts" }
+                        ].map((p) => (
+                          <button
+                            type="button"
+                            key={p.label}
+                            onClick={() => {
+                              setSProduct(p.prod);
+                              setSJustification(p.just);
+                            }}
+                            className="text-[10.5px] font-bold px-3 py-1.5 rounded-lg border border-border/80 bg-muted/20 hover:border-blue-500/40 hover:bg-blue-500/5 text-muted-foreground hover:text-blue-500 transition-all select-none"
+                          >
+                            {p.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
                     <Field label="Service / Product Required" required>
                       <input
                         type="text"
@@ -173,15 +197,50 @@ export default function ICTRequisitionPage() {
 
                 {mode === "store" && (
                   <div className="space-y-5 animate-in fade-in duration-200">
-                    <div className="grid grid-cols-2 gap-4">
-                      <Field label="Product For" required>
-                        <SearchableSelect
-                          value={stProductFor}
-                          onChange={setStProductFor}
-                          options={productForOptions}
-                          className={inputClass}
-                        />
-                      </Field>
+                    {/* Quick Preset Buttons */}
+                    <div className="space-y-2">
+                      <span className="text-[10px] font-black uppercase text-muted-foreground tracking-wider block">Popular Items</span>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          { label: "Wired Mouse", prod: "Wired Mouse", qty: "1", just: "Old mouse scroll wheel is malfunctioning and unresponsive" },
+                          { label: "USB Keyboard", prod: "USB Keyboard", qty: "1", just: "Multiple keys on the current keyboard are stuck or missing" },
+                          { label: "HDMI Cable", prod: "HDMI Cable (1.5m)", qty: "1", just: "Required to connect notebook to a secondary workflow monitor" }
+                        ].map((p) => (
+                          <button
+                            type="button"
+                            key={p.label}
+                            onClick={() => {
+                              setStProduct(p.prod);
+                              setStQuantity(p.qty);
+                              setStJustification(p.just);
+                            }}
+                            className="text-[10.5px] font-bold px-3 py-1.5 rounded-lg border border-border/80 bg-muted/20 hover:border-purple-500/40 hover:bg-purple-500/5 text-muted-foreground hover:text-purple-500 transition-all select-none"
+                          >
+                            {p.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                      <div className="space-y-2 col-span-2">
+                        <label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Product For *</label>
+                        <div className="flex bg-muted/30 p-1 rounded-xl border border-border/80 h-10 items-center justify-stretch">
+                          {["Department Uses", "Personal Uses"].map((c) => {
+                            const isActive = stProductFor === c;
+                            return (
+                              <button
+                                type="button"
+                                key={c}
+                                onClick={() => setStProductFor(c)}
+                                className={`flex-1 h-8 rounded-lg text-[10.5px] font-black uppercase tracking-wider transition-all select-none ${isActive ? "bg-background text-primary shadow-xs" : "text-muted-foreground hover:text-foreground"}`}
+                              >
+                                {c.split(" ")[0]}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
                       <Field label="Quantity" required>
                         <input
                           type="text"
@@ -226,7 +285,7 @@ export default function ICTRequisitionPage() {
             </div>
 
             {/* ── RIGHT: List + Submit ────────────────── */}
-            <div className="flex-[1.5] flex flex-col gap-4 shrink-0 overflow-hidden">
+            <div className="flex-[1.5] flex flex-col gap-2 shrink-0 overflow-hidden">
 
               {/* Table Card */}
               <div className="flex-1 bg-card border border-border/80 rounded-2xl shadow-xs overflow-hidden flex flex-col relative">

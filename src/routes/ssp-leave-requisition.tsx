@@ -79,7 +79,7 @@ export default function LeaveRequisitionPage() {
         <Topbar />
 
         {/* Page Content */}
-        <div className="flex-1 overflow-hidden flex flex-col px-6 py-4 gap-4">
+        <div className="flex-1 overflow-hidden flex flex-col px-6 py-4 gap-2">
 
           {/* Breadcrumb & Header */}
           <div className="flex items-center justify-between shrink-0">
@@ -99,7 +99,7 @@ export default function LeaveRequisitionPage() {
           </div>
 
           {/* Two-column layout */}
-          <div className="flex-1 flex gap-5 min-h-0 overflow-hidden">
+          <div className="flex-1 flex gap-2 min-h-0 overflow-hidden">
 
             {/* ── LEFT: Form Card ───────────────────────────── */}
             <div className="flex-1 bg-card border border-border/80 rounded-2xl shadow-xs flex flex-col overflow-hidden relative">
@@ -241,7 +241,7 @@ export default function LeaveRequisitionPage() {
             </div>
 
             {/* ── RIGHT: Balance + On Behalf ────────────────── */}
-            <div className="w-[320px] flex flex-col gap-4 shrink-0 overflow-y-auto">
+            <div className="w-[320px] flex flex-col gap-2 shrink-0 overflow-y-auto">
 
               {/* Leave Balance Card */}
               <div className="bg-card border border-border/80 rounded-2xl shadow-xs overflow-hidden relative">
