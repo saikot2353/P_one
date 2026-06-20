@@ -31,6 +31,7 @@ import { Route as PersonnelListRouteImport } from './routes/personnel-list'
 import { Route as PersonnelApprovalRouteImport } from './routes/personnel-approval'
 import { Route as PendingManualAttendanceRouteImport } from './routes/pending-manual-attendance'
 import { Route as ManualAttendanceRouteImport } from './routes/manual-attendance'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as LeaveListRouteImport } from './routes/leave-list'
 import { Route as LeaveApproveRouteImport } from './routes/leave-approve'
 import { Route as LeaveApplicationRouteImport } from './routes/leave-application'
@@ -187,6 +188,11 @@ const PendingManualAttendanceRoute = PendingManualAttendanceRouteImport.update({
 const ManualAttendanceRoute = ManualAttendanceRouteImport.update({
   id: '/manual-attendance',
   path: '/manual-attendance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeaveListRoute = LeaveListRouteImport.update({
@@ -441,6 +447,7 @@ export interface FileRoutesByFullPath {
   '/leave-application': typeof LeaveApplicationRoute
   '/leave-approve': typeof LeaveApproveRoute
   '/leave-list': typeof LeaveListRoute
+  '/login': typeof LoginRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
@@ -507,6 +514,7 @@ export interface FileRoutesByTo {
   '/leave-application': typeof LeaveApplicationRoute
   '/leave-approve': typeof LeaveApproveRoute
   '/leave-list': typeof LeaveListRoute
+  '/login': typeof LoginRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
@@ -574,6 +582,7 @@ export interface FileRoutesById {
   '/leave-application': typeof LeaveApplicationRoute
   '/leave-approve': typeof LeaveApproveRoute
   '/leave-list': typeof LeaveListRoute
+  '/login': typeof LoginRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
@@ -642,6 +651,7 @@ export interface FileRouteTypes {
     | '/leave-application'
     | '/leave-approve'
     | '/leave-list'
+    | '/login'
     | '/manual-attendance'
     | '/pending-manual-attendance'
     | '/personnel-approval'
@@ -708,6 +718,7 @@ export interface FileRouteTypes {
     | '/leave-application'
     | '/leave-approve'
     | '/leave-list'
+    | '/login'
     | '/manual-attendance'
     | '/pending-manual-attendance'
     | '/personnel-approval'
@@ -774,6 +785,7 @@ export interface FileRouteTypes {
     | '/leave-application'
     | '/leave-approve'
     | '/leave-list'
+    | '/login'
     | '/manual-attendance'
     | '/pending-manual-attendance'
     | '/personnel-approval'
@@ -841,6 +853,7 @@ export interface RootRouteChildren {
   LeaveApplicationRoute: typeof LeaveApplicationRoute
   LeaveApproveRoute: typeof LeaveApproveRoute
   LeaveListRoute: typeof LeaveListRoute
+  LoginRoute: typeof LoginRoute
   ManualAttendanceRoute: typeof ManualAttendanceRoute
   PendingManualAttendanceRoute: typeof PendingManualAttendanceRoute
   PersonnelApprovalRoute: typeof PersonnelApprovalRoute
@@ -1023,6 +1036,13 @@ declare module '@tanstack/react-router' {
       path: '/manual-attendance'
       fullPath: '/manual-attendance'
       preLoaderRoute: typeof ManualAttendanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/leave-list': {
@@ -1361,6 +1381,7 @@ const rootRouteChildren: RootRouteChildren = {
   LeaveApplicationRoute: LeaveApplicationRoute,
   LeaveApproveRoute: LeaveApproveRoute,
   LeaveListRoute: LeaveListRoute,
+  LoginRoute: LoginRoute,
   ManualAttendanceRoute: ManualAttendanceRoute,
   PendingManualAttendanceRoute: PendingManualAttendanceRoute,
   PersonnelApprovalRoute: PersonnelApprovalRoute,
