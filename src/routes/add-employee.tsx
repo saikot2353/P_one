@@ -3287,8 +3287,14 @@ function AddEmployeePage() {
                           placeholder="e.g. Motijheel Branch"
                         />
                       </div>
+                    </div>
+                  </div>
 
-                      <div className              {/* TAB 3: QUALIFICATIONS & EXPERIENCE (CONSOLIDATED TABBED VIEW) */}
+                  <div className="border-t border-border/30 my-8 pt-2" />
+                </div>
+              )}
+
+              {/* TAB 3: QUALIFICATIONS & EXPERIENCE (CONSOLIDATED TABBED VIEW) */}
               {activeTab === "career_qualifications" && (
                 <div className="space-y-6 animate-in fade-in duration-200">
                   {/* Category Pills Navigation */}
@@ -3894,23 +3900,6 @@ function AddEmployeePage() {
                           toast.success("Progress saved as draft successfully!");
                         }}
                         className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
-                      >
-                        Save as Draft
-                      </button>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveTab("family_dependents");
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
-                      className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200"
-                    >
-                      Next Section <ArrowRight className="size-4" />
-                    </button>
-                  </div>
-                </div>
-              )}ext-foreground hover:bg-muted/50 transition duration-200"
                       >
                         Save as Draft
                       </button>

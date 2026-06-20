@@ -366,7 +366,7 @@ export function Sidebar() {
         <button
           onClick={() => {
             if (typeof window !== "undefined") {
-              sessionStorage.removeItem("cripton_logged_in");
+              localStorage.removeItem("cripton_logged_in");
               window.location.href = "/login";
             }
           }}

@@ -524,7 +524,7 @@ function LoginPage() {
     await new Promise((r) => setTimeout(r, 900));
     setIsLoading(false);
     if (typeof window !== "undefined") {
-      sessionStorage.setItem("cripton_logged_in", "true");
+      localStorage.setItem("cripton_logged_in", "true");
     }
     navigate({ to: "/" });
   }, [selectedCompany, selectedSection, navigate]);

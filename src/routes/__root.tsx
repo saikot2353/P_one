@@ -123,7 +123,7 @@ function RootComponent() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const isLoggedIn = sessionStorage.getItem("cripton_logged_in") === "true";
+      const isLoggedIn = localStorage.getItem("cripton_logged_in") === "true";
       const isPublicPath = currentPath === "/login" || currentPath === "/e-recruitment-form";
 
       if (!isLoggedIn && !isPublicPath) {
