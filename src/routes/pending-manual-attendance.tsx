@@ -119,6 +119,8 @@ function PendingManualAttendancePage() {
   const [editOutTime, setEditOutTime] = useState("");
   const [editReason, setEditReason] = useState("");
   const [editHodStatus, setEditHodStatus] = useState("Pending");
+  const [editHrdStatus, setEditHrdStatus] = useState("Pending");
+  const [editMdStatus, setEditMdStatus] = useState("Pending");
 
   // Custom Calendar & Clock Picker states
   const [activeDatePicker, setActiveDatePicker] = useState<{ id: string; field: string } | null>(null);
@@ -199,6 +201,19 @@ function PendingManualAttendancePage() {
     }
   };
 
+  // Reject Action (Bulk)
+  const handleRejectSelected = () => {
+    if (selectedIds.size === 0) {
+      alert("Please select at least one correction request to reject!");
+      return;
+    }
+    if (confirm(`Are you sure you want to reject ${selectedIds.size} selected pending request(s)?`)) {
+      setRequests(prev => prev.filter(r => !selectedIds.has(r.id)));
+      setSelectedIds(new Set());
+      alert("Requests rejected successfully!");
+    }
+  };
+
   // Trigger editing modal
   const handleStartEdit = (req: any) => {
     setEditingRequest(req);
@@ -206,6 +221,8 @@ function PendingManualAttendancePage() {
     setEditOutTime(req.outTime);
     setEditReason(req.reason);
     setEditHodStatus(req.hodStatus);
+    setEditHrdStatus(req.hrdStatus);
+    setEditMdStatus(req.mdStatus);
   };
 
   // Save changes from Edit Modal
@@ -219,7 +236,9 @@ function PendingManualAttendancePage() {
           inTime: editInTime,
           outTime: editOutTime,
           reason: editReason,
-          hodStatus: editHodStatus
+          hodStatus: editHodStatus,
+          hrdStatus: editHrdStatus,
+          mdStatus: editMdStatus
         };
       })
     );
@@ -462,25 +481,27 @@ function PendingManualAttendancePage() {
       <main className="flex-1 min-w-0 flex flex-col relative">
         <Topbar />
 
-        <div className="p-4 md:p-6 xl:p-8 space-y-6">
+        <div className="p-4 md:p-6 space-y-2">
           {/* Breadcrumbs and Page Title */}
-          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-2xl border border-border/80 p-4 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
+              <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
                 <ChevronRight className="size-2.5" />
                 <span className="text-muted-foreground/75">Human Resource</span>
                 <ChevronRight className="size-2.5" />
-                <span className="text-primary font-semibold">Manual Attendance Approval</span>
+                <span className="text-primary font-extrabold">Manual Attendance Approval</span>
               </div>
-              <h1 className="text-xl font-black text-foreground flex items-center gap-2">
-                <Fingerprint className="size-5.5 text-primary animate-pulse" />
+              <h1 className="text-xl md:text-2xl font-black text-foreground flex items-center gap-2">
+                <div className="p-1.5 bg-primary/10 rounded-lg border border-primary/20 text-primary">
+                  <Fingerprint className="size-5 text-primary animate-pulse" />
+                </div>
                 <span>Manual Attendance Approval</span>
               </h1>
             </div>
             <button
               onClick={() => setRequests(initialPendingList)}
-              className="h-10 px-4 rounded-xl border border-border hover:bg-muted text-xs font-bold text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition duration-200"
+              className="h-10 px-4 rounded-xl border border-border hover:bg-muted text-xs font-bold text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition duration-200 cursor-pointer"
             >
               <RefreshCw className="size-3.5 text-primary" />
               <span>Reset List</span>
@@ -488,23 +509,23 @@ function PendingManualAttendancePage() {
           </div>
 
           {/* Top Panel: Criteria Selection */}
-          <div className="bg-card rounded-lg border border-border/85 p-5 shadow-xs space-y-5">
-            <div className="flex items-center justify-between border-b border-border/40 pb-3">
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary">Criteria Selection</span>
-              <span className="text-[9px] font-bold text-muted-foreground/50">Audit Registry</span>
+          <div className="bg-card rounded-2xl border border-border/85 p-4 shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-border/40 pb-2.5">
+              <span className="text-[10px] font-black uppercase tracking-wider text-primary">Criteria Selection</span>
+              <span className="text-[9px] font-bold text-muted-foreground/45">Audit Registry</span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2">
               {/* Start Date */}
               <div className="space-y-1 relative">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Start Date</label>
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Start Date</label>
                 <div className="relative date-picker-trigger">
                   <input
                     type="text"
                     readOnly
                     value={startDate}
                     onClick={() => setActiveDatePicker({ id: "filters", field: "startDate" })}
-                    className="w-full h-9 px-3 pl-8.5 rounded-lg bg-muted border border-border/40 text-xs font-bold outline-none cursor-pointer text-primary"
+                    className="w-full h-9 px-3 pl-8.5 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none cursor-pointer text-primary"
                   />
                   <Calendar className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-primary" />
 
@@ -518,14 +539,14 @@ function PendingManualAttendancePage() {
 
               {/* End Date */}
               <div className="space-y-1 relative">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">End Date</label>
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">End Date</label>
                 <div className="relative date-picker-trigger">
                   <input
                     type="text"
                     readOnly
                     value={endDate}
                     onClick={() => setActiveDatePicker({ id: "filters", field: "endDate" })}
-                    className="w-full h-9 px-3 pl-8.5 rounded-lg bg-muted border border-border/40 text-xs font-bold outline-none cursor-pointer text-primary"
+                    className="w-full h-9 px-3 pl-8.5 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none cursor-pointer text-primary"
                   />
                   <Calendar className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-primary" />
 
@@ -539,12 +560,12 @@ function PendingManualAttendancePage() {
 
               {/* Employee Type */}
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Employee Type</label>
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Employee Type</label>
                 <div className="relative">
                   <select
                     value={empType}
                     onChange={(e) => setEmpType(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
+                    className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
                   >
                     <option value="ALL">ALL</option>
                     <option value="Permanent">Permanent</option>
@@ -556,12 +577,12 @@ function PendingManualAttendancePage() {
 
               {/* Sub Department */}
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Sub Department</label>
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Sub Department</label>
                 <div className="relative">
                   <select
                     value={subDept}
                     onChange={(e) => setSubDept(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
+                    className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
                   >
                     <option value="ALL">ALL</option>
                     <option value="Management">Management</option>
@@ -575,12 +596,12 @@ function PendingManualAttendancePage() {
 
               {/* Job Title */}
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Job Title</label>
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Job Title</label>
                 <div className="relative">
                   <select
                     value={jobTitle}
                     onChange={(e) => setJobTitle(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
+                    className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
                   >
                     <option value="ALL">ALL</option>
                     <option value="Chief Operating Officer">Chief Operating Officer</option>
@@ -593,12 +614,12 @@ function PendingManualAttendancePage() {
 
               {/* Unit */}
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Unit</label>
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Unit</label>
                 <div className="relative">
                   <select
                     value={unit}
                     onChange={(e) => setUnit(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
+                    className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
                   >
                     <option value="ALL">ALL</option>
                     <option value="PSL">PSL</option>
@@ -610,12 +631,12 @@ function PendingManualAttendancePage() {
 
               {/* Line */}
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Line</label>
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Line</label>
                 <div className="relative">
                   <select
                     value={line}
                     onChange={(e) => setLine(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
+                    className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
                   >
                     <option value="ALL">ALL</option>
                     <option value="Line 1">Line 1</option>
@@ -627,24 +648,24 @@ function PendingManualAttendancePage() {
 
               {/* Employee ID input */}
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Employee Id</label>
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Employee Id</label>
                 <input
                   type="text"
                   value={searchEmpId}
                   onChange={(e) => setSearchEmpId(e.target.value)}
                   placeholder="Enter ID..."
-                  className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary"
+                  className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary"
                 />
               </div>
 
               {/* Status */}
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Status</label>
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Status</label>
                 <div className="relative">
                   <select
                     value={statusRequest}
                     onChange={(e) => setStatusRequest(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
+                    className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
                   >
                     <option value="ALL Request">ALL Request</option>
                     <option value="Pending">Pending</option>
@@ -654,9 +675,9 @@ function PendingManualAttendancePage() {
                 </div>
               </div>
 
-              {/* Blue Search Button exactly matching Pakiza theme! */}
-              <div className="flex items-end pt-1">
-                <button className="w-full h-9.5 px-6 bg-[#1e88e5] hover:bg-[#1565c0] text-white font-extrabold text-xs rounded-lg shadow-sm transition duration-150 uppercase tracking-wider">
+              {/* Blue Search Button */}
+              <div className="flex items-end">
+                <button className="w-full h-9 bg-primary hover:bg-primary-glow text-white font-black text-xs rounded-lg shadow-sm transition duration-150 uppercase tracking-widest cursor-pointer">
                   SEARCH
                 </button>
               </div>
@@ -665,20 +686,20 @@ function PendingManualAttendancePage() {
           </div>
 
           {/* Spreadsheet Datagrid Block */}
-          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
+          <div className="bg-card rounded-2xl border border-border/80 p-4 shadow-xs space-y-3">
 
             {/* Utilities Actions & Table Search */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/30 pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/30 pb-3">
               <div className="flex items-center gap-1.5 select-none">
-                <button className="h-8.5 px-4 rounded-lg border border-border/70 hover:bg-muted font-bold text-xs text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition">
+                <button className="h-8.5 px-4 rounded-lg border border-border/70 hover:bg-muted font-bold text-xs text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition cursor-pointer">
                   <FileSpreadsheet className="size-3.5 text-emerald-500" />
                   <span>EXCEL</span>
                 </button>
-                <button className="h-8.5 px-4 rounded-lg border border-border/70 hover:bg-muted font-bold text-xs text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition">
+                <button className="h-8.5 px-4 rounded-lg border border-border/70 hover:bg-muted font-bold text-xs text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition cursor-pointer">
                   <Printer className="size-3.5 text-blue-500" />
                   <span>PRINT</span>
                 </button>
-                <button className="h-8.5 px-4 rounded-lg border border-border/70 hover:bg-muted font-bold text-xs text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition">
+                <button className="h-8.5 px-4 rounded-lg border border-border/70 hover:bg-muted font-bold text-xs text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition cursor-pointer">
                   <FileDown className="size-3.5 text-rose-500" />
                   <span>PDF</span>
                 </button>
@@ -726,8 +747,8 @@ function PendingManualAttendancePage() {
                     <th className="px-4 py-3 font-extrabold text-center w-24 bg-[#f1f5f9] dark:bg-[#0f172a]">In Time</th>
                     <th className="px-4 py-3 font-extrabold text-center w-28 bg-[#f1f5f9] dark:bg-[#0f172a]">Out Date</th>
                     <th className="px-4 py-3 font-extrabold text-center w-24 bg-[#f1f5f9] dark:bg-[#0f172a]">Out Time</th>
-                    <th className="px-5 py-3 font-extrabold w-[340px] min-w-[340px] bg-[#f1f5f9] dark:bg-[#0f172a]">System Data</th>
-                    <th className="px-4 py-3 font-extrabold w-44 bg-[#f1f5f9] dark:bg-[#0f172a]">HOD</th>
+                    <th className="px-5 py-3 font-extrabold w-[380px] bg-[#f1f5f9] dark:bg-[#0f172a]">Audit Correction Progress</th>
+                    <th className="px-4 py-3 font-extrabold w-44 bg-[#f1f5f9] dark:bg-[#0f172a]">HOD Approved By</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/30">
@@ -735,7 +756,7 @@ function PendingManualAttendancePage() {
                     const isSelected = selectedIds.has(r.id);
                     const stickyCellBgClass = isSelected
                       ? "bg-[#f1f5f9] dark:bg-[#1e293b] group-hover:bg-[#e2e8f0] dark:group-hover:bg-[#334155]"
-                      : "bg-card group-hover:bg-[#f8fafc] dark:group-hover:bg-[#1e293b]";
+                      : "bg-card group-hover:bg-[#f8fafc] dark:hover:bg-[#1e293b]";
 
                     return (
                       <tr
@@ -756,7 +777,7 @@ function PendingManualAttendancePage() {
                             />
                             <button
                               onClick={() => handleStartEdit(r)}
-                              className="p-1 rounded text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/20 transition"
+                              className="p-1 rounded text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/20 transition cursor-pointer"
                               title="Edit Punch Log"
                             >
                               <Pencil className="size-3" />
@@ -780,7 +801,7 @@ function PendingManualAttendancePage() {
                         {/* 5. Name (Sticky Left) */}
                         <td className={`sticky left-[310px] ${stickyCellBgClass} px-4 py-2.5 font-semibold text-foreground border-r border-border/40 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[160px] min-w-[160px] max-w-[160px] transition-all`}>{r.name}</td>
 
-                        {/* 6. Department (Double line!) */}
+                        {/* 6. Department */}
                         <td className="px-4 py-2.5 text-foreground/80 font-medium">
                           <div>{r.dept1}</div>
                           <div className="text-[10px] text-muted-foreground/75 font-normal">{r.dept2}</div>
@@ -801,28 +822,38 @@ function PendingManualAttendancePage() {
                         {/* 11. Out Time */}
                         <td className="px-4 py-2.5 font-mono text-center text-primary font-bold">{r.outTime}</td>
 
-                        {/* 12. System Data block (Matches your text output style precisely!) */}
-                        <td className="px-5 py-2.5 whitespace-pre-wrap font-sans text-[10px] leading-relaxed text-foreground/70 bg-muted/20 dark:bg-[#0e1626]/20">
-                          <div className="grid grid-cols-12 gap-x-1">
-                            <span className="col-span-3 text-muted-foreground/70 font-semibold">By</span>
-                            <span className="col-span-9 font-bold text-foreground/90">: {r.systemBy}</span>
+                        {/* 12. System Data block - Structured Badge Flow */}
+                        <td className="px-5 py-2 text-foreground/70 bg-muted/[0.15] dark:bg-[#0e1626]/10">
+                          <div className="space-y-1.5">
+                            {/* Workflow Badges */}
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[8.5px] font-black uppercase border ${
+                                r.hodStatus === "Approve" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/25" :
+                                r.hodStatus === "Reject" ? "bg-rose-500/10 text-rose-600 border-rose-500/25" : "bg-amber-500/10 text-amber-600 border-amber-500/25"
+                              }`}>
+                                HOD: {r.hodStatus}
+                              </span>
 
-                            <span className="col-span-3 text-muted-foreground/70 font-semibold">Date</span>
-                            <span className="col-span-9 font-bold text-foreground/90">: {r.systemDate}</span>
+                              <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[8.5px] font-black uppercase border ${
+                                r.hrdStatus === "Approve" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/25" :
+                                r.hrdStatus === "Reject" ? "bg-rose-500/10 text-rose-600 border-rose-500/25" : "bg-amber-500/10 text-amber-600 border-amber-500/25"
+                              }`}>
+                                HRD: {r.hrdStatus}
+                              </span>
 
-                            <span className="col-span-3 text-muted-foreground/70 font-semibold">Info</span>
-                            <span className="col-span-9 font-semibold text-primary/80 truncate">: {r.systemInfo}</span>
+                              <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[8.5px] font-black uppercase border ${
+                                r.mdStatus === "Approve" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/25" :
+                                r.mdStatus === "Reject" ? "bg-rose-500/10 text-rose-600 border-rose-500/25" : "bg-amber-500/10 text-amber-600 border-amber-500/25"
+                              }`}>
+                                MD: {r.mdStatus}
+                              </span>
+                            </div>
 
-                            <span className="col-span-3 text-muted-foreground/70 font-semibold">HOD</span>
-                            <span className="col-span-9 font-bold">
-                              : <span className={r.hodStatus === "Approve" ? "text-emerald-500" : "text-amber-500"}>{r.hodStatus}</span>
-                            </span>
-
-                            <span className="col-span-3 text-muted-foreground/70 font-semibold">HRD</span>
-                            <span className="col-span-9 font-bold text-amber-500">: {r.hrdStatus}</span>
-
-                            <span className="col-span-3 text-muted-foreground/70 font-semibold">MD</span>
-                            <span className="col-span-9 font-bold text-amber-500">: {r.mdStatus}</span>
+                            {/* System Meta Description */}
+                            <div className="text-[9.5px] leading-tight text-muted-foreground">
+                              Requested by <span className="font-extrabold text-foreground">{r.systemBy}</span> on <span className="font-semibold">{r.systemDate}</span>
+                              <div className="text-primary font-medium mt-0.5 truncate max-w-[340px]">&bull; {r.systemInfo.replace(/\n/g, ' ')}</div>
+                            </div>
                           </div>
                         </td>
 
@@ -843,25 +874,33 @@ function PendingManualAttendancePage() {
               </table>
             </div>
 
-            {/* Datagrid Footer / Discard Actions */}
+            {/* Datagrid Footer / Action Controls */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2">
               <span className="text-[10px] font-bold text-muted-foreground/75 uppercase tracking-wider">
                 Showing 1 to {filteredRequests.length} of {requests.length} entries
               </span>
 
               <div className="flex items-center gap-2">
-                {/* DELETE red button exactly matching Pakiza style! */}
+                {/* DELETE red button */}
                 <button
                   onClick={handleDeleteSelected}
-                  className="h-9 px-6 bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs rounded-lg shadow-sm transition duration-150 uppercase tracking-wider"
+                  className="h-9 px-5 bg-rose-600 hover:bg-rose-500 text-white font-black text-xs rounded-lg shadow-sm transition duration-150 uppercase tracking-widest cursor-pointer"
                 >
                   DELETE
                 </button>
 
-                {/* APPROVE green button exactly matching Pakiza style! */}
+                {/* REJECT dark red button */}
+                <button
+                  onClick={handleRejectSelected}
+                  className="h-9 px-5 bg-red-800 hover:bg-red-700 text-white font-black text-xs rounded-lg shadow-sm transition duration-150 uppercase tracking-widest cursor-pointer"
+                >
+                  REJECT
+                </button>
+
+                {/* APPROVE green button */}
                 <button
                   onClick={handleApproveSelected}
-                  className="h-9 px-6 bg-[#72b043] hover:bg-[#629c36] text-white font-extrabold text-xs rounded-lg shadow-sm transition duration-150 uppercase tracking-wider"
+                  className="h-9 px-6 bg-[#72b043] hover:bg-[#629c36] text-white font-black text-xs rounded-lg shadow-sm transition duration-150 uppercase tracking-widest cursor-pointer"
                 >
                   APPROVE
                 </button>
@@ -872,37 +911,46 @@ function PendingManualAttendancePage() {
 
         </div>
 
-        {/* Dynamic Inline edit modal */}
+        {/* Dynamic Inline edit modal - Redesigned Dual-Column Grid */}
         {editingRequest && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-            <div className="bg-card text-foreground rounded-lg border border-border shadow-2xl max-w-2xl w-full overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="bg-card text-foreground rounded-2xl border border-border shadow-2xl max-w-4xl w-full overflow-hidden animate-in zoom-in-95 duration-200">
 
-              <div className="px-5 py-4 border-b border-border/60 flex items-center justify-between bg-muted/30">
-                <h2 className="text-xs font-black text-foreground flex items-center gap-1.5 tracking-wide uppercase">
-                  <Pencil className="size-4 text-primary" />
-                  <span>Edit Pending Manual Request</span>
+              <div className="px-6 py-4 border-b border-border/60 flex items-center justify-between bg-muted/30">
+                <h2 className="text-sm font-black text-foreground flex items-center gap-2 tracking-wide uppercase">
+                  <Fingerprint className="size-4.5 text-primary animate-pulse" />
+                  <span>Manual Request Correction Audit</span>
                 </h2>
                 <button
                   onClick={() => setEditingRequest(null)}
-                  className="size-7 rounded-lg hover:bg-muted text-muted-foreground/60 hover:text-foreground flex items-center justify-center transition"
+                  className="size-7 rounded-lg hover:bg-muted text-muted-foreground/60 hover:text-foreground flex items-center justify-center transition cursor-pointer"
                 >
                   <X className="size-4" />
                 </button>
               </div>
 
-              <div className="p-6 space-y-4">
-                <div className="grid grid-cols-2 gap-4 text-xs">
-                  <div>
-                    <span className="font-bold text-muted-foreground">Employee ID</span>
-                    <div className="font-black text-foreground font-mono text-sm mt-0.5">{editingRequest.id}</div>
-                  </div>
-                  <div>
-                    <span className="font-bold text-muted-foreground">Employee Name</span>
-                    <div className="font-bold text-foreground text-sm mt-0.5">{editingRequest.name}</div>
-                  </div>
-                </div>
+              {/* Modal Body: Organized layout columns */}
+              <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
 
-                <div className="space-y-4 pt-2">
+                {/* Left Column: Request Info & Dynamic Times */}
+                <div className="space-y-4">
+                  <div className="bg-muted/30 rounded-xl p-4 border border-border/40 space-y-2">
+                    <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest block border-b border-border/40 pb-1 mb-1.5">Applicant Profile</span>
+                    <div className="grid grid-cols-12 text-xs">
+                      <span className="col-span-4 font-bold text-muted-foreground">Employee ID</span>
+                      <span className="col-span-1 text-muted-foreground/40 text-center">:</span>
+                      <span className="col-span-7 font-black text-foreground font-mono">{editingRequest.id}</span>
+
+                      <span className="col-span-4 font-bold text-muted-foreground mt-1">Name</span>
+                      <span className="col-span-1 text-muted-foreground/40 text-center mt-1">:</span>
+                      <span className="col-span-7 font-bold text-foreground mt-1 truncate">{editingRequest.name}</span>
+
+                      <span className="col-span-4 font-bold text-muted-foreground mt-1">Department</span>
+                      <span className="col-span-1 text-muted-foreground/40 text-center mt-1">:</span>
+                      <span className="col-span-7 font-semibold text-foreground/80 mt-1 truncate">{editingRequest.dept1}</span>
+                    </div>
+                  </div>
+
                   {/* Edit In Time */}
                   <div className="space-y-1.5 relative">
                     <label className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground/75 flex items-center gap-0.5">
@@ -948,10 +996,13 @@ function PendingManualAttendancePage() {
                       )}
                     </div>
                   </div>
+                </div>
 
+                {/* Right Column: Reason and Approval Levels */}
+                <div className="space-y-4">
                   {/* Edit Reason */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground/75">Reason</label>
+                    <label className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground/75">Correction Reason</label>
                     <input
                       type="text"
                       value={editReason}
@@ -961,34 +1012,76 @@ function PendingManualAttendancePage() {
                     />
                   </div>
 
-                  {/* Edit HOD Approval Status */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground/75">HOD Status</label>
-                    <div className="relative">
-                      <select
-                        value={editHodStatus}
-                        onChange={(e) => setEditHodStatus(e.target.value)}
-                        className="w-full h-9 px-3 rounded-lg bg-muted border border-border/60 text-xs font-semibold outline-none focus:border-primary cursor-pointer appearance-none pr-8"
-                      >
-                        <option value="Pending">Pending</option>
-                        <option value="Approve">Approve</option>
-                      </select>
-                      <ChevronDown className="size-3 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                  {/* Multi-Level Approvals */}
+                  <div className="bg-muted/10 rounded-xl p-4 border border-border/40 space-y-3">
+                    <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest block border-b border-border/40 pb-1 mb-1">Approval Sign-off Roster</span>
+
+                    {/* Edit HOD Approval Status */}
+                    <div className="grid grid-cols-12 items-center gap-2">
+                      <label className="col-span-4 text-[10px] font-bold text-muted-foreground/80 uppercase">HOD</label>
+                      <div className="col-span-8 relative">
+                        <select
+                          value={editHodStatus}
+                          onChange={(e) => setEditHodStatus(e.target.value)}
+                          className="w-full h-8 px-3 rounded bg-card border border-border/60 text-xs font-bold outline-none focus:border-primary cursor-pointer appearance-none pr-8"
+                        >
+                          <option value="Pending">Pending</option>
+                          <option value="Approve">Approve</option>
+                          <option value="Reject">Reject</option>
+                        </select>
+                        <ChevronDown className="size-3 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                      </div>
+                    </div>
+
+                    {/* Edit HRD Approval Status */}
+                    <div className="grid grid-cols-12 items-center gap-2">
+                      <label className="col-span-4 text-[10px] font-bold text-muted-foreground/80 uppercase">HRD</label>
+                      <div className="col-span-8 relative">
+                        <select
+                          value={editHrdStatus}
+                          onChange={(e) => setEditHrdStatus(e.target.value)}
+                          className="w-full h-8 px-3 rounded bg-card border border-border/60 text-xs font-bold outline-none focus:border-primary cursor-pointer appearance-none pr-8"
+                        >
+                          <option value="Pending">Pending</option>
+                          <option value="Approve">Approve</option>
+                          <option value="Reject">Reject</option>
+                        </select>
+                        <ChevronDown className="size-3 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                      </div>
+                    </div>
+
+                    {/* Edit MD Approval Status */}
+                    <div className="grid grid-cols-12 items-center gap-2">
+                      <label className="col-span-4 text-[10px] font-bold text-muted-foreground/80 uppercase">MD</label>
+                      <div className="col-span-8 relative">
+                        <select
+                          value={editMdStatus}
+                          onChange={(e) => setEditMdStatus(e.target.value)}
+                          className="w-full h-8 px-3 rounded bg-card border border-border/60 text-xs font-bold outline-none focus:border-primary cursor-pointer appearance-none pr-8"
+                        >
+                          <option value="Pending">Pending</option>
+                          <option value="Approve">Approve</option>
+                          <option value="Reject">Reject</option>
+                        </select>
+                        <ChevronDown className="size-3 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                      </div>
                     </div>
                   </div>
                 </div>
+
               </div>
 
-              <div className="px-5 py-4 border-t border-border/60 flex items-center justify-between bg-muted/20">
+              {/* Modal Footer */}
+              <div className="px-6 py-4 border-t border-border/60 flex items-center justify-between bg-muted/20">
                 <button
                   onClick={() => setEditingRequest(null)}
-                  className="h-9 px-5 bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs rounded-lg uppercase tracking-wider transition"
+                  className="h-9 px-5 bg-card border border-border/50 hover:bg-muted text-muted-foreground font-semibold text-xs rounded-lg transition duration-150 uppercase tracking-wider cursor-pointer"
                 >
                   Close
                 </button>
                 <button
                   onClick={handleSaveEdit}
-                  className="h-9 px-6 bg-[#72b043] hover:bg-[#629c36] text-white font-extrabold text-xs rounded-lg uppercase tracking-wider shadow-sm transition"
+                  className="h-9 px-6 bg-[#72b043] hover:bg-[#629c36] text-white font-black text-xs rounded-lg uppercase tracking-wider shadow-sm transition cursor-pointer"
                 >
                   Apply Changes
                 </button>
