@@ -88,8 +88,13 @@ interface OtConfig {
 interface AbnormalShift {
   sl: number;
   shiftName: string;
-  date: string;
-  reason: string;
+  dateFrom: string;
+  dateTo: string;
+  dayFor: string;
+  minOutTime: string;
+  maxOutTime: string;
+  prevDayInTime: string;
+  splitOutTime: string;
   isActive: "Active" | "Inactive";
 }
 
@@ -169,26 +174,9 @@ const DEFAULT_OT_CONFIGS: OtConfig[] = [
 ];
 
 const DEFAULT_ABNORMAL_SHIFTS: AbnormalShift[] = [
-  { sl: 1, shiftName: "Night Shift Extra", date: "2026-06-20", reason: "Product Launch", isActive: "Active" },
-  { sl: 2, shiftName: "Ramadan Early Shift", date: "2026-03-15", reason: "Holy Ramadan Special Hours", isActive: "Active" },
-  { sl: 3, shiftName: "Durga Puja Shift", date: "2026-10-18", reason: "Festival Special Schedule", isActive: "Active" },
-  { sl: 4, shiftName: "New Year Eve Roster", date: "2026-12-31", reason: "Year-end Operations Adjustments", isActive: "Active" },
-  { sl: 5, shiftName: "Machine Maintenance Shift", date: "2026-07-05", reason: "Quarterly Plant Maintenance", isActive: "Active" },
-  { sl: 6, shiftName: "Annual Auditing Shift", date: "2026-08-12", reason: "Financial Audit Support", isActive: "Active" },
-  { sl: 7, shiftName: "Annual Inventory Count", date: "2026-09-30", reason: "Store Stocktaking Operations", isActive: "Active" },
-  { sl: 8, shiftName: "ERP Migration Shift", date: "2026-05-10", reason: "IT System Upgrades & Transition", isActive: "Active" },
-  { sl: 9, shiftName: "Special Heavy Load Roster", date: "2026-11-22", reason: "Bulk Order Processing Rush", isActive: "Active" },
-  { sl: 10, shiftName: "VIP Delegation Visit Shift", date: "2026-06-25", reason: "Buyer Group Inspection Setup", isActive: "Active" },
-  { sl: 11, shiftName: "Contingency Backup Run", date: "2026-04-18", reason: "Disaster Recovery Drill", isActive: "Active" },
-  { sl: 12, shiftName: "Safety Drill & Training Day", date: "2026-07-15", reason: "Compliance Safety Program", isActive: "Active" },
-  { sl: 13, shiftName: "Year-end Closing Duty", date: "2026-06-30", reason: "Financial Year-end Adjustments", isActive: "Active" },
-  { sl: 14, shiftName: "Winter Special Roster", date: "2026-01-15", reason: "Foggy Weather Shift Adjustment", isActive: "Active" },
-  { sl: 15, shiftName: "Urgent Shipping Shift", date: "2026-09-05", reason: "Air Shipment Deadline Rush", isActive: "Active" },
-  { sl: 16, shiftName: "Server Upgrade Window", date: "2026-08-20", reason: "Database Maintenance Window", isActive: "Active" },
-  { sl: 17, shiftName: "Black Friday Prep Shift", date: "2026-11-25", reason: "E-Commerce Dispatch Load", isActive: "Active" },
-  { sl: 18, shiftName: "Cyclone Alert Backup", date: "2026-05-28", reason: "Weather Contingency Standby", isActive: "Active" },
-  { sl: 19, shiftName: "Plant Renovation Crew", date: "2026-02-12", reason: "Infrastructure Enhancement", isActive: "Active" },
-  { sl: 20, shiftName: "Lead Time Reduction Shift", date: "2026-04-05", reason: "Fast-track Sample Production", isActive: "Active" }
+  { sl: 1, shiftName: "Night", dateFrom: "2024-12-30", dateTo: "2041-11-30", dayFor: "Thursday", minOutTime: "09:00:00", maxOutTime: "15:00:00", prevDayInTime: "06:00:00", splitOutTime: "06:00:00", isActive: "Active" },
+  { sl: 2, shiftName: "Morning Roster", dateFrom: "2025-01-01", dateTo: "2025-12-31", dayFor: "Friday", minOutTime: "14:00:00", maxOutTime: "16:00:00", prevDayInTime: "05:00:00", splitOutTime: "13:00:00", isActive: "Active" },
+  { sl: 3, shiftName: "Evening Roster", dateFrom: "2026-03-15", dateTo: "2026-04-15", dayFor: "ALL", minOutTime: "18:00:00", maxOutTime: "20:00:00", prevDayInTime: "13:00:00", splitOutTime: "21:00:00", isActive: "Active" }
 ];
 
 const DEFAULT_ATTN_BONUS_POLICIES: AttendanceBonusPolicy[] = [
@@ -380,8 +368,13 @@ function TimeSetupPage() {
 
   // Form states - Abnormal Shift
   const [abShiftName, setAbShiftName] = useState("");
-  const [abDate, setAbDate] = useState("");
-  const [abReason, setAbReason] = useState("");
+  const [abDateFrom, setAbDateFrom] = useState("");
+  const [abDateTo, setAbDateTo] = useState("");
+  const [abDayFor, setAbDayFor] = useState("Thursday");
+  const [abMinOutTime, setAbMinOutTime] = useState("");
+  const [abMaxOutTime, setAbMaxOutTime] = useState("");
+  const [abPrevDayInTime, setAbPrevDayInTime] = useState("");
+  const [abSplitOutTime, setAbSplitOutTime] = useState("");
   const [abIsActive, setAbIsActive] = useState<"Active" | "Inactive">("Active");
 
   // Form states - Attendance Bonus Policy
@@ -472,8 +465,13 @@ function TimeSetupPage() {
     } else if (activeTab === "abnormal") {
       const item = abnormalShifts.find(a => a.sl === sl);
       setAbShiftName(item?.shiftName || "");
-      setAbDate(item?.date || "");
-      setAbReason(item?.reason || "");
+      setAbDateFrom(item?.dateFrom || "");
+      setAbDateTo(item?.dateTo || "");
+      setAbDayFor(item?.dayFor || "Thursday");
+      setAbMinOutTime(item?.minOutTime || "09:00:00");
+      setAbMaxOutTime(item?.maxOutTime || "15:00:00");
+      setAbPrevDayInTime(item?.prevDayInTime || "06:00:00");
+      setAbSplitOutTime(item?.splitOutTime || "06:00:00");
       setAbIsActive(item?.isActive || "Active");
     } else if (activeTab === "bonus") {
       const item = attnPolicies.find(b => b.sl === sl);
@@ -552,11 +550,22 @@ function TimeSetupPage() {
     } else if (activeTab === "abnormal") {
       if (!abShiftName) { toast.error("Shift Name is required."); return; }
       let nextList = [...abnormalShifts];
+      const newAb: AbnormalShift = {
+        sl: editSl !== null ? editSl : (abnormalShifts.length > 0 ? Math.max(...abnormalShifts.map(a => a.sl)) + 1 : 1),
+        shiftName: abShiftName,
+        dateFrom: abDateFrom,
+        dateTo: abDateTo,
+        dayFor: abDayFor,
+        minOutTime: abMinOutTime,
+        maxOutTime: abMaxOutTime,
+        prevDayInTime: abPrevDayInTime,
+        splitOutTime: abSplitOutTime,
+        isActive: abIsActive
+      };
       if (editSl !== null) {
-        nextList = abnormalShifts.map(a => a.sl === editSl ? { ...a, shiftName: abShiftName, date: abDate, reason: abReason, isActive: abIsActive } : a);
+        nextList = abnormalShifts.map(a => a.sl === editSl ? newAb : a);
       } else {
-        const sl = abnormalShifts.length > 0 ? Math.max(...abnormalShifts.map(a => a.sl)) + 1 : 1;
-        nextList.push({ sl, shiftName: abShiftName, date: abDate, reason: abReason, isActive: abIsActive });
+        nextList.push(newAb);
       }
       setAbnormalShifts(nextList);
       localStorage.setItem("hris_abnormal_shifts", JSON.stringify(nextList));
@@ -868,15 +877,20 @@ function TimeSetupPage() {
               )}
 
               {activeTab === "abnormal" && (
-                <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "800px" }}>
+                <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "1200px" }}>
                   <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
                     <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
                       <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">#</th>
                       <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">Actions</th>
-                      <th className="px-5 py-4 min-w-[200px]">Shift Name</th>
-                      <th className="px-5 py-4 w-[150px] text-center">Date</th>
-                      <th className="px-5 py-4 min-w-[250px]">Reason</th>
-                      <th className="px-5 py-4 w-[120px] text-center">IsActive</th>
+                      <th className="px-5 py-4 min-w-[150px]">Shift Name</th>
+                      <th className="px-5 py-4 w-[120px] text-center">Date From</th>
+                      <th className="px-5 py-4 w-[120px] text-center">Date To</th>
+                      <th className="px-5 py-4 w-[120px] text-center">Day For</th>
+                      <th className="px-5 py-4 w-[120px] text-center">Min Out Time</th>
+                      <th className="px-5 py-4 w-[120px] text-center">Max Out Time</th>
+                      <th className="px-5 py-4 w-[120px] text-center">Prev Day In Time</th>
+                      <th className="px-5 py-4 w-[120px] text-center">Split Out Time</th>
+                      <th className="px-5 py-4 w-[100px] text-center">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/30 text-foreground">
@@ -889,9 +903,14 @@ function TimeSetupPage() {
                             <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition"><Trash2 className="size-4" /></button>
                           </div>
                         </td>
-                        <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">{item.shiftName}</td>
-                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.date}</td>
-                        <td className="px-5 py-3.5 font-normal">{item.reason || "—"}</td>
+                        <td className="px-5 py-3.5 font-bold text-foreground/90">{item.shiftName}</td>
+                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.dateFrom}</td>
+                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.dateTo}</td>
+                        <td className="px-5 py-3.5 text-center font-semibold text-indigo-600 dark:text-indigo-400">{item.dayFor}</td>
+                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.minOutTime || "—"}</td>
+                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.maxOutTime || "—"}</td>
+                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.prevDayInTime || "—"}</td>
+                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.splitOutTime || "—"}</td>
                         <td className="px-5 py-3.5 text-center">
                           <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}>{item.isActive}</span>
                         </td>

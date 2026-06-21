@@ -134,7 +134,7 @@ function RootComponent() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const versionKey = "hris_master_data_version_v11";
+      const versionKey = "hris_master_data_version_v12";
       if (localStorage.getItem(versionKey) !== "true") {
         const keysToClear = [
           "hris_organizations",
