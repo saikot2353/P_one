@@ -161,9 +161,8 @@ const nav: NavItem[] = [
     label: "HR Policy",
     icon: FileText,
     subitems: [
-      { label: "Company Rules", to: "/" },
-      { label: "Benefits Policy", to: "/" },
-      { label: "Conduct Policy", to: "/" },
+      { label: "JD List", to: "/hr-policy-jds", search: { mode: "list", filterWorkflow: "ALL" } },
+      { label: "JD Approvals", to: "/hr-policy-jds", search: { mode: "list", filterWorkflow: "HR" } },
     ]
   },
 

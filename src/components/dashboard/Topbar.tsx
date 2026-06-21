@@ -67,9 +67,8 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Tax Reports", parent: "Compliance", to: "/" },
   { label: "Audit Logs", parent: "Compliance", to: "/" },
   // HR Policy
-  { label: "Company Rules", parent: "HR Policy", to: "/" },
-  { label: "Benefits Policy", parent: "HR Policy", to: "/" },
-  { label: "Conduct Policy", parent: "HR Policy", to: "/" },
+  { label: "JD List", parent: "HR Policy", to: "/hr-policy-jds", description: "Register, search, and view designation Job Description Sheets (JDS)" },
+  { label: "JD Approvals", parent: "HR Policy", to: "/hr-policy-jds?mode=list&filterWorkflow=HR", description: "Sequential approval board workflow for pending Job Description Sheets" },
   // Disciplinary Action
   { label: "Case Files", parent: "Disciplinary Action", to: "/" },
   { label: "Warning Letters", parent: "Disciplinary Action", to: "/" },

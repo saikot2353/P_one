@@ -54,6 +54,7 @@ import { Route as IncrementListRouteImport } from './routes/increment-list'
 import { Route as IncrementHistoryRouteImport } from './routes/increment-history'
 import { Route as IncrementGadgetRouteImport } from './routes/increment-gadget'
 import { Route as IncrementRouteImport } from './routes/increment'
+import { Route as HrPolicyJdsRouteImport } from './routes/hr-policy-jds'
 import { Route as FinalApproveIncrementRouteImport } from './routes/final-approve-increment'
 import { Route as EvaluationProposeRouteImport } from './routes/evaluation-propose'
 import { Route as EmployeeJobCardRouteImport } from './routes/employee-job-card'
@@ -313,6 +314,11 @@ const IncrementRoute = IncrementRouteImport.update({
   path: '/increment',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HrPolicyJdsRoute = HrPolicyJdsRouteImport.update({
+  id: '/hr-policy-jds',
+  path: '/hr-policy-jds',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FinalApproveIncrementRoute = FinalApproveIncrementRouteImport.update({
   id: '/final-approve-increment',
   path: '/final-approve-increment',
@@ -482,6 +488,7 @@ export interface FileRoutesByFullPath {
   '/employee-job-card': typeof EmployeeJobCardRoute
   '/evaluation-propose': typeof EvaluationProposeRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
+  '/hr-policy-jds': typeof HrPolicyJdsRoute
   '/increment': typeof IncrementRoute
   '/increment-gadget': typeof IncrementGadgetRoute
   '/increment-history': typeof IncrementHistoryRoute
@@ -557,6 +564,7 @@ export interface FileRoutesByTo {
   '/employee-job-card': typeof EmployeeJobCardRoute
   '/evaluation-propose': typeof EvaluationProposeRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
+  '/hr-policy-jds': typeof HrPolicyJdsRoute
   '/increment': typeof IncrementRoute
   '/increment-gadget': typeof IncrementGadgetRoute
   '/increment-history': typeof IncrementHistoryRoute
@@ -633,6 +641,7 @@ export interface FileRoutesById {
   '/employee-job-card': typeof EmployeeJobCardRoute
   '/evaluation-propose': typeof EvaluationProposeRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
+  '/hr-policy-jds': typeof HrPolicyJdsRoute
   '/increment': typeof IncrementRoute
   '/increment-gadget': typeof IncrementGadgetRoute
   '/increment-history': typeof IncrementHistoryRoute
@@ -710,6 +719,7 @@ export interface FileRouteTypes {
     | '/employee-job-card'
     | '/evaluation-propose'
     | '/final-approve-increment'
+    | '/hr-policy-jds'
     | '/increment'
     | '/increment-gadget'
     | '/increment-history'
@@ -785,6 +795,7 @@ export interface FileRouteTypes {
     | '/employee-job-card'
     | '/evaluation-propose'
     | '/final-approve-increment'
+    | '/hr-policy-jds'
     | '/increment'
     | '/increment-gadget'
     | '/increment-history'
@@ -860,6 +871,7 @@ export interface FileRouteTypes {
     | '/employee-job-card'
     | '/evaluation-propose'
     | '/final-approve-increment'
+    | '/hr-policy-jds'
     | '/increment'
     | '/increment-gadget'
     | '/increment-history'
@@ -936,6 +948,7 @@ export interface RootRouteChildren {
   EmployeeJobCardRoute: typeof EmployeeJobCardRoute
   EvaluationProposeRoute: typeof EvaluationProposeRoute
   FinalApproveIncrementRoute: typeof FinalApproveIncrementRoute
+  HrPolicyJdsRoute: typeof HrPolicyJdsRoute
   IncrementRoute: typeof IncrementRoute
   IncrementGadgetRoute: typeof IncrementGadgetRoute
   IncrementHistoryRoute: typeof IncrementHistoryRoute
@@ -1304,6 +1317,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IncrementRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hr-policy-jds': {
+      id: '/hr-policy-jds'
+      path: '/hr-policy-jds'
+      fullPath: '/hr-policy-jds'
+      preLoaderRoute: typeof HrPolicyJdsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/final-approve-increment': {
       id: '/final-approve-increment'
       path: '/final-approve-increment'
@@ -1528,6 +1548,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmployeeJobCardRoute: EmployeeJobCardRoute,
   EvaluationProposeRoute: EvaluationProposeRoute,
   FinalApproveIncrementRoute: FinalApproveIncrementRoute,
+  HrPolicyJdsRoute: HrPolicyJdsRoute,
   IncrementRoute: IncrementRoute,
   IncrementGadgetRoute: IncrementGadgetRoute,
   IncrementHistoryRoute: IncrementHistoryRoute,
