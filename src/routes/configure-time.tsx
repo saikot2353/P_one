@@ -96,9 +96,26 @@ interface AbnormalShift {
 interface AttendanceBonusPolicy {
   sl: number;
   name: string;
-  allowedLateDays: number;
-  allowedAbsentDays: number;
-  bonusAmount: number;
+  employeeType: string;
+  department: string;
+  section: string;
+  designation: string;
+  unit: string;
+  maxLeaveAllowed: number;
+  maxAbsentAllowed: number;
+  lateBasedOn: string;
+  maxLateAllowed: number;
+  maxLateMin: number;
+  lateAuthCount: number;
+  maxEarlyOutAllowed: string;
+  maxEarlyOutMin: number;
+  earlyOutAuthCount: number;
+  combinedStatus: "Yes" | "No";
+  combinedBasedOn: string;
+  combinedMaxMin: number;
+  combinedAuth: number;
+  calculateBy: string;
+  ratio: number;
   isActive: "Active" | "Inactive";
 }
 
@@ -175,27 +192,36 @@ const DEFAULT_ABNORMAL_SHIFTS: AbnormalShift[] = [
 ];
 
 const DEFAULT_ATTN_BONUS_POLICIES: AttendanceBonusPolicy[] = [
-  { sl: 1, name: "General Worker Policy", allowedLateDays: 3, allowedAbsentDays: 0, bonusAmount: 500, isActive: "Active" },
-  { sl: 2, name: "Senior Staff Policy", allowedLateDays: 2, allowedAbsentDays: 0, bonusAmount: 1000, isActive: "Active" },
-  { sl: 3, name: "Officer Bonus Policy", allowedLateDays: 1, allowedAbsentDays: 0, bonusAmount: 1500, isActive: "Active" },
-  { sl: 4, name: "Eid Special Attendance", allowedLateDays: 0, allowedAbsentDays: 0, bonusAmount: 2000, isActive: "Active" },
-  { sl: 5, name: "Ramadan Punctuality Policy", allowedLateDays: 4, allowedAbsentDays: 0, bonusAmount: 800, isActive: "Active" },
-  { sl: 6, name: "Monsoon Regularity Bonus", allowedLateDays: 5, allowedAbsentDays: 0, bonusAmount: 600, isActive: "Active" },
-  { sl: 7, name: "Winter Shift Incentive", allowedLateDays: 3, allowedAbsentDays: 0, bonusAmount: 700, isActive: "Active" },
-  { sl: 8, name: "Night Shift Attendance Bonus", allowedLateDays: 2, allowedAbsentDays: 0, bonusAmount: 1200, isActive: "Active" },
-  { sl: 9, name: "Perfect Month Award", allowedLateDays: 0, allowedAbsentDays: 0, bonusAmount: 2500, isActive: "Active" },
-  { sl: 10, name: "Quarterly Regularity Bonus", allowedLateDays: 6, allowedAbsentDays: 0, bonusAmount: 3000, isActive: "Active" },
-  { sl: 11, name: "Basic Attendance Support", allowedLateDays: 5, allowedAbsentDays: 1, bonusAmount: 300, isActive: "Active" },
-  { sl: 12, name: "Operator Incentive Plan", allowedLateDays: 3, allowedAbsentDays: 0, bonusAmount: 650, isActive: "Active" },
-  { sl: 13, name: "Helper Punctuality Plan", allowedLateDays: 4, allowedAbsentDays: 0, bonusAmount: 450, isActive: "Active" },
-  { sl: 14, name: "Security Attendance Bonus", allowedLateDays: 1, allowedAbsentDays: 0, bonusAmount: 850, isActive: "Active" },
-  { sl: 15, name: "Support Staff Reward", allowedLateDays: 3, allowedAbsentDays: 0, bonusAmount: 400, isActive: "Active" },
-  { sl: 16, name: "IT & Maintenance Incentive", allowedLateDays: 2, allowedAbsentDays: 0, bonusAmount: 1100, isActive: "Active" },
-  { sl: 17, name: "Driver Regularity Bonus", allowedLateDays: 2, allowedAbsentDays: 0, bonusAmount: 900, isActive: "Active" },
-  { sl: 18, name: "Store Keepers Bonus Scheme", allowedLateDays: 3, allowedAbsentDays: 0, bonusAmount: 750, isActive: "Active" },
-  { sl: 19, name: "Executive Regularity Policy", allowedLateDays: 2, allowedAbsentDays: 0, bonusAmount: 1350, isActive: "Active" },
-  { sl: 20, name: "Technical Team Punctuality", allowedLateDays: 2, allowedAbsentDays: 0, bonusAmount: 1250, isActive: "Active" }
-];
+  "General Worker Policy", "Senior Staff Policy", "Officer Bonus Policy", "Eid Special Attendance",
+  "Ramadan Punctuality Policy", "Monsoon Regularity Bonus", "Winter Shift Incentive", "Night Shift Attendance Bonus",
+  "Perfect Month Award", "Quarterly Regularity Bonus", "Basic Attendance Support", "Operator Incentive Plan",
+  "Helper Punctuality Plan", "Security Attendance Bonus", "Support Staff Reward", "IT & Maintenance Incentive",
+  "Driver Regularity Bonus", "Store Keepers Bonus Scheme", "Executive Regularity Policy", "Technical Team Punctuality"
+].map((name, i) => ({
+  sl: i + 1,
+  name,
+  employeeType: "ALL",
+  department: "All Departments",
+  section: "ALL",
+  designation: "ALL",
+  unit: "ALL",
+  maxLeaveAllowed: 0,
+  maxAbsentAllowed: 0,
+  lateBasedOn: "Both",
+  maxLateAllowed: 0,
+  maxLateMin: 0,
+  lateAuthCount: 0,
+  maxEarlyOutAllowed: "Both",
+  maxEarlyOutMin: 0,
+  earlyOutAuthCount: 0,
+  combinedStatus: "Yes",
+  combinedBasedOn: "Min",
+  combinedMaxMin: 1,
+  combinedAuth: 0,
+  calculateBy: "Percentage (%)",
+  ratio: 100,
+  isActive: "Active"
+}));
 
 function TimeSetupPage() {
   const [activeTab, setActiveTab] = useState<TabType>("shift");
@@ -359,10 +385,26 @@ function TimeSetupPage() {
   const [abIsActive, setAbIsActive] = useState<"Active" | "Inactive">("Active");
 
   // Form states - Attendance Bonus Policy
-  const [policyName, setPolicyName] = useState("");
-  const [policyLate, setPolicyLate] = useState<number>(3);
-  const [policyAbsent, setPolicyAbsent] = useState<number>(0);
-  const [policyAmount, setPolicyAmount] = useState<number>(500);
+  const [policyEmployeeType, setPolicyEmployeeType] = useState("ALL");
+  const [policyDepartment, setPolicyDepartment] = useState("All Departments");
+  const [policySection, setPolicySection] = useState("ALL");
+  const [policyDesignation, setPolicyDesignation] = useState("ALL");
+  const [policyUnit, setPolicyUnit] = useState("ALL");
+  const [policyMaxLeave, setPolicyMaxLeave] = useState<number>(0);
+  const [policyMaxAbsent, setPolicyMaxAbsent] = useState<number>(0);
+  const [policyLateBasedOn, setPolicyLateBasedOn] = useState("Both");
+  const [policyMaxLateAllowed, setPolicyMaxLateAllowed] = useState<number>(0);
+  const [policyMaxLateMin, setPolicyMaxLateMin] = useState<number>(0);
+  const [policyLateAuthCount, setPolicyLateAuthCount] = useState<number>(0);
+  const [policyMaxEarlyOutAllowed, setPolicyMaxEarlyOutAllowed] = useState("Both");
+  const [policyMaxEarlyOutMin, setPolicyMaxEarlyOutMin] = useState<number>(0);
+  const [policyEarlyOutAuthCount, setPolicyEarlyOutAuthCount] = useState<number>(0);
+  const [policyCombinedStatus, setPolicyCombinedStatus] = useState<"Yes" | "No">("Yes");
+  const [policyCombinedBasedOn, setPolicyCombinedBasedOn] = useState("Min");
+  const [policyCombinedMaxMin, setPolicyCombinedMaxMin] = useState<number>(1);
+  const [policyCombinedAuth, setPolicyCombinedAuth] = useState<number>(0);
+  const [policyCalculateBy, setPolicyCalculateBy] = useState("Percentage (%)");
+  const [policyRatio, setPolicyRatio] = useState<number>(100);
   const [policyIsActive, setPolicyIsActive] = useState<"Active" | "Inactive">("Active");
 
   const openForm = (sl: number | null) => {
@@ -435,10 +477,26 @@ function TimeSetupPage() {
       setAbIsActive(item?.isActive || "Active");
     } else if (activeTab === "bonus") {
       const item = attnPolicies.find(b => b.sl === sl);
-      setPolicyName(item?.name || "");
-      setPolicyLate(item?.allowedLateDays || 3);
-      setPolicyAbsent(item?.allowedAbsentDays || 0);
-      setPolicyAmount(item?.bonusAmount || 500);
+      setPolicyEmployeeType(item?.employeeType || "ALL");
+      setPolicyDepartment(item?.department || "All Departments");
+      setPolicySection(item?.section || "ALL");
+      setPolicyDesignation(item?.designation || "ALL");
+      setPolicyUnit(item?.unit || "ALL");
+      setPolicyMaxLeave(item?.maxLeaveAllowed !== undefined ? item.maxLeaveAllowed : 0);
+      setPolicyMaxAbsent(item?.maxAbsentAllowed !== undefined ? item.maxAbsentAllowed : 0);
+      setPolicyLateBasedOn(item?.lateBasedOn || "Both");
+      setPolicyMaxLateAllowed(item?.maxLateAllowed !== undefined ? item.maxLateAllowed : 0);
+      setPolicyMaxLateMin(item?.maxLateMin !== undefined ? item.maxLateMin : 0);
+      setPolicyLateAuthCount(item?.lateAuthCount !== undefined ? item.lateAuthCount : 0);
+      setPolicyMaxEarlyOutAllowed(item?.maxEarlyOutAllowed || "Both");
+      setPolicyMaxEarlyOutMin(item?.maxEarlyOutMin !== undefined ? item.maxEarlyOutMin : 0);
+      setPolicyEarlyOutAuthCount(item?.earlyOutAuthCount !== undefined ? item.earlyOutAuthCount : 0);
+      setPolicyCombinedStatus(item?.combinedStatus || "Yes");
+      setPolicyCombinedBasedOn(item?.combinedBasedOn || "Min");
+      setPolicyCombinedMaxMin(item?.combinedMaxMin !== undefined ? item.combinedMaxMin : 1);
+      setPolicyCombinedAuth(item?.combinedAuth !== undefined ? item.combinedAuth : 0);
+      setPolicyCalculateBy(item?.calculateBy || "Percentage (%)");
+      setPolicyRatio(item?.ratio !== undefined ? item.ratio : 100);
       setPolicyIsActive(item?.isActive || "Active");
     }
     setIsFormOpen(true);
@@ -503,13 +561,22 @@ function TimeSetupPage() {
       setAbnormalShifts(nextList);
       localStorage.setItem("hris_abnormal_shifts", JSON.stringify(nextList));
     } else if (activeTab === "bonus") {
-      if (!policyName) { toast.error("Policy Name is required."); return; }
       let nextList = [...attnPolicies];
+      const pName = `${policyEmployeeType} - ${policyDepartment}`;
+      const newPol: AttendanceBonusPolicy = {
+        sl: editSl !== null ? editSl : (attnPolicies.length > 0 ? Math.max(...attnPolicies.map(b => b.sl)) + 1 : 1),
+        name: pName,
+        employeeType: policyEmployeeType, department: policyDepartment, section: policySection, designation: policyDesignation, unit: policyUnit,
+        maxLeaveAllowed: Number(policyMaxLeave), maxAbsentAllowed: Number(policyMaxAbsent),
+        lateBasedOn: policyLateBasedOn, maxLateAllowed: Number(policyMaxLateAllowed), maxLateMin: Number(policyMaxLateMin), lateAuthCount: Number(policyLateAuthCount),
+        maxEarlyOutAllowed: policyMaxEarlyOutAllowed, maxEarlyOutMin: Number(policyMaxEarlyOutMin), earlyOutAuthCount: Number(policyEarlyOutAuthCount),
+        combinedStatus: policyCombinedStatus, combinedBasedOn: policyCombinedBasedOn, combinedMaxMin: Number(policyCombinedMaxMin), combinedAuth: Number(policyCombinedAuth),
+        calculateBy: policyCalculateBy, ratio: Number(policyRatio), isActive: policyIsActive
+      };
       if (editSl !== null) {
-        nextList = attnPolicies.map(b => b.sl === editSl ? { ...b, name: policyName, allowedLateDays: Number(policyLate), allowedAbsentDays: Number(policyAbsent), bonusAmount: Number(policyAmount), isActive: policyIsActive } : b);
+        nextList = attnPolicies.map(b => b.sl === editSl ? newPol : b);
       } else {
-        const sl = attnPolicies.length > 0 ? Math.max(...attnPolicies.map(b => b.sl)) + 1 : 1;
-        nextList.push({ sl, name: policyName, allowedLateDays: Number(policyLate), allowedAbsentDays: Number(policyAbsent), bonusAmount: Number(policyAmount), isActive: policyIsActive });
+        nextList.push(newPol);
       }
       setAttnPolicies(nextList);
       localStorage.setItem("hris_attendance_bonus_policy", JSON.stringify(nextList));
@@ -835,16 +902,18 @@ function TimeSetupPage() {
               )}
 
               {activeTab === "bonus" && (
-                <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "800px" }}>
+                <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "1200px" }}>
                   <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
                     <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
                       <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">#</th>
                       <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">Actions</th>
-                      <th className="px-5 py-4 min-w-[200px]">Policy Name</th>
-                      <th className="px-5 py-4 w-[150px] text-center">Allowed Late Days</th>
-                      <th className="px-5 py-4 w-[150px] text-center">Allowed Absent Days</th>
-                      <th className="px-5 py-4 w-[150px] text-right">Bonus Amount</th>
-                      <th className="px-5 py-4 w-[120px] text-center">IsActive</th>
+                      <th className="px-5 py-4 min-w-[150px]">Employee Type</th>
+                      <th className="px-5 py-4 min-w-[150px]">Department</th>
+                      <th className="px-5 py-4 w-[120px] text-center">Max Leave</th>
+                      <th className="px-5 py-4 w-[120px] text-center">Max Absent</th>
+                      <th className="px-5 py-4 w-[150px] text-center">Calculate By</th>
+                      <th className="px-5 py-4 w-[120px] text-right">Ratio/Amount</th>
+                      <th className="px-5 py-4 w-[100px] text-center">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/30 text-foreground">
@@ -857,10 +926,12 @@ function TimeSetupPage() {
                             <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition"><Trash2 className="size-4" /></button>
                           </div>
                         </td>
-                        <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">{item.name}</td>
-                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.allowedLateDays} days</td>
-                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.allowedAbsentDays} days</td>
-                        <td className="px-5 py-3.5 text-right font-normal font-mono text-emerald-600">{item.bonusAmount} BDT</td>
+                        <td className="px-5 py-3.5 font-bold text-foreground/90">{item.employeeType}</td>
+                        <td className="px-5 py-3.5 text-muted-foreground">{item.department}</td>
+                        <td className="px-5 py-3.5 text-center font-mono">{item.maxLeaveAllowed} Days</td>
+                        <td className="px-5 py-3.5 text-center font-mono">{item.maxAbsentAllowed} Days</td>
+                        <td className="px-5 py-3.5 text-center">{item.calculateBy}</td>
+                        <td className="px-5 py-3.5 text-right font-normal font-mono text-emerald-600">{item.ratio}</td>
                         <td className="px-5 py-3.5 text-center">
                           <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}>{item.isActive}</span>
                         </td>
@@ -877,7 +948,7 @@ function TimeSetupPage() {
         {/* Master Modal Router */}
         {isFormOpen && (
           <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
-            <div className={`bg-card border border-border/80 w-full rounded-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 ${activeTab === 'shift' ? 'max-w-4xl' : 'max-w-2xl'}`}>
+            <div className={`bg-card border border-border/80 w-full rounded-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 ${(activeTab === 'shift' || activeTab === 'bonus') ? 'max-w-5xl' : 'max-w-2xl'}`}>
               
               {/* Modal Header */}
               <div className="px-6 py-4.5 border-b border-border/50 bg-[#f8fafc] dark:bg-[#0f172a] flex items-center justify-between">
@@ -1049,29 +1120,153 @@ function TimeSetupPage() {
                 )}
 
                 {activeTab === "bonus" && (
-                  <div className="space-y-4">
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Policy Name *</label>
-                      <input type="text" placeholder="Policy Name" value={policyName} onChange={e => setPolicyName(e.target.value)} className={insetInputClass} required />
+                  <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                    {/* Row 1 */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Employee Type</label>
+                        <select value={policyEmployeeType} onChange={e => setPolicyEmployeeType(e.target.value)} className={insetSelectClass}>
+                          <option value="ALL">ALL</option>
+                          <option value="Permanent">Permanent</option>
+                          <option value="Probation">Probation</option>
+                        </select>
+                      </div>
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Department</label>
+                        <select value={policyDepartment} onChange={e => setPolicyDepartment(e.target.value)} className={insetSelectClass}>
+                          <option value="All Departments">All Departments</option>
+                          <option value="Production">Production</option>
+                          <option value="HR & Admin">HR & Admin</option>
+                        </select>
+                      </div>
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Section</label>
+                        <select value={policySection} onChange={e => setPolicySection(e.target.value)} className={insetSelectClass}>
+                          <option value="ALL">ALL</option>
+                        </select>
+                      </div>
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Designation</label>
+                        <select value={policyDesignation} onChange={e => setPolicyDesignation(e.target.value)} className={insetSelectClass}>
+                          <option value="ALL">ALL</option>
+                        </select>
+                      </div>
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Unit</label>
+                        <select value={policyUnit} onChange={e => setPolicyUnit(e.target.value)} className={insetSelectClass}>
+                          <option value="ALL">ALL</option>
+                        </select>
+                      </div>
                     </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Allowed Late Days *</label>
-                      <input type="number" value={policyLate} onChange={e => setPolicyLate(Number(e.target.value))} className={insetInputClass} required />
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Allowed Absent Days *</label>
-                      <input type="number" value={policyAbsent} onChange={e => setPolicyAbsent(Number(e.target.value))} className={insetInputClass} required />
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Bonus Amount (BDT) *</label>
-                      <input type="number" value={policyAmount} onChange={e => setPolicyAmount(Number(e.target.value))} className={insetInputClass} required />
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>IsActive *</label>
-                      <select value={policyIsActive} onChange={e => setPolicyIsActive(e.target.value as any)} className={insetSelectClass}>
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                      </select>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-border/40 pt-6">
+                      <div className="space-y-4">
+                        {/* Leave/Absent limits */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className={insetWrapperClass}>
+                            <label className={insetLabelClass}>Max Leave Allowed <span className="text-red-500">*</span></label>
+                            <input type="number" value={policyMaxLeave} onChange={e => setPolicyMaxLeave(Number(e.target.value))} className={insetInputClass} />
+                          </div>
+                          <div className={insetWrapperClass}>
+                            <label className={insetLabelClass}>Max Absent Allowed <span className="text-red-500">*</span></label>
+                            <input type="number" value={policyMaxAbsent} onChange={e => setPolicyMaxAbsent(Number(e.target.value))} className={insetInputClass} />
+                          </div>
+                        </div>
+
+                        {/* Late conditions */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className={insetWrapperClass}>
+                            <label className={insetLabelClass}>Late Based On <span className="text-red-500">*</span></label>
+                            <select value={policyLateBasedOn} onChange={e => setPolicyLateBasedOn(e.target.value)} className={insetSelectClass}>
+                              <option value="Both">Both</option>
+                              <option value="Count">Count</option>
+                              <option value="Minutes">Minutes</option>
+                            </select>
+                          </div>
+                          <div className={insetWrapperClass}>
+                            <label className={insetLabelClass}>Max Late Allowed <span className="text-red-500">*</span></label>
+                            <input type="number" value={policyMaxLateAllowed} onChange={e => setPolicyMaxLateAllowed(Number(e.target.value))} className={insetInputClass} />
+                          </div>
+                          <div className={insetWrapperClass}>
+                            <label className={insetLabelClass}>Max Late Min <span className="text-red-500">*</span></label>
+                            <input type="number" value={policyMaxLateMin} onChange={e => setPolicyMaxLateMin(Number(e.target.value))} className={insetInputClass} />
+                          </div>
+                          <div className={insetWrapperClass}>
+                            <label className={insetLabelClass}>Late Auth Count <span className="text-red-500">*</span></label>
+                            <input type="number" value={policyLateAuthCount} onChange={e => setPolicyLateAuthCount(Number(e.target.value))} className={insetInputClass} />
+                          </div>
+                        </div>
+
+                        {/* Early Out conditions */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className={`${insetWrapperClass} col-span-2`}>
+                            <label className={insetLabelClass}>Max Early Out Allowed <span className="text-red-500">*</span></label>
+                            <select value={policyMaxEarlyOutAllowed} onChange={e => setPolicyMaxEarlyOutAllowed(e.target.value)} className={insetSelectClass}>
+                              <option value="Both">Both</option>
+                              <option value="Count">Count</option>
+                              <option value="Minutes">Minutes</option>
+                            </select>
+                          </div>
+                          <div className={insetWrapperClass}>
+                            <label className={insetLabelClass}>Max Early Out Min <span className="text-red-500">*</span></label>
+                            <input type="number" value={policyMaxEarlyOutMin} onChange={e => setPolicyMaxEarlyOutMin(Number(e.target.value))} className={insetInputClass} />
+                          </div>
+                          <div className={insetWrapperClass}>
+                            <label className={insetLabelClass}>EarlyOut Auth Count <span className="text-red-500">*</span></label>
+                            <input type="number" value={policyEarlyOutAuthCount} onChange={e => setPolicyEarlyOutAuthCount(Number(e.target.value))} className={insetInputClass} />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        {/* Combined conditions */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className={insetWrapperClass}>
+                            <label className={insetLabelClass}>Combined(L/E) Status</label>
+                            <select value={policyCombinedStatus} onChange={e => setPolicyCombinedStatus(e.target.value as any)} className={insetSelectClass}>
+                              <option value="Yes">Yes</option>
+                              <option value="No">No</option>
+                            </select>
+                          </div>
+                          <div className={insetWrapperClass}>
+                            <label className={insetLabelClass}>Based On</label>
+                            <select value={policyCombinedBasedOn} onChange={e => setPolicyCombinedBasedOn(e.target.value)} className={insetSelectClass}>
+                              <option value="Min">Min</option>
+                              <option value="Count">Count</option>
+                            </select>
+                          </div>
+                          <div className={insetWrapperClass}>
+                            <label className={insetLabelClass}>Max Min <span className="text-red-500">*</span></label>
+                            <input type="number" value={policyCombinedMaxMin} onChange={e => setPolicyCombinedMaxMin(Number(e.target.value))} className={insetInputClass} />
+                          </div>
+                          <div className={insetWrapperClass}>
+                            <label className={insetLabelClass}>Combined Auth <span className="text-red-500">*</span></label>
+                            <input type="number" value={policyCombinedAuth} onChange={e => setPolicyCombinedAuth(Number(e.target.value))} className={insetInputClass} />
+                          </div>
+                        </div>
+
+                        {/* Reward definition */}
+                        <div className="grid grid-cols-2 gap-4 border-t border-border/40 pt-4 mt-4">
+                          <div className={`${insetWrapperClass} col-span-2`}>
+                            <label className={insetLabelClass}>Calculate By <span className="text-red-500">*</span></label>
+                            <select value={policyCalculateBy} onChange={e => setPolicyCalculateBy(e.target.value)} className={insetSelectClass}>
+                              <option value="Percentage (%)">Percentage (%)</option>
+                              <option value="Fixed Amount">Fixed Amount</option>
+                            </select>
+                          </div>
+                          <div className={insetWrapperClass}>
+                            <label className={insetLabelClass}>Ratio <span className="text-red-500">*</span></label>
+                            <input type="number" value={policyRatio} onChange={e => setPolicyRatio(Number(e.target.value))} className={insetInputClass} />
+                          </div>
+                          <div className={insetWrapperClass}>
+                            <label className={insetLabelClass}>IsActive <span className="text-red-500">*</span></label>
+                            <select value={policyIsActive} onChange={e => setPolicyIsActive(e.target.value as any)} className={insetSelectClass}>
+                              <option value="Active">Active</option>
+                              <option value="Inactive">Inactive</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -1312,36 +1507,17 @@ function TimeSetupPage() {
                 </button>
               </div>
 
-              {/* Tab Navigation */}
-              <div className="flex border-b border-border/50 bg-[#f8fafc]/50 dark:bg-[#0f172a]/30 px-6 py-2 gap-4 select-none">
-                {[
-                  { id: "general", label: "Target & Scope" },
-                  { id: "timings", label: "Shift & Timings" },
-                  { id: "slabs", label: "Overtime Slabs" },
-                  { id: "rules", label: "Rounding & Rules" },
-                  { id: "breaks", label: "Breaks & Deductions" }
-                ].map(t => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => setOiModalTab(t.id as any)}
-                    className={`pb-1.5 text-xs font-bold uppercase tracking-wider relative cursor-pointer transition ${
-                      oiModalTab === t.id ? "text-primary" : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {t.label}
-                    {oiModalTab === t.id && (
-                      <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full animate-in fade-in duration-200" />
-                    )}
-                  </button>
-                ))}
-              </div>
+              {/* Tab Navigation Removed */}
 
               {/* Body */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-muted/5">
 
-                {oiModalTab === "general" && (
-                  <div className="space-y-4 animate-in fade-in duration-200">
+                {/* Target & Scope Block */}
+                <div className="bg-card p-5 rounded-2xl border border-border/50 shadow-sm space-y-4">
+                  <h4 className="text-sm font-bold text-foreground border-b border-border/50 pb-2 flex items-center gap-2">
+                    <span className="w-1.5 h-4 bg-primary rounded-full"></span> Target & Scope
+                  </h4>
+                  <div className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                       <div className={insetWrapperClass}>
                         <label className={insetLabelClass}>Employee Type *</label>
@@ -1414,10 +1590,14 @@ function TimeSetupPage() {
                       </div>
                     </div>
                   </div>
-                )}
+                </div>
 
-                {oiModalTab === "timings" && (
-                  <div className="space-y-4 animate-in fade-in duration-200">
+                {/* Shift & Timings Block */}
+                <div className="bg-card p-5 rounded-2xl border border-border/50 shadow-sm space-y-4">
+                  <h4 className="text-sm font-bold text-foreground border-b border-border/50 pb-2 flex items-center gap-2">
+                    <span className="w-1.5 h-4 bg-primary rounded-full"></span> Shift & Timings
+                  </h4>
+                  <div className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                       <div className={insetWrapperClass}>
                         <label className={insetLabelClass}>Shift</label>
@@ -1458,10 +1638,14 @@ function TimeSetupPage() {
                       </select>
                     </div>
                   </div>
-                )}
+                </div>
 
-                {oiModalTab === "slabs" && (
-                  <div className="space-y-4 animate-in fade-in duration-200">
+                {/* Overtime Slabs Block */}
+                <div className="bg-card p-5 rounded-2xl border border-border/50 shadow-sm space-y-4">
+                  <h4 className="text-sm font-bold text-foreground border-b border-border/50 pb-2 flex items-center gap-2">
+                    <span className="w-1.5 h-4 bg-primary rounded-full"></span> Overtime Slabs
+                  </h4>
+                  <div className="space-y-4">
                     <div className="bg-muted/10 p-4 rounded-xl border border-border/60">
                       <h4 className="text-xs font-black uppercase text-foreground mb-3">Slab 2 Rules</h4>
                       <div className="grid grid-cols-2 gap-4">
@@ -1504,10 +1688,14 @@ function TimeSetupPage() {
                       </div>
                     </div>
                   </div>
-                )}
+                </div>
 
-                {oiModalTab === "rules" && (
-                  <div className="space-y-4 animate-in fade-in duration-200">
+                {/* Rounding & Rules Block */}
+                <div className="bg-card p-5 rounded-2xl border border-border/50 shadow-sm space-y-4">
+                  <h4 className="text-sm font-bold text-foreground border-b border-border/50 pb-2 flex items-center gap-2">
+                    <span className="w-1.5 h-4 bg-primary rounded-full"></span> Rounding & Rules
+                  </h4>
+                  <div className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className={insetWrapperClass}>
                         <label className={insetLabelClass}>OT After WH *</label>
@@ -1563,10 +1751,14 @@ function TimeSetupPage() {
                       </div>
                     </div>
                   </div>
-                )}
+                </div>
 
-                {oiModalTab === "breaks" && (
-                  <div className="space-y-4 animate-in fade-in duration-200">
+                {/* Breaks & Deductions Block */}
+                <div className="bg-card p-5 rounded-2xl border border-border/50 shadow-sm space-y-4">
+                  <h4 className="text-sm font-bold text-foreground border-b border-border/50 pb-2 flex items-center gap-2">
+                    <span className="w-1.5 h-4 bg-primary rounded-full"></span> Breaks & Deductions
+                  </h4>
+                  <div className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className={insetWrapperClass}>
                         <label className={insetLabelClass}>Prayer Break</label>
@@ -1610,7 +1802,7 @@ function TimeSetupPage() {
                       </div>
                     </div>
                   </div>
-                )}
+                </div>
               </div>
 
               {/* Footer */}
@@ -1623,95 +1815,68 @@ function TimeSetupPage() {
                   CLOSE
                 </button>
                 <div className="flex items-center gap-3">
-                  {(() => {
-                    const otSteps = ["general", "timings", "slabs", "rules", "breaks"] as const;
-                    const currentStepIdx = otSteps.indexOf(oiModalTab);
-                    return (
-                      <>
-                        {currentStepIdx > 0 && (
-                          <button
-                            type="button"
-                            onClick={() => setOiModalTab(otSteps[currentStepIdx - 1])}
-                            className="h-10 px-6 rounded-lg bg-gray-500 hover:bg-gray-600 text-white font-black text-xs transition-all uppercase tracking-wider shadow-sm hover:shadow"
-                          >
-                            BACK
-                          </button>
-                        )}
-                        {currentStepIdx < otSteps.length - 1 ? (
-                          <button
-                            type="button"
-                            onClick={() => setOiModalTab(otSteps[currentStepIdx + 1])}
-                            className="h-10 px-6 rounded-lg bg-[#3498db] hover:bg-[#2980b9] text-white font-black text-xs transition-all uppercase tracking-wider shadow-sm hover:shadow"
-                          >
-                            NEXT
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const isNew = !otInfoItem.sl || otInfoItem.sl === 0;
-                              const sl = isNew ? (otConfigs.length > 0 ? Math.max(...otConfigs.map(o => o.sl)) + 1 : 1) : otInfoItem.sl;
-                              
-                              const updatedItem: OtConfig = {
-                                sl,
-                                employeeType: oiEmployeeType,
-                                department: oiDepartment,
-                                section: oiSection,
-                                designation: oiDesignation,
-                                unit: oiUnit,
-                                otCalculationType: oiOtType,
-                                bufferMinutes: 15,
-                                isActive: oiIsActive,
-                                startDate: oiStartDate,
-                                endDate: oiEndDate,
-                                shift: oiShift,
-                                startTime: oiStartTime,
-                                endTime: oiEndTime,
-                                shiftStartTime: oiShiftStartTime,
-                                otStartTime: oiOtStartTime,
-                                otToleranceUpTo: oiOtToleranceUpTo,
-                                time2Min: oiTime2Min,
-                                time2MaxOt: oiTime2MaxOt,
-                                time3Min: oiTime3Min,
-                                time3MaxOt: oiTime3MaxOt,
-                                time4Min: oiTime4Min,
-                                time4MaxOt: oiTime4MaxOt,
-                                otAfterWH: oiOtAfterWH,
-                                generalDeductHour: oiGeneralDeductHour,
-                                holidayDeductHour: oiHolidayDeductHour,
-                                deductAfter: oiDeductAfter,
-                                otRound: oiOtRound,
-                                roundSlots: oiRoundSlots,
-                                minOt: oiMinOt,
-                                maxOt: oiMaxOt,
-                                prayerBreak: oiPrayerBreak,
-                                dinnerBreak: oiDinnerBreak,
-                                deductionFor: oiDeductionFor,
-                                timeFrom: oiTimeFrom,
-                                timeTo: oiTimeTo,
-                                deductMin: oiDeductMin,
-                                otStartFromShift: oiOtStartFromShift,
-                              };
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const isNew = !otInfoItem.sl || otInfoItem.sl === 0;
+                      const sl = isNew ? (otConfigs.length > 0 ? Math.max(...otConfigs.map(o => o.sl)) + 1 : 1) : otInfoItem.sl;
+                      
+                      const updatedItem: OtConfig = {
+                        sl,
+                        employeeType: oiEmployeeType,
+                        department: oiDepartment,
+                        section: oiSection,
+                        designation: oiDesignation,
+                        unit: oiUnit,
+                        otCalculationType: oiOtType,
+                        bufferMinutes: 15,
+                        isActive: oiIsActive,
+                        startDate: oiStartDate,
+                        endDate: oiEndDate,
+                        shift: oiShift,
+                        startTime: oiStartTime,
+                        endTime: oiEndTime,
+                        shiftStartTime: oiShiftStartTime,
+                        otStartTime: oiOtStartTime,
+                        otToleranceUpTo: oiOtToleranceUpTo,
+                        time2Min: oiTime2Min,
+                        time2MaxOt: oiTime2MaxOt,
+                        time3Min: oiTime3Min,
+                        time3MaxOt: oiTime3MaxOt,
+                        time4Min: oiTime4Min,
+                        time4MaxOt: oiTime4MaxOt,
+                        otAfterWH: oiOtAfterWH,
+                        generalDeductHour: oiGeneralDeductHour,
+                        holidayDeductHour: oiHolidayDeductHour,
+                        deductAfter: oiDeductAfter,
+                        otRound: oiOtRound,
+                        roundSlots: oiRoundSlots,
+                        minOt: oiMinOt,
+                        maxOt: oiMaxOt,
+                        prayerBreak: oiPrayerBreak,
+                        dinnerBreak: oiDinnerBreak,
+                        deductionFor: oiDeductionFor,
+                        timeFrom: oiTimeFrom,
+                        timeTo: oiTimeTo,
+                        deductMin: oiDeductMin,
+                        otStartFromShift: oiOtStartFromShift,
+                      };
 
-                              let nextList = [...otConfigs];
-                              if (isNew) {
-                                nextList.push(updatedItem);
-                              } else {
-                                nextList = otConfigs.map(o => o.sl === sl ? updatedItem : o);
-                              }
-                              setOtConfigs(nextList);
-                              localStorage.setItem("hris_ot_config", JSON.stringify(nextList));
-                              toast.success(isNew ? "OT Configuration created successfully!" : "OT Configuration updated successfully!");
-                              setIsOtInfoOpen(false);
-                            }}
-                            className="h-10 px-8 rounded-lg bg-[#27ae60] hover:bg-[#219a52] text-white font-black text-xs shadow-md hover:shadow-lg transition-all uppercase tracking-wider"
-                          >
-                            {(!otInfoItem.sl || otInfoItem.sl === 0) ? "CREATE" : "UPDATE"}
-                          </button>
-                        )}
-                      </>
-                    );
-                  })()}
+                      let nextList = [...otConfigs];
+                      if (isNew) {
+                        nextList.push(updatedItem);
+                      } else {
+                        nextList = otConfigs.map(o => o.sl === sl ? updatedItem : o);
+                      }
+                      setOtConfigs(nextList);
+                      localStorage.setItem("hris_ot_config", JSON.stringify(nextList));
+                      toast.success(isNew ? "OT Configuration created successfully!" : "OT Configuration updated successfully!");
+                      setIsOtInfoOpen(false);
+                    }}
+                    className="h-10 px-8 rounded-lg bg-[#27ae60] hover:bg-[#219a52] text-white font-black text-xs shadow-md hover:shadow-lg transition-all uppercase tracking-wider"
+                  >
+                    {(!otInfoItem.sl || otInfoItem.sl === 0) ? "CREATE" : "UPDATE"}
+                  </button>
                 </div>
               </div>
 
