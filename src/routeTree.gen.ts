@@ -67,6 +67,11 @@ import { Route as ConfigureEmploymentRouteImport } from './routes/configure-empl
 import { Route as ConfigureEducationRouteImport } from './routes/configure-education'
 import { Route as ConfigureCompensationRouteImport } from './routes/configure-compensation'
 import { Route as CompanyHolidayRouteImport } from './routes/company-holiday'
+import { Route as BudgetStatementRouteImport } from './routes/budget-statement'
+import { Route as BudgetRequisitionApprovalsRouteImport } from './routes/budget-requisition-approvals'
+import { Route as BudgetPlanningRouteImport } from './routes/budget-planning'
+import { Route as BudgetOvertimeRouteImport } from './routes/budget-overtime'
+import { Route as BudgetMyRequisitionsRouteImport } from './routes/budget-my-requisitions'
 import { Route as ApproveIncrementHrRouteImport } from './routes/approve-increment-hr'
 import { Route as ApproveIncrementGadgetRouteImport } from './routes/approve-increment-gadget'
 import { Route as AddEmployeeRouteImport } from './routes/add-employee'
@@ -371,6 +376,32 @@ const CompanyHolidayRoute = CompanyHolidayRouteImport.update({
   path: '/company-holiday',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BudgetStatementRoute = BudgetStatementRouteImport.update({
+  id: '/budget-statement',
+  path: '/budget-statement',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BudgetRequisitionApprovalsRoute =
+  BudgetRequisitionApprovalsRouteImport.update({
+    id: '/budget-requisition-approvals',
+    path: '/budget-requisition-approvals',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const BudgetPlanningRoute = BudgetPlanningRouteImport.update({
+  id: '/budget-planning',
+  path: '/budget-planning',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BudgetOvertimeRoute = BudgetOvertimeRouteImport.update({
+  id: '/budget-overtime',
+  path: '/budget-overtime',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BudgetMyRequisitionsRoute = BudgetMyRequisitionsRouteImport.update({
+  id: '/budget-my-requisitions',
+  path: '/budget-my-requisitions',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApproveIncrementHrRoute = ApproveIncrementHrRouteImport.update({
   id: '/approve-increment-hr',
   path: '/approve-increment-hr',
@@ -419,6 +450,11 @@ export interface FileRoutesByFullPath {
   '/add-employee': typeof AddEmployeeRoute
   '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
+  '/budget-my-requisitions': typeof BudgetMyRequisitionsRoute
+  '/budget-overtime': typeof BudgetOvertimeRoute
+  '/budget-planning': typeof BudgetPlanningRoute
+  '/budget-requisition-approvals': typeof BudgetRequisitionApprovalsRoute
+  '/budget-statement': typeof BudgetStatementRoute
   '/company-holiday': typeof CompanyHolidayRoute
   '/configure-compensation': typeof ConfigureCompensationRoute
   '/configure-education': typeof ConfigureEducationRoute
@@ -487,6 +523,11 @@ export interface FileRoutesByTo {
   '/add-employee': typeof AddEmployeeRoute
   '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
+  '/budget-my-requisitions': typeof BudgetMyRequisitionsRoute
+  '/budget-overtime': typeof BudgetOvertimeRoute
+  '/budget-planning': typeof BudgetPlanningRoute
+  '/budget-requisition-approvals': typeof BudgetRequisitionApprovalsRoute
+  '/budget-statement': typeof BudgetStatementRoute
   '/company-holiday': typeof CompanyHolidayRoute
   '/configure-compensation': typeof ConfigureCompensationRoute
   '/configure-education': typeof ConfigureEducationRoute
@@ -556,6 +597,11 @@ export interface FileRoutesById {
   '/add-employee': typeof AddEmployeeRoute
   '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
+  '/budget-my-requisitions': typeof BudgetMyRequisitionsRoute
+  '/budget-overtime': typeof BudgetOvertimeRoute
+  '/budget-planning': typeof BudgetPlanningRoute
+  '/budget-requisition-approvals': typeof BudgetRequisitionApprovalsRoute
+  '/budget-statement': typeof BudgetStatementRoute
   '/company-holiday': typeof CompanyHolidayRoute
   '/configure-compensation': typeof ConfigureCompensationRoute
   '/configure-education': typeof ConfigureEducationRoute
@@ -626,6 +672,11 @@ export interface FileRouteTypes {
     | '/add-employee'
     | '/approve-increment-gadget'
     | '/approve-increment-hr'
+    | '/budget-my-requisitions'
+    | '/budget-overtime'
+    | '/budget-planning'
+    | '/budget-requisition-approvals'
+    | '/budget-statement'
     | '/company-holiday'
     | '/configure-compensation'
     | '/configure-education'
@@ -694,6 +745,11 @@ export interface FileRouteTypes {
     | '/add-employee'
     | '/approve-increment-gadget'
     | '/approve-increment-hr'
+    | '/budget-my-requisitions'
+    | '/budget-overtime'
+    | '/budget-planning'
+    | '/budget-requisition-approvals'
+    | '/budget-statement'
     | '/company-holiday'
     | '/configure-compensation'
     | '/configure-education'
@@ -762,6 +818,11 @@ export interface FileRouteTypes {
     | '/add-employee'
     | '/approve-increment-gadget'
     | '/approve-increment-hr'
+    | '/budget-my-requisitions'
+    | '/budget-overtime'
+    | '/budget-planning'
+    | '/budget-requisition-approvals'
+    | '/budget-statement'
     | '/company-holiday'
     | '/configure-compensation'
     | '/configure-education'
@@ -831,6 +892,11 @@ export interface RootRouteChildren {
   AddEmployeeRoute: typeof AddEmployeeRoute
   ApproveIncrementGadgetRoute: typeof ApproveIncrementGadgetRoute
   ApproveIncrementHrRoute: typeof ApproveIncrementHrRoute
+  BudgetMyRequisitionsRoute: typeof BudgetMyRequisitionsRoute
+  BudgetOvertimeRoute: typeof BudgetOvertimeRoute
+  BudgetPlanningRoute: typeof BudgetPlanningRoute
+  BudgetRequisitionApprovalsRoute: typeof BudgetRequisitionApprovalsRoute
+  BudgetStatementRoute: typeof BudgetStatementRoute
   CompanyHolidayRoute: typeof CompanyHolidayRoute
   ConfigureCompensationRoute: typeof ConfigureCompensationRoute
   ConfigureEducationRoute: typeof ConfigureEducationRoute
@@ -1303,6 +1369,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompanyHolidayRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/budget-statement': {
+      id: '/budget-statement'
+      path: '/budget-statement'
+      fullPath: '/budget-statement'
+      preLoaderRoute: typeof BudgetStatementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/budget-requisition-approvals': {
+      id: '/budget-requisition-approvals'
+      path: '/budget-requisition-approvals'
+      fullPath: '/budget-requisition-approvals'
+      preLoaderRoute: typeof BudgetRequisitionApprovalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/budget-planning': {
+      id: '/budget-planning'
+      path: '/budget-planning'
+      fullPath: '/budget-planning'
+      preLoaderRoute: typeof BudgetPlanningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/budget-overtime': {
+      id: '/budget-overtime'
+      path: '/budget-overtime'
+      fullPath: '/budget-overtime'
+      preLoaderRoute: typeof BudgetOvertimeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/budget-my-requisitions': {
+      id: '/budget-my-requisitions'
+      path: '/budget-my-requisitions'
+      fullPath: '/budget-my-requisitions'
+      preLoaderRoute: typeof BudgetMyRequisitionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/approve-increment-hr': {
       id: '/approve-increment-hr'
       path: '/approve-increment-hr'
@@ -1367,6 +1468,11 @@ const rootRouteChildren: RootRouteChildren = {
   AddEmployeeRoute: AddEmployeeRoute,
   ApproveIncrementGadgetRoute: ApproveIncrementGadgetRoute,
   ApproveIncrementHrRoute: ApproveIncrementHrRoute,
+  BudgetMyRequisitionsRoute: BudgetMyRequisitionsRoute,
+  BudgetOvertimeRoute: BudgetOvertimeRoute,
+  BudgetPlanningRoute: BudgetPlanningRoute,
+  BudgetRequisitionApprovalsRoute: BudgetRequisitionApprovalsRoute,
+  BudgetStatementRoute: BudgetStatementRoute,
   CompanyHolidayRoute: CompanyHolidayRoute,
   ConfigureCompensationRoute: ConfigureCompensationRoute,
   ConfigureEducationRoute: ConfigureEducationRoute,

@@ -4,7 +4,9 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
   ChevronRight, Search, FileSpreadsheet, Printer, FileDown,
-  CheckCircle2, Lock, Unlock, ArrowRight, ShieldCheck, HelpCircle, RefreshCw, Trash2
+  CheckCircle2, Lock, Unlock, ArrowRight, ShieldCheck, HelpCircle,
+  RefreshCw, Trash2, Plus, Minus, Calculator, Landmark, Coins,
+  Smartphone, UserCheck, Eye, EyeOff
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -37,7 +39,7 @@ const initialWorkflowRows: EarnLeaveWorkflowRow[] = [
   {
     id: "ELW-001",
     empId: "2023043910",
-    empName: "Tahmid Afsar",
+    empName: "Tahmid Afsar Shapno",
     department: "Project Resource & Strategy",
     designation: "Asst. Manager",
     totalDays: 4.39,
@@ -74,30 +76,135 @@ const initialWorkflowRows: EarnLeaveWorkflowRow[] = [
     paymentMode: "Cash",
     bankName: "",
     accountNo: "",
+    status: "Submitted"
+  },
+  {
+    id: "ELW-004",
+    empId: "2047508",
+    empName: "Mst. Jahanara Khatun",
+    department: "Sewing",
+    designation: "Asst. Operator",
+    totalDays: 12.00,
+    perDayRate: 230.50,
+    netPay: 2766,
+    paymentMode: "bKash",
+    bankName: "",
+    accountNo: "01712345678",
+    status: "Submitted"
+  },
+  {
+    id: "ELW-005",
+    empId: "2400015",
+    empName: "Mst. Mukta Khatun",
+    department: "Sewing",
+    designation: "Operator",
+    totalDays: 14.50,
+    perDayRate: 250.00,
+    netPay: 3625,
+    paymentMode: "Rocket",
+    bankName: "",
+    accountNo: "01812345678",
+    status: "Checked"
+  },
+  {
+    id: "ELW-006",
+    empId: "3302786",
+    empName: "Md. Shantona Khatun",
+    department: "Sewing",
+    designation: "Asst. Operator",
+    totalDays: 8.00,
+    perDayRate: 220.00,
+    netPay: 1760,
+    paymentMode: "Cash",
+    bankName: "",
+    accountNo: "",
+    status: "Checked"
+  },
+  {
+    id: "ELW-007",
+    empId: "33028814",
+    empName: "Most. Fote Khatun",
+    department: "Sewing",
+    designation: "Asst. Operator",
+    totalDays: 10.00,
+    perDayRate: 220.00,
+    netPay: 2200,
+    paymentMode: "Bank",
+    bankName: "Pubali Bank PLC",
+    accountNo: "33429817298",
+    status: "Authorized (HRD)"
+  },
+  {
+    id: "ELW-008",
+    empId: "8020064",
+    empName: "Amina Khatun",
+    department: "Store",
+    designation: "Jr. Needle Man",
+    totalDays: 6.50,
+    perDayRate: 240.00,
+    netPay: 1560,
+    paymentMode: "bKash",
+    bankName: "",
+    accountNo: "01998765432",
     status: "Draft"
+  },
+  {
+    id: "ELW-009",
+    empId: "8179446",
+    empName: "Mst. Morzina Khatun",
+    department: "Sewing",
+    designation: "Quality Ins.",
+    totalDays: 5.00,
+    perDayRate: 280.00,
+    netPay: 1400,
+    paymentMode: "Bank",
+    bankName: "Sonali Bank PLC",
+    accountNo: "12093847293",
+    status: "Draft"
+  },
+  {
+    id: "ELW-010",
+    empId: "1001111",
+    empName: "Md. Yeasin Ali",
+    department: "Sewing",
+    designation: "Supervisor",
+    totalDays: 7.50,
+    perDayRate: 310.00,
+    netPay: 2325,
+    paymentMode: "Rocket",
+    bankName: "",
+    accountNo: "01512345678",
+    status: "Submitted"
   }
 ];
 
 function EarnLeaveWorkflowPage() {
-  // 3-Step Sequential Workflow Engine:
-  // Step 1: Submit (Clerk level)
-  // Step 2: Check (HR Officer level)
-  // Step 3: Approve (HRD Director level)
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
-
-  // Table rows database
   const [rows, setRows] = useState<EarnLeaveWorkflowRow[]>(initialWorkflowRows);
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
+  const [filterByStepStatus, setFilterByStepStatus] = useState(true);
 
-  // Filters
+  // Filters State
   const [year, setYear] = useState("2026");
   const [month, setMonth] = useState("May");
   const [empType, setEmpType] = useState("ALL");
   const [section, setSection] = useState("ALL");
   const [unit, setUnit] = useState("ALL");
   const [empIdFilter, setEmpIdFilter] = useState("");
-
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set(["ELW-001", "ELW-002", "ELW-003"]));
+
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  // Quick Add State
+  const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
+  const [newEmpId, setNewEmpId] = useState("");
+  const [newEmpName, setNewEmpName] = useState("");
+  const [newDept, setNewDept] = useState("Sewing");
+  const [newDesig, setNewDesig] = useState("Asst. Operator");
+  const [newDays, setNewDays] = useState("5");
+  const [newRate, setNewRate] = useState("250");
+  const [newPaymentMode, setNewPaymentMode] = useState<"Bank" | "Cash" | "bKash" | "Rocket">("Cash");
+  const [newBankName, setNewBankName] = useState("");
+  const [newAccountNo, setNewAccountNo] = useState("");
 
   const [appliedFilters, setAppliedFilters] = useState({
     year: "2026",
@@ -120,10 +227,38 @@ function EarnLeaveWorkflowPage() {
     });
   };
 
-  // Filter calculations
+  // Stepper Badge Counts (Calculated dynamically)
+  const stepCounts = useMemo(() => {
+    return {
+      drafts: rows.filter(r => r.status === "Draft").length,
+      submitted: rows.filter(r => r.status === "Submitted").length,
+      checked: rows.filter(r => r.status === "Checked").length,
+      authorized: rows.filter(r => r.status === "Authorized (HRD)").length,
+    };
+  }, [rows]);
+
+  // Handle click on Stepper Cards to switch step
+  const handleStepClick = (step: 1 | 2 | 3) => {
+    setCurrentStep(step);
+    setSelectedIds(new Set()); // Reset selection when switching context
+  };
+
+  // Filter calculation logic
   const filteredRows = useMemo(() => {
     return rows.filter(r => {
-      if (appliedFilters.empIdFilter.trim() && r.empId !== appliedFilters.empIdFilter.trim()) return false;
+      // 1. Step Status Filter (if enabled)
+      if (filterByStepStatus) {
+        if (currentStep === 1 && r.status !== "Draft") return false;
+        if (currentStep === 2 && r.status !== "Submitted") return false;
+        if (currentStep === 3 && r.status !== "Checked") return false;
+      }
+
+      // 2. Emp ID Filter
+      if (appliedFilters.empIdFilter.trim() && r.empId !== appliedFilters.empIdFilter.trim()) {
+        return false;
+      }
+
+      // 3. Search query matching Name, ID, Department, Designation
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         return (
@@ -131,49 +266,109 @@ function EarnLeaveWorkflowPage() {
           r.empName.toLowerCase().includes(q) ||
           r.department.toLowerCase().includes(q) ||
           r.designation.toLowerCase().includes(q) ||
-          r.bankName.toLowerCase().includes(q) ||
-          r.accountNo.toLowerCase().includes(q)
+          r.paymentMode.toLowerCase().includes(q)
         );
       }
+
       return true;
     });
-  }, [rows, appliedFilters, searchQuery]);
+  }, [rows, currentStep, filterByStepStatus, appliedFilters, searchQuery]);
 
-  // Stepper controls & locked actions
-  const handleLevel1Submit = () => {
-    if (selectedIds.size === 0) {
-      toast.error("Please select at least one record to submit!");
-      return;
-    }
-    setRows(prev => prev.map(r => selectedIds.has(r.id) ? { ...r, status: "Submitted" } : r));
-    setCurrentStep(2); // Unlock Step 2
-    toast.success("Level 1 Submission Complete! Processed Cash Earned Leaves submitted to HR Officer verification.");
+  // KPI Metrics for Shown Rows
+  const kpis = useMemo(() => {
+    const totalNetPay = filteredRows.reduce((sum, r) => sum + r.netPay, 0);
+    const totalDays = filteredRows.reduce((sum, r) => sum + r.totalDays, 0);
+    const paymentCounts = filteredRows.reduce((acc, r) => {
+      acc[r.paymentMode] = (acc[r.paymentMode] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return {
+      totalNetPay,
+      totalDays: Math.round(totalDays * 100) / 100,
+      paymentSummary: `Bank: ${paymentCounts.Bank || 0} | Cash: ${paymentCounts.Cash || 0} | Mobile: ${(paymentCounts.bKash || 0) + (paymentCounts.Rocket || 0)}`,
+      count: filteredRows.length
+    };
+  }, [filteredRows]);
+
+  // Inline Row Editor
+  const handleRowEdit = (id: string, field: keyof EarnLeaveWorkflowRow, value: any) => {
+    setRows(prev => prev.map(r => {
+      if (r.id === id) {
+        const updated = { ...r, [field]: value };
+        // Recalculate netPay when days or rate change
+        if (field === "totalDays" || field === "perDayRate") {
+          const d = field === "totalDays" ? Number(value) : r.totalDays;
+          const pr = field === "perDayRate" ? Number(value) : r.perDayRate;
+          updated.netPay = Math.round(d * pr);
+        }
+        return updated;
+      }
+      return r;
+    }));
   };
 
-  const handleLevel2Check = () => {
-    if (selectedIds.size === 0) {
-      toast.error("Please select at least one record to verify!");
+  // Single Row Transition Actions
+  const handleSingleTransition = (id: string, currentStatus: string) => {
+    let nextStatus: "Submitted" | "Checked" | "Authorized (HRD)" = "Submitted";
+    let message = "";
+
+    if (currentStatus === "Draft") {
+      nextStatus = "Submitted";
+      message = "Ledger row submitted for verification.";
+    } else if (currentStatus === "Submitted") {
+      nextStatus = "Checked";
+      message = "Ledger row checked & verified.";
+    } else if (currentStatus === "Checked") {
+      nextStatus = "Authorized (HRD)";
+      message = "Ledger row authorized for cash disbursement.";
+    } else {
       return;
     }
-    setRows(prev => prev.map(r => selectedIds.has(r.id) ? { ...r, status: "Checked" } : r));
-    setCurrentStep(3); // Unlock Step 3
-    toast.success("Level 2 HR Check Verification Complete! Verified list forwarded to Director (HRD) authorization.");
+
+    setRows(prev => prev.map(r => r.id === id ? { ...r, status: nextStatus } : r));
+    toast.success(message);
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
   };
 
-  const handleLevel3Approve = () => {
+  // Bulk actions handlers
+  const handleBulkAction = () => {
     if (selectedIds.size === 0) {
-      toast.error("Please select at least one record to authorize!");
+      toast.error("Please select at least one record to process!");
       return;
     }
-    setRows(prev => prev.map(r => selectedIds.has(r.id) ? { ...r, status: "Authorized (HRD)" } : r));
-    toast.success("Level 3 HRD Authorization Approved! All cash payouts cleared for direct disbursement.");
-  };
 
-  // Rollback / Reset for Demo Purposes
-  const handleResetWorkflow = () => {
-    setRows(initialWorkflowRows);
-    setCurrentStep(1);
-    toast.info("Workflow reset to Draft state for demonstration.");
+    let nextStatus: "Submitted" | "Checked" | "Authorized (HRD)" = "Submitted";
+    let message = "";
+
+    if (currentStep === 1) {
+      nextStatus = "Submitted";
+      message = `Submitted ${selectedIds.size} records to verification queue.`;
+    } else if (currentStep === 2) {
+      nextStatus = "Checked";
+      message = `Checked & verified ${selectedIds.size} records.`;
+    } else if (currentStep === 3) {
+      nextStatus = "Authorized (HRD)";
+      message = `Authorized ${selectedIds.size} payouts for payout release!`;
+    }
+
+    setRows(prev => prev.map(r => selectedIds.has(r.id) ? { ...r, status: nextStatus } : r));
+    toast.success(message);
+
+    // Auto-advance step if everything in current filtered list was checked
+    const remainingCount = filteredRows.filter(r => !selectedIds.has(r.id)).length;
+    if (remainingCount === 0 && currentStep < 3) {
+      setTimeout(() => {
+        setCurrentStep(prev => (prev + 1) as any);
+        toast.info(`Advancing to Step ${currentStep + 1}`);
+      }, 1000);
+    }
+
+    setSelectedIds(new Set());
   };
 
   const handleDeleteSelected = () => {
@@ -198,8 +393,57 @@ function EarnLeaveWorkflowPage() {
     });
   };
 
-  // Toggle selectors
+  // Reset Cycle handler
+  const handleResetWorkflow = () => {
+    if (!confirm("Reset all records to Draft stage for testing?")) return;
+    setRows(initialWorkflowRows);
+    setCurrentStep(1);
+    toast.info("Workflow reset to Draft state for demonstration.");
+  };
+
+  // Quick Add handler
+  const handleQuickAdd = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newEmpId.trim() || !newEmpName.trim()) {
+      toast.error("Employee ID and Name are required!");
+      return;
+    }
+
+    const days = parseFloat(newDays) || 0;
+    const rate = parseFloat(newRate) || 0;
+    const net = Math.round(days * rate);
+
+    const newRow: EarnLeaveWorkflowRow = {
+      id: `ELW-${Math.floor(1000 + Math.random() * 9000)}`,
+      empId: newEmpId.trim(),
+      empName: newEmpName.trim(),
+      department: newDept,
+      designation: newDesig,
+      totalDays: days,
+      perDayRate: rate,
+      netPay: net,
+      paymentMode: newPaymentMode,
+      bankName: newPaymentMode === "Bank" ? newBankName.trim() : "",
+      accountNo: newPaymentMode !== "Cash" ? newAccountNo.trim() : "",
+      status: "Draft"
+    };
+
+    setRows(prev => [newRow, ...prev]);
+    toast.success(`Added processed record for ${newEmpName}!`);
+
+    // Reset inputs
+    setNewEmpId("");
+    setNewEmpName("");
+    setNewDays("5");
+    setNewRate("250");
+    setNewBankName("");
+    setNewAccountNo("");
+    setIsQuickAddOpen(false);
+  };
+
+  // Bulk selections logic
   const isAllSelected = filteredRows.length > 0 && filteredRows.every(r => selectedIds.has(r.id));
+  
   const toggleSelectAll = () => {
     if (isAllSelected) {
       setSelectedIds(prev => {
@@ -228,45 +472,43 @@ function EarnLeaveWorkflowPage() {
     });
   };
 
-  // Inline inputs
-  const handleInlineInput = (id: string, field: keyof EarnLeaveWorkflowRow, value: string) => {
-    setRows(prev => prev.map(r => r.id === id ? { ...r, [field]: value } : r));
-  };
-
   return (
     <div className="min-h-screen flex bg-[#f8fafc] dark:bg-[#0f172a] text-foreground transition-colors duration-300">
       <Sidebar />
       <main className="flex-1 min-w-0 flex flex-col relative">
         <Topbar />
 
-        <div className="p-4 md:p-6 lg:p-8 space-y-6">
+        <div className="p-4 md:p-6 lg:p-8 space-y-5">
 
           {/* Breadcrumb Header */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">
+              <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
                 <Link to="/" className="hover:text-primary transition-colors">Home</Link>
                 <ChevronRight className="size-3" />
                 <span>Leave Management</span>
                 <ChevronRight className="size-3" />
                 <span className="text-primary font-extrabold">Earn Leave Workflow</span>
               </div>
-              <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-                <ShieldCheck className="size-6 text-primary animate-pulse" />
+              <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                <ShieldCheck className="size-5.5 text-primary" />
                 <span>Earn Leave Workflow Panel</span>
               </h1>
             </div>
 
-            <div className="flex items-center gap-3">
-              <Link
-                to="/earn-leave-submit"
-                className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white rounded-xl text-[10px] font-extrabold flex items-center gap-1.5 transition uppercase tracking-wider shadow-xs hover:shadow-md"
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsQuickAddOpen(!isQuickAddOpen)}
+                className="h-8.5 px-3 bg-primary hover:bg-primary-glow text-white font-extrabold text-[10.5px] rounded-lg shadow-sm transition flex items-center gap-1.5 uppercase"
               >
-                <span>Disbursement Settings</span>
-              </Link>
+                <Plus className="size-3.5" />
+                <span>Quick-Add Record</span>
+              </button>
+
               <button
                 onClick={handleResetWorkflow}
-                className="px-4 py-2 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-xl text-[10px] font-extrabold text-slate-500 flex items-center gap-1.5 transition uppercase"
+                className="h-8.5 px-3 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg text-[10.5px] font-extrabold text-slate-500 dark:text-slate-400 flex items-center gap-1.5 transition uppercase"
+                title="Reset database workflow statuses to drafts"
               >
                 <RefreshCw className="size-3" />
                 <span>Reset Cycle</span>
@@ -274,272 +516,353 @@ function EarnLeaveWorkflowPage() {
             </div>
           </div>
 
-          {/* Gorgeous Visual Workflow Stepper Panel */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-xs space-y-5">
-            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Accrual clearance status:</h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-              {/* Step 1: Submit */}
-              <div className={`p-4 rounded-lg border-2 flex items-center gap-3 transition-all duration-300 ${currentStep === 1
-                  ? "bg-amber-500/5 border-amber-500 text-amber-900 dark:text-amber-300"
-                  : "bg-emerald-500/5 border-emerald-500/20 text-emerald-700 dark:text-emerald-400"
-                }`}>
-                <div className={`size-8 rounded-xl flex items-center justify-center font-black text-xs ${currentStep === 1 ? "bg-amber-500 text-white" : "bg-emerald-500 text-white"
-                  }`}>
-                  1
-                </div>
-                <div>
-                  <h4 className="text-xs font-black">L1: Submission (Clerk)</h4>
-                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">
-                    {currentStep === 1 ? "Active/Awaiting Drafts" : "Submitted & Unlocked"}
-                  </p>
-                </div>
-                {currentStep > 1 && <CheckCircle2 className="size-5 ml-auto text-emerald-500 animate-pulse" />}
+          {/* Collapsible Quick Add Form Panel */}
+          {isQuickAddOpen && (
+            <div className="bg-white dark:bg-[#1e293b] rounded-lg border-2 border-dashed border-primary/20 p-5 shadow-xs animate-in slide-in-from-top duration-200">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 pb-2.5 mb-4">
+                <h3 className="text-xs font-black uppercase text-primary tracking-wider flex items-center gap-2">
+                  <Calculator className="size-4" />
+                  <span>Quick-Add Processed Accrual Record</span>
+                </h3>
+                <span className="text-[9px] uppercase font-bold text-slate-400">Creates Draft Item</span>
               </div>
 
-              {/* Step 2: Check */}
-              <div className={`p-4 rounded-lg border-2 flex items-center gap-3 transition-all duration-300 ${currentStep === 2
-                  ? "bg-amber-500/5 border-amber-500 text-amber-900 dark:text-amber-300"
-                  : currentStep > 2
-                    ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-700 dark:text-emerald-400"
-                    : "bg-slate-100/40 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 opacity-60 text-slate-400"
-                }`}>
-                <div className={`size-8 rounded-xl flex items-center justify-center font-black text-xs ${currentStep === 2
-                    ? "bg-amber-500 text-white"
-                    : currentStep > 2
-                      ? "bg-emerald-500 text-white"
-                      : "bg-slate-200 dark:bg-slate-800 text-slate-400"
-                  }`}>
-                  {currentStep < 2 ? <Lock className="size-3.5" /> : "2"}
+              <form onSubmit={handleQuickAdd} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3.5 text-[11px] font-bold">
+                <div className="space-y-1">
+                  <label className="text-[9px] uppercase text-slate-400">Employee ID *</label>
+                  <input
+                    type="text" required value={newEmpId} onChange={(e) => setNewEmpId(e.target.value)}
+                    placeholder="e.g. 2023043910"
+                    className="w-full h-8 px-2.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 outline-none focus:border-primary transition font-mono"
+                  />
                 </div>
-                <div>
-                  <h4 className="text-xs font-black">L2: Verification (Check Officer)</h4>
-                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">
-                    {currentStep < 2 ? "Locked" : currentStep === 2 ? "Active / In-Review" : "Verified & Passed"}
-                  </p>
+                <div className="space-y-1">
+                  <label className="text-[9px] uppercase text-slate-400">Employee Name *</label>
+                  <input
+                    type="text" required value={newEmpName} onChange={(e) => setNewEmpName(e.target.value)}
+                    placeholder="e.g. John Doe"
+                    className="w-full h-8 px-2.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 outline-none focus:border-primary transition"
+                  />
                 </div>
-                {currentStep > 2 && <CheckCircle2 className="size-5 ml-auto text-emerald-500 animate-pulse" />}
-              </div>
+                <div className="space-y-1">
+                  <label className="text-[9px] uppercase text-slate-400">Department</label>
+                  <select
+                    value={newDept} onChange={(e) => setNewDept(e.target.value)}
+                    className="w-full h-8 px-2.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 outline-none cursor-pointer"
+                  >
+                    <option value="Project Resource & Strategy">Project Resource & Strategy</option>
+                    <option value="Core Development (HR)">Core Development (HR)</option>
+                    <option value="Core Sales">Core Sales</option>
+                    <option value="Sewing">Sewing</option>
+                    <option value="Store">Store</option>
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[9px] uppercase text-slate-400">Designation</label>
+                  <select
+                    value={newDesig} onChange={(e) => setNewDesig(e.target.value)}
+                    className="w-full h-8 px-2.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 outline-none cursor-pointer"
+                  >
+                    <option value="Asst. Manager">Asst. Manager</option>
+                    <option value="Senior Software Engineer">Senior Software Engineer</option>
+                    <option value="Deputy Manager">Deputy Manager</option>
+                    <option value="Operator">Operator</option>
+                    <option value="Asst. Operator">Asst. Operator</option>
+                    <option value="Quality Ins.">Quality Ins.</option>
+                    <option value="Jr. Needle Man">Jr. Needle Man</option>
+                  </select>
+                </div>
 
-              {/* Step 3: Approve (HRD) */}
-              <div className={`p-4 rounded-lg border-2 flex items-center gap-3 transition-all duration-300 ${currentStep === 3
-                  ? "bg-amber-500/5 border-amber-500 text-amber-900 dark:text-amber-300"
-                  : "bg-slate-100/40 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 opacity-60 text-slate-400"
-                }`}>
-                <div className={`size-8 rounded-xl flex items-center justify-center font-black text-xs ${currentStep === 3
-                    ? "bg-amber-500 text-white"
-                    : "bg-slate-200 dark:bg-slate-800 text-slate-400"
-                  }`}>
-                  {currentStep < 3 ? <Lock className="size-3.5" /> : "3"}
+                <div className="space-y-1">
+                  <label className="text-[9px] uppercase text-slate-400">Earned Days</label>
+                  <input
+                    type="number" step="0.01" value={newDays} onChange={(e) => setNewDays(e.target.value)}
+                    className="w-full h-8 px-2.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 outline-none font-mono"
+                  />
                 </div>
-                <div>
-                  <h4 className="text-xs font-black">L3: Authorization (Director HRD)</h4>
-                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">
-                    {currentStep < 3 ? "Locked" : "Active / Awaiting Payout Clearance"}
-                  </p>
+                <div className="space-y-1">
+                  <label className="text-[9px] uppercase text-slate-400">Per Day Rate (BDT)</label>
+                  <input
+                    type="number" step="0.01" value={newRate} onChange={(e) => setNewRate(e.target.value)}
+                    className="w-full h-8 px-2.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 outline-none font-mono"
+                  />
                 </div>
-              </div>
+                <div className="space-y-1">
+                  <label className="text-[9px] uppercase text-slate-400">Payment Mode</label>
+                  <select
+                    value={newPaymentMode} onChange={(e) => setNewPaymentMode(e.target.value as any)}
+                    className="w-full h-8 px-2.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 outline-none cursor-pointer"
+                  >
+                    <option value="Cash">Cash (Cash Office)</option>
+                    <option value="Bank">Bank Transfer</option>
+                    <option value="bKash">bKash Payout</option>
+                    <option value="Rocket">Rocket Payout</option>
+                  </select>
+                </div>
 
+                {newPaymentMode === "Bank" && (
+                  <div className="space-y-1">
+                    <label className="text-[9px] uppercase text-slate-400">Bank Name</label>
+                    <input
+                      type="text" value={newBankName} onChange={(e) => setNewBankName(e.target.value)}
+                      placeholder="e.g. Dutch-Bangla Bank"
+                      className="w-full h-8 px-2.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 outline-none"
+                    />
+                  </div>
+                )}
+
+                {newPaymentMode !== "Cash" && (
+                  <div className="space-y-1">
+                    <label className="text-[9px] uppercase text-slate-400">
+                      {newPaymentMode === "Bank" ? "Account No" : "Wallet Number"}
+                    </label>
+                    <input
+                      type="text" value={newAccountNo} onChange={(e) => setNewAccountNo(e.target.value)}
+                      placeholder={newPaymentMode === "Bank" ? "125.120.xxxxx" : "017xxxxxxxx"}
+                      className="w-full h-8 px-2.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 outline-none font-mono"
+                    />
+                  </div>
+                )}
+
+                <div className="flex items-end justify-end md:col-span-2 lg:col-span-1">
+                  <button
+                    type="submit"
+                    className="w-full h-8 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-extrabold text-[10px] uppercase shadow-sm transition"
+                  >
+                    Add to Drafts
+                  </button>
+                </div>
+              </form>
             </div>
-          </div>
+          )}
 
-          {/* Sequential Active Action Buttons Panel */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs flex flex-col md:flex-row md:items-center gap-4">
+          {/* Stepper Workflow Cards Panel (Interactive Tabs) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-            {/* Step 1 Submit Button */}
+            {/* Step 1: Submit */}
             <button
-              onClick={handleLevel1Submit}
-              disabled={currentStep !== 1}
-              className={`h-11 px-8 rounded-xl font-extrabold text-xs flex items-center justify-center gap-2 transition uppercase tracking-wider shadow-xs ${currentStep === 1
-                  ? "bg-amber-500 hover:bg-amber-600 text-white cursor-pointer"
-                  : "bg-slate-100 dark:bg-slate-900 text-slate-400 cursor-not-allowed opacity-50"
-                }`}
+              onClick={() => handleStepClick(1)}
+              className={`p-4 rounded-xl border-2 text-left transition-all duration-200 select-none shadow-3xs flex flex-col justify-between h-28 relative overflow-hidden ${
+                currentStep === 1
+                  ? "bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent border-blue-500 ring-2 ring-blue-500/20"
+                  : "bg-white dark:bg-[#1e293b] border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
+              }`}
             >
-              <Unlock className="size-4" />
-              <span>Step 1: Submit Ledger</span>
-            </button>
-
-            <ArrowRight className="size-5 text-slate-300 hidden md:block" />
-
-            {/* Step 2 Verify Button */}
-            <button
-              onClick={handleLevel2Check}
-              disabled={currentStep !== 2}
-              className={`h-11 px-8 rounded-xl font-extrabold text-xs flex items-center justify-center gap-2 transition uppercase tracking-wider shadow-xs ${currentStep === 2
-                  ? "bg-[#1e88e5] hover:bg-[#1565c0] text-white cursor-pointer"
-                  : "bg-slate-100 dark:bg-slate-900 text-slate-400 cursor-not-allowed opacity-50"
-                }`}
-            >
-              {currentStep < 2 ? <Lock className="size-4" /> : <Unlock className="size-4" />}
-              <span>Step 2: Verify & Check</span>
-            </button>
-
-            <ArrowRight className="size-5 text-slate-300 hidden md:block" />
-
-            {/* Step 3 Authorize Button */}
-            <button
-              onClick={handleLevel3Approve}
-              disabled={currentStep !== 3}
-              className={`h-11 px-8 rounded-xl font-extrabold text-xs flex items-center justify-center gap-2 transition uppercase tracking-wider shadow-xs ${currentStep === 3
-                  ? "bg-[#4caf50] hover:bg-[#43a047] text-white cursor-pointer animate-pulse"
-                  : "bg-slate-100 dark:bg-slate-900 text-slate-400 cursor-not-allowed opacity-50"
-                }`}
-            >
-              {currentStep < 3 ? <Lock className="size-4" /> : <Unlock className="size-4" />}
-              <span>Step 3: Authorize (HRD)</span>
-            </button>
-
-          </div>
-
-          {/* Configuration Filter Panel */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-xs">
-            <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-4 text-xs font-bold font-sans">
-
-              {/* Year */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-400 uppercase">Year</label>
-                <select
-                  value={year}
-                  onChange={(e) => setYear(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition"
-                >
-                  <option value="2026">2026</option>
-                  <option value="2025">2025</option>
-                  <option value="2024">2024</option>
-                </select>
-              </div>
-
-              {/* Month */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-400 uppercase">Month</label>
-                <select
-                  value={month}
-                  onChange={(e) => setMonth(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition"
-                >
-                  <option value="January">January</option>
-                  <option value="February">February</option>
-                  <option value="March">March</option>
-                  <option value="April">April</option>
-                  <option value="May">May</option>
-                  <option value="June">June</option>
-                </select>
-              </div>
-
-              {/* Employee Type */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-400 uppercase">Employee Type</label>
-                <select
-                  value={empType}
-                  onChange={(e) => setEmpType(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition"
-                >
-                  <option value="ALL">ALL</option>
-                  <option value="Staff">Staff</option>
-                  <option value="Worker">Worker</option>
-                </select>
-              </div>
-
-              {/* Section */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-400 uppercase">Section</label>
-                <select
-                  value={section}
-                  onChange={(e) => setSection(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition"
-                >
-                  <option value="ALL">ALL</option>
-                  <option value="Finance & Accounts">Finance & Accounts</option>
-                  <option value="Project Resource & Strategy">Project Resource & Strategy</option>
-                </select>
-              </div>
-
-              {/* Unit */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-400 uppercase">Unit</label>
-                <select
-                  value={unit}
-                  onChange={(e) => setUnit(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition"
-                >
-                  <option value="ALL">ALL</option>
-                  <option value="Head Office">Head Office</option>
-                </select>
-              </div>
-
-              {/* Emp ID */}
-              <div className="space-y-1.5 sm:col-span-2">
-                <label className="text-[10px] text-slate-400 uppercase flex items-center justify-between">
-                  <span>Employee ID Filter</span>
-                  <span className="text-[8px] text-slate-400 font-semibold lowercase italic">(Blank for all active workflow items)</span>
-                </label>
-                <input
-                  type="text"
-                  value={empIdFilter}
-                  onChange={(e) => setEmpIdFilter(e.target.value)}
-                  placeholder="e.g. 2023043910"
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition font-mono"
-                />
-              </div>
-
-              {/* Search button aligned right */}
-              <div className="md:col-span-3 lg:col-span-4 flex justify-end pt-2 border-t border-slate-100 dark:border-slate-800/40">
-                <button
-                  type="submit"
-                  className="h-10 px-10 bg-[#4caf50] hover:bg-[#43a047] text-white font-extrabold text-xs rounded-xl shadow-xs transition uppercase tracking-wider"
-                >
-                  Search
-                </button>
-              </div>
-
-            </form>
-          </div>
-
-          {/* Action Row & Utility Controls */}
-          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm space-y-5">
-
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-
-              <div className="flex items-center gap-3">
-                <span className="text-xs font-black text-slate-700 dark:text-slate-300">
-                  Workflow Step Details Ledger
+              <div className="flex items-start justify-between w-full">
+                <div className="flex items-center gap-2.5">
+                  <div className={`size-7 rounded-lg flex items-center justify-center font-black text-xs ${
+                    currentStep === 1 ? "bg-blue-500 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500"
+                  }`}>
+                    1
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-black text-slate-800 dark:text-white">L1: Submission (Clerk)</h4>
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Drafts stage</span>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 bg-blue-500/10 border border-blue-500/20 text-blue-500 rounded text-[9px] font-black uppercase">
+                  {stepCounts.drafts} Draft{stepCounts.drafts !== 1 && "s"}
                 </span>
+              </div>
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                Verify accrued calculations, configure payouts & click submit to forward.
+              </div>
+            </button>
+
+            {/* Step 2: Check */}
+            <button
+              onClick={() => handleStepClick(2)}
+              className={`p-4 rounded-xl border-2 text-left transition-all duration-200 select-none shadow-3xs flex flex-col justify-between h-28 relative overflow-hidden ${
+                currentStep === 2
+                  ? "bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-transparent border-purple-500 ring-2 ring-purple-500/20"
+                  : "bg-white dark:bg-[#1e293b] border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
+              }`}
+            >
+              <div className="flex items-start justify-between w-full">
+                <div className="flex items-center gap-2.5">
+                  <div className={`size-7 rounded-lg flex items-center justify-center font-black text-xs ${
+                    currentStep === 2 ? "bg-purple-500 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500"
+                  }`}>
+                    2
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-black text-slate-800 dark:text-white">L2: Verification (Check Officer)</h4>
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Officer stage</span>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 bg-purple-500/10 border border-purple-500/20 text-purple-500 rounded text-[9px] font-black uppercase">
+                  {stepCounts.submitted} Awaiting check
+                </span>
+              </div>
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                Verify banking details, perform audit calculations & forward to Director.
+              </div>
+            </button>
+
+            {/* Step 3: Approve (HRD) */}
+            <button
+              onClick={() => handleStepClick(3)}
+              className={`p-4 rounded-xl border-2 text-left transition-all duration-200 select-none shadow-3xs flex flex-col justify-between h-28 relative overflow-hidden ${
+                currentStep === 3
+                  ? "bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent border-emerald-500 ring-2 ring-emerald-500/20"
+                  : "bg-white dark:bg-[#1e293b] border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
+              }`}
+            >
+              <div className="flex items-start justify-between w-full">
+                <div className="flex items-center gap-2.5">
+                  <div className={`size-7 rounded-lg flex items-center justify-center font-black text-xs ${
+                    currentStep === 3 ? "bg-emerald-500 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500"
+                  }`}>
+                    3
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-black text-slate-800 dark:text-white">L3: Authorization (Director HRD)</h4>
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Director stage</span>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded text-[9px] font-black uppercase">
+                  {stepCounts.checked} Awaiting app
+                </span>
+              </div>
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                Confirm compliance checklist, authorize disbursements & issue clearance.
+              </div>
+            </button>
+
+          </div>
+
+          {/* KPI Mini metrics summary strip */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-4.5 shadow-3xs">
+            
+            <div className="flex items-center gap-3">
+              <div className="size-9 rounded-lg bg-blue-500/10 dark:bg-blue-500/[0.03] border border-blue-500/20 flex items-center justify-center text-blue-500 shrink-0">
+                <UserCheck className="size-4.5" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-[9px] font-extrabold uppercase text-slate-400 tracking-wide block">Ledger Volume</span>
+                <span className="text-sm font-black text-slate-900 dark:text-white leading-tight block">
+                  {kpis.count} Profile{kpis.count !== 1 && "s"}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 border-l border-slate-100 dark:border-slate-800/60 pl-3 md:pl-5">
+              <div className="size-9 rounded-lg bg-indigo-500/10 dark:bg-indigo-500/[0.03] border border-indigo-500/20 flex items-center justify-center text-indigo-500 shrink-0">
+                <Coins className="size-4.5" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-[9px] font-extrabold uppercase text-slate-400 tracking-wide block">Accrued days</span>
+                <span className="text-sm font-black text-slate-900 dark:text-white leading-tight block">
+                  {kpis.totalDays} Day{kpis.totalDays !== 1 && "s"}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 border-l border-slate-100 dark:border-slate-800/60 pl-3 md:pl-5">
+              <div className="size-9 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/[0.03] border border-emerald-500/20 flex items-center justify-center text-emerald-500 shrink-0">
+                <Landmark className="size-4.5" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-[9px] font-extrabold uppercase text-slate-400 tracking-wide block">Net Cash value</span>
+                <span className="text-sm font-black text-emerald-600 dark:text-emerald-400 leading-tight block">
+                  {kpis.totalNetPay.toLocaleString()} ৳
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 border-l border-slate-100 dark:border-slate-800/60 pl-3 md:pl-5">
+              <div className="size-9 rounded-lg bg-amber-500/10 dark:bg-amber-500/[0.03] border border-amber-500/20 flex items-center justify-center text-amber-500 shrink-0">
+                <Smartphone className="size-4.5" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-[9px] font-extrabold uppercase text-slate-400 tracking-wide block">Payment channels</span>
+                <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 leading-tight block truncate">
+                  {kpis.paymentSummary}
+                </span>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Main Action Details Panel */}
+          <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs space-y-4">
+            
+            {/* Header controls inside table card */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 dark:border-slate-800/80 pb-4">
+              
+              {/* Left actions */}
+              <div className="flex items-center gap-2.5">
+                
+                {/* Click action for active step */}
+                <button
+                  onClick={handleBulkAction}
+                  className={`h-8 px-4 rounded-lg text-[10px] font-extrabold uppercase tracking-wide transition flex items-center gap-1.5 shadow-sm text-white ${
+                    currentStep === 1
+                      ? "bg-blue-600 hover:bg-blue-700"
+                      : currentStep === 2
+                        ? "bg-purple-600 hover:bg-purple-700"
+                        : "bg-emerald-600 hover:bg-emerald-700 animate-pulse"
+                  }`}
+                >
+                  <Unlock className="size-3.5" />
+                  <span>
+                    {currentStep === 1
+                      ? "Submit Selected"
+                      : currentStep === 2
+                        ? "Verify Selected"
+                        : "Authorize Selected"}
+                  </span>
+                </button>
+
                 <button
                   onClick={handleDeleteSelected}
-                  className="h-8 pl-2 pr-3.5 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-650 active:scale-[0.97] text-white font-semibold text-[10px] rounded-lg shadow-xs flex items-center gap-2 transition-all duration-200 uppercase tracking-wider border border-slate-500/10"
+                  className="h-8 pl-2 pr-3.5 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-650 text-white font-extrabold text-[10px] rounded-lg shadow-sm flex items-center gap-1.5 uppercase transition"
                 >
                   <Trash2 className="size-3.5" />
                   <span>Delete Selected</span>
                 </button>
               </div>
 
-              {/* Spreadsheet download utilities & Grid Search input */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              {/* Right filters & controls */}
+              <div className="flex flex-wrap items-center gap-3">
+                
+                {/* Step filter toggle check */}
+                <label className="flex items-center gap-2 px-3 h-8 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 cursor-pointer select-none">
+                  {filterByStepStatus ? (
+                    <Eye className="size-3.5 text-primary" />
+                  ) : (
+                    <EyeOff className="size-3.5 text-slate-400" />
+                  )}
+                  <span>Filter by Step Status</span>
+                  <input
+                    type="checkbox"
+                    checked={filterByStepStatus}
+                    onChange={(e) => setFilterByStepStatus(e.target.checked)}
+                    className="sr-only"
+                  />
+                </label>
 
-                <div className="flex items-center gap-1.5">
-                  <button className="h-8.5 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 font-extrabold text-[11px] text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition">
-                    <FileSpreadsheet className="size-3.5 text-emerald-500" />
-                    <span>EXCEL</span>
+                {/* Print capabilities */}
+                <div className="flex items-center gap-1">
+                  <button className="h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-500 transition" title="Export Excel">
+                    <FileSpreadsheet className="size-4 text-emerald-500" />
                   </button>
-                  <button className="h-8.5 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 font-extrabold text-[11px] text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition">
-                    <Printer className="size-3.5 text-blue-500" />
-                    <span>PRINT</span>
+                  <button className="h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-500 transition" title="Print Grid">
+                    <Printer className="size-4 text-blue-500" />
                   </button>
-                  <button className="h-8.5 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 font-extrabold text-[11px] text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition">
-                    <FileDown className="size-3.5 text-rose-500" />
-                    <span>PDF</span>
+                  <button className="h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-500 transition" title="Save PDF">
+                    <FileDown className="size-4 text-rose-500" />
                   </button>
                 </div>
 
                 <div className="relative">
-                  <Search className="size-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Search className="size-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search ledger..."
-                    className="h-8.5 pl-9 pr-3 w-full sm:w-48 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px] font-bold outline-none focus:bg-white dark:focus:bg-slate-950 focus:border-primary transition"
+                    placeholder="Search ledger grid..."
+                    className="h-8 pl-8 pr-2.5 w-40 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[10px] font-extrabold outline-none focus:bg-white dark:focus:bg-slate-950 focus:border-primary transition"
                   />
                 </div>
 
@@ -547,125 +870,192 @@ function EarnLeaveWorkflowPage() {
 
             </div>
 
-            {/* Pink-Rose table sheet grid */}
-            <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl shadow-xs">
-              <table className="w-full border-collapse text-[10.5px] text-left">
+            {/* Compact spreadsheet table */}
+            <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl shadow-3xs">
+              <table className="w-full border-collapse text-[10px] text-left">
                 <thead>
                   <tr className="bg-[#ffebee] dark:bg-rose-950/20 text-slate-800 dark:text-rose-200 font-black border-b border-slate-200 dark:border-slate-800/80 whitespace-nowrap select-none">
-                    <th className="px-3 py-3 text-center w-10 border-r border-slate-200/50 dark:border-slate-800/30">
+                    <th className="px-2.5 py-2.5 text-center w-8 border-r border-slate-200/50 dark:border-slate-800/30">
                       <input
                         type="checkbox"
                         checked={isAllSelected}
                         onChange={toggleSelectAll}
-                        className="rounded border-slate-300 text-primary focus:ring-primary size-3.5 cursor-pointer"
+                        className="rounded border-slate-300 text-primary focus:ring-primary size-3 cursor-pointer"
                       />
                     </th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Emp ID</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Name</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Department</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Designation</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">Earned Days</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-right">Per Day Rate</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-right">Net Pay</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center w-28">Payment Mode</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-left w-36">Bank Name</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-left w-36">Account No</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">Status</th>
-                    <th className="px-3 py-3 text-center">Actions</th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 w-20">Emp ID</th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 w-36">Name</th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30">Department</th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30">Designation</th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 text-center w-20">Days</th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 text-right w-24">Rate (BDT)</th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 text-right w-24">Net Pay</th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 text-center w-24">Payment Mode</th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 text-left w-36">Bank Name</th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 text-left w-36">Account No</th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 text-center w-20">Status</th>
+                    <th className="px-2.5 py-2.5 text-center w-32">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
                   {filteredRows.map((row) => {
                     const isSelected = selectedIds.has(row.id);
-
+                    
                     let statusColor = "bg-amber-100 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400";
                     if (row.status === "Submitted") {
                       statusColor = "bg-blue-100 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400";
                     } else if (row.status === "Checked") {
-                      statusColor = "bg-purple-100 text-purple-750 dark:bg-purple-950/20 dark:text-purple-400";
+                      statusColor = "bg-purple-100 text-purple-700 dark:bg-purple-950/20 dark:text-purple-400";
                     } else if (row.status === "Authorized (HRD)") {
                       statusColor = "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400";
                     }
 
-                    return (
-                      <tr key={row.id} className="hover:bg-slate-50/55 dark:hover:bg-slate-900/40 transition duration-75 whitespace-nowrap">
+                    // Payment Mode Pills styling
+                    let paymentBadge = "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300";
+                    if (row.paymentMode === "Bank") paymentBadge = "bg-sky-100 text-sky-700 dark:bg-sky-950/30 dark:text-sky-400";
+                    if (row.paymentMode === "bKash") paymentBadge = "bg-pink-100 text-pink-700 dark:bg-pink-950/30 dark:text-pink-400";
+                    if (row.paymentMode === "Rocket") paymentBadge = "bg-violet-100 text-violet-700 dark:bg-violet-950/30 dark:text-violet-400";
+                    if (row.paymentMode === "Cash") paymentBadge = "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400";
 
-                        {/* Checkbox */}
-                        <td className="px-3 py-3 text-center border-r border-slate-100 dark:border-slate-800/50">
+                    return (
+                      <tr key={row.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/40 transition duration-75 whitespace-nowrap">
+                        
+                        <td className="px-2.5 py-1.5 text-center border-r border-slate-100 dark:border-slate-800/50">
                           <input
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => toggleSelect(row.id)}
-                            className="rounded border-slate-300 text-primary focus:ring-primary size-3.5 cursor-pointer"
+                            className="rounded border-slate-300 text-primary focus:ring-primary size-3 cursor-pointer"
                           />
                         </td>
 
-                        {/* ID & Bio */}
-                        <td className="px-3 py-3 font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">{row.empId}</td>
-                        <td className="px-3 py-3 font-extrabold text-slate-900 dark:text-white border-r border-slate-100 dark:border-slate-800/50">{row.empName}</td>
-                        <td className="px-3 py-3 text-slate-650 dark:text-slate-350 border-r border-slate-100 dark:border-slate-800/50">{row.department}</td>
-                        <td className="px-3 py-3 text-slate-650 dark:text-slate-350 border-r border-slate-100 dark:border-slate-800/50">{row.designation}</td>
+                        <td className="px-2.5 py-1.5 font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">{row.empId}</td>
+                        <td className="px-2.5 py-1.5 font-extrabold text-slate-900 dark:text-white border-r border-slate-100 dark:border-slate-800/50 truncate max-w-[120px]" title={row.empName}>{row.empName}</td>
+                        <td className="px-2.5 py-1.5 text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50 truncate max-w-[110px]" title={row.department}>{row.department}</td>
+                        <td className="px-2.5 py-1.5 text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50 truncate max-w-[110px]" title={row.designation}>{row.designation}</td>
 
-                        {/* Calculations */}
-                        <td className="px-3 py-3 text-center font-mono font-bold border-r border-slate-100 dark:border-slate-800/50">{row.totalDays}</td>
-                        <td className="px-3 py-3 text-right font-mono border-r border-slate-100 dark:border-slate-800/50">{row.perDayRate.toFixed(2)}</td>
-                        <td className="px-3 py-3 text-right font-mono font-black text-slate-900 dark:text-white border-r border-slate-100 dark:border-slate-800/50">{row.netPay}</td>
+                        {/* Inline editable Earned Days */}
+                        <td className="px-1.5 py-1 border-r border-slate-100 dark:border-slate-800/50">
+                          <input
+                            type="number"
+                            step="0.01"
+                            disabled={row.status === "Authorized (HRD)"}
+                            value={row.totalDays}
+                            onChange={(e) => handleRowEdit(row.id, "totalDays", parseFloat(e.target.value) || 0)}
+                            className="w-full h-6 px-1 rounded bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[10px] font-mono font-bold text-center focus:border-primary outline-none disabled:opacity-50"
+                          />
+                        </td>
 
-                        {/* Inline Editable: Payment Mode */}
-                        <td className="px-2.5 py-1.5 border-r border-slate-100 dark:border-slate-800/50">
+                        {/* Inline editable Rate */}
+                        <td className="px-1.5 py-1 border-r border-slate-100 dark:border-slate-800/50">
+                          <input
+                            type="number"
+                            step="0.01"
+                            disabled={row.status === "Authorized (HRD)"}
+                            value={row.perDayRate}
+                            onChange={(e) => handleRowEdit(row.id, "perDayRate", parseFloat(e.target.value) || 0)}
+                            className="w-full h-6 px-1 text-right rounded bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[10px] font-mono focus:border-primary outline-none disabled:opacity-50"
+                          />
+                        </td>
+
+                        {/* Recalculated Net Pay Display */}
+                        <td className="px-2.5 py-1.5 font-mono font-black text-right text-slate-900 dark:text-white border-r border-slate-100 dark:border-slate-800/50">
+                          {row.netPay.toLocaleString()}
+                        </td>
+
+                        {/* Inline editable Payment Mode */}
+                        <td className="px-1.5 py-1 border-r border-slate-100 dark:border-slate-800/50">
                           <select
                             value={row.paymentMode}
-                            disabled={currentStep > 2}
-                            onChange={(e) => handleInlineInput(row.id, "paymentMode", e.target.value as any)}
-                            className="w-full h-7 px-1 rounded bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[10px] font-bold outline-none focus:border-primary"
+                            disabled={row.status === "Authorized (HRD)"}
+                            onChange={(e) => handleRowEdit(row.id, "paymentMode", e.target.value as any)}
+                            className={`w-full h-6 px-0.5 rounded border border-slate-200 dark:border-slate-800 text-[9px] font-black focus:border-primary outline-none cursor-pointer ${paymentBadge}`}
                           >
-                            <option value="Bank">Bank</option>
-                            <option value="Cash">Cash</option>
-                            <option value="bKash">bKash</option>
-                            <option value="Rocket">Rocket</option>
+                            <option value="Cash" className="bg-white dark:bg-slate-950 text-slate-700">Cash</option>
+                            <option value="Bank" className="bg-white dark:bg-slate-950 text-slate-700">Bank</option>
+                            <option value="bKash" className="bg-white dark:bg-slate-950 text-slate-700">bKash</option>
+                            <option value="Rocket" className="bg-white dark:bg-slate-950 text-slate-700">Rocket</option>
                           </select>
                         </td>
 
-                        {/* Inline Editable: Bank Name */}
-                        <td className="px-2.5 py-1.5 border-r border-slate-100 dark:border-slate-800/50">
+                        {/* Bank Name Input */}
+                        <td className="px-1.5 py-1 border-r border-slate-100 dark:border-slate-800/50">
                           <input
                             type="text"
+                            disabled={row.status === "Authorized (HRD)" || row.paymentMode !== "Bank"}
                             value={row.bankName}
-                            disabled={currentStep > 2 || row.paymentMode === "Cash"}
-                            onChange={(e) => handleInlineInput(row.id, "bankName", e.target.value)}
-                            placeholder="e.g. Bank NamePLC"
-                            className="w-full h-7 px-2 rounded bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[10px] font-bold outline-none focus:bg-white focus:border-primary disabled:opacity-40"
+                            onChange={(e) => handleRowEdit(row.id, "bankName", e.target.value)}
+                            placeholder="Bank Name"
+                            className="w-full h-6 px-1.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[9.5px] focus:border-primary outline-none disabled:opacity-40"
                           />
                         </td>
 
-                        {/* Inline Editable: Account No */}
-                        <td className="px-2.5 py-1.5 border-r border-slate-100 dark:border-slate-800/50">
+                        {/* Account Number Input */}
+                        <td className="px-1.5 py-1 border-r border-slate-100 dark:border-slate-800/50">
                           <input
                             type="text"
+                            disabled={row.status === "Authorized (HRD)" || row.paymentMode === "Cash"}
                             value={row.accountNo}
-                            disabled={currentStep > 2 || row.paymentMode === "Cash"}
-                            onChange={(e) => handleInlineInput(row.id, "accountNo", e.target.value)}
-                            placeholder="e.g. Acc Account no"
-                            className="w-full h-7 px-2 rounded bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[10px] font-bold outline-none focus:bg-white focus:border-primary disabled:opacity-40"
+                            onChange={(e) => handleRowEdit(row.id, "accountNo", e.target.value)}
+                            placeholder="Acc No / Wallet No"
+                            className="w-full h-6 px-1.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[9.5px] font-mono focus:border-primary outline-none disabled:opacity-40"
                           />
                         </td>
 
-                        {/* Status */}
-                        <td className="px-3 py-3 text-center border-r border-slate-100 dark:border-slate-800/50">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase ${statusColor}`}>
-                            {row.status}
+                        {/* Status Badge */}
+                        <td className="px-2.5 py-1.5 text-center border-r border-slate-100 dark:border-slate-800/50">
+                          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black uppercase ${statusColor}`}>
+                            {row.status === "Authorized (HRD)" ? "Authorized" : row.status}
                           </span>
                         </td>
 
-                        {/* Single Actions */}
-                        <td className="px-3 py-3 text-center">
-                          <button
-                            onClick={() => handleSingleDelete(row.id)}
-                            className="text-rose-500 hover:text-rose-650 hover:scale-105 transition"
-                            title="Delete Record"
-                          >
-                            <Trash2 className="size-3.5" />
-                          </button>
+                        {/* Context-aware Actions Cell */}
+                        <td className="px-2.5 py-1.5 text-center">
+                          <div className="flex items-center justify-center gap-1.5">
+                            
+                            {/* State transitions */}
+                            {row.status === "Draft" && (
+                              <button
+                                onClick={() => handleSingleTransition(row.id, "Draft")}
+                                className="px-1.5 py-0.5 bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 hover:bg-blue-500 hover:text-white rounded text-[8px] font-black uppercase transition"
+                              >
+                                Submit
+                              </button>
+                            )}
+
+                            {row.status === "Submitted" && (
+                              <button
+                                onClick={() => handleSingleTransition(row.id, "Submitted")}
+                                className="px-1.5 py-0.5 bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400 hover:bg-purple-500 hover:text-white rounded text-[8px] font-black uppercase transition"
+                              >
+                                Verify
+                              </button>
+                            )}
+
+                            {row.status === "Checked" && (
+                              <button
+                                onClick={() => handleSingleTransition(row.id, "Checked")}
+                                className="px-1.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-650 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white rounded text-[8px] font-black uppercase transition animate-pulse"
+                              >
+                                Authorize
+                              </button>
+                            )}
+
+                            {row.status === "Authorized (HRD)" && (
+                              <span className="text-emerald-500 dark:text-emerald-400 font-extrabold text-[9px] uppercase tracking-wide">
+                                Cleared ✓
+                              </span>
+                            )}
+
+                            {/* Trash Icon */}
+                            <button
+                              onClick={() => handleSingleDelete(row.id)}
+                              className="text-slate-400 hover:text-rose-500 hover:scale-110 p-0.5 transition"
+                              title="Delete Record"
+                            >
+                              <Trash2 className="size-3.5" />
+                            </button>
+                          </div>
                         </td>
 
                       </tr>
@@ -676,8 +1066,8 @@ function EarnLeaveWorkflowPage() {
                     <tr>
                       <td colSpan={13} className="px-4 py-16 text-center text-slate-400 font-bold">
                         <div className="flex flex-col items-center justify-center gap-2">
-                          <HelpCircle className="size-6 text-slate-300 animate-bounce" />
-                          <span>No processed earned leave records in active workflow queue.</span>
+                          <HelpCircle className="size-6.5 text-slate-350" />
+                          <span>No processed earned leave records in active filtered list.</span>
                         </div>
                       </td>
                     </tr>
@@ -686,20 +1076,20 @@ function EarnLeaveWorkflowPage() {
               </table>
             </div>
 
-            {/* Pagination counts */}
+            {/* Pagination / Grid summary */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-3 border-t border-slate-100 dark:border-slate-800/40">
-              <span className="text-[10.5px] font-bold text-slate-400">
+              <span className="text-[10px] font-bold text-slate-400">
                 Showing 1 to {filteredRows.length} of {filteredRows.length} entries
               </span>
 
-              <div className="flex items-center gap-1.5 select-none text-[10.5px] font-bold">
-                <button className="px-3.5 h-8 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-400 hover:bg-slate-50 cursor-not-allowed">
+              <div className="flex items-center gap-1 select-none text-[10px] font-bold">
+                <button className="px-2.5 h-7 rounded border border-slate-200 dark:border-slate-800 text-slate-400 hover:bg-slate-50 cursor-not-allowed">
                   Previous
                 </button>
-                <button className="size-8 rounded-lg bg-primary text-white flex items-center justify-center font-black">
+                <button className="size-7 rounded bg-primary text-white flex items-center justify-center font-black">
                   1
                 </button>
-                <button className="px-3.5 h-8 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-400 hover:bg-slate-50 cursor-not-allowed">
+                <button className="px-2.5 h-7 rounded border border-slate-200 dark:border-slate-800 text-slate-400 hover:bg-slate-50 cursor-not-allowed">
                   Next
                 </button>
               </div>

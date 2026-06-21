@@ -143,12 +143,14 @@ const nav: NavItem[] = [
     ]
   },
   {
-    label: "Budget",
+    label: "Manpower Budget",
     icon: Coins,
     subitems: [
-      { label: "Annual Budget", to: "/" },
-      { label: "Department Budget", to: "/" },
-      { label: "Expense Claims", to: "/" },
+      { label: "Dashboard & Statement", to: "/budget-statement" },
+      { label: "Budget Planning Hub", to: "/budget-planning" },
+      { label: "My Requisitions", to: "/budget-my-requisitions" },
+      { label: "Requisition Approvals", to: "/budget-requisition-approvals" },
+      { label: "Overtime Control", to: "/budget-overtime" },
     ]
   },
   {
