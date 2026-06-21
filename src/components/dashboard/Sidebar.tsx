@@ -12,6 +12,7 @@ import {
 interface SubItem {
   label: string;
   to: string;
+  search?: Record<string, any>;
 }
 
 interface NavItem {
@@ -134,13 +135,7 @@ const nav: NavItem[] = [
   {
     label: "Manage Shift",
     icon: Clock,
-    active: true,
-    subitems: [
-      { label: "Shift Schedule", to: "/" },
-      { label: "Shift Rotation", to: "/" },
-      { label: "Shift Roster", to: "/" },
-      { label: "Late Policy", to: "/" },
-    ]
+    to: "/shift-control-center"
   },
   {
     label: "Manpower Budget",
@@ -157,9 +152,9 @@ const nav: NavItem[] = [
     label: "Transfer",
     icon: RefreshCw,
     subitems: [
-      { label: "Branch Transfer", to: "/" },
-      { label: "Department Transfer", to: "/" },
-      { label: "Transfer History", to: "/" },
+      { label: "Transfer History", to: "/transfer-control-center", search: { tab: "history" } },
+      { label: "Approve Transfer", to: "/transfer-control-center", search: { tab: "approve" } },
+      { label: "Print Transfer Letter", to: "/transfer-control-center", search: { tab: "print" } },
     ]
   },
   {
@@ -330,11 +325,13 @@ export function Sidebar() {
                 ].join(" ")}
               >
                 {item.subitems.map((sub) => {
-                  const isSubActive = sub.to !== "/" && sub.to === currentPath;
+                  const queryTab = (routerState.location.search as any).tab;
+                  const isSubActive = sub.to !== "/" && sub.to === currentPath && (!sub.search || queryTab === sub.search.tab);
                   return (
                     <Link
                       key={sub.label}
                       to={sub.to}
+                      search={sub.search}
                       className={[
                         "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all duration-150",
                         isSubActive

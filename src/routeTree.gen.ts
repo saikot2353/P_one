@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TransferControlCenterRouteImport } from './routes/transfer-control-center'
 import { Route as SspRequestManualAttendanceRouteImport } from './routes/ssp-request-manual-attendance'
 import { Route as SspNewRequisitionRouteImport } from './routes/ssp-new-requisition'
 import { Route as SspMyRequisitionRouteImport } from './routes/ssp-my-requisition'
@@ -18,6 +19,7 @@ import { Route as SspIctRequisitionRouteImport } from './routes/ssp-ict-requisit
 import { Route as SspAttendanceRouteImport } from './routes/ssp-attendance'
 import { Route as SspApproveManualAttendanceRouteImport } from './routes/ssp-approve-manual-attendance'
 import { Route as SspApprovalRouteImport } from './routes/ssp-approval'
+import { Route as ShiftControlCenterRouteImport } from './routes/shift-control-center'
 import { Route as RecruitmentIeListRouteImport } from './routes/recruitment-ie-list'
 import { Route as RecruitmentHrListRouteImport } from './routes/recruitment-hr-list'
 import { Route as RecruitmentConfigurationRouteImport } from './routes/recruitment-configuration'
@@ -81,6 +83,11 @@ import { Route as RecruitmentHrAssessmentIdRouteImport } from './routes/recruitm
 import { Route as RecruitmentDetailIdRouteImport } from './routes/recruitment-detail.$id'
 import { Route as EmployeeDetailIdRouteImport } from './routes/employee-detail.$id'
 
+const TransferControlCenterRoute = TransferControlCenterRouteImport.update({
+  id: '/transfer-control-center',
+  path: '/transfer-control-center',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SspRequestManualAttendanceRoute =
   SspRequestManualAttendanceRouteImport.update({
     id: '/ssp-request-manual-attendance',
@@ -126,6 +133,11 @@ const SspApproveManualAttendanceRoute =
 const SspApprovalRoute = SspApprovalRouteImport.update({
   id: '/ssp-approval',
   path: '/ssp-approval',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShiftControlCenterRoute = ShiftControlCenterRouteImport.update({
+  id: '/shift-control-center',
+  path: '/shift-control-center',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RecruitmentIeListRoute = RecruitmentIeListRouteImport.update({
@@ -504,6 +516,7 @@ export interface FileRoutesByFullPath {
   '/recruitment-configuration': typeof RecruitmentConfigurationRoute
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
+  '/shift-control-center': typeof ShiftControlCenterRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
   '/ssp-attendance': typeof SspAttendanceRoute
@@ -513,6 +526,7 @@ export interface FileRoutesByFullPath {
   '/ssp-my-requisition': typeof SspMyRequisitionRoute
   '/ssp-new-requisition': typeof SspNewRequisitionRoute
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
+  '/transfer-control-center': typeof TransferControlCenterRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
   '/recruitment-detail/$id': typeof RecruitmentDetailIdRoute
   '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
@@ -577,6 +591,7 @@ export interface FileRoutesByTo {
   '/recruitment-configuration': typeof RecruitmentConfigurationRoute
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
+  '/shift-control-center': typeof ShiftControlCenterRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
   '/ssp-attendance': typeof SspAttendanceRoute
@@ -586,6 +601,7 @@ export interface FileRoutesByTo {
   '/ssp-my-requisition': typeof SspMyRequisitionRoute
   '/ssp-new-requisition': typeof SspNewRequisitionRoute
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
+  '/transfer-control-center': typeof TransferControlCenterRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
   '/recruitment-detail/$id': typeof RecruitmentDetailIdRoute
   '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
@@ -651,6 +667,7 @@ export interface FileRoutesById {
   '/recruitment-configuration': typeof RecruitmentConfigurationRoute
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
+  '/shift-control-center': typeof ShiftControlCenterRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
   '/ssp-attendance': typeof SspAttendanceRoute
@@ -660,6 +677,7 @@ export interface FileRoutesById {
   '/ssp-my-requisition': typeof SspMyRequisitionRoute
   '/ssp-new-requisition': typeof SspNewRequisitionRoute
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
+  '/transfer-control-center': typeof TransferControlCenterRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
   '/recruitment-detail/$id': typeof RecruitmentDetailIdRoute
   '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
@@ -726,6 +744,7 @@ export interface FileRouteTypes {
     | '/recruitment-configuration'
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
+    | '/shift-control-center'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
     | '/ssp-attendance'
@@ -735,6 +754,7 @@ export interface FileRouteTypes {
     | '/ssp-my-requisition'
     | '/ssp-new-requisition'
     | '/ssp-request-manual-attendance'
+    | '/transfer-control-center'
     | '/employee-detail/$id'
     | '/recruitment-detail/$id'
     | '/recruitment-hr-assessment/$id'
@@ -799,6 +819,7 @@ export interface FileRouteTypes {
     | '/recruitment-configuration'
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
+    | '/shift-control-center'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
     | '/ssp-attendance'
@@ -808,6 +829,7 @@ export interface FileRouteTypes {
     | '/ssp-my-requisition'
     | '/ssp-new-requisition'
     | '/ssp-request-manual-attendance'
+    | '/transfer-control-center'
     | '/employee-detail/$id'
     | '/recruitment-detail/$id'
     | '/recruitment-hr-assessment/$id'
@@ -872,6 +894,7 @@ export interface FileRouteTypes {
     | '/recruitment-configuration'
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
+    | '/shift-control-center'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
     | '/ssp-attendance'
@@ -881,6 +904,7 @@ export interface FileRouteTypes {
     | '/ssp-my-requisition'
     | '/ssp-new-requisition'
     | '/ssp-request-manual-attendance'
+    | '/transfer-control-center'
     | '/employee-detail/$id'
     | '/recruitment-detail/$id'
     | '/recruitment-hr-assessment/$id'
@@ -946,6 +970,7 @@ export interface RootRouteChildren {
   RecruitmentConfigurationRoute: typeof RecruitmentConfigurationRoute
   RecruitmentHrListRoute: typeof RecruitmentHrListRoute
   RecruitmentIeListRoute: typeof RecruitmentIeListRoute
+  ShiftControlCenterRoute: typeof ShiftControlCenterRoute
   SspApprovalRoute: typeof SspApprovalRoute
   SspApproveManualAttendanceRoute: typeof SspApproveManualAttendanceRoute
   SspAttendanceRoute: typeof SspAttendanceRoute
@@ -955,6 +980,7 @@ export interface RootRouteChildren {
   SspMyRequisitionRoute: typeof SspMyRequisitionRoute
   SspNewRequisitionRoute: typeof SspNewRequisitionRoute
   SspRequestManualAttendanceRoute: typeof SspRequestManualAttendanceRoute
+  TransferControlCenterRoute: typeof TransferControlCenterRoute
   EmployeeDetailIdRoute: typeof EmployeeDetailIdRoute
   RecruitmentDetailIdRoute: typeof RecruitmentDetailIdRoute
   RecruitmentHrAssessmentIdRoute: typeof RecruitmentHrAssessmentIdRoute
@@ -963,6 +989,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/transfer-control-center': {
+      id: '/transfer-control-center'
+      path: '/transfer-control-center'
+      fullPath: '/transfer-control-center'
+      preLoaderRoute: typeof TransferControlCenterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ssp-request-manual-attendance': {
       id: '/ssp-request-manual-attendance'
       path: '/ssp-request-manual-attendance'
@@ -1024,6 +1057,13 @@ declare module '@tanstack/react-router' {
       path: '/ssp-approval'
       fullPath: '/ssp-approval'
       preLoaderRoute: typeof SspApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shift-control-center': {
+      id: '/shift-control-center'
+      path: '/shift-control-center'
+      fullPath: '/shift-control-center'
+      preLoaderRoute: typeof ShiftControlCenterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/recruitment-ie-list': {
@@ -1522,6 +1562,7 @@ const rootRouteChildren: RootRouteChildren = {
   RecruitmentConfigurationRoute: RecruitmentConfigurationRoute,
   RecruitmentHrListRoute: RecruitmentHrListRoute,
   RecruitmentIeListRoute: RecruitmentIeListRoute,
+  ShiftControlCenterRoute: ShiftControlCenterRoute,
   SspApprovalRoute: SspApprovalRoute,
   SspApproveManualAttendanceRoute: SspApproveManualAttendanceRoute,
   SspAttendanceRoute: SspAttendanceRoute,
@@ -1531,6 +1572,7 @@ const rootRouteChildren: RootRouteChildren = {
   SspMyRequisitionRoute: SspMyRequisitionRoute,
   SspNewRequisitionRoute: SspNewRequisitionRoute,
   SspRequestManualAttendanceRoute: SspRequestManualAttendanceRoute,
+  TransferControlCenterRoute: TransferControlCenterRoute,
   EmployeeDetailIdRoute: EmployeeDetailIdRoute,
   RecruitmentDetailIdRoute: RecruitmentDetailIdRoute,
   RecruitmentHrAssessmentIdRoute: RecruitmentHrAssessmentIdRoute,
