@@ -1065,7 +1065,7 @@ function EmployeeDetailPage() {
                         </div>
                         <div className="mt-8">
                           {(() => {
-                            const timelineData = [
+                            const rawTimeline = [
                               { year: "2014", inc: incRecord.inc2014 },
                               { year: "2015", inc: incRecord.inc2015 },
                               { year: "2016", inc: incRecord.inc2016 },
@@ -1084,58 +1084,178 @@ function EmployeeDetailPage() {
                                 const isPromo = item.inc.includes("(P)");
                                 const val = parseFloat(item.inc.replace("(P)", "").replace(/,/g, "")) || 0;
                                 let rGross = incRecord.salaryJoining;
-                                for (let i = 0; i <= index; i++) rGross += parseFloat(arr[i].inc.replace("(P)", "").replace(/,/g, "")) || 0;
+                                for (let i = 0; i <= index; i++) {
+                                  rGross += parseFloat(arr[i].inc.replace("(P)", "").replace(/,/g, "")) || 0;
+                                }
                                 return { ...item, isPromo, val, rGross };
                               })
                               .reverse();
 
+                            const allNodes = [
+                              ...rawTimeline.map(item => ({
+                                type: "increment" as const,
+                                key: item.year,
+                                year: item.year,
+                                isPromo: item.isPromo,
+                                val: item.val,
+                                rGross: item.rGross,
+                              })),
+                              {
+                                type: "join" as const,
+                                key: "join",
+                                year: incRecord.joiningDate ? incRecord.joiningDate.split("/")[2] : "Joining",
+                                isPromo: false,
+                                val: 0,
+                                rGross: incRecord.salaryJoining,
+                              }
+                            ];
+
                             return (
-                              <div className="relative border-l-2 border-border/40 ml-4 space-y-8 pb-4">
-                                {timelineData.map((item) => (
-                                  <div key={item.year} className="relative pl-6">
-                                    {/* Timeline Dot */}
-                                    <div className="absolute -left-[9px] top-1.5 size-4 rounded-full bg-emerald-500 ring-4 ring-background flex items-center justify-center">
-                                      <div className="size-1.5 bg-background rounded-full"></div>
-                                    </div>
+                              <div className="relative w-full py-6 md:py-10">
+                                {/* Central Timeline Line */}
+                                <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-border/60 -translate-x-1/2 pointer-events-none" />
 
-                                    {/* Content Card */}
-                                    <div className="bg-card border border-border/50 rounded-xl p-4 shadow-sm relative -top-1.5 hover:border-emerald-500/30 transition-colors">
-                                      <div className="flex items-center justify-between mb-3">
-                                        <div className="flex items-center gap-2">
-                                          <span className="font-black text-sm text-foreground">Increment {item.year}</span>
-                                          {item.isPromo && <span className="text-[9px] bg-amber-500/10 text-amber-600 border border-amber-500/20 px-2 py-0.5 rounded-full font-black uppercase tracking-wider">Promoted</span>}
+                                {allNodes.map((node, index) => {
+                                  const isLeft = index % 2 === 0;
+
+                                  // 1. Unified Card Content
+                                  const cardJSX = (
+                                    <div className="w-full max-w-md">
+                                      {node.type === "join" ? (
+                                        <div className="bg-gradient-to-br from-primary/5 via-card to-card border border-primary/20 hover:border-primary/45 rounded-xl p-5 shadow-xs hover:shadow-md transition-all duration-300 relative text-left">
+                                          {/* Subtle top decoration */}
+                                          <div className="absolute top-0 left-0 right-0 h-1 bg-primary rounded-t-xl" />
+                                          <div className="flex items-center justify-between mb-3.5">
+                                            <div className="flex items-center gap-2">
+                                              <span className="font-extrabold text-sm text-foreground">Joined Company</span>
+                                              <span className="text-[9px] bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-full font-black uppercase tracking-wider">
+                                                {node.year}
+                                              </span>
+                                            </div>
+                                            <Briefcase className="size-4 text-primary" />
+                                          </div>
+                                          <div className="flex justify-between items-center text-xs pt-3.5 border-t border-border/40">
+                                            <span className="text-muted-foreground font-semibold uppercase text-[10px] tracking-wider">Joining Salary</span>
+                                            <span className="font-mono font-black text-foreground text-sm">৳{node.rGross.toLocaleString("en-IN")}</span>
+                                          </div>
                                         </div>
-                                        <div className="text-emerald-600 font-mono font-bold text-xs bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded">
-                                          +৳{item.val.toLocaleString("en-IN")}
+                                      ) : (
+                                        <div
+                                          className={`bg-gradient-to-br border rounded-xl p-5 shadow-xs hover:shadow-md transition-all duration-300 relative text-left ${
+                                            node.isPromo
+                                              ? "from-amber-500/5 via-card to-card border-amber-500/25 hover:border-amber-500/50"
+                                              : "from-emerald-500/5 via-card to-card border-emerald-500/20 hover:border-emerald-500/40"
+                                          }`}
+                                        >
+                                          {/* Subtle top decoration */}
+                                          <div
+                                            className={`absolute top-0 left-0 right-0 h-1 rounded-t-xl ${
+                                              node.isPromo ? "bg-amber-500" : "bg-emerald-500"
+                                            }`}
+                                          />
+                                          <div className="flex items-center justify-between mb-3.5">
+                                            <div className="flex items-center gap-2">
+                                              <span className="font-extrabold text-sm text-foreground">Increment {node.year}</span>
+                                              {node.isPromo && (
+                                                <span className="text-[9px] bg-amber-500/10 text-amber-600 border border-amber-500/25 px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider animate-pulse">
+                                                  Promoted
+                                                </span>
+                                              )}
+                                            </div>
+                                            <div
+                                              className={`font-mono font-black text-xs px-2.5 py-1 rounded-lg border ${
+                                                node.isPromo
+                                                  ? "bg-amber-500/10 border-amber-500/20 text-amber-600"
+                                                  : "bg-emerald-500/10 border-emerald-500/20 text-emerald-600"
+                                              }`}
+                                            >
+                                              +৳{node.val.toLocaleString("en-IN")}
+                                            </div>
+                                          </div>
+                                          <div className="flex justify-between items-center text-xs pt-3.5 border-t border-border/40">
+                                            <span className="text-muted-foreground font-semibold uppercase text-[10px] tracking-wider">Running Gross Salary</span>
+                                            <span className="font-mono font-black text-primary text-sm">৳{node.rGross.toLocaleString("en-IN")}</span>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+
+                                  // 2. Unified Balancer Metadata
+                                  const balancerJSX = (
+                                    <div className="flex flex-col gap-1 select-none">
+                                      <span className="text-2xl font-black text-muted-foreground/15 font-mono leading-none">
+                                        {node.year}
+                                      </span>
+                                      <span className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-wider leading-none">
+                                        {node.type === "join"
+                                          ? "Corporate Onboarding"
+                                          : node.isPromo
+                                          ? "Career Advancement"
+                                          : "Annual Raise"}
+                                      </span>
+                                    </div>
+                                  );
+
+                                  // 3. Unified Dot indicator
+                                  const dotJSX = (
+                                    <div
+                                      className={`size-5.5 rounded-full border-4 bg-background flex items-center justify-center shadow-md transition duration-300 ${
+                                        node.type === "join"
+                                          ? "border-primary text-primary"
+                                          : node.isPromo
+                                          ? "border-amber-500 text-amber-500 ring-4 ring-amber-500/10"
+                                          : "border-emerald-500 text-emerald-500 ring-4 ring-emerald-500/10"
+                                      }`}
+                                    >
+                                      <div
+                                        className={`size-1.5 rounded-full ${
+                                          node.type === "join"
+                                            ? "bg-primary"
+                                            : node.isPromo
+                                            ? "bg-amber-500 animate-pulse"
+                                            : "bg-emerald-500"
+                                        }`}
+                                      />
+                                    </div>
+                                  );
+
+                                  return (
+                                    <div key={node.key}>
+                                      {/* Mobile-only Layout */}
+                                      <div className="md:hidden relative pl-12 pb-8 last:pb-0 w-full text-left">
+                                        <div className="absolute left-4 -translate-x-1/2 top-1.5 z-20">
+                                          {dotJSX}
+                                        </div>
+                                        {cardJSX}
+                                      </div>
+
+                                      {/* Desktop symmetric Grid Layout */}
+                                      <div className="hidden md:grid grid-cols-[1fr_40px_1fr] items-center w-full mb-12 last:mb-0">
+                                        {/* Left half */}
+                                        <div className={`flex w-full justify-end text-right ${isLeft ? "" : "pr-8"}`}>
+                                          {isLeft ? cardJSX : balancerJSX}
+                                        </div>
+
+                                        {/* Central Dot */}
+                                        <div className="flex justify-center items-center z-20">
+                                          {dotJSX}
+                                        </div>
+
+                                        {/* Right half */}
+                                        <div className={`flex w-full justify-start text-left ${isLeft ? "pl-8" : ""}`}>
+                                          {isLeft ? balancerJSX : cardJSX}
                                         </div>
                                       </div>
-                                      <div className="flex justify-between items-center text-xs pt-3 border-t border-border/40">
-                                        <span className="text-muted-foreground font-semibold uppercase text-[10px] tracking-wider">Running Gross Salary</span>
-                                        <span className="font-mono font-black text-primary text-sm">৳{item.rGross.toLocaleString("en-IN")}</span>
-                                      </div>
                                     </div>
-                                  </div>
-                                ))}
+                                  );
+                                })}
 
-                                {(!incRecord.total || incRecord.total.startsWith("0")) && (
-                                  <div className="pl-6 pb-4">
+                                {rawTimeline.length === 0 && (
+                                  <div className="pl-12 md:pl-0 md:text-center py-6">
                                     <p className="text-xs font-semibold text-muted-foreground italic">No increments received yet.</p>
                                   </div>
                                 )}
-
-                                {/* Joining Point */}
-                                <div className="relative pl-6">
-                                  <div className="absolute -left-[9px] top-1.5 size-4 rounded-full bg-primary ring-4 ring-background flex items-center justify-center">
-                                    <div className="size-1.5 bg-background rounded-full"></div>
-                                  </div>
-                                  <div className="bg-muted/10 border border-border/40 rounded-xl p-4 relative -top-1.5">
-                                    <div className="font-black text-sm text-primary mb-3">Joined Company</div>
-                                    <div className="flex justify-between items-center text-xs pt-3 border-t border-border/40">
-                                      <span className="text-muted-foreground font-semibold uppercase text-[10px] tracking-wider">Joining Salary</span>
-                                      <span className="font-mono font-black text-foreground text-sm">৳{incRecord.salaryJoining.toLocaleString("en-IN")}</span>
-                                    </div>
-                                  </div>
-                                </div>
                               </div>
                             );
                           })()}

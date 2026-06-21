@@ -10,7 +10,7 @@ import {
   ChevronDown, MapPin, Phone, Mail, Calendar, User, Heart, Briefcase, DollarSign, EyeOff, LayoutGrid, Check,
   TrendingUp, ArrowUpRight, FileSignature, ShieldCheck, CreditCard, UserCheck, UserCog, Clock, CalendarRange,
   CalendarHeart, Power, FileClock, Sparkles, AlertCircle, RefreshCw, Info, ArrowUp, ArrowDown, Save, Star,
-  Trash2, RotateCcw
+  Trash2, RotateCcw, GripVertical
 } from "lucide-react";
 
 export const Route = createFileRoute("/personnel-list")({
@@ -644,6 +644,12 @@ function PersonnelListPage() {
   const [templateName, setTemplateName] = useState("");
   const [isColSelectorOpen, setIsColSelectorOpen] = useState(false);
 
+  // Drag and drop states for column arrangement modal
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [draggedOverIndex, setDraggedOverIndex] = useState<number | null>(null);
+  // Transient state for serial inputs to prevent cursor jump/focus loss while typing
+  const [tempSerials, setTempSerials] = useState<Record<ColumnKey, string>>({} as Record<ColumnKey, string>);
+
   // Dynamic values extracted from dataset to populate dropdowns beautifully
   const departmentsList = useMemo(() => ["ALL", ...Array.from(new Set(employeesData.map(e => e.dept)))], []);
   const sectionsList = useMemo(() => ["ALL", ...Array.from(new Set(employeesData.map(e => e.sect)))], []);
@@ -766,6 +772,11 @@ function PersonnelListPage() {
       const templates = [
         {
           ...createDefaultColumnTemplate(),
+          ...(savedDefault ? {
+            columns: normalizeColumnVisibility(savedDefault.columns),
+            order: normalizeColumnOrder(savedDefault.order),
+            isActive: savedDefault.isActive,
+          } : {}),
           isActive: savedDefault?.isActive ?? !customTemplates.some((template: ColumnTemplate) => template.isActive),
         },
         ...customTemplates,
@@ -832,6 +843,37 @@ function PersonnelListPage() {
     });
   };
 
+  // Drag and drop event handlers
+  const handleDragStart = (e: any, index: number) => {
+    setDraggedIndex(index);
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = "move";
+    }
+  };
+
+  const handleDragOver = (e: any, index: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+    setDraggedOverIndex(index);
+  };
+
+  const handleDrop = (e: any, targetIndex: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === targetIndex) return;
+
+    setDraftColumnOrder(prev => {
+      const next = [...prev];
+      const [draggedItem] = next.splice(draggedIndex, 1);
+      next.splice(targetIndex, 0, draggedItem);
+      return next;
+    });
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDraggedOverIndex(null);
+  };
+
   const applyColumnConfig = (templates = columnTemplates) => {
     const columns = normalizeColumnVisibility(draftVisibleCols);
     const order = normalizeColumnOrder(draftColumnOrder);
@@ -840,7 +882,7 @@ function PersonnelListPage() {
     setColumnOrder(order);
     setDraftVisibleCols(columns);
     setDraftColumnOrder(order);
-    setColumnTemplates(templates.map(template => template.isActive && !template.isDefault ? { ...template, columns, order } : template));
+    setColumnTemplates(templates.map(template => template.isActive ? { ...template, columns, order } : template));
     setBulkActionMessage("Column arrangement applied successfully.");
     setTimeout(() => setBulkActionMessage(null), 4500);
   };
@@ -1690,7 +1732,8 @@ function PersonnelListPage() {
                 </div>
 
                 <div className="min-h-0 flex flex-col">
-                  <div className="grid grid-cols-[72px_1fr_104px_92px] gap-3 px-4 py-3 border-b border-border/40 bg-muted/25 text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                  <div className="grid grid-cols-[40px_72px_1fr_104px_92px] gap-3 px-4 py-3 border-b border-border/40 bg-muted/25 text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                    <span></span>
                     <span>Serial</span>
                     <span>Column Name</span>
                     <span>Show / Hide</span>
@@ -1698,52 +1741,101 @@ function PersonnelListPage() {
                   </div>
 
                   <div className="overflow-y-auto p-4 space-y-2">
-                    {draftColumnOrder.map((key, index) => (
-                      <div key={key} className="grid grid-cols-[72px_1fr_104px_92px] gap-3 items-center rounded-xl border border-border/50 bg-card hover:bg-muted/20 p-2.5 transition">
-                        <input
-                          type="number"
-                          min={1}
-                          max={draftColumnOrder.length}
-                          value={index + 1}
-                          onChange={(event) => updateDraftSerial(key, event.target.value)}
-                          className="h-8 w-16 px-2 rounded-lg bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs font-bold text-center"
-                        />
+                    {draftColumnOrder.map((key, index) => {
+                      const isDragged = draggedIndex === index;
+                      const isDraggedOver = draggedOverIndex === index;
 
-                        <div className="min-w-0">
-                          <div className="text-xs font-bold text-foreground truncate">{getColumnLabel(key)}</div>
-                          <div className="text-[10px] text-muted-foreground/70">Configurable personnel field</div>
-                        </div>
-
-                        <button
-                          onClick={() => toggleDraftColumn(key)}
-                          className={`h-8 px-2.5 rounded-lg border text-[10px] font-extrabold transition flex items-center justify-center gap-1.5 ${draftVisibleCols[key] ? "bg-primary/10 border-primary/25 text-primary" : "bg-muted/30 border-border/50 text-muted-foreground"}`}
+                      return (
+                        <div
+                          key={key}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, index)}
+                          onDragOver={(e) => handleDragOver(e, index)}
+                          onDrop={(e) => handleDrop(e, index)}
+                          onDragEnd={handleDragEnd}
+                          className={`grid grid-cols-[40px_72px_1fr_104px_92px] gap-3 items-center rounded-xl border p-2.5 transition-all duration-200 ${
+                            isDragged
+                              ? "border-primary bg-primary/5 opacity-50 scale-[0.98] select-none pointer-events-none"
+                              : isDraggedOver
+                              ? "border-primary/50 bg-primary/5 border-dashed scale-[1.01]"
+                              : "border-border/50 bg-card hover:bg-muted/20"
+                          }`}
                         >
-                          <span className={`size-4 rounded-md border flex items-center justify-center ${draftVisibleCols[key] ? "bg-primary border-primary text-primary-foreground" : "border-border bg-card"}`}>
-                            {draftVisibleCols[key] && <Check className="size-2.5 stroke-[3.5]" />}
-                          </span>
-                          {draftVisibleCols[key] ? "Show" : "Hide"}
-                        </button>
+                          <div
+                            draggable="false"
+                            className="flex items-center justify-center cursor-grab active:cursor-grabbing p-1 text-muted-foreground/50 hover:text-foreground transition-colors duration-150"
+                            title="Drag to rearrange"
+                          >
+                            <GripVertical className="size-4" />
+                          </div>
 
-                        <div className="flex items-center justify-end gap-1.5">
+                          <input
+                            type="number"
+                            min={1}
+                            max={draftColumnOrder.length}
+                            value={tempSerials[key] !== undefined ? tempSerials[key] : String(index + 1)}
+                            onChange={(event) => {
+                              const val = event.target.value;
+                              setTempSerials(prev => ({ ...prev, [key]: val }));
+                            }}
+                            onBlur={() => {
+                              if (tempSerials[key] !== undefined) {
+                                updateDraftSerial(key, tempSerials[key]);
+                                setTempSerials(prev => {
+                                  const next = { ...prev };
+                                  delete next[key];
+                                  return next;
+                                });
+                              }
+                            }}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter") {
+                                event.currentTarget.blur();
+                              }
+                            }}
+                            draggable="false"
+                            className="h-8 w-16 px-2 rounded-lg bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs font-bold text-center"
+                          />
+
+                          <div className="min-w-0">
+                            <div className="text-xs font-bold text-foreground truncate">{getColumnLabel(key)}</div>
+                            <div className="text-[10px] text-muted-foreground/70">Configurable personnel field</div>
+                          </div>
+
                           <button
-                            onClick={() => moveDraftColumn(key, "up")}
-                            disabled={index === 0}
-                            className="size-8 rounded-lg border border-border/60 bg-card hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed text-muted-foreground hover:text-foreground transition flex items-center justify-center"
-                            title="Move up"
+                            onClick={() => toggleDraftColumn(key)}
+                            draggable="false"
+                            className={`h-8 px-2.5 rounded-lg border text-[10px] font-extrabold transition flex items-center justify-center gap-1.5 ${draftVisibleCols[key] ? "bg-primary/10 border-primary/25 text-primary" : "bg-muted/30 border-border/50 text-muted-foreground"}`}
                           >
-                            <ArrowUp className="size-3.5" />
+                            <span className={`size-4 rounded-md border flex items-center justify-center ${draftVisibleCols[key] ? "bg-primary border-primary text-primary-foreground" : "border-border bg-card"}`}>
+                              {draftVisibleCols[key] && <Check className="size-2.5 stroke-[3.5]" />}
+                            </span>
+                            {draftVisibleCols[key] ? "Show" : "Hide"}
                           </button>
-                          <button
-                            onClick={() => moveDraftColumn(key, "down")}
-                            disabled={index === draftColumnOrder.length - 1}
-                            className="size-8 rounded-lg border border-border/60 bg-card hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed text-muted-foreground hover:text-foreground transition flex items-center justify-center"
-                            title="Move down"
-                          >
-                            <ArrowDown className="size-3.5" />
-                          </button>
+
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              onClick={() => moveDraftColumn(key, "up")}
+                              disabled={index === 0}
+                              draggable="false"
+                              className="size-8 rounded-lg border border-border/60 bg-card hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed text-muted-foreground hover:text-foreground transition flex items-center justify-center"
+                              title="Move up"
+                            >
+                              <ArrowUp className="size-3.5" />
+                            </button>
+                            <button
+                              onClick={() => moveDraftColumn(key, "down")}
+                              disabled={index === draftColumnOrder.length - 1}
+                              draggable="false"
+                              className="size-8 rounded-lg border border-border/60 bg-card hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed text-muted-foreground hover:text-foreground transition flex items-center justify-center"
+                              title="Move down"
+                            >
+                              <ArrowDown className="size-3.5" />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
 
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-t border-border/40 bg-muted/15">
