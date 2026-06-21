@@ -4,8 +4,9 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
   ChevronRight, Search, FileSpreadsheet, Printer, FileDown,
-  CheckCircle2, Lock, Unlock, ArrowRight, ShieldCheck, HelpCircle, RefreshCw
+  CheckCircle2, Lock, Unlock, ArrowRight, ShieldCheck, HelpCircle, RefreshCw, Trash2
 } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/earn-leave-workflow")({
   head: () => ({
@@ -141,38 +142,60 @@ function EarnLeaveWorkflowPage() {
   // Stepper controls & locked actions
   const handleLevel1Submit = () => {
     if (selectedIds.size === 0) {
-      alert("Please select at least one record to submit!");
+      toast.error("Please select at least one record to submit!");
       return;
     }
     setRows(prev => prev.map(r => selectedIds.has(r.id) ? { ...r, status: "Submitted" } : r));
     setCurrentStep(2); // Unlock Step 2
-    alert("Level 1 Submission Complete! Processed Cash Earned Leaves submitted to HR Officer verification.");
+    toast.success("Level 1 Submission Complete! Processed Cash Earned Leaves submitted to HR Officer verification.");
   };
 
   const handleLevel2Check = () => {
     if (selectedIds.size === 0) {
-      alert("Please select at least one record to verify!");
+      toast.error("Please select at least one record to verify!");
       return;
     }
     setRows(prev => prev.map(r => selectedIds.has(r.id) ? { ...r, status: "Checked" } : r));
     setCurrentStep(3); // Unlock Step 3
-    alert("Level 2 HR Check Verification Complete! Verified list forwarded to Director (HRD) authorization.");
+    toast.success("Level 2 HR Check Verification Complete! Verified list forwarded to Director (HRD) authorization.");
   };
 
   const handleLevel3Approve = () => {
     if (selectedIds.size === 0) {
-      alert("Please select at least one record to authorize!");
+      toast.error("Please select at least one record to authorize!");
       return;
     }
     setRows(prev => prev.map(r => selectedIds.has(r.id) ? { ...r, status: "Authorized (HRD)" } : r));
-    alert("Level 3 HRD Authorization Approved! All cash payouts cleared for direct disbursement.");
+    toast.success("Level 3 HRD Authorization Approved! All cash payouts cleared for direct disbursement.");
   };
 
   // Rollback / Reset for Demo Purposes
   const handleResetWorkflow = () => {
     setRows(initialWorkflowRows);
     setCurrentStep(1);
-    alert("Workflow reset to Draft state for demonstration.");
+    toast.info("Workflow reset to Draft state for demonstration.");
+  };
+
+  const handleDeleteSelected = () => {
+    if (selectedIds.size === 0) {
+      toast.error("Please select at least one record to delete.");
+      return;
+    }
+    if (!confirm(`Are you sure you want to delete ${selectedIds.size} selected records?`)) return;
+    setRows(prev => prev.filter(r => !selectedIds.has(r.id)));
+    toast.success(`Deleted ${selectedIds.size} records.`);
+    setSelectedIds(new Set());
+  };
+
+  const handleSingleDelete = (id: string) => {
+    if (!confirm("Are you sure you want to delete this record?")) return;
+    setRows(prev => prev.filter(r => r.id !== id));
+    toast.success("Record deleted successfully.");
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
   };
 
   // Toggle selectors
@@ -234,13 +257,21 @@ function EarnLeaveWorkflowPage() {
               </h1>
             </div>
 
-            <button
-              onClick={handleResetWorkflow}
-              className="px-4 py-2 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-xl text-[10px] font-extrabold text-slate-500 flex items-center gap-1.5 transition uppercase"
-            >
-              <RefreshCw className="size-3" />
-              <span>Reset Cycle</span>
-            </button>
+            <div className="flex items-center gap-3">
+              <Link
+                to="/earn-leave-submit"
+                className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white rounded-xl text-[10px] font-extrabold flex items-center gap-1.5 transition uppercase tracking-wider shadow-xs hover:shadow-md"
+              >
+                <span>Disbursement Settings</span>
+              </Link>
+              <button
+                onClick={handleResetWorkflow}
+                className="px-4 py-2 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-xl text-[10px] font-extrabold text-slate-500 flex items-center gap-1.5 transition uppercase"
+              >
+                <RefreshCw className="size-3" />
+                <span>Reset Cycle</span>
+              </button>
+            </div>
           </div>
 
           {/* Gorgeous Visual Workflow Stepper Panel */}
@@ -470,8 +501,17 @@ function EarnLeaveWorkflowPage() {
 
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-              <div className="text-xs font-black text-slate-700 dark:text-slate-300">
-                Workflow Step Details Ledger
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-black text-slate-700 dark:text-slate-300">
+                  Workflow Step Details Ledger
+                </span>
+                <button
+                  onClick={handleDeleteSelected}
+                  className="h-8 pl-2 pr-3.5 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-650 active:scale-[0.97] text-white font-semibold text-[10px] rounded-lg shadow-xs flex items-center gap-2 transition-all duration-200 uppercase tracking-wider border border-slate-500/10"
+                >
+                  <Trash2 className="size-3.5" />
+                  <span>Delete Selected</span>
+                </button>
               </div>
 
               {/* Spreadsheet download utilities & Grid Search input */}
@@ -530,7 +570,8 @@ function EarnLeaveWorkflowPage() {
                     <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center w-28">Payment Mode</th>
                     <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-left w-36">Bank Name</th>
                     <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-left w-36">Account No</th>
-                    <th className="px-3 py-3 text-center">Status</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">Status</th>
+                    <th className="px-3 py-3 text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -610,10 +651,21 @@ function EarnLeaveWorkflowPage() {
                         </td>
 
                         {/* Status */}
-                        <td className="px-3 py-3 text-center">
+                        <td className="px-3 py-3 text-center border-r border-slate-100 dark:border-slate-800/50">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase ${statusColor}`}>
                             {row.status}
                           </span>
+                        </td>
+
+                        {/* Single Actions */}
+                        <td className="px-3 py-3 text-center">
+                          <button
+                            onClick={() => handleSingleDelete(row.id)}
+                            className="text-rose-500 hover:text-rose-650 hover:scale-105 transition"
+                            title="Delete Record"
+                          >
+                            <Trash2 className="size-3.5" />
+                          </button>
                         </td>
 
                       </tr>
@@ -622,7 +674,7 @@ function EarnLeaveWorkflowPage() {
 
                   {filteredRows.length === 0 && (
                     <tr>
-                      <td colSpan={12} className="px-4 py-16 text-center text-slate-400 font-bold">
+                      <td colSpan={13} className="px-4 py-16 text-center text-slate-400 font-bold">
                         <div className="flex flex-col items-center justify-center gap-2">
                           <HelpCircle className="size-6 text-slate-300 animate-bounce" />
                           <span>No processed earned leave records in active workflow queue.</span>

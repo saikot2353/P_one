@@ -3,8 +3,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  ChevronRight, ArrowLeft, Search, FileSpreadsheet, Printer, FileDown, CheckCircle2, XCircle, Info, Check, X
+  ChevronRight, ArrowLeft, Search, FileSpreadsheet, Printer, FileDown, CheckCircle2,
+  XCircle, Info, Check, X, Trash2, HelpCircle
 } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/leave-approve")({
   head: () => ({
@@ -17,8 +19,9 @@ export const Route = createFileRoute("/leave-approve")({
 });
 
 interface LeaveApplicationRow {
-  id: string;
+  sl: number;
   empId: string;
+  empIdOff: string;
   empName: string;
   company: string;
   department: string;
@@ -30,92 +33,179 @@ interface LeaveApplicationRow {
   status: "Approved" | "Pending" | "Rejected";
 }
 
-const initialRows: LeaveApplicationRow[] = [
+const initialMockLeaveRecords: LeaveApplicationRow[] = [
   {
-    id: "LA-001",
-    empId: "2021032646",
-    empName: "Sadiqul Islam",
-    company: "Pakiza Software Limited",
-    department: "Core Sales",
-    designation: "Deputy Manager",
-    type: "CL",
-    startDate: "30/05/2026",
-    endDate: "30/05/2026",
-    purpose: "",
+    sl: 1,
+    empId: "2047508",
+    empIdOff: "47508",
+    empName: "Mst. Jahanara Khatun",
+    company: "KAC Fashion Wear Ltd",
+    department: "Sewing",
+    designation: "Asst. Operator",
+    type: "ML",
+    startDate: "21/06/2026",
+    endDate: "18/10/2026",
+    purpose: "ML",
     status: "Approved"
   },
   {
-    id: "LA-002",
-    empId: "2021032646",
-    empName: "Sadiqul Islam",
-    company: "Pakiza Software Limited",
-    department: "Core Sales",
-    designation: "Deputy Manager",
-    type: "CL",
-    startDate: "21/05/2026",
-    endDate: "21/05/2026",
-    purpose: "",
+    sl: 2,
+    empId: "2047508",
+    empIdOff: "47508",
+    empName: "Mst. Jahanara Khatun",
+    company: "KAC Fashion Wear Ltd",
+    department: "Sewing",
+    designation: "Asst. Operator",
+    type: "ML",
+    startDate: "21/06/2026",
+    endDate: "18/10/2026",
+    purpose: "ML",
     status: "Approved"
   },
   {
-    id: "LA-003",
-    empId: "2021032646",
-    empName: "Sadiqul Islam",
-    company: "Pakiza Software Limited",
-    department: "Core Sales",
-    designation: "Deputy Manager",
-    type: "CL",
-    startDate: "16/05/2026",
-    endDate: "16/05/2026",
-    purpose: "",
+    sl: 3,
+    empId: "2400015",
+    empIdOff: "400015",
+    empName: "Mst. Mukta Khatun",
+    company: "KAC Fashion Wear Ltd",
+    department: "Sewing",
+    designation: "Operator",
+    type: "ML",
+    startDate: "16/06/2026",
+    endDate: "13/10/2026",
+    purpose: "ML",
     status: "Approved"
   },
   {
-    id: "LA-004",
-    empId: "2022035599",
-    empName: "Dipon Saha",
-    company: "Pakiza Software Limited",
-    department: "Core Development (HR)",
-    designation: "Manager",
+    sl: 4,
+    empId: "3302786",
+    empIdOff: "C-28786",
+    empName: "Md. Shantona Khatun",
+    company: "KAC Fashion Wear Ltd",
+    department: "Sewing",
+    designation: "Asst. Operator",
+    type: "ML",
+    startDate: "11/06/2026",
+    endDate: "08/10/2026",
+    purpose: "ML",
+    status: "Approved"
+  },
+  {
+    sl: 5,
+    empId: "33028814",
+    empIdOff: "C-28814",
+    empName: "Most. Fote Khatun",
+    company: "KAC Fashion Wear Ltd",
+    department: "Sewing",
+    designation: "Asst. Operator",
+    type: "ML",
+    startDate: "09/06/2026",
+    endDate: "06/10/2026",
+    purpose: "ML",
+    status: "Approved"
+  },
+  {
+    sl: 6,
+    empId: "33028814",
+    empIdOff: "C-28814",
+    empName: "Most. Fote Khatun",
+    company: "KAC Fashion Wear Ltd",
+    department: "Sewing",
+    designation: "Asst. Operator",
+    type: "ML",
+    startDate: "09/06/2026",
+    endDate: "06/10/2026",
+    purpose: "ML",
+    status: "Approved"
+  },
+  {
+    sl: 7,
+    empId: "8020064",
+    empIdOff: "WQ-20064",
+    empName: "Amina Khatun",
+    company: "KAC Fashion Wear Ltd",
+    department: "Store",
+    designation: "Jr. Needle Man",
+    type: "ML",
+    startDate: "06/06/2026",
+    endDate: "03/10/2026",
+    purpose: "ML",
+    status: "Approved"
+  },
+  {
+    sl: 8,
+    empId: "8020064",
+    empIdOff: "WQ-20064",
+    empName: "Amina Khatun",
+    company: "KAC Fashion Wear Ltd",
+    department: "Store",
+    designation: "Jr. Needle Man",
+    type: "ML",
+    startDate: "06/06/2026",
+    endDate: "03/10/2026",
+    purpose: "ML",
+    status: "Approved"
+  },
+  {
+    sl: 9,
+    empId: "8179446",
+    empIdOff: "19243",
+    empName: "Mst. Morzina Khatun",
+    company: "KAC Fashion Wear Ltd",
+    department: "Sewing",
+    designation: "Quality Ins.",
     type: "CL",
-    startDate: "06/05/2026",
-    endDate: "07/05/2026",
-    purpose: "",
+    startDate: "26/05/2026",
+    endDate: "26/05/2026",
+    purpose: "CL",
+    status: "Approved"
+  },
+  {
+    sl: 10,
+    empId: "1001111",
+    empIdOff: "KF1-1111",
+    empName: "Md. Yeasin Ali",
+    company: "KAC Fashion Wear Ltd",
+    department: "Sewing",
+    designation: "Supervisor",
+    type: "CL",
+    startDate: "25/05/2026",
+    endDate: "26/05/2026",
+    purpose: "CL",
     status: "Approved"
   }
 ];
 
 function LeaveApprovePage() {
-  // Mock Database
-  const [rows, setRows] = useState<LeaveApplicationRow[]>(initialRows);
+  const [rows, setRows] = useState<LeaveApplicationRow[]>(initialMockLeaveRecords);
 
   // Configuration Panel States
-  const [region, setRegion] = useState("PSL-Operation");
+  const [region, setRegion] = useState("KAC Fashion- Factory");
   const [empType, setEmpType] = useState("ALL");
   const [subDept, setSubDept] = useState("ALL");
   const [jobTitle, setJobTitle] = useState("ALL");
-  const [fromDate, setFromDate] = useState("2026-05-01");
-  const [toDate, setToDate] = useState("2026-05-31");
+  const [fromDate, setFromDate] = useState("2026-03-01");
+  const [toDate, setToDate] = useState("2026-06-30");
   const [stateFilter, setStateFilter] = useState("Approved");
   const [empIdMulti, setEmpIdMulti] = useState("");
+  const [bonusMode, setBonusMode] = useState<"System" | "Office">("System");
 
   // Grid Query Search
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
-  // Applied Filter States (Only update when clicking SEARCH)
+  // Applied Filter States
   const [appliedFilters, setAppliedFilters] = useState({
-    region: "PSL-Operation",
+    region: "KAC Fashion- Factory",
     empType: "ALL",
     subDept: "ALL",
     jobTitle: "ALL",
-    fromDate: "2026-05-01",
-    toDate: "2026-05-31",
+    fromDate: "2026-03-01",
+    toDate: "2026-06-30",
     stateFilter: "Approved",
-    empIdMulti: ""
+    empIdMulti: "",
+    bonusMode: "System"
   });
-
-  // Table Row Checkboxes Selection
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set(["LA-001", "LA-002"]));
 
   // Handle Search Trigger
   const handleSearchTrigger = (e: React.FormEvent) => {
@@ -128,7 +218,8 @@ function LeaveApprovePage() {
       fromDate,
       toDate,
       stateFilter,
-      empIdMulti
+      empIdMulti,
+      bonusMode
     });
   };
 
@@ -141,7 +232,7 @@ function LeaveApprovePage() {
       // 2. Emp ID Multi (comma separated list)
       if (appliedFilters.empIdMulti.trim()) {
         const ids = appliedFilters.empIdMulti.split(",").map(i => i.trim());
-        if (!ids.includes(r.empId)) return false;
+        if (!ids.includes(r.empId) && !ids.includes(r.empIdOff)) return false;
       }
 
       // 3. Text query search (matches name, department, designation, id)
@@ -149,6 +240,7 @@ function LeaveApprovePage() {
         const q = searchQuery.toLowerCase();
         return (
           r.empId.toLowerCase().includes(q) ||
+          r.empIdOff.toLowerCase().includes(q) ||
           r.empName.toLowerCase().includes(q) ||
           r.company.toLowerCase().includes(q) ||
           r.department.toLowerCase().includes(q) ||
@@ -161,54 +253,78 @@ function LeaveApprovePage() {
     });
   }, [rows, appliedFilters, searchQuery]);
 
-  // Bulk Actions
-  const handleApproveSelected = () => {
-    if (selectedIds.size === 0) {
-      alert("Please select at least one leave request!");
-      return;
-    }
-    setRows(prev => prev.map(r => selectedIds.has(r.id) ? { ...r, status: "Approved" } : r));
-    alert(`Successfully approved ${selectedIds.size} selected leave requests!`);
-  };
-
-  const handleRejectSelected = () => {
-    if (selectedIds.size === 0) {
-      alert("Please select at least one leave request!");
-      return;
-    }
-    setRows(prev => prev.map(r => selectedIds.has(r.id) ? { ...r, status: "Rejected" } : r));
-    alert(`Successfully rejected ${selectedIds.size} selected leave requests!`);
-  };
-
-  // Toggle Single Selection
-  const toggleSelect = (id: string) => {
-    setSelectedIds(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  };
-
-  // Toggle Select All
-  const isAllSelected = filteredRows.length > 0 && filteredRows.every(r => selectedIds.has(r.id));
+  // Toggle Selection
+  const isAllSelected = filteredRows.length > 0 && filteredRows.every(r => selectedIds.has(r.sl));
+  
   const toggleSelectAll = () => {
     if (isAllSelected) {
       setSelectedIds(prev => {
         const next = new Set(prev);
-        filteredRows.forEach(r => next.delete(r.id));
+        filteredRows.forEach(r => next.delete(r.sl));
         return next;
       });
     } else {
       setSelectedIds(prev => {
         const next = new Set(prev);
-        filteredRows.forEach(r => next.add(r.id));
+        filteredRows.forEach(r => next.add(r.sl));
         return next;
       });
     }
+  };
+
+  const toggleSelect = (sl: number) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(sl)) {
+        next.delete(sl);
+      } else {
+        next.add(sl);
+      }
+      return next;
+    });
+  };
+
+  // Bulk Actions
+  const handleApproveSelected = () => {
+    if (selectedIds.size === 0) {
+      toast.error("Please select at least one leave request!");
+      return;
+    }
+    setRows(prev => prev.map(r => selectedIds.has(r.sl) ? { ...r, status: "Approved" } : r));
+    toast.success(`Successfully approved ${selectedIds.size} selected leave requests!`);
+    setSelectedIds(new Set());
+  };
+
+  const handleRejectSelected = () => {
+    if (selectedIds.size === 0) {
+      toast.error("Please select at least one leave request!");
+      return;
+    }
+    setRows(prev => prev.map(r => selectedIds.has(r.sl) ? { ...r, status: "Rejected" } : r));
+    toast.success(`Successfully rejected ${selectedIds.size} selected leave requests!`);
+    setSelectedIds(new Set());
+  };
+
+  const handleDeleteSelected = () => {
+    if (selectedIds.size === 0) {
+      toast.error("Please select at least one record to delete.");
+      return;
+    }
+    if (!confirm(`Are you sure you want to delete ${selectedIds.size} selected records?`)) return;
+    setRows(prev => prev.filter(r => !selectedIds.has(r.sl)));
+    toast.success(`Deleted ${selectedIds.size} records.`);
+    setSelectedIds(new Set());
+  };
+
+  const handleSingleDelete = (sl: number) => {
+    if (!confirm("Are you sure you want to delete this leave request?")) return;
+    setRows(prev => prev.filter(r => r.sl !== sl));
+    toast.success("Request deleted successfully.");
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.delete(sl);
+      return next;
+    });
   };
 
   return (
@@ -219,26 +335,34 @@ function LeaveApprovePage() {
 
         <div className="p-4 md:p-6 lg:p-8 space-y-6">
 
-          {/* Title Bar containing the back arrow */}
+          {/* Title Bar containing the back arrow & link to database */}
           <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs flex flex-col gap-3">
             <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
               <Link to="/" className="hover:text-primary transition-colors">Home</Link>
               <ChevronRight className="size-2.5" />
-              <span>Human Resource</span>
+              <span>Leave Management</span>
               <ChevronRight className="size-2.5" />
-              <span className="text-primary font-semibold">Leave Approve</span>
+              <span className="text-primary font-semibold">Leave Approve Board</span>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <Link
+                  to="/leave"
+                  className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition text-slate-600 dark:text-slate-400"
+                >
+                  <ArrowLeft className="size-5" />
+                </Link>
+                <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                  <span>Leave Approve</span>
+                </h1>
+              </div>
               <Link
-                to="/"
-                className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition text-slate-600 dark:text-slate-400"
+                to="/leave-list"
+                className="h-9 px-4 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300 font-extrabold text-[10px] rounded-xl shadow-xs transition flex items-center gap-1.5 uppercase tracking-wider"
               >
-                <ArrowLeft className="size-5" />
+                <span>View Leave List</span>
               </Link>
-              <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
-                Leave Approve
-              </h1>
             </div>
           </div>
 
@@ -252,8 +376,9 @@ function LeaveApprovePage() {
                 <select
                   value={region}
                   onChange={(e) => setRegion(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition"
+                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition cursor-pointer"
                 >
+                  <option value="KAC Fashion- Factory">KAC Fashion- Factory</option>
                   <option value="PSL-Operation">PSL-Operation</option>
                   <option value="PSL-HeadOffice">PSL-HeadOffice</option>
                 </select>
@@ -265,7 +390,7 @@ function LeaveApprovePage() {
                 <select
                   value={empType}
                   onChange={(e) => setEmpType(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition"
+                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition cursor-pointer"
                 >
                   <option value="ALL">ALL</option>
                   <option value="Staff">Staff</option>
@@ -279,9 +404,11 @@ function LeaveApprovePage() {
                 <select
                   value={subDept}
                   onChange={(e) => setSubDept(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition"
+                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition cursor-pointer"
                 >
                   <option value="ALL">ALL</option>
+                  <option value="Sewing">Sewing</option>
+                  <option value="Store">Store</option>
                   <option value="Core Sales">Core Sales</option>
                   <option value="Core Development (HR)">Core Development (HR)</option>
                 </select>
@@ -293,11 +420,14 @@ function LeaveApprovePage() {
                 <select
                   value={jobTitle}
                   onChange={(e) => setJobTitle(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition"
+                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition cursor-pointer"
                 >
                   <option value="ALL">ALL</option>
-                  <option value="Manager">Manager</option>
-                  <option value="Deputy Manager">Deputy Manager</option>
+                  <option value="Operator">Operator</option>
+                  <option value="Asst. Operator">Asst. Operator</option>
+                  <option value="Jr. Needle Man">Jr. Needle Man</option>
+                  <option value="Quality Ins.">Quality Ins.</option>
+                  <option value="Supervisor">Supervisor</option>
                 </select>
               </div>
 
@@ -329,7 +459,7 @@ function LeaveApprovePage() {
                 <select
                   value={stateFilter}
                   onChange={(e) => setStateFilter(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition"
+                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition cursor-pointer"
                 >
                   <option value="Approved">Approved</option>
                   <option value="Pending">Pending</option>
@@ -338,8 +468,35 @@ function LeaveApprovePage() {
                 </select>
               </div>
 
-              {/* Emp ID Multi */}
+              {/* Accrual Mode Toggles */}
               <div className="space-y-1.5">
+                <label className="text-[10px] text-slate-400 uppercase">Accrual Mode</label>
+                <div className="flex items-center gap-4 h-10">
+                  <label className="flex items-center gap-1.5 text-xs font-bold text-foreground cursor-pointer select-none">
+                    <input
+                      type="radio"
+                      name="bonusMode"
+                      checked={bonusMode === "System"}
+                      onChange={() => setBonusMode("System")}
+                      className="size-4 text-primary border-slate-355 focus:ring-primary/20 cursor-pointer"
+                    />
+                    <span>System</span>
+                  </label>
+                  <label className="flex items-center gap-1.5 text-xs font-bold text-foreground cursor-pointer select-none">
+                    <input
+                      type="radio"
+                      name="bonusMode"
+                      checked={bonusMode === "Office"}
+                      onChange={() => setBonusMode("Office")}
+                      className="size-4 text-primary border-slate-355 focus:ring-primary/20 cursor-pointer"
+                    />
+                    <span>Office</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Emp ID Multi */}
+              <div className="space-y-1.5 sm:col-span-2">
                 <label className="text-[10px] text-slate-400 uppercase">EmpId Multi with comma</label>
                 <input
                   type="text"
@@ -354,7 +511,7 @@ function LeaveApprovePage() {
               <div className="lg:col-span-4 flex justify-end pt-2 border-t border-slate-100 dark:border-slate-800/40">
                 <button
                   type="submit"
-                  className="h-10 px-10 bg-primary hover:bg-primary-glow text-primary-foreground font-semibold text-xs rounded-xl shadow-xs transition uppercase tracking-wider shadow-sm"
+                  className="h-10 px-10 bg-[#4caf50] hover:bg-[#43a047] text-white font-extrabold text-xs rounded-xl shadow-xs transition uppercase tracking-wider shadow-sm"
                 >
                   Search
                 </button>
@@ -368,7 +525,7 @@ function LeaveApprovePage() {
 
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-              {/* Approve / Reject buttons */}
+              {/* Approve / Reject / Delete Selected buttons */}
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleApproveSelected}
@@ -389,11 +546,18 @@ function LeaveApprovePage() {
                   </span>
                   <span>Reject Selected</span>
                 </button>
+
+                <button
+                  onClick={handleDeleteSelected}
+                  className="h-8 pl-2 pr-3.5 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-650 active:scale-[0.97] text-white font-semibold text-[10px] rounded-lg shadow-xs flex items-center gap-2 transition-all duration-200 uppercase tracking-wider border border-slate-500/10"
+                >
+                  <Trash2 className="size-3.5" />
+                  <span>Delete Selected</span>
+                </button>
               </div>
 
               {/* Spreadsheet download utilities & Grid Search input */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-
                 <div className="flex items-center gap-1.5">
                   <button className="h-8.5 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 font-extrabold text-[11px] text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition">
                     <FileSpreadsheet className="size-3.5 text-emerald-500" />
@@ -419,17 +583,16 @@ function LeaveApprovePage() {
                     className="h-8.5 pl-9 pr-3 w-full sm:w-48 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px] font-bold outline-none focus:bg-white dark:focus:bg-slate-950 focus:border-primary transition"
                   />
                 </div>
-
               </div>
 
             </div>
 
             {/* Custom styled peach-rose table grid */}
             <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl shadow-xs">
-              <table className="w-full border-collapse text-[11px] text-left">
+              <table className="w-full border-collapse text-[10.5px] text-left">
                 <thead>
                   <tr className="bg-[#ffebee] dark:bg-rose-950/20 text-slate-800 dark:text-rose-200 font-black border-b border-slate-200 dark:border-slate-800/80 whitespace-nowrap select-none">
-                    <th className="px-4 py-3 text-center w-12 border-r border-slate-200/50 dark:border-slate-800/30">
+                    <th className="px-3 py-3 text-center w-10 border-r border-slate-200/50 dark:border-slate-800/30">
                       <input
                         type="checkbox"
                         checked={isAllSelected}
@@ -437,21 +600,23 @@ function LeaveApprovePage() {
                         className="rounded border-slate-300 text-primary focus:ring-primary size-3.5 cursor-pointer"
                       />
                     </th>
-                    <th className="px-4 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Emp Id</th>
-                    <th className="px-4 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Emp Name</th>
-                    <th className="px-4 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Company</th>
-                    <th className="px-4 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Department</th>
-                    <th className="px-4 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Designation</th>
-                    <th className="px-4 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">Type</th>
-                    <th className="px-4 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">Start Date</th>
-                    <th className="px-4 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">End Date</th>
-                    <th className="px-4 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Purpose</th>
-                    <th className="px-4 py-3 text-center">Status</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Emp Id</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Emp Id(Off)</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Emp Name</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Company</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Department</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Designation</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">Type</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">Start Date</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">End Date</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Purpose</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">Status</th>
+                    <th className="px-3 py-3 text-center">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
                   {filteredRows.map((row) => {
-                    const isSelected = selectedIds.has(row.id);
+                    const isSelected = selectedIds.has(row.sl);
 
                     let statusBadge = "bg-amber-100 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400";
                     if (row.status === "Approved") {
@@ -461,30 +626,42 @@ function LeaveApprovePage() {
                     }
 
                     return (
-                      <tr key={row.id} className="hover:bg-slate-50/55 dark:hover:bg-slate-900/40 transition duration-75 whitespace-nowrap">
-                        <td className="px-4 py-3 text-center border-r border-slate-100 dark:border-slate-800/50">
+                      <tr key={row.sl} className="hover:bg-slate-50/55 dark:hover:bg-slate-900/40 transition duration-75 whitespace-nowrap">
+                        <td className="px-3 py-3 text-center border-r border-slate-100 dark:border-slate-800/50">
                           <input
                             type="checkbox"
                             checked={isSelected}
-                            onChange={() => toggleSelect(row.id)}
+                            onChange={() => toggleSelect(row.sl)}
                             className="rounded border-slate-300 text-primary focus:ring-primary size-3.5 cursor-pointer"
                           />
                         </td>
-                        <td className="px-4 py-3 font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">{row.empId}</td>
-                        <td className="px-4 py-3 font-extrabold text-slate-900 dark:text-white border-r border-slate-100 dark:border-slate-800/50">{row.empName}</td>
-                        <td className="px-4 py-3 text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">{row.company}</td>
-                        <td className="px-4 py-3 text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">{row.department}</td>
-                        <td className="px-4 py-3 text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">{row.designation}</td>
-                        <td className="px-4 py-3 text-center font-extrabold text-slate-800 dark:text-slate-200 border-r border-slate-100 dark:border-slate-800/50">{row.type}</td>
-                        <td className="px-4 py-3 text-center font-mono text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">{row.startDate}</td>
-                        <td className="px-4 py-3 text-center font-mono text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">{row.endDate}</td>
-                        <td className="px-4 py-3 text-slate-500 max-w-[120px] truncate border-r border-slate-100 dark:border-slate-800/50" title={row.purpose}>
+                        <td className="px-3 py-3 font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">{row.empId}</td>
+                        <td className="px-3 py-3 font-mono text-slate-650 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">{row.empIdOff}</td>
+                        <td className="px-3 py-3 font-extrabold text-slate-900 dark:text-white border-r border-slate-100 dark:border-slate-800/50">{row.empName}</td>
+                        <td className="px-3 py-3 text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">{row.company}</td>
+                        <td className="px-3 py-3 text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">{row.department}</td>
+                        <td className="px-3 py-3 text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">{row.designation}</td>
+                        <td className="px-3 py-3 text-center font-extrabold text-slate-800 dark:text-slate-200 border-r border-slate-100 dark:border-slate-800/50">{row.type}</td>
+                        <td className="px-3 py-3 text-center font-mono text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">{row.startDate}</td>
+                        <td className="px-3 py-3 text-center font-mono text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">{row.endDate}</td>
+                        <td className="px-3 py-3 text-slate-500 max-w-[120px] truncate border-r border-slate-100 dark:border-slate-800/50" title={row.purpose}>
                           {row.purpose || "—"}
                         </td>
-                        <td className="px-4 py-3 text-center">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[9.5px] font-black uppercase ${statusBadge}`}>
+                        <td className="px-3 py-3 text-center border-r border-slate-100 dark:border-slate-800/50">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase ${statusBadge}`}>
                             {row.status}
                           </span>
+                        </td>
+                        
+                        {/* Single Actions */}
+                        <td className="px-3 py-3 text-center">
+                          <button
+                            onClick={() => handleSingleDelete(row.sl)}
+                            className="text-rose-500 hover:text-rose-650 hover:scale-105 transition"
+                            title="Delete Request"
+                          >
+                            <Trash2 className="size-3.5" />
+                          </button>
                         </td>
                       </tr>
                     );
@@ -492,7 +669,7 @@ function LeaveApprovePage() {
 
                   {filteredRows.length === 0 && (
                     <tr>
-                      <td colSpan={11} className="px-4 py-16 text-center text-slate-400 font-bold">
+                      <td colSpan={13} className="px-4 py-16 text-center text-slate-400 font-bold">
                         <div className="flex flex-col items-center justify-center gap-2">
                           <Info className="size-6 text-slate-300" />
                           <span>No leave requests found matching parameters.</span>

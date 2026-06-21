@@ -65,6 +65,7 @@ function LeaveApplicationPage() {
   // Form States
   const [year, setYear] = useState("2026");
   const [attendanceBonus, setAttendanceBonus] = useState("Yes");
+  const [bonusMode, setBonusMode] = useState<"System" | "Office">("System");
   const [employeeId, setEmployeeId] = useState("2023043910");
 
   const [leaveType, setLeaveType] = useState("Casual Leave");
@@ -176,10 +177,10 @@ function LeaveApplicationPage() {
             {/* Form Section */}
             <div className="xl:col-span-2 space-y-2">
 
-              <form onSubmit={handleSubmit} className="space-y-2">
+              <form onSubmit={handleSubmit} className="space-y-4">
 
                 {/* PART 1: APPLICANT DETAILS */}
-                <div className="bg-card border border-border/80 rounded-2xl p-6 shadow-xs space-y-5 relative overflow-hidden">
+                <div className="bg-card border border-border/85 rounded-2xl p-6 shadow-xs space-y-5 relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-primary/40 to-transparent" />
                   
                   <div className="flex items-center gap-2.5 border-b border-border/40 pb-3.5">
@@ -187,13 +188,13 @@ function LeaveApplicationPage() {
                     <h3 className="text-xs font-black uppercase tracking-wider text-foreground">Applicant Information</h3>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-1.5 md:col-span-1">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Year *</label>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="space-y-1.5 col-span-1">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Year *</label>
                       <select
                         value={year}
                         onChange={(e) => setYear(e.target.value)}
-                        className="w-full h-10 px-3 rounded-xl bg-muted/20 border border-border/80 text-xs font-bold outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                        className="w-full h-10 px-3 rounded-xl bg-muted/20 border border-border/80 text-xs font-bold outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer"
                       >
                         <option value="2026">2026</option>
                         <option value="2025">2025</option>
@@ -201,22 +202,48 @@ function LeaveApplicationPage() {
                       </select>
                     </div>
 
-                    <div className="space-y-1.5 md:col-span-1">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Attendance Bonus</label>
+                    <div className="space-y-1.5 col-span-1">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Attendance Bonus</label>
                       <select
                         value={attendanceBonus}
                         onChange={(e) => setAttendanceBonus(e.target.value)}
-                        className="w-full h-10 px-3 rounded-xl bg-muted/20 border border-border/80 text-xs font-bold outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                        className="w-full h-10 px-3 rounded-xl bg-muted/20 border border-border/80 text-xs font-bold outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer"
                       >
                         <option value="Yes">Yes</option>
                         <option value="No">No</option>
                       </select>
                     </div>
 
-                    <div className="space-y-1.5 md:col-span-1">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Employee ID *</label>
+                    <div className="space-y-1.5 col-span-1">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Accrual Mode</label>
+                      <div className="flex items-center gap-4 h-10">
+                        <label className="flex items-center gap-1.5 text-xs font-bold text-foreground cursor-pointer select-none">
+                          <input
+                            type="radio"
+                            name="bonusMode"
+                            checked={bonusMode === "System"}
+                            onChange={() => setBonusMode("System")}
+                            className="size-4 text-primary border-slate-300 focus:ring-primary/20 cursor-pointer"
+                          />
+                          <span>System</span>
+                        </label>
+                        <label className="flex items-center gap-1.5 text-xs font-bold text-foreground cursor-pointer select-none">
+                          <input
+                            type="radio"
+                            name="bonusMode"
+                            checked={bonusMode === "Office"}
+                            onChange={() => setBonusMode("Office")}
+                            className="size-4 text-primary border-slate-300 focus:ring-primary/20 cursor-pointer"
+                          />
+                          <span>Office</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5 col-span-1">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Employee ID *</label>
                       <div className="relative">
-                        <User className="size-4 text-muted-foreground absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <User className="size-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
                           type="text"
                           required
@@ -229,58 +256,47 @@ function LeaveApplicationPage() {
                     </div>
                   </div>
 
-                  {/* Elegant dynamically fetched employee details */}
+                  {/* dynamic verified employee details with colon-alignment and avatar placeholder */}
                   {matchedEmployee ? (
-                    <div className="p-5 rounded-xl border border-primary/25 bg-gradient-to-br from-primary/[0.03] to-transparent dark:from-primary/[0.01] grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in duration-300">
+                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 p-5 rounded-xl border border-primary/20 bg-gradient-to-br from-primary/[0.02] to-transparent dark:from-primary/[0.005] animate-in fade-in duration-300">
+                      
+                      {/* Left: Info Grid */}
+                      <div className="flex-1 grid grid-cols-[140px_15px_1fr] gap-y-2.5 text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                        <span>Employee Name</span>
+                        <span className="text-slate-400/60 text-center">:</span>
+                        <span className="text-slate-900 dark:text-slate-100 capitalize font-black normal-case">{matchedEmployee.name}</span>
 
-                      <div className="md:col-span-2 flex items-center gap-3.5 border-b border-border/40 pb-3">
-                        <div className="size-10 rounded-xl bg-gradient-to-tr from-primary to-primary-glow text-white grid place-items-center font-bold text-xs shadow-md shadow-primary/25">
-                          {matchedEmployee.name.split(" ").map(n => n[0]).join("")}
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-black text-foreground">{matchedEmployee.name}</h4>
-                          <span className="text-[10px] font-extrabold uppercase bg-primary/10 text-primary border border-primary/25 px-2 py-0.5 rounded-md mt-0.5 inline-block">{matchedEmployee.type}</span>
-                        </div>
+                        <span>Employee Type</span>
+                        <span className="text-slate-400/60 text-center">:</span>
+                        <span className="text-slate-900 dark:text-slate-100 font-bold normal-case">{matchedEmployee.type}</span>
+
+                        <span>Joining Date</span>
+                        <span className="text-slate-400/60 text-center">:</span>
+                        <span className="text-slate-900 dark:text-slate-100 font-mono font-bold">{matchedEmployee.joiningDate}</span>
+
+                        <span>Designation</span>
+                        <span className="text-slate-400/60 text-center">:</span>
+                        <span className="text-slate-900 dark:text-slate-100 font-bold normal-case">{matchedEmployee.designation}</span>
+
+                        <span>Section</span>
+                        <span className="text-slate-400/60 text-center">:</span>
+                        <span className="text-slate-900 dark:text-slate-100 font-bold normal-case">{matchedEmployee.section}</span>
+
+                        <span>Unit</span>
+                        <span className="text-slate-400/60 text-center">:</span>
+                        <span className="text-slate-900 dark:text-slate-100 font-bold normal-case">{matchedEmployee.unit}</span>
+
+                        <span>Line</span>
+                        <span className="text-slate-400/60 text-center">:</span>
+                        <span className="text-slate-900 dark:text-slate-100 font-bold normal-case">{matchedEmployee.line}</span>
                       </div>
 
-                      <div className="flex items-center gap-3 text-xs">
-                        <div className="size-8 rounded-lg bg-muted/30 border border-border/50 flex items-center justify-center shrink-0">
-                          <Briefcase className="size-4 text-muted-foreground" />
-                        </div>
-                        <div>
-                          <div className="text-[9px] text-muted-foreground font-black uppercase">Designation & Team</div>
-                          <div className="font-extrabold text-foreground">{matchedEmployee.designation}</div>
-                          <div className="text-[10px] text-muted-foreground/90 font-medium">{matchedEmployee.section}</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3 text-xs">
-                        <div className="size-8 rounded-lg bg-muted/30 border border-border/50 flex items-center justify-center shrink-0">
-                          <Building2 className="size-4 text-muted-foreground" />
-                        </div>
-                        <div>
-                          <div className="text-[9px] text-muted-foreground font-black uppercase">Corporate Unit</div>
-                          <div className="font-extrabold text-foreground">{matchedEmployee.unit}</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3 text-xs">
-                        <div className="size-8 rounded-lg bg-muted/30 border border-border/50 flex items-center justify-center shrink-0">
-                          <CalendarDays className="size-4 text-muted-foreground" />
-                        </div>
-                        <div>
-                          <div className="text-[9px] text-muted-foreground font-black uppercase">Joining Date</div>
-                          <div className="font-extrabold text-foreground">{matchedEmployee.joiningDate}</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3 text-xs">
-                        <div className="size-8 rounded-lg bg-muted/30 border border-border/50 flex items-center justify-center shrink-0">
-                          <Layers className="size-4 text-muted-foreground" />
-                        </div>
-                        <div>
-                          <div className="text-[9px] text-muted-foreground font-black uppercase">Allocated Floor Line</div>
-                          <div className="font-extrabold text-foreground">{matchedEmployee.line}</div>
+                      {/* Right: Avatar Placeholder */}
+                      <div className="shrink-0 self-center md:self-start">
+                        <div className="w-28 h-32 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center p-3 text-center text-[9px] font-black text-slate-400/80 uppercase tracking-wider select-none shadow-3xs">
+                          <User className="size-8 text-slate-300 dark:text-slate-700 mb-2 animate-pulse" />
+                          <span>NO IMAGE</span>
+                          <span className="mt-0.5">AVAILABLE</span>
                         </div>
                       </div>
 
@@ -297,7 +313,7 @@ function LeaveApplicationPage() {
                 </div>
 
                 {/* PART 2: LEAVE PERIOD DETAILS */}
-                <div className="bg-card border border-border/80 rounded-2xl p-6 shadow-xs space-y-5 relative overflow-hidden">
+                <div className="bg-card border border-border/85 rounded-2xl p-6 shadow-xs space-y-5 relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-cyan-500/40 to-transparent" />
 
                   <div className="flex items-center gap-2.5 border-b border-border/40 pb-3.5">
@@ -305,54 +321,126 @@ function LeaveApplicationPage() {
                     <h3 className="text-xs font-black uppercase tracking-wider text-foreground">Leave Schedule & Type</h3>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Leave Type *</label>
-                      <select
-                        value={leaveType}
-                        onChange={(e) => setLeaveType(e.target.value)}
-                        className="w-full h-10 px-3 rounded-xl bg-muted/20 border border-border/80 text-xs font-bold outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all"
-                      >
-                        <option value="Casual Leave">Casual Leave</option>
-                        <option value="Sick Leave">Sick Leave</option>
-                        <option value="Earned Leave">Earned Leave</option>
-                        <option value="Maternity Leave">Maternity Leave</option>
-                        <option value="Special Leave">Special Leave</option>
-                      </select>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                    {/* Left Column inputs */}
+                    <div className="space-y-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Leave Type *</label>
+                        <select
+                          value={leaveType}
+                          onChange={(e) => setLeaveType(e.target.value)}
+                          className="w-full h-10 px-3 rounded-xl bg-muted/20 border border-border/80 text-xs font-bold outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all cursor-pointer"
+                        >
+                          <option value="Casual Leave">Casual Leave</option>
+                          <option value="Sick Leave">Sick Leave</option>
+                          <option value="Earned Leave">Earned Leave</option>
+                          <option value="Maternity Leave">Maternity Leave</option>
+                          <option value="Special Leave">Special Leave</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Leave Duration From *</label>
+                        <input
+                          type="date"
+                          required
+                          value={durationFrom}
+                          onChange={(e) => setDurationFrom(e.target.value)}
+                          className="w-full h-10 px-3.5 rounded-xl bg-muted/20 border border-border/80 text-xs font-bold outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all text-foreground"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Purpose / Reason</label>
+                        <textarea
+                          value={purpose}
+                          onChange={(e) => setPurpose(e.target.value)}
+                          placeholder="Detail the circumstances of this leave application..."
+                          className="w-full h-24 p-3.5 rounded-xl bg-muted/20 border border-border/80 text-xs font-bold outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 focus:bg-background transition-all resize-none placeholder:text-muted-foreground/45"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Contact Number during Leave</label>
+                        <div className="relative">
+                          <Phone className="size-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                          <input
+                            type="text"
+                            value={contactNumber}
+                            onChange={(e) => setContactNumber(e.target.value)}
+                            placeholder="e.g. +880 17xx-xxxxxx"
+                            className="w-full h-10 pl-10 pr-3.5 rounded-xl bg-muted/20 border border-border/80 text-xs font-bold outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 focus:bg-background transition-all"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Attachment (if any)</label>
+                        <div className="flex items-center gap-3">
+                          <label className="h-10 px-4 rounded-xl bg-muted/20 border border-border/80 hover:bg-muted/30 text-foreground cursor-pointer flex items-center gap-2 transition-all select-none text-xs font-bold shrink-0">
+                            <Upload className="size-4 text-slate-400" />
+                            <span>Choose File</span>
+                            <input
+                              type="file"
+                              onChange={handleFileChange}
+                              className="hidden"
+                            />
+                          </label>
+                          <span className="text-[10.5px] font-black text-slate-400/80 truncate max-w-[180px]">
+                            {fileName || "No file chosen"}
+                          </span>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Leave Pay With *</label>
-                      <select
-                        value={leavePayWith}
-                        onChange={(e) => setLeavePayWith(e.target.value)}
-                        className="w-full h-10 px-3 rounded-xl bg-muted/20 border border-border/80 text-xs font-bold outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all"
-                      >
-                        <option value="With Pay">With Pay</option>
-                        <option value="Without Pay">Without Pay</option>
-                      </select>
-                    </div>
+                    {/* Right Column inputs */}
+                    <div className="space-y-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Leave Pay With *</label>
+                        <select
+                          value={leavePayWith}
+                          onChange={(e) => setLeavePayWith(e.target.value)}
+                          className="w-full h-10 px-3 rounded-xl bg-muted/20 border border-border/80 text-xs font-bold outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all cursor-pointer"
+                        >
+                          <option value="With Pay">With Pay</option>
+                          <option value="Without Pay">Without Pay</option>
+                        </select>
+                      </div>
 
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Leave Duration From *</label>
-                      <input
-                        type="date"
-                        required
-                        value={durationFrom}
-                        onChange={(e) => setDurationFrom(e.target.value)}
-                        className="w-full h-10 px-3.5 rounded-xl bg-muted/20 border border-border/80 text-xs font-bold outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all text-foreground"
-                      />
-                    </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Leave Duration To *</label>
+                        <input
+                          type="date"
+                          required
+                          value={durationTo}
+                          onChange={(e) => setDurationTo(e.target.value)}
+                          className="w-full h-10 px-3.5 rounded-xl bg-muted/20 border border-border/80 text-xs font-bold outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all text-foreground"
+                        />
+                      </div>
 
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Leave Duration To *</label>
-                      <input
-                        type="date"
-                        required
-                        value={durationTo}
-                        onChange={(e) => setDurationTo(e.target.value)}
-                        className="w-full h-10 px-3.5 rounded-xl bg-muted/20 border border-border/80 text-xs font-bold outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all text-foreground"
-                      />
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Address during Leave</label>
+                        <textarea
+                          value={address}
+                          onChange={(e) => setAddress(e.target.value)}
+                          placeholder="e.g. Village/Post/District details..."
+                          className="w-full h-24 p-3.5 rounded-xl bg-muted/20 border border-border/80 text-xs font-bold outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 focus:bg-background transition-all resize-none placeholder:text-muted-foreground/45"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Responsible Employee</label>
+                        <div className="relative">
+                          <User className="size-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                          <input
+                            type="text"
+                            value={responsibleEmp}
+                            onChange={(e) => setResponsibleEmp(e.target.value)}
+                            placeholder="ID / Name of coverage officer"
+                            className="w-full h-10 pl-10 pr-3.5 rounded-xl bg-muted/20 border border-border/80 text-xs font-bold outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 focus:bg-background transition-all"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -367,89 +455,6 @@ function LeaveApplicationPage() {
                       </span>
                     </div>
                   )}
-
-                </div>
-
-                {/* PART 3: COVERAGE & LOGISTICS */}
-                <div className="bg-card border border-border/80 rounded-2xl p-6 shadow-xs space-y-5 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-purple-500/40 to-transparent" />
-
-                  <div className="flex items-center gap-2.5 border-b border-border/40 pb-3.5">
-                    <div className="size-7 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 grid place-items-center font-bold text-xs border border-purple-500/20">03</div>
-                    <h3 className="text-xs font-black uppercase tracking-wider text-foreground">Coverage & Logistics</h3>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1.5 md:col-span-2">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Purpose / Reason</label>
-                      <textarea
-                        value={purpose}
-                        onChange={(e) => setPurpose(e.target.value)}
-                        placeholder="Detail the circumstances of this leave application..."
-                        className="w-full h-24 p-3.5 rounded-xl bg-muted/20 border border-border/80 text-xs font-bold outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-background transition-all resize-none placeholder:text-muted-foreground/40"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Address during Leave</label>
-                      <div className="relative">
-                        <MapPin className="size-4 text-muted-foreground absolute left-3.5 top-1/2 -translate-y-1/2" />
-                        <input
-                          type="text"
-                          value={address}
-                          onChange={(e) => setAddress(e.target.value)}
-                          placeholder="e.g. Village/Post/District details"
-                          className="w-full h-10 pl-10 pr-3.5 rounded-xl bg-muted/20 border border-border/80 text-xs font-bold outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-background transition-all"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Contact Number during Leave</label>
-                      <div className="relative">
-                        <Phone className="size-4 text-muted-foreground absolute left-3.5 top-1/2 -translate-y-1/2" />
-                        <input
-                          type="text"
-                          value={contactNumber}
-                          onChange={(e) => setContactNumber(e.target.value)}
-                          placeholder="e.g. +880 17xx-xxxxxx"
-                          className="w-full h-10 pl-10 pr-3.5 rounded-xl bg-muted/20 border border-border/80 text-xs font-bold outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-background transition-all"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Responsible Employee</label>
-                      <div className="relative">
-                        <RefreshCw className="size-4 text-muted-foreground absolute left-3.5 top-1/2 -translate-y-1/2 animate-spin-slow" />
-                        <input
-                          type="text"
-                          value={responsibleEmp}
-                          onChange={(e) => setResponsibleEmp(e.target.value)}
-                          placeholder="ID / Name of coverage officer"
-                          className="w-full h-10 pl-10 pr-3.5 rounded-xl bg-muted/20 border border-border/80 text-xs font-bold outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-background transition-all"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Attachment (if any)</label>
-                      <div className="flex items-center gap-3">
-                        <label className="h-10 px-4 rounded-xl bg-muted/20 border border-border/80 hover:bg-muted/30 text-foreground cursor-pointer flex items-center gap-2 transition-all select-none text-xs font-bold">
-                          <Upload className="size-4 text-muted-foreground" />
-                          <span>Choose File</span>
-                          <input
-                            type="file"
-                            onChange={handleFileChange}
-                            className="hidden"
-                          />
-                        </label>
-                        <span className="text-[10.5px] font-black text-muted-foreground truncate max-w-[150px]">
-                          {fileName || "No file chosen"}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
 
                 </div>
 

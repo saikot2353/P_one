@@ -76,14 +76,8 @@ const nav: NavItem[] = [
   },
   {
     label: "Leave",
-    icon: CalendarX,
-    subitems: [
-      { label: "Leave List", to: "/leave-list" },
-      { label: "Leave Approve", to: "/leave-approve" },
-      { label: "Earn Leave Process", to: "/earn-leave-process" },
-      { label: "Earn Leave Workflow", to: "/earn-leave-workflow" },
-      { label: "Earn Leave Process List", to: "/" },
-    ]
+    to: "/leave",
+    icon: CalendarX
   },
   {
     label: "KPI Performance",

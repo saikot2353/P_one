@@ -3,8 +3,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  ChevronRight, Search, FileSpreadsheet, Printer, FileDown, CalendarDays, Info, ShieldCheck, MapPin, Building, Plus
+  ChevronRight, Search, FileSpreadsheet, Printer, FileDown, CalendarDays,
+  Info, ShieldCheck, Plus, Check, X, Trash2, HelpCircle
 } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/leave-list")({
   head: () => ({
@@ -19,6 +21,7 @@ export const Route = createFileRoute("/leave-list")({
 interface LeaveRecordRow {
   sl: number;
   empId: string;
+  empIdOff: string;
   empName: string;
   company: string;
   department: string;
@@ -27,98 +30,182 @@ interface LeaveRecordRow {
   startDate: string;
   endDate: string;
   purpose: string;
-  totalDays: number;
   status: "Approved" | "Pending" | "Rejected";
 }
 
-const mockLeaveRecords: LeaveRecordRow[] = [
+const initialMockLeaveRecords: LeaveRecordRow[] = [
   {
     sl: 1,
-    empId: "2021032646",
-    empName: "Sadiqul Islam",
-    company: "Pakiza Software Limited",
-    department: "Core Sales",
-    designation: "Deputy Manager",
-    type: "CL",
-    startDate: "30/05/2026",
-    endDate: "30/05/2026",
-    purpose: "",
-    totalDays: 1,
+    empId: "2047508",
+    empIdOff: "47508",
+    empName: "Mst. Jahanara Khatun",
+    company: "KAC Fashion Wear Ltd",
+    department: "Sewing",
+    designation: "Asst. Operator",
+    type: "ML",
+    startDate: "21/06/2026",
+    endDate: "18/10/2026",
+    purpose: "ML",
     status: "Approved"
   },
   {
     sl: 2,
-    empId: "2021032646",
-    empName: "Sadiqul Islam",
-    company: "Pakiza Software Limited",
-    department: "Core Sales",
-    designation: "Deputy Manager",
-    type: "CL",
-    startDate: "21/05/2026",
-    endDate: "21/05/2026",
-    purpose: "",
-    totalDays: 1,
+    empId: "2047508",
+    empIdOff: "47508",
+    empName: "Mst. Jahanara Khatun",
+    company: "KAC Fashion Wear Ltd",
+    department: "Sewing",
+    designation: "Asst. Operator",
+    type: "ML",
+    startDate: "21/06/2026",
+    endDate: "18/10/2026",
+    purpose: "ML",
     status: "Approved"
   },
   {
     sl: 3,
-    empId: "2021032646",
-    empName: "Sadiqul Islam",
-    company: "Pakiza Software Limited",
-    department: "Core Sales",
-    designation: "Deputy Manager",
-    type: "CL",
-    startDate: "16/05/2026",
-    endDate: "16/05/2026",
-    purpose: "",
-    totalDays: 1,
+    empId: "2400015",
+    empIdOff: "400015",
+    empName: "Mst. Mukta Khatun",
+    company: "KAC Fashion Wear Ltd",
+    department: "Sewing",
+    designation: "Operator",
+    type: "ML",
+    startDate: "16/06/2026",
+    endDate: "13/10/2026",
+    purpose: "ML",
     status: "Approved"
   },
   {
     sl: 4,
-    empId: "2022035599",
-    empName: "Dipon Saha",
-    company: "Pakiza Software Limited",
-    department: "Core Development (HR)",
-    designation: "Manager",
+    empId: "3302786",
+    empIdOff: "C-28786",
+    empName: "Md. Shantona Khatun",
+    company: "KAC Fashion Wear Ltd",
+    department: "Sewing",
+    designation: "Asst. Operator",
+    type: "ML",
+    startDate: "11/06/2026",
+    endDate: "08/10/2026",
+    purpose: "ML",
+    status: "Approved"
+  },
+  {
+    sl: 5,
+    empId: "33028814",
+    empIdOff: "C-28814",
+    empName: "Most. Fote Khatun",
+    company: "KAC Fashion Wear Ltd",
+    department: "Sewing",
+    designation: "Asst. Operator",
+    type: "ML",
+    startDate: "09/06/2026",
+    endDate: "06/10/2026",
+    purpose: "ML",
+    status: "Approved"
+  },
+  {
+    sl: 6,
+    empId: "33028814",
+    empIdOff: "C-28814",
+    empName: "Most. Fote Khatun",
+    company: "KAC Fashion Wear Ltd",
+    department: "Sewing",
+    designation: "Asst. Operator",
+    type: "ML",
+    startDate: "09/06/2026",
+    endDate: "06/10/2026",
+    purpose: "ML",
+    status: "Approved"
+  },
+  {
+    sl: 7,
+    empId: "8020064",
+    empIdOff: "WQ-20064",
+    empName: "Amina Khatun",
+    company: "KAC Fashion Wear Ltd",
+    department: "Store",
+    designation: "Jr. Needle Man",
+    type: "ML",
+    startDate: "06/06/2026",
+    endDate: "03/10/2026",
+    purpose: "ML",
+    status: "Approved"
+  },
+  {
+    sl: 8,
+    empId: "8020064",
+    empIdOff: "WQ-20064",
+    empName: "Amina Khatun",
+    company: "KAC Fashion Wear Ltd",
+    department: "Store",
+    designation: "Jr. Needle Man",
+    type: "ML",
+    startDate: "06/06/2026",
+    endDate: "03/10/2026",
+    purpose: "ML",
+    status: "Approved"
+  },
+  {
+    sl: 9,
+    empId: "8179446",
+    empIdOff: "19243",
+    empName: "Mst. Morzina Khatun",
+    company: "KAC Fashion Wear Ltd",
+    department: "Sewing",
+    designation: "Quality Ins.",
     type: "CL",
-    startDate: "06/05/2026",
-    endDate: "07/05/2026",
-    purpose: "",
-    totalDays: 2,
+    startDate: "26/05/2026",
+    endDate: "26/05/2026",
+    purpose: "CL",
+    status: "Approved"
+  },
+  {
+    sl: 10,
+    empId: "1001111",
+    empIdOff: "KF1-1111",
+    empName: "Md. Yeasin Ali",
+    company: "KAC Fashion Wear Ltd",
+    department: "Sewing",
+    designation: "Supervisor",
+    type: "CL",
+    startDate: "25/05/2026",
+    endDate: "26/05/2026",
+    purpose: "CL",
     status: "Approved"
   }
 ];
 
 function LeaveListPage() {
+  const [records, setRecords] = useState<LeaveRecordRow[]>(initialMockLeaveRecords);
+
   // Query States
-  const [region, setRegion] = useState("PSL-Operation");
+  const [region, setRegion] = useState("KAC Fashion- Factory");
   const [empType, setEmpType] = useState("ALL");
   const [subDept, setSubDept] = useState("ALL");
   const [jobTitle, setJobTitle] = useState("ALL");
-  const [unit, setUnit] = useState("ALL");
-  const [line, setLine] = useState("ALL");
-  const [fromDate, setFromDate] = useState("2026-05-01");
-  const [toDate, setToDate] = useState("2026-05-31");
+  const [fromDate, setFromDate] = useState("2026-03-01");
+  const [toDate, setToDate] = useState("2026-06-30");
   const [leaveType, setLeaveType] = useState("ALL");
   const [status, setStatus] = useState("Approved");
   const [empIdMulti, setEmpIdMulti] = useState("");
+  const [bonusMode, setBonusMode] = useState<"System" | "Office">("System");
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
   // Filter Trigger
   const [appliedFilters, setAppliedFilters] = useState({
-    region: "PSL-Operation",
+    region: "KAC Fashion- Factory",
     empType: "ALL",
     subDept: "ALL",
     jobTitle: "ALL",
-    unit: "ALL",
-    line: "ALL",
-    fromDate: "2026-05-01",
-    toDate: "2026-05-31",
+    fromDate: "2026-03-01",
+    toDate: "2026-06-30",
     leaveType: "ALL",
     status: "Approved",
-    empIdMulti: ""
+    empIdMulti: "",
+    bonusMode: "System"
   });
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -128,19 +215,18 @@ function LeaveListPage() {
       empType,
       subDept,
       jobTitle,
-      unit,
-      line,
       fromDate,
       toDate,
       leaveType,
       status,
-      empIdMulti
+      empIdMulti,
+      bonusMode
     });
   };
 
   // Filter & Search computation
   const filteredRecords = useMemo(() => {
-    return mockLeaveRecords.filter(r => {
+    return records.filter(r => {
       // 1. Status Filter
       if (appliedFilters.status !== "ALL" && r.status !== appliedFilters.status) return false;
 
@@ -150,7 +236,7 @@ function LeaveListPage() {
       // 3. Comma-separated Multi IDs Lookups
       if (appliedFilters.empIdMulti.trim()) {
         const ids = appliedFilters.empIdMulti.split(",").map(i => i.trim());
-        if (!ids.includes(r.empId)) return false;
+        if (!ids.includes(r.empId) && !ids.includes(r.empIdOff)) return false;
       }
 
       // 4. Text Search Box matches Name, Dept, Company, Id, Designation
@@ -158,6 +244,7 @@ function LeaveListPage() {
         const q = searchQuery.toLowerCase();
         return (
           r.empId.toLowerCase().includes(q) ||
+          r.empIdOff.toLowerCase().includes(q) ||
           r.empName.toLowerCase().includes(q) ||
           r.company.toLowerCase().includes(q) ||
           r.department.toLowerCase().includes(q) ||
@@ -168,7 +255,81 @@ function LeaveListPage() {
 
       return true;
     });
-  }, [appliedFilters, searchQuery]);
+  }, [records, appliedFilters, searchQuery]);
+
+  // Bulk selections logic
+  const isAllSelected = filteredRecords.length > 0 && filteredRecords.every(r => selectedIds.has(r.sl));
+  
+  const toggleSelectAll = () => {
+    if (isAllSelected) {
+      setSelectedIds(prev => {
+        const next = new Set(prev);
+        filteredRecords.forEach(r => next.delete(r.sl));
+        return next;
+      });
+    } else {
+      setSelectedIds(prev => {
+        const next = new Set(prev);
+        filteredRecords.forEach(r => next.add(r.sl));
+        return next;
+      });
+    }
+  };
+
+  const toggleSelect = (sl: number) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(sl)) {
+        next.delete(sl);
+      } else {
+        next.add(sl);
+      }
+      return next;
+    });
+  };
+
+  // Bulk actions handlers
+  const handleApproveSelected = () => {
+    if (selectedIds.size === 0) {
+      toast.error("Please select at least one record to approve.");
+      return;
+    }
+    setRecords(prev => prev.map(r => selectedIds.has(r.sl) ? { ...r, status: "Approved" } : r));
+    toast.success(`Successfully approved ${selectedIds.size} selected leave records!`);
+    setSelectedIds(new Set());
+  };
+
+  const handleRejectSelected = () => {
+    if (selectedIds.size === 0) {
+      toast.error("Please select at least one record to reject.");
+      return;
+    }
+    setRecords(prev => prev.map(r => selectedIds.has(r.sl) ? { ...r, status: "Rejected" } : r));
+    toast.success(`Successfully rejected ${selectedIds.size} selected leave records!`);
+    setSelectedIds(new Set());
+  };
+
+  const handleDeleteSelected = () => {
+    if (selectedIds.size === 0) {
+      toast.error("Please select at least one record to delete.");
+      return;
+    }
+    if (!confirm(`Are you sure you want to delete ${selectedIds.size} selected records?`)) return;
+    setRecords(prev => prev.filter(r => !selectedIds.has(r.sl)));
+    toast.success(`Deleted ${selectedIds.size} records.`);
+    setSelectedIds(new Set());
+  };
+
+  const handleSingleDelete = (sl: number) => {
+    if (!confirm("Are you sure you want to delete this leave record?")) return;
+    setRecords(prev => prev.filter(r => r.sl !== sl));
+    toast.success("Record deleted successfully.");
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.delete(sl);
+      return next;
+    });
+  };
 
   return (
     <div className="min-h-screen flex bg-[#f8fafc] dark:bg-[#0f172a] text-foreground transition-colors duration-300">
@@ -186,15 +347,22 @@ function LeaveListPage() {
                 <ChevronRight className="size-3" />
                 <span>Leave Management</span>
                 <ChevronRight className="size-3" />
-                <span className="text-primary font-extrabold">Leave List</span>
+                <span className="text-primary font-extrabold">Leave List & Approve</span>
               </div>
               <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
                 <CalendarDays className="size-6 text-primary animate-pulse" />
-                <span>Leave List</span>
+                <span>Leave Approved & List</span>
               </h1>
             </div>
 
             <div className="flex items-center gap-3">
+              <Link
+                to="/leave-approve"
+                className="h-10 px-5 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300 font-extrabold text-xs rounded-xl shadow-xs transition flex items-center gap-2 uppercase tracking-wider"
+              >
+                <ShieldCheck className="size-4 text-emerald-500" />
+                <span>Go to Approval Board</span>
+              </Link>
               <Link
                 to="/leave-application"
                 className="h-10 px-5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-xs rounded-xl shadow-xs hover:shadow-md transition flex items-center gap-2 uppercase tracking-wider"
@@ -202,9 +370,6 @@ function LeaveListPage() {
                 <Plus className="size-4 text-white" />
                 <span>Apply for Leave</span>
               </Link>
-              <div className="text-[10px] font-extrabold uppercase bg-primary/10 text-primary px-4 py-2 rounded-full border border-primary/20 select-none">
-                Session Calendar: 2026
-              </div>
             </div>
           </div>
 
@@ -218,8 +383,9 @@ function LeaveListPage() {
                 <select
                   value={region}
                   onChange={(e) => setRegion(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition"
+                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition cursor-pointer"
                 >
+                  <option value="KAC Fashion- Factory">KAC Fashion- Factory</option>
                   <option value="PSL-Operation">PSL-Operation</option>
                   <option value="PSL-HeadOffice">PSL-HeadOffice</option>
                 </select>
@@ -231,7 +397,7 @@ function LeaveListPage() {
                 <select
                   value={empType}
                   onChange={(e) => setEmpType(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition"
+                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition cursor-pointer"
                 >
                   <option value="ALL">ALL</option>
                   <option value="Staff">Staff</option>
@@ -245,9 +411,11 @@ function LeaveListPage() {
                 <select
                   value={subDept}
                   onChange={(e) => setSubDept(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition"
+                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition cursor-pointer"
                 >
                   <option value="ALL">ALL</option>
+                  <option value="Sewing">Sewing</option>
+                  <option value="Store">Store</option>
                   <option value="Core Sales">Core Sales</option>
                   <option value="Core Development (HR)">Core Development (HR)</option>
                 </select>
@@ -259,39 +427,14 @@ function LeaveListPage() {
                 <select
                   value={jobTitle}
                   onChange={(e) => setJobTitle(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition"
+                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition cursor-pointer"
                 >
                   <option value="ALL">ALL</option>
-                  <option value="Manager">Manager</option>
-                  <option value="Deputy Manager">Deputy Manager</option>
-                </select>
-              </div>
-
-              {/* Unit */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-400 uppercase">Unit</label>
-                <select
-                  value={unit}
-                  onChange={(e) => setUnit(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition"
-                >
-                  <option value="ALL">ALL</option>
-                  <option value="Unit 1">Unit 1</option>
-                  <option value="Unit 2">Unit 2</option>
-                </select>
-              </div>
-
-              {/* Line */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-400 uppercase">Line</label>
-                <select
-                  value={line}
-                  onChange={(e) => setLine(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition"
-                >
-                  <option value="ALL">ALL</option>
-                  <option value="Line 1">Line 1</option>
-                  <option value="Line 2">Line 2</option>
+                  <option value="Operator">Operator</option>
+                  <option value="Asst. Operator">Asst. Operator</option>
+                  <option value="Jr. Needle Man">Jr. Needle Man</option>
+                  <option value="Quality Ins.">Quality Ins.</option>
+                  <option value="Supervisor">Supervisor</option>
                 </select>
               </div>
 
@@ -317,34 +460,46 @@ function LeaveListPage() {
                 />
               </div>
 
-              {/* Leave Type */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-400 uppercase">Leave Type</label>
-                <select
-                  value={leaveType}
-                  onChange={(e) => setLeaveType(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition"
-                >
-                  <option value="ALL">ALL</option>
-                  <option value="CL">Casual Leave (CL)</option>
-                  <option value="SL">Sick Leave (SL)</option>
-                  <option value="EL">Earned Leave (EL)</option>
-                </select>
-              </div>
-
               {/* Status */}
               <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-400 uppercase">Status</label>
+                <label className="text-[10px] text-slate-400 uppercase">State</label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition"
+                  className="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-primary transition cursor-pointer"
                 >
                   <option value="Approved">Approved</option>
                   <option value="Pending">Pending</option>
                   <option value="Rejected">Rejected</option>
                   <option value="ALL">ALL Statuses</option>
                 </select>
+              </div>
+
+              {/* Accrual Mode Toggles */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] text-slate-400 uppercase">Accrual Mode</label>
+                <div className="flex items-center gap-4 h-10">
+                  <label className="flex items-center gap-1.5 text-xs font-bold text-foreground cursor-pointer select-none">
+                    <input
+                      type="radio"
+                      name="bonusMode"
+                      checked={bonusMode === "System"}
+                      onChange={() => setBonusMode("System")}
+                      className="size-4 text-primary border-slate-350 focus:ring-primary/20 cursor-pointer"
+                    />
+                    <span>System</span>
+                  </label>
+                  <label className="flex items-center gap-1.5 text-xs font-bold text-foreground cursor-pointer select-none">
+                    <input
+                      type="radio"
+                      name="bonusMode"
+                      checked={bonusMode === "Office"}
+                      onChange={() => setBonusMode("Office")}
+                      className="size-4 text-primary border-slate-350 focus:ring-primary/20 cursor-pointer"
+                    />
+                    <span>Office</span>
+                  </label>
+                </div>
               </div>
 
               {/* Emp ID Multi */}
@@ -360,10 +515,10 @@ function LeaveListPage() {
               </div>
 
               {/* Search Submit Bar */}
-              <div className="md:col-span-3 lg:col-span-4 flex justify-end pt-2 border-t border-slate-100 dark:border-slate-800/40">
+              <div className="md:col-span-2 lg:col-span-4 flex justify-end pt-2 border-t border-slate-100 dark:border-slate-800/40">
                 <button
                   type="submit"
-                  className="h-10 px-10 bg-[#1e88e5] hover:bg-[#1565c0] text-white font-extrabold text-xs rounded-xl shadow-xs transition uppercase tracking-wider"
+                  className="h-10 px-10 bg-[#4caf50] hover:bg-[#43a047] text-white font-extrabold text-xs rounded-xl shadow-xs transition uppercase tracking-wider"
                 >
                   Search
                 </button>
@@ -377,57 +532,99 @@ function LeaveListPage() {
 
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-              {/* Spreadsheet download utilities */}
-              <div className="flex items-center gap-1.5">
-                <button className="h-8.5 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 font-extrabold text-[11px] text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition">
-                  <FileSpreadsheet className="size-3.5 text-emerald-500" />
-                  <span>EXCEL</span>
+              {/* Action Board (Approve/Reject/Delete Selected) */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleApproveSelected}
+                  className="h-8 pl-2 pr-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-[0.97] text-white font-semibold text-[10px] rounded-lg shadow-xs flex items-center gap-2 transition-all duration-200 uppercase tracking-wider border border-emerald-500/10"
+                >
+                  <span className="p-0.5 bg-white/20 rounded-md text-white shadow-3xs flex items-center justify-center">
+                    <Check className="size-3" />
+                  </span>
+                  <span>Approve Selected</span>
                 </button>
-                <button className="h-8.5 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 font-extrabold text-[11px] text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition">
-                  <Printer className="size-3.5 text-blue-500" />
-                  <span>PRINT</span>
+
+                <button
+                  onClick={handleRejectSelected}
+                  className="h-8 pl-2 pr-3.5 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 active:scale-[0.97] text-white font-semibold text-[10px] rounded-lg shadow-xs flex items-center gap-2 transition-all duration-200 uppercase tracking-wider border border-rose-500/10"
+                >
+                  <span className="p-0.5 bg-white/20 rounded-md text-white shadow-3xs flex items-center justify-center">
+                    <X className="size-3" />
+                  </span>
+                  <span>Reject Selected</span>
                 </button>
-                <button className="h-8.5 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 font-extrabold text-[11px] text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition">
-                  <FileDown className="size-3.5 text-rose-500" />
-                  <span>PDF</span>
+
+                <button
+                  onClick={handleDeleteSelected}
+                  className="h-8 pl-2 pr-3.5 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-650 active:scale-[0.97] text-white font-semibold text-[10px] rounded-lg shadow-xs flex items-center gap-2 transition-all duration-200 uppercase tracking-wider border border-slate-500/10"
+                >
+                  <Trash2 className="size-3.5" />
+                  <span>Delete Selected</span>
                 </button>
               </div>
 
-              {/* Grid Search query box */}
-              <div className="relative">
-                <Search className="size-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search database..."
-                  className="h-8.5 pl-9 pr-3 w-full sm:w-48 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px] font-bold outline-none focus:bg-white dark:focus:bg-slate-950 focus:border-primary transition"
-                />
+              {/* Spreadsheet download utilities & Search query box */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="flex items-center gap-1.5">
+                  <button className="h-8.5 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 font-extrabold text-[11px] text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition">
+                    <FileSpreadsheet className="size-3.5 text-emerald-500" />
+                    <span>EXCEL</span>
+                  </button>
+                  <button className="h-8.5 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 font-extrabold text-[11px] text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition">
+                    <Printer className="size-3.5 text-blue-500" />
+                    <span>PRINT</span>
+                  </button>
+                  <button className="h-8.5 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 font-extrabold text-[11px] text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition">
+                    <FileDown className="size-3.5 text-rose-500" />
+                    <span>PDF</span>
+                  </button>
+                </div>
+
+                <div className="relative">
+                  <Search className="size-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search database..."
+                    className="h-8.5 pl-9 pr-3 w-full sm:w-48 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px] font-bold outline-none focus:bg-white dark:focus:bg-slate-950 focus:border-primary transition"
+                  />
+                </div>
               </div>
 
             </div>
 
             {/* Pink/Rose Grid Data Sheet */}
             <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl shadow-xs">
-              <table className="w-full border-collapse text-[11px] text-left">
+              <table className="w-full border-collapse text-[10.5px] text-left">
                 <thead>
                   <tr className="bg-[#ffebee] dark:bg-rose-950/20 text-slate-800 dark:text-rose-200 font-black border-b border-slate-200 dark:border-slate-800/80 whitespace-nowrap select-none">
-                    <th className="px-4 py-3 text-center w-12 border-r border-slate-200/50 dark:border-slate-800/30">SL</th>
-                    <th className="px-4 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Id</th>
-                    <th className="px-4 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Name</th>
-                    <th className="px-4 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Company</th>
-                    <th className="px-4 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Department</th>
-                    <th className="px-4 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Designation</th>
-                    <th className="px-4 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">Type</th>
-                    <th className="px-4 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">Start Date</th>
-                    <th className="px-4 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">End Date</th>
-                    <th className="px-4 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Purpose</th>
-                    <th className="px-4 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center w-16">Total(D)</th>
-                    <th className="px-4 py-3 text-center">Status</th>
+                    <th className="px-3 py-3 text-center w-10 border-r border-slate-200/50 dark:border-slate-800/30">
+                      <input
+                        type="checkbox"
+                        checked={isAllSelected}
+                        onChange={toggleSelectAll}
+                        className="rounded border-slate-350 text-primary focus:ring-primary size-3.5 cursor-pointer"
+                      />
+                    </th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Emp Id</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Emp Id(Off)</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Emp Name</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Company</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Department</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Designation</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">Type</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">Start Date</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">End Date</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Purpose</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">Status</th>
+                    <th className="px-3 py-3 text-center">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {filteredRecords.map((row, idx) => {
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
+                  {filteredRecords.map((row) => {
+                    const isSelected = selectedIds.has(row.sl);
+                    
                     let statusColor = "bg-amber-100 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400";
                     if (row.status === "Approved") {
                       statusColor = "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400";
@@ -437,34 +634,58 @@ function LeaveListPage() {
 
                     return (
                       <tr key={row.sl} className="hover:bg-slate-50/55 dark:hover:bg-slate-900/40 transition duration-75 whitespace-nowrap">
-                        <td className="px-4 py-3 text-center font-bold text-slate-400 border-r border-slate-100 dark:border-slate-800/50">{idx + 1}</td>
-                        <td className="px-4 py-3 font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">{row.empId}</td>
-                        <td className="px-4 py-3 font-extrabold text-slate-900 dark:text-white border-r border-slate-100 dark:border-slate-800/50">{row.empName}</td>
-                        <td className="px-4 py-3 text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">{row.company}</td>
-                        <td className="px-4 py-3 text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">{row.department}</td>
-                        <td className="px-4 py-3 text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">{row.designation}</td>
-                        <td className="px-4 py-3 text-center font-extrabold text-slate-800 dark:text-slate-200 border-r border-slate-100 dark:border-slate-800/50">{row.type}</td>
-                        <td className="px-4 py-3 text-center font-mono text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">{row.startDate}</td>
-                        <td className="px-4 py-3 text-center font-mono text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">{row.endDate}</td>
-                        <td className="px-4 py-3 text-slate-500 max-w-[120px] truncate border-r border-slate-100 dark:border-slate-800/50" title={row.purpose}>
+                        
+                        {/* Checkbox */}
+                        <td className="px-3 py-3 text-center border-r border-slate-100 dark:border-slate-800/50">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => toggleSelect(row.sl)}
+                            className="rounded border-slate-350 text-primary focus:ring-primary size-3.5 cursor-pointer"
+                          />
+                        </td>
+
+                        <td className="px-3 py-3 font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">{row.empId}</td>
+                        <td className="px-3 py-3 font-mono text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">{row.empIdOff}</td>
+                        <td className="px-3 py-3 font-extrabold text-slate-900 dark:text-white border-r border-slate-100 dark:border-slate-800/50">{row.empName}</td>
+                        <td className="px-3 py-3 text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">{row.company}</td>
+                        <td className="px-3 py-3 text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">{row.department}</td>
+                        <td className="px-3 py-3 text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">{row.designation}</td>
+                        <td className="px-3 py-3 text-center font-extrabold text-slate-850 dark:text-slate-200 border-r border-slate-100 dark:border-slate-800/50">{row.type}</td>
+                        <td className="px-3 py-3 text-center font-mono text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">{row.startDate}</td>
+                        <td className="px-3 py-3 text-center font-mono text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">{row.endDate}</td>
+                        <td className="px-3 py-3 text-slate-500 max-w-[120px] truncate border-r border-slate-100 dark:border-slate-800/50" title={row.purpose}>
                           {row.purpose || "—"}
                         </td>
-                        <td className="px-4 py-3 text-center font-black text-slate-900 dark:text-white border-r border-slate-100 dark:border-slate-800/50">{row.totalDays}</td>
-                        <td className="px-4 py-3 text-center">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[9.5px] font-black uppercase ${statusColor}`}>
+                        
+                        {/* Status */}
+                        <td className="px-3 py-3 text-center border-r border-slate-100 dark:border-slate-800/50">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase ${statusColor}`}>
                             {row.status}
                           </span>
                         </td>
+
+                        {/* Single Actions */}
+                        <td className="px-3 py-3 text-center">
+                          <button
+                            onClick={() => handleSingleDelete(row.sl)}
+                            className="text-rose-500 hover:text-rose-650 hover:scale-105 transition"
+                            title="Delete Record"
+                          >
+                            <Trash2 className="size-3.5" />
+                          </button>
+                        </td>
+
                       </tr>
                     );
                   })}
 
                   {filteredRecords.length === 0 && (
                     <tr>
-                      <td colSpan={12} className="px-4 py-16 text-center text-slate-400 font-bold">
+                      <td colSpan={13} className="px-4 py-16 text-center text-slate-400 font-bold">
                         <div className="flex flex-col items-center justify-center gap-2">
-                          <Info className="size-6 text-slate-300 animate-bounce" />
-                          <span>No leave history records found.</span>
+                          <HelpCircle className="size-6 text-slate-300 animate-bounce" />
+                          <span>No leave history records matching the filters.</span>
                         </div>
                       </td>
                     </tr>
@@ -473,7 +694,7 @@ function LeaveListPage() {
               </table>
             </div>
 
-            {/* Pagination controls */}
+            {/* Pagination Controls */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-3 border-t border-slate-100 dark:border-slate-800/40">
               <span className="text-[10.5px] font-bold text-slate-400">
                 Showing 1 to {filteredRecords.length} of {filteredRecords.length} entries

@@ -3,8 +3,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  ChevronRight, Search, FileSpreadsheet, Printer, FileDown, CalendarDays, CheckCircle2, ShieldCheck, HelpCircle
+  ChevronRight, Search, FileSpreadsheet, Printer, FileDown, CalendarDays, CheckCircle2, ShieldCheck, HelpCircle, Trash2
 } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/earn-leave-submit")({
   head: () => ({
@@ -181,14 +182,33 @@ function EarnLeaveSubmitPage() {
 
   const handleBulkSubmit = () => {
     if (selectedIds.size === 0) {
-      alert("Please select at least one record to submit!");
+      toast.error("Please select at least one record to submit!");
       return;
     }
     setRows(prev => prev.map(r => selectedIds.has(r.id) ? { ...r, status: "Submitted" } : r));
-    setSuccessMessage(`Successfully submitted ${selectedIds.size} processed Earn Leave cash-disbursements for clearance!`);
-    setTimeout(() => {
-      setSuccessMessage("");
-    }, 6000);
+    toast.success(`Successfully submitted ${selectedIds.size} processed Earn Leave cash-disbursements for clearance!`);
+  };
+
+  const handleDeleteSelected = () => {
+    if (selectedIds.size === 0) {
+      toast.error("Please select at least one record to delete.");
+      return;
+    }
+    if (!confirm(`Are you sure you want to delete ${selectedIds.size} selected records?`)) return;
+    setRows(prev => prev.filter(r => !selectedIds.has(r.id)));
+    toast.success(`Deleted ${selectedIds.size} records.`);
+    setSelectedIds(new Set());
+  };
+
+  const handleSingleDelete = (id: string) => {
+    if (!confirm("Are you sure you want to delete this record?")) return;
+    setRows(prev => prev.filter(r => r.id !== id));
+    toast.success("Record deleted successfully.");
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
   };
 
   return (
@@ -337,7 +357,7 @@ function EarnLeaveSubmitPage() {
 
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-              {/* Submit Selected action */}
+              {/* Submit Selected & Delete Selected actions */}
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleBulkSubmit}
@@ -345,6 +365,13 @@ function EarnLeaveSubmitPage() {
                 >
                   <ShieldCheck className="size-4" />
                   <span>Submit Selected</span>
+                </button>
+                <button
+                  onClick={handleDeleteSelected}
+                  className="h-9 px-6 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-650 active:scale-[0.97] text-white font-extrabold text-[10.5px] rounded-lg shadow-xs flex items-center gap-1.5 transition-all duration-200 uppercase tracking-wider border border-slate-500/10"
+                >
+                  <Trash2 className="size-4" />
+                  <span>Delete Selected</span>
                 </button>
               </div>
 
@@ -404,7 +431,8 @@ function EarnLeaveSubmitPage() {
                     <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center w-28">Payment Mode</th>
                     <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-left w-36">Bank Name</th>
                     <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-left w-36">Account No</th>
-                    <th className="px-3 py-3 text-center">Status</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">Status</th>
+                    <th className="px-3 py-3 text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -482,10 +510,21 @@ function EarnLeaveSubmitPage() {
                         </td>
 
                         {/* Status */}
-                        <td className="px-3 py-3 text-center">
+                        <td className="px-3 py-3 text-center border-r border-slate-100 dark:border-slate-800/50">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase ${statusColor}`}>
                             {row.status}
                           </span>
+                        </td>
+
+                        {/* Single Actions */}
+                        <td className="px-3 py-3 text-center">
+                          <button
+                            onClick={() => handleSingleDelete(row.id)}
+                            className="text-rose-500 hover:text-rose-650 hover:scale-105 transition"
+                            title="Delete Record"
+                          >
+                            <Trash2 className="size-3.5" />
+                          </button>
                         </td>
 
                       </tr>
@@ -494,7 +533,7 @@ function EarnLeaveSubmitPage() {
 
                   {filteredRows.length === 0 && (
                     <tr>
-                      <td colSpan={12} className="px-4 py-16 text-center text-slate-400 font-bold">
+                      <td colSpan={13} className="px-4 py-16 text-center text-slate-400 font-bold">
                         <div className="flex flex-col items-center justify-center gap-2">
                           <HelpCircle className="size-6 text-slate-300 animate-bounce" />
                           <span>No processed earned leave records ready to submit.</span>

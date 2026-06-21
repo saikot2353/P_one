@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
@@ -66,6 +66,18 @@ const initialRecords: EarnLeaveRecord[] = [
 ];
 
 function EarnLeaveProcessPage() {
+  const [processType, setProcessType] = useState<"year" | "month" | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const t = params.get("type");
+      if (t === "year" || t === "month") {
+        setProcessType(t);
+      }
+    }
+  }, []);
+
   // Database States
   const [records, setRecords] = useState<EarnLeaveRecord[]>(initialRecords);
 
@@ -185,11 +197,11 @@ function EarnLeaveProcessPage() {
                 <ChevronRight className="size-3" />
                 <span>Leave Management</span>
                 <ChevronRight className="size-3" />
-                <span className="text-primary font-extrabold">Earn Leave Process</span>
+                <span className="text-primary font-extrabold">Earn Leave Process{processType === "year" ? " (Year)" : processType === "month" ? " (Month)" : ""}</span>
               </div>
               <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
                 <Coins className="size-6 text-primary animate-pulse" />
-                <span>Earn Leave Process</span>
+                <span>Earn Leave Process{processType === "year" ? " (Year)" : processType === "month" ? " (Month)" : ""}</span>
               </h1>
             </div>
 

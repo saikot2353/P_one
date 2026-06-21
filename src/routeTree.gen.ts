@@ -35,6 +35,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as LeaveListRouteImport } from './routes/leave-list'
 import { Route as LeaveApproveRouteImport } from './routes/leave-approve'
 import { Route as LeaveApplicationRouteImport } from './routes/leave-application'
+import { Route as LeaveRouteImport } from './routes/leave'
 import { Route as KpiTaskNameRouteImport } from './routes/kpi-task-name'
 import { Route as KpiSettingRouteImport } from './routes/kpi-setting'
 import { Route as KpiSelfAssessmentRouteImport } from './routes/kpi-self-assessment'
@@ -208,6 +209,11 @@ const LeaveApproveRoute = LeaveApproveRouteImport.update({
 const LeaveApplicationRoute = LeaveApplicationRouteImport.update({
   id: '/leave-application',
   path: '/leave-application',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaveRoute = LeaveRouteImport.update({
+  id: '/leave',
+  path: '/leave',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KpiTaskNameRoute = KpiTaskNameRouteImport.update({
@@ -444,6 +450,7 @@ export interface FileRoutesByFullPath {
   '/kpi-self-assessment': typeof KpiSelfAssessmentRoute
   '/kpi-setting': typeof KpiSettingRoute
   '/kpi-task-name': typeof KpiTaskNameRoute
+  '/leave': typeof LeaveRoute
   '/leave-application': typeof LeaveApplicationRoute
   '/leave-approve': typeof LeaveApproveRoute
   '/leave-list': typeof LeaveListRoute
@@ -511,6 +518,7 @@ export interface FileRoutesByTo {
   '/kpi-self-assessment': typeof KpiSelfAssessmentRoute
   '/kpi-setting': typeof KpiSettingRoute
   '/kpi-task-name': typeof KpiTaskNameRoute
+  '/leave': typeof LeaveRoute
   '/leave-application': typeof LeaveApplicationRoute
   '/leave-approve': typeof LeaveApproveRoute
   '/leave-list': typeof LeaveListRoute
@@ -579,6 +587,7 @@ export interface FileRoutesById {
   '/kpi-self-assessment': typeof KpiSelfAssessmentRoute
   '/kpi-setting': typeof KpiSettingRoute
   '/kpi-task-name': typeof KpiTaskNameRoute
+  '/leave': typeof LeaveRoute
   '/leave-application': typeof LeaveApplicationRoute
   '/leave-approve': typeof LeaveApproveRoute
   '/leave-list': typeof LeaveListRoute
@@ -648,6 +657,7 @@ export interface FileRouteTypes {
     | '/kpi-self-assessment'
     | '/kpi-setting'
     | '/kpi-task-name'
+    | '/leave'
     | '/leave-application'
     | '/leave-approve'
     | '/leave-list'
@@ -715,6 +725,7 @@ export interface FileRouteTypes {
     | '/kpi-self-assessment'
     | '/kpi-setting'
     | '/kpi-task-name'
+    | '/leave'
     | '/leave-application'
     | '/leave-approve'
     | '/leave-list'
@@ -782,6 +793,7 @@ export interface FileRouteTypes {
     | '/kpi-self-assessment'
     | '/kpi-setting'
     | '/kpi-task-name'
+    | '/leave'
     | '/leave-application'
     | '/leave-approve'
     | '/leave-list'
@@ -850,6 +862,7 @@ export interface RootRouteChildren {
   KpiSelfAssessmentRoute: typeof KpiSelfAssessmentRoute
   KpiSettingRoute: typeof KpiSettingRoute
   KpiTaskNameRoute: typeof KpiTaskNameRoute
+  LeaveRoute: typeof LeaveRoute
   LeaveApplicationRoute: typeof LeaveApplicationRoute
   LeaveApproveRoute: typeof LeaveApproveRoute
   LeaveListRoute: typeof LeaveListRoute
@@ -1064,6 +1077,13 @@ declare module '@tanstack/react-router' {
       path: '/leave-application'
       fullPath: '/leave-application'
       preLoaderRoute: typeof LeaveApplicationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leave': {
+      id: '/leave'
+      path: '/leave'
+      fullPath: '/leave'
+      preLoaderRoute: typeof LeaveRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kpi-task-name': {
@@ -1378,6 +1398,7 @@ const rootRouteChildren: RootRouteChildren = {
   KpiSelfAssessmentRoute: KpiSelfAssessmentRoute,
   KpiSettingRoute: KpiSettingRoute,
   KpiTaskNameRoute: KpiTaskNameRoute,
+  LeaveRoute: LeaveRoute,
   LeaveApplicationRoute: LeaveApplicationRoute,
   LeaveApproveRoute: LeaveApproveRoute,
   LeaveListRoute: LeaveListRoute,
