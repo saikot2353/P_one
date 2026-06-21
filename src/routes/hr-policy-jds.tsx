@@ -183,7 +183,7 @@ const INITIAL_JDS_LIST: JDSItem[] = [
 ];
 
 export default function JDSManagementPage() {
-  const { selectedSl, mode } = Route.useSearch();
+  const { selectedSl, mode, filterWorkflow: urlFilterWorkflow } = Route.useSearch();
   const navigate = useNavigate();
 
   const [jdsList, setJdsList] = useState<JDSItem[]>(() => {
@@ -239,6 +239,13 @@ export default function JDSManagementPage() {
   const [filterDesignation, setFilterDesignation] = useState("ALL");
   const [filterWorkflow, setFilterWorkflow] = useState("ALL");
   const [filterSearch, setFilterSearch] = useState("");
+
+  // Sync filterWorkflow state with URL Search parameter
+  useEffect(() => {
+    if (urlFilterWorkflow) {
+      setFilterWorkflow(urlFilterWorkflow);
+    }
+  }, [urlFilterWorkflow]);
 
   // Populate form if mode is edit
   useEffect(() => {
@@ -815,11 +822,13 @@ export default function JDSManagementPage() {
                               </div>
                             </td>
 
-                            <td className="px-5 py-3.5 font-black text-foreground/95 flex items-center gap-2">
-                              <span>{item.designation}</span>
-                              {item.isDefault && (
-                                <span className="text-[8px] font-black uppercase bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 px-1.5 py-0.2 rounded-md">Default</span>
-                              )}
+                            <td className="px-5 py-3.5 font-black text-foreground/95">
+                              <div className="flex items-center gap-2">
+                                <span>{item.designation}</span>
+                                {item.isDefault && (
+                                  <span className="text-[8px] font-black uppercase bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 px-1.5 py-0.2 rounded-md">Default</span>
+                                )}
+                              </div>
                             </td>
                             <td className="px-5 py-3.5 font-semibold text-slate-500">{item.company}</td>
                             <td className="px-5 py-3.5 text-center text-slate-500 font-semibold">{item.location}</td>
