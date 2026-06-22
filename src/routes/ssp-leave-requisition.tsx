@@ -54,7 +54,7 @@ const DUMMY_EMPLOYEES = [
   { id: "emp8", name: "Tariqul Islam", designation: "IT Support Specialist", department: "HR & Admin", type: "Probation" }
 ];
 
-export default function LeaveRequisitionPage() {
+function LeaveRequisitionPage() {
   const [requestMode, setRequestMode] = useState<"single" | "group">("single");
   const [leaveType, setLeaveType] = useState("Casual Leave");
   const [leaveCategory, setLeaveCategory] = useState("Full Day Leave");

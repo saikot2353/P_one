@@ -9,7 +9,7 @@ export const Route = createFileRoute("/ssp-approve-manual-attendance")({
   component: ApproveManualAttendancePage,
 });
 
-export default function ApproveManualAttendancePage() {
+function ApproveManualAttendancePage() {
   const [department, setDepartment] = useState("All Departments");
   const [search, setSearch] = useState("");
 

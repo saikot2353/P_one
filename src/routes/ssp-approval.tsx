@@ -200,7 +200,7 @@ const dummyRequisitions: Requisition[] = [
   }
 ];
 
-export default function SSPApprovalPage() {
+function SSPApprovalPage() {
   const [selectedReq, setSelectedReq] = useState<Requisition | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [commentText, setCommentText] = useState("");

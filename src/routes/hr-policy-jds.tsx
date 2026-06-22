@@ -182,7 +182,7 @@ const INITIAL_JDS_LIST: JDSItem[] = [
   }
 ];
 
-export default function JDSManagementPage() {
+function JDSManagementPage() {
   const { selectedSl, mode, filterWorkflow: urlFilterWorkflow } = Route.useSearch();
   const navigate = useNavigate();
 

@@ -280,5 +280,3 @@ function RecruitmentBasicSetup() {
     </div>
   );
 }
-
-export default RecruitmentBasicSetup;

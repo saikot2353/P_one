@@ -6,7 +6,7 @@ import {
   CalendarDays, CalendarX, ShieldAlert, Fingerprint, Timer,
   CreditCard, Cpu, ShieldCheck, Lightbulb, Settings,
   LifeBuoy, ChevronDown, ChevronRight, File, Briefcase, UserPlus,
-  LogOut
+  LogOut, HeartHandshake
 } from "lucide-react";
 
 interface SubItem {
@@ -174,6 +174,14 @@ const nav: NavItem[] = [
     ]
   },
 
+  {
+    label: "Welfare & Support",
+    icon: HeartHandshake,
+    subitems: [
+      { label: "Zakat Management", to: "/zakat-management" },
+      { label: "Financial Aid", to: "/financial-aid" },
+    ]
+  },
   {
     label: "Disciplinary Action",
     icon: ShieldAlert,

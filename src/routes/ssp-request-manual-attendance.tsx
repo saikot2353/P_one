@@ -25,7 +25,7 @@ function Field({ label, required, children }: { label: string; required?: boolea
   );
 }
 
-export default function RequestManualAttendancePage() {
+function RequestManualAttendancePage() {
   const [date, setDate] = useState("");
   const [inTime, setInTime] = useState("");
   const [outTime, setOutTime] = useState("");

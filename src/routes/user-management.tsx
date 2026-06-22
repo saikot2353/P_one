@@ -36,6 +36,7 @@ interface UserItem {
   password?: string;
   redirectUrl?: string;
   companyAccess?: string[];
+  sectionAccess?: string[];
   avatar?: string;
 }
 
@@ -279,6 +280,7 @@ function UserManagementPage() {
   const [userRedirectUrl, setUserRedirectUrl] = useState("Select Main Menu");
   const [showPassword, setShowPassword] = useState(false);
   const [userCompanyAccess, setUserCompanyAccess] = useState<string[]>([]);
+  const [userSectionAccess, setUserSectionAccess] = useState<string[]>([]);
   const [userAvatar, setUserAvatar] = useState("");
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -343,6 +345,7 @@ function UserManagementPage() {
         setUserPassword(user.password || "");
         setUserRedirectUrl(user.redirectUrl || "Select Main Menu");
         setUserCompanyAccess(user.companyAccess || []);
+        setUserSectionAccess(user.sectionAccess || []);
         setUserAvatar(user.avatar || "");
 
         const hasMatchingEmp = employees.some(e => e.id === user.empId);
@@ -369,6 +372,7 @@ function UserManagementPage() {
       setUserPassword("");
       setUserRedirectUrl("Select Main Menu");
       setUserCompanyAccess([]);
+      setUserSectionAccess([]);
       setUserAvatar("");
     }
     setIsUserModalOpen(true);
@@ -822,23 +826,38 @@ function UserManagementPage() {
                             </span>
                           </td>
                           <td className="px-5 py-3.5 font-medium">
-                            <div className="flex flex-wrap gap-1 max-w-[200px]">
-                              {(!item.companyAccess || item.companyAccess.length === 0) ? (
-                                <span className="text-[10px] text-muted-foreground">—</span>
-                              ) : item.companyAccess.includes("All") ? (
-                                <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-600 border border-blue-500/20 text-[9px] font-semibold uppercase">All Companies</span>
-                              ) : (
-                                item.companyAccess.map(c => {
-                                  let short = c;
-                                  if (c === "Pakiza Software Limited") short = "PSL";
-                                  if (c === "Pakiza Knit Composite Ltd") short = "PKCL";
-                                  if (c === "Pakiza Group") short = "Group";
-                                  return (
-                                    <span key={c} className="px-2 py-0.5 rounded bg-slate-500/10 text-slate-600 border border-slate-500/20 text-[9px] font-semibold" title={c}>
-                                      {short}
-                                    </span>
-                                  );
-                                })
+                            <div className="flex flex-col gap-1.5 max-w-[200px]">
+                              <div className="flex flex-wrap gap-1">
+                                {(!item.companyAccess || item.companyAccess.length === 0) ? (
+                                  <span className="text-[10px] text-muted-foreground">—</span>
+                                ) : item.companyAccess.includes("All") ? (
+                                  <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-600 border border-blue-500/20 text-[9px] font-semibold uppercase">All Companies</span>
+                                ) : (
+                                  item.companyAccess.map(c => {
+                                    let short = c;
+                                    if (c === "Pakiza Software Limited") short = "PSL";
+                                    if (c === "Pakiza Knit Composite Ltd") short = "PKCL";
+                                    if (c === "Pakiza Group") short = "Group";
+                                    return (
+                                      <span key={c} className="px-2 py-0.5 rounded bg-slate-500/10 text-slate-600 border border-slate-500/20 text-[9px] font-semibold" title={c}>
+                                        {short}
+                                      </span>
+                                    );
+                                  })
+                                )}
+                              </div>
+                              {item.sectionAccess && item.sectionAccess.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-0.5">
+                                  {item.sectionAccess.includes("All") ? (
+                                    <span className="px-2 py-0.5 rounded bg-teal-500/10 text-teal-600 border border-teal-500/20 text-[8.5px] font-semibold uppercase">All Sections</span>
+                                  ) : (
+                                    item.sectionAccess.map(s => (
+                                      <span key={s} className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 text-[8.5px] font-medium truncate max-w-[80px]" title={s}>
+                                        {s}
+                                      </span>
+                                    ))
+                                  )}
+                                </div>
                               )}
                             </div>
                           </td>
@@ -1306,6 +1325,76 @@ function UserManagementPage() {
                             <div className="flex-1 min-w-0">
                               <div className="text-[11px] font-medium">{c.label}</div>
                               <div className="text-[9px] text-slate-500 dark:text-slate-400 font-normal">{c.desc}</div>
+                            </div>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Section Access Checklist Cards */}
+                  <div className="space-y-2 mt-4">
+                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Section Access</label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                      
+                      <label className={`flex items-start gap-3.5 p-3 rounded-xl border cursor-pointer select-none transition ${
+                        userSectionAccess.includes("All")
+                          ? "bg-primary/5 border-primary text-primary"
+                          : "bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100/50"
+                      }`}>
+                        <input
+                          type="checkbox"
+                          checked={userSectionAccess.includes("All")}
+                          onChange={e => {
+                            if (e.target.checked) {
+                              setUserSectionAccess(["All"]);
+                            } else {
+                              setUserSectionAccess([]);
+                            }
+                          }}
+                          className="size-4.5 rounded border-slate-300 dark:border-slate-700 text-primary cursor-pointer transition focus:ring-0 mt-0.5"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-[11px] font-medium">All Sections</div>
+                          <div className="text-[9px] text-slate-500 dark:text-slate-400 font-normal">Full access to all sections</div>
+                        </div>
+                      </label>
+                      
+                      {[
+                        { value: "PSL-Operation", label: "PSL-Operation", co: "Pakiza Software Limited" },
+                        { value: "PSL-Head Office", label: "PSL-Head Office", co: "Pakiza Software Limited" },
+                        { value: "PKC-Dyeing", label: "PKC-Dyeing", co: "Pakiza Knit Composite Ltd" },
+                        { value: "PKC-Sewing", label: "PKC-Sewing", co: "Pakiza Knit Composite Ltd" },
+                        { value: "PKC-Cutting", label: "PKC-Cutting", co: "Pakiza Knit Composite Ltd" },
+                        { value: "PG-Corporate", label: "PG-Corporate", co: "Pakiza Group" },
+                        { value: "PG-Textile Sales", label: "PG-Textile Sales", co: "Pakiza Group" }
+                      ].filter(s => userCompanyAccess.includes("All") || userCompanyAccess.includes(s.co)).map(s => {
+                        const isChecked = userSectionAccess.includes(s.value) || userSectionAccess.includes("All");
+                        const isDisabled = userSectionAccess.includes("All");
+                        return (
+                          <label key={s.value} className={`flex items-start gap-3.5 p-3 rounded-xl border transition ${
+                            isDisabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer select-none"
+                          } ${
+                            isChecked
+                              ? "bg-primary/5 border-primary/50 text-primary"
+                              : "bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100/50"
+                          }`}>
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              disabled={isDisabled}
+                              onChange={e => {
+                                if (e.target.checked) {
+                                  setUserSectionAccess([...userSectionAccess, s.value].filter(v => v !== "All"));
+                                } else {
+                                  setUserSectionAccess(userSectionAccess.filter(v => v !== s.value && v !== "All"));
+                                }
+                              }}
+                              className="size-4.5 rounded border-slate-300 dark:border-slate-700 text-primary cursor-pointer transition focus:ring-0 mt-0.5"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="text-[11px] font-medium">{s.label}</div>
+                              <div className="text-[9px] text-slate-500 dark:text-slate-400 font-normal">{s.co}</div>
                             </div>
                           </label>
                         );

@@ -40,7 +40,7 @@ interface StoreItem {
   justification: string;
 }
 
-export default function ICTRequisitionPage() {
+function ICTRequisitionPage() {
   const [mode, setMode] = useState<"service" | "store">("service");
 
   // Form State (Service)

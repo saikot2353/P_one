@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ZakatManagementRouteImport } from './routes/zakat-management'
 import { Route as UserManagementRouteImport } from './routes/user-management'
 import { Route as TransferControlCenterRouteImport } from './routes/transfer-control-center'
 import { Route as SspRequestManualAttendanceRouteImport } from './routes/ssp-request-manual-attendance'
@@ -57,6 +58,7 @@ import { Route as IncrementHistoryRouteImport } from './routes/increment-history
 import { Route as IncrementGadgetRouteImport } from './routes/increment-gadget'
 import { Route as IncrementRouteImport } from './routes/increment'
 import { Route as HrPolicyJdsRouteImport } from './routes/hr-policy-jds'
+import { Route as FinancialAidRouteImport } from './routes/financial-aid'
 import { Route as FinalApproveIncrementRouteImport } from './routes/final-approve-increment'
 import { Route as EvaluationProposeRouteImport } from './routes/evaluation-propose'
 import { Route as EmployeeJobCardRouteImport } from './routes/employee-job-card'
@@ -86,6 +88,11 @@ import { Route as RecruitmentHrAssessmentIdRouteImport } from './routes/recruitm
 import { Route as RecruitmentDetailIdRouteImport } from './routes/recruitment-detail.$id'
 import { Route as EmployeeDetailIdRouteImport } from './routes/employee-detail.$id'
 
+const ZakatManagementRoute = ZakatManagementRouteImport.update({
+  id: '/zakat-management',
+  path: '/zakat-management',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UserManagementRoute = UserManagementRouteImport.update({
   id: '/user-management',
   path: '/user-management',
@@ -331,6 +338,11 @@ const HrPolicyJdsRoute = HrPolicyJdsRouteImport.update({
   path: '/hr-policy-jds',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FinancialAidRoute = FinancialAidRouteImport.update({
+  id: '/financial-aid',
+  path: '/financial-aid',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FinalApproveIncrementRoute = FinalApproveIncrementRouteImport.update({
   id: '/final-approve-increment',
   path: '/final-approve-increment',
@@ -500,6 +512,7 @@ export interface FileRoutesByFullPath {
   '/employee-job-card': typeof EmployeeJobCardRoute
   '/evaluation-propose': typeof EvaluationProposeRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
+  '/financial-aid': typeof FinancialAidRoute
   '/hr-policy-jds': typeof HrPolicyJdsRoute
   '/increment': typeof IncrementRoute
   '/increment-gadget': typeof IncrementGadgetRoute
@@ -548,6 +561,7 @@ export interface FileRoutesByFullPath {
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
+  '/zakat-management': typeof ZakatManagementRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
   '/recruitment-detail/$id': typeof RecruitmentDetailIdRoute
   '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
@@ -578,6 +592,7 @@ export interface FileRoutesByTo {
   '/employee-job-card': typeof EmployeeJobCardRoute
   '/evaluation-propose': typeof EvaluationProposeRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
+  '/financial-aid': typeof FinancialAidRoute
   '/hr-policy-jds': typeof HrPolicyJdsRoute
   '/increment': typeof IncrementRoute
   '/increment-gadget': typeof IncrementGadgetRoute
@@ -626,6 +641,7 @@ export interface FileRoutesByTo {
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
+  '/zakat-management': typeof ZakatManagementRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
   '/recruitment-detail/$id': typeof RecruitmentDetailIdRoute
   '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
@@ -657,6 +673,7 @@ export interface FileRoutesById {
   '/employee-job-card': typeof EmployeeJobCardRoute
   '/evaluation-propose': typeof EvaluationProposeRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
+  '/financial-aid': typeof FinancialAidRoute
   '/hr-policy-jds': typeof HrPolicyJdsRoute
   '/increment': typeof IncrementRoute
   '/increment-gadget': typeof IncrementGadgetRoute
@@ -705,6 +722,7 @@ export interface FileRoutesById {
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
+  '/zakat-management': typeof ZakatManagementRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
   '/recruitment-detail/$id': typeof RecruitmentDetailIdRoute
   '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
@@ -737,6 +755,7 @@ export interface FileRouteTypes {
     | '/employee-job-card'
     | '/evaluation-propose'
     | '/final-approve-increment'
+    | '/financial-aid'
     | '/hr-policy-jds'
     | '/increment'
     | '/increment-gadget'
@@ -785,6 +804,7 @@ export interface FileRouteTypes {
     | '/ssp-request-manual-attendance'
     | '/transfer-control-center'
     | '/user-management'
+    | '/zakat-management'
     | '/employee-detail/$id'
     | '/recruitment-detail/$id'
     | '/recruitment-hr-assessment/$id'
@@ -815,6 +835,7 @@ export interface FileRouteTypes {
     | '/employee-job-card'
     | '/evaluation-propose'
     | '/final-approve-increment'
+    | '/financial-aid'
     | '/hr-policy-jds'
     | '/increment'
     | '/increment-gadget'
@@ -863,6 +884,7 @@ export interface FileRouteTypes {
     | '/ssp-request-manual-attendance'
     | '/transfer-control-center'
     | '/user-management'
+    | '/zakat-management'
     | '/employee-detail/$id'
     | '/recruitment-detail/$id'
     | '/recruitment-hr-assessment/$id'
@@ -893,6 +915,7 @@ export interface FileRouteTypes {
     | '/employee-job-card'
     | '/evaluation-propose'
     | '/final-approve-increment'
+    | '/financial-aid'
     | '/hr-policy-jds'
     | '/increment'
     | '/increment-gadget'
@@ -941,6 +964,7 @@ export interface FileRouteTypes {
     | '/ssp-request-manual-attendance'
     | '/transfer-control-center'
     | '/user-management'
+    | '/zakat-management'
     | '/employee-detail/$id'
     | '/recruitment-detail/$id'
     | '/recruitment-hr-assessment/$id'
@@ -972,6 +996,7 @@ export interface RootRouteChildren {
   EmployeeJobCardRoute: typeof EmployeeJobCardRoute
   EvaluationProposeRoute: typeof EvaluationProposeRoute
   FinalApproveIncrementRoute: typeof FinalApproveIncrementRoute
+  FinancialAidRoute: typeof FinancialAidRoute
   HrPolicyJdsRoute: typeof HrPolicyJdsRoute
   IncrementRoute: typeof IncrementRoute
   IncrementGadgetRoute: typeof IncrementGadgetRoute
@@ -1020,6 +1045,7 @@ export interface RootRouteChildren {
   SspRequestManualAttendanceRoute: typeof SspRequestManualAttendanceRoute
   TransferControlCenterRoute: typeof TransferControlCenterRoute
   UserManagementRoute: typeof UserManagementRoute
+  ZakatManagementRoute: typeof ZakatManagementRoute
   EmployeeDetailIdRoute: typeof EmployeeDetailIdRoute
   RecruitmentDetailIdRoute: typeof RecruitmentDetailIdRoute
   RecruitmentHrAssessmentIdRoute: typeof RecruitmentHrAssessmentIdRoute
@@ -1028,6 +1054,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/zakat-management': {
+      id: '/zakat-management'
+      path: '/zakat-management'
+      fullPath: '/zakat-management'
+      preLoaderRoute: typeof ZakatManagementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/user-management': {
       id: '/user-management'
       path: '/user-management'
@@ -1364,6 +1397,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HrPolicyJdsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/financial-aid': {
+      id: '/financial-aid'
+      path: '/financial-aid'
+      fullPath: '/financial-aid'
+      preLoaderRoute: typeof FinancialAidRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/final-approve-increment': {
       id: '/final-approve-increment'
       path: '/final-approve-increment'
@@ -1588,6 +1628,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmployeeJobCardRoute: EmployeeJobCardRoute,
   EvaluationProposeRoute: EvaluationProposeRoute,
   FinalApproveIncrementRoute: FinalApproveIncrementRoute,
+  FinancialAidRoute: FinancialAidRoute,
   HrPolicyJdsRoute: HrPolicyJdsRoute,
   IncrementRoute: IncrementRoute,
   IncrementGadgetRoute: IncrementGadgetRoute,
@@ -1636,6 +1677,7 @@ const rootRouteChildren: RootRouteChildren = {
   SspRequestManualAttendanceRoute: SspRequestManualAttendanceRoute,
   TransferControlCenterRoute: TransferControlCenterRoute,
   UserManagementRoute: UserManagementRoute,
+  ZakatManagementRoute: ZakatManagementRoute,
   EmployeeDetailIdRoute: EmployeeDetailIdRoute,
   RecruitmentDetailIdRoute: RecruitmentDetailIdRoute,
   RecruitmentHrAssessmentIdRoute: RecruitmentHrAssessmentIdRoute,

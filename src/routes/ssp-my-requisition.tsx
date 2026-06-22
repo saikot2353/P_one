@@ -35,7 +35,7 @@ interface RequisitionRow {
   onClickView: () => void;
 }
 
-export default function MyRequisitionPage() {
+function MyRequisitionPage() {
   const [leaveModalOpen, setLeaveModalOpen] = useState(false);
   const [storeModalOpen, setStoreModalOpen] = useState(false);
 

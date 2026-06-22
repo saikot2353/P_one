@@ -153,7 +153,7 @@ const getStatusBadgeStyle = (status: AttendanceStatus) => {
   }
 };
 
-export default function MyAttendancePage() {
+function MyAttendancePage() {
   const [currentMonth, setCurrentMonth] = useState("June 2026");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDateStr, setSelectedDateStr] = useState("");
