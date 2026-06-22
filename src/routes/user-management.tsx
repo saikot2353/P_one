@@ -115,32 +115,46 @@ const SEED_OVERRIDES: UserOverrideRow[] = [
 ];
 
 const AVAILABLE_MENUS = [
-  "All",
   "Dashboard",
-  "Management Dashboard",
-  "Create Requisition",
-  "My Requests",
-  "Vehicle Support",
-  "Support Queue",
-  "Vehicles",
-  "Drivers",
-  "Fuel Types",
-  "Departments",
-  "Vendors & Workshop",
-  "Transport Companies",
-  "Locations",
-  "Brand, Model & Color",
-  "Parts",
-  "Renter Bill Items",
-  "Fuel & Expenses Entries",
-  "Fuel & Expenses Reports",
-  "Token",
-  "Trip Logs",
-  "Calendar",
-  "Daily Trips",
-  "Trip Log Report",
-  "Policies",
-  "Claims"
+  "SSP - New Requisition",
+  "SSP - My Requisition",
+  "SSP - Approval",
+  "SSP - Attendance",
+  "Configure - Structure Setup",
+  "Configure - Job & Employee Setup",
+  "Configure - Shift & Time Rules",
+  "Configure - Allowances & Bonuses",
+  "Configure - Education & Training",
+  "Configure - Leave & Policies",
+  "Personnel Info - Personnel List",
+  "Personnel Info - Approval",
+  "Attendance - Manual Attendance",
+  "Attendance - Manual Attendance Approval",
+  "Attendance - Employee Job Card",
+  "Roster - Create Roster",
+  "Roster - Company Holiday",
+  "Leave - Leave Application",
+  "Leave - Leave Approve",
+  "Leave - Leave List",
+  "KPI Performance - Dashboard",
+  "KPI Performance - Cycles",
+  "KPI Performance - Criteria Setup",
+  "KPI Performance - My Self-Assessment",
+  "KPI Performance - 360° Peer Review",
+  "KPI Performance - Assessment Workflow",
+  "KPI Performance - KPI Reports",
+  "Evaluation - Increment Configurator",
+  "Evaluation - Evaluation Propose",
+  "Evaluation - Propose Increment",
+  "Evaluation - Increment Summary",
+  "Evaluation - Approve Increment",
+  "Evaluation - Increment List",
+  "Evaluation - Increment History",
+  "Transfer - Transfer History",
+  "Transfer - Approve Transfer",
+  "HR Policy - JD List",
+  "HR Policy - JD Approvals",
+  "User Management"
 ];
 
 function UserManagementPage() {
@@ -837,10 +851,10 @@ function UserManagementPage() {
                   <UserCheck className="size-5" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold tracking-tight text-foreground">
+                  <h2 className="text-base font-medium tracking-tight text-foreground">
                     {editingUserSl ? "Edit User Profile" : "Register New User"}
                   </h2>
-                  <p className="text-[10px] text-muted-foreground/80 font-bold -mt-0.5">
+                  <p className="text-[10px] text-muted-foreground/80 font-normal -mt-0.5">
                     {editingUserSl ? "Update user settings, role credentials and company directories" : "Create new credentials and assign specific organizational permissions"}
                   </p>
                 </div>
@@ -862,8 +876,8 @@ function UserManagementPage() {
                   
                   {/* Creation Mode Toggle */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Creation Mode</label>
-                    <div className="flex gap-1.5 p-1 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200/50 dark:border-slate-800/50">
+                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Creation Mode</label>
+                    <div className="flex gap-1.5 p-1 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200/50 dark:border-slate-800/50 overflow-hidden">
                       <button
                         type="button"
                         onClick={() => {
@@ -878,7 +892,7 @@ function UserManagementPage() {
                           setUserUserId("");
                           setUserAvatar("");
                         }}
-                        className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all duration-200 ${
+                        className={`flex-1 py-2 text-[9px] font-medium uppercase tracking-wider rounded-lg transition-all duration-200 whitespace-nowrap px-1.5 ${
                           createMode === "with_id" 
                             ? "bg-white dark:bg-slate-800 text-primary shadow-xs border border-slate-200/10" 
                             : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
@@ -900,7 +914,7 @@ function UserManagementPage() {
                           setUserUserId("");
                           setUserAvatar("");
                         }}
-                        className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all duration-200 ${
+                        className={`flex-1 py-2 text-[9px] font-medium uppercase tracking-wider rounded-lg transition-all duration-200 whitespace-nowrap px-1.5 ${
                           createMode === "without_id" 
                             ? "bg-white dark:bg-slate-800 text-primary shadow-xs border border-slate-200/10" 
                             : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
@@ -914,7 +928,7 @@ function UserManagementPage() {
                   {/* Image Upload Area (Shown in without_id mode) */}
                   {createMode === "without_id" && (
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">User Photo</label>
+                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">User Photo</label>
                       <div className="flex flex-col items-center justify-center p-6 bg-slate-50/50 dark:bg-slate-900/30 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl group transition hover:border-primary/50 relative overflow-hidden">
                         {userAvatar ? (
                           <div className="relative size-24 rounded-full overflow-hidden border-2 border-primary/20 shadow-md group-hover:scale-105 transition-transform duration-200">
@@ -922,7 +936,7 @@ function UserManagementPage() {
                             <button
                               type="button"
                               onClick={() => setUserAvatar("")}
-                              className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-[9px] font-bold transition-opacity"
+                              className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-[9px] font-medium transition-opacity"
                             >
                               Remove Photo
                             </button>
@@ -932,8 +946,8 @@ function UserManagementPage() {
                             <div className="size-16 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-2 group-hover:scale-105 transition-transform duration-200 shadow-2xs">
                               <Users className="size-7" />
                             </div>
-                            <span className="text-[11px] font-semibold text-primary group-hover:underline">Upload Photo</span>
-                            <span className="text-[9px] text-muted-foreground mt-0.5">Max 2MB (JPG, PNG)</span>
+                            <span className="text-[11px] font-medium text-primary group-hover:underline">Upload Photo</span>
+                            <span className="text-[9px] text-muted-foreground mt-0.5 font-normal">Max 2MB (JPG, PNG)</span>
                             <input
                               type="file"
                               accept="image/*"
@@ -949,7 +963,7 @@ function UserManagementPage() {
                   {/* Employee Information Card (Shown in with_id mode when employee is selected) */}
                   {createMode === "with_id" && (
                     <div className="space-y-3">
-                      <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Employee ID Selection</label>
+                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Employee ID Selection</label>
                       <SearchableSelect
                         options={employeeOptions}
                         value={selectedEmployeeId}
@@ -963,9 +977,9 @@ function UserManagementPage() {
                             {userFirstName[0] || ""}{userLastName[0] || ""}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{userFirstName} {userLastName}</div>
-                            <div className="text-[9.5px] text-slate-500 truncate font-semibold">{userDepartment || "No Department"}</div>
-                            <div className="text-[9px] font-mono text-primary font-semibold mt-0.5">ID: {selectedEmployeeId}</div>
+                            <div className="text-xs font-medium text-slate-800 dark:text-slate-200 truncate">{userFirstName} {userLastName}</div>
+                            <div className="text-[9.5px] text-slate-500 truncate font-normal">{userDepartment || "No Department"}</div>
+                            <div className="text-[9px] font-mono text-primary font-normal mt-0.5">ID: {selectedEmployeeId}</div>
                           </div>
                         </div>
                       )}
@@ -976,7 +990,7 @@ function UserManagementPage() {
                   <div className="space-y-3.5 pt-2">
                     {/* User ID Field */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                         User ID * 
                         <span className="text-[8.5px] font-normal text-slate-400 dark:text-slate-500 lowercase italic ml-1">(login handle)</span>
                       </label>
@@ -987,7 +1001,7 @@ function UserManagementPage() {
                           value={userUserId}
                           onChange={e => setUserUserId(e.target.value)}
                           placeholder="Enter unique login User ID"
-                          className="w-full h-10 pl-9.5 pr-3.5 text-xs font-semibold bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition"
+                          className="w-full h-10 pl-9.5 pr-3.5 text-xs font-normal bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition"
                           required
                         />
                       </div>
@@ -995,7 +1009,7 @@ function UserManagementPage() {
 
                     {/* Password */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Password *</label>
+                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Password *</label>
                       <div className="relative">
                         <Lock className="size-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                         <input
@@ -1003,7 +1017,7 @@ function UserManagementPage() {
                           value={userPassword}
                           onChange={e => setUserPassword(e.target.value)}
                           placeholder="••••••••"
-                          className="w-full h-10 pl-9.5 pr-10 text-xs font-semibold bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition"
+                          className="w-full h-10 pl-9.5 pr-10 text-xs font-normal bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition"
                           required
                         />
                         <button
@@ -1018,11 +1032,11 @@ function UserManagementPage() {
 
                     {/* Status */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Status *</label>
+                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Status *</label>
                       <select
                         value={userIsActive}
                         onChange={e => setUserIsActive(e.target.value as any)}
-                        className="w-full h-10 px-3.5 text-xs font-semibold bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition cursor-pointer"
+                        className="w-full h-10 px-3.5 text-xs font-normal bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition cursor-pointer"
                         required
                       >
                         <option value="Active">Active</option>
@@ -1036,14 +1050,14 @@ function UserManagementPage() {
                 {/* Right Column (md:col-span-8) - Personal Profile Information & System Directory Access */}
                 <div className="md:col-span-8 space-y-5">
                   
-                  <div className="text-[11px] font-bold uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-850 pb-1.5 shrink-0">
+                  <div className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-850 pb-1.5 shrink-0">
                     Profile & Directory Access Details
                   </div>
 
                   {/* Personal Name Grid */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">First Name *</label>
+                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">First Name *</label>
                       <div className="relative">
                         <User className="size-3.5 text-slate-455 dark:text-slate-505 absolute left-3 top-1/2 -translate-y-1/2" />
                         <input
@@ -1051,7 +1065,7 @@ function UserManagementPage() {
                           value={userFirstName}
                           onChange={e => setUserFirstName(e.target.value)}
                           placeholder="Enter first name"
-                          className={`w-full h-10 pl-9.5 pr-3.5 text-xs font-semibold bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition ${
+                          className={`w-full h-10 pl-9.5 pr-3.5 text-xs font-normal bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition ${
                             createMode === "with_id" ? "bg-slate-100 dark:bg-slate-900 cursor-not-allowed opacity-75 border-slate-200/50" : ""
                           }`}
                           readOnly={createMode === "with_id"}
@@ -1060,7 +1074,7 @@ function UserManagementPage() {
                       </div>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Last Name *</label>
+                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Last Name *</label>
                       <div className="relative">
                         <User className="size-3.5 text-slate-455 dark:text-slate-505 absolute left-3 top-1/2 -translate-y-1/2" />
                         <input
@@ -1068,7 +1082,7 @@ function UserManagementPage() {
                           value={userLastName}
                           onChange={e => setUserLastName(e.target.value)}
                           placeholder="Enter last name"
-                          className={`w-full h-10 pl-9.5 pr-3.5 text-xs font-semibold bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition ${
+                          className={`w-full h-10 pl-9.5 pr-3.5 text-xs font-normal bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition ${
                             createMode === "with_id" ? "bg-slate-100 dark:bg-slate-900 cursor-not-allowed opacity-75 border-slate-200/50" : ""
                           }`}
                           readOnly={createMode === "with_id"}
@@ -1081,7 +1095,7 @@ function UserManagementPage() {
                   {/* Phone & Email Grid */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Phone *</label>
+                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Phone *</label>
                       <div className="relative">
                         <Phone className="size-3.5 text-slate-455 dark:text-slate-550 absolute left-3 top-1/2 -translate-y-1/2" />
                         <input
@@ -1089,7 +1103,7 @@ function UserManagementPage() {
                           value={userPhone}
                           onChange={e => setUserPhone(e.target.value)}
                           placeholder="Enter phone number"
-                          className={`w-full h-10 pl-9.5 pr-3.5 text-xs font-semibold bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition ${
+                          className={`w-full h-10 pl-9.5 pr-3.5 text-xs font-normal bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition ${
                             createMode === "with_id" ? "bg-slate-100 dark:bg-slate-900 cursor-not-allowed opacity-75 border-slate-200/50" : ""
                           }`}
                           readOnly={createMode === "with_id"}
@@ -1098,7 +1112,7 @@ function UserManagementPage() {
                       </div>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Email *</label>
+                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Email *</label>
                       <div className="relative">
                         <Mail className="size-3.5 text-slate-455 dark:text-slate-550 absolute left-3 top-1/2 -translate-y-1/2" />
                         <input
@@ -1106,7 +1120,7 @@ function UserManagementPage() {
                           value={userEmail}
                           onChange={e => setUserEmail(e.target.value)}
                           placeholder="Enter email address"
-                          className={`w-full h-10 pl-9.5 pr-3.5 text-xs font-semibold bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition ${
+                          className={`w-full h-10 pl-9.5 pr-3.5 text-xs font-normal bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition ${
                             createMode === "with_id" ? "bg-slate-100 dark:bg-slate-900 cursor-not-allowed opacity-75 border-slate-200/50" : ""
                           }`}
                           readOnly={createMode === "with_id"}
@@ -1119,11 +1133,11 @@ function UserManagementPage() {
                   {/* System Role & Corporate Department Grid */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Role *</label>
+                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Role *</label>
                       <select
                         value={userRole}
                         onChange={e => setUserRole(e.target.value)}
-                        className="w-full h-10 px-3.5 text-xs font-semibold bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition cursor-pointer"
+                        className="w-full h-10 px-3.5 text-xs font-normal bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition cursor-pointer"
                         required
                       >
                         <option value="">Select Role</option>
@@ -1133,7 +1147,7 @@ function UserManagementPage() {
                       </select>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Department *</label>
+                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Department *</label>
                       {createMode === "with_id" ? (
                         <div className="relative">
                           <Users className="size-3.5 text-slate-455 dark:text-slate-550 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -1141,7 +1155,7 @@ function UserManagementPage() {
                             type="text"
                             value={userDepartment}
                             placeholder="Select Department"
-                            className="w-full h-10 pl-9.5 pr-3.5 text-xs font-semibold bg-slate-100 dark:bg-slate-900 cursor-not-allowed opacity-75 border border-slate-200/50 dark:border-slate-800 rounded-xl outline-none"
+                            className="w-full h-10 pl-9.5 pr-3.5 text-xs font-normal bg-slate-100 dark:bg-slate-900 cursor-not-allowed opacity-75 border-slate-200/50 dark:border-slate-800 rounded-xl outline-none"
                             readOnly
                             required
                           />
@@ -1150,7 +1164,7 @@ function UserManagementPage() {
                         <select
                           value={userDepartment}
                           onChange={e => setUserDepartment(e.target.value)}
-                          className="w-full h-10 px-3.5 text-xs font-semibold bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition cursor-pointer"
+                          className="w-full h-10 px-3.5 text-xs font-normal bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition cursor-pointer"
                           required
                         >
                           <option value="">Select Department</option>
@@ -1164,11 +1178,11 @@ function UserManagementPage() {
 
                   {/* Redirect URL Selection */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Redirect URL *</label>
+                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Redirect URL *</label>
                     <select
                       value={userRedirectUrl}
                       onChange={e => setUserRedirectUrl(e.target.value)}
-                      className="w-full h-10 px-3.5 text-xs font-semibold bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition cursor-pointer"
+                      className="w-full h-10 px-3.5 text-xs font-normal bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition cursor-pointer"
                       required
                     >
                       <option value="Select Main Menu">Select Main Menu</option>
@@ -1180,7 +1194,7 @@ function UserManagementPage() {
 
                   {/* Company Access Checklist Cards */}
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Company Access *</label>
+                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Company Access *</label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                       
                       {/* All Companies Option Card */}
@@ -1202,8 +1216,8 @@ function UserManagementPage() {
                           className="size-4.5 rounded border-slate-300 dark:border-slate-700 text-primary cursor-pointer transition focus:ring-0 mt-0.5"
                         />
                         <div className="flex-1 min-w-0">
-                          <div className="text-[11px] font-bold">All Companies</div>
-                          <div className="text-[9px] text-slate-500 dark:text-slate-400 font-medium">Full, unrestricted administrative directory visibility</div>
+                          <div className="text-[11px] font-medium">All Companies</div>
+                          <div className="text-[9px] text-slate-500 dark:text-slate-400 font-normal">Full, unrestricted administrative directory visibility</div>
                         </div>
                       </label>
                       
@@ -1243,8 +1257,8 @@ function UserManagementPage() {
                               className="size-4.5 rounded border-slate-300 dark:border-slate-700 text-primary cursor-pointer transition focus:ring-0 mt-0.5"
                             />
                             <div className="flex-1 min-w-0">
-                              <div className="text-[11px] font-bold">{c.label}</div>
-                              <div className="text-[9px] text-slate-500 dark:text-slate-400 font-medium">{c.desc}</div>
+                              <div className="text-[11px] font-medium">{c.label}</div>
+                              <div className="text-[9px] text-slate-500 dark:text-slate-400 font-normal">{c.desc}</div>
                             </div>
                           </label>
                         );
@@ -1260,13 +1274,13 @@ function UserManagementPage() {
                 <button
                   type="button"
                   onClick={() => setIsUserModalOpen(false)}
-                  className="h-10 px-6 rounded-lg bg-white dark:bg-slate-800 border border-border text-foreground hover:bg-muted font-bold text-xs transition-all uppercase tracking-wider shadow-3xs"
+                  className="h-10 px-6 rounded-lg bg-white dark:bg-slate-800 border border-border text-foreground hover:bg-muted font-medium text-xs transition-all uppercase tracking-wider shadow-3xs"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="h-10 px-8 rounded-lg bg-primary hover:bg-primary/95 text-white font-bold text-xs shadow-xs transition-all uppercase tracking-wider"
+                  className="h-10 px-8 rounded-lg bg-primary hover:bg-primary/95 text-white font-medium text-xs shadow-xs transition-all uppercase tracking-wider"
                 >
                   Save User
                 </button>
