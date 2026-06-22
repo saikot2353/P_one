@@ -4,7 +4,7 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
   Banknote, ChevronRight, Plus, Search, Printer, X, Trash2,
-  CheckCircle2, Clock, AlertCircle, Settings
+  CheckCircle2, Clock, AlertCircle, Settings, Download, Eye
 } from "lucide-react";
 
 export const Route = createFileRoute("/financial-aid")({
@@ -78,6 +78,11 @@ function FinancialAidPage() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("ALL");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [minAmount, setMinAmount] = useState("");
+  const [maxAmount, setMaxAmount] = useState("");
+  const [viewDetailsRecord, setViewDetailsRecord] = useState<AidRecord | null>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newEmpName, setNewEmpName] = useState("");
@@ -196,6 +201,11 @@ function FinancialAidPage() {
   const filteredRecords = useMemo(() => {
     return records.filter(r => {
       if (selectedStatus !== "ALL" && r.status !== selectedStatus) return false;
+      if (dateFrom && r.requestDate < dateFrom) return false;
+      if (dateTo && r.requestDate > dateTo) return false;
+      if (minAmount && r.amount < parseFloat(minAmount)) return false;
+      if (maxAmount && r.amount > parseFloat(maxAmount)) return false;
+      
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         return (
@@ -207,7 +217,7 @@ function FinancialAidPage() {
       }
       return true;
     });
-  }, [records, selectedStatus, searchQuery]);
+  }, [records, selectedStatus, searchQuery, dateFrom, dateTo, minAmount, maxAmount]);
 
   const isTenureEligible = useMemo(() => {
     if (!newTenure) return true;
@@ -287,6 +297,26 @@ function FinancialAidPage() {
   };
 
   const handlePrint = () => window.print();
+
+  const handleExportCSV = () => {
+    if (filteredRecords.length === 0) {
+      alert("No records to export.");
+      return;
+    }
+    const headers = ["ID", "Employee Name", "Employee ID", "Tenure (Months)", "Amount", "Reason", "Date", "Status"];
+    const rows = filteredRecords.map(r => [
+      r.id, r.employeeName, r.employeeId, r.tenureMonths, r.amount, `"${r.reason.replace(/"/g, '""')}"`, r.requestDate, r.status
+    ]);
+    const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `financial_aid_report_${new Date().toISOString().split("T")[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
@@ -368,35 +398,59 @@ function FinancialAidPage() {
 
           {/* Table Container */}
           <div className="bg-card rounded-xl border border-border/80 shadow-xs overflow-hidden">
-            <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/40 bg-muted/10">
-              <div className="flex flex-wrap gap-3 w-full sm:w-auto">
-                <select
-                  value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value)}
-                  className="h-9 px-4 rounded-lg bg-background border border-border/60 text-xs font-semibold outline-none focus:border-blue-500 shadow-sm"
-                >
-                  <option value="ALL">All Statuses</option>
-                  <option value="Pending">Pending Request</option>
-                  <option value="Approved">Approved & Granted</option>
-                  <option value="Rejected">Rejected</option>
-                </select>
+            <div className="p-5 flex flex-col gap-4 border-b border-border/40 bg-muted/10">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex flex-wrap gap-3 w-full sm:w-auto">
+                  <select
+                    value={selectedStatus}
+                    onChange={(e) => setSelectedStatus(e.target.value)}
+                    className="h-9 px-4 rounded-lg bg-background border border-border/60 text-xs font-semibold outline-none focus:border-blue-500 shadow-sm"
+                  >
+                    <option value="ALL">All Statuses</option>
+                    <option value="Pending">Pending Request</option>
+                    <option value="Approved">Approved & Granted</option>
+                    <option value="Rejected">Rejected</option>
+                  </select>
 
-                <div className="relative flex-1 min-w-[240px]">
-                  <Search className="size-4 text-muted-foreground/60 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search name, ID, or reason..."
-                    className="w-full h-9 pl-9 pr-4 rounded-lg bg-background border border-border/60 text-xs font-semibold outline-none focus:border-blue-500 transition shadow-sm"
-                  />
+                  <div className="relative flex-1 min-w-[240px]">
+                    <Search className="size-4 text-muted-foreground/60 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search name, ID, or reason..."
+                      className="w-full h-9 pl-9 pr-4 rounded-lg bg-background border border-border/60 text-xs font-semibold outline-none focus:border-blue-500 transition shadow-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1.5 print:hidden shrink-0">
+                  <button onClick={handleExportCSV} className="h-9 px-4 rounded-lg border border-border/60 bg-background hover:bg-muted font-bold text-xs flex items-center gap-1.5 transition shadow-sm text-emerald-600">
+                    <Download className="size-3.5" /> Export CSV
+                  </button>
+                  <button onClick={handlePrint} className="h-9 px-4 rounded-lg border border-border/60 bg-background hover:bg-muted font-bold text-xs flex items-center gap-1.5 transition shadow-sm text-blue-600">
+                    <Printer className="size-3.5" /> Print Report
+                  </button>
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5 print:hidden shrink-0">
-                <button onClick={handlePrint} className="h-9 px-4 rounded-lg border border-border/60 bg-background hover:bg-muted font-bold text-xs flex items-center gap-1.5 transition shadow-sm">
-                  <Printer className="size-3.5 text-blue-500" /> Print Report
-                </button>
+              {/* Advanced Filters */}
+              <div className="flex flex-wrap gap-4 items-center pt-3 border-t border-border/40">
+                <div className="flex items-center gap-2">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase">Date:</label>
+                  <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="h-8 px-2 rounded-md bg-background border border-border/60 text-xs outline-none focus:border-blue-500" title="From Date" />
+                  <span className="text-muted-foreground">-</span>
+                  <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="h-8 px-2 rounded-md bg-background border border-border/60 text-xs outline-none focus:border-blue-500" title="To Date" />
+                </div>
+                <div className="flex items-center gap-2 pl-4 border-l border-border/40">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase">Amount:</label>
+                  <input type="number" placeholder="Min" value={minAmount} onChange={e => setMinAmount(e.target.value)} className="w-20 h-8 px-2 rounded-md bg-background border border-border/60 text-xs outline-none focus:border-blue-500" />
+                  <span className="text-muted-foreground">-</span>
+                  <input type="number" placeholder="Max" value={maxAmount} onChange={e => setMaxAmount(e.target.value)} className="w-20 h-8 px-2 rounded-md bg-background border border-border/60 text-xs outline-none focus:border-blue-500" />
+                </div>
+                {(dateFrom || dateTo || minAmount || maxAmount) && (
+                  <button onClick={() => { setDateFrom(""); setDateTo(""); setMinAmount(""); setMaxAmount(""); }} className="text-[10px] text-rose-500 font-bold hover:underline ml-2">Clear Filters</button>
+                )}
               </div>
             </div>
 
@@ -453,19 +507,28 @@ function FinancialAidPage() {
                       </td>
                       <td className="px-5 py-4 text-center print:hidden">
                         <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => setViewDetailsRecord(row)}
+                            className="p-1.5 hover:bg-blue-500/10 text-blue-500 rounded transition"
+                            title="View Details"
+                          >
+                            <Eye className="size-4" />
+                          </button>
                           {row.status === "Pending" && (
                             <>
                               <button 
                                 onClick={(e) => handleUpdateStatus(row.id, "Approved", e)}
-                                className="h-7 px-3 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-600 hover:text-white font-bold rounded text-[10px] transition border border-emerald-500/20"
+                                className="p-1.5 hover:bg-emerald-500/10 text-emerald-600 rounded transition"
+                                title="Approve"
                               >
-                                Approve
+                                <CheckCircle2 className="size-4" />
                               </button>
                               <button 
                                 onClick={(e) => handleUpdateStatus(row.id, "Rejected", e)}
-                                className="h-7 px-3 bg-rose-500/10 hover:bg-rose-500 text-rose-600 hover:text-white font-bold rounded text-[10px] transition border border-rose-500/20"
+                                className="p-1.5 hover:bg-rose-500/10 text-rose-500 rounded transition"
+                                title="Reject"
                               >
-                                Reject
+                                <X className="size-4" />
                               </button>
                             </>
                           )}
@@ -721,6 +784,54 @@ function FinancialAidPage() {
                 <button type="submit" className="h-10 px-6 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition shadow-md">Save Pool</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* MODAL: View Request Details */}
+      {viewDetailsRecord && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-card w-full max-w-lg rounded-xl shadow-2xl p-6 border border-border relative">
+            <button onClick={() => setViewDetailsRecord(null)} className="absolute right-4 top-4 p-1.5 text-muted-foreground hover:bg-muted rounded-lg transition">
+              <X className="size-5" />
+            </button>
+            <h3 className="text-base font-black text-foreground mb-5 flex items-center gap-2 border-b border-border/40 pb-3.5">
+              <Eye className="size-5 text-blue-600" /> Request Details: {viewDetailsRecord.id}
+            </h3>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4 bg-muted/20 p-4 rounded-lg border border-border/40 text-xs">
+                <div>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-0.5">Candidate</span>
+                  <span className="font-bold text-foreground">{viewDetailsRecord.employeeName}</span>
+                  <div className="text-muted-foreground font-mono">{viewDetailsRecord.employeeId}</div>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-0.5">Tenure</span>
+                  <span className="font-bold text-foreground">{viewDetailsRecord.tenureMonths} months</span>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-0.5">Requested Amount</span>
+                  <span className="font-black text-blue-600 text-sm">৳ {viewDetailsRecord.amount.toLocaleString()}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-0.5">Date Filed</span>
+                  <span className="font-mono text-foreground">{viewDetailsRecord.requestDate}</span>
+                </div>
+              </div>
+
+              <div>
+                <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Full Support Reason / Justification</span>
+                <div className="bg-background p-4 rounded-lg border border-border/60 text-xs text-foreground leading-relaxed whitespace-pre-wrap">
+                  {viewDetailsRecord.reason}
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-4 border-t border-border/40 gap-2">
+                <button onClick={() => setViewDetailsRecord(null)} className="h-9 px-6 bg-muted hover:bg-muted/80 text-foreground font-bold rounded-lg transition text-xs">
+                  Close
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

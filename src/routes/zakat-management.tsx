@@ -4,7 +4,7 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
   HeartHandshake, ChevronRight, Plus, Search, FileSpreadsheet, Printer, X, Trash2,
-  CheckCircle2, Clock, ShieldCheck, AlertCircle, Info, Settings, ArrowRight, UserCheck, FileText
+  CheckCircle2, Clock, ShieldCheck, AlertCircle, Info, Settings, ArrowRight, UserCheck, FileText, Download
 } from "lucide-react";
 
 export const Route = createFileRoute("/zakat-management")({
@@ -132,6 +132,8 @@ function ZakatManagementPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("ALL");
   const [selectedAsnaf, setSelectedAsnaf] = useState("ALL");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   // Selection for Detail Drawer/Workflow
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
@@ -260,6 +262,8 @@ function ZakatManagementPage() {
     return records.filter(r => {
       if (selectedStatus !== "ALL" && r.agencyStatus !== selectedStatus) return false;
       if (selectedAsnaf !== "ALL" && r.asnafCategory !== selectedAsnaf) return false;
+      if (dateFrom && r.assignedDate < dateFrom) return false;
+      if (dateTo && r.assignedDate > dateTo) return false;
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         return (
@@ -271,7 +275,7 @@ function ZakatManagementPage() {
       }
       return true;
     });
-  }, [records, selectedStatus, selectedAsnaf, searchQuery]);
+  }, [records, selectedStatus, selectedAsnaf, searchQuery, dateFrom, dateTo]);
 
   const activeRecord = useMemo(() => {
     return records.find(r => r.id === selectedRecordId) || null;
@@ -405,6 +409,26 @@ function ZakatManagementPage() {
 
   const handlePrint = () => window.print();
 
+  const handleExportCSV = () => {
+    if (filteredRecords.length === 0) {
+      alert("No records to export.");
+      return;
+    }
+    const headers = ["ID", "Agent Employee", "Agent ID", "Recipient Name", "Asnaf Category", "Amount", "Assigned Date", "Deadline", "Status"];
+    const rows = filteredRecords.map(r => [
+      r.id, r.employeeName, r.employeeId, `"${r.recipientName.replace(/"/g, '""')}"`, r.asnafCategory, r.amount, r.assignedDate, r.distributionDeadline, r.agencyStatus
+    ]);
+    const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `zakat_management_report_${new Date().toISOString().split("T")[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
       <Sidebar />
@@ -490,51 +514,67 @@ function ZakatManagementPage() {
           <div className="space-y-6">
             {/* Table Container */}
             <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/40">
-                <div className="flex flex-wrap gap-2.5 w-full sm:w-auto">
-                  <select
-                    value={selectedStatus}
-                    onChange={(e) => setSelectedStatus(e.target.value)}
-                    className="h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-emerald-500"
-                  >
-                    <option value="ALL">All Agency Statuses</option>
-                    <option value="Assigned">Assigned (Funds Dispatched)</option>
-                    <option value="Acknowledged">Acknowledged by Employee</option>
-                    <option value="Distributed">Distributed (Awaiting HR Verification)</option>
-                    <option value="Verified">Verified & Completed</option>
-                  </select>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/40">
+                  <div className="flex flex-wrap gap-2.5 w-full sm:w-auto">
+                    <select
+                      value={selectedStatus}
+                      onChange={(e) => setSelectedStatus(e.target.value)}
+                      className="h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-emerald-500"
+                    >
+                      <option value="ALL">All Agency Statuses</option>
+                      <option value="Assigned">Assigned (Funds Dispatched)</option>
+                      <option value="Acknowledged">Acknowledged by Employee</option>
+                      <option value="Distributed">Distributed (Awaiting HR Verification)</option>
+                      <option value="Verified">Verified & Completed</option>
+                    </select>
 
-                  <select
-                    value={selectedAsnaf}
-                    onChange={(e) => setSelectedAsnaf(e.target.value)}
-                    className="h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-emerald-500"
-                  >
-                    <option value="ALL">All Asnaf Categories</option>
-                    <option value="Al-Fuqara">Al-Fuqara (The Poor)</option>
-                    <option value="Al-Masakin">Al-Masakin (The Needy)</option>
-                    <option value="Al-Gharimin">Al-Gharimin (In Debt)</option>
-                    <option value="Fi Sabilillah">Fi Sabilillah (Cause of Allah)</option>
-                    <option value="Ibnus-Sabil">Ibnus-Sabil (Wayfarer)</option>
-                  </select>
+                    <select
+                      value={selectedAsnaf}
+                      onChange={(e) => setSelectedAsnaf(e.target.value)}
+                      className="h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-emerald-500"
+                    >
+                      <option value="ALL">All Asnaf Categories</option>
+                      <option value="Al-Fuqara">Al-Fuqara (The Poor)</option>
+                      <option value="Al-Masakin">Al-Masakin (The Needy)</option>
+                      <option value="Al-Gharimin">Al-Gharimin (In Debt)</option>
+                      <option value="Fi Sabilillah">Fi Sabilillah (Cause of Allah)</option>
+                      <option value="Ibnus-Sabil">Ibnus-Sabil (Wayfarer)</option>
+                    </select>
 
-                  <div className="relative flex-1 min-w-[200px]">
-                    <Search className="size-4 text-muted-foreground/60 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search employee, recipient, or ID..."
-                      className="w-full h-9 pl-9 pr-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:bg-card focus:border-emerald-500 transition"
-                    />
+                    <div className="relative flex-1 min-w-[200px]">
+                      <Search className="size-4 text-muted-foreground/60 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search employee, recipient, or ID..."
+                        className="w-full h-9 pl-9 pr-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:bg-card focus:border-emerald-500 transition"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 print:hidden shrink-0">
+                    <button onClick={handleExportCSV} className="h-9 px-4 rounded-lg border border-border/70 hover:bg-muted font-bold text-xs flex items-center gap-1.5 transition text-emerald-600">
+                      <Download className="size-3.5" /> Export CSV
+                    </button>
+                    <button onClick={handlePrint} className="h-9 px-4 rounded-lg border border-border/70 hover:bg-muted font-bold text-xs flex items-center gap-1.5 transition text-blue-600">
+                      <Printer className="size-3.5" /> Print
+                    </button>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 print:hidden shrink-0">
-                  <button onClick={handlePrint} className="h-9 px-4 rounded-lg border border-border/70 hover:bg-muted font-bold text-xs flex items-center gap-1.5 transition">
-                    <Printer className="size-3.5 text-blue-500" /> Print
-                  </button>
+                {/* Advanced Filters */}
+                <div className="flex flex-wrap gap-4 items-center pb-4">
+                  <div className="flex items-center gap-2">
+                    <label className="text-[10px] font-black text-muted-foreground uppercase">Assigned Date:</label>
+                    <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="h-8 px-2 rounded-md bg-muted border border-border/40 text-xs outline-none focus:border-emerald-500" title="From Date" />
+                    <span className="text-muted-foreground">-</span>
+                    <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="h-8 px-2 rounded-md bg-muted border border-border/40 text-xs outline-none focus:border-emerald-500" title="To Date" />
+                  </div>
+                  {(dateFrom || dateTo) && (
+                    <button onClick={() => { setDateFrom(""); setDateTo(""); }} className="text-[10px] text-rose-500 font-bold hover:underline ml-2">Clear Date Filter</button>
+                  )}
                 </div>
-              </div>
 
               {/* Table */}
               <div className="overflow-x-auto border border-border/50 rounded-xl">
@@ -601,13 +641,24 @@ function ZakatManagementPage() {
                             )}
                           </td>
                           <td className="px-4 py-3 text-center print:hidden" onClick={e => e.stopPropagation()}>
-                            <button
-                              onClick={(e) => handleDelete(row.id, e)}
-                              className="p-1 hover:bg-rose-500/10 text-rose-500 rounded transition"
-                              title="Delete record"
-                            >
-                              <Trash2 className="size-4" />
-                            </button>
+                            <div className="flex items-center justify-center gap-1.5">
+                              {row.agencyStatus !== "Verified" && (
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleUpdateAgencyStatus(row.id, row.agencyStatus === "Distributed" ? "Verified" : "Distributed"); }}
+                                  className="p-1.5 hover:bg-emerald-500/10 text-emerald-600 rounded transition"
+                                  title={row.agencyStatus === "Distributed" ? "Verify Distribution" : "Mark as Distributed"}
+                                >
+                                  {row.agencyStatus === "Distributed" ? <ShieldCheck className="size-4" /> : <CheckCircle2 className="size-4" />}
+                                </button>
+                              )}
+                              <button
+                                onClick={(e) => handleDelete(row.id, e)}
+                                className="p-1.5 hover:bg-rose-500/10 text-rose-500 rounded transition"
+                                title="Delete record"
+                              >
+                                <Trash2 className="size-4" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       );
