@@ -6,7 +6,7 @@ import {
   CalendarDays, CalendarX, ShieldAlert, Fingerprint, Timer,
   CreditCard, Cpu, ShieldCheck, Lightbulb, Settings,
   LifeBuoy, ChevronDown, ChevronRight, File, Briefcase, UserPlus,
-  LogOut, HeartHandshake
+  LogOut, HeartHandshake, Banknote
 } from "lucide-react";
 
 interface SubItem {
@@ -206,6 +206,18 @@ const nav: NavItem[] = [
       { label: "Allowance Setup", to: "/" },
       { label: "Employee Allowance", to: "/" },
       { label: "Tax Exemption Rules", to: "/" },
+    ]
+  },
+  {
+    label: "Payroll",
+    icon: Banknote,
+    subitems: [
+      { label: "Advance", to: "/payroll-advance" },
+      { label: "Loan", to: "/payroll-loan" },
+      { label: "Deductions", to: "/payroll-deductions" },
+      { label: "Salary Process", to: "/salary-process" },
+      { label: "Benefits", to: "/payroll-benefits" },
+      { label: "Reports", to: "/payroll-reports" },
     ]
   },
   {

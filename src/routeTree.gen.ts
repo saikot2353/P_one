@@ -22,6 +22,7 @@ import { Route as SspAttendanceRouteImport } from './routes/ssp-attendance'
 import { Route as SspApproveManualAttendanceRouteImport } from './routes/ssp-approve-manual-attendance'
 import { Route as SspApprovalRouteImport } from './routes/ssp-approval'
 import { Route as ShiftControlCenterRouteImport } from './routes/shift-control-center'
+import { Route as SalaryProcessRouteImport } from './routes/salary-process'
 import { Route as RecruitmentIeListRouteImport } from './routes/recruitment-ie-list'
 import { Route as RecruitmentHrListRouteImport } from './routes/recruitment-hr-list'
 import { Route as RecruitmentConfigurationRouteImport } from './routes/recruitment-configuration'
@@ -35,6 +36,10 @@ import { Route as PersonnelListRouteImport } from './routes/personnel-list'
 import { Route as PersonnelApprovalRouteImport } from './routes/personnel-approval'
 import { Route as PermissionManagementRouteImport } from './routes/permission-management'
 import { Route as PendingManualAttendanceRouteImport } from './routes/pending-manual-attendance'
+import { Route as PayrollReportsRouteImport } from './routes/payroll-reports'
+import { Route as PayrollLoanRouteImport } from './routes/payroll-loan'
+import { Route as PayrollBenefitsRouteImport } from './routes/payroll-benefits'
+import { Route as PayrollAdvanceRouteImport } from './routes/payroll-advance'
 import { Route as ManualAttendanceRouteImport } from './routes/manual-attendance'
 import { Route as ManageOvertimeRouteImport } from './routes/manage-overtime'
 import { Route as LoginRouteImport } from './routes/login'
@@ -60,6 +65,7 @@ import { Route as IncrementGadgetRouteImport } from './routes/increment-gadget'
 import { Route as IncrementRouteImport } from './routes/increment'
 import { Route as HrPolicyJdsRouteImport } from './routes/hr-policy-jds'
 import { Route as FinancialAidRouteImport } from './routes/financial-aid'
+import { Route as FinalSettlementRouteImport } from './routes/final-settlement'
 import { Route as FinalApproveIncrementRouteImport } from './routes/final-approve-increment'
 import { Route as EvaluationProposeRouteImport } from './routes/evaluation-propose'
 import { Route as EmployeeJobCardRouteImport } from './routes/employee-job-card'
@@ -157,6 +163,11 @@ const ShiftControlCenterRoute = ShiftControlCenterRouteImport.update({
   path: '/shift-control-center',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SalaryProcessRoute = SalaryProcessRouteImport.update({
+  id: '/salary-process',
+  path: '/salary-process',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RecruitmentIeListRoute = RecruitmentIeListRouteImport.update({
   id: '/recruitment-ie-list',
   path: '/recruitment-ie-list',
@@ -223,6 +234,26 @@ const PermissionManagementRoute = PermissionManagementRouteImport.update({
 const PendingManualAttendanceRoute = PendingManualAttendanceRouteImport.update({
   id: '/pending-manual-attendance',
   path: '/pending-manual-attendance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayrollReportsRoute = PayrollReportsRouteImport.update({
+  id: '/payroll-reports',
+  path: '/payroll-reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayrollLoanRoute = PayrollLoanRouteImport.update({
+  id: '/payroll-loan',
+  path: '/payroll-loan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayrollBenefitsRoute = PayrollBenefitsRouteImport.update({
+  id: '/payroll-benefits',
+  path: '/payroll-benefits',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayrollAdvanceRoute = PayrollAdvanceRouteImport.update({
+  id: '/payroll-advance',
+  path: '/payroll-advance',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ManualAttendanceRoute = ManualAttendanceRouteImport.update({
@@ -348,6 +379,11 @@ const HrPolicyJdsRoute = HrPolicyJdsRouteImport.update({
 const FinancialAidRoute = FinancialAidRouteImport.update({
   id: '/financial-aid',
   path: '/financial-aid',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FinalSettlementRoute = FinalSettlementRouteImport.update({
+  id: '/final-settlement',
+  path: '/final-settlement',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FinalApproveIncrementRoute = FinalApproveIncrementRouteImport.update({
@@ -525,6 +561,7 @@ export interface FileRoutesByFullPath {
   '/employee-job-card': typeof EmployeeJobCardRoute
   '/evaluation-propose': typeof EvaluationProposeRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
+  '/final-settlement': typeof FinalSettlementRoute
   '/financial-aid': typeof FinancialAidRoute
   '/hr-policy-jds': typeof HrPolicyJdsRoute
   '/increment': typeof IncrementRoute
@@ -550,6 +587,10 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
+  '/payroll-advance': typeof PayrollAdvanceRoute
+  '/payroll-benefits': typeof PayrollBenefitsRoute
+  '/payroll-loan': typeof PayrollLoanRoute
+  '/payroll-reports': typeof PayrollReportsRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
   '/permission-management': typeof PermissionManagementRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
@@ -563,6 +604,7 @@ export interface FileRoutesByFullPath {
   '/recruitment-configuration': typeof RecruitmentConfigurationRoute
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
+  '/salary-process': typeof SalaryProcessRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
@@ -607,6 +649,7 @@ export interface FileRoutesByTo {
   '/employee-job-card': typeof EmployeeJobCardRoute
   '/evaluation-propose': typeof EvaluationProposeRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
+  '/final-settlement': typeof FinalSettlementRoute
   '/financial-aid': typeof FinancialAidRoute
   '/hr-policy-jds': typeof HrPolicyJdsRoute
   '/increment': typeof IncrementRoute
@@ -632,6 +675,10 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
+  '/payroll-advance': typeof PayrollAdvanceRoute
+  '/payroll-benefits': typeof PayrollBenefitsRoute
+  '/payroll-loan': typeof PayrollLoanRoute
+  '/payroll-reports': typeof PayrollReportsRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
   '/permission-management': typeof PermissionManagementRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
@@ -645,6 +692,7 @@ export interface FileRoutesByTo {
   '/recruitment-configuration': typeof RecruitmentConfigurationRoute
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
+  '/salary-process': typeof SalaryProcessRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
@@ -690,6 +738,7 @@ export interface FileRoutesById {
   '/employee-job-card': typeof EmployeeJobCardRoute
   '/evaluation-propose': typeof EvaluationProposeRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
+  '/final-settlement': typeof FinalSettlementRoute
   '/financial-aid': typeof FinancialAidRoute
   '/hr-policy-jds': typeof HrPolicyJdsRoute
   '/increment': typeof IncrementRoute
@@ -715,6 +764,10 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
+  '/payroll-advance': typeof PayrollAdvanceRoute
+  '/payroll-benefits': typeof PayrollBenefitsRoute
+  '/payroll-loan': typeof PayrollLoanRoute
+  '/payroll-reports': typeof PayrollReportsRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
   '/permission-management': typeof PermissionManagementRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
@@ -728,6 +781,7 @@ export interface FileRoutesById {
   '/recruitment-configuration': typeof RecruitmentConfigurationRoute
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
+  '/salary-process': typeof SalaryProcessRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
@@ -774,6 +828,7 @@ export interface FileRouteTypes {
     | '/employee-job-card'
     | '/evaluation-propose'
     | '/final-approve-increment'
+    | '/final-settlement'
     | '/financial-aid'
     | '/hr-policy-jds'
     | '/increment'
@@ -799,6 +854,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
+    | '/payroll-advance'
+    | '/payroll-benefits'
+    | '/payroll-loan'
+    | '/payroll-reports'
     | '/pending-manual-attendance'
     | '/permission-management'
     | '/personnel-approval'
@@ -812,6 +871,7 @@ export interface FileRouteTypes {
     | '/recruitment-configuration'
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
+    | '/salary-process'
     | '/shift-control-center'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
@@ -856,6 +916,7 @@ export interface FileRouteTypes {
     | '/employee-job-card'
     | '/evaluation-propose'
     | '/final-approve-increment'
+    | '/final-settlement'
     | '/financial-aid'
     | '/hr-policy-jds'
     | '/increment'
@@ -881,6 +942,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
+    | '/payroll-advance'
+    | '/payroll-benefits'
+    | '/payroll-loan'
+    | '/payroll-reports'
     | '/pending-manual-attendance'
     | '/permission-management'
     | '/personnel-approval'
@@ -894,6 +959,7 @@ export interface FileRouteTypes {
     | '/recruitment-configuration'
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
+    | '/salary-process'
     | '/shift-control-center'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
@@ -938,6 +1004,7 @@ export interface FileRouteTypes {
     | '/employee-job-card'
     | '/evaluation-propose'
     | '/final-approve-increment'
+    | '/final-settlement'
     | '/financial-aid'
     | '/hr-policy-jds'
     | '/increment'
@@ -963,6 +1030,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
+    | '/payroll-advance'
+    | '/payroll-benefits'
+    | '/payroll-loan'
+    | '/payroll-reports'
     | '/pending-manual-attendance'
     | '/permission-management'
     | '/personnel-approval'
@@ -976,6 +1047,7 @@ export interface FileRouteTypes {
     | '/recruitment-configuration'
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
+    | '/salary-process'
     | '/shift-control-center'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
@@ -1021,6 +1093,7 @@ export interface RootRouteChildren {
   EmployeeJobCardRoute: typeof EmployeeJobCardRoute
   EvaluationProposeRoute: typeof EvaluationProposeRoute
   FinalApproveIncrementRoute: typeof FinalApproveIncrementRoute
+  FinalSettlementRoute: typeof FinalSettlementRoute
   FinancialAidRoute: typeof FinancialAidRoute
   HrPolicyJdsRoute: typeof HrPolicyJdsRoute
   IncrementRoute: typeof IncrementRoute
@@ -1046,6 +1119,10 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ManageOvertimeRoute: typeof ManageOvertimeRoute
   ManualAttendanceRoute: typeof ManualAttendanceRoute
+  PayrollAdvanceRoute: typeof PayrollAdvanceRoute
+  PayrollBenefitsRoute: typeof PayrollBenefitsRoute
+  PayrollLoanRoute: typeof PayrollLoanRoute
+  PayrollReportsRoute: typeof PayrollReportsRoute
   PendingManualAttendanceRoute: typeof PendingManualAttendanceRoute
   PermissionManagementRoute: typeof PermissionManagementRoute
   PersonnelApprovalRoute: typeof PersonnelApprovalRoute
@@ -1059,6 +1136,7 @@ export interface RootRouteChildren {
   RecruitmentConfigurationRoute: typeof RecruitmentConfigurationRoute
   RecruitmentHrListRoute: typeof RecruitmentHrListRoute
   RecruitmentIeListRoute: typeof RecruitmentIeListRoute
+  SalaryProcessRoute: typeof SalaryProcessRoute
   ShiftControlCenterRoute: typeof ShiftControlCenterRoute
   SspApprovalRoute: typeof SspApprovalRoute
   SspApproveManualAttendanceRoute: typeof SspApproveManualAttendanceRoute
@@ -1171,6 +1249,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShiftControlCenterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/salary-process': {
+      id: '/salary-process'
+      path: '/salary-process'
+      fullPath: '/salary-process'
+      preLoaderRoute: typeof SalaryProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/recruitment-ie-list': {
       id: '/recruitment-ie-list'
       path: '/recruitment-ie-list'
@@ -1260,6 +1345,34 @@ declare module '@tanstack/react-router' {
       path: '/pending-manual-attendance'
       fullPath: '/pending-manual-attendance'
       preLoaderRoute: typeof PendingManualAttendanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payroll-reports': {
+      id: '/payroll-reports'
+      path: '/payroll-reports'
+      fullPath: '/payroll-reports'
+      preLoaderRoute: typeof PayrollReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payroll-loan': {
+      id: '/payroll-loan'
+      path: '/payroll-loan'
+      fullPath: '/payroll-loan'
+      preLoaderRoute: typeof PayrollLoanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payroll-benefits': {
+      id: '/payroll-benefits'
+      path: '/payroll-benefits'
+      fullPath: '/payroll-benefits'
+      preLoaderRoute: typeof PayrollBenefitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payroll-advance': {
+      id: '/payroll-advance'
+      path: '/payroll-advance'
+      fullPath: '/payroll-advance'
+      preLoaderRoute: typeof PayrollAdvanceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/manual-attendance': {
@@ -1435,6 +1548,13 @@ declare module '@tanstack/react-router' {
       path: '/financial-aid'
       fullPath: '/financial-aid'
       preLoaderRoute: typeof FinancialAidRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/final-settlement': {
+      id: '/final-settlement'
+      path: '/final-settlement'
+      fullPath: '/final-settlement'
+      preLoaderRoute: typeof FinalSettlementRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/final-approve-increment': {
@@ -1669,6 +1789,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmployeeJobCardRoute: EmployeeJobCardRoute,
   EvaluationProposeRoute: EvaluationProposeRoute,
   FinalApproveIncrementRoute: FinalApproveIncrementRoute,
+  FinalSettlementRoute: FinalSettlementRoute,
   FinancialAidRoute: FinancialAidRoute,
   HrPolicyJdsRoute: HrPolicyJdsRoute,
   IncrementRoute: IncrementRoute,
@@ -1694,6 +1815,10 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ManageOvertimeRoute: ManageOvertimeRoute,
   ManualAttendanceRoute: ManualAttendanceRoute,
+  PayrollAdvanceRoute: PayrollAdvanceRoute,
+  PayrollBenefitsRoute: PayrollBenefitsRoute,
+  PayrollLoanRoute: PayrollLoanRoute,
+  PayrollReportsRoute: PayrollReportsRoute,
   PendingManualAttendanceRoute: PendingManualAttendanceRoute,
   PermissionManagementRoute: PermissionManagementRoute,
   PersonnelApprovalRoute: PersonnelApprovalRoute,
@@ -1707,6 +1832,7 @@ const rootRouteChildren: RootRouteChildren = {
   RecruitmentConfigurationRoute: RecruitmentConfigurationRoute,
   RecruitmentHrListRoute: RecruitmentHrListRoute,
   RecruitmentIeListRoute: RecruitmentIeListRoute,
+  SalaryProcessRoute: SalaryProcessRoute,
   ShiftControlCenterRoute: ShiftControlCenterRoute,
   SspApprovalRoute: SspApprovalRoute,
   SspApproveManualAttendanceRoute: SspApproveManualAttendanceRoute,
