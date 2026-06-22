@@ -96,22 +96,69 @@ const SEED_ROLES: RoleItem[] = [
 ];
 
 const SEED_PERMISSIONS: PermissionRow[] = [
-  { sl: 1, role: "Admin", menu: "Fuel & Expenses Reports", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 2, role: "Admin", menu: "Billing", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 3, role: "Admin", menu: "IOU Slip", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 4, role: "Admin", menu: "Expenses", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 5, role: "Admin", menu: "My Requests", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 6, role: "Admin", menu: "Vehicles", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 7, role: "Admin", menu: "Drivers", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 8, role: "Admin", menu: "Dashboard", read: true, write: true, full: true, sync: true, prevDate: true },
-  { sl: 9, role: "Admin", menu: "Requisition", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 10, role: "Admin", menu: "Create Requisition", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 11, role: "Admin", menu: "Master Data", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 12, role: "Admin", menu: "Trip Management", read: true, write: true, full: true, sync: false, prevDate: false }
+  // Admin permissions for all 40 menus
+  { sl: 1, role: "Admin", menu: "Dashboard", read: true, write: true, full: true, sync: true, prevDate: true },
+  { sl: 2, role: "Admin", menu: "SSP - New Requisition", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 3, role: "Admin", menu: "SSP - My Requisition", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 4, role: "Admin", menu: "SSP - Approval", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 5, role: "Admin", menu: "SSP - Attendance", read: true, write: true, full: true, sync: true, prevDate: false },
+  { sl: 6, role: "Admin", menu: "Configure - Structure Setup", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 7, role: "Admin", menu: "Configure - Job & Employee Setup", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 8, role: "Admin", menu: "Configure - Shift & Time Rules", read: true, write: true, full: true, sync: true, prevDate: true },
+  { sl: 9, role: "Admin", menu: "Configure - Allowances & Bonuses", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 10, role: "Admin", menu: "Configure - Education & Training", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 11, role: "Admin", menu: "Configure - Leave & Policies", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 12, role: "Admin", menu: "Personnel Info - Personnel List", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 13, role: "Admin", menu: "Personnel Info - Approval", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 14, role: "Admin", menu: "Attendance - Manual Attendance", read: true, write: true, full: true, sync: true, prevDate: true },
+  { sl: 15, role: "Admin", menu: "Attendance - Manual Attendance Approval", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 16, role: "Admin", menu: "Attendance - Employee Job Card", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 17, role: "Admin", menu: "Roster - Create Roster", read: true, write: true, full: true, sync: true, prevDate: false },
+  { sl: 18, role: "Admin", menu: "Roster - Company Holiday", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 19, role: "Admin", menu: "Leave - Leave Application", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 20, role: "Admin", menu: "Leave - Leave Approve", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 21, role: "Admin", menu: "Leave - Leave List", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 22, role: "Admin", menu: "KPI Performance - Dashboard", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 23, role: "Admin", menu: "KPI Performance - Cycles", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 24, role: "Admin", menu: "KPI Performance - Criteria Setup", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 25, role: "Admin", menu: "KPI Performance - My Self-Assessment", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 26, role: "Admin", menu: "KPI Performance - 360° Peer Review", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 27, role: "Admin", menu: "KPI Performance - Assessment Workflow", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 28, role: "Admin", menu: "KPI Performance - KPI Reports", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 29, role: "Admin", menu: "Evaluation - Increment Configurator", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 30, role: "Admin", menu: "Evaluation - Evaluation Propose", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 31, role: "Admin", menu: "Evaluation - Propose Increment", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 32, role: "Admin", menu: "Evaluation - Increment Summary", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 33, role: "Admin", menu: "Evaluation - Approve Increment", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 34, role: "Admin", menu: "Evaluation - Increment List", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 35, role: "Admin", menu: "Evaluation - Increment History", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 36, role: "Admin", menu: "Transfer - Transfer History", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 37, role: "Admin", menu: "Transfer - Approve Transfer", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 38, role: "Admin", menu: "HR Policy - JD List", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 39, role: "Admin", menu: "HR Policy - JD Approvals", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 40, role: "Admin", menu: "User Management", read: true, write: true, full: true, sync: false, prevDate: false },
+
+  // employee permissions - subset of menus
+  { sl: 41, role: "employee", menu: "Dashboard", read: true, write: false, full: false, sync: false, prevDate: false },
+  { sl: 42, role: "employee", menu: "SSP - New Requisition", read: true, write: true, full: false, sync: false, prevDate: false },
+  { sl: 43, role: "employee", menu: "SSP - My Requisition", read: true, write: true, full: false, sync: false, prevDate: false },
+  { sl: 44, role: "employee", menu: "SSP - Attendance", read: true, write: false, full: false, sync: false, prevDate: false },
+  { sl: 45, role: "employee", menu: "Leave - Leave Application", read: true, write: true, full: false, sync: false, prevDate: false },
+  { sl: 46, role: "employee", menu: "Leave - Leave List", read: true, write: false, full: false, sync: false, prevDate: false },
+  { sl: 47, role: "employee", menu: "KPI Performance - My Self-Assessment", read: true, write: true, full: false, sync: false, prevDate: false },
+
+  // HOD permissions - subset of menus
+  { sl: 48, role: "HOD", menu: "Dashboard", read: true, write: true, full: false, sync: true, prevDate: false },
+  { sl: 49, role: "HOD", menu: "SSP - Approval", read: true, write: true, full: false, sync: false, prevDate: false },
+  { sl: 50, role: "HOD", menu: "Personnel Info - Personnel List", read: true, write: false, full: false, sync: false, prevDate: false },
+  { sl: 51, role: "HOD", menu: "Leave - Leave Approve", read: true, write: true, full: false, sync: false, prevDate: false },
+  { sl: 52, role: "HOD", menu: "KPI Performance - 360° Peer Review", read: true, write: true, full: false, sync: false, prevDate: false },
+  { sl: 53, role: "HOD", menu: "KPI Performance - Assessment Workflow", read: true, write: true, full: false, sync: false, prevDate: false }
 ];
 
 const SEED_OVERRIDES: UserOverrideRow[] = [
-  { sl: 1, empId: "2023045044", menu: "Dashboard", read: true, write: false, full: false, sync: false, prevDate: false }
+  { sl: 1, empId: "2023043910", menu: "Configure - Structure Setup", read: true, write: false, full: false, sync: false, prevDate: false },
+  { sl: 2, empId: "2023043910", menu: "User Management", read: true, write: true, full: true, sync: true, prevDate: true }
 ];
 
 const AVAILABLE_MENUS = [

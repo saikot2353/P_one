@@ -98,12 +98,70 @@ const SEED_ROLES: RoleItem[] = [
 ];
 
 const SEED_PERMISSIONS: PermissionRow[] = [
+  // Admin permissions for all 40 menus
   { sl: 1, role: "Admin", menu: "Dashboard", read: true, write: true, full: true, sync: true, prevDate: true },
-  { sl: 2, role: "Admin", menu: "Configure - Structure Setup", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 3, role: "Admin", menu: "User Management", read: true, write: true, full: true, sync: false, prevDate: false }
+  { sl: 2, role: "Admin", menu: "SSP - New Requisition", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 3, role: "Admin", menu: "SSP - My Requisition", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 4, role: "Admin", menu: "SSP - Approval", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 5, role: "Admin", menu: "SSP - Attendance", read: true, write: true, full: true, sync: true, prevDate: false },
+  { sl: 6, role: "Admin", menu: "Configure - Structure Setup", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 7, role: "Admin", menu: "Configure - Job & Employee Setup", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 8, role: "Admin", menu: "Configure - Shift & Time Rules", read: true, write: true, full: true, sync: true, prevDate: true },
+  { sl: 9, role: "Admin", menu: "Configure - Allowances & Bonuses", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 10, role: "Admin", menu: "Configure - Education & Training", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 11, role: "Admin", menu: "Configure - Leave & Policies", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 12, role: "Admin", menu: "Personnel Info - Personnel List", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 13, role: "Admin", menu: "Personnel Info - Approval", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 14, role: "Admin", menu: "Attendance - Manual Attendance", read: true, write: true, full: true, sync: true, prevDate: true },
+  { sl: 15, role: "Admin", menu: "Attendance - Manual Attendance Approval", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 16, role: "Admin", menu: "Attendance - Employee Job Card", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 17, role: "Admin", menu: "Roster - Create Roster", read: true, write: true, full: true, sync: true, prevDate: false },
+  { sl: 18, role: "Admin", menu: "Roster - Company Holiday", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 19, role: "Admin", menu: "Leave - Leave Application", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 20, role: "Admin", menu: "Leave - Leave Approve", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 21, role: "Admin", menu: "Leave - Leave List", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 22, role: "Admin", menu: "KPI Performance - Dashboard", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 23, role: "Admin", menu: "KPI Performance - Cycles", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 24, role: "Admin", menu: "KPI Performance - Criteria Setup", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 25, role: "Admin", menu: "KPI Performance - My Self-Assessment", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 26, role: "Admin", menu: "KPI Performance - 360° Peer Review", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 27, role: "Admin", menu: "KPI Performance - Assessment Workflow", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 28, role: "Admin", menu: "KPI Performance - KPI Reports", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 29, role: "Admin", menu: "Evaluation - Increment Configurator", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 30, role: "Admin", menu: "Evaluation - Evaluation Propose", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 31, role: "Admin", menu: "Evaluation - Propose Increment", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 32, role: "Admin", menu: "Evaluation - Increment Summary", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 33, role: "Admin", menu: "Evaluation - Approve Increment", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 34, role: "Admin", menu: "Evaluation - Increment List", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 35, role: "Admin", menu: "Evaluation - Increment History", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 36, role: "Admin", menu: "Transfer - Transfer History", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 37, role: "Admin", menu: "Transfer - Approve Transfer", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 38, role: "Admin", menu: "HR Policy - JD List", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 39, role: "Admin", menu: "HR Policy - JD Approvals", read: true, write: true, full: true, sync: false, prevDate: false },
+  { sl: 40, role: "Admin", menu: "User Management", read: true, write: true, full: true, sync: false, prevDate: false },
+
+  // employee permissions - subset of menus
+  { sl: 41, role: "employee", menu: "Dashboard", read: true, write: false, full: false, sync: false, prevDate: false },
+  { sl: 42, role: "employee", menu: "SSP - New Requisition", read: true, write: true, full: false, sync: false, prevDate: false },
+  { sl: 43, role: "employee", menu: "SSP - My Requisition", read: true, write: true, full: false, sync: false, prevDate: false },
+  { sl: 44, role: "employee", menu: "SSP - Attendance", read: true, write: false, full: false, sync: false, prevDate: false },
+  { sl: 45, role: "employee", menu: "Leave - Leave Application", read: true, write: true, full: false, sync: false, prevDate: false },
+  { sl: 46, role: "employee", menu: "Leave - Leave List", read: true, write: false, full: false, sync: false, prevDate: false },
+  { sl: 47, role: "employee", menu: "KPI Performance - My Self-Assessment", read: true, write: true, full: false, sync: false, prevDate: false },
+
+  // HOD permissions - subset of menus
+  { sl: 48, role: "HOD", menu: "Dashboard", read: true, write: true, full: false, sync: true, prevDate: false },
+  { sl: 49, role: "HOD", menu: "SSP - Approval", read: true, write: true, full: false, sync: false, prevDate: false },
+  { sl: 50, role: "HOD", menu: "Personnel Info - Personnel List", read: true, write: false, full: false, sync: false, prevDate: false },
+  { sl: 51, role: "HOD", menu: "Leave - Leave Approve", read: true, write: true, full: false, sync: false, prevDate: false },
+  { sl: 52, role: "HOD", menu: "KPI Performance - 360° Peer Review", read: true, write: true, full: false, sync: false, prevDate: false },
+  { sl: 53, role: "HOD", menu: "KPI Performance - Assessment Workflow", read: true, write: true, full: false, sync: false, prevDate: false }
 ];
 
-const SEED_OVERRIDES: UserOverrideRow[] = [];
+const SEED_OVERRIDES: UserOverrideRow[] = [
+  { sl: 1, empId: "2023043910", menu: "Configure - Structure Setup", read: true, write: false, full: false, sync: false, prevDate: false },
+  { sl: 2, empId: "2023043910", menu: "User Management", read: true, write: true, full: true, sync: true, prevDate: true }
+];
 
 const AVAILABLE_MENUS = [
   "Dashboard",
@@ -360,19 +418,51 @@ function PermissionManagementPage() {
     }
   };
 
+  const handleDeleteOverride = (menu: string) => {
+    if (!activeOverrideUser) return;
+    const nextOverrides = overrides.filter(o => !(o.empId === activeOverrideUser.empId && o.menu === menu));
+    saveOverrides(nextOverrides);
+    toast.info(`Reverted "${menu}" to system role defaults`);
+  };
+
   const handleUpdateOverrideValue = (menu: string, field: keyof Omit<UserOverrideRow, "sl" | "empId" | "menu">, value: boolean) => {
     if (!activeOverrideUser) return;
-    const updated = overrides.map(o => {
-      if (o.empId === activeOverrideUser.empId && o.menu === menu) {
-        const next = { ...o, [field]: value };
-        if (field === "full" && value) {
-          next.read = true;
-          next.write = true;
+    const exists = overrides.some(o => o.empId === activeOverrideUser.empId && o.menu === menu);
+    let updated: UserOverrideRow[];
+
+    if (exists) {
+      updated = overrides.map(o => {
+        if (o.empId === activeOverrideUser.empId && o.menu === menu) {
+          const next = { ...o, [field]: value };
+          if (field === "full" && value) {
+            next.read = true;
+            next.write = true;
+          }
+          return next;
         }
-        return next;
+        return o;
+      });
+    } else {
+      const baseMatch = permissions.find(p => p.role === activeOverrideUser.role && p.menu === menu);
+      const nextSl = overrides.length > 0 ? Math.max(...overrides.map(o => o.sl)) + 1 : 1;
+      const newOverride: UserOverrideRow = {
+        sl: nextSl,
+        empId: activeOverrideUser.empId,
+        menu,
+        read: baseMatch ? baseMatch.read : false,
+        write: baseMatch ? baseMatch.write : false,
+        full: baseMatch ? baseMatch.full : false,
+        sync: baseMatch ? baseMatch.sync : false,
+        prevDate: baseMatch ? baseMatch.prevDate : false
+      };
+      newOverride[field] = value;
+      if (field === "full" && value) {
+        newOverride.read = true;
+        newOverride.write = true;
       }
-      return o;
-    });
+      updated = [...overrides, newOverride];
+      toast.success(`Custom override activated for "${menu}"`);
+    }
     saveOverrides(updated);
   };
 
@@ -690,13 +780,13 @@ function PermissionManagementPage() {
                       <thead className="text-muted-foreground uppercase font-semibold tracking-wider text-[9.5px] border-b border-border/50 bg-[#f8fafc] dark:bg-[#0f172a] sticky top-0 z-10">
                         <tr>
                           <th className="px-5 py-4 w-[60px] text-center">#</th>
-                          <th className="px-5 py-4 min-w-[220px]">Menu Route Path</th>
-                          <th className="px-5 py-4 w-[110px] text-center">Override Privilege</th>
+                          <th className="px-5 py-4 min-w-[250px]">Menu Route Path</th>
                           <th className="px-5 py-4 w-[110px] text-center">Read Only</th>
                           <th className="px-5 py-4 w-[110px] text-center">Write Access</th>
                           <th className="px-5 py-4 w-[110px] text-center">Full Control</th>
                           <th className="px-5 py-4 w-[110px] text-center">Sync Log</th>
                           <th className="px-5 py-4 w-[110px] text-center">Back Date</th>
+                          <th className="px-5 py-4 w-[100px] text-center">Actions</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border/30 text-foreground">
@@ -710,78 +800,73 @@ function PermissionManagementPage() {
                           userWisePermissionsData.map((row, idx) => (
                             <tr key={row.menu} className={`group transition-all ${
                               row.hasOverride 
-                                ? "bg-amber-500/5 hover:bg-amber-500/10" 
+                                ? "bg-amber-500/[0.03] dark:bg-amber-500/[0.02] hover:bg-amber-500/[0.08] dark:hover:bg-amber-500/[0.05]" 
                                 : "hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d]"
                             }`}>
                               <td className="px-5 py-3.5 text-center font-mono text-slate-500 font-semibold">{idx + 1}</td>
-                              <td className="px-5 py-3.5 font-semibold text-foreground/95">{row.menu}</td>
-                              <td className="px-5 py-3.5 text-center">
-                                <label className="inline-flex items-center gap-1.5 cursor-pointer">
-                                  <input
-                                    type="checkbox"
-                                    checked={row.hasOverride}
-                                    onChange={e => handleToggleOverride(row.menu, e.target.checked)}
-                                    className="size-4 rounded border-border text-amber-500 cursor-pointer transition focus:ring-0"
-                                  />
-                                  <span className={`text-[10px] font-semibold uppercase tracking-wider ${
-                                    row.hasOverride ? "text-amber-600" : "text-slate-400"
-                                  }`}>Custom</span>
-                                </label>
+                              <td className="px-5 py-3.5">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold text-foreground/95">{row.menu}</span>
+                                  {row.hasOverride && (
+                                    <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-450 border border-amber-500/20 text-[8.5px] font-black uppercase tracking-wider scale-90">
+                                      Custom
+                                    </span>
+                                  )}
+                                </div>
                               </td>
                               <td className="px-5 py-3.5 text-center">
                                 <input
                                   type="checkbox"
                                   checked={row.read}
-                                  disabled={!row.hasOverride}
                                   onChange={e => handleUpdateOverrideValue(row.menu, "read", e.target.checked)}
-                                  className={`size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0 ${
-                                    !row.hasOverride ? "opacity-50 cursor-not-allowed" : ""
-                                  }`}
+                                  className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                                 />
                               </td>
                               <td className="px-5 py-3.5 text-center">
                                 <input
                                   type="checkbox"
                                   checked={row.write}
-                                  disabled={!row.hasOverride}
                                   onChange={e => handleUpdateOverrideValue(row.menu, "write", e.target.checked)}
-                                  className={`size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0 ${
-                                    !row.hasOverride ? "opacity-50 cursor-not-allowed" : ""
-                                  }`}
+                                  className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                                 />
                               </td>
                               <td className="px-5 py-3.5 text-center">
                                 <input
                                   type="checkbox"
                                   checked={row.full}
-                                  disabled={!row.hasOverride}
                                   onChange={e => handleUpdateOverrideValue(row.menu, "full", e.target.checked)}
-                                  className={`size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0 ${
-                                    !row.hasOverride ? "opacity-50 cursor-not-allowed" : ""
-                                  }`}
+                                  className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                                 />
                               </td>
                               <td className="px-5 py-3.5 text-center">
                                 <input
                                   type="checkbox"
                                   checked={row.sync}
-                                  disabled={!row.hasOverride}
                                   onChange={e => handleUpdateOverrideValue(row.menu, "sync", e.target.checked)}
-                                  className={`size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0 ${
-                                    !row.hasOverride ? "opacity-50 cursor-not-allowed" : ""
-                                  }`}
+                                  className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                                 />
                               </td>
                               <td className="px-5 py-3.5 text-center">
                                 <input
                                   type="checkbox"
                                   checked={row.prevDate}
-                                  disabled={!row.hasOverride}
                                   onChange={e => handleUpdateOverrideValue(row.menu, "prevDate", e.target.checked)}
-                                  className={`size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0 ${
-                                    !row.hasOverride ? "opacity-50 cursor-not-allowed" : ""
-                                  }`}
+                                  className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                                 />
+                              </td>
+                              <td className="px-5 py-3.5 text-center">
+                                {row.hasOverride ? (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteOverride(row.menu)}
+                                    className="text-amber-600 hover:text-amber-700 transition"
+                                    title="Revert custom overrides to base role defaults"
+                                  >
+                                    <Trash2 className="size-4" />
+                                  </button>
+                                ) : (
+                                  <span className="text-slate-300 dark:text-slate-700 font-mono select-none">—</span>
+                                )}
                               </td>
                             </tr>
                           ))

@@ -457,7 +457,11 @@ export function Topbar() {
                 "recruitment_config_multi_ss_v2",
                 "recruitment_candidates",
                 "recruitment_data_version",
-                "recruitment_synced_employees"
+                "recruitment_synced_employees",
+                "cripton_user_list",
+                "cripton_role_list",
+                "cripton_permissions_list",
+                "cripton_overrides_list"
               ];
               keysToClear.forEach(key => localStorage.removeItem(key));
               localStorage.setItem("hris_master_data_version_v11", "true");
