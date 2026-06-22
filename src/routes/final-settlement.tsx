@@ -217,10 +217,26 @@ function FinalSettlementPage() {
     setElFrom("2022"); setElTo("2026"); setElBalanceDays("50.72"); setElPayment("78617.00");
     setClBalanceDays("5"); setClPayment("5000.00");
     setServiceBenefitYear("3"); setPayableDaysPerYear("7.00"); setServiceBenefitTotal("19530.00");
-    setPfAmount("35000.00"); setCpfAmount("35000.00"); setGrandTotal("98147.00");
+    setPfAmount("35000.00"); setCpfAmount("35000.00"); setGrandTotal("104807.00");
     setCompensationAmt("5000.00"); setCompensationRemarks("Good performance bonus");
-    setNetPayment("103147.00");
+    setNetPayment("104807.00");
     setComments("Verified by HR. Cleared all assets.");
+    setCompensations([
+      { for: "Special Performance Bonus", amount: "5000.00" },
+      { for: "Sales Commission", amount: "1500.00" },
+      { for: "Unused Sick Leave Encashment", amount: "3250.00" },
+      { for: "Project Completion Reward", amount: "10000.00" },
+      { for: "Overtime Adjustment", amount: "850.00" },
+      { for: "", amount: "" }
+    ]);
+    setDeductions([
+      { for: "Unadjusted Loan", amount: "2000.00" },
+      { for: "Lost ID Card Penalty", amount: "500.00" },
+      { for: "Advance Salary Adjustment", amount: "5000.00" },
+      { for: "Notice Period Shortage", amount: "3500.00" },
+      { for: "Damaged Equipment", amount: "1200.00" },
+      { for: "", amount: "" }
+    ]);
     setCalculated(true);
   }
 
@@ -348,274 +364,307 @@ function FinalSettlementPage() {
 
           {/* ─── CREATE FORM ────────────────────────────────────────────────── */}
           {view === "create" && (
-            <div className="space-y-4">
+            <div className="bg-card border border-border/60 shadow-sm rounded flex flex-col relative min-h-[calc(100vh-140px)] w-full overflow-hidden">
+              <div className="p-6 flex-1 space-y-4">
 
-              {/* ── Row 1: Employee ID Lookup ── */}
-              <div className="bg-card border border-border/60 rounded-lg shadow-sm p-4">
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+              {/* ── Configuration & Records ── */}
+              <div className="border border-border/60 rounded p-5 mb-4 bg-card shadow-sm">
+                <div className="flex items-center gap-1.5 mb-5 text-[11px] font-bold text-primary">
+                  <span className="uppercase tracking-wider border-b-2 border-primary/30 pb-0.5">Configuration & Records</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                   <div className="space-y-1">
-                    <label className="text-[11px] font-semibold text-muted-foreground">Mode</label>
-                    <Select value={mode} onChange={(e: any) => setMode(e.target.value)}>
-                      <option>With Salary</option>
-                      <option>Without Salary</option>
-                    </Select>
+                    <label className="text-[10px] font-semibold text-muted-foreground">Payment Type <span className="text-rose-500">*</span></label>
+                    <Select><option>Bank</option><option>Cash</option></Select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground cursor-pointer">
+                      <input type="checkbox" className="accent-primary size-3" defaultChecked /> Notice Deduction
+                    </label>
+                    <Select><option>30</option><option>60</option></Select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-semibold text-[#3b82f6]">Employee ID</label>
+                    <Input value={employeeId} onChange={(e: any) => setEmployeeId(e.target.value)} placeholder="e.g. 2023043910" className="font-bold border-[#3b82f6]/30 focus:ring-[#3b82f6]/40" />
+                    <button onClick={handleLoadEmployee} className="mt-1.5 text-[9px] bg-[#3b82f6] hover:bg-[#2563eb] transition-colors text-white px-2.5 py-0.5 rounded font-bold tracking-wider uppercase shadow-sm">Load Employee</button>
                   </div>
                   <div className="space-y-1 md:col-span-2">
-                    <label className="text-[11px] font-semibold text-muted-foreground">Employee ID <span className="text-rose-500">*</span></label>
-                    <div className="flex gap-2">
-                      <Input value={employeeId} onChange={(e: any) => setEmployeeId(e.target.value)} placeholder="e.g. 2022041203" />
-                      <button onClick={handleLoadEmployee}
-                        className="shrink-0 px-4 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded hover:bg-primary/90 transition-colors shadow-sm">
-                        Load
-                      </button>
+                    <label className="text-[10px] font-semibold text-muted-foreground">Settlement Type <span className="text-rose-500">*</span></label>
+                    <Select value={settlementType} onChange={(e: any) => setSettlementType(e.target.value)}>
+                      <option value="Working">Working</option>
+                      {settlementTypes.map(t => <option key={t}>{t}</option>)}
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-semibold text-muted-foreground">Apply Date <span className="text-rose-500">*</span></label>
+                    <Input type="date" value={resignApplyDate} onChange={(e: any) => setResignApplyDate(e.target.value)} />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-semibold text-muted-foreground">Action Date <span className="text-rose-500">*</span></label>
+                    <Input type="date" value={settlementDate} onChange={(e: any) => setSettlementDate(e.target.value)} />
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Employee Information ── */}
+              <div className="border border-border/60 rounded p-5 mb-6 bg-card shadow-sm">
+                <div className="flex items-center gap-1.5 mb-5 text-[11px] font-bold text-[#84cc16]">
+                  <span className="uppercase tracking-wider border-b-2 border-[#84cc16]/30 pb-0.5">Employee Information</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-0.5 pt-1">
+                  <div className="space-y-1.5 border-r border-border/30 pr-6">
+                    <InfoRow label="Company" value={empLoaded ? "Pakiza Software Limited(PSL-Operation)" : ""} />
+                    <InfoRow label="Emp Name" value={empLoaded ? "Tahmid Afsar" : ""} />
+                    <InfoRow label="Designation" value={empLoaded ? "Asst. Manager" : ""} />
+                    <InfoRow label="Department" value={empLoaded ? "Business Innovation" : ""} />
+                    <InfoRow label="Section" value={empLoaded ? "Project Resource & Strategy" : ""} />
+                    <InfoRow label="Unit" value={empLoaded ? "PSL" : ""} />
+                    <InfoRow label="Joining Date" value={empLoaded ? "01/08/2023" : ""} />
+                    <InfoRow label="Employee Type" value={empLoaded ? "Office Executive" : ""} />
+                    <InfoRow label="Bank Account" value={empLoaded ? "171.103.0256059" : ""} />
+                  </div>
+                  <div className="space-y-1.5 pl-6">
+                    <InfoRow label="Basic Salary" value={empLoaded ? "31200.00" : ""} />
+                    <InfoRow label="House Rent" value={empLoaded ? "15600.00" : ""} />
+                    <InfoRow label="Medical" value={empLoaded ? "3120.00" : ""} />
+                    <InfoRow label="Transport Allowance" value={empLoaded ? "2080.00" : ""} />
+                    <InfoRow label="Food Allowance" value={empLoaded ? "0.00" : ""} />
+                    <div className="pt-2 mt-2 border-t border-border/50">
+                      <InfoRow label="Gross Salary" value={empLoaded ? "52000.00" : ""} />
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* ── Main Form Stack ── */}
-              <div className="space-y-4">
+              {/* ── Sections ── */}
 
-                {/* ══ TOP PANEL: Employee Info ══ */}
-                <div className="bg-card border border-border/60 rounded-lg shadow-sm overflow-hidden">
-                  <div className="px-4 py-2.5 bg-muted/20 border-b border-border/60">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-primary">Employee Info</span>
-                  </div>
-                  <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-0.5">
-                    <InfoRow label="Company" value={empLoaded ? emp.company : ""} />
-                    <InfoRow label="Emp Name" value={empLoaded ? emp.name : ""} />
-                    <InfoRow label="Joining Date" value={empLoaded ? emp.joiningDate : ""} />
-                    <InfoRow label="Designation" value={empLoaded ? emp.designation : ""} />
-                    <InfoRow label="Department" value={empLoaded ? emp.department : ""} />
-                    <InfoRow label="Line" value={empLoaded ? emp.line : ""} />
-                    <InfoRow label="Grade" value={empLoaded ? emp.grade : ""} />
-                    <InfoRow label="Gross Salary" value={empLoaded ? `৳ ${emp.grossSalary}` : ""} />
-                    <InfoRow label="Basic Salary" value={empLoaded ? `৳ ${emp.basicSalary}` : ""} />
-                    <InfoRow label="Tenure of work" value={empLoaded ? emp.tenure : ""} />
-                    <InfoRow label="Day Shortage" value={empLoaded ? emp.dayShortage : ""} />
-                  </div>
-                  {/* Net Payable bar */}
-                  <div className={`mx-4 mb-4 mt-2 rounded px-4 py-3 flex items-center justify-between text-xs font-bold border ${calculated ? "bg-[#ffece6] border-[#ffcbb9] text-[#d64817] dark:text-[#ffb197] shadow-sm" : "bg-muted/40 border-border/40 text-muted-foreground"}`}>
-                    <span>Net Payable</span>
-                    <span className="font-mono text-sm">Tk. {calculated ? netPayment : "0.00"}</span>
-                  </div>
+              {/* Salary Info */}
+              <div className="border border-border/60 rounded p-4 mb-4 bg-card shadow-sm">
+                <div className="flex items-center gap-1.5 mb-4 text-[11px] font-bold text-[#3b82f6]">
+                  <input type="checkbox" className="accent-[#3b82f6] size-3" defaultChecked /> Salary Info
                 </div>
-
-                {/* ══ RIGHT PANEL: Settlement Info ══ */}
-                <div className="bg-card border border-border/60 rounded-lg shadow-sm overflow-hidden">
-                  <div className="px-4 py-2.5 bg-muted/20 border-b border-border/60">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-primary">Settlement Info</span>
+                <div className="flex gap-4 items-end mb-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-muted-foreground block">From Date <span className="text-rose-500">*</span></label>
+                    <Input type="date" value={salaryFromDate} onChange={(e: any) => setSalaryFromDate(e.target.value)} className="w-32" />
                   </div>
-                  <div className="p-4">
-
-                    <SubSection title="1. General Details">
-                      <div className="grid grid-cols-2 gap-3 mb-3">
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-semibold text-muted-foreground">Settlement Type <span className="text-rose-500">*</span></label>
-                          <Select value={settlementType} onChange={(e: any) => setSettlementType(e.target.value)}>
-                            <option value="">Select...</option>
-                            {settlementTypes.map(t => <option key={t}>{t}</option>)}
-                          </Select>
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-semibold text-muted-foreground">Settlement Date <span className="text-rose-500">*</span></label>
-                          <Input type="date" value={settlementDate} onChange={(e: any) => setSettlementDate(e.target.value)} />
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-semibold text-muted-foreground">Resign Apply Date <span className="text-rose-500">*</span></label>
-                          <Input type="date" value={resignApplyDate} onChange={(e: any) => setResignApplyDate(e.target.value)} />
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-semibold text-muted-foreground">Resign Date <span className="text-rose-500">*</span></label>
-                          <Input type="date" value={resignDate} onChange={(e: any) => setResignDate(e.target.value)} />
-                        </div>
-                        <div className="space-y-1 col-span-2">
-                          <label className="text-[10px] font-semibold text-muted-foreground">Last Working Date (Pre) <span className="text-rose-500">*</span></label>
-                          <Input type="date" value={lastWorkingDate} onChange={(e: any) => setLastWorkingDate(e.target.value)} />
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-4 py-1.5 border-t border-border/25 mt-2 pt-3">
-                        <span className="text-[11px] text-muted-foreground w-28 shrink-0">Deduction Type</span>
-                        <label className="flex items-center gap-1 cursor-pointer">
-                          <input type="radio" name="dedType" checked={deductionType === "yes"} onChange={() => setDeductionType("yes")} className="accent-primary size-3" />
-                          <span className="text-[11px]">Yes</span>
-                        </label>
-                        <label className="flex items-center gap-1 cursor-pointer">
-                          <input type="radio" name="dedType" checked={deductionType === "no"} onChange={() => setDeductionType("no")} className="accent-primary size-3" />
-                          <span className="text-[11px]">No</span>
-                        </label>
-                      </div>
-                    </SubSection>
-
-                    <SubSection title="2. Attendance & Notice">
-                      <CalcRow left={<CalcField label="Notice Period (Day)" value={noticePeriod} onChange={(e: any) => setNoticePeriod(e.target.value)} />} right={<CalcField label="Notice Shortage Ded." value={noticeShortage} onChange={(e: any) => setNoticeShortage(e.target.value)} />} />
-                      <CalcRow left={<CalcField label="Working Days" value={workingDays} onChange={(e: any) => setWorkingDays(e.target.value)} />} right={<CalcField label="Present" value={present} onChange={(e: any) => setPresent(e.target.value)} />} />
-                      <CalcRow left={<CalcField label="Leave" value={leave} onChange={(e: any) => setLeave(e.target.value)} />} right={<CalcField label="Holiday" value={holiday} onChange={(e: any) => setHoliday(e.target.value)} />} />
-                      <CalcRow left={<CalcField label="Absent Days" value={absentDays} onChange={(e: any) => setAbsentDays(e.target.value)} />} right={<CalcField label="Absent Deduction" value={absentDeduction} onChange={(e: any) => setAbsentDeduction(e.target.value)} />} />
-                    </SubSection>
-
-                    <SubSection title="3. Deductions">
-                      <CalcRow left={<CalcField label="PF Deduction" value={pfDeduction} onChange={(e: any) => setPfDeduction(e.target.value)} />} right={<CalcField label="Tax Deduction" value={taxDeduction} onChange={(e: any) => setTaxDeduction(e.target.value)} />} />
-                      <CalcRow left={<CalcField label="Advance Deduction" value={advanceDeduction} onChange={(e: any) => setAdvanceDeduction(e.target.value)} />} right={<CalcField label="Loan Deduction" value={loanDeduction} onChange={(e: any) => setLoanDeduction(e.target.value)} />} />
-                      <CalcRow left={<CalcField label="Lunch Deduction" value={lunchDeduction} onChange={(e: any) => setLunchDeduction(e.target.value)} />} right={<CalcField label="Others Deduction" value={othersDeduction} onChange={(e: any) => setOthersDeduction(e.target.value)} />} />
-                      <CalcRow left={<CalcField label="Rev. Stamp" value={revStamp} onChange={(e: any) => setRevStamp(e.target.value)} />} right={<CalcField label="Wagely Advance" value={wagelyAdvance} onChange={(e: any) => setWagelyAdvance(e.target.value)} />} />
-                    </SubSection>
-
-                    <SubSection title="4. Allowances & Extras">
-                      <CalcRow left={<CalcField label="Behaviour Allow." value={behaviourAllowance} onChange={(e: any) => setBehaviourAllowance(e.target.value)} />} right={<CalcField label="Holiday Allowance" value={holidayAllowance} onChange={(e: any) => setHolidayAllowance(e.target.value)} />} />
-                      <CalcRow left={<CalcField label="General Allowance" value={generalAllowance} onChange={(e: any) => setGeneralAllowance(e.target.value)} />} right={<CalcField label="Conveyance Allow." value={conveyanceAllowance} onChange={(e: any) => setConveyanceAllowance(e.target.value)} />} />
-                      <CalcRow left={<CalcField label="Incentive Allowance" value={incentiveAllowance} onChange={(e: any) => setIncentiveAllowance(e.target.value)} />} right={<CalcField label="Other Allowance" value={otherAllowance} onChange={(e: any) => setOtherAllowance(e.target.value)} />} />
-                      <CalcRow left={<CalcField label="OT Rate" value={otRate} onChange={(e: any) => setOtRate(e.target.value)} />} right={<CalcField label="OT Hour" value={otHour} onChange={(e: any) => setOtHour(e.target.value)} />} />
-                      <CalcRow left={<CalcField label="OT Payment" value={otPayment} onChange={(e: any) => setOtPayment(e.target.value)} />} right={<CalcField label="Arrear" value={arrear} onChange={(e: any) => setArrear(e.target.value)} />} />
-                      <CalcRow left={<CalcField label="Attendance Bonus" value={attendanceBonus} onChange={(e: any) => setAttendanceBonus(e.target.value)} />} right={<CalcField label="Tiffin & Night Bill" value={tiffinNightBill} onChange={(e: any) => setTiffinNightBill(e.target.value)} />} />
-                    </SubSection>
-
-                    <SubSection title="5. Base Salaries">
-                      <div className="grid grid-cols-2 gap-x-3 bg-primary/5 rounded border border-primary/20 p-2">
-                         <CalcField label="Pay Salary" value={paySalary} readOnly />
-                         <CalcField label="Net Salary" value={calculated ? netSalary : ""} readOnly />
-                      </div>
-                    </SubSection>
-
-                    <SubSection title="6. Leave & Service Benefits">
-                      <div className="pb-2 border-b border-border/25 mb-2">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-[11px] text-muted-foreground w-16 shrink-0">EL Year</span>
-                          <span className="text-[10px] text-muted-foreground">From</span>
-                          <div className="flex gap-1">
-                            <Select value={elFrom} onChange={(e: any) => setElFrom(e.target.value)} className="w-16 text-[11px]"><option value="">Yr</option>{elYears.map(y => <option key={y}>{y}</option>)}</Select>
-                            <Select value={elFromMonth} onChange={(e: any) => setElFromMonth(e.target.value)} className="w-16 text-[11px]"><option value="">Mon</option>{elMonths.map(m => <option key={m}>{m}</option>)}</Select>
-                          </div>
-                          <span className="text-[10px] text-muted-foreground ml-2">To</span>
-                          <div className="flex gap-1">
-                            <Select value={elTo} onChange={(e: any) => setElTo(e.target.value)} className="w-16 text-[11px]"><option value="">Yr</option>{elYears.map(y => <option key={y}>{y}</option>)}</Select>
-                            <Select value={elToMonth} onChange={(e: any) => setElToMonth(e.target.value)} className="w-16 text-[11px]"><option value="">Mon</option>{elMonths.map(m => <option key={m}>{m}</option>)}</Select>
-                          </div>
-                        </div>
-                      </div>
-                      <CalcRow left={<CalcField label="EL Balance Days" value={elBalanceDays} onChange={(e: any) => setElBalanceDays(e.target.value)} />} right={<CalcField label="EL Payment" value={elPayment} readOnly />} />
-                      <CalcRow left={<CalcField label="CL Balance Days" value={clBalanceDays} onChange={(e: any) => setClBalanceDays(e.target.value)} />} right={<CalcField label="CL Payment" value={clPayment} readOnly />} />
-                      <CalcRow left={<CalcField label="Service Ben. Year" value={serviceBenefitYear} onChange={(e: any) => setServiceBenefitYear(e.target.value)} />} right={<CalcField label="Payable Days (SB)" value={payableDaysPerYear} onChange={(e: any) => setPayableDaysPerYear(e.target.value)} />} />
-                      <div className="py-1.5 mt-1 border-t border-border/25">
-                        <CalcField label="Service Benefit (Total)" value={serviceBenefitTotal} readOnly />
-                      </div>
-                    </SubSection>
-
-                    <SubSection title="7. Final Adjustments & Totals">
-                      <CalcRow left={<CalcField label="PF Amount" value={pfAmount} onChange={(e: any) => setPfAmount(e.target.value)} />} right={<CalcField label="CPF Amount" value={cpfAmount} onChange={(e: any) => setCpfAmount(e.target.value)} />} />
-                      <div className="py-2 border-b border-border/25">
-                        <CalcField label="Grand Total" value={calculated ? grandTotal : ""} readOnly />
-                      </div>
-                      <CalcRow left={<CalcField label="Compensation Amt" value={compensationAmt} onChange={(e: any) => setCompensationAmt(e.target.value)} />} right={<CalcField label="Comp. Remarks" value={compensationRemarks} onChange={(e: any) => setCompensationRemarks(e.target.value)} />} />
-                      <div className="py-2 mt-1 bg-amber-500/10 rounded border border-amber-500/20 px-2">
-                        <CalcField label="Net Payment" value={calculated ? netPayment : ""} readOnly />
-                      </div>
-                      <div className="pt-3">
-                        <label className="text-[10px] font-semibold text-muted-foreground block mb-1">Final Comments</label>
-                        <textarea value={comments} onChange={e => setComments(e.target.value)} rows={2} placeholder="Add any finalizing notes here..."
-                          className="w-full text-[11px] border border-border bg-background rounded px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary/40 resize-none" />
-                      </div>
-                    </SubSection>
-
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-muted-foreground block">To Date <span className="text-rose-500">*</span></label>
+                    <Input type="date" value={salaryToDate} onChange={(e: any) => setSalaryToDate(e.target.value)} className="w-32" />
                   </div>
+                  <button className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-4 py-1.5 rounded text-[10px] font-bold uppercase transition-colors tracking-wider">
+                    Generate
+                  </button>
+                </div>
+                <div className="overflow-x-auto rounded border border-border/50">
+                  <table className="w-full text-[10px] text-center whitespace-nowrap">
+                    <thead className="bg-muted/20 border-b border-border/50 text-muted-foreground">
+                      <tr>
+                        <th className="p-2 font-medium border-r border-border/50">#</th>
+                        <th className="p-2 font-medium border-r border-border/50 text-left">Emp Id</th>
+                        <th className="p-2 font-medium border-r border-border/50 text-left">Name</th>
+                        <th className="p-2 font-medium border-r border-border/50">Month</th>
+                        <th className="p-2 font-medium border-r border-border/50">Year</th>
+                        <th className="p-2 font-medium border-r border-border/50">W/D</th>
+                        <th className="p-2 font-medium border-r border-border/50">Present</th>
+                        <th className="p-2 font-medium border-r border-border/50">Holiday</th>
+                        <th className="p-2 font-medium border-r border-border/50">Leave</th>
+                        <th className="p-2 font-medium border-r border-border/50">Absent</th>
+                        <th className="p-2 font-medium border-r border-border/50">OT</th>
+                        <th className="p-2 font-medium border-r border-border/50">OT Amt</th>
+                        <th className="p-2 font-medium border-r border-border/50">Pay Basic</th>
+                        <th className="p-2 font-medium border-r border-border/50">House Rent</th>
+                        <th className="p-2 font-medium border-r border-border/50">Medical</th>
+                        <th className="p-2 font-medium border-r border-border/50">Transport</th>
+                        <th className="p-2 font-medium border-r border-border/50">Food</th>
+                        <th className="p-2 font-medium border-r border-border/50">Adv Amount</th>
+                        <th className="p-2 font-medium border-r border-border/50">Abs Amount</th>
+                        <th className="p-2 font-medium border-r border-border/50">Tax Amount</th>
+                        <th className="p-2 font-medium">Total Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {empLoaded ? (
+                        <tr className="border-b border-border/30 hover:bg-muted/10">
+                          <td className="p-2 border-r border-border/50">1</td>
+                          <td className="p-2 border-r border-border/50 text-left">2023043910</td>
+                          <td className="p-2 border-r border-border/50 text-left">Tahmid Afsar</td>
+                          <td className="p-2 border-r border-border/50">06</td>
+                          <td className="p-2 border-r border-border/50">2026</td>
+                          <td className="p-2 border-r border-border/50">14</td>
+                          <td className="p-2 border-r border-border/50">14</td>
+                          <td className="p-2 border-r border-border/50">8</td>
+                          <td className="p-2 border-r border-border/50">0</td>
+                          <td className="p-2 border-r border-border/50">0</td>
+                          <td className="p-2 border-r border-border/50">0.00</td>
+                          <td className="p-2 border-r border-border/50">0</td>
+                          <td className="p-2 border-r border-border/50">22880.00</td>
+                          <td className="p-2 border-r border-border/50">11440.00</td>
+                          <td className="p-2 border-r border-border/50">2288.00</td>
+                          <td className="p-2 border-r border-border/50">1525.33</td>
+                          <td className="p-2 border-r border-border/50">0.00</td>
+                          <td className="p-2 border-r border-border/50">0</td>
+                          <td className="p-2 border-r border-border/50">0</td>
+                          <td className="p-2 border-r border-border/50">0.00</td>
+                          <td className="p-2 font-semibold">52000</td>
+                        </tr>
+                      ) : (
+                        <tr><td colSpan={21} className="p-4 text-center text-muted-foreground italic">No data generated.</td></tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </div>
 
-              {/* ── Salary Info Section ── */}
-              {mode === "With Salary" && (
-                <SectionCard title="Salary Info" action={<SectionToggle />}>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-semibold text-muted-foreground">From Date <span className="text-rose-500">*</span></label>
-                        <Input type="date" value={salaryFromDate} onChange={(e: any) => setSalaryFromDate(e.target.value)} className="w-36" />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-semibold text-muted-foreground">To Date <span className="text-rose-500">*</span></label>
-                        <Input type="date" value={salaryToDate} onChange={(e: any) => setSalaryToDate(e.target.value)} className="w-36" />
-                      </div>
-                      <button className="mt-5 px-3 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded hover:bg-primary/90 transition-colors flex items-center gap-1.5 shadow-sm">
-                        <RefreshCw className="size-3" /> Generate
-                      </button>
-                    </div>
-                    <div className="overflow-x-auto rounded border border-border/50">
-                      <table className="w-full text-[11px]">
-                        <thead>
-                          <tr className="bg-muted/30 border-b border-border/50">
-                            {["Emp Id", "Name", "Month", "Year", "WD", "Present", "Holiday", "Leave", "Absent", "OT", "OT Amt", "Pay Basic", "House Rent", "Medical", "Transport", "Food", "Total Amt"].map(h => (
-                              <th key={h} className="px-2 py-2 text-left font-semibold text-muted-foreground whitespace-nowrap">{h}</th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {empLoaded ? (
-                            <tr className="border-b border-border/30 hover:bg-muted/20">
-                              <td className="px-2 py-2 font-mono">2022041203</td>
-                              <td className="px-2 py-2 whitespace-nowrap">Khairul Bashar Masum</td>
-                              <td className="px-2 py-2">05</td><td className="px-2 py-2">2026</td>
-                              <td className="px-2 py-2">25</td><td className="px-2 py-2">23</td>
-                              <td className="px-2 py-2">0</td><td className="px-2 py-2">2</td>
-                              <td className="px-2 py-2">0</td><td className="px-2 py-2">10</td>
-                              <td className="px-2 py-2">1500</td><td className="px-2 py-2">27,900</td>
-                              <td className="px-2 py-2">13,950</td><td className="px-2 py-2">2,790</td>
-                              <td className="px-2 py-2">1,860</td><td className="px-2 py-2">0</td>
-                              <td className="px-2 py-2 font-semibold">48,000</td>
-                            </tr>
-                          ) : (
-                            <tr><td colSpan={17} className="px-3 py-5 text-center text-[11px] text-muted-foreground">Load an employee and click Generate.</td></tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </SectionCard>
-              )}
-
-              {/* ── Compensation + Deduction side by side ── */}
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                <SectionCard title="Additional Compensation" action={<SectionToggle />}>
-                  <div className="space-y-2">
-                    {compensations.map((row, i) => (
-                      <div key={i} className="flex items-center gap-2">
-                        <Input value={row.for} onChange={(e: any) => setCompensations(p => p.map((r, idx) => idx === i ? { ...r, for: e.target.value } : r))} placeholder="Compensation For" className="flex-1" />
-                        <Input value={row.amount} onChange={(e: any) => setCompensations(p => p.map((r, idx) => idx === i ? { ...r, amount: e.target.value } : r))} placeholder="Amount" type="number" className="w-28 font-mono" />
-                        {i === compensations.length - 1 ? (
-                          <button onClick={() => setCompensations(p => [...p, { for: "", amount: "" }])} className="p-1.5 rounded bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors"><Plus className="size-3.5" /></button>
-                        ) : (
-                          <button onClick={() => setCompensations(p => p.filter((_, idx) => idx !== i))} className="p-1.5 rounded bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500/20 transition-colors"><X className="size-3.5" /></button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </SectionCard>
-
-                <SectionCard title="Additional Deduction" action={<SectionToggle />}>
-                  <div className="space-y-2">
-                    {deductions.map((row, i) => (
-                      <div key={i} className="flex items-center gap-2">
-                        <Input value={row.for} onChange={(e: any) => setDeductions(p => p.map((r, idx) => idx === i ? { ...r, for: e.target.value } : r))} placeholder="Deduction For" className="flex-1" />
-                        <Input value={row.amount} onChange={(e: any) => setDeductions(p => p.map((r, idx) => idx === i ? { ...r, amount: e.target.value } : r))} placeholder="Amount" type="number" className="w-28 font-mono" />
-                        {i === deductions.length - 1 ? (
-                          <button onClick={() => setDeductions(p => [...p, { for: "", amount: "" }])} className="p-1.5 rounded bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors"><Plus className="size-3.5" /></button>
-                        ) : (
-                          <button onClick={() => setDeductions(p => p.filter((_, idx) => idx !== i))} className="p-1.5 rounded bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500/20 transition-colors"><X className="size-3.5" /></button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </SectionCard>
+              {/* Compensation Info */}
+              <div className="border border-border/60 rounded p-4 mb-4 bg-card shadow-sm">
+                <div className="flex items-center gap-1.5 mb-4 text-[11px] font-bold text-[#84cc16]">
+                  <input type="checkbox" className="accent-[#84cc16] size-3" defaultChecked /> Compensation Info
+                </div>
+                <div className="overflow-x-auto rounded border border-border/50">
+                  <table className="w-full text-[10px]">
+                    <thead className="bg-[#f2f9f2] border-b border-border/50 text-[#84cc16]">
+                      <tr>
+                        <th className="p-2 font-medium border-r border-border/50 w-12 text-center">#</th>
+                        <th className="p-2 font-medium border-r border-border/50 text-left">Compensation For</th>
+                        <th className="p-2 font-medium border-r border-border/50 text-right w-32">Amount</th>
+                        <th className="p-2 font-medium w-12 text-center text-muted-foreground/50">
+                          <Plus className="size-3.5 mx-auto" />
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {compensations.map((row, i) => (
+                        <tr key={i} className="border-b border-border/30 last:border-0 hover:bg-muted/10">
+                          <td className="p-2 border-r border-border/50 text-center text-muted-foreground">{i + 1}</td>
+                          <td className="p-0 border-r border-border/50"><Input value={row.for} onChange={(e: any) => setCompensations(p => p.map((r, idx) => idx === i ? { ...r, for: e.target.value } : r))} placeholder="Compensation For" className="border-0 shadow-none h-8 text-[10px] rounded-none focus:ring-0" /></td>
+                          <td className="p-0 border-r border-border/50"><Input value={row.amount} onChange={(e: any) => setCompensations(p => p.map((r, idx) => idx === i ? { ...r, amount: e.target.value } : r))} placeholder="Amount" type="number" className="border-0 shadow-none h-8 text-[10px] text-right font-mono rounded-none focus:ring-0" /></td>
+                          <td className="p-1 text-center">
+                            {i === compensations.length - 1 ? (
+                              <button onClick={() => setCompensations(p => [...p, { for: "", amount: "" }])} className="p-1 rounded text-muted-foreground border border-border/50 hover:bg-muted/40 transition-colors mx-auto block"><Plus className="size-3" /></button>
+                            ) : (
+                              <button onClick={() => setCompensations(p => p.filter((_, idx) => idx !== i))} className="p-1 rounded text-rose-500 border border-rose-500/20 hover:bg-rose-500/10 transition-colors mx-auto block"><Trash2 className="size-3" /></button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
-              {/* ── Bottom Action Bar ── */}
-              <div className="bg-card border border-border/60 rounded-lg shadow-sm p-4 flex items-center justify-between sticky bottom-4 z-10">
+              {/* Earn Leave Info */}
+              <div className="border border-border/60 rounded p-4 mb-4 bg-card shadow-sm">
+                <div className="flex items-center gap-1.5 mb-4 text-[11px] font-bold text-[#3b82f6]">
+                  <input type="checkbox" className="accent-[#3b82f6] size-3" defaultChecked /> Earn Leave Info
+                </div>
+                <div className="flex gap-4 items-end mb-6">
+                  <div>
+                    <label className="text-[10px] text-muted-foreground block mb-1">EL Year:</label>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px]">From</span>
+                      <Select className="w-20"><option>2023</option></Select>
+                      <span className="text-[10px]">To</span>
+                      <Select className="w-20"><option>2026</option></Select>
+                    </div>
+                  </div>
+                  <button className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-4 py-1.5 rounded text-[10px] font-bold uppercase transition-colors tracking-wider">
+                    Generate
+                  </button>
+                </div>
+                <div className="flex justify-between items-center border-t border-border/50 pt-3 text-[11px] font-bold">
+                  <div className="flex-1 flex justify-between pr-20"><span>Annual Leave Days</span><span>:</span></div>
+                  <div className="w-24 text-right">{empLoaded ? elBalanceDays : ""}</div>
+                  <div className="flex-1 flex justify-between pl-20 pr-20"><span>Pay Amount</span><span>:</span></div>
+                  <div className="w-24 text-right">{empLoaded ? elPayment : ""}</div>
+                </div>
+              </div>
+
+              {/* Service Benefit Info */}
+              <div className="border border-border/60 rounded p-4 mb-4 bg-card shadow-sm">
+                <div className="flex items-center gap-1.5 mb-4 text-[11px] font-bold text-[#3b82f6]">
+                  <input type="checkbox" className="accent-[#3b82f6] size-3" defaultChecked /> Service Benefit Info
+                </div>
+                <div className="flex items-center gap-16 mb-4">
+                  <div className="flex-1 flex justify-between font-bold text-[11px] pr-20">
+                    <span>Tenure of work</span>
+                    <span>: {empLoaded ? "0 Year, 0 Month, 0 Day" : ""}</span>
+                  </div>
+                  <div className="flex-1">
+                    <button className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-4 py-1.5 rounded text-[10px] font-bold uppercase transition-colors tracking-wider">
+                      Generate
+                    </button>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center border-t border-border/50 pt-3 text-[11px] font-bold">
+                  <div className="flex-1 flex justify-between pr-20"><span>Service Days</span><span>:</span></div>
+                  <div className="w-24 text-right">{empLoaded ? "1080" : ""}</div>
+                  <div className="flex-1 flex justify-between pl-20 pr-20"><span>Pay Amount</span><span>:</span></div>
+                  <div className="w-24 text-right">{empLoaded ? serviceBenefitTotal : ""}</div>
+                </div>
+              </div>
+
+              {/* Deduction Info */}
+              <div className="border border-border/60 rounded p-4 mb-6 bg-card shadow-sm">
+                <div className="flex items-center gap-1.5 mb-4 text-[11px] font-bold text-rose-500">
+                  <input type="checkbox" className="accent-rose-500 size-3" defaultChecked /> Deduction Info
+                </div>
+                <div className="overflow-x-auto rounded border border-border/50">
+                  <table className="w-full text-[10px]">
+                    <thead className="bg-rose-50 border-b border-border/50 text-rose-600">
+                      <tr>
+                        <th className="p-2 font-medium border-r border-border/50 w-12 text-center">#</th>
+                        <th className="p-2 font-medium border-r border-border/50 text-left">Deduction For</th>
+                        <th className="p-2 font-medium border-r border-border/50 text-right w-32">Amount</th>
+                        <th className="p-2 font-medium w-12 text-center text-rose-600/50">
+                          <Plus className="size-3.5 mx-auto" />
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {deductions.map((row, i) => (
+                        <tr key={i} className="border-b border-border/30 last:border-0 hover:bg-muted/10">
+                          <td className="p-2 border-r border-border/50 text-center text-muted-foreground">{i + 1}</td>
+                          <td className="p-0 border-r border-border/50"><Input value={row.for} onChange={(e: any) => setDeductions(p => p.map((r, idx) => idx === i ? { ...r, for: e.target.value } : r))} placeholder="Deduction For" className="border-0 shadow-none h-8 text-[10px] rounded-none focus:ring-0" /></td>
+                          <td className="p-0 border-r border-border/50"><Input value={row.amount} onChange={(e: any) => setDeductions(p => p.map((r, idx) => idx === i ? { ...r, amount: e.target.value } : r))} placeholder="Amount" type="number" className="border-0 shadow-none h-8 text-[10px] text-right font-mono rounded-none focus:ring-0" /></td>
+                          <td className="p-1 text-center">
+                            {i === deductions.length - 1 ? (
+                              <button onClick={() => setDeductions(p => [...p, { for: "", amount: "" }])} className="p-1 rounded text-muted-foreground border border-border/50 hover:bg-muted/40 transition-colors mx-auto block"><Plus className="size-3" /></button>
+                            ) : (
+                              <button onClick={() => setDeductions(p => p.filter((_, idx) => idx !== i))} className="p-1 rounded text-rose-500 border border-rose-500/20 hover:bg-rose-500/10 transition-colors mx-auto block"><Trash2 className="size-3" /></button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* ── Summary & Actions ── */}
+              <div className="flex justify-end mb-6">
+                <div className="w-full md:w-[45%] border border-border/50 rounded p-4 space-y-2.5 font-bold text-[11px] bg-card shadow-sm">
+                  <div className="flex justify-between"><span>Total Payable</span><span>: {empLoaded ? "109317.00" : ""}</span></div>
+                  <div className="flex justify-between"><span>Notice Pay-D Days</span><span>: {empLoaded ? "3000.00" : ""}</span></div>
+                  <div className="flex justify-between"><span>Advance</span><span>: {empLoaded ? "1000.00" : ""}</span></div>
+                  <div className="flex justify-between"><span>Mobile Bill</span><span>: {empLoaded ? "500.00" : ""}</span></div>
+                  <div className="flex justify-between"><span>Revenue Stamp</span><span>: {empLoaded ? "10.00" : ""}</span></div>
+                  <div className="flex justify-between border-t border-border/50 pt-2.5 mt-2.5"><span>Grand Total</span><span>: {empLoaded ? grandTotal : ""}</span></div>
+                  <div className="flex justify-between"><span>NetPayable</span><span>: {empLoaded ? netPayment : ""}</span></div>
+                </div>
+              </div>
+              </div>
+              <div className="bg-gray-50/80 border-t border-border/50 p-4 rounded-b flex items-center justify-between">
                 <button onClick={handleCalculate}
-                  className="px-6 py-2 bg-[#3b82f6] hover:bg-[#2563eb] text-white text-[11px] font-bold rounded transition-colors shadow-sm uppercase tracking-wide">
-                  Calculation
+                  className="px-6 py-2 bg-[#3b82f6] hover:bg-[#2563eb] text-white text-[11px] font-bold rounded transition-colors shadow-sm tracking-wide">
+                  CALCULATION
                 </button>
-                <button onClick={handleSubmit} disabled={!calculated}
-                  className="px-6 py-2 bg-[#f97316] hover:bg-[#ea580c] text-white text-[11px] font-bold rounded transition-colors shadow-sm disabled:opacity-40 disabled:cursor-not-allowed uppercase tracking-wide">
-                  Update
+                <button
+                  className="px-6 py-2 bg-gray-200 text-gray-400 border border-gray-200 text-[11px] font-bold rounded cursor-not-allowed tracking-wide" disabled>
+                  SUBMIT
                 </button>
               </div>
 
