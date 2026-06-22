@@ -195,9 +195,8 @@ const nav: NavItem[] = [
     label: "Manage Overtime",
     icon: Timer,
     subitems: [
-      { label: "Overtime Requests", to: "/" },
-      { label: "OT Calculations", to: "/" },
-      { label: "OT Approvals", to: "/" },
+      { label: "OT Tracking & Submissions", to: "/manage-overtime" },
+      { label: "Approve OT Requisition", to: "/approve-overtime" },
     ]
   },
   {

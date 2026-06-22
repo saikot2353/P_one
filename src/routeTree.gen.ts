@@ -36,6 +36,7 @@ import { Route as PersonnelApprovalRouteImport } from './routes/personnel-approv
 import { Route as PermissionManagementRouteImport } from './routes/permission-management'
 import { Route as PendingManualAttendanceRouteImport } from './routes/pending-manual-attendance'
 import { Route as ManualAttendanceRouteImport } from './routes/manual-attendance'
+import { Route as ManageOvertimeRouteImport } from './routes/manage-overtime'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LeaveListRouteImport } from './routes/leave-list'
 import { Route as LeaveApproveRouteImport } from './routes/leave-approve'
@@ -79,6 +80,7 @@ import { Route as BudgetRequisitionApprovalsRouteImport } from './routes/budget-
 import { Route as BudgetPlanningRouteImport } from './routes/budget-planning'
 import { Route as BudgetOvertimeRouteImport } from './routes/budget-overtime'
 import { Route as BudgetMyRequisitionsRouteImport } from './routes/budget-my-requisitions'
+import { Route as ApproveOvertimeRouteImport } from './routes/approve-overtime'
 import { Route as ApproveIncrementHrRouteImport } from './routes/approve-increment-hr'
 import { Route as ApproveIncrementGadgetRouteImport } from './routes/approve-increment-gadget'
 import { Route as AddEmployeeRouteImport } from './routes/add-employee'
@@ -226,6 +228,11 @@ const PendingManualAttendanceRoute = PendingManualAttendanceRouteImport.update({
 const ManualAttendanceRoute = ManualAttendanceRouteImport.update({
   id: '/manual-attendance',
   path: '/manual-attendance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManageOvertimeRoute = ManageOvertimeRouteImport.update({
+  id: '/manage-overtime',
+  path: '/manage-overtime',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -444,6 +451,11 @@ const BudgetMyRequisitionsRoute = BudgetMyRequisitionsRouteImport.update({
   path: '/budget-my-requisitions',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApproveOvertimeRoute = ApproveOvertimeRouteImport.update({
+  id: '/approve-overtime',
+  path: '/approve-overtime',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApproveIncrementHrRoute = ApproveIncrementHrRouteImport.update({
   id: '/approve-increment-hr',
   path: '/approve-increment-hr',
@@ -492,6 +504,7 @@ export interface FileRoutesByFullPath {
   '/add-employee': typeof AddEmployeeRoute
   '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
+  '/approve-overtime': typeof ApproveOvertimeRoute
   '/budget-my-requisitions': typeof BudgetMyRequisitionsRoute
   '/budget-overtime': typeof BudgetOvertimeRoute
   '/budget-planning': typeof BudgetPlanningRoute
@@ -535,6 +548,7 @@ export interface FileRoutesByFullPath {
   '/leave-approve': typeof LeaveApproveRoute
   '/leave-list': typeof LeaveListRoute
   '/login': typeof LoginRoute
+  '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
   '/permission-management': typeof PermissionManagementRoute
@@ -572,6 +586,7 @@ export interface FileRoutesByTo {
   '/add-employee': typeof AddEmployeeRoute
   '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
+  '/approve-overtime': typeof ApproveOvertimeRoute
   '/budget-my-requisitions': typeof BudgetMyRequisitionsRoute
   '/budget-overtime': typeof BudgetOvertimeRoute
   '/budget-planning': typeof BudgetPlanningRoute
@@ -615,6 +630,7 @@ export interface FileRoutesByTo {
   '/leave-approve': typeof LeaveApproveRoute
   '/leave-list': typeof LeaveListRoute
   '/login': typeof LoginRoute
+  '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
   '/permission-management': typeof PermissionManagementRoute
@@ -653,6 +669,7 @@ export interface FileRoutesById {
   '/add-employee': typeof AddEmployeeRoute
   '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
+  '/approve-overtime': typeof ApproveOvertimeRoute
   '/budget-my-requisitions': typeof BudgetMyRequisitionsRoute
   '/budget-overtime': typeof BudgetOvertimeRoute
   '/budget-planning': typeof BudgetPlanningRoute
@@ -696,6 +713,7 @@ export interface FileRoutesById {
   '/leave-approve': typeof LeaveApproveRoute
   '/leave-list': typeof LeaveListRoute
   '/login': typeof LoginRoute
+  '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
   '/permission-management': typeof PermissionManagementRoute
@@ -735,6 +753,7 @@ export interface FileRouteTypes {
     | '/add-employee'
     | '/approve-increment-gadget'
     | '/approve-increment-hr'
+    | '/approve-overtime'
     | '/budget-my-requisitions'
     | '/budget-overtime'
     | '/budget-planning'
@@ -778,6 +797,7 @@ export interface FileRouteTypes {
     | '/leave-approve'
     | '/leave-list'
     | '/login'
+    | '/manage-overtime'
     | '/manual-attendance'
     | '/pending-manual-attendance'
     | '/permission-management'
@@ -815,6 +835,7 @@ export interface FileRouteTypes {
     | '/add-employee'
     | '/approve-increment-gadget'
     | '/approve-increment-hr'
+    | '/approve-overtime'
     | '/budget-my-requisitions'
     | '/budget-overtime'
     | '/budget-planning'
@@ -858,6 +879,7 @@ export interface FileRouteTypes {
     | '/leave-approve'
     | '/leave-list'
     | '/login'
+    | '/manage-overtime'
     | '/manual-attendance'
     | '/pending-manual-attendance'
     | '/permission-management'
@@ -895,6 +917,7 @@ export interface FileRouteTypes {
     | '/add-employee'
     | '/approve-increment-gadget'
     | '/approve-increment-hr'
+    | '/approve-overtime'
     | '/budget-my-requisitions'
     | '/budget-overtime'
     | '/budget-planning'
@@ -938,6 +961,7 @@ export interface FileRouteTypes {
     | '/leave-approve'
     | '/leave-list'
     | '/login'
+    | '/manage-overtime'
     | '/manual-attendance'
     | '/pending-manual-attendance'
     | '/permission-management'
@@ -976,6 +1000,7 @@ export interface RootRouteChildren {
   AddEmployeeRoute: typeof AddEmployeeRoute
   ApproveIncrementGadgetRoute: typeof ApproveIncrementGadgetRoute
   ApproveIncrementHrRoute: typeof ApproveIncrementHrRoute
+  ApproveOvertimeRoute: typeof ApproveOvertimeRoute
   BudgetMyRequisitionsRoute: typeof BudgetMyRequisitionsRoute
   BudgetOvertimeRoute: typeof BudgetOvertimeRoute
   BudgetPlanningRoute: typeof BudgetPlanningRoute
@@ -1019,6 +1044,7 @@ export interface RootRouteChildren {
   LeaveApproveRoute: typeof LeaveApproveRoute
   LeaveListRoute: typeof LeaveListRoute
   LoginRoute: typeof LoginRoute
+  ManageOvertimeRoute: typeof ManageOvertimeRoute
   ManualAttendanceRoute: typeof ManualAttendanceRoute
   PendingManualAttendanceRoute: typeof PendingManualAttendanceRoute
   PermissionManagementRoute: typeof PermissionManagementRoute
@@ -1241,6 +1267,13 @@ declare module '@tanstack/react-router' {
       path: '/manual-attendance'
       fullPath: '/manual-attendance'
       preLoaderRoute: typeof ManualAttendanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manage-overtime': {
+      id: '/manage-overtime'
+      path: '/manage-overtime'
+      fullPath: '/manage-overtime'
+      preLoaderRoute: typeof ManageOvertimeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -1544,6 +1577,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BudgetMyRequisitionsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/approve-overtime': {
+      id: '/approve-overtime'
+      path: '/approve-overtime'
+      fullPath: '/approve-overtime'
+      preLoaderRoute: typeof ApproveOvertimeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/approve-increment-hr': {
       id: '/approve-increment-hr'
       path: '/approve-increment-hr'
@@ -1608,6 +1648,7 @@ const rootRouteChildren: RootRouteChildren = {
   AddEmployeeRoute: AddEmployeeRoute,
   ApproveIncrementGadgetRoute: ApproveIncrementGadgetRoute,
   ApproveIncrementHrRoute: ApproveIncrementHrRoute,
+  ApproveOvertimeRoute: ApproveOvertimeRoute,
   BudgetMyRequisitionsRoute: BudgetMyRequisitionsRoute,
   BudgetOvertimeRoute: BudgetOvertimeRoute,
   BudgetPlanningRoute: BudgetPlanningRoute,
@@ -1651,6 +1692,7 @@ const rootRouteChildren: RootRouteChildren = {
   LeaveApproveRoute: LeaveApproveRoute,
   LeaveListRoute: LeaveListRoute,
   LoginRoute: LoginRoute,
+  ManageOvertimeRoute: ManageOvertimeRoute,
   ManualAttendanceRoute: ManualAttendanceRoute,
   PendingManualAttendanceRoute: PendingManualAttendanceRoute,
   PermissionManagementRoute: PermissionManagementRoute,
