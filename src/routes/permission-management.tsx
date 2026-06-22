@@ -261,6 +261,11 @@ function PermissionManagementPage() {
   const [selectedRoleFilter, setSelectedRoleFilter] = useState("Admin");
   const [selectedMainMenu, setSelectedMainMenu] = useState("Select Main Menu");
   const [selectedOverrideUser, setSelectedOverrideUser] = useState("2023043910");
+  const [selectedOverrideMenu, setSelectedOverrideMenu] = useState("Select Main Menu");
+
+  const [isPermModalOpen, setIsPermModalOpen] = useState(false);
+  const [activePermRole, setActivePermRole] = useState<string | null>(null);
+  const [selectedModalMenu, setSelectedModalMenu] = useState("Select Main Menu");
 
   // Role Form Modal State
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
@@ -374,101 +379,101 @@ function PermissionManagementPage() {
     return users.find(u => u.empId === selectedOverrideUser) || null;
   }, [users, selectedOverrideUser]);
 
-  const userWisePermissionsData = useMemo(() => {
+  const activeUserOverrides = useMemo(() => {
     if (!activeOverrideUser) return [];
-    const baseRole = activeOverrideUser.role;
-    const baseRolePerms = permissions.filter(p => p.role === baseRole);
+    return overrides.filter(o => o.empId === activeOverrideUser.empId);
+  }, [overrides, activeOverrideUser]);
 
-    return baseRolePerms.map((base, idx) => {
-      const userCustom = overrides.find(o => o.empId === activeOverrideUser.empId && o.menu === base.menu);
-      return {
-        sl: idx + 1,
-        menu: base.menu,
-        hasOverride: !!userCustom,
-        read: userCustom ? userCustom.read : base.read,
-        write: userCustom ? userCustom.write : base.write,
-        full: userCustom ? userCustom.full : base.full,
-        sync: userCustom ? userCustom.sync : base.sync,
-        prevDate: userCustom ? userCustom.prevDate : base.prevDate
-      };
-    });
-  }, [activeOverrideUser, permissions, overrides]);
-
-  const handleToggleOverride = (menu: string, checkState: boolean) => {
-    if (!activeOverrideUser) return;
-    if (checkState) {
-      const baseMatch = permissions.find(p => p.role === activeOverrideUser.role && p.menu === menu);
-      const nextSl = overrides.length > 0 ? Math.max(...overrides.map(o => o.sl)) + 1 : 1;
-      const newOverride: UserOverrideRow = {
-        sl: nextSl,
-        empId: activeOverrideUser.empId,
-        menu,
-        read: baseMatch ? baseMatch.read : true,
-        write: baseMatch ? baseMatch.write : false,
-        full: baseMatch ? baseMatch.full : false,
-        sync: baseMatch ? baseMatch.sync : false,
-        prevDate: baseMatch ? baseMatch.prevDate : false
-      };
-      saveOverrides([...overrides, newOverride]);
-      toast.success(`Activated user override settings for "${menu}"`);
-    } else {
-      const nextOverrides = overrides.filter(o => !(o.empId === activeOverrideUser.empId && o.menu === menu));
-      saveOverrides(nextOverrides);
-      toast.info(`Reverted "${menu}" to system role defaults`);
+  const handleAddOverrideRoute = () => {
+    if (!activeOverrideUser) {
+      toast.error("Please select a target user first");
+      return;
     }
-  };
+    if (selectedOverrideMenu === "Select Main Menu") {
+      toast.error("Please select a route menu to register mapping");
+      return;
+    }
 
-  const handleDeleteOverride = (menu: string) => {
-    if (!activeOverrideUser) return;
-    const nextOverrides = overrides.filter(o => !(o.empId === activeOverrideUser.empId && o.menu === menu));
-    saveOverrides(nextOverrides);
-    toast.info(`Reverted "${menu}" to system role defaults`);
-  };
-
-  const handleUpdateOverrideValue = (menu: string, field: keyof Omit<UserOverrideRow, "sl" | "empId" | "menu">, value: boolean) => {
-    if (!activeOverrideUser) return;
-    const exists = overrides.some(o => o.empId === activeOverrideUser.empId && o.menu === menu);
-    let updated: UserOverrideRow[];
-
+    const exists = overrides.some(o => o.empId === activeOverrideUser.empId && o.menu === selectedOverrideMenu);
     if (exists) {
-      updated = overrides.map(o => {
-        if (o.empId === activeOverrideUser.empId && o.menu === menu) {
-          const next = { ...o, [field]: value };
-          if (field === "full" && value) {
-            next.read = true;
-            next.write = true;
-          }
-          return next;
-        }
-        return o;
-      });
-    } else {
-      const baseMatch = permissions.find(p => p.role === activeOverrideUser.role && p.menu === menu);
-      const nextSl = overrides.length > 0 ? Math.max(...overrides.map(o => o.sl)) + 1 : 1;
-      const newOverride: UserOverrideRow = {
-        sl: nextSl,
-        empId: activeOverrideUser.empId,
-        menu,
-        read: baseMatch ? baseMatch.read : false,
-        write: baseMatch ? baseMatch.write : false,
-        full: baseMatch ? baseMatch.full : false,
-        sync: baseMatch ? baseMatch.sync : false,
-        prevDate: baseMatch ? baseMatch.prevDate : false
-      };
-      newOverride[field] = value;
-      if (field === "full" && value) {
-        newOverride.read = true;
-        newOverride.write = true;
-      }
-      updated = [...overrides, newOverride];
-      toast.success(`Custom override activated for "${menu}"`);
+      toast.error("This menu route is already assigned to this user");
+      return;
     }
+
+    const nextSl = overrides.length > 0 ? Math.max(...overrides.map(o => o.sl)) + 1 : 1;
+    const newOverride: UserOverrideRow = {
+      sl: nextSl,
+      empId: activeOverrideUser.empId,
+      menu: selectedOverrideMenu,
+      read: true,
+      write: false,
+      full: false,
+      sync: false,
+      prevDate: false
+    };
+
+    saveOverrides([...overrides, newOverride]);
+    toast.success(`Registered route "${selectedOverrideMenu}" custom override to user "${activeOverrideUser.name}"`);
+  };
+
+  const handleDeleteOverride = (sl: number) => {
+    const updated = overrides.filter(o => o.sl !== sl).map((o, idx) => ({ ...o, sl: idx + 1 }));
+    saveOverrides(updated);
+    toast.success("User override permission record removed");
+  };
+
+  const handleUpdateOverrideValue = (sl: number, field: keyof Omit<UserOverrideRow, "sl" | "empId" | "menu">, value: boolean) => {
+    const updated = overrides.map(o => {
+      if (o.sl === sl) {
+        const next = { ...o, [field]: value };
+        if (field === "full" && value) {
+          next.read = true;
+          next.write = true;
+        }
+        return next;
+      }
+      return o;
+    });
     saveOverrides(updated);
   };
 
   const activeRolePermissions = useMemo(() => {
     return permissions.filter(p => p.role === selectedRoleFilter);
   }, [permissions, selectedRoleFilter]);
+
+  const activeModalRolePermissions = useMemo(() => {
+    if (!activePermRole) return [];
+    return permissions.filter(p => p.role === activePermRole);
+  }, [permissions, activePermRole]);
+
+  const handleAddModalPermissionRoute = () => {
+    if (!activePermRole) return;
+    if (selectedModalMenu === "Select Main Menu") {
+      toast.error("Please select a route menu to register mapping");
+      return;
+    }
+
+    const exists = permissions.some(p => p.role === activePermRole && p.menu === selectedModalMenu);
+    if (exists) {
+      toast.error("This menu route is already assigned to this role");
+      return;
+    }
+
+    const nextSl = permissions.length > 0 ? Math.max(...permissions.map(p => p.sl)) + 1 : 1;
+    const newPerm: PermissionRow = {
+      sl: nextSl,
+      role: activePermRole,
+      menu: selectedModalMenu,
+      read: true,
+      write: false,
+      full: false,
+      sync: false,
+      prevDate: false
+    };
+
+    savePermissions([...permissions, newPerm]);
+    toast.success(`Registered route "${selectedModalMenu}" to "${activePermRole}" permissions`);
+  };
 
   const roleSelectOptions = useMemo(() => {
     return roles.filter(r => r.isActive === "Active").map(r => ({ value: r.name, label: r.name }));
@@ -720,6 +725,17 @@ function PermissionManagementPage() {
                               <div className="flex items-center justify-center gap-3">
                                 <button
                                   type="button"
+                                  onClick={() => {
+                                    setActivePermRole(r.name);
+                                    setIsPermModalOpen(true);
+                                  }}
+                                  className="text-indigo-500 hover:text-indigo-600 transition"
+                                  title="View Page Permissions"
+                                >
+                                  <Eye className="size-4" />
+                                </button>
+                                <button
+                                  type="button"
                                   onClick={() => openRoleForm(r.sl)}
                                   className="text-orange-500 hover:text-orange-600 transition"
                                   title="Rename role designation"
@@ -748,8 +764,8 @@ function PermissionManagementPage() {
               {tab === "user-permissions" && (
                 <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                   
-                  {/* Select User Override Row */}
-                  <div className="px-6 py-4 border-b border-border bg-[#f8fafc]/30 dark:bg-[#0f172a]/30 shrink-0 flex items-center gap-4">
+                  {/* Filter & Assignment Bar */}
+                  <div className="px-6 py-4 border-b border-border bg-[#f8fafc]/30 dark:bg-[#0f172a]/30 shrink-0 flex flex-wrap items-center justify-between gap-4">
                     <div className="flex items-center gap-3 w-96">
                       <span className="text-[10px] font-semibold uppercase text-muted-foreground tracking-wider shrink-0">
                         Target User:
@@ -762,16 +778,32 @@ function PermissionManagementPage() {
                           placeholder="Search target user..."
                         />
                       </div>
+                      {activeOverrideUser && (
+                        <div className="flex items-center gap-2 bg-indigo-500/5 border border-indigo-500/10 px-3 py-1.5 rounded-xl shrink-0">
+                          <Shield className="size-3.5 text-indigo-500" />
+                          <span className="text-[10.5px] font-medium text-indigo-500/90">
+                            Base Role: <strong className="uppercase">{activeOverrideUser.role}</strong>
+                          </span>
+                        </div>
+                      )}
                     </div>
 
-                    {activeOverrideUser && (
-                      <div className="flex items-center gap-2 bg-indigo-500/5 border border-indigo-500/10 px-3 py-1.5 rounded-xl">
-                        <Shield className="size-3.5 text-indigo-500" />
-                        <span className="text-[10.5px] font-medium text-indigo-500/90">
-                          Base Role: <strong className="uppercase">{activeOverrideUser.role}</strong>
-                        </span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-80">
+                        <SearchableSelect
+                          options={menuSelectOptions}
+                          value={selectedOverrideMenu}
+                          onChange={setSelectedOverrideMenu}
+                          placeholder="Select menu route path..."
+                        />
                       </div>
-                    )}
+                      <button
+                        onClick={handleAddOverrideRoute}
+                        className="h-8.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-[10px] rounded-xl uppercase tracking-wider flex items-center gap-1.5 transition"
+                      >
+                        <Plus className="size-3.5" /> Assign Route
+                      </button>
+                    </div>
                   </div>
 
                   {/* Overrides Table */}
@@ -790,35 +822,29 @@ function PermissionManagementPage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border/30 text-foreground">
-                        {userWisePermissionsData.length === 0 ? (
+                        {activeUserOverrides.length === 0 ? (
                           <tr>
                             <td colSpan={8} className="py-12 text-center text-[12px] font-medium text-muted-foreground/60">
-                              No permissions associated with this user's base role configuration. Ensure the base role has active permissions.
+                              No custom overrides assigned to user. Assign a route above.
                             </td>
                           </tr>
                         ) : (
-                          userWisePermissionsData.map((row, idx) => (
-                            <tr key={row.menu} className={`group transition-all ${
-                              row.hasOverride 
-                                ? "bg-amber-500/[0.03] dark:bg-amber-500/[0.02] hover:bg-amber-500/[0.08] dark:hover:bg-amber-500/[0.05]" 
-                                : "hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d]"
-                            }`}>
+                          activeUserOverrides.map((row, idx) => (
+                            <tr key={row.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all bg-amber-500/[0.03] dark:bg-amber-500/[0.02] hover:bg-amber-500/[0.08] dark:hover:bg-amber-500/[0.05]">
                               <td className="px-5 py-3.5 text-center font-mono text-slate-500 font-semibold">{idx + 1}</td>
                               <td className="px-5 py-3.5">
                                 <div className="flex items-center gap-2">
                                   <span className="font-semibold text-foreground/95">{row.menu}</span>
-                                  {row.hasOverride && (
-                                    <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-450 border border-amber-500/20 text-[8.5px] font-black uppercase tracking-wider scale-90">
-                                      Custom
-                                    </span>
-                                  )}
+                                  <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-450 border border-amber-500/20 text-[8.5px] font-black uppercase tracking-wider scale-90">
+                                    Custom
+                                  </span>
                                 </div>
                               </td>
                               <td className="px-5 py-3.5 text-center">
                                 <input
                                   type="checkbox"
                                   checked={row.read}
-                                  onChange={e => handleUpdateOverrideValue(row.menu, "read", e.target.checked)}
+                                  onChange={e => handleUpdateOverrideValue(row.sl, "read", e.target.checked)}
                                   className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                                 />
                               </td>
@@ -826,7 +852,7 @@ function PermissionManagementPage() {
                                 <input
                                   type="checkbox"
                                   checked={row.write}
-                                  onChange={e => handleUpdateOverrideValue(row.menu, "write", e.target.checked)}
+                                  onChange={e => handleUpdateOverrideValue(row.sl, "write", e.target.checked)}
                                   className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                                 />
                               </td>
@@ -834,7 +860,7 @@ function PermissionManagementPage() {
                                 <input
                                   type="checkbox"
                                   checked={row.full}
-                                  onChange={e => handleUpdateOverrideValue(row.menu, "full", e.target.checked)}
+                                  onChange={e => handleUpdateOverrideValue(row.sl, "full", e.target.checked)}
                                   className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                                 />
                               </td>
@@ -842,7 +868,7 @@ function PermissionManagementPage() {
                                 <input
                                   type="checkbox"
                                   checked={row.sync}
-                                  onChange={e => handleUpdateOverrideValue(row.menu, "sync", e.target.checked)}
+                                  onChange={e => handleUpdateOverrideValue(row.sl, "sync", e.target.checked)}
                                   className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                                 />
                               </td>
@@ -850,23 +876,19 @@ function PermissionManagementPage() {
                                 <input
                                   type="checkbox"
                                   checked={row.prevDate}
-                                  onChange={e => handleUpdateOverrideValue(row.menu, "prevDate", e.target.checked)}
+                                  onChange={e => handleUpdateOverrideValue(row.sl, "prevDate", e.target.checked)}
                                   className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                                 />
                               </td>
                               <td className="px-5 py-3.5 text-center">
-                                {row.hasOverride ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleDeleteOverride(row.menu)}
-                                    className="text-amber-600 hover:text-amber-700 transition"
-                                    title="Revert custom overrides to base role defaults"
-                                  >
-                                    <Trash2 className="size-4" />
-                                  </button>
-                                ) : (
-                                  <span className="text-slate-300 dark:text-slate-700 font-mono select-none">—</span>
-                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteOverride(row.sl)}
+                                  className="text-rose-500 hover:text-rose-600 transition"
+                                  title="Remove user overrides"
+                                >
+                                  <Trash2 className="size-4" />
+                                </button>
                               </td>
                             </tr>
                           ))
@@ -954,6 +976,153 @@ function PermissionManagementPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ROLE PERMISSIONS MODAL */}
+      {isPermModalOpen && activePermRole && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+          <div className="bg-card border border-border/80 w-full max-w-5xl rounded-2xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+            
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-border/50 bg-[#f8fafc] dark:bg-[#0f172a] flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="size-9 bg-indigo-500/10 rounded-xl flex items-center justify-center text-indigo-500 border border-indigo-500/20">
+                  <Shield className="size-5" />
+                </div>
+                <div>
+                  <h2 className="text-base font-semibold tracking-tight text-foreground uppercase">
+                    Permissions for: {activePermRole}
+                  </h2>
+                </div>
+              </div>
+              <button 
+                onClick={() => setIsPermModalOpen(false)}
+                className="size-8.5 rounded-xl hover:bg-muted/80 flex items-center justify-center transition-colors text-muted-foreground hover:text-foreground border border-border/20"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+              
+              {/* Route Assignment Bar inside Modal */}
+              <div className="px-6 py-4 border-b border-border bg-[#f8fafc]/30 dark:bg-[#0f172a]/30 shrink-0 flex items-center justify-end gap-2">
+                <div className="w-80">
+                  <SearchableSelect
+                    options={menuSelectOptions}
+                    value={selectedModalMenu}
+                    onChange={setSelectedModalMenu}
+                    placeholder="Select menu route path..."
+                  />
+                </div>
+                <button
+                  onClick={handleAddModalPermissionRoute}
+                  className="h-8.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-[10px] rounded-xl uppercase tracking-wider flex items-center gap-1.5 transition"
+                >
+                  <Plus className="size-3.5" /> Assign Route
+                </button>
+              </div>
+
+              {/* Permissions Table */}
+              <div className="flex-1 overflow-auto min-h-0">
+                <table className="w-full text-left text-xs border-collapse whitespace-nowrap">
+                  <thead className="text-muted-foreground uppercase font-semibold tracking-wider text-[9.5px] border-b border-border/50 bg-[#f8fafc] dark:bg-[#0f172a] sticky top-0 z-10">
+                    <tr>
+                      <th className="px-5 py-4 w-[60px] text-center">#</th>
+                      <th className="px-5 py-4 min-w-[250px]">Menu Route Path</th>
+                      <th className="px-5 py-4 w-[110px] text-center">Read Only</th>
+                      <th className="px-5 py-4 w-[110px] text-center">Write Access</th>
+                      <th className="px-5 py-4 w-[110px] text-center">Full Control</th>
+                      <th className="px-5 py-4 w-[110px] text-center">Sync Log</th>
+                      <th className="px-5 py-4 w-[110px] text-center">Back Date</th>
+                      <th className="px-5 py-4 w-[100px] text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/30 text-foreground">
+                    {activeModalRolePermissions.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="py-12 text-center text-[12px] font-medium text-muted-foreground/60">
+                          No route permissions assigned to role "{activePermRole}". Assign a route above.
+                        </td>
+                      </tr>
+                    ) : (
+                      activeModalRolePermissions.map((row, idx) => (
+                        <tr key={row.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
+                          <td className="px-5 py-3.5 text-center font-mono text-slate-500 font-semibold">{idx + 1}</td>
+                          <td className="px-5 py-3.5 font-semibold text-foreground/95">{row.menu}</td>
+                          <td className="px-5 py-3.5 text-center">
+                            <input
+                              type="checkbox"
+                              checked={row.read}
+                              onChange={e => handleUpdatePermissionValue(row.sl, "read", e.target.checked)}
+                              className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
+                            />
+                          </td>
+                          <td className="px-5 py-3.5 text-center">
+                            <input
+                              type="checkbox"
+                              checked={row.write}
+                              onChange={e => handleUpdatePermissionValue(row.sl, "write", e.target.checked)}
+                              className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
+                            />
+                          </td>
+                          <td className="px-5 py-3.5 text-center">
+                            <input
+                              type="checkbox"
+                              checked={row.full}
+                              onChange={e => handleUpdatePermissionValue(row.sl, "full", e.target.checked)}
+                              className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
+                            />
+                          </td>
+                          <td className="px-5 py-3.5 text-center">
+                            <input
+                              type="checkbox"
+                              checked={row.sync}
+                              onChange={e => handleUpdatePermissionValue(row.sl, "sync", e.target.checked)}
+                              className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
+                            />
+                          </td>
+                          <td className="px-5 py-3.5 text-center">
+                            <input
+                              type="checkbox"
+                              checked={row.prevDate}
+                              onChange={e => handleUpdatePermissionValue(row.sl, "prevDate", e.target.checked)}
+                              className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
+                            />
+                          </td>
+                          <td className="px-5 py-3.5 text-center">
+                            <button
+                              type="button"
+                              onClick={() => handleDeletePermission(row.sl)}
+                              className="text-rose-500 hover:text-rose-600 transition"
+                              title="Remove route bindings"
+                            >
+                              <Trash2 className="size-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+
+            {/* Modal Footer */}
+            <div className="border-t border-border/50 pt-4 pb-4 px-6 flex items-center justify-end bg-[#f8fafc] dark:bg-[#0f172a] shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsPermModalOpen(false)}
+                className="h-9 px-6 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80 font-semibold text-xs transition-all uppercase tracking-wider border border-border shadow-2xs"
+              >
+                CLOSE
+              </button>
+            </div>
+
           </div>
         </div>
       )}
