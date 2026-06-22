@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, SlidersHorizontal, UserRound, Clock, Coins,
@@ -260,6 +260,7 @@ const nav: NavItem[] = [
 export function Sidebar() {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
+  const scrollRef = useRef<HTMLElement>(null);
 
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
@@ -268,8 +269,34 @@ export function Sidebar() {
         initial[item.label] = true;
       }
     });
+    
+    if (typeof window !== "undefined") {
+      const saved = sessionStorage.getItem("sidebar_menus");
+      if (saved) {
+        try {
+          return { ...JSON.parse(saved), ...initial };
+        } catch (e) {}
+      }
+    }
     return initial;
   });
+
+  useEffect(() => {
+    sessionStorage.setItem("sidebar_menus", JSON.stringify(openMenus));
+  }, [openMenus]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && scrollRef.current) {
+      const savedScroll = sessionStorage.getItem("sidebar_scroll");
+      if (savedScroll) {
+        scrollRef.current.scrollTop = parseInt(savedScroll, 10);
+      }
+    }
+  }, []);
+
+  const handleScroll = (e: React.UIEvent<HTMLElement>) => {
+    sessionStorage.setItem("sidebar_scroll", e.currentTarget.scrollTop.toString());
+  };
 
   const toggleMenu = (label: string) => {
     setOpenMenus((prev) => ({
@@ -289,7 +316,11 @@ export function Sidebar() {
           <div className="text-[9px] uppercase tracking-[0.25em] font-bold text-sidebar-primary">HRIS</div>
         </div>
       </div>
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-none">
+      <nav 
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-none"
+      >
         <div className="px-2.5 pb-2 text-[9px] font-extrabold uppercase tracking-widest text-sidebar-foreground/45">Workspace</div>
         {nav.map((item) => {
           const Icon = item.icon;
