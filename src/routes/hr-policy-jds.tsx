@@ -232,8 +232,8 @@ export default function JDSManagementPage() {
   const [actingRole, setActingRole] = useState<"HR" | "HOD" | "Plant Head" | "MD">("HR");
 
   // Filter pane states
-  const [filterCompany, setFilterCompany] = useState("Pakiza Software Limited");
-  const [filterLocation, setFilterLocation] = useState("PSL-Operation");
+  const [filterCompany, setFilterCompany] = useState("All");
+  const [filterLocation, setFilterLocation] = useState("All");
   const [filterDept, setFilterDept] = useState("All Departments");
   const [filterSection, setFilterSection] = useState("All");
   const [filterDesignation, setFilterDesignation] = useState("ALL");
@@ -281,8 +281,24 @@ export default function JDSManagementPage() {
   }, [mode, activeSl, activeItem]);
 
   // Dropdown list options mapping
-  const companyOptions = [{ value: "Pakiza Software Limited", label: "Pakiza Software Limited" }];
-  const locationOptions = [{ value: "PSL-Operation", label: "PSL-Operation" }];
+  const companyOptions = [
+    { value: "Pakiza Software Limited", label: "Pakiza Software Limited" },
+    { value: "Pakiza Knit Composite Ltd", label: "Pakiza Knit Composite Ltd" },
+    { value: "Pakiza Group", label: "Pakiza Group" }
+  ];
+  const locationOptions = [
+    { value: "PSL-Operation", label: "PSL-Operation" },
+    { value: "PKCL-Factory", label: "PKCL-Factory" },
+    { value: "Head Office", label: "Head Office" }
+  ];
+  const filterCompanyOptions = [
+    { value: "All", label: "All Companies" },
+    ...companyOptions
+  ];
+  const filterLocationOptions = [
+    { value: "All", label: "All Locations" },
+    ...locationOptions
+  ];
   const deptOptions = [
     { value: "HR, Admin and Compliance", label: "HR, Admin and Compliance" },
     { value: "Implementation & Business Analysis", label: "Implementation & Business Analysis" },
@@ -379,11 +395,11 @@ export default function JDSManagementPage() {
       responsibilities,
       technologies,
       competencies,
-      submitStatus: isEdit ? (activeItem?.submitStatus || "Pending") : "Pending",
-      hrStatus: isEdit ? (activeItem?.hrStatus || "Pending") : "Pending",
-      hodStatus: isEdit ? (activeItem?.hodStatus || "Pending") : "Pending",
-      plantHeadStatus: isEdit ? (activeItem?.plantHeadStatus || "Pending") : "Pending",
-      mdStatus: isEdit ? (activeItem?.mdStatus || "Pending") : "Pending",
+      submitStatus: "Pending",
+      hrStatus: "Pending",
+      hodStatus: "Pending",
+      plantHeadStatus: "Pending",
+      mdStatus: "Pending",
     };
 
     if (isEdit) {
@@ -441,7 +457,7 @@ export default function JDSManagementPage() {
             .company { font-size: 14px; font-weight: bold; color: #64748b; margin-top: 5px; }
             table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
             th, td { border: 1px solid #cbd5e1; padding: 12px; text-align: left; font-size: 13px; }
-            th { bg-color: #f8fafc; font-weight: 800; text-transform: uppercase; color: #475569; width: 25%; }
+            th { background-color: #f8fafc; font-weight: 800; text-transform: uppercase; color: #475569; width: 25%; }
             .section-title { font-size: 16px; font-weight: 800; text-transform: uppercase; color: #0f172a; border-bottom: 2px solid #cbd5e1; padding-bottom: 6px; margin: 30px 0 15px 0; letter-spacing: 0.5px; }
             ol { padding-left: 20px; margin: 0; }
             li { margin-bottom: 10px; font-size: 13px; }
@@ -579,6 +595,17 @@ export default function JDSManagementPage() {
     return "bg-amber-500/10 text-amber-600 border-amber-500/20";
   };
 
+  const getChainNodeStyle = (status: string, fallback: string) => {
+    const activeStatus = status === "Pending" ? fallback : status;
+    if (activeStatus === "Approved") {
+      return "bg-emerald-500/10 text-emerald-600 border-emerald-500 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-500/80";
+    }
+    if (activeStatus === "Rejected") {
+      return "bg-rose-500/10 text-rose-600 border-rose-500 dark:bg-rose-950/20 dark:text-rose-450 dark:border-rose-500/80";
+    }
+    return "bg-amber-500/10 text-amber-600 border-amber-500 dark:bg-amber-950/20 dark:text-amber-450 dark:border-amber-500/80";
+  };
+
   const getWorkflowCellBadge = (item: JDSItem, role: "HR" | "HOD" | "Plant Head" | "MD") => {
     if (item.submitStatus === "Pending") {
       return <span className="text-[10px] font-bold text-slate-400">Locked</span>;
@@ -694,7 +721,7 @@ export default function JDSManagementPage() {
                       <SearchableSelect
                         value={filterCompany}
                         onChange={setFilterCompany}
-                        options={companyOptions}
+                        options={filterCompanyOptions}
                         className="h-8 py-0 text-xs rounded-lg"
                       />
                     </div>
@@ -703,7 +730,7 @@ export default function JDSManagementPage() {
                       <SearchableSelect
                         value={filterLocation}
                         onChange={setFilterLocation}
-                        options={locationOptions}
+                        options={filterLocationOptions}
                         className="h-8 py-0 text-xs rounded-lg"
                       />
                     </div>
@@ -793,7 +820,7 @@ export default function JDSManagementPage() {
                                   type="button"
                                   onClick={() => navigate({ to: "/hr-policy-jds", search: { selectedSl: String(item.sl), mode: "edit" } })}
                                   title="Edit Specifications"
-                                  className="text-orange-500 hover:text-orange-655 transition"
+                                  className="text-orange-500 hover:text-orange-600 transition"
                                 >
                                   <Pencil className="size-4" />
                                 </button>
@@ -803,7 +830,7 @@ export default function JDSManagementPage() {
                                     type="button"
                                     onClick={() => handleWorkflowSubmit(item.sl)}
                                     title="Submit to Sequential workflow"
-                                    className="text-indigo-650 hover:text-indigo-700 transition flex items-center gap-1 font-bold text-[11px]"
+                                    className="text-indigo-600 hover:text-indigo-700 transition flex items-center gap-1 font-bold text-[11px]"
                                   >
                                     <Send className="size-3.5" /> Submit
                                   </button>
@@ -885,7 +912,7 @@ export default function JDSManagementPage() {
                 <div className="flex-1 overflow-y-auto p-6 space-y-6">
                   {/* Position Details */}
                   <div className="bg-slate-50/50 dark:bg-slate-900/20 p-5 rounded-2xl border border-border/60 space-y-4">
-                    <h4 className="text-[10px] font-extrabold text-indigo-650 dark:text-indigo-400 uppercase tracking-widest flex items-center gap-2">
+                    <h4 className="text-[10px] font-extrabold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest flex items-center gap-2">
                       <span className="w-1.5 h-3 rounded-full bg-primary" /> Target Position Specifications
                     </h4>
                     
@@ -1081,7 +1108,7 @@ export default function JDSManagementPage() {
                     </button>
                     <button
                       onClick={() => navigate({ to: "/hr-policy-jds", search: { selectedSl: String(activeItem.sl), mode: "edit" } })}
-                      className="h-8.5 px-4 bg-amber-500 hover:bg-amber-605 text-white text-[10.5px] font-black rounded-xl flex items-center gap-1.5 uppercase tracking-wider transition shadow-2xs"
+                      className="h-8.5 px-4 bg-amber-500 hover:bg-amber-600 text-white text-[10.5px] font-black rounded-xl flex items-center gap-1.5 uppercase tracking-wider transition shadow-2xs"
                     >
                       <Pencil className="size-3.5" /> Edit JDS
                     </button>
@@ -1103,7 +1130,7 @@ export default function JDSManagementPage() {
                       <h4 className="text-[10px] font-black text-foreground uppercase tracking-widest flex items-center gap-1.5">
                         <ShieldCheck className="size-4 text-indigo-500" /> Permission Sequential Approval Pipeline
                       </h4>
-                      <div className="text-[10px] font-black uppercase text-indigo-650 bg-indigo-500/10 px-2.5 py-0.5 rounded-md">
+                      <div className="text-[10px] font-black uppercase text-indigo-600 bg-indigo-500/10 px-2.5 py-0.5 rounded-md">
                         Current Stage: {workflowState?.text}
                       </div>
                     </div>
@@ -1122,7 +1149,7 @@ export default function JDSManagementPage() {
                             <div className={`size-10 rounded-full flex items-center justify-center text-[11px] font-black border-2 transition-all ${
                               stage.unlocked 
                                 ? style 
-                                : "bg-slate-100 dark:bg-slate-800 text-slate-350 dark:text-slate-700 border-slate-200 dark:border-slate-800"
+                                : "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-700 border-slate-200 dark:border-slate-800"
                             }`}>
                               {stage.role}
                             </div>
@@ -1165,7 +1192,7 @@ export default function JDSManagementPage() {
                           {activeItem.submitStatus === "Pending" ? (
                             <button
                               onClick={() => handleWorkflowSubmit(activeItem.sl)}
-                              className="h-8.5 px-4 bg-indigo-650 hover:bg-indigo-700 text-white text-[10px] font-black rounded-lg flex items-center gap-1.5 uppercase tracking-wider transition shadow-2xs"
+                              className="h-8.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-black rounded-lg flex items-center gap-1.5 uppercase tracking-wider transition shadow-2xs"
                             >
                               <Send className="size-3.5" /> Submit JDS to Workflow
                             </button>

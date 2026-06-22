@@ -167,7 +167,7 @@ function EmployeeDetailPage() {
               </div>
               <div className="flex items-center gap-3">
                 <div className="size-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-extrabold text-xl shadow-sm">
-                  {selectedEmp.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                  {selectedEmp.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
                 </div>
                 <div>
                   <h1 className="text-xl font-extrabold tracking-tight text-foreground flex items-center gap-2">
@@ -664,7 +664,7 @@ function EmployeeDetailPage() {
                           </div>
 
                           <div className="relative border-l-2 border-border/50 ml-4.5 pl-6 space-y-6">
-                            {expList.map((exp, index) => (
+                            {expList.map((exp: any, index: number) => (
                               <div key={index} className="relative group">
                                 {/* Timeline Node Icon */}
                                 <div className="absolute -left-[33px] top-1.5 size-5 rounded-full border-2 border-primary bg-card flex items-center justify-center shadow-xs transition duration-200 group-hover:scale-110">
@@ -719,7 +719,7 @@ function EmployeeDetailPage() {
                           </div>
 
                           <div className="grid grid-cols-1 gap-4">
-                            {involList.map((invol, index) => (
+                            {involList.map((invol: any, index: number) => (
                               <div key={index} className="bg-amber-500/2 border border-amber-500/15 rounded-xl p-4.5 space-y-3 relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 w-20 h-20 bg-amber-500/3 rounded-bl-full pointer-events-none group-hover:bg-amber-500/6 transition-colors duration-300" />
                                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/20 pb-2.5">
@@ -762,7 +762,7 @@ function EmployeeDetailPage() {
                           </div>
 
                           <div className="grid grid-cols-1 gap-4">
-                            {eduList.map((edu, index) => (
+                            {eduList.map((edu: any, index: number) => (
                               <div key={index} className="bg-indigo-500/2 border border-indigo-500/10 hover:border-indigo-500/25 rounded-xl p-4 transition-all duration-300 hover:shadow-2xs relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 w-16 h-16 bg-indigo-500/3 rounded-bl-full pointer-events-none group-hover:bg-indigo-500/6 transition-colors duration-300" />
                                 <div className="flex items-start gap-3">
@@ -807,7 +807,7 @@ function EmployeeDetailPage() {
                           </div>
 
                           <div className="grid grid-cols-1 gap-4">
-                            {certList.map((cert, index) => (
+                            {certList.map((cert: any, index: number) => (
                               <div key={index} className="bg-emerald-500/2 border border-emerald-500/10 hover:border-emerald-500/25 rounded-xl p-4 transition-all duration-300 hover:shadow-2xs relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/3 rounded-bl-full pointer-events-none group-hover:bg-emerald-500/6 transition-colors duration-300" />
                                 <div className="space-y-2 flex-1 min-w-0">
@@ -844,7 +844,7 @@ function EmployeeDetailPage() {
                           </div>
 
                           <div className="grid grid-cols-1 gap-4">
-                            {trainList.map((train, index) => (
+                            {trainList.map((train: any, index: number) => (
                               <div key={index} className="bg-indigo-500/2 border border-indigo-500/10 hover:border-indigo-500/25 rounded-xl p-4 transition-all duration-300 hover:shadow-2xs relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 w-16 h-16 bg-indigo-500/3 rounded-bl-full pointer-events-none group-hover:bg-indigo-500/6 transition-colors duration-300" />
                                 <div className="space-y-2 flex-1 min-w-0">

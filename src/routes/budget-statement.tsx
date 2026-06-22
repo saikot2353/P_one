@@ -4,7 +4,8 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
   FileText, Search, FileSpreadsheet, Printer, FileDown, Plus,
-  ChevronRight, Coins, RefreshCw, BarChart3, Users, Play, SearchCode
+  ChevronRight, Coins, RefreshCw, BarChart3, Users, Play, SearchCode,
+  AlertCircle
 } from "lucide-react";
 import { toast } from "sonner";
 

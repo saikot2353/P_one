@@ -349,25 +349,33 @@ function PoliciesSetupPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/30 text-foreground">
-                    {leaves.filter(l => (l.leaveType || "").toLowerCase().includes(searchQuery.toLowerCase())).map((item, idx) => (
-                      <tr key={item.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
-                        <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
-                        <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
-                          <div className="flex items-center justify-center gap-3">
-                            <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition"><Pencil className="size-4" /></button>
-                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition"><Trash2 className="size-4" /></button>
-                          </div>
-                        </td>
-                        <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">{item.company || "—"}</td>
-                        <td className="px-5 py-3.5 font-normal text-slate-700 dark:text-slate-300">{item.leaveType}</td>
-                        <td className="px-5 py-3.5 text-center font-normal">{item.isEarnLeave}</td>
-                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.leaveQty}</td>
-                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.cfQty}</td>
-                        <td className="px-5 py-3.5 text-center">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}>{item.isActive}</span>
+                    {leaves.filter(l => (l.leaveType || "").toLowerCase().includes(searchQuery.toLowerCase())).length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="py-8 text-center text-xs font-bold text-muted-foreground/60">
+                          No leaves matching the search query.
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      leaves.filter(l => (l.leaveType || "").toLowerCase().includes(searchQuery.toLowerCase())).map((item, idx) => (
+                        <tr key={item.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
+                          <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
+                          <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
+                            <div className="flex items-center justify-center gap-3">
+                              <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition"><Pencil className="size-4" /></button>
+                              <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-600 transition"><Trash2 className="size-4" /></button>
+                            </div>
+                          </td>
+                          <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">{item.company || "—"}</td>
+                          <td className="px-5 py-3.5 font-normal text-slate-700 dark:text-slate-300">{item.leaveType}</td>
+                          <td className="px-5 py-3.5 text-center font-normal">{item.isEarnLeave}</td>
+                          <td className="px-5 py-3.5 text-center font-normal font-mono">{item.leaveQty}</td>
+                          <td className="px-5 py-3.5 text-center font-normal font-mono">{item.cfQty}</td>
+                          <td className="px-5 py-3.5 text-center">
+                            <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}>{item.isActive}</span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               )}
@@ -384,22 +392,30 @@ function PoliciesSetupPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/30 text-foreground">
-                    {policies.filter(p => (p.name || "").toLowerCase().includes(searchQuery.toLowerCase())).map((item, idx) => (
-                      <tr key={item.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
-                        <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
-                        <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
-                          <div className="flex items-center justify-center gap-3">
-                            <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition"><Pencil className="size-4" /></button>
-                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition"><Trash2 className="size-4" /></button>
-                          </div>
-                        </td>
-                        <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">{item.name}</td>
-                        <td className="px-5 py-3.5 font-normal text-slate-700 dark:text-slate-300">{item.description || "—"}</td>
-                        <td className="px-5 py-3.5 text-center">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}>{item.isActive}</span>
+                    {policies.filter(p => (p.name || "").toLowerCase().includes(searchQuery.toLowerCase())).length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="py-8 text-center text-xs font-bold text-muted-foreground/60">
+                          No policies matching the search query.
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      policies.filter(p => (p.name || "").toLowerCase().includes(searchQuery.toLowerCase())).map((item, idx) => (
+                        <tr key={item.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
+                          <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
+                          <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
+                            <div className="flex items-center justify-center gap-3">
+                              <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition"><Pencil className="size-4" /></button>
+                              <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-600 transition"><Trash2 className="size-4" /></button>
+                            </div>
+                          </td>
+                          <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">{item.name}</td>
+                          <td className="px-5 py-3.5 font-normal text-slate-700 dark:text-slate-300">{item.description || "—"}</td>
+                          <td className="px-5 py-3.5 text-center">
+                            <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}>{item.isActive}</span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               )}
@@ -529,13 +545,13 @@ function PoliciesSetupPage() {
                   <button
                     type="button"
                     onClick={() => setIsFormOpen(false)}
-                    className="h-10 px-6 rounded-lg bg-[#f39c12] hover:bg-[#e67e22] text-white font-black text-xs transition-all uppercase tracking-wider shadow-sm hover:shadow"
+                    className="h-10 px-6 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80 font-black text-xs transition-all uppercase tracking-wider border border-border shadow-2xs"
                   >
                     CLOSE
                   </button>
                   <button
                     type="submit"
-                    className="h-10 px-8 rounded-lg text-white font-black text-xs shadow-md hover:shadow-lg transition-all uppercase tracking-wider flex items-center gap-1.5 bg-[#2ecc71] hover:bg-[#27ae60]"
+                    className="h-10 px-8 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-black text-xs shadow-xs hover:shadow-sm transition-all uppercase tracking-wider flex items-center gap-1.5"
                   >
                     {editSl ? "UPDATE" : "CREATE"}
                   </button>

@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import clientLogo from "../components/dashboard/client_logo.png";
+import { toast } from "sonner";
 import {
   Eye, EyeOff, Lock, Mail, User, Building2, LayoutGrid,
   ChevronRight, ChevronDown, Shield, ArrowRight, Check, Fingerprint,
@@ -476,6 +477,45 @@ function GlassSearchDropdown({
   );
 }
 
+interface UserItem {
+  sl: number;
+  name: string;
+  email: string;
+  empId: string;
+  userId: string;
+  role: string;
+  department: string;
+  lastLogin: string;
+  isActive: "Active" | "Inactive";
+  phone?: string;
+  password?: string;
+  redirectUrl?: string;
+  companyAccess?: string[];
+}
+
+const SEED_USERS: UserItem[] = [
+  { sl: 1, name: "Tahmid Afsar", email: "tahmid.bd@pakizasoftware.com", empId: "2023043910", userId: "2023043910", role: "Admin", department: "Business Innovation", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["All"] },
+  { sl: 2, name: "Tahsin Ahmed", email: "tahsin.cmr@pakizaknit.com", empId: "2021026991", userId: "2021026991", role: "employee", department: "Procurement and Supply Chain - (Procurement and Supply Chain)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
+  { sl: 3, name: "Shanewas Hossen", email: "shahnewas.account@pakizaknit.com", empId: "2019016666", userId: "2019016666", role: "employee", department: "Accounts & Finance - (Accounts & Finance)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
+  { sl: 4, name: "Suman Mazumder", email: "suman@pfd-global.com", empId: "2024050708", userId: "2024050708", role: "employee", department: "Marketing and Merchandising - (Marketing and Merchandising)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
+  { sl: 5, name: "Sultan Ahmed", email: "sultan.ba@pakizasoftware.com", empId: "2023045044", userId: "2023045044", role: "employee", department: "Implementation & Business Analysis - (Business Analysis)", lastLogin: "2026-05-12 15:48:06", isActive: "Active", password: "password123", companyAccess: ["Pakiza Software Limited"] },
+  { sl: 6, name: "Md. Jamshed Alam", email: "jamshed.alam@pakizaknit.com", empId: "2014001017", userId: "2014001017", role: "HOD", department: "Management", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["All"] },
+  { sl: 7, name: "Md. Tuhin Hosen", email: "mdtuhin.dyeing@pakizaknit.com", empId: "2021028128", userId: "2021028128", role: "employee", department: "Fabrics Department - (Finish Fabric Store (MCD))", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
+  { sl: 8, name: "Md. Shameem", email: "shamim.ahmed@pakizaknit.com", empId: "2018012755", userId: "2018012755", role: "HOD", department: "RMG Operations - (Embroidery)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
+  { sl: 9, name: "Tushar Kanti Das", email: "tushar.kanti@pakizaknit.com", empId: "2016005888", userId: "2016005888", role: "HOD", department: "Admin", lastLogin: "2026-04-02 13:11:13", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd", "Pakiza Software Limited"] },
+  { sl: 10, name: "Kanak Das", email: "kanakdas01914@gmail.com", empId: "2019016183", userId: "2019016183", role: "employee", department: "—", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
+  { sl: 11, name: "Md. Saeid Maruf", email: "syed.maruf@pakizaknit.com", empId: "2014001111", userId: "2014001111", role: "HOD", department: "Production Planning - (Production Planning)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
+  { sl: 12, name: "Md. Tariql Islam", email: "tariqul.rmg@pakizaknit.com", empId: "2021027208", userId: "2021027208", role: "employee", department: "Finishing Department - (Finishing)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
+  { sl: 13, name: "Md. Ruhul Amin Chowdhury", email: "faysal.amin@pakizaknit.com", empId: "2016001098", userId: "2016001098", role: "HOD", department: "Marketing and Merchandising - (Marketing and Merchandising)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
+  { sl: 14, name: "Admin User", email: "admin@pakiza.com", empId: "ADMIN01", userId: "admin", role: "Admin", department: "IT Department", lastLogin: "—", isActive: "Active", password: "admin", companyAccess: ["All"] }
+];
+
+const ALL_COMPANIES = [
+  { id: "pakiza-software", name: "Pakiza Software Limited", location: "Dhaka, Bangladesh", employees: "150", gradient: "linear-gradient(135deg, #1d4ed8, #3b82f6)" },
+  { id: "pakiza-knit", name: "Pakiza Knit Composite Ltd", location: "Savar, Bangladesh", employees: "3,200", gradient: "linear-gradient(135deg, #0e7490, #0891b2)" },
+  { id: "pakiza-group", name: "Pakiza Group", location: "Dhaka, Bangladesh", employees: "8,500", gradient: "linear-gradient(135deg, #2563eb, #1e40af)" },
+];
+
 /* ═══════════ MAIN LOGIN PAGE ═══════════ */
 function LoginPage() {
   const navigate = useNavigate();
@@ -490,6 +530,7 @@ function LoginPage() {
   const [transitioning, setTransitioning] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [theme, setTheme] = useState<Theme>("light");
+  const [currentUser, setCurrentUser] = useState<UserItem | null>(null);
 
   useEffect(() => {
     requestAnimationFrame(() => setMounted(true));
@@ -506,14 +547,81 @@ function LoginPage() {
     }
   }, [theme]);
 
+  // Load current user from localStorage on step transitions/mounts
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedUser = localStorage.getItem("cripton_current_user");
+      if (storedUser) {
+        try {
+          setCurrentUser(JSON.parse(storedUser));
+        } catch (e) {
+          // ignore
+        }
+      }
+    }
+  }, [step]);
+
   const toggleTheme = useCallback(() => setTheme((t) => (t === "dark" ? "light" : "dark")), []);
 
   const handleLogin = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) return;
     setIsLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
+    
+    // Simulate network delay for premium visual load
+    await new Promise((r) => setTimeout(r, 1200));
+
+    let usersList = SEED_USERS;
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("cripton_user_list");
+      if (stored) {
+        try {
+          usersList = JSON.parse(stored);
+        } catch (err) {
+          console.error("Error parsing user list:", err);
+        }
+      } else {
+        // Initialize localStorage database
+        localStorage.setItem("cripton_user_list", JSON.stringify(SEED_USERS));
+      }
+    }
+
+    const matchedUser = usersList.find(
+      (u) => u.userId?.toLowerCase() === email.trim().toLowerCase()
+    );
+
     setIsLoading(false);
+
+    if (!matchedUser) {
+      toast.error("User ID not found.");
+      return;
+    }
+
+    if (matchedUser.password !== password) {
+      toast.error("Incorrect password.");
+      return;
+    }
+
+    if (matchedUser.isActive !== "Active") {
+      toast.error("Your account is inactive. Please contact system administrator.");
+      return;
+    }
+
+    // Success! Save lastLogin and set currentUser
+    if (typeof window !== "undefined") {
+      const now = new Date();
+      const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
+      
+      const updatedList = usersList.map((u) =>
+        u.sl === matchedUser.sl ? { ...u, lastLogin: formattedDate } : u
+      );
+      
+      localStorage.setItem("cripton_user_list", JSON.stringify(updatedList));
+      localStorage.setItem("cripton_current_user", JSON.stringify({ ...matchedUser, lastLogin: formattedDate }));
+      setCurrentUser({ ...matchedUser, lastLogin: formattedDate });
+    }
+
+    toast.success(`Logged in as ${matchedUser.name}`);
     setTransitioning(true);
     setTimeout(() => { setStep(2); setTransitioning(false); }, 500);
   }, [email, password]);
@@ -529,11 +637,12 @@ function LoginPage() {
     navigate({ to: "/" });
   }, [selectedCompany, selectedSection, navigate]);
 
-  const companies = [
-    { id: "cripton-bd", name: "Cripton Group", location: "Dhaka, Bangladesh", employees: "2,450", gradient: "linear-gradient(135deg, #1d4ed8, #3b82f6)" },
-    { id: "cripton-intl", name: "Cripton International", location: "Singapore", employees: "890", gradient: "linear-gradient(135deg, #0e7490, #0891b2)" },
-    { id: "cripton-tech", name: "Cripton Technologies", location: "Chittagong, BD", employees: "1,120", gradient: "linear-gradient(135deg, #2563eb, #1e40af)" },
-  ];
+  const allowedCompanies = useMemo(() => {
+    if (!currentUser) return ALL_COMPANIES;
+    const access = currentUser.companyAccess || [];
+    if (access.includes("All")) return ALL_COMPANIES;
+    return ALL_COMPANIES.filter(c => access.includes(c.name));
+  }, [currentUser]);
 
   const sections = [
     { id: "hr", name: "Human Resources", icon: Users, desc: "Personnel & payroll", gradient: "linear-gradient(135deg, #2563eb, #1e40af)" },
@@ -962,7 +1071,7 @@ function LoginPage() {
 
               <GlassSearchDropdown label="Company" icon={<Building2 className="w-4 h-4" style={{ color: "var(--l-accent-solid)" }} />}
                 placeholder="Search companies..." triggerPlaceholder="Select a company" value={selectedCompany} onChange={setSelectedCompany}
-                items={companies.map((c) => ({ id: c.id, name: c.name, description: `${c.location} · ${c.employees} people`, gradient: c.gradient, renderIcon: () => <Building2 className="w-4.5 h-4.5 text-white" /> }))}
+                items={allowedCompanies.map((c) => ({ id: c.id, name: c.name, description: `${c.location} · ${c.employees} people`, gradient: c.gradient, renderIcon: () => <Building2 className="w-4.5 h-4.5 text-white" /> }))}
                 id="company-dropdown" />
 
               <GlassSearchDropdown label="Department" icon={<LayoutGrid className="w-4 h-4" style={{ color: "var(--l-accent-solid)" }} />}

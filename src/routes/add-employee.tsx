@@ -3546,7 +3546,7 @@ function AddEmployeePage() {
                                     ) : (
                                       <button
                                         type="button"
-                                        onClick={() => triggerMockUpload("experience", index)}
+                                        onClick={() => triggerRowMockUpload("experience", index)}
                                         className="h-7 px-2.5 rounded-lg border border-dashed border-primary/30 hover:border-primary hover:bg-primary/5 text-primary text-[10px] font-bold flex items-center justify-center gap-1 mx-auto transition duration-200"
                                       >
                                         <Upload className="size-3 text-primary/75" /> Upload File

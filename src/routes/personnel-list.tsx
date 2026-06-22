@@ -1567,7 +1567,7 @@ function PersonnelListPage() {
                         <td className={`sticky left-[230px] ${stickyCellBgClass} px-3 py-3.5 font-medium text-foreground border-r border-border/40 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[180px] min-w-[180px] max-w-[180px] transition-all`}>
                           <div className="flex items-center gap-2">
                             <div className="size-6.5 rounded-lg bg-primary/10 text-[9px] font-bold text-primary flex items-center justify-center shadow-2xs animate-pulse">
-                              {e.name.split(" ").map(s => s[0]).slice(0, 2).join("")}
+                              {e.name.split(" ").map((s: string) => s[0]).slice(0, 2).join("")}
                             </div>
                             <div className="flex flex-col min-w-0">
                               <span className="truncate max-w-[120px] font-medium text-foreground">{e.name}</span>

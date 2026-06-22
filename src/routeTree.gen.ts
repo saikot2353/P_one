@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UserManagementRouteImport } from './routes/user-management'
 import { Route as TransferControlCenterRouteImport } from './routes/transfer-control-center'
 import { Route as SspRequestManualAttendanceRouteImport } from './routes/ssp-request-manual-attendance'
 import { Route as SspNewRequisitionRouteImport } from './routes/ssp-new-requisition'
@@ -31,6 +32,7 @@ import { Route as RecruitmentAssessmentListRouteImport } from './routes/recruitm
 import { Route as ProposeIncrementRouteImport } from './routes/propose-increment'
 import { Route as PersonnelListRouteImport } from './routes/personnel-list'
 import { Route as PersonnelApprovalRouteImport } from './routes/personnel-approval'
+import { Route as PermissionManagementRouteImport } from './routes/permission-management'
 import { Route as PendingManualAttendanceRouteImport } from './routes/pending-manual-attendance'
 import { Route as ManualAttendanceRouteImport } from './routes/manual-attendance'
 import { Route as LoginRouteImport } from './routes/login'
@@ -84,6 +86,11 @@ import { Route as RecruitmentHrAssessmentIdRouteImport } from './routes/recruitm
 import { Route as RecruitmentDetailIdRouteImport } from './routes/recruitment-detail.$id'
 import { Route as EmployeeDetailIdRouteImport } from './routes/employee-detail.$id'
 
+const UserManagementRoute = UserManagementRouteImport.update({
+  id: '/user-management',
+  path: '/user-management',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TransferControlCenterRoute = TransferControlCenterRouteImport.update({
   id: '/transfer-control-center',
   path: '/transfer-control-center',
@@ -197,6 +204,11 @@ const PersonnelListRoute = PersonnelListRouteImport.update({
 const PersonnelApprovalRoute = PersonnelApprovalRouteImport.update({
   id: '/personnel-approval',
   path: '/personnel-approval',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PermissionManagementRoute = PermissionManagementRouteImport.update({
+  id: '/permission-management',
+  path: '/permission-management',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PendingManualAttendanceRoute = PendingManualAttendanceRouteImport.update({
@@ -512,6 +524,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
+  '/permission-management': typeof PermissionManagementRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
   '/personnel-list': typeof PersonnelListRoute
   '/propose-increment': typeof ProposeIncrementRoute
@@ -534,6 +547,7 @@ export interface FileRoutesByFullPath {
   '/ssp-new-requisition': typeof SspNewRequisitionRoute
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
+  '/user-management': typeof UserManagementRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
   '/recruitment-detail/$id': typeof RecruitmentDetailIdRoute
   '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
@@ -588,6 +602,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
+  '/permission-management': typeof PermissionManagementRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
   '/personnel-list': typeof PersonnelListRoute
   '/propose-increment': typeof ProposeIncrementRoute
@@ -610,6 +625,7 @@ export interface FileRoutesByTo {
   '/ssp-new-requisition': typeof SspNewRequisitionRoute
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
+  '/user-management': typeof UserManagementRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
   '/recruitment-detail/$id': typeof RecruitmentDetailIdRoute
   '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
@@ -665,6 +681,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
+  '/permission-management': typeof PermissionManagementRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
   '/personnel-list': typeof PersonnelListRoute
   '/propose-increment': typeof ProposeIncrementRoute
@@ -687,6 +704,7 @@ export interface FileRoutesById {
   '/ssp-new-requisition': typeof SspNewRequisitionRoute
   '/ssp-request-manual-attendance': typeof SspRequestManualAttendanceRoute
   '/transfer-control-center': typeof TransferControlCenterRoute
+  '/user-management': typeof UserManagementRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
   '/recruitment-detail/$id': typeof RecruitmentDetailIdRoute
   '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
@@ -743,6 +761,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/manual-attendance'
     | '/pending-manual-attendance'
+    | '/permission-management'
     | '/personnel-approval'
     | '/personnel-list'
     | '/propose-increment'
@@ -765,6 +784,7 @@ export interface FileRouteTypes {
     | '/ssp-new-requisition'
     | '/ssp-request-manual-attendance'
     | '/transfer-control-center'
+    | '/user-management'
     | '/employee-detail/$id'
     | '/recruitment-detail/$id'
     | '/recruitment-hr-assessment/$id'
@@ -819,6 +839,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/manual-attendance'
     | '/pending-manual-attendance'
+    | '/permission-management'
     | '/personnel-approval'
     | '/personnel-list'
     | '/propose-increment'
@@ -841,6 +862,7 @@ export interface FileRouteTypes {
     | '/ssp-new-requisition'
     | '/ssp-request-manual-attendance'
     | '/transfer-control-center'
+    | '/user-management'
     | '/employee-detail/$id'
     | '/recruitment-detail/$id'
     | '/recruitment-hr-assessment/$id'
@@ -895,6 +917,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/manual-attendance'
     | '/pending-manual-attendance'
+    | '/permission-management'
     | '/personnel-approval'
     | '/personnel-list'
     | '/propose-increment'
@@ -917,6 +940,7 @@ export interface FileRouteTypes {
     | '/ssp-new-requisition'
     | '/ssp-request-manual-attendance'
     | '/transfer-control-center'
+    | '/user-management'
     | '/employee-detail/$id'
     | '/recruitment-detail/$id'
     | '/recruitment-hr-assessment/$id'
@@ -972,6 +996,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ManualAttendanceRoute: typeof ManualAttendanceRoute
   PendingManualAttendanceRoute: typeof PendingManualAttendanceRoute
+  PermissionManagementRoute: typeof PermissionManagementRoute
   PersonnelApprovalRoute: typeof PersonnelApprovalRoute
   PersonnelListRoute: typeof PersonnelListRoute
   ProposeIncrementRoute: typeof ProposeIncrementRoute
@@ -994,6 +1019,7 @@ export interface RootRouteChildren {
   SspNewRequisitionRoute: typeof SspNewRequisitionRoute
   SspRequestManualAttendanceRoute: typeof SspRequestManualAttendanceRoute
   TransferControlCenterRoute: typeof TransferControlCenterRoute
+  UserManagementRoute: typeof UserManagementRoute
   EmployeeDetailIdRoute: typeof EmployeeDetailIdRoute
   RecruitmentDetailIdRoute: typeof RecruitmentDetailIdRoute
   RecruitmentHrAssessmentIdRoute: typeof RecruitmentHrAssessmentIdRoute
@@ -1002,6 +1028,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/user-management': {
+      id: '/user-management'
+      path: '/user-management'
+      fullPath: '/user-management'
+      preLoaderRoute: typeof UserManagementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/transfer-control-center': {
       id: '/transfer-control-center'
       path: '/transfer-control-center'
@@ -1154,6 +1187,13 @@ declare module '@tanstack/react-router' {
       path: '/personnel-approval'
       fullPath: '/personnel-approval'
       preLoaderRoute: typeof PersonnelApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/permission-management': {
+      id: '/permission-management'
+      path: '/permission-management'
+      fullPath: '/permission-management'
+      preLoaderRoute: typeof PermissionManagementRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pending-manual-attendance': {
@@ -1572,6 +1612,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ManualAttendanceRoute: ManualAttendanceRoute,
   PendingManualAttendanceRoute: PendingManualAttendanceRoute,
+  PermissionManagementRoute: PermissionManagementRoute,
   PersonnelApprovalRoute: PersonnelApprovalRoute,
   PersonnelListRoute: PersonnelListRoute,
   ProposeIncrementRoute: ProposeIncrementRoute,
@@ -1594,6 +1635,7 @@ const rootRouteChildren: RootRouteChildren = {
   SspNewRequisitionRoute: SspNewRequisitionRoute,
   SspRequestManualAttendanceRoute: SspRequestManualAttendanceRoute,
   TransferControlCenterRoute: TransferControlCenterRoute,
+  UserManagementRoute: UserManagementRoute,
   EmployeeDetailIdRoute: EmployeeDetailIdRoute,
   RecruitmentDetailIdRoute: RecruitmentDetailIdRoute,
   RecruitmentHrAssessmentIdRoute: RecruitmentHrAssessmentIdRoute,

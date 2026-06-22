@@ -165,6 +165,14 @@ const nav: NavItem[] = [
       { label: "JD Approvals", to: "/hr-policy-jds", search: { mode: "list", filterWorkflow: "HR" } },
     ]
   },
+  {
+    label: "User Management",
+    icon: Users,
+    subitems: [
+      { label: "User List", to: "/user-management" },
+      { label: "Permission Management", to: "/permission-management" },
+    ]
+  },
 
   {
     label: "Disciplinary Action",
@@ -324,8 +332,14 @@ export function Sidebar() {
                 ].join(" ")}
               >
                 {item.subitems.map((sub) => {
-                  const queryTab = (routerState.location.search as any).tab;
-                  const isSubActive = sub.to !== "/" && sub.to === currentPath && (!sub.search || queryTab === sub.search.tab);
+                  const searchParams = routerState.location.search as Record<string, any>;
+                  const isSubActive =
+                    sub.to !== "/" &&
+                    sub.to === currentPath &&
+                    (!sub.search ||
+                      Object.keys(sub.search).every(
+                        (key) => sub.search?.[key] === searchParams[key]
+                      ));
                   return (
                     <Link
                       key={sub.label}

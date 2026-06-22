@@ -316,7 +316,7 @@ function TimeSetupPage() {
     localStorage.setItem("hris_shifts", JSON.stringify(shiftsData));
 
     // OT Config
-    const otData = safeParse("hris_ot_config", DEFAULT_OT_CONFIGS).map(o => ({
+    const otData = safeParse("hris_ot_config", DEFAULT_OT_CONFIGS).map((o: any) => ({
       ...o,
       department: o.department || "All Departments",
       section: o.section || "ALL",
@@ -543,7 +543,7 @@ function TimeSetupPage() {
         nextList = otConfigs.map(o => o.sl === editSl ? { ...o, employeeType: otEmpType, otCalculationType: otCalcType, bufferMinutes: Number(otBuffer), isActive: otIsActive } : o);
       } else {
         const sl = otConfigs.length > 0 ? Math.max(...otConfigs.map(o => o.sl)) + 1 : 1;
-        nextList.push({ sl, employeeType: otEmpType, otCalculationType: otCalcType, bufferMinutes: Number(otBuffer), isActive: otIsActive });
+        nextList.push({ sl, employeeType: otEmpType, otCalculationType: otCalcType, bufferMinutes: Number(otBuffer), isActive: otIsActive, department: "All Departments", section: "ALL", designation: "ALL", unit: "ALL" });
       }
       setOtConfigs(nextList);
       localStorage.setItem("hris_ot_config", JSON.stringify(nextList));
@@ -1115,20 +1115,48 @@ function TimeSetupPage() {
                 )}
 
                 {activeTab === "abnormal" && (
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Shift Name *</label>
                       <input type="text" placeholder="Abnormal Shift Name" value={abShiftName} onChange={e => setAbShiftName(e.target.value)} className={insetInputClass} required />
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Date *</label>
-                      <input type="date" value={abDate} onChange={e => setAbDate(e.target.value)} className={insetInputClass} required />
+                      <label className={insetLabelClass}>Day For *</label>
+                      <select value={abDayFor} onChange={e => setAbDayFor(e.target.value)} className={insetSelectClass} required>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                        <option value="Sunday">Sunday</option>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                      </select>
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Reason</label>
-                      <input type="text" placeholder="Reason details" value={abReason} onChange={e => setAbReason(e.target.value)} className={insetInputClass} />
+                      <label className={insetLabelClass}>Date From *</label>
+                      <input type="date" value={abDateFrom} onChange={e => setAbDateFrom(e.target.value)} className={insetInputClass} required />
                     </div>
                     <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Date To *</label>
+                      <input type="date" value={abDateTo} onChange={e => setAbDateTo(e.target.value)} className={insetInputClass} required />
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Min Out Time</label>
+                      <input type="text" placeholder="e.g. 09:00:00" value={abMinOutTime} onChange={e => setAbMinOutTime(e.target.value)} className={insetInputClass} />
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Max Out Time</label>
+                      <input type="text" placeholder="e.g. 15:00:00" value={abMaxOutTime} onChange={e => setAbMaxOutTime(e.target.value)} className={insetInputClass} />
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Prev Day In Time</label>
+                      <input type="text" placeholder="e.g. 06:00:00" value={abPrevDayInTime} onChange={e => setAbPrevDayInTime(e.target.value)} className={insetInputClass} />
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Split Out Time</label>
+                      <input type="text" placeholder="e.g. 06:00:00" value={abSplitOutTime} onChange={e => setAbSplitOutTime(e.target.value)} className={insetInputClass} />
+                    </div>
+                    <div className={`${insetWrapperClass} sm:col-span-2`}>
                       <label className={insetLabelClass}>IsActive *</label>
                       <select value={abIsActive} onChange={e => setAbIsActive(e.target.value as any)} className={insetSelectClass}>
                         <option value="Active">Active</option>
