@@ -39,12 +39,14 @@ import { Route as PermissionManagementRouteImport } from './routes/permission-ma
 import { Route as PendingManualAttendanceRouteImport } from './routes/pending-manual-attendance'
 import { Route as PayrollReportsRouteImport } from './routes/payroll-reports'
 import { Route as PayrollLoanRouteImport } from './routes/payroll-loan'
+import { Route as PayrollDeductionsRouteImport } from './routes/payroll-deductions'
 import { Route as PayrollBenefitsRouteImport } from './routes/payroll-benefits'
 import { Route as PayrollAdvanceRouteImport } from './routes/payroll-advance'
 import { Route as MonthlySalaryProcessRouteImport } from './routes/monthly-salary-process'
 import { Route as ManualAttendanceRouteImport } from './routes/manual-attendance'
 import { Route as ManageOvertimeRouteImport } from './routes/manage-overtime'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LoanApprovalRouteImport } from './routes/loan-approval'
 import { Route as LoanApplicationRouteImport } from './routes/loan-application'
 import { Route as LeaveListRouteImport } from './routes/leave-list'
 import { Route as LeaveApproveRouteImport } from './routes/leave-approve'
@@ -256,6 +258,11 @@ const PayrollLoanRoute = PayrollLoanRouteImport.update({
   path: '/payroll-loan',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PayrollDeductionsRoute = PayrollDeductionsRouteImport.update({
+  id: '/payroll-deductions',
+  path: '/payroll-deductions',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PayrollBenefitsRoute = PayrollBenefitsRouteImport.update({
   id: '/payroll-benefits',
   path: '/payroll-benefits',
@@ -284,6 +291,11 @@ const ManageOvertimeRoute = ManageOvertimeRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoanApprovalRoute = LoanApprovalRouteImport.update({
+  id: '/loan-approval',
+  path: '/loan-approval',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoanApplicationRoute = LoanApplicationRouteImport.update({
@@ -617,12 +629,14 @@ export interface FileRoutesByFullPath {
   '/leave-approve': typeof LeaveApproveRoute
   '/leave-list': typeof LeaveListRoute
   '/loan-application': typeof LoanApplicationRoute
+  '/loan-approval': typeof LoanApprovalRoute
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
+  '/payroll-deductions': typeof PayrollDeductionsRoute
   '/payroll-loan': typeof PayrollLoanRoute
   '/payroll-reports': typeof PayrollReportsRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
@@ -710,12 +724,14 @@ export interface FileRoutesByTo {
   '/leave-approve': typeof LeaveApproveRoute
   '/leave-list': typeof LeaveListRoute
   '/loan-application': typeof LoanApplicationRoute
+  '/loan-approval': typeof LoanApprovalRoute
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
+  '/payroll-deductions': typeof PayrollDeductionsRoute
   '/payroll-loan': typeof PayrollLoanRoute
   '/payroll-reports': typeof PayrollReportsRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
@@ -804,12 +820,14 @@ export interface FileRoutesById {
   '/leave-approve': typeof LeaveApproveRoute
   '/leave-list': typeof LeaveListRoute
   '/loan-application': typeof LoanApplicationRoute
+  '/loan-approval': typeof LoanApprovalRoute
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
+  '/payroll-deductions': typeof PayrollDeductionsRoute
   '/payroll-loan': typeof PayrollLoanRoute
   '/payroll-reports': typeof PayrollReportsRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
@@ -899,12 +917,14 @@ export interface FileRouteTypes {
     | '/leave-approve'
     | '/leave-list'
     | '/loan-application'
+    | '/loan-approval'
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
     | '/monthly-salary-process'
     | '/payroll-advance'
     | '/payroll-benefits'
+    | '/payroll-deductions'
     | '/payroll-loan'
     | '/payroll-reports'
     | '/pending-manual-attendance'
@@ -992,12 +1012,14 @@ export interface FileRouteTypes {
     | '/leave-approve'
     | '/leave-list'
     | '/loan-application'
+    | '/loan-approval'
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
     | '/monthly-salary-process'
     | '/payroll-advance'
     | '/payroll-benefits'
+    | '/payroll-deductions'
     | '/payroll-loan'
     | '/payroll-reports'
     | '/pending-manual-attendance'
@@ -1085,12 +1107,14 @@ export interface FileRouteTypes {
     | '/leave-approve'
     | '/leave-list'
     | '/loan-application'
+    | '/loan-approval'
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
     | '/monthly-salary-process'
     | '/payroll-advance'
     | '/payroll-benefits'
+    | '/payroll-deductions'
     | '/payroll-loan'
     | '/payroll-reports'
     | '/pending-manual-attendance'
@@ -1179,12 +1203,14 @@ export interface RootRouteChildren {
   LeaveApproveRoute: typeof LeaveApproveRoute
   LeaveListRoute: typeof LeaveListRoute
   LoanApplicationRoute: typeof LoanApplicationRoute
+  LoanApprovalRoute: typeof LoanApprovalRoute
   LoginRoute: typeof LoginRoute
   ManageOvertimeRoute: typeof ManageOvertimeRoute
   ManualAttendanceRoute: typeof ManualAttendanceRoute
   MonthlySalaryProcessRoute: typeof MonthlySalaryProcessRoute
   PayrollAdvanceRoute: typeof PayrollAdvanceRoute
   PayrollBenefitsRoute: typeof PayrollBenefitsRoute
+  PayrollDeductionsRoute: typeof PayrollDeductionsRoute
   PayrollLoanRoute: typeof PayrollLoanRoute
   PayrollReportsRoute: typeof PayrollReportsRoute
   PendingManualAttendanceRoute: typeof PendingManualAttendanceRoute
@@ -1433,6 +1459,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PayrollLoanRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/payroll-deductions': {
+      id: '/payroll-deductions'
+      path: '/payroll-deductions'
+      fullPath: '/payroll-deductions'
+      preLoaderRoute: typeof PayrollDeductionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/payroll-benefits': {
       id: '/payroll-benefits'
       path: '/payroll-benefits'
@@ -1473,6 +1506,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/loan-approval': {
+      id: '/loan-approval'
+      path: '/loan-approval'
+      fullPath: '/loan-approval'
+      preLoaderRoute: typeof LoanApprovalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/loan-application': {
@@ -1915,12 +1955,14 @@ const rootRouteChildren: RootRouteChildren = {
   LeaveApproveRoute: LeaveApproveRoute,
   LeaveListRoute: LeaveListRoute,
   LoanApplicationRoute: LoanApplicationRoute,
+  LoanApprovalRoute: LoanApprovalRoute,
   LoginRoute: LoginRoute,
   ManageOvertimeRoute: ManageOvertimeRoute,
   ManualAttendanceRoute: ManualAttendanceRoute,
   MonthlySalaryProcessRoute: MonthlySalaryProcessRoute,
   PayrollAdvanceRoute: PayrollAdvanceRoute,
   PayrollBenefitsRoute: PayrollBenefitsRoute,
+  PayrollDeductionsRoute: PayrollDeductionsRoute,
   PayrollLoanRoute: PayrollLoanRoute,
   PayrollReportsRoute: PayrollReportsRoute,
   PendingManualAttendanceRoute: PendingManualAttendanceRoute,

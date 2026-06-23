@@ -233,8 +233,7 @@ const nav: NavItem[] = [
         label: "Loan",
         subitems: [
           { label: "Loan Management", to: "/loan-application" },
-          { label: "Approve By HOD", to: "#" },
-          { label: "Approve By HR", to: "#" },
+          { label: "Loan Approval", to: "/loan-approval" },
         ]
       },
       { label: "Deductions", to: "/payroll-deductions" },
