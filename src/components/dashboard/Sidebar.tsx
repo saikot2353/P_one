@@ -9,10 +9,17 @@ import {
   LogOut, HeartHandshake, Banknote
 } from "lucide-react";
 
-interface SubItem {
+interface NestedItem {
   label: string;
   to: string;
   search?: Record<string, any>;
+}
+
+interface SubItem {
+  label: string;
+  to?: string;
+  search?: Record<string, any>;
+  subitems?: NestedItem[];
 }
 
 interface NavItem {
@@ -212,12 +219,68 @@ const nav: NavItem[] = [
     label: "Payroll",
     icon: Banknote,
     subitems: [
-      { label: "Advance", to: "/payroll-advance" },
-      { label: "Loan", to: "/payroll-loan" },
+      {
+        label: "Advance",
+        subitems: [
+          { label: "Advance Requisition", to: "#" },
+          { label: "Approve Requisition", to: "#" },
+          { label: "Advance List", to: "#" },
+          { label: "Advance Status", to: "#" },
+          { label: "Incentive Allowance", to: "#" },
+        ]
+      },
+      {
+        label: "Loan",
+        subitems: [
+          { label: "Loan Management", to: "/loan-application" },
+          { label: "Approve By HOD", to: "#" },
+          { label: "Approve By HR", to: "#" },
+        ]
+      },
       { label: "Deductions", to: "/payroll-deductions" },
-      { label: "Salary Process", to: "/salary-process" },
-      { label: "Benefits", to: "/payroll-benefits" },
-      { label: "Reports", to: "/payroll-reports" },
+      {
+        label: "Salary Process",
+        subitems: [
+          { label: "Monthly Salary Process", to: "/monthly-salary-process" },
+          { label: "Advance Salary Process", to: "/advance-salary-process" },
+          { label: "Yearly Bonus Process", to: "/yearly-bonus-process" },
+          { label: "Check & Approve", to: "/check-approve-salary" },
+        ]
+      },
+      { 
+        label: "Benefits",
+        subitems: [
+          { label: "Master Data", to: "/payroll-benefits-master-data" },
+          { label: "Common Benefits", to: "/payroll-benefits-common" },
+          { label: "Monthly Benefits", to: "/payroll-benefits-monthly" },
+          { label: "Loan/Advance Req.", to: "/payroll-benefits-loan-req" },
+          { label: "Loan Reschedule Sys.", to: "/payroll-benefits-loan-reschedule" },
+        ]
+      },
+      {
+        label: "Final Settlement",
+        subitems: [
+          { label: "Execute Final Settlement", to: "/payroll-final-settlement-execute" },
+        ]
+      },
+      {
+        label: "Reports",
+        subitems: [
+          { label: "Monthly Salary Details", to: "#" },
+          { label: "Monthly Left Salary Sheet", to: "#" },
+          { label: "Employee Salary History", to: "#" },
+          { label: "Monthly Advance Salary Sheet", to: "#" },
+          { label: "Summary Salary Sheet", to: "#" },
+          { label: "Employee Tax", to: "#" },
+          { label: "Yearly Bonus Report", to: "#" },
+          { label: "Bonus Summary Report", to: "#" },
+          { label: "Bonus Summary Report(Unit Wise)", to: "#" },
+          { label: "Holiday Summary Sheet", to: "#" },
+          { label: "Earn Leave Pay Report", to: "#" },
+          { label: "Allowance Payment", to: "#" },
+          { label: "Final Settlement", to: "#" },
+        ]
+      },
     ]
   },
   {
@@ -265,8 +328,20 @@ export function Sidebar() {
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
     nav.forEach(item => {
-      if (item.subitems && item.subitems.some(sub => sub.to !== "/" && sub.to === currentPath)) {
-        initial[item.label] = true;
+      if (item.subitems) {
+        const isChildActive = item.subitems.some(sub => {
+          if (sub.to && sub.to !== "/" && sub.to === currentPath) return true;
+          if (sub.subitems && sub.subitems.some(nested => nested.to !== "/" && nested.to === currentPath)) return true;
+          return false;
+        });
+        if (isChildActive) {
+          initial[item.label] = true;
+        }
+        item.subitems.forEach(sub => {
+          if (sub.subitems && sub.subitems.some(nested => nested.to !== "/" && nested.to === currentPath)) {
+            initial[sub.label] = true;
+          }
+        });
       }
     });
     
@@ -298,7 +373,11 @@ export function Sidebar() {
     sessionStorage.setItem("sidebar_scroll", e.currentTarget.scrollTop.toString());
   };
 
-  const toggleMenu = (label: string) => {
+  const toggleMenu = (label: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setOpenMenus((prev) => ({
       ...prev,
       [label]: !prev[label],
@@ -325,8 +404,12 @@ export function Sidebar() {
         {nav.map((item) => {
           const Icon = item.icon;
 
-          // Determine parent active state dynamically: active if its route is active OR any of its subitems is active
-          const isParentActive = item.to === currentPath || (item.subitems && item.subitems.some(sub => sub.to !== "/" && sub.to === currentPath));
+          // Determine parent active state dynamically
+          const isParentActive = item.to === currentPath || (item.subitems && item.subitems.some(sub => {
+            if (sub.to && sub.to !== "/" && sub.to === currentPath) return true;
+            if (sub.subitems && sub.subitems.some(nested => nested.to !== "/" && nested.to === currentPath)) return true;
+            return false;
+          }));
 
           if (!item.subitems) {
             return (
@@ -354,7 +437,7 @@ export function Sidebar() {
           return (
             <div key={item.label} className="space-y-0.5 border-b border-sidebar-border/30 last:border-0 pb-1">
               <button
-                onClick={() => toggleMenu(item.label)}
+                onClick={(e) => toggleMenu(item.label, e)}
                 className={[
                   "w-full group flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12px] text-left transition-all duration-200 font-semibold",
                   isParentActive
@@ -382,8 +465,60 @@ export function Sidebar() {
                 ].join(" ")}
               >
                 {item.subitems.map((sub) => {
+                  if (sub.subitems) {
+                    const isSubOpen = openMenus[sub.label];
+                    const isSubActive = sub.subitems.some(nested => nested.to !== "/" && nested.to === currentPath);
+                    return (
+                      <div key={sub.label} className="space-y-0.5">
+                        <button
+                          onClick={(e) => toggleMenu(sub.label, e)}
+                          className={[
+                            "w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all duration-150",
+                            isSubActive ? "text-sidebar-foreground font-bold" : "text-sidebar-foreground/75 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                          ].join(" ")}
+                        >
+                          <div className="flex items-center gap-2">
+                            <File className={["size-3 shrink-0", isSubActive ? "text-primary font-black" : "text-sidebar-foreground/45"].join(" ")} />
+                            <span className="truncate">{sub.label}</span>
+                          </div>
+                          {isSubOpen ? (
+                            <ChevronDown className="size-3 text-sidebar-foreground/45 transition-transform duration-300 rotate-180" />
+                          ) : (
+                            <ChevronRight className="size-3 text-sidebar-foreground/45 transition-transform duration-300" />
+                          )}
+                        </button>
+                        <div
+                          className={[
+                            "overflow-hidden transition-all duration-300 space-y-0.5 pl-6",
+                            isSubOpen ? "max-h-[300px] opacity-100 py-0.5 mt-0.5" : "max-h-0 opacity-0"
+                          ].join(" ")}
+                        >
+                          {sub.subitems.map((nested) => {
+                            const isNestedActive = nested.to !== "/" && nested.to === currentPath;
+                            return (
+                              <Link
+                                key={nested.label}
+                                to={nested.to}
+                                className={[
+                                  "flex items-center gap-2 px-3 py-1.5 rounded-md text-[10px] font-medium transition-all duration-150",
+                                  isNestedActive
+                                    ? "bg-primary/10 text-primary font-bold shadow-2xs"
+                                    : "text-sidebar-foreground/60 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"
+                                ].join(" ")}
+                              >
+                                <span className={["w-1.5 h-1.5 rounded-full shrink-0", isNestedActive ? "bg-primary" : "bg-sidebar-foreground/20"].join(" ")} />
+                                <span className="truncate">{nested.label}</span>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  }
+
                   const searchParams = routerState.location.search as Record<string, any>;
                   const isSubActive =
+                    sub.to &&
                     sub.to !== "/" &&
                     sub.to === currentPath &&
                     (!sub.search ||
@@ -393,7 +528,7 @@ export function Sidebar() {
                   return (
                     <Link
                       key={sub.label}
-                      to={sub.to}
+                      to={sub.to || "/"}
                       search={sub.search}
                       className={[
                         "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all duration-150",
@@ -449,3 +584,4 @@ export function Sidebar() {
     </aside>
   );
 }
+
