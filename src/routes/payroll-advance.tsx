@@ -119,71 +119,124 @@ function PayrollAdvancePage() {
                     <Plus className="size-4" /> New Requisition
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-md overflow-y-auto max-h-[90vh]">
-                  <DialogHeader>
-                    <DialogTitle>New Advance Requisition</DialogTitle>
+                <DialogContent className="sm:max-w-4xl overflow-y-auto max-h-[90vh] p-6">
+                  <DialogHeader className="mb-4">
+                    <DialogTitle className="text-xl">New Advance Requisition</DialogTitle>
                     <DialogDescription>
                       Create a new salary or general advance request for an employee.
                     </DialogDescription>
                   </DialogHeader>
-                  <div className="py-6 space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="req-emp">Employee</Label>
-                      <Select>
-                        <SelectTrigger id="req-emp">
-                          <SelectValue placeholder="Select Employee..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="2021028542">2021028542 - Zakir Hossain</SelectItem>
-                          <SelectItem value="2022041203">2022041203 - Khairul Bashar Masum</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="req-month">Month</Label>
-                        <Select defaultValue="06">
-                          <SelectTrigger id="req-month">
-                            <SelectValue placeholder="Month" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="01">January</SelectItem>
-                            <SelectItem value="02">February</SelectItem>
-                            <SelectItem value="03">March</SelectItem>
-                            <SelectItem value="04">April</SelectItem>
-                            <SelectItem value="05">May</SelectItem>
-                            <SelectItem value="06">June</SelectItem>
-                          </SelectContent>
-                        </Select>
+                  <div className="py-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 mb-6">
+                      {/* Left Column - Readonly Info */}
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+                          <Label htmlFor="req-empid" className="text-xs font-medium text-muted-foreground">EmpId</Label>
+                          <Input id="req-empid" placeholder="Enter Emp ID..." className="h-8 text-xs" />
+                        </div>
+                        <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+                          <Label className="text-xs font-medium text-muted-foreground">Company</Label>
+                          <Input readOnly className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
+                        </div>
+                        <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+                          <Label className="text-xs font-medium text-muted-foreground">Employee Type</Label>
+                          <Input readOnly className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
+                        </div>
+                        <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+                          <Label className="text-xs font-medium text-muted-foreground">Department</Label>
+                          <Input readOnly className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
+                        </div>
+                        <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+                          <Label className="text-xs font-medium text-muted-foreground">Designation</Label>
+                          <Input readOnly className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
+                        </div>
+                        <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+                          <Label className="text-xs font-medium text-muted-foreground">Basic Salary</Label>
+                          <Input readOnly className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
+                        </div>
+                        <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+                          <Label className="text-xs font-medium text-muted-foreground">Gross Salary</Label>
+                          <Input readOnly className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="req-year">Year</Label>
-                        <Select defaultValue="2026">
-                          <SelectTrigger id="req-year">
-                            <SelectValue placeholder="Year" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="2026">2026</SelectItem>
-                            <SelectItem value="2025">2025</SelectItem>
-                          </SelectContent>
-                        </Select>
+
+                      {/* Right Column - Inputs */}
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+                          <Label htmlFor="req-month" className="text-xs font-medium text-muted-foreground">Month</Label>
+                          <Select defaultValue="06">
+                            <SelectTrigger id="req-month" className="h-8 text-xs">
+                              <SelectValue placeholder="Month" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="01">January</SelectItem>
+                              <SelectItem value="02">February</SelectItem>
+                              <SelectItem value="03">March</SelectItem>
+                              <SelectItem value="04">April</SelectItem>
+                              <SelectItem value="05">May</SelectItem>
+                              <SelectItem value="06">June</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+                          <Label htmlFor="req-year" className="text-xs font-medium text-muted-foreground">Year</Label>
+                          <Select defaultValue="2026">
+                            <SelectTrigger id="req-year" className="h-8 text-xs">
+                              <SelectValue placeholder="Year" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="2026">2026</SelectItem>
+                              <SelectItem value="2025">2025</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+                          <Label htmlFor="req-amount" className="text-xs font-medium text-muted-foreground">Advance Amount</Label>
+                          <Input id="req-amount" type="number" placeholder="0.00" className="h-8 text-xs" />
+                        </div>
+                        <div className="grid grid-cols-[120px_1fr] items-start gap-4">
+                          <Label htmlFor="req-remarks" className="text-xs font-medium text-muted-foreground pt-2">Remark</Label>
+                          <textarea 
+                            id="req-remarks" 
+                            className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-xs shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" 
+                          />
+                        </div>
+                        <div className="grid grid-cols-[120px_1fr] items-center gap-4 pt-2">
+                          <div className="col-start-2 flex gap-2">
+                            <Button size="sm" type="submit" className="h-7 text-xs px-6" onClick={() => setIsModalOpen(false)}>Submit</Button>
+                            <Button size="sm" variant="outline" className="h-7 text-xs px-6 bg-muted/30">Reset</Button>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="req-amount">Advance Amount</Label>
-                      <Input id="req-amount" type="number" placeholder="0.00" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="req-remarks">Remarks</Label>
-                      <Input id="req-remarks" placeholder="E.g., Salary Advance" />
+
+                    {/* History Table */}
+                    <div className="space-y-3 mt-6 border-t border-border/60 pt-6">
+                      <h3 className="text-sm font-bold text-foreground flex items-center gap-2 border-b-2 border-primary/20 pb-1 w-max">
+                        Salary Advance History
+                      </h3>
+                      <div className="border border-border/60 rounded-md overflow-hidden">
+                        <Table>
+                          <TableHeader className="bg-muted/30">
+                            <TableRow>
+                              <TableHead className="text-xs font-bold text-primary">Month</TableHead>
+                              <TableHead className="text-xs font-bold text-primary">Year</TableHead>
+                              <TableHead className="text-xs font-bold text-primary">Advance</TableHead>
+                              <TableHead className="text-xs font-bold text-primary">Status</TableHead>
+                              <TableHead className="text-xs font-bold text-primary">Remark</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            <TableRow className="hover:bg-transparent">
+                              <TableCell colSpan={5} className="text-center text-xs text-muted-foreground font-medium py-8 bg-muted/10">
+                                No data available!
+                              </TableCell>
+                            </TableRow>
+                          </TableBody>
+                        </Table>
+                      </div>
                     </div>
                   </div>
-                  <DialogFooter>
-                    <DialogClose asChild>
-                      <Button variant="outline">Cancel</Button>
-                    </DialogClose>
-                    <Button type="submit" onClick={() => setIsModalOpen(false)}>Submit Requisition</Button>
-                  </DialogFooter>
                 </DialogContent>
               </Dialog>
 
