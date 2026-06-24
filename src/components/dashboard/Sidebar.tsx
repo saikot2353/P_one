@@ -6,7 +6,7 @@ import {
   CalendarDays, CalendarX, ShieldAlert, Fingerprint, Timer,
   CreditCard, Cpu, ShieldCheck, Lightbulb, Settings,
   LifeBuoy, ChevronDown, ChevronRight, File, Briefcase, UserPlus,
-  LogOut, HeartHandshake, Banknote
+  LogOut, HeartHandshake, Banknote, CheckCircle
 } from "lucide-react";
 
 interface NestedItem {
@@ -28,6 +28,7 @@ interface NavItem {
   icon: any;
   active?: boolean;
   subitems?: SubItem[];
+  search?: Record<string, any>;
 }
 
 const nav: NavItem[] = [
@@ -38,7 +39,6 @@ const nav: NavItem[] = [
     subitems: [
       { label: "New Requisition", to: "/ssp-new-requisition" },
       { label: "My Requisition", to: "/ssp-my-requisition" },
-      { label: "Approval", to: "/ssp-approval" },
       { label: "Attendance", to: "/ssp-attendance" },
     ]
   },
@@ -55,20 +55,32 @@ const nav: NavItem[] = [
     ]
   },
   {
-    label: "Personnel Info",
-    icon: UserRound,
-    active: true,
+    label: "HR Approvals",
+    icon: CheckCircle,
     subitems: [
-      { label: "Personnel List", to: "/personnel-list" },
-      { label: "Approval", to: "/personnel-approval" },
+      { label: "SSP Approval", to: "/ssp-approval" },
+      { label: "Personnel Approval", to: "/personnel-approval" },
+      { label: "Manual Attendance", to: "/pending-manual-attendance" },
+      { label: "JD Approvals", to: "/hr-policy-jds", search: { mode: "list", filterWorkflow: "HR" } },
+      { label: "Increment Gadget", to: "/approve-increment-gadget" },
+      { label: "Increment (HR)", to: "/approve-increment-hr" },
+      { label: "Final Increment", to: "/final-approve-increment" },
+      { label: "Budget Requisitions", to: "/budget-requisition-approvals" },
+      { label: "Transfer Approvals", to: "/transfer-control-center", search: { tab: "approve" } },
+      { label: "Overtime Requisitions", to: "/approve-overtime" },
     ]
+  },
+  {
+    label: "Personnel Info",
+    to: "/personnel-list",
+    icon: UserRound,
+    active: true
   },
   {
     label: "Attendance",
     icon: Fingerprint,
     subitems: [
       { label: "Manual Attendance", to: "/manual-attendance" },
-      { label: "Manual Attendance Approval", to: "/pending-manual-attendance" },
       { label: "Employee Job Card", to: "/employee-job-card" },
       { label: "Allowance Process", to: "/" },
       { label: "Allowance Requisition", to: "/" },
@@ -109,10 +121,7 @@ const nav: NavItem[] = [
       { label: "Evaluation Propose", to: "/evaluation-propose" },
       { label: "Propose Increment", to: "/propose-increment" },
       { label: "Increment Summary", to: "/increment-summary" },
-      { label: "Approve Increment Gadget", to: "/approve-increment-gadget" },
       { label: "Increment Queue List", to: "/increment-queuelist" },
-      { label: "Approve Increment (HR)", to: "/approve-increment-hr" },
-      { label: "Approve Increment", to: "/final-approve-increment" },
       { label: "Increment List", to: "/increment-list" },
       { label: "Increment History", to: "/increment-history" },
     ]
@@ -151,7 +160,6 @@ const nav: NavItem[] = [
       { label: "Dashboard & Statement", to: "/budget-statement" },
       { label: "Budget Planning Hub", to: "/budget-planning" },
       { label: "My Requisitions", to: "/budget-my-requisitions" },
-      { label: "Requisition Approvals", to: "/budget-requisition-approvals" },
       { label: "Overtime Control", to: "/budget-overtime" },
     ]
   },
@@ -160,17 +168,14 @@ const nav: NavItem[] = [
     icon: RefreshCw,
     subitems: [
       { label: "Transfer History", to: "/transfer-control-center", search: { tab: "history" } },
-      { label: "Approve Transfer", to: "/transfer-control-center", search: { tab: "approve" } },
       { label: "Print Transfer Letter", to: "/transfer-control-center", search: { tab: "print" } },
     ]
   },
   {
     label: "HR Policy",
-    icon: FileText,
-    subitems: [
-      { label: "JD List", to: "/hr-policy-jds", search: { mode: "list", filterWorkflow: "ALL" } },
-      { label: "JD Approvals", to: "/hr-policy-jds", search: { mode: "list", filterWorkflow: "HR" } },
-    ]
+    to: "/hr-policy-jds",
+    search: { mode: "list", filterWorkflow: "ALL" },
+    icon: FileText
   },
   {
     label: "User Management",
@@ -203,7 +208,6 @@ const nav: NavItem[] = [
     icon: Timer,
     subitems: [
       { label: "OT Tracking & Submissions", to: "/manage-overtime" },
-      { label: "Approve OT Requisition", to: "/approve-overtime" },
     ]
   },
   {
@@ -425,6 +429,7 @@ export function Sidebar() {
               <div key={item.label} className="border-b border-sidebar-border/30 last:border-0 pb-1">
                 <Link
                   to={item.to || "/"}
+                  search={item.search}
                   className={[
                     "group flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12px] font-semibold transition-all duration-200",
                     isParentActive
