@@ -223,16 +223,13 @@ const nav: NavItem[] = [
         label: "Advance",
         subitems: [
           { label: "Advance Req & List", to: "/payroll-advance" },
-          { label: "Approve Requisition", to: "#" },
-          { label: "Advance Status", to: "#" },
-          { label: "Incentive Allowance", to: "#" },
+          { label: "Incentive Allowance", to: "/incentive-allowance" },
         ]
       },
       {
         label: "Loan",
         subitems: [
           { label: "Loan Management", to: "/loan-application" },
-          { label: "Loan Approval", to: "/loan-approval" },
         ]
       },
       { label: "Deductions", to: "/payroll-deductions" },
@@ -242,7 +239,14 @@ const nav: NavItem[] = [
           { label: "Monthly Salary Process", to: "/monthly-salary-process" },
           { label: "Advance Salary Process", to: "/advance-salary-process" },
           { label: "Yearly Bonus Process", to: "/yearly-bonus-process" },
-          { label: "Check & Approve", to: "/check-approve-salary" },
+        ]
+      },
+      {
+        label: "Payroll Approval",
+        subitems: [
+          { label: "Advance Requisitions", to: "/approve-advance" },
+          { label: "Loan Applications", to: "/loan-approval" },
+          { label: "Salary Sheets", to: "/check-approve-salary" },
         ]
       },
       { 
@@ -342,20 +346,27 @@ export function Sidebar() {
         });
       }
     });
-    
+    return initial;
+  });
+
+  const isMounted = useRef(false);
+  useEffect(() => {
     if (typeof window !== "undefined") {
       const saved = sessionStorage.getItem("sidebar_menus");
       if (saved) {
         try {
-          return { ...JSON.parse(saved), ...initial };
+          const parsed = JSON.parse(saved);
+          setOpenMenus(prev => ({ ...parsed, ...prev }));
         } catch (e) {}
       }
     }
-    return initial;
-  });
+    isMounted.current = true;
+  }, []);
 
   useEffect(() => {
-    sessionStorage.setItem("sidebar_menus", JSON.stringify(openMenus));
+    if (isMounted.current) {
+      sessionStorage.setItem("sidebar_menus", JSON.stringify(openMenus));
+    }
   }, [openMenus]);
 
   useEffect(() => {

@@ -37,6 +37,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 
+import { SearchableSelect } from "@/components/ui/searchable-select";
+
 export const Route = createFileRoute("/payroll-advance")({
   head: () => ({
     meta: [
@@ -46,6 +48,50 @@ export const Route = createFileRoute("/payroll-advance")({
   }),
   component: PayrollAdvancePage,
 });
+
+// Dummy Employee Details for the Searchable Dropdown
+const employeeOptions = [
+  {
+    value: "2021028542",
+    label: "2021028542 - Zakir Hossain",
+    company: "Pakiza Software Limited",
+    type: "Office Executive",
+    department: "Implementation & Support (HR)",
+    designation: "Executive",
+    basic: "15,000.00",
+    gross: "25,000.00",
+  },
+  {
+    value: "2022041203",
+    label: "2022041203 - Khairul Bashar Masum",
+    company: "Pakiza Software Limited",
+    type: "Office Executive",
+    department: "HR Team",
+    designation: "Asst. Manager",
+    basic: "22,500.00",
+    gross: "35,000.00",
+  },
+  {
+    value: "2023043910",
+    label: "2023043910 - Tahmid Afsar",
+    company: "Pakiza Software Limited",
+    type: "Office Executive",
+    department: "Project Resource & Strategy",
+    designation: "Asst. Manager",
+    basic: "28,000.00",
+    gross: "45,000.00",
+  },
+  {
+    value: "2023046001",
+    label: "2023046001 - Sohanur Rahman Schan",
+    company: "Pakiza Software Limited",
+    type: "Office Executive",
+    department: "Admin",
+    designation: "Executive",
+    basic: "18,000.00",
+    gross: "30,000.00",
+  },
+];
 
 // Dummy Data based on the user's screenshots
 const advanceData = [
@@ -64,6 +110,9 @@ const advanceData = [
 function PayrollAdvancePage() {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEmpId, setSelectedEmpId] = useState("");
+
+  const selectedEmployee = employeeOptions.find(emp => emp.value === selectedEmpId) || null;
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -132,31 +181,37 @@ function PayrollAdvancePage() {
                       <div className="space-y-3">
                         <div className="grid grid-cols-[120px_1fr] items-center gap-4">
                           <Label htmlFor="req-empid" className="text-xs font-medium text-muted-foreground">EmpId</Label>
-                          <Input id="req-empid" placeholder="Enter Emp ID..." className="h-8 text-xs" />
+                          <SearchableSelect 
+                            options={employeeOptions} 
+                            value={selectedEmpId} 
+                            onChange={setSelectedEmpId} 
+                            placeholder="Search Emp ID..." 
+                            className="h-8 text-xs"
+                          />
                         </div>
                         <div className="grid grid-cols-[120px_1fr] items-center gap-4">
                           <Label className="text-xs font-medium text-muted-foreground">Company</Label>
-                          <Input readOnly className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
+                          <Input readOnly value={selectedEmployee?.company || ""} placeholder="-" className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
                         </div>
                         <div className="grid grid-cols-[120px_1fr] items-center gap-4">
                           <Label className="text-xs font-medium text-muted-foreground">Employee Type</Label>
-                          <Input readOnly className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
+                          <Input readOnly value={selectedEmployee?.type || ""} placeholder="-" className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
                         </div>
                         <div className="grid grid-cols-[120px_1fr] items-center gap-4">
                           <Label className="text-xs font-medium text-muted-foreground">Department</Label>
-                          <Input readOnly className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
+                          <Input readOnly value={selectedEmployee?.department || ""} placeholder="-" className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
                         </div>
                         <div className="grid grid-cols-[120px_1fr] items-center gap-4">
                           <Label className="text-xs font-medium text-muted-foreground">Designation</Label>
-                          <Input readOnly className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
+                          <Input readOnly value={selectedEmployee?.designation || ""} placeholder="-" className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
                         </div>
                         <div className="grid grid-cols-[120px_1fr] items-center gap-4">
                           <Label className="text-xs font-medium text-muted-foreground">Basic Salary</Label>
-                          <Input readOnly className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
+                          <Input readOnly value={selectedEmployee?.basic || ""} placeholder="-" className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
                         </div>
                         <div className="grid grid-cols-[120px_1fr] items-center gap-4">
                           <Label className="text-xs font-medium text-muted-foreground">Gross Salary</Label>
-                          <Input readOnly className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
+                          <Input readOnly value={selectedEmployee?.gross || ""} placeholder="-" className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
                         </div>
                       </div>
 
