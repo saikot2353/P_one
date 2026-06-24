@@ -364,7 +364,7 @@ function FinalApproveIncrementPage() {
                     <th className="px-3 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                <tbody className="divide-y divide-slate-100 border-b border-slate-100 dark:divide-slate-800 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300">
                   {filteredRecords.map((row) => {
                     const isChecked = selectedIds.has(row.empId);
                     return (

@@ -80,7 +80,7 @@ function ApproveManualAttendancePage() {
                     <th className="px-5 py-3 font-semibold text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="text-foreground bg-white dark:bg-slate-900/40 divide-y divide-slate-100 dark:divide-slate-800/40">
+                <tbody className="text-foreground bg-white dark:bg-slate-900/40 divide-y divide-slate-100 border-b border-slate-100 dark:divide-slate-800/40 dark:border-slate-800">
                   {pendingRequests.map(req => (
                     <tr key={req.id} className="border-b border-border/30 dark:border-slate-800/40 hover:bg-muted/10 transition-colors">
                       <td className="px-5 py-3">

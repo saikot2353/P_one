@@ -614,7 +614,7 @@ function LeaveApprovePage() {
                     <th className="px-3 py-3 text-center">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
+                <tbody className="divide-y divide-slate-100 border-b border-slate-100 dark:divide-slate-800 dark:border-slate-800 font-medium">
                   {filteredRows.map((row) => {
                     const isSelected = selectedIds.has(row.sl);
 

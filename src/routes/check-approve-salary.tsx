@@ -399,7 +399,7 @@ function CheckApproveSalaryPage() {
                       <th className="px-4 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest w-[180px]">Feedback / Comments</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs text-slate-700 dark:text-slate-300 font-semibold">
+                  <tbody className="divide-y divide-slate-100 border-b border-slate-100 dark:divide-slate-800 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 font-semibold">
                     {filteredRecords.map((row) => {
                       const isChecked = selectedIds.has(row.id);
                       const isSelectable = (mainTab === "check" && row.status === "Pending") || (mainTab === "approve" && row.status === "Checked");

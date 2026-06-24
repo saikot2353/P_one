@@ -281,7 +281,7 @@ function RequisitionApprovalsPage() {
                     <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center w-[140px]">Status Layer</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                <tbody className="divide-y divide-slate-100 border-b border-slate-100 dark:divide-slate-800 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300">
                   {filteredRequisitions.map((r) => {
                     const isChecked = selectedIds.has(r.id);
                     let statusBadge = "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20";
