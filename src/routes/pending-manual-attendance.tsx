@@ -1,23 +1,28 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
+import { SearchableSelect } from "@/components/ui/searchable-select";
+import { Badge } from "@/components/ui/badge";
 import {
-  Fingerprint, Search, FileSpreadsheet, Printer, FileDown, X, SlidersHorizontal, Pencil,
-  ChevronDown, ChevronRight, ChevronLeft, LayoutGrid, Check, Plus, Trash2, Calendar, Clock, AlertCircle, RefreshCw
+  ChevronRight,
+  Search,
+  Printer,
+  Table as TableIcon,
+  X,
+  CheckCircle2,
+  Clock,
+  Fingerprint,
+  XCircle,
+  FolderOpen,
+  Pencil
 } from "lucide-react";
 
 export const Route = createFileRoute("/pending-manual-attendance")({
-  head: () => ({
-    meta: [
-      { title: "Manual Attendance Approval — CRIPTON" },
-      { name: "description", content: "HR audit registry of attendance corrections, department approvals, and punch overrides." },
-    ],
-  }),
   component: PendingManualAttendancePage,
 });
 
-// Authentic pending requests dataset based directly on your spreadsheet image structure!
+// Authentic pending requests dataset
 const initialPendingList = [
   {
     id: "2016001055",
@@ -100,773 +105,333 @@ const initialPendingList = [
 function PendingManualAttendancePage() {
   const [requests, setRequests] = useState(initialPendingList);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [searchQuery, setSearchQuery] = useState("");
 
-  // Filters (Matches your top card parameters precisely!)
-  const [startDate, setStartDate] = useState("14/05/2026");
-  const [endDate, setEndDate] = useState("17/05/2026");
-  const [empType, setEmpType] = useState("ALL");
-  const [subDept, setSubDept] = useState("ALL");
-  const [jobTitle, setJobTitle] = useState("ALL");
-  const [unit, setUnit] = useState("ALL");
-  const [line, setLine] = useState("ALL");
-  const [searchEmpId, setSearchEmpId] = useState("");
-  const [statusRequest, setStatusRequest] = useState("ALL Request");
+  // Filters
+  const [startDate, setStartDate] = useState("2026-05-14");
+  const [endDate, setEndDate] = useState("2026-05-17");
+  const [department, setDepartment] = useState("All Departments");
+  const [statusFilter, setStatusFilter] = useState<string>("Pending");
+  const [globalSearch, setGlobalSearch] = useState("");
+
+  const departmentOptions = [
+    { value: "All Departments", label: "All Departments" },
+    { value: "Management", label: "Management" },
+    { value: "Core Development (HR)", label: "Core Development (HR)" },
+    { value: "Business Innovation", label: "Business Innovation" },
+    { value: "Core Sales", label: "Core Sales" }
+  ];
 
   // Inline dynamic edit modal states
   const [editingRequest, setEditingRequest] = useState<any | null>(null);
   const [editInTime, setEditInTime] = useState("");
   const [editOutTime, setEditOutTime] = useState("");
   const [editReason, setEditReason] = useState("");
-  const [editHodStatus, setEditHodStatus] = useState("Pending");
-  const [editHrdStatus, setEditHrdStatus] = useState("Pending");
-  const [editMdStatus, setEditMdStatus] = useState("Pending");
 
-  // Custom Calendar & Clock Picker states
-  const [activeDatePicker, setActiveDatePicker] = useState<{ id: string; field: string } | null>(null);
-  const [activeTimePicker, setActiveTimePicker] = useState<{ id: string; field: string } | null>(null);
-
-  // Calendar month state
-  const [calendarMonth, setCalendarMonth] = useState(4); // May
-  const [calendarYear, setCalendarYear] = useState(2026);
-
-  const monthNames = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
-
-  // Self-cleaning clickaway listener
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target.closest(".date-picker-trigger") && !target.closest(".date-picker-popover")) {
-        setActiveDatePicker(null);
-      }
-      if (!target.closest(".time-picker-trigger") && !target.closest(".time-picker-popover")) {
-        setActiveTimePicker(null);
-      }
-    };
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, []);
-
-  // Global Checkbox toggles
-  const isAllSelected = useMemo(() => {
-    return requests.length > 0 && selectedIds.size === requests.length;
-  }, [requests, selectedIds]);
-
-  const toggleSelectAll = () => {
-    if (isAllSelected) {
-      setSelectedIds(new Set());
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedIds(new Set(filteredRequests.map(r => r.id)));
     } else {
-      setSelectedIds(new Set(requests.map(r => r.id)));
+      setSelectedIds(new Set());
     }
   };
 
-  const toggleSelectRow = (id: string) => {
+  const handleSelectRow = (id: string) => {
     setSelectedIds(prev => {
       const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   };
 
-  // Delete Action (Red Button!)
-  const handleDeleteSelected = () => {
-    if (selectedIds.size === 0) {
-      alert("Please select at least one correction request to delete!");
-      return;
-    }
-    if (confirm(`Are you sure you want to delete ${selectedIds.size} selected pending request(s)?`)) {
-      setRequests(prev => prev.filter(r => !selectedIds.has(r.id)));
-      setSelectedIds(new Set());
-      alert("Requests deleted successfully!");
-    }
+  const handleBulkApprove = () => {
+    if (selectedIds.size === 0) return;
+    setRequests(prev => prev.map(r => selectedIds.has(r.id) ? { ...r, hodStatus: "Approve" } : r));
+    setSelectedIds(new Set());
   };
 
-  // Approve Action (Green Button!)
-  const handleApproveSelected = () => {
-    if (selectedIds.size === 0) {
-      alert("Please select at least one correction request to approve!");
-      return;
-    }
-    if (confirm(`Are you sure you want to approve ${selectedIds.size} selected attendance correction request(s)?`)) {
-      setRequests(prev => prev.filter(r => !selectedIds.has(r.id)));
-      setSelectedIds(new Set());
-      alert("Requests approved successfully!");
-    }
+  const handleBulkReject = () => {
+    if (selectedIds.size === 0) return;
+    setRequests(prev => prev.map(r => selectedIds.has(r.id) ? { ...r, hodStatus: "Reject" } : r));
+    setSelectedIds(new Set());
   };
 
-  // Reject Action (Bulk)
-  const handleRejectSelected = () => {
-    if (selectedIds.size === 0) {
-      alert("Please select at least one correction request to reject!");
-      return;
-    }
-    if (confirm(`Are you sure you want to reject ${selectedIds.size} selected pending request(s)?`)) {
-      setRequests(prev => prev.filter(r => !selectedIds.has(r.id)));
-      setSelectedIds(new Set());
-      alert("Requests rejected successfully!");
-    }
-  };
-
-  // Trigger editing modal
   const handleStartEdit = (req: any) => {
     setEditingRequest(req);
     setEditInTime(req.inTime);
     setEditOutTime(req.outTime);
     setEditReason(req.reason);
-    setEditHodStatus(req.hodStatus);
-    setEditHrdStatus(req.hrdStatus);
-    setEditMdStatus(req.mdStatus);
   };
 
-  // Save changes from Edit Modal
   const handleSaveEdit = () => {
     if (!editingRequest) return;
-    setRequests(prev =>
-      prev.map(r => {
-        if (r.id !== editingRequest.id) return r;
-        return {
-          ...r,
-          inTime: editInTime,
-          outTime: editOutTime,
-          reason: editReason,
-          hodStatus: editHodStatus,
-          hrdStatus: editHrdStatus,
-          mdStatus: editMdStatus
-        };
-      })
-    );
+    setRequests(prev => prev.map(r => {
+      if (r.id !== editingRequest.id) return r;
+      return { ...r, inTime: editInTime, outTime: editOutTime, reason: editReason };
+    }));
     setEditingRequest(null);
-    alert("Manual Request updated successfully!");
   };
 
-  // Search filter query matching!
+  // Stats & Filtering
   const filteredRequests = useMemo(() => {
     return requests.filter(r => {
-      // 1. Employee ID filter
-      if (searchEmpId.trim() && !r.id.includes(searchEmpId.trim())) return false;
-
-      // 2. Department filter
-      if (subDept !== "ALL" && r.dept1 !== subDept) return false;
-
-      // 3. Status filter
-      if (statusRequest !== "ALL Request") {
-        const matchStatus = statusRequest === "Pending" ? "Pending" : "Approve";
-        if (r.hodStatus !== matchStatus) return false;
+      if (statusFilter !== "All") {
+        if (statusFilter === "Pending" && r.hodStatus !== "Pending") return false;
+        if (statusFilter === "Approved" && r.hodStatus !== "Approve") return false;
+        if (statusFilter === "Rejected" && r.hodStatus !== "Reject") return false;
       }
-
-      // 4. General search filter
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase();
-        return (
-          r.name.toLowerCase().includes(query) ||
-          r.id.includes(query) ||
-          r.title.toLowerCase().includes(query) ||
-          r.hodName.toLowerCase().includes(query)
-        );
+      if (department !== "All Departments" && r.dept1 !== department) return false;
+      if (globalSearch) {
+        const q = globalSearch.toLowerCase();
+        return r.name.toLowerCase().includes(q) || r.id.includes(q) || r.title.toLowerCase().includes(q);
       }
-
       return true;
     });
-  }, [requests, searchEmpId, subDept, statusRequest, searchQuery]);
+  }, [requests, statusFilter, department, globalSearch]);
 
-  // Date selection handler
-  const handleSelectDate = (dateString: string) => {
-    if (!activeDatePicker) return;
-    const { id, field } = activeDatePicker;
-
-    if (id === "filters") {
-      if (field === "startDate") setStartDate(dateString);
-      if (field === "endDate") setEndDate(dateString);
-    }
-    setActiveDatePicker(null);
-  };
-
-  // Time selection handler
-  const handleSelectTime = (timeString: string) => {
-    if (!activeTimePicker) return;
-    const { id, field } = activeTimePicker;
-
-    if (id === "edit") {
-      if (field === "inTime") setEditInTime(timeString);
-      if (field === "outTime") setEditOutTime(timeString);
-    }
-    setActiveTimePicker(null);
-  };
-
-  // Render Days for Calendar
-  const renderCalendarDays = useMemo(() => {
-    const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
-    const firstDayIndex = new Date(calendarYear, calendarMonth, 1).getDay();
-
-    const days = [];
-    for (let i = 0; i < firstDayIndex; i++) {
-      days.push(<div key={`empty-${i}`} className="size-8" />);
-    }
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dayStr = String(day).padStart(2, "0");
-      const monthStr = String(calendarMonth + 1).padStart(2, "0");
-      const fullDate = `${dayStr}/${monthStr}/${calendarYear}`;
-
-      days.push(
-        <button
-          key={`day-${day}`}
-          onClick={(ev) => {
-            ev.stopPropagation();
-            handleSelectDate(fullDate);
-          }}
-          className="size-8 rounded-lg hover:bg-primary hover:text-white flex items-center justify-center text-[11px] font-bold text-foreground/85 transition"
-        >
-          {day}
-        </button>
-      );
-    }
-    return days;
-  }, [calendarMonth, calendarYear, activeDatePicker]);
-
-  // Calendar Markup
-  const renderCalendarMarkup = () => {
-    return (
-      <div className="w-56 select-none bg-card">
-        <div className="flex items-center justify-between border-b border-border/40 pb-2 mb-2">
-          <button
-            onClick={(ev) => {
-              ev.stopPropagation();
-              if (calendarMonth === 0) {
-                setCalendarMonth(11);
-                setCalendarYear(prev => prev - 1);
-              } else {
-                setCalendarMonth(prev => prev - 1);
-              }
-            }}
-            className="p-1 rounded-lg hover:bg-muted text-muted-foreground transition"
-          >
-            <ChevronLeft className="size-3.5" />
-          </button>
-          <span className="text-[10px] font-black uppercase text-foreground tracking-wider">
-            {monthNames[calendarMonth]} {calendarYear}
-          </span>
-          <button
-            onClick={(ev) => {
-              ev.stopPropagation();
-              if (calendarMonth === 11) {
-                setCalendarMonth(0);
-                setCalendarYear(prev => prev + 1);
-              } else {
-                setCalendarMonth(prev => prev + 1);
-              }
-            }}
-            className="p-1 rounded-lg hover:bg-muted text-muted-foreground transition"
-          >
-            <ChevronRight className="size-3.5" />
-          </button>
-        </div>
-        <div className="grid grid-cols-7 gap-1 text-[9px] font-bold text-center text-muted-foreground uppercase pb-1 tracking-wider border-b border-border/30 mb-1">
-          <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
-        </div>
-        <div className="grid grid-cols-7 gap-0.5 text-center">
-          {renderCalendarDays}
-        </div>
-      </div>
-    );
-  };
-
-  // Clock Selector Markup
-  const renderTimeClockMarkup = () => {
-    const hours = ["08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"];
-    const minutes = ["00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55"];
-    const currVal = activeTimePicker?.field === "inTime" ? editInTime : editOutTime;
-    const [currHr, currMin] = currVal ? currVal.split(":") : ["09", "00"];
-
-    return (
-      <div className="w-[260px] select-none space-y-3">
-        <div className="flex items-center justify-between border-b border-border/40 pb-2">
-          <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">Clock Selector</span>
-          <div className="px-2.5 py-0.5 rounded bg-primary/10 text-primary font-mono font-bold text-xs">
-            {currHr || "09"}:{currMin || "00"}
-          </div>
-        </div>
-
-        {/* HR Quick Presets */}
-        <div className="space-y-1">
-          <span className="text-[8.5px] font-extrabold text-primary uppercase tracking-wider">HR Presets</span>
-          <div className="grid grid-cols-4 gap-1">
-            {[
-              { label: "09:00 IN", val: "09:00" },
-              { label: "10:00 IN", val: "10:00" },
-              { label: "18:00 OUT", val: "18:00" },
-              { label: "20:00 OUT", val: "20:00" }
-            ].map(p => (
-              <button
-                key={p.val}
-                onClick={(ev) => {
-                  ev.stopPropagation();
-                  handleSelectTime(p.val);
-                }}
-                className="py-1 px-1 bg-muted hover:bg-primary hover:text-white rounded text-[8.5px] font-black uppercase border border-border/40 text-foreground/80 transition"
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Hours / Minutes Grid */}
-        <div className="grid grid-cols-2 gap-2">
-          <div className="space-y-1">
-            <span className="text-[8px] font-bold text-muted-foreground uppercase">Hours</span>
-            <div className="grid grid-cols-3 gap-1 h-32 overflow-y-auto border border-border/40 rounded-lg p-1 bg-muted/40 scrollbar-none">
-              {hours.map(hr => (
-                <button
-                  key={hr}
-                  onClick={(ev) => {
-                    ev.stopPropagation();
-                    const nextTime = `${hr}:${currMin || "00"}`;
-                    if (activeTimePicker?.field === "inTime") setEditInTime(nextTime);
-                    else setEditOutTime(nextTime);
-                  }}
-                  className={["py-1 rounded text-[9.5px] font-mono font-bold", currHr === hr ? "bg-primary text-white" : "bg-card border border-border/20 text-foreground/70 hover:bg-muted"].join(" ")}
-                >
-                  {hr}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <span className="text-[8px] font-bold text-muted-foreground uppercase">Minutes</span>
-            <div className="grid grid-cols-3 gap-1 h-32 overflow-y-auto border border-border/40 rounded-lg p-1 bg-muted/40 scrollbar-none">
-              {minutes.map(min => (
-                <button
-                  key={min}
-                  onClick={(ev) => {
-                    ev.stopPropagation();
-                    const nextTime = `${currHr || "09"}:${min}`;
-                    if (activeTimePicker?.field === "inTime") setEditInTime(nextTime);
-                    else setEditOutTime(nextTime);
-                  }}
-                  className={["py-1 rounded text-[9.5px] font-mono font-bold", currMin === min ? "bg-primary text-white" : "bg-card border border-border/20 text-foreground/70 hover:bg-muted"].join(" ")}
-                >
-                  {min}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="pt-1.5 border-t border-border/30">
-          <button
-            onClick={(ev) => {
-              ev.stopPropagation();
-              handleSelectTime(`${currHr || "09"}:${currMin || "00"}`);
-            }}
-            className="w-full py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded text-white font-extrabold text-[11px] transition uppercase shadow-xs tracking-wider"
-          >
-            Apply Time Punch
-          </button>
-        </div>
-      </div>
-    );
-  };
+  const totalCount = requests.length;
+  const pendingCount = requests.filter(r => r.hodStatus === "Pending").length;
+  const approvedCount = requests.filter(r => r.hodStatus === "Approve").length;
+  const rejectedCount = requests.filter(r => r.hodStatus === "Reject").length;
 
   return (
-    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
+    <div className="h-screen flex bg-[#f1f5f9] dark:bg-[#0b0f19] text-[#334155] dark:text-slate-200 overflow-hidden font-sans antialiased tracking-tight">
       <Sidebar />
-      <main className="flex-1 min-w-0 flex flex-col relative">
+      <main className="flex-1 min-w-0 flex flex-col overflow-hidden">
         <Topbar />
 
-        <div className="p-4 md:p-6 space-y-2">
-          {/* Breadcrumbs and Page Title */}
-          <div className="bg-card rounded-2xl border border-border/80 p-4 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
-                <ChevronRight className="size-2.5" />
-                <span className="text-muted-foreground/75">Human Resource</span>
-                <ChevronRight className="size-2.5" />
-                <span className="text-primary font-extrabold">Manual Attendance Approval</span>
+        <div className="flex-1 flex flex-col p-4 xl:p-6 gap-3.5 overflow-hidden bg-slate-50/50 dark:bg-slate-950/10">
+          
+          {/* Header Block */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-lg px-5 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                <Link to="/" className="hover:text-[#2563eb] transition-colors">Home</Link>
+                <ChevronRight className="size-2" />
+                <span className="hover:text-[#2563eb] transition-colors">Human Resource</span>
+                <ChevronRight className="size-2" />
+                <span className="text-slate-600 dark:text-slate-300 font-semibold">Attendance Approvals</span>
               </div>
-              <h1 className="text-xl md:text-2xl font-black text-foreground flex items-center gap-2">
-                <div className="p-1.5 bg-primary/10 rounded-lg border border-primary/20 text-primary">
-                  <Fingerprint className="size-5 text-primary animate-pulse" />
-                </div>
-                <span>Manual Attendance Approval</span>
-              </h1>
+              <div className="flex items-center gap-2">
+                <div className="size-1.5 rounded-full bg-[#2563eb]" />
+                <h1 className="text-lg font-bold tracking-tight text-slate-800 dark:text-slate-100">
+                  Manual Attendance Approvals
+                </h1>
+              </div>
             </div>
-            <button
-              onClick={() => setRequests(initialPendingList)}
-              className="h-10 px-4 rounded-xl border border-border hover:bg-muted text-xs font-bold text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition duration-200 cursor-pointer"
-            >
-              <RefreshCw className="size-3.5 text-primary" />
-              <span>Reset List</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#2563eb] bg-[#2563eb]/5 border border-[#2563eb]/15 px-3 py-1.5 rounded-full select-none">
+                HR Audit Registry
+              </span>
+            </div>
           </div>
 
-          {/* Top Panel: Criteria Selection */}
-          <div className="bg-card rounded-2xl border border-border/85 p-4 shadow-xs space-y-4">
-            <div className="flex items-center justify-between border-b border-border/40 pb-2.5">
-              <span className="text-[10px] font-black uppercase tracking-wider text-primary">Criteria Selection</span>
-              <span className="text-[9px] font-bold text-muted-foreground/45">Audit Registry</span>
+          {/* KPI Dashboard Summary Row */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 shrink-0">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm flex items-center gap-3">
+              <div className="size-8.5 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 shrink-0 border border-slate-100 dark:border-slate-700">
+                <FolderOpen className="size-4" />
+              </div>
+              <div>
+                <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Total Queue</p>
+                <h3 className="text-sm font-extrabold text-slate-700 dark:text-slate-200 mt-0.5">{totalCount} Requests</h3>
+              </div>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2">
-              {/* Start Date */}
-              <div className="space-y-1 relative">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Start Date</label>
-                <div className="relative date-picker-trigger">
-                  <input
-                    type="text"
-                    readOnly
-                    value={startDate}
-                    onClick={() => setActiveDatePicker({ id: "filters", field: "startDate" })}
-                    className="w-full h-9 px-3 pl-8.5 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none cursor-pointer text-primary"
-                  />
-                  <Calendar className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-primary" />
-
-                  {activeDatePicker?.id === "filters" && activeDatePicker?.field === "startDate" && (
-                    <div className="absolute z-50 bg-card border border-border/70 rounded-lg p-4 shadow-2xl space-y-3 date-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
-                      {renderCalendarMarkup()}
-                    </div>
-                  )}
-                </div>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm flex items-center gap-3">
+              <div className="size-8.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0 border border-emerald-100 dark:border-emerald-800">
+                <CheckCircle2 className="size-4" />
               </div>
-
-              {/* End Date */}
-              <div className="space-y-1 relative">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">End Date</label>
-                <div className="relative date-picker-trigger">
-                  <input
-                    type="text"
-                    readOnly
-                    value={endDate}
-                    onClick={() => setActiveDatePicker({ id: "filters", field: "endDate" })}
-                    className="w-full h-9 px-3 pl-8.5 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none cursor-pointer text-primary"
-                  />
-                  <Calendar className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-primary" />
-
-                  {activeDatePicker?.id === "filters" && activeDatePicker?.field === "endDate" && (
-                    <div className="absolute z-50 bg-card border border-border/70 rounded-lg p-4 shadow-2xl space-y-3 date-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
-                      {renderCalendarMarkup()}
-                    </div>
-                  )}
-                </div>
+              <div>
+                <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Approved</p>
+                <h3 className="text-sm font-extrabold text-slate-700 dark:text-slate-200 mt-0.5">{approvedCount} Requests</h3>
               </div>
-
-              {/* Employee Type */}
-              <div className="space-y-1">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Employee Type</label>
-                <div className="relative">
-                  <select
-                    value={empType}
-                    onChange={(e) => setEmpType(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
-                  >
-                    <option value="ALL">ALL</option>
-                    <option value="Permanent">Permanent</option>
-                    <option value="Contractual">Contractual</option>
-                  </select>
-                  <ChevronDown className="size-3 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                </div>
+            </div>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm flex items-center gap-3">
+              <div className="size-8.5 rounded-lg bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0 border border-amber-100 dark:border-amber-800">
+                <Clock className="size-4" />
               </div>
-
-              {/* Sub Department */}
-              <div className="space-y-1">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Sub Department</label>
-                <div className="relative">
-                  <select
-                    value={subDept}
-                    onChange={(e) => setSubDept(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
-                  >
-                    <option value="ALL">ALL</option>
-                    <option value="Management">Management</option>
-                    <option value="Core Development (HR)">Core Development (HR)</option>
-                    <option value="Accounts & Vat">Accounts & Vat</option>
-                    <option value="Core Sales">Core Sales</option>
-                  </select>
-                  <ChevronDown className="size-3 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                </div>
+              <div>
+                <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Pending</p>
+                <h3 className="text-sm font-extrabold text-slate-700 dark:text-slate-200 mt-0.5">{pendingCount} Requests</h3>
               </div>
-
-              {/* Job Title */}
-              <div className="space-y-1">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Job Title</label>
-                <div className="relative">
-                  <select
-                    value={jobTitle}
-                    onChange={(e) => setJobTitle(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
-                  >
-                    <option value="ALL">ALL</option>
-                    <option value="Chief Operating Officer">Chief Operating Officer</option>
-                    <option value="Manager">Manager</option>
-                    <option value="Executive">Executive</option>
-                  </select>
-                  <ChevronDown className="size-3 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                </div>
+            </div>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm flex items-center gap-3">
+              <div className="size-8.5 rounded-lg bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0 border border-rose-100 dark:border-rose-800">
+                <XCircle className="size-4" />
               </div>
-
-              {/* Unit */}
-              <div className="space-y-1">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Unit</label>
-                <div className="relative">
-                  <select
-                    value={unit}
-                    onChange={(e) => setUnit(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
-                  >
-                    <option value="ALL">ALL</option>
-                    <option value="PSL">PSL</option>
-                    <option value="PTVL">PTVL</option>
-                  </select>
-                  <ChevronDown className="size-3 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                </div>
+              <div>
+                <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Rejected</p>
+                <h3 className="text-sm font-extrabold text-slate-700 dark:text-slate-200 mt-0.5">{rejectedCount} Requests</h3>
               </div>
+            </div>
+          </div>
 
-              {/* Line */}
-              <div className="space-y-1">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Line</label>
-                <div className="relative">
-                  <select
-                    value={line}
-                    onChange={(e) => setLine(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
-                  >
-                    <option value="ALL">ALL</option>
-                    <option value="Line 1">Line 1</option>
-                    <option value="Line 2">Line 2</option>
-                  </select>
-                  <ChevronDown className="size-3 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                </div>
-              </div>
-
-              {/* Employee ID input */}
-              <div className="space-y-1">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Employee Id</label>
+          {/* Smart Filters */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-3 shadow-sm shrink-0 space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-3.5 gap-y-2.5">
+              <div className="space-y-0.5">
+                <label className="text-[8.5px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Start Date</label>
                 <input
-                  type="text"
-                  value={searchEmpId}
-                  onChange={(e) => setSearchEmpId(e.target.value)}
-                  placeholder="Enter ID..."
-                  className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary"
+                  type="date"
+                  value={startDate}
+                  onChange={e => setStartDate(e.target.value)}
+                  className="h-8 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2 text-[11px] font-semibold text-slate-800 dark:text-slate-200 outline-none focus:border-[#2563eb]"
                 />
               </div>
-
-              {/* Status */}
-              <div className="space-y-1">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Status</label>
-                <div className="relative">
-                  <select
-                    value={statusRequest}
-                    onChange={(e) => setStatusRequest(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
-                  >
-                    <option value="ALL Request">ALL Request</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Approved">Approved</option>
-                  </select>
-                  <ChevronDown className="size-3 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                </div>
+              <div className="space-y-0.5">
+                <label className="text-[8.5px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">End Date</label>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={e => setEndDate(e.target.value)}
+                  className="h-8 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2 text-[11px] font-semibold text-slate-800 dark:text-slate-200 outline-none focus:border-[#2563eb]"
+                />
               </div>
-
-              {/* Blue Search Button */}
-              <div className="flex items-end">
-                <button className="w-full h-9 bg-primary hover:bg-primary-glow text-white font-black text-xs rounded-lg shadow-sm transition duration-150 uppercase tracking-widest cursor-pointer">
-                  SEARCH
-                </button>
+              <div className="space-y-0.5">
+                <label className="text-[8.5px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Department</label>
+                <SearchableSelect
+                  value={department}
+                  onChange={setDepartment}
+                  options={departmentOptions}
+                  className="h-8 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-[11px] font-semibold text-slate-800 dark:text-slate-200"
+                />
               </div>
+            </div>
 
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex items-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-0.5 shadow-inner">
+                {(["All", "Approved", "Pending", "Rejected"] as const).map(filter => {
+                  const isActive = statusFilter === filter;
+                  return (
+                    <button
+                      key={filter}
+                      onClick={() => setStatusFilter(filter)}
+                      className={`px-2.5 py-1 text-[9px] font-bold rounded transition-all uppercase tracking-wider ${isActive
+                          ? "bg-white dark:bg-slate-600 text-slate-900 dark:text-white shadow-sm"
+                          : "text-slate-500 dark:text-slate-400 hover:bg-white/40 dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-slate-200"
+                        }`}
+                    >
+                      {filter}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="relative w-64">
+                <Search className="absolute left-2.5 top-2 size-3 text-slate-400 dark:text-slate-500" />
+                <input
+                  type="text"
+                  value={globalSearch}
+                  onChange={e => setGlobalSearch(e.target.value)}
+                  placeholder="Quick Search ID, Name..."
+                  className="h-7.5 pl-8 pr-3 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none text-slate-800 dark:text-slate-200"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Spreadsheet Datagrid Block */}
-          <div className="bg-card rounded-2xl border border-border/80 p-4 shadow-xs space-y-3">
-
-            {/* Utilities Actions & Table Search */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/30 pb-3">
-              <div className="flex items-center gap-1.5 select-none">
-                <button className="h-8.5 px-4 rounded-lg border border-border/70 hover:bg-muted font-bold text-xs text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition cursor-pointer">
-                  <FileSpreadsheet className="size-3.5 text-emerald-500" />
-                  <span>EXCEL</span>
+          {/* Action Toolbar & Data Table */}
+          <div className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-lg overflow-hidden flex flex-col min-h-0">
+            {/* Toolbar */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/20 shrink-0">
+              <div className="flex items-center gap-1.5">
+                <button className="h-8 px-3 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1 bg-white dark:bg-slate-900 cursor-pointer shadow-sm">
+                  <TableIcon className="size-3.5 text-emerald-600 dark:text-emerald-400" /> EXCEL
                 </button>
-                <button className="h-8.5 px-4 rounded-lg border border-border/70 hover:bg-muted font-bold text-xs text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition cursor-pointer">
-                  <Printer className="size-3.5 text-blue-500" />
-                  <span>PRINT</span>
+                <button className="h-8 px-3 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1 bg-white dark:bg-slate-900 cursor-pointer shadow-sm">
+                  <Printer className="size-3.5 text-slate-500 dark:text-slate-400" /> PRINT
                 </button>
-                <button className="h-8.5 px-4 rounded-lg border border-border/70 hover:bg-muted font-bold text-xs text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition cursor-pointer">
-                  <FileDown className="size-3.5 text-rose-500" />
-                  <span>PDF</span>
-                </button>
-              </div>
-
-              {/* Right Side Text Search */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-muted-foreground">Search:</span>
-                <div className="relative w-56 sm:w-64">
-                  <Search className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search query..."
-                    className="w-full h-8 pl-9 pr-3 rounded-lg bg-muted border border-border/40 focus:border-primary focus:bg-card focus:ring-1 focus:ring-primary/20 outline-none text-xs transition duration-200"
-                  />
-                </div>
               </div>
             </div>
 
-            {/* High-Fidelity Table with Fixed (Sticky Left) Columns */}
-            <div className="overflow-x-auto border border-border/50 rounded-xl max-h-[55vh]">
-              <table className="min-w-[1950px] w-full border-collapse text-[11px] text-left">
-                <thead>
-                  <tr className="bg-[#f1f5f9] dark:bg-[#0f172a] text-foreground font-bold border-b border-border/50 select-none whitespace-nowrap">
-                    {/* Fixed Left Header Columns */}
-                    <th className="sticky left-0 bg-[#f1f5f9] dark:bg-[#0f172a] px-4 py-3 text-center border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[60px] min-w-[60px] max-w-[60px]">
-                      <input
-                        type="checkbox"
-                        checked={isAllSelected}
-                        onChange={toggleSelectAll}
-                        className="rounded border-border/60 text-primary focus:ring-primary/15 cursor-pointer animate-pulse"
+            {/* Bulk Action Bar - Sticky */}
+            {selectedIds.size > 0 && (
+              <div className="p-3 bg-[#2563eb]/5 border-b border-[#2563eb]/10 flex items-center justify-between animate-in fade-in slide-in-from-top-2">
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="bg-[#2563eb]/20 text-[#2563eb] hover:bg-[#2563eb]/20">
+                    {selectedIds.size} Selected
+                  </Badge>
+                  <span className="text-[11px] font-medium text-slate-500">entries ready for action</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button onClick={handleBulkReject} className="h-7.5 px-3 border border-rose-200 text-rose-600 hover:bg-rose-50 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer">
+                    <XCircle className="size-3.5" /> Reject Selected
+                  </button>
+                  <button onClick={handleBulkApprove} className="h-7.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer">
+                    <CheckCircle2 className="size-3.5" /> Approve Selected
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Data Table */}
+            <div className="flex-1 overflow-auto">
+              <table className="w-full min-w-[1200px] border-collapse text-left">
+                <thead className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 z-10">
+                  <tr className="bg-slate-50 dark:bg-slate-950">
+                    <th className="px-4 py-3 w-[60px] text-center border-r border-slate-200 dark:border-slate-800">
+                      <input 
+                        type="checkbox" 
+                        className="rounded border-slate-300 text-[#2563eb] focus:ring-[#2563eb]" 
+                        onChange={handleSelectAll}
+                        checked={selectedIds.size === filteredRequests.length && filteredRequests.length > 0}
                       />
                     </th>
-                    <th className="sticky left-[60px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-3 font-extrabold text-center border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[40px] min-w-[40px] max-w-[40px]">#</th>
-                    <th className="sticky left-[100px] bg-[#f1f5f9] dark:bg-[#0f172a] px-4 py-3 font-extrabold border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[120px] min-w-[120px] max-w-[120px]">Reason</th>
-                    <th className="sticky left-[220px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-3 font-extrabold border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[90px] min-w-[90px] max-w-[90px]">Emp ID</th>
-                    <th className="sticky left-[310px] bg-[#f1f5f9] dark:bg-[#0f172a] px-4 py-3 font-extrabold border-r border-border/40 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[160px] min-w-[160px] max-w-[160px]">Name</th>
-
-                    {/* Scrolling Columns */}
-                    <th className="px-4 py-3 font-extrabold w-48 bg-[#f1f5f9] dark:bg-[#0f172a]">Department</th>
-                    <th className="px-4 py-3 font-extrabold w-48 bg-[#f1f5f9] dark:bg-[#0f172a]">Designation</th>
-                    <th className="px-4 py-3 font-extrabold text-center w-28 bg-[#f1f5f9] dark:bg-[#0f172a]">Date</th>
-                    <th className="px-4 py-3 font-extrabold text-center w-24 bg-[#f1f5f9] dark:bg-[#0f172a]">In Time</th>
-                    <th className="px-4 py-3 font-extrabold text-center w-28 bg-[#f1f5f9] dark:bg-[#0f172a]">Out Date</th>
-                    <th className="px-4 py-3 font-extrabold text-center w-24 bg-[#f1f5f9] dark:bg-[#0f172a]">Out Time</th>
-                    <th className="px-5 py-3 font-extrabold w-[380px] bg-[#f1f5f9] dark:bg-[#0f172a]">Audit Correction Progress</th>
-                    <th className="px-4 py-3 font-extrabold w-44 bg-[#f1f5f9] dark:bg-[#0f172a]">HOD Approved By</th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-[80px]">Action</th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-[100px]">Emp ID</th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-[180px]">Employee Name</th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-[140px]">Department</th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center w-[90px]">Date</th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center w-[80px]">In Time</th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center w-[80px]">Out Time</th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center w-[120px]">HOD Status</th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest min-w-[200px]">System Notes</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/30">
-                  {filteredRequests.map((r, idx) => {
-                    const isSelected = selectedIds.has(r.id);
-                    const stickyCellBgClass = isSelected
-                      ? "bg-[#f1f5f9] dark:bg-[#1e293b] group-hover:bg-[#e2e8f0] dark:group-hover:bg-[#334155]"
-                      : "bg-card group-hover:bg-[#f8fafc] dark:hover:bg-[#1e293b]";
-
-                    return (
-                      <tr
-                        key={r.id}
-                        className={[
-                          "group hover:bg-[#f8fafc] dark:hover:bg-[#1e293b] transition duration-150 whitespace-nowrap",
-                          isSelected ? "bg-[#f1f5f9] dark:bg-[#1e293b]" : ""
-                        ].join(" ")}
-                      >
-                        {/* 1. Selector + Pencil Action Column (Sticky Left) */}
-                        <td className={`sticky left-0 ${stickyCellBgClass} px-4 py-2.5 border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[60px] min-w-[60px] max-w-[60px] transition-all`}>
-                          <div className="flex items-center justify-between gap-1">
-                            <input
-                              type="checkbox"
-                              checked={isSelected}
-                              onChange={() => toggleSelectRow(r.id)}
-                              className="rounded border-border/60 text-primary focus:ring-primary/15 cursor-pointer"
-                            />
-                            <button
-                              onClick={() => handleStartEdit(r)}
-                              className="p-1 rounded text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/20 transition cursor-pointer"
-                              title="Edit Punch Log"
-                            >
-                              <Pencil className="size-3" />
-                            </button>
-                          </div>
-                        </td>
-
-                        {/* 2. # SL (Sticky Left) */}
-                        <td className={`sticky left-[60px] ${stickyCellBgClass} px-3 py-2.5 text-center font-bold text-muted-foreground/60 border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[40px] min-w-[40px] max-w-[40px] transition-all`}>{idx + 1}</td>
-
-                        {/* 3. Reason (Sticky Left) */}
-                        <td className={`sticky left-[100px] ${stickyCellBgClass} px-4 py-2.5 border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[120px] min-w-[120px] max-w-[120px] transition-all`}>
-                          <span className={r.reason ? "font-semibold text-foreground/80" : "text-muted-foreground/30 italic"}>
-                            {r.reason || "N/A"}
-                          </span>
-                        </td>
-
-                        {/* 4. Emp ID (Sticky Left) */}
-                        <td className={`sticky left-[220px] ${stickyCellBgClass} px-3 py-2.5 font-bold text-foreground/90 font-mono border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[90px] min-w-[90px] max-w-[90px] transition-all`}>{r.id}</td>
-
-                        {/* 5. Name (Sticky Left) */}
-                        <td className={`sticky left-[310px] ${stickyCellBgClass} px-4 py-2.5 font-semibold text-foreground border-r border-border/40 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[160px] min-w-[160px] max-w-[160px] transition-all`}>{r.name}</td>
-
-                        {/* 6. Department */}
-                        <td className="px-4 py-2.5 text-foreground/80 font-medium">
-                          <div>{r.dept1}</div>
-                          <div className="text-[10px] text-muted-foreground/75 font-normal">{r.dept2}</div>
-                        </td>
-
-                        {/* 7. Designation */}
-                        <td className="px-4 py-2.5 text-foreground/75 font-semibold">{r.title}</td>
-
-                        {/* 8. Date */}
-                        <td className="px-4 py-2.5 font-mono text-center font-bold text-foreground/80">{r.date}</td>
-
-                        {/* 9. In Time */}
-                        <td className="px-4 py-2.5 font-mono text-center text-primary font-bold">{r.inTime}</td>
-
-                        {/* 10. Out Date */}
-                        <td className="px-4 py-2.5 font-mono text-center font-bold text-foreground/80">{r.outDate}</td>
-
-                        {/* 11. Out Time */}
-                        <td className="px-4 py-2.5 font-mono text-center text-primary font-bold">{r.outTime}</td>
-
-                        {/* 12. System Data block - Structured Badge Flow */}
-                        <td className="px-5 py-2 text-foreground/70 bg-muted/[0.15] dark:bg-[#0e1626]/10">
-                          <div className="space-y-1.5">
-                            {/* Workflow Badges */}
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[8.5px] font-black uppercase border ${
-                                r.hodStatus === "Approve" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/25" :
-                                r.hodStatus === "Reject" ? "bg-rose-500/10 text-rose-600 border-rose-500/25" : "bg-amber-500/10 text-amber-600 border-amber-500/25"
-                              }`}>
-                                HOD: {r.hodStatus}
-                              </span>
-
-                              <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[8.5px] font-black uppercase border ${
-                                r.hrdStatus === "Approve" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/25" :
-                                r.hrdStatus === "Reject" ? "bg-rose-500/10 text-rose-600 border-rose-500/25" : "bg-amber-500/10 text-amber-600 border-amber-500/25"
-                              }`}>
-                                HRD: {r.hrdStatus}
-                              </span>
-
-                              <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[8.5px] font-black uppercase border ${
-                                r.mdStatus === "Approve" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/25" :
-                                r.mdStatus === "Reject" ? "bg-rose-500/10 text-rose-600 border-rose-500/25" : "bg-amber-500/10 text-amber-600 border-amber-500/25"
-                              }`}>
-                                MD: {r.mdStatus}
-                              </span>
-                            </div>
-
-                            {/* System Meta Description */}
-                            <div className="text-[9.5px] leading-tight text-muted-foreground">
-                              Requested by <span className="font-extrabold text-foreground">{r.systemBy}</span> on <span className="font-semibold">{r.systemDate}</span>
-                              <div className="text-primary font-medium mt-0.5 truncate max-w-[340px]">&bull; {r.systemInfo.replace(/\n/g, ' ')}</div>
-                            </div>
-                          </div>
-                        </td>
-
-                        {/* 13. HOD Manager Name */}
-                        <td className="px-4 py-2.5 font-semibold text-foreground/90">{r.hodName}</td>
-                      </tr>
-                    );
-                  })}
-
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  {filteredRequests.map(row => (
+                    <tr key={row.id} className={`hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${selectedIds.has(row.id) ? 'bg-[#2563eb]/5 dark:bg-[#2563eb]/10' : ''}`}>
+                      <td className="px-4 py-2 text-center border-r border-slate-200 dark:border-slate-800">
+                        <input 
+                          type="checkbox" 
+                          className="rounded border-slate-300 text-[#2563eb] focus:ring-[#2563eb]" 
+                          checked={selectedIds.has(row.id)}
+                          onChange={() => handleSelectRow(row.id)}
+                        />
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        <button onClick={() => handleStartEdit(row)} className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 transition cursor-pointer" title="Edit Correction">
+                          <Pencil className="size-3.5" />
+                        </button>
+                      </td>
+                      <td className="px-4 py-2 font-mono text-slate-500">{row.id}</td>
+                      <td className="px-4 py-2 font-bold text-slate-800 dark:text-slate-100">{row.name}</td>
+                      <td className="px-4 py-2 text-slate-500 text-[10.5px]">
+                        <div className="truncate">{row.dept1}</div>
+                        <div className="font-normal text-slate-400">{row.title}</div>
+                      </td>
+                      <td className="px-4 py-2 text-center font-mono text-slate-600">{row.date}</td>
+                      <td className="px-4 py-2 text-center font-mono font-bold text-[#2563eb]">{row.inTime}</td>
+                      <td className="px-4 py-2 text-center font-mono font-bold text-[#2563eb]">{row.outTime}</td>
+                      <td className="px-4 py-2 text-center">
+                        <span className={`px-2 py-0.5 rounded-xl text-[8.5px] font-extrabold uppercase border ${row.hodStatus === "Approve"
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                            : row.hodStatus === "Reject"
+                              ? "bg-rose-50 text-rose-700 border-rose-200"
+                              : "bg-amber-50 text-amber-700 border-amber-200"
+                          }`}>
+                          {row.hodStatus === "Approve" ? "Approved" : row.hodStatus}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 text-[10px] text-slate-500">
+                        <div className="line-clamp-2" title={row.systemInfo}>{row.systemInfo.replace(/\n/g, ' ')}</div>
+                        {row.reason && <div className="text-slate-400 italic">"{row.reason}"</div>}
+                      </td>
+                    </tr>
+                  ))}
                   {filteredRequests.length === 0 && (
                     <tr>
-                      <td colSpan={20} className="px-4 py-12 text-center text-muted-foreground font-semibold">
-                        No pending attendance correction requests match these filter boundaries.
+                      <td colSpan={10} className="py-8 text-center text-slate-400 dark:text-slate-500 font-bold">
+                        No attendance correction requests found.
                       </td>
                     </tr>
                   )}
@@ -874,216 +439,80 @@ function PendingManualAttendancePage() {
               </table>
             </div>
 
-            {/* Datagrid Footer / Action Controls */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2">
-              <span className="text-[10px] font-bold text-muted-foreground/75 uppercase tracking-wider">
-                Showing 1 to {filteredRequests.length} of {requests.length} entries
-              </span>
-
-              <div className="flex items-center gap-2">
-                {/* DELETE red button */}
-                <button
-                  onClick={handleDeleteSelected}
-                  className="h-9 px-5 bg-rose-600 hover:bg-rose-500 text-white font-black text-xs rounded-lg shadow-sm transition duration-150 uppercase tracking-widest cursor-pointer"
-                >
-                  DELETE
-                </button>
-
-                {/* REJECT dark red button */}
-                <button
-                  onClick={handleRejectSelected}
-                  className="h-9 px-5 bg-red-800 hover:bg-red-700 text-white font-black text-xs rounded-lg shadow-sm transition duration-150 uppercase tracking-widest cursor-pointer"
-                >
-                  REJECT
-                </button>
-
-                {/* APPROVE green button */}
-                <button
-                  onClick={handleApproveSelected}
-                  className="h-9 px-6 bg-[#72b043] hover:bg-[#629c36] text-white font-black text-xs rounded-lg shadow-sm transition duration-150 uppercase tracking-widest cursor-pointer"
-                >
-                  APPROVE
-                </button>
+            {/* Pagination footer */}
+            <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 dark:text-slate-500 px-5 py-2.5 border-t border-slate-100 dark:border-slate-800 shrink-0">
+              <div>Showing 1 to {filteredRequests.length} entries</div>
+              <div className="flex items-center gap-1.5">
+                <button className="text-slate-400 dark:text-slate-500 hover:text-slate-700 transition-colors" disabled>Previous</button>
+                <button className="size-5.5 rounded bg-slate-700 dark:bg-slate-200 text-white dark:text-slate-900 flex items-center justify-center shadow-sm text-[9.5px]">1</button>
+                <button className="text-slate-400 dark:text-slate-500 hover:text-slate-700 transition-colors" disabled>Next</button>
               </div>
             </div>
-
           </div>
-
         </div>
 
-        {/* Dynamic Inline edit modal - Redesigned Dual-Column Grid */}
+        {/* Dynamic Inline Edit Modal (Simplified for Design System) */}
         {editingRequest && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-            <div className="bg-card text-foreground rounded-2xl border border-border shadow-2xl max-w-4xl w-full overflow-hidden animate-in zoom-in-95 duration-200">
-
-              <div className="px-6 py-4 border-b border-border/60 flex items-center justify-between bg-muted/30">
-                <h2 className="text-sm font-black text-foreground flex items-center gap-2 tracking-wide uppercase">
-                  <Fingerprint className="size-4.5 text-primary animate-pulse" />
-                  <span>Manual Request Correction Audit</span>
+            <div className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xl max-w-lg w-full overflow-hidden animate-in zoom-in-95 duration-200">
+              
+              <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-950/50">
+                <h2 className="text-sm font-black flex items-center gap-2 uppercase tracking-wider text-slate-700 dark:text-slate-200">
+                  <Fingerprint className="size-4.5 text-[#2563eb]" />
+                  <span>Manual Correction Form</span>
                 </h2>
-                <button
-                  onClick={() => setEditingRequest(null)}
-                  className="size-7 rounded-lg hover:bg-muted text-muted-foreground/60 hover:text-foreground flex items-center justify-center transition cursor-pointer"
-                >
+                <button onClick={() => setEditingRequest(null)} className="text-slate-400 hover:text-slate-600 transition">
                   <X className="size-4" />
                 </button>
               </div>
 
-              {/* Modal Body: Organized layout columns */}
-              <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-
-                {/* Left Column: Request Info & Dynamic Times */}
-                <div className="space-y-4">
-                  <div className="bg-muted/30 rounded-xl p-4 border border-border/40 space-y-2">
-                    <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest block border-b border-border/40 pb-1 mb-1.5">Applicant Profile</span>
-                    <div className="grid grid-cols-12 text-xs">
-                      <span className="col-span-4 font-bold text-muted-foreground">Employee ID</span>
-                      <span className="col-span-1 text-muted-foreground/40 text-center">:</span>
-                      <span className="col-span-7 font-black text-foreground font-mono">{editingRequest.id}</span>
-
-                      <span className="col-span-4 font-bold text-muted-foreground mt-1">Name</span>
-                      <span className="col-span-1 text-muted-foreground/40 text-center mt-1">:</span>
-                      <span className="col-span-7 font-bold text-foreground mt-1 truncate">{editingRequest.name}</span>
-
-                      <span className="col-span-4 font-bold text-muted-foreground mt-1">Department</span>
-                      <span className="col-span-1 text-muted-foreground/40 text-center mt-1">:</span>
-                      <span className="col-span-7 font-semibold text-foreground/80 mt-1 truncate">{editingRequest.dept1}</span>
-                    </div>
-                  </div>
-
-                  {/* Edit In Time */}
-                  <div className="space-y-1.5 relative">
-                    <label className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground/75 flex items-center gap-0.5">
-                      In Time <span className="text-rose-500">*</span>
-                    </label>
-                    <div className="relative time-picker-trigger">
-                      <input
-                        type="text"
-                        readOnly
-                        value={editInTime}
-                        onClick={() => setActiveTimePicker({ id: "edit", field: "inTime" })}
-                        className="w-full h-9 px-3 pl-8.5 rounded-lg bg-muted border border-border/60 text-xs font-bold outline-none cursor-pointer text-primary"
-                      />
-                      <Clock className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-primary" />
-
-                      {activeTimePicker?.id === "edit" && activeTimePicker?.field === "inTime" && (
-                        <div className="absolute z-50 bg-card border border-border/70 rounded-lg p-4 shadow-2xl space-y-3 time-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
-                          {renderTimeClockMarkup()}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Edit Out Time */}
-                  <div className="space-y-1.5 relative">
-                    <label className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground/75 flex items-center gap-0.5">
-                      Out Time <span className="text-rose-500">*</span>
-                    </label>
-                    <div className="relative time-picker-trigger">
-                      <input
-                        type="text"
-                        readOnly
-                        value={editOutTime}
-                        onClick={() => setActiveTimePicker({ id: "edit", field: "outTime" })}
-                        className="w-full h-9 px-3 pl-8.5 rounded-lg bg-muted border border-border/60 text-xs font-bold outline-none cursor-pointer text-primary"
-                      />
-                      <Clock className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-primary" />
-
-                      {activeTimePicker?.id === "edit" && activeTimePicker?.field === "outTime" && (
-                        <div className="absolute z-50 bg-card border border-border/70 rounded-lg p-4 shadow-2xl space-y-3 time-picker-popover top-full mt-1.5 left-0 animate-in fade-in duration-100">
-                          {renderTimeClockMarkup()}
-                        </div>
-                      )}
-                    </div>
-                  </div>
+              <div className="p-5 space-y-4">
+                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3 border border-slate-100 dark:border-slate-800">
+                  <div className="text-xs font-black">{editingRequest.name}</div>
+                  <div className="text-[10px] text-slate-500 font-mono mt-0.5">{editingRequest.id} — {editingRequest.dept1}</div>
                 </div>
 
-                {/* Right Column: Reason and Approval Levels */}
-                <div className="space-y-4">
-                  {/* Edit Reason */}
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground/75">Correction Reason</label>
-                    <input
-                      type="text"
-                      value={editReason}
-                      onChange={(e) => setEditReason(e.target.value)}
-                      placeholder="Input correction reason..."
-                      className="w-full h-9 px-3 rounded-lg bg-muted border border-border/60 text-xs font-semibold outline-none focus:border-primary"
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">In Time</label>
+                    <input 
+                      type="time" 
+                      step="1"
+                      value={editInTime}
+                      onChange={e => setEditInTime(e.target.value)}
+                      className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-mono outline-none focus:border-[#2563eb]"
                     />
                   </div>
-
-                  {/* Multi-Level Approvals */}
-                  <div className="bg-muted/10 rounded-xl p-4 border border-border/40 space-y-3">
-                    <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest block border-b border-border/40 pb-1 mb-1">Approval Sign-off Roster</span>
-
-                    {/* Edit HOD Approval Status */}
-                    <div className="grid grid-cols-12 items-center gap-2">
-                      <label className="col-span-4 text-[10px] font-bold text-muted-foreground/80 uppercase">HOD</label>
-                      <div className="col-span-8 relative">
-                        <select
-                          value={editHodStatus}
-                          onChange={(e) => setEditHodStatus(e.target.value)}
-                          className="w-full h-8 px-3 rounded bg-card border border-border/60 text-xs font-bold outline-none focus:border-primary cursor-pointer appearance-none pr-8"
-                        >
-                          <option value="Pending">Pending</option>
-                          <option value="Approve">Approve</option>
-                          <option value="Reject">Reject</option>
-                        </select>
-                        <ChevronDown className="size-3 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-                      </div>
-                    </div>
-
-                    {/* Edit HRD Approval Status */}
-                    <div className="grid grid-cols-12 items-center gap-2">
-                      <label className="col-span-4 text-[10px] font-bold text-muted-foreground/80 uppercase">HRD</label>
-                      <div className="col-span-8 relative">
-                        <select
-                          value={editHrdStatus}
-                          onChange={(e) => setEditHrdStatus(e.target.value)}
-                          className="w-full h-8 px-3 rounded bg-card border border-border/60 text-xs font-bold outline-none focus:border-primary cursor-pointer appearance-none pr-8"
-                        >
-                          <option value="Pending">Pending</option>
-                          <option value="Approve">Approve</option>
-                          <option value="Reject">Reject</option>
-                        </select>
-                        <ChevronDown className="size-3 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-                      </div>
-                    </div>
-
-                    {/* Edit MD Approval Status */}
-                    <div className="grid grid-cols-12 items-center gap-2">
-                      <label className="col-span-4 text-[10px] font-bold text-muted-foreground/80 uppercase">MD</label>
-                      <div className="col-span-8 relative">
-                        <select
-                          value={editMdStatus}
-                          onChange={(e) => setEditMdStatus(e.target.value)}
-                          className="w-full h-8 px-3 rounded bg-card border border-border/60 text-xs font-bold outline-none focus:border-primary cursor-pointer appearance-none pr-8"
-                        >
-                          <option value="Pending">Pending</option>
-                          <option value="Approve">Approve</option>
-                          <option value="Reject">Reject</option>
-                        </select>
-                        <ChevronDown className="size-3 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-                      </div>
-                    </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Out Time</label>
+                    <input 
+                      type="time" 
+                      step="1"
+                      value={editOutTime}
+                      onChange={e => setEditOutTime(e.target.value)}
+                      className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-mono outline-none focus:border-[#2563eb]"
+                    />
                   </div>
                 </div>
 
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Correction Reason</label>
+                  <input 
+                    type="text" 
+                    value={editReason}
+                    onChange={e => setEditReason(e.target.value)}
+                    placeholder="Provide reason for correction..."
+                    className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs outline-none focus:border-[#2563eb]"
+                  />
+                </div>
               </div>
 
-              {/* Modal Footer */}
-              <div className="px-6 py-4 border-t border-border/60 flex items-center justify-between bg-muted/20">
-                <button
-                  onClick={() => setEditingRequest(null)}
-                  className="h-9 px-5 bg-card border border-border/50 hover:bg-muted text-muted-foreground font-semibold text-xs rounded-lg transition duration-150 uppercase tracking-wider cursor-pointer"
-                >
-                  Close
+              <div className="px-5 py-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-2 bg-slate-50 dark:bg-slate-950/50">
+                <button onClick={() => setEditingRequest(null)} className="h-8.5 px-4 rounded-lg text-xs font-bold text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 transition uppercase tracking-wider cursor-pointer">
+                  Cancel
                 </button>
-                <button
-                  onClick={handleSaveEdit}
-                  className="h-9 px-6 bg-[#72b043] hover:bg-[#629c36] text-white font-black text-xs rounded-lg uppercase tracking-wider shadow-sm transition cursor-pointer"
-                >
-                  Apply Changes
+                <button onClick={handleSaveEdit} className="h-8.5 px-5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm transition cursor-pointer">
+                  Save Adjustments
                 </button>
               </div>
 
