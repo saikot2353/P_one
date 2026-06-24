@@ -2,10 +2,12 @@ import { useState, useMemo, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
+import { Badge } from "@/components/ui/badge";
 import {
   Timer, ChevronRight, Search, Printer, CheckCircle2,
-  X, AlertCircle, LayoutDashboard, ShieldCheck, Download, Eye
+  X, AlertCircle, ShieldCheck, Download, Eye, Clock, XCircle
 } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/approve-overtime")({
   head: () => ({
@@ -43,7 +45,7 @@ function ApproveOvertimePage() {
 
   const [viewDetailsRecord, setViewDetailsRecord] = useState<SubmittedOTRecord | null>(null);
 
-  const [budgetPool, setBudgetPool] = useState<number>(() => {
+  const [budgetPool] = useState<number>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("cripton_ot_budget");
       return saved ? parseFloat(saved) : 50000;
@@ -61,6 +63,8 @@ function ApproveOvertimePage() {
   const [selectedDept, setSelectedDept] = useState("ALL");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const stats = useMemo(() => {
     let totalReqHours = 0;
@@ -103,32 +107,57 @@ function ApproveOvertimePage() {
     });
   }, [submittedRecords, selectedStatus, selectedDept, searchQuery, dateFrom, dateTo]);
 
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedIds(new Set(filteredRecords.filter(r => r.status === "Pending").map(r => r.id)));
+    } else {
+      setSelectedIds(new Set());
+    }
+  };
+
+  const handleSelectOne = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
   const handleUpdateStatus = (id: string, newStatus: "Approved" | "Rejected") => {
     if (newStatus === "Rejected") {
       const remarks = window.prompt("Please provide a reason for rejection:");
       if (remarks === null) return; // User cancelled
     }
     setSubmittedRecords(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r));
+    toast.success(`Request ${newStatus.toLowerCase()} successfully!`);
   };
 
   const handleBulkApprove = () => {
-    const pendingIds = filteredRecords.filter(r => r.status === "Pending").map(r => r.id);
-    if (pendingIds.length === 0) {
-      alert("No pending records to approve in the current view.");
-      return;
-    }
+    if (selectedIds.size === 0) return;
     
     // Check Budget Warning
-    const totalPendingCost = filteredRecords.filter(r => r.status === "Pending").reduce((sum, r) => sum + (r.reqOt + r.reqMot) * 150, 0);
+    const totalPendingCost = submittedRecords.filter(r => selectedIds.has(r.id)).reduce((sum, r) => sum + (r.reqOt + r.reqMot) * 150, 0);
     if (totalPendingCost > stats.remainingBudget) {
-      if (!confirm(`WARNING: Approving these ${pendingIds.length} requests will exceed the corporate OT budget by ৳ ${(totalPendingCost - stats.remainingBudget).toLocaleString()}! Proceed anyway?`)) {
+      if (!confirm(`WARNING: Approving these ${selectedIds.size} requests will exceed the corporate OT budget by ৳ ${(totalPendingCost - stats.remainingBudget).toLocaleString()}! Proceed anyway?`)) {
         return;
       }
     } else {
-      if (!confirm(`Are you sure you want to approve ${pendingIds.length} overtime requisitions?`)) return;
+      if (!confirm(`Are you sure you want to approve ${selectedIds.size} overtime requisitions?`)) return;
     }
 
-    setSubmittedRecords(prev => prev.map(r => pendingIds.includes(r.id) ? { ...r, status: "Approved" } : r));
+    setSubmittedRecords(prev => prev.map(r => selectedIds.has(r.id) ? { ...r, status: "Approved" } : r));
+    setSelectedIds(new Set());
+    toast.success(`Successfully approved ${selectedIds.size} requests!`);
+  };
+
+  const handleBulkReject = () => {
+    if (selectedIds.size === 0) return;
+    const remarks = window.prompt("Please provide a reason for bulk rejection:");
+    if (remarks === null) return;
+    setSubmittedRecords(prev => prev.map(r => selectedIds.has(r.id) ? { ...r, status: "Rejected" } : r));
+    setSelectedIds(new Set());
+    toast.success(`Successfully rejected ${selectedIds.size} requests!`);
   };
 
   const handleExportCSV = () => {
@@ -152,275 +181,304 @@ function ApproveOvertimePage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
+    <div className="h-screen flex bg-[#f1f5f9] dark:bg-[#0b0f19] text-[#334155] dark:text-slate-200 overflow-hidden font-sans antialiased tracking-tight">
       <Sidebar />
-      <main className="flex-1 min-w-0 flex flex-col relative">
+      <main className="flex-1 min-w-0 flex flex-col overflow-hidden">
         <Topbar />
 
-        <div className="p-4 md:p-6 xl:p-8 space-y-6">
+        <div className="flex-1 flex flex-col p-4 xl:p-6 gap-3.5 overflow-hidden bg-slate-50/50 dark:bg-slate-950/10">
           {/* Header */}
-          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-lg px-5 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0 print:hidden">
             <div>
-              <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
-                <ChevronRight className="size-2.5" />
-                <span className="text-muted-foreground/75">Manage Overtime</span>
-                <ChevronRight className="size-2.5" />
-                <span className="text-emerald-600 font-semibold">OT Approvals</span>
+              <div className="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">
+                <Link to="/" className="hover:text-[#2563eb] transition-colors">Home</Link>
+                <ChevronRight className="size-2" />
+                <span className="hover:text-[#2563eb] transition-colors">HR Approvals</span>
+                <ChevronRight className="size-2" />
+                <span className="text-slate-600 dark:text-slate-300 font-semibold">OT Approvals</span>
               </div>
-              <h1 className="text-xl font-black text-foreground flex items-center gap-2">
-                <ShieldCheck className="size-5.5 text-emerald-600" />
+              <h1 className="text-lg font-bold tracking-tight text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                <ShieldCheck className="size-5 text-emerald-600" />
                 <span>Overtime Approval Center</span>
               </h1>
-              <p className="text-xs text-muted-foreground mt-1">
-                Review, manage, and approve department overtime requisitions against the corporate budget.
-              </p>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <button 
-                onClick={handleBulkApprove}
-                className="h-9 px-5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg shadow-sm flex items-center gap-2 transition uppercase tracking-wider"
-              >
-                <CheckCircle2 className="size-4" /> Bulk Approve Filtered
-              </button>
             </div>
           </div>
 
           {/* KPI Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 print:hidden">
-            <div className="p-4 rounded-xl border bg-card text-[#1e88e5] bg-[#1e88e5]/5 border-[#1e88e5]/10 shadow-xs space-y-1 transition duration-200">
-              <span className="text-[10px] font-black tracking-wider uppercase opacity-75">Global OT Budget</span>
-              <div className="text-2xl font-black">৳ {stats.budgetPool.toLocaleString()}</div>
-              <div className="text-[10px] opacity-60 font-semibold mt-1">Total Allocated Corporate Pool</div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 shrink-0 print:hidden">
+            <div className="bg-white dark:bg-slate-900 border border-[#1e88e5]/20 bg-[#1e88e5]/5 rounded-xl p-3 shadow-sm space-y-1">
+              <span className="text-[9px] font-black tracking-wider uppercase opacity-75 text-[#1e88e5]">Global OT Budget</span>
+              <div className="text-xl font-black text-[#1e88e5]">৳ {stats.budgetPool.toLocaleString()}</div>
+              <div className="text-[9px] font-semibold opacity-60 text-[#1e88e5]">Total Allocated Corporate Pool</div>
             </div>
-            <div className={`p-4 rounded-xl border bg-card shadow-xs space-y-1 transition duration-200 ${stats.remainingBudget < 10000 ? 'text-rose-600 bg-rose-500/5 border-rose-500/20' : 'text-indigo-600 bg-indigo-500/5 border-indigo-500/10'}`}>
-              <span className="text-[10px] font-black tracking-wider uppercase opacity-75">Remaining Balance</span>
-              <div className="text-2xl font-black">৳ {stats.remainingBudget.toLocaleString()}</div>
-              <div className="text-[10px] opacity-60 font-semibold mt-1">Available Budget for new OT</div>
+            <div className={`bg-white dark:bg-slate-900 border rounded-xl p-3 shadow-sm space-y-1 ${stats.remainingBudget < 10000 ? 'border-rose-500/20 bg-rose-500/5 text-rose-600' : 'border-indigo-500/10 bg-indigo-500/5 text-indigo-600'}`}>
+              <span className="text-[9px] font-black tracking-wider uppercase opacity-75">Remaining Balance</span>
+              <div className="text-xl font-black">৳ {stats.remainingBudget.toLocaleString()}</div>
+              <div className="text-[9px] font-semibold opacity-60">Available Budget for new OT</div>
             </div>
-            <div className="p-4 rounded-xl border bg-card text-emerald-600 bg-emerald-500/5 border-emerald-500/10 shadow-xs space-y-1 transition duration-200">
-              <span className="text-[10px] font-black tracking-wider uppercase opacity-75">Approved Liability</span>
-              <div className="text-2xl font-black">৳ {stats.approvedCost.toLocaleString()}</div>
-              <div className="text-[10px] opacity-60 font-semibold mt-1">{stats.totalApprovedHours} hours approved</div>
+            <div className="bg-white dark:bg-slate-900 border border-emerald-500/10 bg-emerald-500/5 rounded-xl p-3 shadow-sm space-y-1 text-emerald-600">
+              <span className="text-[9px] font-black tracking-wider uppercase opacity-75">Approved Liability</span>
+              <div className="text-xl font-black">৳ {stats.approvedCost.toLocaleString()}</div>
+              <div className="text-[9px] font-semibold opacity-60">{stats.totalApprovedHours} hours approved</div>
             </div>
-            <div className="p-4 rounded-xl border bg-card text-amber-600 bg-amber-500/5 border-amber-500/10 shadow-xs space-y-1 transition duration-200">
-              <span className="text-[10px] font-black tracking-wider uppercase opacity-75">Pending Action</span>
-              <div className="text-2xl font-black">{stats.pendingCount} Requests</div>
-              <div className="text-[10px] opacity-60 font-semibold mt-1">Awaiting Management Approval</div>
+            <div className="bg-white dark:bg-slate-900 border border-amber-500/10 bg-amber-500/5 rounded-xl p-3 shadow-sm space-y-1 text-amber-600">
+              <span className="text-[9px] font-black tracking-wider uppercase opacity-75">Pending Action</span>
+              <div className="text-xl font-black">{stats.pendingCount} Requests</div>
+              <div className="text-[9px] font-semibold opacity-60">Awaiting Management Approval</div>
             </div>
           </div>
 
-          {/* Table Container */}
-          <div className="bg-card rounded-xl border border-border/80 shadow-xs overflow-hidden">
-            <div className="p-5 flex flex-col gap-4 border-b border-border/40 bg-muted/10">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div className="flex flex-wrap gap-3 w-full sm:w-auto">
-                  <select
-                    value={selectedStatus}
-                    onChange={(e) => setSelectedStatus(e.target.value)}
-                    className="h-9 px-4 rounded-lg bg-background border border-border/60 text-xs font-semibold outline-none focus:border-emerald-500 shadow-sm"
-                  >
-                    <option value="ALL">All Statuses</option>
-                    <option value="Pending">Pending Approval</option>
-                    <option value="Approved">Approved</option>
-                    <option value="Rejected">Rejected</option>
-                  </select>
+          {/* Filters Area */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-3 shadow-sm shrink-0 print:hidden space-y-3">
+            <div className="flex flex-col sm:flex-row flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  className="h-8.5 px-3 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-semibold outline-none focus:border-[#2563eb]"
+                >
+                  <option value="ALL">All Statuses</option>
+                  <option value="Pending">Pending Approval</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
 
-                  <select
-                    value={selectedDept}
-                    onChange={(e) => setSelectedDept(e.target.value)}
-                    className="h-9 px-4 rounded-lg bg-background border border-border/60 text-xs font-semibold outline-none focus:border-emerald-500 shadow-sm"
-                  >
-                    <option value="ALL">All Departments</option>
-                    <option value="Admin">Admin</option>
-                    <option value="Business Innovation">Business Innovation</option>
-                    <option value="Business Automation">Business Automation</option>
-                  </select>
+                <select
+                  value={selectedDept}
+                  onChange={(e) => setSelectedDept(e.target.value)}
+                  className="h-8.5 px-3 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-semibold outline-none focus:border-[#2563eb]"
+                >
+                  <option value="ALL">All Departments</option>
+                  <option value="Admin">Admin</option>
+                  <option value="Business Innovation">Business Innovation</option>
+                  <option value="Business Automation">Business Automation</option>
+                </select>
 
-                  <div className="relative flex-1 min-w-[240px]">
-                    <Search className="size-4 text-muted-foreground/60 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search ID or Employee Name..."
-                      className="w-full h-9 pl-9 pr-4 rounded-lg bg-background border border-border/60 text-xs font-semibold outline-none focus:border-emerald-500 transition shadow-sm"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-1.5 print:hidden shrink-0">
-                  <button onClick={handleExportCSV} className="h-9 px-4 rounded-lg border border-border/60 bg-background hover:bg-muted font-bold text-xs flex items-center gap-1.5 transition shadow-sm text-emerald-600">
-                    <Download className="size-3.5" /> Export CSV
-                  </button>
-                  <button onClick={() => window.print()} className="h-9 px-4 rounded-lg border border-border/60 bg-background hover:bg-muted font-bold text-xs flex items-center gap-1.5 transition shadow-sm text-blue-600">
-                    <Printer className="size-3.5" /> Print
-                  </button>
+                <div className="relative flex-1 min-w-[200px]">
+                  <Search className="size-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search ID or Employee Name..."
+                    className="w-full h-8.5 pl-8 pr-3 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-semibold outline-none focus:border-[#2563eb] transition"
+                  />
                 </div>
               </div>
 
-              {/* Advanced Filters */}
-              <div className="flex flex-wrap gap-4 items-center pt-3 border-t border-border/40">
-                <div className="flex items-center gap-2">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase">OT Date:</label>
-                  <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="h-8 px-2 rounded-md bg-background border border-border/60 text-xs outline-none focus:border-emerald-500" title="From Date" />
-                  <span className="text-muted-foreground">-</span>
-                  <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="h-8 px-2 rounded-md bg-background border border-border/60 text-xs outline-none focus:border-emerald-500" title="To Date" />
-                </div>
-                {(dateFrom || dateTo) && (
-                  <button onClick={() => { setDateFrom(""); setDateTo(""); }} className="text-[10px] text-rose-500 font-bold hover:underline ml-2">Clear Dates</button>
-                )}
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button onClick={handleExportCSV} className="h-8.5 px-3 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 transition text-emerald-600">
+                  <Download className="size-3.5" /> Export
+                </button>
+                <button onClick={() => window.print()} className="h-8.5 px-3 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 transition text-[#2563eb]">
+                  <Printer className="size-3.5" /> Print
+                </button>
               </div>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-xs text-left">
-                <thead>
-                  <tr className="bg-[#f1f5f9] dark:bg-[#0f172a] text-foreground font-bold border-b border-border/50 select-none whitespace-nowrap text-[11px]">
-                    <th className="px-5 py-3 border-r border-border/30">Req ID</th>
-                    <th className="px-5 py-3 border-r border-border/30">Employee Details</th>
-                    <th className="px-5 py-3 text-center border-r border-border/30">OT Date</th>
-                    <th className="px-5 py-3 text-center border-r border-border/30">Requested Hours</th>
-                    <th className="px-5 py-3 text-center border-r border-border/30">Status</th>
-                    <th className="px-5 py-3 text-center print:hidden">Actions</th>
+            <div className="flex items-center gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <label className="text-[9px] font-black text-slate-400 uppercase">Date Range:</label>
+                <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="h-7.5 px-2 rounded bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[11px] outline-none focus:border-[#2563eb]" />
+                <span className="text-slate-400">-</span>
+                <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="h-7.5 px-2 rounded bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[11px] outline-none focus:border-[#2563eb]" />
+              </div>
+              {(dateFrom || dateTo) && (
+                <button onClick={() => { setDateFrom(""); setDateTo(""); }} className="text-[10px] text-rose-500 font-bold hover:underline">Clear Dates</button>
+              )}
+            </div>
+          </div>
+
+          {/* Main Table Area */}
+          <div className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-lg overflow-hidden flex flex-col min-h-0">
+            {selectedIds.size > 0 && (
+              <div className="p-3 bg-[#2563eb]/5 border-b border-[#2563eb]/10 flex items-center justify-between animate-in fade-in slide-in-from-top-2">
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="bg-[#2563eb]/20 text-[#2563eb] hover:bg-[#2563eb]/20">
+                    {selectedIds.size} Selected
+                  </Badge>
+                  <span className="text-[11px] font-medium text-slate-500">records ready for action</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button onClick={handleBulkReject} className="h-7.5 px-3 border border-rose-200 text-rose-600 hover:bg-rose-50 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all">
+                    <XCircle className="size-3.5" /> Reject Selected
+                  </button>
+                  <button onClick={handleBulkApprove} className="h-7.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all shadow-sm">
+                    <CheckCircle2 className="size-3.5" /> Approve Selected
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="flex-1 overflow-auto">
+              <table className="w-full text-left border-collapse whitespace-nowrap min-w-[900px]">
+                <thead className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 z-10">
+                  <tr className="bg-slate-50 dark:bg-slate-950">
+                    {selectedStatus === "Pending" && (
+                      <th className="px-4 py-3 w-[50px] text-center border-r border-slate-200 dark:border-slate-800">
+                        <input 
+                          type="checkbox" 
+                          className="rounded border-slate-300 text-[#2563eb] focus:ring-[#2563eb]" 
+                          onChange={handleSelectAll}
+                          checked={selectedIds.size === filteredRecords.filter(r => r.status === "Pending").length && selectedIds.size > 0}
+                        />
+                      </th>
+                    )}
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest border-r border-slate-200 dark:border-slate-800 w-[100px]">Req ID</th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest border-r border-slate-200 dark:border-slate-800">Employee Details</th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center border-r border-slate-200 dark:border-slate-800 w-[120px]">OT Date</th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center border-r border-slate-200 dark:border-slate-800 w-[150px]">Requested Hours</th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center border-r border-slate-200 dark:border-slate-800 w-[120px]">Status</th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center w-[100px] print:hidden">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/30 font-sans text-xs">
-                  {filteredRecords.map((row) => (
-                    <tr key={row.id} className="hover:bg-[#f8fafc] dark:hover:bg-[#1e293b]/30 transition duration-75">
-                      <td className="px-5 py-3 font-mono font-bold text-foreground/70 border-r border-border/20">{row.id}</td>
-                      <td className="px-5 py-3 border-r border-border/20">
-                        <div className="font-black text-foreground">{row.employeeName}</div>
-                        <div className="text-[10px] text-muted-foreground font-mono mt-0.5">
-                          {row.employeeId} • {row.department}
-                        </div>
-                      </td>
-                      <td className="px-5 py-3 text-center font-mono border-r border-border/20">
-                        {row.otDate}
-                      </td>
-                      <td className="px-5 py-3 text-center border-r border-border/20">
-                        <div className="font-black text-foreground text-sm">{row.reqOt + row.reqMot} hrs</div>
-                        <div className="text-[9px] text-muted-foreground font-mono">
-                          (OT: {row.reqOt} | MOT: {row.reqMot})
-                        </div>
-                      </td>
-                      <td className="px-5 py-3 text-center border-r border-border/20">
-                        {row.status === "Pending" && (
-                          <span className="inline-flex items-center gap-1.5 text-amber-600 bg-amber-500/10 px-2.5 py-1 rounded-md text-[10px] font-bold border border-amber-500/20">
-                            <Clock className="size-3" /> Pending
-                          </span>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs text-slate-700 dark:text-slate-300 font-semibold">
+                  {filteredRecords.map((row) => {
+                    const isChecked = selectedIds.has(row.id);
+                    return (
+                      <tr key={row.id} className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${isChecked ? 'bg-[#2563eb]/5 dark:bg-[#2563eb]/10' : ''}`}>
+                        {selectedStatus === "Pending" && (
+                          <td className="px-4 py-3 text-center border-r border-slate-200 dark:border-slate-800">
+                            {row.status === "Pending" && (
+                              <input 
+                                type="checkbox" 
+                                className="rounded border-slate-300 text-[#2563eb] focus:ring-[#2563eb]" 
+                                checked={isChecked}
+                                onChange={() => handleSelectOne(row.id)}
+                              />
+                            )}
+                          </td>
                         )}
-                        {row.status === "Approved" && (
-                          <span className="inline-flex items-center gap-1.5 text-emerald-600 bg-emerald-500/10 px-2.5 py-1 rounded-md text-[10px] font-bold border border-emerald-500/20">
-                            <CheckCircle2 className="size-3" /> Approved
-                          </span>
-                        )}
-                        {row.status === "Rejected" && (
-                          <span className="inline-flex items-center gap-1.5 text-rose-600 bg-rose-500/10 px-2.5 py-1 rounded-md text-[10px] font-bold border border-rose-500/20">
-                            <AlertCircle className="size-3" /> Rejected
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-5 py-4 text-center print:hidden">
-                        <div className="flex items-center justify-center gap-1.5">
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setViewDetailsRecord(row); }}
-                            className="p-1.5 hover:bg-blue-500/10 text-blue-500 rounded transition"
-                            title="View Details"
-                          >
-                            <Eye className="size-4" />
-                          </button>
+                        <td className="px-4 py-3 font-mono font-bold text-slate-500 border-r border-slate-200 dark:border-slate-800">{row.id}</td>
+                        <td className="px-4 py-3 border-r border-slate-200 dark:border-slate-800">
+                          <div className="font-bold text-slate-800 dark:text-slate-100">{row.employeeName}</div>
+                          <div className="text-[10px] text-slate-500 font-mono mt-0.5">
+                            {row.employeeId} • {row.department}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-center font-mono border-r border-slate-200 dark:border-slate-800">
+                          {row.otDate}
+                        </td>
+                        <td className="px-4 py-3 text-center border-r border-slate-200 dark:border-slate-800">
+                          <div className="font-black text-slate-800 dark:text-slate-100 text-sm">{row.reqOt + row.reqMot} hrs</div>
+                          <div className="text-[9px] text-slate-500 font-mono mt-0.5">
+                            (OT: {row.reqOt} | MOT: {row.reqMot})
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-center border-r border-slate-200 dark:border-slate-800">
                           {row.status === "Pending" && (
-                            <>
-                              <button 
-                                onClick={(e) => { e.stopPropagation(); handleUpdateStatus(row.id, "Approved"); }}
-                                className="p-1.5 hover:bg-emerald-500/10 text-emerald-600 rounded transition"
-                                title="Approve"
-                              >
-                                <CheckCircle2 className="size-4" />
-                              </button>
-                              <button 
-                                onClick={(e) => { e.stopPropagation(); handleUpdateStatus(row.id, "Rejected"); }}
-                                className="p-1.5 hover:bg-rose-500/10 text-rose-500 rounded transition"
-                                title="Reject"
-                              >
-                                <X className="size-4" />
-                              </button>
-                            </>
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[9px] font-bold uppercase border bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20">
+                              <Clock className="size-3" /> Pending
+                            </span>
                           )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                          {row.status === "Approved" && (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[9px] font-bold uppercase border bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
+                              <CheckCircle2 className="size-3" /> Approved
+                            </span>
+                          )}
+                          {row.status === "Rejected" && (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[9px] font-bold uppercase border bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20">
+                              <AlertCircle className="size-3" /> Rejected
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-center print:hidden">
+                          <div className="flex items-center justify-center gap-1.5">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setViewDetailsRecord(row); }}
+                              className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-[#2563eb] rounded transition"
+                              title="View Details"
+                            >
+                              <Eye className="size-3.5" />
+                            </button>
+                            {row.status === "Pending" && (
+                              <>
+                                <button 
+                                  onClick={(e) => { e.stopPropagation(); handleUpdateStatus(row.id, "Approved"); }}
+                                  className="p-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 text-emerald-500 rounded transition"
+                                  title="Approve"
+                                >
+                                  <CheckCircle2 className="size-3.5" />
+                                </button>
+                                <button 
+                                  onClick={(e) => { e.stopPropagation(); handleUpdateStatus(row.id, "Rejected"); }}
+                                  className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-500/10 text-rose-500 rounded transition"
+                                  title="Reject"
+                                >
+                                  <X className="size-3.5" />
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                   {filteredRecords.length === 0 && (
                     <tr>
-                      <td colSpan={6} className="px-5 py-12 text-center text-muted-foreground font-medium">
-                        No OT requests found matching the current filters.
+                      <td colSpan={7} className="px-4 py-12 text-center text-slate-500 font-medium">
+                        No OT requests found matching the current criteria.
                       </td>
                     </tr>
                   )}
                 </tbody>
               </table>
             </div>
-          </div>
 
+            <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 px-5 py-2.5 border-t border-slate-100 dark:border-slate-800 shrink-0 print:hidden">
+              <div>Showing {filteredRecords.length} records</div>
+              <div className="flex items-center gap-1.5">
+                <button className="text-slate-400 hover:text-slate-600 transition-colors" disabled>Previous</button>
+                <button className="size-5.5 rounded bg-slate-700 dark:bg-slate-200 text-white dark:text-slate-900 flex items-center justify-center shadow-sm text-[9.5px]">1</button>
+                <button className="text-slate-400 hover:text-slate-600 transition-colors" disabled>Next</button>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
 
       {/* View Details Modal */}
       {viewDetailsRecord && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-md rounded-xl shadow-lg border border-border/80 overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b border-border/40 bg-muted/30">
-              <h3 className="font-black text-foreground flex items-center gap-2">
-                <Timer className="size-5 text-emerald-600" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 dark:bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
+              <h3 className="font-black text-slate-800 dark:text-slate-100 flex items-center gap-2 text-sm uppercase tracking-wider">
+                <Timer className="size-4.5 text-emerald-600" />
                 Overtime Justification
               </h3>
               <button 
                 onClick={() => setViewDetailsRecord(null)}
-                className="p-1 hover:bg-muted text-muted-foreground hover:text-foreground rounded transition"
+                className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 rounded-lg transition"
               >
-                <X className="size-5" />
+                <X className="size-4.5" />
               </button>
             </div>
-            <div className="p-5 space-y-4">
+            <div className="p-5 space-y-5">
               <div>
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block mb-1">Employee</label>
-                <div className="font-bold text-sm text-foreground">{viewDetailsRecord.employeeName}</div>
-                <div className="text-xs text-muted-foreground font-mono">{viewDetailsRecord.employeeId} • {viewDetailsRecord.department}</div>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Employee</label>
+                <div className="font-bold text-sm text-slate-800 dark:text-slate-100">{viewDetailsRecord.employeeName}</div>
+                <div className="text-xs text-slate-500 font-mono mt-0.5">{viewDetailsRecord.employeeId} • {viewDetailsRecord.department}</div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block mb-1">OT Date</label>
-                  <div className="font-mono text-sm">{viewDetailsRecord.otDate}</div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">OT Date</label>
+                  <div className="font-mono text-sm font-bold">{viewDetailsRecord.otDate}</div>
                 </div>
                 <div>
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block mb-1">Total Hours</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Total Hours</label>
                   <div className="font-black text-emerald-600 text-sm">{viewDetailsRecord.reqOt + viewDetailsRecord.reqMot} hrs</div>
                 </div>
               </div>
-              <div className="p-4 bg-muted/40 rounded-lg border border-border/50">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block mb-2">Manager's Reason</label>
-                <p className="text-sm text-foreground leading-relaxed">
+              <div className="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Manager's Reason</label>
+                <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
                   {viewDetailsRecord.reason || "No specific reason provided."}
                 </p>
               </div>
             </div>
-            <div className="p-4 border-t border-border/40 flex justify-end">
-              <button 
-                onClick={() => setViewDetailsRecord(null)}
-                className="h-9 px-4 rounded-lg border border-border/60 hover:bg-muted font-bold text-xs transition"
-              >
-                Close
-              </button>
-            </div>
           </div>
         </div>
       )}
-
     </div>
   );
 }
-
-
