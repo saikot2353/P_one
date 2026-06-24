@@ -222,9 +222,8 @@ const nav: NavItem[] = [
       {
         label: "Advance",
         subitems: [
-          { label: "Advance Requisition", to: "#" },
+          { label: "Advance Req & List", to: "/payroll-advance" },
           { label: "Approve Requisition", to: "#" },
-          { label: "Advance List", to: "#" },
           { label: "Advance Status", to: "#" },
           { label: "Incentive Allowance", to: "#" },
         ]
