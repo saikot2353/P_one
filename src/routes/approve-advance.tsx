@@ -19,6 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export const Route = createFileRoute("/approve-advance")({
   head: () => ({
@@ -39,15 +40,40 @@ const initialPendingData = [
 
 function ApproveAdvancePage() {
   const [approvals, setApprovals] = useState(initialPendingData);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   const handleApprove = (id: number) => {
     setApprovals(prev => prev.filter(req => req.id !== id));
-    // Here we'd show a success toast in a real app
+    setSelectedIds(prev => prev.filter(selectedId => selectedId !== id));
   };
 
   const handleReject = (id: number) => {
     setApprovals(prev => prev.filter(req => req.id !== id));
-    // Here we'd show a rejection toast in a real app
+    setSelectedIds(prev => prev.filter(selectedId => selectedId !== id));
+  };
+
+  const handleApproveSelected = () => {
+    setApprovals(prev => prev.filter(req => !selectedIds.includes(req.id)));
+    setSelectedIds([]);
+  };
+
+  const handleRejectSelected = () => {
+    setApprovals(prev => prev.filter(req => !selectedIds.includes(req.id)));
+    setSelectedIds([]);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === approvals.length && approvals.length > 0) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(approvals.map(req => req.id));
+    }
+  };
+
+  const toggleSelect = (id: number) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(selectedId => selectedId !== id) : [...prev, id]
+    );
   };
 
   return (
@@ -91,6 +117,26 @@ function ApproveAdvancePage() {
 
           {/* Main Content Area */}
           <div className="bg-card border border-border/60 rounded-lg shadow-sm">
+            {selectedIds.length > 0 && (
+              <div className="p-3 bg-primary/5 border-b border-border/50 flex items-center justify-between animate-in fade-in slide-in-from-top-2">
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="bg-primary/20 text-primary hover:bg-primary/20">
+                    {selectedIds.length} Selected
+                  </Badge>
+                  <span className="text-sm font-medium text-muted-foreground">items ready for action</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button size="sm" variant="outline" onClick={handleRejectSelected} className="border-rose-200 text-rose-600 hover:bg-rose-50 hover:text-rose-700 h-8">
+                    <XCircle className="size-3.5 mr-1.5" />
+                    Reject Selected
+                  </Button>
+                  <Button size="sm" onClick={handleApproveSelected} className="bg-emerald-600 hover:bg-emerald-700 text-white h-8">
+                    <CheckCircle2 className="size-3.5 mr-1.5" />
+                    Approve Selected
+                  </Button>
+                </div>
+              </div>
+            )}
             <div className="p-4 border-b border-border/50 flex flex-col sm:flex-row justify-between items-center gap-4">
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" className="h-8 gap-2 bg-background">
@@ -113,6 +159,13 @@ function ApproveAdvancePage() {
               <Table>
                 <TableHeader className="bg-muted/50">
                   <TableRow className="hover:bg-transparent">
+                    <TableHead className="w-[40px] text-center">
+                      <Checkbox 
+                        checked={approvals.length > 0 && selectedIds.length === approvals.length}
+                        onCheckedChange={toggleSelectAll}
+                        aria-label="Select all"
+                      />
+                    </TableHead>
                     <TableHead className="w-[60px] text-xs font-semibold">SL</TableHead>
                     <TableHead className="text-xs font-semibold">Req Date</TableHead>
                     <TableHead className="text-xs font-semibold">EmpId</TableHead>
@@ -127,7 +180,7 @@ function ApproveAdvancePage() {
                 <TableBody>
                   {approvals.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="text-center text-sm text-muted-foreground py-12">
+                      <TableCell colSpan={10} className="text-center text-sm text-muted-foreground py-12">
                         <div className="flex flex-col items-center gap-2">
                           <CheckCircle2 className="size-8 text-emerald-500/50" />
                           <p>No pending advance requisitions to review!</p>
@@ -136,7 +189,14 @@ function ApproveAdvancePage() {
                     </TableRow>
                   ) : (
                     approvals.map((row, idx) => (
-                      <TableRow key={row.id}>
+                      <TableRow key={row.id} className={selectedIds.includes(row.id) ? "bg-primary/5" : ""}>
+                        <TableCell className="text-center">
+                          <Checkbox 
+                            checked={selectedIds.includes(row.id)}
+                            onCheckedChange={() => toggleSelect(row.id)}
+                            aria-label={`Select row ${idx + 1}`}
+                          />
+                        </TableCell>
                         <TableCell className="text-xs font-medium">{idx + 1}</TableCell>
                         <TableCell className="text-xs text-muted-foreground">{row.reqDate}</TableCell>
                         <TableCell className="text-xs font-medium">{row.empId}</TableCell>

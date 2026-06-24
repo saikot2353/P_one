@@ -13,6 +13,7 @@ interface NestedItem {
   label: string;
   to: string;
   search?: Record<string, any>;
+  count?: number;
 }
 
 interface SubItem {
@@ -20,6 +21,7 @@ interface SubItem {
   to?: string;
   search?: Record<string, any>;
   subitems?: NestedItem[];
+  count?: number;
 }
 
 interface NavItem {
@@ -29,6 +31,7 @@ interface NavItem {
   active?: boolean;
   subitems?: SubItem[];
   search?: Record<string, any>;
+  count?: number;
 }
 
 const nav: NavItem[] = [
@@ -55,19 +58,36 @@ const nav: NavItem[] = [
     ]
   },
   {
-    label: "HR Approvals",
+    label: "Approvals",
     icon: CheckCircle,
+    count: 38,
     subitems: [
-      { label: "SSP Approval", to: "/ssp-approval" },
-      { label: "Personnel Approval", to: "/personnel-approval" },
-      { label: "Manual Attendance", to: "/pending-manual-attendance" },
-      { label: "JD Approvals", to: "/hr-policy-jds", search: { mode: "list", filterWorkflow: "HR" } },
-      { label: "Increment Gadget", to: "/approve-increment-gadget" },
-      { label: "Increment (HR)", to: "/approve-increment-hr" },
-      { label: "Final Increment", to: "/final-approve-increment" },
-      { label: "Budget Requisitions", to: "/budget-requisition-approvals" },
-      { label: "Transfer Approvals", to: "/transfer-control-center", search: { tab: "approve" } },
-      { label: "Overtime Requisitions", to: "/approve-overtime" },
+      { label: "All Approvals", to: "/all-approvals" },
+      {
+        label: "HR Approvals",
+        count: 24,
+        subitems: [
+          { label: "SSP Approval", to: "/ssp-approval", count: 5 },
+          { label: "Personnel Approval", to: "/personnel-approval", count: 2 },
+          { label: "Manual Attendance", to: "/pending-manual-attendance", count: 7 },
+          { label: "JD Approvals", to: "/hr-policy-jds", search: { mode: "list", filterWorkflow: "HR" }, count: 1 },
+          { label: "Increment Gadget", to: "/approve-increment-gadget", count: 3 },
+          { label: "Increment (HR)", to: "/approve-increment-hr", count: 2 },
+          { label: "Final Increment", to: "/final-approve-increment", count: 1 },
+          { label: "Budget Requisitions", to: "/budget-requisition-approvals" },
+          { label: "Transfer Approvals", to: "/transfer-control-center", search: { tab: "approve" }, count: 2 },
+          { label: "Overtime Requisitions", to: "/approve-overtime", count: 1 },
+        ]
+      },
+      {
+        label: "Payroll Approval",
+        count: 14,
+        subitems: [
+          { label: "Advance Requisitions", to: "/approve-advance", count: 3 },
+          { label: "Loan Applications", to: "/loan-approval", count: 5 },
+          { label: "Salary Sheets", to: "/check-approve-salary", count: 6 },
+        ]
+      }
     ]
   },
   {
@@ -243,14 +263,6 @@ const nav: NavItem[] = [
           { label: "Monthly Salary Process", to: "/monthly-salary-process" },
           { label: "Advance Salary Process", to: "/advance-salary-process" },
           { label: "Yearly Bonus Process", to: "/yearly-bonus-process" },
-        ]
-      },
-      {
-        label: "Payroll Approval",
-        subitems: [
-          { label: "Advance Requisitions", to: "/approve-advance" },
-          { label: "Loan Applications", to: "/loan-approval" },
-          { label: "Salary Sheets", to: "/check-approve-salary" },
         ]
       },
       { 
@@ -466,6 +478,11 @@ export function Sidebar() {
                   ].join(" ")}
                 />
                 <span className="flex-1 truncate">{item.label}</span>
+                {item.count !== undefined && item.count > 0 && (
+                  <span className="bg-amber-500/10 text-amber-600 text-[10px] font-bold px-1.5 py-0.5 rounded-md mr-1 leading-none shadow-[0_0_8px_oklch(0.7_0.2_50/0.15)] border border-amber-500/20">
+                    {item.count}
+                  </span>
+                )}
                 {isOpen ? (
                   <ChevronDown className="size-3.5 text-sidebar-foreground/45 transition-transform duration-300 rotate-180" />
                 ) : (
@@ -495,6 +512,11 @@ export function Sidebar() {
                             <File className={["size-3 shrink-0", isSubActive ? "text-primary font-black" : "text-sidebar-foreground/45"].join(" ")} />
                             <span className="truncate">{sub.label}</span>
                           </div>
+                          {sub.count !== undefined && sub.count > 0 && (
+                            <span className="bg-amber-500/10 text-amber-600 text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none shadow-[0_0_8px_oklch(0.7_0.2_50/0.15)] border border-amber-500/20">
+                              {sub.count}
+                            </span>
+                          )}
                           {isSubOpen ? (
                             <ChevronDown className="size-3 text-sidebar-foreground/45 transition-transform duration-300 rotate-180" />
                           ) : (
@@ -522,6 +544,11 @@ export function Sidebar() {
                               >
                                 <span className={["w-1.5 h-1.5 rounded-full shrink-0", isNestedActive ? "bg-primary" : "bg-sidebar-foreground/20"].join(" ")} />
                                 <span className="truncate">{nested.label}</span>
+                                {nested.count !== undefined && nested.count > 0 && (
+                                  <span className="ml-auto bg-amber-500/10 text-amber-600 text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none shadow-[0_0_8px_oklch(0.7_0.2_50/0.15)] border border-amber-500/20">
+                                    {nested.count}
+                                  </span>
+                                )}
                               </Link>
                             );
                           })}
@@ -553,6 +580,11 @@ export function Sidebar() {
                     >
                       <File className={["size-3 shrink-0", isSubActive ? "text-primary font-black" : "text-sidebar-foreground/45"].join(" ")} />
                       <span className="truncate">{sub.label}</span>
+                      {sub.count !== undefined && sub.count > 0 && (
+                        <span className="ml-auto bg-amber-500/10 text-amber-600 text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none shadow-[0_0_8px_oklch(0.7_0.2_50/0.15)] border border-amber-500/20">
+                          {sub.count}
+                        </span>
+                      )}
                     </Link>
                   );
                 })}

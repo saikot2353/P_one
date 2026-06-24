@@ -3,8 +3,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
-  ChevronRight, CheckCircle2, Search, FileText, Printer, FileDown, UserCheck, ShieldCheck
+  ChevronRight, CheckCircle2, Search, FileText, Printer, FileDown, UserCheck, ShieldCheck, XCircle
 } from "lucide-react";
 
 export const Route = createFileRoute("/loan-approval")({
@@ -180,6 +181,26 @@ function LoanApprovalPage() {
                 </div>
               ) : (
                 <div className="p-0 flex flex-col flex-1 h-full">
+                  {selectedRows.length > 0 && (
+                    <div className="p-3 bg-primary/5 border-b border-slate-200 flex items-center justify-between animate-in fade-in slide-in-from-top-2">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="bg-primary/20 text-primary hover:bg-primary/20">
+                          {selectedRows.length} Selected
+                        </Badge>
+                        <span className="text-sm font-medium text-slate-500">applications ready for action</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button size="sm" variant="outline" onClick={() => setSelectedRows([])} className="border-rose-200 text-rose-600 hover:bg-rose-50 hover:text-rose-700 h-8">
+                          <XCircle className="size-3.5 mr-1.5" />
+                          Reject Selected
+                        </Button>
+                        <Button size="sm" onClick={() => setSelectedRows([])} className="bg-emerald-600 hover:bg-emerald-700 text-white h-8">
+                          <CheckCircle2 className="size-3.5 mr-1.5" />
+                          Approve Selected
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
                       <thead className="text-xs text-slate-500 bg-blue-100/50 border-b border-slate-200">
@@ -236,7 +257,7 @@ function LoanApprovalPage() {
                     </table>
                   </div>
                   
-                  <div className="p-4 border-t border-slate-100 flex items-center justify-between">
+                  <div className="p-4 border-t border-slate-100 flex items-center justify-between mt-auto">
                     <div className="text-xs font-medium text-slate-500">
                       Showing 1 to {mockListData.length} of {mockListData.length} entries
                     </div>
@@ -245,15 +266,6 @@ function LoanApprovalPage() {
                       <Button variant="default" size="sm" className="h-8 w-8 p-0 text-xs bg-[#8bc34a] hover:bg-[#7cb342] text-white">1</Button>
                       <Button variant="outline" size="sm" className="h-8 text-xs text-slate-500 bg-white hover:bg-slate-50" disabled>Next</Button>
                     </div>
-                  </div>
-
-                  <div className="p-4 border-t border-slate-200 bg-slate-50 mt-auto flex gap-3">
-                    <Button className="bg-[#8bc34a] hover:bg-[#7cb342] text-white px-8 h-10 shadow-sm font-semibold rounded-md">
-                      APPROVED
-                    </Button>
-                    <Button className="bg-[#ef4444] hover:bg-[#dc2626] text-white px-8 h-10 shadow-sm font-semibold rounded-md">
-                      REJECT
-                    </Button>
                   </div>
                 </div>
               )}

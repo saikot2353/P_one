@@ -5,6 +5,7 @@ import { Topbar } from "@/components/dashboard/Topbar";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import {
   ChevronRight, ClipboardCheck, Search,
   Play, FileText, Printer, FileDown, CheckCircle, XCircle
@@ -338,30 +339,45 @@ function CheckApproveSalaryPage() {
                   <div className="p-4 space-y-4">
                     
                     {/* Action Bar */}
-                    <div className="flex items-center justify-between pb-2">
-                      <div className="flex items-center gap-2">
-                        {mainTab === "check" ? (
-                          <>
-                            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 text-xs font-semibold px-4 shadow-sm" disabled={selectedRows.length === 0}>
-                              CHECK
-                            </Button>
-                            <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white h-8 text-xs font-semibold px-4 shadow-sm" disabled={selectedRows.length === 0}>
-                              REVIEW
-                            </Button>
-                          </>
-                        ) : (
-                          <>
-                            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 text-xs font-semibold px-4 shadow-sm" disabled={selectedRows.length === 0}>
-                              APPROVE
-                            </Button>
-                            <Button size="sm" className="bg-rose-600 hover:bg-rose-700 text-white h-8 text-xs font-semibold px-4 shadow-sm" disabled={selectedRows.length === 0}>
-                              REJECT
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                      <div className="text-xs font-medium text-muted-foreground bg-muted/50 px-2.5 py-1 rounded-md border border-border/60">
-                        Showing {mockData.length} entries
+                    <div className="flex flex-col gap-4 pb-2">
+                      {selectedRows.length > 0 && (
+                        <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg flex items-center justify-between animate-in fade-in slide-in-from-top-2">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary" className="bg-primary/20 text-primary hover:bg-primary/20">
+                              {selectedRows.length} Selected
+                            </Badge>
+                            <span className="text-sm font-medium text-slate-500">entries ready for {mainTab === "check" ? "review" : "action"}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {mainTab === "check" ? (
+                              <>
+                                <Button size="sm" variant="outline" onClick={() => setSelectedRows([])} className="border-amber-200 text-amber-600 hover:bg-amber-50 h-8">
+                                  Review Selected
+                                </Button>
+                                <Button size="sm" onClick={() => setSelectedRows([])} className="bg-emerald-600 hover:bg-emerald-700 text-white h-8">
+                                  <ClipboardCheck className="size-3.5 mr-1.5" />
+                                  Check Selected
+                                </Button>
+                              </>
+                            ) : (
+                              <>
+                                <Button size="sm" variant="outline" onClick={() => setSelectedRows([])} className="border-rose-200 text-rose-600 hover:bg-rose-50 hover:text-rose-700 h-8">
+                                  <XCircle className="size-3.5 mr-1.5" />
+                                  Reject Selected
+                                </Button>
+                                <Button size="sm" onClick={() => setSelectedRows([])} className="bg-emerald-600 hover:bg-emerald-700 text-white h-8">
+                                  <CheckCircle className="size-3.5 mr-1.5" />
+                                  Approve Selected
+                                </Button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      <div className="flex items-center justify-end">
+                        <div className="text-xs font-medium text-muted-foreground bg-muted/50 px-2.5 py-1 rounded-md border border-border/60">
+                          Showing {mockData.length} entries
+                        </div>
                       </div>
                     </div>
 
