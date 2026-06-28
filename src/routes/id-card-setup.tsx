@@ -7,7 +7,7 @@ import { employeesData } from "@/routes/personnel-list";
 import { 
   UserRound, Printer, Upload, Palette, FileText, 
   Check, RefreshCcw, Sparkles, Info, Eye, Save, Trash2, 
-  Layers, Users, Search, SlidersHorizontal, ChevronRight
+  Layers, Users, Search, SlidersHorizontal, ChevronRight, Plus
 } from "lucide-react";
 
 export const Route = createFileRoute("/id-card-setup")({
@@ -686,15 +686,15 @@ function IDCardSetupPage() {
                   <div className="flex items-center justify-between pb-3 border-b border-border/20">
                     <div className="flex items-center gap-2.5">
                       <Layers className="size-4.5 text-primary" />
-                      <h3 className="text-sm font-bold text-foreground">Saved Templates</h3>
+                      <h3 className="text-sm font-bold text-foreground">Design Templates</h3>
                     </div>
                     <button
                       type="button"
                       onClick={() => setShowSaveTemplateModal(true)}
                       className="h-8 px-3 rounded-lg bg-primary/15 hover:bg-primary/20 text-primary text-xs font-bold transition flex items-center gap-1 cursor-pointer"
                     >
-                      <Save className="size-3.5" />
-                      Save Design
+                      <Plus className="size-3.5" />
+                      Create Template
                     </button>
                   </div>
 
@@ -1137,7 +1137,7 @@ function IDCardSetupPage() {
                   </div>
 
                   {/* Filters Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Search query */}
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">Search Staff</label>
@@ -1165,6 +1165,33 @@ function IDCardSetupPage() {
                         {departmentsList.map(dept => (
                           <option key={dept} value={dept}>{dept}</option>
                         ))}
+                      </select>
+                    </div>
+
+                    {/* Template Filter */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">Card Template</label>
+                      <select
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          const t = [...SYSTEM_TEMPLATES, ...savedTemplates].find(temp => temp.id === val);
+                          if (t) handleLoadTemplate(t);
+                        }}
+                        className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs font-bold outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition cursor-pointer text-foreground"
+                      >
+                        <option value="">Select Template...</option>
+                        <optgroup label="System Templates">
+                          {SYSTEM_TEMPLATES.map(t => (
+                            <option key={t.id} value={t.id}>{t.name}</option>
+                          ))}
+                        </optgroup>
+                        {savedTemplates.length > 0 && (
+                          <optgroup label="Custom Templates">
+                            {savedTemplates.map(t => (
+                              <option key={t.id} value={t.id}>{t.name}</option>
+                            ))}
+                          </optgroup>
+                        )}
                       </select>
                     </div>
                   </div>
