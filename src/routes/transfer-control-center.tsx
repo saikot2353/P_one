@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import {
   RefreshCw, ChevronRight, CheckCircle2, XCircle, FileSpreadsheet, Printer, FileDown,
-  AlertCircle, Search, Trash2, Calendar, FileText, UserCheck, Users, Copy, Send, Award, FileCheck2, Info, Plus, FolderOpen, Activity, Undo2
+  AlertCircle, Search, Trash2, Calendar, FileText, UserCheck, Users, Copy, Send, Award, FileCheck2, Info, Plus, FolderOpen, Activity, Undo2, X
 } from "lucide-react";
 
 interface SearchParams {

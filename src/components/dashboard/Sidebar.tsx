@@ -92,9 +92,11 @@ const nav: NavItem[] = [
   },
   {
     label: "Personnel Info",
-    to: "/personnel-list",
     icon: UserRound,
-    active: true
+    subitems: [
+      { label: "Personnel List", to: "/personnel-list" },
+      { label: "ID Card Setup", to: "/id-card-setup" }
+    ]
   },
   {
     label: "Attendance",

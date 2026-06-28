@@ -69,6 +69,7 @@ import { Route as IncrementHistoryRouteImport } from './routes/increment-history
 import { Route as IncrementGadgetRouteImport } from './routes/increment-gadget'
 import { Route as IncrementRouteImport } from './routes/increment'
 import { Route as IncentiveAllowanceRouteImport } from './routes/incentive-allowance'
+import { Route as IdCardSetupRouteImport } from './routes/id-card-setup'
 import { Route as HrPolicyJdsRouteImport } from './routes/hr-policy-jds'
 import { Route as FinancialAidRouteImport } from './routes/financial-aid'
 import { Route as FinalSettlementRouteImport } from './routes/final-settlement'
@@ -97,6 +98,7 @@ import { Route as ApproveOvertimeRouteImport } from './routes/approve-overtime'
 import { Route as ApproveIncrementHrRouteImport } from './routes/approve-increment-hr'
 import { Route as ApproveIncrementGadgetRouteImport } from './routes/approve-increment-gadget'
 import { Route as ApproveAdvanceRouteImport } from './routes/approve-advance'
+import { Route as AllApprovalsRouteImport } from './routes/all-approvals'
 import { Route as AdvanceSalaryProcessRouteImport } from './routes/advance-salary-process'
 import { Route as AddEmployeeRouteImport } from './routes/add-employee'
 import { Route as IndexRouteImport } from './routes/index'
@@ -410,6 +412,11 @@ const IncentiveAllowanceRoute = IncentiveAllowanceRouteImport.update({
   path: '/incentive-allowance',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IdCardSetupRoute = IdCardSetupRouteImport.update({
+  id: '/id-card-setup',
+  path: '/id-card-setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HrPolicyJdsRoute = HrPolicyJdsRouteImport.update({
   id: '/hr-policy-jds',
   path: '/hr-policy-jds',
@@ -551,6 +558,11 @@ const ApproveAdvanceRoute = ApproveAdvanceRouteImport.update({
   path: '/approve-advance',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AllApprovalsRoute = AllApprovalsRouteImport.update({
+  id: '/all-approvals',
+  path: '/all-approvals',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdvanceSalaryProcessRoute = AdvanceSalaryProcessRouteImport.update({
   id: '/advance-salary-process',
   path: '/advance-salary-process',
@@ -593,6 +605,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/add-employee': typeof AddEmployeeRoute
   '/advance-salary-process': typeof AdvanceSalaryProcessRoute
+  '/all-approvals': typeof AllApprovalsRoute
   '/approve-advance': typeof ApproveAdvanceRoute
   '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
@@ -621,6 +634,7 @@ export interface FileRoutesByFullPath {
   '/final-settlement': typeof FinalSettlementRoute
   '/financial-aid': typeof FinancialAidRoute
   '/hr-policy-jds': typeof HrPolicyJdsRoute
+  '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
   '/increment': typeof IncrementRoute
   '/increment-gadget': typeof IncrementGadgetRoute
@@ -690,6 +704,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/add-employee': typeof AddEmployeeRoute
   '/advance-salary-process': typeof AdvanceSalaryProcessRoute
+  '/all-approvals': typeof AllApprovalsRoute
   '/approve-advance': typeof ApproveAdvanceRoute
   '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
@@ -718,6 +733,7 @@ export interface FileRoutesByTo {
   '/final-settlement': typeof FinalSettlementRoute
   '/financial-aid': typeof FinancialAidRoute
   '/hr-policy-jds': typeof HrPolicyJdsRoute
+  '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
   '/increment': typeof IncrementRoute
   '/increment-gadget': typeof IncrementGadgetRoute
@@ -788,6 +804,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/add-employee': typeof AddEmployeeRoute
   '/advance-salary-process': typeof AdvanceSalaryProcessRoute
+  '/all-approvals': typeof AllApprovalsRoute
   '/approve-advance': typeof ApproveAdvanceRoute
   '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
@@ -816,6 +833,7 @@ export interface FileRoutesById {
   '/final-settlement': typeof FinalSettlementRoute
   '/financial-aid': typeof FinancialAidRoute
   '/hr-policy-jds': typeof HrPolicyJdsRoute
+  '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
   '/increment': typeof IncrementRoute
   '/increment-gadget': typeof IncrementGadgetRoute
@@ -887,6 +905,7 @@ export interface FileRouteTypes {
     | '/'
     | '/add-employee'
     | '/advance-salary-process'
+    | '/all-approvals'
     | '/approve-advance'
     | '/approve-increment-gadget'
     | '/approve-increment-hr'
@@ -915,6 +934,7 @@ export interface FileRouteTypes {
     | '/final-settlement'
     | '/financial-aid'
     | '/hr-policy-jds'
+    | '/id-card-setup'
     | '/incentive-allowance'
     | '/increment'
     | '/increment-gadget'
@@ -984,6 +1004,7 @@ export interface FileRouteTypes {
     | '/'
     | '/add-employee'
     | '/advance-salary-process'
+    | '/all-approvals'
     | '/approve-advance'
     | '/approve-increment-gadget'
     | '/approve-increment-hr'
@@ -1012,6 +1033,7 @@ export interface FileRouteTypes {
     | '/final-settlement'
     | '/financial-aid'
     | '/hr-policy-jds'
+    | '/id-card-setup'
     | '/incentive-allowance'
     | '/increment'
     | '/increment-gadget'
@@ -1081,6 +1103,7 @@ export interface FileRouteTypes {
     | '/'
     | '/add-employee'
     | '/advance-salary-process'
+    | '/all-approvals'
     | '/approve-advance'
     | '/approve-increment-gadget'
     | '/approve-increment-hr'
@@ -1109,6 +1132,7 @@ export interface FileRouteTypes {
     | '/final-settlement'
     | '/financial-aid'
     | '/hr-policy-jds'
+    | '/id-card-setup'
     | '/incentive-allowance'
     | '/increment'
     | '/increment-gadget'
@@ -1179,6 +1203,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AddEmployeeRoute: typeof AddEmployeeRoute
   AdvanceSalaryProcessRoute: typeof AdvanceSalaryProcessRoute
+  AllApprovalsRoute: typeof AllApprovalsRoute
   ApproveAdvanceRoute: typeof ApproveAdvanceRoute
   ApproveIncrementGadgetRoute: typeof ApproveIncrementGadgetRoute
   ApproveIncrementHrRoute: typeof ApproveIncrementHrRoute
@@ -1207,6 +1232,7 @@ export interface RootRouteChildren {
   FinalSettlementRoute: typeof FinalSettlementRoute
   FinancialAidRoute: typeof FinancialAidRoute
   HrPolicyJdsRoute: typeof HrPolicyJdsRoute
+  IdCardSetupRoute: typeof IdCardSetupRoute
   IncentiveAllowanceRoute: typeof IncentiveAllowanceRoute
   IncrementRoute: typeof IncrementRoute
   IncrementGadgetRoute: typeof IncrementGadgetRoute
@@ -1695,6 +1721,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IncentiveAllowanceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/id-card-setup': {
+      id: '/id-card-setup'
+      path: '/id-card-setup'
+      fullPath: '/id-card-setup'
+      preLoaderRoute: typeof IdCardSetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hr-policy-jds': {
       id: '/hr-policy-jds'
       path: '/hr-policy-jds'
@@ -1891,6 +1924,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApproveAdvanceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/all-approvals': {
+      id: '/all-approvals'
+      path: '/all-approvals'
+      fullPath: '/all-approvals'
+      preLoaderRoute: typeof AllApprovalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/advance-salary-process': {
       id: '/advance-salary-process'
       path: '/advance-salary-process'
@@ -1947,6 +1987,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AddEmployeeRoute: AddEmployeeRoute,
   AdvanceSalaryProcessRoute: AdvanceSalaryProcessRoute,
+  AllApprovalsRoute: AllApprovalsRoute,
   ApproveAdvanceRoute: ApproveAdvanceRoute,
   ApproveIncrementGadgetRoute: ApproveIncrementGadgetRoute,
   ApproveIncrementHrRoute: ApproveIncrementHrRoute,
@@ -1975,6 +2016,7 @@ const rootRouteChildren: RootRouteChildren = {
   FinalSettlementRoute: FinalSettlementRoute,
   FinancialAidRoute: FinancialAidRoute,
   HrPolicyJdsRoute: HrPolicyJdsRoute,
+  IdCardSetupRoute: IdCardSetupRoute,
   IncentiveAllowanceRoute: IncentiveAllowanceRoute,
   IncrementRoute: IncrementRoute,
   IncrementGadgetRoute: IncrementGadgetRoute,

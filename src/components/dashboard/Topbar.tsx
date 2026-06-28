@@ -20,6 +20,7 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Dashboard Overview", parent: "Home", to: "/" },
   // Personnel Info
   { label: "Personnel List", parent: "Personnel Info", to: "/personnel-list", description: "View and filter complete staff profiles" },
+  { label: "ID Card Setup", parent: "Personnel Info", to: "/id-card-setup", description: "Design and generate dynamic employee ID cards" },
   { label: "Manpower Basic Form", parent: "Personnel Info", to: "/" },
   { label: "Manpower Basic List", parent: "Personnel Info", to: "/" },
   { label: "Personnel QR Scanner", parent: "Personnel Info", to: "/" },
