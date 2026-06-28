@@ -7,7 +7,8 @@ import { employeesData } from "@/routes/personnel-list";
 import { 
   UserRound, Printer, Upload, Palette, FileText, 
   Check, RefreshCcw, Sparkles, Info, Eye, Save, Trash2, 
-  Layers, Users, Search, SlidersHorizontal, ChevronRight, Plus
+  Layers, Users, Search, SlidersHorizontal, ChevronRight, Plus,
+  GripVertical, ArrowUp, ArrowDown
 } from "lucide-react";
 
 export const Route = createFileRoute("/id-card-setup")({
@@ -16,6 +17,11 @@ export const Route = createFileRoute("/id-card-setup")({
       { title: "ID Card Setup — CRIPTON" },
       { name: "description", content: "Design, configure, save templates, and bulk-print employee ID cards." },
     ],
+    links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "anonymous" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" }
+    ]
   }),
   component: IDCardSetupPage,
 });
@@ -34,6 +40,7 @@ interface CardTemplate {
   showDesignation: boolean;
   showBarcode: boolean;
   backText: string;
+  elementOrder: string[];
   isSystem?: boolean;
 }
 
@@ -65,6 +72,7 @@ const SYSTEM_TEMPLATES: CardTemplate[] = [
     showDesignation: true,
     showBarcode: true,
     backText: "This card is the property of CRIPTON GROUP.\nIf found, please return to the nearest HR Department or mail to:\nHouse 12, Road 5, Sector 3, Uttara, Dhaka-1230.\nTel: +880 2 8901234 | Email: hr@cripton.com",
+    elementOrder: ["header", "photo", "identity", "details", "footer"],
     isSystem: true
   },
   {
@@ -81,6 +89,7 @@ const SYSTEM_TEMPLATES: CardTemplate[] = [
     showDesignation: true,
     showBarcode: true,
     backText: "If found, please return to:\nPakiza Textile Factory, Savar, Dhaka.\nIn case of emergency, contact factory admin office.",
+    elementOrder: ["header", "photo", "identity", "details", "footer"],
     isSystem: true
   },
   {
@@ -97,6 +106,7 @@ const SYSTEM_TEMPLATES: CardTemplate[] = [
     showDesignation: true,
     showBarcode: true,
     backText: "This card is the property of Pakiza Software.\nUnauthorized use is strictly prohibited and subject to disciplinary action.\nWeb: www.pakizasoftware.com",
+    elementOrder: ["header", "photo", "identity", "details", "footer"],
     isSystem: true
   }
 ];
@@ -108,10 +118,19 @@ function IDCardSetupPage() {
   // State for card design configuration
   const [orientation, setOrientation] = useState<"vertical" | "horizontal">("vertical");
   const [themeColor, setThemeColor] = useState<string>("#1e88e5");
-  const [companyName, setCompanyName] = useState<string>("CRIPTON GROUP");
+  const [companyName, setCompanyName] = useState<string>("PAKIZA SOFTWARE");
   const [logoUrl, setLogoUrl] = useState<string>(DEFAULT_LOGO_SVG);
   const [signatureUrl, setSignatureUrl] = useState<string>(DEFAULT_SIGNATURE_SVG);
   
+  // Drag and Drop Layout Elements Order
+  const [elementOrder, setElementOrder] = useState<string[]>([
+    "header",
+    "photo",
+    "identity",
+    "details",
+    "footer"
+  ]);
+
   // Toggle visible elements
   const [showBloodGroup, setShowBloodGroup] = useState<boolean>(true);
   const [showJoinDate, setShowJoinDate] = useState<boolean>(true);
@@ -121,7 +140,7 @@ function IDCardSetupPage() {
   
   // Custom text on back side
   const [backText, setBackText] = useState<string>(
-    "This card is the property of CRIPTON GROUP.\nIf found, please return to the nearest HR Department or mail to:\nHouse 12, Road 5, Sector 3, Uttara, Dhaka-1230.\nTel: +880 2 8901234 | Email: hr@cripton.com"
+    "This card is the property of PAKIZA SOFTWARE.\nIf found, please return to the nearest HR Department or mail to:\nHouse 12, Road 5, Sector 3, Uttara, Dhaka-1230.\nTel: +880 2 8901234 | Email: hr@cripton.com"
   );
 
   // Single Designer Specific state
@@ -138,6 +157,10 @@ function IDCardSetupPage() {
   const [bulkDeptFilter, setBulkDeptFilter] = useState<string>("ALL");
   const [bulkSelectedEmpIds, setBulkSelectedEmpIds] = useState<string[]>([]);
   const [bulkPrintMode, setBulkPrintMode] = useState<"both" | "front" | "back">("both");
+
+  // Drag and drop refs
+  const dragItem = useRef<number | null>(null);
+  const dragOverItem = useRef<number | null>(null);
 
   // References for image uploads
   const logoInputRef = useRef<HTMLInputElement>(null);
@@ -181,7 +204,8 @@ function IDCardSetupPage() {
       showDepartment,
       showDesignation,
       showBarcode,
-      backText
+      backText,
+      elementOrder
     };
 
     const updated = [...savedTemplates, newTemplate];
@@ -203,6 +227,11 @@ function IDCardSetupPage() {
     setShowDesignation(template.showDesignation);
     setShowBarcode(template.showBarcode);
     setBackText(template.backText);
+    if (template.elementOrder) {
+      setElementOrder(template.elementOrder);
+    } else {
+      setElementOrder(["header", "photo", "identity", "details", "footer"]);
+    }
   };
 
   // Delete a template
@@ -254,10 +283,8 @@ function IDCardSetupPage() {
     const allSelected = filteredIds.every(id => bulkSelectedEmpIds.includes(id));
     
     if (allSelected) {
-      // Deselect all filtered
       setBulkSelectedEmpIds(prev => prev.filter(id => !filteredIds.includes(id)));
     } else {
-      // Select all filtered
       setBulkSelectedEmpIds(prev => {
         const union = new Set([...prev, ...filteredIds]);
         return Array.from(union);
@@ -269,6 +296,38 @@ function IDCardSetupPage() {
     setBulkSelectedEmpIds(prev => 
       prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
     );
+  };
+
+  // Handle Drag & Drop Sorting
+  const handleDragStart = (index: number) => {
+    dragItem.current = index;
+  };
+
+  const handleDragEnter = (index: number) => {
+    dragOverItem.current = index;
+  };
+
+  const handleDragEnd = () => {
+    if (dragItem.current !== null && dragOverItem.current !== null) {
+      const copyListItems = [...elementOrder];
+      const dragItemContent = copyListItems[dragItem.current];
+      copyListItems.splice(dragItem.current, 1);
+      copyListItems.splice(dragOverItem.current, 0, dragItemContent);
+      dragItem.current = null;
+      dragOverItem.current = null;
+      setElementOrder(copyListItems);
+    }
+  };
+
+  const moveElement = (index: number, direction: "up" | "down") => {
+    const newIndex = direction === "up" ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= elementOrder.length) return;
+    
+    const copy = [...elementOrder];
+    const temp = copy[index];
+    copy[index] = copy[newIndex];
+    copy[newIndex] = temp;
+    setElementOrder(copy);
   };
 
   // Handle Logo Upload
@@ -308,17 +367,18 @@ function IDCardSetupPage() {
   const handleReset = () => {
     setOrientation("vertical");
     setThemeColor("#1e88e5");
-    setCompanyName("CRIPTON GROUP");
+    setCompanyName("PAKIZA SOFTWARE");
     setLogoUrl(DEFAULT_LOGO_SVG);
     setSignatureUrl(DEFAULT_SIGNATURE_SVG);
     setBackText(
-      "This card is the property of CRIPTON GROUP.\nIf found, please return to the nearest HR Department or mail to:\nHouse 12, Road 5, Sector 3, Uttara, Dhaka-1230.\nTel: +880 2 8901234 | Email: hr@cripton.com"
+      "This card is the property of PAKIZA SOFTWARE.\nIf found, please return to the nearest HR Department or mail to:\nHouse 12, Road 5, Sector 3, Uttara, Dhaka-1230.\nTel: +880 2 8901234 | Email: hr@cripton.com"
     );
     setShowBloodGroup(true);
     setShowJoinDate(true);
     setShowDepartment(true);
     setShowDesignation(true);
     setShowBarcode(true);
+    setElementOrder(["header", "photo", "identity", "details", "footer"]);
     setIsFlipped(false);
   };
 
@@ -327,14 +387,14 @@ function IDCardSetupPage() {
     if (!id) return null;
     const bars: React.ReactNode[] = [];
     let currentX = 10;
-    const height = 30;
+    const height = 24;
     
     const idDigits = id.replace(/\D/g, "") || "123456789";
     const pattern = idDigits.split("").map(d => parseInt(d, 10));
     
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 28; i++) {
       const digit = pattern[i % pattern.length];
-      const width = (digit % 3 === 0) ? 2.2 : (digit % 2 === 0) ? 1.2 : 0.6;
+      const width = (digit % 3 === 0) ? 2.0 : (digit % 2 === 0) ? 1.0 : 0.5;
       const isSpace = i % 2 === 1;
       
       if (!isSpace) {
@@ -349,11 +409,11 @@ function IDCardSetupPage() {
           />
         );
       }
-      currentX += width + 1.0;
+      currentX += width + 0.8;
     }
     
     return (
-      <div className="flex flex-col items-center justify-center mt-1.5 font-mono text-[8px] text-gray-800">
+      <div className="flex flex-col items-center justify-center mt-1 font-mono text-[7.5px] text-gray-800">
         <svg width={currentX + 10} height={height} className="overflow-visible">
           {bars}
         </svg>
@@ -362,255 +422,498 @@ function IDCardSetupPage() {
     );
   };
 
-  // Render Front Side of ID Card
-  const renderCardFront = (emp: typeof employeesData[0], sizeStyle = {}) => {
+  // Render Front Side of ID Card (Vertical)
+  const renderVerticalFront = (emp: typeof employeesData[0]) => {
     return (
       <div 
-        className="relative bg-white text-slate-900 overflow-hidden flex flex-col justify-between select-none"
-        style={{
-          width: orientation === "vertical" ? "100%" : "100%",
-          height: orientation === "vertical" ? "100%" : "100%",
-          ...sizeStyle
-        }}
+        className="size-full flex flex-col justify-between relative bg-gradient-to-b from-white via-slate-50/50 to-slate-50/80"
+        style={{ fontFamily: "'Inter', sans-serif" }}
       >
-        {orientation === "vertical" ? (
-          <>
-            {/* Header Decorator */}
-            <div className="relative h-20 flex flex-col justify-center px-4 overflow-hidden" style={{ backgroundColor: themeColor }}>
-              <svg className="absolute inset-0 opacity-15 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path d="M0,50 C30,40 70,60 100,50 L100,100 L0,100 Z" fill="black" />
-                <path d="M0,30 C50,60 50,30 100,60 L100,0 L0,0 Z" fill="white" />
-              </svg>
-              <div className="relative z-10 flex items-center gap-2">
-                {logoUrl && (
-                  <img src={logoUrl} alt="Logo" className="size-8.5 rounded-lg bg-white/95 p-1 border border-white/20 shadow-xs object-contain" />
-                )}
-                <span className="text-white font-black text-xs tracking-wider truncate uppercase">
-                  {companyName}
-                </span>
-              </div>
-            </div>
-            <div className="h-1.5 w-full" style={{ backgroundColor: themeColor + "40" }} />
+        {/* Holographic security seal in the top-right corner */}
+        <div className="absolute right-4.5 top-4.5 size-7.5 rounded-full opacity-[0.14] bg-gradient-to-tr from-cyan-400 via-pink-400 to-yellow-400 mix-blend-overlay border border-white/60 flex items-center justify-center pointer-events-none z-30">
+          <svg className="size-4.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            <path d="M2 12h20" />
+          </svg>
+        </div>
 
-            {/* Profile Details Content */}
-            <div className="flex-1 flex flex-col items-center justify-center px-5 pt-3 pb-2">
-              {/* Photo */}
-              <div className="relative size-22 rounded-2xl bg-slate-100 border-2 overflow-hidden flex items-center justify-center shadow-md" style={{ borderColor: themeColor }}>
-                <UserRound className="size-12 text-slate-400" />
-              </div>
+        {/* Subtle decorative background network lines */}
+        <div className="absolute inset-0 opacity-[0.05] pointer-events-none z-0 overflow-hidden">
+          <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <line x1="10" y1="20" x2="30" y2="50" stroke="black" strokeWidth="0.8" />
+            <line x1="30" y1="50" x2="85" y2="25" stroke="black" strokeWidth="0.8" />
+            <line x1="85" y1="25" x2="90" y2="70" stroke="black" strokeWidth="0.8" />
+            <line x1="90" y1="70" x2="20" y2="85" stroke="black" strokeWidth="0.8" />
+            <line x1="20" y1="85" x2="10" y2="20" stroke="black" strokeWidth="0.8" />
+            <circle cx="10" cy="20" r="1.5" fill="black" />
+            <circle cx="30" cy="50" r="2.5" fill="black" />
+            <circle cx="85" cy="25" r="2.0" fill="black" />
+            <circle cx="90" cy="70" r="1.5" fill="black" />
+            <circle cx="20" cy="85" r="2.5" fill="black" />
+          </svg>
+        </div>
 
-              {/* Employee Identity */}
-              <div className="text-center mt-3 w-full">
-                <h4 className="font-extrabold text-slate-900 text-[14px] leading-snug truncate">
-                  {emp.name}
-                </h4>
-                {showDesignation && (
-                  <p className="text-[10.5px] font-bold mt-0.5 uppercase tracking-wide" style={{ color: themeColor }}>
-                    {emp.title}
-                  </p>
-                )}
-              </div>
+        {/* Outer Accent Border */}
+        <div className="absolute inset-0 border-[1.5px] rounded-2xl pointer-events-none z-45" style={{ borderColor: themeColor }} />
 
-              {/* Metadata Grid */}
-              <div className="w-full mt-3 bg-slate-50 border border-slate-100 rounded-xl p-2.5 space-y-1.5 text-[9.5px]">
-                <div className="flex justify-between">
-                  <span className="text-slate-500 font-semibold uppercase">ID Number</span>
-                  <span className="font-bold text-slate-800">{emp.id}</span>
-                </div>
-                {showDepartment && (
-                  <div className="flex justify-between">
-                    <span className="text-slate-500 font-semibold uppercase">Department</span>
-                    <span className="font-bold text-slate-800 truncate max-w-[120px]">{emp.dept}</span>
-                  </div>
-                )}
-                {showJoinDate && (
-                  <div className="flex justify-between">
-                    <span className="text-slate-500 font-semibold uppercase">Join Date</span>
-                    <span className="font-bold text-slate-800">{emp.joinDate}</span>
-                  </div>
-                )}
-                {showBloodGroup && (
-                  <div className="flex justify-between">
-                    <span className="text-slate-500 font-semibold uppercase">Blood Group</span>
-                    <span className="font-extrabold text-red-600">{emp.blood || "—"}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Footer Sign-off */}
-            <div className="px-5 pb-4 pt-1 border-t border-slate-100 flex items-end justify-between">
-              <div className="text-[6.5px] text-slate-400 font-extrabold tracking-widest uppercase pb-1">
-                SECURE ID CARD
-              </div>
-              <div className="flex flex-col items-center">
-                {signatureUrl && (
-                  <img src={signatureUrl} alt="Signature" className="h-6 w-16 object-contain mix-blend-multiply" />
-                )}
-                <span className="text-[7.5px] text-slate-500 font-bold border-t border-slate-300 pt-0.5 w-16 text-center mt-0.5">
-                  Authorized Sign
-                </span>
-              </div>
-            </div>
-          </>
-        ) : (
-          /* Horizontal Front */
-          <div className="flex size-full">
-            <div className="w-4 h-full flex-none" style={{ backgroundColor: themeColor }} />
-            <div className="flex-1 flex flex-col justify-between p-4">
-              <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                <div className="flex items-center gap-2">
+        {/* Map through ordered layout elements */}
+        {elementOrder.map(elementId => {
+          switch (elementId) {
+            case "header":
+              return (
+                <div key="header" className="relative z-10 pt-6 px-5 flex items-center gap-3 shrink-0">
                   {logoUrl && (
-                    <img src={logoUrl} alt="Logo" className="size-7 rounded bg-slate-50 p-0.5 object-contain" />
+                    <img 
+                      src={logoUrl} 
+                      alt="Logo" 
+                      className="h-10 w-12 object-contain filter drop-shadow-3xs" 
+                    />
                   )}
-                  <span className="font-black text-xs tracking-wider uppercase text-slate-800">
-                    {companyName}
-                  </span>
-                </div>
-                <span className="text-[8px] font-extrabold tracking-wider text-slate-400 uppercase">
-                  Staff ID Card
-                </span>
-              </div>
-
-              <div className="flex-1 flex gap-4 items-center py-2.5">
-                <div className="size-20 rounded-xl bg-slate-100 border overflow-hidden flex items-center justify-center shrink-0 shadow-xs" style={{ borderColor: themeColor }}>
-                  <UserRound className="size-11 text-slate-400" />
-                </div>
-
-                <div className="flex-1 min-w-0 space-y-1.5">
-                  <div>
-                    <h4 className="font-extrabold text-slate-900 text-[13px] leading-tight truncate">
-                      {emp.name}
-                    </h4>
-                    {showDesignation && (
-                      <p className="text-[9.5px] font-bold uppercase tracking-wider" style={{ color: themeColor }}>
-                        {emp.title}
-                      </p>
-                    )}
+                  <div className="min-w-0 leading-tight">
+                    <span className="text-[14px] font-black tracking-tight text-slate-850 uppercase block">
+                      {companyName}
+                    </span>
+                    <span className="text-[6.5px] font-bold text-slate-400 tracking-wider uppercase block mt-0.5">
+                      Excellence | Intelligence | Automation
+                    </span>
                   </div>
+                </div>
+              );
 
-                  <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[8.5px] bg-slate-50/70 p-2 rounded-lg border border-slate-100/50">
-                    <div>
-                      <span className="text-slate-400 font-semibold block uppercase text-[6.5px] leading-none mb-0.5">Emp ID</span>
+            case "photo":
+              return (
+                <div key="photo" className="relative z-10 flex justify-center py-2 shrink-0">
+                  {/* Circular profile with double border and drop shadow */}
+                  <div className="relative">
+                    <div 
+                      className="size-34 rounded-full bg-slate-100 border-[3px] overflow-hidden flex items-center justify-center shadow-lg relative z-10"
+                      style={{ borderColor: themeColor }}
+                    >
+                      <UserRound className="size-18 text-slate-300" />
+                    </div>
+                    {/* Inner ring gap */}
+                    <div className="absolute -inset-[3px] rounded-full border border-white/85 z-20 pointer-events-none" />
+                    {/* Outer thin ring */}
+                    <div className="absolute -inset-[5px] rounded-full border border-slate-200/60 z-0 pointer-events-none" />
+                  </div>
+                </div>
+              );
+
+            case "identity":
+              return (
+                <div key="identity" className="relative z-10 px-5 text-center shrink-0">
+                  <h4 className="font-extrabold text-slate-850 text-[17px] tracking-tight leading-tight uppercase">
+                    {emp.name}
+                  </h4>
+                  {showDesignation && (
+                    <p className="text-[9.5px] font-bold text-slate-400 mt-1.5 uppercase tracking-widest leading-none">
+                      {emp.title}
+                    </p>
+                  )}
+                </div>
+              );
+
+            case "details":
+              if (!showDepartment && !showJoinDate && !showBloodGroup) return null;
+              return (
+                <div key="details" className="relative z-10 px-5 shrink-0">
+                  <div className="bg-slate-50/70 border border-slate-200/50 rounded-xl p-3.5 space-y-2 text-[9.5px] font-medium shadow-3xs">
+                    <div className="flex justify-between items-center pb-1 border-b border-slate-100/50">
+                      <span className="text-slate-450 font-bold uppercase tracking-wide flex items-center gap-1.5">
+                        <svg className="size-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="9" cy="10" r="2" /><path d="M15 8h2M15 12h2M15 16h2" /></svg>
+                        Emp ID
+                      </span>
                       <span className="font-bold text-slate-800">{emp.id}</span>
                     </div>
                     {showDepartment && (
-                      <div className="truncate">
-                        <span className="text-slate-400 font-semibold block uppercase text-[6.5px] leading-none mb-0.5">Dept</span>
-                        <span className="font-bold text-slate-800 truncate block">{emp.dept}</span>
+                      <div className="flex justify-between items-center pb-1 border-b border-slate-100/50">
+                        <span className="text-slate-450 font-bold uppercase tracking-wide flex items-center gap-1.5">
+                          <svg className="size-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 21h18M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16M9 9h6M9 13h6M9 17h6" /></svg>
+                          Dept
+                        </span>
+                        <span className="font-bold text-slate-800 truncate max-w-[125px]">{emp.dept}</span>
                       </div>
                     )}
                     {showJoinDate && (
-                      <div>
-                        <span className="text-slate-400 font-semibold block uppercase text-[6.5px] leading-none mb-0.5">Join Date</span>
+                      <div className="flex justify-between items-center pb-1 border-b border-slate-100/50">
+                        <span className="text-slate-450 font-bold uppercase tracking-wide flex items-center gap-1.5">
+                          <svg className="size-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                          Join Date
+                        </span>
                         <span className="font-bold text-slate-800">{emp.joinDate}</span>
                       </div>
                     )}
                     {showBloodGroup && (
-                      <div>
-                        <span className="text-slate-400 font-semibold block uppercase text-[6.5px] leading-none mb-0.5">Blood</span>
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-450 font-bold uppercase tracking-wide flex items-center gap-1.5">
+                          <svg className="size-3 text-red-500/80" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
+                          Blood
+                        </span>
                         <span className="font-extrabold text-red-600">{emp.blood || "—"}</span>
                       </div>
                     )}
                   </div>
                 </div>
-              </div>
+              );
 
-              <div className="flex justify-between items-end border-t border-slate-100 pt-2">
-                <span className="text-[6.5px] font-extrabold tracking-widest text-slate-400 uppercase">
-                  SECURE ID
-                </span>
-                <div className="flex items-center gap-2">
-                  {signatureUrl && (
-                    <img src={signatureUrl} alt="Signature" className="h-5.5 w-14 object-contain mix-blend-multiply" />
-                  )}
-                  <span className="text-[7px] text-slate-500 font-bold border-l border-slate-300 pl-2 py-0.5">
-                    Authorized Sign
-                  </span>
+            case "footer":
+              return (
+                <div key="footer" className="relative z-10 shrink-0">
+                  {/* Solid colored thin website footer bar */}
+                  <div 
+                    className="w-full py-2.5 text-center text-[9px] font-extrabold text-white tracking-widest uppercase flex items-center justify-center gap-1.5"
+                    style={{ backgroundColor: themeColor }}
+                  >
+                    <svg className="size-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                      <path d="M2 12h20" />
+                    </svg>
+                    www.pakizasoftware.com
+                  </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        )}
+              );
+
+            default:
+              return null;
+          }
+        })}
       </div>
     );
   };
 
-  // Render Back Side of ID Card
-  const renderCardBack = (emp: typeof employeesData[0], sizeStyle = {}) => {
+  // Render Front Side of ID Card (Horizontal)
+  const renderHorizontalFront = (emp: typeof employeesData[0]) => {
     return (
       <div 
-        className="relative bg-white text-slate-900 overflow-hidden flex flex-col justify-between select-none"
-        style={{
-          width: orientation === "vertical" ? "100%" : "100%",
-          height: orientation === "vertical" ? "100%" : "100%",
-          ...sizeStyle
-        }}
+        className="size-full flex justify-between relative bg-gradient-to-r from-white via-slate-50/30 to-slate-50/50 p-5"
+        style={{ fontFamily: "'Inter', sans-serif" }}
       >
-        {orientation === "vertical" ? (
-          <>
-            <div className="h-3 w-full" style={{ backgroundColor: themeColor }} />
+        {/* Outer Border */}
+        <div className="absolute inset-0 border-[1.5px] rounded-2xl pointer-events-none z-40" style={{ borderColor: themeColor }} />
 
-            <div className="flex-1 flex flex-col justify-between p-5 text-center">
-              
-              <div className="flex flex-col items-center gap-1 pt-1">
-                {logoUrl && (
-                  <img src={logoUrl} alt="Logo" className="size-8 object-contain opacity-75 grayscale" />
-                )}
-                <span className="text-[10px] font-black text-slate-700 tracking-wider uppercase">
-                  {companyName}
-                </span>
-              </div>
-
-              <div className="text-[8.5px] font-bold text-slate-500 leading-relaxed px-1 my-3 text-center whitespace-pre-line">
-                {backText}
-              </div>
-
-              <div className="border-t border-slate-150 pt-2 pb-1 text-[8px] font-bold text-slate-400">
-                EMERGENCY CONTACT: <span className="text-slate-800 font-black">+8801750021154</span>
-              </div>
-
-              {showBarcode && (
-                <div className="pb-1 flex justify-center">
-                  {renderBarcode(emp.id)}
-                </div>
-              )}
+        {/* Left Side: Photo and Footer info */}
+        <div className="w-1/3 flex flex-col justify-between items-center z-10 h-full py-1">
+          <div className="relative">
+            <div 
+              className="size-24 rounded-full bg-slate-100 border-[2.5px] overflow-hidden flex items-center justify-center shadow-md relative z-10"
+              style={{ borderColor: themeColor }}
+            >
+              <UserRound className="size-13 text-slate-300" />
             </div>
+            <div className="absolute -inset-[2.5px] rounded-full border border-white/90 z-20 pointer-events-none" />
+          </div>
+          
+          <div className="text-[8.5px] font-bold text-slate-800 tracking-wider mt-2 flex items-center gap-1">
+            <svg className="size-2.5 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /><path d="M2 12h20" />
+            </svg>
+            www.pakizasoftware.com
+          </div>
+        </div>
 
-            <div className="h-1.5 w-full bg-slate-100" />
-          </>
-        ) : (
-          /* Horizontal Back */
-          <div className="flex size-full flex-col justify-between p-4">
-            <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-              <span className="text-[9px] font-black text-slate-700 tracking-wider uppercase flex items-center gap-1.5">
-                {logoUrl && (
-                  <img src={logoUrl} alt="Logo" className="size-5 object-contain grayscale" />
-                )}
+        {/* Right Side: Header, Identity, and Details */}
+        <div className="w-2/3 pl-4 flex flex-col justify-between z-10 h-full py-1">
+          {/* Logo Header */}
+          <div className="flex items-center gap-2">
+            {logoUrl && (
+              <img src={logoUrl} alt="Logo" className="h-8 w-10 object-contain" />
+            )}
+            <div className="min-w-0 leading-tight">
+              <span className="text-[11.5px] font-black text-slate-850 uppercase block">
                 {companyName}
               </span>
-              <span className="text-[8px] font-bold text-slate-400">
-                Emergency: +8801750021154
+              <span className="text-[5.5px] font-bold text-slate-400 tracking-wider uppercase block mt-0.5">
+                Excellence | Intelligence | Automation
               </span>
             </div>
-
-            <div className="flex-1 flex gap-4 items-center py-2.5">
-              <div className="flex-1 text-[8px] font-bold text-slate-500 leading-relaxed whitespace-pre-line text-left">
-                {backText}
-              </div>
-
-              {showBarcode && (
-                <div className="shrink-0 scale-90 origin-right border-l border-slate-100 pl-3">
-                  {renderBarcode(emp.id)}
-                </div>
-              )}
-            </div>
-
-            <div className="h-2 w-full rounded-full" style={{ backgroundColor: themeColor }} />
           </div>
-        )}
+
+          {/* Identity */}
+          <div className="my-1.5">
+            <h4 className="font-extrabold text-slate-900 text-[14.5px] leading-tight truncate uppercase">
+              {emp.name}
+            </h4>
+            {showDesignation && (
+              <p className="text-[8.5px] font-bold uppercase tracking-wider mt-0.5" style={{ color: themeColor }}>
+                {emp.title}
+              </p>
+            )}
+          </div>
+
+          {/* Details */}
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[8.5px] bg-slate-50/75 p-2.5 rounded-xl border border-slate-150/50 shadow-3xs">
+            <div>
+              <span className="text-slate-400 font-bold block uppercase text-[6.5px]">Emp ID</span>
+              <span className="font-bold text-slate-800">{emp.id}</span>
+            </div>
+            {showDepartment && (
+              <div className="truncate">
+                <span className="text-slate-400 font-bold block uppercase text-[6.5px]">Dept</span>
+                <span className="font-bold text-slate-800 truncate block">{emp.dept}</span>
+              </div>
+            )}
+            {showJoinDate && (
+              <div>
+                <span className="text-slate-400 font-bold block uppercase text-[6.5px]">Join Date</span>
+                <span className="font-bold text-slate-800">{emp.joinDate}</span>
+              </div>
+            )}
+            {showBloodGroup && (
+              <div>
+                <span className="text-slate-400 font-bold block uppercase text-[6.5px]">Blood</span>
+                <span className="font-extrabold text-red-600">{emp.blood || "—"}</span>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     );
+  };
+
+  // Render Back Side of ID Card (Vertical)
+  const renderVerticalBack = (emp: typeof employeesData[0]) => {
+    return (
+      <div 
+        className="size-full flex flex-col justify-between relative bg-gradient-to-b from-white via-slate-50/40 to-slate-50/70"
+        style={{ fontFamily: "'Inter', sans-serif" }}
+      >
+        {/* Outer Accent Border */}
+        <div className="absolute inset-0 border-[1.5px] rounded-2xl pointer-events-none z-45" style={{ borderColor: themeColor }} />
+
+        {/* Subtle background graphic */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-0 overflow-hidden">
+          <svg width="100%" height="100%" viewBox="0 0 100 100">
+            <line x1="0" y1="30" x2="100" y2="30" stroke="black" strokeWidth="1" />
+            <line x1="0" y1="70" x2="100" y2="70" stroke="black" strokeWidth="1" />
+            <line x1="30" y1="0" x2="30" y2="100" stroke="black" strokeWidth="1" />
+            <line x1="70" y1="0" x2="70" y2="100" stroke="black" strokeWidth="1" />
+          </svg>
+        </div>
+
+        {/* Top Header Block */}
+        <div className="pt-5.5 px-5 shrink-0 z-10">
+          <div 
+            className="w-full py-1.5 rounded-lg text-center font-extrabold text-white text-[11.5px] uppercase tracking-[0.2em] shadow-xs"
+            style={{ backgroundColor: themeColor }}
+          >
+            IDENTITY CARD
+          </div>
+        </div>
+
+        {/* Middle Two-Column Grid */}
+        <div className="flex-1 px-5 py-3 flex items-center justify-between gap-4 z-10">
+          
+          {/* Left Column: QR Code + Details */}
+          <div className="w-[45%] space-y-3.5 flex flex-col justify-center">
+            {/* Real SVG QR code placeholder */}
+            <div className="size-16 bg-white border border-slate-200/80 p-1.5 rounded-xl flex items-center justify-center self-center shadow-3xs">
+              <svg viewBox="0 0 100 100" className="size-full">
+                <path d="M0,0 h30 v30 h-30 z M10,10 h10 v10 h-10 z" fill="black" />
+                <path d="M70,0 h30 v30 h-30 z M80,10 h10 v10 h-10 z" fill="black" />
+                <path d="M0,70 h30 v30 h-30 z M10,80 h10 v10 h-10 z" fill="black" />
+                <rect x="40" y="0" width="10" height="10" fill="black" />
+                <rect x="50" y="20" width="10" height="10" fill="black" />
+                <rect x="40" y="40" width="20" height="20" fill="black" />
+                <rect x="10" y="40" width="10" height="20" fill="black" />
+                <rect x="70" y="50" width="20" height="10" fill="black" />
+                <rect x="90" y="80" width="10" height="10" fill="black" />
+                <rect x="50" y="80" width="20" height="10" fill="black" />
+                <rect x="80" y="90" width="10" height="10" fill="black" />
+              </svg>
+            </div>
+
+            {/* Left Details */}
+            <div className="space-y-2 text-[9.5px]">
+              <div>
+                <span className="text-slate-400 font-bold block text-[7px] uppercase tracking-wider">D O B</span>
+                <span className="font-bold text-slate-800">{emp.dob || "22/12/1999"}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 font-bold block text-[7px] uppercase tracking-wider">Gender</span>
+                <span className="font-bold text-slate-800">{emp.gender || "Male"}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 font-bold block text-[7px] uppercase tracking-wider">Joining Date</span>
+                <span className="font-bold text-slate-800">{emp.joinDate}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Center Divider Line */}
+          <div className="w-[1.5px] bg-slate-200 self-stretch my-1.5" />
+
+          {/* Right Column: Decorative Graphic + Details */}
+          <div className="w-[45%] space-y-3.5 flex flex-col justify-center relative">
+            {/* Network background graphic on the right */}
+            <div className="absolute right-0 top-0 size-20 opacity-[0.04] pointer-events-none">
+              <svg width="100%" height="100%" viewBox="0 0 100 100">
+                <line x1="10" y1="10" x2="60" y2="40" stroke="black" strokeWidth="2" />
+                <line x1="60" y1="40" x2="80" y2="80" stroke="black" strokeWidth="2" />
+                <line x1="10" y1="10" x2="80" y2="80" stroke="black" strokeWidth="2" />
+                <circle cx="10" cy="10" r="5" fill="black" />
+                <circle cx="60" cy="40" r="8" fill="black" />
+                <circle cx="80" cy="80" r="6" fill="black" />
+              </svg>
+            </div>
+
+            {/* Right Details */}
+            <div className="space-y-2 text-[9.5px] pl-2.5 z-10">
+              <div>
+                <span className="text-slate-400 font-bold block text-[7px] uppercase tracking-wider">Employee No.</span>
+                <span className="font-extrabold text-slate-800">{emp.id}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 font-bold block text-[7px] uppercase tracking-wider">Blood Group</span>
+                <span className="font-extrabold text-red-600">{emp.blood || "—"}</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Signature Block */}
+        <div className="px-5 text-center shrink-0 z-10 flex flex-col items-center">
+          {signatureUrl && (
+            <img src={signatureUrl} alt="Signature" className="h-6.5 w-18 object-contain mix-blend-multiply" />
+          )}
+          <span className="text-[7.5px] text-slate-400 font-bold tracking-wider mt-1 block">
+            Authorized Signature
+          </span>
+        </div>
+
+        {/* Company Address Details */}
+        <div className="px-5 pt-3 pb-2 text-center shrink-0 z-10 border-t border-slate-100">
+          <span className="text-[10px] font-extrabold text-slate-800 uppercase tracking-wider block">
+            {companyName} LIMITED
+          </span>
+          <span className="text-[6.5px] font-bold text-slate-400 leading-normal block mt-0.5 max-w-[200px] mx-auto">
+            H# 97, R# 11/A, Dhanmondi, Dhaka-1209, Bangladesh.
+          </span>
+          
+          {/* Contact Row with clean SVGs */}
+          <div className="flex justify-center items-center gap-3 text-[6.5px] text-slate-500 font-bold mt-1.5">
+            <span className="flex items-center gap-1">
+              <svg className="size-2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
+              +8809612 811 111
+            </span>
+            <span className="flex items-center gap-1">
+              <svg className="size-2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><rect x="3" y="4" width="18" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
+              info@pakizasoftware.com
+            </span>
+          </div>
+        </div>
+
+        {/* Solid Colored Footer Notice */}
+        <div 
+          className="w-full py-2 text-center text-[7.5px] font-black text-white uppercase tracking-[0.1em] shrink-0"
+          style={{ backgroundColor: themeColor }}
+        >
+          If found unattended, please return to below address
+        </div>
+      </div>
+    );
+  };
+
+  // Render Back Side of ID Card (Horizontal)
+  const renderHorizontalBack = (emp: typeof employeesData[0]) => {
+    return (
+      <div 
+        className="size-full flex flex-col justify-between relative bg-white p-4"
+        style={{ fontFamily: "'Inter', sans-serif" }}
+      >
+        {/* Outer Border */}
+        <div className="absolute inset-0 border-[1.5px] rounded-2xl pointer-events-none z-40" style={{ borderColor: themeColor }} />
+
+        {/* Top bar */}
+        <div className="flex justify-between items-center pb-2 border-b border-slate-100 z-10">
+          <span className="text-[9px] font-black text-slate-850 tracking-wider uppercase flex items-center gap-1.5">
+            {logoUrl && (
+              <img src={logoUrl} alt="Logo" className="h-5 w-6 object-contain grayscale" />
+            )}
+            {companyName}
+          </span>
+          <div 
+            className="px-2.5 py-0.5 rounded-md text-white text-[7.5px] font-extrabold uppercase tracking-wider"
+            style={{ backgroundColor: themeColor }}
+          >
+            IDENTITY CARD
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 flex gap-4 items-center py-2.5 z-10">
+          {/* QR Code */}
+          <div className="size-14 bg-white border border-slate-200 p-1 rounded-lg flex items-center justify-center shrink-0 shadow-3xs">
+            <svg viewBox="0 0 100 100" className="size-full">
+              <path d="M0,0 h30 v30 h-30 z M10,10 h10 v10 h-10 z" fill="black" />
+              <path d="M70,0 h30 v30 h-30 z M80,10 h10 v10 h-10 z" fill="black" />
+              <path d="M0,70 h30 v30 h-30 z M10,80 h10 v10 h-10 z" fill="black" />
+              <rect x="40" y="0" width="10" height="10" fill="black" />
+              <rect x="50" y="20" width="10" height="10" fill="black" />
+              <rect x="40" y="40" width="20" height="20" fill="black" />
+              <rect x="10" y="40" width="10" height="20" fill="black" />
+              <rect x="70" y="50" width="20" height="10" fill="black" />
+              <rect x="90" y="80" width="10" height="10" fill="black" />
+              <rect x="50" y="80" width="20" height="10" fill="black" />
+            </svg>
+          </div>
+
+          {/* Details Grid */}
+          <div className="flex-1 grid grid-cols-2 gap-x-2 gap-y-1 text-[8.5px] leading-tight">
+            <div>
+              <span className="text-slate-400 font-bold block text-[6px] uppercase">Employee No</span>
+              <span className="font-bold text-slate-800">{emp.id}</span>
+            </div>
+            <div>
+              <span className="text-slate-400 font-bold block text-[6px] uppercase">Blood Group</span>
+              <span className="font-extrabold text-red-600">{emp.blood || "—"}</span>
+            </div>
+            <div>
+              <span className="text-slate-400 font-bold block text-[6px] uppercase">D O B</span>
+              <span className="font-bold text-slate-800">{emp.dob || "22/12/1999"}</span>
+            </div>
+            <div>
+              <span className="text-slate-400 font-bold block text-[6px] uppercase">Joining Date</span>
+              <span className="font-bold text-slate-800">{emp.joinDate}</span>
+            </div>
+          </div>
+
+          {/* Signature */}
+          <div className="shrink-0 flex flex-col items-center justify-center pl-2.5 border-l border-slate-100">
+            {signatureUrl && (
+              <img src={signatureUrl} alt="Signature" className="h-5.5 w-12 object-contain mix-blend-multiply" />
+            )}
+            <span className="text-[6.5px] text-slate-400 font-bold tracking-wide mt-0.5">
+              Authorized Sign
+            </span>
+          </div>
+        </div>
+
+        {/* Bottom Address / Website */}
+        <div className="flex justify-between items-center border-t border-slate-100 pt-2 z-10 text-[7px] text-slate-400 font-semibold">
+          <span>H# 97, R# 11/A, Dhanmondi, Dhaka.</span>
+          <span className="text-[7.5px] font-extrabold text-slate-700">info@pakizasoftware.com</span>
+        </div>
+      </div>
+    );
+  };
+
+  const renderCardFront = (emp: typeof employeesData[0], sizeStyle = {}) => {
+    if (orientation === "vertical") {
+      return renderVerticalFront(emp);
+    } else {
+      return renderHorizontalFront(emp);
+    }
+  };
+
+  const renderCardBack = (emp: typeof employeesData[0], sizeStyle = {}) => {
+    if (orientation === "vertical") {
+      return renderVerticalBack(emp);
+    } else {
+      return renderHorizontalBack(emp);
+    }
   };
 
   return (
@@ -743,7 +1046,7 @@ function IDCardSetupPage() {
 
                     {savedTemplates.length === 0 && (
                       <div className="md:col-span-2 text-center p-3 rounded-xl border border-dashed border-border/40 text-xs text-muted-foreground font-medium">
-                        No custom templates saved. Configure a style and click "Save Design" to store it.
+                        No custom templates saved. Configure a style and click "Create Template" to store it.
                       </div>
                     )}
                   </div>
@@ -788,6 +1091,70 @@ function IDCardSetupPage() {
                       </div>
                     </div>
                   )}
+                </div>
+
+                {/* Drag and Drop Layout Manager */}
+                <div className="p-5 rounded-2xl bg-card border border-border/40 space-y-4 shadow-sm">
+                  <div className="flex items-center justify-between pb-3 border-b border-border/20">
+                    <div className="flex items-center gap-2.5">
+                      <GripVertical className="size-4.5 text-primary" />
+                      <h3 className="text-sm font-bold text-foreground">Card Elements Layout (Drag & Drop)</h3>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-muted-foreground font-medium">
+                    Drag and drop items to rearrange their vertical order on the front side of the ID card, or use the up/down arrows.
+                  </p>
+
+                  <div className="space-y-2">
+                    {elementOrder.map((elementId, index) => {
+                      const labelMap: Record<string, string> = {
+                        header: "Header (Logo & Tagline)",
+                        photo: "Employee Photo",
+                        identity: "Identity (Name & Designation)",
+                        details: "Details Block (ID, Dept, Blood, Join Date)",
+                        footer: "Footer (Website Link)"
+                      };
+
+                      return (
+                        <div
+                          key={elementId}
+                          draggable
+                          onDragStart={() => handleDragStart(index)}
+                          onDragEnter={() => handleDragEnter(index)}
+                          onDragEnd={handleDragEnd}
+                          onDragOver={(e) => e.preventDefault()}
+                          className="flex items-center justify-between p-3.5 rounded-xl border border-border/40 bg-muted/20 hover:bg-muted/40 transition duration-150 cursor-grab active:cursor-grabbing group select-none"
+                        >
+                          <div className="flex items-center gap-3">
+                            <GripVertical className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                            <span className="text-xs font-bold text-foreground">{labelMap[elementId]}</span>
+                          </div>
+
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              disabled={index === 0}
+                              onClick={() => moveElement(index, "up")}
+                              className="p-1.5 rounded-lg border border-border/20 hover:bg-card text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition cursor-pointer"
+                              title="Move Up"
+                            >
+                              <ArrowUp className="size-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              disabled={index === elementOrder.length - 1}
+                              onClick={() => moveElement(index, "down")}
+                              className="p-1.5 rounded-lg border border-border/20 hover:bg-card text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition cursor-pointer"
+                              title="Move Down"
+                            >
+                              <ArrowDown className="size-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 {/* Step 2: Branding & Color Theme */}
@@ -1046,7 +1413,7 @@ function IDCardSetupPage() {
 
                   {/* 3D Card Scene */}
                   <div 
-                    className="relative select-none"
+                    className="relative select-none animate-in fade-in zoom-in-95 duration-200"
                     style={{
                       perspective: "1200px",
                       width: orientation === "vertical" ? "280px" : "420px",
@@ -1261,11 +1628,11 @@ function IDCardSetupPage() {
                           <input
                             type="checkbox"
                             checked={isSelected}
-                            onChange={() => {}} // handled by row click
+                            onChange={() => {}} 
                             className="rounded border-border text-primary focus:ring-primary/25 size-4"
                           />
                           
-                          <div className="size-8 rounded-lg bg-slate-800/20 border flex items-center justify-center shrink-0">
+                          <div className="size-8 rounded-lg bg-slate-850/10 border flex items-center justify-center shrink-0">
                             <UserRound className="size-4.5 text-muted-foreground" />
                           </div>
 
@@ -1419,7 +1786,6 @@ function IDCardSetupPage() {
               print-color-adjust: exact !important;
             }
             
-            /* Grid layout for printing multiple cards on A4 */
             .print-grid-container {
               display: grid !important;
               grid-template-columns: repeat(2, 1fr) !important;
