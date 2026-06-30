@@ -3,16 +3,38 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  ChevronRight, Sparkles, User, DollarSign, TrendingUp, Award, Clock,
-  Layers, Users, Sliders, CheckCircle2, ChevronDown, ListFilter, AlertCircle, Send, X,
-  FileSpreadsheet, Printer, FileDown, Search, ArrowUpRight
+  ChevronRight,
+  Sparkles,
+  User,
+  DollarSign,
+  TrendingUp,
+  Award,
+  Clock,
+  Layers,
+  Users,
+  Sliders,
+  CheckCircle2,
+  ChevronDown,
+  ListFilter,
+  AlertCircle,
+  Send,
+  X,
+  FileSpreadsheet,
+  Printer,
+  FileDown,
+  Search,
+  ArrowUpRight,
 } from "lucide-react";
 
 export const Route = createFileRoute("/increment")({
   head: () => ({
     meta: [
       { title: "Salary Increment Configurator — CRIPTON" },
-      { name: "description", content: "Consolidated enterprise configurator for salary scale adjustments, bulk processes, and single increment workflow proposals." },
+      {
+        name: "description",
+        content:
+          "Consolidated enterprise configurator for salary scale adjustments, bulk processes, and single increment workflow proposals.",
+      },
     ],
   }),
   component: IncrementConfiguratorPage,
@@ -50,12 +72,48 @@ interface GadgetEmployee {
 }
 
 const mockEmployees: SimpleEmployee[] = [
-  { id: "2022035599", name: "Tahmid Afsar Shapno", designation: "HR Director", department: "Core Development (HR)", currentSalary: 201600 },
-  { id: "2021032646", name: "Sadiqul Islam", designation: "Deputy Manager", department: "Core Sales", currentSalary: 104500 },
-  { id: "2023051028", name: "Dipon Saha", designation: "Manager", department: "Core Development (HR)", currentSalary: 129600 },
-  { id: "2022091485", name: "Tanzila Rahman", designation: "Senior Software Engineer", department: "Tech Core", currentSalary: 126500 },
-  { id: "2024018847", name: "Fahim Ahmed", designation: "UI/UX Designer", department: "Creative Design", currentSalary: 71500 },
-  { id: "2022119932", name: "Nabil Chowdhury", designation: "Sales Lead", department: "Core Sales", currentSalary: 90950 }
+  {
+    id: "2022035599",
+    name: "Tahmid Afsar Shapno",
+    designation: "HR Director",
+    department: "Core Development (HR)",
+    currentSalary: 201600,
+  },
+  {
+    id: "2021032646",
+    name: "Sadiqul Islam",
+    designation: "Deputy Manager",
+    department: "Core Sales",
+    currentSalary: 104500,
+  },
+  {
+    id: "2023051028",
+    name: "Dipon Saha",
+    designation: "Manager",
+    department: "Core Development (HR)",
+    currentSalary: 129600,
+  },
+  {
+    id: "2022091485",
+    name: "Tanzila Rahman",
+    designation: "Senior Software Engineer",
+    department: "Tech Core",
+    currentSalary: 126500,
+  },
+  {
+    id: "2024018847",
+    name: "Fahim Ahmed",
+    designation: "UI/UX Designer",
+    department: "Creative Design",
+    currentSalary: 71500,
+  },
+  {
+    id: "2022119932",
+    name: "Nabil Chowdhury",
+    designation: "Sales Lead",
+    department: "Core Sales",
+    currentSalary: 90950,
+  },
 ];
 
 const initialGadgetEmployees: GadgetEmployee[] = [
@@ -73,13 +131,13 @@ const initialGadgetEmployees: GadgetEmployee[] = [
     grade: "None",
     newGrade: "None",
     unit: "PSL",
-    oldBasic: 18900.00,
-    newBasic: 18900.00,
-    basicDiff: 0.00,
-    oldGross: 31500.00,
-    newGross: 31500.00,
-    grossDiff: 0.00,
-    incrementGross: 0
+    oldBasic: 18900.0,
+    newBasic: 18900.0,
+    basicDiff: 0.0,
+    oldGross: 31500.0,
+    newGross: 31500.0,
+    grossDiff: 0.0,
+    incrementGross: 0,
   },
   {
     id: "2021032646",
@@ -95,13 +153,13 @@ const initialGadgetEmployees: GadgetEmployee[] = [
     grade: "None",
     newGrade: "None",
     unit: "PSL",
-    oldBasic: 35400.00,
-    newBasic: 35400.00,
-    basicDiff: 0.00,
-    oldGross: 59000.00,
-    newGross: 59000.00,
-    grossDiff: 0.00,
-    incrementGross: 0
+    oldBasic: 35400.0,
+    newBasic: 35400.0,
+    basicDiff: 0.0,
+    oldGross: 59000.0,
+    newGross: 59000.0,
+    grossDiff: 0.0,
+    incrementGross: 0,
   },
   {
     id: "2022035599",
@@ -117,13 +175,13 @@ const initialGadgetEmployees: GadgetEmployee[] = [
     grade: "None",
     newGrade: "None",
     unit: "PSL",
-    oldBasic: 40200.00,
-    newBasic: 40200.00,
-    basicDiff: 0.00,
-    oldGross: 67000.00,
-    newGross: 67000.00,
-    grossDiff: 0.00,
-    incrementGross: 0
+    oldBasic: 40200.0,
+    newBasic: 40200.0,
+    basicDiff: 0.0,
+    oldGross: 67000.0,
+    newGross: 67000.0,
+    grossDiff: 0.0,
+    incrementGross: 0,
   },
   {
     id: "2022041203",
@@ -139,13 +197,13 @@ const initialGadgetEmployees: GadgetEmployee[] = [
     grade: "None",
     newGrade: "None",
     unit: "PSL",
-    oldBasic: 27900.00,
-    newBasic: 27900.00,
-    basicDiff: 0.00,
-    oldGross: 46500.00,
-    newGross: 46500.00,
-    grossDiff: 0.00,
-    incrementGross: 0
+    oldBasic: 27900.0,
+    newBasic: 27900.0,
+    basicDiff: 0.0,
+    oldGross: 46500.0,
+    newGross: 46500.0,
+    grossDiff: 0.0,
+    incrementGross: 0,
   },
   {
     id: "2023043021",
@@ -161,13 +219,13 @@ const initialGadgetEmployees: GadgetEmployee[] = [
     grade: "None",
     newGrade: "None",
     unit: "PSL",
-    oldBasic: 11400.00,
-    newBasic: 11400.00,
-    basicDiff: 0.00,
-    oldGross: 19000.00,
-    newGross: 19000.00,
-    grossDiff: 0.00,
-    incrementGross: 0
+    oldBasic: 11400.0,
+    newBasic: 11400.0,
+    basicDiff: 0.0,
+    oldGross: 19000.0,
+    newGross: 19000.0,
+    grossDiff: 0.0,
+    incrementGross: 0,
   },
   {
     id: "2023043909",
@@ -183,13 +241,13 @@ const initialGadgetEmployees: GadgetEmployee[] = [
     grade: "None",
     newGrade: "None",
     unit: "PSL",
-    oldBasic: 43800.00,
-    newBasic: 43800.00,
-    basicDiff: 0.00,
-    oldGross: 73000.00,
-    newGross: 73000.00,
-    grossDiff: 0.00,
-    incrementGross: 0
+    oldBasic: 43800.0,
+    newBasic: 43800.0,
+    basicDiff: 0.0,
+    oldGross: 73000.0,
+    newGross: 73000.0,
+    grossDiff: 0.0,
+    incrementGross: 0,
   },
   {
     id: "2023043910",
@@ -205,14 +263,14 @@ const initialGadgetEmployees: GadgetEmployee[] = [
     grade: "None",
     newGrade: "None",
     unit: "PSL",
-    oldBasic: 31200.00,
-    newBasic: 31200.00,
-    basicDiff: 0.00,
-    oldGross: 52000.00,
-    newGross: 52000.00,
-    grossDiff: 0.00,
-    incrementGross: 0
-  }
+    oldBasic: 31200.0,
+    newBasic: 31200.0,
+    basicDiff: 0.0,
+    oldGross: 52000.0,
+    newGross: 52000.0,
+    grossDiff: 0.0,
+    incrementGross: 0,
+  },
 ];
 
 function IncrementConfiguratorPage() {
@@ -239,7 +297,7 @@ function IncrementConfiguratorPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const activeEmp = useMemo(() => {
-    return mockEmployees.find(e => e.id === selectedEmpId) || mockEmployees[0];
+    return mockEmployees.find((e) => e.id === selectedEmpId) || mockEmployees[0];
   }, [selectedEmpId]);
 
   // Load pre-selected employee from local storage if redirected from Increment Process
@@ -275,7 +333,9 @@ function IncrementConfiguratorPage() {
     setIsSubmitting(true);
     setTimeout(() => {
       setIsSubmitting(false);
-      showToast(`Increment proposal of ৳${amount.toLocaleString()} submitted successfully for ${activeEmp.name}!`);
+      showToast(
+        `Increment proposal of ৳${amount.toLocaleString()} submitted successfully for ${activeEmp.name}!`,
+      );
 
       // Save proposed item directly to queue local storage
       const newRec = {
@@ -295,13 +355,12 @@ function IncrementConfiguratorPage() {
         month: "Dec",
         status: "Working",
         approved: false,
-        hrEndorsed: false
+        hrEndorsed: false,
       };
       const existing = localStorage.getItem("custom_increment_queue_records");
       const list = existing ? JSON.parse(existing) : [];
       list.unshift(newRec);
       localStorage.setItem("custom_increment_queue_records", JSON.stringify(list));
-
     }, 1200);
   };
 
@@ -325,46 +384,54 @@ function IncrementConfiguratorPage() {
 
   // Dynamic calculations when Increment Gross changes
   const handleInlineIncrementChange = (id: string, val: number) => {
-    setGadgetEmployees(prev => prev.map(emp => {
-      if (emp.id === id) {
-        const newGross = emp.oldGross + val;
-        // Basic split computed based on scale param rule (default 60%)
-        const newBasic = Math.round((newGross * basicRatio) / 100);
-        return {
-          ...emp,
-          incrementGross: val,
-          newGross,
-          grossDiff: val,
-          newBasic,
-          basicDiff: newBasic - emp.oldBasic
-        };
-      }
-      return emp;
-    }));
+    setGadgetEmployees((prev) =>
+      prev.map((emp) => {
+        if (emp.id === id) {
+          const newGross = emp.oldGross + val;
+          // Basic split computed based on scale param rule (default 60%)
+          const newBasic = Math.round((newGross * basicRatio) / 100);
+          return {
+            ...emp,
+            incrementGross: val,
+            newGross,
+            grossDiff: val,
+            newBasic,
+            basicDiff: newBasic - emp.oldBasic,
+          };
+        }
+        return emp;
+      }),
+    );
   };
 
-  const handleInlineSelectChange = (id: string, field: "newType" | "newDesignation" | "newGrade", val: string) => {
-    setGadgetEmployees(prev => prev.map(emp => {
-      if (emp.id === id) {
-        return {
-          ...emp,
-          [field]: val
-        };
-      }
-      return emp;
-    }));
+  const handleInlineSelectChange = (
+    id: string,
+    field: "newType" | "newDesignation" | "newGrade",
+    val: string,
+  ) => {
+    setGadgetEmployees((prev) =>
+      prev.map((emp) => {
+        if (emp.id === id) {
+          return {
+            ...emp,
+            [field]: val,
+          };
+        }
+        return emp;
+      }),
+    );
   };
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
-      setSelectedIds(gadgetEmployees.map(emp => emp.id));
+      setSelectedIds(gadgetEmployees.map((emp) => emp.id));
     } else {
       setSelectedIds([]);
     }
   };
 
   const handleSelectRow = (id: string) => {
-    setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
   const handleBatchSubmit = (e: React.FormEvent) => {
@@ -374,13 +441,13 @@ function IncrementConfiguratorPage() {
       return;
     }
 
-    const processed = gadgetEmployees.filter(emp => selectedIds.includes(emp.id));
+    const processed = gadgetEmployees.filter((emp) => selectedIds.includes(emp.id));
 
     // Save to custom queue records in local storage
     const existing = localStorage.getItem("custom_increment_queue_records");
     const list = existing ? JSON.parse(existing) : [];
 
-    processed.forEach(emp => {
+    processed.forEach((emp) => {
       const newRec = {
         action: "edit",
         id: emp.id,
@@ -398,7 +465,7 @@ function IncrementConfiguratorPage() {
         month: gadgetMonth,
         status: emp.status,
         approved: false,
-        hrEndorsed: false
+        hrEndorsed: false,
       };
 
       // Prevent duplicates in queue
@@ -411,7 +478,9 @@ function IncrementConfiguratorPage() {
     });
 
     localStorage.setItem("custom_increment_queue_records", JSON.stringify(list));
-    showToast(`Batch processing submitted successfully for ${processed.length} employees to the Approvals Console!`);
+    showToast(
+      `Batch processing submitted successfully for ${processed.length} employees to the Approvals Console!`,
+    );
     setSelectedIds([]);
   };
 
@@ -427,12 +496,13 @@ function IncrementConfiguratorPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 lg:p-8 space-y-6">
-
           {/* Breadcrumb and Page Header */}
           <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-2.5" />
                 <span className="hover:text-primary transition-colors">Evaluation</span>
                 <ChevronRight className="size-2.5" />
@@ -440,18 +510,24 @@ function IncrementConfiguratorPage() {
               </div>
               <div className="flex items-center gap-3">
                 <div className="size-2.5 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]" />
-                <h1 className="text-xl font-extrabold tracking-tight text-foreground">Increment Configurator Workspace</h1>
+                <h1 className="text-xl font-extrabold tracking-tight text-foreground">
+                  Increment Configurator Workspace
+                </h1>
               </div>
             </div>
 
             {/* Quick stats indicators */}
             <div className="flex items-center gap-3 flex-wrap">
               <div className="bg-card border border-border/70 rounded-xl px-3.5 py-1.5 shadow-2xs">
-                <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80">Calculations</div>
+                <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80">
+                  Calculations
+                </div>
                 <div className="text-sm font-extrabold text-foreground mt-0.5">Automated</div>
               </div>
               <div className="bg-primary/10 border border-primary/20 rounded-xl px-3.5 py-1.5 shadow-2xs">
-                <div className="text-[9px] font-bold uppercase tracking-wider text-primary">System Base</div>
+                <div className="text-[9px] font-bold uppercase tracking-wider text-primary">
+                  System Base
+                </div>
                 <div className="text-sm font-extrabold text-primary mt-0.5">Gross Adjusted</div>
               </div>
             </div>
@@ -462,7 +538,10 @@ function IncrementConfiguratorPage() {
             <div className="fixed bottom-5 right-5 z-50 bg-[#1e293b] text-white border border-primary/30 rounded-xl px-4 py-3 shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div className="size-2 rounded-full bg-primary animate-ping" />
               <span className="text-xs font-semibold">{toastMessage}</span>
-              <button onClick={() => setToastMessage(null)} className="text-slate-400 hover:text-white transition">
+              <button
+                onClick={() => setToastMessage(null)}
+                className="text-slate-400 hover:text-white transition"
+              >
                 <X className="size-3.5" />
               </button>
             </div>
@@ -494,11 +573,9 @@ function IncrementConfiguratorPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-6">
-
             {/* TAB 1: INCREMENT GADGET BATCH PROCESSING */}
             {activeTab === "batch" && (
               <div className="space-y-6 animate-in fade-in duration-200">
-
                 {/* 11 Filters Configuration Grid (Matched Legacy Screenshot) */}
                 <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs relative overflow-hidden">
                   <div className="absolute top-0 inset-x-0 h-[2.5px] bg-gradient-to-r from-primary/10 via-primary/45 to-primary/10" />
@@ -509,16 +586,28 @@ function IncrementConfiguratorPage() {
 
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
                     <div className="space-y-1.5">
-                      <label className="text-[9px] font-black uppercase text-muted-foreground">Year (Gadget)</label>
-                      <select value={gadgetYear} onChange={(e) => setGadgetYear(e.target.value)} className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
+                      <label className="text-[9px] font-black uppercase text-muted-foreground">
+                        Year (Gadget)
+                      </label>
+                      <select
+                        value={gadgetYear}
+                        onChange={(e) => setGadgetYear(e.target.value)}
+                        className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold"
+                      >
                         <option value="2025">2025</option>
                         <option value="2026">2026</option>
                       </select>
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-[9px] font-black uppercase text-muted-foreground">Month (Gadget)</label>
-                      <select value={gadgetMonth} onChange={(e) => setGadgetMonth(e.target.value)} className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
+                      <label className="text-[9px] font-black uppercase text-muted-foreground">
+                        Month (Gadget)
+                      </label>
+                      <select
+                        value={gadgetMonth}
+                        onChange={(e) => setGadgetMonth(e.target.value)}
+                        className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold"
+                      >
                         <option value="Dec">Dec</option>
                         <option value="Jan">Jan</option>
                         <option value="May">May</option>
@@ -526,24 +615,42 @@ function IncrementConfiguratorPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-[9px] font-black uppercase text-muted-foreground">Gadget Mode</label>
-                      <select value={gadgetMode} onChange={(e) => setGadgetMode(e.target.value)} className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
+                      <label className="text-[9px] font-black uppercase text-muted-foreground">
+                        Gadget Mode
+                      </label>
+                      <select
+                        value={gadgetMode}
+                        onChange={(e) => setGadgetMode(e.target.value)}
+                        className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold"
+                      >
                         <option value="Regular">Regular</option>
                         <option value="Special">Special Mode</option>
                       </select>
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-[9px] font-black uppercase text-muted-foreground">Employee Type</label>
-                      <select value={gadgetEmpType} onChange={(e) => setGadgetEmpType(e.target.value)} className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
+                      <label className="text-[9px] font-black uppercase text-muted-foreground">
+                        Employee Type
+                      </label>
+                      <select
+                        value={gadgetEmpType}
+                        onChange={(e) => setGadgetEmpType(e.target.value)}
+                        className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold"
+                      >
                         <option value="Office Executive">Office Executive</option>
                         <option value="Factory worker">Factory staff</option>
                       </select>
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-[9px] font-black uppercase text-muted-foreground">Section</label>
-                      <select value={gadgetSection} onChange={(e) => setGadgetSection(e.target.value)} className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
+                      <label className="text-[9px] font-black uppercase text-muted-foreground">
+                        Section
+                      </label>
+                      <select
+                        value={gadgetSection}
+                        onChange={(e) => setGadgetSection(e.target.value)}
+                        className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold"
+                      >
                         <option value="ALL">ALL</option>
                         <option value="HR">HR Team</option>
                         <option value="Creative">Creative</option>
@@ -551,16 +658,28 @@ function IncrementConfiguratorPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-[9px] font-black uppercase text-muted-foreground">Unit</label>
-                      <select value={gadgetUnit} onChange={(e) => setGadgetUnit(e.target.value)} className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
+                      <label className="text-[9px] font-black uppercase text-muted-foreground">
+                        Unit
+                      </label>
+                      <select
+                        value={gadgetUnit}
+                        onChange={(e) => setGadgetUnit(e.target.value)}
+                        className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold"
+                      >
                         <option value="ALL">ALL</option>
                         <option value="PSL">PSL Unit</option>
                       </select>
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-[9px] font-black uppercase text-muted-foreground">Designation</label>
-                      <select value={gadgetDesignation} onChange={(e) => setGadgetDesignation(e.target.value)} className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
+                      <label className="text-[9px] font-black uppercase text-muted-foreground">
+                        Designation
+                      </label>
+                      <select
+                        value={gadgetDesignation}
+                        onChange={(e) => setGadgetDesignation(e.target.value)}
+                        className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold"
+                      >
                         <option value="ALL">ALL</option>
                         <option value="Manager">Manager</option>
                         <option value="Executive">Executive</option>
@@ -568,39 +687,68 @@ function IncrementConfiguratorPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-[9px] font-black uppercase text-muted-foreground">Grade</label>
-                      <select value={gadgetGrade} onChange={(e) => setGadgetGrade(e.target.value)} className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
+                      <label className="text-[9px] font-black uppercase text-muted-foreground">
+                        Grade
+                      </label>
+                      <select
+                        value={gadgetGrade}
+                        onChange={(e) => setGadgetGrade(e.target.value)}
+                        className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold"
+                      >
                         <option value="ALL">ALL</option>
                         <option value="None">None</option>
                       </select>
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-[9px] font-black uppercase text-muted-foreground">Status</label>
-                      <select value={gadgetStatus} onChange={(e) => setGadgetStatus(e.target.value)} className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
+                      <label className="text-[9px] font-black uppercase text-muted-foreground">
+                        Status
+                      </label>
+                      <select
+                        value={gadgetStatus}
+                        onChange={(e) => setGadgetStatus(e.target.value)}
+                        className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold"
+                      >
                         <option value="Working">Working</option>
                         <option value="Terminated">Terminated</option>
                       </select>
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-[9px] font-black uppercase text-muted-foreground">Joining Year</label>
-                      <select value={gadgetJoiningYear} onChange={(e) => setGadgetJoiningYear(e.target.value)} className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
+                      <label className="text-[9px] font-black uppercase text-muted-foreground">
+                        Joining Year
+                      </label>
+                      <select
+                        value={gadgetJoiningYear}
+                        onChange={(e) => setGadgetJoiningYear(e.target.value)}
+                        className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold"
+                      >
                         <option value="2023">2023</option>
                         <option value="2022">2022</option>
                       </select>
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-[9px] font-black uppercase text-muted-foreground">Joining Month</label>
-                      <select value={gadgetJoiningMonth} onChange={(e) => setGadgetJoiningMonth(e.target.value)} className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
+                      <label className="text-[9px] font-black uppercase text-muted-foreground">
+                        Joining Month
+                      </label>
+                      <select
+                        value={gadgetJoiningMonth}
+                        onChange={(e) => setGadgetJoiningMonth(e.target.value)}
+                        className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold"
+                      >
                         <option value="Dec">Dec</option>
                         <option value="Jan">Jan</option>
                       </select>
                     </div>
 
                     <div className="space-y-1.5 flex items-end">
-                      <button onClick={() => showToast("Search parameters locked. Showing matching ledger accounts.")} className="w-full h-8.5 bg-primary hover:opacity-95 text-primary-foreground font-extrabold text-[10px] rounded-xl shadow-xs transition uppercase tracking-wider flex items-center justify-center gap-1">
+                      <button
+                        onClick={() =>
+                          showToast("Search parameters locked. Showing matching ledger accounts.")
+                        }
+                        className="w-full h-8.5 bg-primary hover:opacity-95 text-primary-foreground font-extrabold text-[10px] rounded-xl shadow-xs transition uppercase tracking-wider flex items-center justify-center gap-1"
+                      >
                         <Search className="size-3.5" /> Search Gadget
                       </button>
                     </div>
@@ -614,14 +762,22 @@ function IncrementConfiguratorPage() {
                       <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-primary/10 text-primary">
                         {selectedIds.length} Checked
                       </span>
-                      <h3 className="text-xs font-black uppercase text-foreground">Interactive Compensation Ledger Sheet</h3>
+                      <h3 className="text-xs font-black uppercase text-foreground">
+                        Interactive Compensation Ledger Sheet
+                      </h3>
                     </div>
 
                     <div className="flex items-center gap-2 flex-wrap">
-                      <button onClick={() => alert("Excel export initiated.")} className="h-8 px-3 rounded-lg border border-border/40 bg-card hover:bg-muted text-xs font-extrabold text-muted-foreground transition flex items-center gap-1.5">
+                      <button
+                        onClick={() => alert("Excel export initiated.")}
+                        className="h-8 px-3 rounded-lg border border-border/40 bg-card hover:bg-muted text-xs font-extrabold text-muted-foreground transition flex items-center gap-1.5"
+                      >
                         <FileSpreadsheet className="size-3.5" /> Excel
                       </button>
-                      <button onClick={() => alert("Print document ready.")} className="h-8 px-3 rounded-lg border border-border/40 bg-card hover:bg-muted text-xs font-extrabold text-muted-foreground transition flex items-center gap-1.5">
+                      <button
+                        onClick={() => alert("Print document ready.")}
+                        className="h-8 px-3 rounded-lg border border-border/40 bg-card hover:bg-muted text-xs font-extrabold text-muted-foreground transition flex items-center gap-1.5"
+                      >
                         <Printer className="size-3.5" /> Print
                       </button>
                     </div>
@@ -656,14 +812,19 @@ function IncrementConfiguratorPage() {
                           <th className="px-4 py-3 text-right">Old Gross</th>
                           <th className="px-4 py-3 text-right text-emerald-600">New Gross</th>
                           <th className="px-4 py-3 text-right text-emerald-600">Gross Diff</th>
-                          <th className="px-4 py-3 text-center bg-primary/5 border-x border-primary/20">Increment Gross</th>
+                          <th className="px-4 py-3 text-center bg-primary/5 border-x border-primary/20">
+                            Increment Gross
+                          </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border/20">
                         {gadgetEmployees.map((emp, index) => {
                           const isChecked = selectedIds.includes(emp.id);
                           return (
-                            <tr key={emp.id} className={`transition ${isChecked ? "bg-primary/[0.03] hover:bg-primary/[0.05]" : "hover:bg-muted/40"}`}>
+                            <tr
+                              key={emp.id}
+                              className={`transition ${isChecked ? "bg-primary/[0.03] hover:bg-primary/[0.05]" : "hover:bg-muted/40"}`}
+                            >
                               <td className="px-3 py-3 text-center">
                                 <input
                                   type="checkbox"
@@ -672,26 +833,40 @@ function IncrementConfiguratorPage() {
                                   className="rounded border-border text-primary focus:ring-primary/20 size-4 cursor-pointer"
                                 />
                               </td>
-                              <td className="px-2 py-3 text-center font-mono font-bold text-muted-foreground/60">{index + 1}</td>
-                              <td className="px-3 py-3 font-mono font-black text-foreground">{emp.id}</td>
+                              <td className="px-2 py-3 text-center font-mono font-bold text-muted-foreground/60">
+                                {index + 1}
+                              </td>
+                              <td className="px-3 py-3 font-mono font-black text-foreground">
+                                {emp.id}
+                              </td>
                               <td className="px-4 py-3">
                                 <div className="font-extrabold text-foreground">{emp.name}</div>
                               </td>
                               <td className="px-4 py-3">
                                 <select
                                   value={emp.newType}
-                                  onChange={(e) => handleInlineSelectChange(emp.id, "newType", e.target.value)}
+                                  onChange={(e) =>
+                                    handleInlineSelectChange(emp.id, "newType", e.target.value)
+                                  }
                                   className="h-7 px-2 rounded-lg bg-muted border border-border/40 text-[10px] font-bold"
                                 >
                                   <option value="Office Executive">Office Executive</option>
                                   <option value="Factory Worker">Factory Worker</option>
                                 </select>
                               </td>
-                              <td className="px-4 py-3 text-muted-foreground font-semibold">{emp.department}</td>
+                              <td className="px-4 py-3 text-muted-foreground font-semibold">
+                                {emp.department}
+                              </td>
                               <td className="px-4 py-3">
                                 <select
                                   value={emp.newDesignation}
-                                  onChange={(e) => handleInlineSelectChange(emp.id, "newDesignation", e.target.value)}
+                                  onChange={(e) =>
+                                    handleInlineSelectChange(
+                                      emp.id,
+                                      "newDesignation",
+                                      e.target.value,
+                                    )
+                                  }
                                   className="h-7 px-2 rounded-lg bg-muted border border-border/40 text-[10px] font-bold"
                                 >
                                   <option value="Executive">Executive</option>
@@ -704,12 +879,18 @@ function IncrementConfiguratorPage() {
                                   <option value="QA Engineer">QA Engineer</option>
                                 </select>
                               </td>
-                              <td className="px-4 py-3 font-mono font-semibold text-muted-foreground/80">{emp.joiningDate}</td>
-                              <td className="px-3 py-3 font-mono font-semibold text-muted-foreground">{emp.shift}</td>
+                              <td className="px-4 py-3 font-mono font-semibold text-muted-foreground/80">
+                                {emp.joiningDate}
+                              </td>
+                              <td className="px-3 py-3 font-mono font-semibold text-muted-foreground">
+                                {emp.shift}
+                              </td>
                               <td className="px-3 py-3">
                                 <select
                                   value={emp.newGrade}
-                                  onChange={(e) => handleInlineSelectChange(emp.id, "newGrade", e.target.value)}
+                                  onChange={(e) =>
+                                    handleInlineSelectChange(emp.id, "newGrade", e.target.value)
+                                  }
                                   className="h-7 px-2 rounded-lg bg-muted border border-border/40 text-[10px] font-bold"
                                 >
                                   <option value="None">None</option>
@@ -717,20 +898,39 @@ function IncrementConfiguratorPage() {
                                   <option value="Grade-2">Grade-2</option>
                                 </select>
                               </td>
-                              <td className="px-3 py-3 font-mono font-bold text-muted-foreground">{emp.unit}</td>
-                              <td className="px-4 py-3 text-right font-mono font-semibold">৳{emp.oldBasic.toFixed(2)}</td>
-                              <td className="px-4 py-3 text-right font-mono font-black text-primary">৳{emp.newBasic.toFixed(2)}</td>
-                              <td className="px-4 py-3 text-right font-mono font-bold text-primary">+৳{emp.basicDiff.toFixed(2)}</td>
-                              <td className="px-4 py-3 text-right font-mono font-semibold">৳{emp.oldGross.toFixed(2)}</td>
-                              <td className="px-4 py-3 text-right font-mono font-black text-emerald-600">৳{emp.newGross.toFixed(2)}</td>
-                              <td className="px-4 py-3 text-right font-mono font-bold text-emerald-600">+৳{emp.grossDiff.toFixed(2)}</td>
+                              <td className="px-3 py-3 font-mono font-bold text-muted-foreground">
+                                {emp.unit}
+                              </td>
+                              <td className="px-4 py-3 text-right font-mono font-semibold">
+                                ৳{emp.oldBasic.toFixed(2)}
+                              </td>
+                              <td className="px-4 py-3 text-right font-mono font-black text-primary">
+                                ৳{emp.newBasic.toFixed(2)}
+                              </td>
+                              <td className="px-4 py-3 text-right font-mono font-bold text-primary">
+                                +৳{emp.basicDiff.toFixed(2)}
+                              </td>
+                              <td className="px-4 py-3 text-right font-mono font-semibold">
+                                ৳{emp.oldGross.toFixed(2)}
+                              </td>
+                              <td className="px-4 py-3 text-right font-mono font-black text-emerald-600">
+                                ৳{emp.newGross.toFixed(2)}
+                              </td>
+                              <td className="px-4 py-3 text-right font-mono font-bold text-emerald-600">
+                                +৳{emp.grossDiff.toFixed(2)}
+                              </td>
                               <td className="px-4 py-2 text-center bg-primary/5 border-x border-primary/20">
                                 <input
                                   type="number"
                                   min="0"
                                   step="500"
                                   value={emp.incrementGross}
-                                  onChange={(e) => handleInlineIncrementChange(emp.id, parseInt(e.target.value) || 0)}
+                                  onChange={(e) =>
+                                    handleInlineIncrementChange(
+                                      emp.id,
+                                      parseInt(e.target.value) || 0,
+                                    )
+                                  }
                                   className="w-24 h-7 px-2.5 rounded-lg bg-card border border-primary/30 outline-none focus:border-primary text-center font-mono font-black text-xs text-primary"
                                 />
                               </td>
@@ -751,23 +951,26 @@ function IncrementConfiguratorPage() {
                     </button>
                   </div>
                 </div>
-
               </div>
             )}
 
             {/* TAB 2: SINGLE PROPOSAL */}
             {activeTab === "single" && (
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start animate-in fade-in duration-200">
-
                 {/* Proposal Setup Form */}
-                <form onSubmit={handleSingleSubmit} className="lg:col-span-7 bg-card rounded-lg border border-border/80 p-6 shadow-xs space-y-6">
+                <form
+                  onSubmit={handleSingleSubmit}
+                  className="lg:col-span-7 bg-card rounded-lg border border-border/80 p-6 shadow-xs space-y-6"
+                >
                   <h3 className="text-sm font-black uppercase tracking-wider text-foreground flex items-center gap-2">
                     <Sparkles className="size-4.5 text-primary" />
                     <span>Configure Single Appraised Adjustment</span>
                   </h3>
 
                   <div className="space-y-2">
-                    <label className="text-[10px] text-muted-foreground uppercase font-black">Select Employee *</label>
+                    <label className="text-[10px] text-muted-foreground uppercase font-black">
+                      Select Employee *
+                    </label>
                     <div className="relative">
                       <select
                         value={selectedEmpId}
@@ -787,7 +990,9 @@ function IncrementConfiguratorPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-[10px] text-muted-foreground uppercase font-black">Increment Percent (%)</label>
+                      <label className="text-[10px] text-muted-foreground uppercase font-black">
+                        Increment Percent (%)
+                      </label>
                       <input
                         type="number"
                         step="0.1"
@@ -800,7 +1005,9 @@ function IncrementConfiguratorPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] text-muted-foreground uppercase font-black">Increment Amount (৳)</label>
+                      <label className="text-[10px] text-muted-foreground uppercase font-black">
+                        Increment Amount (৳)
+                      </label>
                       <input
                         type="number"
                         min="1"
@@ -813,7 +1020,9 @@ function IncrementConfiguratorPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[10px] text-muted-foreground uppercase font-black">Performance Justification *</label>
+                    <label className="text-[10px] text-muted-foreground uppercase font-black">
+                      Performance Justification *
+                    </label>
                     <textarea
                       rows={4}
                       required
@@ -849,13 +1058,17 @@ function IncrementConfiguratorPage() {
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div className="bg-muted/40 p-3 rounded-xl border border-border/40">
-                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground">Current Gross</span>
+                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground">
+                            Current Gross
+                          </span>
                           <div className="text-sm font-black text-foreground font-mono mt-0.5">
                             ৳{activeEmp.currentSalary.toLocaleString("en-IN")}
                           </div>
                         </div>
                         <div className="bg-emerald-500/5 border border-emerald-500/20 p-3 rounded-xl">
-                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-emerald-600">Adjustment</span>
+                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-emerald-600">
+                            Adjustment
+                          </span>
                           <div className="text-sm font-black text-emerald-600 font-mono mt-0.5">
                             +৳{amount.toLocaleString("en-IN")}
                           </div>
@@ -864,13 +1077,17 @@ function IncrementConfiguratorPage() {
 
                       <div className="p-3 bg-muted/40 rounded-xl border border-border/40 flex items-center justify-between">
                         <div>
-                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-primary">New Gross</span>
+                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-primary">
+                            New Gross
+                          </span>
                           <div className="text-base font-black text-primary font-mono mt-0.5">
                             ৳{(activeEmp.currentSalary + amount).toLocaleString("en-IN")}
                           </div>
                         </div>
                         <div className="text-right">
-                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground">Growth</span>
+                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground">
+                            Growth
+                          </span>
                           <div className="text-xs font-black text-emerald-600 mt-0.5 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/15">
                             +{percent.toFixed(1)}%
                           </div>
@@ -879,13 +1096,15 @@ function IncrementConfiguratorPage() {
                     </div>
                   </div>
                 </div>
-
               </div>
             )}
 
             {/* TAB 3: SCALE RULES & PARAMETERS */}
             {activeTab === "rules" && (
-              <form onSubmit={handleSaveRules} className="bg-card rounded-lg border border-border/80 p-6 shadow-xs space-y-6 animate-in fade-in duration-200">
+              <form
+                onSubmit={handleSaveRules}
+                className="bg-card rounded-lg border border-border/80 p-6 shadow-xs space-y-6 animate-in fade-in duration-200"
+              >
                 <h3 className="text-sm font-black uppercase tracking-wider text-foreground flex items-center gap-2">
                   <Sliders className="size-4.5 text-primary" />
                   <span>Statutory Wage Allocation Rules</span>
@@ -893,7 +1112,9 @@ function IncrementConfiguratorPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase text-muted-foreground">Basic Salary Ratio (%)</label>
+                    <label className="text-[10px] font-black uppercase text-muted-foreground">
+                      Basic Salary Ratio (%)
+                    </label>
                     <input
                       type="number"
                       value={basicRatio}
@@ -903,7 +1124,9 @@ function IncrementConfiguratorPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase text-muted-foreground">House Rent Allocation (%)</label>
+                    <label className="text-[10px] font-black uppercase text-muted-foreground">
+                      House Rent Allocation (%)
+                    </label>
                     <input
                       type="number"
                       value={houseRentRatio}
@@ -913,7 +1136,9 @@ function IncrementConfiguratorPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase text-muted-foreground">Medical standard flat (৳)</label>
+                    <label className="text-[10px] font-black uppercase text-muted-foreground">
+                      Medical standard flat (৳)
+                    </label>
                     <input
                       type="number"
                       value={medicalAllowance}
@@ -923,7 +1148,9 @@ function IncrementConfiguratorPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase text-muted-foreground">Arrear calculation threshold (days)</label>
+                    <label className="text-[10px] font-black uppercase text-muted-foreground">
+                      Arrear calculation threshold (days)
+                    </label>
                     <input
                       type="number"
                       value={arrearThreshold}
@@ -936,7 +1163,9 @@ function IncrementConfiguratorPage() {
                 <div className="bg-primary/5 p-4 rounded-xl border border-primary/10 flex items-start gap-2.5">
                   <AlertCircle className="size-4 text-primary shrink-0 mt-0.5" />
                   <p className="text-[10.5px] text-muted-foreground font-semibold leading-relaxed">
-                    Scaling rules are applied instantly by the live calculation engine when proposing new salary packages. Changing ratios will not affect historical records, but will apply to all pending increment queues.
+                    Scaling rules are applied instantly by the live calculation engine when
+                    proposing new salary packages. Changing ratios will not affect historical
+                    records, but will apply to all pending increment queues.
                   </p>
                 </div>
 
@@ -950,9 +1179,7 @@ function IncrementConfiguratorPage() {
                 </div>
               </form>
             )}
-
           </div>
-
         </div>
       </main>
     </div>

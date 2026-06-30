@@ -2,15 +2,29 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  ChevronRight, CalendarClock, CheckCircle2, ShieldCheck, ListOrdered,
-  Send, Trash2, CalendarDays, CalendarRange, Clock, Coins, FileText
+  ChevronRight,
+  CalendarClock,
+  CheckCircle2,
+  ShieldCheck,
+  ListOrdered,
+  Send,
+  Trash2,
+  CalendarDays,
+  CalendarRange,
+  Clock,
+  Coins,
+  FileText,
 } from "lucide-react";
 
 export const Route = createFileRoute("/leave")({
   head: () => ({
     meta: [
       { title: "Leave & Accruals Hub — CRIPTON" },
-      { name: "description", content: "Access leave applications, approval boards, lists, and earned leave processing channels." },
+      {
+        name: "description",
+        content:
+          "Access leave applications, approval boards, lists, and earned leave processing channels.",
+      },
     ],
   }),
   component: LeaveHubPage,
@@ -27,7 +41,7 @@ function LeaveHubPage() {
       iconColor: "text-blue-500",
       iconBg: "bg-blue-500/10 border-blue-500/20",
       badge: "Entry",
-      badgeColor: "bg-blue-500/10 text-blue-500 border-blue-500/20"
+      badgeColor: "bg-blue-500/10 text-blue-500 border-blue-500/20",
     },
     {
       title: "Leave Approved & List",
@@ -38,7 +52,7 @@ function LeaveHubPage() {
       iconColor: "text-emerald-500",
       iconBg: "bg-emerald-500/10 border-emerald-500/20",
       badge: "Approve, View or Delete",
-      badgeColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+      badgeColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
     },
     {
       title: "Earn Leave Process (Year)",
@@ -49,7 +63,7 @@ function LeaveHubPage() {
       iconColor: "text-amber-500",
       iconBg: "bg-amber-500/10 border-amber-500/20",
       badge: "Year Base Process",
-      badgeColor: "bg-amber-500/10 text-amber-500 border-amber-500/20"
+      badgeColor: "bg-amber-500/10 text-amber-500 border-amber-500/20",
     },
     {
       title: "Earn Leave Process Month",
@@ -60,7 +74,7 @@ function LeaveHubPage() {
       iconColor: "text-orange-500",
       iconBg: "bg-orange-500/10 border-orange-500/20",
       badge: "Month Base Process",
-      badgeColor: "bg-orange-500/10 text-orange-500 border-orange-500/20"
+      badgeColor: "bg-orange-500/10 text-orange-500 border-orange-500/20",
     },
     {
       title: "Earn Leave Submit & List",
@@ -71,24 +85,86 @@ function LeaveHubPage() {
       iconColor: "text-indigo-500",
       iconBg: "bg-indigo-500/10 border-indigo-500/20",
       badge: "Submit Or Delete",
-      badgeColor: "bg-indigo-500/10 text-indigo-500 border-indigo-500/20"
-    }
+      badgeColor: "bg-indigo-500/10 text-indigo-500 border-indigo-500/20",
+    },
   ];
 
   const recentActions = [
-    { id: "LV-2026-004", type: "Leave Application", name: "Tahmid Afsar", date: "20/06/2026", details: "Casual Leave (2 Days)", status: "Approved" },
-    { id: "ELS-001", type: "Earn Leave Submit", name: "Tahmid Afsar", date: "19/06/2026", details: "disb. 4.39 Days (7,609 BDT)", status: "Submitted" },
-    { id: "ELS-002", type: "Earn Leave Submit", name: "Dipon Saha", date: "19/06/2026", details: "disb. 5.60 Days (14,560 BDT)", status: "Submitted" },
-    { id: "LV-2026-003", type: "Leave Application", name: "Dipon Saha", date: "18/06/2026", details: "Sick Leave (3 Days)", status: "Approved" },
-    { id: "LV-2026-002", type: "Leave Application", name: "Sadiqul Islam", date: "17/06/2026", details: "Annual Leave (5 Days)", status: "Pending" },
-    { id: "LV-2026-001", type: "Leave Application", name: "Tahmid Afsar", date: "15/06/2026", details: "Casual Leave (1 Day)", status: "Approved" }
+    {
+      id: "LV-2026-004",
+      type: "Leave Application",
+      name: "Tahmid Afsar",
+      date: "20/06/2026",
+      details: "Casual Leave (2 Days)",
+      status: "Approved",
+    },
+    {
+      id: "ELS-001",
+      type: "Earn Leave Submit",
+      name: "Tahmid Afsar",
+      date: "19/06/2026",
+      details: "disb. 4.39 Days (7,609 BDT)",
+      status: "Submitted",
+    },
+    {
+      id: "ELS-002",
+      type: "Earn Leave Submit",
+      name: "Dipon Saha",
+      date: "19/06/2026",
+      details: "disb. 5.60 Days (14,560 BDT)",
+      status: "Submitted",
+    },
+    {
+      id: "LV-2026-003",
+      type: "Leave Application",
+      name: "Dipon Saha",
+      date: "18/06/2026",
+      details: "Sick Leave (3 Days)",
+      status: "Approved",
+    },
+    {
+      id: "LV-2026-002",
+      type: "Leave Application",
+      name: "Sadiqul Islam",
+      date: "17/06/2026",
+      details: "Annual Leave (5 Days)",
+      status: "Pending",
+    },
+    {
+      id: "LV-2026-001",
+      type: "Leave Application",
+      name: "Tahmid Afsar",
+      date: "15/06/2026",
+      details: "Casual Leave (1 Day)",
+      status: "Approved",
+    },
   ];
 
   const stats = [
-    { label: "Pending Leave Requests", value: "1", icon: Clock, color: "text-amber-500 bg-amber-500/10 border-amber-500/20" },
-    { label: "Approved (This Month)", value: "3", icon: CheckCircle2, color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20" },
-    { label: "Earn Leave Accrued", value: "9.99 Days", icon: Coins, color: "text-blue-500 bg-blue-500/10 border-blue-500/20" },
-    { label: "Total Action Records", value: "6", icon: FileText, color: "text-purple-500 bg-purple-500/10 border-purple-500/20" },
+    {
+      label: "Pending Leave Requests",
+      value: "1",
+      icon: Clock,
+      color: "text-amber-500 bg-amber-500/10 border-amber-500/20",
+    },
+    {
+      label: "Approved (This Month)",
+      value: "3",
+      icon: CheckCircle2,
+      color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
+    },
+    {
+      label: "Earn Leave Accrued",
+      value: "9.99 Days",
+      icon: Coins,
+      color: "text-blue-500 bg-blue-500/10 border-blue-500/20",
+    },
+    {
+      label: "Total Action Records",
+      value: "6",
+      icon: FileText,
+      color: "text-purple-500 bg-purple-500/10 border-purple-500/20",
+    },
   ];
 
   return (
@@ -101,7 +177,9 @@ function LeaveHubPage() {
           <div className="bg-card border border-border/80 rounded-lg p-4 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-2.5" />
                 <span className="text-muted-foreground/75">Leave Management</span>
                 <ChevronRight className="size-2.5" />
@@ -121,13 +199,20 @@ function LeaveHubPage() {
 
           {/* Quick Metrics Ribbon */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            {stats.map(stat => (
-              <div key={stat.label} className="bg-card border border-border/80 p-3 rounded-lg shadow-xs flex items-center gap-3">
-                <div className={`size-8.5 rounded-md border flex items-center justify-center ${stat.color}`}>
+            {stats.map((stat) => (
+              <div
+                key={stat.label}
+                className="bg-card border border-border/80 p-3 rounded-lg shadow-xs flex items-center gap-3"
+              >
+                <div
+                  className={`size-8.5 rounded-md border flex items-center justify-center ${stat.color}`}
+                >
                   <stat.icon className="size-4" />
                 </div>
                 <div>
-                  <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">{stat.label}</span>
+                  <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">
+                    {stat.label}
+                  </span>
                   <span className="text-sm font-black text-foreground">{stat.value}</span>
                 </div>
               </div>
@@ -138,29 +223,41 @@ function LeaveHubPage() {
             {/* Requisition Categories (col-span-2) */}
             <div className="lg:col-span-2 bg-card border border-border/80 p-4 rounded-lg shadow-xs space-y-3">
               <div>
-                <h3 className="text-xs font-black uppercase tracking-wider text-primary">Select Leave Portal Category</h3>
-                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Choose an action below to process transactions or view historical grids</p>
+                <h3 className="text-xs font-black uppercase tracking-wider text-primary">
+                  Select Leave Portal Category
+                </h3>
+                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">
+                  Choose an action below to process transactions or view historical grids
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-                {categories.map(category => (
+                {categories.map((category) => (
                   <Link
                     key={category.title}
                     to={category.to}
                     className="group relative bg-muted/20 hover:bg-card border border-border hover:border-primary/30 rounded-lg p-5 shadow-xs transition-all duration-300 overflow-hidden flex flex-col gap-4 hover:-translate-y-0.5"
                   >
                     <div className="flex items-center justify-between">
-                      <div className={`size-12 rounded-md border ${category.iconBg} flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3`}>
+                      <div
+                        className={`size-12 rounded-md border ${category.iconBg} flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3`}
+                      >
                         <category.icon className={`size-5.5 ${category.iconColor}`} />
                       </div>
-                      <span className={`text-[8.5px] font-black uppercase px-2 py-0.5 rounded border ${category.badgeColor}`}>
+                      <span
+                        className={`text-[8.5px] font-black uppercase px-2 py-0.5 rounded border ${category.badgeColor}`}
+                      >
                         {category.badge}
                       </span>
                     </div>
 
                     <div>
-                      <h3 className="text-sm font-black text-foreground group-hover:text-primary transition-colors duration-200">{category.title}</h3>
-                      <p className="text-[10px] text-muted-foreground leading-normal mt-1 font-medium">{category.desc}</p>
+                      <h3 className="text-sm font-black text-foreground group-hover:text-primary transition-colors duration-200">
+                        {category.title}
+                      </h3>
+                      <p className="text-[10px] text-muted-foreground leading-normal mt-1 font-medium">
+                        {category.desc}
+                      </p>
                     </div>
 
                     <div className="flex items-center gap-1 text-[10px] font-black text-primary hover:text-primary-glow select-none mt-2">
@@ -176,26 +273,46 @@ function LeaveHubPage() {
             <div className="space-y-2">
               <div className="bg-card border border-border/80 p-4 rounded-lg shadow-xs space-y-3">
                 <div className="border-b border-border/40 pb-2 flex items-center justify-between">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-primary">Recent Leave Actions</span>
-                  <Link to="/leave-list" className="text-[9px] font-black uppercase tracking-wider text-primary hover:text-primary-glow hover:underline transition-all">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-primary">
+                    Recent Leave Actions
+                  </span>
+                  <Link
+                    to="/leave-list"
+                    className="text-[9px] font-black uppercase tracking-wider text-primary hover:text-primary-glow hover:underline transition-all"
+                  >
                     View All
                   </Link>
                 </div>
 
                 <div className="divide-y divide-border/40 text-xs">
-                  {recentActions.map(action => (
-                    <div key={action.id} className="py-2.5 flex items-center justify-between gap-3 first:pt-0 last:pb-0">
+                  {recentActions.map((action) => (
+                    <div
+                      key={action.id}
+                      className="py-2.5 flex items-center justify-between gap-3 first:pt-0 last:pb-0"
+                    >
                       <div className="space-y-0.5 min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[9.5px] font-mono font-bold text-muted-foreground">{action.id}</span>
-                          <span className="text-[9.5px] font-black text-foreground truncate">{action.type}</span>
+                          <span className="text-[9.5px] font-mono font-bold text-muted-foreground">
+                            {action.id}
+                          </span>
+                          <span className="text-[9.5px] font-black text-foreground truncate">
+                            {action.type}
+                          </span>
                         </div>
-                        <span className="text-[9px] text-muted-foreground block truncate font-medium">{action.name} &bull; {action.details} &bull; {action.date}</span>
+                        <span className="text-[9px] text-muted-foreground block truncate font-medium">
+                          {action.name} &bull; {action.details} &bull; {action.date}
+                        </span>
                       </div>
 
-                      <span className={`text-[8.5px] font-black uppercase px-2 py-0.5 rounded border shrink-0 ${action.status === "Approved" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/25" :
-                        action.status === "Submitted" ? "bg-blue-500/10 text-blue-600 border-blue-500/25" : "bg-amber-500/10 text-amber-600 border-amber-500/25"
-                        }`}>
+                      <span
+                        className={`text-[8.5px] font-black uppercase px-2 py-0.5 rounded border shrink-0 ${
+                          action.status === "Approved"
+                            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/25"
+                            : action.status === "Submitted"
+                              ? "bg-blue-500/10 text-blue-600 border-blue-500/25"
+                              : "bg-amber-500/10 text-amber-600 border-amber-500/25"
+                        }`}
+                      >
                         {action.status}
                       </span>
                     </div>

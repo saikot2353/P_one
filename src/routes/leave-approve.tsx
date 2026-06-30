@@ -3,8 +3,19 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  ChevronRight, ArrowLeft, Search, FileSpreadsheet, Printer, FileDown, CheckCircle2,
-  XCircle, Info, Check, X, Trash2, HelpCircle
+  ChevronRight,
+  ArrowLeft,
+  Search,
+  FileSpreadsheet,
+  Printer,
+  FileDown,
+  CheckCircle2,
+  XCircle,
+  Info,
+  Check,
+  X,
+  Trash2,
+  HelpCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -12,7 +23,10 @@ export const Route = createFileRoute("/leave-approve")({
   head: () => ({
     meta: [
       { title: "Leave Approvals — CRIPTON" },
-      { name: "description", content: "Review, search, and bulk approve or reject employee leave applications." },
+      {
+        name: "description",
+        content: "Review, search, and bulk approve or reject employee leave applications.",
+      },
     ],
   }),
   component: LeaveApprovePage,
@@ -46,7 +60,7 @@ const initialMockLeaveRecords: LeaveApplicationRow[] = [
     startDate: "21/06/2026",
     endDate: "18/10/2026",
     purpose: "ML",
-    status: "Approved"
+    status: "Approved",
   },
   {
     sl: 2,
@@ -60,7 +74,7 @@ const initialMockLeaveRecords: LeaveApplicationRow[] = [
     startDate: "21/06/2026",
     endDate: "18/10/2026",
     purpose: "ML",
-    status: "Approved"
+    status: "Approved",
   },
   {
     sl: 3,
@@ -74,7 +88,7 @@ const initialMockLeaveRecords: LeaveApplicationRow[] = [
     startDate: "16/06/2026",
     endDate: "13/10/2026",
     purpose: "ML",
-    status: "Approved"
+    status: "Approved",
   },
   {
     sl: 4,
@@ -88,7 +102,7 @@ const initialMockLeaveRecords: LeaveApplicationRow[] = [
     startDate: "11/06/2026",
     endDate: "08/10/2026",
     purpose: "ML",
-    status: "Approved"
+    status: "Approved",
   },
   {
     sl: 5,
@@ -102,7 +116,7 @@ const initialMockLeaveRecords: LeaveApplicationRow[] = [
     startDate: "09/06/2026",
     endDate: "06/10/2026",
     purpose: "ML",
-    status: "Approved"
+    status: "Approved",
   },
   {
     sl: 6,
@@ -116,7 +130,7 @@ const initialMockLeaveRecords: LeaveApplicationRow[] = [
     startDate: "09/06/2026",
     endDate: "06/10/2026",
     purpose: "ML",
-    status: "Approved"
+    status: "Approved",
   },
   {
     sl: 7,
@@ -130,7 +144,7 @@ const initialMockLeaveRecords: LeaveApplicationRow[] = [
     startDate: "06/06/2026",
     endDate: "03/10/2026",
     purpose: "ML",
-    status: "Approved"
+    status: "Approved",
   },
   {
     sl: 8,
@@ -144,7 +158,7 @@ const initialMockLeaveRecords: LeaveApplicationRow[] = [
     startDate: "06/06/2026",
     endDate: "03/10/2026",
     purpose: "ML",
-    status: "Approved"
+    status: "Approved",
   },
   {
     sl: 9,
@@ -158,7 +172,7 @@ const initialMockLeaveRecords: LeaveApplicationRow[] = [
     startDate: "26/05/2026",
     endDate: "26/05/2026",
     purpose: "CL",
-    status: "Approved"
+    status: "Approved",
   },
   {
     sl: 10,
@@ -172,8 +186,8 @@ const initialMockLeaveRecords: LeaveApplicationRow[] = [
     startDate: "25/05/2026",
     endDate: "26/05/2026",
     purpose: "CL",
-    status: "Approved"
-  }
+    status: "Approved",
+  },
 ];
 
 function LeaveApprovePage() {
@@ -204,7 +218,7 @@ function LeaveApprovePage() {
     toDate: "2026-06-30",
     stateFilter: "Approved",
     empIdMulti: "",
-    bonusMode: "System"
+    bonusMode: "System",
   });
 
   // Handle Search Trigger
@@ -219,19 +233,20 @@ function LeaveApprovePage() {
       toDate,
       stateFilter,
       empIdMulti,
-      bonusMode
+      bonusMode,
     });
   };
 
   // Filter & Search Logic
   const filteredRows = useMemo(() => {
-    return rows.filter(r => {
+    return rows.filter((r) => {
       // 1. Dropdown State filter
-      if (appliedFilters.stateFilter !== "ALL" && r.status !== appliedFilters.stateFilter) return false;
+      if (appliedFilters.stateFilter !== "ALL" && r.status !== appliedFilters.stateFilter)
+        return false;
 
       // 2. Emp ID Multi (comma separated list)
       if (appliedFilters.empIdMulti.trim()) {
-        const ids = appliedFilters.empIdMulti.split(",").map(i => i.trim());
+        const ids = appliedFilters.empIdMulti.split(",").map((i) => i.trim());
         if (!ids.includes(r.empId) && !ids.includes(r.empIdOff)) return false;
       }
 
@@ -254,26 +269,26 @@ function LeaveApprovePage() {
   }, [rows, appliedFilters, searchQuery]);
 
   // Toggle Selection
-  const isAllSelected = filteredRows.length > 0 && filteredRows.every(r => selectedIds.has(r.sl));
-  
+  const isAllSelected = filteredRows.length > 0 && filteredRows.every((r) => selectedIds.has(r.sl));
+
   const toggleSelectAll = () => {
     if (isAllSelected) {
-      setSelectedIds(prev => {
+      setSelectedIds((prev) => {
         const next = new Set(prev);
-        filteredRows.forEach(r => next.delete(r.sl));
+        filteredRows.forEach((r) => next.delete(r.sl));
         return next;
       });
     } else {
-      setSelectedIds(prev => {
+      setSelectedIds((prev) => {
         const next = new Set(prev);
-        filteredRows.forEach(r => next.add(r.sl));
+        filteredRows.forEach((r) => next.add(r.sl));
         return next;
       });
     }
   };
 
   const toggleSelect = (sl: number) => {
-    setSelectedIds(prev => {
+    setSelectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(sl)) {
         next.delete(sl);
@@ -290,7 +305,7 @@ function LeaveApprovePage() {
       toast.error("Please select at least one leave request!");
       return;
     }
-    setRows(prev => prev.map(r => selectedIds.has(r.sl) ? { ...r, status: "Approved" } : r));
+    setRows((prev) => prev.map((r) => (selectedIds.has(r.sl) ? { ...r, status: "Approved" } : r)));
     toast.success(`Successfully approved ${selectedIds.size} selected leave requests!`);
     setSelectedIds(new Set());
   };
@@ -300,7 +315,7 @@ function LeaveApprovePage() {
       toast.error("Please select at least one leave request!");
       return;
     }
-    setRows(prev => prev.map(r => selectedIds.has(r.sl) ? { ...r, status: "Rejected" } : r));
+    setRows((prev) => prev.map((r) => (selectedIds.has(r.sl) ? { ...r, status: "Rejected" } : r)));
     toast.success(`Successfully rejected ${selectedIds.size} selected leave requests!`);
     setSelectedIds(new Set());
   };
@@ -311,16 +326,16 @@ function LeaveApprovePage() {
       return;
     }
     if (!confirm(`Are you sure you want to delete ${selectedIds.size} selected records?`)) return;
-    setRows(prev => prev.filter(r => !selectedIds.has(r.sl)));
+    setRows((prev) => prev.filter((r) => !selectedIds.has(r.sl)));
     toast.success(`Deleted ${selectedIds.size} records.`);
     setSelectedIds(new Set());
   };
 
   const handleSingleDelete = (sl: number) => {
     if (!confirm("Are you sure you want to delete this leave request?")) return;
-    setRows(prev => prev.filter(r => r.sl !== sl));
+    setRows((prev) => prev.filter((r) => r.sl !== sl));
     toast.success("Request deleted successfully.");
-    setSelectedIds(prev => {
+    setSelectedIds((prev) => {
       const next = new Set(prev);
       next.delete(sl);
       return next;
@@ -334,11 +349,12 @@ function LeaveApprovePage() {
         <Topbar />
 
         <div className="p-4 md:p-6 lg:p-8 space-y-6">
-
           {/* Title Bar containing the back arrow & link to database */}
           <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs flex flex-col gap-3">
             <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-              <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+              <Link to="/" className="hover:text-primary transition-colors">
+                Home
+              </Link>
               <ChevronRight className="size-2.5" />
               <span>Leave Management</span>
               <ChevronRight className="size-2.5" />
@@ -368,8 +384,10 @@ function LeaveApprovePage() {
 
           {/* Parameters / Configuration Form Panel */}
           <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-xs">
-            <form onSubmit={handleSearchTrigger} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-4 text-xs font-bold">
-
+            <form
+              onSubmit={handleSearchTrigger}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-4 text-xs font-bold"
+            >
               {/* Region */}
               <div className="space-y-1.5">
                 <label className="text-[10px] text-slate-400 uppercase">Region</label>
@@ -497,7 +515,9 @@ function LeaveApprovePage() {
 
               {/* Emp ID Multi */}
               <div className="space-y-1.5 sm:col-span-2">
-                <label className="text-[10px] text-slate-400 uppercase">EmpId Multi with comma</label>
+                <label className="text-[10px] text-slate-400 uppercase">
+                  EmpId Multi with comma
+                </label>
                 <input
                   type="text"
                   value={empIdMulti}
@@ -516,15 +536,12 @@ function LeaveApprovePage() {
                   Search
                 </button>
               </div>
-
             </form>
           </div>
 
           {/* Action Row & Utility Controls */}
           <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm space-y-5">
-
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-
               {/* Approve / Reject / Delete Selected buttons */}
               <div className="flex items-center gap-3">
                 <button
@@ -584,7 +601,6 @@ function LeaveApprovePage() {
                   />
                 </div>
               </div>
-
             </div>
 
             {/* Custom styled peach-rose table grid */}
@@ -600,17 +616,39 @@ function LeaveApprovePage() {
                         className="rounded border-slate-300 text-primary focus:ring-primary size-3.5 cursor-pointer"
                       />
                     </th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Emp Id</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Emp Id(Off)</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Emp Name</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Company</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Department</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Designation</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">Type</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">Start Date</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">End Date</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Purpose</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">Status</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">
+                      Emp Id
+                    </th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">
+                      Emp Id(Off)
+                    </th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">
+                      Emp Name
+                    </th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">
+                      Company
+                    </th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">
+                      Department
+                    </th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">
+                      Designation
+                    </th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">
+                      Type
+                    </th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">
+                      Start Date
+                    </th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">
+                      End Date
+                    </th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">
+                      Purpose
+                    </th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">
+                      Status
+                    </th>
                     <th className="px-3 py-3 text-center">Actions</th>
                   </tr>
                 </thead>
@@ -618,15 +656,21 @@ function LeaveApprovePage() {
                   {filteredRows.map((row) => {
                     const isSelected = selectedIds.has(row.sl);
 
-                    let statusBadge = "bg-amber-100 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400";
+                    let statusBadge =
+                      "bg-amber-100 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400";
                     if (row.status === "Approved") {
-                      statusBadge = "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400";
+                      statusBadge =
+                        "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400";
                     } else if (row.status === "Rejected") {
-                      statusBadge = "bg-rose-100 text-rose-700 dark:bg-rose-950/20 dark:text-rose-400";
+                      statusBadge =
+                        "bg-rose-100 text-rose-700 dark:bg-rose-950/20 dark:text-rose-400";
                     }
 
                     return (
-                      <tr key={row.sl} className="hover:bg-slate-50/55 dark:hover:bg-slate-900/40 transition duration-75 whitespace-nowrap">
+                      <tr
+                        key={row.sl}
+                        className="hover:bg-slate-50/55 dark:hover:bg-slate-900/40 transition duration-75 whitespace-nowrap"
+                      >
                         <td className="px-3 py-3 text-center border-r border-slate-100 dark:border-slate-800/50">
                           <input
                             type="checkbox"
@@ -635,24 +679,47 @@ function LeaveApprovePage() {
                             className="rounded border-slate-300 text-primary focus:ring-primary size-3.5 cursor-pointer"
                           />
                         </td>
-                        <td className="px-3 py-3 font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">{row.empId}</td>
-                        <td className="px-3 py-3 font-mono text-slate-650 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">{row.empIdOff}</td>
-                        <td className="px-3 py-3 font-extrabold text-slate-900 dark:text-white border-r border-slate-100 dark:border-slate-800/50">{row.empName}</td>
-                        <td className="px-3 py-3 text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">{row.company}</td>
-                        <td className="px-3 py-3 text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">{row.department}</td>
-                        <td className="px-3 py-3 text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">{row.designation}</td>
-                        <td className="px-3 py-3 text-center font-extrabold text-slate-800 dark:text-slate-200 border-r border-slate-100 dark:border-slate-800/50">{row.type}</td>
-                        <td className="px-3 py-3 text-center font-mono text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">{row.startDate}</td>
-                        <td className="px-3 py-3 text-center font-mono text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">{row.endDate}</td>
-                        <td className="px-3 py-3 text-slate-500 max-w-[120px] truncate border-r border-slate-100 dark:border-slate-800/50" title={row.purpose}>
+                        <td className="px-3 py-3 font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">
+                          {row.empId}
+                        </td>
+                        <td className="px-3 py-3 font-mono text-slate-650 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">
+                          {row.empIdOff}
+                        </td>
+                        <td className="px-3 py-3 font-extrabold text-slate-900 dark:text-white border-r border-slate-100 dark:border-slate-800/50">
+                          {row.empName}
+                        </td>
+                        <td className="px-3 py-3 text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">
+                          {row.company}
+                        </td>
+                        <td className="px-3 py-3 text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">
+                          {row.department}
+                        </td>
+                        <td className="px-3 py-3 text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">
+                          {row.designation}
+                        </td>
+                        <td className="px-3 py-3 text-center font-extrabold text-slate-800 dark:text-slate-200 border-r border-slate-100 dark:border-slate-800/50">
+                          {row.type}
+                        </td>
+                        <td className="px-3 py-3 text-center font-mono text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">
+                          {row.startDate}
+                        </td>
+                        <td className="px-3 py-3 text-center font-mono text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50">
+                          {row.endDate}
+                        </td>
+                        <td
+                          className="px-3 py-3 text-slate-500 max-w-[120px] truncate border-r border-slate-100 dark:border-slate-800/50"
+                          title={row.purpose}
+                        >
                           {row.purpose || "—"}
                         </td>
                         <td className="px-3 py-3 text-center border-r border-slate-100 dark:border-slate-800/50">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase ${statusBadge}`}>
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase ${statusBadge}`}
+                          >
                             {row.status}
                           </span>
                         </td>
-                        
+
                         {/* Single Actions */}
                         <td className="px-3 py-3 text-center">
                           <button
@@ -699,9 +766,7 @@ function LeaveApprovePage() {
                 </button>
               </div>
             </div>
-
           </div>
-
         </div>
       </main>
     </div>

@@ -14,7 +14,7 @@ import {
   CheckCircle2,
   Clock,
   XCircle,
-  FolderOpen
+  FolderOpen,
 } from "lucide-react";
 import { LeaveApplicationModal } from "@/components/ssp/LeaveApplicationModal";
 import { GeneralStoreRequisitionModal } from "@/components/ssp/GeneralStoreRequisitionModal";
@@ -47,9 +47,7 @@ function MyRequisitionPage() {
   const [reqNumber, setReqNumber] = useState("");
   const [globalSearch, setGlobalSearch] = useState("");
 
-  const requesterOptions = [
-    { value: "Tahmid Afsar", label: "Tahmid Afsar (Assistant Manager)" }
-  ];
+  const requesterOptions = [{ value: "Tahmid Afsar", label: "Tahmid Afsar (Assistant Manager)" }];
 
   const tableData: RequisitionRow[] = [
     {
@@ -59,7 +57,7 @@ function MyRequisitionPage() {
       status: "Approved",
       doc: "General Product Store Requisition",
       note: "",
-      onClickView: () => setStoreModalOpen(true)
+      onClickView: () => setStoreModalOpen(true),
     },
     {
       id: "372569",
@@ -68,18 +66,18 @@ function MyRequisitionPage() {
       status: "Approved",
       doc: "Leave Application",
       note: "",
-      onClickView: () => setLeaveModalOpen(true)
-    }
+      onClickView: () => setLeaveModalOpen(true),
+    },
   ];
 
   // Calculate stats
   const totalCount = tableData.length;
-  const approvedCount = tableData.filter(r => r.status === "Approved").length;
-  const pendingCount = tableData.filter(r => r.status === "Pending").length;
-  const rejectedCount = tableData.filter(r => r.status === "Rejected").length;
+  const approvedCount = tableData.filter((r) => r.status === "Approved").length;
+  const pendingCount = tableData.filter((r) => r.status === "Pending").length;
+  const rejectedCount = tableData.filter((r) => r.status === "Rejected").length;
 
   // Filter logic
-  const filteredData = tableData.filter(row => {
+  const filteredData = tableData.filter((row) => {
     if (statusFilter !== "All" && row.status !== statusFilter) return false;
     if (reqNumber && !row.reqNum.includes(reqNumber)) return false;
     if (globalSearch) {
@@ -100,12 +98,13 @@ function MyRequisitionPage() {
         <Topbar />
 
         <div className="flex-1 flex flex-col p-4 xl:p-6 gap-4 overflow-hidden">
-
           {/* Header Block */}
           <div className="bg-white border border-slate-200/80 rounded-lg px-5 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
             <div className="space-y-0.5">
               <div className="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-2" />
                 <span className="hover:text-primary transition-colors">SSP</span>
                 <ChevronRight className="size-2" />
@@ -113,9 +112,7 @@ function MyRequisitionPage() {
               </div>
               <div className="flex items-center gap-2">
                 <div className="size-1.5 rounded-full bg-slate-400" />
-                <h1 className="text-lg font-bold tracking-tight text-slate-800">
-                  My Requisitions
-                </h1>
+                <h1 className="text-lg font-bold tracking-tight text-slate-800">My Requisitions</h1>
               </div>
             </div>
             <div className="text-[11px] text-slate-500 font-medium">
@@ -125,15 +122,18 @@ function MyRequisitionPage() {
 
           {/* KPI Dashboard Summary Row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 shrink-0">
-
             {/* Total Requisitions */}
             <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-[0_1px_3px_rgba(0,0,0,0.015)] flex items-center gap-3">
               <div className="size-9 rounded-lg bg-slate-50 flex items-center justify-center text-slate-555 shrink-0 border border-slate-100">
                 <FolderOpen className="size-4.5" />
               </div>
               <div>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Total Submitted</p>
-                <h3 className="text-base font-black text-slate-800 leading-none mt-0.5">{totalCount} Requests</h3>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                  Total Submitted
+                </p>
+                <h3 className="text-base font-black text-slate-800 leading-none mt-0.5">
+                  {totalCount} Requests
+                </h3>
               </div>
             </div>
 
@@ -143,8 +143,12 @@ function MyRequisitionPage() {
                 <CheckCircle2 className="size-4.5" />
               </div>
               <div>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Approved</p>
-                <h3 className="text-base font-black text-slate-800 leading-none mt-0.5">{approvedCount} Requests</h3>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                  Approved
+                </p>
+                <h3 className="text-base font-black text-slate-800 leading-none mt-0.5">
+                  {approvedCount} Requests
+                </h3>
               </div>
             </div>
 
@@ -154,8 +158,12 @@ function MyRequisitionPage() {
                 <Clock className="size-4.5" />
               </div>
               <div>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Pending</p>
-                <h3 className="text-base font-black text-slate-800 leading-none mt-0.5">{pendingCount} Requests</h3>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                  Pending
+                </p>
+                <h3 className="text-base font-black text-slate-800 leading-none mt-0.5">
+                  {pendingCount} Requests
+                </h3>
               </div>
             </div>
 
@@ -165,20 +173,24 @@ function MyRequisitionPage() {
                 <XCircle className="size-4.5" />
               </div>
               <div>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Rejected</p>
-                <h3 className="text-base font-black text-slate-800 leading-none mt-0.5">{rejectedCount} Requests</h3>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                  Rejected
+                </p>
+                <h3 className="text-base font-black text-slate-800 leading-none mt-0.5">
+                  {rejectedCount} Requests
+                </h3>
               </div>
             </div>
-
           </div>
 
           {/* Smart Filters and Navigation Bar */}
           <div className="bg-white border border-slate-200/80 rounded-lg p-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col xl:flex-row xl:items-center justify-between gap-3 shrink-0">
-
             <div className="flex flex-wrap items-center gap-3">
               {/* Requester Select */}
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Employee:</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  Employee:
+                </span>
                 <SearchableSelect
                   value={requester}
                   onChange={setRequester}
@@ -192,14 +204,14 @@ function MyRequisitionPage() {
                 <input
                   type="date"
                   value={dateFrom}
-                  onChange={e => setDateFrom(e.target.value)}
+                  onChange={(e) => setDateFrom(e.target.value)}
                   className="h-7 px-1.5 bg-transparent border-0 text-[10.5px] font-bold focus:outline-none"
                 />
                 <span className="text-slate-350 text-[10.5px] font-bold">to</span>
                 <input
                   type="date"
                   value={dateTo}
-                  onChange={e => setDateTo(e.target.value)}
+                  onChange={(e) => setDateTo(e.target.value)}
                   className="h-7 px-1.5 bg-transparent border-0 text-[10.5px] font-bold focus:outline-none"
                 />
               </div>
@@ -208,16 +220,17 @@ function MyRequisitionPage() {
             {/* Smart Filter Pills (One-click filtering) */}
             <div className="flex items-center gap-3">
               <div className="flex items-center bg-slate-50 border border-slate-200 rounded-lg p-0.5 shadow-3xs">
-                {(["All", "Approved", "Pending", "Rejected"] as const).map(filter => {
+                {(["All", "Approved", "Pending", "Rejected"] as const).map((filter) => {
                   const isActive = statusFilter === filter;
                   return (
                     <button
                       key={filter}
                       onClick={() => setStatusFilter(filter)}
-                      className={`px-2.5 py-1 text-[9px] font-bold rounded transition-all uppercase tracking-wider ${isActive
+                      className={`px-2.5 py-1 text-[9px] font-bold rounded transition-all uppercase tracking-wider ${
+                        isActive
                           ? "bg-slate-700 text-white shadow-3xs"
                           : "text-slate-500 hover:bg-white/40 hover:text-slate-800"
-                        }`}
+                      }`}
                     >
                       {filter}
                     </button>
@@ -230,18 +243,16 @@ function MyRequisitionPage() {
                 <input
                   type="text"
                   value={reqNumber}
-                  onChange={e => setReqNumber(e.target.value)}
+                  onChange={(e) => setReqNumber(e.target.value)}
                   placeholder="Req Number..."
                   className="h-7.5 pl-8 pr-3 w-full bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:border-slate-400"
                 />
               </div>
             </div>
-
           </div>
 
           {/* Action Toolbar & Requisitions List Table Card */}
           <div className="flex-1 bg-white border border-slate-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.03)] rounded-lg overflow-hidden flex flex-col min-h-0">
-
             {/* Toolbar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 border-b border-slate-200 bg-slate-50/20 shrink-0">
               <div className="flex items-center gap-1.5">
@@ -261,7 +272,7 @@ function MyRequisitionPage() {
                 <input
                   type="text"
                   value={globalSearch}
-                  onChange={e => setGlobalSearch(e.target.value)}
+                  onChange={(e) => setGlobalSearch(e.target.value)}
                   placeholder="Quick Search..."
                   className="h-7.5 w-full pl-8.5 pr-3 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:border-slate-400"
                 />
@@ -273,12 +284,24 @@ function MyRequisitionPage() {
               <table className="w-full border-collapse text-left">
                 <thead className="sticky top-0 bg-white border-b border-slate-200 z-10 shadow-3xs">
                   <tr className="bg-[#fafafa]">
-                    <th className="px-5 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest">Actions</th>
-                    <th className="px-5 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest">ReqNum</th>
-                    <th className="px-5 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest">ReqDate</th>
-                    <th className="px-5 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
-                    <th className="px-5 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest">Document</th>
-                    <th className="px-5 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest">ReqNote</th>
+                    <th className="px-5 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                      Actions
+                    </th>
+                    <th className="px-5 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                      ReqNum
+                    </th>
+                    <th className="px-5 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                      ReqDate
+                    </th>
+                    <th className="px-5 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                      Status
+                    </th>
+                    <th className="px-5 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                      Document
+                    </th>
+                    <th className="px-5 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                      ReqNote
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-xs font-semibold text-slate-700">
@@ -300,15 +323,20 @@ function MyRequisitionPage() {
                       <td className="px-5 py-2 font-bold text-slate-800">{row.reqNum}</td>
                       <td className="px-5 py-2 text-slate-500 font-mono">{row.date}</td>
                       <td className="px-5 py-2">
-                        <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border ${row.status === "Approved"
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-200/50"
-                            : "bg-amber-50 text-amber-700 border-amber-200/50"
-                          }`}>
+                        <span
+                          className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border ${
+                            row.status === "Approved"
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-200/50"
+                              : "bg-amber-50 text-amber-700 border-amber-200/50"
+                          }`}
+                        >
                           {row.status}
                         </span>
                       </td>
                       <td className="px-5 py-2 text-slate-800">{row.doc}</td>
-                      <td className="px-5 py-2 text-slate-400 font-normal italic">{row.note || "—"}</td>
+                      <td className="px-5 py-2 text-slate-400 font-normal italic">
+                        {row.note || "—"}
+                      </td>
                     </tr>
                   ))}
                   {filteredData.length === 0 && (
@@ -324,14 +352,27 @@ function MyRequisitionPage() {
 
             {/* Pagination footer */}
             <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 px-5 py-2.5 border-t border-slate-200 bg-slate-50/10 shrink-0">
-              <div>Showing 1 to {filteredData.length} of {filteredData.length} entries</div>
+              <div>
+                Showing 1 to {filteredData.length} of {filteredData.length} entries
+              </div>
               <div className="flex items-center gap-1.5">
-                <button className="text-slate-400 hover:text-slate-700 transition-colors disabled:opacity-30" disabled>Previous</button>
-                <button className="size-5.5 rounded bg-slate-700 text-white flex items-center justify-center shadow-sm text-[9.5px]">1</button>
-                <button className="text-slate-400 hover:text-slate-700 transition-colors disabled:opacity-30" disabled>Next</button>
+                <button
+                  className="text-slate-400 hover:text-slate-700 transition-colors disabled:opacity-30"
+                  disabled
+                >
+                  Previous
+                </button>
+                <button className="size-5.5 rounded bg-slate-700 text-white flex items-center justify-center shadow-sm text-[9.5px]">
+                  1
+                </button>
+                <button
+                  className="text-slate-400 hover:text-slate-700 transition-colors disabled:opacity-30"
+                  disabled
+                >
+                  Next
+                </button>
               </div>
             </div>
-
           </div>
         </div>
       </main>

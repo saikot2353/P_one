@@ -15,7 +15,7 @@ import {
   Fingerprint,
   XCircle,
   FolderOpen,
-  Pencil
+  Pencil,
 } from "lucide-react";
 
 export const Route = createFileRoute("/pending-manual-attendance")({
@@ -41,7 +41,7 @@ const initialPendingList = [
     hodStatus: "Approve",
     hrdStatus: "Pending",
     mdStatus: "Pending",
-    hodName: "Rakibul Islam Khan"
+    hodName: "Rakibul Islam Khan",
   },
   {
     id: "2022035599",
@@ -60,7 +60,7 @@ const initialPendingList = [
     hodStatus: "Pending",
     hrdStatus: "Pending",
     mdStatus: "Pending",
-    hodName: "Zakir Hossain"
+    hodName: "Zakir Hossain",
   },
   {
     id: "2023043910",
@@ -79,7 +79,7 @@ const initialPendingList = [
     hodStatus: "Approve",
     hrdStatus: "Approve",
     mdStatus: "Pending",
-    hodName: "Rakibul Islam Khan"
+    hodName: "Rakibul Islam Khan",
   },
   {
     id: "2021032646",
@@ -98,8 +98,8 @@ const initialPendingList = [
     hodStatus: "Pending",
     hrdStatus: "Pending",
     mdStatus: "Pending",
-    hodName: "Zakir Hossain"
-  }
+    hodName: "Zakir Hossain",
+  },
 ];
 
 function PendingManualAttendancePage() {
@@ -118,7 +118,7 @@ function PendingManualAttendancePage() {
     { value: "Management", label: "Management" },
     { value: "Core Development (HR)", label: "Core Development (HR)" },
     { value: "Business Innovation", label: "Business Innovation" },
-    { value: "Core Sales", label: "Core Sales" }
+    { value: "Core Sales", label: "Core Sales" },
   ];
 
   // Inline dynamic edit modal states
@@ -129,14 +129,14 @@ function PendingManualAttendancePage() {
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
-      setSelectedIds(new Set(filteredRequests.map(r => r.id)));
+      setSelectedIds(new Set(filteredRequests.map((r) => r.id)));
     } else {
       setSelectedIds(new Set());
     }
   };
 
   const handleSelectRow = (id: string) => {
-    setSelectedIds(prev => {
+    setSelectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
@@ -146,13 +146,17 @@ function PendingManualAttendancePage() {
 
   const handleBulkApprove = () => {
     if (selectedIds.size === 0) return;
-    setRequests(prev => prev.map(r => selectedIds.has(r.id) ? { ...r, hodStatus: "Approve" } : r));
+    setRequests((prev) =>
+      prev.map((r) => (selectedIds.has(r.id) ? { ...r, hodStatus: "Approve" } : r)),
+    );
     setSelectedIds(new Set());
   };
 
   const handleBulkReject = () => {
     if (selectedIds.size === 0) return;
-    setRequests(prev => prev.map(r => selectedIds.has(r.id) ? { ...r, hodStatus: "Reject" } : r));
+    setRequests((prev) =>
+      prev.map((r) => (selectedIds.has(r.id) ? { ...r, hodStatus: "Reject" } : r)),
+    );
     setSelectedIds(new Set());
   };
 
@@ -165,16 +169,18 @@ function PendingManualAttendancePage() {
 
   const handleSaveEdit = () => {
     if (!editingRequest) return;
-    setRequests(prev => prev.map(r => {
-      if (r.id !== editingRequest.id) return r;
-      return { ...r, inTime: editInTime, outTime: editOutTime, reason: editReason };
-    }));
+    setRequests((prev) =>
+      prev.map((r) => {
+        if (r.id !== editingRequest.id) return r;
+        return { ...r, inTime: editInTime, outTime: editOutTime, reason: editReason };
+      }),
+    );
     setEditingRequest(null);
   };
 
   // Stats & Filtering
   const filteredRequests = useMemo(() => {
-    return requests.filter(r => {
+    return requests.filter((r) => {
       if (statusFilter !== "All") {
         if (statusFilter === "Pending" && r.hodStatus !== "Pending") return false;
         if (statusFilter === "Approved" && r.hodStatus !== "Approve") return false;
@@ -183,16 +189,18 @@ function PendingManualAttendancePage() {
       if (department !== "All Departments" && r.dept1 !== department) return false;
       if (globalSearch) {
         const q = globalSearch.toLowerCase();
-        return r.name.toLowerCase().includes(q) || r.id.includes(q) || r.title.toLowerCase().includes(q);
+        return (
+          r.name.toLowerCase().includes(q) || r.id.includes(q) || r.title.toLowerCase().includes(q)
+        );
       }
       return true;
     });
   }, [requests, statusFilter, department, globalSearch]);
 
   const totalCount = requests.length;
-  const pendingCount = requests.filter(r => r.hodStatus === "Pending").length;
-  const approvedCount = requests.filter(r => r.hodStatus === "Approve").length;
-  const rejectedCount = requests.filter(r => r.hodStatus === "Reject").length;
+  const pendingCount = requests.filter((r) => r.hodStatus === "Pending").length;
+  const approvedCount = requests.filter((r) => r.hodStatus === "Approve").length;
+  const rejectedCount = requests.filter((r) => r.hodStatus === "Reject").length;
 
   return (
     <div className="h-screen flex bg-[#f1f5f9] dark:bg-[#0b0f19] text-[#334155] dark:text-slate-200 overflow-hidden font-sans antialiased tracking-tight">
@@ -201,16 +209,19 @@ function PendingManualAttendancePage() {
         <Topbar />
 
         <div className="flex-1 flex flex-col p-4 xl:p-6 gap-3.5 overflow-hidden bg-slate-50/50 dark:bg-slate-950/10">
-          
           {/* Header Block */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-lg px-5 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
             <div className="space-y-0.5">
               <div className="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                <Link to="/" className="hover:text-[#2563eb] transition-colors">Home</Link>
+                <Link to="/" className="hover:text-[#2563eb] transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-2" />
                 <span className="hover:text-[#2563eb] transition-colors">Human Resource</span>
                 <ChevronRight className="size-2" />
-                <span className="text-slate-600 dark:text-slate-300 font-semibold">Attendance Approvals</span>
+                <span className="text-slate-600 dark:text-slate-300 font-semibold">
+                  Attendance Approvals
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="size-1.5 rounded-full bg-[#2563eb]" />
@@ -233,8 +244,12 @@ function PendingManualAttendancePage() {
                 <FolderOpen className="size-4" />
               </div>
               <div>
-                <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Total Queue</p>
-                <h3 className="text-sm font-extrabold text-slate-700 dark:text-slate-200 mt-0.5">{totalCount} Requests</h3>
+                <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Total Queue
+                </p>
+                <h3 className="text-sm font-extrabold text-slate-700 dark:text-slate-200 mt-0.5">
+                  {totalCount} Requests
+                </h3>
               </div>
             </div>
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm flex items-center gap-3">
@@ -242,8 +257,12 @@ function PendingManualAttendancePage() {
                 <CheckCircle2 className="size-4" />
               </div>
               <div>
-                <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Approved</p>
-                <h3 className="text-sm font-extrabold text-slate-700 dark:text-slate-200 mt-0.5">{approvedCount} Requests</h3>
+                <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Approved
+                </p>
+                <h3 className="text-sm font-extrabold text-slate-700 dark:text-slate-200 mt-0.5">
+                  {approvedCount} Requests
+                </h3>
               </div>
             </div>
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm flex items-center gap-3">
@@ -251,8 +270,12 @@ function PendingManualAttendancePage() {
                 <Clock className="size-4" />
               </div>
               <div>
-                <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Pending</p>
-                <h3 className="text-sm font-extrabold text-slate-700 dark:text-slate-200 mt-0.5">{pendingCount} Requests</h3>
+                <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Pending
+                </p>
+                <h3 className="text-sm font-extrabold text-slate-700 dark:text-slate-200 mt-0.5">
+                  {pendingCount} Requests
+                </h3>
               </div>
             </div>
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm flex items-center gap-3">
@@ -260,8 +283,12 @@ function PendingManualAttendancePage() {
                 <XCircle className="size-4" />
               </div>
               <div>
-                <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Rejected</p>
-                <h3 className="text-sm font-extrabold text-slate-700 dark:text-slate-200 mt-0.5">{rejectedCount} Requests</h3>
+                <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Rejected
+                </p>
+                <h3 className="text-sm font-extrabold text-slate-700 dark:text-slate-200 mt-0.5">
+                  {rejectedCount} Requests
+                </h3>
               </div>
             </div>
           </div>
@@ -270,25 +297,31 @@ function PendingManualAttendancePage() {
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-3 shadow-sm shrink-0 space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-3.5 gap-y-2.5">
               <div className="space-y-0.5">
-                <label className="text-[8.5px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Start Date</label>
+                <label className="text-[8.5px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Start Date
+                </label>
                 <input
                   type="date"
                   value={startDate}
-                  onChange={e => setStartDate(e.target.value)}
+                  onChange={(e) => setStartDate(e.target.value)}
                   className="h-8 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2 text-[11px] font-semibold text-slate-800 dark:text-slate-200 outline-none focus:border-[#2563eb]"
                 />
               </div>
               <div className="space-y-0.5">
-                <label className="text-[8.5px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">End Date</label>
+                <label className="text-[8.5px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  End Date
+                </label>
                 <input
                   type="date"
                   value={endDate}
-                  onChange={e => setEndDate(e.target.value)}
+                  onChange={(e) => setEndDate(e.target.value)}
                   className="h-8 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2 text-[11px] font-semibold text-slate-800 dark:text-slate-200 outline-none focus:border-[#2563eb]"
                 />
               </div>
               <div className="space-y-0.5">
-                <label className="text-[8.5px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Department</label>
+                <label className="text-[8.5px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Department
+                </label>
                 <SearchableSelect
                   value={department}
                   onChange={setDepartment}
@@ -300,16 +333,17 @@ function PendingManualAttendancePage() {
 
             <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-slate-100 dark:border-slate-800">
               <div className="flex items-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-0.5 shadow-inner">
-                {(["All", "Approved", "Pending", "Rejected"] as const).map(filter => {
+                {(["All", "Approved", "Pending", "Rejected"] as const).map((filter) => {
                   const isActive = statusFilter === filter;
                   return (
                     <button
                       key={filter}
                       onClick={() => setStatusFilter(filter)}
-                      className={`px-2.5 py-1 text-[9px] font-bold rounded transition-all uppercase tracking-wider ${isActive
+                      className={`px-2.5 py-1 text-[9px] font-bold rounded transition-all uppercase tracking-wider ${
+                        isActive
                           ? "bg-white dark:bg-slate-600 text-slate-900 dark:text-white shadow-sm"
                           : "text-slate-500 dark:text-slate-400 hover:bg-white/40 dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-slate-200"
-                        }`}
+                      }`}
                     >
                       {filter}
                     </button>
@@ -321,7 +355,7 @@ function PendingManualAttendancePage() {
                 <input
                   type="text"
                   value={globalSearch}
-                  onChange={e => setGlobalSearch(e.target.value)}
+                  onChange={(e) => setGlobalSearch(e.target.value)}
                   placeholder="Quick Search ID, Name..."
                   className="h-7.5 pl-8 pr-3 w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none text-slate-800 dark:text-slate-200"
                 />
@@ -347,16 +381,27 @@ function PendingManualAttendancePage() {
             {selectedIds.size > 0 && (
               <div className="p-3 bg-[#2563eb]/5 border-b border-[#2563eb]/10 flex items-center justify-between animate-in fade-in slide-in-from-top-2">
                 <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="bg-[#2563eb]/20 text-[#2563eb] hover:bg-[#2563eb]/20">
+                  <Badge
+                    variant="secondary"
+                    className="bg-[#2563eb]/20 text-[#2563eb] hover:bg-[#2563eb]/20"
+                  >
                     {selectedIds.size} Selected
                   </Badge>
-                  <span className="text-[11px] font-medium text-slate-500">entries ready for action</span>
+                  <span className="text-[11px] font-medium text-slate-500">
+                    entries ready for action
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={handleBulkReject} className="h-7.5 px-3 border border-rose-200 text-rose-600 hover:bg-rose-50 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer">
+                  <button
+                    onClick={handleBulkReject}
+                    className="h-7.5 px-3 border border-rose-200 text-rose-600 hover:bg-rose-50 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer"
+                  >
                     <XCircle className="size-3.5" /> Reject Selected
                   </button>
-                  <button onClick={handleBulkApprove} className="h-7.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer">
+                  <button
+                    onClick={handleBulkApprove}
+                    className="h-7.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer"
+                  >
                     <CheckCircle2 className="size-3.5" /> Approve Selected
                   </button>
                 </div>
@@ -369,68 +414,110 @@ function PendingManualAttendancePage() {
                 <thead className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 z-10">
                   <tr className="bg-slate-50 dark:bg-slate-950">
                     <th className="px-4 py-3 w-[60px] text-center border-r border-slate-200 dark:border-slate-800">
-                      <input 
-                        type="checkbox" 
-                        className="rounded border-slate-300 text-[#2563eb] focus:ring-[#2563eb]" 
+                      <input
+                        type="checkbox"
+                        className="rounded border-slate-300 text-[#2563eb] focus:ring-[#2563eb]"
                         onChange={handleSelectAll}
-                        checked={selectedIds.size === filteredRequests.length && filteredRequests.length > 0}
+                        checked={
+                          selectedIds.size === filteredRequests.length &&
+                          filteredRequests.length > 0
+                        }
                       />
                     </th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-[80px]">Action</th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-[100px]">Emp ID</th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-[180px]">Employee Name</th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-[140px]">Department</th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center w-[90px]">Date</th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center w-[80px]">In Time</th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center w-[80px]">Out Time</th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center w-[120px]">HOD Status</th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest min-w-[200px]">System Notes</th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-[80px]">
+                      Action
+                    </th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-[100px]">
+                      Emp ID
+                    </th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-[180px]">
+                      Employee Name
+                    </th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-[140px]">
+                      Department
+                    </th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center w-[90px]">
+                      Date
+                    </th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center w-[80px]">
+                      In Time
+                    </th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center w-[80px]">
+                      Out Time
+                    </th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center w-[120px]">
+                      HOD Status
+                    </th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest min-w-[200px]">
+                      System Notes
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  {filteredRequests.map(row => (
-                    <tr key={row.id} className={`hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${selectedIds.has(row.id) ? 'bg-[#2563eb]/5 dark:bg-[#2563eb]/10' : ''}`}>
+                  {filteredRequests.map((row) => (
+                    <tr
+                      key={row.id}
+                      className={`hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${selectedIds.has(row.id) ? "bg-[#2563eb]/5 dark:bg-[#2563eb]/10" : ""}`}
+                    >
                       <td className="px-4 py-2 text-center border-r border-slate-200 dark:border-slate-800">
-                        <input 
-                          type="checkbox" 
-                          className="rounded border-slate-300 text-[#2563eb] focus:ring-[#2563eb]" 
+                        <input
+                          type="checkbox"
+                          className="rounded border-slate-300 text-[#2563eb] focus:ring-[#2563eb]"
                           checked={selectedIds.has(row.id)}
                           onChange={() => handleSelectRow(row.id)}
                         />
                       </td>
                       <td className="px-4 py-2 text-center">
-                        <button onClick={() => handleStartEdit(row)} className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 transition cursor-pointer" title="Edit Correction">
+                        <button
+                          onClick={() => handleStartEdit(row)}
+                          className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 transition cursor-pointer"
+                          title="Edit Correction"
+                        >
                           <Pencil className="size-3.5" />
                         </button>
                       </td>
                       <td className="px-4 py-2 font-mono text-slate-500">{row.id}</td>
-                      <td className="px-4 py-2 font-bold text-slate-800 dark:text-slate-100">{row.name}</td>
+                      <td className="px-4 py-2 font-bold text-slate-800 dark:text-slate-100">
+                        {row.name}
+                      </td>
                       <td className="px-4 py-2 text-slate-500 text-[10.5px]">
                         <div className="truncate">{row.dept1}</div>
                         <div className="font-normal text-slate-400">{row.title}</div>
                       </td>
                       <td className="px-4 py-2 text-center font-mono text-slate-600">{row.date}</td>
-                      <td className="px-4 py-2 text-center font-mono font-bold text-[#2563eb]">{row.inTime}</td>
-                      <td className="px-4 py-2 text-center font-mono font-bold text-[#2563eb]">{row.outTime}</td>
+                      <td className="px-4 py-2 text-center font-mono font-bold text-[#2563eb]">
+                        {row.inTime}
+                      </td>
+                      <td className="px-4 py-2 text-center font-mono font-bold text-[#2563eb]">
+                        {row.outTime}
+                      </td>
                       <td className="px-4 py-2 text-center">
-                        <span className={`px-2 py-0.5 rounded-xl text-[8.5px] font-extrabold uppercase border ${row.hodStatus === "Approve"
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                            : row.hodStatus === "Reject"
-                              ? "bg-rose-50 text-rose-700 border-rose-200"
-                              : "bg-amber-50 text-amber-700 border-amber-200"
-                          }`}>
+                        <span
+                          className={`px-2 py-0.5 rounded-xl text-[8.5px] font-extrabold uppercase border ${
+                            row.hodStatus === "Approve"
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                              : row.hodStatus === "Reject"
+                                ? "bg-rose-50 text-rose-700 border-rose-200"
+                                : "bg-amber-50 text-amber-700 border-amber-200"
+                          }`}
+                        >
                           {row.hodStatus === "Approve" ? "Approved" : row.hodStatus}
                         </span>
                       </td>
                       <td className="px-4 py-2 text-[10px] text-slate-500">
-                        <div className="line-clamp-2" title={row.systemInfo}>{row.systemInfo.replace(/\n/g, ' ')}</div>
+                        <div className="line-clamp-2" title={row.systemInfo}>
+                          {row.systemInfo.replace(/\n/g, " ")}
+                        </div>
                         {row.reason && <div className="text-slate-400 italic">"{row.reason}"</div>}
                       </td>
                     </tr>
                   ))}
                   {filteredRequests.length === 0 && (
                     <tr>
-                      <td colSpan={10} className="py-8 text-center text-slate-400 dark:text-slate-500 font-bold">
+                      <td
+                        colSpan={10}
+                        className="py-8 text-center text-slate-400 dark:text-slate-500 font-bold"
+                      >
                         No attendance correction requests found.
                       </td>
                     </tr>
@@ -443,9 +530,21 @@ function PendingManualAttendancePage() {
             <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 dark:text-slate-500 px-5 py-2.5 border-t border-slate-100 dark:border-slate-800 shrink-0">
               <div>Showing 1 to {filteredRequests.length} entries</div>
               <div className="flex items-center gap-1.5">
-                <button className="text-slate-400 dark:text-slate-500 hover:text-slate-700 transition-colors" disabled>Previous</button>
-                <button className="size-5.5 rounded bg-slate-700 dark:bg-slate-200 text-white dark:text-slate-900 flex items-center justify-center shadow-sm text-[9.5px]">1</button>
-                <button className="text-slate-400 dark:text-slate-500 hover:text-slate-700 transition-colors" disabled>Next</button>
+                <button
+                  className="text-slate-400 dark:text-slate-500 hover:text-slate-700 transition-colors"
+                  disabled
+                >
+                  Previous
+                </button>
+                <button className="size-5.5 rounded bg-slate-700 dark:bg-slate-200 text-white dark:text-slate-900 flex items-center justify-center shadow-sm text-[9.5px]">
+                  1
+                </button>
+                <button
+                  className="text-slate-400 dark:text-slate-500 hover:text-slate-700 transition-colors"
+                  disabled
+                >
+                  Next
+                </button>
               </div>
             </div>
           </div>
@@ -455,13 +554,15 @@ function PendingManualAttendancePage() {
         {editingRequest && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
             <div className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xl max-w-lg w-full overflow-hidden animate-in zoom-in-95 duration-200">
-              
               <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-950/50">
                 <h2 className="text-sm font-black flex items-center gap-2 uppercase tracking-wider text-slate-700 dark:text-slate-200">
                   <Fingerprint className="size-4.5 text-[#2563eb]" />
                   <span>Manual Correction Form</span>
                 </h2>
-                <button onClick={() => setEditingRequest(null)} className="text-slate-400 hover:text-slate-600 transition">
+                <button
+                  onClick={() => setEditingRequest(null)}
+                  className="text-slate-400 hover:text-slate-600 transition"
+                >
                   <X className="size-4" />
                 </button>
               </div>
@@ -469,38 +570,46 @@ function PendingManualAttendancePage() {
               <div className="p-5 space-y-4">
                 <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3 border border-slate-100 dark:border-slate-800">
                   <div className="text-xs font-black">{editingRequest.name}</div>
-                  <div className="text-[10px] text-slate-500 font-mono mt-0.5">{editingRequest.id} — {editingRequest.dept1}</div>
+                  <div className="text-[10px] text-slate-500 font-mono mt-0.5">
+                    {editingRequest.id} — {editingRequest.dept1}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">In Time</label>
-                    <input 
-                      type="time" 
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                      In Time
+                    </label>
+                    <input
+                      type="time"
                       step="1"
                       value={editInTime}
-                      onChange={e => setEditInTime(e.target.value)}
+                      onChange={(e) => setEditInTime(e.target.value)}
                       className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-mono outline-none focus:border-[#2563eb]"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Out Time</label>
-                    <input 
-                      type="time" 
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                      Out Time
+                    </label>
+                    <input
+                      type="time"
                       step="1"
                       value={editOutTime}
-                      onChange={e => setEditOutTime(e.target.value)}
+                      onChange={(e) => setEditOutTime(e.target.value)}
                       className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-mono outline-none focus:border-[#2563eb]"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Correction Reason</label>
-                  <input 
-                    type="text" 
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                    Correction Reason
+                  </label>
+                  <input
+                    type="text"
                     value={editReason}
-                    onChange={e => setEditReason(e.target.value)}
+                    onChange={(e) => setEditReason(e.target.value)}
                     placeholder="Provide reason for correction..."
                     className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs outline-none focus:border-[#2563eb]"
                   />
@@ -508,18 +617,22 @@ function PendingManualAttendancePage() {
               </div>
 
               <div className="px-5 py-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-2 bg-slate-50 dark:bg-slate-950/50">
-                <button onClick={() => setEditingRequest(null)} className="h-8.5 px-4 rounded-lg text-xs font-bold text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 transition uppercase tracking-wider cursor-pointer">
+                <button
+                  onClick={() => setEditingRequest(null)}
+                  className="h-8.5 px-4 rounded-lg text-xs font-bold text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 transition uppercase tracking-wider cursor-pointer"
+                >
                   Cancel
                 </button>
-                <button onClick={handleSaveEdit} className="h-8.5 px-5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm transition cursor-pointer">
+                <button
+                  onClick={handleSaveEdit}
+                  className="h-8.5 px-5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm transition cursor-pointer"
+                >
                   Save Adjustments
                 </button>
               </div>
-
             </div>
           </div>
         )}
-
       </main>
     </div>
   );

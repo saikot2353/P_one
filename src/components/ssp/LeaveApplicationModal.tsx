@@ -8,43 +8,57 @@ interface LeaveApplicationModalProps {
 
 export function LeaveApplicationModal({ open, onOpenChange }: LeaveApplicationModalProps) {
   const details = [
-    ["Type", "Sick Leave"], ["From", "04/04/2026"],
-    ["Category", "Full Day Leave"], ["To", "04/04/2026"],
-    ["Documents", "—"], ["Duration", "1 Day"],
-    ["Contact", "01750021154"], ["Responsible", "Md. Anik Islam (Dy. Manager)"],
-    ["Address", "Jahangirnagar University"], ["Purpose", "Semester Final Exam"],
+    ["Type", "Sick Leave"],
+    ["From", "04/04/2026"],
+    ["Category", "Full Day Leave"],
+    ["To", "04/04/2026"],
+    ["Documents", "—"],
+    ["Duration", "1 Day"],
+    ["Contact", "01750021154"],
+    ["Responsible", "Md. Anik Islam (Dy. Manager)"],
+    ["Address", "Jahangirnagar University"],
+    ["Purpose", "Semester Final Exam"],
   ];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl p-0 bg-white border border-border/40 shadow-2xl rounded-lg overflow-hidden gap-0 max-h-[95vh] [&>button]:hidden">
-
         {/* Header */}
         <div className="px-6 py-4 border-b border-border/30 flex items-center justify-between bg-muted/10 shrink-0">
           <div>
-            <h2 className="text-[16px] font-bold text-foreground tracking-tight">Leave Application</h2>
+            <h2 className="text-[16px] font-bold text-foreground tracking-tight">
+              Leave Application
+            </h2>
             <p className="text-[11px] text-muted-foreground/80 mt-0.5">Requisition Detail View</p>
           </div>
-          <button onClick={() => onOpenChange(false)} className="size-8 rounded-full bg-white hover:bg-muted border border-border/50 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors shadow-sm">
+          <button
+            onClick={() => onOpenChange(false)}
+            className="size-8 rounded-full bg-white hover:bg-muted border border-border/50 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors shadow-sm"
+          >
             <X className="size-4" />
           </button>
         </div>
 
         {/* Body */}
         <div className="px-6 py-5 space-y-6 overflow-hidden">
-
           {/* Reference & Requester Card */}
           <div className="bg-muted/10 border border-border/30 rounded-xl p-4 flex items-start justify-between">
             <div className="space-y-1">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Reference No.</p>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                Reference No.
+              </p>
               <p className="text-[13px] font-semibold text-foreground bg-white px-2 py-0.5 rounded border border-border/50 shadow-sm w-fit">
                 PSL-RQ-LEAVE-372569
               </p>
             </div>
             <div className="text-right space-y-1">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Submitted By</p>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                Submitted By
+              </p>
               <p className="text-[13px] font-semibold text-foreground">Tahmid Afsar</p>
-              <p className="text-[11px] text-muted-foreground font-medium">Emp ID: 2023043910 · Asst. Manager</p>
+              <p className="text-[11px] text-muted-foreground font-medium">
+                Emp ID: 2023043910 · Asst. Manager
+              </p>
               <p className="text-[11px] text-muted-foreground font-medium">Business Innovation</p>
             </div>
           </div>
@@ -57,7 +71,10 @@ export function LeaveApplicationModal({ open, onOpenChange }: LeaveApplicationMo
             </h3>
             <div className="grid grid-cols-2 gap-x-12 gap-y-2.5 px-1">
               {details.map(([k, v]) => (
-                <div key={k} className="flex justify-between items-center border-b border-border/20 pb-1.5">
+                <div
+                  key={k}
+                  className="flex justify-between items-center border-b border-border/20 pb-1.5"
+                >
                   <span className="text-[11px] font-semibold text-muted-foreground">{k}</span>
                   <span className="text-[12px] font-medium text-foreground text-right">{v}</span>
                 </div>
@@ -75,8 +92,19 @@ export function LeaveApplicationModal({ open, onOpenChange }: LeaveApplicationMo
               <table className="w-full text-left text-[11px]">
                 <thead className="bg-muted/30 text-muted-foreground">
                   <tr>
-                    {["#", "Leave Type", "Enjoyed", "Balance", "Date From", "Date To", "Duration", "Pay Type"].map(h => (
-                      <th key={h} className="px-4 py-2 font-semibold border-b border-border/30">{h}</th>
+                    {[
+                      "#",
+                      "Leave Type",
+                      "Enjoyed",
+                      "Balance",
+                      "Date From",
+                      "Date To",
+                      "Duration",
+                      "Pay Type",
+                    ].map((h) => (
+                      <th key={h} className="px-4 py-2 font-semibold border-b border-border/30">
+                        {h}
+                      </th>
                     ))}
                   </tr>
                 </thead>
@@ -90,7 +118,9 @@ export function LeaveApplicationModal({ open, onOpenChange }: LeaveApplicationMo
                     <td className="px-4 py-3 text-muted-foreground">04/04/2026</td>
                     <td className="px-4 py-3 font-medium">1 Day</td>
                     <td className="px-4 py-3">
-                      <span className="px-2 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl text-[10px] font-bold">With Pay</span>
+                      <span className="px-2 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl text-[10px] font-bold">
+                        With Pay
+                      </span>
                     </td>
                   </tr>
                 </tbody>
@@ -106,10 +136,23 @@ export function LeaveApplicationModal({ open, onOpenChange }: LeaveApplicationMo
             </h3>
             <div className="grid grid-cols-2 gap-4">
               {[
-                { role: "Manager", name: "Md. Zahidul Islam", title: "COO", date: "02 Apr 2026 · 13:50" },
-                { role: "Head of HR", name: "Rajebul Hasan Rajon", title: "Deputy Manager", date: "21 Apr 2026 · 20:11" },
-              ].map(a => (
-                <div key={a.role} className="p-3.5 bg-emerald-50/30 border border-emerald-100 rounded-xl flex items-start gap-3">
+                {
+                  role: "Manager",
+                  name: "Md. Zahidul Islam",
+                  title: "COO",
+                  date: "02 Apr 2026 · 13:50",
+                },
+                {
+                  role: "Head of HR",
+                  name: "Rajebul Hasan Rajon",
+                  title: "Deputy Manager",
+                  date: "21 Apr 2026 · 20:11",
+                },
+              ].map((a) => (
+                <div
+                  key={a.role}
+                  className="p-3.5 bg-emerald-50/30 border border-emerald-100 rounded-xl flex items-start gap-3"
+                >
                   <div className="mt-0.5 bg-emerald-100 p-1.5 rounded-full text-emerald-600">
                     <CheckCircle2 className="size-4" />
                   </div>
@@ -125,7 +168,6 @@ export function LeaveApplicationModal({ open, onOpenChange }: LeaveApplicationMo
               ))}
             </div>
           </div>
-
         </div>
       </DialogContent>
     </Dialog>

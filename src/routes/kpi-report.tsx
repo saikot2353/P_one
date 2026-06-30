@@ -3,18 +3,27 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  ChevronRight, FileText, Printer, FileDown, Search, Filter, CalendarRange,
-  Building, CheckCircle2, TrendingUp
+  ChevronRight,
+  FileText,
+  Printer,
+  FileDown,
+  Search,
+  Filter,
+  CalendarRange,
+  Building,
+  CheckCircle2,
+  TrendingUp,
 } from "lucide-react";
-import { 
-  loadAssessments, loadKpiCycles, loadGradeBands, DEPARTMENT_LIST 
-} from "@/lib/kpi-data";
+import { loadAssessments, loadKpiCycles, loadGradeBands, DEPARTMENT_LIST } from "@/lib/kpi-data";
 
 export const Route = createFileRoute("/kpi-report")({
   head: () => ({
     meta: [
       { title: "KPI Reports — CRIPTON" },
-      { name: "description", content: "Generate and export comprehensive performance evaluation reports." },
+      {
+        name: "description",
+        content: "Generate and export comprehensive performance evaluation reports.",
+      },
     ],
   }),
   component: KpiReportPage,
@@ -32,7 +41,7 @@ function KpiReportPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredAssessments = useMemo(() => {
-    return assessments.filter(a => {
+    return assessments.filter((a) => {
       if (a.cycleId !== activeCycle) return false;
       // Reports usually focus on completed/in-progress assessments
       if (a.status === "Pending") return false;
@@ -40,9 +49,11 @@ function KpiReportPage() {
       if (activeGrade !== "All" && a.gradeResult !== activeGrade) return false;
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        if (!a.employeeName.toLowerCase().includes(q) &&
-            !a.employeeId.toLowerCase().includes(q) &&
-            !a.designation.toLowerCase().includes(q)) {
+        if (
+          !a.employeeName.toLowerCase().includes(q) &&
+          !a.employeeId.toLowerCase().includes(q) &&
+          !a.designation.toLowerCase().includes(q)
+        ) {
           return false;
         }
       }
@@ -57,12 +68,13 @@ function KpiReportPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 xl:p-8 space-y-6">
-
           {/* Header */}
           <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-2.5" />
                 <span className="text-muted-foreground/75">KPI</span>
                 <ChevronRight className="size-2.5" />
@@ -75,11 +87,17 @@ function KpiReportPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <button onClick={() => alert("Excel Export Complete.")} className="h-9 px-4 bg-card border border-border/40 hover:bg-muted text-muted-foreground font-extrabold text-[10px] rounded-lg shadow-2xs transition uppercase tracking-wider flex items-center gap-1.5">
+              <button
+                onClick={() => alert("Excel Export Complete.")}
+                className="h-9 px-4 bg-card border border-border/40 hover:bg-muted text-muted-foreground font-extrabold text-[10px] rounded-lg shadow-2xs transition uppercase tracking-wider flex items-center gap-1.5"
+              >
                 <FileDown className="size-3.5 text-emerald-600" />
                 <span>Export CSV</span>
               </button>
-              <button onClick={() => window.print()} className="h-9 px-4 bg-card border border-border/40 hover:bg-muted text-muted-foreground font-extrabold text-[10px] rounded-lg shadow-2xs transition uppercase tracking-wider flex items-center gap-1.5">
+              <button
+                onClick={() => window.print()}
+                className="h-9 px-4 bg-card border border-border/40 hover:bg-muted text-muted-foreground font-extrabold text-[10px] rounded-lg shadow-2xs transition uppercase tracking-wider flex items-center gap-1.5"
+              >
                 <Printer className="size-3.5 text-primary" />
                 <span>Print</span>
               </button>
@@ -97,7 +115,11 @@ function KpiReportPage() {
                 onChange={(e) => setActiveCycle(e.target.value)}
                 className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5]"
               >
-                {cycles.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                {cycles.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -110,7 +132,11 @@ function KpiReportPage() {
                 onChange={(e) => setActiveDepartment(e.target.value)}
                 className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5]"
               >
-                {DEPARTMENT_LIST.map(d => <option key={d} value={d}>{d}</option>)}
+                {DEPARTMENT_LIST.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -124,7 +150,11 @@ function KpiReportPage() {
                 className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5]"
               >
                 <option value="All">All Grades</option>
-                {bands.map(b => <option key={b.id} value={b.grade}>{b.grade} ({b.assessment})</option>)}
+                {bands.map((b) => (
+                  <option key={b.id} value={b.grade}>
+                    {b.grade} ({b.assessment})
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -148,7 +178,7 @@ function KpiReportPage() {
             <div className="hidden print:block p-6 border-b border-border/80 text-center">
               <h2 className="text-xl font-black text-foreground">CRIPTON KPI Report</h2>
               <p className="text-sm font-semibold text-muted-foreground mt-1">
-                Cycle: {cycles.find(c => c.id === activeCycle)?.name}
+                Cycle: {cycles.find((c) => c.id === activeCycle)?.name}
               </p>
             </div>
 
@@ -171,24 +201,43 @@ function KpiReportPage() {
                 </thead>
                 <tbody className="divide-y divide-border/20 text-xs font-semibold">
                   {filteredAssessments.map((item, idx) => {
-                    const gradeColor = bands.find(b => b.grade === item.gradeResult)?.color || "#94a3b8";
+                    const gradeColor =
+                      bands.find((b) => b.grade === item.gradeResult)?.color || "#94a3b8";
                     return (
                       <tr key={item.id} className="hover:bg-muted/10">
-                        <td className="px-4 py-3 text-center text-muted-foreground/50 font-bold">{idx + 1}</td>
-                        <td className="px-4 py-3 font-mono text-foreground/80">{item.employeeId}</td>
+                        <td className="px-4 py-3 text-center text-muted-foreground/50 font-bold">
+                          {idx + 1}
+                        </td>
+                        <td className="px-4 py-3 font-mono text-foreground/80">
+                          {item.employeeId}
+                        </td>
                         <td className="px-4 py-3 font-bold text-foreground">{item.employeeName}</td>
                         <td className="px-4 py-3 text-muted-foreground">{item.designation}</td>
                         <td className="px-4 py-3 text-muted-foreground">{item.department}</td>
-                        <td className="px-4 py-3 text-right font-mono">{item.grossSalary.toLocaleString()}</td>
-                        <td className="px-4 py-3 text-center font-black" style={{ color: gradeColor }}>
+                        <td className="px-4 py-3 text-right font-mono">
+                          {item.grossSalary.toLocaleString()}
+                        </td>
+                        <td
+                          className="px-4 py-3 text-center font-black"
+                          style={{ color: gradeColor }}
+                        >
                           {item.totalWeightedScore > 0 ? `${item.totalWeightedScore}%` : "—"}
                         </td>
                         <td className="px-4 py-3 text-center">
                           {item.gradeResult ? (
-                            <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-black border" style={{ color: gradeColor, borderColor: `${gradeColor}40`, backgroundColor: `${gradeColor}10` }}>
+                            <span
+                              className="inline-flex px-2 py-0.5 rounded text-[10px] font-black border"
+                              style={{
+                                color: gradeColor,
+                                borderColor: `${gradeColor}40`,
+                                backgroundColor: `${gradeColor}10`,
+                              }}
+                            >
                               {item.gradeResult}
                             </span>
-                          ) : "—"}
+                          ) : (
+                            "—"
+                          )}
                         </td>
                         <td className="px-4 py-3 text-right font-mono text-emerald-600">
                           {item.incAmount > 0 ? `+${item.incAmount.toLocaleString()}` : "—"}
@@ -197,11 +246,18 @@ function KpiReportPage() {
                           {item.newGrossSalary > 0 ? item.newGrossSalary.toLocaleString() : "—"}
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase border ${
-                            item.status === "Completed" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" :
-                            "bg-[#1e88e5]/10 text-[#1e88e5] border-[#1e88e5]/20"
-                          }`}>
-                            {item.status === "Completed" ? <CheckCircle2 className="size-2.5" /> : <TrendingUp className="size-2.5" />}
+                          <span
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase border ${
+                              item.status === "Completed"
+                                ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                                : "bg-[#1e88e5]/10 text-[#1e88e5] border-[#1e88e5]/20"
+                            }`}
+                          >
+                            {item.status === "Completed" ? (
+                              <CheckCircle2 className="size-2.5" />
+                            ) : (
+                              <TrendingUp className="size-2.5" />
+                            )}
                             {item.status}
                           </span>
                         </td>
@@ -210,7 +266,10 @@ function KpiReportPage() {
                   })}
                   {filteredAssessments.length === 0 && (
                     <tr>
-                      <td colSpan={11} className="text-center py-10 text-xs font-bold text-muted-foreground">
+                      <td
+                        colSpan={11}
+                        className="text-center py-10 text-xs font-bold text-muted-foreground"
+                      >
                         No assessment reports found for the selected filters.
                       </td>
                     </tr>
@@ -224,7 +283,6 @@ function KpiReportPage() {
               <span>Generated on {new Date().toLocaleDateString()}</span>
             </div>
           </div>
-
         </div>
       </main>
     </div>

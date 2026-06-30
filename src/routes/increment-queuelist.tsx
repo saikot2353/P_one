@@ -4,18 +4,50 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { rawQueueRecords, QueueRecord } from "./-increment-queue-data";
 import {
-  Search, FileSpreadsheet, Printer, FileDown, Plus, Info,
-  Sparkles, X, Eye, ArrowUpDown, Filter, ChevronDown, ChevronRight, Check,
-  LayoutGrid, SlidersHorizontal, EyeOff, FileText, FileClock,
-  TrendingUp, DollarSign, UserCog, Edit, Settings, ArrowRight, Sparkle, Calendar, Banknote, Briefcase,
-  CheckCircle2, ListFilter, ClipboardCheck, ShieldAlert
+  Search,
+  FileSpreadsheet,
+  Printer,
+  FileDown,
+  Plus,
+  Info,
+  Sparkles,
+  X,
+  Eye,
+  ArrowUpDown,
+  Filter,
+  ChevronDown,
+  ChevronRight,
+  Check,
+  LayoutGrid,
+  SlidersHorizontal,
+  EyeOff,
+  FileText,
+  FileClock,
+  TrendingUp,
+  DollarSign,
+  UserCog,
+  Edit,
+  Settings,
+  ArrowRight,
+  Sparkle,
+  Calendar,
+  Banknote,
+  Briefcase,
+  CheckCircle2,
+  ListFilter,
+  ClipboardCheck,
+  ShieldAlert,
 } from "lucide-react";
 
 export const Route = createFileRoute("/increment-queuelist")({
   head: () => ({
     meta: [
       { title: "Approvals Console — CRIPTON HRIS" },
-      { name: "description", content: "Unified enterprise approval console for human resource increments, HR endorsements, and final executive MD approvals." },
+      {
+        name: "description",
+        content:
+          "Unified enterprise approval console for human resource increments, HR endorsements, and final executive MD approvals.",
+      },
     ],
   }),
   component: IncrementQueueListPage,
@@ -41,7 +73,9 @@ function IncrementQueueListPage() {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        const filteredRaw = rawQueueRecords.filter(raw => !parsed.some((cust: any) => cust.empId === raw.empId));
+        const filteredRaw = rawQueueRecords.filter(
+          (raw) => !parsed.some((cust: any) => cust.empId === raw.empId),
+        );
         setQueueRecords([...parsed, ...filteredRaw]);
       } catch (e) {
         console.error(e);
@@ -90,7 +124,9 @@ function IncrementQueueListPage() {
   const [editingRecord, setEditingRecord] = useState<QueueRecord | null>(null);
 
   // Tab control state inside the Edit Configurator Modal
-  const [modalActiveTab, setModalActiveTab] = useState<"schedule" | "adjust" | "allowances" | "promotion">("schedule");
+  const [modalActiveTab, setModalActiveTab] = useState<
+    "schedule" | "adjust" | "allowances" | "promotion"
+  >("schedule");
 
   // Columns visibility & sorting states
   const [visibleCols, setVisibleCols] = useState(defaultColumns);
@@ -183,11 +219,10 @@ function IncrementQueueListPage() {
     setEditIncAmount(computedGrossInc.toString());
 
     // Basic splits allocations
-    setEditHouseRent(Math.round(computedBasicInc * 0.50).toString());
+    setEditHouseRent(Math.round(computedBasicInc * 0.5).toString());
     setEditMedical(Math.round(computedBasicInc * 0.12).toString());
     setEditConveyance("500");
     setEditFood("500");
-
   }, [editIncrementVal, editCalBy, editIncBy, editingRecord]);
 
   const applyPresetPercentage = (pct: number) => {
@@ -202,22 +237,26 @@ function IncrementQueueListPage() {
 
     const parsedGrossVal = parseFloat(editIncGross) || 0;
 
-    setQueueRecords(prev => prev.map(item => {
-      if (item.sl === editingRecord.sl) {
-        const currentGross = item.prevGross || item.grossAfterInc || 30000;
-        return {
-          ...item,
-          prevGross: currentGross,
-          lastIncDate: editIncDate,
-          lastIncAmount: parsedGrossVal,
-          grossAfterInc: currentGross + parsedGrossVal
-        };
-      }
-      return item;
-    }));
+    setQueueRecords((prev) =>
+      prev.map((item) => {
+        if (item.sl === editingRecord.sl) {
+          const currentGross = item.prevGross || item.grossAfterInc || 30000;
+          return {
+            ...item,
+            prevGross: currentGross,
+            lastIncDate: editIncDate,
+            lastIncAmount: parsedGrossVal,
+            grossAfterInc: currentGross + parsedGrossVal,
+          };
+        }
+        return item;
+      }),
+    );
 
     setEditingRecord(null);
-    showToast(`Salary increment submitted successfully for ${editingRecord.empName}! Queue entry updated.`);
+    showToast(
+      `Salary increment submitted successfully for ${editingRecord.empName}! Queue entry updated.`,
+    );
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -240,20 +279,21 @@ function IncrementQueueListPage() {
   };
 
   const departmentsList = useMemo(() => {
-    const depts = new Set(queueRecords.map(r => r.department));
+    const depts = new Set(queueRecords.map((r) => r.department));
     return Array.from(depts).sort();
   }, [queueRecords]);
 
   const sectionsList = useMemo(() => {
-    const filteredDepts = department === "All Departments"
-      ? queueRecords
-      : queueRecords.filter(r => r.department === department);
-    const sections = new Set(filteredDepts.map(r => r.section));
+    const filteredDepts =
+      department === "All Departments"
+        ? queueRecords
+        : queueRecords.filter((r) => r.department === department);
+    const sections = new Set(filteredDepts.map((r) => r.section));
     return Array.from(sections).sort();
   }, [department, queueRecords]);
 
   const designationsList = useMemo(() => {
-    const desigs = new Set(queueRecords.map(r => r.designation));
+    const desigs = new Set(queueRecords.map((r) => r.designation));
     return Array.from(desigs).sort();
   }, [queueRecords]);
 
@@ -304,22 +344,20 @@ function IncrementQueueListPage() {
     if (selectedEmpIds.length === filteredRecords.length) {
       setSelectedEmpIds([]);
     } else {
-      setSelectedEmpIds(filteredRecords.map(r => r.empId));
+      setSelectedEmpIds(filteredRecords.map((r) => r.empId));
     }
   };
 
   const toggleSelectEmp = (empId: string) => {
-    setSelectedEmpIds(prev =>
-      prev.includes(empId)
-        ? prev.filter(item => item !== empId)
-        : [...prev, empId]
+    setSelectedEmpIds((prev) =>
+      prev.includes(empId) ? prev.filter((item) => item !== empId) : [...prev, empId],
     );
   };
 
   const toggleColumn = (key: keyof typeof defaultColumns) => {
-    setVisibleCols(prev => ({
+    setVisibleCols((prev) => ({
       ...prev,
-      [key]: !prev[key]
+      [key]: !prev[key],
     }));
   };
 
@@ -327,25 +365,28 @@ function IncrementQueueListPage() {
     let list = [...queueRecords];
 
     if (appliedFilters.department !== "All Departments") {
-      list = list.filter(r => r.department === appliedFilters.department);
+      list = list.filter((r) => r.department === appliedFilters.department);
     }
     if (appliedFilters.section !== "ALL") {
-      list = list.filter(r => r.section === appliedFilters.section);
+      list = list.filter((r) => r.section === appliedFilters.section);
     }
     if (appliedFilters.designation !== "ALL") {
-      list = list.filter(r => r.designation === appliedFilters.designation);
+      list = list.filter((r) => r.designation === appliedFilters.designation);
     }
     if (appliedFilters.searchEmpId.trim()) {
-      list = list.filter(r => r.empId.toLowerCase().includes(appliedFilters.searchEmpId.trim().toLowerCase()));
+      list = list.filter((r) =>
+        r.empId.toLowerCase().includes(appliedFilters.searchEmpId.trim().toLowerCase()),
+      );
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      list = list.filter(r =>
-        r.empId.toLowerCase().includes(q) ||
-        r.empName.toLowerCase().includes(q) ||
-        r.designation.toLowerCase().includes(q) ||
-        r.section.toLowerCase().includes(q) ||
-        r.department.toLowerCase().includes(q)
+      list = list.filter(
+        (r) =>
+          r.empId.toLowerCase().includes(q) ||
+          r.empName.toLowerCase().includes(q) ||
+          r.designation.toLowerCase().includes(q) ||
+          r.section.toLowerCase().includes(q) ||
+          r.department.toLowerCase().includes(q),
       );
     }
 
@@ -373,7 +414,7 @@ function IncrementQueueListPage() {
     let totalPending = 0;
     let totalAdjustedVal = 0;
 
-    queueRecords.forEach(r => {
+    queueRecords.forEach((r) => {
       if (r.lastIncAmount) {
         totalAdjustedVal += r.lastIncAmount;
       } else {
@@ -411,13 +452,32 @@ function IncrementQueueListPage() {
 
   // MOCK HR ENDORSEMENTS
   const mockHrEndorsements = [
-    { id: "HR-9844", name: "Md. Rafsan Kabir", department: "Core Development", amount: 8500, date: "18/05/2026" },
-    { id: "HR-9122", name: "Md Johirul Islam", department: "Business Automation", amount: 4500, date: "17/05/2026" }
+    {
+      id: "HR-9844",
+      name: "Md. Rafsan Kabir",
+      department: "Core Development",
+      amount: 8500,
+      date: "18/05/2026",
+    },
+    {
+      id: "HR-9122",
+      name: "Md Johirul Islam",
+      department: "Business Automation",
+      amount: 4500,
+      date: "17/05/2026",
+    },
   ];
 
   // MOCK EXECUTIVE APPROVALS
   const mockExecApprovals = [
-    { id: "MD-8812", name: "Mohammad Methoun Ahmed", department: "Business Automation", amount: 15000, date: "18/05/2026", justification: "System manager appraisal recommendation HOD" }
+    {
+      id: "MD-8812",
+      name: "Mohammad Methoun Ahmed",
+      department: "Business Automation",
+      amount: 15000,
+      date: "18/05/2026",
+      justification: "System manager appraisal recommendation HOD",
+    },
   ];
 
   return (
@@ -427,12 +487,13 @@ function IncrementQueueListPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 lg:p-8 space-y-6 print:p-0">
-
           {/* Breadcrumb and Page Header */}
           <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-2.5" />
                 <span className="hover:text-primary transition-colors">Human Resource</span>
                 <ChevronRight className="size-2.5" />
@@ -440,23 +501,37 @@ function IncrementQueueListPage() {
               </div>
               <div className="flex items-center gap-3">
                 <div className="size-2.5 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]" />
-                <h1 className="text-xl font-extrabold tracking-tight text-foreground">Approvals Console</h1>
+                <h1 className="text-xl font-extrabold tracking-tight text-foreground">
+                  Approvals Console
+                </h1>
               </div>
             </div>
 
             {/* Quick Metrics Bar */}
             <div className="flex items-center gap-3 flex-wrap">
               <div className="bg-card border border-border/70 rounded-xl px-3.5 py-1.5 shadow-2xs hover:shadow-xs transition duration-200">
-                <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80">Active Queue</div>
-                <div className="text-sm font-extrabold text-foreground mt-0.5">{queueRecords.length}</div>
+                <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80">
+                  Active Queue
+                </div>
+                <div className="text-sm font-extrabold text-foreground mt-0.5">
+                  {queueRecords.length}
+                </div>
               </div>
               <div className="bg-primary/10 border border-primary/20 rounded-xl px-3.5 py-1.5 shadow-2xs">
-                <div className="text-[9px] font-bold uppercase tracking-wider text-primary">HR Endorsements</div>
-                <div className="text-sm font-extrabold text-primary mt-0.5">{mockHrEndorsements.length}</div>
+                <div className="text-[9px] font-bold uppercase tracking-wider text-primary">
+                  HR Endorsements
+                </div>
+                <div className="text-sm font-extrabold text-primary mt-0.5">
+                  {mockHrEndorsements.length}
+                </div>
               </div>
               <div className="bg-card border border-border/70 rounded-xl px-3.5 py-1.5 shadow-2xs">
-                <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80 font-black">MD Pending</div>
-                <div className="text-sm font-extrabold text-foreground mt-0.5">{mockExecApprovals.length}</div>
+                <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80 font-black">
+                  MD Pending
+                </div>
+                <div className="text-sm font-extrabold text-foreground mt-0.5">
+                  {mockExecApprovals.length}
+                </div>
               </div>
             </div>
           </div>
@@ -491,7 +566,10 @@ function IncrementQueueListPage() {
             <div className="fixed bottom-5 right-5 z-50 bg-[#1e293b] text-white border border-primary/30 rounded-xl px-4 py-3 shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div className="size-2 rounded-full bg-primary animate-ping" />
               <span className="text-xs font-semibold">{toastMessage}</span>
-              <button onClick={() => setToastMessage(null)} className="text-slate-400 hover:text-white transition">
+              <button
+                onClick={() => setToastMessage(null)}
+                className="text-slate-400 hover:text-white transition"
+              >
                 <X className="size-3.5" />
               </button>
             </div>
@@ -500,7 +578,6 @@ function IncrementQueueListPage() {
           {/* Tab Rendering Router */}
           {activeConsoleTab === "queue" && (
             <div className="space-y-6">
-
               {/* ⚡ SPONTANEOUS RESPONSIVE & SPACIOUS FILTER HUB */}
               <div className="bg-card rounded-lg border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300 print:hidden">
                 <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-primary/10 via-primary/45 to-primary/10" />
@@ -508,7 +585,9 @@ function IncrementQueueListPage() {
                 <form onSubmit={handleSearchSubmit} className="p-5 space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Employee ID</label>
+                      <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                        Employee ID
+                      </label>
                       <input
                         type="text"
                         value={searchEmpId}
@@ -519,7 +598,9 @@ function IncrementQueueListPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Department</label>
+                      <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                        Department
+                      </label>
                       <div className="relative">
                         <select
                           value={department}
@@ -527,8 +608,10 @@ function IncrementQueueListPage() {
                           className="w-full h-10 pl-3.5 pr-8 rounded-xl bg-muted border border-border/40 text-xs font-semibold appearance-none cursor-pointer"
                         >
                           <option value="All Departments">All Departments</option>
-                          {departmentsList.map(d => (
-                            <option key={d} value={d}>{d}</option>
+                          {departmentsList.map((d) => (
+                            <option key={d} value={d}>
+                              {d}
+                            </option>
                           ))}
                         </select>
                         <ChevronDown className="size-4 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
@@ -536,7 +619,9 @@ function IncrementQueueListPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Status</label>
+                      <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                        Status
+                      </label>
                       <div className="relative">
                         <select
                           value={status}
@@ -555,7 +640,9 @@ function IncrementQueueListPage() {
                   {showAdvancedFilters && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 pt-4 border-t border-border/30 animate-in slide-in-from-top-2 duration-200">
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Company</label>
+                        <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                          Company
+                        </label>
                         <select
                           value={company}
                           onChange={(e) => setCompany(e.target.value)}
@@ -567,7 +654,9 @@ function IncrementQueueListPage() {
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Area</label>
+                        <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                          Area
+                        </label>
                         <select
                           value={area}
                           onChange={(e) => setArea(e.target.value)}
@@ -578,7 +667,9 @@ function IncrementQueueListPage() {
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Employee Type</label>
+                        <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                          Employee Type
+                        </label>
                         <select
                           value={empType}
                           onChange={(e) => setEmpType(e.target.value)}
@@ -590,29 +681,37 @@ function IncrementQueueListPage() {
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Section</label>
+                        <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                          Section
+                        </label>
                         <select
                           value={section}
                           onChange={(e) => setSection(e.target.value)}
                           className="w-full h-9 rounded-xl bg-muted border border-border/40 text-xs font-medium"
                         >
                           <option value="ALL">ALL</option>
-                          {sectionsList.map(s => (
-                            <option key={s} value={s}>{s}</option>
+                          {sectionsList.map((s) => (
+                            <option key={s} value={s}>
+                              {s}
+                            </option>
                           ))}
                         </select>
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Designation</label>
+                        <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                          Designation
+                        </label>
                         <select
                           value={designation}
                           onChange={(e) => setDesignation(e.target.value)}
                           className="w-full h-9 rounded-xl bg-muted border border-border/40 text-xs font-medium"
                         >
                           <option value="ALL">ALL</option>
-                          {designationsList.map(d => (
-                            <option key={d} value={d}>{d}</option>
+                          {designationsList.map((d) => (
+                            <option key={d} value={d}>
+                              {d}
+                            </option>
                           ))}
                         </select>
                       </div>
@@ -626,7 +725,11 @@ function IncrementQueueListPage() {
                       className="w-full sm:w-auto h-9 px-4 rounded-xl border border-border hover:bg-muted text-xs font-bold flex items-center justify-center gap-1.5 transition text-muted-foreground hover:text-foreground"
                     >
                       <SlidersHorizontal className="size-3.5 text-primary" />
-                      <span>{showAdvancedFilters ? "Hide Advanced Filters" : "Show Advanced Filters (9)"}</span>
+                      <span>
+                        {showAdvancedFilters
+                          ? "Hide Advanced Filters"
+                          : "Show Advanced Filters (9)"}
+                      </span>
                     </button>
 
                     <div className="w-full sm:w-auto flex justify-end gap-2">
@@ -688,19 +791,45 @@ function IncrementQueueListPage() {
                     <thead>
                       <tr className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/60 bg-muted/40 border-b border-border/40">
                         <th className="sticky left-0 bg-[#f1f5f9] dark:bg-[#0f172a] px-2 py-4 font-bold border-r border-border/30 z-20 w-[110px] min-w-[110px] text-center">
-                          <input type="checkbox" checked={filteredRecords.length > 0 && selectedEmpIds.length === filteredRecords.length} onChange={toggleSelectAll} className="rounded border-border text-primary focus:ring-primary/20" />
+                          <input
+                            type="checkbox"
+                            checked={
+                              filteredRecords.length > 0 &&
+                              selectedEmpIds.length === filteredRecords.length
+                            }
+                            onChange={toggleSelectAll}
+                            className="rounded border-border text-primary focus:ring-primary/20"
+                          />
                         </th>
                         <th className="px-3 py-4 text-center font-bold">#</th>
-                        <th className="sticky left-[110px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-4 font-bold border-r border-border/30 z-20 w-[100px] min-w-[100px]">Emp ID</th>
-                        <th className="sticky left-[210px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-4 font-bold border-r border-border/40 z-20 w-[180px] min-w-[180px]">Name</th>
-                        {visibleCols.department && <th className="px-5 py-4 font-bold">Department</th>}
+                        <th className="sticky left-[110px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-4 font-bold border-r border-border/30 z-20 w-[100px] min-w-[100px]">
+                          Emp ID
+                        </th>
+                        <th className="sticky left-[210px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-4 font-bold border-r border-border/40 z-20 w-[180px] min-w-[180px]">
+                          Name
+                        </th>
+                        {visibleCols.department && (
+                          <th className="px-5 py-4 font-bold">Department</th>
+                        )}
                         {visibleCols.section && <th className="px-5 py-4 font-bold">Section</th>}
-                        {visibleCols.designation && <th className="px-5 py-4 font-bold">Designation</th>}
-                        {visibleCols.joiningDate && <th className="px-5 py-4 font-bold text-center">Joining Date</th>}
-                        {visibleCols.prevGross && <th className="px-5 py-4 font-bold text-right">Prev. Gross</th>}
-                        {visibleCols.lastIncDate && <th className="px-5 py-4 font-bold text-center">Last Inc Date</th>}
-                        {visibleCols.lastIncAmount && <th className="px-5 py-4 font-bold text-right">Last Inc Amount</th>}
-                        {visibleCols.grossAfterInc && <th className="px-5 py-4 font-bold text-right">Gross after Inc.</th>}
+                        {visibleCols.designation && (
+                          <th className="px-5 py-4 font-bold">Designation</th>
+                        )}
+                        {visibleCols.joiningDate && (
+                          <th className="px-5 py-4 font-bold text-center">Joining Date</th>
+                        )}
+                        {visibleCols.prevGross && (
+                          <th className="px-5 py-4 font-bold text-right">Prev. Gross</th>
+                        )}
+                        {visibleCols.lastIncDate && (
+                          <th className="px-5 py-4 font-bold text-center">Last Inc Date</th>
+                        )}
+                        {visibleCols.lastIncAmount && (
+                          <th className="px-5 py-4 font-bold text-right">Last Inc Amount</th>
+                        )}
+                        {visibleCols.grossAfterInc && (
+                          <th className="px-5 py-4 font-bold text-right">Gross after Inc.</th>
+                        )}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border/45">
@@ -711,29 +840,83 @@ function IncrementQueueListPage() {
                           : "bg-card group-hover:bg-[#f8fafc] dark:group-hover:bg-[#1e293b]";
 
                         return (
-                          <tr key={row.empId} className={`group ${isSelected ? "bg-[#f1f5f9] dark:bg-[#1e293b]" : "hover:bg-[#f8fafc] dark:hover:bg-[#1e293b]"}`}>
-                            <td className={`sticky left-0 ${stickyCellBgClass} px-2 py-2 border-r border-border/30 z-10 w-[110px] text-center`}>
+                          <tr
+                            key={row.empId}
+                            className={`group ${isSelected ? "bg-[#f1f5f9] dark:bg-[#1e293b]" : "hover:bg-[#f8fafc] dark:hover:bg-[#1e293b]"}`}
+                          >
+                            <td
+                              className={`sticky left-0 ${stickyCellBgClass} px-2 py-2 border-r border-border/30 z-10 w-[110px] text-center`}
+                            >
                               <div className="flex items-center gap-1.5 justify-center">
-                                <input type="checkbox" checked={isSelected} onChange={() => toggleSelectEmp(row.empId)} className="rounded text-primary" />
-                                <button className="size-6 bg-primary text-primary-foreground rounded hover:opacity-90 transition flex items-center justify-center" onClick={() => handleStartEdit(row)}>
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  onChange={() => toggleSelectEmp(row.empId)}
+                                  className="rounded text-primary"
+                                />
+                                <button
+                                  className="size-6 bg-primary text-primary-foreground rounded hover:opacity-90 transition flex items-center justify-center"
+                                  onClick={() => handleStartEdit(row)}
+                                >
                                   <Edit className="size-3" />
                                 </button>
-                                <button className="size-6 border border-border rounded flex items-center justify-center" onClick={() => handleStartEdit(row)}>
+                                <button
+                                  className="size-6 border border-border rounded flex items-center justify-center"
+                                  onClick={() => handleStartEdit(row)}
+                                >
                                   <Settings className="size-3" />
                                 </button>
                               </div>
                             </td>
-                            <td className="px-3 py-3.5 text-center font-semibold text-muted-foreground/80 font-mono">{idx + 1}</td>
-                            <td className={`sticky left-[110px] ${stickyCellBgClass} px-3 py-3.5 font-bold text-primary font-mono`}>{row.empId}</td>
-                            <td className={`sticky left-[210px] ${stickyCellBgClass} px-3 py-3.5 font-bold text-foreground truncate w-[180px]`}>{row.empName}</td>
-                            {visibleCols.department && <td className="px-5 py-3.5 text-foreground/80">{row.department}</td>}
-                            {visibleCols.section && <td className="px-5 py-3.5 text-muted-foreground/90">{row.section}</td>}
-                            {visibleCols.designation && <td className="px-5 py-3.5 font-semibold">{row.designation}</td>}
-                            {visibleCols.joiningDate && <td className="px-5 py-3.5 text-center font-mono">{row.joiningDate}</td>}
-                            {visibleCols.prevGross && <td className="px-5 py-3.5 text-right font-mono">৳{row.prevGross?.toLocaleString()}</td>}
-                            {visibleCols.lastIncDate && <td className="px-5 py-3.5 text-center font-mono">{row.lastIncDate || "—"}</td>}
-                            {visibleCols.lastIncAmount && <td className="px-5 py-3.5 text-right font-mono text-primary font-bold">৳{row.lastIncAmount?.toLocaleString()}</td>}
-                            {visibleCols.grossAfterInc && <td className="px-5 py-3.5 text-right font-mono text-primary font-black">৳{row.grossAfterInc?.toLocaleString()}</td>}
+                            <td className="px-3 py-3.5 text-center font-semibold text-muted-foreground/80 font-mono">
+                              {idx + 1}
+                            </td>
+                            <td
+                              className={`sticky left-[110px] ${stickyCellBgClass} px-3 py-3.5 font-bold text-primary font-mono`}
+                            >
+                              {row.empId}
+                            </td>
+                            <td
+                              className={`sticky left-[210px] ${stickyCellBgClass} px-3 py-3.5 font-bold text-foreground truncate w-[180px]`}
+                            >
+                              {row.empName}
+                            </td>
+                            {visibleCols.department && (
+                              <td className="px-5 py-3.5 text-foreground/80">{row.department}</td>
+                            )}
+                            {visibleCols.section && (
+                              <td className="px-5 py-3.5 text-muted-foreground/90">
+                                {row.section}
+                              </td>
+                            )}
+                            {visibleCols.designation && (
+                              <td className="px-5 py-3.5 font-semibold">{row.designation}</td>
+                            )}
+                            {visibleCols.joiningDate && (
+                              <td className="px-5 py-3.5 text-center font-mono">
+                                {row.joiningDate}
+                              </td>
+                            )}
+                            {visibleCols.prevGross && (
+                              <td className="px-5 py-3.5 text-right font-mono">
+                                ৳{row.prevGross?.toLocaleString()}
+                              </td>
+                            )}
+                            {visibleCols.lastIncDate && (
+                              <td className="px-5 py-3.5 text-center font-mono">
+                                {row.lastIncDate || "—"}
+                              </td>
+                            )}
+                            {visibleCols.lastIncAmount && (
+                              <td className="px-5 py-3.5 text-right font-mono text-primary font-bold">
+                                ৳{row.lastIncAmount?.toLocaleString()}
+                              </td>
+                            )}
+                            {visibleCols.grossAfterInc && (
+                              <td className="px-5 py-3.5 text-right font-mono text-primary font-black">
+                                ৳{row.grossAfterInc?.toLocaleString()}
+                              </td>
+                            )}
                           </tr>
                         );
                       })}
@@ -741,7 +924,6 @@ function IncrementQueueListPage() {
                   </table>
                 </div>
               </div>
-
             </div>
           )}
 
@@ -754,21 +936,48 @@ function IncrementQueueListPage() {
               </h3>
 
               <div className="space-y-4">
-                {mockHrEndorsements.map(item => (
-                  <div key={item.id} className="p-4 rounded-xl border border-border/60 bg-muted/20 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                {mockHrEndorsements.map((item) => (
+                  <div
+                    key={item.id}
+                    className="p-4 rounded-xl border border-border/60 bg-muted/20 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+                  >
                     <div>
-                      <div className="text-xs font-black text-foreground">{item.name} ({item.id})</div>
-                      <div className="text-[10px] text-muted-foreground font-semibold mt-1">Proposed adjustment of <strong className="text-primary">৳{item.amount.toLocaleString()}</strong> on {item.date}</div>
+                      <div className="text-xs font-black text-foreground">
+                        {item.name} ({item.id})
+                      </div>
+                      <div className="text-[10px] text-muted-foreground font-semibold mt-1">
+                        Proposed adjustment of{" "}
+                        <strong className="text-primary">৳{item.amount.toLocaleString()}</strong> on{" "}
+                        {item.date}
+                      </div>
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => showToast(`Increment endorsement declined/rolled back for ${item.name}.`)} className="h-8 px-4 border border-border hover:bg-muted text-xs font-bold text-muted-foreground rounded-lg transition">Rollback</button>
-                      <button onClick={() => showToast(`HR digital endorsement successfully compiled for ${item.name}!`)} className="h-8 px-4 bg-primary text-primary-foreground text-xs font-bold rounded-lg transition hover:opacity-90">Endorse & Sign</button>
+                      <button
+                        onClick={() =>
+                          showToast(`Increment endorsement declined/rolled back for ${item.name}.`)
+                        }
+                        className="h-8 px-4 border border-border hover:bg-muted text-xs font-bold text-muted-foreground rounded-lg transition"
+                      >
+                        Rollback
+                      </button>
+                      <button
+                        onClick={() =>
+                          showToast(
+                            `HR digital endorsement successfully compiled for ${item.name}!`,
+                          )
+                        }
+                        className="h-8 px-4 bg-primary text-primary-foreground text-xs font-bold rounded-lg transition hover:opacity-90"
+                      >
+                        Endorse & Sign
+                      </button>
                     </div>
                   </div>
                 ))}
 
                 {mockHrEndorsements.length === 0 && (
-                  <div className="text-center py-12 text-xs font-semibold text-muted-foreground">No HR endorsement actions required.</div>
+                  <div className="text-center py-12 text-xs font-semibold text-muted-foreground">
+                    No HR endorsement actions required.
+                  </div>
                 )}
               </div>
             </div>
@@ -783,30 +992,54 @@ function IncrementQueueListPage() {
               </h3>
 
               <div className="space-y-4">
-                {mockExecApprovals.map(item => (
-                  <div key={item.id} className="p-4 rounded-xl border border-border/60 bg-muted/20 space-y-3">
+                {mockExecApprovals.map((item) => (
+                  <div
+                    key={item.id}
+                    className="p-4 rounded-xl border border-border/60 bg-muted/20 space-y-3"
+                  >
                     <div className="flex justify-between items-center">
                       <div className="text-xs font-black text-foreground">{item.name}</div>
-                      <span className="text-[9px] font-bold uppercase tracking-wider bg-primary/10 text-primary px-2 py-0.5 rounded-md border border-primary/20">Executive appraisal</span>
+                      <span className="text-[9px] font-bold uppercase tracking-wider bg-primary/10 text-primary px-2 py-0.5 rounded-md border border-primary/20">
+                        Executive appraisal
+                      </span>
                     </div>
                     <div className="text-[11px] text-muted-foreground leading-relaxed">
                       Scale adjustment proposal: <strong>৳{item.amount.toLocaleString()}</strong>
-                      <div className="text-[10px] text-muted-foreground/80 mt-1 italic">HOD Remarks: "{item.justification}"</div>
+                      <div className="text-[10px] text-muted-foreground/80 mt-1 italic">
+                        HOD Remarks: "{item.justification}"
+                      </div>
                     </div>
                     <div className="flex justify-end gap-2 pt-2 border-t border-border/20">
-                      <button onClick={() => showToast("Authorisation rolled back with query notification.")} className="h-8 px-4 border border-[#ef4444]/20 text-[#ef4444] hover:bg-[#ef4444]/5 text-xs font-bold rounded-lg transition">Rollback</button>
-                      <button onClick={() => showToast("Final salary scale adjustment executed and committed to active payroll registers!")} className="h-8 px-5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition shadow-2xs">Authorise & Execute</button>
+                      <button
+                        onClick={() =>
+                          showToast("Authorisation rolled back with query notification.")
+                        }
+                        className="h-8 px-4 border border-[#ef4444]/20 text-[#ef4444] hover:bg-[#ef4444]/5 text-xs font-bold rounded-lg transition"
+                      >
+                        Rollback
+                      </button>
+                      <button
+                        onClick={() =>
+                          showToast(
+                            "Final salary scale adjustment executed and committed to active payroll registers!",
+                          )
+                        }
+                        className="h-8 px-5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition shadow-2xs"
+                      >
+                        Authorise & Execute
+                      </button>
                     </div>
                   </div>
                 ))}
 
                 {mockExecApprovals.length === 0 && (
-                  <div className="text-center py-12 text-xs font-semibold text-muted-foreground">No final authorizations pending in executive queues.</div>
+                  <div className="text-center py-12 text-xs font-semibold text-muted-foreground">
+                    No final authorizations pending in executive queues.
+                  </div>
                 )}
               </div>
             </div>
           )}
-
         </div>
       </main>
 
@@ -816,7 +1049,6 @@ function IncrementQueueListPage() {
       {editingRecord && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#090d16]/80 backdrop-blur-md p-4 overflow-y-auto animate-in fade-in duration-200">
           <div className="bg-card w-full max-w-6xl rounded-3xl border border-border/80 shadow-2xl relative animate-in zoom-in-95 duration-200 text-foreground overflow-hidden my-4 flex flex-col max-h-[92vh]">
-
             {/* Modal Header */}
             <div className="flex items-center justify-between p-5 border-b border-border/40 bg-muted/20 shrink-0">
               <div className="flex items-center gap-3">
@@ -843,9 +1075,7 @@ function IncrementQueueListPage() {
 
             {/* Scrollable Split-Screen Inner Container */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
-
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-
                 {/* LEFT PILLAR (40%): Employee profile dossier & live comparative card */}
                 <div className="lg:col-span-5 space-y-5">
                   <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs relative overflow-hidden">
@@ -858,20 +1088,32 @@ function IncrementQueueListPage() {
 
                     <div className="space-y-3">
                       <div className="flex justify-between items-center py-1.5 border-b border-border/30">
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase">Employee ID</span>
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                          Employee ID
+                        </span>
                         <span className="text-xs font-bold text-foreground font-mono bg-muted/60 px-2 py-0.5 rounded-md border border-border/20">
                           {editingRecord.empId}
                         </span>
                       </div>
                       <div className="flex justify-between items-center py-1.5 border-b border-border/30">
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase">Full Name</span>
-                        <span className="text-xs font-bold text-foreground truncate max-w-[180px]" title={editingRecord.empName}>
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                          Full Name
+                        </span>
+                        <span
+                          className="text-xs font-bold text-foreground truncate max-w-[180px]"
+                          title={editingRecord.empName}
+                        >
                           {editingRecord.empName}
                         </span>
                       </div>
                       <div className="flex justify-between items-center py-1.5 border-b border-border/30">
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase">Department</span>
-                        <span className="text-xs font-semibold text-foreground truncate max-w-[180px]" title={editingRecord.department}>
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                          Department
+                        </span>
+                        <span
+                          className="text-xs font-semibold text-foreground truncate max-w-[180px]"
+                          title={editingRecord.department}
+                        >
                           {editingRecord.department}
                         </span>
                       </div>
@@ -889,14 +1131,18 @@ function IncrementQueueListPage() {
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div className="bg-muted/40 p-3 rounded-xl border border-border/40">
-                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground">Before</span>
+                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground">
+                            Before
+                          </span>
                           <div className="text-sm font-black text-foreground font-mono mt-0.5">
                             ৳{computedModalStats.oldGross.toLocaleString("en-IN")}
                           </div>
                         </div>
 
                         <div className="bg-green-500/5 border border-green-500/20 p-3 rounded-xl">
-                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-green-500">Increment</span>
+                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-green-500">
+                            Increment
+                          </span>
                           <div className="text-sm font-black text-green-600 dark:text-green-400 font-mono mt-0.5">
                             +৳{computedModalStats.delta.toLocaleString("en-IN")}
                           </div>
@@ -905,13 +1151,17 @@ function IncrementQueueListPage() {
 
                       <div className="p-3 bg-muted/40 rounded-xl border border-border/40 flex items-center justify-between">
                         <div>
-                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-primary">New Outlay</span>
+                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-primary">
+                            New Outlay
+                          </span>
                           <div className="text-base font-black text-primary font-mono mt-0.5">
                             ৳{computedModalStats.newGross.toLocaleString("en-IN")}
                           </div>
                         </div>
                         <div className="text-right">
-                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground">Percentage Shift</span>
+                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-muted-foreground">
+                            Percentage Shift
+                          </span>
                           <div className="text-xs font-black text-green-600 mt-0.5 bg-green-500/10 px-2 py-0.5 rounded-md border border-green-500/15">
                             +{computedModalStats.percent.toFixed(1)}%
                           </div>
@@ -923,7 +1173,6 @@ function IncrementQueueListPage() {
 
                 {/* RIGHT PILLAR (60%): Segmented Tab configurator console */}
                 <div className="lg:col-span-7 bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden flex flex-col min-h-[460px]">
-
                   {/* Tab Selector Bar */}
                   <div className="flex border-b border-border/40 bg-muted/30 shrink-0">
                     <button
@@ -965,36 +1214,65 @@ function IncrementQueueListPage() {
 
                   {/* Tab Panels content area */}
                   <div className="p-6 flex-1">
-
                     {/* TAB 1: SCHEDULE */}
                     {modalActiveTab === "schedule" && (
                       <div className="space-y-5 animate-in fade-in duration-200">
                         <div className="bg-blue-500/5 p-4 rounded-xl border border-blue-500/10 mb-2">
-                          <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest block mb-1">📅 Timeframe & Operations Class</span>
-                          <p className="text-[11px] text-muted-foreground">Select the year, month, and date this salary adjustment should be committed to active payroll registers.</p>
+                          <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest block mb-1">
+                            📅 Timeframe & Operations Class
+                          </span>
+                          <p className="text-[11px] text-muted-foreground">
+                            Select the year, month, and date this salary adjustment should be
+                            committed to active payroll registers.
+                          </p>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Effective Year</label>
-                            <select value={editYear} onChange={(e) => setEditYear(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
+                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                              Effective Year
+                            </label>
+                            <select
+                              value={editYear}
+                              onChange={(e) => setEditYear(e.target.value)}
+                              className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs font-semibold"
+                            >
                               <option value="2026">2026</option>
                               <option value="2025">2025</option>
                             </select>
                           </div>
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Effective Month</label>
-                            <select value={editMonth} onChange={(e) => setEditMonth(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
+                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                              Effective Month
+                            </label>
+                            <select
+                              value={editMonth}
+                              onChange={(e) => setEditMonth(e.target.value)}
+                              className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs font-semibold"
+                            >
                               <option value="May">May</option>
                               <option value="January">January</option>
                             </select>
                           </div>
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Increment Date</label>
-                            <input type="text" value={editIncDate} onChange={(e) => setEditIncDate(e.target.value)} className="w-full h-10 px-3.5 rounded-xl bg-muted border border-border/40 text-xs font-bold" />
+                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                              Increment Date
+                            </label>
+                            <input
+                              type="text"
+                              value={editIncDate}
+                              onChange={(e) => setEditIncDate(e.target.value)}
+                              className="w-full h-10 px-3.5 rounded-xl bg-muted border border-border/40 text-xs font-bold"
+                            />
                           </div>
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Increment Type</label>
-                            <select value={editIncType} onChange={(e) => setEditIncType(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
+                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                              Increment Type
+                            </label>
+                            <select
+                              value={editIncType}
+                              onChange={(e) => setEditIncType(e.target.value)}
+                              className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs font-semibold"
+                            >
                               <option value="General">General</option>
                               <option value="Special">Special</option>
                               <option value="Promotion">Promotion</option>
@@ -1009,15 +1287,27 @@ function IncrementQueueListPage() {
                       <div className="space-y-5 animate-in fade-in duration-200">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Increment By</label>
-                            <select value={editIncBy} onChange={(e) => setEditIncBy(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
+                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                              Increment By
+                            </label>
+                            <select
+                              value={editIncBy}
+                              onChange={(e) => setEditIncBy(e.target.value)}
+                              className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs font-semibold"
+                            >
                               <option value="Gross">Gross Amount</option>
                               <option value="Basic">Basic Amount</option>
                             </select>
                           </div>
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Calculation Model</label>
-                            <select value={editCalBy} onChange={(e) => setEditCalBy(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
+                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                              Calculation Model
+                            </label>
+                            <select
+                              value={editCalBy}
+                              onChange={(e) => setEditCalBy(e.target.value)}
+                              className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs font-semibold"
+                            >
                               <option value="Fixed">Fixed Flat Amount (৳)</option>
                               <option value="Percentage">Percentage Increment (%)</option>
                             </select>
@@ -1025,30 +1315,69 @@ function IncrementQueueListPage() {
                         </div>
 
                         <div className="bg-muted/50 p-4 rounded-xl border border-border/40 space-y-3">
-                          <span className="text-[9.5px] font-extrabold uppercase tracking-widest text-primary block">Quick-Apply Percentage Preset</span>
+                          <span className="text-[9.5px] font-extrabold uppercase tracking-widest text-primary block">
+                            Quick-Apply Percentage Preset
+                          </span>
                           <div className="flex gap-1.5 flex-wrap">
-                            {[5, 10, 12.5, 15, 20].map(pct => (
-                              <button type="button" key={pct} onClick={() => applyPresetPercentage(pct)} className="h-8 px-3.5 rounded-lg border border-border bg-card text-xs font-extrabold hover:bg-primary hover:text-primary-foreground transition duration-150">+{pct}%</button>
+                            {[5, 10, 12.5, 15, 20].map((pct) => (
+                              <button
+                                type="button"
+                                key={pct}
+                                onClick={() => applyPresetPercentage(pct)}
+                                className="h-8 px-3.5 rounded-lg border border-border bg-card text-xs font-extrabold hover:bg-primary hover:text-primary-foreground transition duration-150"
+                              >
+                                +{pct}%
+                              </button>
                             ))}
                           </div>
                           <div className="space-y-1.5 pt-2">
                             <div className="flex justify-between text-[10px] font-bold text-muted-foreground">
                               <span>Interactive slider</span>
-                              <span className="text-foreground font-extrabold font-mono">{editCalBy === "Percentage" ? `${editIncrementVal}%` : `৳${parseFloat(editIncrementVal).toLocaleString()}`}</span>
+                              <span className="text-foreground font-extrabold font-mono">
+                                {editCalBy === "Percentage"
+                                  ? `${editIncrementVal}%`
+                                  : `৳${parseFloat(editIncrementVal).toLocaleString()}`}
+                              </span>
                             </div>
-                            <input type="range" min={editCalBy === "Percentage" ? 1 : 500} max={editCalBy === "Percentage" ? 50 : 25000} step={editCalBy === "Percentage" ? 0.5 : 500} value={parseFloat(editIncrementVal) || 0} onChange={(e) => setEditIncrementVal(e.target.value)} className="w-full h-1.5 rounded-lg bg-border accent-primary cursor-pointer" />
+                            <input
+                              type="range"
+                              min={editCalBy === "Percentage" ? 1 : 500}
+                              max={editCalBy === "Percentage" ? 50 : 25000}
+                              step={editCalBy === "Percentage" ? 0.5 : 500}
+                              value={parseFloat(editIncrementVal) || 0}
+                              onChange={(e) => setEditIncrementVal(e.target.value)}
+                              className="w-full h-1.5 rounded-lg bg-border accent-primary cursor-pointer"
+                            />
                           </div>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                           <div className="space-y-1.5 bg-primary/5 p-2 rounded-xl border border-primary/15">
-                            <label className="text-[10px] font-black uppercase tracking-wider text-primary">Adjuster Value {editCalBy === "Percentage" ? "(%)" : "(৳)"}</label>
-                            <input type="text" value={editIncrementVal} onChange={(e) => setEditIncrementVal(e.target.value)} className="w-full h-9 px-3 rounded-lg bg-card border border-border/40 text-xs font-black text-primary font-mono focus:ring-1 focus:ring-primary/25 outline-none" />
+                            <label className="text-[10px] font-black uppercase tracking-wider text-primary">
+                              Adjuster Value {editCalBy === "Percentage" ? "(%)" : "(৳)"}
+                            </label>
+                            <input
+                              type="text"
+                              value={editIncrementVal}
+                              onChange={(e) => setEditIncrementVal(e.target.value)}
+                              className="w-full h-9 px-3 rounded-lg bg-card border border-border/40 text-xs font-black text-primary font-mono focus:ring-1 focus:ring-primary/25 outline-none"
+                            />
                           </div>
 
                           <div className="flex items-center gap-2.5 px-2 py-4">
-                            <input type="checkbox" id="modal-arrear" checked={editArrear} onChange={(e) => setEditArrear(e.target.checked)} className="rounded border-border text-primary focus:ring-primary/20 cursor-pointer size-4.5" />
-                            <label htmlFor="modal-arrear" className="text-xs font-extrabold text-slate-700 dark:text-slate-300 cursor-pointer">Mark as Backlog Arrear</label>
+                            <input
+                              type="checkbox"
+                              id="modal-arrear"
+                              checked={editArrear}
+                              onChange={(e) => setEditArrear(e.target.checked)}
+                              className="rounded border-border text-primary focus:ring-primary/20 cursor-pointer size-4.5"
+                            />
+                            <label
+                              htmlFor="modal-arrear"
+                              className="text-xs font-extrabold text-slate-700 dark:text-slate-300 cursor-pointer"
+                            >
+                              Mark as Backlog Arrear
+                            </label>
                           </div>
                         </div>
                       </div>
@@ -1059,25 +1388,56 @@ function IncrementQueueListPage() {
                       <div className="space-y-5 animate-in fade-in duration-200">
                         <div className="bg-green-500/5 p-4 rounded-xl border border-green-500/10 mb-1 flex items-center gap-2">
                           <Info className="size-4 text-green-600 shrink-0" />
-                          <p className="text-[10.5px] text-muted-foreground font-semibold">Salary allocations split dynamically based on scale ratios. Modify inputs below for manual adjustments.</p>
+                          <p className="text-[10.5px] text-muted-foreground font-semibold">
+                            Salary allocations split dynamically based on scale ratios. Modify
+                            inputs below for manual adjustments.
+                          </p>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-muted-foreground uppercase">Inc Basic</label>
-                            <input type="text" value={editIncBasic} onChange={(e) => setEditIncBasic(e.target.value)} className="w-full h-9.5 px-3 rounded-xl bg-card border border-border/40 text-xs font-bold font-mono" />
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                              Inc Basic
+                            </label>
+                            <input
+                              type="text"
+                              value={editIncBasic}
+                              onChange={(e) => setEditIncBasic(e.target.value)}
+                              className="w-full h-9.5 px-3 rounded-xl bg-card border border-border/40 text-xs font-bold font-mono"
+                            />
                           </div>
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-muted-foreground uppercase">Inc Gross</label>
-                            <input type="text" value={editIncGross} onChange={(e) => setEditIncGross(e.target.value)} className="w-full h-9.5 px-3 rounded-xl bg-card border border-border/40 text-xs font-bold font-mono" />
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                              Inc Gross
+                            </label>
+                            <input
+                              type="text"
+                              value={editIncGross}
+                              onChange={(e) => setEditIncGross(e.target.value)}
+                              className="w-full h-9.5 px-3 rounded-xl bg-card border border-border/40 text-xs font-bold font-mono"
+                            />
                           </div>
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-muted-foreground uppercase">House Rent</label>
-                            <input type="text" value={editHouseRent} onChange={(e) => setEditHouseRent(e.target.value)} className="w-full h-9.5 px-3 rounded-xl bg-card border border-border/40 text-xs font-bold font-mono" />
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                              House Rent
+                            </label>
+                            <input
+                              type="text"
+                              value={editHouseRent}
+                              onChange={(e) => setEditHouseRent(e.target.value)}
+                              className="w-full h-9.5 px-3 rounded-xl bg-card border border-border/40 text-xs font-bold font-mono"
+                            />
                           </div>
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-muted-foreground uppercase">Medical</label>
-                            <input type="text" value={editMedical} onChange={(e) => setEditMedical(e.target.value)} className="w-full h-9.5 px-3 rounded-xl bg-card border border-border/40 text-xs font-bold font-mono" />
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                              Medical
+                            </label>
+                            <input
+                              type="text"
+                              value={editMedical}
+                              onChange={(e) => setEditMedical(e.target.value)}
+                              className="w-full h-9.5 px-3 rounded-xl bg-card border border-border/40 text-xs font-bold font-mono"
+                            />
                           </div>
                         </div>
                       </div>
@@ -1088,15 +1448,27 @@ function IncrementQueueListPage() {
                       <div className="space-y-5 animate-in fade-in duration-200">
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-muted-foreground uppercase">Prom Type</label>
-                            <select value={editPromType} onChange={(e) => setEditPromType(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                              Prom Type
+                            </label>
+                            <select
+                              value={editPromType}
+                              onChange={(e) => setEditPromType(e.target.value)}
+                              className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs font-semibold"
+                            >
                               <option value="ALL">ALL</option>
                               <option value="Designation">Designation</option>
                             </select>
                           </div>
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-muted-foreground uppercase">New Designation</label>
-                            <select value={editPromJobTitle} onChange={(e) => setEditPromJobTitle(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                              New Designation
+                            </label>
+                            <select
+                              value={editPromJobTitle}
+                              onChange={(e) => setEditPromJobTitle(e.target.value)}
+                              className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs font-semibold"
+                            >
                               <option value="ALL">ALL</option>
                               <option value="Sr. Executive">Sr. Executive</option>
                               <option value="Manager">Manager</option>
@@ -1104,33 +1476,49 @@ function IncrementQueueListPage() {
                           </div>
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-bold text-muted-foreground uppercase">Remarks / Notes</label>
-                          <textarea value={editRemarks} onChange={(e) => setEditRemarks(e.target.value)} rows={4} className="w-full p-3.5 rounded-lg bg-muted border border-border/40 text-xs font-semibold focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none" />
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                            Remarks / Notes
+                          </label>
+                          <textarea
+                            value={editRemarks}
+                            onChange={(e) => setEditRemarks(e.target.value)}
+                            rows={4}
+                            className="w-full p-3.5 rounded-lg bg-muted border border-border/40 text-xs font-semibold focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none"
+                          />
                         </div>
                       </div>
                     )}
-
                   </div>
-
                 </div>
-
               </div>
-
             </div>
 
             {/* Modal Bottom Sticky Footer Controls */}
             <div className="p-5 border-t border-border/40 bg-muted/20 shrink-0 flex items-center justify-between gap-3">
-              <span className="text-[10px] font-bold text-muted-foreground hidden md:inline">* Dynamic split engine scales variables immediately. Ensure audit reviews before submitting.</span>
+              <span className="text-[10px] font-bold text-muted-foreground hidden md:inline">
+                * Dynamic split engine scales variables immediately. Ensure audit reviews before
+                submitting.
+              </span>
               <div className="flex gap-2 ml-auto w-full md:w-auto justify-end">
-                <button type="button" onClick={() => setEditingRecord(null)} className="h-10 px-5 border border-border hover:bg-muted text-muted-foreground font-extrabold text-xs rounded-xl transition uppercase tracking-wider">Close</button>
-                <button type="button" onClick={handleSaveIncrement} className="h-10 px-8 bg-gradient-to-br from-primary to-primary-glow text-primary-foreground font-extrabold text-xs rounded-xl shadow-md hover:shadow-lg transition-all duration-200 uppercase tracking-wider">Submit Changes</button>
+                <button
+                  type="button"
+                  onClick={() => setEditingRecord(null)}
+                  className="h-10 px-5 border border-border hover:bg-muted text-muted-foreground font-extrabold text-xs rounded-xl transition uppercase tracking-wider"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveIncrement}
+                  className="h-10 px-8 bg-gradient-to-br from-primary to-primary-glow text-primary-foreground font-extrabold text-xs rounded-xl shadow-md hover:shadow-lg transition-all duration-200 uppercase tracking-wider"
+                >
+                  Submit Changes
+                </button>
               </div>
             </div>
-
           </div>
         </div>
       )}
-
     </div>
   );
 }

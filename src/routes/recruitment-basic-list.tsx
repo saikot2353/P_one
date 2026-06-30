@@ -3,8 +3,27 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  Sparkles, ChevronRight, Search, Plus, Trash2, Edit3, ShieldAlert,
-  Eye, CheckCircle2, XCircle, X, User, GraduationCap, Briefcase, MapPin, Heart, Mail, Phone, Calendar, Clock, Info
+  Sparkles,
+  ChevronRight,
+  Search,
+  Plus,
+  Trash2,
+  Edit3,
+  ShieldAlert,
+  Eye,
+  CheckCircle2,
+  XCircle,
+  X,
+  User,
+  GraduationCap,
+  Briefcase,
+  MapPin,
+  Heart,
+  Mail,
+  Phone,
+  Calendar,
+  Clock,
+  Info,
 } from "lucide-react";
 import { toast } from "sonner";
 import { initializeRecruitmentMockData } from "@/lib/recruitment-mock-data";
@@ -13,7 +32,10 @@ export const Route = createFileRoute("/recruitment-basic-list")({
   head: () => ({
     meta: [
       { title: "Application Queue List — CRIPTON HRIS" },
-      { name: "description", content: "Directory of registered candidate profiles temporarily enrolled." },
+      {
+        name: "description",
+        content: "Directory of registered candidate profiles temporarily enrolled.",
+      },
     ],
   }),
   component: BasicInfoListPage,
@@ -56,9 +78,9 @@ interface Candidate {
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
-    "Pending": "bg-[#faf5ff] text-[#7e22ce] border-[#e9d5ff]", // Purple
-    "Approved": "bg-[#ecfdf5] text-[#047857] border-[#a7f3d0]", // Green/Emerald
-    "Rejected": "bg-[#fdf2f2] text-[#b91c1c] border-[#fde8e8]", // Red
+    Pending: "bg-[#faf5ff] text-[#7e22ce] border-[#e9d5ff]", // Purple
+    Approved: "bg-[#ecfdf5] text-[#047857] border-[#a7f3d0]", // Green/Emerald
+    Rejected: "bg-[#fdf2f2] text-[#b91c1c] border-[#fde8e8]", // Red
   };
 
   let displayStatus = "Pending";
@@ -69,7 +91,9 @@ function StatusBadge({ status }: { status: string }) {
   }
 
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${map[displayStatus] || "bg-slate-50 text-slate-600 border-slate-200"}`}>
+    <span
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${map[displayStatus] || "bg-slate-50 text-slate-600 border-slate-200"}`}
+    >
       {displayStatus}
     </span>
   );
@@ -97,7 +121,7 @@ function BasicInfoListPage() {
   }, []);
 
   const handleApprove = (empId: string) => {
-    const updated = candidates.map(c => {
+    const updated = candidates.map((c) => {
       if (c.empIdTemp === empId) {
         return { ...c, assessStatus: "IE Pending" };
       }
@@ -110,7 +134,7 @@ function BasicInfoListPage() {
   };
 
   const handleReject = (empId: string) => {
-    const updated = candidates.map(c => {
+    const updated = candidates.map((c) => {
       if (c.empIdTemp === empId) {
         return { ...c, assessStatus: "HR Rejected" };
       }
@@ -146,7 +170,9 @@ function BasicInfoListPage() {
           <div className="bg-card rounded-lg border border-border/85 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-3" />
                 <span>e-Recruitment</span>
                 <ChevronRight className="size-3" />
@@ -163,7 +189,7 @@ function BasicInfoListPage() {
                 Total Queue: <strong className="text-foreground">{candidates.length}</strong>
               </span>
               <Link
-                to="/recruitment-basic-entry"
+                to="/e-recruitment-form"
                 className="h-9.5 px-4 bg-primary hover:opacity-95 text-primary-foreground font-black text-xs rounded-xl shadow-xs transition uppercase tracking-wider flex items-center justify-center gap-1.5"
               >
                 <Plus className="size-4" />
@@ -209,13 +235,25 @@ function BasicInfoListPage() {
                 <tbody className="divide-y divide-border/20">
                   {filteredCandidates.map((c, idx) => (
                     <tr key={c.empIdTemp} className="hover:bg-muted/40 transition duration-150">
-                      <td className="px-4 py-3.5 text-center font-mono text-muted-foreground/70 font-semibold">{idx + 1}</td>
-                      <td className="px-4 py-3.5 font-mono font-bold text-foreground">{c.empIdTemp}</td>
+                      <td className="px-4 py-3.5 text-center font-mono text-muted-foreground/70 font-semibold">
+                        {idx + 1}
+                      </td>
+                      <td className="px-4 py-3.5 font-mono font-bold text-foreground">
+                        {c.empIdTemp}
+                      </td>
                       <td className="px-4 py-3.5 font-bold text-foreground">{c.nameEng}</td>
-                      <td className="px-4 py-3.5 font-semibold text-muted-foreground font-mono">{c.personalContact}</td>
-                      <td className="px-4 py-3.5 font-medium text-muted-foreground font-mono">{c.personalEmail || "—"}</td>
-                      <td className="px-4 py-3.5 font-semibold text-muted-foreground/75 font-mono">{c.doj}</td>
-                      <td className="px-4 py-3.5 text-center"><StatusBadge status={c.assessStatus} /></td>
+                      <td className="px-4 py-3.5 font-semibold text-muted-foreground font-mono">
+                        {c.personalContact}
+                      </td>
+                      <td className="px-4 py-3.5 font-medium text-muted-foreground font-mono">
+                        {c.personalEmail || "—"}
+                      </td>
+                      <td className="px-4 py-3.5 font-semibold text-muted-foreground/75 font-mono">
+                        {c.doj}
+                      </td>
+                      <td className="px-4 py-3.5 text-center">
+                        <StatusBadge status={c.assessStatus} />
+                      </td>
                       <td className="px-4 py-3.5 text-center">
                         <div className="flex items-center justify-center gap-1.5">
                           <Link
@@ -232,7 +270,10 @@ function BasicInfoListPage() {
                   ))}
                   {filteredCandidates.length === 0 && (
                     <tr>
-                      <td colSpan={8} className="text-center py-10 font-bold text-muted-foreground text-xs">
+                      <td
+                        colSpan={8}
+                        className="text-center py-10 font-bold text-muted-foreground text-xs"
+                      >
                         No temporary candidates found in registration queue.
                       </td>
                     </tr>
@@ -242,7 +283,6 @@ function BasicInfoListPage() {
             </div>
           </div>
         </div>
-
       </main>
     </div>
   );

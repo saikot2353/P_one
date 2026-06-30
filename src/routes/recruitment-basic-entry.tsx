@@ -16,7 +16,7 @@ import {
   CheckCircle2,
   Info,
   Contact2,
-  Search
+  Search,
 } from "lucide-react";
 
 export const Route = createFileRoute("/recruitment-basic-entry")({
@@ -54,9 +54,10 @@ function FieldInput({
         defaultValue={value}
         placeholder={placeholder}
         className={`h-10 w-full rounded-xl border px-3 text-sm outline-none transition-all duration-200
-          ${readOnly
-            ? "bg-muted/60 border-border/30 text-primary font-bold cursor-default"
-            : "bg-background border-border/80 text-foreground hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/10"
+          ${
+            readOnly
+              ? "bg-muted/60 border-border/30 text-primary font-bold cursor-default"
+              : "bg-background border-border/80 text-foreground hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/10"
           }`}
       />
     </div>
@@ -116,7 +117,9 @@ function SectionHeader({
         {icon}
       </div>
       <div>
-        <h2 className="text-[11px] font-black text-foreground/70 uppercase tracking-widest leading-none">{title}</h2>
+        <h2 className="text-[11px] font-black text-foreground/70 uppercase tracking-widest leading-none">
+          {title}
+        </h2>
         {subtitle && <p className="text-[10px] text-muted-foreground/75 mt-1">{subtitle}</p>}
       </div>
     </div>
@@ -125,13 +128,7 @@ function SectionHeader({
 
 // ─── Smart Photo Uploader ────────────────────────────────────────────────────
 
-function PhotoUploader({
-  label,
-  isSignature = false,
-}: {
-  label: string;
-  isSignature?: boolean;
-}) {
+function PhotoUploader({ label, isSignature = false }: { label: string; isSignature?: boolean }) {
   const [preview, setPreview] = useState<string | null>(null);
   const [camMode, setCamMode] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -148,7 +145,9 @@ function PhotoUploader({
   return (
     <div className="flex-1 min-w-[280px] bg-muted/10 border border-border/60 rounded-lg p-5 space-y-4 transition-all hover:shadow-xs">
       <div className="flex items-center justify-between pb-2 border-b border-border/30">
-        <span className="text-[11px] font-bold uppercase tracking-wider text-foreground/80">{label}</span>
+        <span className="text-[11px] font-bold uppercase tracking-wider text-foreground/80">
+          {label}
+        </span>
         {preview && (
           <span className="inline-flex items-center gap-1 text-[9px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-200">
             <CheckCircle2 className="size-2.5" /> Loaded
@@ -207,7 +206,10 @@ function PhotoUploader({
             {preview && (
               <button
                 type="button"
-                onClick={() => { setPreview(null); if (fileRef.current) fileRef.current.value = ""; }}
+                onClick={() => {
+                  setPreview(null);
+                  if (fileRef.current) fileRef.current.value = "";
+                }}
                 className="h-8 px-2.5 rounded-lg bg-red-50 hover:bg-red-100 border border-red-150 text-red-600 text-[10px] font-bold transition-all"
               >
                 <Trash2 className="size-3.5" />
@@ -229,74 +231,102 @@ const religionOptions = [
   { value: "Hindu", label: "Hindu" },
   { value: "Christian", label: "Christian" },
   { value: "Buddhist", label: "Buddhist" },
-  { value: "Other", label: "Other" }
+  { value: "Other", label: "Other" },
 ];
 
 const maritalStatusOptions = [
   { value: "Single", label: "Single" },
   { value: "Married", label: "Married" },
   { value: "Divorced", label: "Divorced" },
-  { value: "Widowed", label: "Widowed" }
+  { value: "Widowed", label: "Widowed" },
 ];
 
 const employeeTypeOptions = [
   { value: "Worker", label: "Worker" },
   { value: "Staff", label: "Staff" },
-  { value: "Executive", label: "Executive" }
+  { value: "Executive", label: "Executive" },
 ];
 
 const departmentOptions = [
   { value: "RMG Operation", label: "RMG Operation" },
   { value: "Quality Control", label: "Quality Control" },
   { value: "HR & Admin", label: "HR & Admin" },
-  { value: "Commercial", label: "Commercial" }
+  { value: "Commercial", label: "Commercial" },
 ];
 
 const sectionOptions = [
   { value: "Sewing", label: "Sewing" },
   { value: "Cutting", label: "Cutting" },
   { value: "Finishing", label: "Finishing" },
-  { value: "Washing", label: "Washing" }
+  { value: "Washing", label: "Washing" },
 ];
 
 const designationOptions = [
   { value: "Operator", label: "Operator" },
   { value: "Helper", label: "Helper" },
   { value: "Quality Inspector", label: "Quality Inspector" },
-  { value: "Floor Incharge", label: "Floor Incharge" }
+  { value: "Floor Incharge", label: "Floor Incharge" },
 ];
 
 const unitOptions = [
   { value: "Unit-6", label: "Unit-6" },
   { value: "Unit-7", label: "Unit-7" },
-  { value: "Unit-8", label: "Unit-8" }
+  { value: "Unit-8", label: "Unit-8" },
 ];
 
-const lineOptions = Array.from({ length: 20 }, (_, i) => ({ value: `${i + 1}`, label: `Line ${i + 1}` }));
+const lineOptions = Array.from({ length: 20 }, (_, i) => ({
+  value: `${i + 1}`,
+  label: `Line ${i + 1}`,
+}));
 
-const gradeOptions = ["A+", "A", "A-", "B+", "B", "C+", "C", "H"].map(g => ({ value: g, label: g }));
+const gradeOptions = ["A+", "A", "A-", "B+", "B", "C+", "C", "H"].map((g) => ({
+  value: g,
+  label: g,
+}));
 
 const jobNatureOptions = [
   { value: "Permanent", label: "Permanent" },
   { value: "Temporary", label: "Temporary" },
   { value: "Contractual", label: "Contractual" },
-  { value: "Probation", label: "Probation" }
+  { value: "Probation", label: "Probation" },
 ];
 
 const shiftOptions = [
   { value: "General Shift", label: "General Shift" },
   { value: "Shift A", label: "Shift A" },
   { value: "Shift B", label: "Shift B" },
-  { value: "Shift C", label: "Shift C" }
+  { value: "Shift C", label: "Shift C" },
 ];
 
-const divisionOptions = ["Dhaka", "Chattogram", "Sylhet", "Rajshahi", "Khulna", "Barisal", "Rangpur", "Mymensingh"].map(d => ({ value: d, label: d }));
+const divisionOptions = [
+  "Dhaka",
+  "Chattogram",
+  "Sylhet",
+  "Rajshahi",
+  "Khulna",
+  "Barisal",
+  "Rangpur",
+  "Mymensingh",
+].map((d) => ({ value: d, label: d }));
 
-const districtOptions = ["Dhaka", "Gazipur", "Narayanganj", "Chattogram", "Sylhet", "Comilla"].map(d => ({ value: d, label: d }));
+const districtOptions = ["Dhaka", "Gazipur", "Narayanganj", "Chattogram", "Sylhet", "Comilla"].map(
+  (d) => ({ value: d, label: d }),
+);
 
-const thanaOptions = ["Uttara", "Mirpur", "Motijheel", "Tongi", "Gazipur Sadar", "Hathazari", "Raujan", "Boalkhali"].map(t => ({ value: t, label: t }));
+const thanaOptions = [
+  "Uttara",
+  "Mirpur",
+  "Motijheel",
+  "Tongi",
+  "Gazipur Sadar",
+  "Hathazari",
+  "Raujan",
+  "Boalkhali",
+].map((t) => ({ value: t, label: t }));
 
-const postOfficeOptions = ["Uttara Model Town", "Mirpur-10", "Hathazari", "Raujan Bazar"].map(p => ({ value: p, label: p }));
+const postOfficeOptions = ["Uttara Model Town", "Mirpur-10", "Hathazari", "Raujan Bazar"].map(
+  (p) => ({ value: p, label: p }),
+);
 
 const countryOptions = [{ value: "Bangladesh", label: "Bangladesh" }];
 
@@ -366,12 +396,13 @@ function RecruitmentBasicEntry() {
         <Topbar />
 
         <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-[1400px] mx-auto w-full">
-
           {/* Page Header */}
           <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-3" />
                 <span>IE Recruitment</span>
                 <ChevronRight className="size-3" />
@@ -384,7 +415,9 @@ function RecruitmentBasicEntry() {
             </div>
             <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/25 rounded-xl px-3 py-2 shadow-2xs">
               <Info className="size-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
-              <span className="text-[10px] text-amber-700 dark:text-amber-400 font-semibold">Data inter-linked to IE Assessment &amp; Personal Info</span>
+              <span className="text-[10px] text-amber-700 dark:text-amber-400 font-semibold">
+                Data inter-linked to IE Assessment &amp; Personal Info
+              </span>
             </div>
           </div>
 
@@ -482,26 +515,11 @@ function RecruitmentBasicEntry() {
                 options={designationOptions}
               />
 
-              <FieldSelect
-                label="Unit"
-                value={unit}
-                onChange={setUnit}
-                options={unitOptions}
-              />
+              <FieldSelect label="Unit" value={unit} onChange={setUnit} options={unitOptions} />
 
-              <FieldSelect
-                label="Line"
-                value={line}
-                onChange={setLine}
-                options={lineOptions}
-              />
+              <FieldSelect label="Line" value={line} onChange={setLine} options={lineOptions} />
 
-              <FieldSelect
-                label="Grade"
-                value={grade}
-                onChange={setGrade}
-                options={gradeOptions}
-              />
+              <FieldSelect label="Grade" value={grade} onChange={setGrade} options={gradeOptions} />
 
               <FieldSelect
                 label="Job Nature"
@@ -510,12 +528,7 @@ function RecruitmentBasicEntry() {
                 options={jobNatureOptions}
               />
 
-              <FieldSelect
-                label="Shift"
-                value={shift}
-                onChange={setShift}
-                options={shiftOptions}
-              />
+              <FieldSelect label="Shift" value={shift} onChange={setShift} options={shiftOptions} />
             </div>
           </div>
 
@@ -562,7 +575,12 @@ function RecruitmentBasicEntry() {
                 onChange={setPresCountry}
                 options={countryOptions}
               />
-              <FieldInput label="Full Present Address" readOnly placeholder="Auto-generated" className="md:col-span-2" />
+              <FieldInput
+                label="Full Present Address"
+                readOnly
+                placeholder="Auto-generated"
+                className="md:col-span-2"
+              />
             </div>
           </div>
 
@@ -570,9 +588,13 @@ function RecruitmentBasicEntry() {
           <div className="bg-card rounded-lg border border-border/80 shadow-2xs overflow-hidden">
             <div className="flex items-center justify-between gap-3 px-5 py-3.5 border-b border-border/50 bg-muted/20">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-card border border-border/80 text-primary shadow-2xs"><MapPin className="size-4" /></div>
+                <div className="p-2 rounded-xl bg-card border border-border/80 text-primary shadow-2xs">
+                  <MapPin className="size-4" />
+                </div>
                 <div>
-                  <h2 className="text-[11px] font-black text-foreground/70 uppercase tracking-widest leading-none">Permanent Address</h2>
+                  <h2 className="text-[11px] font-black text-foreground/70 uppercase tracking-widest leading-none">
+                    Permanent Address
+                  </h2>
                   <p className="text-[10px] text-muted-foreground/75 mt-1">Home / native address</p>
                 </div>
               </div>
@@ -585,10 +607,14 @@ function RecruitmentBasicEntry() {
                   className="size-3.5 accent-primary cursor-pointer rounded"
                 />
                 <Copy className="size-3 text-muted-foreground" />
-                <span className="text-[10.5px] text-foreground font-bold whitespace-nowrap">Same as Present Address</span>
+                <span className="text-[10.5px] text-foreground font-bold whitespace-nowrap">
+                  Same as Present Address
+                </span>
               </label>
             </div>
-            <div className={`p-6 grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-5 transition-opacity duration-300 ${copyAddress ? "opacity-50 pointer-events-none" : ""}`}>
+            <div
+              className={`p-6 grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-5 transition-opacity duration-300 ${copyAddress ? "opacity-50 pointer-events-none" : ""}`}
+            >
               <FieldSelect
                 label="Division"
                 value={permDivision}
@@ -624,7 +650,12 @@ function RecruitmentBasicEntry() {
                 onChange={setPermCountry}
                 options={countryOptions}
               />
-              <FieldInput label="Full Permanent Address" readOnly placeholder="Auto-generated" className="md:col-span-2" />
+              <FieldInput
+                label="Full Permanent Address"
+                readOnly
+                placeholder="Auto-generated"
+                className="md:col-span-2"
+              />
             </div>
           </div>
 
@@ -637,13 +668,8 @@ function RecruitmentBasicEntry() {
             />
             <div className="p-6">
               <div className="flex flex-col md:flex-row gap-6">
-                <PhotoUploader
-                  label="Employee Photo"
-                />
-                <PhotoUploader
-                  label="Employee Signature"
-                  isSignature={true}
-                />
+                <PhotoUploader label="Employee Photo" />
+                <PhotoUploader label="Employee Signature" isSignature={true} />
               </div>
             </div>
           </div>
@@ -651,7 +677,8 @@ function RecruitmentBasicEntry() {
           {/* ── SUBMIT BAR (at the very bottom) ────────────────────────── */}
           <div className="p-5 bg-card rounded-lg border border-border/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-[11px] text-muted-foreground font-semibold">
-              All <span className="text-red-500 font-bold">*</span> marked fields are required before candidate registration.
+              All <span className="text-red-500 font-bold">*</span> marked fields are required
+              before candidate registration.
             </p>
             <div className="flex items-center gap-3">
               <button
@@ -670,7 +697,6 @@ function RecruitmentBasicEntry() {
               </button>
             </div>
           </div>
-
         </div>
       </main>
     </div>

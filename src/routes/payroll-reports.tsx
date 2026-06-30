@@ -2,8 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  ChevronRight, BarChart3, FileText, History, List, 
-  CalendarDays, Calculator, Gift, PieChart
+  ChevronRight,
+  BarChart3,
+  FileText,
+  History,
+  List,
+  CalendarDays,
+  Calculator,
+  Gift,
+  PieChart,
 } from "lucide-react";
 
 export const Route = createFileRoute("/payroll-reports")({
@@ -23,35 +30,100 @@ function PayrollReportsPage() {
       description: "Generate comprehensive salary sheets and history.",
       icon: FileText,
       items: [
-        { title: "Monthly Salary Details", icon: FileText, desc: "Detailed breakdown of monthly salaries.", to: "#" },
-        { title: "Monthly Left Salary Sheet", icon: FileText, desc: "Salary sheet for resigned/left employees.", to: "#" },
-        { title: "Employee Salary History", icon: History, desc: "Historical salary data for employees.", to: "#" },
-        { title: "Monthly Advance Salary Sheet", icon: FileText, desc: "Report on monthly advance salary payments.", to: "#" },
-        { title: "Summary Salary Sheet", icon: List, desc: "Summarized overview of the monthly salary.", to: "#" },
-      ]
+        {
+          title: "Monthly Salary Details",
+          icon: FileText,
+          desc: "Detailed breakdown of monthly salaries.",
+          to: "#",
+        },
+        {
+          title: "Monthly Left Salary Sheet",
+          icon: FileText,
+          desc: "Salary sheet for resigned/left employees.",
+          to: "#",
+        },
+        {
+          title: "Employee Salary History",
+          icon: History,
+          desc: "Historical salary data for employees.",
+          to: "#",
+        },
+        {
+          title: "Monthly Advance Salary Sheet",
+          icon: FileText,
+          desc: "Report on monthly advance salary payments.",
+          to: "#",
+        },
+        {
+          title: "Summary Salary Sheet",
+          icon: List,
+          desc: "Summarized overview of the monthly salary.",
+          to: "#",
+        },
+      ],
     },
     {
       title: "Bonus & Tax Reports",
       description: "Review tax calculations and bonus distributions.",
       icon: Calculator,
       items: [
-        { title: "Employee Tax", icon: Calculator, desc: "Report on employee tax deductions and calculations.", to: "#" },
-        { title: "Yearly Bonus Report", icon: Gift, desc: "Comprehensive report on yearly bonuses.", to: "#" },
-        { title: "Bonus Summary Report", icon: PieChart, desc: "Summarized overview of distributed bonuses.", to: "#" },
-        { title: "Bonus Summary Report(Unit Wise)", icon: PieChart, desc: "Bonus summary breakdown by organizational unit.", to: "#" },
-      ]
+        {
+          title: "Employee Tax",
+          icon: Calculator,
+          desc: "Report on employee tax deductions and calculations.",
+          to: "#",
+        },
+        {
+          title: "Yearly Bonus Report",
+          icon: Gift,
+          desc: "Comprehensive report on yearly bonuses.",
+          to: "#",
+        },
+        {
+          title: "Bonus Summary Report",
+          icon: PieChart,
+          desc: "Summarized overview of distributed bonuses.",
+          to: "#",
+        },
+        {
+          title: "Bonus Summary Report(Unit Wise)",
+          icon: PieChart,
+          desc: "Bonus summary breakdown by organizational unit.",
+          to: "#",
+        },
+      ],
     },
     {
       title: "Other Payroll Reports",
       description: "Access holiday, leave, allowance, and settlement reports.",
       icon: BarChart3,
       items: [
-        { title: "Holiday Summary Sheet", icon: CalendarDays, desc: "Summary of holidays and related pay.", to: "#" },
-        { title: "Earn Leave Pay Report", icon: FileText, desc: "Report on earned leave encashment and payments.", to: "#" },
-        { title: "Allowance Payment", icon: FileText, desc: "Detailed report on allowance distributions.", to: "#" },
-        { title: "Final Settlement", icon: FileText, desc: "Report on processed final settlements.", to: "#" },
-      ]
-    }
+        {
+          title: "Holiday Summary Sheet",
+          icon: CalendarDays,
+          desc: "Summary of holidays and related pay.",
+          to: "#",
+        },
+        {
+          title: "Earn Leave Pay Report",
+          icon: FileText,
+          desc: "Report on earned leave encashment and payments.",
+          to: "#",
+        },
+        {
+          title: "Allowance Payment",
+          icon: FileText,
+          desc: "Detailed report on allowance distributions.",
+          to: "#",
+        },
+        {
+          title: "Final Settlement",
+          icon: FileText,
+          desc: "Report on processed final settlements.",
+          to: "#",
+        },
+      ],
+    },
   ];
 
   return (
@@ -59,11 +131,13 @@ function PayrollReportsPage() {
       <Sidebar />
       <main className="flex-1 min-w-0 flex flex-col relative overflow-y-auto bg-muted/20">
         <Topbar />
-        
+
         <div className="p-4 md:p-6 space-y-6 w-full">
           {/* Breadcrumb Navigation */}
           <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-            <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
+            <Link to="/" className="hover:text-foreground transition-colors">
+              Home
+            </Link>
             <ChevronRight className="size-3.5" />
             <span>Payroll</span>
             <ChevronRight className="size-3.5" />
@@ -81,12 +155,14 @@ function PayrollReportsPage() {
                   Payroll Reports Hub
                 </h1>
                 <p className="text-sm text-muted-foreground mt-2 max-w-2xl">
-                  Generate, view, and export detailed reports for salaries, bonuses, taxes, and final settlements.
+                  Generate, view, and export detailed reports for salaries, bonuses, taxes, and
+                  final settlements.
                 </p>
               </div>
               <div className="shrink-0">
                 <div className="text-xs font-medium text-muted-foreground bg-muted px-3 py-2 rounded-md border border-border">
-                  Accounting Period: <span className="text-foreground font-semibold">June 2026</span>
+                  Accounting Period:{" "}
+                  <span className="text-foreground font-semibold">June 2026</span>
                 </div>
               </div>
             </div>
@@ -95,17 +171,22 @@ function PayrollReportsPage() {
           {/* Sections as Cards */}
           <div className="space-y-6">
             {sections.map((section) => (
-              <div key={section.title} className="bg-card border border-border/60 rounded-lg shadow-sm overflow-hidden flex flex-col">
+              <div
+                key={section.title}
+                className="bg-card border border-border/60 rounded-lg shadow-sm overflow-hidden flex flex-col"
+              >
                 <div className="p-5 border-b border-border/60 bg-muted/10">
                   <div className="flex items-center gap-2.5 text-foreground">
                     <section.icon className="size-5 text-muted-foreground" />
                     <h2 className="text-lg font-semibold tracking-tight">{section.title}</h2>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1.5 ml-7.5">{section.description}</p>
+                  <p className="text-sm text-muted-foreground mt-1.5 ml-7.5">
+                    {section.description}
+                  </p>
                 </div>
                 <div className="p-3 bg-card">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                    {section.items.map(category => (
+                    {section.items.map((category) => (
                       <Link
                         key={category.title}
                         to={category.to}
@@ -115,8 +196,12 @@ function PayrollReportsPage() {
                           <category.icon className="size-4" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors truncate">{category.title}</h3>
-                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2 leading-relaxed">{category.desc}</p>
+                          <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors truncate">
+                            {category.title}
+                          </h3>
+                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2 leading-relaxed">
+                            {category.desc}
+                          </p>
                         </div>
                         <ChevronRight className="size-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0 self-center" />
                       </Link>
@@ -126,7 +211,6 @@ function PayrollReportsPage() {
               </div>
             ))}
           </div>
-
         </div>
       </main>
     </div>

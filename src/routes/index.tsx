@@ -3,20 +3,30 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { DailyQuickStats } from "@/components/dashboard/DailyQuickStats";
 import {
-  HeadcountChart, DepartmentChart, AttendanceChart, GoalsRadial,
-  TodayAttendancePie, TodayLateAbsentPie, DateWiseOTBar
+  HeadcountChart,
+  DepartmentChart,
+  AttendanceChart,
+  GoalsRadial,
+  TodayAttendancePie,
+  TodayLateAbsentPie,
+  DateWiseOTBar,
 } from "@/components/dashboard/Charts";
-import {
-  LeaveRequests, UpcomingEvents, RecruitmentPipeline,
-} from "@/components/dashboard/Panels";
+import { LeaveRequests, UpcomingEvents, RecruitmentPipeline } from "@/components/dashboard/Panels";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "CRIPTON HRIS — Workforce Intelligence Dashboard" },
-      { name: "description", content: "A modern HR command center: headcount, attendance, payroll, and recruitment analytics in one place." },
+      {
+        name: "description",
+        content:
+          "A modern HR command center: headcount, attendance, payroll, and recruitment analytics in one place.",
+      },
       { property: "og:title", content: "CRIPTON HRIS — Workforce Intelligence Dashboard" },
-      { property: "og:description", content: "Professional HR dashboard with charts, approvals, and recruitment pipelines." },
+      {
+        property: "og:description",
+        content: "Professional HR dashboard with charts, approvals, and recruitment pipelines.",
+      },
     ],
   }),
   component: DashboardPage,
@@ -33,8 +43,12 @@ function DashboardPage() {
           <div className="space-y-2.5">
             <div className="flex items-center justify-between border-b border-border/40 pb-1.5 mb-2">
               <div>
-                <h2 className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Daily Quick Stats</h2>
-                <p className="text-[10px] text-muted-foreground/60 mt-0.5 font-semibold">Real-time operational metrics for today</p>
+                <h2 className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                  Daily Quick Stats
+                </h2>
+                <p className="text-[10px] text-muted-foreground/60 mt-0.5 font-semibold">
+                  Real-time operational metrics for today
+                </p>
               </div>
             </div>
             <DailyQuickStats />
@@ -44,8 +58,12 @@ function DashboardPage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
               <div>
-                <h2 className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Today's Presence & Overtime</h2>
-                <p className="text-[10px] text-muted-foreground/60 mt-0.5 font-semibold">Daily attendance statuses and overtime payouts</p>
+                <h2 className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                  Today's Presence & Overtime
+                </h2>
+                <p className="text-[10px] text-muted-foreground/60 mt-0.5 font-semibold">
+                  Daily attendance statuses and overtime payouts
+                </p>
               </div>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5 lg:gap-4.5">
@@ -61,8 +79,12 @@ function DashboardPage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
               <div>
-                <h2 className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Historical Overview</h2>
-                <p className="text-[10px] text-muted-foreground/60 mt-0.5 font-semibold">Headcount cycles, department allocation splits, and attendance schedules</p>
+                <h2 className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                  Historical Overview
+                </h2>
+                <p className="text-[10px] text-muted-foreground/60 mt-0.5 font-semibold">
+                  Headcount cycles, department allocation splits, and attendance schedules
+                </p>
               </div>
             </div>
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-3.5 lg:gap-4.5">
@@ -79,8 +101,12 @@ function DashboardPage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
               <div>
-                <h2 className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Operations & Logistics</h2>
-                <p className="text-[10px] text-muted-foreground/60 mt-0.5 font-semibold">Request approvals, milestone tracking, and active recruitment pipelines</p>
+                <h2 className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                  Operations & Logistics
+                </h2>
+                <p className="text-[10px] text-muted-foreground/60 mt-0.5 font-semibold">
+                  Request approvals, milestone tracking, and active recruitment pipelines
+                </p>
               </div>
             </div>
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-3.5 lg:gap-4.5">

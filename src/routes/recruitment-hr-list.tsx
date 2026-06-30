@@ -38,13 +38,17 @@ function HRAssessmentListPage() {
         const parsed = JSON.parse(saved);
         setCandidates(parsed);
         // By default, show candidates that are pending HR approval
-        setFilteredCandidates(parsed.filter((c: any) => c.assessStatus === "HR Pending" || c.assessStatus === "IE Submitted"));
+        setFilteredCandidates(
+          parsed.filter(
+            (c: any) => c.assessStatus === "HR Pending" || c.assessStatus === "IE Submitted",
+          ),
+        );
       }
     }
   }, []);
 
   const handleSearch = () => {
-    const filtered = candidates.filter(c => {
+    const filtered = candidates.filter((c) => {
       if (assessStatus && c.assessStatus !== assessStatus) return false;
       if (empIdTemp && !c.empIdTemp.toLowerCase().includes(empIdTemp.toLowerCase())) return false;
       if (empType && c.employeeType !== empType) return false;
@@ -72,7 +76,9 @@ function HRAssessmentListPage() {
           <div className="bg-card rounded-lg border border-border/85 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-3" />
                 <span>IE Recruitment</span>
                 <ChevronRight className="size-3" />
@@ -87,21 +93,135 @@ function HRAssessmentListPage() {
 
           <div className="bg-card rounded-lg border border-border/80 shadow-xs p-6 space-y-6">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-primary uppercase">Assess Status *</label><select value={assessStatus} onChange={e => setAssessStatus(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted text-primary font-bold border border-border/40 text-xs focus:border-primary/80 outline-none"><option value="HR Pending">HR Pending</option><option value="HR Approved">HR Approved</option><option value="HR Rejected">HR Rejected</option><option value="">All</option></select></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-red-500 uppercase">DOJ From *</label><input type="date" value={dojFrom} onChange={e => setDojFrom(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none" /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-red-500 uppercase">DOJ To *</label><input type="date" value={dojTo} onChange={e => setDojTo(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none" /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-muted-foreground uppercase">Emp Type</label><select value={empType} onChange={e => setEmpType(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"><option value="">Select/Multi</option><option value="Office Executive">Office Executive</option><option value="Worker">Worker</option></select></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-muted-foreground uppercase">Department</label><select value={department} onChange={e => setDepartment(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"><option value="">Select/Multi</option><option value="RMG Production">RMG Production</option></select></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-muted-foreground uppercase">Section</label><select value={section} onChange={e => setSection(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"><option value="">Select/Multi</option><option value="RMG-Production-IE & Planning">IE & Planning</option></select></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-muted-foreground uppercase">Designation</label><select value={designation} onChange={e => setDesignation(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"><option value="">Select/Multi</option><option value="Production Operator">Production Operator</option></select></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-muted-foreground uppercase">Unit</label><select value={unit} onChange={e => setUnit(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"><option value="">Select/Multi</option><option value="Unit-01">Unit-01</option></select></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-muted-foreground uppercase">Line</label><select value={line} onChange={e => setLine(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"><option value="">Select/Multi</option><option value="Line-04">Line-04</option></select></div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-primary uppercase">
+                  Assess Status *
+                </label>
+                <select
+                  value={assessStatus}
+                  onChange={(e) => setAssessStatus(e.target.value)}
+                  className="w-full h-10 px-3 rounded-xl bg-muted text-primary font-bold border border-border/40 text-xs focus:border-primary/80 outline-none"
+                >
+                  <option value="HR Pending">HR Pending</option>
+                  <option value="HR Approved">HR Approved</option>
+                  <option value="HR Rejected">HR Rejected</option>
+                  <option value="">All</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-red-500 uppercase">DOJ From *</label>
+                <input
+                  type="date"
+                  value={dojFrom}
+                  onChange={(e) => setDojFrom(e.target.value)}
+                  className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-red-500 uppercase">DOJ To *</label>
+                <input
+                  type="date"
+                  value={dojTo}
+                  onChange={(e) => setDojTo(e.target.value)}
+                  className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                  Emp Type
+                </label>
+                <select
+                  value={empType}
+                  onChange={(e) => setEmpType(e.target.value)}
+                  className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"
+                >
+                  <option value="">Select/Multi</option>
+                  <option value="Office Executive">Office Executive</option>
+                  <option value="Worker">Worker</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                  Department
+                </label>
+                <select
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"
+                >
+                  <option value="">Select/Multi</option>
+                  <option value="RMG Production">RMG Production</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                  Section
+                </label>
+                <select
+                  value={section}
+                  onChange={(e) => setSection(e.target.value)}
+                  className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"
+                >
+                  <option value="">Select/Multi</option>
+                  <option value="RMG-Production-IE & Planning">IE & Planning</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                  Designation
+                </label>
+                <select
+                  value={designation}
+                  onChange={(e) => setDesignation(e.target.value)}
+                  className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"
+                >
+                  <option value="">Select/Multi</option>
+                  <option value="Production Operator">Production Operator</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                  Unit
+                </label>
+                <select
+                  value={unit}
+                  onChange={(e) => setUnit(e.target.value)}
+                  className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"
+                >
+                  <option value="">Select/Multi</option>
+                  <option value="Unit-01">Unit-01</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                  Line
+                </label>
+                <select
+                  value={line}
+                  onChange={(e) => setLine(e.target.value)}
+                  className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"
+                >
+                  <option value="">Select/Multi</option>
+                  <option value="Line-04">Line-04</option>
+                </select>
+              </div>
               <div className="space-y-1.5 flex items-end gap-2">
                 <div className="flex-1 space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Emp ID-Temp</label>
-                  <input type="text" placeholder="Single/Multi" value={empIdTemp} onChange={e => setEmpIdTemp(e.target.value)} className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none" />
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Emp ID-Temp
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Single/Multi"
+                    value={empIdTemp}
+                    onChange={(e) => setEmpIdTemp(e.target.value)}
+                    className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs focus:border-primary/80 outline-none"
+                  />
                 </div>
-                <button onClick={handleSearch} className="h-10 px-4 rounded-xl bg-muted hover:bg-muted/80 text-foreground font-black text-xs transition flex items-center justify-center gap-1.5 shadow-sm border border-border/50">
+                <button
+                  onClick={handleSearch}
+                  className="h-10 px-4 rounded-xl bg-muted hover:bg-muted/80 text-foreground font-black text-xs transition flex items-center justify-center gap-1.5 shadow-sm border border-border/50"
+                >
                   <Search className="size-4 text-primary" /> Search
                 </button>
               </div>
@@ -134,7 +254,11 @@ function HRAssessmentListPage() {
                     <tr key={item.empIdTemp} className="hover:bg-muted/10 transition-colors">
                       <td className="px-4 py-3">{idx + 1}</td>
                       <td className="px-4 py-3">
-                        <button onClick={() => handleExecute(item.empIdTemp)} className="p-1.5 rounded-lg bg-yellow-100 text-yellow-700 hover:bg-yellow-400 hover:text-black border border-yellow-300 transition-colors" title="Execute Assessment">
+                        <button
+                          onClick={() => handleExecute(item.empIdTemp)}
+                          className="p-1.5 rounded-lg bg-yellow-100 text-yellow-700 hover:bg-yellow-400 hover:text-black border border-yellow-300 transition-colors"
+                          title="Execute Assessment"
+                        >
                           <Send className="size-4" />
                         </button>
                       </td>
@@ -143,7 +267,9 @@ function HRAssessmentListPage() {
                       <td className="px-4 py-3">{item.empCategory || item.employeeType}</td>
                       <td className="px-4 py-3">{item.department || "RMG Operation"}</td>
                       <td className="px-4 py-3">{item.section || "Sewing"}</td>
-                      <td className="px-4 py-3">{item.appliedFor || item.designation || "Operator"}</td>
+                      <td className="px-4 py-3">
+                        {item.appliedFor || item.designation || "Operator"}
+                      </td>
                       <td className="px-4 py-3">{item.jobNature || "Permanent"}</td>
                       <td className="px-4 py-3">{item.unit || "Unit-6"}</td>
                       <td className="px-4 py-3">{item.line || "52"}</td>
@@ -155,7 +281,10 @@ function HRAssessmentListPage() {
                   ))}
                   {filteredCandidates.length === 0 && (
                     <tr>
-                      <td colSpan={15} className="px-4 py-10 text-center text-muted-foreground text-xs font-bold">
+                      <td
+                        colSpan={15}
+                        className="px-4 py-10 text-center text-muted-foreground text-xs font-bold"
+                      >
                         No pending candidates found.
                       </td>
                     </tr>
@@ -163,7 +292,6 @@ function HRAssessmentListPage() {
                 </tbody>
               </table>
             </div>
-
           </div>
         </div>
       </main>

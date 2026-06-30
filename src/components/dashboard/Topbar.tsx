@@ -1,11 +1,33 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import {
-  Bell, Search, MessagesSquare, Sun, Moon, CornerDownLeft,
-  UserRound, Fingerprint, CalendarDays, CalendarX, Clock, Coins, Users,
-  RefreshCw, FileText, BarChart3, ClipboardCheck, ShieldAlert, Timer,
-  CreditCard, Cpu, ShieldCheck as ComplianceIcon, Lightbulb, LayoutDashboard, UserPlus,
-  SlidersHorizontal, Briefcase
+  Bell,
+  Search,
+  MessagesSquare,
+  Sun,
+  Moon,
+  CornerDownLeft,
+  UserRound,
+  Fingerprint,
+  CalendarDays,
+  CalendarX,
+  Clock,
+  Coins,
+  Users,
+  RefreshCw,
+  FileText,
+  BarChart3,
+  ClipboardCheck,
+  ShieldAlert,
+  Timer,
+  CreditCard,
+  Cpu,
+  ShieldCheck as ComplianceIcon,
+  Lightbulb,
+  LayoutDashboard,
+  UserPlus,
+  SlidersHorizontal,
+  Briefcase,
 } from "lucide-react";
 import avatarImg from "./avatar.png";
 
@@ -19,27 +41,92 @@ interface SearchMenuLink {
 const searchableMenus: SearchMenuLink[] = [
   { label: "Dashboard Overview", parent: "Home", to: "/" },
   // Personnel Info
-  { label: "Personnel List", parent: "Personnel Info", to: "/personnel-list", description: "View and filter complete staff profiles" },
-  { label: "ID Card Setup", parent: "Personnel Info", to: "/id-card-setup", description: "Design and generate dynamic employee ID cards" },
+  {
+    label: "Personnel List",
+    parent: "Personnel Info",
+    to: "/personnel-list",
+    description: "View and filter complete staff profiles",
+  },
+  {
+    label: "ID Card Setup",
+    parent: "Personnel Info",
+    to: "/id-card-setup",
+    description: "Design and generate dynamic employee ID cards",
+  },
   { label: "Manpower Basic Form", parent: "Personnel Info", to: "/" },
   { label: "Manpower Basic List", parent: "Personnel Info", to: "/" },
   { label: "Personnel QR Scanner", parent: "Personnel Info", to: "/" },
   // Attendance
-  { label: "Manual Attendance Entry", parent: "Attendance", to: "/manual-attendance", description: "Insert and record manual logs" },
-  { label: "Manual Attendance Approval", parent: "Attendance", to: "/pending-manual-attendance", description: "Verify pending manual logs" },
-  { label: "Employee Job Card", parent: "Attendance", to: "/employee-job-card", description: "Monthly attendance cards" },
+  {
+    label: "Manual Attendance Entry",
+    parent: "Attendance",
+    to: "/manual-attendance",
+    description: "Insert and record manual logs",
+  },
+  {
+    label: "Manual Attendance Approval",
+    parent: "Attendance",
+    to: "/pending-manual-attendance",
+    description: "Verify pending manual logs",
+  },
+  {
+    label: "Employee Job Card",
+    parent: "Attendance",
+    to: "/employee-job-card",
+    description: "Monthly attendance cards",
+  },
   { label: "Allowance Process", parent: "Attendance", to: "/" },
   { label: "Allowance Requisition", parent: "Attendance", to: "/" },
   // Roster
-  { label: "Create Roster Plan", parent: "Roster", to: "/create-roster", description: "Configure employee roster plans" },
-  { label: "Company Holiday Calendar", parent: "Roster", to: "/company-holiday", description: "Manage statutory company holidays" },
+  {
+    label: "Create Roster Plan",
+    parent: "Roster",
+    to: "/create-roster",
+    description: "Configure employee roster plans",
+  },
+  {
+    label: "Company Holiday Calendar",
+    parent: "Roster",
+    to: "/company-holiday",
+    description: "Manage statutory company holidays",
+  },
   // Leave
-  { label: "Leave Application Form", parent: "Leave", to: "/leave-application", description: "Draft and submit new leaves" },
-  { label: "Leave Approval Board", parent: "Leave", to: "/leave-approve", description: "Review and approve/reject leave requests" },
-  { label: "Leave List Database", parent: "Leave", to: "/leave-list", description: "Historical database of employee leaves" },
-  { label: "Earn Leave Process", parent: "Leave", to: "/earn-leave-process", description: "Accrue cash payments for earned leave" },
-  { label: "Earn Leave Workflow Center", parent: "Leave", to: "/earn-leave-workflow", description: "Unified Submit/Check/Approve pipeline" },
-  { label: "Earn Leave Process List", parent: "Leave", to: "/", description: "View processed earn leaves" },
+  {
+    label: "Leave Application Form",
+    parent: "Leave",
+    to: "/leave-application",
+    description: "Draft and submit new leaves",
+  },
+  {
+    label: "Leave Approval Board",
+    parent: "Leave",
+    to: "/leave-approve",
+    description: "Review and approve/reject leave requests",
+  },
+  {
+    label: "Leave List Database",
+    parent: "Leave",
+    to: "/leave-list",
+    description: "Historical database of employee leaves",
+  },
+  {
+    label: "Earn Leave Process",
+    parent: "Leave",
+    to: "/earn-leave-process",
+    description: "Accrue cash payments for earned leave",
+  },
+  {
+    label: "Earn Leave Workflow Center",
+    parent: "Leave",
+    to: "/earn-leave-workflow",
+    description: "Unified Submit/Check/Approve pipeline",
+  },
+  {
+    label: "Earn Leave Process List",
+    parent: "Leave",
+    to: "/",
+    description: "View processed earn leaves",
+  },
   // Manage Shift
   { label: "Shift Schedule Configurator", parent: "Manage Shift", to: "/" },
   { label: "Shift Rotation Planner", parent: "Manage Shift", to: "/" },
@@ -54,22 +141,72 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Department Transfer", parent: "Transfer", to: "/" },
   { label: "Transfer History", parent: "Transfer", to: "/" },
   // KPI
-  { label: "KPI Dashboard", parent: "KPI", to: "/kpi-dashboard", description: "Organization-wide KPI analytics" },
-  { label: "KPI Cycles", parent: "KPI", to: "/kpi-cycles", description: "Manage appraisal periods" },
-  { label: "KPI Criteria Setup", parent: "KPI", to: "/kpi-task-name", description: "Configure KPI criteria" },
-  { label: "Grade Bands", parent: "KPI", to: "/kpi-setting", description: "Configure scoring ranges" },
-  { label: "My Self-Assessment", parent: "KPI", to: "/kpi-self-assessment", description: "Employee self-evaluation" },
-  { label: "360° Peer Review", parent: "KPI", to: "/kpi-peer-review", description: "Evaluate your peers" },
-  { label: "Assessment Workflow", parent: "KPI", to: "/kpi-assessment-workflow", description: "Appraisal approval workflow" },
-  { label: "KPI Reports", parent: "KPI", to: "/kpi-report", description: "Export performance reports" },
+  {
+    label: "KPI Dashboard",
+    parent: "KPI",
+    to: "/kpi-dashboard",
+    description: "Organization-wide KPI analytics",
+  },
+  {
+    label: "KPI Cycles",
+    parent: "KPI",
+    to: "/kpi-cycles",
+    description: "Manage appraisal periods",
+  },
+  {
+    label: "KPI Criteria Setup",
+    parent: "KPI",
+    to: "/kpi-task-name",
+    description: "Configure KPI criteria",
+  },
+  {
+    label: "Grade Bands",
+    parent: "KPI",
+    to: "/kpi-setting",
+    description: "Configure scoring ranges",
+  },
+  {
+    label: "My Self-Assessment",
+    parent: "KPI",
+    to: "/kpi-self-assessment",
+    description: "Employee self-evaluation",
+  },
+  {
+    label: "360° Peer Review",
+    parent: "KPI",
+    to: "/kpi-peer-review",
+    description: "Evaluate your peers",
+  },
+  {
+    label: "Assessment Workflow",
+    parent: "KPI",
+    to: "/kpi-assessment-workflow",
+    description: "Appraisal approval workflow",
+  },
+  {
+    label: "KPI Reports",
+    parent: "KPI",
+    to: "/kpi-report",
+    description: "Export performance reports",
+  },
   { label: "Approval", parent: "Personnel Info", to: "/personnel-approval" },
   // Compliance
   { label: "Statutory Compliance Audit", parent: "Compliance", to: "/" },
   { label: "Tax Reports", parent: "Compliance", to: "/" },
   { label: "Audit Logs", parent: "Compliance", to: "/" },
   // HR Policy
-  { label: "JD List", parent: "HR Policy", to: "/hr-policy-jds", description: "Register, search, and view designation Job Description Sheets (JDS)" },
-  { label: "JD Approvals", parent: "HR Policy", to: "/hr-policy-jds?mode=list&filterWorkflow=HR", description: "Sequential approval board workflow for pending Job Description Sheets" },
+  {
+    label: "JD List",
+    parent: "HR Policy",
+    to: "/hr-policy-jds",
+    description: "Register, search, and view designation Job Description Sheets (JDS)",
+  },
+  {
+    label: "JD Approvals",
+    parent: "HR Policy",
+    to: "/hr-policy-jds?mode=list&filterWorkflow=HR",
+    description: "Sequential approval board workflow for pending Job Description Sheets",
+  },
   // Disciplinary Action
   { label: "Case Files", parent: "Disciplinary Action", to: "/" },
   { label: "Warning Letters", parent: "Disciplinary Action", to: "/" },
@@ -94,93 +231,391 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Holiday Celebrations", parent: "Event", to: "/" },
   { label: "Team Building", parent: "Event", to: "/" },
   // IE Recruitment
-  { label: "Recruitment Basic ID Setup", parent: "IE Recruitment", to: "/recruitment-basic-setup", description: "Define recruitment rules and temp ID setup" },
-  { label: "Recruitment Basic Entry Form", parent: "IE Recruitment", to: "/recruitment-basic-entry", description: "Register new candidate profiles temporarily" },
-  { label: "Recruitment Basic Info List", parent: "IE Recruitment", to: "/recruitment-basic-info-list", description: "View directory of registered temp profiles" },
-  { label: "Recruitment Configuration Settings", parent: "IE Recruitment", to: "/recruitment-configuration", description: "Manage SMV banks, machine list, operations etc." },
-  { label: "Recruitment Assessment List", parent: "IE Recruitment", to: "/recruitment-assessment-list", description: "Floor evaluation and HR approval workflow" },
-  { label: "IE Assessment", parent: "IE Recruitment", to: "/recruitment-ie-list", description: "IE evaluation list" },
-  { label: "HR Assessment", parent: "IE Recruitment", to: "/recruitment-hr-list", description: "HR evaluation list" },
+  {
+    label: "Recruitment Basic ID Setup",
+    parent: "IE Recruitment",
+    to: "/recruitment-basic-setup",
+    description: "Define recruitment rules and temp ID setup",
+  },
+  {
+    label: "Recruitment Basic Entry Form",
+    parent: "IE Recruitment",
+    to: "/recruitment-basic-entry",
+    description: "Register new candidate profiles temporarily",
+  },
+  {
+    label: "Recruitment Basic Info List",
+    parent: "IE Recruitment",
+    to: "/recruitment-basic-info-list",
+    description: "View directory of registered temp profiles",
+  },
+  {
+    label: "Recruitment Configuration Settings",
+    parent: "IE Recruitment",
+    to: "/recruitment-configuration",
+    description: "Manage SMV banks, machine list, operations etc.",
+  },
+  {
+    label: "Recruitment Assessment List",
+    parent: "IE Recruitment",
+    to: "/recruitment-assessment-list",
+    description: "Floor evaluation and HR approval workflow",
+  },
+  {
+    label: "IE Assessment",
+    parent: "IE Recruitment",
+    to: "/recruitment-ie-list",
+    description: "IE evaluation list",
+  },
+  {
+    label: "HR Assessment",
+    parent: "IE Recruitment",
+    to: "/recruitment-hr-list",
+    description: "HR evaluation list",
+  },
   // e-Recruitment
-  { label: "e-Recruitment Form", parent: "e-Recruitment", to: "/e-recruitment-form", description: "Digital recruitment form" },
-  { label: "Candidate List", parent: "e-Recruitment", to: "/recruitment-basic-list", description: "List of candidates" },
-  { label: "Approved Candidates", parent: "e-Recruitment", to: "/recruitment-assessment-list", description: "Approved candidates list" },
+  {
+    label: "e-Recruitment Form",
+    parent: "e-Recruitment",
+    to: "/e-recruitment-form",
+    description: "Digital recruitment form",
+  },
+  {
+    label: "Candidate List",
+    parent: "e-Recruitment",
+    to: "/recruitment-basic-list",
+    description: "List of candidates",
+  },
+  {
+    label: "Approved Candidates",
+    parent: "e-Recruitment",
+    to: "/recruitment-assessment-list",
+    description: "Approved candidates list",
+  },
   // SSP
-  { label: "New Requisition", parent: "SSP", to: "/ssp-new-requisition", description: "Create a new SSP requisition" },
-  { label: "My Requisition", parent: "SSP", to: "/ssp-my-requisition", description: "View your SSP requisitions" },
-  { label: "SSP Approval", parent: "SSP", to: "/ssp-approval", description: "Approve SSP requests" },
-  { label: "SSP Attendance", parent: "SSP", to: "/ssp-attendance", description: "SSP attendance tracking" },
+  {
+    label: "New Requisition",
+    parent: "SSP",
+    to: "/ssp-new-requisition",
+    description: "Create a new SSP requisition",
+  },
+  {
+    label: "My Requisition",
+    parent: "SSP",
+    to: "/ssp-my-requisition",
+    description: "View your SSP requisitions",
+  },
+  {
+    label: "SSP Approval",
+    parent: "SSP",
+    to: "/ssp-approval",
+    description: "Approve SSP requests",
+  },
+  {
+    label: "SSP Attendance",
+    parent: "SSP",
+    to: "/ssp-attendance",
+    description: "SSP attendance tracking",
+  },
   // Evaluation
-  { label: "Increment Configurator", parent: "Evaluation", to: "/increment-gadget", description: "Configure salary increments" },
-  { label: "Evaluation Propose", parent: "Evaluation", to: "/evaluation-propose", description: "Propose evaluation scores" },
-  { label: "Propose Increment", parent: "Evaluation", to: "/propose-increment", description: "Propose salary increments" },
-  { label: "Increment Summary", parent: "Evaluation", to: "/increment-summary", description: "Summary of all increments" },
-  { label: "Approve Increment Gadget", parent: "Evaluation", to: "/approve-increment-gadget", description: "Approval interface for increments" },
-  { label: "Increment Queue List", parent: "Evaluation", to: "/increment-queuelist", description: "Pending increment queue" },
-  { label: "Approve Increment (HR)", parent: "Evaluation", to: "/approve-increment-hr", description: "HR increment approval" },
-  { label: "Final Approve Increment", parent: "Evaluation", to: "/final-approve-increment", description: "Final increment approval" },
-  { label: "Increment List", parent: "Evaluation", to: "/increment-list", description: "List of all increments" },
-  { label: "Increment History", parent: "Evaluation", to: "/increment-history", description: "Historical increment records" },
+  {
+    label: "Increment Configurator",
+    parent: "Evaluation",
+    to: "/increment-gadget",
+    description: "Configure salary increments",
+  },
+  {
+    label: "Evaluation Propose",
+    parent: "Evaluation",
+    to: "/evaluation-propose",
+    description: "Propose evaluation scores",
+  },
+  {
+    label: "Propose Increment",
+    parent: "Evaluation",
+    to: "/propose-increment",
+    description: "Propose salary increments",
+  },
+  {
+    label: "Increment Summary",
+    parent: "Evaluation",
+    to: "/increment-summary",
+    description: "Summary of all increments",
+  },
+  {
+    label: "Approve Increment Gadget",
+    parent: "Evaluation",
+    to: "/approve-increment-gadget",
+    description: "Approval interface for increments",
+  },
+  {
+    label: "Increment Queue List",
+    parent: "Evaluation",
+    to: "/increment-queuelist",
+    description: "Pending increment queue",
+  },
+  {
+    label: "Approve Increment (HR)",
+    parent: "Evaluation",
+    to: "/approve-increment-hr",
+    description: "HR increment approval",
+  },
+  {
+    label: "Final Approve Increment",
+    parent: "Evaluation",
+    to: "/final-approve-increment",
+    description: "Final increment approval",
+  },
+  {
+    label: "Increment List",
+    parent: "Evaluation",
+    to: "/increment-list",
+    description: "List of all increments",
+  },
+  {
+    label: "Increment History",
+    parent: "Evaluation",
+    to: "/increment-history",
+    description: "Historical increment records",
+  },
   // Configure
-  { label: "Company Settings Setup", parent: "Configure", to: "/configure-structure?tab=company", description: "Configure global enterprise HR settings and validation rules." },
-  { label: "Organization Setup", parent: "Configure", to: "/configure-structure?tab=company", description: "Configure organization settings" },
-  { label: "Area Name Setup", parent: "Configure", to: "/configure-structure?tab=area", description: "Configure area names" },
-  { label: "Company Mapping Setup", parent: "Configure", to: "/configure-structure?tab=mapping", description: "Configure company mapping" },
-  { label: "Employee Type Setup", parent: "Configure", to: "/configure-employment?tab=empType", description: "Configure employee types" },
-  { label: "Department Setup", parent: "Configure", to: "/configure-structure?tab=department", description: "Configure department settings" },
-  { label: "Section Setup", parent: "Configure", to: "/configure-structure?tab=section", description: "Configure section settings" },
-  { label: "Designation Group Setup", parent: "Configure", to: "/configure-employment?tab=designationGroup", description: "Configure designation groups" },
-  { label: "Job Title Setup", parent: "Configure", to: "/configure-employment?tab=jobTitle", description: "Configure job titles" },
-  { label: "Grade Setup", parent: "Configure", to: "/configure-employment?tab=grade", description: "Configure grade settings" },
-  { label: "Shift Setup", parent: "Configure", to: "/configure-time?tab=shift", description: "Configure shifts" },
-  { label: "Unit Setup", parent: "Configure", to: "/configure-structure?tab=unit", description: "Configure units" },
-  { label: "Line Setup", parent: "Configure", to: "/configure-structure?tab=line", description: "Configure lines" },
-  { label: "Country Setup", parent: "Configure", to: "/configure-employment?tab=country", description: "Configure countries" },
-  { label: "Religion Setup", parent: "Configure", to: "/configure-employment?tab=religion", description: "Configure religion settings" },
-  { label: "Bonus Setting", parent: "Configure", to: "/configure-compensation?tab=bonus", description: "Configure bonus settings" },
-  { label: "Educational Qualification Setup", parent: "Configure", to: "/configure-education?tab=qualification", description: "Configure educational qualifications" },
-  { label: "Education Institution Setup", parent: "Configure", to: "/configure-education?tab=institution", description: "Configure educational institutions" },
-  { label: "Education Result Setup", parent: "Configure", to: "/configure-education?tab=result", description: "Configure education results" },
-  { label: "Training Category Setup", parent: "Configure", to: "/configure-education?tab=training", description: "Configure training categories" },
-  { label: "Leave Setting Setup", parent: "Configure", to: "/configure-policies?tab=leave", description: "Configure leave settings" },
-  { label: "Allowance Rate Setup", parent: "Configure", to: "/configure-compensation?tab=allowance", description: "Configure allowance rates" },
-  { label: "Tiffin Rate Setup", parent: "Configure", to: "/configure-compensation?tab=tiffin", description: "Configure tiffin rates" },
-  { label: "Lunch Rate Setup", parent: "Configure", to: "/configure-compensation?tab=lunch", description: "Configure lunch rates" },
-  { label: "Policy Name Setup", parent: "Configure", to: "/configure-policies?tab=policy", description: "Configure policies" },
-  { label: "OT Configuration Setup", parent: "Configure", to: "/configure-time?tab=ot", description: "Configure overtime settings" },
-  { label: "Place In BD Setup", parent: "Configure", to: "/configure-employment?tab=place", description: "Configure Bangladeshi locations" },
-  { label: "Conveyance Setup", parent: "Configure", to: "/configure-compensation?tab=conveyance", description: "Configure conveyance rates" },
-  { label: "Abnormal Shift Setup", parent: "Configure", to: "/configure-time?tab=abnormal", description: "Configure abnormal shifts" },
-  { label: "Attendance Bonus Policy Setup", parent: "Configure", to: "/configure-time?tab=bonus", description: "Configure attendance bonuses" },
-  { label: "Job Nature Setup", parent: "Configure", to: "/configure-employment?tab=nature", description: "Configure job natures" },
+  {
+    label: "Company Settings Setup",
+    parent: "Configure",
+    to: "/configure-structure?tab=company",
+    description: "Configure global enterprise HR settings and validation rules.",
+  },
+  {
+    label: "Organization Setup",
+    parent: "Configure",
+    to: "/configure-structure?tab=company",
+    description: "Configure organization settings",
+  },
+  {
+    label: "Area Name Setup",
+    parent: "Configure",
+    to: "/configure-structure?tab=area",
+    description: "Configure area names",
+  },
+  {
+    label: "Company Mapping Setup",
+    parent: "Configure",
+    to: "/configure-structure?tab=mapping",
+    description: "Configure company mapping",
+  },
+  {
+    label: "Employee Type Setup",
+    parent: "Configure",
+    to: "/configure-employment?tab=empType",
+    description: "Configure employee types",
+  },
+  {
+    label: "Department Setup",
+    parent: "Configure",
+    to: "/configure-structure?tab=department",
+    description: "Configure department settings",
+  },
+  {
+    label: "Section Setup",
+    parent: "Configure",
+    to: "/configure-structure?tab=section",
+    description: "Configure section settings",
+  },
+  {
+    label: "Designation Group Setup",
+    parent: "Configure",
+    to: "/configure-employment?tab=designationGroup",
+    description: "Configure designation groups",
+  },
+  {
+    label: "Job Title Setup",
+    parent: "Configure",
+    to: "/configure-employment?tab=jobTitle",
+    description: "Configure job titles",
+  },
+  {
+    label: "Grade Setup",
+    parent: "Configure",
+    to: "/configure-employment?tab=grade",
+    description: "Configure grade settings",
+  },
+  {
+    label: "Shift Setup",
+    parent: "Configure",
+    to: "/configure-time?tab=shift",
+    description: "Configure shifts",
+  },
+  {
+    label: "Unit Setup",
+    parent: "Configure",
+    to: "/configure-structure?tab=unit",
+    description: "Configure units",
+  },
+  {
+    label: "Line Setup",
+    parent: "Configure",
+    to: "/configure-structure?tab=line",
+    description: "Configure lines",
+  },
+  {
+    label: "Country Setup",
+    parent: "Configure",
+    to: "/configure-employment?tab=country",
+    description: "Configure countries",
+  },
+  {
+    label: "Religion Setup",
+    parent: "Configure",
+    to: "/configure-employment?tab=religion",
+    description: "Configure religion settings",
+  },
+  {
+    label: "Bonus Setting",
+    parent: "Configure",
+    to: "/configure-compensation?tab=bonus",
+    description: "Configure bonus settings",
+  },
+  {
+    label: "Educational Qualification Setup",
+    parent: "Configure",
+    to: "/configure-education?tab=qualification",
+    description: "Configure educational qualifications",
+  },
+  {
+    label: "Education Institution Setup",
+    parent: "Configure",
+    to: "/configure-education?tab=institution",
+    description: "Configure educational institutions",
+  },
+  {
+    label: "Education Result Setup",
+    parent: "Configure",
+    to: "/configure-education?tab=result",
+    description: "Configure education results",
+  },
+  {
+    label: "Training Category Setup",
+    parent: "Configure",
+    to: "/configure-education?tab=training",
+    description: "Configure training categories",
+  },
+  {
+    label: "Leave Setting Setup",
+    parent: "Configure",
+    to: "/configure-policies?tab=leave",
+    description: "Configure leave settings",
+  },
+  {
+    label: "Allowance Rate Setup",
+    parent: "Configure",
+    to: "/configure-compensation?tab=allowance",
+    description: "Configure allowance rates",
+  },
+  {
+    label: "Tiffin Rate Setup",
+    parent: "Configure",
+    to: "/configure-compensation?tab=tiffin",
+    description: "Configure tiffin rates",
+  },
+  {
+    label: "Lunch Rate Setup",
+    parent: "Configure",
+    to: "/configure-compensation?tab=lunch",
+    description: "Configure lunch rates",
+  },
+  {
+    label: "Policy Name Setup",
+    parent: "Configure",
+    to: "/configure-policies?tab=policy",
+    description: "Configure policies",
+  },
+  {
+    label: "OT Configuration Setup",
+    parent: "Configure",
+    to: "/configure-time?tab=ot",
+    description: "Configure overtime settings",
+  },
+  {
+    label: "Place In BD Setup",
+    parent: "Configure",
+    to: "/configure-employment?tab=place",
+    description: "Configure Bangladeshi locations",
+  },
+  {
+    label: "Conveyance Setup",
+    parent: "Configure",
+    to: "/configure-compensation?tab=conveyance",
+    description: "Configure conveyance rates",
+  },
+  {
+    label: "Abnormal Shift Setup",
+    parent: "Configure",
+    to: "/configure-time?tab=abnormal",
+    description: "Configure abnormal shifts",
+  },
+  {
+    label: "Attendance Bonus Policy Setup",
+    parent: "Configure",
+    to: "/configure-time?tab=bonus",
+    description: "Configure attendance bonuses",
+  },
+  {
+    label: "Job Nature Setup",
+    parent: "Configure",
+    to: "/configure-employment?tab=nature",
+    description: "Configure job natures",
+  },
 ];
 
 // Dynamically fetch search category visual icon
 function getCategoryIcon(parent: string) {
   switch (parent) {
-    case "Home": return LayoutDashboard;
-    case "Personnel Info": return UserRound;
-    case "Attendance": return Fingerprint;
-    case "Roster": return CalendarDays;
-    case "Leave": return CalendarX;
-    case "Manage Shift": return Clock;
-    case "Budget": return Coins;
-    case "Transfer": return RefreshCw;
-    case "HR Policy": return FileText;
-    case "KPI": return BarChart3;
-    case "Evaluation": return ClipboardCheck;
-    case "Disciplinary Action": return ShieldAlert;
-    case "Manage Overtime": return Timer;
-    case "Manage Allowance": return CreditCard;
-    case "Processes": return Cpu;
-    case "Compliance": return ComplianceIcon;
-    case "Idea Share": return Lightbulb;
-    case "IE Recruitment": return UserPlus;
-    case "e-Recruitment": return UserPlus;
-    case "SSP": return Briefcase;
-    case "Configure": return SlidersHorizontal;
-    case "Event": return CalendarDays;
-    default: return LayoutDashboard;
+    case "Home":
+      return LayoutDashboard;
+    case "Personnel Info":
+      return UserRound;
+    case "Attendance":
+      return Fingerprint;
+    case "Roster":
+      return CalendarDays;
+    case "Leave":
+      return CalendarX;
+    case "Manage Shift":
+      return Clock;
+    case "Budget":
+      return Coins;
+    case "Transfer":
+      return RefreshCw;
+    case "HR Policy":
+      return FileText;
+    case "KPI":
+      return BarChart3;
+    case "Evaluation":
+      return ClipboardCheck;
+    case "Disciplinary Action":
+      return ShieldAlert;
+    case "Manage Overtime":
+      return Timer;
+    case "Manage Allowance":
+      return CreditCard;
+    case "Processes":
+      return Cpu;
+    case "Compliance":
+      return ComplianceIcon;
+    case "Idea Share":
+      return Lightbulb;
+    case "IE Recruitment":
+      return UserPlus;
+    case "e-Recruitment":
+      return UserPlus;
+    case "SSP":
+      return Briefcase;
+    case "Configure":
+      return SlidersHorizontal;
+    case "Event":
+      return CalendarDays;
+    default:
+      return LayoutDashboard;
   }
 }
 
@@ -219,13 +654,14 @@ export function Topbar() {
     const q = searchQuery.toLowerCase().trim();
     if (!q) {
       // Show default active system paths for Quick Access
-      return searchableMenus.filter(m => m.to !== "/").slice(0, 5);
+      return searchableMenus.filter((m) => m.to !== "/").slice(0, 5);
     }
-    return searchableMenus.filter(item =>
-      item.label.toLowerCase().includes(q) ||
-      item.parent.toLowerCase().includes(q) ||
-      (item.description && item.description.toLowerCase().includes(q)) ||
-      item.to.toLowerCase().includes(q)
+    return searchableMenus.filter(
+      (item) =>
+        item.label.toLowerCase().includes(q) ||
+        item.parent.toLowerCase().includes(q) ||
+        (item.description && item.description.toLowerCase().includes(q)) ||
+        item.to.toLowerCase().includes(q),
     );
   }, [searchQuery]);
 
@@ -240,10 +676,10 @@ export function Topbar() {
 
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setFocusedIndex(prev => (prev + 1) % filteredResults.length);
+      setFocusedIndex((prev) => (prev + 1) % filteredResults.length);
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setFocusedIndex(prev => (prev - 1 + filteredResults.length) % filteredResults.length);
+      setFocusedIndex((prev) => (prev - 1 + filteredResults.length) % filteredResults.length);
     } else if (e.key === "Enter") {
       e.preventDefault();
       const selected = filteredResults[focusedIndex];
@@ -290,10 +726,11 @@ export function Topbar() {
     <header className="h-14 px-5 flex items-center gap-3 border-b border-border/60 bg-card/90 backdrop-blur-md sticky top-0 z-20 transition-colors duration-300 shadow-2xs">
       <div>
         <h1 className="text-sm font-bold tracking-tight text-foreground">{greeting}, Shapno 👋</h1>
-        <p className="text-[11px] text-muted-foreground/90 font-medium font-sans">Here's what's happening across your organization today.</p>
+        <p className="text-[11px] text-muted-foreground/90 font-medium font-sans">
+          Here's what's happening across your organization today.
+        </p>
       </div>
       <div className="ml-auto flex items-center gap-2.5">
-
         {/* Interactive Global Menu Search Container */}
         <div className="relative hidden md:block global-search-container">
           <div className="relative group">
@@ -307,20 +744,27 @@ export function Topbar() {
               placeholder="Search menus (e.g. Leave Application, Roster...)"
               className="w-76 focus:w-88 pl-10 pr-14 h-9.5 rounded-full bg-slate-100/80 dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/40 focus:border-primary/80 focus:bg-card focus:ring-4 focus:ring-primary/10 outline-none text-xs transition-all duration-300 font-sans font-bold"
             />
-            <kbd className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[9px] font-black px-2 py-0.5 rounded bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 shadow-2xs select-none pointer-events-none">⌘K</kbd>
+            <kbd className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[9px] font-black px-2 py-0.5 rounded bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 shadow-2xs select-none pointer-events-none">
+              ⌘K
+            </kbd>
           </div>
 
           {/* Search Result Popover List */}
           {isSearchOpen && (
             <div className="absolute right-0 top-11.5 w-[390px] bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-lg shadow-[0_20px_50px_rgba(0,0,0,0.12)] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-
               {/* Header inside popover */}
               <div className="px-4 py-3 bg-slate-50/50 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800/60 flex items-center justify-between text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                 <span className="flex items-center gap-1.5">
                   <span className="text-amber-500 animate-pulse">⚡</span>
-                  <span>{searchQuery ? `Matching Menus (${filteredResults.length})` : "Quick Access Menus"}</span>
+                  <span>
+                    {searchQuery
+                      ? `Matching Menus (${filteredResults.length})`
+                      : "Quick Access Menus"}
+                  </span>
                 </span>
-                <span className="px-2 py-0.5 rounded-md bg-slate-200/50 dark:bg-slate-800 text-[8.5px] font-bold lowercase tracking-normal">esc to close</span>
+                <span className="px-2 py-0.5 rounded-md bg-slate-200/50 dark:bg-slate-800 text-[8.5px] font-bold lowercase tracking-normal">
+                  esc to close
+                </span>
               </div>
 
               {/* Scrollable list items */}
@@ -338,17 +782,22 @@ export function Topbar() {
                         setIsSearchOpen(false);
                         setSearchQuery("");
                       }}
-                      className={`w-full group text-left flex items-center gap-3 p-2.5 rounded-xl transition duration-150 border ${isFocused
+                      className={`w-full group text-left flex items-center gap-3 p-2.5 rounded-xl transition duration-150 border ${
+                        isFocused
                           ? "bg-primary/[0.08] dark:bg-primary/[0.12] border-primary/20 text-primary"
                           : "hover:bg-slate-50/70 dark:hover:bg-slate-900/40 border-transparent text-slate-700 dark:text-slate-350"
-                        }`}
+                      }`}
                     >
                       {/* Left: Beautiful visually distinct Category Icon Box */}
-                      <div className={`size-8 rounded-lg flex items-center justify-center border shrink-0 transition-transform duration-300 ${isFocused ? "scale-105" : ""
-                        } ${isActiveRoute
-                          ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
-                          : "bg-slate-100 border-slate-200/40 text-slate-400 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-500"
-                        }`}>
+                      <div
+                        className={`size-8 rounded-lg flex items-center justify-center border shrink-0 transition-transform duration-300 ${
+                          isFocused ? "scale-105" : ""
+                        } ${
+                          isActiveRoute
+                            ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                            : "bg-slate-100 border-slate-200/40 text-slate-400 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-500"
+                        }`}
+                      >
                         <CategoryIcon className="size-4" />
                       </div>
 
@@ -358,10 +807,13 @@ export function Topbar() {
                           <span className="text-[11px] font-black tracking-tight leading-none">
                             {item.label}
                           </span>
-                          <span className={`px-1.5 py-0.2 rounded text-[7.5px] font-black uppercase tracking-wider scale-90 ${isActiveRoute
-                              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                              : "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500"
-                            }`}>
+                          <span
+                            className={`px-1.5 py-0.2 rounded text-[7.5px] font-black uppercase tracking-wider scale-90 ${
+                              isActiveRoute
+                                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                                : "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500"
+                            }`}
+                          >
                             {item.parent}
                           </span>
                         </div>
@@ -398,10 +850,8 @@ export function Topbar() {
                 </span>
                 <span>Enter to open</span>
               </div>
-
             </div>
           )}
-
         </div>
         <button
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -416,7 +866,11 @@ export function Topbar() {
         </button>
         <button
           onClick={() => {
-            if (confirm("Are you sure you want to reset all mock data to the latest 20-row defaults? This will overwrite custom edits.")) {
+            if (
+              confirm(
+                "Are you sure you want to reset all mock data to the latest 20-row defaults? This will overwrite custom edits.",
+              )
+            ) {
               const keysToClear = [
                 "hris_organizations",
                 "hris_areas",
@@ -462,9 +916,9 @@ export function Topbar() {
                 "cripton_user_list",
                 "cripton_role_list",
                 "cripton_permissions_list",
-                "cripton_overrides_list"
+                "cripton_overrides_list",
               ];
-              keysToClear.forEach(key => localStorage.removeItem(key));
+              keysToClear.forEach((key) => localStorage.removeItem(key));
               localStorage.setItem("hris_master_data_version_v11", "true");
               window.location.reload();
             }
@@ -492,14 +946,12 @@ export function Topbar() {
         <div className="flex items-center gap-3 pl-3.5 border-l border-border/60">
           <div className="text-right hidden lg:block">
             <div className="text-xs font-bold text-foreground">Tahmid Afsar</div>
-            <div className="text-[9px] font-bold text-muted-foreground/85 mt-0.5">Pakiza Software Limited (PSL-Operation)</div>
+            <div className="text-[9px] font-bold text-muted-foreground/85 mt-0.5">
+              Pakiza Software Limited (PSL-Operation)
+            </div>
           </div>
           <div className="size-9 rounded-full overflow-hidden border border-border/80 shadow-2xs flex-shrink-0 bg-muted">
-            <img
-              src={avatarImg}
-              alt="Tahmid Afsar"
-              className="size-full object-cover"
-            />
+            <img src={avatarImg} alt="Tahmid Afsar" className="size-full object-cover" />
           </div>
         </div>
       </div>

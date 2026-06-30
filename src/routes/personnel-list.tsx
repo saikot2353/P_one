@@ -6,18 +6,62 @@ import { Topbar } from "@/components/dashboard/Topbar";
 import { EmployeeDetailTabs } from "@/components/dashboard/employee-detail-tabs";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import {
-  Search, FileDown, Printer, FileText, ChevronRight, UserPlus, Eye, Edit3, X, SlidersHorizontal,
-  ChevronDown, MapPin, Phone, Mail, Calendar, User, Heart, Briefcase, DollarSign, EyeOff, LayoutGrid, Check,
-  TrendingUp, ArrowUpRight, FileSignature, ShieldCheck, CreditCard, UserCheck, UserCog, Clock, CalendarRange,
-  CalendarHeart, Power, FileClock, Sparkles, AlertCircle, RefreshCw, Info, ArrowUp, ArrowDown, Save, Star,
-  Trash2, RotateCcw, GripVertical
+  Search,
+  FileDown,
+  Printer,
+  FileText,
+  ChevronRight,
+  UserPlus,
+  Eye,
+  Edit3,
+  X,
+  SlidersHorizontal,
+  ChevronDown,
+  MapPin,
+  Phone,
+  Mail,
+  Calendar,
+  User,
+  Heart,
+  Briefcase,
+  DollarSign,
+  EyeOff,
+  LayoutGrid,
+  Check,
+  TrendingUp,
+  ArrowUpRight,
+  FileSignature,
+  ShieldCheck,
+  CreditCard,
+  UserCheck,
+  UserCog,
+  Clock,
+  CalendarRange,
+  CalendarHeart,
+  Power,
+  FileClock,
+  Sparkles,
+  AlertCircle,
+  RefreshCw,
+  Info,
+  ArrowUp,
+  ArrowDown,
+  Save,
+  Star,
+  Trash2,
+  RotateCcw,
+  GripVertical,
 } from "lucide-react";
 
 export const Route = createFileRoute("/personnel-list")({
   head: () => ({
     meta: [
       { title: "Personnel List — CRIPTON HRIS" },
-      { name: "description", content: "Professional personnel database, advanced column configurations, custom search filters, and slide-over profile sheets." },
+      {
+        name: "description",
+        content:
+          "Professional personnel database, advanced column configurations, custom search filters, and slide-over profile sheets.",
+      },
     ],
   }),
   component: PersonnelListPage,
@@ -55,7 +99,7 @@ export const employeesData = [
     empStatus: "Permanent",
     confirmDate: "01/11/2023",
     village: "Bhola",
-    acStatus: "Active"
+    acStatus: "Active",
   },
   {
     id: "2023046001",
@@ -82,7 +126,7 @@ export const employeesData = [
     empStatus: "Permanent",
     confirmDate: "—",
     village: "Village # Bishnopur",
-    acStatus: "Active"
+    acStatus: "Active",
   },
   {
     id: "2023043021",
@@ -114,7 +158,7 @@ export const employeesData = [
     empStatus: "Permanent",
     confirmDate: "—",
     village: "Chandidar",
-    acStatus: "Active"
+    acStatus: "Active",
   },
   {
     id: "2026059411",
@@ -146,7 +190,7 @@ export const employeesData = [
     empStatus: "Probation",
     confirmDate: "10/08/2026",
     village: "Hawlader Bari, Vill# Voroshakathi",
-    acStatus: "Active"
+    acStatus: "Active",
   },
   {
     id: "2024049326",
@@ -178,7 +222,7 @@ export const employeesData = [
     empStatus: "Probation",
     confirmDate: "01/09/2024",
     village: "Village # Londoha",
-    acStatus: "Active"
+    acStatus: "Active",
   },
   {
     id: "2026058726",
@@ -210,7 +254,7 @@ export const employeesData = [
     empStatus: "Probation",
     confirmDate: "22/05/2026",
     village: "H# 1227",
-    acStatus: "Active"
+    acStatus: "Active",
   },
   {
     id: "2023045044",
@@ -242,7 +286,7 @@ export const employeesData = [
     empStatus: "Permanent",
     confirmDate: "—",
     village: "House :12, Bhangnahati",
-    acStatus: "Active"
+    acStatus: "Active",
   },
   {
     id: "2026058686",
@@ -274,7 +318,7 @@ export const employeesData = [
     empStatus: "Probation",
     confirmDate: "15/05/2026",
     village: "Vill# Chachahar Moddhopara",
-    acStatus: "Active"
+    acStatus: "Active",
   },
   {
     id: "2025058109",
@@ -306,7 +350,7 @@ export const employeesData = [
     empStatus: "Probation",
     confirmDate: "22/06/2026",
     village: "Village # Vewamara",
-    acStatus: "Active"
+    acStatus: "Active",
   },
   {
     id: "2026058685",
@@ -338,8 +382,8 @@ export const employeesData = [
     empStatus: "Probation",
     confirmDate: "15/05/2026",
     village: "Dhaka",
-    acStatus: "Active"
-  }
+    acStatus: "Active",
+  },
 ];
 
 // All headers config that users can toggle visibility for!
@@ -421,7 +465,7 @@ const getColumnLabel = (key: ColumnKey) => {
 const normalizeColumnOrder = (order?: ColumnKey[]) => {
   const validKeys = new Set(defaultColumnOrder);
   const cleaned = (order || []).filter((key): key is ColumnKey => validKeys.has(key));
-  return [...cleaned, ...defaultColumnOrder.filter(key => !cleaned.includes(key))];
+  return [...cleaned, ...defaultColumnOrder.filter((key) => !cleaned.includes(key))];
 };
 
 const normalizeColumnVisibility = (columns?: Partial<Record<ColumnKey, boolean>>) => ({
@@ -430,7 +474,9 @@ const normalizeColumnVisibility = (columns?: Partial<Record<ColumnKey, boolean>>
 });
 
 const columnRenderers: Record<ColumnKey, (employee: any) => ReactNode> = {
-  empIdOffc: (e) => <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.offcId}</td>,
+  empIdOffc: (e) => (
+    <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.offcId}</td>
+  ),
   employeeType: (e) => <td className="px-5 py-3.5 text-foreground/85 font-medium">{e.type}</td>,
   dept: (e) => <td className="px-5 py-3.5 text-foreground/80 font-medium">{e.dept}</td>,
   section: (e) => <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.sect}</td>,
@@ -439,8 +485,12 @@ const columnRenderers: Record<ColumnKey, (employee: any) => ReactNode> = {
   line: (e) => <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.line}</td>,
   grade: (e) => <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.grade}</td>,
   shift: (e) => <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.shift}</td>,
-  shiftStart: (e) => <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.shiftStart}</td>,
-  joinDate: (e) => <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.joinDate}</td>,
+  shiftStart: (e) => (
+    <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.shiftStart}</td>
+  ),
+  joinDate: (e) => (
+    <td className="px-5 py-3.5 text-muted-foreground/80 font-medium">{e.joinDate}</td>
+  ),
   blood: (e) => (
     <td className="px-5 py-3.5 text-center">
       <span className="inline-flex items-center justify-center px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30">
@@ -459,18 +509,31 @@ const columnRenderers: Record<ColumnKey, (employee: any) => ReactNode> = {
     </td>
   ),
   email: (e) => <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.email}</td>,
-  officeMob: (e) => <td className="px-5 py-3.5 text-muted-foreground/90 font-medium font-mono">{e.officeMob}</td>,
+  officeMob: (e) => (
+    <td className="px-5 py-3.5 text-muted-foreground/90 font-medium font-mono">{e.officeMob}</td>
+  ),
   gender: (e) => <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.gender}</td>,
   dob: (e) => <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{e.dob}</td>,
   empStatus: (e) => (
     <td className="px-5 py-3.5">
-      <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${e.empStatus === "Permanent" ? "bg-success/15 text-success" : "bg-warning/15 text-warning"}`}>
-        <span className={`size-1.5 rounded-full ${e.empStatus === "Permanent" ? "bg-success" : "bg-warning animate-pulse"}`} />
+      <span
+        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${e.empStatus === "Permanent" ? "bg-success/15 text-success" : "bg-warning/15 text-warning"}`}
+      >
+        <span
+          className={`size-1.5 rounded-full ${e.empStatus === "Permanent" ? "bg-success" : "bg-warning animate-pulse"}`}
+        />
         {e.empStatus}
       </span>
     </td>
   ),
-  village: (e) => <td className="px-5 py-3.5 text-muted-foreground/80 font-medium truncate max-w-[150px]" title={e.village}>{e.village}</td>,
+  village: (e) => (
+    <td
+      className="px-5 py-3.5 text-muted-foreground/80 font-medium truncate max-w-[150px]"
+      title={e.village}
+    >
+      {e.village}
+    </td>
+  ),
   acStatus: (e) => (
     <td className="px-5 py-3.5 text-center">
       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-500">
@@ -482,11 +545,12 @@ const columnRenderers: Record<ColumnKey, (employee: any) => ReactNode> = {
 };
 
 const getColumnHeaderClass = (key: ColumnKey) => {
-  const alignClass = key === "blood" || key === "acStatus"
-    ? "text-center"
-    : key === "basic" || key === "gross"
-      ? "text-right"
-      : "";
+  const alignClass =
+    key === "blood" || key === "acStatus"
+      ? "text-center"
+      : key === "basic" || key === "gross"
+        ? "text-right"
+        : "";
 
   return `px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] ${alignClass}`;
 };
@@ -503,8 +567,8 @@ function PersonnelListPage() {
           const parsed = JSON.parse(synced);
           if (parsed && parsed.length > 0) {
             const merged = [...parsed];
-            employeesData.forEach(d => {
-              if (!merged.some(m => m.id === d.id)) {
+            employeesData.forEach((d) => {
+              if (!merged.some((m) => m.id === d.id)) {
                 merged.push(d);
               }
             });
@@ -546,14 +610,14 @@ function PersonnelListPage() {
 
   const handleResignSubmit = () => {
     if (!resignModalEmp) return;
-    const updated = employees.map(emp => {
+    const updated = employees.map((emp) => {
       if (emp.id === resignModalEmp.id) {
         return {
           ...emp,
           status: resignStatus,
           acStatus: "Inactive",
-          resignDate: resignDate || new Date().toLocaleDateString('en-GB'),
-          resignRemarks: resignRemarks
+          resignDate: resignDate || new Date().toLocaleDateString("en-GB"),
+          resignRemarks: resignRemarks,
         };
       }
       return emp;
@@ -564,13 +628,15 @@ function PersonnelListPage() {
     setResignRemarks("");
     setResignDate("");
 
-    setBulkActionMessage(`${resignModalEmp.name} has been successfully marked as ${resignStatus.toLowerCase()}.`);
+    setBulkActionMessage(
+      `${resignModalEmp.name} has been successfully marked as ${resignStatus.toLowerCase()}.`,
+    );
     setTimeout(() => setBulkActionMessage(null), 4500);
   };
 
   const handleRejoinSubmit = () => {
     if (!rejoinModalEmp) return;
-    if (employees.some(emp => emp.id === newEmpId)) {
+    if (employees.some((emp) => emp.id === newEmpId)) {
       alert("Employee ID already exists!");
       return;
     }
@@ -578,7 +644,7 @@ function PersonnelListPage() {
     const newEmp = {
       ...rejoinModalEmp,
       id: newEmpId,
-      joinDate: newJoinDate || new Date().toLocaleDateString('en-GB'),
+      joinDate: newJoinDate || new Date().toLocaleDateString("en-GB"),
       status: "Working",
       acStatus: "Active",
       title: newDesignation,
@@ -594,14 +660,14 @@ function PersonnelListPage() {
       rejoinRemarks: rejoinRemarks,
       confirmDate: "",
       holiday: "—",
-      rejoinedTo: undefined // clear rejoin pointer for the active record
+      rejoinedTo: undefined, // clear rejoin pointer for the active record
     };
 
-    const updated = employees.map(emp => {
+    const updated = employees.map((emp) => {
       if (emp.id === rejoinModalEmp.id) {
         return {
           ...emp,
-          rejoinedTo: newEmpId
+          rejoinedTo: newEmpId,
         };
       }
       return emp;
@@ -614,10 +680,11 @@ function PersonnelListPage() {
     setRejoinModalEmp(null);
     setRejoinRemarks("");
 
-    setBulkActionMessage(`${rejoinModalEmp.name} has rejoined successfully with new Employee ID: ${newEmpId}.`);
+    setBulkActionMessage(
+      `${rejoinModalEmp.name} has rejoined successfully with new Employee ID: ${newEmpId}.`,
+    );
     setTimeout(() => setBulkActionMessage(null), 4500);
   };
-
 
   // Selection & Action Hub States
   const [selectedEmpIds, setSelectedEmpIds] = useState<string[]>([]);
@@ -638,9 +705,13 @@ function PersonnelListPage() {
   const [isFilterCollapsed, setIsFilterCollapsed] = useState(false);
   const [visibleCols, setVisibleCols] = useState<Record<ColumnKey, boolean>>({ ...defaultColumns });
   const [columnOrder, setColumnOrder] = useState<ColumnKey[]>([...defaultColumnOrder]);
-  const [draftVisibleCols, setDraftVisibleCols] = useState<Record<ColumnKey, boolean>>({ ...defaultColumns });
+  const [draftVisibleCols, setDraftVisibleCols] = useState<Record<ColumnKey, boolean>>({
+    ...defaultColumns,
+  });
   const [draftColumnOrder, setDraftColumnOrder] = useState<ColumnKey[]>([...defaultColumnOrder]);
-  const [columnTemplates, setColumnTemplates] = useState<ColumnTemplate[]>([createDefaultColumnTemplate()]);
+  const [columnTemplates, setColumnTemplates] = useState<ColumnTemplate[]>([
+    createDefaultColumnTemplate(),
+  ]);
   const [templateName, setTemplateName] = useState("");
   const [isColSelectorOpen, setIsColSelectorOpen] = useState(false);
 
@@ -648,13 +719,27 @@ function PersonnelListPage() {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [draggedOverIndex, setDraggedOverIndex] = useState<number | null>(null);
   // Transient state for serial inputs to prevent cursor jump/focus loss while typing
-  const [tempSerials, setTempSerials] = useState<Record<ColumnKey, string>>({} as Record<ColumnKey, string>);
+  const [tempSerials, setTempSerials] = useState<Record<ColumnKey, string>>(
+    {} as Record<ColumnKey, string>,
+  );
 
   // Dynamic values extracted from dataset to populate dropdowns beautifully
-  const departmentsList = useMemo(() => ["ALL", ...Array.from(new Set(employeesData.map(e => e.dept)))], []);
-  const sectionsList = useMemo(() => ["ALL", ...Array.from(new Set(employeesData.map(e => e.sect)))], []);
-  const designationsList = useMemo(() => ["ALL", ...Array.from(new Set(employeesData.map(e => e.title)))], []);
-  const empTypesList = useMemo(() => ["ALL", ...Array.from(new Set(employeesData.map(e => e.type)))], []);
+  const departmentsList = useMemo(
+    () => ["ALL", ...Array.from(new Set(employeesData.map((e) => e.dept)))],
+    [],
+  );
+  const sectionsList = useMemo(
+    () => ["ALL", ...Array.from(new Set(employeesData.map((e) => e.sect)))],
+    [],
+  );
+  const designationsList = useMemo(
+    () => ["ALL", ...Array.from(new Set(employeesData.map((e) => e.title)))],
+    [],
+  );
+  const empTypesList = useMemo(
+    () => ["ALL", ...Array.from(new Set(employeesData.map((e) => e.type)))],
+    [],
+  );
 
   // Real-time interactive search and multi-filtering logic!
   const filteredEmployees = useMemo(() => {
@@ -672,7 +757,10 @@ function PersonnelListPage() {
 
       // 2. Commma-separated Employee ID list
       if (empIdFilter.trim() !== "") {
-        const ids = empIdFilter.split(",").map(id => id.trim()).filter(id => id.length > 0);
+        const ids = empIdFilter
+          .split(",")
+          .map((id) => id.trim())
+          .filter((id) => id.length > 0);
         if (ids.length > 0 && !ids.includes(e.id)) return false;
       }
 
@@ -685,7 +773,8 @@ function PersonnelListPage() {
       if (searchQuery.trim() === "" && empIdFilter.trim() === "") {
         if (statusFilter !== "ALL" && e.status !== statusFilter) return false;
       } else {
-        if (statusFilter !== "ALL" && statusFilter !== "Working" && e.status !== statusFilter) return false;
+        if (statusFilter !== "ALL" && statusFilter !== "Working" && e.status !== statusFilter)
+          return false;
       }
 
       if (empStatusFilter !== "ALL" && e.empStatus !== empStatusFilter) return false;
@@ -693,7 +782,17 @@ function PersonnelListPage() {
 
       return true;
     });
-  }, [employees, searchQuery, empIdFilter, deptFilter, sectFilter, empTypeFilter, statusFilter, empStatusFilter, designationFilter]);
+  }, [
+    employees,
+    searchQuery,
+    empIdFilter,
+    deptFilter,
+    sectFilter,
+    empTypeFilter,
+    statusFilter,
+    empStatusFilter,
+    designationFilter,
+  ]);
 
   // Reset all filters easily
   const resetFilters = () => {
@@ -713,15 +812,13 @@ function PersonnelListPage() {
     if (selectedEmpIds.length === filteredEmployees.length) {
       setSelectedEmpIds([]);
     } else {
-      setSelectedEmpIds(filteredEmployees.map(e => e.id));
+      setSelectedEmpIds(filteredEmployees.map((e) => e.id));
     }
   };
 
   const toggleSelectEmp = (id: string) => {
-    setSelectedEmpIds(prev =>
-      prev.includes(id)
-        ? prev.filter(item => item !== id)
-        : [...prev, id]
+    setSelectedEmpIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
     );
   };
 
@@ -730,23 +827,31 @@ function PersonnelListPage() {
     setActiveDocGenerating(docName);
     setTimeout(() => {
       setActiveDocGenerating(null);
-      const targetNames = selectedEmpIds.map(id => {
-        const emp = employees.find(e => e.id === id);
-        return emp ? emp.name : id;
-      }).join(", ");
+      const targetNames = selectedEmpIds
+        .map((id) => {
+          const emp = employees.find((e) => e.id === id);
+          return emp ? emp.name : id;
+        })
+        .join(", ");
 
-      setBulkActionMessage(`Generated ${docName} successfully for: ${targetNames.length > 55 ? targetNames.substring(0, 52) + "..." : targetNames}`);
+      setBulkActionMessage(
+        `Generated ${docName} successfully for: ${targetNames.length > 55 ? targetNames.substring(0, 52) + "..." : targetNames}`,
+      );
       setTimeout(() => setBulkActionMessage(null), 4500);
     }, 1200);
   };
 
   const triggerBulkAction = (actionName: string) => {
-    const targetNames = selectedEmpIds.map(id => {
-      const emp = employees.find(e => e.id === id);
-      return emp ? emp.name : id;
-    }).join(", ");
+    const targetNames = selectedEmpIds
+      .map((id) => {
+        const emp = employees.find((e) => e.id === id);
+        return emp ? emp.name : id;
+      })
+      .join(", ");
 
-    setBulkActionMessage(`Bulk action [${actionName}] applied successfully to: ${targetNames.length > 55 ? targetNames.substring(0, 52) + "..." : targetNames}`);
+    setBulkActionMessage(
+      `Bulk action [${actionName}] applied successfully to: ${targetNames.length > 55 ? targetNames.substring(0, 52) + "..." : targetNames}`,
+    );
     setTimeout(() => setBulkActionMessage(null), 4500);
   };
 
@@ -772,19 +877,27 @@ function PersonnelListPage() {
       const templates = [
         {
           ...createDefaultColumnTemplate(),
-          ...(savedDefault ? {
-            columns: normalizeColumnVisibility(savedDefault.columns),
-            order: normalizeColumnOrder(savedDefault.order),
-            isActive: savedDefault.isActive,
-          } : {}),
-          isActive: savedDefault?.isActive ?? !customTemplates.some((template: ColumnTemplate) => template.isActive),
+          ...(savedDefault
+            ? {
+                columns: normalizeColumnVisibility(savedDefault.columns),
+                order: normalizeColumnOrder(savedDefault.order),
+                isActive: savedDefault.isActive,
+              }
+            : {}),
+          isActive:
+            savedDefault?.isActive ??
+            !customTemplates.some((template: ColumnTemplate) => template.isActive),
         },
         ...customTemplates,
       ];
-      const normalizedTemplates = templates.some(template => template.isActive)
-        ? templates.map((template, index) => ({ ...template, isActive: template.isActive && templates.findIndex(item => item.isActive) === index }))
+      const normalizedTemplates = templates.some((template) => template.isActive)
+        ? templates.map((template, index) => ({
+            ...template,
+            isActive: template.isActive && templates.findIndex((item) => item.isActive) === index,
+          }))
         : fallback;
-      const activeTemplate = normalizedTemplates.find(template => template.isActive) || normalizedTemplates[0];
+      const activeTemplate =
+        normalizedTemplates.find((template) => template.isActive) || normalizedTemplates[0];
 
       setColumnTemplates(normalizedTemplates);
       setVisibleCols(normalizeColumnVisibility(activeTemplate.columns));
@@ -810,14 +923,14 @@ function PersonnelListPage() {
   };
 
   const toggleDraftColumn = (key: ColumnKey) => {
-    setDraftVisibleCols(prev => ({
+    setDraftVisibleCols((prev) => ({
       ...prev,
-      [key]: !prev[key]
+      [key]: !prev[key],
     }));
   };
 
   const moveDraftColumn = (key: ColumnKey, direction: "up" | "down") => {
-    setDraftColumnOrder(prev => {
+    setDraftColumnOrder((prev) => {
       const currentIndex = prev.indexOf(key);
       const nextIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
       if (currentIndex < 0 || nextIndex < 0 || nextIndex >= prev.length) return prev;
@@ -831,7 +944,7 @@ function PersonnelListPage() {
     const serial = Number(value);
     if (!Number.isFinite(serial)) return;
 
-    setDraftColumnOrder(prev => {
+    setDraftColumnOrder((prev) => {
       const currentIndex = prev.indexOf(key);
       const nextIndex = Math.min(Math.max(serial - 1, 0), prev.length - 1);
       if (currentIndex < 0 || currentIndex === nextIndex) return prev;
@@ -861,7 +974,7 @@ function PersonnelListPage() {
     e.preventDefault();
     if (draggedIndex === null || draggedIndex === targetIndex) return;
 
-    setDraftColumnOrder(prev => {
+    setDraftColumnOrder((prev) => {
       const next = [...prev];
       const [draggedItem] = next.splice(draggedIndex, 1);
       next.splice(targetIndex, 0, draggedItem);
@@ -882,18 +995,20 @@ function PersonnelListPage() {
     setColumnOrder(order);
     setDraftVisibleCols(columns);
     setDraftColumnOrder(order);
-    setColumnTemplates(templates.map(template => template.isActive ? { ...template, columns, order } : template));
+    setColumnTemplates(
+      templates.map((template) => (template.isActive ? { ...template, columns, order } : template)),
+    );
     setBulkActionMessage("Column arrangement applied successfully.");
     setTimeout(() => setBulkActionMessage(null), 4500);
   };
 
   const activateColumnTemplate = (templateId: string) => {
-    const targetTemplate = columnTemplates.find(template => template.id === templateId);
+    const targetTemplate = columnTemplates.find((template) => template.id === templateId);
     if (!targetTemplate) return;
 
     const columns = normalizeColumnVisibility(targetTemplate.columns);
     const order = normalizeColumnOrder(targetTemplate.order);
-    const updatedTemplates = columnTemplates.map(template => ({
+    const updatedTemplates = columnTemplates.map((template) => ({
       ...template,
       isActive: template.id === templateId,
     }));
@@ -908,11 +1023,11 @@ function PersonnelListPage() {
   };
 
   const deactivateColumnTemplate = (templateId: string) => {
-    const targetTemplate = columnTemplates.find(template => template.id === templateId);
+    const targetTemplate = columnTemplates.find((template) => template.id === templateId);
     const defaultTemplate = createDefaultColumnTemplate();
     if (!targetTemplate || targetTemplate.isDefault) return;
 
-    const updatedTemplates = columnTemplates.map(template => ({
+    const updatedTemplates = columnTemplates.map((template) => ({
       ...template,
       isActive: template.id === defaultTemplate.id,
     }));
@@ -943,7 +1058,9 @@ function PersonnelListPage() {
       columns,
       order,
     };
-    const updatedTemplates = columnTemplates.map(template => ({ ...template, isActive: false })).concat(newTemplate);
+    const updatedTemplates = columnTemplates
+      .map((template) => ({ ...template, isActive: false }))
+      .concat(newTemplate);
 
     setTemplateName("");
     setColumnTemplates(updatedTemplates);
@@ -956,14 +1073,15 @@ function PersonnelListPage() {
   };
 
   const deleteColumnTemplate = (templateId: string) => {
-    const targetTemplate = columnTemplates.find(template => template.id === templateId);
+    const targetTemplate = columnTemplates.find((template) => template.id === templateId);
     if (!targetTemplate || targetTemplate.isDefault) return;
 
-    const remainingTemplates = columnTemplates.filter(template => template.id !== templateId);
+    const remainingTemplates = columnTemplates.filter((template) => template.id !== templateId);
     const updatedTemplates = targetTemplate.isActive
       ? remainingTemplates.map((template, index) => ({ ...template, isActive: index === 0 }))
       : remainingTemplates;
-    const activeTemplate = updatedTemplates.find(template => template.isActive) || createDefaultColumnTemplate();
+    const activeTemplate =
+      updatedTemplates.find((template) => template.isActive) || createDefaultColumnTemplate();
 
     setColumnTemplates(updatedTemplates);
     setVisibleCols(normalizeColumnVisibility(activeTemplate.columns));
@@ -982,12 +1100,13 @@ function PersonnelListPage() {
 
         {/* Main Content Area */}
         <div className="p-4 md:p-6 xl:p-8 space-y-2">
-
           {/* Breadcrumb and Page Header */}
           <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-2.5" />
                 <span className="hover:text-primary transition-colors">Human Resource</span>
                 <ChevronRight className="size-2.5" />
@@ -995,19 +1114,27 @@ function PersonnelListPage() {
               </div>
               <div className="flex items-center gap-3">
                 <div className="size-2.5 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]" />
-                <h1 className="text-xl font-extrabold tracking-tight text-foreground">Personnel List</h1>
+                <h1 className="text-xl font-extrabold tracking-tight text-foreground">
+                  Personnel List
+                </h1>
               </div>
             </div>
 
             {/* Quick Metrics Bar */}
             <div className="flex items-center gap-3 flex-wrap">
               <div className="bg-card border border-border/70 rounded-lg px-3.5 py-2 shadow-2xs hover:shadow-xs transition duration-200 flex items-center gap-2">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/85">Total Employees:</div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/85">
+                  Total Employees:
+                </div>
                 <div className="text-xs font-extrabold text-foreground">{employees.length}</div>
               </div>
               <div className="bg-[oklch(0.98_0.02_160)] dark:bg-[oklch(0.20_0.035_165)] border border-[oklch(0.62_0.16_155/0.2)] rounded-lg px-3.5 py-2 shadow-2xs flex items-center gap-2">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-success/95">Working:</div>
-                <div className="text-xs font-extrabold text-success">{employees.filter(e => e.status === "Working").length}</div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-success/95">
+                  Working:
+                </div>
+                <div className="text-xs font-extrabold text-success">
+                  {employees.filter((e) => e.status === "Working").length}
+                </div>
               </div>
               <button
                 onClick={() => window.open("/add-employee", "_blank")}
@@ -1038,7 +1165,7 @@ function PersonnelListPage() {
                     empTypeFilter !== "ALL",
                     statusFilter !== "Working",
                     empStatusFilter !== "ALL",
-                    designationFilter !== "ALL"
+                    designationFilter !== "ALL",
                   ].filter(Boolean).length;
 
                   return activeCount > 0 ? (
@@ -1047,26 +1174,38 @@ function PersonnelListPage() {
                     </span>
                   ) : null;
                 })()}
-                <ChevronDown className={`size-3.5 text-muted-foreground/60 transition-transform duration-300 ${isFilterCollapsed ? "-rotate-90" : ""}`} />
+                <ChevronDown
+                  className={`size-3.5 text-muted-foreground/60 transition-transform duration-300 ${isFilterCollapsed ? "-rotate-90" : ""}`}
+                />
               </button>
-              {(!isFilterCollapsed && (empIdFilter || deptFilter !== "ALL" || sectFilter !== "ALL" || empTypeFilter !== "ALL" || statusFilter !== "Working" || empStatusFilter !== "ALL" || designationFilter !== "ALL")) && (
-                <button
-                  onClick={resetFilters}
-                  className="text-[10px] font-medium text-rose-500 hover:text-rose-600 hover:underline"
-                >
-                  Clear All Filters
-                </button>
-              )}
+              {!isFilterCollapsed &&
+                (empIdFilter ||
+                  deptFilter !== "ALL" ||
+                  sectFilter !== "ALL" ||
+                  empTypeFilter !== "ALL" ||
+                  statusFilter !== "Working" ||
+                  empStatusFilter !== "ALL" ||
+                  designationFilter !== "ALL") && (
+                  <button
+                    onClick={resetFilters}
+                    className="text-[10px] font-medium text-rose-500 hover:text-rose-600 hover:underline"
+                  >
+                    Clear All Filters
+                  </button>
+                )}
             </div>
 
-            <div className={`transition-all duration-300 overflow-hidden ${isFilterCollapsed ? "max-h-0 opacity-0" : "max-h-[600px] opacity-100 p-5"}`}>
+            <div
+              className={`transition-all duration-300 overflow-hidden ${isFilterCollapsed ? "max-h-0 opacity-0" : "max-h-[600px] opacity-100 p-5"}`}
+            >
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4.5">
-
                 {/* Employee ID search list */}
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75 flex items-center justify-between">
                     <span>Employee ID</span>
-                    <span className="text-[9px] text-primary/80 lowercase tracking-normal font-semibold">use comma as separator</span>
+                    <span className="text-[9px] text-primary/80 lowercase tracking-normal font-semibold">
+                      use comma as separator
+                    </span>
                   </label>
                   <input
                     type="text"
@@ -1079,7 +1218,9 @@ function PersonnelListPage() {
 
                 {/* ID Type Segment Selector */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">ID Type Scope</label>
+                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                    ID Type Scope
+                  </label>
                   <div className="flex p-1 rounded-xl bg-muted border border-border/40 h-9.5">
                     <button
                       onClick={() => setSystemOffice("system")}
@@ -1098,12 +1239,17 @@ function PersonnelListPage() {
 
                 {/* Employee Type select */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Employee Type</label>
+                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                    Employee Type
+                  </label>
                   <div className="relative">
                     <SearchableSelect
                       value={empTypeFilter}
                       onChange={setEmpTypeFilter}
-                      options={empTypesList.map(type => ({ value: type, label: type === "ALL" ? "All Types" : type }))}
+                      options={empTypesList.map((type) => ({
+                        value: type,
+                        label: type === "ALL" ? "All Types" : type,
+                      }))}
                       placeholder="Select type..."
                     />
                   </div>
@@ -1111,12 +1257,17 @@ function PersonnelListPage() {
 
                 {/* Department select */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Department</label>
+                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                    Department
+                  </label>
                   <div className="relative">
                     <SearchableSelect
                       value={deptFilter}
                       onChange={setDeptFilter}
-                      options={departmentsList.map(dept => ({ value: dept, label: dept === "ALL" ? "All Departments" : dept }))}
+                      options={departmentsList.map((dept) => ({
+                        value: dept,
+                        label: dept === "ALL" ? "All Departments" : dept,
+                      }))}
                       placeholder="Select department..."
                     />
                   </div>
@@ -1124,12 +1275,17 @@ function PersonnelListPage() {
 
                 {/* Section select */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Section</label>
+                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                    Section
+                  </label>
                   <div className="relative">
                     <SearchableSelect
                       value={sectFilter}
                       onChange={setSectFilter}
-                      options={sectionsList.map(sect => ({ value: sect, label: sect === "ALL" ? "All Sections" : sect }))}
+                      options={sectionsList.map((sect) => ({
+                        value: sect,
+                        label: sect === "ALL" ? "All Sections" : sect,
+                      }))}
                       placeholder="Select section..."
                     />
                   </div>
@@ -1137,12 +1293,17 @@ function PersonnelListPage() {
 
                 {/* Designation select */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Designation</label>
+                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                    Designation
+                  </label>
                   <div className="relative">
                     <SearchableSelect
                       value={designationFilter}
                       onChange={setDesignationFilter}
-                      options={designationsList.map(des => ({ value: des, label: des === "ALL" ? "All Designations" : des }))}
+                      options={designationsList.map((des) => ({
+                        value: des,
+                        label: des === "ALL" ? "All Designations" : des,
+                      }))}
                       placeholder="Select designation..."
                     />
                   </div>
@@ -1150,7 +1311,9 @@ function PersonnelListPage() {
 
                 {/* Working Status select */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Working Status</label>
+                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                    Working Status
+                  </label>
                   <div className="relative">
                     <SearchableSelect
                       value={statusFilter}
@@ -1160,7 +1323,7 @@ function PersonnelListPage() {
                         { value: "Working", label: "Working" },
                         { value: "On Leave", label: "On Leave" },
                         { value: "Resigned", label: "Resigned" },
-                        { value: "Terminated", label: "Terminated" }
+                        { value: "Terminated", label: "Terminated" },
                       ]}
                       placeholder="Select status..."
                     />
@@ -1169,7 +1332,9 @@ function PersonnelListPage() {
 
                 {/* Employment Status select */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Employment Status</label>
+                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                    Employment Status
+                  </label>
                   <div className="relative">
                     <SearchableSelect
                       value={empStatusFilter}
@@ -1177,13 +1342,12 @@ function PersonnelListPage() {
                       options={[
                         { value: "ALL", label: "All Statuses" },
                         { value: "Probation", label: "Probation" },
-                        { value: "Permanent", label: "Permanent" }
+                        { value: "Permanent", label: "Permanent" },
                       ]}
                       placeholder="Select status..."
                     />
                   </div>
                 </div>
-
               </div>
             </div>
           </div>
@@ -1195,10 +1359,17 @@ function PersonnelListPage() {
                 <Sparkles className="size-4 animate-pulse" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-[10px] font-bold text-primary uppercase tracking-wider animate-pulse">HRIS Operations Hub</div>
-                <p className="text-xs text-white dark:text-foreground font-bold mt-0.5 leading-snug">{bulkActionMessage}</p>
+                <div className="text-[10px] font-bold text-primary uppercase tracking-wider animate-pulse">
+                  HRIS Operations Hub
+                </div>
+                <p className="text-xs text-white dark:text-foreground font-bold mt-0.5 leading-snug">
+                  {bulkActionMessage}
+                </p>
               </div>
-              <button onClick={() => setBulkActionMessage(null)} className="text-slate-400 hover:text-white dark:text-muted-foreground dark:hover:text-foreground">
+              <button
+                onClick={() => setBulkActionMessage(null)}
+                className="text-slate-400 hover:text-white dark:text-muted-foreground dark:hover:text-foreground"
+              >
                 <X className="size-4" />
               </button>
             </div>
@@ -1215,8 +1386,13 @@ function PersonnelListPage() {
                     <Sparkles className="size-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-semibold text-foreground">Personnel Operations & Document Center</h3>
-                    <p className="text-xs text-muted-foreground/80 mt-0.5 font-normal">Generate statutory letters, print certificates, and manage employee profiles in bulk.</p>
+                    <h3 className="text-sm font-semibold text-foreground">
+                      Personnel Operations & Document Center
+                    </h3>
+                    <p className="text-xs text-muted-foreground/80 mt-0.5 font-normal">
+                      Generate statutory letters, print certificates, and manage employee profiles
+                      in bulk.
+                    </p>
                   </div>
                 </div>
                 <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-indigo-500/5 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-normal shadow-3xs">
@@ -1232,7 +1408,9 @@ function PersonnelListPage() {
                     <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-primary/10 text-primary">
                       {selectedEmpIds.length} Selected
                     </span>
-                    <h3 className="text-xs font-extrabold text-foreground tracking-tight">Active Operations & Print Console</h3>
+                    <h3 className="text-xs font-extrabold text-foreground tracking-tight">
+                      Active Operations & Print Console
+                    </h3>
                   </div>
                   <button
                     onClick={() => setSelectedEmpIds([])}
@@ -1244,7 +1422,6 @@ function PersonnelListPage() {
 
                 {/* Operations Grid */}
                 <div className="grid grid-cols-1 xl:grid-cols-12 gap-5">
-
                   {/* Left Console: Documents Grid */}
                   <div className="xl:col-span-8 space-y-4">
                     <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/80 uppercase tracking-widest">
@@ -1253,7 +1430,6 @@ function PersonnelListPage() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-
                       {/* Column A: Letters & Agreements */}
                       <div className="space-y-2 bg-muted/15 border border-border/20 rounded-xl p-3.5">
                         <div className="text-[10px] font-extrabold text-foreground/90 uppercase tracking-wider pb-1.5 border-b border-border/30 flex items-center gap-1.5">
@@ -1269,8 +1445,8 @@ function PersonnelListPage() {
                             "Confirmation Letter",
                             "Experience Certificate",
                             "NOC Letter",
-                            "Salary Certificate"
-                          ].map(doc => (
+                            "Salary Certificate",
+                          ].map((doc) => (
                             <button
                               key={doc}
                               disabled={activeDocGenerating !== null}
@@ -1303,8 +1479,8 @@ function PersonnelListPage() {
                             "Emp Check List",
                             "Performance Appraisal",
                             "BI Verification",
-                            "Police Verification"
-                          ].map(doc => (
+                            "Police Verification",
+                          ].map((doc) => (
                             <button
                               key={doc}
                               disabled={activeDocGenerating !== null}
@@ -1337,8 +1513,8 @@ function PersonnelListPage() {
                             "Personal Resume",
                             "Report Set",
                             "Zero Abuse EXE",
-                            "Service CoC"
-                          ].map(doc => (
+                            "Service CoC",
+                          ].map((doc) => (
                             <button
                               key={doc}
                               disabled={activeDocGenerating !== null}
@@ -1355,7 +1531,6 @@ function PersonnelListPage() {
                           ))}
                         </div>
                       </div>
-
                     </div>
                   </div>
 
@@ -1369,15 +1544,55 @@ function PersonnelListPage() {
                     <div className="bg-muted/15 border border-border/20 rounded-xl p-3.5 h-[calc(100%-1.75rem)] flex flex-col justify-between gap-3">
                       <div className="grid grid-cols-2 gap-2">
                         {[
-                          { name: "Make Permanent", icon: UserCheck, color: "hover:bg-emerald-500/10 hover:border-emerald-500/30 text-emerald-600 dark:text-emerald-400" },
-                          { name: "Status Update", icon: UserCog, color: "hover:bg-indigo-500/10 hover:border-indigo-500/30 text-indigo-600 dark:text-indigo-400" },
-                          { name: "OT Status Update", icon: Clock, color: "hover:bg-amber-500/10 hover:border-amber-500/30 text-amber-600 dark:text-amber-400" },
-                          { name: "Shift Rotation", icon: CalendarRange, color: "hover:bg-rose-500/10 hover:border-rose-500/30 text-rose-600 dark:text-rose-400" },
-                          { name: "Set Holiday", icon: CalendarHeart, color: "hover:bg-cyan-500/10 hover:border-cyan-500/30 text-cyan-600 dark:text-cyan-400" },
-                          { name: "Set A/C IsActive", icon: Power, color: "hover:bg-purple-500/10 hover:border-purple-500/30 text-purple-600 dark:text-purple-400" },
-                          { name: "ID Card IssueDate", icon: FileClock, color: "hover:bg-fuchsia-500/10 hover:border-fuchsia-500/30 text-fuchsia-600 dark:text-fuchsia-400" },
-                          { name: "Revenue Mapping", icon: DollarSign, color: "hover:bg-teal-500/10 hover:border-teal-500/30 text-teal-600 dark:text-teal-400" }
-                        ].map(op => {
+                          {
+                            name: "Make Permanent",
+                            icon: UserCheck,
+                            color:
+                              "hover:bg-emerald-500/10 hover:border-emerald-500/30 text-emerald-600 dark:text-emerald-400",
+                          },
+                          {
+                            name: "Status Update",
+                            icon: UserCog,
+                            color:
+                              "hover:bg-indigo-500/10 hover:border-indigo-500/30 text-indigo-600 dark:text-indigo-400",
+                          },
+                          {
+                            name: "OT Status Update",
+                            icon: Clock,
+                            color:
+                              "hover:bg-amber-500/10 hover:border-amber-500/30 text-amber-600 dark:text-amber-400",
+                          },
+                          {
+                            name: "Shift Rotation",
+                            icon: CalendarRange,
+                            color:
+                              "hover:bg-rose-500/10 hover:border-rose-500/30 text-rose-600 dark:text-rose-400",
+                          },
+                          {
+                            name: "Set Holiday",
+                            icon: CalendarHeart,
+                            color:
+                              "hover:bg-cyan-500/10 hover:border-cyan-500/30 text-cyan-600 dark:text-cyan-400",
+                          },
+                          {
+                            name: "Set A/C IsActive",
+                            icon: Power,
+                            color:
+                              "hover:bg-purple-500/10 hover:border-purple-500/30 text-purple-600 dark:text-purple-400",
+                          },
+                          {
+                            name: "ID Card IssueDate",
+                            icon: FileClock,
+                            color:
+                              "hover:bg-fuchsia-500/10 hover:border-fuchsia-500/30 text-fuchsia-600 dark:text-fuchsia-400",
+                          },
+                          {
+                            name: "Revenue Mapping",
+                            icon: DollarSign,
+                            color:
+                              "hover:bg-teal-500/10 hover:border-teal-500/30 text-teal-600 dark:text-teal-400",
+                          },
+                        ].map((op) => {
                           const IconComponent = op.icon;
                           return (
                             <button
@@ -1386,19 +1601,21 @@ function PersonnelListPage() {
                               className={`flex flex-col items-center justify-center p-3 rounded-xl border border-border/40 bg-card text-center gap-1.5 transition-all hover:scale-102 hover:shadow-2xs ${op.color}`}
                             >
                               <IconComponent className="size-4.5" />
-                              <span className="text-[10px] font-bold tracking-tight whitespace-nowrap leading-none">{op.name}</span>
+                              <span className="text-[10px] font-bold tracking-tight whitespace-nowrap leading-none">
+                                {op.name}
+                              </span>
                             </button>
                           );
                         })}
                       </div>
 
                       <div className="bg-primary/5 border border-primary/10 rounded-xl p-3 text-[10px] text-muted-foreground/80 leading-relaxed">
-                        💡 <span className="font-extrabold text-foreground">Bulk operations</span> applied here will simultaneously update the corporate records for all {selectedEmpIds.length} checked personnel.
+                        💡 <span className="font-extrabold text-foreground">Bulk operations</span>{" "}
+                        applied here will simultaneously update the corporate records for all{" "}
+                        {selectedEmpIds.length} checked personnel.
                       </div>
                     </div>
-
                   </div>
-
                 </div>
               </div>
             )}
@@ -1406,10 +1623,8 @@ function PersonnelListPage() {
 
           {/* Data Grid Card Container */}
           <div className="bg-card rounded-lg border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300">
-
             {/* Toolbar Header */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-5 border-b border-border/40">
-
               {/* Export Buttons */}
               <div className="flex items-center gap-2">
                 <button className="h-8.5 px-3 rounded-lg border border-border/60 hover:bg-muted text-xs font-semibold text-foreground/80 hover:text-foreground transition duration-200 flex items-center gap-1.5">
@@ -1463,7 +1678,10 @@ function PersonnelListPage() {
                       <div className="flex items-center gap-2">
                         <input
                           type="checkbox"
-                          checked={filteredEmployees.length > 0 && selectedEmpIds.length === filteredEmployees.length}
+                          checked={
+                            filteredEmployees.length > 0 &&
+                            selectedEmpIds.length === filteredEmployees.length
+                          }
                           onChange={toggleSelectAll}
                           className="rounded border-border text-primary focus:ring-primary/20 cursor-pointer"
                         />
@@ -1471,27 +1689,41 @@ function PersonnelListPage() {
                       </div>
                     </th>
                     {/* Fixed Sticky Header for ID and Name */}
-                    <th className="sticky left-[130px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-4 font-bold border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[100px] min-w-[100px] max-w-[100px]">Emp ID</th>
-                    <th className="sticky left-[230px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-4 font-bold border-r border-border/40 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[180px] min-w-[180px] max-w-[180px]">Name</th>
+                    <th className="sticky left-[130px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-4 font-bold border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[100px] min-w-[100px] max-w-[100px]">
+                      Emp ID
+                    </th>
+                    <th className="sticky left-[230px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-4 font-bold border-r border-border/40 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[180px] min-w-[180px] max-w-[180px]">
+                      Name
+                    </th>
 
                     {/* Standard Configurable headers */}
-                    {columnOrder.filter(key => visibleCols[key]).map(key => (
-                      <th key={key} className={getColumnHeaderClass(key)}>{getColumnLabel(key)}</th>
-                    ))}
+                    {columnOrder
+                      .filter((key) => visibleCols[key])
+                      .map((key) => (
+                        <th key={key} className={getColumnHeaderClass(key)}>
+                          {getColumnLabel(key)}
+                        </th>
+                      ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/45">
                   {filteredEmployees.map((e, index) => {
-                    const stickyCellBgClass = "bg-card group-hover:bg-[#f8fafc] dark:group-hover:bg-[#1e293b]";
+                    const stickyCellBgClass =
+                      "bg-card group-hover:bg-[#f8fafc] dark:group-hover:bg-[#1e293b]";
 
                     return (
                       <tr
                         key={e.id}
-                        onClick={() => navigate({ to: '/employee-detail/$id', params: { id: e.id } })}
+                        onClick={() =>
+                          navigate({ to: "/employee-detail/$id", params: { id: e.id } })
+                        }
                         className={`group transition-all cursor-pointer hover:bg-[#f8fafc] dark:hover:bg-[#1e293b]`}
                       >
                         {/* Sticky left Action & Checkbox Column cell */}
-                        <td className={`sticky left-0 ${stickyCellBgClass} px-2 py-2 border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[130px] min-w-[130px] max-w-[130px] transition-all`} onClick={(event) => event.stopPropagation()}>
+                        <td
+                          className={`sticky left-0 ${stickyCellBgClass} px-2 py-2 border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[130px] min-w-[130px] max-w-[130px] transition-all`}
+                          onClick={(event) => event.stopPropagation()}
+                        >
                           <div className="flex items-center gap-1.5 justify-center">
                             <input
                               type="checkbox"
@@ -1501,27 +1733,31 @@ function PersonnelListPage() {
                             />
                             <button
                               className="size-6 rounded-lg bg-amber-500/10 text-amber-600 border border-amber-500/20 hover:bg-amber-500 hover:text-white transition flex items-center justify-center shadow-3xs"
-                              onClick={() => navigate({ to: '/employee-detail/$id', params: { id: e.id } })}
+                              onClick={() =>
+                                navigate({ to: "/employee-detail/$id", params: { id: e.id } })
+                              }
                               title="Quick Sheet"
                             >
                               <FileText className="size-3" />
                             </button>
                             <button
                               className="size-6 rounded-lg bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 hover:bg-indigo-500 hover:text-white transition flex items-center justify-center shadow-3xs"
-                              onClick={() => navigate({ to: '/employee-detail/$id', params: { id: e.id } })}
+                              onClick={() =>
+                                navigate({ to: "/employee-detail/$id", params: { id: e.id } })
+                              }
                               title="View File"
                             >
                               <Eye className="size-3" />
                             </button>
 
-                            {(!e.status || e.status === "Working" || e.status === "On Leave") ? (
+                            {!e.status || e.status === "Working" || e.status === "On Leave" ? (
                               <button
                                 className="size-6 rounded-lg bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500 hover:text-white transition flex items-center justify-center shadow-3xs"
                                 onClick={() => {
                                   setResignModalEmp(e);
                                   setResignStatus("Resigned");
                                   setResignRemarks("");
-                                  setResignDate(new Date().toISOString().split('T')[0]);
+                                  setResignDate(new Date().toISOString().split("T")[0]);
                                 }}
                                 title="Resign / Terminate"
                               >
@@ -1533,7 +1769,7 @@ function PersonnelListPage() {
                                 onClick={() => {
                                   setRejoinModalEmp(e);
                                   setNewEmpId(e.id + "R");
-                                  setNewJoinDate(new Date().toISOString().split('T')[0]);
+                                  setNewJoinDate(new Date().toISOString().split("T")[0]);
                                   setNewDesignation(e.title || "");
                                   setNewDept(e.dept || "");
                                   setNewSect(e.sect || "");
@@ -1561,32 +1797,53 @@ function PersonnelListPage() {
                         </td>
 
                         {/* Sticky left Emp ID & Name cells */}
-                        <td className={`sticky left-[130px] ${stickyCellBgClass} px-3 py-3.5 font-medium text-primary border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[100px] min-w-[100px] max-w-[100px] transition-all`}>
+                        <td
+                          className={`sticky left-[130px] ${stickyCellBgClass} px-3 py-3.5 font-medium text-primary border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[100px] min-w-[100px] max-w-[100px] transition-all`}
+                        >
                           {e.id}
                         </td>
-                        <td className={`sticky left-[230px] ${stickyCellBgClass} px-3 py-3.5 font-medium text-foreground border-r border-border/40 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[180px] min-w-[180px] max-w-[180px] transition-all`}>
+                        <td
+                          className={`sticky left-[230px] ${stickyCellBgClass} px-3 py-3.5 font-medium text-foreground border-r border-border/40 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[180px] min-w-[180px] max-w-[180px] transition-all`}
+                        >
                           <div className="flex items-center gap-2">
                             <div className="size-6.5 rounded-lg bg-primary/10 text-[9px] font-bold text-primary flex items-center justify-center shadow-2xs animate-pulse">
-                              {e.name.split(" ").map((s: string) => s[0]).slice(0, 2).join("")}
+                              {e.name
+                                .split(" ")
+                                .map((s: string) => s[0])
+                                .slice(0, 2)
+                                .join("")}
                             </div>
                             <div className="flex flex-col min-w-0">
-                              <span className="truncate max-w-[120px] font-medium text-foreground">{e.name}</span>
+                              <span className="truncate max-w-[120px] font-medium text-foreground">
+                                {e.name}
+                              </span>
                               <div className="flex items-center gap-1 mt-0.5 flex-wrap">
                                 {e.status && e.status !== "Working" && (
-                                  <span className={`text-[8px] px-1.5 py-0.5 rounded leading-none ${e.status === "Resigned" ? "bg-amber-500/10 text-amber-500 border border-amber-500/20" :
-                                      e.status === "Terminated" ? "bg-rose-500/10 text-rose-500 border border-rose-500/20" :
-                                        "bg-blue-500/10 text-blue-500 border border-blue-500/20"
-                                    }`}>
+                                  <span
+                                    className={`text-[8px] px-1.5 py-0.5 rounded leading-none ${
+                                      e.status === "Resigned"
+                                        ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
+                                        : e.status === "Terminated"
+                                          ? "bg-rose-500/10 text-rose-500 border border-rose-500/20"
+                                          : "bg-blue-500/10 text-blue-500 border border-blue-500/20"
+                                    }`}
+                                  >
                                     {e.status}
                                   </span>
                                 )}
                                 {e.rejoinedTo && (
-                                  <span className="text-[8px] px-1.5 py-0.5 rounded leading-none bg-purple-500/10 text-purple-500 border border-purple-500/20" title={`Rejoined as ID: ${e.rejoinedTo}`}>
+                                  <span
+                                    className="text-[8px] px-1.5 py-0.5 rounded leading-none bg-purple-500/10 text-purple-500 border border-purple-500/20"
+                                    title={`Rejoined as ID: ${e.rejoinedTo}`}
+                                  >
                                     Rejoined
                                   </span>
                                 )}
                                 {e.rejoinRef && (
-                                  <span className="text-[8px] px-1.5 py-0.5 rounded leading-none bg-indigo-500/10 text-indigo-500 border border-indigo-500/20" title={`Rejoined from ID: ${e.rejoinRef}`}>
+                                  <span
+                                    className="text-[8px] px-1.5 py-0.5 rounded leading-none bg-indigo-500/10 text-indigo-500 border border-indigo-500/20"
+                                    title={`Rejoined from ID: ${e.rejoinRef}`}
+                                  >
                                     Rejoined Emp
                                   </span>
                                 )}
@@ -1596,9 +1853,11 @@ function PersonnelListPage() {
                         </td>
 
                         {/* Configurable Cells */}
-                        {columnOrder.filter(key => visibleCols[key]).map(key => (
-                          <Fragment key={key}>{columnRenderers[key](e)}</Fragment>
-                        ))}
+                        {columnOrder
+                          .filter((key) => visibleCols[key])
+                          .map((key) => (
+                            <Fragment key={key}>{columnRenderers[key](e)}</Fragment>
+                          ))}
                       </tr>
                     );
                   })}
@@ -1607,8 +1866,15 @@ function PersonnelListPage() {
                       <td colSpan={30} className="px-5 py-12 text-center text-muted-foreground">
                         <div className="flex flex-col items-center justify-center gap-2">
                           <EyeOff className="size-8 text-muted-foreground/45" />
-                          <span className="font-semibold text-xs">No employees match the specified search parameters.</span>
-                          <button onClick={resetFilters} className="text-[10px] font-bold text-primary hover:underline mt-1">Clear Filters</button>
+                          <span className="font-semibold text-xs">
+                            No employees match the specified search parameters.
+                          </span>
+                          <button
+                            onClick={resetFilters}
+                            className="text-[10px] font-bold text-primary hover:underline mt-1"
+                          >
+                            Clear Filters
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -1620,15 +1886,27 @@ function PersonnelListPage() {
             {/* Bottom Footer Info */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 border-t border-border/40 bg-muted/15">
               <span className="text-[11px] font-semibold text-muted-foreground/80">
-                Showing {filteredEmployees.length > 0 ? 1 : 0} to {filteredEmployees.length} of {employees.length} entries
+                Showing {filteredEmployees.length > 0 ? 1 : 0} to {filteredEmployees.length} of{" "}
+                {employees.length} entries
               </span>
               <div className="flex items-center gap-1">
-                <button className="h-8 px-3 rounded-lg border border-border/60 bg-card hover:bg-muted text-xs font-bold text-muted-foreground disabled:opacity-50 transition" disabled>Previous</button>
-                <button className="h-8 w-8 rounded-lg bg-primary text-primary-foreground text-xs font-bold shadow-2xs">1</button>
-                <button className="h-8 px-3 rounded-lg border border-border/60 bg-card hover:bg-muted text-xs font-bold text-muted-foreground disabled:opacity-50 transition" disabled>Next</button>
+                <button
+                  className="h-8 px-3 rounded-lg border border-border/60 bg-card hover:bg-muted text-xs font-bold text-muted-foreground disabled:opacity-50 transition"
+                  disabled
+                >
+                  Previous
+                </button>
+                <button className="h-8 w-8 rounded-lg bg-primary text-primary-foreground text-xs font-bold shadow-2xs">
+                  1
+                </button>
+                <button
+                  className="h-8 px-3 rounded-lg border border-border/60 bg-card hover:bg-muted text-xs font-bold text-muted-foreground disabled:opacity-50 transition"
+                  disabled
+                >
+                  Next
+                </button>
               </div>
             </div>
-
           </div>
         </div>
 
@@ -1647,9 +1925,14 @@ function PersonnelListPage() {
                     <LayoutGrid className="size-4 text-primary" />
                     <h3 className="text-sm font-bold text-foreground">Column Arrangement</h3>
                   </div>
-                  <p className="text-xs text-muted-foreground/75 mt-1">Set show/hide status, change serial order, and save reusable templates.</p>
+                  <p className="text-xs text-muted-foreground/75 mt-1">
+                    Set show/hide status, change serial order, and save reusable templates.
+                  </p>
                 </div>
-                <button onClick={() => setIsColSelectorOpen(false)} className="size-8 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center">
+                <button
+                  onClick={() => setIsColSelectorOpen(false)}
+                  className="size-8 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center"
+                >
                   <X className="size-4" />
                 </button>
               </div>
@@ -1658,12 +1941,16 @@ function PersonnelListPage() {
                 <div className="border-b lg:border-b-0 lg:border-r border-border/40 p-4 space-y-4 overflow-y-auto">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Templates</span>
-                      <span className="text-[10px] font-bold text-primary">{columnTemplates.length} saved</span>
+                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                        Templates
+                      </span>
+                      <span className="text-[10px] font-bold text-primary">
+                        {columnTemplates.length} saved
+                      </span>
                     </div>
 
                     <div className="space-y-2">
-                      {columnTemplates.map(template => {
+                      {columnTemplates.map((template) => {
                         const visibleCount = Object.values(template.columns).filter(Boolean).length;
 
                         return (
@@ -1674,25 +1961,38 @@ function PersonnelListPage() {
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">
                                 <div className="flex items-center gap-1.5">
-                                  {template.isDefault && <Star className="size-3.5 text-amber-500 fill-amber-500/20" />}
-                                  <span className="text-xs font-extrabold text-foreground truncate">{template.name}</span>
+                                  {template.isDefault && (
+                                    <Star className="size-3.5 text-amber-500 fill-amber-500/20" />
+                                  )}
+                                  <span className="text-xs font-extrabold text-foreground truncate">
+                                    {template.name}
+                                  </span>
                                 </div>
                                 <div className="text-[10px] text-muted-foreground/75 mt-1">
-                                  {visibleCount} visible, {defaultColumnOrder.length - visibleCount} hidden
+                                  {visibleCount} visible, {defaultColumnOrder.length - visibleCount}{" "}
+                                  hidden
                                 </div>
                               </div>
-                              <span className={`shrink-0 px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${template.isActive ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-muted text-muted-foreground"}`}>
+                              <span
+                                className={`shrink-0 px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${template.isActive ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-muted text-muted-foreground"}`}
+                              >
                                 {template.isActive ? "Active" : "Inactive"}
                               </span>
                             </div>
 
                             <div className="flex items-center gap-2 mt-3">
                               <button
-                                onClick={() => template.isActive && !template.isDefault ? deactivateColumnTemplate(template.id) : activateColumnTemplate(template.id)}
+                                onClick={() =>
+                                  template.isActive && !template.isDefault
+                                    ? deactivateColumnTemplate(template.id)
+                                    : activateColumnTemplate(template.id)
+                                }
                                 disabled={template.isActive && template.isDefault}
                                 className="h-7 px-3 rounded-lg border border-border/60 bg-card hover:bg-muted text-[10px] font-bold text-foreground/80 disabled:opacity-50 disabled:cursor-not-allowed transition"
                               >
-                                {template.isActive && !template.isDefault ? "Deactivate" : "Activate"}
+                                {template.isActive && !template.isDefault
+                                  ? "Deactivate"
+                                  : "Activate"}
                               </button>
                               {!template.isDefault && (
                                 <button
@@ -1711,7 +2011,9 @@ function PersonnelListPage() {
                   </div>
 
                   <div className="rounded-xl border border-border/50 bg-card p-3 space-y-2">
-                    <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Save Current As Template</label>
+                    <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                      Save Current As Template
+                    </label>
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
@@ -1757,8 +2059,8 @@ function PersonnelListPage() {
                             isDragged
                               ? "border-primary bg-primary/5 opacity-50 scale-[0.98] select-none pointer-events-none"
                               : isDraggedOver
-                              ? "border-primary/50 bg-primary/5 border-dashed scale-[1.01]"
-                              : "border-border/50 bg-card hover:bg-muted/20"
+                                ? "border-primary/50 bg-primary/5 border-dashed scale-[1.01]"
+                                : "border-border/50 bg-card hover:bg-muted/20"
                           }`}
                         >
                           <div
@@ -1773,15 +2075,17 @@ function PersonnelListPage() {
                             type="number"
                             min={1}
                             max={draftColumnOrder.length}
-                            value={tempSerials[key] !== undefined ? tempSerials[key] : String(index + 1)}
+                            value={
+                              tempSerials[key] !== undefined ? tempSerials[key] : String(index + 1)
+                            }
                             onChange={(event) => {
                               const val = event.target.value;
-                              setTempSerials(prev => ({ ...prev, [key]: val }));
+                              setTempSerials((prev) => ({ ...prev, [key]: val }));
                             }}
                             onBlur={() => {
                               if (tempSerials[key] !== undefined) {
                                 updateDraftSerial(key, tempSerials[key]);
-                                setTempSerials(prev => {
+                                setTempSerials((prev) => {
                                   const next = { ...prev };
                                   delete next[key];
                                   return next;
@@ -1798,8 +2102,12 @@ function PersonnelListPage() {
                           />
 
                           <div className="min-w-0">
-                            <div className="text-xs font-bold text-foreground truncate">{getColumnLabel(key)}</div>
-                            <div className="text-[10px] text-muted-foreground/70">Configurable personnel field</div>
+                            <div className="text-xs font-bold text-foreground truncate">
+                              {getColumnLabel(key)}
+                            </div>
+                            <div className="text-[10px] text-muted-foreground/70">
+                              Configurable personnel field
+                            </div>
                           </div>
 
                           <button
@@ -1807,7 +2115,9 @@ function PersonnelListPage() {
                             draggable="false"
                             className={`h-8 px-2.5 rounded-lg border text-[10px] font-extrabold transition flex items-center justify-center gap-1.5 ${draftVisibleCols[key] ? "bg-primary/10 border-primary/25 text-primary" : "bg-muted/30 border-border/50 text-muted-foreground"}`}
                           >
-                            <span className={`size-4 rounded-md border flex items-center justify-center ${draftVisibleCols[key] ? "bg-primary border-primary text-primary-foreground" : "border-border bg-card"}`}>
+                            <span
+                              className={`size-4 rounded-md border flex items-center justify-center ${draftVisibleCols[key] ? "bg-primary border-primary text-primary-foreground" : "border-border bg-card"}`}
+                            >
                               {draftVisibleCols[key] && <Check className="size-2.5 stroke-[3.5]" />}
                             </span>
                             {draftVisibleCols[key] ? "Show" : "Hide"}
@@ -1876,18 +2186,25 @@ function PersonnelListPage() {
             <div className="bg-card w-full max-w-2xl border border-border rounded-lg shadow-xl overflow-hidden p-6 space-y-4 animate-in zoom-in-95 duration-200">
               <div className="flex items-center justify-between border-b border-border/40 pb-3">
                 <h3 className="text-sm font-bold text-foreground">Resign / Terminate Employee</h3>
-                <button onClick={() => setResignModalEmp(null)} className="text-muted-foreground hover:text-foreground">
+                <button
+                  onClick={() => setResignModalEmp(null)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
                   <X className="size-4" />
                 </button>
               </div>
 
               <div className="text-xs text-muted-foreground">
-                You are updating the status of <span className="font-semibold text-foreground">{resignModalEmp.name}</span> (ID: {resignModalEmp.id}).
+                You are updating the status of{" "}
+                <span className="font-semibold text-foreground">{resignModalEmp.name}</span> (ID:{" "}
+                {resignModalEmp.id}).
               </div>
 
               <div className="space-y-3">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Action Type</label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Action Type
+                  </label>
                   <select
                     value={resignStatus}
                     onChange={(e) => setResignStatus(e.target.value as any)}
@@ -1899,7 +2216,9 @@ function PersonnelListPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Effective Date</label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Effective Date
+                  </label>
                   <input
                     type="date"
                     value={resignDate}
@@ -1909,7 +2228,9 @@ function PersonnelListPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Remarks / Reason</label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Remarks / Reason
+                  </label>
                   <textarea
                     value={resignRemarks}
                     onChange={(e) => setResignRemarks(e.target.value)}
@@ -1944,18 +2265,27 @@ function PersonnelListPage() {
             <div className="bg-card w-full max-w-3xl border border-border rounded-lg shadow-xl overflow-hidden p-6 space-y-4 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between border-b border-border/40 pb-3">
                 <h3 className="text-sm font-bold text-foreground">Rejoin / Re-employ Employee</h3>
-                <button onClick={() => setRejoinModalEmp(null)} className="text-muted-foreground hover:text-foreground">
+                <button
+                  onClick={() => setRejoinModalEmp(null)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
                   <X className="size-4" />
                 </button>
               </div>
 
               <div className="text-xs text-muted-foreground bg-primary/5 p-3 rounded-xl border border-primary/10">
-                Rejoining will create a <span className="font-semibold text-foreground">new employment profile</span> with a new Employee ID for <span className="font-semibold text-foreground">{rejoinModalEmp.name}</span>. The old files, documents, and history will be connected automatically.
+                Rejoining will create a{" "}
+                <span className="font-semibold text-foreground">new employment profile</span> with a
+                new Employee ID for{" "}
+                <span className="font-semibold text-foreground">{rejoinModalEmp.name}</span>. The
+                old files, documents, and history will be connected automatically.
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">New Employee ID</label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    New Employee ID
+                  </label>
                   <input
                     type="text"
                     value={newEmpId}
@@ -1966,7 +2296,9 @@ function PersonnelListPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">New Joining Date</label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    New Joining Date
+                  </label>
                   <input
                     type="date"
                     value={newJoinDate}
@@ -1976,7 +2308,9 @@ function PersonnelListPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Designation / Title</label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Designation / Title
+                  </label>
                   <input
                     type="text"
                     value={newDesignation}
@@ -1986,7 +2320,9 @@ function PersonnelListPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Department</label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Department
+                  </label>
                   <input
                     type="text"
                     value={newDept}
@@ -1996,7 +2332,9 @@ function PersonnelListPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Section</label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Section
+                  </label>
                   <input
                     type="text"
                     value={newSect}
@@ -2006,7 +2344,9 @@ function PersonnelListPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Employee Type</label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Employee Type
+                  </label>
                   <select
                     value={newEmpType}
                     onChange={(e) => setNewEmpType(e.target.value)}
@@ -2019,7 +2359,9 @@ function PersonnelListPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Grade</label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Grade
+                  </label>
                   <input
                     type="text"
                     value={newGrade}
@@ -2029,7 +2371,9 @@ function PersonnelListPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Shift</label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Shift
+                  </label>
                   <input
                     type="text"
                     value={newShift}
@@ -2039,7 +2383,9 @@ function PersonnelListPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Basic Salary</label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Basic Salary
+                  </label>
                   <input
                     type="text"
                     value={newBasic}
@@ -2049,7 +2395,9 @@ function PersonnelListPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Gross Salary</label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Gross Salary
+                  </label>
                   <input
                     type="text"
                     value={newGross}
@@ -2060,7 +2408,9 @@ function PersonnelListPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Rejoin Notes / Remarks</label>
+                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  Rejoin Notes / Remarks
+                </label>
                 <textarea
                   value={rejoinRemarks}
                   onChange={(e) => setRejoinRemarks(e.target.value)}
@@ -2087,7 +2437,6 @@ function PersonnelListPage() {
             </div>
           </div>
         )}
-
       </main>
     </div>
   );

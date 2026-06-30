@@ -598,8 +598,11 @@ function AddEmployeePage() {
   };
 
   const parseNidText = (text: string) => {
-    const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
-    
+    const lines = text
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean);
+
     let nameEng = "";
     let nameBng = "";
     let fatherNameBng = "";
@@ -612,7 +615,10 @@ function AddEmployeePage() {
 
     // --- Pass 1: Extract NID Number ---
     // Only normalize digits in a scoped way (don't mutate the entire text)
-    const digitNormalized = text.replace(/[lI]/g, "1").replace(/O/g, "0").replace(/S(?=\d)/g, "5");
+    const digitNormalized = text
+      .replace(/[lI]/g, "1")
+      .replace(/O/g, "0")
+      .replace(/S(?=\d)/g, "5");
     // NID numbers: 10, 13, or 17 digits, possibly with spaces from OCR
     const nidMatch = digitNormalized.match(/\b(\d[\d\s]{8,18}\d)\b/);
     if (nidMatch) {
@@ -630,7 +636,7 @@ function AddEmployeePage() {
     // IMPORTANT: Skip any line that says "Place of Birth" / "জন্মস্থান"
     for (const line of lines) {
       if (/(place of birth|জন্মস্থান|birthplace)/i.test(line)) continue;
-      
+
       // "Date of Birth: 12 Jul 1999" pattern
       if (/(date of birth|dob|birth date|জন্ম তারিখ)/i.test(line)) {
         const afterColon = line.split(/[:]\s*/);
@@ -645,7 +651,7 @@ function AddEmployeePage() {
         }
         continue;
       }
-      
+
       // Standalone date formats (if DOB label wasn't found)
       if (!dob) {
         const standaloneDate = line.match(/^(\d{1,2}\s+[A-Za-z]{3,}\s+\d{4})$/);
@@ -660,7 +666,10 @@ function AddEmployeePage() {
 
       // === Name (English) ===
       // "Name: TAHMID AFSAR" — must NOT contain father/mother/spouse keywords
-      if (/(^name\b|^nane\b|^mame\b)/i.test(lineLower) && !/(father|mother|spouse|পিতা|মাতা)/i.test(lineLower)) {
+      if (
+        /(^name\b|^nane\b|^mame\b)/i.test(lineLower) &&
+        !/(father|mother|spouse|পিতা|মাতা)/i.test(lineLower)
+      ) {
         const parts = line.split(/[:]\s*/);
         if (parts.length > 1 && parts.slice(1).join(":").trim().length > 1) {
           nameEng = parts.slice(1).join(":").trim();
@@ -714,12 +723,15 @@ function AddEmployeePage() {
           if (engParts.length > 1) addrStart = engParts.slice(1).join(":").trim();
         }
         if (addrStart) addressLines.push(addrStart);
-        
+
         // Grab continuation lines (lines that look like address fragments, not new key-value pairs)
         for (let j = i + 1; j < lines.length && j <= i + 4; j++) {
           const nextLine = lines[j];
           // Stop if we hit a new labeled field
-          if (/(^name|^নাম|^পিতা|^মাতা|^date|^জন্ম|^blood|^রক্তের|^id\s*no|^national)/i.test(nextLine)) break;
+          if (
+            /(^name|^নাম|^পিতা|^মাতা|^date|^জন্ম|^blood|^রক্তের|^id\s*no|^national)/i.test(nextLine)
+          )
+            break;
           // Address continuation lines typically contain: numbers, commas, Bengali place names
           if (nextLine.length > 3) {
             addressLines.push(nextLine);
@@ -754,20 +766,28 @@ function AddEmployeePage() {
 
     // Name English fallback: look for an ALL CAPS line that's not a known label
     if (!nameEng) {
-      const allCapsLine = lines.find(l =>
-        /^[A-Z][A-Z\s\.]{4,}$/.test(l.trim()) &&
-        !/(FATHER|MOTHER|BLOOD|NID|DATE|BIRTH|GOVERNMENT|REPUBLIC|NATIONAL|CARD|BANGLADESH)/i.test(l)
+      const allCapsLine = lines.find(
+        (l) =>
+          /^[A-Z][A-Z\s\.]{4,}$/.test(l.trim()) &&
+          !/(FATHER|MOTHER|BLOOD|NID|DATE|BIRTH|GOVERNMENT|REPUBLIC|NATIONAL|CARD|BANGLADESH)/i.test(
+            l,
+          ),
       );
       if (allCapsLine) nameEng = allCapsLine.trim();
     }
 
     // Mother's Name Bangla fallback: On Smart Cards, মাতা name appears on the line AFTER "Date of Birth"
     if (!motherNameBng) {
-      const dobLineIdx = lines.findIndex(l => /(date of birth|dob|জন্ম তারিখ)/i.test(l) && !/(place|জন্মস্থান)/i.test(l));
+      const dobLineIdx = lines.findIndex(
+        (l) => /(date of birth|dob|জন্ম তারিখ)/i.test(l) && !/(place|জন্মস্থান)/i.test(l),
+      );
       if (dobLineIdx !== -1 && dobLineIdx + 1 < lines.length) {
         const nextLine = lines[dobLineIdx + 1].trim();
         // Make sure it's not another known field
-        if (nextLine.length > 3 && !/(id|nid|blood|address|ঠিকানা|রক্তের|national|\d{5,})/i.test(nextLine)) {
+        if (
+          nextLine.length > 3 &&
+          !/(id|nid|blood|address|ঠিকানা|রক্তের|national|\d{5,})/i.test(nextLine)
+        ) {
           motherNameBng = nextLine;
         }
       }
@@ -782,10 +802,29 @@ function AddEmployeePage() {
     // --- Pass 5: Normalize DOB to YYYY-MM-DD ---
     if (dob) {
       const monthMap: Record<string, string> = {
-        jan: "01", feb: "02", mar: "03", apr: "04", may: "05", jun: "06",
-        jul: "07", aug: "08", sep: "09", oct: "10", nov: "11", dec: "12",
-        january: "01", february: "02", march: "03", april: "04", june: "06",
-        july: "07", august: "08", september: "09", october: "10", november: "11", december: "12"
+        jan: "01",
+        feb: "02",
+        mar: "03",
+        apr: "04",
+        may: "05",
+        jun: "06",
+        jul: "07",
+        aug: "08",
+        sep: "09",
+        oct: "10",
+        nov: "11",
+        dec: "12",
+        january: "01",
+        february: "02",
+        march: "03",
+        april: "04",
+        june: "06",
+        july: "07",
+        august: "08",
+        september: "09",
+        october: "10",
+        november: "11",
+        december: "12",
       };
       // "12 Jul 1999" or "12-Jul-1999"
       const match1 = dob.match(/(\d{1,2})[\s\-\/]+([a-zA-Z]{3,})[\s\-\/]+(\d{4})/);
@@ -821,15 +860,20 @@ function AddEmployeePage() {
 
     // --- Final: Clean output values ---
     // For English name: strip the "Name:" prefix if it slipped through and remove non-latin chars
-    const cleanEngName = (val: string) => val.replace(/(name|nane|mame)[:\-\s]*/ig, "").replace(/[^a-zA-Z\s\.]/g, "").trim();
-    const cleanBngLabel = (val: string, label: string) => val.replace(new RegExp(`${label}[:\\-\\s]*`, "ig"), "").trim();
+    const cleanEngName = (val: string) =>
+      val
+        .replace(/(name|nane|mame)[:\-\s]*/gi, "")
+        .replace(/[^a-zA-Z\s\.]/g, "")
+        .trim();
+    const cleanBngLabel = (val: string, label: string) =>
+      val.replace(new RegExp(`${label}[:\\-\\s]*`, "ig"), "").trim();
 
     return {
       nameEng: cleanEngName(nameEng) || "",
       nameBng: cleanBngLabel(nameBng, "নাম") || "",
-      fatherNameEng: "",  // Not typically on Bangladeshi Smart Card front/back
+      fatherNameEng: "", // Not typically on Bangladeshi Smart Card front/back
       fatherNameBng: cleanBngLabel(fatherNameBng, "পিতা") || "",
-      motherNameEng: "",  // Not typically on Bangladeshi Smart Card front/back
+      motherNameEng: "", // Not typically on Bangladeshi Smart Card front/back
       motherNameBng: cleanBngLabel(motherNameBng, "মাতা") || "",
       blood: bloodGroup || "",
       nid: nid || "",
@@ -845,8 +889,6 @@ function AddEmployeePage() {
       presPostOffice: "",
     };
   };
-
-
 
   const handleRealNidUpload = async () => {
     if (!nidFrontImage) return;
@@ -866,8 +908,8 @@ function AddEmployeePage() {
               const canvas = document.createElement("canvas");
               let width = img.width;
               let height = img.height;
-              const maxDim = 1024; 
-              
+              const maxDim = 1024;
+
               if (width > maxDim || height > maxDim) {
                 if (width > height) {
                   height = Math.round((height * maxDim) / width);
@@ -914,7 +956,9 @@ function AddEmployeePage() {
         if (data && data.ParsedResults && data.ParsedResults.length > 0) {
           return data.ParsedResults[0].ParsedText || "";
         } else if (data && data.ErrorMessage) {
-          throw new Error(Array.isArray(data.ErrorMessage) ? data.ErrorMessage.join(", ") : data.ErrorMessage);
+          throw new Error(
+            Array.isArray(data.ErrorMessage) ? data.ErrorMessage.join(", ") : data.ErrorMessage,
+          );
         }
         return "";
       };
@@ -927,10 +971,10 @@ function AddEmployeePage() {
       let combinedText = await processFile(nidFrontImage);
 
       if (nidBackImage) {
-         setNidScanProgress(55);
-         setNidScanStep(3); // Uploading & Extracting Back Side
-         const backText = await processFile(nidBackImage);
-         combinedText += "\n" + backText;
+        setNidScanProgress(55);
+        setNidScanStep(3); // Uploading & Extracting Back Side
+        const backText = await processFile(nidBackImage);
+        combinedText += "\n" + backText;
       }
 
       setNidScanProgress(80);
@@ -950,7 +994,6 @@ function AddEmployeePage() {
         setShowNidScannerModal(false);
         setShowNidOcrModal(true);
       }, 400);
-
     } catch (err: any) {
       console.error("OCR Scanning failed: ", err);
       setNidScanProgress(100);
@@ -976,7 +1019,9 @@ function AddEmployeePage() {
           presUpazila: "Mirpur",
           presPostOffice: "Mirpur-12",
         });
-        setRawOcrText(`OCR Error: ${err?.message || "Unknown error"}\n\nModal loaded in safe input mode. Please enter the details manually below.`);
+        setRawOcrText(
+          `OCR Error: ${err?.message || "Unknown error"}\n\nModal loaded in safe input mode. Please enter the details manually below.`,
+        );
         setShowNidScannerModal(false);
         setShowNidOcrModal(true);
       }, 400);
@@ -1012,7 +1057,9 @@ function AddEmployeePage() {
       permUpazila: extractedNid.presUpazila,
       permPostOffice: extractedNid.presPostOffice,
       sameAsPresent: true,
-      nidScan: nidFrontImage ? `uploaded_real_nid.jpg` : `mock_nid_ocr_${extractedNid.nameEng.toLowerCase().replace(/ /g, "_")}.jpg`
+      nidScan: nidFrontImage
+        ? `uploaded_real_nid.jpg`
+        : `mock_nid_ocr_${extractedNid.nameEng.toLowerCase().replace(/ /g, "_")}.jpg`,
     }));
     setShowNidOcrModal(false);
   };
@@ -1226,33 +1273,50 @@ function AddEmployeePage() {
             {/* Top bar: Overall progress + label */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-muted/20 border border-border/30 rounded-xl p-4">
               <div className="space-y-1">
-                <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary block">Profile Completion Status</span>
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary block">
+                  Profile Completion Status
+                </span>
                 <p className="text-[10px] text-muted-foreground flex items-center gap-1.5">
                   <Info className="size-3 text-primary shrink-0" />
-                  <span>Fields marked with <span className="text-rose-500 font-bold">*</span> are mandatory for validation.</span>
+                  <span>
+                    Fields marked with <span className="text-rose-500 font-bold">*</span> are
+                    mandatory for validation.
+                  </span>
                 </p>
               </div>
               <div className="flex items-center gap-3 self-start md:self-auto">
                 <div className="relative size-12 flex items-center justify-center shrink-0 bg-card rounded-full border border-border/30 shadow-2xs">
                   <svg className="size-full transform -rotate-90">
-                    <circle cx="24" cy="24" r="20" className="stroke-muted/40" strokeWidth="3" fill="transparent" />
-                    <circle 
-                      cx="24" 
-                      cy="24" 
-                      r="20" 
-                      className="stroke-primary transition-all duration-500" 
-                      strokeWidth="3.5" 
-                      strokeDasharray={125.6} 
-                      strokeDashoffset={125.6 - (125.6 * overallPercentage) / 100} 
-                      strokeLinecap="round" 
-                      fill="transparent" 
+                    <circle
+                      cx="24"
+                      cy="24"
+                      r="20"
+                      className="stroke-muted/40"
+                      strokeWidth="3"
+                      fill="transparent"
+                    />
+                    <circle
+                      cx="24"
+                      cy="24"
+                      r="20"
+                      className="stroke-primary transition-all duration-500"
+                      strokeWidth="3.5"
+                      strokeDasharray={125.6}
+                      strokeDashoffset={125.6 - (125.6 * overallPercentage) / 100}
+                      strokeLinecap="round"
+                      fill="transparent"
                     />
                   </svg>
-                  <span className="absolute text-xs font-black text-primary">{overallPercentage}%</span>
+                  <span className="absolute text-xs font-black text-primary">
+                    {overallPercentage}%
+                  </span>
                 </div>
                 <div className="space-y-0.5">
                   <span className="text-xs font-black text-foreground">Overall Progress</span>
-                  <span className="text-[10px] text-muted-foreground block">Completed {TABS.filter(t => isTabCompleted(t.id)).length} of {TABS.length} sections</span>
+                  <span className="text-[10px] text-muted-foreground block">
+                    Completed {TABS.filter((t) => isTabCompleted(t.id)).length} of {TABS.length}{" "}
+                    sections
+                  </span>
                 </div>
               </div>
             </div>
@@ -1281,19 +1345,31 @@ function AddEmployeePage() {
                     >
                       {/* Top part: Icon + step indicator */}
                       <div className="flex items-center justify-between gap-2 w-full">
-                        <span className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest">Step 0{idx + 1}</span>
-                        <div className={`size-6 rounded-md flex items-center justify-center transition-all ${
-                          isActive ? "bg-primary text-primary-foreground shadow-xs" :
-                          completed ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" :
-                          "bg-muted text-muted-foreground"
-                        }`}>
-                          {completed && !isActive ? <Check className="size-3.5 stroke-[3]" /> : <TabIcon className="size-3.5" />}
+                        <span className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest">
+                          Step 0{idx + 1}
+                        </span>
+                        <div
+                          className={`size-6 rounded-md flex items-center justify-center transition-all ${
+                            isActive
+                              ? "bg-primary text-primary-foreground shadow-xs"
+                              : completed
+                                ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
+                                : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {completed && !isActive ? (
+                            <Check className="size-3.5 stroke-[3]" />
+                          ) : (
+                            <TabIcon className="size-3.5" />
+                          )}
                         </div>
                       </div>
 
                       {/* Label */}
                       <div className="mt-2.5">
-                        <span className={`block text-[11px] font-black leading-tight truncate ${isActive ? "text-primary" : "text-foreground"}`}>
+                        <span
+                          className={`block text-[11px] font-black leading-tight truncate ${isActive ? "text-primary" : "text-foreground"}`}
+                        >
                           {tab.label}
                         </span>
                       </div>
@@ -1303,17 +1379,28 @@ function AddEmployeePage() {
                         <div className="flex-1 h-1 bg-muted rounded-full overflow-hidden border border-border/10">
                           <div
                             className={`h-full rounded-full transition-all duration-500 ${
-                              percentage === 100 ? "bg-emerald-500" :
-                              percentage > 40 ? "bg-amber-500" : "bg-rose-500"
+                              percentage === 100
+                                ? "bg-emerald-500"
+                                : percentage > 40
+                                  ? "bg-amber-500"
+                                  : "bg-rose-500"
                             }`}
                             style={{ width: `${percentage}%` }}
                           />
                         </div>
-                        <span className={`text-[9px] font-black shrink-0 ${
-                          isActive ? "text-primary" :
-                          percentage === 100 ? "text-emerald-500" :
-                          percentage > 40 ? "text-amber-500" : "text-rose-500"
-                        }`}>{percentage}%</span>
+                        <span
+                          className={`text-[9px] font-black shrink-0 ${
+                            isActive
+                              ? "text-primary"
+                              : percentage === 100
+                                ? "text-emerald-500"
+                                : percentage > 40
+                                  ? "text-amber-500"
+                                  : "text-rose-500"
+                          }`}
+                        >
+                          {percentage}%
+                        </span>
                       </div>
                     </button>
                   );
@@ -1378,12 +1465,13 @@ function AddEmployeePage() {
                           >
                             {/* Circle Stepper Dot/Bubble */}
                             <div
-                              className={`size-[42px] rounded-full flex items-center justify-center border-2 transition-all duration-300 relative ${isSelected
+                              className={`size-[42px] rounded-full flex items-center justify-center border-2 transition-all duration-300 relative ${
+                                isSelected
                                   ? "bg-primary text-primary-foreground border-primary shadow-[0_0_15px_var(--primary)] scale-110"
                                   : isCompleted
                                     ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.2)]"
                                     : "bg-card text-muted-foreground border-border/80 hover:border-muted-foreground/60"
-                                }`}
+                              }`}
                             >
                               {isCompleted ? (
                                 <Check className="size-[18px] stroke-[3]" />
@@ -1400,23 +1488,25 @@ function AddEmployeePage() {
                             {/* Text labels and percentages */}
                             <div className="text-center space-y-1.5 w-full min-w-[120px]">
                               <span
-                                className={`text-[10px] font-black uppercase tracking-wider block transition-colors duration-200 ${isSelected
+                                className={`text-[10px] font-black uppercase tracking-wider block transition-colors duration-200 ${
+                                  isSelected
                                     ? "text-primary"
                                     : "text-muted-foreground group-hover:text-foreground"
-                                  }`}
+                                }`}
                               >
                                 {idx + 1}. {step.label}
                               </span>
 
                               <span
-                                className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full inline-block transition-all duration-200 ${isSelected
+                                className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full inline-block transition-all duration-200 ${
+                                  isSelected
                                     ? "bg-primary/10 text-primary border border-primary/20"
                                     : isCompleted
                                       ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/10"
                                       : subPercentage > 0
                                         ? "bg-amber-500/10 text-amber-600 border border-amber-500/10"
                                         : "bg-rose-500/10 text-rose-600 border border-rose-500/10"
-                                  }`}
+                                }`}
                               >
                                 {subPercentage}%
                               </span>
@@ -1444,10 +1534,13 @@ function AddEmployeePage() {
                               Autofill with Smart Document Scan
                             </h3>
                             <p className="text-[11px] text-muted-foreground leading-relaxed">
-                              Upload a scanned copy or picture of your National ID, Passport, Birth Certificate, or Driving License. Our smart AI extractor will instantly parse your name, parent details, date of birth, document number, gender, and addresses so you don't have to enter them manually.
+                              Upload a scanned copy or picture of your National ID, Passport, Birth
+                              Certificate, or Driving License. Our smart AI extractor will instantly
+                              parse your name, parent details, date of birth, document number,
+                              gender, and addresses so you don't have to enter them manually.
                             </p>
                           </div>
-                          
+
                           {/* Control Panel */}
                           <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
                             <button
@@ -1455,7 +1548,8 @@ function AddEmployeePage() {
                               onClick={() => setShowNidScannerModal(true)}
                               className="h-10 px-6 rounded-xl text-xs font-black shadow-lg bg-primary text-primary-foreground hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 group"
                             >
-                              <Scan className="size-4 group-hover:rotate-12 transition-transform" /> Open Smart Scanner
+                              <Scan className="size-4 group-hover:rotate-12 transition-transform" />{" "}
+                              Open Smart Scanner
                             </button>
                           </div>
                         </div>
@@ -1488,8 +1582,9 @@ function AddEmployeePage() {
                               type="text"
                               value={form.nameEng}
                               onChange={(e) => handleChange("nameEng", e.target.value)}
-                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full ${errors.nameEng ? "border-rose-400" : "border-border"
-                                }`}
+                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full ${
+                                errors.nameEng ? "border-rose-400" : "border-border"
+                              }`}
                               placeholder="e.g. Tahmid Afsar Shapno"
                             />
                           </div>
@@ -1517,8 +1612,9 @@ function AddEmployeePage() {
                               type="date"
                               value={form.dob}
                               onChange={(e) => handleChange("dob", e.target.value)}
-                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full ${errors.dob ? "border-rose-400" : "border-border"
-                                }`}
+                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full ${
+                                errors.dob ? "border-rose-400" : "border-border"
+                              }`}
                             />
                           </div>
 
@@ -1530,7 +1626,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.gender}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   { value: "Male", label: "Male" },
                                   { value: "Female", label: "Female" },
@@ -1548,7 +1644,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.religion}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   { value: "Islam", label: "Islam" },
                                   { value: "Hinduism", label: "Hinduism" },
@@ -1568,7 +1664,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.blood}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   { value: "A (+ve)", label: "A (+ve)" },
                                   { value: "A (-ve)", label: "A (-ve)" },
@@ -1591,7 +1687,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.maritalStatus}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   { value: "Single", label: "Single" },
                                   { value: "Married", label: "Married" },
@@ -1610,7 +1706,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.education}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   {
                                     value: "Bachelor of Science (B.Sc)",
@@ -1764,7 +1860,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.dept}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   { value: "Supply Chain", label: "Supply Chain" },
                                   {
@@ -1791,7 +1887,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.title}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   { value: "Executive", label: "Executive" },
                                   { value: "Office Executive", label: "Office Executive" },
@@ -1815,7 +1911,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.empType}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   { value: "Office Executive", label: "Office Executive" },
                                   { value: "Factory worker", label: "Factory worker" },
@@ -1833,7 +1929,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.workingArea}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   { value: "PSL-Operation", label: "PSL-Operation" },
                                   { value: "Head Office", label: "Head Office" },
@@ -1852,7 +1948,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.sect}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   { value: "ALL", label: "ALL" },
                                   { value: "Software Development", label: "Software Development" },
@@ -1872,7 +1968,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.jobNature}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   { value: "ALL", label: "ALL" },
                                   { value: "Full-Time", label: "Full-Time" },
@@ -1891,7 +1987,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.unit}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   { value: "ALL", label: "ALL" },
                                   { value: "Unit 1", label: "Unit 1" },
@@ -1910,7 +2006,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.line}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   { value: "ALL", label: "ALL" },
                                   { value: "Line A", label: "Line A" },
@@ -1929,7 +2025,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.grade}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   { value: "ALL", label: "None" },
                                   { value: "Grade A", label: "Grade A" },
@@ -1949,7 +2045,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.shift}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   { value: "General Shift", label: "General Shift" },
                                   { value: "Night Shift", label: "Night Shift" },
@@ -1967,7 +2063,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.empStatus}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   { value: "Probation", label: "Probation" },
                                   { value: "Permanent", label: "Permanent" },
@@ -1985,7 +2081,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.probationPeriod}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   { value: "N/A", label: "N/A" },
                                   { value: "3", label: "3" },
@@ -2004,7 +2100,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.holiday}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   { value: "N/A", label: "N/A" },
                                   { value: "Friday", label: "Friday" },
@@ -2023,7 +2119,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.setManager}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   {
                                     value: "Mamunoor Rashid (DGM), Head Office",
@@ -2044,7 +2140,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.recruitmentType}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   { value: "New", label: "New" },
                                   { value: "Re-appointment", label: "Re-appointment" },
@@ -2070,7 +2166,6 @@ function AddEmployeePage() {
                         </div>
                       </div>
 
-
                       {/* Card 3: Legal Identification Credentials */}
                       <div className="bg-card border border-border/60 rounded-lg p-6 shadow-2xs relative overflow-hidden transition-all duration-300 hover:border-violet-500/20">
                         <div className="absolute top-0 left-0 h-full w-1.5 bg-violet-500" />
@@ -2083,7 +2178,8 @@ function AddEmployeePage() {
                               Legal Identification Credentials
                             </h3>
                             <p className="text-[11px] text-muted-foreground">
-                              Government-issued identity cards, license numbers, and professional indexes.
+                              Government-issued identity cards, license numbers, and professional
+                              indexes.
                             </p>
                           </div>
                         </div>
@@ -2195,13 +2291,13 @@ function AddEmployeePage() {
                                 <label className="text-[10px] font-bold text-muted-foreground uppercase">
                                   Spouse Name (English)
                                 </label>
-                                  <input
-                                    type="text"
-                                    value={form.spouseNameEng}
-                                    onChange={(e) => handleChange("spouseNameEng", e.target.value)}
-                                    className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full"
-                                    placeholder="Spouse Legal Name"
-                                  />
+                                <input
+                                  type="text"
+                                  value={form.spouseNameEng}
+                                  onChange={(e) => handleChange("spouseNameEng", e.target.value)}
+                                  className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full"
+                                  placeholder="Spouse Legal Name"
+                                />
                               </div>
 
                               {/* Spouse Name Bng */}
@@ -2209,13 +2305,13 @@ function AddEmployeePage() {
                                 <label className="text-[10px] font-bold text-muted-foreground uppercase">
                                   Spouse Name (Bengali)
                                 </label>
-                                  <input
-                                    type="text"
-                                    value={form.spouseNameBng}
-                                    onChange={(e) => handleChange("spouseNameBng", e.target.value)}
-                                    className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full"
-                                    placeholder="উদা: স্বামী/স্ত্রীর নাম"
-                                  />
+                                <input
+                                  type="text"
+                                  value={form.spouseNameBng}
+                                  onChange={(e) => handleChange("spouseNameBng", e.target.value)}
+                                  className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full"
+                                  placeholder="উদা: স্বামী/স্ত্রীর নাম"
+                                />
                               </div>
 
                               {/* Spouse NID */}
@@ -2223,13 +2319,13 @@ function AddEmployeePage() {
                                 <label className="text-[10px] font-bold text-muted-foreground uppercase">
                                   Spouse NID
                                 </label>
-                                  <input
-                                    type="text"
-                                    value={form.spouseNid}
-                                    onChange={(e) => handleChange("spouseNid", e.target.value)}
-                                    className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full font-mono"
-                                    placeholder="Spouse NID Number"
-                                  />
+                                <input
+                                  type="text"
+                                  value={form.spouseNid}
+                                  onChange={(e) => handleChange("spouseNid", e.target.value)}
+                                  className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full font-mono"
+                                  placeholder="Spouse NID Number"
+                                />
                               </div>
 
                               {/* Spouse Contact */}
@@ -2237,13 +2333,13 @@ function AddEmployeePage() {
                                 <label className="text-[10px] font-bold text-muted-foreground uppercase">
                                   Spouse Contact No
                                 </label>
-                                  <input
-                                    type="text"
-                                    value={form.spouseContactNo}
-                                    onChange={(e) => handleChange("spouseContactNo", e.target.value)}
-                                    className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full font-mono"
-                                    placeholder="Contact Number"
-                                  />
+                                <input
+                                  type="text"
+                                  value={form.spouseContactNo}
+                                  onChange={(e) => handleChange("spouseContactNo", e.target.value)}
+                                  className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full font-mono"
+                                  placeholder="Contact Number"
+                                />
                               </div>
                             </div>
                           </div>
@@ -2290,14 +2386,15 @@ function AddEmployeePage() {
                               </p>
                             </div>
 
-                            {uploadProgress.picture !== undefined && uploadProgress.picture < 100 && (
-                              <div className="w-full bg-muted rounded-full h-1.5 mt-2">
-                                <div
-                                  className="bg-primary h-1.5 rounded-full transition-all"
-                                  style={{ width: `${uploadProgress.picture}%` }}
-                                ></div>
-                              </div>
-                            )}
+                            {uploadProgress.picture !== undefined &&
+                              uploadProgress.picture < 100 && (
+                                <div className="w-full bg-muted rounded-full h-1.5 mt-2">
+                                  <div
+                                    className="bg-primary h-1.5 rounded-full transition-all"
+                                    style={{ width: `${uploadProgress.picture}%` }}
+                                  ></div>
+                                </div>
+                              )}
 
                             {form.picture ? (
                               <div className="absolute inset-0 bg-card/95 flex flex-col items-center justify-center p-4 gap-3 animate-in fade-in">
@@ -2340,14 +2437,15 @@ function AddEmployeePage() {
                               </p>
                             </div>
 
-                            {uploadProgress.signature !== undefined && uploadProgress.signature < 100 && (
-                              <div className="w-full bg-muted rounded-full h-1.5 mt-2">
-                                <div
-                                  className="bg-indigo-500 h-1.5 rounded-full transition-all"
-                                  style={{ width: `${uploadProgress.signature}%` }}
-                                ></div>
-                              </div>
-                            )}
+                            {uploadProgress.signature !== undefined &&
+                              uploadProgress.signature < 100 && (
+                                <div className="w-full bg-muted rounded-full h-1.5 mt-2">
+                                  <div
+                                    className="bg-indigo-500 h-1.5 rounded-full transition-all"
+                                    style={{ width: `${uploadProgress.signature}%` }}
+                                  ></div>
+                                </div>
+                              )}
 
                             {form.signature ? (
                               <div className="absolute inset-0 bg-card/95 flex flex-col items-center justify-center p-4 gap-3 animate-in fade-in">
@@ -2390,14 +2488,15 @@ function AddEmployeePage() {
                               </p>
                             </div>
 
-                            {uploadProgress.nidScan !== undefined && uploadProgress.nidScan < 100 && (
-                              <div className="w-full bg-muted rounded-full h-1.5 mt-2">
-                                <div
-                                  className="bg-amber-500 h-1.5 rounded-full transition-all"
-                                  style={{ width: `${uploadProgress.nidScan}%` }}
-                                ></div>
-                              </div>
-                            )}
+                            {uploadProgress.nidScan !== undefined &&
+                              uploadProgress.nidScan < 100 && (
+                                <div className="w-full bg-muted rounded-full h-1.5 mt-2">
+                                  <div
+                                    className="bg-amber-500 h-1.5 rounded-full transition-all"
+                                    style={{ width: `${uploadProgress.nidScan}%` }}
+                                  ></div>
+                                </div>
+                              )}
 
                             {form.nidScan ? (
                               <div className="absolute inset-0 bg-card/95 flex flex-col items-center justify-center p-4 gap-3 animate-in fade-in">
@@ -2462,8 +2561,8 @@ function AddEmployeePage() {
                           Next Section <ArrowRight className="size-4" />
                         </button>
                       </div>
-                      </div>
-                    )}
+                    </div>
+                  )}
 
                   {/* SUBSECTION: CONTACT & RESIDENCY */}
                   {subSection === "address_contact" && (
@@ -2510,7 +2609,9 @@ function AddEmployeePage() {
                               </span>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">                              {/* PostOffice */}
+                            <div className="grid grid-cols-2 gap-4">
+                              {" "}
+                              {/* PostOffice */}
                               <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center justify-between">
                                   <span>PostOffice</span>
@@ -2525,12 +2626,11 @@ function AddEmployeePage() {
                                 <div className="relative">
                                   <SearchableSelect
                                     value={form.presPostOffice}
-                                    onChange={() => { }}
+                                    onChange={() => {}}
                                     options={postOffices.map((p) => ({ value: p, label: p }))}
                                   />
                                 </div>
                               </div>
-
                               {/* Village/House Eng */}
                               <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-muted-foreground uppercase">
@@ -2544,7 +2644,6 @@ function AddEmployeePage() {
                                   placeholder="Vill # Dhopapara"
                                 />
                               </div>
-
                               {/* Village/House Bng */}
                               <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-muted-foreground uppercase">
@@ -2558,7 +2657,6 @@ function AddEmployeePage() {
                                   placeholder="গ্রাম # ধোপাপাড়া"
                                 />
                               </div>
-
                               {/* Road */}
                               <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-muted-foreground uppercase">
@@ -2572,7 +2670,6 @@ function AddEmployeePage() {
                                   placeholder="Road No / Name"
                                 />
                               </div>
-
                               {/* Others */}
                               <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-muted-foreground uppercase">
@@ -2586,7 +2683,6 @@ function AddEmployeePage() {
                                   placeholder="Flat / Level"
                                 />
                               </div>
-
                               {/* Country */}
                               <div className="col-span-2 space-y-1">
                                 <label className="text-[10px] font-bold text-muted-foreground uppercase">
@@ -2595,7 +2691,7 @@ function AddEmployeePage() {
                                 <div className="relative">
                                   <SearchableSelect
                                     value={form.presCountry}
-                                    onChange={() => { }}
+                                    onChange={() => {}}
                                     options={[
                                       { value: "Bangladesh", label: "Bangladesh" },
                                       { value: "India", label: "India" },
@@ -2641,7 +2737,6 @@ function AddEmployeePage() {
                               </div>
                             ) : (
                               <div className="grid grid-cols-2 gap-4 animate-in fade-in duration-200">
-
                                 {/* PostOffice */}
                                 <div className="space-y-1">
                                   <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center justify-between">
@@ -2657,7 +2752,7 @@ function AddEmployeePage() {
                                   <div className="relative">
                                     <SearchableSelect
                                       value={form.permPostOffice}
-                                      onChange={() => { }}
+                                      onChange={() => {}}
                                       options={postOffices.map((p) => ({ value: p, label: p }))}
                                     />
                                   </div>
@@ -2727,7 +2822,7 @@ function AddEmployeePage() {
                                   <div className="relative">
                                     <SearchableSelect
                                       value={form.permCountry}
-                                      onChange={() => { }}
+                                      onChange={() => {}}
                                       options={[
                                         { value: "Bangladesh", label: "Bangladesh" },
                                         { value: "India", label: "India" },
@@ -2933,8 +3028,9 @@ function AddEmployeePage() {
                                 type="number"
                                 value={form.gross}
                                 onChange={(e) => handleChange("gross", e.target.value)}
-                                className={`h-10 pl-7.5 pr-3.5 rounded-xl border bg-primary/5 text-sm font-extrabold font-mono text-primary focus:outline-none focus:ring-1 focus:ring-primary w-full ${errors.gross ? "border-rose-400" : "border-border/80"
-                                  }`}
+                                className={`h-10 pl-7.5 pr-3.5 rounded-xl border bg-primary/5 text-sm font-extrabold font-mono text-primary focus:outline-none focus:ring-1 focus:ring-primary w-full ${
+                                  errors.gross ? "border-rose-400" : "border-border/80"
+                                }`}
                                 placeholder="e.g. 45000"
                               />
                             </div>
@@ -3233,7 +3329,7 @@ function AddEmployeePage() {
                         </label>
                         <SearchableSelect
                           value={form.paymentMode}
-                          onChange={() => { }}
+                          onChange={() => {}}
                           options={[
                             { value: "Bank Transfer", label: "Bank Transfer" },
                             { value: "Cash", label: "Cash payment" },
@@ -3267,7 +3363,7 @@ function AddEmployeePage() {
                           placeholder="e.g. 102.120.99827"
                         />
                       </div>
-                      
+
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-bold text-muted-foreground uppercase">
                           Routing Number
@@ -3293,7 +3389,8 @@ function AddEmployeePage() {
                       Qualifications, Experience & Credentials
                     </h2>
                     <p className="text-[10px] text-muted-foreground mt-0.5">
-                      Add academic qualifications, prior work history, certifications, training, and involvements.
+                      Add academic qualifications, prior work history, certifications, training, and
+                      involvements.
                     </p>
                   </div>
 
@@ -3301,7 +3398,9 @@ function AddEmployeePage() {
                   <div className="bg-card border border-border/60 rounded-lg overflow-hidden transition-all duration-300 hover:border-border">
                     <button
                       type="button"
-                      onClick={() => setOpenSections((prev) => ({ ...prev, academic: !prev.academic }))}
+                      onClick={() =>
+                        setOpenSections((prev) => ({ ...prev, academic: !prev.academic }))
+                      }
                       className="w-full flex items-center justify-between p-4 bg-muted/10 hover:bg-muted/20 transition duration-200 border-b border-border/40 text-left"
                     >
                       <div className="flex items-center gap-2.5">
@@ -3317,7 +3416,9 @@ function AddEmployeePage() {
                           </span>
                         </div>
                       </div>
-                      <ChevronDown className={`size-4 text-muted-foreground transition-transform duration-300 ${openSections.academic ? "rotate-180" : ""}`} />
+                      <ChevronDown
+                        className={`size-4 text-muted-foreground transition-transform duration-300 ${openSections.academic ? "rotate-180" : ""}`}
+                      />
                     </button>
 
                     {openSections.academic && (
@@ -3330,7 +3431,9 @@ function AddEmployeePage() {
                                 <th className="px-4 py-3">Institution Name</th>
                                 <th className="px-4 py-3 w-[100px] text-center">Passing Year</th>
                                 <th className="px-4 py-3 w-[100px] text-center">Result / GPA</th>
-                                <th className="px-4 py-3 w-[170px] text-center">Attachment (Optional)</th>
+                                <th className="px-4 py-3 w-[170px] text-center">
+                                  Attachment (Optional)
+                                </th>
                                 <th className="px-4 py-3 w-[60px] text-right">Action</th>
                               </tr>
                             </thead>
@@ -3343,14 +3446,32 @@ function AddEmployeePage() {
                                   <td className="px-4 py-2">
                                     <SearchableSelect
                                       value={edu.degree}
-                                      onChange={() => { }}
+                                      onChange={() => {}}
                                       options={[
-                                        { value: "Secondary (SSC)", label: "Secondary School (SSC)" },
-                                        { value: "Higher Secondary (HSC)", label: "Higher Secondary (HSC)" },
-                                        { value: "Bachelor of Science (B.Sc)", label: "Bachelor of Science (B.Sc)" },
-                                        { value: "Master of Science (M.Sc)", label: "Master of Science (M.Sc)" },
-                                        { value: "MBA / Post Grad", label: "Executive MBA / Post Grad" },
-                                        { value: "PhD / Doctorate", label: "PhD / Doctorate Degree" },
+                                        {
+                                          value: "Secondary (SSC)",
+                                          label: "Secondary School (SSC)",
+                                        },
+                                        {
+                                          value: "Higher Secondary (HSC)",
+                                          label: "Higher Secondary (HSC)",
+                                        },
+                                        {
+                                          value: "Bachelor of Science (B.Sc)",
+                                          label: "Bachelor of Science (B.Sc)",
+                                        },
+                                        {
+                                          value: "Master of Science (M.Sc)",
+                                          label: "Master of Science (M.Sc)",
+                                        },
+                                        {
+                                          value: "MBA / Post Grad",
+                                          label: "Executive MBA / Post Grad",
+                                        },
+                                        {
+                                          value: "PhD / Doctorate",
+                                          label: "PhD / Doctorate Degree",
+                                        },
                                       ]}
                                     />
                                   </td>
@@ -3358,7 +3479,9 @@ function AddEmployeePage() {
                                     <input
                                       type="text"
                                       value={edu.institute}
-                                      onChange={(e) => handleEduChange(index, "institute", e.target.value)}
+                                      onChange={(e) =>
+                                        handleEduChange(index, "institute", e.target.value)
+                                      }
                                       className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
                                       placeholder="e.g. Dhaka University"
                                     />
@@ -3367,7 +3490,9 @@ function AddEmployeePage() {
                                     <input
                                       type="text"
                                       value={edu.passingYear}
-                                      onChange={(e) => handleEduChange(index, "passingYear", e.target.value)}
+                                      onChange={(e) =>
+                                        handleEduChange(index, "passingYear", e.target.value)
+                                      }
                                       className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full text-center font-mono focus:ring-1 focus:ring-primary focus:border-primary"
                                       placeholder="e.g. 2022"
                                     />
@@ -3376,7 +3501,9 @@ function AddEmployeePage() {
                                     <input
                                       type="text"
                                       value={edu.resultGpa}
-                                      onChange={(e) => handleEduChange(index, "resultGpa", e.target.value)}
+                                      onChange={(e) =>
+                                        handleEduChange(index, "resultGpa", e.target.value)
+                                      }
                                       className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full text-center font-mono focus:ring-1 focus:ring-primary focus:border-primary"
                                       placeholder="e.g. 3.85"
                                     />
@@ -3409,7 +3536,11 @@ function AddEmployeePage() {
                                   <td className="px-4 py-2 text-right">
                                     <button
                                       type="button"
-                                      onClick={() => setEducationList((prev) => prev.filter((_, i) => i !== index))}
+                                      onClick={() =>
+                                        setEducationList((prev) =>
+                                          prev.filter((_, i) => i !== index),
+                                        )
+                                      }
                                       className="p-1.5 rounded-lg text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 transition"
                                     >
                                       <Trash className="size-3.5" />
@@ -3419,8 +3550,12 @@ function AddEmployeePage() {
                               ))}
                               {educationList.length === 0 && (
                                 <tr>
-                                  <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground text-xs italic">
-                                    No academic credentials logged yet. Click the button below to add your first qualification.
+                                  <td
+                                    colSpan={6}
+                                    className="px-4 py-8 text-center text-muted-foreground text-xs italic"
+                                  >
+                                    No academic credentials logged yet. Click the button below to
+                                    add your first qualification.
                                   </td>
                                 </tr>
                               )}
@@ -3445,7 +3580,9 @@ function AddEmployeePage() {
                   <div className="bg-card border border-border/60 rounded-lg overflow-hidden transition-all duration-300 hover:border-border">
                     <button
                       type="button"
-                      onClick={() => setOpenSections((prev) => ({ ...prev, experience: !prev.experience }))}
+                      onClick={() =>
+                        setOpenSections((prev) => ({ ...prev, experience: !prev.experience }))
+                      }
                       className="w-full flex items-center justify-between p-4 bg-muted/10 hover:bg-muted/20 transition duration-200 border-b border-border/40 text-left"
                     >
                       <div className="flex items-center gap-2.5">
@@ -3461,7 +3598,9 @@ function AddEmployeePage() {
                           </span>
                         </div>
                       </div>
-                      <ChevronDown className={`size-4 text-muted-foreground transition-transform duration-300 ${openSections.experience ? "rotate-180" : ""}`} />
+                      <ChevronDown
+                        className={`size-4 text-muted-foreground transition-transform duration-300 ${openSections.experience ? "rotate-180" : ""}`}
+                      />
                     </button>
 
                     {openSections.experience && (
@@ -3475,7 +3614,9 @@ function AddEmployeePage() {
                                 <th className="px-4 py-3 w-[120px] text-center">From Date</th>
                                 <th className="px-4 py-3 w-[120px] text-center">To Date</th>
                                 <th className="px-4 py-3">Reason for Leaving</th>
-                                <th className="px-4 py-3 w-[170px] text-center">Attachment (Optional)</th>
+                                <th className="px-4 py-3 w-[170px] text-center">
+                                  Attachment (Optional)
+                                </th>
                                 <th className="px-4 py-3 w-[60px] text-right">Action</th>
                               </tr>
                             </thead>
@@ -3489,7 +3630,9 @@ function AddEmployeePage() {
                                     <input
                                       type="text"
                                       value={exp.company}
-                                      onChange={(e) => handleExpChange(index, "company", e.target.value)}
+                                      onChange={(e) =>
+                                        handleExpChange(index, "company", e.target.value)
+                                      }
                                       className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
                                       placeholder="e.g. Brain Station 23"
                                     />
@@ -3498,7 +3641,9 @@ function AddEmployeePage() {
                                     <input
                                       type="text"
                                       value={exp.designation}
-                                      onChange={(e) => handleExpChange(index, "designation", e.target.value)}
+                                      onChange={(e) =>
+                                        handleExpChange(index, "designation", e.target.value)
+                                      }
                                       className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
                                       placeholder="e.g. Senior Software Engineer"
                                     />
@@ -3507,7 +3652,9 @@ function AddEmployeePage() {
                                     <input
                                       type="date"
                                       value={exp.fromDate}
-                                      onChange={(e) => handleExpChange(index, "fromDate", e.target.value)}
+                                      onChange={(e) =>
+                                        handleExpChange(index, "fromDate", e.target.value)
+                                      }
                                       className="h-8 px-2 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
                                     />
                                   </td>
@@ -3515,7 +3662,9 @@ function AddEmployeePage() {
                                     <input
                                       type="date"
                                       value={exp.toDate}
-                                      onChange={(e) => handleExpChange(index, "toDate", e.target.value)}
+                                      onChange={(e) =>
+                                        handleExpChange(index, "toDate", e.target.value)
+                                      }
                                       className="h-8 px-2 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
                                     />
                                   </td>
@@ -3523,7 +3672,9 @@ function AddEmployeePage() {
                                     <input
                                       type="text"
                                       value={exp.leavingReason}
-                                      onChange={(e) => handleExpChange(index, "leavingReason", e.target.value)}
+                                      onChange={(e) =>
+                                        handleExpChange(index, "leavingReason", e.target.value)
+                                      }
                                       className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
                                       placeholder="e.g. Career Growth"
                                     />
@@ -3556,7 +3707,11 @@ function AddEmployeePage() {
                                   <td className="px-4 py-2 text-right">
                                     <button
                                       type="button"
-                                      onClick={() => setExperienceList((prev) => prev.filter((_, i) => i !== index))}
+                                      onClick={() =>
+                                        setExperienceList((prev) =>
+                                          prev.filter((_, i) => i !== index),
+                                        )
+                                      }
                                       className="p-1.5 rounded-lg text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 transition"
                                     >
                                       <Trash className="size-3.5" />
@@ -3566,8 +3721,12 @@ function AddEmployeePage() {
                               ))}
                               {experienceList.length === 0 && (
                                 <tr>
-                                  <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground text-xs italic">
-                                    No prior work experience logged. Click the button below to add your first job history.
+                                  <td
+                                    colSpan={7}
+                                    className="px-4 py-8 text-center text-muted-foreground text-xs italic"
+                                  >
+                                    No prior work experience logged. Click the button below to add
+                                    your first job history.
                                   </td>
                                 </tr>
                               )}
@@ -3592,7 +3751,12 @@ function AddEmployeePage() {
                   <div className="bg-card border border-border/60 rounded-lg overflow-hidden transition-all duration-300 hover:border-border">
                     <button
                       type="button"
-                      onClick={() => setOpenSections((prev) => ({ ...prev, certifications: !prev.certifications }))}
+                      onClick={() =>
+                        setOpenSections((prev) => ({
+                          ...prev,
+                          certifications: !prev.certifications,
+                        }))
+                      }
                       className="w-full flex items-center justify-between p-4 bg-muted/10 hover:bg-muted/20 transition duration-200 border-b border-border/40 text-left"
                     >
                       <div className="flex items-center gap-2.5">
@@ -3608,7 +3772,9 @@ function AddEmployeePage() {
                           </span>
                         </div>
                       </div>
-                      <ChevronDown className={`size-4 text-muted-foreground transition-transform duration-300 ${openSections.certifications ? "rotate-180" : ""}`} />
+                      <ChevronDown
+                        className={`size-4 text-muted-foreground transition-transform duration-300 ${openSections.certifications ? "rotate-180" : ""}`}
+                      />
                     </button>
 
                     {openSections.certifications && (
@@ -3634,7 +3800,9 @@ function AddEmployeePage() {
                                     <input
                                       type="text"
                                       value={cert.certificateName}
-                                      onChange={(e) => handleCertChange(index, "certificateName", e.target.value)}
+                                      onChange={(e) =>
+                                        handleCertChange(index, "certificateName", e.target.value)
+                                      }
                                       className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
                                       placeholder="e.g. AWS Certified Architect"
                                     />
@@ -3643,7 +3811,9 @@ function AddEmployeePage() {
                                     <input
                                       type="text"
                                       value={cert.organization}
-                                      onChange={(e) => handleCertChange(index, "organization", e.target.value)}
+                                      onChange={(e) =>
+                                        handleCertChange(index, "organization", e.target.value)
+                                      }
                                       className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
                                       placeholder="e.g. Amazon Web Services"
                                     />
@@ -3652,7 +3822,9 @@ function AddEmployeePage() {
                                     <input
                                       type="text"
                                       value={cert.credentialId}
-                                      onChange={(e) => handleCertChange(index, "credentialId", e.target.value)}
+                                      onChange={(e) =>
+                                        handleCertChange(index, "credentialId", e.target.value)
+                                      }
                                       className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full text-center font-mono focus:ring-1 focus:ring-primary focus:border-primary"
                                       placeholder="e.g. AWS-12345"
                                     />
@@ -3661,14 +3833,20 @@ function AddEmployeePage() {
                                     <input
                                       type="date"
                                       value={cert.issueDate}
-                                      onChange={(e) => handleCertChange(index, "issueDate", e.target.value)}
+                                      onChange={(e) =>
+                                        handleCertChange(index, "issueDate", e.target.value)
+                                      }
                                       className="h-8 px-2 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
                                     />
                                   </td>
                                   <td className="px-4 py-2 text-right">
                                     <button
                                       type="button"
-                                      onClick={() => setCertifications((prev) => prev.filter((_, i) => i !== index))}
+                                      onClick={() =>
+                                        setCertifications((prev) =>
+                                          prev.filter((_, i) => i !== index),
+                                        )
+                                      }
                                       className="p-1.5 rounded-lg text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 transition"
                                     >
                                       <Trash className="size-3.5" />
@@ -3678,8 +3856,12 @@ function AddEmployeePage() {
                               ))}
                               {certifications.length === 0 && (
                                 <tr>
-                                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground text-xs italic">
-                                    No certification credentials added yet. Click the button below to add your first cert.
+                                  <td
+                                    colSpan={5}
+                                    className="px-4 py-8 text-center text-muted-foreground text-xs italic"
+                                  >
+                                    No certification credentials added yet. Click the button below
+                                    to add your first cert.
                                   </td>
                                 </tr>
                               )}
@@ -3704,7 +3886,9 @@ function AddEmployeePage() {
                   <div className="bg-card border border-border/60 rounded-lg overflow-hidden transition-all duration-300 hover:border-border">
                     <button
                       type="button"
-                      onClick={() => setOpenSections((prev) => ({ ...prev, training: !prev.training }))}
+                      onClick={() =>
+                        setOpenSections((prev) => ({ ...prev, training: !prev.training }))
+                      }
                       className="w-full flex items-center justify-between p-4 bg-muted/10 hover:bg-muted/20 transition duration-200 border-b border-border/40 text-left"
                     >
                       <div className="flex items-center gap-2.5">
@@ -3720,7 +3904,9 @@ function AddEmployeePage() {
                           </span>
                         </div>
                       </div>
-                      <ChevronDown className={`size-4 text-muted-foreground transition-transform duration-300 ${openSections.training ? "rotate-180" : ""}`} />
+                      <ChevronDown
+                        className={`size-4 text-muted-foreground transition-transform duration-300 ${openSections.training ? "rotate-180" : ""}`}
+                      />
                     </button>
 
                     {openSections.training && (
@@ -3746,7 +3932,9 @@ function AddEmployeePage() {
                                     <input
                                       type="text"
                                       value={t.trainingTitle}
-                                      onChange={(e) => handleTrainChange(index, "trainingTitle", e.target.value)}
+                                      onChange={(e) =>
+                                        handleTrainChange(index, "trainingTitle", e.target.value)
+                                      }
                                       className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
                                       placeholder="e.g. Advanced System Architecture"
                                     />
@@ -3755,7 +3943,9 @@ function AddEmployeePage() {
                                     <input
                                       type="text"
                                       value={t.institution}
-                                      onChange={(e) => handleTrainChange(index, "institution", e.target.value)}
+                                      onChange={(e) =>
+                                        handleTrainChange(index, "institution", e.target.value)
+                                      }
                                       className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
                                       placeholder="e.g. Coursera"
                                     />
@@ -3764,7 +3954,9 @@ function AddEmployeePage() {
                                     <input
                                       type="text"
                                       value={t.duration}
-                                      onChange={(e) => handleTrainChange(index, "duration", e.target.value)}
+                                      onChange={(e) =>
+                                        handleTrainChange(index, "duration", e.target.value)
+                                      }
                                       className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full text-center focus:ring-1 focus:ring-primary focus:border-primary"
                                       placeholder="e.g. 12 Weeks"
                                     />
@@ -3773,14 +3965,20 @@ function AddEmployeePage() {
                                     <input
                                       type="date"
                                       value={t.completionDate}
-                                      onChange={(e) => handleTrainChange(index, "completionDate", e.target.value)}
+                                      onChange={(e) =>
+                                        handleTrainChange(index, "completionDate", e.target.value)
+                                      }
                                       className="h-8 px-2 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
                                     />
                                   </td>
                                   <td className="px-4 py-2 text-right">
                                     <button
                                       type="button"
-                                      onClick={() => setTrainingList((prev) => prev.filter((_, i) => i !== index))}
+                                      onClick={() =>
+                                        setTrainingList((prev) =>
+                                          prev.filter((_, i) => i !== index),
+                                        )
+                                      }
                                       className="p-1.5 rounded-lg text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 transition"
                                     >
                                       <Trash className="size-3.5" />
@@ -3790,8 +3988,12 @@ function AddEmployeePage() {
                               ))}
                               {trainingList.length === 0 && (
                                 <tr>
-                                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground text-xs italic">
-                                    No training programs logged. Click the button below to add your first training record.
+                                  <td
+                                    colSpan={5}
+                                    className="px-4 py-8 text-center text-muted-foreground text-xs italic"
+                                  >
+                                    No training programs logged. Click the button below to add your
+                                    first training record.
                                   </td>
                                 </tr>
                               )}
@@ -3816,7 +4018,9 @@ function AddEmployeePage() {
                   <div className="bg-card border border-border/60 rounded-lg overflow-hidden transition-all duration-300 hover:border-border">
                     <button
                       type="button"
-                      onClick={() => setOpenSections((prev) => ({ ...prev, involvements: !prev.involvements }))}
+                      onClick={() =>
+                        setOpenSections((prev) => ({ ...prev, involvements: !prev.involvements }))
+                      }
                       className="w-full flex items-center justify-between p-4 bg-muted/10 hover:bg-muted/20 transition duration-200 border-b border-border/40 text-left"
                     >
                       <div className="flex items-center gap-2.5">
@@ -3832,7 +4036,9 @@ function AddEmployeePage() {
                           </span>
                         </div>
                       </div>
-                      <ChevronDown className={`size-4 text-muted-foreground transition-transform duration-300 ${openSections.involvements ? "rotate-180" : ""}`} />
+                      <ChevronDown
+                        className={`size-4 text-muted-foreground transition-transform duration-300 ${openSections.involvements ? "rotate-180" : ""}`}
+                      />
                     </button>
 
                     {openSections.involvements && (
@@ -3858,7 +4064,9 @@ function AddEmployeePage() {
                                     <input
                                       type="text"
                                       value={invol.activityName}
-                                      onChange={(e) => handleInvolChange(index, "activityName", e.target.value)}
+                                      onChange={(e) =>
+                                        handleInvolChange(index, "activityName", e.target.value)
+                                      }
                                       className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
                                       placeholder="e.g. Safety Committee"
                                     />
@@ -3867,7 +4075,9 @@ function AddEmployeePage() {
                                     <input
                                       type="text"
                                       value={invol.role}
-                                      onChange={(e) => handleInvolChange(index, "role", e.target.value)}
+                                      onChange={(e) =>
+                                        handleInvolChange(index, "role", e.target.value)
+                                      }
                                       className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
                                       placeholder="e.g. Committee Secretary"
                                     />
@@ -3876,7 +4086,9 @@ function AddEmployeePage() {
                                     <input
                                       type="text"
                                       value={invol.duration}
-                                      onChange={(e) => handleInvolChange(index, "duration", e.target.value)}
+                                      onChange={(e) =>
+                                        handleInvolChange(index, "duration", e.target.value)
+                                      }
                                       className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full text-center focus:ring-1 focus:ring-primary focus:border-primary"
                                       placeholder="e.g. 6 Months"
                                     />
@@ -3885,7 +4097,9 @@ function AddEmployeePage() {
                                     <input
                                       type="text"
                                       value={invol.description}
-                                      onChange={(e) => handleInvolChange(index, "description", e.target.value)}
+                                      onChange={(e) =>
+                                        handleInvolChange(index, "description", e.target.value)
+                                      }
                                       className="h-8 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:ring-1 focus:ring-primary focus:border-primary"
                                       placeholder="e.g. Supervised emergency drills"
                                     />
@@ -3893,7 +4107,11 @@ function AddEmployeePage() {
                                   <td className="px-4 py-2 text-right">
                                     <button
                                       type="button"
-                                      onClick={() => setInvolvements((prev) => prev.filter((_, i) => i !== index))}
+                                      onClick={() =>
+                                        setInvolvements((prev) =>
+                                          prev.filter((_, i) => i !== index),
+                                        )
+                                      }
                                       className="p-1.5 rounded-lg text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 transition"
                                     >
                                       <Trash className="size-3.5" />
@@ -3903,8 +4121,12 @@ function AddEmployeePage() {
                               ))}
                               {involvements.length === 0 && (
                                 <tr>
-                                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground text-xs italic">
-                                    No organizational involvements logged. Click the button below to add your first record.
+                                  <td
+                                    colSpan={5}
+                                    className="px-4 py-8 text-center text-muted-foreground text-xs italic"
+                                  >
+                                    No organizational involvements logged. Click the button below to
+                                    add your first record.
                                   </td>
                                 </tr>
                               )}
@@ -3992,7 +4214,7 @@ function AddEmployeePage() {
                       </label>
                       <SearchableSelect
                         value={form.emergencyRelation}
-                        onChange={() => { }}
+                        onChange={() => {}}
                         options={[
                           { value: "Father", label: "Father" },
                           { value: "Mother", label: "Mother" },
@@ -4120,7 +4342,7 @@ function AddEmployeePage() {
                       </label>
                       <SearchableSelect
                         value={form.nomineeRelation}
-                        onChange={() => { }}
+                        onChange={() => {}}
                         options={[
                           { value: "Mother", label: "Mother" },
                           { value: "Father", label: "Father" },
@@ -4364,7 +4586,7 @@ function AddEmployeePage() {
                             <td className="px-4 py-2">
                               <SearchableSelect
                                 value={dep.depRelation}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   { value: "Child", label: "Child (Son/Daughter)" },
                                   { value: "Spouse", label: "Spouse (Husband/Wife)" },
@@ -4568,7 +4790,7 @@ function AddEmployeePage() {
                             <td className="px-4 py-2">
                               <SearchableSelect
                                 value={doc.docType}
-                                onChange={() => { }}
+                                onChange={() => {}}
                                 options={[
                                   { value: "PDF", label: "PDF Document" },
                                   { value: "DOCX", label: "Microsoft Word (DOCX)" },
@@ -4646,7 +4868,7 @@ function AddEmployeePage() {
                       </label>
                       <SearchableSelect
                         value={form.verificationStatus}
-                        onChange={() => { }}
+                        onChange={() => {}}
                         options={[
                           { value: "Verified", label: "Verified & Cleared" },
                           { value: "Pending", label: "Pending Audit" },
@@ -4898,7 +5120,6 @@ function AddEmployeePage() {
       {showNidOcrModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-300">
           <div className="bg-card border border-border/80 rounded-2xl shadow-2xl p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto flex flex-col gap-5 animate-in zoom-in-95 duration-200">
-            
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-border/30 pb-4">
               <div className="flex items-center gap-2.5">
@@ -4925,7 +5146,6 @@ function AddEmployeePage() {
 
             {/* Modal Body - Editable Fields */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-y-auto max-h-[65vh] pr-1.5">
-              
               {/* Left Column: Image Preview & Raw OCR Log */}
               <div className="lg:col-span-5 space-y-4">
                 {nidFrontPreview ? (
@@ -4935,11 +5155,19 @@ function AddEmployeePage() {
                     </label>
                     <div className="flex flex-col gap-3">
                       <div className="border border-border/80 rounded-xl overflow-hidden bg-muted/20 relative aspect-video flex items-center justify-center p-1.5 shadow-sm">
-                        <img src={nidFrontPreview} alt="Front Side" className="object-contain max-h-32 w-full rounded-lg" />
+                        <img
+                          src={nidFrontPreview}
+                          alt="Front Side"
+                          className="object-contain max-h-32 w-full rounded-lg"
+                        />
                       </div>
                       {nidBackPreview && (
                         <div className="border border-border/80 rounded-xl overflow-hidden bg-muted/20 relative aspect-video flex items-center justify-center p-1.5 shadow-sm">
-                          <img src={nidBackPreview} alt="Back Side" className="object-contain max-h-32 w-full rounded-lg" />
+                          <img
+                            src={nidBackPreview}
+                            alt="Back Side"
+                            className="object-contain max-h-32 w-full rounded-lg"
+                          />
                         </div>
                       )}
                     </div>
@@ -4950,7 +5178,9 @@ function AddEmployeePage() {
                       <Sparkles className="size-4" />
                     </div>
                     <span className="block font-bold">Mock Profiler Mode</span>
-                    <span className="block text-[9px] text-muted-foreground/75">Pre-populated simulation database loaded.</span>
+                    <span className="block text-[9px] text-muted-foreground/75">
+                      Pre-populated simulation database loaded.
+                    </span>
                   </div>
                 )}
 
@@ -4969,7 +5199,6 @@ function AddEmployeePage() {
 
               {/* Right Column: Editable fields */}
               <div className="lg:col-span-7 space-y-6">
-                
                 {/* Category 1: Names & Identity */}
                 <div className="space-y-4">
                   <h4 className="text-[10px] font-black uppercase tracking-widest text-primary border-b border-border/20 pb-1">
@@ -4977,38 +5206,54 @@ function AddEmployeePage() {
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Name (English)</label>
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                        Name (English)
+                      </label>
                       <input
                         type="text"
                         value={extractedNid.nameEng}
-                        onChange={(e) => setExtractedNid(prev => ({ ...prev, nameEng: e.target.value }))}
+                        onChange={(e) =>
+                          setExtractedNid((prev) => ({ ...prev, nameEng: e.target.value }))
+                        }
                         className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary w-full"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Name (Bangla)</label>
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                        Name (Bangla)
+                      </label>
                       <input
                         type="text"
                         value={extractedNid.nameBng}
-                        onChange={(e) => setExtractedNid(prev => ({ ...prev, nameBng: e.target.value }))}
+                        onChange={(e) =>
+                          setExtractedNid((prev) => ({ ...prev, nameBng: e.target.value }))
+                        }
                         className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary w-full"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Father's Name (Bng)</label>
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                        Father's Name (Bng)
+                      </label>
                       <input
                         type="text"
                         value={extractedNid.fatherNameBng}
-                        onChange={(e) => setExtractedNid(prev => ({ ...prev, fatherNameBng: e.target.value }))}
+                        onChange={(e) =>
+                          setExtractedNid((prev) => ({ ...prev, fatherNameBng: e.target.value }))
+                        }
                         className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary w-full"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Mother's Name (Bng)</label>
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                        Mother's Name (Bng)
+                      </label>
                       <input
                         type="text"
                         value={extractedNid.motherNameBng}
-                        onChange={(e) => setExtractedNid(prev => ({ ...prev, motherNameBng: e.target.value }))}
+                        onChange={(e) =>
+                          setExtractedNid((prev) => ({ ...prev, motherNameBng: e.target.value }))
+                        }
                         className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary w-full"
                       />
                     </div>
@@ -5022,28 +5267,40 @@ function AddEmployeePage() {
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                     <div className="sm:col-span-2 space-y-1">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase">NID Number</label>
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                        NID Number
+                      </label>
                       <input
                         type="text"
                         value={extractedNid.nid}
-                        onChange={(e) => setExtractedNid(prev => ({ ...prev, nid: e.target.value }))}
+                        onChange={(e) =>
+                          setExtractedNid((prev) => ({ ...prev, nid: e.target.value }))
+                        }
                         className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary w-full font-mono"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Date of Birth</label>
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                        Date of Birth
+                      </label>
                       <input
                         type="date"
                         value={extractedNid.dob}
-                        onChange={(e) => setExtractedNid(prev => ({ ...prev, dob: e.target.value }))}
+                        onChange={(e) =>
+                          setExtractedNid((prev) => ({ ...prev, dob: e.target.value }))
+                        }
                         className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary w-full"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Gender</label>
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                        Gender
+                      </label>
                       <select
                         value={extractedNid.gender}
-                        onChange={(e) => setExtractedNid(prev => ({ ...prev, gender: e.target.value }))}
+                        onChange={(e) =>
+                          setExtractedNid((prev) => ({ ...prev, gender: e.target.value }))
+                        }
                         className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary w-full"
                       >
                         <option value="Male">Male</option>
@@ -5061,18 +5318,22 @@ function AddEmployeePage() {
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Village / Street (English)</label>
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                        Village / Street (English)
+                      </label>
                       <input
                         type="text"
                         value={extractedNid.presVillageEng}
-                        onChange={(e) => setExtractedNid(prev => ({ ...prev, presVillageEng: e.target.value }))}
+                        onChange={(e) =>
+                          setExtractedNid((prev) => ({ ...prev, presVillageEng: e.target.value }))
+                        }
                         className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary w-full"
                       />
                     </div>
                   </div>
                 </div>
+              </div>
             </div>
-          </div>
 
             {/* Modal Footer */}
             <div className="flex justify-end gap-3 border-t border-border/30 pt-4 mt-2">
@@ -5163,7 +5424,7 @@ function AddEmployeePage() {
       {/* NID Scanner Modal */}
       {showNidScannerModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div 
+          <div
             className="absolute inset-0 bg-background/80 backdrop-blur-sm transition-opacity"
             onClick={() => !isNidScanning && setShowNidScannerModal(false)}
           />
@@ -5175,8 +5436,12 @@ function AddEmployeePage() {
                   <Scan className="size-5" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-black text-foreground uppercase tracking-wider">Smart Document Scanner</h3>
-                  <p className="text-[11px] text-muted-foreground font-medium">Upload both sides of the document for AI data extraction</p>
+                  <h3 className="text-sm font-black text-foreground uppercase tracking-wider">
+                    Smart Document Scanner
+                  </h3>
+                  <p className="text-[11px] text-muted-foreground font-medium">
+                    Upload both sides of the document for AI data extraction
+                  </p>
                 </div>
               </div>
               <button
@@ -5190,19 +5455,20 @@ function AddEmployeePage() {
 
             {/* Modal Body */}
             <div className="p-6 md:p-8 flex flex-col gap-8 bg-gradient-to-b from-transparent to-muted/10">
-              
               {/* Document Type Selector */}
               {!isNidScanning && (
                 <div className="flex flex-col items-center justify-center space-y-3">
                   <span className="text-xs font-black uppercase tracking-widest text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
                     Step 1: Select Document Type
                   </span>
-                  <select 
+                  <select
                     className="h-11 px-4 rounded-xl bg-card border border-border/60 text-sm font-bold outline-none focus:border-primary shadow-xs min-w-[280px] text-center"
                     value={scanDocumentType}
                     onChange={(e) => setScanDocumentType(e.target.value)}
                   >
-                    <option value="" disabled>-- Select Document --</option>
+                    <option value="" disabled>
+                      -- Select Document --
+                    </option>
                     <option value="NID">National ID (NID)</option>
                     <option value="Passport">Passport</option>
                     <option value="Birth_Certificate">Birth Certificate</option>
@@ -5215,15 +5481,17 @@ function AddEmployeePage() {
               {scanDocumentType && !isNidScanning && (
                 <div className="flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-300">
                   <div className="flex items-center justify-center mb-6">
-                     <span className="text-xs font-black uppercase tracking-widest text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
+                    <span className="text-xs font-black uppercase tracking-widest text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
                       Step 2: Upload Images
                     </span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {/* Front Side Upload */}
-                    <div 
-                      className={`relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-2xl transition-all duration-200 ${nidFrontImage ? 'border-emerald-500 bg-emerald-500/5' : 'border-border hover:border-primary/50 hover:bg-muted/30 cursor-pointer group'}`}
-                      onClick={() => !nidFrontImage && document.getElementById("modal-front-input")?.click()}
+                    <div
+                      className={`relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-2xl transition-all duration-200 ${nidFrontImage ? "border-emerald-500 bg-emerald-500/5" : "border-border hover:border-primary/50 hover:bg-muted/30 cursor-pointer group"}`}
+                      onClick={() =>
+                        !nidFrontImage && document.getElementById("modal-front-input")?.click()
+                      }
                     >
                       <input
                         type="file"
@@ -5240,10 +5508,18 @@ function AddEmployeePage() {
                       />
                       {nidFrontPreview ? (
                         <div className="relative w-full h-[140px] rounded-lg overflow-hidden shadow-sm">
-                          <img src={nidFrontPreview} alt="Front Preview" className="w-full h-full object-cover" />
+                          <img
+                            src={nidFrontPreview}
+                            alt="Front Preview"
+                            className="w-full h-full object-cover"
+                          />
                           <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                            <button 
-                              onClick={(e) => { e.stopPropagation(); setNidFrontImage(null); setNidFrontPreview(null); }}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setNidFrontImage(null);
+                                setNidFrontPreview(null);
+                              }}
                               className="px-4 py-2 bg-rose-500 text-white text-xs font-bold rounded-lg shadow-lg flex items-center gap-2"
                             >
                               <Trash2 className="size-3.5" /> Remove
@@ -5257,16 +5533,20 @@ function AddEmployeePage() {
                           </div>
                           <div>
                             <p className="text-sm font-bold text-foreground">Front Side</p>
-                            <p className="text-[10px] text-muted-foreground mt-1">Click to browse</p>
+                            <p className="text-[10px] text-muted-foreground mt-1">
+                              Click to browse
+                            </p>
                           </div>
                         </div>
                       )}
                     </div>
 
                     {/* Back Side Upload */}
-                    <div 
-                      className={`relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-2xl transition-all duration-200 ${nidBackImage ? 'border-emerald-500 bg-emerald-500/5' : 'border-border hover:border-primary/50 hover:bg-muted/30 cursor-pointer group'}`}
-                      onClick={() => !nidBackImage && document.getElementById("modal-back-input")?.click()}
+                    <div
+                      className={`relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-2xl transition-all duration-200 ${nidBackImage ? "border-emerald-500 bg-emerald-500/5" : "border-border hover:border-primary/50 hover:bg-muted/30 cursor-pointer group"}`}
+                      onClick={() =>
+                        !nidBackImage && document.getElementById("modal-back-input")?.click()
+                      }
                     >
                       <input
                         type="file"
@@ -5283,10 +5563,18 @@ function AddEmployeePage() {
                       />
                       {nidBackPreview ? (
                         <div className="relative w-full h-[140px] rounded-lg overflow-hidden shadow-sm">
-                          <img src={nidBackPreview} alt="Back Preview" className="w-full h-full object-cover" />
+                          <img
+                            src={nidBackPreview}
+                            alt="Back Preview"
+                            className="w-full h-full object-cover"
+                          />
                           <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                            <button 
-                              onClick={(e) => { e.stopPropagation(); setNidBackImage(null); setNidBackPreview(null); }}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setNidBackImage(null);
+                                setNidBackPreview(null);
+                              }}
                               className="px-4 py-2 bg-rose-500 text-white text-xs font-bold rounded-lg shadow-lg flex items-center gap-2"
                             >
                               <Trash2 className="size-3.5" /> Remove
@@ -5300,7 +5588,9 @@ function AddEmployeePage() {
                           </div>
                           <div>
                             <p className="text-sm font-bold text-foreground">Back Side</p>
-                            <p className="text-[10px] text-muted-foreground mt-1">Click to browse</p>
+                            <p className="text-[10px] text-muted-foreground mt-1">
+                              Click to browse
+                            </p>
                           </div>
                         </div>
                       )}
@@ -5316,9 +5606,29 @@ function AddEmployeePage() {
                     <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse scale-90" />
                     <div className="relative p-8 bg-card border border-primary/30 rounded-2xl shadow-[0_0_40px_rgba(var(--primary-rgb),0.12)] flex flex-col items-center gap-6 text-center">
                       <div className="relative flex items-center justify-center size-28">
-                        <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
-                          <circle className="text-muted/20 stroke-current" strokeWidth="5" cx="50" cy="50" r="44" fill="transparent" />
-                          <circle className="text-primary stroke-current transition-all duration-300 ease-in-out" strokeWidth="5" strokeLinecap="round" strokeDasharray="276.46" strokeDashoffset={276.46 - (276.46 * nidScanProgress) / 100} cx="50" cy="50" r="44" fill="transparent" />
+                        <svg
+                          className="absolute inset-0 w-full h-full -rotate-90"
+                          viewBox="0 0 100 100"
+                        >
+                          <circle
+                            className="text-muted/20 stroke-current"
+                            strokeWidth="5"
+                            cx="50"
+                            cy="50"
+                            r="44"
+                            fill="transparent"
+                          />
+                          <circle
+                            className="text-primary stroke-current transition-all duration-300 ease-in-out"
+                            strokeWidth="5"
+                            strokeLinecap="round"
+                            strokeDasharray="276.46"
+                            strokeDashoffset={276.46 - (276.46 * nidScanProgress) / 100}
+                            cx="50"
+                            cy="50"
+                            r="44"
+                            fill="transparent"
+                          />
                         </svg>
                         <Cpu className="size-10 text-primary animate-pulse" />
                       </div>
@@ -5329,7 +5639,9 @@ function AddEmployeePage() {
                           {nidScanStep === 3 && "Running Deep-Learning OCR..."}
                           {nidScanStep === 4 && "Structuring Semantic Fields..."}
                         </h4>
-                        <p className="text-xs font-bold text-muted-foreground mt-1.5">{nidScanProgress}% Completed</p>
+                        <p className="text-xs font-bold text-muted-foreground mt-1.5">
+                          {nidScanProgress}% Completed
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -5354,9 +5666,13 @@ function AddEmployeePage() {
                 className={`h-10 px-8 rounded-xl text-xs font-black shadow-lg transition-all duration-200 flex items-center justify-center gap-2 ${!scanDocumentType || !nidFrontImage || isNidScanning ? "bg-muted text-muted-foreground cursor-not-allowed opacity-70" : "bg-primary text-primary-foreground hover:scale-[1.02] active:scale-[0.98]"}`}
               >
                 {isNidScanning ? (
-                  <><Loader2 className="size-4 animate-spin" /> Processing...</>
+                  <>
+                    <Loader2 className="size-4 animate-spin" /> Processing...
+                  </>
                 ) : (
-                  <><Sparkles className="size-4" /> Start Scan</>
+                  <>
+                    <Sparkles className="size-4" /> Start Scan
+                  </>
                 )}
               </button>
             </div>

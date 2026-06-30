@@ -3,14 +3,25 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  Fingerprint, ChevronRight, CalendarDays, RefreshCw, X, ChevronDown, Check, SlidersHorizontal
+  Fingerprint,
+  ChevronRight,
+  CalendarDays,
+  RefreshCw,
+  X,
+  ChevronDown,
+  Check,
+  SlidersHorizontal,
 } from "lucide-react";
 
 export const Route = createFileRoute("/create-roster")({
   head: () => ({
     meta: [
       { title: "Employee Roster — CRIPTON" },
-      { name: "description", content: "Corporate Shift Roster scheduling registry, weekend allocations, and default holiday configurations." },
+      {
+        name: "description",
+        content:
+          "Corporate Shift Roster scheduling registry, weekend allocations, and default holiday configurations.",
+      },
     ],
   }),
   component: CreateRosterPage,
@@ -18,16 +29,61 @@ export const Route = createFileRoute("/create-roster")({
 
 // Mock initial employee database for roster generation
 const rosterEmployees = [
-  { id: "2023043910", name: "Tahmid Afsar Shapno", dept: "Business Innovation", type: "ALL", unit: "PSL", line: "N/A" },
-  { id: "2016001055", name: "Md. Zahidul Islam", dept: "Management", type: "ALL", unit: "PSL", line: "Line-02" },
-  { id: "2022035599", name: "Dipon Saha", dept: "Core Development (HR)", type: "ALL", unit: "PSL", line: "Line-03" },
-  { id: "2025057309", name: "Bani Amin Jwel", dept: "Core Development (HR)", type: "ALL", unit: "PSL", line: "Line-01" },
-  { id: "2021032646", name: "Sadiqul Islam", dept: "Core Sales", type: "ALL", unit: "PSL", line: "Line-02" }
+  {
+    id: "2023043910",
+    name: "Tahmid Afsar Shapno",
+    dept: "Business Innovation",
+    type: "ALL",
+    unit: "PSL",
+    line: "N/A",
+  },
+  {
+    id: "2016001055",
+    name: "Md. Zahidul Islam",
+    dept: "Management",
+    type: "ALL",
+    unit: "PSL",
+    line: "Line-02",
+  },
+  {
+    id: "2022035599",
+    name: "Dipon Saha",
+    dept: "Core Development (HR)",
+    type: "ALL",
+    unit: "PSL",
+    line: "Line-03",
+  },
+  {
+    id: "2025057309",
+    name: "Bani Amin Jwel",
+    dept: "Core Development (HR)",
+    type: "ALL",
+    unit: "PSL",
+    line: "Line-01",
+  },
+  {
+    id: "2021032646",
+    name: "Sadiqul Islam",
+    dept: "Core Sales",
+    type: "ALL",
+    unit: "PSL",
+    line: "Line-02",
+  },
 ];
 
 const monthsList = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 function CreateRosterPage() {
@@ -52,7 +108,7 @@ function CreateRosterPage() {
   // Roster matrix state: maps empId -> Array of 31 status strings ('W' = Work, 'H' = Holiday, 'GH' = Govt Holiday)
   const [rosterMatrix, setRosterMatrix] = useState<Record<string, string[]>>(() => {
     const initial: Record<string, string[]> = {};
-    rosterEmployees.forEach(emp => {
+    rosterEmployees.forEach((emp) => {
       // Default: set every day to 'W' (Working)
       initial[emp.id] = Array(31).fill("W");
     });
@@ -63,13 +119,13 @@ function CreateRosterPage() {
   const activeIds = useMemo(() => {
     return empIdsInput
       .split(",")
-      .map(id => id.trim())
-      .filter(id => id.length > 0);
+      .map((id) => id.trim())
+      .filter((id) => id.length > 0);
   }, [empIdsInput]);
 
   // Filter roster employees by selection boundaries
   const filteredEmployees = useMemo(() => {
-    return rosterEmployees.filter(emp => {
+    return rosterEmployees.filter((emp) => {
       // Comma separator match
       if (activeIds.length > 0 && !activeIds.includes(emp.id)) return false;
       if (subDept !== "ALL" && emp.dept !== subDept) return false;
@@ -82,9 +138,9 @@ function CreateRosterPage() {
   // Action: Set Specific Day (1-31) Status
   const handleSetDayStatus = (statusType: "GH" | "H" | "W") => {
     const dayIdx = targetDay - 1;
-    setRosterMatrix(prev => {
+    setRosterMatrix((prev) => {
       const next = { ...prev };
-      filteredEmployees.forEach(emp => {
+      filteredEmployees.forEach((emp) => {
         const empSchedule = [...(next[emp.id] || Array(31).fill("W"))];
         empSchedule[dayIdx] = statusType;
         next[emp.id] = empSchedule;
@@ -102,7 +158,13 @@ function CreateRosterPage() {
 
     // Map weekend name to JS day index (Saturday = 6, Sunday = 0, Friday = 5, etc.)
     const dayMap: Record<string, number> = {
-      "Sunday": 0, "Monday": 1, "Tuesday": 2, "Wednesday": 3, "Thursday": 4, "Friday": 5, "Saturday": 6
+      Sunday: 0,
+      Monday: 1,
+      Tuesday: 2,
+      Wednesday: 3,
+      Thursday: 4,
+      Friday: 5,
+      Saturday: 6,
     };
     const targetDayIndex = dayMap[weekendDay] ?? 6;
 
@@ -115,18 +177,20 @@ function CreateRosterPage() {
       }
     }
 
-    setRosterMatrix(prev => {
+    setRosterMatrix((prev) => {
       const next = { ...prev };
-      filteredEmployees.forEach(emp => {
+      filteredEmployees.forEach((emp) => {
         const empSchedule = [...(next[emp.id] || Array(31).fill("W"))];
-        dayIndicesToUpdate.forEach(idx => {
+        dayIndicesToUpdate.forEach((idx) => {
           empSchedule[idx] = "H";
         });
         next[emp.id] = empSchedule;
       });
       return next;
     });
-    alert(`Successfully applied Weekend Holiday (H) to all ${weekendDay}s in ${selectedMonth} ${selectedYear}!`);
+    alert(
+      `Successfully applied Weekend Holiday (H) to all ${weekendDay}s in ${selectedMonth} ${selectedYear}!`,
+    );
   };
 
   // Action: ROSTER HOLIDAY
@@ -145,11 +209,11 @@ function CreateRosterPage() {
       }
     }
 
-    setRosterMatrix(prev => {
+    setRosterMatrix((prev) => {
       const next = { ...prev };
-      filteredEmployees.forEach(emp => {
+      filteredEmployees.forEach((emp) => {
         const empSchedule = [...(next[emp.id] || Array(31).fill("W"))];
-        weekendIndices.forEach(idx => {
+        weekendIndices.forEach((idx) => {
           empSchedule[idx] = "H";
         });
         next[emp.id] = empSchedule;
@@ -169,16 +233,17 @@ function CreateRosterPage() {
 
     for (let d = 1; d <= daysInMonth; d++) {
       const dt = new Date(yearNum, monthIndex, d);
-      if (dt.getDay() === 5) { // Friday
+      if (dt.getDay() === 5) {
+        // Friday
         fridayIndices.push(d - 1);
       }
     }
 
-    setRosterMatrix(prev => {
+    setRosterMatrix((prev) => {
       const next = { ...prev };
-      filteredEmployees.forEach(emp => {
+      filteredEmployees.forEach((emp) => {
         const empSchedule = [...(next[emp.id] || Array(31).fill("W"))];
-        fridayIndices.forEach(idx => {
+        fridayIndices.forEach((idx) => {
           empSchedule[idx] = "H";
         });
         next[emp.id] = empSchedule;
@@ -190,15 +255,17 @@ function CreateRosterPage() {
 
   // Bottom action: UPDATE ROSTER
   const handleUpdateRoster = () => {
-    alert(`Roster configuration successfully saved & updated for ${filteredEmployees.length} employee(s) for the month of ${selectedMonth} ${selectedYear}!`);
+    alert(
+      `Roster configuration successfully saved & updated for ${filteredEmployees.length} employee(s) for the month of ${selectedMonth} ${selectedYear}!`,
+    );
   };
 
   // Bottom action: DELETE ROSTER
   const handleDeleteRoster = () => {
     if (confirm("Are you sure you want to discard this entire roster schedule configuration?")) {
-      setRosterMatrix(prev => {
+      setRosterMatrix((prev) => {
         const next = { ...prev };
-        filteredEmployees.forEach(emp => {
+        filteredEmployees.forEach((emp) => {
           next[emp.id] = Array(31).fill("W");
         });
         return next;
@@ -218,7 +285,9 @@ function CreateRosterPage() {
           <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-2.5" />
                 <span className="text-muted-foreground/75">Human Resource</span>
                 <ChevronRight className="size-2.5" />
@@ -238,20 +307,22 @@ function CreateRosterPage() {
 
           {/* Configuration Grid Panel (Two main cards side by side) */}
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-
             {/* Left Card: General Criteria Selection */}
             <div className="xl:col-span-8 bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-6">
               <div className="flex items-center justify-between border-b border-border/40 pb-3">
-                <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary">Roster Generation boundaries</span>
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary">
+                  Roster Generation boundaries
+                </span>
                 <span className="text-[9px] font-bold text-muted-foreground/50">Left Controls</span>
               </div>
 
               {/* Roster Criteria Grid */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-
                 {/* Employee ID textarea */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Employee ID (Multiple)</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Employee ID (Multiple)
+                  </label>
                   <textarea
                     value={empIdsInput}
                     onChange={(e) => setEmpIdsInput(e.target.value)}
@@ -262,7 +333,9 @@ function CreateRosterPage() {
 
                 {/* Year Dropdown */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Year</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Year
+                  </label>
                   <div className="relative">
                     <select
                       value={selectedYear}
@@ -279,15 +352,19 @@ function CreateRosterPage() {
 
                 {/* Month Dropdown */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Month</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Month
+                  </label>
                   <div className="relative">
                     <select
                       value={selectedMonth}
                       onChange={(e) => setSelectedMonth(e.target.value)}
                       className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
                     >
-                      {monthsList.map(m => (
-                        <option key={m} value={m}>{m}</option>
+                      {monthsList.map((m) => (
+                        <option key={m} value={m}>
+                          {m}
+                        </option>
                       ))}
                     </select>
                     <ChevronDown className="size-3 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -296,7 +373,9 @@ function CreateRosterPage() {
 
                 {/* Company Name */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Company Name</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Company Name
+                  </label>
                   <div className="relative">
                     <select
                       value={companyName}
@@ -312,7 +391,9 @@ function CreateRosterPage() {
 
                 {/* Area Name */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Area Name</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Area Name
+                  </label>
                   <div className="relative">
                     <select
                       value={areaName}
@@ -328,7 +409,9 @@ function CreateRosterPage() {
 
                 {/* Employee Type */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Employee Type</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Employee Type
+                  </label>
                   <div className="relative">
                     <select
                       value={employeeType}
@@ -345,7 +428,9 @@ function CreateRosterPage() {
 
                 {/* Sub Department */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Sub Department</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Sub Department
+                  </label>
                   <div className="relative">
                     <select
                       value={subDept}
@@ -364,7 +449,9 @@ function CreateRosterPage() {
 
                 {/* Unit */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Unit</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Unit
+                  </label>
                   <div className="relative">
                     <select
                       value={unit}
@@ -381,7 +468,9 @@ function CreateRosterPage() {
 
                 {/* Line */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Line</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Line
+                  </label>
                   <div className="relative">
                     <select
                       value={line}
@@ -399,7 +488,9 @@ function CreateRosterPage() {
 
                 {/* Joining From */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Joining From</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Joining From
+                  </label>
                   <input
                     type="date"
                     value={joiningFrom}
@@ -410,7 +501,9 @@ function CreateRosterPage() {
 
                 {/* Joining To */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Joining To</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Joining To
+                  </label>
                   <input
                     type="date"
                     value={joiningTo}
@@ -421,7 +514,9 @@ function CreateRosterPage() {
 
                 {/* Status */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Status</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Status
+                  </label>
                   <div className="relative">
                     <select
                       value={status}
@@ -434,7 +529,6 @@ function CreateRosterPage() {
                     <ChevronDown className="size-3 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   </div>
                 </div>
-
               </div>
 
               {/* Roster Actions bottom left inside first card */}
@@ -452,27 +546,34 @@ function CreateRosterPage() {
                   DEFAULT HOLIDAY
                 </button>
               </div>
-
             </div>
 
             {/* Right Card: Day & Weekend Override Selector */}
             <div className="xl:col-span-4 bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-6">
               <div className="flex items-center justify-between border-b border-border/40 pb-3">
-                <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary">Day & Weekend Overrides</span>
-                <span className="text-[9px] font-bold text-muted-foreground/50">Right Controls</span>
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary">
+                  Day & Weekend Overrides
+                </span>
+                <span className="text-[9px] font-bold text-muted-foreground/50">
+                  Right Controls
+                </span>
               </div>
 
               {/* Selector A Day */}
               <div className="space-y-3">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase block">Select A Day(1-31)</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase block">
+                  Select A Day(1-31)
+                </label>
                 <div className="relative">
                   <select
                     value={targetDay}
                     onChange={(e) => setTargetDay(parseInt(e.target.value))}
                     className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-bold outline-none focus:border-primary appearance-none pr-8 cursor-pointer text-primary"
                   >
-                    {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
-                      <option key={day} value={day}>{day}</option>
+                    {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                      <option key={day} value={day}>
+                        {day}
+                      </option>
                     ))}
                   </select>
                   <ChevronDown className="size-3 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -503,7 +604,9 @@ function CreateRosterPage() {
 
               {/* Selector A Weekend */}
               <div className="space-y-3 pt-2">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase block">Select A Weekend</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase block">
+                  Select A Weekend
+                </label>
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
                     <select
@@ -511,8 +614,18 @@ function CreateRosterPage() {
                       onChange={(e) => setWeekendDay(e.target.value)}
                       className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs font-semibold outline-none focus:border-primary appearance-none pr-8 cursor-pointer"
                     >
-                      {["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map(day => (
-                        <option key={day} value={day}>{day}</option>
+                      {[
+                        "Saturday",
+                        "Sunday",
+                        "Monday",
+                        "Tuesday",
+                        "Wednesday",
+                        "Thursday",
+                        "Friday",
+                      ].map((day) => (
+                        <option key={day} value={day}>
+                          {day}
+                        </option>
                       ))}
                     </select>
                     <ChevronDown className="size-3 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -525,16 +638,18 @@ function CreateRosterPage() {
                   </button>
                 </div>
               </div>
-
             </div>
-
           </div>
 
           {/* Bottom Table Card: Generated Scheduler Roster Calendar */}
           <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-5">
             <div className="flex items-center justify-between border-b border-border/30 pb-3">
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary">Roster Schedule Matrix</span>
-              <span className="text-[9px] font-bold text-muted-foreground/60">Dynamic Live View (1-31)</span>
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary">
+                Roster Schedule Matrix
+              </span>
+              <span className="text-[9px] font-bold text-muted-foreground/60">
+                Dynamic Live View (1-31)
+              </span>
             </div>
 
             {/* Matrix Data Spreadsheet */}
@@ -542,33 +657,55 @@ function CreateRosterPage() {
               <table className="w-full border-collapse text-[10px] text-left">
                 <thead>
                   <tr className="bg-[#f1f5f9] dark:bg-[#0f172a] text-foreground font-bold border-b border-border/50 select-none whitespace-nowrap">
-                    <th className="px-3 py-2.5 font-extrabold w-24 border-r border-border/30 text-center">Emp ID</th>
-                    <th className="px-3 py-2.5 font-extrabold w-36 border-r border-border/30">Employee Name</th>
-                    <th className="px-3 py-2.5 font-extrabold w-28 border-r border-border/30">Sub Dept</th>
+                    <th className="px-3 py-2.5 font-extrabold w-24 border-r border-border/30 text-center">
+                      Emp ID
+                    </th>
+                    <th className="px-3 py-2.5 font-extrabold w-36 border-r border-border/30">
+                      Employee Name
+                    </th>
+                    <th className="px-3 py-2.5 font-extrabold w-28 border-r border-border/30">
+                      Sub Dept
+                    </th>
 
                     {/* Render days 1 to 31 columns */}
-                    {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
-                      <th key={d} className="px-2 py-2.5 font-extrabold text-center w-8 border-r border-border/30">{d}</th>
+                    {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                      <th
+                        key={d}
+                        className="px-2 py-2.5 font-extrabold text-center w-8 border-r border-border/30"
+                      >
+                        {d}
+                      </th>
                     ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/30">
-                  {filteredEmployees.map(emp => {
+                  {filteredEmployees.map((emp) => {
                     const schedule = rosterMatrix[emp.id] || Array(31).fill("W");
 
                     return (
-                      <tr key={emp.id} className="hover:bg-[#f8fafc] dark:hover:bg-[#1e293b] transition duration-75 whitespace-nowrap">
-                        <td className="px-3 py-2 font-bold font-mono text-center text-foreground border-r border-border/20">{emp.id}</td>
-                        <td className="px-3 py-2 font-bold text-foreground/80 border-r border-border/20">{emp.name}</td>
-                        <td className="px-3 py-2 text-muted-foreground border-r border-border/20">{emp.dept}</td>
+                      <tr
+                        key={emp.id}
+                        className="hover:bg-[#f8fafc] dark:hover:bg-[#1e293b] transition duration-75 whitespace-nowrap"
+                      >
+                        <td className="px-3 py-2 font-bold font-mono text-center text-foreground border-r border-border/20">
+                          {emp.id}
+                        </td>
+                        <td className="px-3 py-2 font-bold text-foreground/80 border-r border-border/20">
+                          {emp.name}
+                        </td>
+                        <td className="px-3 py-2 text-muted-foreground border-r border-border/20">
+                          {emp.dept}
+                        </td>
 
                         {/* Roster schedule cells */}
                         {schedule.map((dayStatus, idx) => {
                           let cellColorClass = "bg-muted text-muted-foreground/60"; // 'W' Work Day
                           if (dayStatus === "H") {
-                            cellColorClass = "bg-rose-500/25 text-rose-700 dark:text-rose-400 font-black"; // Holiday
+                            cellColorClass =
+                              "bg-rose-500/25 text-rose-700 dark:text-rose-400 font-black"; // Holiday
                           } else if (dayStatus === "GH") {
-                            cellColorClass = "bg-[#c2db42]/30 text-slate-800 dark:text-slate-200 font-black"; // Govt Holiday
+                            cellColorClass =
+                              "bg-[#c2db42]/30 text-slate-800 dark:text-slate-200 font-black"; // Govt Holiday
                           }
 
                           return (
@@ -576,7 +713,7 @@ function CreateRosterPage() {
                               <div
                                 onClick={() => {
                                   // Click row day cell directly to toggle between W -> H -> GH
-                                  setRosterMatrix(prev => {
+                                  setRosterMatrix((prev) => {
                                     const next = { ...prev };
                                     const sch = [...(next[emp.id] || Array(31).fill("W"))];
                                     const curr = sch[idx];
@@ -601,8 +738,12 @@ function CreateRosterPage() {
 
                   {filteredEmployees.length === 0 && (
                     <tr>
-                      <td colSpan={35} className="px-4 py-12 text-center text-muted-foreground font-semibold">
-                        No employees found matching these boundaries. Use comma separator in ID panel to active employees.
+                      <td
+                        colSpan={35}
+                        className="px-4 py-12 text-center text-muted-foreground font-semibold"
+                      >
+                        No employees found matching these boundaries. Use comma separator in ID
+                        panel to active employees.
                       </td>
                     </tr>
                   )}
@@ -625,9 +766,7 @@ function CreateRosterPage() {
                 DELETE ROSTER
               </button>
             </div>
-
           </div>
-
         </div>
       </main>
     </div>

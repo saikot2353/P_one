@@ -4,10 +4,30 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import {
-  ChevronRight, Users, ShieldAlert, ShieldCheck, Plus, Search,
-  Pencil, Trash2, X, Check, Eye, EyeOff, HelpCircle, Info, Printer,
-  FileSpreadsheet, FileText, CheckCircle2, UserCheck, Shield,
-  User, Mail, Phone, Lock
+  ChevronRight,
+  Users,
+  ShieldAlert,
+  ShieldCheck,
+  Plus,
+  Search,
+  Pencil,
+  Trash2,
+  X,
+  Check,
+  Eye,
+  EyeOff,
+  HelpCircle,
+  Info,
+  Printer,
+  FileSpreadsheet,
+  FileText,
+  CheckCircle2,
+  UserCheck,
+  Shield,
+  User,
+  Mail,
+  Phone,
+  Lock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { employeesData } from "@/routes/personnel-list";
@@ -16,7 +36,10 @@ export const Route = createFileRoute("/user-management")({
   head: () => ({
     meta: [
       { title: "User Management — CRIPTON" },
-      { name: "description", content: "Manage system directory users, status, and company access." },
+      {
+        name: "description",
+        content: "Manage system directory users, status, and company access.",
+      },
     ],
   }),
   component: UserManagementPage,
@@ -72,20 +95,188 @@ interface UserOverrideRow {
 // Mock Databases
 // ----------------------------------------------------
 const SEED_USERS: UserItem[] = [
-  { sl: 1, name: "Tahmid Afsar", email: "tahmid.bd@pakizasoftware.com", empId: "2023043910", userId: "2023043910", role: "Admin", department: "Business Innovation", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["All"] },
-  { sl: 2, name: "Tahsin Ahmed", email: "tahsin.cmr@pakizaknit.com", empId: "2021026991", userId: "2021026991", role: "employee", department: "Procurement and Supply Chain - (Procurement and Supply Chain)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 3, name: "Shanewas Hossen", email: "shahnewas.account@pakizaknit.com", empId: "2019016666", userId: "2019016666", role: "employee", department: "Accounts & Finance - (Accounts & Finance)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 4, name: "Suman Mazumder", email: "suman@pfd-global.com", empId: "2024050708", userId: "2024050708", role: "employee", department: "Marketing and Merchandising - (Marketing and Merchandising)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 5, name: "Sultan Ahmed", email: "sultan.ba@pakizasoftware.com", empId: "2023045044", userId: "2023045044", role: "employee", department: "Implementation & Business Analysis - (Business Analysis)", lastLogin: "2026-05-12 15:48:06", isActive: "Active", password: "password123", companyAccess: ["Pakiza Software Limited"] },
-  { sl: 6, name: "Md. Jamshed Alam", email: "jamshed.alam@pakizaknit.com", empId: "2014001017", userId: "2014001017", role: "HOD", department: "Management", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["All"] },
-  { sl: 7, name: "Md. Tuhin Hosen", email: "mdtuhin.dyeing@pakizaknit.com", empId: "2021028128", userId: "2021028128", role: "employee", department: "Fabrics Department - (Finish Fabric Store (MCD))", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 8, name: "Md. Shameem", email: "shamim.ahmed@pakizaknit.com", empId: "2018012755", userId: "2018012755", role: "HOD", department: "RMG Operations - (Embroidery)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 9, name: "Tushar Kanti Das", email: "tushar.kanti@pakizaknit.com", empId: "2016005888", userId: "2016005888", role: "HOD", department: "Admin", lastLogin: "2026-04-02 13:11:13", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd", "Pakiza Software Limited"] },
-  { sl: 10, name: "Kanak Das", email: "kanakdas01914@gmail.com", empId: "2019016183", userId: "2019016183", role: "employee", department: "—", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 11, name: "Md. Saeid Maruf", email: "syed.maruf@pakizaknit.com", empId: "2014001111", userId: "2014001111", role: "HOD", department: "Production Planning - (Production Planning)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 12, name: "Md. Tariql Islam", email: "tariqul.rmg@pakizaknit.com", empId: "2021027208", userId: "2021027208", role: "employee", department: "Finishing Department - (Finishing)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 13, name: "Md. Ruhul Amin Chowdhury", email: "faysal.amin@pakizaknit.com", empId: "2016001098", userId: "2016001098", role: "HOD", department: "Marketing and Merchandising - (Marketing and Merchandising)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 14, name: "Admin User", email: "admin@pakiza.com", empId: "ADMIN01", userId: "admin", role: "Admin", department: "IT Department", lastLogin: "—", isActive: "Active", password: "admin", companyAccess: ["All"] }
+  {
+    sl: 1,
+    name: "Tahmid Afsar",
+    email: "tahmid.bd@pakizasoftware.com",
+    empId: "2023043910",
+    userId: "2023043910",
+    role: "Admin",
+    department: "Business Innovation",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["All"],
+  },
+  {
+    sl: 2,
+    name: "Tahsin Ahmed",
+    email: "tahsin.cmr@pakizaknit.com",
+    empId: "2021026991",
+    userId: "2021026991",
+    role: "employee",
+    department: "Procurement and Supply Chain - (Procurement and Supply Chain)",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 3,
+    name: "Shanewas Hossen",
+    email: "shahnewas.account@pakizaknit.com",
+    empId: "2019016666",
+    userId: "2019016666",
+    role: "employee",
+    department: "Accounts & Finance - (Accounts & Finance)",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 4,
+    name: "Suman Mazumder",
+    email: "suman@pfd-global.com",
+    empId: "2024050708",
+    userId: "2024050708",
+    role: "employee",
+    department: "Marketing and Merchandising - (Marketing and Merchandising)",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 5,
+    name: "Sultan Ahmed",
+    email: "sultan.ba@pakizasoftware.com",
+    empId: "2023045044",
+    userId: "2023045044",
+    role: "employee",
+    department: "Implementation & Business Analysis - (Business Analysis)",
+    lastLogin: "2026-05-12 15:48:06",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Software Limited"],
+  },
+  {
+    sl: 6,
+    name: "Md. Jamshed Alam",
+    email: "jamshed.alam@pakizaknit.com",
+    empId: "2014001017",
+    userId: "2014001017",
+    role: "HOD",
+    department: "Management",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["All"],
+  },
+  {
+    sl: 7,
+    name: "Md. Tuhin Hosen",
+    email: "mdtuhin.dyeing@pakizaknit.com",
+    empId: "2021028128",
+    userId: "2021028128",
+    role: "employee",
+    department: "Fabrics Department - (Finish Fabric Store (MCD))",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 8,
+    name: "Md. Shameem",
+    email: "shamim.ahmed@pakizaknit.com",
+    empId: "2018012755",
+    userId: "2018012755",
+    role: "HOD",
+    department: "RMG Operations - (Embroidery)",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 9,
+    name: "Tushar Kanti Das",
+    email: "tushar.kanti@pakizaknit.com",
+    empId: "2016005888",
+    userId: "2016005888",
+    role: "HOD",
+    department: "Admin",
+    lastLogin: "2026-04-02 13:11:13",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd", "Pakiza Software Limited"],
+  },
+  {
+    sl: 10,
+    name: "Kanak Das",
+    email: "kanakdas01914@gmail.com",
+    empId: "2019016183",
+    userId: "2019016183",
+    role: "employee",
+    department: "—",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 11,
+    name: "Md. Saeid Maruf",
+    email: "syed.maruf@pakizaknit.com",
+    empId: "2014001111",
+    userId: "2014001111",
+    role: "HOD",
+    department: "Production Planning - (Production Planning)",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 12,
+    name: "Md. Tariql Islam",
+    email: "tariqul.rmg@pakizaknit.com",
+    empId: "2021027208",
+    userId: "2021027208",
+    role: "employee",
+    department: "Finishing Department - (Finishing)",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 13,
+    name: "Md. Ruhul Amin Chowdhury",
+    email: "faysal.amin@pakizaknit.com",
+    empId: "2016001098",
+    userId: "2016001098",
+    role: "HOD",
+    department: "Marketing and Merchandising - (Marketing and Merchandising)",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 14,
+    name: "Admin User",
+    email: "admin@pakiza.com",
+    empId: "ADMIN01",
+    userId: "admin",
+    role: "Admin",
+    department: "IT Department",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "admin",
+    companyAccess: ["All"],
+  },
 ];
 
 const SEED_ROLES: RoleItem[] = [
@@ -93,73 +284,568 @@ const SEED_ROLES: RoleItem[] = [
   { sl: 2, name: "employee", isActive: "Active" },
   { sl: 3, name: "Reception", isActive: "Active" },
   { sl: 4, name: "management", isActive: "Active" },
-  { sl: 5, name: "HOD", isActive: "Active" }
+  { sl: 5, name: "HOD", isActive: "Active" },
 ];
 
 const SEED_PERMISSIONS: PermissionRow[] = [
   // Admin permissions for all 40 menus
-  { sl: 1, role: "Admin", menu: "Dashboard", read: true, write: true, full: true, sync: true, prevDate: true },
-  { sl: 2, role: "Admin", menu: "SSP - New Requisition", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 3, role: "Admin", menu: "SSP - My Requisition", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 4, role: "Admin", menu: "SSP - Approval", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 5, role: "Admin", menu: "SSP - Attendance", read: true, write: true, full: true, sync: true, prevDate: false },
-  { sl: 6, role: "Admin", menu: "Configure - Structure Setup", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 7, role: "Admin", menu: "Configure - Job & Employee Setup", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 8, role: "Admin", menu: "Configure - Shift & Time Rules", read: true, write: true, full: true, sync: true, prevDate: true },
-  { sl: 9, role: "Admin", menu: "Configure - Allowances & Bonuses", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 10, role: "Admin", menu: "Configure - Education & Training", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 11, role: "Admin", menu: "Configure - Leave & Policies", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 12, role: "Admin", menu: "Personnel Info - Personnel List", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 13, role: "Admin", menu: "Personnel Info - Approval", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 14, role: "Admin", menu: "Attendance - Manual Attendance", read: true, write: true, full: true, sync: true, prevDate: true },
-  { sl: 15, role: "Admin", menu: "Attendance - Manual Attendance Approval", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 16, role: "Admin", menu: "Attendance - Employee Job Card", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 17, role: "Admin", menu: "Roster - Create Roster", read: true, write: true, full: true, sync: true, prevDate: false },
-  { sl: 18, role: "Admin", menu: "Roster - Company Holiday", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 19, role: "Admin", menu: "Leave - Leave Application", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 20, role: "Admin", menu: "Leave - Leave Approve", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 21, role: "Admin", menu: "Leave - Leave List", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 22, role: "Admin", menu: "KPI Performance - Dashboard", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 23, role: "Admin", menu: "KPI Performance - Cycles", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 24, role: "Admin", menu: "KPI Performance - Criteria Setup", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 25, role: "Admin", menu: "KPI Performance - My Self-Assessment", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 26, role: "Admin", menu: "KPI Performance - 360° Peer Review", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 27, role: "Admin", menu: "KPI Performance - Assessment Workflow", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 28, role: "Admin", menu: "KPI Performance - KPI Reports", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 29, role: "Admin", menu: "Evaluation - Increment Configurator", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 30, role: "Admin", menu: "Evaluation - Evaluation Propose", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 31, role: "Admin", menu: "Evaluation - Propose Increment", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 32, role: "Admin", menu: "Evaluation - Increment Summary", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 33, role: "Admin", menu: "Evaluation - Approve Increment", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 34, role: "Admin", menu: "Evaluation - Increment List", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 35, role: "Admin", menu: "Evaluation - Increment History", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 36, role: "Admin", menu: "Transfer - Transfer History", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 37, role: "Admin", menu: "Transfer - Approve Transfer", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 38, role: "Admin", menu: "HR Policy - JD List", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 39, role: "Admin", menu: "HR Policy - JD Approvals", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 40, role: "Admin", menu: "User Management", read: true, write: true, full: true, sync: false, prevDate: false },
+  {
+    sl: 1,
+    role: "Admin",
+    menu: "Dashboard",
+    read: true,
+    write: true,
+    full: true,
+    sync: true,
+    prevDate: true,
+  },
+  {
+    sl: 2,
+    role: "Admin",
+    menu: "SSP - New Requisition",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 3,
+    role: "Admin",
+    menu: "SSP - My Requisition",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 4,
+    role: "Admin",
+    menu: "SSP - Approval",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 5,
+    role: "Admin",
+    menu: "SSP - Attendance",
+    read: true,
+    write: true,
+    full: true,
+    sync: true,
+    prevDate: false,
+  },
+  {
+    sl: 6,
+    role: "Admin",
+    menu: "Configure - Structure Setup",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 7,
+    role: "Admin",
+    menu: "Configure - Job & Employee Setup",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 8,
+    role: "Admin",
+    menu: "Configure - Shift & Time Rules",
+    read: true,
+    write: true,
+    full: true,
+    sync: true,
+    prevDate: true,
+  },
+  {
+    sl: 9,
+    role: "Admin",
+    menu: "Configure - Allowances & Bonuses",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 10,
+    role: "Admin",
+    menu: "Configure - Education & Training",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 11,
+    role: "Admin",
+    menu: "Configure - Leave & Policies",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 12,
+    role: "Admin",
+    menu: "Personnel Info - Personnel List",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 13,
+    role: "Admin",
+    menu: "Personnel Info - Approval",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 14,
+    role: "Admin",
+    menu: "Attendance - Manual Attendance",
+    read: true,
+    write: true,
+    full: true,
+    sync: true,
+    prevDate: true,
+  },
+  {
+    sl: 15,
+    role: "Admin",
+    menu: "Attendance - Manual Attendance Approval",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 16,
+    role: "Admin",
+    menu: "Attendance - Employee Job Card",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 17,
+    role: "Admin",
+    menu: "Roster - Create Roster",
+    read: true,
+    write: true,
+    full: true,
+    sync: true,
+    prevDate: false,
+  },
+  {
+    sl: 18,
+    role: "Admin",
+    menu: "Roster - Company Holiday",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 19,
+    role: "Admin",
+    menu: "Leave - Leave Application",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 20,
+    role: "Admin",
+    menu: "Leave - Leave Approve",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 21,
+    role: "Admin",
+    menu: "Leave - Leave List",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 22,
+    role: "Admin",
+    menu: "KPI Performance - Dashboard",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 23,
+    role: "Admin",
+    menu: "KPI Performance - Cycles",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 24,
+    role: "Admin",
+    menu: "KPI Performance - Criteria Setup",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 25,
+    role: "Admin",
+    menu: "KPI Performance - My Self-Assessment",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 26,
+    role: "Admin",
+    menu: "KPI Performance - 360° Peer Review",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 27,
+    role: "Admin",
+    menu: "KPI Performance - Assessment Workflow",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 28,
+    role: "Admin",
+    menu: "KPI Performance - KPI Reports",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 29,
+    role: "Admin",
+    menu: "Evaluation - Increment Configurator",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 30,
+    role: "Admin",
+    menu: "Evaluation - Evaluation Propose",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 31,
+    role: "Admin",
+    menu: "Evaluation - Propose Increment",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 32,
+    role: "Admin",
+    menu: "Evaluation - Increment Summary",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 33,
+    role: "Admin",
+    menu: "Evaluation - Approve Increment",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 34,
+    role: "Admin",
+    menu: "Evaluation - Increment List",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 35,
+    role: "Admin",
+    menu: "Evaluation - Increment History",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 36,
+    role: "Admin",
+    menu: "Transfer - Transfer History",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 37,
+    role: "Admin",
+    menu: "Transfer - Approve Transfer",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 38,
+    role: "Admin",
+    menu: "HR Policy - JD List",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 39,
+    role: "Admin",
+    menu: "HR Policy - JD Approvals",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 40,
+    role: "Admin",
+    menu: "User Management",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
 
   // employee permissions - subset of menus
-  { sl: 41, role: "employee", menu: "Dashboard", read: true, write: false, full: false, sync: false, prevDate: false },
-  { sl: 42, role: "employee", menu: "SSP - New Requisition", read: true, write: true, full: false, sync: false, prevDate: false },
-  { sl: 43, role: "employee", menu: "SSP - My Requisition", read: true, write: true, full: false, sync: false, prevDate: false },
-  { sl: 44, role: "employee", menu: "SSP - Attendance", read: true, write: false, full: false, sync: false, prevDate: false },
-  { sl: 45, role: "employee", menu: "Leave - Leave Application", read: true, write: true, full: false, sync: false, prevDate: false },
-  { sl: 46, role: "employee", menu: "Leave - Leave List", read: true, write: false, full: false, sync: false, prevDate: false },
-  { sl: 47, role: "employee", menu: "KPI Performance - My Self-Assessment", read: true, write: true, full: false, sync: false, prevDate: false },
+  {
+    sl: 41,
+    role: "employee",
+    menu: "Dashboard",
+    read: true,
+    write: false,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 42,
+    role: "employee",
+    menu: "SSP - New Requisition",
+    read: true,
+    write: true,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 43,
+    role: "employee",
+    menu: "SSP - My Requisition",
+    read: true,
+    write: true,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 44,
+    role: "employee",
+    menu: "SSP - Attendance",
+    read: true,
+    write: false,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 45,
+    role: "employee",
+    menu: "Leave - Leave Application",
+    read: true,
+    write: true,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 46,
+    role: "employee",
+    menu: "Leave - Leave List",
+    read: true,
+    write: false,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 47,
+    role: "employee",
+    menu: "KPI Performance - My Self-Assessment",
+    read: true,
+    write: true,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
 
   // HOD permissions - subset of menus
-  { sl: 48, role: "HOD", menu: "Dashboard", read: true, write: true, full: false, sync: true, prevDate: false },
-  { sl: 49, role: "HOD", menu: "SSP - Approval", read: true, write: true, full: false, sync: false, prevDate: false },
-  { sl: 50, role: "HOD", menu: "Personnel Info - Personnel List", read: true, write: false, full: false, sync: false, prevDate: false },
-  { sl: 51, role: "HOD", menu: "Leave - Leave Approve", read: true, write: true, full: false, sync: false, prevDate: false },
-  { sl: 52, role: "HOD", menu: "KPI Performance - 360° Peer Review", read: true, write: true, full: false, sync: false, prevDate: false },
-  { sl: 53, role: "HOD", menu: "KPI Performance - Assessment Workflow", read: true, write: true, full: false, sync: false, prevDate: false }
+  {
+    sl: 48,
+    role: "HOD",
+    menu: "Dashboard",
+    read: true,
+    write: true,
+    full: false,
+    sync: true,
+    prevDate: false,
+  },
+  {
+    sl: 49,
+    role: "HOD",
+    menu: "SSP - Approval",
+    read: true,
+    write: true,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 50,
+    role: "HOD",
+    menu: "Personnel Info - Personnel List",
+    read: true,
+    write: false,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 51,
+    role: "HOD",
+    menu: "Leave - Leave Approve",
+    read: true,
+    write: true,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 52,
+    role: "HOD",
+    menu: "KPI Performance - 360° Peer Review",
+    read: true,
+    write: true,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 53,
+    role: "HOD",
+    menu: "KPI Performance - Assessment Workflow",
+    read: true,
+    write: true,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
 ];
 
 const SEED_OVERRIDES: UserOverrideRow[] = [
-  { sl: 1, empId: "2023043910", menu: "Configure - Structure Setup", read: true, write: false, full: false, sync: false, prevDate: false },
-  { sl: 2, empId: "2023043910", menu: "User Management", read: true, write: true, full: true, sync: true, prevDate: true }
+  {
+    sl: 1,
+    empId: "2023043910",
+    menu: "Configure - Structure Setup",
+    read: true,
+    write: false,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 2,
+    empId: "2023043910",
+    menu: "User Management",
+    read: true,
+    write: true,
+    full: true,
+    sync: true,
+    prevDate: true,
+  },
 ];
 
 const AVAILABLE_MENUS = [
@@ -202,7 +888,7 @@ const AVAILABLE_MENUS = [
   "Transfer - Approve Transfer",
   "HR Policy - JD List",
   "HR Policy - JD Approvals",
-  "User Management"
+  "User Management",
 ];
 
 function UserManagementPage() {
@@ -219,7 +905,11 @@ function UserManagementPage() {
       if (typeof window !== "undefined") {
         const data = localStorage.getItem(key);
         if (data) {
-          try { return JSON.parse(data); } catch (e) { return seed; }
+          try {
+            return JSON.parse(data);
+          } catch (e) {
+            return seed;
+          }
         }
         localStorage.setItem(key, JSON.stringify(seed));
       }
@@ -327,12 +1017,12 @@ function UserManagementPage() {
     setEditingUserSl(sl);
     setShowPassword(false);
     if (sl !== null) {
-      const user = users.find(u => u.sl === sl);
+      const user = users.find((u) => u.sl === sl);
       if (user) {
         const nameParts = (user.name || "").trim().split(" ");
         const firstName = nameParts[0] || "";
         const lastName = nameParts.slice(1).join(" ") || "";
-        
+
         setUserFirstName(firstName);
         setUserLastName(lastName);
         setUserEmail(user.email || "");
@@ -348,7 +1038,7 @@ function UserManagementPage() {
         setUserSectionAccess(user.sectionAccess || []);
         setUserAvatar(user.avatar || "");
 
-        const hasMatchingEmp = employees.some(e => e.id === user.empId);
+        const hasMatchingEmp = employees.some((e) => e.id === user.empId);
         if (hasMatchingEmp && user.empId !== "N/A" && user.empId !== "") {
           setCreateMode("with_id");
           setSelectedEmployeeId(user.empId);
@@ -381,12 +1071,12 @@ function UserManagementPage() {
   // User select / autocompletion handler
   const handleSelectEmployee = (empId: string) => {
     setSelectedEmployeeId(empId);
-    const emp = employees.find(e => e.id === empId);
+    const emp = employees.find((e) => e.id === empId);
     if (emp) {
       const nameParts = (emp.name || "").trim().split(" ");
       const firstName = nameParts[0] || "";
       const lastName = nameParts.slice(1).join(" ") || "";
-      
+
       setUserFirstName(firstName);
       setUserLastName(lastName);
       setUserEmail(emp.email || "");
@@ -417,7 +1107,9 @@ function UserManagementPage() {
     }
 
     // Check for duplicate User ID
-    const userIdExists = users.some(u => u.sl !== editingUserSl && u.userId.toLowerCase() === finalUserId.toLowerCase());
+    const userIdExists = users.some(
+      (u) => u.sl !== editingUserSl && u.userId.toLowerCase() === finalUserId.toLowerCase(),
+    );
     if (userIdExists) {
       toast.error(`User ID "${finalUserId}" is already taken.`);
       return;
@@ -435,39 +1127,43 @@ function UserManagementPage() {
 
     let updatedUsers = [...users];
     if (editingUserSl !== null) {
-      updatedUsers = users.map(u => u.sl === editingUserSl ? {
-        ...u, 
-        name: fullName, 
-        email: userEmail, 
-        empId: finalEmpId, 
-        userId: finalUserId,
-        role: userRole, 
-        department: userDepartment, 
-        isActive: userIsActive,
-        phone: userPhone,
-        password: userPassword,
-        redirectUrl: userRedirectUrl,
-        companyAccess: userCompanyAccess,
-        avatar: userAvatar
-      } : u);
+      updatedUsers = users.map((u) =>
+        u.sl === editingUserSl
+          ? {
+              ...u,
+              name: fullName,
+              email: userEmail,
+              empId: finalEmpId,
+              userId: finalUserId,
+              role: userRole,
+              department: userDepartment,
+              isActive: userIsActive,
+              phone: userPhone,
+              password: userPassword,
+              redirectUrl: userRedirectUrl,
+              companyAccess: userCompanyAccess,
+              avatar: userAvatar,
+            }
+          : u,
+      );
       toast.success("User profile updated successfully");
     } else {
-      const nextSl = users.length > 0 ? Math.max(...users.map(u => u.sl)) + 1 : 1;
+      const nextSl = users.length > 0 ? Math.max(...users.map((u) => u.sl)) + 1 : 1;
       updatedUsers.push({
-        sl: nextSl, 
-        name: fullName, 
-        email: userEmail, 
-        empId: finalEmpId, 
+        sl: nextSl,
+        name: fullName,
+        email: userEmail,
+        empId: finalEmpId,
         userId: finalUserId,
-        role: userRole, 
-        department: userDepartment, 
-        lastLogin: "—", 
+        role: userRole,
+        department: userDepartment,
+        lastLogin: "—",
         isActive: userIsActive,
         phone: userPhone,
         password: userPassword,
         redirectUrl: userRedirectUrl,
         companyAccess: userCompanyAccess,
-        avatar: userAvatar
+        avatar: userAvatar,
       });
       toast.success("New user registered successfully");
     }
@@ -477,7 +1173,7 @@ function UserManagementPage() {
 
   const handleDeleteUser = (sl: number) => {
     if (confirm("Are you sure you want to de-register this user?")) {
-      const updated = users.filter(u => u.sl !== sl).map((u, idx) => ({ ...u, sl: idx + 1 }));
+      const updated = users.filter((u) => u.sl !== sl).map((u, idx) => ({ ...u, sl: idx + 1 }));
       saveUsers(updated);
       toast.success("User deleted successfully");
     }
@@ -487,7 +1183,7 @@ function UserManagementPage() {
   const openRoleForm = (sl: number | null) => {
     setEditingRoleSl(sl);
     if (sl !== null) {
-      const role = roles.find(r => r.sl === sl);
+      const role = roles.find((r) => r.sl === sl);
       setRoleName(role?.name || "");
       setRoleIsActive(role?.isActive || "Active");
     } else {
@@ -506,16 +1202,20 @@ function UserManagementPage() {
     }
     let updatedRoles = [...roles];
     if (editingRoleSl !== null) {
-      const oldRole = roles.find(r => r.sl === editingRoleSl);
-      updatedRoles = roles.map(r => r.sl === editingRoleSl ? { ...r, name: roleName, isActive: roleIsActive } : r);
+      const oldRole = roles.find((r) => r.sl === editingRoleSl);
+      updatedRoles = roles.map((r) =>
+        r.sl === editingRoleSl ? { ...r, name: roleName, isActive: roleIsActive } : r,
+      );
       // Cascade rename in permissions list
       if (oldRole) {
-        const nextPerms = permissions.map(p => p.role === oldRole.name ? { ...p, role: roleName } : p);
+        const nextPerms = permissions.map((p) =>
+          p.role === oldRole.name ? { ...p, role: roleName } : p,
+        );
         savePermissions(nextPerms);
       }
       toast.success("Role updated successfully");
     } else {
-      const nextSl = roles.length > 0 ? Math.max(...roles.map(r => r.sl)) + 1 : 1;
+      const nextSl = roles.length > 0 ? Math.max(...roles.map((r) => r.sl)) + 1 : 1;
       updatedRoles.push({ sl: nextSl, name: roleName, isActive: roleIsActive });
       toast.success("New role added successfully");
     }
@@ -524,11 +1224,15 @@ function UserManagementPage() {
   };
 
   const handleDeleteRole = (sl: number) => {
-    const target = roles.find(r => r.sl === sl);
+    const target = roles.find((r) => r.sl === sl);
     if (!target) return;
-    if (confirm(`Delete the role "${target.name}"? This deletes all associated page permission mappings.`)) {
-      const updated = roles.filter(r => r.sl !== sl).map((r, idx) => ({ ...r, sl: idx + 1 }));
-      const nextPerms = permissions.filter(p => p.role !== target.name);
+    if (
+      confirm(
+        `Delete the role "${target.name}"? This deletes all associated page permission mappings.`,
+      )
+    ) {
+      const updated = roles.filter((r) => r.sl !== sl).map((r, idx) => ({ ...r, sl: idx + 1 }));
+      const nextPerms = permissions.filter((p) => p.role !== target.name);
       saveRoles(updated);
       savePermissions(nextPerms);
       toast.success("Role and modular permission configs deleted");
@@ -542,13 +1246,15 @@ function UserManagementPage() {
       return;
     }
 
-    const exists = permissions.some(p => p.role === selectedRoleFilter && p.menu === selectedMainMenu);
+    const exists = permissions.some(
+      (p) => p.role === selectedRoleFilter && p.menu === selectedMainMenu,
+    );
     if (exists) {
       toast.error("This menu route is already assigned to this role");
       return;
     }
 
-    const nextSl = permissions.length > 0 ? Math.max(...permissions.map(p => p.sl)) + 1 : 1;
+    const nextSl = permissions.length > 0 ? Math.max(...permissions.map((p) => p.sl)) + 1 : 1;
     const newPerm: PermissionRow = {
       sl: nextSl,
       role: selectedRoleFilter,
@@ -557,15 +1263,19 @@ function UserManagementPage() {
       write: false,
       full: false,
       sync: false,
-      prevDate: false
+      prevDate: false,
     };
 
     savePermissions([...permissions, newPerm]);
     toast.success(`Registered route "${selectedMainMenu}" to "${selectedRoleFilter}" permissions`);
   };
 
-  const handleUpdatePermissionValue = (sl: number, field: keyof Omit<PermissionRow, "sl" | "role" | "menu">, value: boolean) => {
-    const updated = permissions.map(p => {
+  const handleUpdatePermissionValue = (
+    sl: number,
+    field: keyof Omit<PermissionRow, "sl" | "role" | "menu">,
+    value: boolean,
+  ) => {
+    const updated = permissions.map((p) => {
       if (p.sl === sl) {
         const next = { ...p, [field]: value };
         // Logic constraint: if Full is set true, enable read/write automatically
@@ -581,26 +1291,28 @@ function UserManagementPage() {
   };
 
   const handleDeletePermission = (sl: number) => {
-    const updated = permissions.filter(p => p.sl !== sl).map((p, idx) => ({ ...p, sl: idx + 1 }));
+    const updated = permissions.filter((p) => p.sl !== sl).map((p, idx) => ({ ...p, sl: idx + 1 }));
     savePermissions(updated);
     toast.success("Permission record removed");
   };
 
   // User Wise overrides logic
   const activeOverrideUser = useMemo(() => {
-    return users.find(u => u.empId === selectedOverrideUser) || null;
+    return users.find((u) => u.empId === selectedOverrideUser) || null;
   }, [users, selectedOverrideUser]);
 
   // Combine active override user's base role permissions with override overrides
   const userWisePermissionsData = useMemo(() => {
     if (!activeOverrideUser) return [];
     const baseRole = activeOverrideUser.role;
-    
+
     // Base permissions for this user's role
-    const baseRolePerms = permissions.filter(p => p.role === baseRole);
+    const baseRolePerms = permissions.filter((p) => p.role === baseRole);
 
     return baseRolePerms.map((base, idx) => {
-      const userCustom = overrides.find(o => o.empId === activeOverrideUser.empId && o.menu === base.menu);
+      const userCustom = overrides.find(
+        (o) => o.empId === activeOverrideUser.empId && o.menu === base.menu,
+      );
       return {
         sl: idx + 1,
         menu: base.menu,
@@ -609,7 +1321,7 @@ function UserManagementPage() {
         write: userCustom ? userCustom.write : base.write,
         full: userCustom ? userCustom.full : base.full,
         sync: userCustom ? userCustom.sync : base.sync,
-        prevDate: userCustom ? userCustom.prevDate : base.prevDate
+        prevDate: userCustom ? userCustom.prevDate : base.prevDate,
       };
     });
   }, [activeOverrideUser, permissions, overrides]);
@@ -618,8 +1330,10 @@ function UserManagementPage() {
     if (!activeOverrideUser) return;
     if (checkState) {
       // Add custom override copy matching base role values
-      const baseMatch = permissions.find(p => p.role === activeOverrideUser.role && p.menu === menu);
-      const nextSl = overrides.length > 0 ? Math.max(...overrides.map(o => o.sl)) + 1 : 1;
+      const baseMatch = permissions.find(
+        (p) => p.role === activeOverrideUser.role && p.menu === menu,
+      );
+      const nextSl = overrides.length > 0 ? Math.max(...overrides.map((o) => o.sl)) + 1 : 1;
       const newOverride: UserOverrideRow = {
         sl: nextSl,
         empId: activeOverrideUser.empId,
@@ -628,21 +1342,27 @@ function UserManagementPage() {
         write: baseMatch ? baseMatch.write : false,
         full: baseMatch ? baseMatch.full : false,
         sync: baseMatch ? baseMatch.sync : false,
-        prevDate: baseMatch ? baseMatch.prevDate : false
+        prevDate: baseMatch ? baseMatch.prevDate : false,
       };
       saveOverrides([...overrides, newOverride]);
       toast.success(`Activated user override settings for "${menu}"`);
     } else {
       // Remove custom override row
-      const nextOverrides = overrides.filter(o => !(o.empId === activeOverrideUser.empId && o.menu === menu));
+      const nextOverrides = overrides.filter(
+        (o) => !(o.empId === activeOverrideUser.empId && o.menu === menu),
+      );
       saveOverrides(nextOverrides);
       toast.info(`Reverted "${menu}" to system role defaults`);
     }
   };
 
-  const handleUpdateOverrideValue = (menu: string, field: keyof Omit<UserOverrideRow, "sl" | "empId" | "menu">, value: boolean) => {
+  const handleUpdateOverrideValue = (
+    menu: string,
+    field: keyof Omit<UserOverrideRow, "sl" | "empId" | "menu">,
+    value: boolean,
+  ) => {
     if (!activeOverrideUser) return;
-    const updated = overrides.map(o => {
+    const updated = overrides.map((o) => {
       if (o.empId === activeOverrideUser.empId && o.menu === menu) {
         const next = { ...o, [field]: value };
         if (field === "full" && value) {
@@ -658,8 +1378,9 @@ function UserManagementPage() {
 
   // Filtered lists
   const filteredUsers = useMemo(() => {
-    return users.filter(u => {
-      const matchesSearch = !searchQuery.trim() ||
+    return users.filter((u) => {
+      const matchesSearch =
+        !searchQuery.trim() ||
         u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         u.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
         u.empId.includes(searchQuery) ||
@@ -669,32 +1390,43 @@ function UserManagementPage() {
   }, [users, searchQuery]);
 
   const activeRolePermissions = useMemo(() => {
-    return permissions.filter(p => p.role === selectedRoleFilter);
+    return permissions.filter((p) => p.role === selectedRoleFilter);
   }, [permissions, selectedRoleFilter]);
 
   // Dropdown mapping options
   const roleSelectOptions = useMemo(() => {
-    return roles.filter(r => r.isActive === "Active").map(r => ({ value: r.name, label: r.name }));
+    return roles
+      .filter((r) => r.isActive === "Active")
+      .map((r) => ({ value: r.name, label: r.name }));
   }, [roles]);
 
   const menuSelectOptions = useMemo(() => {
-    return AVAILABLE_MENUS.filter(m => m !== "All").map(m => ({ value: m, label: m }));
+    return AVAILABLE_MENUS.filter((m) => m !== "All").map((m) => ({ value: m, label: m }));
   }, []);
 
   const userSelectOptions = useMemo(() => {
-    return users.map(u => ({ value: u.empId, label: `${u.empId} - ${u.name} (${u.role})` }));
+    return users.map((u) => ({ value: u.empId, label: `${u.empId} - ${u.name} (${u.role})` }));
   }, [users]);
 
   const employeeOptions = useMemo(() => {
-    return employees.map(e => ({
+    return employees.map((e) => ({
       value: e.id,
-      label: `${e.id} - ${e.name} (${e.title || "Employee"})`
+      label: `${e.id} - ${e.name} (${e.title || "Employee"})`,
     }));
   }, [employees]);
 
   const departmentsList = useMemo(() => {
-    const list = Array.from(new Set(employees.map(e => e.dept).filter(Boolean)));
-    return list.length > 0 ? list : ["Procurement and Supply Chain", "Accounts & Finance", "Marketing and Merchandising", "Admin", "HR, Admin and Compliance", "Management"];
+    const list = Array.from(new Set(employees.map((e) => e.dept).filter(Boolean)));
+    return list.length > 0
+      ? list
+      : [
+          "Procurement and Supply Chain",
+          "Accounts & Finance",
+          "Marketing and Merchandising",
+          "Admin",
+          "HR, Admin and Compliance",
+          "Management",
+        ];
   }, [employees]);
 
   // Role colors mapping helper
@@ -715,11 +1447,12 @@ function UserManagementPage() {
 
         {/* Content Panel */}
         <div className="flex-1 overflow-hidden flex flex-col px-6 py-4 gap-4 bg-[#f8fafc] dark:bg-[#090d16]">
-          
           {/* Breadcrumbs Banner */}
           <div className="flex items-center justify-between shrink-0">
             <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">
-              <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
+              <Link to="/" className="hover:text-foreground transition-colors">
+                Home
+              </Link>
               <ChevronRight className="size-3 text-muted-foreground/60" />
               <span className="text-muted-foreground font-semibold">Administration</span>
               <ChevronRight className="size-3 text-muted-foreground/60" />
@@ -735,7 +1468,7 @@ function UserManagementPage() {
           {/* Master Tab Container */}
           <div className="flex-1 bg-card border border-border rounded-2xl shadow-xs flex flex-col overflow-hidden relative">
             <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-primary to-indigo-500" />
-            
+
             {/* Page Title & Section Headers */}
             <div className="px-6 pt-5 pb-3 border-b border-border bg-muted/10 shrink-0 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
@@ -757,20 +1490,19 @@ function UserManagementPage() {
 
             {/* USER LIST DATAGRID */}
             <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-card">
-              
               {/* Search / Filters Bar */}
               <div className="px-6 py-4 border-b border-border shrink-0 flex items-center justify-between gap-4">
                 <span className="text-[10px] font-semibold uppercase text-muted-foreground/75 tracking-wider flex items-center gap-1.5">
                   <Search className="size-3.5" /> Search Directory
                 </span>
-                
+
                 <div className="relative w-80">
                   <Search className="size-3.5 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     placeholder="Search by name, email, employee ID..."
                     value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full h-8.5 pl-8 pr-3 text-[11px] font-medium bg-muted/10 border border-border/80 rounded-xl outline-none focus:border-primary/60 transition"
                   />
                 </div>
@@ -797,49 +1529,77 @@ function UserManagementPage() {
                   <tbody className="divide-y divide-border/30 text-foreground">
                     {filteredUsers.length === 0 ? (
                       <tr>
-                        <td colSpan={11} className="py-12 text-center text-[12px] font-medium text-muted-foreground/60">
+                        <td
+                          colSpan={11}
+                          className="py-12 text-center text-[12px] font-medium text-muted-foreground/60"
+                        >
                           No registered users match the search criteria.
                         </td>
                       </tr>
                     ) : (
                       filteredUsers.map((item, idx) => (
-                        <tr key={item.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
-                          <td className="px-5 py-3.5 text-center font-mono text-slate-500 font-semibold">{idx + 1}</td>
+                        <tr
+                          key={item.sl}
+                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                        >
+                          <td className="px-5 py-3.5 text-center font-mono text-slate-500 font-semibold">
+                            {idx + 1}
+                          </td>
                           <td className="px-5 py-3.5">
                             <div className="flex items-center gap-2.5">
                               {item.avatar ? (
-                                <img src={item.avatar} alt={item.name} className="size-7.5 rounded-full object-cover border border-border shadow-3xs" />
+                                <img
+                                  src={item.avatar}
+                                  alt={item.name}
+                                  className="size-7.5 rounded-full object-cover border border-border shadow-3xs"
+                                />
                               ) : (
                                 <div className="size-7.5 rounded-full bg-primary/10 text-primary border border-primary/20 flex items-center justify-center font-bold text-[10px] uppercase shadow-3xs">
-                                  {item.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                                  {item.name
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")
+                                    .slice(0, 2)}
                                 </div>
                               )}
                               <span className="font-semibold text-foreground/95">{item.name}</span>
                             </div>
                           </td>
-                          <td className="px-5 py-3.5 text-center font-mono font-semibold text-slate-600">{item.userId || "—"}</td>
+                          <td className="px-5 py-3.5 text-center font-mono font-semibold text-slate-600">
+                            {item.userId || "—"}
+                          </td>
                           <td className="px-5 py-3.5 font-medium text-slate-500">{item.email}</td>
-                          <td className="px-5 py-3.5 text-center font-mono font-semibold text-slate-600">{item.empId}</td>
+                          <td className="px-5 py-3.5 text-center font-mono font-semibold text-slate-600">
+                            {item.empId}
+                          </td>
                           <td className="px-5 py-3.5 text-center">
-                            <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-semibold uppercase border tracking-wider ${getRoleBadgeStyle(item.role)}`}>
+                            <span
+                              className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-semibold uppercase border tracking-wider ${getRoleBadgeStyle(item.role)}`}
+                            >
                               {item.role}
                             </span>
                           </td>
                           <td className="px-5 py-3.5 font-medium">
                             <div className="flex flex-col gap-1.5 max-w-[200px]">
                               <div className="flex flex-wrap gap-1">
-                                {(!item.companyAccess || item.companyAccess.length === 0) ? (
+                                {!item.companyAccess || item.companyAccess.length === 0 ? (
                                   <span className="text-[10px] text-muted-foreground">—</span>
                                 ) : item.companyAccess.includes("All") ? (
-                                  <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-600 border border-blue-500/20 text-[9px] font-semibold uppercase">All Companies</span>
+                                  <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-600 border border-blue-500/20 text-[9px] font-semibold uppercase">
+                                    All Companies
+                                  </span>
                                 ) : (
-                                  item.companyAccess.map(c => {
+                                  item.companyAccess.map((c) => {
                                     let short = c;
                                     if (c === "Pakiza Software Limited") short = "PSL";
                                     if (c === "Pakiza Knit Composite Ltd") short = "PKCL";
                                     if (c === "Pakiza Group") short = "Group";
                                     return (
-                                      <span key={c} className="px-2 py-0.5 rounded bg-slate-500/10 text-slate-600 border border-slate-500/20 text-[9px] font-semibold" title={c}>
+                                      <span
+                                        key={c}
+                                        className="px-2 py-0.5 rounded bg-slate-500/10 text-slate-600 border border-slate-500/20 text-[9px] font-semibold"
+                                        title={c}
+                                      >
                                         {short}
                                       </span>
                                     );
@@ -849,10 +1609,16 @@ function UserManagementPage() {
                               {item.sectionAccess && item.sectionAccess.length > 0 && (
                                 <div className="flex flex-wrap gap-1 mt-0.5">
                                   {item.sectionAccess.includes("All") ? (
-                                    <span className="px-2 py-0.5 rounded bg-teal-500/10 text-teal-600 border border-teal-500/20 text-[8.5px] font-semibold uppercase">All Sections</span>
+                                    <span className="px-2 py-0.5 rounded bg-teal-500/10 text-teal-600 border border-teal-500/20 text-[8.5px] font-semibold uppercase">
+                                      All Sections
+                                    </span>
                                   ) : (
-                                    item.sectionAccess.map(s => (
-                                      <span key={s} className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 text-[8.5px] font-medium truncate max-w-[80px]" title={s}>
+                                    item.sectionAccess.map((s) => (
+                                      <span
+                                        key={s}
+                                        className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 text-[8.5px] font-medium truncate max-w-[80px]"
+                                        title={s}
+                                      >
                                         {s}
                                       </span>
                                     ))
@@ -861,14 +1627,23 @@ function UserManagementPage() {
                               )}
                             </div>
                           </td>
-                          <td className="px-5 py-3.5 font-medium truncate max-w-xs" title={item.department}>{item.department}</td>
-                          <td className="px-5 py-3.5 text-center font-medium text-slate-400 font-mono text-[10.5px]">{item.lastLogin}</td>
+                          <td
+                            className="px-5 py-3.5 font-medium truncate max-w-xs"
+                            title={item.department}
+                          >
+                            {item.department}
+                          </td>
+                          <td className="px-5 py-3.5 text-center font-medium text-slate-400 font-mono text-[10.5px]">
+                            {item.lastLogin}
+                          </td>
                           <td className="px-5 py-3.5 text-center">
-                            <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-semibold border uppercase tracking-wider ${
-                              item.isActive === "Active" 
-                                ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" 
-                                : "bg-rose-500/10 text-rose-600 border-rose-500/20"
-                            }`}>
+                            <span
+                              className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-semibold border uppercase tracking-wider ${
+                                item.isActive === "Active"
+                                  ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                                  : "bg-rose-500/10 text-rose-600 border-rose-500/20"
+                              }`}
+                            >
                               {item.isActive}
                             </span>
                           </td>
@@ -899,9 +1674,7 @@ function UserManagementPage() {
                 </table>
               </div>
             </div>
-
           </div>
-
         </div>
       </main>
 
@@ -909,7 +1682,6 @@ function UserManagementPage() {
       {isUserModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
           <div className="bg-card border border-border/80 w-full max-w-5xl rounded-2xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
-            
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-border/50 bg-[#f8fafc] dark:bg-[#0f172a] flex items-center justify-between">
               <div className="flex items-center gap-2.5">
@@ -921,11 +1693,13 @@ function UserManagementPage() {
                     {editingUserSl ? "Edit User Profile" : "Register New User"}
                   </h2>
                   <p className="text-[10px] text-muted-foreground/80 font-normal -mt-0.5">
-                    {editingUserSl ? "Update user settings, role credentials and company directories" : "Create new credentials and assign specific organizational permissions"}
+                    {editingUserSl
+                      ? "Update user settings, role credentials and company directories"
+                      : "Create new credentials and assign specific organizational permissions"}
                   </p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => setIsUserModalOpen(false)}
                 className="size-8.5 rounded-xl hover:bg-muted/80 flex items-center justify-center transition-colors text-muted-foreground hover:text-foreground border border-border/20"
               >
@@ -936,13 +1710,13 @@ function UserManagementPage() {
             {/* Modal Form */}
             <form onSubmit={handleUserSubmit} className="flex-1 overflow-y-auto p-6">
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-                
                 {/* Left Column (md:col-span-4) - Identity Toggle & Basic Account Details */}
                 <div className="md:col-span-4 space-y-5 md:border-r border-slate-100 dark:border-slate-800/80 md:pr-6">
-                  
                   {/* Creation Mode Toggle */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Creation Mode</label>
+                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                      Creation Mode
+                    </label>
                     <div className="flex gap-1.5 p-1 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200/50 dark:border-slate-800/50 overflow-hidden">
                       <button
                         type="button"
@@ -959,8 +1733,8 @@ function UserManagementPage() {
                           setUserAvatar("");
                         }}
                         className={`flex-1 py-2 text-[9px] font-medium uppercase tracking-wider rounded-lg transition-all duration-200 whitespace-nowrap px-1.5 ${
-                          createMode === "with_id" 
-                            ? "bg-white dark:bg-slate-800 text-primary shadow-xs border border-slate-200/10" 
+                          createMode === "with_id"
+                            ? "bg-white dark:bg-slate-800 text-primary shadow-xs border border-slate-200/10"
                             : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
                         }`}
                       >
@@ -981,8 +1755,8 @@ function UserManagementPage() {
                           setUserAvatar("");
                         }}
                         className={`flex-1 py-2 text-[9px] font-medium uppercase tracking-wider rounded-lg transition-all duration-200 whitespace-nowrap px-1.5 ${
-                          createMode === "without_id" 
-                            ? "bg-white dark:bg-slate-800 text-primary shadow-xs border border-slate-200/10" 
+                          createMode === "without_id"
+                            ? "bg-white dark:bg-slate-800 text-primary shadow-xs border border-slate-200/10"
                             : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
                         }`}
                       >
@@ -994,11 +1768,17 @@ function UserManagementPage() {
                   {/* Image Upload Area (Shown in without_id mode) */}
                   {createMode === "without_id" && (
                     <div className="space-y-2">
-                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">User Photo</label>
+                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                        User Photo
+                      </label>
                       <div className="flex flex-col items-center justify-center p-6 bg-slate-50/50 dark:bg-slate-900/30 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl group transition hover:border-primary/50 relative overflow-hidden">
                         {userAvatar ? (
                           <div className="relative size-24 rounded-full overflow-hidden border-2 border-primary/20 shadow-md group-hover:scale-105 transition-transform duration-200">
-                            <img src={userAvatar} alt="Preview" className="size-full object-cover" />
+                            <img
+                              src={userAvatar}
+                              alt="Preview"
+                              className="size-full object-cover"
+                            />
                             <button
                               type="button"
                               onClick={() => setUserAvatar("")}
@@ -1012,8 +1792,12 @@ function UserManagementPage() {
                             <div className="size-16 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-2 group-hover:scale-105 transition-transform duration-200 shadow-2xs">
                               <Users className="size-7" />
                             </div>
-                            <span className="text-[11px] font-medium text-primary group-hover:underline">Upload Photo</span>
-                            <span className="text-[9px] text-muted-foreground mt-0.5 font-normal">Max 2MB (JPG, PNG)</span>
+                            <span className="text-[11px] font-medium text-primary group-hover:underline">
+                              Upload Photo
+                            </span>
+                            <span className="text-[9px] text-muted-foreground mt-0.5 font-normal">
+                              Max 2MB (JPG, PNG)
+                            </span>
                             <input
                               type="file"
                               accept="image/*"
@@ -1029,23 +1813,32 @@ function UserManagementPage() {
                   {/* Employee Information Card (Shown in with_id mode when employee is selected) */}
                   {createMode === "with_id" && (
                     <div className="space-y-3">
-                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Employee ID Selection</label>
+                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                        Employee ID Selection
+                      </label>
                       <SearchableSelect
                         options={employeeOptions}
                         value={selectedEmployeeId}
                         onChange={handleSelectEmployee}
                         placeholder="Select Employee..."
                       />
-                      
+
                       {selectedEmployeeId && (
                         <div className="p-3.5 bg-gradient-to-br from-slate-50 to-slate-100/50 dark:from-slate-950 dark:to-slate-900/50 border border-slate-200/60 dark:border-slate-800/60 rounded-xl flex items-center gap-3 animate-in fade-in duration-200 shadow-3xs">
                           <div className="size-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-xs uppercase shadow-3xs">
-                            {userFirstName[0] || ""}{userLastName[0] || ""}
+                            {userFirstName[0] || ""}
+                            {userLastName[0] || ""}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <div className="text-xs font-medium text-slate-800 dark:text-slate-200 truncate">{userFirstName} {userLastName}</div>
-                            <div className="text-[9.5px] text-slate-500 truncate font-normal">{userDepartment || "No Department"}</div>
-                            <div className="text-[9px] font-mono text-primary font-normal mt-0.5">ID: {selectedEmployeeId}</div>
+                            <div className="text-xs font-medium text-slate-800 dark:text-slate-200 truncate">
+                              {userFirstName} {userLastName}
+                            </div>
+                            <div className="text-[9.5px] text-slate-500 truncate font-normal">
+                              {userDepartment || "No Department"}
+                            </div>
+                            <div className="text-[9px] font-mono text-primary font-normal mt-0.5">
+                              ID: {selectedEmployeeId}
+                            </div>
                           </div>
                         </div>
                       )}
@@ -1057,15 +1850,17 @@ function UserManagementPage() {
                     {/* User ID Field */}
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-                        User ID * 
-                        <span className="text-[8.5px] font-normal text-slate-400 dark:text-slate-500 lowercase italic ml-1">(login handle)</span>
+                        User ID *
+                        <span className="text-[8.5px] font-normal text-slate-400 dark:text-slate-500 lowercase italic ml-1">
+                          (login handle)
+                        </span>
                       </label>
                       <div className="relative">
                         <User className="size-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                         <input
                           type="text"
                           value={userUserId}
-                          onChange={e => setUserUserId(e.target.value)}
+                          onChange={(e) => setUserUserId(e.target.value)}
                           placeholder="Enter unique login User ID"
                           className="w-full h-10 pl-9.5 pr-3.5 text-xs font-normal bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition"
                           required
@@ -1075,13 +1870,15 @@ function UserManagementPage() {
 
                     {/* Password */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Password *</label>
+                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                        Password *
+                      </label>
                       <div className="relative">
                         <Lock className="size-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                         <input
                           type={showPassword ? "text" : "password"}
                           value={userPassword}
-                          onChange={e => setUserPassword(e.target.value)}
+                          onChange={(e) => setUserPassword(e.target.value)}
                           placeholder="••••••••"
                           className="w-full h-10 pl-9.5 pr-10 text-xs font-normal bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition"
                           required
@@ -1091,17 +1888,23 @@ function UserManagementPage() {
                           onClick={() => setShowPassword(!showPassword)}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-650 dark:hover:text-slate-350 transition"
                         >
-                          {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                          {showPassword ? (
+                            <EyeOff className="size-4" />
+                          ) : (
+                            <Eye className="size-4" />
+                          )}
                         </button>
                       </div>
                     </div>
 
                     {/* Status */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Status *</label>
+                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                        Status *
+                      </label>
                       <select
                         value={userIsActive}
-                        onChange={e => setUserIsActive(e.target.value as any)}
+                        onChange={(e) => setUserIsActive(e.target.value as any)}
                         className="w-full h-10 px-3.5 text-xs font-normal bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition cursor-pointer"
                         required
                       >
@@ -1110,12 +1913,10 @@ function UserManagementPage() {
                       </select>
                     </div>
                   </div>
-
                 </div>
 
                 {/* Right Column (md:col-span-8) - Personal Profile Information & System Directory Access */}
                 <div className="md:col-span-8 space-y-5">
-                  
                   <div className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-850 pb-1.5 shrink-0">
                     Profile & Directory Access Details
                   </div>
@@ -1123,16 +1924,20 @@ function UserManagementPage() {
                   {/* Personal Name Grid */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">First Name *</label>
+                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                        First Name *
+                      </label>
                       <div className="relative">
                         <User className="size-3.5 text-slate-455 dark:text-slate-505 absolute left-3 top-1/2 -translate-y-1/2" />
                         <input
                           type="text"
                           value={userFirstName}
-                          onChange={e => setUserFirstName(e.target.value)}
+                          onChange={(e) => setUserFirstName(e.target.value)}
                           placeholder="Enter first name"
                           className={`w-full h-10 pl-9.5 pr-3.5 text-xs font-normal bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition ${
-                            createMode === "with_id" ? "bg-slate-100 dark:bg-slate-900 cursor-not-allowed opacity-75 border-slate-200/50" : ""
+                            createMode === "with_id"
+                              ? "bg-slate-100 dark:bg-slate-900 cursor-not-allowed opacity-75 border-slate-200/50"
+                              : ""
                           }`}
                           readOnly={createMode === "with_id"}
                           required
@@ -1140,16 +1945,20 @@ function UserManagementPage() {
                       </div>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Last Name *</label>
+                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                        Last Name *
+                      </label>
                       <div className="relative">
                         <User className="size-3.5 text-slate-455 dark:text-slate-505 absolute left-3 top-1/2 -translate-y-1/2" />
                         <input
                           type="text"
                           value={userLastName}
-                          onChange={e => setUserLastName(e.target.value)}
+                          onChange={(e) => setUserLastName(e.target.value)}
                           placeholder="Enter last name"
                           className={`w-full h-10 pl-9.5 pr-3.5 text-xs font-normal bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition ${
-                            createMode === "with_id" ? "bg-slate-100 dark:bg-slate-900 cursor-not-allowed opacity-75 border-slate-200/50" : ""
+                            createMode === "with_id"
+                              ? "bg-slate-100 dark:bg-slate-900 cursor-not-allowed opacity-75 border-slate-200/50"
+                              : ""
                           }`}
                           readOnly={createMode === "with_id"}
                           required
@@ -1161,16 +1970,20 @@ function UserManagementPage() {
                   {/* Phone & Email Grid */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Phone *</label>
+                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                        Phone *
+                      </label>
                       <div className="relative">
                         <Phone className="size-3.5 text-slate-455 dark:text-slate-550 absolute left-3 top-1/2 -translate-y-1/2" />
                         <input
                           type="text"
                           value={userPhone}
-                          onChange={e => setUserPhone(e.target.value)}
+                          onChange={(e) => setUserPhone(e.target.value)}
                           placeholder="Enter phone number"
                           className={`w-full h-10 pl-9.5 pr-3.5 text-xs font-normal bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition ${
-                            createMode === "with_id" ? "bg-slate-100 dark:bg-slate-900 cursor-not-allowed opacity-75 border-slate-200/50" : ""
+                            createMode === "with_id"
+                              ? "bg-slate-100 dark:bg-slate-900 cursor-not-allowed opacity-75 border-slate-200/50"
+                              : ""
                           }`}
                           readOnly={createMode === "with_id"}
                           required
@@ -1178,16 +1991,20 @@ function UserManagementPage() {
                       </div>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Email *</label>
+                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                        Email *
+                      </label>
                       <div className="relative">
                         <Mail className="size-3.5 text-slate-455 dark:text-slate-550 absolute left-3 top-1/2 -translate-y-1/2" />
                         <input
                           type="email"
                           value={userEmail}
-                          onChange={e => setUserEmail(e.target.value)}
+                          onChange={(e) => setUserEmail(e.target.value)}
                           placeholder="Enter email address"
                           className={`w-full h-10 pl-9.5 pr-3.5 text-xs font-normal bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition ${
-                            createMode === "with_id" ? "bg-slate-100 dark:bg-slate-900 cursor-not-allowed opacity-75 border-slate-200/50" : ""
+                            createMode === "with_id"
+                              ? "bg-slate-100 dark:bg-slate-900 cursor-not-allowed opacity-75 border-slate-200/50"
+                              : ""
                           }`}
                           readOnly={createMode === "with_id"}
                           required
@@ -1199,21 +2016,27 @@ function UserManagementPage() {
                   {/* System Role & Corporate Department Grid */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Role *</label>
+                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                        Role *
+                      </label>
                       <select
                         value={userRole}
-                        onChange={e => setUserRole(e.target.value)}
+                        onChange={(e) => setUserRole(e.target.value)}
                         className="w-full h-10 px-3.5 text-xs font-normal bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition cursor-pointer"
                         required
                       >
                         <option value="">Select Role</option>
-                        {roles.map(r => (
-                          <option key={r.name} value={r.name}>{r.name}</option>
+                        {roles.map((r) => (
+                          <option key={r.name} value={r.name}>
+                            {r.name}
+                          </option>
                         ))}
                       </select>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Department *</label>
+                      <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                        Department *
+                      </label>
                       {createMode === "with_id" ? (
                         <div className="relative">
                           <Users className="size-3.5 text-slate-455 dark:text-slate-550 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -1229,13 +2052,15 @@ function UserManagementPage() {
                       ) : (
                         <select
                           value={userDepartment}
-                          onChange={e => setUserDepartment(e.target.value)}
+                          onChange={(e) => setUserDepartment(e.target.value)}
                           className="w-full h-10 px-3.5 text-xs font-normal bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition cursor-pointer"
                           required
                         >
                           <option value="">Select Department</option>
-                          {departmentsList.map(dept => (
-                            <option key={dept} value={dept}>{dept}</option>
+                          {departmentsList.map((dept) => (
+                            <option key={dept} value={dept}>
+                              {dept}
+                            </option>
                           ))}
                         </select>
                       )}
@@ -1244,37 +2069,49 @@ function UserManagementPage() {
 
                   {/* Redirect URL Selection */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Redirect URL *</label>
+                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                      Redirect URL *
+                    </label>
                     <select
                       value={userRedirectUrl}
-                      onChange={e => setUserRedirectUrl(e.target.value)}
+                      onChange={(e) => setUserRedirectUrl(e.target.value)}
                       className="w-full h-10 px-3.5 text-xs font-normal bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition cursor-pointer"
                       required
                     >
                       <option value="Select Main Menu">Select Main Menu</option>
-                      {AVAILABLE_MENUS.filter(m => m !== "All").map(m => (
-                        <option key={m} value={m}>{m}</option>
+                      {AVAILABLE_MENUS.filter((m) => m !== "All").map((m) => (
+                        <option key={m} value={m}>
+                          {m}
+                        </option>
                       ))}
                     </select>
                   </div>
 
                   {/* Company Access Checklist Cards */}
                   <div className="space-y-2">
-                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Company Access *</label>
+                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                      Company Access *
+                    </label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                      
                       {/* All Companies Option Card */}
-                      <label className={`flex items-start gap-3.5 p-3 rounded-xl border cursor-pointer select-none transition ${
-                        userCompanyAccess.includes("All")
-                          ? "bg-primary/5 border-primary text-primary"
-                          : "bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100/50"
-                      }`}>
+                      <label
+                        className={`flex items-start gap-3.5 p-3 rounded-xl border cursor-pointer select-none transition ${
+                          userCompanyAccess.includes("All")
+                            ? "bg-primary/5 border-primary text-primary"
+                            : "bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100/50"
+                        }`}
+                      >
                         <input
                           type="checkbox"
                           checked={userCompanyAccess.includes("All")}
-                          onChange={e => {
+                          onChange={(e) => {
                             if (e.target.checked) {
-                              setUserCompanyAccess(["All", "Pakiza Software Limited", "Pakiza Knit Composite Ltd", "Pakiza Group"]);
+                              setUserCompanyAccess([
+                                "All",
+                                "Pakiza Software Limited",
+                                "Pakiza Knit Composite Ltd",
+                                "Pakiza Group",
+                              ]);
                             } else {
                               setUserCompanyAccess([]);
                             }
@@ -1283,48 +2120,81 @@ function UserManagementPage() {
                         />
                         <div className="flex-1 min-w-0">
                           <div className="text-[11px] font-medium">All Companies</div>
-                          <div className="text-[9px] text-slate-500 dark:text-slate-400 font-normal">Full, unrestricted administrative directory visibility</div>
+                          <div className="text-[9px] text-slate-500 dark:text-slate-400 font-normal">
+                            Full, unrestricted administrative directory visibility
+                          </div>
                         </div>
                       </label>
-                      
+
                       {/* Individual Companies Card List */}
                       {[
-                        { value: "Pakiza Software Limited", label: "Pakiza Software Ltd", desc: "Access software ops & setup divisions" },
-                        { value: "Pakiza Knit Composite Ltd", label: "Pakiza Knit Composite Ltd", desc: "Access factory systems & operations" },
-                        { value: "Pakiza Group", label: "Pakiza Group", desc: "Access group-wide central systems" }
-                      ].map(c => {
-                        const isChecked = userCompanyAccess.includes(c.value) || userCompanyAccess.includes("All");
+                        {
+                          value: "Pakiza Software Limited",
+                          label: "Pakiza Software Ltd",
+                          desc: "Access software ops & setup divisions",
+                        },
+                        {
+                          value: "Pakiza Knit Composite Ltd",
+                          label: "Pakiza Knit Composite Ltd",
+                          desc: "Access factory systems & operations",
+                        },
+                        {
+                          value: "Pakiza Group",
+                          label: "Pakiza Group",
+                          desc: "Access group-wide central systems",
+                        },
+                      ].map((c) => {
+                        const isChecked =
+                          userCompanyAccess.includes(c.value) || userCompanyAccess.includes("All");
                         const isDisabled = userCompanyAccess.includes("All");
                         return (
-                          <label key={c.value} className={`flex items-start gap-3.5 p-3 rounded-xl border transition ${
-                            isDisabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer select-none"
-                          } ${
-                            isChecked
-                              ? "bg-primary/5 border-primary/50 text-primary"
-                              : "bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100/50"
-                          }`}>
+                          <label
+                            key={c.value}
+                            className={`flex items-start gap-3.5 p-3 rounded-xl border transition ${
+                              isDisabled
+                                ? "opacity-60 cursor-not-allowed"
+                                : "cursor-pointer select-none"
+                            } ${
+                              isChecked
+                                ? "bg-primary/5 border-primary/50 text-primary"
+                                : "bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100/50"
+                            }`}
+                          >
                             <input
                               type="checkbox"
                               checked={isChecked}
                               disabled={isDisabled}
-                              onChange={e => {
+                              onChange={(e) => {
                                 if (e.target.checked) {
                                   const next = [...userCompanyAccess, c.value];
-                                  const allIndividually = ["Pakiza Software Limited", "Pakiza Knit Composite Ltd", "Pakiza Group"].every(co => next.includes(co));
+                                  const allIndividually = [
+                                    "Pakiza Software Limited",
+                                    "Pakiza Knit Composite Ltd",
+                                    "Pakiza Group",
+                                  ].every((co) => next.includes(co));
                                   if (allIndividually) {
-                                    setUserCompanyAccess(["All", "Pakiza Software Limited", "Pakiza Knit Composite Ltd", "Pakiza Group"]);
+                                    setUserCompanyAccess([
+                                      "All",
+                                      "Pakiza Software Limited",
+                                      "Pakiza Knit Composite Ltd",
+                                      "Pakiza Group",
+                                    ]);
                                   } else {
                                     setUserCompanyAccess(next);
                                   }
                                 } else {
-                                  setUserCompanyAccess(userCompanyAccess.filter(v => v !== c.value && v !== "All"));
+                                  setUserCompanyAccess(
+                                    userCompanyAccess.filter((v) => v !== c.value && v !== "All"),
+                                  );
                                 }
                               }}
                               className="size-4.5 rounded border-slate-300 dark:border-slate-700 text-primary cursor-pointer transition focus:ring-0 mt-0.5"
                             />
                             <div className="flex-1 min-w-0">
                               <div className="text-[11px] font-medium">{c.label}</div>
-                              <div className="text-[9px] text-slate-500 dark:text-slate-400 font-normal">{c.desc}</div>
+                              <div className="text-[9px] text-slate-500 dark:text-slate-400 font-normal">
+                                {c.desc}
+                              </div>
                             </div>
                           </label>
                         );
@@ -1334,18 +2204,21 @@ function UserManagementPage() {
 
                   {/* Section Access Checklist Cards */}
                   <div className="space-y-2 mt-4">
-                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Section Access</label>
+                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                      Section Access
+                    </label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                      
-                      <label className={`flex items-start gap-3.5 p-3 rounded-xl border cursor-pointer select-none transition ${
-                        userSectionAccess.includes("All")
-                          ? "bg-primary/5 border-primary text-primary"
-                          : "bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100/50"
-                      }`}>
+                      <label
+                        className={`flex items-start gap-3.5 p-3 rounded-xl border cursor-pointer select-none transition ${
+                          userSectionAccess.includes("All")
+                            ? "bg-primary/5 border-primary text-primary"
+                            : "bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100/50"
+                        }`}
+                      >
                         <input
                           type="checkbox"
                           checked={userSectionAccess.includes("All")}
-                          onChange={e => {
+                          onChange={(e) => {
                             if (e.target.checked) {
                               setUserSectionAccess(["All"]);
                             } else {
@@ -1356,52 +2229,95 @@ function UserManagementPage() {
                         />
                         <div className="flex-1 min-w-0">
                           <div className="text-[11px] font-medium">All Sections</div>
-                          <div className="text-[9px] text-slate-500 dark:text-slate-400 font-normal">Full access to all sections</div>
+                          <div className="text-[9px] text-slate-500 dark:text-slate-400 font-normal">
+                            Full access to all sections
+                          </div>
                         </div>
                       </label>
-                      
+
                       {[
-                        { value: "PSL-Operation", label: "PSL-Operation", co: "Pakiza Software Limited" },
-                        { value: "PSL-Head Office", label: "PSL-Head Office", co: "Pakiza Software Limited" },
-                        { value: "PKC-Dyeing", label: "PKC-Dyeing", co: "Pakiza Knit Composite Ltd" },
-                        { value: "PKC-Sewing", label: "PKC-Sewing", co: "Pakiza Knit Composite Ltd" },
-                        { value: "PKC-Cutting", label: "PKC-Cutting", co: "Pakiza Knit Composite Ltd" },
+                        {
+                          value: "PSL-Operation",
+                          label: "PSL-Operation",
+                          co: "Pakiza Software Limited",
+                        },
+                        {
+                          value: "PSL-Head Office",
+                          label: "PSL-Head Office",
+                          co: "Pakiza Software Limited",
+                        },
+                        {
+                          value: "PKC-Dyeing",
+                          label: "PKC-Dyeing",
+                          co: "Pakiza Knit Composite Ltd",
+                        },
+                        {
+                          value: "PKC-Sewing",
+                          label: "PKC-Sewing",
+                          co: "Pakiza Knit Composite Ltd",
+                        },
+                        {
+                          value: "PKC-Cutting",
+                          label: "PKC-Cutting",
+                          co: "Pakiza Knit Composite Ltd",
+                        },
                         { value: "PG-Corporate", label: "PG-Corporate", co: "Pakiza Group" },
-                        { value: "PG-Textile Sales", label: "PG-Textile Sales", co: "Pakiza Group" }
-                      ].filter(s => userCompanyAccess.includes("All") || userCompanyAccess.includes(s.co)).map(s => {
-                        const isChecked = userSectionAccess.includes(s.value) || userSectionAccess.includes("All");
-                        const isDisabled = userSectionAccess.includes("All");
-                        return (
-                          <label key={s.value} className={`flex items-start gap-3.5 p-3 rounded-xl border transition ${
-                            isDisabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer select-none"
-                          } ${
-                            isChecked
-                              ? "bg-primary/5 border-primary/50 text-primary"
-                              : "bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100/50"
-                          }`}>
-                            <input
-                              type="checkbox"
-                              checked={isChecked}
-                              disabled={isDisabled}
-                              onChange={e => {
-                                if (e.target.checked) {
-                                  setUserSectionAccess([...userSectionAccess, s.value].filter(v => v !== "All"));
-                                } else {
-                                  setUserSectionAccess(userSectionAccess.filter(v => v !== s.value && v !== "All"));
-                                }
-                              }}
-                              className="size-4.5 rounded border-slate-300 dark:border-slate-700 text-primary cursor-pointer transition focus:ring-0 mt-0.5"
-                            />
-                            <div className="flex-1 min-w-0">
-                              <div className="text-[11px] font-medium">{s.label}</div>
-                              <div className="text-[9px] text-slate-500 dark:text-slate-400 font-normal">{s.co}</div>
-                            </div>
-                          </label>
-                        );
-                      })}
+                        {
+                          value: "PG-Textile Sales",
+                          label: "PG-Textile Sales",
+                          co: "Pakiza Group",
+                        },
+                      ]
+                        .filter(
+                          (s) =>
+                            userCompanyAccess.includes("All") || userCompanyAccess.includes(s.co),
+                        )
+                        .map((s) => {
+                          const isChecked =
+                            userSectionAccess.includes(s.value) ||
+                            userSectionAccess.includes("All");
+                          const isDisabled = userSectionAccess.includes("All");
+                          return (
+                            <label
+                              key={s.value}
+                              className={`flex items-start gap-3.5 p-3 rounded-xl border transition ${
+                                isDisabled
+                                  ? "opacity-60 cursor-not-allowed"
+                                  : "cursor-pointer select-none"
+                              } ${
+                                isChecked
+                                  ? "bg-primary/5 border-primary/50 text-primary"
+                                  : "bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100/50"
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                disabled={isDisabled}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setUserSectionAccess(
+                                      [...userSectionAccess, s.value].filter((v) => v !== "All"),
+                                    );
+                                  } else {
+                                    setUserSectionAccess(
+                                      userSectionAccess.filter((v) => v !== s.value && v !== "All"),
+                                    );
+                                  }
+                                }}
+                                className="size-4.5 rounded border-slate-300 dark:border-slate-700 text-primary cursor-pointer transition focus:ring-0 mt-0.5"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <div className="text-[11px] font-medium">{s.label}</div>
+                                <div className="text-[9px] text-slate-500 dark:text-slate-400 font-normal">
+                                  {s.co}
+                                </div>
+                              </div>
+                            </label>
+                          );
+                        })}
                     </div>
                   </div>
-
                 </div>
               </div>
 
@@ -1430,7 +2346,6 @@ function UserManagementPage() {
       {isRoleModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
           <div className="bg-card border border-border/80 w-full max-w-md rounded-2xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
-            
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-border/50 bg-[#f8fafc] dark:bg-[#0f172a] flex items-center justify-between">
               <div className="flex items-center gap-2.5">
@@ -1443,7 +2358,7 @@ function UserManagementPage() {
                   </h2>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => setIsRoleModalOpen(false)}
                 className="size-8.5 rounded-xl hover:bg-muted/80 flex items-center justify-center transition-colors text-muted-foreground hover:text-foreground border border-border/20"
               >
@@ -1455,11 +2370,13 @@ function UserManagementPage() {
             <form onSubmit={handleRoleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
               <div className="space-y-3">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Role Name *</label>
+                  <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">
+                    Role Name *
+                  </label>
                   <input
                     type="text"
                     value={roleName}
-                    onChange={e => setRoleName(e.target.value)}
+                    onChange={(e) => setRoleName(e.target.value)}
                     placeholder="e.g. employee"
                     className="w-full h-10 px-3.5 text-xs font-semibold bg-muted/40 border border-border rounded-xl focus:outline-none focus:border-primary transition"
                     required
@@ -1467,10 +2384,12 @@ function UserManagementPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Status *</label>
+                  <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">
+                    Status *
+                  </label>
                   <select
                     value={roleIsActive}
-                    onChange={e => setRoleIsActive(e.target.value as any)}
+                    onChange={(e) => setRoleIsActive(e.target.value as any)}
                     className="w-full h-10 px-3.5 text-xs font-semibold bg-muted/40 border border-border rounded-xl focus:outline-none focus:border-primary transition cursor-pointer"
                   >
                     <option value="Active">Active</option>
@@ -1499,7 +2418,6 @@ function UserManagementPage() {
           </div>
         </div>
       )}
-
     </div>
   );
 }

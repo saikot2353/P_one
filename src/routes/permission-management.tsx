@@ -4,9 +4,23 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import {
-  ChevronRight, Users, ShieldAlert, ShieldCheck, Plus, Search,
-  Pencil, Trash2, X, Check, HelpCircle, Info, Shield, Key, Eye,
-  Lock, Settings
+  ChevronRight,
+  Users,
+  ShieldAlert,
+  ShieldCheck,
+  Plus,
+  Search,
+  Pencil,
+  Trash2,
+  X,
+  Check,
+  HelpCircle,
+  Info,
+  Shield,
+  Key,
+  Eye,
+  Lock,
+  Settings,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -19,7 +33,11 @@ export const Route = createFileRoute("/permission-management")({
   head: () => ({
     meta: [
       { title: "Permission Management — CRIPTON" },
-      { name: "description", content: "Configure role-based access control, system roles, and user permission overrides." },
+      {
+        name: "description",
+        content:
+          "Configure role-based access control, system roles, and user permission overrides.",
+      },
     ],
   }),
   component: PermissionManagementPage,
@@ -73,20 +91,188 @@ interface UserOverrideRow {
 // Mock Seeds
 // ----------------------------------------------------
 const SEED_USERS: UserItem[] = [
-  { sl: 1, name: "Tahmid Afsar", email: "tahmid.bd@pakizasoftware.com", empId: "2023043910", userId: "2023043910", role: "Admin", department: "Business Innovation", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["All"] },
-  { sl: 2, name: "Tahsin Ahmed", email: "tahsin.cmr@pakizaknit.com", empId: "2021026991", userId: "2021026991", role: "employee", department: "Procurement and Supply Chain - (Procurement and Supply Chain)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 3, name: "Shanewas Hossen", email: "shahnewas.account@pakizaknit.com", empId: "2019016666", userId: "2019016666", role: "employee", department: "Accounts & Finance - (Accounts & Finance)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 4, name: "Suman Mazumder", email: "suman@pfd-global.com", empId: "2024050708", userId: "2024050708", role: "employee", department: "Marketing and Merchandising - (Marketing and Merchandising)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 5, name: "Sultan Ahmed", email: "sultan.ba@pakizasoftware.com", empId: "2023045044", userId: "2023045044", role: "employee", department: "Implementation & Business Analysis - (Business Analysis)", lastLogin: "2026-05-12 15:48:06", isActive: "Active", password: "password123", companyAccess: ["Pakiza Software Limited"] },
-  { sl: 6, name: "Md. Jamshed Alam", email: "jamshed.alam@pakizaknit.com", empId: "2014001017", userId: "2014001017", role: "HOD", department: "Management", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["All"] },
-  { sl: 7, name: "Md. Tuhin Hosen", email: "mdtuhin.dyeing@pakizaknit.com", empId: "2021028128", userId: "2021028128", role: "employee", department: "Fabrics Department - (Finish Fabric Store (MCD))", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 8, name: "Md. Shameem", email: "shamim.ahmed@pakizaknit.com", empId: "2018012755", userId: "2018012755", role: "HOD", department: "RMG Operations - (Embroidery)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 9, name: "Tushar Kanti Das", email: "tushar.kanti@pakizaknit.com", empId: "2016005888", userId: "2016005888", role: "HOD", department: "Admin", lastLogin: "2026-04-02 13:11:13", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd", "Pakiza Software Limited"] },
-  { sl: 10, name: "Kanak Das", email: "kanakdas01914@gmail.com", empId: "2019016183", userId: "2019016183", role: "employee", department: "—", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 11, name: "Md. Saeid Maruf", email: "syed.maruf@pakizaknit.com", empId: "2014001111", userId: "2014001111", role: "HOD", department: "Production Planning - (Production Planning)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 12, name: "Md. Tariql Islam", email: "tariqul.rmg@pakizaknit.com", empId: "2021027208", userId: "2021027208", role: "employee", department: "Finishing Department - (Finishing)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 13, name: "Md. Ruhul Amin Chowdhury", email: "faysal.amin@pakizaknit.com", empId: "2016001098", userId: "2016001098", role: "HOD", department: "Marketing and Merchandising - (Marketing and Merchandising)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 14, name: "Admin User", email: "admin@pakiza.com", empId: "ADMIN01", userId: "admin", role: "Admin", department: "IT Department", lastLogin: "—", isActive: "Active", password: "admin", companyAccess: ["All"] }
+  {
+    sl: 1,
+    name: "Tahmid Afsar",
+    email: "tahmid.bd@pakizasoftware.com",
+    empId: "2023043910",
+    userId: "2023043910",
+    role: "Admin",
+    department: "Business Innovation",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["All"],
+  },
+  {
+    sl: 2,
+    name: "Tahsin Ahmed",
+    email: "tahsin.cmr@pakizaknit.com",
+    empId: "2021026991",
+    userId: "2021026991",
+    role: "employee",
+    department: "Procurement and Supply Chain - (Procurement and Supply Chain)",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 3,
+    name: "Shanewas Hossen",
+    email: "shahnewas.account@pakizaknit.com",
+    empId: "2019016666",
+    userId: "2019016666",
+    role: "employee",
+    department: "Accounts & Finance - (Accounts & Finance)",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 4,
+    name: "Suman Mazumder",
+    email: "suman@pfd-global.com",
+    empId: "2024050708",
+    userId: "2024050708",
+    role: "employee",
+    department: "Marketing and Merchandising - (Marketing and Merchandising)",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 5,
+    name: "Sultan Ahmed",
+    email: "sultan.ba@pakizasoftware.com",
+    empId: "2023045044",
+    userId: "2023045044",
+    role: "employee",
+    department: "Implementation & Business Analysis - (Business Analysis)",
+    lastLogin: "2026-05-12 15:48:06",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Software Limited"],
+  },
+  {
+    sl: 6,
+    name: "Md. Jamshed Alam",
+    email: "jamshed.alam@pakizaknit.com",
+    empId: "2014001017",
+    userId: "2014001017",
+    role: "HOD",
+    department: "Management",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["All"],
+  },
+  {
+    sl: 7,
+    name: "Md. Tuhin Hosen",
+    email: "mdtuhin.dyeing@pakizaknit.com",
+    empId: "2021028128",
+    userId: "2021028128",
+    role: "employee",
+    department: "Fabrics Department - (Finish Fabric Store (MCD))",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 8,
+    name: "Md. Shameem",
+    email: "shamim.ahmed@pakizaknit.com",
+    empId: "2018012755",
+    userId: "2018012755",
+    role: "HOD",
+    department: "RMG Operations - (Embroidery)",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 9,
+    name: "Tushar Kanti Das",
+    email: "tushar.kanti@pakizaknit.com",
+    empId: "2016005888",
+    userId: "2016005888",
+    role: "HOD",
+    department: "Admin",
+    lastLogin: "2026-04-02 13:11:13",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd", "Pakiza Software Limited"],
+  },
+  {
+    sl: 10,
+    name: "Kanak Das",
+    email: "kanakdas01914@gmail.com",
+    empId: "2019016183",
+    userId: "2019016183",
+    role: "employee",
+    department: "—",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 11,
+    name: "Md. Saeid Maruf",
+    email: "syed.maruf@pakizaknit.com",
+    empId: "2014001111",
+    userId: "2014001111",
+    role: "HOD",
+    department: "Production Planning - (Production Planning)",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 12,
+    name: "Md. Tariql Islam",
+    email: "tariqul.rmg@pakizaknit.com",
+    empId: "2021027208",
+    userId: "2021027208",
+    role: "employee",
+    department: "Finishing Department - (Finishing)",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 13,
+    name: "Md. Ruhul Amin Chowdhury",
+    email: "faysal.amin@pakizaknit.com",
+    empId: "2016001098",
+    userId: "2016001098",
+    role: "HOD",
+    department: "Marketing and Merchandising - (Marketing and Merchandising)",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 14,
+    name: "Admin User",
+    email: "admin@pakiza.com",
+    empId: "ADMIN01",
+    userId: "admin",
+    role: "Admin",
+    department: "IT Department",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "admin",
+    companyAccess: ["All"],
+  },
 ];
 
 const SEED_ROLES: RoleItem[] = [
@@ -94,73 +280,568 @@ const SEED_ROLES: RoleItem[] = [
   { sl: 2, name: "employee", isActive: "Active" },
   { sl: 3, name: "Reception", isActive: "Active" },
   { sl: 4, name: "management", isActive: "Active" },
-  { sl: 5, name: "HOD", isActive: "Active" }
+  { sl: 5, name: "HOD", isActive: "Active" },
 ];
 
 const SEED_PERMISSIONS: PermissionRow[] = [
   // Admin permissions for all 40 menus
-  { sl: 1, role: "Admin", menu: "Dashboard", read: true, write: true, full: true, sync: true, prevDate: true },
-  { sl: 2, role: "Admin", menu: "SSP - New Requisition", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 3, role: "Admin", menu: "SSP - My Requisition", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 4, role: "Admin", menu: "SSP - Approval", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 5, role: "Admin", menu: "SSP - Attendance", read: true, write: true, full: true, sync: true, prevDate: false },
-  { sl: 6, role: "Admin", menu: "Configure - Structure Setup", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 7, role: "Admin", menu: "Configure - Job & Employee Setup", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 8, role: "Admin", menu: "Configure - Shift & Time Rules", read: true, write: true, full: true, sync: true, prevDate: true },
-  { sl: 9, role: "Admin", menu: "Configure - Allowances & Bonuses", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 10, role: "Admin", menu: "Configure - Education & Training", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 11, role: "Admin", menu: "Configure - Leave & Policies", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 12, role: "Admin", menu: "Personnel Info - Personnel List", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 13, role: "Admin", menu: "Personnel Info - Approval", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 14, role: "Admin", menu: "Attendance - Manual Attendance", read: true, write: true, full: true, sync: true, prevDate: true },
-  { sl: 15, role: "Admin", menu: "Attendance - Manual Attendance Approval", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 16, role: "Admin", menu: "Attendance - Employee Job Card", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 17, role: "Admin", menu: "Roster - Create Roster", read: true, write: true, full: true, sync: true, prevDate: false },
-  { sl: 18, role: "Admin", menu: "Roster - Company Holiday", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 19, role: "Admin", menu: "Leave - Leave Application", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 20, role: "Admin", menu: "Leave - Leave Approve", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 21, role: "Admin", menu: "Leave - Leave List", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 22, role: "Admin", menu: "KPI Performance - Dashboard", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 23, role: "Admin", menu: "KPI Performance - Cycles", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 24, role: "Admin", menu: "KPI Performance - Criteria Setup", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 25, role: "Admin", menu: "KPI Performance - My Self-Assessment", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 26, role: "Admin", menu: "KPI Performance - 360° Peer Review", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 27, role: "Admin", menu: "KPI Performance - Assessment Workflow", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 28, role: "Admin", menu: "KPI Performance - KPI Reports", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 29, role: "Admin", menu: "Evaluation - Increment Configurator", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 30, role: "Admin", menu: "Evaluation - Evaluation Propose", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 31, role: "Admin", menu: "Evaluation - Propose Increment", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 32, role: "Admin", menu: "Evaluation - Increment Summary", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 33, role: "Admin", menu: "Evaluation - Approve Increment", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 34, role: "Admin", menu: "Evaluation - Increment List", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 35, role: "Admin", menu: "Evaluation - Increment History", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 36, role: "Admin", menu: "Transfer - Transfer History", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 37, role: "Admin", menu: "Transfer - Approve Transfer", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 38, role: "Admin", menu: "HR Policy - JD List", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 39, role: "Admin", menu: "HR Policy - JD Approvals", read: true, write: true, full: true, sync: false, prevDate: false },
-  { sl: 40, role: "Admin", menu: "User Management", read: true, write: true, full: true, sync: false, prevDate: false },
+  {
+    sl: 1,
+    role: "Admin",
+    menu: "Dashboard",
+    read: true,
+    write: true,
+    full: true,
+    sync: true,
+    prevDate: true,
+  },
+  {
+    sl: 2,
+    role: "Admin",
+    menu: "SSP - New Requisition",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 3,
+    role: "Admin",
+    menu: "SSP - My Requisition",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 4,
+    role: "Admin",
+    menu: "SSP - Approval",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 5,
+    role: "Admin",
+    menu: "SSP - Attendance",
+    read: true,
+    write: true,
+    full: true,
+    sync: true,
+    prevDate: false,
+  },
+  {
+    sl: 6,
+    role: "Admin",
+    menu: "Configure - Structure Setup",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 7,
+    role: "Admin",
+    menu: "Configure - Job & Employee Setup",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 8,
+    role: "Admin",
+    menu: "Configure - Shift & Time Rules",
+    read: true,
+    write: true,
+    full: true,
+    sync: true,
+    prevDate: true,
+  },
+  {
+    sl: 9,
+    role: "Admin",
+    menu: "Configure - Allowances & Bonuses",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 10,
+    role: "Admin",
+    menu: "Configure - Education & Training",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 11,
+    role: "Admin",
+    menu: "Configure - Leave & Policies",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 12,
+    role: "Admin",
+    menu: "Personnel Info - Personnel List",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 13,
+    role: "Admin",
+    menu: "Personnel Info - Approval",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 14,
+    role: "Admin",
+    menu: "Attendance - Manual Attendance",
+    read: true,
+    write: true,
+    full: true,
+    sync: true,
+    prevDate: true,
+  },
+  {
+    sl: 15,
+    role: "Admin",
+    menu: "Attendance - Manual Attendance Approval",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 16,
+    role: "Admin",
+    menu: "Attendance - Employee Job Card",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 17,
+    role: "Admin",
+    menu: "Roster - Create Roster",
+    read: true,
+    write: true,
+    full: true,
+    sync: true,
+    prevDate: false,
+  },
+  {
+    sl: 18,
+    role: "Admin",
+    menu: "Roster - Company Holiday",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 19,
+    role: "Admin",
+    menu: "Leave - Leave Application",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 20,
+    role: "Admin",
+    menu: "Leave - Leave Approve",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 21,
+    role: "Admin",
+    menu: "Leave - Leave List",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 22,
+    role: "Admin",
+    menu: "KPI Performance - Dashboard",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 23,
+    role: "Admin",
+    menu: "KPI Performance - Cycles",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 24,
+    role: "Admin",
+    menu: "KPI Performance - Criteria Setup",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 25,
+    role: "Admin",
+    menu: "KPI Performance - My Self-Assessment",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 26,
+    role: "Admin",
+    menu: "KPI Performance - 360° Peer Review",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 27,
+    role: "Admin",
+    menu: "KPI Performance - Assessment Workflow",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 28,
+    role: "Admin",
+    menu: "KPI Performance - KPI Reports",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 29,
+    role: "Admin",
+    menu: "Evaluation - Increment Configurator",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 30,
+    role: "Admin",
+    menu: "Evaluation - Evaluation Propose",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 31,
+    role: "Admin",
+    menu: "Evaluation - Propose Increment",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 32,
+    role: "Admin",
+    menu: "Evaluation - Increment Summary",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 33,
+    role: "Admin",
+    menu: "Evaluation - Approve Increment",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 34,
+    role: "Admin",
+    menu: "Evaluation - Increment List",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 35,
+    role: "Admin",
+    menu: "Evaluation - Increment History",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 36,
+    role: "Admin",
+    menu: "Transfer - Transfer History",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 37,
+    role: "Admin",
+    menu: "Transfer - Approve Transfer",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 38,
+    role: "Admin",
+    menu: "HR Policy - JD List",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 39,
+    role: "Admin",
+    menu: "HR Policy - JD Approvals",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 40,
+    role: "Admin",
+    menu: "User Management",
+    read: true,
+    write: true,
+    full: true,
+    sync: false,
+    prevDate: false,
+  },
 
   // employee permissions - subset of menus
-  { sl: 41, role: "employee", menu: "Dashboard", read: true, write: false, full: false, sync: false, prevDate: false },
-  { sl: 42, role: "employee", menu: "SSP - New Requisition", read: true, write: true, full: false, sync: false, prevDate: false },
-  { sl: 43, role: "employee", menu: "SSP - My Requisition", read: true, write: true, full: false, sync: false, prevDate: false },
-  { sl: 44, role: "employee", menu: "SSP - Attendance", read: true, write: false, full: false, sync: false, prevDate: false },
-  { sl: 45, role: "employee", menu: "Leave - Leave Application", read: true, write: true, full: false, sync: false, prevDate: false },
-  { sl: 46, role: "employee", menu: "Leave - Leave List", read: true, write: false, full: false, sync: false, prevDate: false },
-  { sl: 47, role: "employee", menu: "KPI Performance - My Self-Assessment", read: true, write: true, full: false, sync: false, prevDate: false },
+  {
+    sl: 41,
+    role: "employee",
+    menu: "Dashboard",
+    read: true,
+    write: false,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 42,
+    role: "employee",
+    menu: "SSP - New Requisition",
+    read: true,
+    write: true,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 43,
+    role: "employee",
+    menu: "SSP - My Requisition",
+    read: true,
+    write: true,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 44,
+    role: "employee",
+    menu: "SSP - Attendance",
+    read: true,
+    write: false,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 45,
+    role: "employee",
+    menu: "Leave - Leave Application",
+    read: true,
+    write: true,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 46,
+    role: "employee",
+    menu: "Leave - Leave List",
+    read: true,
+    write: false,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 47,
+    role: "employee",
+    menu: "KPI Performance - My Self-Assessment",
+    read: true,
+    write: true,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
 
   // HOD permissions - subset of menus
-  { sl: 48, role: "HOD", menu: "Dashboard", read: true, write: true, full: false, sync: true, prevDate: false },
-  { sl: 49, role: "HOD", menu: "SSP - Approval", read: true, write: true, full: false, sync: false, prevDate: false },
-  { sl: 50, role: "HOD", menu: "Personnel Info - Personnel List", read: true, write: false, full: false, sync: false, prevDate: false },
-  { sl: 51, role: "HOD", menu: "Leave - Leave Approve", read: true, write: true, full: false, sync: false, prevDate: false },
-  { sl: 52, role: "HOD", menu: "KPI Performance - 360° Peer Review", read: true, write: true, full: false, sync: false, prevDate: false },
-  { sl: 53, role: "HOD", menu: "KPI Performance - Assessment Workflow", read: true, write: true, full: false, sync: false, prevDate: false }
+  {
+    sl: 48,
+    role: "HOD",
+    menu: "Dashboard",
+    read: true,
+    write: true,
+    full: false,
+    sync: true,
+    prevDate: false,
+  },
+  {
+    sl: 49,
+    role: "HOD",
+    menu: "SSP - Approval",
+    read: true,
+    write: true,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 50,
+    role: "HOD",
+    menu: "Personnel Info - Personnel List",
+    read: true,
+    write: false,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 51,
+    role: "HOD",
+    menu: "Leave - Leave Approve",
+    read: true,
+    write: true,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 52,
+    role: "HOD",
+    menu: "KPI Performance - 360° Peer Review",
+    read: true,
+    write: true,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 53,
+    role: "HOD",
+    menu: "KPI Performance - Assessment Workflow",
+    read: true,
+    write: true,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
 ];
 
 const SEED_OVERRIDES: UserOverrideRow[] = [
-  { sl: 1, empId: "2023043910", menu: "Configure - Structure Setup", read: true, write: false, full: false, sync: false, prevDate: false },
-  { sl: 2, empId: "2023043910", menu: "User Management", read: true, write: true, full: true, sync: true, prevDate: true }
+  {
+    sl: 1,
+    empId: "2023043910",
+    menu: "Configure - Structure Setup",
+    read: true,
+    write: false,
+    full: false,
+    sync: false,
+    prevDate: false,
+  },
+  {
+    sl: 2,
+    empId: "2023043910",
+    menu: "User Management",
+    read: true,
+    write: true,
+    full: true,
+    sync: true,
+    prevDate: true,
+  },
 ];
 
 const AVAILABLE_MENUS = [
@@ -203,7 +884,7 @@ const AVAILABLE_MENUS = [
   "Transfer - Approve Transfer",
   "HR Policy - JD List",
   "HR Policy - JD Approvals",
-  "User Management"
+  "User Management",
 ];
 
 function PermissionManagementPage() {
@@ -277,7 +958,7 @@ function PermissionManagementPage() {
   const openRoleForm = (sl: number | null) => {
     setEditingRoleSl(sl);
     if (sl !== null) {
-      const role = roles.find(r => r.sl === sl);
+      const role = roles.find((r) => r.sl === sl);
       setRoleName(role?.name || "");
       setRoleIsActive(role?.isActive || "Active");
     } else {
@@ -295,16 +976,20 @@ function PermissionManagementPage() {
     }
     let updatedRoles = [...roles];
     if (editingRoleSl !== null) {
-      const oldRole = roles.find(r => r.sl === editingRoleSl);
-      updatedRoles = roles.map(r => r.sl === editingRoleSl ? { ...r, name: roleName, isActive: roleIsActive } : r);
+      const oldRole = roles.find((r) => r.sl === editingRoleSl);
+      updatedRoles = roles.map((r) =>
+        r.sl === editingRoleSl ? { ...r, name: roleName, isActive: roleIsActive } : r,
+      );
       // Renames mapping
       if (oldRole) {
-        const nextPerms = permissions.map(p => p.role === oldRole.name ? { ...p, role: roleName } : p);
+        const nextPerms = permissions.map((p) =>
+          p.role === oldRole.name ? { ...p, role: roleName } : p,
+        );
         savePermissions(nextPerms);
       }
       toast.success("Role updated successfully");
     } else {
-      const nextSl = roles.length > 0 ? Math.max(...roles.map(r => r.sl)) + 1 : 1;
+      const nextSl = roles.length > 0 ? Math.max(...roles.map((r) => r.sl)) + 1 : 1;
       updatedRoles.push({ sl: nextSl, name: roleName, isActive: roleIsActive });
       toast.success("New role added successfully");
     }
@@ -313,11 +998,15 @@ function PermissionManagementPage() {
   };
 
   const handleDeleteRole = (sl: number) => {
-    const target = roles.find(r => r.sl === sl);
+    const target = roles.find((r) => r.sl === sl);
     if (!target) return;
-    if (confirm(`Delete the role "${target.name}"? This deletes all associated page permission mappings.`)) {
-      const updated = roles.filter(r => r.sl !== sl).map((r, idx) => ({ ...r, sl: idx + 1 }));
-      const nextPerms = permissions.filter(p => p.role !== target.name);
+    if (
+      confirm(
+        `Delete the role "${target.name}"? This deletes all associated page permission mappings.`,
+      )
+    ) {
+      const updated = roles.filter((r) => r.sl !== sl).map((r, idx) => ({ ...r, sl: idx + 1 }));
+      const nextPerms = permissions.filter((p) => p.role !== target.name);
       saveRoles(updated);
       savePermissions(nextPerms);
       toast.success("Role and modular permission configs deleted");
@@ -331,13 +1020,15 @@ function PermissionManagementPage() {
       return;
     }
 
-    const exists = permissions.some(p => p.role === selectedRoleFilter && p.menu === selectedMainMenu);
+    const exists = permissions.some(
+      (p) => p.role === selectedRoleFilter && p.menu === selectedMainMenu,
+    );
     if (exists) {
       toast.error("This menu route is already assigned to this role");
       return;
     }
 
-    const nextSl = permissions.length > 0 ? Math.max(...permissions.map(p => p.sl)) + 1 : 1;
+    const nextSl = permissions.length > 0 ? Math.max(...permissions.map((p) => p.sl)) + 1 : 1;
     const newPerm: PermissionRow = {
       sl: nextSl,
       role: selectedRoleFilter,
@@ -346,15 +1037,19 @@ function PermissionManagementPage() {
       write: false,
       full: false,
       sync: false,
-      prevDate: false
+      prevDate: false,
     };
 
     savePermissions([...permissions, newPerm]);
     toast.success(`Registered route "${selectedMainMenu}" to "${selectedRoleFilter}" permissions`);
   };
 
-  const handleUpdatePermissionValue = (sl: number, field: keyof Omit<PermissionRow, "sl" | "role" | "menu">, value: boolean) => {
-    const updated = permissions.map(p => {
+  const handleUpdatePermissionValue = (
+    sl: number,
+    field: keyof Omit<PermissionRow, "sl" | "role" | "menu">,
+    value: boolean,
+  ) => {
+    const updated = permissions.map((p) => {
       if (p.sl === sl) {
         const next = { ...p, [field]: value };
         if (field === "full" && value) {
@@ -369,19 +1064,19 @@ function PermissionManagementPage() {
   };
 
   const handleDeletePermission = (sl: number) => {
-    const updated = permissions.filter(p => p.sl !== sl).map((p, idx) => ({ ...p, sl: idx + 1 }));
+    const updated = permissions.filter((p) => p.sl !== sl).map((p, idx) => ({ ...p, sl: idx + 1 }));
     savePermissions(updated);
     toast.success("Permission record removed");
   };
 
   // User Wise overrides logic
   const activeOverrideUser = useMemo(() => {
-    return users.find(u => u.empId === selectedOverrideUser) || null;
+    return users.find((u) => u.empId === selectedOverrideUser) || null;
   }, [users, selectedOverrideUser]);
 
   const activeUserOverrides = useMemo(() => {
     if (!activeOverrideUser) return [];
-    return overrides.filter(o => o.empId === activeOverrideUser.empId);
+    return overrides.filter((o) => o.empId === activeOverrideUser.empId);
   }, [overrides, activeOverrideUser]);
 
   const handleAddOverrideRoute = () => {
@@ -394,13 +1089,15 @@ function PermissionManagementPage() {
       return;
     }
 
-    const exists = overrides.some(o => o.empId === activeOverrideUser.empId && o.menu === selectedOverrideMenu);
+    const exists = overrides.some(
+      (o) => o.empId === activeOverrideUser.empId && o.menu === selectedOverrideMenu,
+    );
     if (exists) {
       toast.error("This menu route is already assigned to this user");
       return;
     }
 
-    const nextSl = overrides.length > 0 ? Math.max(...overrides.map(o => o.sl)) + 1 : 1;
+    const nextSl = overrides.length > 0 ? Math.max(...overrides.map((o) => o.sl)) + 1 : 1;
     const newOverride: UserOverrideRow = {
       sl: nextSl,
       empId: activeOverrideUser.empId,
@@ -409,21 +1106,27 @@ function PermissionManagementPage() {
       write: false,
       full: false,
       sync: false,
-      prevDate: false
+      prevDate: false,
     };
 
     saveOverrides([...overrides, newOverride]);
-    toast.success(`Registered route "${selectedOverrideMenu}" custom override to user "${activeOverrideUser.name}"`);
+    toast.success(
+      `Registered route "${selectedOverrideMenu}" custom override to user "${activeOverrideUser.name}"`,
+    );
   };
 
   const handleDeleteOverride = (sl: number) => {
-    const updated = overrides.filter(o => o.sl !== sl).map((o, idx) => ({ ...o, sl: idx + 1 }));
+    const updated = overrides.filter((o) => o.sl !== sl).map((o, idx) => ({ ...o, sl: idx + 1 }));
     saveOverrides(updated);
     toast.success("User override permission record removed");
   };
 
-  const handleUpdateOverrideValue = (sl: number, field: keyof Omit<UserOverrideRow, "sl" | "empId" | "menu">, value: boolean) => {
-    const updated = overrides.map(o => {
+  const handleUpdateOverrideValue = (
+    sl: number,
+    field: keyof Omit<UserOverrideRow, "sl" | "empId" | "menu">,
+    value: boolean,
+  ) => {
+    const updated = overrides.map((o) => {
       if (o.sl === sl) {
         const next = { ...o, [field]: value };
         if (field === "full" && value) {
@@ -438,12 +1141,12 @@ function PermissionManagementPage() {
   };
 
   const activeRolePermissions = useMemo(() => {
-    return permissions.filter(p => p.role === selectedRoleFilter);
+    return permissions.filter((p) => p.role === selectedRoleFilter);
   }, [permissions, selectedRoleFilter]);
 
   const activeModalRolePermissions = useMemo(() => {
     if (!activePermRole) return [];
-    return permissions.filter(p => p.role === activePermRole);
+    return permissions.filter((p) => p.role === activePermRole);
   }, [permissions, activePermRole]);
 
   const handleAddModalPermissionRoute = () => {
@@ -453,13 +1156,15 @@ function PermissionManagementPage() {
       return;
     }
 
-    const exists = permissions.some(p => p.role === activePermRole && p.menu === selectedModalMenu);
+    const exists = permissions.some(
+      (p) => p.role === activePermRole && p.menu === selectedModalMenu,
+    );
     if (exists) {
       toast.error("This menu route is already assigned to this role");
       return;
     }
 
-    const nextSl = permissions.length > 0 ? Math.max(...permissions.map(p => p.sl)) + 1 : 1;
+    const nextSl = permissions.length > 0 ? Math.max(...permissions.map((p) => p.sl)) + 1 : 1;
     const newPerm: PermissionRow = {
       sl: nextSl,
       role: activePermRole,
@@ -468,7 +1173,7 @@ function PermissionManagementPage() {
       write: false,
       full: false,
       sync: false,
-      prevDate: false
+      prevDate: false,
     };
 
     savePermissions([...permissions, newPerm]);
@@ -476,15 +1181,17 @@ function PermissionManagementPage() {
   };
 
   const roleSelectOptions = useMemo(() => {
-    return roles.filter(r => r.isActive === "Active").map(r => ({ value: r.name, label: r.name }));
+    return roles
+      .filter((r) => r.isActive === "Active")
+      .map((r) => ({ value: r.name, label: r.name }));
   }, [roles]);
 
   const menuSelectOptions = useMemo(() => {
-    return AVAILABLE_MENUS.map(m => ({ value: m, label: m }));
+    return AVAILABLE_MENUS.map((m) => ({ value: m, label: m }));
   }, []);
 
   const userSelectOptions = useMemo(() => {
-    return users.map(u => ({ value: u.empId, label: `${u.empId} - ${u.name} (${u.role})` }));
+    return users.map((u) => ({ value: u.empId, label: `${u.empId} - ${u.name} (${u.role})` }));
   }, [users]);
 
   const setTab = (newTab: string) => {
@@ -499,11 +1206,12 @@ function PermissionManagementPage() {
 
         {/* Content Container */}
         <div className="flex-1 overflow-hidden flex flex-col px-6 py-4 gap-4 bg-[#f8fafc] dark:bg-[#090d16]">
-          
           {/* Breadcrumbs Banner */}
           <div className="flex items-center justify-between shrink-0">
             <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/80 uppercase tracking-widest font-semibold">
-              <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
+              <Link to="/" className="hover:text-foreground transition-colors">
+                Home
+              </Link>
               <ChevronRight className="size-3 text-muted-foreground/60" />
               <span className="text-muted-foreground font-semibold">Administration</span>
               <ChevronRight className="size-3 text-muted-foreground/60" />
@@ -527,7 +1235,8 @@ function PermissionManagementPage() {
                   <Lock className="size-5 text-indigo-500" /> Permission Management
                 </h2>
                 <p className="text-[9.5px] font-medium text-muted-foreground/80 leading-none mt-1">
-                  Configure security privileges, custom roles, and specific user permission overrides.
+                  Configure security privileges, custom roles, and specific user permission
+                  overrides.
                 </p>
               </div>
 
@@ -546,8 +1255,8 @@ function PermissionManagementPage() {
               {[
                 { id: "permissions", label: "Permission Matrix", icon: Shield },
                 { id: "roles", label: "Role Directory", icon: Users },
-                { id: "user-permissions", label: "User Wise Override", icon: Key }
-              ].map(t => {
+                { id: "user-permissions", label: "User Wise Override", icon: Key },
+              ].map((t) => {
                 const Icon = t.icon;
                 const active = tab === t.id;
                 return (
@@ -569,11 +1278,9 @@ function PermissionManagementPage() {
 
             {/* TAB CONTENT PANELS */}
             <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-card">
-              
               {/* TAB 1: PERMISSION MATRIX SETUP */}
               {tab === "permissions" && (
                 <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-                  
                   {/* Filter & Assignment Bar */}
                   <div className="px-6 py-4 border-b border-border bg-[#f8fafc]/30 dark:bg-[#0f172a]/30 shrink-0 flex flex-wrap items-center justify-between gap-4">
                     <div className="flex items-center gap-3 w-72">
@@ -626,20 +1333,33 @@ function PermissionManagementPage() {
                       <tbody className="divide-y divide-border/30 text-foreground">
                         {activeRolePermissions.length === 0 ? (
                           <tr>
-                            <td colSpan={8} className="py-12 text-center text-[12px] font-medium text-muted-foreground/60">
-                              No route permissions assigned to role "{selectedRoleFilter}". Assign a route above.
+                            <td
+                              colSpan={8}
+                              className="py-12 text-center text-[12px] font-medium text-muted-foreground/60"
+                            >
+                              No route permissions assigned to role "{selectedRoleFilter}". Assign a
+                              route above.
                             </td>
                           </tr>
                         ) : (
                           activeRolePermissions.map((row, idx) => (
-                            <tr key={row.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
-                              <td className="px-5 py-3.5 text-center font-mono text-slate-500 font-semibold">{idx + 1}</td>
-                              <td className="px-5 py-3.5 font-semibold text-foreground/95">{row.menu}</td>
+                            <tr
+                              key={row.sl}
+                              className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                            >
+                              <td className="px-5 py-3.5 text-center font-mono text-slate-500 font-semibold">
+                                {idx + 1}
+                              </td>
+                              <td className="px-5 py-3.5 font-semibold text-foreground/95">
+                                {row.menu}
+                              </td>
                               <td className="px-5 py-3.5 text-center">
                                 <input
                                   type="checkbox"
                                   checked={row.read}
-                                  onChange={e => handleUpdatePermissionValue(row.sl, "read", e.target.checked)}
+                                  onChange={(e) =>
+                                    handleUpdatePermissionValue(row.sl, "read", e.target.checked)
+                                  }
                                   className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                                 />
                               </td>
@@ -647,7 +1367,9 @@ function PermissionManagementPage() {
                                 <input
                                   type="checkbox"
                                   checked={row.write}
-                                  onChange={e => handleUpdatePermissionValue(row.sl, "write", e.target.checked)}
+                                  onChange={(e) =>
+                                    handleUpdatePermissionValue(row.sl, "write", e.target.checked)
+                                  }
                                   className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                                 />
                               </td>
@@ -655,7 +1377,9 @@ function PermissionManagementPage() {
                                 <input
                                   type="checkbox"
                                   checked={row.full}
-                                  onChange={e => handleUpdatePermissionValue(row.sl, "full", e.target.checked)}
+                                  onChange={(e) =>
+                                    handleUpdatePermissionValue(row.sl, "full", e.target.checked)
+                                  }
                                   className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                                 />
                               </td>
@@ -663,7 +1387,9 @@ function PermissionManagementPage() {
                                 <input
                                   type="checkbox"
                                   checked={row.sync}
-                                  onChange={e => handleUpdatePermissionValue(row.sl, "sync", e.target.checked)}
+                                  onChange={(e) =>
+                                    handleUpdatePermissionValue(row.sl, "sync", e.target.checked)
+                                  }
                                   className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                                 />
                               </td>
@@ -671,7 +1397,13 @@ function PermissionManagementPage() {
                                 <input
                                   type="checkbox"
                                   checked={row.prevDate}
-                                  onChange={e => handleUpdatePermissionValue(row.sl, "prevDate", e.target.checked)}
+                                  onChange={(e) =>
+                                    handleUpdatePermissionValue(
+                                      row.sl,
+                                      "prevDate",
+                                      e.target.checked,
+                                    )
+                                  }
                                   className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                                 />
                               </td>
@@ -709,15 +1441,24 @@ function PermissionManagementPage() {
                       </thead>
                       <tbody className="divide-y divide-border/30 text-foreground">
                         {roles.map((r, idx) => (
-                          <tr key={r.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
-                            <td className="px-5 py-3.5 text-center font-mono text-slate-500 font-semibold">{idx + 1}</td>
-                            <td className="px-5 py-3.5 font-semibold text-foreground/95">{r.name}</td>
+                          <tr
+                            key={r.sl}
+                            className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                          >
+                            <td className="px-5 py-3.5 text-center font-mono text-slate-500 font-semibold">
+                              {idx + 1}
+                            </td>
+                            <td className="px-5 py-3.5 font-semibold text-foreground/95">
+                              {r.name}
+                            </td>
                             <td className="px-5 py-3.5 text-center">
-                              <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-semibold border uppercase tracking-wider ${
-                                r.isActive === "Active"
-                                  ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
-                                  : "bg-rose-500/10 text-rose-600 border-rose-500/20"
-                              }`}>
+                              <span
+                                className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-semibold border uppercase tracking-wider ${
+                                  r.isActive === "Active"
+                                    ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                                    : "bg-rose-500/10 text-rose-600 border-rose-500/20"
+                                }`}
+                              >
                                 {r.isActive}
                               </span>
                             </td>
@@ -763,7 +1504,6 @@ function PermissionManagementPage() {
               {/* TAB 3: USER WISE OVERRIDES MATRIX */}
               {tab === "user-permissions" && (
                 <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-                  
                   {/* Filter & Assignment Bar */}
                   <div className="px-6 py-4 border-b border-border bg-[#f8fafc]/30 dark:bg-[#0f172a]/30 shrink-0 flex flex-wrap items-center justify-between gap-4">
                     <div className="flex items-center gap-3 w-96">
@@ -782,7 +1522,8 @@ function PermissionManagementPage() {
                         <div className="flex items-center gap-2 bg-indigo-500/5 border border-indigo-500/10 px-3 py-1.5 rounded-xl shrink-0">
                           <Shield className="size-3.5 text-indigo-500" />
                           <span className="text-[10.5px] font-medium text-indigo-500/90">
-                            Base Role: <strong className="uppercase">{activeOverrideUser.role}</strong>
+                            Base Role:{" "}
+                            <strong className="uppercase">{activeOverrideUser.role}</strong>
                           </span>
                         </div>
                       )}
@@ -824,17 +1565,27 @@ function PermissionManagementPage() {
                       <tbody className="divide-y divide-border/30 text-foreground">
                         {activeUserOverrides.length === 0 ? (
                           <tr>
-                            <td colSpan={8} className="py-12 text-center text-[12px] font-medium text-muted-foreground/60">
+                            <td
+                              colSpan={8}
+                              className="py-12 text-center text-[12px] font-medium text-muted-foreground/60"
+                            >
                               No custom overrides assigned to user. Assign a route above.
                             </td>
                           </tr>
                         ) : (
                           activeUserOverrides.map((row, idx) => (
-                            <tr key={row.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all bg-amber-500/[0.03] dark:bg-amber-500/[0.02] hover:bg-amber-500/[0.08] dark:hover:bg-amber-500/[0.05]">
-                              <td className="px-5 py-3.5 text-center font-mono text-slate-500 font-semibold">{idx + 1}</td>
+                            <tr
+                              key={row.sl}
+                              className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all bg-amber-500/[0.03] dark:bg-amber-500/[0.02] hover:bg-amber-500/[0.08] dark:hover:bg-amber-500/[0.05]"
+                            >
+                              <td className="px-5 py-3.5 text-center font-mono text-slate-500 font-semibold">
+                                {idx + 1}
+                              </td>
                               <td className="px-5 py-3.5">
                                 <div className="flex items-center gap-2">
-                                  <span className="font-semibold text-foreground/95">{row.menu}</span>
+                                  <span className="font-semibold text-foreground/95">
+                                    {row.menu}
+                                  </span>
                                   <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-450 border border-amber-500/20 text-[8.5px] font-black uppercase tracking-wider scale-90">
                                     Custom
                                   </span>
@@ -844,7 +1595,9 @@ function PermissionManagementPage() {
                                 <input
                                   type="checkbox"
                                   checked={row.read}
-                                  onChange={e => handleUpdateOverrideValue(row.sl, "read", e.target.checked)}
+                                  onChange={(e) =>
+                                    handleUpdateOverrideValue(row.sl, "read", e.target.checked)
+                                  }
                                   className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                                 />
                               </td>
@@ -852,7 +1605,9 @@ function PermissionManagementPage() {
                                 <input
                                   type="checkbox"
                                   checked={row.write}
-                                  onChange={e => handleUpdateOverrideValue(row.sl, "write", e.target.checked)}
+                                  onChange={(e) =>
+                                    handleUpdateOverrideValue(row.sl, "write", e.target.checked)
+                                  }
                                   className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                                 />
                               </td>
@@ -860,7 +1615,9 @@ function PermissionManagementPage() {
                                 <input
                                   type="checkbox"
                                   checked={row.full}
-                                  onChange={e => handleUpdateOverrideValue(row.sl, "full", e.target.checked)}
+                                  onChange={(e) =>
+                                    handleUpdateOverrideValue(row.sl, "full", e.target.checked)
+                                  }
                                   className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                                 />
                               </td>
@@ -868,7 +1625,9 @@ function PermissionManagementPage() {
                                 <input
                                   type="checkbox"
                                   checked={row.sync}
-                                  onChange={e => handleUpdateOverrideValue(row.sl, "sync", e.target.checked)}
+                                  onChange={(e) =>
+                                    handleUpdateOverrideValue(row.sl, "sync", e.target.checked)
+                                  }
                                   className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                                 />
                               </td>
@@ -876,7 +1635,9 @@ function PermissionManagementPage() {
                                 <input
                                   type="checkbox"
                                   checked={row.prevDate}
-                                  onChange={e => handleUpdateOverrideValue(row.sl, "prevDate", e.target.checked)}
+                                  onChange={(e) =>
+                                    handleUpdateOverrideValue(row.sl, "prevDate", e.target.checked)
+                                  }
                                   className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                                 />
                               </td>
@@ -898,11 +1659,8 @@ function PermissionManagementPage() {
                   </div>
                 </div>
               )}
-
             </div>
-
           </div>
-
         </div>
       </main>
 
@@ -910,7 +1668,6 @@ function PermissionManagementPage() {
       {isRoleModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
           <div className="bg-card border border-border/80 w-full max-w-md rounded-2xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
-            
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-border/50 bg-[#f8fafc] dark:bg-[#0f172a] flex items-center justify-between">
               <div className="flex items-center gap-2.5">
@@ -923,7 +1680,7 @@ function PermissionManagementPage() {
                   </h2>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => setIsRoleModalOpen(false)}
                 className="size-8.5 rounded-xl hover:bg-muted/80 flex items-center justify-center transition-colors text-muted-foreground hover:text-foreground border border-border/20"
               >
@@ -935,11 +1692,13 @@ function PermissionManagementPage() {
             <form onSubmit={handleRoleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
               <div className="space-y-3">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Role Name *</label>
+                  <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">
+                    Role Name *
+                  </label>
                   <input
                     type="text"
                     value={roleName}
-                    onChange={e => setRoleName(e.target.value)}
+                    onChange={(e) => setRoleName(e.target.value)}
                     placeholder="e.g. manager"
                     className="w-full h-10 px-3.5 text-xs font-semibold bg-muted/40 border border-border rounded-xl focus:outline-none focus:border-primary transition"
                     required
@@ -947,10 +1706,12 @@ function PermissionManagementPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Status *</label>
+                  <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">
+                    Status *
+                  </label>
                   <select
                     value={roleIsActive}
-                    onChange={e => setRoleIsActive(e.target.value as any)}
+                    onChange={(e) => setRoleIsActive(e.target.value as any)}
                     className="w-full h-10 px-3.5 text-xs font-semibold bg-muted/40 border border-border rounded-xl focus:outline-none focus:border-primary transition cursor-pointer"
                   >
                     <option value="Active">Active</option>
@@ -984,7 +1745,6 @@ function PermissionManagementPage() {
       {isPermModalOpen && activePermRole && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
           <div className="bg-card border border-border/80 w-full max-w-5xl rounded-2xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
-            
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-border/50 bg-[#f8fafc] dark:bg-[#0f172a] flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2.5">
@@ -997,7 +1757,7 @@ function PermissionManagementPage() {
                   </h2>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => setIsPermModalOpen(false)}
                 className="size-8.5 rounded-xl hover:bg-muted/80 flex items-center justify-center transition-colors text-muted-foreground hover:text-foreground border border-border/20"
               >
@@ -1007,7 +1767,6 @@ function PermissionManagementPage() {
 
             {/* Modal Content */}
             <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-              
               {/* Route Assignment Bar inside Modal */}
               <div className="px-6 py-4 border-b border-border bg-[#f8fafc]/30 dark:bg-[#0f172a]/30 shrink-0 flex items-center justify-end gap-2">
                 <div className="w-80">
@@ -1044,20 +1803,33 @@ function PermissionManagementPage() {
                   <tbody className="divide-y divide-border/30 text-foreground">
                     {activeModalRolePermissions.length === 0 ? (
                       <tr>
-                        <td colSpan={8} className="py-12 text-center text-[12px] font-medium text-muted-foreground/60">
-                          No route permissions assigned to role "{activePermRole}". Assign a route above.
+                        <td
+                          colSpan={8}
+                          className="py-12 text-center text-[12px] font-medium text-muted-foreground/60"
+                        >
+                          No route permissions assigned to role "{activePermRole}". Assign a route
+                          above.
                         </td>
                       </tr>
                     ) : (
                       activeModalRolePermissions.map((row, idx) => (
-                        <tr key={row.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
-                          <td className="px-5 py-3.5 text-center font-mono text-slate-500 font-semibold">{idx + 1}</td>
-                          <td className="px-5 py-3.5 font-semibold text-foreground/95">{row.menu}</td>
+                        <tr
+                          key={row.sl}
+                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                        >
+                          <td className="px-5 py-3.5 text-center font-mono text-slate-500 font-semibold">
+                            {idx + 1}
+                          </td>
+                          <td className="px-5 py-3.5 font-semibold text-foreground/95">
+                            {row.menu}
+                          </td>
                           <td className="px-5 py-3.5 text-center">
                             <input
                               type="checkbox"
                               checked={row.read}
-                              onChange={e => handleUpdatePermissionValue(row.sl, "read", e.target.checked)}
+                              onChange={(e) =>
+                                handleUpdatePermissionValue(row.sl, "read", e.target.checked)
+                              }
                               className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                             />
                           </td>
@@ -1065,7 +1837,9 @@ function PermissionManagementPage() {
                             <input
                               type="checkbox"
                               checked={row.write}
-                              onChange={e => handleUpdatePermissionValue(row.sl, "write", e.target.checked)}
+                              onChange={(e) =>
+                                handleUpdatePermissionValue(row.sl, "write", e.target.checked)
+                              }
                               className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                             />
                           </td>
@@ -1073,7 +1847,9 @@ function PermissionManagementPage() {
                             <input
                               type="checkbox"
                               checked={row.full}
-                              onChange={e => handleUpdatePermissionValue(row.sl, "full", e.target.checked)}
+                              onChange={(e) =>
+                                handleUpdatePermissionValue(row.sl, "full", e.target.checked)
+                              }
                               className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                             />
                           </td>
@@ -1081,7 +1857,9 @@ function PermissionManagementPage() {
                             <input
                               type="checkbox"
                               checked={row.sync}
-                              onChange={e => handleUpdatePermissionValue(row.sl, "sync", e.target.checked)}
+                              onChange={(e) =>
+                                handleUpdatePermissionValue(row.sl, "sync", e.target.checked)
+                              }
                               className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                             />
                           </td>
@@ -1089,7 +1867,9 @@ function PermissionManagementPage() {
                             <input
                               type="checkbox"
                               checked={row.prevDate}
-                              onChange={e => handleUpdatePermissionValue(row.sl, "prevDate", e.target.checked)}
+                              onChange={(e) =>
+                                handleUpdatePermissionValue(row.sl, "prevDate", e.target.checked)
+                              }
                               className="size-4 rounded border-border text-primary cursor-pointer transition focus:ring-0"
                             />
                           </td>
@@ -1109,7 +1889,6 @@ function PermissionManagementPage() {
                   </tbody>
                 </table>
               </div>
-
             </div>
 
             {/* Modal Footer */}
@@ -1122,11 +1901,9 @@ function PermissionManagementPage() {
                 CLOSE
               </button>
             </div>
-
           </div>
         </div>
       )}
-
     </div>
   );
 }

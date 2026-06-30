@@ -1,15 +1,35 @@
 import {
-  ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
-  BarChart, Bar, PieChart, Pie, Cell, Legend, RadialBarChart, RadialBar, LabelList
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+  RadialBarChart,
+  RadialBar,
+  LabelList,
 } from "recharts";
 
 const headcount = [
-  { m: "Jan", hires: 24, exits: 8 }, { m: "Feb", hires: 31, exits: 11 },
-  { m: "Mar", hires: 28, exits: 9 }, { m: "Apr", hires: 42, exits: 14 },
-  { m: "May", hires: 38, exits: 12 }, { m: "Jun", hires: 51, exits: 10 },
-  { m: "Jul", hires: 47, exits: 16 }, { m: "Aug", hires: 55, exits: 13 },
-  { m: "Sep", hires: 49, exits: 11 }, { m: "Oct", hires: 62, exits: 15 },
-  { m: "Nov", hires: 58, exits: 12 }, { m: "Dec", hires: 71, exits: 17 },
+  { m: "Jan", hires: 24, exits: 8 },
+  { m: "Feb", hires: 31, exits: 11 },
+  { m: "Mar", hires: 28, exits: 9 },
+  { m: "Apr", hires: 42, exits: 14 },
+  { m: "May", hires: 38, exits: 12 },
+  { m: "Jun", hires: 51, exits: 10 },
+  { m: "Jul", hires: 47, exits: 16 },
+  { m: "Aug", hires: 55, exits: 13 },
+  { m: "Sep", hires: 49, exits: 11 },
+  { m: "Oct", hires: 62, exits: 15 },
+  { m: "Nov", hires: 58, exits: 12 },
+  { m: "Dec", hires: 71, exits: 17 },
 ];
 
 const departments = [
@@ -30,20 +50,18 @@ const attendance = [
   { d: "Sun", present: 0, remote: 0, leave: 0 },
 ];
 
-const goals = [
-  { name: "Goals", value: 78, fill: "var(--primary)" },
-];
+const goals = [{ name: "Goals", value: 78, fill: "var(--primary)" }];
 
 const todayAttendance = [
   { name: "Presence", value: 95.86, color: "var(--success)" },
-  { name: "Absence", value: 4.00, color: "var(--destructive)" },
+  { name: "Absence", value: 4.0, color: "var(--destructive)" },
   { name: "Holiday", value: 0.14, color: "var(--chart-1)" },
   { name: "Leave", value: 0, color: "var(--warning)" },
 ];
 
 const todayLateAbsent = [
-  { name: "Late", value: 58.40, color: "var(--warning)" },
-  { name: "Absence", value: 41.60, color: "var(--destructive)" },
+  { name: "Late", value: 58.4, color: "var(--warning)" },
+  { name: "Absence", value: 41.6, color: "var(--destructive)" },
 ];
 
 const dateWiseOT = [
@@ -65,7 +83,10 @@ function CustomTooltip({ active, payload, label }: any) {
         <div className="space-y-1.5">
           {payload.map((p: any, i: number) => (
             <div key={i} className="flex items-center gap-2 text-[11px]">
-              <span className="size-2 rounded-full shadow-xs" style={{ backgroundColor: p.color || p.stroke || p.fill }} />
+              <span
+                className="size-2 rounded-full shadow-xs"
+                style={{ backgroundColor: p.color || p.stroke || p.fill }}
+              />
               <span className="text-muted-foreground/90 font-medium">{p.name}:</span>
               <span className="font-bold text-foreground ml-auto">{p.value.toLocaleString()}</span>
             </div>
@@ -79,7 +100,9 @@ function CustomTooltip({ active, payload, label }: any) {
 
 function Card({ title, subtitle, action, children, className = "" }: any) {
   return (
-    <div className={`group rounded-lg bg-card border border-border/70 p-4 shadow-xs transition-all duration-300 hover:shadow-md hover:border-border/95 relative overflow-hidden ${className}`}>
+    <div
+      className={`group rounded-lg bg-card border border-border/70 p-4 shadow-xs transition-all duration-300 hover:shadow-md hover:border-border/95 relative overflow-hidden ${className}`}
+    >
       {/* Dynamic top gradient line to give a premium feel */}
       <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary/10 via-primary/30 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       <div className="flex items-start justify-between mb-3.5">
@@ -101,8 +124,11 @@ function Tabs() {
       {items.map((i, idx) => (
         <button
           key={i}
-          className={`text-[10px] font-semibold px-2.5 py-1 rounded-md transition-all ${idx === 2 ? "bg-card text-primary font-bold shadow-xs" : "text-muted-foreground hover:text-foreground"
-            }`}
+          className={`text-[10px] font-semibold px-2.5 py-1 rounded-md transition-all ${
+            idx === 2
+              ? "bg-card text-primary font-bold shadow-xs"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
         >
           {i}
         </button>
@@ -113,7 +139,12 @@ function Tabs() {
 
 export function HeadcountChart() {
   return (
-    <Card title="Headcount Trends" subtitle="New hires vs. exits across the year" action={<Tabs />} className="xl:col-span-2">
+    <Card
+      title="Headcount Trends"
+      subtitle="New hires vs. exits across the year"
+      action={<Tabs />}
+      className="xl:col-span-2"
+    >
       <div className="h-[230px] mt-2">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={headcount} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
@@ -127,12 +158,40 @@ export function HeadcountChart() {
                 <stop offset="100%" stopColor="var(--chart-5)" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.6} vertical={false} />
-            <XAxis dataKey="m" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
-            <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="var(--border)"
+              opacity={0.6}
+              vertical={false}
+            />
+            <XAxis
+              dataKey="m"
+              tickLine={false}
+              axisLine={false}
+              tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+            />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+            />
             <Tooltip content={<CustomTooltip />} />
-            <Area type="monotone" name="New Hires" dataKey="hires" stroke="var(--primary)" strokeWidth={2.5} fill="url(#gHires)" />
-            <Area type="monotone" name="Exits" dataKey="exits" stroke="var(--chart-5)" strokeWidth={2.5} fill="url(#gExits)" />
+            <Area
+              type="monotone"
+              name="New Hires"
+              dataKey="hires"
+              stroke="var(--primary)"
+              strokeWidth={2.5}
+              fill="url(#gHires)"
+            />
+            <Area
+              type="monotone"
+              name="Exits"
+              dataKey="exits"
+              stroke="var(--chart-5)"
+              strokeWidth={2.5}
+              fill="url(#gExits)"
+            />
           </AreaChart>
         </ResponsiveContainer>
       </div>
@@ -147,9 +206,20 @@ export function DepartmentChart() {
       <div className="relative h-40 mt-1">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <Pie data={departments} dataKey="value" innerRadius={55} outerRadius={75} paddingAngle={4} stroke="none">
+            <Pie
+              data={departments}
+              dataKey="value"
+              innerRadius={55}
+              outerRadius={75}
+              paddingAngle={4}
+              stroke="none"
+            >
               {departments.map((d, i) => (
-                <Cell key={i} fill={d.color} className="outline-none filter hover:brightness-105 transition-all duration-300" />
+                <Cell
+                  key={i}
+                  fill={d.color}
+                  className="outline-none filter hover:brightness-105 transition-all duration-300"
+                />
               ))}
             </Pie>
             <Tooltip content={<CustomTooltip />} />
@@ -157,18 +227,30 @@ export function DepartmentChart() {
         </ResponsiveContainer>
         <div className="absolute inset-0 grid place-items-center pointer-events-none">
           <div className="text-center">
-            <div className="text-xl font-extrabold tracking-tight text-foreground">{total.toLocaleString()}</div>
-            <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80 mt-0.5">Employees</div>
+            <div className="text-xl font-extrabold tracking-tight text-foreground">
+              {total.toLocaleString()}
+            </div>
+            <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80 mt-0.5">
+              Employees
+            </div>
           </div>
         </div>
       </div>
       <div className="mt-3.5 space-y-1.5">
         {departments.map((d) => (
-          <div key={d.name} className="flex items-center gap-2 text-xs p-1 rounded-lg hover:bg-muted/50 transition duration-200">
-            <span className="size-2 rounded-full ring-2 ring-background shadow-xs" style={{ background: d.color }} />
+          <div
+            key={d.name}
+            className="flex items-center gap-2 text-xs p-1 rounded-lg hover:bg-muted/50 transition duration-200"
+          >
+            <span
+              className="size-2 rounded-full ring-2 ring-background shadow-xs"
+              style={{ background: d.color }}
+            />
             <span className="text-foreground font-medium">{d.name}</span>
             <span className="ml-auto font-bold text-foreground">{d.value}</span>
-            <span className="text-muted-foreground/80 font-medium w-10 text-right">{Math.round((d.value / total) * 100)}%</span>
+            <span className="text-muted-foreground/80 font-medium w-10 text-right">
+              {Math.round((d.value / total) * 100)}%
+            </span>
           </div>
         ))}
       </div>
@@ -178,7 +260,11 @@ export function DepartmentChart() {
 
 export function AttendanceChart() {
   return (
-    <Card title="Weekly Attendance Trends" subtitle="Active presence and remote engagement tracking" className="xl:col-span-2">
+    <Card
+      title="Weekly Attendance Trends"
+      subtitle="Active presence and remote engagement tracking"
+      className="xl:col-span-2"
+    >
       <div className="h-[190px] mt-2">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={attendance} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
@@ -192,14 +278,54 @@ export function AttendanceChart() {
                 <stop offset="100%" stopColor="var(--chart-2)" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.6} vertical={false} />
-            <XAxis dataKey="d" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
-            <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="var(--border)"
+              opacity={0.6}
+              vertical={false}
+            />
+            <XAxis
+              dataKey="d"
+              tickLine={false}
+              axisLine={false}
+              tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+            />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+            />
             <Tooltip content={<CustomTooltip />} />
-            <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11, paddingTop: 12, fontWeight: 500 }} />
-            <Area type="monotone" name="Office Present" dataKey="present" stroke="var(--primary)" strokeWidth={2.5} fill="url(#attPresent)" />
-            <Area type="monotone" name="Remote Work" dataKey="remote" stroke="var(--chart-2)" strokeWidth={2} fill="url(#attRemote)" />
-            <Area type="monotone" name="On Leave" dataKey="leave" stroke="var(--chart-3)" strokeWidth={1.5} strokeDasharray="4 4" fill="none" />
+            <Legend
+              iconType="circle"
+              iconSize={8}
+              wrapperStyle={{ fontSize: 11, paddingTop: 12, fontWeight: 500 }}
+            />
+            <Area
+              type="monotone"
+              name="Office Present"
+              dataKey="present"
+              stroke="var(--primary)"
+              strokeWidth={2.5}
+              fill="url(#attPresent)"
+            />
+            <Area
+              type="monotone"
+              name="Remote Work"
+              dataKey="remote"
+              stroke="var(--chart-2)"
+              strokeWidth={2}
+              fill="url(#attRemote)"
+            />
+            <Area
+              type="monotone"
+              name="On Leave"
+              dataKey="leave"
+              stroke="var(--chart-3)"
+              strokeWidth={1.5}
+              strokeDasharray="4 4"
+              fill="none"
+            />
           </AreaChart>
         </ResponsiveContainer>
       </div>
@@ -212,14 +338,22 @@ export function GoalsRadial() {
     <Card title="Performance Goals" subtitle="Q2 completion across teams">
       <div className="relative h-40 mt-1">
         <ResponsiveContainer width="100%" height="100%">
-          <RadialBarChart innerRadius="75%" outerRadius="96%" data={goals} startAngle={210} endAngle={-30}>
+          <RadialBarChart
+            innerRadius="75%"
+            outerRadius="96%"
+            data={goals}
+            startAngle={210}
+            endAngle={-30}
+          >
             <RadialBar background={{ fill: "var(--muted)" }} dataKey="value" cornerRadius={20} />
           </RadialBarChart>
         </ResponsiveContainer>
         <div className="absolute inset-0 grid place-items-center pointer-events-none">
           <div className="text-center">
             <div className="text-2xl font-extrabold tracking-tight text-foreground">78%</div>
-            <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80 mt-0.5">Completed</div>
+            <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80 mt-0.5">
+              Completed
+            </div>
           </div>
         </div>
       </div>
@@ -247,9 +381,24 @@ export function TodayAttendancePie() {
       <div className="relative h-56 mt-2">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <Pie data={todayAttendance} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={85} paddingAngle={3} stroke="var(--background)" strokeWidth={3}>
+            <Pie
+              data={todayAttendance}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              innerRadius={60}
+              outerRadius={85}
+              paddingAngle={3}
+              stroke="var(--background)"
+              strokeWidth={3}
+            >
               {todayAttendance.map((d, i) => (
-                <Cell key={i} fill={d.color} className="outline-none filter hover:brightness-105 transition-all duration-300" />
+                <Cell
+                  key={i}
+                  fill={d.color}
+                  className="outline-none filter hover:brightness-105 transition-all duration-300"
+                />
               ))}
             </Pie>
             <Tooltip content={<CustomTooltip />} />
@@ -267,9 +416,24 @@ export function TodayLateAbsentPie() {
       <div className="relative h-56 mt-2">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <Pie data={todayLateAbsent} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={85} paddingAngle={3} stroke="var(--background)" strokeWidth={3}>
+            <Pie
+              data={todayLateAbsent}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              innerRadius={60}
+              outerRadius={85}
+              paddingAngle={3}
+              stroke="var(--background)"
+              strokeWidth={3}
+            >
               {todayLateAbsent.map((d, i) => (
-                <Cell key={i} fill={d.color} className="outline-none filter hover:brightness-105 transition-all duration-300" />
+                <Cell
+                  key={i}
+                  fill={d.color}
+                  className="outline-none filter hover:brightness-105 transition-all duration-300"
+                />
               ))}
             </Pie>
             <Tooltip content={<CustomTooltip />} />
@@ -283,19 +447,47 @@ export function TodayLateAbsentPie() {
 
 export function DateWiseOTBar() {
   return (
-    <Card title="Date Wise OT Summary" subtitle="Total Overtime Amount (BDT) over the last 8 days" className="xl:col-span-full">
+    <Card
+      title="Date Wise OT Summary"
+      subtitle="Total Overtime Amount (BDT) over the last 8 days"
+      className="xl:col-span-full"
+    >
       <div className="h-[280px] mt-4">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={dateWiseOT} margin={{ top: 25, right: 10, left: 10, bottom: 20 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.4} vertical={false} />
-            <XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "var(--muted-foreground)", fontWeight: 600 }} dy={10} />
-            <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} dx={-10} tickFormatter={(val) => `${val / 1000}k`} />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="var(--border)"
+              opacity={0.4}
+              vertical={false}
+            />
+            <XAxis
+              dataKey="date"
+              tickLine={false}
+              axisLine={false}
+              tick={{ fontSize: 11, fill: "var(--muted-foreground)", fontWeight: 600 }}
+              dy={10}
+            />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+              dx={-10}
+              tickFormatter={(val) => `${val / 1000}k`}
+            />
             <Tooltip content={<CustomTooltip />} />
             <Bar dataKey="amount" radius={[6, 6, 0, 0]} maxBarSize={45}>
               {dateWiseOT.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} fillOpacity={0.9} />
               ))}
-              <LabelList dataKey="amount" position="top" fill="var(--muted-foreground)" fontSize={10} fontWeight="900" formatter={(val: number) => `৳ ${val.toLocaleString()}`} />
+              <LabelList
+                dataKey="amount"
+                position="top"
+                fill="var(--muted-foreground)"
+                fontSize={10}
+                fontWeight="900"
+                formatter={(val: number) => `৳ ${val.toLocaleString()}`}
+              />
             </Bar>
           </BarChart>
         </ResponsiveContainer>

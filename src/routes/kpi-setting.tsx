@@ -3,8 +3,16 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  ChevronRight, Plus, Edit3, Trash2, X, CheckCircle2,
-  TrendingUp, Award, Activity, AlertCircle
+  ChevronRight,
+  Plus,
+  Edit3,
+  Trash2,
+  X,
+  CheckCircle2,
+  TrendingUp,
+  Award,
+  Activity,
+  AlertCircle,
 } from "lucide-react";
 import { type GradeBand, loadGradeBands, saveGradeBands } from "@/lib/kpi-data";
 
@@ -12,7 +20,10 @@ export const Route = createFileRoute("/kpi-setting")({
   head: () => ({
     meta: [
       { title: "Grade Band Configuration — CRIPTON" },
-      { name: "description", content: "Configure KPI scoring bands, letter grades, and increment/promotion eligibility." },
+      {
+        name: "description",
+        content: "Configure KPI scoring bands, letter grades, and increment/promotion eligibility.",
+      },
     ],
   }),
   component: GradeBandConfigPage,
@@ -24,7 +35,7 @@ function GradeBandConfigPage() {
     const loaded = loadGradeBands();
     return loaded.sort((a, b) => b.pointFrom - a.pointFrom);
   });
-  
+
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -47,17 +58,23 @@ function GradeBandConfigPage() {
     color: "#3b82f6",
     incrementEligible: false,
     promotionEligible: false,
-    status: "Active"
+    status: "Active",
   });
 
-  const activeBands = useMemo(() => bands.filter(b => b.status === "Active"), [bands]);
+  const activeBands = useMemo(() => bands.filter((b) => b.status === "Active"), [bands]);
 
   const openAddModal = () => {
     setEditId(null);
     setErrorMsg("");
     setForm({
-      pointFrom: 0, pointTo: 0, grade: "", assessment: "", color: "#3b82f6",
-      incrementEligible: false, promotionEligible: false, status: "Active"
+      pointFrom: 0,
+      pointTo: 0,
+      grade: "",
+      assessment: "",
+      color: "#3b82f6",
+      incrementEligible: false,
+      promotionEligible: false,
+      status: "Active",
     });
     setShowModal(true);
   };
@@ -73,7 +90,7 @@ function GradeBandConfigPage() {
       color: item.color,
       incrementEligible: item.incrementEligible,
       promotionEligible: item.promotionEligible,
-      status: item.status
+      status: item.status,
     });
     setShowModal(true);
   };
@@ -109,29 +126,33 @@ function GradeBandConfigPage() {
 
     let updated: GradeBand[];
     if (editId) {
-      updated = bands.map(b => b.id === editId ? { ...b, ...form } : b);
+      updated = bands.map((b) => (b.id === editId ? { ...b, ...form } : b));
     } else {
       const newId = `GB-${String(bands.length + 1).padStart(3, "0")}`;
       updated = [...bands, { id: newId, ...form }];
     }
-    
+
     // Sort descending
     updated.sort((a, b) => b.pointFrom - a.pointFrom);
-    
+
     setBands(updated);
     saveGradeBands(updated);
     setShowModal(false);
   };
 
   const handleDelete = (id: string) => {
-    const updated = bands.filter(b => b.id !== id);
+    const updated = bands.filter((b) => b.id !== id);
     setBands(updated);
     saveGradeBands(updated);
     setDeleteConfirm(null);
   };
 
   const handleToggleStatus = (id: string) => {
-    const updated = bands.map(b => b.id === id ? { ...b, status: b.status === "Active" ? "Inactive" as const : "Active" as const } : b);
+    const updated = bands.map((b) =>
+      b.id === id
+        ? { ...b, status: b.status === "Active" ? ("Inactive" as const) : ("Active" as const) }
+        : b,
+    );
     setBands(updated);
     saveGradeBands(updated);
   };
@@ -143,12 +164,13 @@ function GradeBandConfigPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 xl:p-8 space-y-6">
-
           {/* Header */}
           <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-2.5" />
                 <span className="text-muted-foreground/75">KPI</span>
                 <ChevronRight className="size-2.5" />
@@ -158,7 +180,9 @@ function GradeBandConfigPage() {
                 <TrendingUp className="size-5.5 text-primary" />
                 <span>Grade Band Configuration</span>
               </h1>
-              <p className="text-xs text-muted-foreground mt-1">Configure scoring ranges, letter grades, and eligibility rules for appraisals</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Configure scoring ranges, letter grades, and eligibility rules for appraisals
+              </p>
             </div>
 
             <button
@@ -176,7 +200,7 @@ function GradeBandConfigPage() {
               <Activity className="size-4 text-primary" />
               Active Grade Spectrum
             </h3>
-            
+
             {activeBands.length > 0 ? (
               <div className="h-10 rounded-xl overflow-hidden flex shadow-inner bg-muted/20">
                 {activeBands.map((band) => {
@@ -189,7 +213,9 @@ function GradeBandConfigPage() {
                       title={`${band.grade}: ${band.pointFrom}-${band.pointTo}`}
                     >
                       <span className="text-[11px] font-black">{band.grade}</span>
-                      <span className="text-[8px] font-bold opacity-80">{band.pointFrom}-{band.pointTo}</span>
+                      <span className="text-[8px] font-bold opacity-80">
+                        {band.pointFrom}-{band.pointTo}
+                      </span>
                     </div>
                   );
                 })}
@@ -204,56 +230,90 @@ function GradeBandConfigPage() {
           {/* Grade Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
             {bands.map((band) => (
-              <div key={band.id} className={`bg-card rounded-xl border border-border/80 shadow-xs overflow-hidden relative group ${band.status === "Inactive" ? "opacity-60 grayscale" : ""}`}>
+              <div
+                key={band.id}
+                className={`bg-card rounded-xl border border-border/80 shadow-xs overflow-hidden relative group ${band.status === "Inactive" ? "opacity-60 grayscale" : ""}`}
+              >
                 <div className="h-2 w-full" style={{ backgroundColor: band.color }} />
-                
+
                 <div className="p-5 space-y-4">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h4 className="text-2xl font-black" style={{ color: band.color }}>{band.grade}</h4>
-                      <span className="text-xs font-bold text-foreground block">{band.assessment}</span>
+                      <h4 className="text-2xl font-black" style={{ color: band.color }}>
+                        {band.grade}
+                      </h4>
+                      <span className="text-xs font-bold text-foreground block">
+                        {band.assessment}
+                      </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-[10px] font-black uppercase text-muted-foreground tracking-wider block">Range</span>
-                      <span className="text-sm font-mono font-bold text-foreground">{band.pointFrom} - {band.pointTo}</span>
+                      <span className="text-[10px] font-black uppercase text-muted-foreground tracking-wider block">
+                        Range
+                      </span>
+                      <span className="text-sm font-mono font-bold text-foreground">
+                        {band.pointFrom} - {band.pointTo}
+                      </span>
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-2 pt-3 border-t border-border/30">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase">Increment</span>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                        Increment
+                      </span>
                       {band.incrementEligible ? (
-                        <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600">Eligible</span>
+                        <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600">
+                          Eligible
+                        </span>
                       ) : (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-muted text-muted-foreground">Ineligible</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-muted text-muted-foreground">
+                          Ineligible
+                        </span>
                       )}
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase">Promotion</span>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                        Promotion
+                      </span>
                       {band.promotionEligible ? (
-                        <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600">Eligible</span>
+                        <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600">
+                          Eligible
+                        </span>
                       ) : (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-muted text-muted-foreground">Ineligible</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-muted text-muted-foreground">
+                          Ineligible
+                        </span>
                       )}
                     </div>
                   </div>
                 </div>
 
                 <div className="absolute top-4 right-4 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => openEditModal(band)} className="size-7 rounded-lg bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-primary transition" title="Edit">
+                  <button
+                    onClick={() => openEditModal(band)}
+                    className="size-7 rounded-lg bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-primary transition"
+                    title="Edit"
+                  >
                     <Edit3 className="size-3.5" />
                   </button>
-                  <button onClick={() => handleToggleStatus(band.id)} className="size-7 rounded-lg bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-amber-500 transition" title={band.status === "Active" ? "Deactivate" : "Activate"}>
+                  <button
+                    onClick={() => handleToggleStatus(band.id)}
+                    className="size-7 rounded-lg bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-amber-500 transition"
+                    title={band.status === "Active" ? "Deactivate" : "Activate"}
+                  >
                     <Activity className="size-3.5" />
                   </button>
-                  <button onClick={() => setDeleteConfirm(band.id)} className="size-7 rounded-lg bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-red-500 transition" title="Delete">
+                  <button
+                    onClick={() => setDeleteConfirm(band.id)}
+                    className="size-7 rounded-lg bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-red-500 transition"
+                    title="Delete"
+                  >
                     <Trash2 className="size-3.5" />
                   </button>
                 </div>
               </div>
             ))}
           </div>
-
         </div>
       </main>
 
@@ -285,26 +345,34 @@ function GradeBandConfigPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Point From *</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Point From *
+                  </label>
                   <input
                     type="number"
                     required
                     min={0}
                     max={100}
                     value={form.pointFrom}
-                    onChange={(e) => setForm(p => ({ ...p, pointFrom: parseInt(e.target.value) || 0 }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, pointFrom: parseInt(e.target.value) || 0 }))
+                    }
                     className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold font-mono outline-none focus:border-[#1e88e5]"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Point To *</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Point To *
+                  </label>
                   <input
                     type="number"
                     required
                     min={0}
                     max={100}
                     value={form.pointTo}
-                    onChange={(e) => setForm(p => ({ ...p, pointTo: parseInt(e.target.value) || 0 }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, pointTo: parseInt(e.target.value) || 0 }))
+                    }
                     className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold font-mono outline-none focus:border-[#1e88e5]"
                   />
                 </div>
@@ -312,29 +380,33 @@ function GradeBandConfigPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Letter Grade *</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Letter Grade *
+                  </label>
                   <input
                     type="text"
                     required
                     value={form.grade}
-                    onChange={(e) => setForm(p => ({ ...p, grade: e.target.value }))}
+                    onChange={(e) => setForm((p) => ({ ...p, grade: e.target.value }))}
                     placeholder="e.g., A+"
                     className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5]"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Brand Color *</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Brand Color *
+                  </label>
                   <div className="flex gap-2">
                     <input
                       type="color"
                       value={form.color}
-                      onChange={(e) => setForm(p => ({ ...p, color: e.target.value }))}
+                      onChange={(e) => setForm((p) => ({ ...p, color: e.target.value }))}
                       className="h-9 w-9 rounded border border-border/40 cursor-pointer"
                     />
                     <input
                       type="text"
                       value={form.color}
-                      onChange={(e) => setForm(p => ({ ...p, color: e.target.value }))}
+                      onChange={(e) => setForm((p) => ({ ...p, color: e.target.value }))}
                       className="flex-1 h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold font-mono outline-none focus:border-[#1e88e5]"
                     />
                   </div>
@@ -342,30 +414,40 @@ function GradeBandConfigPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Assessment Label *</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                  Assessment Label *
+                </label>
                 <input
                   type="text"
                   required
                   value={form.assessment}
-                  onChange={(e) => setForm(p => ({ ...p, assessment: e.target.value }))}
+                  onChange={(e) => setForm((p) => ({ ...p, assessment: e.target.value }))}
                   placeholder="e.g., Outstanding"
                   className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5]"
                 />
               </div>
 
               <div className="border-t border-border/30 pt-4 space-y-3">
-                <span className="text-[10px] font-black uppercase text-foreground">Eligibility Rules</span>
-                
+                <span className="text-[10px] font-black uppercase text-foreground">
+                  Eligibility Rules
+                </span>
+
                 <label className="flex items-center gap-3 cursor-pointer group">
                   <input
                     type="checkbox"
                     checked={form.incrementEligible}
-                    onChange={(e) => setForm(p => ({ ...p, incrementEligible: e.target.checked }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, incrementEligible: e.target.checked }))
+                    }
                     className="size-4 rounded border-border/40 text-[#1e88e5] focus:ring-[#1e88e5]/20 cursor-pointer"
                   />
                   <div>
-                    <span className="text-xs font-bold text-foreground block">Eligible for Annual Increment</span>
-                    <span className="text-[10px] text-muted-foreground">Employee qualifies for salary increase</span>
+                    <span className="text-xs font-bold text-foreground block">
+                      Eligible for Annual Increment
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      Employee qualifies for salary increase
+                    </span>
                   </div>
                 </label>
 
@@ -373,12 +455,18 @@ function GradeBandConfigPage() {
                   <input
                     type="checkbox"
                     checked={form.promotionEligible}
-                    onChange={(e) => setForm(p => ({ ...p, promotionEligible: e.target.checked }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, promotionEligible: e.target.checked }))
+                    }
                     className="size-4 rounded border-border/40 text-[#1e88e5] focus:ring-[#1e88e5]/20 cursor-pointer"
                   />
                   <div>
-                    <span className="text-xs font-bold text-foreground block">Eligible for Promotion</span>
-                    <span className="text-[10px] text-muted-foreground">Employee qualifies for designation change</span>
+                    <span className="text-xs font-bold text-foreground block">
+                      Eligible for Promotion
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      Employee qualifies for designation change
+                    </span>
                   </div>
                 </label>
               </div>

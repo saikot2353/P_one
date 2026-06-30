@@ -2,8 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  ChevronRight, CreditCard, Send, List, CheckCircle2, UserCheck,
-  Briefcase, FileText, Activity
+  ChevronRight,
+  CreditCard,
+  Send,
+  List,
+  CheckCircle2,
+  UserCheck,
+  Briefcase,
+  FileText,
+  Activity,
 } from "lucide-react";
 
 export const Route = createFileRoute("/payroll-loan")({
@@ -59,7 +66,9 @@ function PayrollLoanPage() {
         <div className="p-4 md:p-6 space-y-6 w-full">
           {/* Breadcrumb Navigation */}
           <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-            <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
+            <Link to="/" className="hover:text-foreground transition-colors">
+              Home
+            </Link>
             <ChevronRight className="size-3.5" />
             <span>Payroll</span>
             <ChevronRight className="size-3.5" />
@@ -77,12 +86,14 @@ function PayrollLoanPage() {
                   Loan Management
                 </h1>
                 <p className="text-sm text-muted-foreground mt-2 max-w-2xl">
-                  Oversee the complete employee loan lifecycle, from initial applications to departmental and HR approvals.
+                  Oversee the complete employee loan lifecycle, from initial applications to
+                  departmental and HR approvals.
                 </p>
               </div>
               <div className="shrink-0">
                 <div className="text-xs font-medium text-muted-foreground bg-muted px-3 py-2 rounded-md border border-border">
-                  Accounting Period: <span className="text-foreground font-semibold">June 2026</span>
+                  Accounting Period:{" "}
+                  <span className="text-foreground font-semibold">June 2026</span>
                 </div>
               </div>
             </div>
@@ -90,13 +101,18 @@ function PayrollLoanPage() {
 
           {/* Key Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {stats.map(stat => (
-              <div key={stat.label} className="bg-card border border-border/60 p-4 rounded-lg shadow-sm flex items-center gap-4">
+            {stats.map((stat) => (
+              <div
+                key={stat.label}
+                className="bg-card border border-border/60 p-4 rounded-lg shadow-sm flex items-center gap-4"
+              >
                 <div className="p-3 bg-muted rounded-md border border-border/50 text-muted-foreground">
                   <stat.icon className="size-5" />
                 </div>
                 <div>
-                  <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{stat.label}</div>
+                  <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    {stat.label}
+                  </div>
                   <div className="text-xl font-bold text-foreground mt-0.5">{stat.value}</div>
                 </div>
               </div>
@@ -107,7 +123,7 @@ function PayrollLoanPage() {
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-foreground tracking-tight">Modules</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {categories.map(category => (
+              {categories.map((category) => (
                 <Link
                   key={category.title}
                   to={category.to}
@@ -118,7 +134,9 @@ function PayrollLoanPage() {
                       <div className="p-2 bg-primary/5 text-primary rounded-md border border-primary/10 group-hover:bg-primary/10 transition-colors">
                         <category.icon className="size-5" />
                       </div>
-                      <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">{category.title}</h3>
+                      <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                        {category.title}
+                      </h3>
                     </div>
                     <ChevronRight className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>
@@ -127,7 +145,6 @@ function PayrollLoanPage() {
               ))}
             </div>
           </div>
-
         </div>
       </main>
     </div>

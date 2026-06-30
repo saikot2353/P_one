@@ -3,15 +3,37 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  Fingerprint, Search, FileSpreadsheet, Printer, FileDown, X, SlidersHorizontal, Check, Plus,
-  Trash2, Calendar, Clock, RefreshCw, ChevronDown, ChevronRight, ChevronLeft, User, Building, MapPin, Briefcase
+  Fingerprint,
+  Search,
+  FileSpreadsheet,
+  Printer,
+  FileDown,
+  X,
+  SlidersHorizontal,
+  Check,
+  Plus,
+  Trash2,
+  Calendar,
+  Clock,
+  RefreshCw,
+  ChevronDown,
+  ChevronRight,
+  ChevronLeft,
+  User,
+  Building,
+  MapPin,
+  Briefcase,
 } from "lucide-react";
 
 export const Route = createFileRoute("/employee-job-card")({
   head: () => ({
     meta: [
       { title: "Employee Job Card — CRIPTON" },
-      { name: "description", content: "Comprehensive employee job card registry displaying punch timelines, attendance states, and overtime hours." },
+      {
+        name: "description",
+        content:
+          "Comprehensive employee job card registry displaying punch timelines, attendance states, and overtime hours.",
+      },
     ],
   }),
   component: EmployeeJobCardPage,
@@ -30,16 +52,23 @@ interface SearchableSelectProps {
   className?: string;
 }
 
-function SearchableSelect({ options, value, onChange, placeholder = "Select option...", className = "" }: SearchableSelectProps) {
+function SearchableSelect({
+  options,
+  value,
+  onChange,
+  placeholder = "Select option...",
+  className = "",
+}: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const selectedOption = options.find(o => o.value === value);
+  const selectedOption = options.find((o) => o.value === value);
 
-  const filteredOptions = options.filter(o =>
-    o.label.toLowerCase().includes(search.toLowerCase()) ||
-    o.value.toLowerCase().includes(search.toLowerCase())
+  const filteredOptions = options.filter(
+    (o) =>
+      o.label.toLowerCase().includes(search.toLowerCase()) ||
+      o.value.toLowerCase().includes(search.toLowerCase()),
   );
 
   useEffect(() => {
@@ -65,7 +94,9 @@ function SearchableSelect({ options, value, onChange, placeholder = "Select opti
         <span className="truncate text-foreground font-bold">
           {selectedOption ? selectedOption.label : placeholder}
         </span>
-        <ChevronDown className={`size-3.5 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown
+          className={`size-3.5 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+        />
       </button>
 
       {isOpen && (
@@ -84,7 +115,7 @@ function SearchableSelect({ options, value, onChange, placeholder = "Select opti
 
           <div className="max-h-48 overflow-y-auto p-1 divide-y divide-border/10 font-sans text-xs">
             {filteredOptions.length > 0 ? (
-              filteredOptions.map(option => {
+              filteredOptions.map((option) => {
                 const isSelected = option.value === value;
                 return (
                   <button
@@ -94,10 +125,11 @@ function SearchableSelect({ options, value, onChange, placeholder = "Select opti
                       onChange(option.value);
                       setIsOpen(false);
                     }}
-                    className={`w-full px-3 py-2 text-left rounded-lg transition duration-100 flex items-center justify-between font-bold ${isSelected
+                    className={`w-full px-3 py-2 text-left rounded-lg transition duration-100 flex items-center justify-between font-bold ${
+                      isSelected
                         ? "bg-[#1e88e5]/10 text-[#1e88e5]"
                         : "text-foreground/80 hover:bg-muted/80 hover:text-foreground"
-                      }`}
+                    }`}
                   >
                     <span className="truncate">{option.label}</span>
                     {isSelected && <Check className="size-3 text-[#1e88e5]" />}
@@ -117,16 +149,19 @@ function SearchableSelect({ options, value, onChange, placeholder = "Select opti
 }
 
 // Mock database for available employees & their metadata
-const employeeDb: Record<string, {
-  name: string;
-  type: string;
-  subDept: string;
-  jobTitle: string;
-  unit: string;
-  shift: string;
-  shiftStartDate: string;
-  defaultHoliday: string;
-}> = {
+const employeeDb: Record<
+  string,
+  {
+    name: string;
+    type: string;
+    subDept: string;
+    jobTitle: string;
+    unit: string;
+    shift: string;
+    shiftStartDate: string;
+    defaultHoliday: string;
+  }
+> = {
   "2023043910": {
     name: "Tahmid Afsar Shapno",
     type: "Permanent",
@@ -135,7 +170,7 @@ const employeeDb: Record<string, {
     unit: "PSL",
     shift: "General Shift",
     shiftStartDate: "01/08/2023",
-    defaultHoliday: "Friday"
+    defaultHoliday: "Friday",
   },
   "2016001055": {
     name: "Md. Zahidul Islam",
@@ -145,7 +180,7 @@ const employeeDb: Record<string, {
     unit: "PSL",
     shift: "General Shift",
     shiftStartDate: "15/03/2016",
-    defaultHoliday: "Friday"
+    defaultHoliday: "Friday",
   },
   "2022035599": {
     name: "Dipon Saha",
@@ -155,8 +190,8 @@ const employeeDb: Record<string, {
     unit: "PTVL",
     shift: "Exe-Ptvl Shift",
     shiftStartDate: "10/05/2022",
-    defaultHoliday: "Friday"
-  }
+    defaultHoliday: "Friday",
+  },
 };
 
 // Generates daily attendance log for an employee for a given month/year
@@ -169,10 +204,23 @@ const generateAttendanceData = (empId: string, month: string, year: number) => {
     unit: "N/A",
     shift: "General Shift",
     shiftStartDate: "N/A",
-    defaultHoliday: "Friday"
+    defaultHoliday: "Friday",
   };
 
-  const monthIndex = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].indexOf(month);
+  const monthIndex = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ].indexOf(month);
   const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
   const logs = [];
 
@@ -191,7 +239,7 @@ const generateAttendanceData = (empId: string, month: string, year: number) => {
         outTime: "",
         overtime: "0.00",
         shift: emp.shift,
-        status: "Holiday"
+        status: "Holiday",
       });
     } else if (day === 21 || day === 22) {
       // Casual Leave preset
@@ -204,21 +252,23 @@ const generateAttendanceData = (empId: string, month: string, year: number) => {
         outTime: "N/A",
         overtime: "0.00",
         shift: emp.shift,
-        status: "CL"
+        status: "CL",
       });
     } else {
       // Regular Present days
       // Generate realistic dynamic punch times
       const inHr = 8 + (day % 3 === 0 ? 2 : 0) + (day % 5 === 0 ? 1 : 0);
-      const inMin = Math.floor(20 + (day * 7) % 39);
-      const inSec = Math.floor(10 + (day * 13) % 49);
+      const inMin = Math.floor(20 + ((day * 7) % 39));
+      const inSec = Math.floor(10 + ((day * 13) % 49));
       const inTimeStr = `${String(inHr).padStart(2, "0")}:${String(inMin).padStart(2, "0")}:${String(inSec).padStart(2, "0")}`;
 
       // Simulate early leaves on days divisible by 7
       const isEarlyDay = day % 7 === 0;
-      const outHr = isEarlyDay ? 17 : (18 + (day % 4 === 0 ? 1 : 0) + (day % 6 === 0 ? 2 : 0));
-      const outMin = isEarlyDay ? Math.floor(10 + (day * 9) % 30) : Math.floor(10 + (day * 9) % 45);
-      const outSec = Math.floor(10 + (day * 17) % 49);
+      const outHr = isEarlyDay ? 17 : 18 + (day % 4 === 0 ? 1 : 0) + (day % 6 === 0 ? 2 : 0);
+      const outMin = isEarlyDay
+        ? Math.floor(10 + ((day * 9) % 30))
+        : Math.floor(10 + ((day * 9) % 45));
+      const outSec = Math.floor(10 + ((day * 17) % 49));
       const outTimeStr = `${String(outHr).padStart(2, "0")}:${String(outMin).padStart(2, "0")}:${String(outSec).padStart(2, "0")}`;
 
       // Overtime calculation: if out time past 18:00
@@ -236,7 +286,7 @@ const generateAttendanceData = (empId: string, month: string, year: number) => {
         outTime: outTimeStr,
         overtime: ot,
         shift: emp.shift,
-        status: "Present"
+        status: "Present",
       });
     }
   }
@@ -266,65 +316,86 @@ function EmployeeJobCardPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 31;
 
-  const yearOptions = useMemo(() => [
-    { value: "2026", label: "2026" },
-    { value: "2025", label: "2025" },
-    { value: "2024", label: "2024" }
-  ], []);
+  const yearOptions = useMemo(
+    () => [
+      { value: "2026", label: "2026" },
+      { value: "2025", label: "2025" },
+      { value: "2024", label: "2024" },
+    ],
+    [],
+  );
 
-  const companyOptions = useMemo(() => [
-    { value: "Pakiza Software Limited", label: "Pakiza Software Limited" },
-    { value: "Pakiza Group", label: "Pakiza Group" }
-  ], []);
+  const companyOptions = useMemo(
+    () => [
+      { value: "Pakiza Software Limited", label: "Pakiza Software Limited" },
+      { value: "Pakiza Group", label: "Pakiza Group" },
+    ],
+    [],
+  );
 
-  const areaOptions = useMemo(() => [
-    { value: "PSL-Head Office", label: "PSL-Head Office" },
-    { value: "PSL-Factory Operations", label: "PSL-Factory Operations" }
-  ], []);
+  const areaOptions = useMemo(
+    () => [
+      { value: "PSL-Head Office", label: "PSL-Head Office" },
+      { value: "PSL-Factory Operations", label: "PSL-Factory Operations" },
+    ],
+    [],
+  );
 
-  const typeOptions = useMemo(() => [
-    { value: "Actual", label: "Actual" },
-    { value: "Standard", label: "Standard" }
-  ], []);
+  const typeOptions = useMemo(
+    () => [
+      { value: "Actual", label: "Actual" },
+      { value: "Standard", label: "Standard" },
+    ],
+    [],
+  );
 
   const employeeOptions = useMemo(() => {
-    return Object.keys(employeeDb).map(id => ({
+    return Object.keys(employeeDb).map((id) => ({
       value: id,
-      label: `${id} - ${employeeDb[id].name}`
+      label: `${id} - ${employeeDb[id].name}`,
     }));
   }, []);
 
   const addEmployeeOptions = useMemo(() => {
     return Object.keys(employeeDb)
-      .filter(id => !multiEmpIds.includes(id))
-      .map(id => ({
+      .filter((id) => !multiEmpIds.includes(id))
+      .map((id) => ({
         value: id,
-        label: `${id} - ${employeeDb[id].name}`
+        label: `${id} - ${employeeDb[id].name}`,
       }));
   }, [multiEmpIds]);
 
   // Inline time punch edit handler
-  const handleTimeChange = (empId: string, date: string, field: 'inTime' | 'outTime', value: string) => {
-    setRenderedLogs(prev => prev.map(row => {
-      if (row.empId === empId && row.date === date) {
-        return { ...row, [field]: value };
-      }
-      return row;
-    }));
+  const handleTimeChange = (
+    empId: string,
+    date: string,
+    field: "inTime" | "outTime",
+    value: string,
+  ) => {
+    setRenderedLogs((prev) =>
+      prev.map((row) => {
+        if (row.empId === empId && row.date === date) {
+          return { ...row, [field]: value };
+        }
+        return row;
+      }),
+    );
   };
 
   // Auto-fill metadata for display based on active primary ID
   const activeEmpMetadata = useMemo(() => {
-    return employeeDb[activeEmpId] || {
-      name: "N/A",
-      type: "N/A",
-      subDept: "N/A",
-      jobTitle: "N/A",
-      unit: "N/A",
-      shift: "N/A",
-      shiftStartDate: "N/A",
-      defaultHoliday: "N/A"
-    };
+    return (
+      employeeDb[activeEmpId] || {
+        name: "N/A",
+        type: "N/A",
+        subDept: "N/A",
+        jobTitle: "N/A",
+        unit: "N/A",
+        shift: "N/A",
+        shiftStartDate: "N/A",
+        defaultHoliday: "N/A",
+      }
+    );
   }, [activeEmpId]);
 
   // Retrieve initial logs on mount
@@ -335,8 +406,8 @@ function EmployeeJobCardPage() {
   const handleGetLogs = () => {
     // Generate full list by combining all selected employees and months
     const allLogs: any[] = [];
-    multiEmpIds.forEach(empId => {
-      selectedMonths.forEach(m => {
+    multiEmpIds.forEach((empId) => {
+      selectedMonths.forEach((m) => {
         allLogs.push(...generateAttendanceData(empId, m, selectedYear));
       });
     });
@@ -348,16 +419,16 @@ function EmployeeJobCardPage() {
   const handleAddEmployee = (id: string) => {
     const cleanId = id.trim();
     if (cleanId && !multiEmpIds.includes(cleanId)) {
-      setMultiEmpIds(prev => [...prev, cleanId]);
+      setMultiEmpIds((prev) => [...prev, cleanId]);
     }
   };
 
   // Remove employee ID from multi-select
   const handleRemoveEmployee = (id: string) => {
     if (multiEmpIds.length > 1) {
-      setMultiEmpIds(prev => prev.filter(item => item !== id));
+      setMultiEmpIds((prev) => prev.filter((item) => item !== id));
       if (activeEmpId === id) {
-        const remaining = multiEmpIds.filter(item => item !== id);
+        const remaining = multiEmpIds.filter((item) => item !== id);
         setActiveEmpId(remaining[0]);
       }
     } else {
@@ -367,10 +438,10 @@ function EmployeeJobCardPage() {
 
   // Checkbox toggle for multiple months
   const toggleMonth = (m: string) => {
-    setSelectedMonths(prev => {
+    setSelectedMonths((prev) => {
       if (prev.includes(m)) {
         if (prev.length === 1) return prev; // keep at least one
-        return prev.filter(item => item !== m);
+        return prev.filter((item) => item !== m);
       } else {
         return [...prev, m];
       }
@@ -379,7 +450,7 @@ function EmployeeJobCardPage() {
 
   // Filtered rows matching query
   const filteredRows = useMemo(() => {
-    return renderedLogs.filter(row => {
+    return renderedLogs.filter((row) => {
       if (!searchQuery.trim()) return true;
       const q = searchQuery.toLowerCase();
       return (
@@ -400,7 +471,7 @@ function EmployeeJobCardPage() {
     let lateCount = 0;
     let earlyLeaveCount = 0;
 
-    filteredRows.forEach(r => {
+    filteredRows.forEach((r) => {
       // Calculate active status under runtime calculation rules
       let activeStatus = r.status;
       if (isRuntimeCal && r.status === "Present") {
@@ -468,7 +539,9 @@ function EmployeeJobCardPage() {
           <div className="bg-card rounded-2xl border border-border/80 p-4 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-2.5" />
                 <span className="text-muted-foreground/75">Human Resource</span>
                 <ChevronRight className="size-2.5" />
@@ -491,28 +564,46 @@ function EmployeeJobCardPage() {
           {/* Top Panel: Criteria Selection */}
           <div className="bg-card rounded-2xl border border-border/85 p-5 shadow-sm space-y-4 print:hidden">
             <div className="flex items-center justify-between border-b border-border/40 pb-2.5">
-              <span className="text-[10px] font-black uppercase tracking-wider text-primary">Job Card Configuration & Filtering</span>
-              <span className="text-[9px] font-bold text-muted-foreground/40">Parametric Filters</span>
+              <span className="text-[10px] font-black uppercase tracking-wider text-primary">
+                Job Card Configuration & Filtering
+              </span>
+              <span className="text-[9px] font-bold text-muted-foreground/40">
+                Parametric Filters
+              </span>
             </div>
 
             {/* Grid Container for Layout Balance */}
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-
               {/* Left Wing: Scope & Active Employees (col-span-3) */}
               <div className="lg:col-span-3 space-y-4">
                 {/* 1. Period Selection */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block">Select Months (Multi-Select)</label>
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block">
+                    Select Months (Multi-Select)
+                  </label>
                   <div className="flex flex-wrap gap-1 p-1 bg-muted/30 dark:bg-slate-900/20 rounded-xl border border-border/40">
-                    {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map(m => {
+                    {[
+                      "Jan",
+                      "Feb",
+                      "Mar",
+                      "Apr",
+                      "May",
+                      "Jun",
+                      "Jul",
+                      "Aug",
+                      "Sep",
+                      "Oct",
+                      "Nov",
+                      "Dec",
+                    ].map((m) => {
                       const isSelected = selectedMonths.includes(m);
                       return (
                         <button
                           key={m}
                           onClick={() => toggleMonth(m)}
                           className={`px-2.5 py-1 rounded-lg text-[9.5px] font-black uppercase transition-all duration-150 ${
-                            isSelected 
-                              ? "bg-primary text-white shadow-xs" 
+                            isSelected
+                              ? "bg-primary text-white shadow-xs"
                               : "hover:bg-card text-muted-foreground hover:text-foreground"
                           }`}
                         >
@@ -527,7 +618,9 @@ function EmployeeJobCardPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {/* Year */}
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Year</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">
+                      Year
+                    </label>
                     <SearchableSelect
                       options={yearOptions}
                       value={selectedYear.toString()}
@@ -537,7 +630,9 @@ function EmployeeJobCardPage() {
 
                   {/* Company */}
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Company</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">
+                      Company
+                    </label>
                     <SearchableSelect
                       options={companyOptions}
                       value={selectedCompany}
@@ -547,7 +642,9 @@ function EmployeeJobCardPage() {
 
                   {/* Area Name */}
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Area Name</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">
+                      Area Name
+                    </label>
                     <SearchableSelect
                       options={areaOptions}
                       value={selectedArea}
@@ -558,11 +655,18 @@ function EmployeeJobCardPage() {
 
                 {/* 3. Active Multi Selected Employees tags display */}
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Active Selection Registry (Multi)</label>
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">
+                    Active Selection Registry (Multi)
+                  </label>
                   <div className="min-h-10 p-1.5 bg-muted/20 dark:bg-slate-900/10 rounded-xl border border-border/40 flex flex-wrap gap-1.5 items-center">
-                    {multiEmpIds.map(id => (
-                      <span key={id} className="inline-flex items-center gap-1 bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 rounded-lg text-[10.5px] font-extrabold transition-all duration-150 hover:bg-primary/15">
-                        <span>{id} ({employeeDb[id]?.name || "N/A"})</span>
+                    {multiEmpIds.map((id) => (
+                      <span
+                        key={id}
+                        className="inline-flex items-center gap-1 bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 rounded-lg text-[10.5px] font-extrabold transition-all duration-150 hover:bg-primary/15"
+                      >
+                        <span>
+                          {id} ({employeeDb[id]?.name || "N/A"})
+                        </span>
                         <button
                           onClick={() => handleRemoveEmployee(id)}
                           className="hover:text-rose-500 font-bold ml-0.5 transition"
@@ -587,12 +691,13 @@ function EmployeeJobCardPage() {
 
               {/* Right Wing: Primary Selection & Runtime Engine (col-span-2) */}
               <div className="lg:col-span-2 flex flex-col justify-between gap-4">
-
                 {/* 1. Core Selection block */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {/* Type dropdown */}
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Type</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">
+                      Type
+                    </label>
                     <SearchableSelect
                       options={typeOptions}
                       value={selectedType}
@@ -602,7 +707,9 @@ function EmployeeJobCardPage() {
 
                   {/* Primary Employee ID Selection */}
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">Primary Employee</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">
+                      Primary Employee
+                    </label>
                     <SearchableSelect
                       options={employeeOptions}
                       value={activeEmpId}
@@ -618,8 +725,12 @@ function EmployeeJobCardPage() {
                 <div className="p-3 bg-primary/[0.02] dark:bg-primary/[0.01] border border-primary/20 rounded-xl flex-1 flex flex-col justify-center space-y-2">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-[11px] font-extrabold text-primary tracking-wide">Runtime Evaluation</h4>
-                      <p className="text-[9px] text-muted-foreground">Dynamically evaluate punch logs</p>
+                      <h4 className="text-[11px] font-extrabold text-primary tracking-wide">
+                        Runtime Evaluation
+                      </h4>
+                      <p className="text-[9px] text-muted-foreground">
+                        Dynamically evaluate punch logs
+                      </p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer select-none">
                       <input
@@ -636,7 +747,9 @@ function EmployeeJobCardPage() {
                     <div className="grid grid-cols-2 gap-2 pt-1.5 border-t border-primary/10">
                       {/* Shift In Threshold */}
                       <div className="space-y-0.5">
-                        <span className="text-[9px] font-black text-muted-foreground uppercase">Shift In Time</span>
+                        <span className="text-[9px] font-black text-muted-foreground uppercase">
+                          Shift In Time
+                        </span>
                         <input
                           type="text"
                           value={shiftInThreshold}
@@ -648,7 +761,9 @@ function EmployeeJobCardPage() {
 
                       {/* Shift Out Threshold */}
                       <div className="space-y-0.5">
-                        <span className="text-[9px] font-black text-muted-foreground uppercase">Shift Out Time</span>
+                        <span className="text-[9px] font-black text-muted-foreground uppercase">
+                          Shift Out Time
+                        </span>
                         <input
                           type="text"
                           value={shiftOutThreshold}
@@ -666,36 +781,55 @@ function EmployeeJobCardPage() {
             {/* Dynamic Metadata Summary Card based on primary ID */}
             <div className="p-4 bg-gradient-to-r from-primary/[0.04] via-transparent to-transparent border border-border/60 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-[3px] h-full bg-primary" />
-              
+
               <div className="flex items-center gap-3">
                 <div className="size-11 rounded-xl bg-gradient-to-tr from-primary to-primary-glow text-white flex items-center justify-center font-black text-sm shadow-md shadow-primary/25">
-                  {activeEmpMetadata.name.split(" ").map(n => n[0]).join("")}
+                  {activeEmpMetadata.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
                 </div>
                 <div>
                   <h3 className="text-sm font-black text-foreground">{activeEmpMetadata.name}</h3>
                   <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
-                    <span className="text-[9.5px] font-extrabold uppercase bg-primary/10 text-primary border border-primary/25 px-1.5 py-0.5 rounded-md">{activeEmpMetadata.type}</span>
-                    <span className="text-[9.5px] font-bold text-muted-foreground">{activeEmpMetadata.jobTitle} &bull; {activeEmpMetadata.subDept}</span>
+                    <span className="text-[9.5px] font-extrabold uppercase bg-primary/10 text-primary border border-primary/25 px-1.5 py-0.5 rounded-md">
+                      {activeEmpMetadata.type}
+                    </span>
+                    <span className="text-[9.5px] font-bold text-muted-foreground">
+                      {activeEmpMetadata.jobTitle} &bull; {activeEmpMetadata.subDept}
+                    </span>
                   </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-2 text-xs w-full md:w-auto border-t md:border-t-0 md:border-l border-border/40 pt-3 md:pt-0 md:pl-6">
                 <div>
-                  <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block">Unit</span>
+                  <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block">
+                    Unit
+                  </span>
                   <span className="text-foreground font-black">{activeEmpMetadata.unit}</span>
                 </div>
                 <div>
-                  <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block">Shift</span>
+                  <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block">
+                    Shift
+                  </span>
                   <span className="text-foreground font-semibold">{activeEmpMetadata.shift}</span>
                 </div>
                 <div>
-                  <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block">Shift Start</span>
-                  <span className="text-foreground font-semibold font-mono">{activeEmpMetadata.shiftStartDate}</span>
+                  <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block">
+                    Shift Start
+                  </span>
+                  <span className="text-foreground font-semibold font-mono">
+                    {activeEmpMetadata.shiftStartDate}
+                  </span>
                 </div>
                 <div>
-                  <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block">Weekly Holiday</span>
-                  <span className="text-rose-500 font-extrabold">{activeEmpMetadata.defaultHoliday}</span>
+                  <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block">
+                    Weekly Holiday
+                  </span>
+                  <span className="text-rose-500 font-extrabold">
+                    {activeEmpMetadata.defaultHoliday}
+                  </span>
                 </div>
               </div>
             </div>
@@ -715,42 +849,62 @@ function EmployeeJobCardPage() {
           {/* Summary Stats Cards Ribbon */}
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2 print:hidden">
             <div className="bg-card rounded-xl border border-border/80 p-3 shadow-xs flex items-center gap-3">
-              <div className="size-8.5 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-black text-xs">P</div>
+              <div className="size-8.5 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-black text-xs">
+                P
+              </div>
               <div>
-                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">Present Days</span>
+                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">
+                  Present Days
+                </span>
                 <span className="text-sm font-black text-foreground">{stats.present}</span>
               </div>
             </div>
 
             <div className="bg-card rounded-xl border border-border/80 p-3 shadow-xs flex items-center gap-3">
-              <div className="size-8.5 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center font-black text-xs">L</div>
+              <div className="size-8.5 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center font-black text-xs">
+                L
+              </div>
               <div>
-                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">Leaves Taken</span>
+                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">
+                  Leaves Taken
+                </span>
                 <span className="text-sm font-black text-foreground">{stats.leaves}</span>
               </div>
             </div>
 
             <div className="bg-card rounded-xl border border-border/80 p-3 shadow-xs flex items-center gap-3">
-              <div className="size-8.5 rounded-lg bg-slate-500/10 text-slate-500 flex items-center justify-center font-black text-xs">H</div>
+              <div className="size-8.5 rounded-lg bg-slate-500/10 text-slate-500 flex items-center justify-center font-black text-xs">
+                H
+              </div>
               <div>
-                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">Weekly Holidays</span>
+                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">
+                  Weekly Holidays
+                </span>
                 <span className="text-sm font-black text-foreground">{stats.holidays}</span>
               </div>
             </div>
 
             <div className="bg-card rounded-xl border border-border/80 p-3 shadow-xs flex items-center gap-3">
-              <div className="size-8.5 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-black text-xs">OT</div>
+              <div className="size-8.5 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-black text-xs">
+                OT
+              </div>
               <div>
-                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">Overtime Hours</span>
+                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">
+                  Overtime Hours
+                </span>
                 <span className="text-sm font-black text-foreground">{stats.totalOt} hrs</span>
               </div>
             </div>
 
             {/* Late Entries Count */}
             <div className="bg-card rounded-xl border border-border/80 p-3 shadow-xs flex items-center gap-3">
-              <div className="size-8.5 rounded-lg bg-rose-500/10 text-rose-500 flex items-center justify-center font-black text-xs">LT</div>
+              <div className="size-8.5 rounded-lg bg-rose-500/10 text-rose-500 flex items-center justify-center font-black text-xs">
+                LT
+              </div>
               <div>
-                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">Late Entries</span>
+                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">
+                  Late Entries
+                </span>
                 <span className="text-sm font-black text-foreground font-mono">
                   {isRuntimeCal ? stats.lateCount : "—"}
                 </span>
@@ -759,9 +913,13 @@ function EmployeeJobCardPage() {
 
             {/* Early Leaves Count */}
             <div className="bg-card rounded-xl border border-border/80 p-3 shadow-xs flex items-center gap-3">
-              <div className="size-8.5 rounded-lg bg-purple-500/10 text-purple-500 flex items-center justify-center font-black text-xs">EL</div>
+              <div className="size-8.5 rounded-lg bg-purple-500/10 text-purple-500 flex items-center justify-center font-black text-xs">
+                EL
+              </div>
               <div>
-                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">Early Leaves</span>
+                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">
+                  Early Leaves
+                </span>
                 <span className="text-sm font-black text-foreground font-mono">
                   {isRuntimeCal ? stats.earlyLeaveCount : "—"}
                 </span>
@@ -771,7 +929,6 @@ function EmployeeJobCardPage() {
 
           {/* Spreadsheet Datagrid Card */}
           <div className="bg-card rounded-2xl border border-border/80 p-4 shadow-xs space-y-3">
-
             {/* Utilities Toolbar & Search */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/30 pb-4 print:hidden">
               <div className="flex items-center gap-1.5 select-none">
@@ -814,15 +971,33 @@ function EmployeeJobCardPage() {
                 <thead>
                   <tr className="bg-[#f1f5f9] dark:bg-[#0f172a] text-foreground font-bold border-b border-border/50 select-none whitespace-nowrap">
                     {/* Columns headers matching Pakiza structure */}
-                    <th className="px-4 py-3 font-extrabold text-center w-12 border-r border-border/30">SL</th>
-                    <th className="px-4 py-3 font-extrabold w-28 border-r border-border/30">Employee ID</th>
-                    <th className="px-4 py-3 font-extrabold w-36 border-r border-border/30">Employee Name</th>
-                    <th className="px-4 py-3 font-extrabold text-center w-28 border-r border-border/30">Atn Date</th>
-                    <th className="px-4 py-3 font-extrabold text-center w-28 border-r border-border/30">Out Date</th>
-                    <th className="px-4 py-3 font-extrabold text-center w-24 border-r border-border/30">In Time</th>
-                    <th className="px-4 py-3 font-extrabold text-center w-24 border-r border-border/30">Out Time</th>
-                    <th className="px-4 py-3 font-extrabold text-right w-24 border-r border-border/30">Over Time</th>
-                    <th className="px-4 py-3 font-extrabold w-32 border-r border-border/30">Duty Shift</th>
+                    <th className="px-4 py-3 font-extrabold text-center w-12 border-r border-border/30">
+                      SL
+                    </th>
+                    <th className="px-4 py-3 font-extrabold w-28 border-r border-border/30">
+                      Employee ID
+                    </th>
+                    <th className="px-4 py-3 font-extrabold w-36 border-r border-border/30">
+                      Employee Name
+                    </th>
+                    <th className="px-4 py-3 font-extrabold text-center w-28 border-r border-border/30">
+                      Atn Date
+                    </th>
+                    <th className="px-4 py-3 font-extrabold text-center w-28 border-r border-border/30">
+                      Out Date
+                    </th>
+                    <th className="px-4 py-3 font-extrabold text-center w-24 border-r border-border/30">
+                      In Time
+                    </th>
+                    <th className="px-4 py-3 font-extrabold text-center w-24 border-r border-border/30">
+                      Out Time
+                    </th>
+                    <th className="px-4 py-3 font-extrabold text-right w-24 border-r border-border/30">
+                      Over Time
+                    </th>
+                    <th className="px-4 py-3 font-extrabold w-32 border-r border-border/30">
+                      Duty Shift
+                    </th>
                     <th className="px-4 py-3 font-extrabold text-center w-24">Status</th>
                   </tr>
                 </thead>
@@ -860,11 +1035,14 @@ function EmployeeJobCardPage() {
                     } else if (activeStatus === "CL") {
                       statusBadgeClass = "text-amber-500 dark:text-amber-400 font-extrabold";
                     } else if (activeStatus === "Late") {
-                      statusBadgeClass = "text-amber-600 dark:text-amber-400 font-extrabold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20";
+                      statusBadgeClass =
+                        "text-amber-600 dark:text-amber-400 font-extrabold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20";
                     } else if (activeStatus === "Early Leave") {
-                      statusBadgeClass = "text-purple-600 dark:text-purple-400 font-extrabold bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20";
+                      statusBadgeClass =
+                        "text-purple-600 dark:text-purple-400 font-extrabold bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20";
                     } else if (activeStatus === "Late & Early") {
-                      statusBadgeClass = "text-rose-600 dark:text-rose-400 font-extrabold bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20 animate-pulse";
+                      statusBadgeClass =
+                        "text-rose-600 dark:text-rose-400 font-extrabold bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20 animate-pulse";
                     }
 
                     return (
@@ -872,11 +1050,21 @@ function EmployeeJobCardPage() {
                         key={`${row.empId}-${row.date}`}
                         className="group hover:bg-[#f8fafc] dark:hover:bg-[#1e293b] transition duration-100 whitespace-nowrap"
                       >
-                        <td className="px-4 py-2.5 text-center font-bold text-muted-foreground/60 border-r border-border/20">{slNo}</td>
-                        <td className="px-4 py-2.5 font-bold font-mono text-foreground border-r border-border/20">{row.empId}</td>
-                        <td className="px-4 py-2.5 font-semibold text-foreground/80 border-r border-border/20">{row.empName}</td>
-                        <td className="px-4 py-2.5 font-mono text-center font-bold text-foreground/80 border-r border-border/20">{row.date}</td>
-                        <td className="px-4 py-2.5 font-mono text-center text-muted-foreground border-r border-border/20">{row.outDate || ""}</td>
+                        <td className="px-4 py-2.5 text-center font-bold text-muted-foreground/60 border-r border-border/20">
+                          {slNo}
+                        </td>
+                        <td className="px-4 py-2.5 font-bold font-mono text-foreground border-r border-border/20">
+                          {row.empId}
+                        </td>
+                        <td className="px-4 py-2.5 font-semibold text-foreground/80 border-r border-border/20">
+                          {row.empName}
+                        </td>
+                        <td className="px-4 py-2.5 font-mono text-center font-bold text-foreground/80 border-r border-border/20">
+                          {row.date}
+                        </td>
+                        <td className="px-4 py-2.5 font-mono text-center text-muted-foreground border-r border-border/20">
+                          {row.outDate || ""}
+                        </td>
 
                         {/* Dynamic In Time Input Cell */}
                         <td className="px-4 py-2 text-center text-primary font-bold border-r border-border/20">
@@ -884,7 +1072,9 @@ function EmployeeJobCardPage() {
                             <input
                               type="text"
                               value={row.inTime}
-                              onChange={(e) => handleTimeChange(row.empId, row.date, 'inTime', e.target.value)}
+                              onChange={(e) =>
+                                handleTimeChange(row.empId, row.date, "inTime", e.target.value)
+                              }
                               className="w-20 h-7 text-center bg-slate-100 dark:bg-slate-900 focus:bg-card border border-border/40 focus:border-[#1e88e5] focus:ring-1 focus:ring-[#1e88e5]/20 rounded outline-none text-[11px] font-bold text-primary font-mono transition"
                             />
                           ) : (
@@ -898,7 +1088,9 @@ function EmployeeJobCardPage() {
                             <input
                               type="text"
                               value={row.outTime}
-                              onChange={(e) => handleTimeChange(row.empId, row.date, 'outTime', e.target.value)}
+                              onChange={(e) =>
+                                handleTimeChange(row.empId, row.date, "outTime", e.target.value)
+                              }
                               className="w-20 h-7 text-center bg-slate-100 dark:bg-slate-900 focus:bg-card border border-border/40 focus:border-[#1e88e5] focus:ring-1 focus:ring-[#1e88e5]/20 rounded outline-none text-[11px] font-bold text-primary font-mono transition"
                             />
                           ) : (
@@ -906,12 +1098,14 @@ function EmployeeJobCardPage() {
                           )}
                         </td>
 
-                        <td className="px-4 py-2.5 font-mono text-right font-bold text-foreground/85 border-r border-border/20">{row.overtime}</td>
-                        <td className="px-4 py-2.5 text-muted-foreground border-r border-border/20">{row.shift}</td>
+                        <td className="px-4 py-2.5 font-mono text-right font-bold text-foreground/85 border-r border-border/20">
+                          {row.overtime}
+                        </td>
+                        <td className="px-4 py-2.5 text-muted-foreground border-r border-border/20">
+                          {row.shift}
+                        </td>
                         <td className="px-4 py-2.5 text-center">
-                          <span className={statusBadgeClass}>
-                            {activeStatus}
-                          </span>
+                          <span className={statusBadgeClass}>{activeStatus}</span>
                         </td>
                       </tr>
                     );
@@ -919,8 +1113,12 @@ function EmployeeJobCardPage() {
 
                   {paginatedRows.length === 0 && (
                     <tr>
-                      <td colSpan={20} className="px-4 py-16 text-center text-muted-foreground font-semibold">
-                        No attendance job card data found for selected boundaries. Click GET to load records.
+                      <td
+                        colSpan={20}
+                        className="px-4 py-16 text-center text-muted-foreground font-semibold"
+                      >
+                        No attendance job card data found for selected boundaries. Click GET to load
+                        records.
                       </td>
                     </tr>
                   )}
@@ -931,7 +1129,9 @@ function EmployeeJobCardPage() {
             {/* Table Footer: Stats & Pagination */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2 print:hidden">
               <span className="text-[10px] font-bold text-muted-foreground/75 uppercase tracking-wider">
-                Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredRows.length)} to {Math.min(currentPage * itemsPerPage, filteredRows.length)} of {filteredRows.length} entries
+                Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredRows.length)} to{" "}
+                {Math.min(currentPage * itemsPerPage, filteredRows.length)} of {filteredRows.length}{" "}
+                entries
               </span>
 
               <div className="flex items-center gap-4">
@@ -949,7 +1149,7 @@ function EmployeeJobCardPage() {
                 <div className="flex items-center gap-1">
                   <button
                     disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                     className="p-1 rounded-lg border border-border/60 hover:bg-muted text-muted-foreground transition disabled:opacity-30 disabled:pointer-events-none"
                   >
                     <ChevronLeft className="size-4" />
@@ -959,7 +1159,7 @@ function EmployeeJobCardPage() {
                   </span>
                   <button
                     disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                     className="p-1 rounded-lg border border-border/60 hover:bg-muted text-muted-foreground transition disabled:opacity-30 disabled:pointer-events-none"
                   >
                     <ChevronRight className="size-4" />
@@ -967,7 +1167,6 @@ function EmployeeJobCardPage() {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </main>

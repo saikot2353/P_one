@@ -1,7 +1,7 @@
-import * as React from "react"
-import { Check, ChevronDown, Search } from "lucide-react"
+import * as React from "react";
+import { Check, ChevronDown, Search } from "lucide-react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 import {
   Command,
   CommandEmpty,
@@ -9,24 +9,20 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface Option {
-  value: string
-  label: string
+  value: string;
+  label: string;
 }
 
 interface SearchableSelectProps {
-  options: Option[]
-  value: string
-  onChange: (value: string) => void
-  placeholder?: string
-  className?: string
+  options: Option[];
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  className?: string;
 }
 
 export function SearchableSelect({
@@ -36,9 +32,9 @@ export function SearchableSelect({
   placeholder = "Select...",
   className,
 }: SearchableSelectProps) {
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = React.useState(false);
 
-  const selectedOption = options.find((option) => option.value === value)
+  const selectedOption = options.find((option) => option.value === value);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -48,7 +44,7 @@ export function SearchableSelect({
           aria-expanded={open}
           className={cn(
             "flex w-full items-center justify-between h-10 px-3 rounded-xl bg-background border border-border/80 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-sm transition-all text-foreground cursor-pointer hover:border-primary/50 text-left",
-            className
+            className,
           )}
         >
           <span className="flex items-center gap-2 truncate">
@@ -58,29 +54,31 @@ export function SearchableSelect({
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50 text-muted-foreground" />
         </button>
       </PopoverTrigger>
-      <PopoverContent 
-        className="w-[var(--radix-popover-trigger-width)] p-0 shadow-lg border-border/50 rounded-xl overflow-hidden" 
+      <PopoverContent
+        className="w-[var(--radix-popover-trigger-width)] p-0 shadow-lg border-border/50 rounded-xl overflow-hidden"
         align="start"
       >
         <Command>
           <CommandInput placeholder="Search..." className="h-9 text-xs" />
           <CommandList className="max-h-[200px]">
-            <CommandEmpty className="py-3 text-center text-xs text-muted-foreground">No results found.</CommandEmpty>
+            <CommandEmpty className="py-3 text-center text-xs text-muted-foreground">
+              No results found.
+            </CommandEmpty>
             <CommandGroup className="p-1">
               {options.map((option) => (
                 <CommandItem
                   key={option.value}
                   value={option.label}
                   onSelect={() => {
-                    onChange(option.value)
-                    setOpen(false)
+                    onChange(option.value);
+                    setOpen(false);
                   }}
                   className="text-xs rounded-lg cursor-pointer data-[selected=true]:bg-primary/10 data-[selected=true]:text-primary my-0.5"
                 >
                   <Check
                     className={cn(
                       "mr-2 h-3.5 w-3.5 text-primary",
-                      value === option.value ? "opacity-100" : "opacity-0"
+                      value === option.value ? "opacity-100" : "opacity-0",
                     )}
                   />
                   {option.label}
@@ -91,5 +89,5 @@ export function SearchableSelect({
         </Command>
       </PopoverContent>
     </Popover>
-  )
+  );
 }

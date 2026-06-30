@@ -3,16 +3,38 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import clientLogo from "../components/dashboard/client_logo.png";
 import { toast } from "sonner";
 import {
-  Eye, EyeOff, Lock, Mail, User, Building2, LayoutGrid,
-  ChevronRight, ChevronDown, Shield, ArrowRight, Check, Fingerprint,
-  Zap, Users, BarChart3, Globe, Cpu, Target, Search, Sun, Moon
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  User,
+  Building2,
+  LayoutGrid,
+  ChevronRight,
+  ChevronDown,
+  Shield,
+  ArrowRight,
+  Check,
+  Fingerprint,
+  Zap,
+  Users,
+  BarChart3,
+  Globe,
+  Cpu,
+  Target,
+  Search,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
       { title: "CRIPTON HRIS — Sign In" },
-      { name: "description", content: "Sign in to your CRIPTON HRIS account to access workforce intelligence." },
+      {
+        name: "description",
+        content: "Sign in to your CRIPTON HRIS account to access workforce intelligence.",
+      },
     ],
   }),
   component: LoginPage,
@@ -101,9 +123,7 @@ function AuroraCanvas({ theme }: { theme: Theme }) {
 
         for (let x = 0; x <= w; x += 2) {
           const y =
-            baseY +
-            Math.sin(x * 0.005 + speed) * 30 +
-            Math.cos(x * 0.008 + speed * 1.5) * 15;
+            baseY + Math.sin(x * 0.005 + speed) * 30 + Math.cos(x * 0.008 + speed * 1.5) * 15;
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
@@ -121,13 +141,16 @@ function AuroraCanvas({ theme }: { theme: Theme }) {
       // Floating light dust particles (aurora embers)
       const numParticles = 25;
       for (let i = 0; i < numParticles; i++) {
-        const px = ((i * 197.3 + time * 15) % w);
-        const py = (h * 0.9 - ((i * 37.7 + time * 30) % (h * 0.8)));
-        const opacity = Math.sin((py / h) * Math.PI) * (isDark ? 0.08 : 0.15) * (0.6 + 0.4 * Math.sin(time * 2 + i));
+        const px = (i * 197.3 + time * 15) % w;
+        const py = h * 0.9 - ((i * 37.7 + time * 30) % (h * 0.8));
+        const opacity =
+          Math.sin((py / h) * Math.PI) *
+          (isDark ? 0.08 : 0.15) *
+          (0.6 + 0.4 * Math.sin(time * 2 + i));
         const r = 1 + (i % 2.5);
         ctx.beginPath();
         ctx.arc(px, py, r, 0, Math.PI * 2);
-        ctx.fillStyle = isDark 
+        ctx.fillStyle = isDark
           ? `rgba(100, 180, 255, ${opacity})`
           : `rgba(29, 78, 216, ${opacity})`;
         ctx.fill();
@@ -136,8 +159,8 @@ function AuroraCanvas({ theme }: { theme: Theme }) {
       // Stars (dark mode only)
       if (isDark) {
         for (let i = 0; i < 80; i++) {
-          const sx = ((i * 137.5) % w);
-          const sy = ((i * 97.3) % (h * 0.6));
+          const sx = (i * 137.5) % w;
+          const sy = (i * 97.3) % (h * 0.6);
           const flicker = 0.3 + Math.sin(time * 2 + i) * 0.3;
           const size = 0.5 + (i % 3) * 0.5;
           ctx.beginPath();
@@ -167,9 +190,20 @@ function AuroraCanvas({ theme }: { theme: Theme }) {
 }
 
 /* ─────────── Floating Geometric Shape ─────────── */
-function FloatingShape({ type, size, x, y, delay, duration }: {
+function FloatingShape({
+  type,
+  size,
+  x,
+  y,
+  delay,
+  duration,
+}: {
   type: "hexagon" | "diamond" | "circle" | "triangle";
-  size: number; x: string; y: string; delay: number; duration: number;
+  size: number;
+  x: string;
+  y: string;
+  delay: number;
+  duration: number;
 }) {
   const shapes: Record<string, string> = {
     hexagon: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
@@ -182,7 +216,10 @@ function FloatingShape({ type, size, x, y, delay, duration }: {
     <div
       className="absolute pointer-events-none"
       style={{
-        left: x, top: y, width: size, height: size,
+        left: x,
+        top: y,
+        width: size,
+        height: size,
         clipPath: shapes[type],
         border: "1px solid var(--l-shape-border)",
         background: "var(--l-shape-fill)",
@@ -205,10 +242,13 @@ function TypeWriter({ texts }: { texts: string[] }) {
     let timeout: ReturnType<typeof setTimeout>;
 
     if (!isDeleting && charIndex <= currentText.length) {
-      timeout = setTimeout(() => {
-        setDisplay(currentText.slice(0, charIndex));
-        setCharIndex((c) => c + 1);
-      }, 60 + Math.random() * 40);
+      timeout = setTimeout(
+        () => {
+          setDisplay(currentText.slice(0, charIndex));
+          setCharIndex((c) => c + 1);
+        },
+        60 + Math.random() * 40,
+      );
     } else if (!isDeleting && charIndex > currentText.length) {
       timeout = setTimeout(() => setIsDeleting(true), 2200);
     } else if (isDeleting && charIndex > 0) {
@@ -239,8 +279,16 @@ function TypeWriter({ texts }: { texts: string[] }) {
 }
 
 /* ─────────── Animated Stat Counter ─────────── */
-function AnimatedCounter({ end, suffix, label, delay }: {
-  end: number; suffix: string; label: string; delay: number;
+function AnimatedCounter({
+  end,
+  suffix,
+  label,
+  delay,
+}: {
+  end: number;
+  suffix: string;
+  label: string;
+  delay: number;
 }) {
   const [count, setCount] = useState(0);
   const [started, setStarted] = useState(false);
@@ -255,7 +303,10 @@ function AnimatedCounter({ end, suffix, label, delay }: {
     const step = end / 40;
     const interval = setInterval(() => {
       setCount((c) => {
-        if (c + step >= end) { clearInterval(interval); return end; }
+        if (c + step >= end) {
+          clearInterval(interval);
+          return end;
+        }
         return c + step;
       });
     }, 30);
@@ -272,9 +323,13 @@ function AnimatedCounter({ end, suffix, label, delay }: {
           WebkitTextFillColor: "transparent",
         }}
       >
-        {Math.round(count).toLocaleString()}{suffix}
+        {Math.round(count).toLocaleString()}
+        {suffix}
       </div>
-      <div className="text-[10px] uppercase tracking-widest font-semibold mt-0.5" style={{ color: "var(--l-stat-label)" }}>
+      <div
+        className="text-[10px] uppercase tracking-widest font-semibold mt-0.5"
+        style={{ color: "var(--l-stat-label)" }}
+      >
         {label}
       </div>
     </div>
@@ -287,11 +342,19 @@ function PulsingLogo({ size = 48 }: { size?: number }) {
     <div className="relative" style={{ width: size, height: size }}>
       <div
         className="absolute inset-0 rounded-2xl"
-        style={{ background: "linear-gradient(135deg, #1d4ed8, #3b82f6)", animation: "pulseRing 2.5s ease-in-out infinite", opacity: 0.2 }}
+        style={{
+          background: "linear-gradient(135deg, #1d4ed8, #3b82f6)",
+          animation: "pulseRing 2.5s ease-in-out infinite",
+          opacity: 0.2,
+        }}
       />
       <div
         className="absolute inset-0 rounded-2xl"
-        style={{ background: "linear-gradient(135deg, #1d4ed8, #3b82f6)", animation: "pulseRing 2.5s ease-in-out 0.5s infinite", opacity: 0.1 }}
+        style={{
+          background: "linear-gradient(135deg, #1d4ed8, #3b82f6)",
+          animation: "pulseRing 2.5s ease-in-out 0.5s infinite",
+          opacity: 0.1,
+        }}
       />
       <div
         className="relative w-full h-full rounded-2xl flex items-center justify-center overflow-hidden"
@@ -300,8 +363,18 @@ function PulsingLogo({ size = 48 }: { size?: number }) {
           boxShadow: "0 8px 32px rgba(29, 78, 216, 0.4), inset 0 1px 0 rgba(255,255,255,0.15)",
         }}
       >
-        <Shield className="text-white" style={{ width: size * 0.5, height: size * 0.5 }} strokeWidth={2.2} />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%, rgba(255,255,255,0.05) 100%)" }} />
+        <Shield
+          className="text-white"
+          style={{ width: size * 0.5, height: size * 0.5 }}
+          strokeWidth={2.2}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%, rgba(255,255,255,0.05) 100%)",
+          }}
+        />
       </div>
     </div>
   );
@@ -355,10 +428,27 @@ interface DropdownItem {
 }
 
 function GlassSearchDropdown({
-  label, icon, placeholder, triggerPlaceholder, value, onChange, items, id, className = "", disabled = false
+  label,
+  icon,
+  placeholder,
+  triggerPlaceholder,
+  value,
+  onChange,
+  items,
+  id,
+  className = "",
+  disabled = false,
 }: {
-  label: string; icon: React.ReactNode; placeholder: string; triggerPlaceholder: string;
-  value: string | null; onChange: (value: string) => void; items: DropdownItem[]; id: string; className?: string; disabled?: boolean;
+  label: string;
+  icon: React.ReactNode;
+  placeholder: string;
+  triggerPlaceholder: string;
+  value: string | null;
+  onChange: (value: string) => void;
+  items: DropdownItem[];
+  id: string;
+  className?: string;
+  disabled?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -366,32 +456,47 @@ function GlassSearchDropdown({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const filtered = items.filter(
-    (item) => item.name.toLowerCase().includes(search.toLowerCase()) || item.description.toLowerCase().includes(search.toLowerCase())
+    (item) =>
+      item.name.toLowerCase().includes(search.toLowerCase()) ||
+      item.description.toLowerCase().includes(search.toLowerCase()),
   );
   const selectedItem = items.find((i) => i.id === value);
 
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) { setOpen(false); setSearch(""); }
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+        setSearch("");
+      }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
-  useEffect(() => { if (open && inputRef.current) inputRef.current.focus(); }, [open]);
+  useEffect(() => {
+    if (open && inputRef.current) inputRef.current.focus();
+  }, [open]);
 
   return (
     <div className={`mb-5 ${className}`} ref={containerRef} id={id}>
       <div className="flex items-center gap-2 mb-2.5">
         {icon}
-        <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--l-label)" }}>{label}</span>
+        <span
+          className="text-[10px] font-bold uppercase tracking-widest"
+          style={{ color: "var(--l-label)" }}
+        >
+          {label}
+        </span>
       </div>
 
       <button
         type="button"
         disabled={disabled}
-        onClick={() => { setOpen(!open); setSearch(""); }}
+        onClick={() => {
+          setOpen(!open);
+          setSearch("");
+        }}
         className={`login-glass-input w-full rounded-2xl flex items-center gap-3 px-4 py-3.5 text-left group ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
         style={{
           borderColor: open ? "var(--l-focus-border)" : undefined,
@@ -401,70 +506,134 @@ function GlassSearchDropdown({
       >
         {selectedItem ? (
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: selectedItem.gradient }}>{selectedItem.renderIcon()}</div>
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+              style={{ background: selectedItem.gradient }}
+            >
+              {selectedItem.renderIcon()}
+            </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-bold truncate" style={{ color: "var(--l-text)" }}>{selectedItem.name}</p>
-              <p className="text-[10px] truncate" style={{ color: "var(--l-muted)" }}>{selectedItem.description}</p>
+              <p className="text-sm font-bold truncate" style={{ color: "var(--l-text)" }}>
+                {selectedItem.name}
+              </p>
+              <p className="text-[10px] truncate" style={{ color: "var(--l-muted)" }}>
+                {selectedItem.description}
+              </p>
             </div>
           </div>
         ) : (
           <div className="flex items-center gap-2.5 flex-1">
             <Search className="w-4 h-4" style={{ color: "var(--l-icon-muted)" }} />
-            <span className="text-sm font-medium" style={{ color: "var(--l-placeholder)" }}>{triggerPlaceholder}</span>
+            <span className="text-sm font-medium" style={{ color: "var(--l-placeholder)" }}>
+              {triggerPlaceholder}
+            </span>
           </div>
         )}
-        <ChevronDown className="w-4 h-4 flex-shrink-0 transition-transform duration-300" style={{ color: "var(--l-icon-muted)", transform: open ? "rotate(180deg)" : "rotate(0deg)" }} />
+        <ChevronDown
+          className="w-4 h-4 flex-shrink-0 transition-transform duration-300"
+          style={{
+            color: "var(--l-icon-muted)",
+            transform: open ? "rotate(180deg)" : "rotate(0deg)",
+          }}
+        />
       </button>
 
       {open && (
         <div
           className="mt-2 rounded-2xl overflow-hidden relative z-50"
           style={{
-            background: "var(--l-dropdown-bg)", border: "1px solid var(--l-dropdown-border)",
-            boxShadow: "var(--l-dropdown-shadow)", backdropFilter: "blur(24px)",
+            background: "var(--l-dropdown-bg)",
+            border: "1px solid var(--l-dropdown-border)",
+            boxShadow: "var(--l-dropdown-shadow)",
+            backdropFilter: "blur(24px)",
             animation: "dropdownOpen 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
           }}
         >
-          <div className="flex items-center gap-2.5 px-4 py-3" style={{ borderBottom: "1px solid var(--l-divider)" }}>
+          <div
+            className="flex items-center gap-2.5 px-4 py-3"
+            style={{ borderBottom: "1px solid var(--l-divider)" }}
+          >
             <Search className="w-4 h-4 flex-shrink-0" style={{ color: "var(--l-accent)" }} />
             <input
-              ref={inputRef} type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder={placeholder}
+              ref={inputRef}
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={placeholder}
               className="w-full bg-transparent outline-none text-sm font-medium"
               style={{ color: "var(--l-text)", caretColor: "var(--l-accent)" }}
             />
             {search && (
-              <button type="button" onClick={() => setSearch("")}
+              <button
+                type="button"
+                onClick={() => setSearch("")}
                 className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md"
-                style={{ color: "var(--l-muted)", background: "var(--l-clear-bg)" }}>Clear</button>
+                style={{ color: "var(--l-muted)", background: "var(--l-clear-bg)" }}
+              >
+                Clear
+              </button>
             )}
           </div>
           <div className="overflow-y-auto p-1.5" style={{ maxHeight: 220 }}>
             {filtered.length === 0 ? (
-              <div className="py-6 text-center text-xs font-medium" style={{ color: "var(--l-muted)" }}>No results found</div>
+              <div
+                className="py-6 text-center text-xs font-medium"
+                style={{ color: "var(--l-muted)" }}
+              >
+                No results found
+              </div>
             ) : (
               filtered.map((item, idx) => (
                 <button
-                  key={item.id} type="button"
-                  onClick={() => { onChange(item.id); setOpen(false); setSearch(""); }}
+                  key={item.id}
+                  type="button"
+                  onClick={() => {
+                    onChange(item.id);
+                    setOpen(false);
+                    setSearch("");
+                  }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-200"
                   style={{
                     background: value === item.id ? "var(--l-selected-bg)" : "transparent",
                     animation: `fadeInUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) ${idx * 0.03}s both`,
                   }}
-                  onMouseEnter={(e) => { if (value !== item.id) e.currentTarget.style.background = "var(--l-hover-bg)"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = value === item.id ? "var(--l-selected-bg)" : "transparent"; }}
+                  onMouseEnter={(e) => {
+                    if (value !== item.id) e.currentTarget.style.background = "var(--l-hover-bg)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background =
+                      value === item.id ? "var(--l-selected-bg)" : "transparent";
+                  }}
                 >
-                  <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ background: item.gradient, boxShadow: value === item.id ? "0 4px 14px rgba(79, 110, 247, 0.2)" : "none" }}>
+                  <div
+                    className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{
+                      background: item.gradient,
+                      boxShadow: value === item.id ? "0 4px 14px rgba(79, 110, 247, 0.2)" : "none",
+                    }}
+                  >
                     {item.renderIcon()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-bold truncate" style={{ color: "var(--l-text)" }}>{item.name}</p>
-                    <p className="text-[10px] truncate" style={{ color: "var(--l-muted)" }}>{item.description}</p>
+                    <p
+                      className="text-[13px] font-bold truncate"
+                      style={{ color: "var(--l-text)" }}
+                    >
+                      {item.name}
+                    </p>
+                    <p className="text-[10px] truncate" style={{ color: "var(--l-muted)" }}>
+                      {item.description}
+                    </p>
                   </div>
                   {value === item.id && (
-                    <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                      style={{ background: "linear-gradient(135deg, #10b981, #059669)", boxShadow: "0 2px 6px rgba(16, 185, 129, 0.3)", animation: "scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1)" }}>
+                    <div
+                      className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                      style={{
+                        background: "linear-gradient(135deg, #10b981, #059669)",
+                        boxShadow: "0 2px 6px rgba(16, 185, 129, 0.3)",
+                        animation: "scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+                      }}
+                    >
                       <Check className="w-3 h-3 text-white" strokeWidth={3} />
                     </div>
                   )}
@@ -495,26 +664,212 @@ interface UserItem {
 }
 
 const SEED_USERS: UserItem[] = [
-  { sl: 1, name: "Tahmid Afsar", email: "tahmid.bd@pakizasoftware.com", empId: "2023043910", userId: "2023043910", role: "Admin", department: "Business Innovation", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["All"] },
-  { sl: 2, name: "Tahsin Ahmed", email: "tahsin.cmr@pakizaknit.com", empId: "2021026991", userId: "2021026991", role: "employee", department: "Procurement and Supply Chain - (Procurement and Supply Chain)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 3, name: "Shanewas Hossen", email: "shahnewas.account@pakizaknit.com", empId: "2019016666", userId: "2019016666", role: "employee", department: "Accounts & Finance - (Accounts & Finance)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 4, name: "Suman Mazumder", email: "suman@pfd-global.com", empId: "2024050708", userId: "2024050708", role: "employee", department: "Marketing and Merchandising - (Marketing and Merchandising)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 5, name: "Sultan Ahmed", email: "sultan.ba@pakizasoftware.com", empId: "2023045044", userId: "2023045044", role: "employee", department: "Implementation & Business Analysis - (Business Analysis)", lastLogin: "2026-05-12 15:48:06", isActive: "Active", password: "password123", companyAccess: ["Pakiza Software Limited"] },
-  { sl: 6, name: "Md. Jamshed Alam", email: "jamshed.alam@pakizaknit.com", empId: "2014001017", userId: "2014001017", role: "HOD", department: "Management", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["All"] },
-  { sl: 7, name: "Md. Tuhin Hosen", email: "mdtuhin.dyeing@pakizaknit.com", empId: "2021028128", userId: "2021028128", role: "employee", department: "Fabrics Department - (Finish Fabric Store (MCD))", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 8, name: "Md. Shameem", email: "shamim.ahmed@pakizaknit.com", empId: "2018012755", userId: "2018012755", role: "HOD", department: "RMG Operations - (Embroidery)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 9, name: "Tushar Kanti Das", email: "tushar.kanti@pakizaknit.com", empId: "2016005888", userId: "2016005888", role: "HOD", department: "Admin", lastLogin: "2026-04-02 13:11:13", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd", "Pakiza Software Limited"] },
-  { sl: 10, name: "Kanak Das", email: "kanakdas01914@gmail.com", empId: "2019016183", userId: "2019016183", role: "employee", department: "—", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 11, name: "Md. Saeid Maruf", email: "syed.maruf@pakizaknit.com", empId: "2014001111", userId: "2014001111", role: "HOD", department: "Production Planning - (Production Planning)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 12, name: "Md. Tariql Islam", email: "tariqul.rmg@pakizaknit.com", empId: "2021027208", userId: "2021027208", role: "employee", department: "Finishing Department - (Finishing)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 13, name: "Md. Ruhul Amin Chowdhury", email: "faysal.amin@pakizaknit.com", empId: "2016001098", userId: "2016001098", role: "HOD", department: "Marketing and Merchandising - (Marketing and Merchandising)", lastLogin: "—", isActive: "Active", password: "password123", companyAccess: ["Pakiza Knit Composite Ltd"] },
-  { sl: 14, name: "Admin User", email: "admin@pakiza.com", empId: "ADMIN01", userId: "admin", role: "Admin", department: "IT Department", lastLogin: "—", isActive: "Active", password: "admin", companyAccess: ["All"] }
+  {
+    sl: 1,
+    name: "Tahmid Afsar",
+    email: "tahmid.bd@pakizasoftware.com",
+    empId: "2023043910",
+    userId: "2023043910",
+    role: "Admin",
+    department: "Business Innovation",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["All"],
+  },
+  {
+    sl: 2,
+    name: "Tahsin Ahmed",
+    email: "tahsin.cmr@pakizaknit.com",
+    empId: "2021026991",
+    userId: "2021026991",
+    role: "employee",
+    department: "Procurement and Supply Chain - (Procurement and Supply Chain)",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 3,
+    name: "Shanewas Hossen",
+    email: "shahnewas.account@pakizaknit.com",
+    empId: "2019016666",
+    userId: "2019016666",
+    role: "employee",
+    department: "Accounts & Finance - (Accounts & Finance)",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 4,
+    name: "Suman Mazumder",
+    email: "suman@pfd-global.com",
+    empId: "2024050708",
+    userId: "2024050708",
+    role: "employee",
+    department: "Marketing and Merchandising - (Marketing and Merchandising)",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 5,
+    name: "Sultan Ahmed",
+    email: "sultan.ba@pakizasoftware.com",
+    empId: "2023045044",
+    userId: "2023045044",
+    role: "employee",
+    department: "Implementation & Business Analysis - (Business Analysis)",
+    lastLogin: "2026-05-12 15:48:06",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Software Limited"],
+  },
+  {
+    sl: 6,
+    name: "Md. Jamshed Alam",
+    email: "jamshed.alam@pakizaknit.com",
+    empId: "2014001017",
+    userId: "2014001017",
+    role: "HOD",
+    department: "Management",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["All"],
+  },
+  {
+    sl: 7,
+    name: "Md. Tuhin Hosen",
+    email: "mdtuhin.dyeing@pakizaknit.com",
+    empId: "2021028128",
+    userId: "2021028128",
+    role: "employee",
+    department: "Fabrics Department - (Finish Fabric Store (MCD))",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 8,
+    name: "Md. Shameem",
+    email: "shamim.ahmed@pakizaknit.com",
+    empId: "2018012755",
+    userId: "2018012755",
+    role: "HOD",
+    department: "RMG Operations - (Embroidery)",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 9,
+    name: "Tushar Kanti Das",
+    email: "tushar.kanti@pakizaknit.com",
+    empId: "2016005888",
+    userId: "2016005888",
+    role: "HOD",
+    department: "Admin",
+    lastLogin: "2026-04-02 13:11:13",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd", "Pakiza Software Limited"],
+  },
+  {
+    sl: 10,
+    name: "Kanak Das",
+    email: "kanakdas01914@gmail.com",
+    empId: "2019016183",
+    userId: "2019016183",
+    role: "employee",
+    department: "—",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 11,
+    name: "Md. Saeid Maruf",
+    email: "syed.maruf@pakizaknit.com",
+    empId: "2014001111",
+    userId: "2014001111",
+    role: "HOD",
+    department: "Production Planning - (Production Planning)",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 12,
+    name: "Md. Tariql Islam",
+    email: "tariqul.rmg@pakizaknit.com",
+    empId: "2021027208",
+    userId: "2021027208",
+    role: "employee",
+    department: "Finishing Department - (Finishing)",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 13,
+    name: "Md. Ruhul Amin Chowdhury",
+    email: "faysal.amin@pakizaknit.com",
+    empId: "2016001098",
+    userId: "2016001098",
+    role: "HOD",
+    department: "Marketing and Merchandising - (Marketing and Merchandising)",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "password123",
+    companyAccess: ["Pakiza Knit Composite Ltd"],
+  },
+  {
+    sl: 14,
+    name: "Admin User",
+    email: "admin@pakiza.com",
+    empId: "ADMIN01",
+    userId: "admin",
+    role: "Admin",
+    department: "IT Department",
+    lastLogin: "—",
+    isActive: "Active",
+    password: "admin",
+    companyAccess: ["All"],
+  },
 ];
 
 const ALL_COMPANIES = [
-  { id: "pakiza-software", name: "Pakiza Software Limited", location: "Dhaka, Bangladesh", employees: "150", gradient: "linear-gradient(135deg, #1d4ed8, #3b82f6)" },
-  { id: "pakiza-knit", name: "Pakiza Knit Composite Ltd", location: "Savar, Bangladesh", employees: "3,200", gradient: "linear-gradient(135deg, #0e7490, #0891b2)" },
-  { id: "pakiza-group", name: "Pakiza Group", location: "Dhaka, Bangladesh", employees: "8,500", gradient: "linear-gradient(135deg, #2563eb, #1e40af)" },
+  {
+    id: "pakiza-software",
+    name: "Pakiza Software Limited",
+    location: "Dhaka, Bangladesh",
+    employees: "150",
+    gradient: "linear-gradient(135deg, #1d4ed8, #3b82f6)",
+  },
+  {
+    id: "pakiza-knit",
+    name: "Pakiza Knit Composite Ltd",
+    location: "Savar, Bangladesh",
+    employees: "3,200",
+    gradient: "linear-gradient(135deg, #0e7490, #0891b2)",
+  },
+  {
+    id: "pakiza-group",
+    name: "Pakiza Group",
+    location: "Dhaka, Bangladesh",
+    employees: "8,500",
+    gradient: "linear-gradient(135deg, #2563eb, #1e40af)",
+  },
 ];
 
 /* ═══════════ MAIN LOGIN PAGE ═══════════ */
@@ -564,71 +919,78 @@ function LoginPage() {
 
   const toggleTheme = useCallback(() => setTheme((t) => (t === "dark" ? "light" : "dark")), []);
 
-  const handleLogin = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    const finalEmail = (email || "").trim() || "admin";
-    const finalPassword = password || "password123";
-    setIsLoading(true);
-    
-    // Simulate network delay for premium visual load
-    await new Promise((r) => setTimeout(r, 1200));
+  const handleLogin = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      const finalEmail = (email || "").trim() || "admin";
+      const finalPassword = password || "password123";
+      setIsLoading(true);
 
-    let usersList = SEED_USERS;
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("cripton_user_list");
-      if (stored) {
-        try {
-          usersList = JSON.parse(stored);
-        } catch (err) {
-          console.error("Error parsing user list:", err);
+      // Simulate network delay for premium visual load
+      await new Promise((r) => setTimeout(r, 1200));
+
+      let usersList = SEED_USERS;
+      if (typeof window !== "undefined") {
+        const stored = localStorage.getItem("cripton_user_list");
+        if (stored) {
+          try {
+            usersList = JSON.parse(stored);
+          } catch (err) {
+            console.error("Error parsing user list:", err);
+          }
+        } else {
+          // Initialize localStorage database
+          localStorage.setItem("cripton_user_list", JSON.stringify(SEED_USERS));
         }
-      } else {
-        // Initialize localStorage database
-        localStorage.setItem("cripton_user_list", JSON.stringify(SEED_USERS));
       }
-    }
 
-    let matchedUser = usersList.find(
-      (u) => u.userId?.toLowerCase() === finalEmail.toLowerCase()
-    );
+      let matchedUser = usersList.find((u) => u.userId?.toLowerCase() === finalEmail.toLowerCase());
 
-    setIsLoading(false);
+      setIsLoading(false);
 
-    if (!matchedUser) {
-      matchedUser = {
-        sl: Date.now(),
-        name: finalEmail.split('@')[0] || finalEmail,
-        email: finalEmail,
-        empId: "GUEST" + Math.floor(Math.random() * 10000),
-        userId: finalEmail,
-        role: "Admin",
-        department: "General",
-        lastLogin: "—",
-        isActive: "Active",
-        password: finalPassword,
-        companyAccess: ["All"]
-      };
-      usersList.push(matchedUser);
-    }
+      if (!matchedUser) {
+        matchedUser = {
+          sl: Date.now(),
+          name: finalEmail.split("@")[0] || finalEmail,
+          email: finalEmail,
+          empId: "GUEST" + Math.floor(Math.random() * 10000),
+          userId: finalEmail,
+          role: "Admin",
+          department: "General",
+          lastLogin: "—",
+          isActive: "Active",
+          password: finalPassword,
+          companyAccess: ["All"],
+        };
+        usersList.push(matchedUser);
+      }
 
-    // Success! Save lastLogin and set currentUser
-    if (typeof window !== "undefined") {
-      const now = new Date();
-      const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
-      
-      const updatedList = usersList.map((u) =>
-        u.sl === matchedUser.sl ? { ...u, lastLogin: formattedDate } : u
-      );
-      
-      localStorage.setItem("cripton_user_list", JSON.stringify(updatedList));
-      localStorage.setItem("cripton_current_user", JSON.stringify({ ...matchedUser, lastLogin: formattedDate }));
-      setCurrentUser({ ...matchedUser, lastLogin: formattedDate });
-    }
+      // Success! Save lastLogin and set currentUser
+      if (typeof window !== "undefined") {
+        const now = new Date();
+        const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
 
-    toast.success(`Logged in as ${matchedUser.name}`);
-    setTransitioning(true);
-    setTimeout(() => { setStep(2); setTransitioning(false); }, 500);
-  }, [email, password]);
+        const updatedList = usersList.map((u) =>
+          u.sl === matchedUser.sl ? { ...u, lastLogin: formattedDate } : u,
+        );
+
+        localStorage.setItem("cripton_user_list", JSON.stringify(updatedList));
+        localStorage.setItem(
+          "cripton_current_user",
+          JSON.stringify({ ...matchedUser, lastLogin: formattedDate }),
+        );
+        setCurrentUser({ ...matchedUser, lastLogin: formattedDate });
+      }
+
+      toast.success(`Logged in as ${matchedUser.name}`);
+      setTransitioning(true);
+      setTimeout(() => {
+        setStep(2);
+        setTransitioning(false);
+      }, 500);
+    },
+    [email, password],
+  );
 
   const handleContinue = useCallback(async () => {
     if (!selectedCompany || !selectedSection) return;
@@ -645,7 +1007,7 @@ function LoginPage() {
     if (!currentUser) return ALL_COMPANIES;
     const access = currentUser.companyAccess || [];
     if (access.includes("All")) return ALL_COMPANIES;
-    return ALL_COMPANIES.filter(c => access.includes(c.name));
+    return ALL_COMPANIES.filter((c) => access.includes(c.name));
   }, [currentUser]);
 
   useEffect(() => {
@@ -654,22 +1016,64 @@ function LoginPage() {
 
   const sections = useMemo(() => {
     if (!selectedCompany) return [];
-    
+
     if (selectedCompany === "pakiza-software") {
       return [
-        { id: "psl-op", name: "PSL-Operation", icon: Zap, desc: "Software operations", gradient: "linear-gradient(135deg, #2563eb, #1e40af)" },
-        { id: "psl-ho", name: "PSL-Head Office", icon: Building2, desc: "Corporate headquarters", gradient: "linear-gradient(135deg, #6366f1, #4338ca)" }
+        {
+          id: "psl-op",
+          name: "PSL-Operation",
+          icon: Zap,
+          desc: "Software operations",
+          gradient: "linear-gradient(135deg, #2563eb, #1e40af)",
+        },
+        {
+          id: "psl-ho",
+          name: "PSL-Head Office",
+          icon: Building2,
+          desc: "Corporate headquarters",
+          gradient: "linear-gradient(135deg, #6366f1, #4338ca)",
+        },
       ];
     } else if (selectedCompany === "pakiza-knit") {
       return [
-        { id: "pkc-dyeing", name: "PKC-Dyeing", icon: Zap, desc: "Dyeing operations", gradient: "linear-gradient(135deg, #d97706, #b45309)" },
-        { id: "pkc-sewing", name: "PKC-Sewing", icon: Users, desc: "Sewing department", gradient: "linear-gradient(135deg, #2563eb, #1e40af)" },
-        { id: "pkc-cutting", name: "PKC-Cutting", icon: Target, desc: "Cutting operations", gradient: "linear-gradient(135deg, #0891b2, #0e7490)" },
+        {
+          id: "pkc-dyeing",
+          name: "PKC-Dyeing",
+          icon: Zap,
+          desc: "Dyeing operations",
+          gradient: "linear-gradient(135deg, #d97706, #b45309)",
+        },
+        {
+          id: "pkc-sewing",
+          name: "PKC-Sewing",
+          icon: Users,
+          desc: "Sewing department",
+          gradient: "linear-gradient(135deg, #2563eb, #1e40af)",
+        },
+        {
+          id: "pkc-cutting",
+          name: "PKC-Cutting",
+          icon: Target,
+          desc: "Cutting operations",
+          gradient: "linear-gradient(135deg, #0891b2, #0e7490)",
+        },
       ];
     } else if (selectedCompany === "pakiza-group") {
       return [
-        { id: "pg-corporate", name: "PG-Corporate", icon: Building2, desc: "Corporate administration", gradient: "linear-gradient(135deg, #6366f1, #4338ca)" },
-        { id: "pg-textile", name: "PG-Textile Sales", icon: BarChart3, desc: "Textile sales & marketing", gradient: "linear-gradient(135deg, #059669, #047857)" },
+        {
+          id: "pg-corporate",
+          name: "PG-Corporate",
+          icon: Building2,
+          desc: "Corporate administration",
+          gradient: "linear-gradient(135deg, #6366f1, #4338ca)",
+        },
+        {
+          id: "pg-textile",
+          name: "PG-Textile Sales",
+          icon: BarChart3,
+          desc: "Textile sales & marketing",
+          gradient: "linear-gradient(135deg, #059669, #047857)",
+        },
       ];
     }
     return [];
@@ -921,8 +1325,21 @@ function LoginPage() {
         <AuroraCanvas theme={theme} />
 
         {/* Morphing blobs */}
-        <div className="morph-blob absolute" style={{ width: 350, height: 350, left: "10%", top: "15%", background: "var(--l-blob1)" }} />
-        <div className="morph-blob absolute" style={{ width: 280, height: 280, right: "5%", bottom: "20%", background: "var(--l-blob2)", animationDelay: "-4s" }} />
+        <div
+          className="morph-blob absolute"
+          style={{ width: 350, height: 350, left: "10%", top: "15%", background: "var(--l-blob1)" }}
+        />
+        <div
+          className="morph-blob absolute"
+          style={{
+            width: 280,
+            height: 280,
+            right: "5%",
+            bottom: "20%",
+            background: "var(--l-blob2)",
+            animationDelay: "-4s",
+          }}
+        />
 
         {/* Floating shapes */}
         <FloatingShape type="hexagon" size={80} x="15%" y="20%" delay={0} duration={8} />
@@ -937,21 +1354,44 @@ function LoginPage() {
           <div className="flex items-center gap-3">
             <PulsingLogo size={44} />
             <div>
-              <h1 className="text-xl font-extrabold tracking-tight" style={{ color: "var(--l-text-heading)" }}>CRIPTON</h1>
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: "var(--l-left-brand-sub)" }}>HRIS Platform</p>
+              <h1
+                className="text-xl font-extrabold tracking-tight"
+                style={{ color: "var(--l-text-heading)" }}
+              >
+                CRIPTON
+              </h1>
+              <p
+                className="text-[10px] font-bold uppercase tracking-[0.3em]"
+                style={{ color: "var(--l-left-brand-sub)" }}
+              >
+                HRIS Platform
+              </p>
             </div>
           </div>
         </div>
 
         <div className="relative z-10 -mt-8">
-          <h2 className="text-4xl xl:text-5xl font-black leading-[1.1] tracking-tight mb-4" style={{ color: "var(--l-text-heading)" }}>
-            Workforce<br />Intelligence,<br />
-            <span style={{ background: "linear-gradient(135deg, #1d4ed8, #3b82f6, #06b6d4)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+          <h2
+            className="text-4xl xl:text-5xl font-black leading-[1.1] tracking-tight mb-4"
+            style={{ color: "var(--l-text-heading)" }}
+          >
+            Workforce
+            <br />
+            Intelligence,
+            <br />
+            <span
+              style={{
+                background: "linear-gradient(135deg, #1d4ed8, #3b82f6, #06b6d4)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
               <TypeWriter texts={["Reimagined.", "Simplified.", "Amplified.", "Unified."]} />
             </span>
           </h2>
           <p className="text-sm leading-relaxed max-w-sm" style={{ color: "var(--l-left-body)" }}>
-            An enterprise HR command center that transforms how organizations manage people, performance, and potential.
+            An enterprise HR command center that transforms how organizations manage people,
+            performance, and potential.
           </p>
         </div>
 
@@ -964,10 +1404,13 @@ function LoginPage() {
         </div>
 
         {/* Edge fades */}
-        <div className="absolute inset-0 pointer-events-none z-[5]" style={{
-          background: `linear-gradient(to right, transparent 85%, var(--l-edge-fade) 100%), linear-gradient(to bottom, transparent 90%, var(--l-edge-fade) 100%), linear-gradient(to top, transparent 92%, var(--l-edge-fade) 100%)`,
-          transition: "background 0.5s ease",
-        }} />
+        <div
+          className="absolute inset-0 pointer-events-none z-[5]"
+          style={{
+            background: `linear-gradient(to right, transparent 85%, var(--l-edge-fade) 100%), linear-gradient(to bottom, transparent 90%, var(--l-edge-fade) 100%), linear-gradient(to top, transparent 92%, var(--l-edge-fade) 100%)`,
+            transition: "background 0.5s ease",
+          }}
+        />
       </div>
 
       {/* ═══════ RIGHT PANEL — Form ═══════ */}
@@ -975,16 +1418,35 @@ function LoginPage() {
         className="w-full lg:w-[48%] flex items-center justify-center p-6 md:p-10 relative"
         style={{ background: "var(--l-panel-bg)", transition: "background 0.5s ease" }}
       >
-        <div className="absolute pointer-events-none" style={{ width: 500, height: 500, left: "50%", top: "50%", transform: "translate(-50%, -50%)", background: "var(--l-radial-glow)" }} />
+        <div
+          className="absolute pointer-events-none"
+          style={{
+            width: 500,
+            height: 500,
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%, -50%)",
+            background: "var(--l-radial-glow)",
+          }}
+        />
 
-        <div className="w-full relative z-10" style={{ maxWidth: step === 1 ? 420 : 520, transition: "max-width 0.5s cubic-bezier(0.4, 0, 0.2, 1)" }}>
-
+        <div
+          className="w-full relative z-10"
+          style={{
+            maxWidth: step === 1 ? 420 : 520,
+            transition: "max-width 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+          }}
+        >
           {/* ─── STEP 1: Login ─── */}
           {step === 1 && (
             <div
               className="gradient-border rounded-3xl p-8 md:p-10"
               style={{
-                animation: mounted ? (transitioning ? "slideOutLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards" : "scaleIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards") : "none",
+                animation: mounted
+                  ? transitioning
+                    ? "slideOutLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards"
+                    : "scaleIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards"
+                  : "none",
                 opacity: mounted ? undefined : 0,
               }}
             >
@@ -992,72 +1454,189 @@ function LoginPage() {
               <div className="flex items-center gap-3 mb-8 lg:hidden">
                 <PulsingLogo size={40} />
                 <div>
-                  <h1 className="text-lg font-extrabold tracking-tight" style={{ color: "var(--l-text-heading)" }}>CRIPTON</h1>
-                  <p className="text-[9px] font-bold uppercase tracking-[0.3em]" style={{ color: "var(--l-muted)" }}>HRIS Platform</p>
+                  <h1
+                    className="text-lg font-extrabold tracking-tight"
+                    style={{ color: "var(--l-text-heading)" }}
+                  >
+                    CRIPTON
+                  </h1>
+                  <p
+                    className="text-[9px] font-bold uppercase tracking-[0.3em]"
+                    style={{ color: "var(--l-muted)" }}
+                  >
+                    HRIS Platform
+                  </p>
                 </div>
               </div>
 
               {/* Client Logo Header */}
               <div className="flex flex-col items-center text-center mb-8">
-                <div className="w-20 h-20 rounded-2xl flex items-center justify-center p-3 mb-4 shadow-sm border transition-all duration-300"
+                <div
+                  className="w-20 h-20 rounded-2xl flex items-center justify-center p-3 mb-4 shadow-sm border transition-all duration-300"
                   style={{
                     background: "var(--l-input-bg)",
                     borderColor: "var(--l-input-border)",
                     boxShadow: "0 10px 30px -10px rgba(29, 78, 216, 0.12)",
-                  }}>
-                  <img src={clientLogo} alt="Client Logo" className="w-full h-full object-contain" />
+                  }}
+                >
+                  <img
+                    src={clientLogo}
+                    alt="Client Logo"
+                    className="w-full h-full object-contain"
+                  />
                 </div>
-                <div className="flex items-center gap-2 px-3 py-1 rounded-full mb-3" 
-                  style={{ 
+                <div
+                  className="flex items-center gap-2 px-3 py-1 rounded-full mb-3"
+                  style={{
                     background: "var(--l-fingerprint-bg)",
-                    border: "1px solid var(--l-input-border)"
-                  }}>
+                    border: "1px solid var(--l-input-border)",
+                  }}
+                >
                   <Fingerprint className="w-3.5 h-3.5" style={{ color: "var(--l-accent-solid)" }} />
-                  <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: "var(--l-secure-text)" }}>Secure Gateway</span>
+                  <span
+                    className="text-[9px] font-black uppercase tracking-widest"
+                    style={{ color: "var(--l-secure-text)" }}
+                  >
+                    Secure Gateway
+                  </span>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-black tracking-tight mb-2" style={{ color: "var(--l-text-heading)" }}>Welcome back</h2>
-                <p className="text-sm" style={{ color: "var(--l-text-subtitle)" }}>Enter your credentials to access your workspace</p>
+                <h2
+                  className="text-2xl md:text-3xl font-black tracking-tight mb-2"
+                  style={{ color: "var(--l-text-heading)" }}
+                >
+                  Welcome back
+                </h2>
+                <p className="text-sm" style={{ color: "var(--l-text-subtitle)" }}>
+                  Enter your credentials to access your workspace
+                </p>
               </div>
 
               {/* Form */}
               <form onSubmit={handleLogin} className="space-y-5">
                 <div>
-                  <label className="block text-[11px] font-bold mb-2 uppercase tracking-wider" style={{ color: "var(--l-label)" }} htmlFor="login-username">User ID</label>
+                  <label
+                    className="block text-[11px] font-bold mb-2 uppercase tracking-wider"
+                    style={{ color: "var(--l-label)" }}
+                    htmlFor="login-username"
+                  >
+                    User ID
+                  </label>
                   <div className="login-glass-input rounded-2xl flex items-center gap-3 px-4 py-3.5">
-                    <User className="w-[18px] h-[18px] flex-shrink-0 transition-all duration-400" style={{ color: focusedField === "email" ? "var(--l-icon-active)" : "var(--l-icon-muted)", filter: focusedField === "email" ? "var(--l-icon-glow)" : "none" }} />
-                    <input id="login-username" type="text" value={email} onChange={(e) => setEmail(e.target.value)} onFocus={() => setFocusedField("email")} onBlur={() => setFocusedField(null)}
-                      placeholder="Enter your User ID (e.g. admin)" className="w-full bg-transparent outline-none text-sm font-medium"
-                      style={{ color: "var(--l-text)", caretColor: "var(--l-accent-solid)" }} autoComplete="username" />
+                    <User
+                      className="w-[18px] h-[18px] flex-shrink-0 transition-all duration-400"
+                      style={{
+                        color:
+                          focusedField === "email" ? "var(--l-icon-active)" : "var(--l-icon-muted)",
+                        filter: focusedField === "email" ? "var(--l-icon-glow)" : "none",
+                      }}
+                    />
+                    <input
+                      id="login-username"
+                      type="text"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      onFocus={() => setFocusedField("email")}
+                      onBlur={() => setFocusedField(null)}
+                      placeholder="Enter your User ID (e.g. admin)"
+                      className="w-full bg-transparent outline-none text-sm font-medium"
+                      style={{ color: "var(--l-text)", caretColor: "var(--l-accent-solid)" }}
+                      autoComplete="username"
+                    />
                   </div>
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--l-label)" }} htmlFor="login-password">Password</label>
-                    <button type="button" className="text-[11px] font-semibold transition-colors duration-300" style={{ color: "var(--l-forgot-color)" }} tabIndex={-1}>Forgot?</button>
+                    <label
+                      className="text-[11px] font-bold uppercase tracking-wider"
+                      style={{ color: "var(--l-label)" }}
+                      htmlFor="login-password"
+                    >
+                      Password
+                    </label>
+                    <button
+                      type="button"
+                      className="text-[11px] font-semibold transition-colors duration-300"
+                      style={{ color: "var(--l-forgot-color)" }}
+                      tabIndex={-1}
+                    >
+                      Forgot?
+                    </button>
                   </div>
                   <div className="login-glass-input rounded-2xl flex items-center gap-3 px-4 py-3.5">
-                    <Lock className="w-[18px] h-[18px] flex-shrink-0 transition-all duration-400" style={{ color: focusedField === "password" ? "var(--l-icon-active)" : "var(--l-icon-muted)", filter: focusedField === "password" ? "var(--l-icon-glow)" : "none" }} />
-                    <input id="login-password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} onFocus={() => setFocusedField("password")} onBlur={() => setFocusedField(null)}
-                      placeholder="Enter your password (optional)" className="w-full bg-transparent outline-none text-sm font-medium"
-                      style={{ color: "var(--l-text)", caretColor: "var(--l-accent-solid)" }} autoComplete="current-password" />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="flex-shrink-0 p-1 rounded-lg transition-all duration-300" style={{ color: "var(--l-icon-muted)" }} tabIndex={-1} aria-label={showPassword ? "Hide password" : "Show password"}>
+                    <Lock
+                      className="w-[18px] h-[18px] flex-shrink-0 transition-all duration-400"
+                      style={{
+                        color:
+                          focusedField === "password"
+                            ? "var(--l-icon-active)"
+                            : "var(--l-icon-muted)",
+                        filter: focusedField === "password" ? "var(--l-icon-glow)" : "none",
+                      }}
+                    />
+                    <input
+                      id="login-password"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      onFocus={() => setFocusedField("password")}
+                      onBlur={() => setFocusedField(null)}
+                      placeholder="Enter your password (optional)"
+                      className="w-full bg-transparent outline-none text-sm font-medium"
+                      style={{ color: "var(--l-text)", caretColor: "var(--l-accent-solid)" }}
+                      autoComplete="current-password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="flex-shrink-0 p-1 rounded-lg transition-all duration-300"
+                      style={{ color: "var(--l-icon-muted)" }}
+                      tabIndex={-1}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between pt-1">
-                  <label className="flex items-center gap-2 cursor-pointer group" htmlFor="login-remember">
-                    <div className="w-4.5 h-4.5 rounded-md flex items-center justify-center transition-all duration-300" style={{ border: `1.5px solid var(--l-checkbox-border)`, background: "var(--l-checkbox-bg)" }}>
-                      <Check className="w-3 h-3" style={{ color: "var(--l-accent-solid)" }} strokeWidth={3} />
+                  <label
+                    className="flex items-center gap-2 cursor-pointer group"
+                    htmlFor="login-remember"
+                  >
+                    <div
+                      className="w-4.5 h-4.5 rounded-md flex items-center justify-center transition-all duration-300"
+                      style={{
+                        border: `1.5px solid var(--l-checkbox-border)`,
+                        background: "var(--l-checkbox-bg)",
+                      }}
+                    >
+                      <Check
+                        className="w-3 h-3"
+                        style={{ color: "var(--l-accent-solid)" }}
+                        strokeWidth={3}
+                      />
                     </div>
-                    <span className="text-xs font-medium" style={{ color: "var(--l-label)" }}>Remember me</span>
+                    <span className="text-xs font-medium" style={{ color: "var(--l-label)" }}>
+                      Remember me
+                    </span>
                   </label>
                 </div>
 
-                <button type="submit" disabled={isLoading} className="btn-shine w-full py-4 rounded-2xl text-sm font-bold text-white flex items-center justify-center gap-2.5 mt-1" id="login-submit-btn">
-                  {isLoading ? <div className="spinner-ring" /> : <><span>Sign In to Workspace</span><ArrowRight className="w-4.5 h-4.5" /></>}
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="btn-shine w-full py-4 rounded-2xl text-sm font-bold text-white flex items-center justify-center gap-2.5 mt-1"
+                  id="login-submit-btn"
+                >
+                  {isLoading ? (
+                    <div className="spinner-ring" />
+                  ) : (
+                    <>
+                      <span>Sign In to Workspace</span>
+                      <ArrowRight className="w-4.5 h-4.5" />
+                    </>
+                  )}
                 </button>
               </form>
 
@@ -1066,8 +1645,16 @@ function LoginPage() {
                 <div className="flex items-center justify-center gap-6">
                   {["AES-256", "SOC 2", "GDPR"].map((badge) => (
                     <div key={badge} className="flex items-center gap-1.5">
-                      <div className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--l-badge-dot)" }} />
-                      <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--l-badge-text)" }}>{badge}</span>
+                      <div
+                        className="w-1.5 h-1.5 rounded-full"
+                        style={{ background: "var(--l-badge-dot)" }}
+                      />
+                      <span
+                        className="text-[10px] font-bold uppercase tracking-wider"
+                        style={{ color: "var(--l-badge-text)" }}
+                      >
+                        {badge}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -1077,53 +1664,125 @@ function LoginPage() {
 
           {/* ─── STEP 2: Company & Section ─── */}
           {step === 2 && (
-            <div className="gradient-border rounded-3xl p-8 md:p-10" style={{ animation: "slideInRight 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards" }}>
-              <button type="button"
-                onClick={() => { setTransitioning(true); setTimeout(() => { setStep(1); setTransitioning(false); }, 400); }}
+            <div
+              className="gradient-border rounded-3xl p-8 md:p-10"
+              style={{ animation: "slideInRight 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards" }}
+            >
+              <button
+                type="button"
+                onClick={() => {
+                  setTransitioning(true);
+                  setTimeout(() => {
+                    setStep(1);
+                    setTransitioning(false);
+                  }, 400);
+                }}
                 className="flex items-center gap-1.5 text-xs font-semibold mb-6 transition-all duration-300 group"
-                style={{ color: "var(--l-back-color)" }}>
+                style={{ color: "var(--l-back-color)" }}
+              >
                 <ChevronRight className="w-3.5 h-3.5 rotate-180 transition-transform duration-300 group-hover:-translate-x-1" />
                 Back to login
               </button>
 
               <div className="mb-7">
-                <h2 className="text-2xl font-black tracking-tight mb-1.5" style={{ color: "var(--l-text-heading)" }}>Select Workspace</h2>
-                <p className="text-sm" style={{ color: "var(--l-text-subtitle)" }}>Choose a company and section to begin</p>
+                <h2
+                  className="text-2xl font-black tracking-tight mb-1.5"
+                  style={{ color: "var(--l-text-heading)" }}
+                >
+                  Select Workspace
+                </h2>
+                <p className="text-sm" style={{ color: "var(--l-text-subtitle)" }}>
+                  Choose a company and section to begin
+                </p>
               </div>
 
-              <GlassSearchDropdown label="Company" icon={<Building2 className="w-4 h-4" style={{ color: "var(--l-accent-solid)" }} />}
-                placeholder="Search companies..." triggerPlaceholder="Select a company" value={selectedCompany} onChange={setSelectedCompany}
-                items={allowedCompanies.map((c) => ({ id: c.id, name: c.name, description: `${c.location} · ${c.employees} people`, gradient: c.gradient, renderIcon: () => <Building2 className="w-4.5 h-4.5 text-white" /> }))}
-                id="company-dropdown" />
+              <GlassSearchDropdown
+                label="Company"
+                icon={<Building2 className="w-4 h-4" style={{ color: "var(--l-accent-solid)" }} />}
+                placeholder="Search companies..."
+                triggerPlaceholder="Select a company"
+                value={selectedCompany}
+                onChange={setSelectedCompany}
+                items={allowedCompanies.map((c) => ({
+                  id: c.id,
+                  name: c.name,
+                  description: `${c.location} · ${c.employees} people`,
+                  gradient: c.gradient,
+                  renderIcon: () => <Building2 className="w-4.5 h-4.5 text-white" />,
+                }))}
+                id="company-dropdown"
+              />
 
-              <GlassSearchDropdown label="Section" icon={<LayoutGrid className="w-4 h-4" style={{ color: "var(--l-accent-solid)" }} />}
-                placeholder="Search sections..." triggerPlaceholder="Select a section" value={selectedSection} onChange={setSelectedSection}
+              <GlassSearchDropdown
+                label="Section"
+                icon={<LayoutGrid className="w-4 h-4" style={{ color: "var(--l-accent-solid)" }} />}
+                placeholder="Search sections..."
+                triggerPlaceholder="Select a section"
+                value={selectedSection}
+                onChange={setSelectedSection}
                 disabled={!selectedCompany}
-                items={sections.map((s) => { const Icon = s.icon; return { id: s.id, name: s.name, description: s.desc, gradient: s.gradient, renderIcon: () => <Icon className="w-4.5 h-4.5 text-white" /> }; })}
-                id="section-dropdown" className="mb-7" />
+                items={sections.map((s) => {
+                  const Icon = s.icon;
+                  return {
+                    id: s.id,
+                    name: s.name,
+                    description: s.desc,
+                    gradient: s.gradient,
+                    renderIcon: () => <Icon className="w-4.5 h-4.5 text-white" />,
+                  };
+                })}
+                id="section-dropdown"
+                className="mb-7"
+              />
 
-              <button type="button" onClick={handleContinue} disabled={isLoading || !selectedCompany || !selectedSection}
-                className="btn-shine w-full py-4 rounded-2xl text-sm font-bold text-white flex items-center justify-center gap-2.5" id="continue-to-dashboard-btn">
-                {isLoading ? <div className="spinner-ring" /> : <><span>Launch Dashboard</span><ArrowRight className="w-4.5 h-4.5" /></>}
+              <button
+                type="button"
+                onClick={handleContinue}
+                disabled={isLoading || !selectedCompany || !selectedSection}
+                className="btn-shine w-full py-4 rounded-2xl text-sm font-bold text-white flex items-center justify-center gap-2.5"
+                id="continue-to-dashboard-btn"
+              >
+                {isLoading ? (
+                  <div className="spinner-ring" />
+                ) : (
+                  <>
+                    <span>Launch Dashboard</span>
+                    <ArrowRight className="w-4.5 h-4.5" />
+                  </>
+                )}
               </button>
 
-              <p className="text-center text-[10px] font-medium mt-4" style={{ color: "var(--l-step2-note)" }}>Switch workspaces anytime from settings</p>
+              <p
+                className="text-center text-[10px] font-medium mt-4"
+                style={{ color: "var(--l-step2-note)" }}
+              >
+                Switch workspaces anytime from settings
+              </p>
             </div>
           )}
 
           {/* Step indicator */}
           <div className="flex items-center justify-center gap-2.5 mt-7">
             {[1, 2].map((s) => (
-              <div key={s} className="h-1.5 rounded-full transition-all duration-600"
+              <div
+                key={s}
+                className="h-1.5 rounded-full transition-all duration-600"
                 style={{
                   width: step === s ? 28 : 8,
-                  background: step === s ? "linear-gradient(90deg, #1d4ed8, #3b82f6)" : "var(--l-step-inactive)",
+                  background:
+                    step === s
+                      ? "linear-gradient(90deg, #1d4ed8, #3b82f6)"
+                      : "var(--l-step-inactive)",
                   boxShadow: step === s ? "0 0 12px rgba(29, 78, 216, 0.3)" : "none",
-                }} />
+                }}
+              />
             ))}
           </div>
 
-          <p className="text-center text-[10px] font-medium mt-4" style={{ color: "var(--l-footer-color)" }}>
+          <p
+            className="text-center text-[10px] font-medium mt-4"
+            style={{ color: "var(--l-footer-color)" }}
+          >
             © 2026 Cripton HRIS · Privacy · Terms
           </p>
         </div>

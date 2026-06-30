@@ -3,15 +3,36 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  Calendar, ChevronRight, User, Phone, MapPin, FileText, Upload, Send, RefreshCw, AlertCircle, FileCheck,
-  Briefcase, Building2, Map, CalendarDays, HelpCircle, Layers, CheckCircle2, Trash2
+  Calendar,
+  ChevronRight,
+  User,
+  Phone,
+  MapPin,
+  FileText,
+  Upload,
+  Send,
+  RefreshCw,
+  AlertCircle,
+  FileCheck,
+  Briefcase,
+  Building2,
+  Map,
+  CalendarDays,
+  HelpCircle,
+  Layers,
+  CheckCircle2,
+  Trash2,
 } from "lucide-react";
 
 export const Route = createFileRoute("/leave-application")({
   head: () => ({
     meta: [
       { title: "Leave Application — CRIPTON" },
-      { name: "description", content: "Submit employee leave requests, configure pay parameters, and review balance summaries." },
+      {
+        name: "description",
+        content:
+          "Submit employee leave requests, configure pay parameters, and review balance summaries.",
+      },
     ],
   }),
   component: LeaveApplicationPage,
@@ -37,7 +58,7 @@ const mockEmployees: Record<string, EmployeeData> = {
     designation: "Asst. Manager",
     section: "Project Resource & Strategy",
     unit: "PSL",
-    line: "N/A"
+    line: "N/A",
   },
   "2016001055": {
     id: "2016001055",
@@ -47,7 +68,7 @@ const mockEmployees: Record<string, EmployeeData> = {
     designation: "Chief Operating Officer",
     section: "Executive Committee",
     unit: "Pakiza Software Limited (Head Office)",
-    line: "Management Block"
+    line: "Management Block",
   },
   "2022035599": {
     id: "2022035599",
@@ -57,8 +78,8 @@ const mockEmployees: Record<string, EmployeeData> = {
     designation: "Senior Software Engineer",
     section: "Core Development (HR)",
     unit: "Pakiza Software Limited (Head Office)",
-    line: "Engineering Block - L2"
-  }
+    line: "Engineering Block - L2",
+  },
 };
 
 function LeaveApplicationPage() {
@@ -109,7 +130,7 @@ function LeaveApplicationPage() {
     }
 
     setSuccessMessage(
-      `Leave Application successfully submitted! ID: LEAVE-${Math.floor(1000 + Math.random() * 9000)}. Dynamic parameters allocated with ${leavePayWith}.`
+      `Leave Application successfully submitted! ID: LEAVE-${Math.floor(1000 + Math.random() * 9000)}. Dynamic parameters allocated with ${leavePayWith}.`,
     );
 
     setTimeout(() => {
@@ -138,14 +159,15 @@ function LeaveApplicationPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 lg:p-8 space-y-2">
-
           {/* Breadcrumb and Modern Page Header */}
           <div className="relative overflow-hidden bg-gradient-to-r from-[#3f51b5]/10 via-[#00bcd4]/10 to-[#9c27b0]/5 dark:from-[#3f51b5]/25 dark:via-[#00bcd4]/20 dark:to-[#9c27b0]/15 rounded-2xl border border-primary/10 p-6 md:p-8 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
-            
+
             <div className="relative z-10 space-y-1">
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-3 text-muted-foreground/60" />
                 <span>Leave Management</span>
                 <ChevronRight className="size-3 text-muted-foreground/60" />
@@ -173,24 +195,27 @@ function LeaveApplicationPage() {
           )}
 
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-2">
-
             {/* Form Section */}
             <div className="xl:col-span-2 space-y-2">
-
               <form onSubmit={handleSubmit} className="space-y-4">
-
                 {/* PART 1: APPLICANT DETAILS */}
                 <div className="bg-card border border-border/85 rounded-2xl p-6 shadow-xs space-y-5 relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-primary/40 to-transparent" />
-                  
+
                   <div className="flex items-center gap-2.5 border-b border-border/40 pb-3.5">
-                    <div className="size-7 rounded-lg bg-primary/10 text-primary grid place-items-center font-bold text-xs border border-primary/20">01</div>
-                    <h3 className="text-xs font-black uppercase tracking-wider text-foreground">Applicant Information</h3>
+                    <div className="size-7 rounded-lg bg-primary/10 text-primary grid place-items-center font-bold text-xs border border-primary/20">
+                      01
+                    </div>
+                    <h3 className="text-xs font-black uppercase tracking-wider text-foreground">
+                      Applicant Information
+                    </h3>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="space-y-1.5 col-span-1">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Year *</label>
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                        Year *
+                      </label>
                       <select
                         value={year}
                         onChange={(e) => setYear(e.target.value)}
@@ -203,7 +228,9 @@ function LeaveApplicationPage() {
                     </div>
 
                     <div className="space-y-1.5 col-span-1">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Attendance Bonus</label>
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                        Attendance Bonus
+                      </label>
                       <select
                         value={attendanceBonus}
                         onChange={(e) => setAttendanceBonus(e.target.value)}
@@ -215,7 +242,9 @@ function LeaveApplicationPage() {
                     </div>
 
                     <div className="space-y-1.5 col-span-1">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Accrual Mode</label>
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                        Accrual Mode
+                      </label>
                       <div className="flex items-center gap-4 h-10">
                         <label className="flex items-center gap-1.5 text-xs font-bold text-foreground cursor-pointer select-none">
                           <input
@@ -241,7 +270,9 @@ function LeaveApplicationPage() {
                     </div>
 
                     <div className="space-y-1.5 col-span-1">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Employee ID *</label>
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                        Employee ID *
+                      </label>
                       <div className="relative">
                         <User className="size-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
@@ -259,36 +290,49 @@ function LeaveApplicationPage() {
                   {/* dynamic verified employee details with colon-alignment and avatar placeholder */}
                   {matchedEmployee ? (
                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 p-5 rounded-xl border border-primary/20 bg-gradient-to-br from-primary/[0.02] to-transparent dark:from-primary/[0.005] animate-in fade-in duration-300">
-                      
                       {/* Left: Info Grid */}
                       <div className="flex-1 grid grid-cols-[140px_15px_1fr] gap-y-2.5 text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
                         <span>Employee Name</span>
                         <span className="text-slate-400/60 text-center">:</span>
-                        <span className="text-slate-900 dark:text-slate-100 capitalize font-black normal-case">{matchedEmployee.name}</span>
+                        <span className="text-slate-900 dark:text-slate-100 capitalize font-black normal-case">
+                          {matchedEmployee.name}
+                        </span>
 
                         <span>Employee Type</span>
                         <span className="text-slate-400/60 text-center">:</span>
-                        <span className="text-slate-900 dark:text-slate-100 font-bold normal-case">{matchedEmployee.type}</span>
+                        <span className="text-slate-900 dark:text-slate-100 font-bold normal-case">
+                          {matchedEmployee.type}
+                        </span>
 
                         <span>Joining Date</span>
                         <span className="text-slate-400/60 text-center">:</span>
-                        <span className="text-slate-900 dark:text-slate-100 font-mono font-bold">{matchedEmployee.joiningDate}</span>
+                        <span className="text-slate-900 dark:text-slate-100 font-mono font-bold">
+                          {matchedEmployee.joiningDate}
+                        </span>
 
                         <span>Designation</span>
                         <span className="text-slate-400/60 text-center">:</span>
-                        <span className="text-slate-900 dark:text-slate-100 font-bold normal-case">{matchedEmployee.designation}</span>
+                        <span className="text-slate-900 dark:text-slate-100 font-bold normal-case">
+                          {matchedEmployee.designation}
+                        </span>
 
                         <span>Section</span>
                         <span className="text-slate-400/60 text-center">:</span>
-                        <span className="text-slate-900 dark:text-slate-100 font-bold normal-case">{matchedEmployee.section}</span>
+                        <span className="text-slate-900 dark:text-slate-100 font-bold normal-case">
+                          {matchedEmployee.section}
+                        </span>
 
                         <span>Unit</span>
                         <span className="text-slate-400/60 text-center">:</span>
-                        <span className="text-slate-900 dark:text-slate-100 font-bold normal-case">{matchedEmployee.unit}</span>
+                        <span className="text-slate-900 dark:text-slate-100 font-bold normal-case">
+                          {matchedEmployee.unit}
+                        </span>
 
                         <span>Line</span>
                         <span className="text-slate-400/60 text-center">:</span>
-                        <span className="text-slate-900 dark:text-slate-100 font-bold normal-case">{matchedEmployee.line}</span>
+                        <span className="text-slate-900 dark:text-slate-100 font-bold normal-case">
+                          {matchedEmployee.line}
+                        </span>
                       </div>
 
                       {/* Right: Avatar Placeholder */}
@@ -299,7 +343,6 @@ function LeaveApplicationPage() {
                           <span className="mt-0.5">AVAILABLE</span>
                         </div>
                       </div>
-
                     </div>
                   ) : (
                     <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 dark:bg-amber-500/[0.02] flex items-center gap-3">
@@ -309,7 +352,6 @@ function LeaveApplicationPage() {
                       </span>
                     </div>
                   )}
-
                 </div>
 
                 {/* PART 2: LEAVE PERIOD DETAILS */}
@@ -317,15 +359,21 @@ function LeaveApplicationPage() {
                   <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-cyan-500/40 to-transparent" />
 
                   <div className="flex items-center gap-2.5 border-b border-border/40 pb-3.5">
-                    <div className="size-7 rounded-lg bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 grid place-items-center font-bold text-xs border border-cyan-500/20">02</div>
-                    <h3 className="text-xs font-black uppercase tracking-wider text-foreground">Leave Schedule & Type</h3>
+                    <div className="size-7 rounded-lg bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 grid place-items-center font-bold text-xs border border-cyan-500/20">
+                      02
+                    </div>
+                    <h3 className="text-xs font-black uppercase tracking-wider text-foreground">
+                      Leave Schedule & Type
+                    </h3>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                     {/* Left Column inputs */}
                     <div className="space-y-4">
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Leave Type *</label>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                          Leave Type *
+                        </label>
                         <select
                           value={leaveType}
                           onChange={(e) => setLeaveType(e.target.value)}
@@ -340,7 +388,9 @@ function LeaveApplicationPage() {
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Leave Duration From *</label>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                          Leave Duration From *
+                        </label>
                         <input
                           type="date"
                           required
@@ -351,7 +401,9 @@ function LeaveApplicationPage() {
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Purpose / Reason</label>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                          Purpose / Reason
+                        </label>
                         <textarea
                           value={purpose}
                           onChange={(e) => setPurpose(e.target.value)}
@@ -361,7 +413,9 @@ function LeaveApplicationPage() {
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Contact Number during Leave</label>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                          Contact Number during Leave
+                        </label>
                         <div className="relative">
                           <Phone className="size-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                           <input
@@ -375,16 +429,14 @@ function LeaveApplicationPage() {
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Attachment (if any)</label>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                          Attachment (if any)
+                        </label>
                         <div className="flex items-center gap-3">
                           <label className="h-10 px-4 rounded-xl bg-muted/20 border border-border/80 hover:bg-muted/30 text-foreground cursor-pointer flex items-center gap-2 transition-all select-none text-xs font-bold shrink-0">
                             <Upload className="size-4 text-slate-400" />
                             <span>Choose File</span>
-                            <input
-                              type="file"
-                              onChange={handleFileChange}
-                              className="hidden"
-                            />
+                            <input type="file" onChange={handleFileChange} className="hidden" />
                           </label>
                           <span className="text-[10.5px] font-black text-slate-400/80 truncate max-w-[180px]">
                             {fileName || "No file chosen"}
@@ -396,7 +448,9 @@ function LeaveApplicationPage() {
                     {/* Right Column inputs */}
                     <div className="space-y-4">
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Leave Pay With *</label>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                          Leave Pay With *
+                        </label>
                         <select
                           value={leavePayWith}
                           onChange={(e) => setLeavePayWith(e.target.value)}
@@ -408,7 +462,9 @@ function LeaveApplicationPage() {
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Leave Duration To *</label>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                          Leave Duration To *
+                        </label>
                         <input
                           type="date"
                           required
@@ -419,7 +475,9 @@ function LeaveApplicationPage() {
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Address during Leave</label>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                          Address during Leave
+                        </label>
                         <textarea
                           value={address}
                           onChange={(e) => setAddress(e.target.value)}
@@ -429,7 +487,9 @@ function LeaveApplicationPage() {
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Responsible Employee</label>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                          Responsible Employee
+                        </label>
                         <div className="relative">
                           <User className="size-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                           <input
@@ -455,7 +515,6 @@ function LeaveApplicationPage() {
                       </span>
                     </div>
                   )}
-
                 </div>
 
                 {/* Submissions Action footer */}
@@ -483,41 +542,83 @@ function LeaveApplicationPage() {
                     <span>Submit Leave Proposal</span>
                   </button>
                 </div>
-
               </form>
-
             </div>
 
             {/* Sidebar Balance summary */}
             <div className="space-y-2">
-
               <div className="bg-card border border-border/80 rounded-2xl p-6 shadow-xs space-y-5 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-emerald-500/40 to-transparent" />
-                
+
                 <div className="border-b border-border/40 pb-3 flex items-center justify-between">
-                  <h3 className="text-xs font-black uppercase tracking-wider text-foreground">Leave Ledger Summary</h3>
+                  <h3 className="text-xs font-black uppercase tracking-wider text-foreground">
+                    Leave Ledger Summary
+                  </h3>
                   <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
                 </div>
 
                 <div className="space-y-4">
                   {[
-                    { label: "Casual Leave", spent: 4, limit: 10, fill: "from-blue-500 to-indigo-500", text: "text-blue-500", bg: "bg-blue-500/10 border-blue-500/20" },
-                    { label: "Sick Leave", spent: 3, limit: 14, fill: "from-emerald-500 to-teal-500", text: "text-emerald-500", bg: "bg-emerald-500/10 border-emerald-500/20" },
-                    { label: "Earned Leave", spent: 6, limit: 18, fill: "from-amber-500 to-orange-500", text: "text-amber-500", bg: "bg-amber-500/10 border-amber-500/20" },
-                    { label: "Maternity Leave", spent: 0, limit: 90, fill: "from-purple-500 to-fuchsia-500", text: "text-purple-500", bg: "bg-purple-500/10 border-purple-500/20" },
-                    { label: "Leave Without Pay", spent: 2, limit: 30, fill: "from-rose-500 to-pink-500", text: "text-rose-500", bg: "bg-rose-500/10 border-rose-500/20" }
+                    {
+                      label: "Casual Leave",
+                      spent: 4,
+                      limit: 10,
+                      fill: "from-blue-500 to-indigo-500",
+                      text: "text-blue-500",
+                      bg: "bg-blue-500/10 border-blue-500/20",
+                    },
+                    {
+                      label: "Sick Leave",
+                      spent: 3,
+                      limit: 14,
+                      fill: "from-emerald-500 to-teal-500",
+                      text: "text-emerald-500",
+                      bg: "bg-emerald-500/10 border-emerald-500/20",
+                    },
+                    {
+                      label: "Earned Leave",
+                      spent: 6,
+                      limit: 18,
+                      fill: "from-amber-500 to-orange-500",
+                      text: "text-amber-500",
+                      bg: "bg-amber-500/10 border-amber-500/20",
+                    },
+                    {
+                      label: "Maternity Leave",
+                      spent: 0,
+                      limit: 90,
+                      fill: "from-purple-500 to-fuchsia-500",
+                      text: "text-purple-500",
+                      bg: "bg-purple-500/10 border-purple-500/20",
+                    },
+                    {
+                      label: "Leave Without Pay",
+                      spent: 2,
+                      limit: 30,
+                      fill: "from-rose-500 to-pink-500",
+                      text: "text-rose-500",
+                      bg: "bg-rose-500/10 border-rose-500/20",
+                    },
                   ].map((lv, idx) => {
                     const remaining = lv.limit - lv.spent;
                     const percent = (lv.spent / lv.limit) * 100;
 
                     return (
-                      <div key={idx} className="space-y-2.5 p-4 rounded-xl border border-border/50 bg-muted/5 hover:bg-muted/10 hover:shadow-xs transition duration-200">
+                      <div
+                        key={idx}
+                        className="space-y-2.5 p-4 rounded-xl border border-border/50 bg-muted/5 hover:bg-muted/10 hover:shadow-xs transition duration-200"
+                      >
                         <div className="flex items-center justify-between text-xs font-bold text-foreground">
                           <span>{lv.label}</span>
-                          <span className={`font-black ${lv.text}`}>{remaining} / {lv.limit} Days Left</span>
+                          <span className={`font-black ${lv.text}`}>
+                            {remaining} / {lv.limit} Days Left
+                          </span>
                         </div>
                         <div className="w-full h-2 bg-muted rounded-full overflow-hidden border border-border/40">
-                          <div className={`h-full bg-gradient-to-r ${lv.fill} rounded-full transition-all duration-500`} style={{ width: `${percent}%` }} />
+                          <div
+                            className={`h-full bg-gradient-to-r ${lv.fill} rounded-full transition-all duration-500`}
+                            style={{ width: `${percent}%` }}
+                          />
                         </div>
                         <div className="flex items-center justify-between text-[9px] text-muted-foreground font-black uppercase tracking-wider">
                           <span>Consumed: {lv.spent} Days</span>
@@ -532,20 +633,19 @@ function LeaveApplicationPage() {
               {/* Policy notes card */}
               <div className="bg-card border border-border/80 rounded-2xl p-6 shadow-xs space-y-4 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-primary to-transparent" />
-                
+
                 <div className="flex items-center gap-2.5 text-primary font-black text-[11px] uppercase tracking-wider border-b border-border/40 pb-3">
                   <FileText className="size-4 animate-bounce text-primary" />
                   <span>Leave Regulation Policy</span>
                 </div>
                 <p className="text-[11px] text-muted-foreground font-bold leading-relaxed">
-                  All requests must be submitted at least 24 hours prior for single day leaves, and 7 days prior for leaves exceeding 3 calendar days. Attachment documentation is highly recommended for Sick Leaves exceeding 2 days.
+                  All requests must be submitted at least 24 hours prior for single day leaves, and
+                  7 days prior for leaves exceeding 3 calendar days. Attachment documentation is
+                  highly recommended for Sick Leaves exceeding 2 days.
                 </p>
               </div>
-
             </div>
-
           </div>
-
         </div>
       </main>
     </div>

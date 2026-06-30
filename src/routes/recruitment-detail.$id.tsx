@@ -3,7 +3,21 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  ArrowLeft, CheckCircle2, XCircle, User, GraduationCap, Briefcase, MapPin, Heart, Info, Phone, Calendar, Mail, FileText, Landmark, ChevronRight
+  ArrowLeft,
+  CheckCircle2,
+  XCircle,
+  User,
+  GraduationCap,
+  Briefcase,
+  MapPin,
+  Heart,
+  Info,
+  Phone,
+  Calendar,
+  Mail,
+  FileText,
+  Landmark,
+  ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -76,9 +90,9 @@ function SectionHeader({
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
-    "Pending":  "bg-purple-100 text-purple-800 border-purple-200",
-    "Approved": "bg-emerald-100 text-emerald-800 border-emerald-200",
-    "Rejected": "bg-rose-100 text-rose-800 border-rose-200",
+    Pending: "bg-purple-100 text-purple-800 border-purple-200",
+    Approved: "bg-emerald-100 text-emerald-800 border-emerald-200",
+    Rejected: "bg-rose-100 text-rose-800 border-rose-200",
   };
 
   let displayStatus = "Pending";
@@ -89,7 +103,9 @@ function StatusBadge({ status }: { status: string }) {
   }
 
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider border whitespace-nowrap ${map[displayStatus] || "bg-slate-50 text-slate-200 border-slate-200"}`}>
+    <span
+      className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider border whitespace-nowrap ${map[displayStatus] || "bg-slate-50 text-slate-200 border-slate-200"}`}
+    >
       {displayStatus}
     </span>
   );
@@ -99,7 +115,9 @@ function DetailRow({ label, value }: { label: string; value?: string }) {
   return (
     <div className="flex items-center justify-between py-2 border-b border-border/10 text-xs hover:bg-muted/10 px-1.5 rounded transition-colors duration-150">
       <span className="font-semibold text-muted-foreground">{label}</span>
-      <span className="font-bold text-foreground text-right truncate max-w-[65%]">{value || "—"}</span>
+      <span className="font-bold text-foreground text-right truncate max-w-[65%]">
+        {value || "—"}
+      </span>
     </div>
   );
 }
@@ -160,7 +178,7 @@ function RecruitmentDetailPage() {
       empStatus: "Probation",
       confirmDate: "—",
       village: candidate.presentAddress || "—",
-      acStatus: "Active"
+      acStatus: "Active",
     };
 
     localStorage.setItem(syncedKey, JSON.stringify([...parsedSynced, newEmployeeRecord]));
@@ -210,7 +228,9 @@ function RecruitmentDetailPage() {
           <div className="flex-1 flex items-center justify-center">
             <div className="flex flex-col items-center gap-3">
               <div className="size-10 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
-              <p className="text-sm text-muted-foreground font-semibold">Loading applicant dossier...</p>
+              <p className="text-sm text-muted-foreground font-semibold">
+                Loading applicant dossier...
+              </p>
             </div>
           </div>
         </main>
@@ -225,13 +245,15 @@ function RecruitmentDetailPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 space-y-4 overflow-y-auto h-full pb-24">
-          
           {/* Top Breadcrumb & Actions */}
           <div className="bg-card rounded-xl border border-border/60 p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-3xs">
             <div className="flex items-center gap-3">
-              <img 
-                src={candidate.photo || `https://images.unsplash.com/photo-${candidate.empIdTemp === "PAL000002" || candidate.empIdTemp === "PAL000004" || candidate.empIdTemp === "PAL000006" || candidate.empIdTemp === "PAL000008" || candidate.empIdTemp === "PAL000010" || candidate.empIdTemp === "PAL000012" || candidate.empIdTemp === "PAL000014" ? "1494790108377-be9c29b29330" : "1535713875002-d1d0cf377fde"}?auto=format&fit=crop&w=120&h=120&q=80`} 
-                alt={candidate.nameEng} 
+              <img
+                src={
+                  candidate.photo ||
+                  `https://images.unsplash.com/photo-${candidate.empIdTemp === "PAL000002" || candidate.empIdTemp === "PAL000004" || candidate.empIdTemp === "PAL000006" || candidate.empIdTemp === "PAL000008" || candidate.empIdTemp === "PAL000010" || candidate.empIdTemp === "PAL000012" || candidate.empIdTemp === "PAL000014" ? "1494790108377-be9c29b29330" : "1535713875002-d1d0cf377fde"}?auto=format&fit=crop&w=120&h=120&q=80`
+                }
+                alt={candidate.nameEng}
                 className="size-11 rounded-full border border-border/60 object-cover shadow-xs"
               />
               <div>
@@ -239,7 +261,9 @@ function RecruitmentDetailPage() {
                   {candidate.nameEng}
                   <StatusBadge status={candidate.assessStatus} />
                 </h1>
-                <p className="text-[10px] font-semibold text-muted-foreground">ID: {candidate.empIdTemp} — {candidate.designation}</p>
+                <p className="text-[10px] font-semibold text-muted-foreground">
+                  ID: {candidate.empIdTemp} — {candidate.designation}
+                </p>
               </div>
             </div>
 
@@ -255,13 +279,14 @@ function RecruitmentDetailPage() {
 
           {/* Unified Compact Dashboard Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
             {/* Left Hand: Personal & Contacts & Nominee */}
             <div className="space-y-4">
-              
               {/* Personal Details */}
               <div className="bg-card rounded-xl border border-border/60 p-4 shadow-3xs">
-                <SectionHeader icon={<Info className="size-4" />} title="Personal & Identity Dossier" />
+                <SectionHeader
+                  icon={<Info className="size-4" />}
+                  title="Personal & Identity Dossier"
+                />
                 <div className="space-y-1">
                   <DetailRow label="Candidate Name (ENG)" value={candidate.nameEng} />
                   <DetailRow label="Candidate Name (BNG)" value={candidate.nameBng} />
@@ -279,7 +304,10 @@ function RecruitmentDetailPage() {
 
               {/* Contacts & emergency References */}
               <div className="bg-card rounded-xl border border-border/60 p-4 shadow-3xs">
-                <SectionHeader icon={<Phone className="size-4" />} title="Contact & Reachability Channels" />
+                <SectionHeader
+                  icon={<Phone className="size-4" />}
+                  title="Contact & Reachability Channels"
+                />
                 <div className="space-y-1">
                   <DetailRow label="Personal Contact No" value={candidate.personalContact} />
                   <DetailRow label="Personal Email Address" value={candidate.personalEmail} />
@@ -292,7 +320,10 @@ function RecruitmentDetailPage() {
               {/* Nominee Declaration */}
               {candidate.nominee && (
                 <div className="bg-card rounded-xl border border-border/60 p-4 shadow-3xs">
-                  <SectionHeader icon={<Heart className="size-4" />} title="Nominee Declaration Dossier" />
+                  <SectionHeader
+                    icon={<Heart className="size-4" />}
+                    title="Nominee Declaration Dossier"
+                  />
                   <div className="space-y-1">
                     <DetailRow label="Nominee Full Name" value={candidate.nominee.name} />
                     <DetailRow label="Relationship" value={candidate.nominee.relation} />
@@ -301,15 +332,16 @@ function RecruitmentDetailPage() {
                   </div>
                 </div>
               )}
-
             </div>
 
             {/* Right Hand: Qualification, Experiences & Addresses */}
             <div className="space-y-4">
-
               {/* Academic Profile */}
               <div className="bg-card rounded-xl border border-border/60 p-4 shadow-3xs">
-                <SectionHeader icon={<GraduationCap className="size-4" />} title="Academic Qualifications" />
+                <SectionHeader
+                  icon={<GraduationCap className="size-4" />}
+                  title="Academic Qualifications"
+                />
                 <div className="border border-border/30 rounded-lg overflow-hidden mt-2">
                   <table className="w-full text-left text-xs bg-card">
                     <thead>
@@ -325,14 +357,20 @@ function RecruitmentDetailPage() {
                         candidate.academics.map((ac: any, idx: number) => (
                           <tr key={ac.id || idx} className="hover:bg-muted/10">
                             <td className="px-3 py-2 font-bold text-foreground">{ac.title}</td>
-                            <td className="px-3 py-2 font-semibold text-muted-foreground">{ac.institution}</td>
+                            <td className="px-3 py-2 font-semibold text-muted-foreground">
+                              {ac.institution}
+                            </td>
                             <td className="px-3 py-2 text-center font-mono">{ac.year}</td>
-                            <td className="px-3 py-2 text-right font-bold text-primary">{ac.result}</td>
+                            <td className="px-3 py-2 text-right font-bold text-primary">
+                              {ac.result}
+                            </td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={4} className="text-center py-3 italic text-muted-foreground">No academic profiles declared.</td>
+                          <td colSpan={4} className="text-center py-3 italic text-muted-foreground">
+                            No academic profiles declared.
+                          </td>
                         </tr>
                       )}
                     </tbody>
@@ -342,7 +380,10 @@ function RecruitmentDetailPage() {
 
               {/* Job History Timeline */}
               <div className="bg-card rounded-xl border border-border/60 p-4 shadow-3xs">
-                <SectionHeader icon={<Briefcase className="size-4" />} title="Prior Job Experience Timeline" />
+                <SectionHeader
+                  icon={<Briefcase className="size-4" />}
+                  title="Prior Job Experience Timeline"
+                />
                 <div className="border border-border/30 rounded-lg overflow-hidden mt-2">
                   <table className="w-full text-left text-xs bg-card">
                     <thead>
@@ -358,14 +399,22 @@ function RecruitmentDetailPage() {
                         candidate.experiences.map((exp: any, idx: number) => (
                           <tr key={exp.id || idx} className="hover:bg-muted/10">
                             <td className="px-3 py-2 font-bold text-foreground">{exp.company}</td>
-                            <td className="px-3 py-2 font-semibold text-muted-foreground">{exp.designation}</td>
-                            <td className="px-3 py-2 text-center font-mono whitespace-nowrap text-[10px]">{exp.from} to {exp.to}</td>
-                            <td className="px-3 py-2 text-right font-medium text-muted-foreground italic truncate max-w-[150px]">{exp.reason}</td>
+                            <td className="px-3 py-2 font-semibold text-muted-foreground">
+                              {exp.designation}
+                            </td>
+                            <td className="px-3 py-2 text-center font-mono whitespace-nowrap text-[10px]">
+                              {exp.from} to {exp.to}
+                            </td>
+                            <td className="px-3 py-2 text-right font-medium text-muted-foreground italic truncate max-w-[150px]">
+                              {exp.reason}
+                            </td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={4} className="text-center py-3 italic text-muted-foreground">No experience history declared.</td>
+                          <td colSpan={4} className="text-center py-3 italic text-muted-foreground">
+                            No experience history declared.
+                          </td>
                         </tr>
                       )}
                     </tbody>
@@ -375,21 +424,30 @@ function RecruitmentDetailPage() {
 
               {/* Address Coordinates */}
               <div className="bg-card rounded-xl border border-border/60 p-4 shadow-3xs">
-                <SectionHeader icon={<MapPin className="size-4" />} title="Registered Address Coordinates" />
+                <SectionHeader
+                  icon={<MapPin className="size-4" />}
+                  title="Registered Address Coordinates"
+                />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2 text-xs">
                   <div className="bg-muted/10 border border-border/30 rounded-lg p-2.5">
-                    <p className="text-[9px] font-bold uppercase text-primary mb-1 flex items-center gap-1"><MapPin className="size-3" /> Present Address</p>
-                    <p className="text-foreground/80 leading-normal font-medium">{candidate.presentAddress || "—"}</p>
+                    <p className="text-[9px] font-bold uppercase text-primary mb-1 flex items-center gap-1">
+                      <MapPin className="size-3" /> Present Address
+                    </p>
+                    <p className="text-foreground/80 leading-normal font-medium">
+                      {candidate.presentAddress || "—"}
+                    </p>
                   </div>
                   <div className="bg-muted/10 border border-border/30 rounded-lg p-2.5">
-                    <p className="text-[9px] font-bold uppercase text-primary mb-1 flex items-center gap-1"><MapPin className="size-3" /> Permanent Address</p>
-                    <p className="text-foreground/80 leading-normal font-medium">{candidate.permanentAddress || "—"}</p>
+                    <p className="text-[9px] font-bold uppercase text-primary mb-1 flex items-center gap-1">
+                      <MapPin className="size-3" /> Permanent Address
+                    </p>
+                    <p className="text-foreground/80 leading-normal font-medium">
+                      {candidate.permanentAddress || "—"}
+                    </p>
                   </div>
                 </div>
               </div>
-
             </div>
-
           </div>
 
           {/* Floating Footer Action Bar */}
@@ -411,7 +469,6 @@ function RecruitmentDetailPage() {
               </button>
             </div>
           </div>
-
         </div>
       </main>
     </div>

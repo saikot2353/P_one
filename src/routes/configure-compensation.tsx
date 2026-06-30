@@ -2,9 +2,20 @@ import { useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
-import { 
-  ChevronRight, Search, Plus, Pencil, Trash2, X,
-  FileSpreadsheet, Printer, FileText, Coins, Gift, Coffee, Truck
+import {
+  ChevronRight,
+  Search,
+  Plus,
+  Pencil,
+  Trash2,
+  X,
+  FileSpreadsheet,
+  Printer,
+  FileText,
+  Coins,
+  Gift,
+  Coffee,
+  Truck,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -12,7 +23,11 @@ export const Route = createFileRoute("/configure-compensation")({
   head: () => ({
     meta: [
       { title: "Allowances & Bonuses Setup — CRIPTON HRIS" },
-      { name: "description", content: "Configure allowance rates, tiffin rates, lunch rates, conveyance, and bonus policies." },
+      {
+        name: "description",
+        content:
+          "Configure allowance rates, tiffin rates, lunch rates, conveyance, and bonus policies.",
+      },
     ],
   }),
   component: CompensationSetupPage,
@@ -97,49 +112,849 @@ interface BonusSetting {
 // Defaults
 // ----------------------------------------------------
 const DEFAULT_ALLOWANCES: AllowanceRate[] = [
-  { sl: 1, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "ALL", department: "All Departments", subDepartment: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 10000, salaryTo: 100000, rateFor: "Holiday", basedOn: "Basic", rate: 1.5, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
-  { sl: 2, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Operator", department: "Production Dept", subDepartment: "Sewing Section", designation: "Operator", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 8000, salaryTo: 16000, rateFor: "Overtime", basedOn: "Basic", rate: 2.0, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
-  { sl: 3, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Helper", department: "Production Dept", subDepartment: "Sewing Section", designation: "Helper", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 8000, salaryTo: 10000, rateFor: "Overtime", basedOn: "Basic", rate: 2.0, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
-  { sl: 4, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Staff", department: "Quality Assurance", subDepartment: "Inspection", designation: "QC Inspector", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 12000, salaryTo: 25000, rateFor: "Overtime", basedOn: "Gross", rate: 1.5, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
-  { sl: 5, company: "Pakiza Knit Composite Ltd", area: "Head Office", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Officer", department: "HR & Admin", subDepartment: "Admin Support", designation: "HR Executive", workingHourFrom: "09:00", workingHourTo: "18:00", salaryFrom: 20000, salaryTo: 35000, rateFor: "Holiday", basedOn: "Flat Rate", rate: 1000, divByHour: "No", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
-  { sl: 6, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Operator", department: "Production Dept", subDepartment: "Cutting Section", designation: "Cutter", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 9000, salaryTo: 15000, rateFor: "Overtime", basedOn: "Basic", rate: 2.0, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
-  { sl: 7, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "ALL", department: "Maintenance Dept", subDepartment: "Machine Repairs", designation: "Electrician", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 10000, salaryTo: 22000, rateFor: "Night Shift", basedOn: "Flat Rate", rate: 150, divByHour: "No", getAfterReq: "Yes", getAfterReqRate: 4, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
-  { sl: 8, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Worker", department: "Washing Department", subDepartment: "Washing Lab", designation: "Operator", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 8500, salaryTo: 14000, rateFor: "Overtime", basedOn: "Basic", rate: 2.0, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
-  { sl: 9, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Security Guard", department: "Security & Safety", subDepartment: "Fire & Safety Wing", designation: "Security Guard", workingHourFrom: "06:00", workingHourTo: "18:00", salaryFrom: 9500, salaryTo: 15000, rateFor: "Holiday", basedOn: "Flat Rate", rate: 500, divByHour: "No", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
-  { sl: 10, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Worker", department: "Packaging & Carton", subDepartment: "Carton Box Maker", designation: "Helper", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 8000, salaryTo: 9500, rateFor: "Overtime", basedOn: "Basic", rate: 2.0, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
-  { sl: 11, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "ALL", department: "Store & Inventory", subDepartment: "Yarn Store", designation: "Store Executive", workingHourFrom: "08:30", workingHourTo: "17:30", salaryFrom: 15000, salaryTo: 28000, rateFor: "Overtime", basedOn: "Gross", rate: 1.5, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
-  { sl: 12, company: "Pakiza Knit Composite Ltd", area: "Head Office", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Officer", department: "Finance & Accounts", subDepartment: "Accounts Payable", designation: "Senior Accountant", workingHourFrom: "09:00", workingHourTo: "18:00", salaryFrom: 30000, salaryTo: 55000, rateFor: "Holiday", basedOn: "Flat Rate", rate: 1500, divByHour: "No", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
-  { sl: 13, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Driver", department: "Logistics & Supply", subDepartment: "Central Warehouse", designation: "Heavy Vehicle Driver", workingHourFrom: "08:00", workingHourTo: "18:00", salaryFrom: 12000, salaryTo: 20000, rateFor: "Holiday", basedOn: "Flat Rate", rate: 800, divByHour: "No", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
-  { sl: 14, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Casual", department: "Production Dept", subDepartment: "Sewing Section", designation: "Helper", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 8000, salaryTo: 9000, rateFor: "Overtime", basedOn: "Basic", rate: 2.0, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
-  { sl: 15, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Apprentice", department: "Production Dept", subDepartment: "Sewing Section", designation: "Trainee Operator", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 6000, salaryTo: 8000, rateFor: "Overtime", basedOn: "Basic", rate: 1.5, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
-  { sl: 16, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "ALL", department: "Engineering & Utility", subDepartment: "Power House", designation: "Boiler Operator", workingHourFrom: "08:00", workingHourTo: "16:00", salaryFrom: 11000, salaryTo: 22000, rateFor: "Night Shift", basedOn: "Flat Rate", rate: 200, divByHour: "No", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
-  { sl: 17, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Permanent", department: "Quality Assurance", subDepartment: "Inspection", designation: "QC Inspector", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 10000, salaryTo: 18000, rateFor: "Overtime", basedOn: "Basic", rate: 2.0, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
-  { sl: 18, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Staff", department: "Production Dept", subDepartment: "Sample Section", designation: "Pattern Maker", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 15000, salaryTo: 28000, rateFor: "Overtime", basedOn: "Gross", rate: 1.5, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
-  { sl: 19, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "ALL", department: "Production Dept", subDepartment: "Sewing Section", designation: "Line Leader", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 12000, salaryTo: 20000, rateFor: "Attendance Bonus", basedOn: "Flat Rate", rate: 500, divByHour: "No", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" },
-  { sl: 20, company: "Pakiza Knit Composite Ltd", area: "Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Supervisor", department: "Production Dept", subDepartment: "Sewing Section", designation: "Supervisor", workingHourFrom: "08:00", workingHourTo: "17:00", salaryFrom: 15000, salaryTo: 25000, rateFor: "Overtime", basedOn: "Basic", rate: 2.0, divByHour: "Yes", getAfterReq: "No", getAfterReqRate: 0, eotAfter: 0, lunch: 0, dinner: 0, isActive: "Active" }
+  {
+    sl: 1,
+    company: "Pakiza Knit Composite Ltd",
+    area: "Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "ALL",
+    department: "All Departments",
+    subDepartment: "ALL",
+    designation: "ALL",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    salaryFrom: 10000,
+    salaryTo: 100000,
+    rateFor: "Holiday",
+    basedOn: "Basic",
+    rate: 1.5,
+    divByHour: "Yes",
+    getAfterReq: "No",
+    getAfterReqRate: 0,
+    eotAfter: 0,
+    lunch: 0,
+    dinner: 0,
+    isActive: "Active",
+  },
+  {
+    sl: 2,
+    company: "Pakiza Knit Composite Ltd",
+    area: "Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Operator",
+    department: "Production Dept",
+    subDepartment: "Sewing Section",
+    designation: "Operator",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    salaryFrom: 8000,
+    salaryTo: 16000,
+    rateFor: "Overtime",
+    basedOn: "Basic",
+    rate: 2.0,
+    divByHour: "Yes",
+    getAfterReq: "No",
+    getAfterReqRate: 0,
+    eotAfter: 0,
+    lunch: 0,
+    dinner: 0,
+    isActive: "Active",
+  },
+  {
+    sl: 3,
+    company: "Pakiza Knit Composite Ltd",
+    area: "Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Helper",
+    department: "Production Dept",
+    subDepartment: "Sewing Section",
+    designation: "Helper",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    salaryFrom: 8000,
+    salaryTo: 10000,
+    rateFor: "Overtime",
+    basedOn: "Basic",
+    rate: 2.0,
+    divByHour: "Yes",
+    getAfterReq: "No",
+    getAfterReqRate: 0,
+    eotAfter: 0,
+    lunch: 0,
+    dinner: 0,
+    isActive: "Active",
+  },
+  {
+    sl: 4,
+    company: "Pakiza Knit Composite Ltd",
+    area: "Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Staff",
+    department: "Quality Assurance",
+    subDepartment: "Inspection",
+    designation: "QC Inspector",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    salaryFrom: 12000,
+    salaryTo: 25000,
+    rateFor: "Overtime",
+    basedOn: "Gross",
+    rate: 1.5,
+    divByHour: "Yes",
+    getAfterReq: "No",
+    getAfterReqRate: 0,
+    eotAfter: 0,
+    lunch: 0,
+    dinner: 0,
+    isActive: "Active",
+  },
+  {
+    sl: 5,
+    company: "Pakiza Knit Composite Ltd",
+    area: "Head Office",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Officer",
+    department: "HR & Admin",
+    subDepartment: "Admin Support",
+    designation: "HR Executive",
+    workingHourFrom: "09:00",
+    workingHourTo: "18:00",
+    salaryFrom: 20000,
+    salaryTo: 35000,
+    rateFor: "Holiday",
+    basedOn: "Flat Rate",
+    rate: 1000,
+    divByHour: "No",
+    getAfterReq: "No",
+    getAfterReqRate: 0,
+    eotAfter: 0,
+    lunch: 0,
+    dinner: 0,
+    isActive: "Active",
+  },
+  {
+    sl: 6,
+    company: "Pakiza Knit Composite Ltd",
+    area: "Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Operator",
+    department: "Production Dept",
+    subDepartment: "Cutting Section",
+    designation: "Cutter",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    salaryFrom: 9000,
+    salaryTo: 15000,
+    rateFor: "Overtime",
+    basedOn: "Basic",
+    rate: 2.0,
+    divByHour: "Yes",
+    getAfterReq: "No",
+    getAfterReqRate: 0,
+    eotAfter: 0,
+    lunch: 0,
+    dinner: 0,
+    isActive: "Active",
+  },
+  {
+    sl: 7,
+    company: "Pakiza Knit Composite Ltd",
+    area: "Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "ALL",
+    department: "Maintenance Dept",
+    subDepartment: "Machine Repairs",
+    designation: "Electrician",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    salaryFrom: 10000,
+    salaryTo: 22000,
+    rateFor: "Night Shift",
+    basedOn: "Flat Rate",
+    rate: 150,
+    divByHour: "No",
+    getAfterReq: "Yes",
+    getAfterReqRate: 4,
+    eotAfter: 0,
+    lunch: 0,
+    dinner: 0,
+    isActive: "Active",
+  },
+  {
+    sl: 8,
+    company: "Pakiza Knit Composite Ltd",
+    area: "Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Worker",
+    department: "Washing Department",
+    subDepartment: "Washing Lab",
+    designation: "Operator",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    salaryFrom: 8500,
+    salaryTo: 14000,
+    rateFor: "Overtime",
+    basedOn: "Basic",
+    rate: 2.0,
+    divByHour: "Yes",
+    getAfterReq: "No",
+    getAfterReqRate: 0,
+    eotAfter: 0,
+    lunch: 0,
+    dinner: 0,
+    isActive: "Active",
+  },
+  {
+    sl: 9,
+    company: "Pakiza Knit Composite Ltd",
+    area: "Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Security Guard",
+    department: "Security & Safety",
+    subDepartment: "Fire & Safety Wing",
+    designation: "Security Guard",
+    workingHourFrom: "06:00",
+    workingHourTo: "18:00",
+    salaryFrom: 9500,
+    salaryTo: 15000,
+    rateFor: "Holiday",
+    basedOn: "Flat Rate",
+    rate: 500,
+    divByHour: "No",
+    getAfterReq: "No",
+    getAfterReqRate: 0,
+    eotAfter: 0,
+    lunch: 0,
+    dinner: 0,
+    isActive: "Active",
+  },
+  {
+    sl: 10,
+    company: "Pakiza Knit Composite Ltd",
+    area: "Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Worker",
+    department: "Packaging & Carton",
+    subDepartment: "Carton Box Maker",
+    designation: "Helper",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    salaryFrom: 8000,
+    salaryTo: 9500,
+    rateFor: "Overtime",
+    basedOn: "Basic",
+    rate: 2.0,
+    divByHour: "Yes",
+    getAfterReq: "No",
+    getAfterReqRate: 0,
+    eotAfter: 0,
+    lunch: 0,
+    dinner: 0,
+    isActive: "Active",
+  },
+  {
+    sl: 11,
+    company: "Pakiza Knit Composite Ltd",
+    area: "Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "ALL",
+    department: "Store & Inventory",
+    subDepartment: "Yarn Store",
+    designation: "Store Executive",
+    workingHourFrom: "08:30",
+    workingHourTo: "17:30",
+    salaryFrom: 15000,
+    salaryTo: 28000,
+    rateFor: "Overtime",
+    basedOn: "Gross",
+    rate: 1.5,
+    divByHour: "Yes",
+    getAfterReq: "No",
+    getAfterReqRate: 0,
+    eotAfter: 0,
+    lunch: 0,
+    dinner: 0,
+    isActive: "Active",
+  },
+  {
+    sl: 12,
+    company: "Pakiza Knit Composite Ltd",
+    area: "Head Office",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Officer",
+    department: "Finance & Accounts",
+    subDepartment: "Accounts Payable",
+    designation: "Senior Accountant",
+    workingHourFrom: "09:00",
+    workingHourTo: "18:00",
+    salaryFrom: 30000,
+    salaryTo: 55000,
+    rateFor: "Holiday",
+    basedOn: "Flat Rate",
+    rate: 1500,
+    divByHour: "No",
+    getAfterReq: "No",
+    getAfterReqRate: 0,
+    eotAfter: 0,
+    lunch: 0,
+    dinner: 0,
+    isActive: "Active",
+  },
+  {
+    sl: 13,
+    company: "Pakiza Knit Composite Ltd",
+    area: "Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Driver",
+    department: "Logistics & Supply",
+    subDepartment: "Central Warehouse",
+    designation: "Heavy Vehicle Driver",
+    workingHourFrom: "08:00",
+    workingHourTo: "18:00",
+    salaryFrom: 12000,
+    salaryTo: 20000,
+    rateFor: "Holiday",
+    basedOn: "Flat Rate",
+    rate: 800,
+    divByHour: "No",
+    getAfterReq: "No",
+    getAfterReqRate: 0,
+    eotAfter: 0,
+    lunch: 0,
+    dinner: 0,
+    isActive: "Active",
+  },
+  {
+    sl: 14,
+    company: "Pakiza Knit Composite Ltd",
+    area: "Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Casual",
+    department: "Production Dept",
+    subDepartment: "Sewing Section",
+    designation: "Helper",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    salaryFrom: 8000,
+    salaryTo: 9000,
+    rateFor: "Overtime",
+    basedOn: "Basic",
+    rate: 2.0,
+    divByHour: "Yes",
+    getAfterReq: "No",
+    getAfterReqRate: 0,
+    eotAfter: 0,
+    lunch: 0,
+    dinner: 0,
+    isActive: "Active",
+  },
+  {
+    sl: 15,
+    company: "Pakiza Knit Composite Ltd",
+    area: "Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Apprentice",
+    department: "Production Dept",
+    subDepartment: "Sewing Section",
+    designation: "Trainee Operator",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    salaryFrom: 6000,
+    salaryTo: 8000,
+    rateFor: "Overtime",
+    basedOn: "Basic",
+    rate: 1.5,
+    divByHour: "Yes",
+    getAfterReq: "No",
+    getAfterReqRate: 0,
+    eotAfter: 0,
+    lunch: 0,
+    dinner: 0,
+    isActive: "Active",
+  },
+  {
+    sl: 16,
+    company: "Pakiza Knit Composite Ltd",
+    area: "Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "ALL",
+    department: "Engineering & Utility",
+    subDepartment: "Power House",
+    designation: "Boiler Operator",
+    workingHourFrom: "08:00",
+    workingHourTo: "16:00",
+    salaryFrom: 11000,
+    salaryTo: 22000,
+    rateFor: "Night Shift",
+    basedOn: "Flat Rate",
+    rate: 200,
+    divByHour: "No",
+    getAfterReq: "No",
+    getAfterReqRate: 0,
+    eotAfter: 0,
+    lunch: 0,
+    dinner: 0,
+    isActive: "Active",
+  },
+  {
+    sl: 17,
+    company: "Pakiza Knit Composite Ltd",
+    area: "Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Permanent",
+    department: "Quality Assurance",
+    subDepartment: "Inspection",
+    designation: "QC Inspector",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    salaryFrom: 10000,
+    salaryTo: 18000,
+    rateFor: "Overtime",
+    basedOn: "Basic",
+    rate: 2.0,
+    divByHour: "Yes",
+    getAfterReq: "No",
+    getAfterReqRate: 0,
+    eotAfter: 0,
+    lunch: 0,
+    dinner: 0,
+    isActive: "Active",
+  },
+  {
+    sl: 18,
+    company: "Pakiza Knit Composite Ltd",
+    area: "Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Staff",
+    department: "Production Dept",
+    subDepartment: "Sample Section",
+    designation: "Pattern Maker",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    salaryFrom: 15000,
+    salaryTo: 28000,
+    rateFor: "Overtime",
+    basedOn: "Gross",
+    rate: 1.5,
+    divByHour: "Yes",
+    getAfterReq: "No",
+    getAfterReqRate: 0,
+    eotAfter: 0,
+    lunch: 0,
+    dinner: 0,
+    isActive: "Active",
+  },
+  {
+    sl: 19,
+    company: "Pakiza Knit Composite Ltd",
+    area: "Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "ALL",
+    department: "Production Dept",
+    subDepartment: "Sewing Section",
+    designation: "Line Leader",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    salaryFrom: 12000,
+    salaryTo: 20000,
+    rateFor: "Attendance Bonus",
+    basedOn: "Flat Rate",
+    rate: 500,
+    divByHour: "No",
+    getAfterReq: "No",
+    getAfterReqRate: 0,
+    eotAfter: 0,
+    lunch: 0,
+    dinner: 0,
+    isActive: "Active",
+  },
+  {
+    sl: 20,
+    company: "Pakiza Knit Composite Ltd",
+    area: "Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Supervisor",
+    department: "Production Dept",
+    subDepartment: "Sewing Section",
+    designation: "Supervisor",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    salaryFrom: 15000,
+    salaryTo: 25000,
+    rateFor: "Overtime",
+    basedOn: "Basic",
+    rate: 2.0,
+    divByHour: "Yes",
+    getAfterReq: "No",
+    getAfterReqRate: 0,
+    eotAfter: 0,
+    lunch: 0,
+    dinner: 0,
+    isActive: "Active",
+  },
 ];
 
 const DEFAULT_TIFFIN: TiffinRate[] = [
-  { sl: 1, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "ALL", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 50 },
-  { sl: 2, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Permanent", department: "Production Dept", section: "Sewing Section", designation: "Operator", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 55 },
-  { sl: 3, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Casual", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 45 },
-  { sl: 4, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Contractual", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 60 },
-  { sl: 5, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Apprentice", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 40 },
-  { sl: 6, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Part-Time", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 50 },
-  { sl: 7, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Intern", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 60 },
-  { sl: 8, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Temporary", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 45 },
-  { sl: 9, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Seasonal", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 45 },
-  { sl: 10, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Outsourced", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 50 },
-  { sl: 11, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Consultant", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 70 },
-  { sl: 12, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Freelance", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 70 },
-  { sl: 13, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Daily Wager", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 40 },
-  { sl: 14, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Project-Based", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 60 },
-  { sl: 15, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Advisory Staff", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 80 },
-  { sl: 16, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Trainee", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 45 },
-  { sl: 17, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Shift-Worker", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 55 },
-  { sl: 18, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "On-Call Staff", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 50 },
-  { sl: 19, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Retainer Contract", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 65 },
-  { sl: 20, company: "Aleya Apparels Ltd.", area: "Aleya-Factory", applicableFrom: "2026-01-01", applicableTo: "2026-12-31", employeeType: "Guest Expert", department: "All Departments", section: "ALL", designation: "ALL", workingHourFrom: "08:00", workingHourTo: "17:00", isActive: "Active", basedOnTiffin: "Hour", workingShift: "Day", rate: 75 }
+  {
+    sl: 1,
+    company: "Aleya Apparels Ltd.",
+    area: "Aleya-Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "ALL",
+    department: "All Departments",
+    section: "ALL",
+    designation: "ALL",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    isActive: "Active",
+    basedOnTiffin: "Hour",
+    workingShift: "Day",
+    rate: 50,
+  },
+  {
+    sl: 2,
+    company: "Aleya Apparels Ltd.",
+    area: "Aleya-Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Permanent",
+    department: "Production Dept",
+    section: "Sewing Section",
+    designation: "Operator",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    isActive: "Active",
+    basedOnTiffin: "Hour",
+    workingShift: "Day",
+    rate: 55,
+  },
+  {
+    sl: 3,
+    company: "Aleya Apparels Ltd.",
+    area: "Aleya-Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Casual",
+    department: "All Departments",
+    section: "ALL",
+    designation: "ALL",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    isActive: "Active",
+    basedOnTiffin: "Hour",
+    workingShift: "Day",
+    rate: 45,
+  },
+  {
+    sl: 4,
+    company: "Aleya Apparels Ltd.",
+    area: "Aleya-Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Contractual",
+    department: "All Departments",
+    section: "ALL",
+    designation: "ALL",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    isActive: "Active",
+    basedOnTiffin: "Hour",
+    workingShift: "Day",
+    rate: 60,
+  },
+  {
+    sl: 5,
+    company: "Aleya Apparels Ltd.",
+    area: "Aleya-Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Apprentice",
+    department: "All Departments",
+    section: "ALL",
+    designation: "ALL",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    isActive: "Active",
+    basedOnTiffin: "Hour",
+    workingShift: "Day",
+    rate: 40,
+  },
+  {
+    sl: 6,
+    company: "Aleya Apparels Ltd.",
+    area: "Aleya-Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Part-Time",
+    department: "All Departments",
+    section: "ALL",
+    designation: "ALL",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    isActive: "Active",
+    basedOnTiffin: "Hour",
+    workingShift: "Day",
+    rate: 50,
+  },
+  {
+    sl: 7,
+    company: "Aleya Apparels Ltd.",
+    area: "Aleya-Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Intern",
+    department: "All Departments",
+    section: "ALL",
+    designation: "ALL",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    isActive: "Active",
+    basedOnTiffin: "Hour",
+    workingShift: "Day",
+    rate: 60,
+  },
+  {
+    sl: 8,
+    company: "Aleya Apparels Ltd.",
+    area: "Aleya-Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Temporary",
+    department: "All Departments",
+    section: "ALL",
+    designation: "ALL",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    isActive: "Active",
+    basedOnTiffin: "Hour",
+    workingShift: "Day",
+    rate: 45,
+  },
+  {
+    sl: 9,
+    company: "Aleya Apparels Ltd.",
+    area: "Aleya-Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Seasonal",
+    department: "All Departments",
+    section: "ALL",
+    designation: "ALL",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    isActive: "Active",
+    basedOnTiffin: "Hour",
+    workingShift: "Day",
+    rate: 45,
+  },
+  {
+    sl: 10,
+    company: "Aleya Apparels Ltd.",
+    area: "Aleya-Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Outsourced",
+    department: "All Departments",
+    section: "ALL",
+    designation: "ALL",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    isActive: "Active",
+    basedOnTiffin: "Hour",
+    workingShift: "Day",
+    rate: 50,
+  },
+  {
+    sl: 11,
+    company: "Aleya Apparels Ltd.",
+    area: "Aleya-Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Consultant",
+    department: "All Departments",
+    section: "ALL",
+    designation: "ALL",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    isActive: "Active",
+    basedOnTiffin: "Hour",
+    workingShift: "Day",
+    rate: 70,
+  },
+  {
+    sl: 12,
+    company: "Aleya Apparels Ltd.",
+    area: "Aleya-Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Freelance",
+    department: "All Departments",
+    section: "ALL",
+    designation: "ALL",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    isActive: "Active",
+    basedOnTiffin: "Hour",
+    workingShift: "Day",
+    rate: 70,
+  },
+  {
+    sl: 13,
+    company: "Aleya Apparels Ltd.",
+    area: "Aleya-Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Daily Wager",
+    department: "All Departments",
+    section: "ALL",
+    designation: "ALL",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    isActive: "Active",
+    basedOnTiffin: "Hour",
+    workingShift: "Day",
+    rate: 40,
+  },
+  {
+    sl: 14,
+    company: "Aleya Apparels Ltd.",
+    area: "Aleya-Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Project-Based",
+    department: "All Departments",
+    section: "ALL",
+    designation: "ALL",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    isActive: "Active",
+    basedOnTiffin: "Hour",
+    workingShift: "Day",
+    rate: 60,
+  },
+  {
+    sl: 15,
+    company: "Aleya Apparels Ltd.",
+    area: "Aleya-Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Advisory Staff",
+    department: "All Departments",
+    section: "ALL",
+    designation: "ALL",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    isActive: "Active",
+    basedOnTiffin: "Hour",
+    workingShift: "Day",
+    rate: 80,
+  },
+  {
+    sl: 16,
+    company: "Aleya Apparels Ltd.",
+    area: "Aleya-Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Trainee",
+    department: "All Departments",
+    section: "ALL",
+    designation: "ALL",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    isActive: "Active",
+    basedOnTiffin: "Hour",
+    workingShift: "Day",
+    rate: 45,
+  },
+  {
+    sl: 17,
+    company: "Aleya Apparels Ltd.",
+    area: "Aleya-Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Shift-Worker",
+    department: "All Departments",
+    section: "ALL",
+    designation: "ALL",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    isActive: "Active",
+    basedOnTiffin: "Hour",
+    workingShift: "Day",
+    rate: 55,
+  },
+  {
+    sl: 18,
+    company: "Aleya Apparels Ltd.",
+    area: "Aleya-Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "On-Call Staff",
+    department: "All Departments",
+    section: "ALL",
+    designation: "ALL",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    isActive: "Active",
+    basedOnTiffin: "Hour",
+    workingShift: "Day",
+    rate: 50,
+  },
+  {
+    sl: 19,
+    company: "Aleya Apparels Ltd.",
+    area: "Aleya-Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Retainer Contract",
+    department: "All Departments",
+    section: "ALL",
+    designation: "ALL",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    isActive: "Active",
+    basedOnTiffin: "Hour",
+    workingShift: "Day",
+    rate: 65,
+  },
+  {
+    sl: 20,
+    company: "Aleya Apparels Ltd.",
+    area: "Aleya-Factory",
+    applicableFrom: "2026-01-01",
+    applicableTo: "2026-12-31",
+    employeeType: "Guest Expert",
+    department: "All Departments",
+    section: "ALL",
+    designation: "ALL",
+    workingHourFrom: "08:00",
+    workingHourTo: "17:00",
+    isActive: "Active",
+    basedOnTiffin: "Hour",
+    workingShift: "Day",
+    rate: 75,
+  },
 ];
 
 const DEFAULT_LUNCH: LunchRate[] = [
@@ -162,7 +977,7 @@ const DEFAULT_LUNCH: LunchRate[] = [
   { sl: 17, employeeType: "Shift-Worker", rate: 85, isActive: "Active" },
   { sl: 18, employeeType: "On-Call Staff", rate: 80, isActive: "Active" },
   { sl: 19, employeeType: "Retainer Contract", rate: 95, isActive: "Active" },
-  { sl: 20, employeeType: "Guest Expert", rate: 110, isActive: "Active" }
+  { sl: 20, employeeType: "Guest Expert", rate: 110, isActive: "Active" },
 ];
 
 const DEFAULT_CONVEYANCE: ConveyanceSetup[] = [
@@ -185,30 +1000,230 @@ const DEFAULT_CONVEYANCE: ConveyanceSetup[] = [
   { sl: 17, employeeType: "Shift-Worker", amount: 1600, isActive: "Active" },
   { sl: 18, employeeType: "On-Call Staff", amount: 1500, isActive: "Active" },
   { sl: 19, employeeType: "Retainer Contract", amount: 2200, isActive: "Active" },
-  { sl: 20, employeeType: "Guest Expert", amount: 3000, isActive: "Active" }
+  { sl: 20, employeeType: "Guest Expert", amount: 3000, isActive: "Active" },
 ];
 
 const DEFAULT_BONUSES: BonusSetting[] = [
-  { sl: 1, employeeType: "ALL", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 50, designation: "ALL", includeServiceLength: "Yes", isActive: "Active" },
-  { sl: 2, employeeType: "Permanent", daysFrom: 365, daysTo: 9999, basedOn: "Basic", bonusPercent: 100, designation: "ALL", includeServiceLength: "Yes", isActive: "Active" },
-  { sl: 3, employeeType: "Casual", daysFrom: 180, daysTo: 365, basedOn: "Gross", bonusPercent: 30, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
-  { sl: 4, employeeType: "Contractual", daysFrom: 90, daysTo: 365, basedOn: "Basic", bonusPercent: 40, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
-  { sl: 5, employeeType: "Apprentice", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 20, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
-  { sl: 6, employeeType: "Part-Time", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 30, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
-  { sl: 7, employeeType: "Intern", daysFrom: 90, daysTo: 180, basedOn: "Gross", bonusPercent: 25, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
-  { sl: 8, employeeType: "Temporary", daysFrom: 180, daysTo: 365, basedOn: "Gross", bonusPercent: 30, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
-  { sl: 9, employeeType: "Seasonal", daysFrom: 90, daysTo: 180, basedOn: "Basic", bonusPercent: 20, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
-  { sl: 10, employeeType: "Outsourced", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 35, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
-  { sl: 11, employeeType: "Consultant", daysFrom: 180, daysTo: 365, basedOn: "Gross", bonusPercent: 50, designation: "ALL", includeServiceLength: "Yes", isActive: "Active" },
-  { sl: 12, employeeType: "Freelance", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 40, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
-  { sl: 13, employeeType: "Daily Wager", daysFrom: 90, daysTo: 180, basedOn: "Basic", bonusPercent: 15, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
-  { sl: 14, employeeType: "Project-Based", daysFrom: 180, daysTo: 365, basedOn: "Gross", bonusPercent: 45, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
-  { sl: 15, employeeType: "Advisory Staff", daysFrom: 365, daysTo: 9999, basedOn: "Gross", bonusPercent: 80, designation: "ALL", includeServiceLength: "Yes", isActive: "Active" },
-  { sl: 16, employeeType: "Trainee", daysFrom: 90, daysTo: 180, basedOn: "Basic", bonusPercent: 20, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
-  { sl: 17, employeeType: "Shift-Worker", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 55, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
-  { sl: 18, employeeType: "On-Call Staff", daysFrom: 180, daysTo: 365, basedOn: "Basic", bonusPercent: 40, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
-  { sl: 19, employeeType: "Retainer Contract", daysFrom: 180, daysTo: 365, basedOn: "Gross", bonusPercent: 40, designation: "ALL", includeServiceLength: "No", isActive: "Active" },
-  { sl: 20, employeeType: "Guest Expert", daysFrom: 90, daysTo: 365, basedOn: "Basic", bonusPercent: 50, designation: "ALL", includeServiceLength: "No", isActive: "Active" }
+  {
+    sl: 1,
+    employeeType: "ALL",
+    daysFrom: 180,
+    daysTo: 365,
+    basedOn: "Basic",
+    bonusPercent: 50,
+    designation: "ALL",
+    includeServiceLength: "Yes",
+    isActive: "Active",
+  },
+  {
+    sl: 2,
+    employeeType: "Permanent",
+    daysFrom: 365,
+    daysTo: 9999,
+    basedOn: "Basic",
+    bonusPercent: 100,
+    designation: "ALL",
+    includeServiceLength: "Yes",
+    isActive: "Active",
+  },
+  {
+    sl: 3,
+    employeeType: "Casual",
+    daysFrom: 180,
+    daysTo: 365,
+    basedOn: "Gross",
+    bonusPercent: 30,
+    designation: "ALL",
+    includeServiceLength: "No",
+    isActive: "Active",
+  },
+  {
+    sl: 4,
+    employeeType: "Contractual",
+    daysFrom: 90,
+    daysTo: 365,
+    basedOn: "Basic",
+    bonusPercent: 40,
+    designation: "ALL",
+    includeServiceLength: "No",
+    isActive: "Active",
+  },
+  {
+    sl: 5,
+    employeeType: "Apprentice",
+    daysFrom: 180,
+    daysTo: 365,
+    basedOn: "Basic",
+    bonusPercent: 20,
+    designation: "ALL",
+    includeServiceLength: "No",
+    isActive: "Active",
+  },
+  {
+    sl: 6,
+    employeeType: "Part-Time",
+    daysFrom: 180,
+    daysTo: 365,
+    basedOn: "Basic",
+    bonusPercent: 30,
+    designation: "ALL",
+    includeServiceLength: "No",
+    isActive: "Active",
+  },
+  {
+    sl: 7,
+    employeeType: "Intern",
+    daysFrom: 90,
+    daysTo: 180,
+    basedOn: "Gross",
+    bonusPercent: 25,
+    designation: "ALL",
+    includeServiceLength: "No",
+    isActive: "Active",
+  },
+  {
+    sl: 8,
+    employeeType: "Temporary",
+    daysFrom: 180,
+    daysTo: 365,
+    basedOn: "Gross",
+    bonusPercent: 30,
+    designation: "ALL",
+    includeServiceLength: "No",
+    isActive: "Active",
+  },
+  {
+    sl: 9,
+    employeeType: "Seasonal",
+    daysFrom: 90,
+    daysTo: 180,
+    basedOn: "Basic",
+    bonusPercent: 20,
+    designation: "ALL",
+    includeServiceLength: "No",
+    isActive: "Active",
+  },
+  {
+    sl: 10,
+    employeeType: "Outsourced",
+    daysFrom: 180,
+    daysTo: 365,
+    basedOn: "Basic",
+    bonusPercent: 35,
+    designation: "ALL",
+    includeServiceLength: "No",
+    isActive: "Active",
+  },
+  {
+    sl: 11,
+    employeeType: "Consultant",
+    daysFrom: 180,
+    daysTo: 365,
+    basedOn: "Gross",
+    bonusPercent: 50,
+    designation: "ALL",
+    includeServiceLength: "Yes",
+    isActive: "Active",
+  },
+  {
+    sl: 12,
+    employeeType: "Freelance",
+    daysFrom: 180,
+    daysTo: 365,
+    basedOn: "Basic",
+    bonusPercent: 40,
+    designation: "ALL",
+    includeServiceLength: "No",
+    isActive: "Active",
+  },
+  {
+    sl: 13,
+    employeeType: "Daily Wager",
+    daysFrom: 90,
+    daysTo: 180,
+    basedOn: "Basic",
+    bonusPercent: 15,
+    designation: "ALL",
+    includeServiceLength: "No",
+    isActive: "Active",
+  },
+  {
+    sl: 14,
+    employeeType: "Project-Based",
+    daysFrom: 180,
+    daysTo: 365,
+    basedOn: "Gross",
+    bonusPercent: 45,
+    designation: "ALL",
+    includeServiceLength: "No",
+    isActive: "Active",
+  },
+  {
+    sl: 15,
+    employeeType: "Advisory Staff",
+    daysFrom: 365,
+    daysTo: 9999,
+    basedOn: "Gross",
+    bonusPercent: 80,
+    designation: "ALL",
+    includeServiceLength: "Yes",
+    isActive: "Active",
+  },
+  {
+    sl: 16,
+    employeeType: "Trainee",
+    daysFrom: 90,
+    daysTo: 180,
+    basedOn: "Basic",
+    bonusPercent: 20,
+    designation: "ALL",
+    includeServiceLength: "No",
+    isActive: "Active",
+  },
+  {
+    sl: 17,
+    employeeType: "Shift-Worker",
+    daysFrom: 180,
+    daysTo: 365,
+    basedOn: "Basic",
+    bonusPercent: 55,
+    designation: "ALL",
+    includeServiceLength: "No",
+    isActive: "Active",
+  },
+  {
+    sl: 18,
+    employeeType: "On-Call Staff",
+    daysFrom: 180,
+    daysTo: 365,
+    basedOn: "Basic",
+    bonusPercent: 40,
+    designation: "ALL",
+    includeServiceLength: "No",
+    isActive: "Active",
+  },
+  {
+    sl: 19,
+    employeeType: "Retainer Contract",
+    daysFrom: 180,
+    daysTo: 365,
+    basedOn: "Gross",
+    bonusPercent: 40,
+    designation: "ALL",
+    includeServiceLength: "No",
+    isActive: "Active",
+  },
+  {
+    sl: 20,
+    employeeType: "Guest Expert",
+    daysFrom: 90,
+    daysTo: 365,
+    basedOn: "Basic",
+    bonusPercent: 50,
+    designation: "ALL",
+    includeServiceLength: "No",
+    isActive: "Active",
+  },
 ];
 
 function CompensationSetupPage() {
@@ -340,7 +1355,7 @@ function CompensationSetupPage() {
   const openForm = (sl: number | null) => {
     setEditSl(sl);
     if (activeTab === "allowance") {
-      const item = allowances.find(a => a.sl === sl);
+      const item = allowances.find((a) => a.sl === sl);
       setCompany(item?.company || "Pakiza Knit Composite Ltd");
       setArea(item?.area || "Factory");
       setApplicableFrom(item?.applicableFrom || "");
@@ -364,7 +1379,7 @@ function CompensationSetupPage() {
       setDinner(item?.dinner || 0);
       setAllowanceIsActive(item?.isActive || "Active");
     } else if (activeTab === "tiffin") {
-      const item = tiffinRates.find(t => t.sl === sl);
+      const item = tiffinRates.find((t) => t.sl === sl);
       setTiffinCompany(item?.company || "Aleya Apparels Ltd.");
       setTiffinArea(item?.area || "Aleya-Factory");
       setTiffinApplicableFrom(item?.applicableFrom || "2026-01-01");
@@ -380,17 +1395,17 @@ function CompensationSetupPage() {
       setTiffinRateVal(item?.rate || 50);
       setTiffinIsActive(item?.isActive || "Active");
     } else if (activeTab === "lunch") {
-      const item = lunchRates.find(l => l.sl === sl);
+      const item = lunchRates.find((l) => l.sl === sl);
       setLunchEmpType(item?.employeeType || "ALL");
       setLunchRateVal(item?.rate || 80);
       setLunchIsActive(item?.isActive || "Active");
     } else if (activeTab === "conveyance") {
-      const item = conveyances.find(c => c.sl === sl);
+      const item = conveyances.find((c) => c.sl === sl);
       setConvEmpType(item?.employeeType || "ALL");
       setConvAmount(item?.amount || 1500);
       setConvIsActive(item?.isActive || "Active");
     } else if (activeTab === "bonus") {
-      const item = bonuses.find(b => b.sl === sl);
+      const item = bonuses.find((b) => b.sl === sl);
       setBonusEmpType(item?.employeeType || "ALL");
       setBonusDaysFrom(item?.daysFrom || 180);
       setBonusDaysTo(item?.daysTo || 365);
@@ -407,23 +1422,31 @@ function CompensationSetupPage() {
     if (!confirm("Are you sure you want to delete this setting?")) return;
 
     if (activeTab === "allowance") {
-      const updated = allowances.filter(a => a.sl !== sl).map((a, idx) => ({ ...a, sl: idx + 1 }));
+      const updated = allowances
+        .filter((a) => a.sl !== sl)
+        .map((a, idx) => ({ ...a, sl: idx + 1 }));
       setAllowances(updated);
       localStorage.setItem("hris_allowance_rates", JSON.stringify(updated));
     } else if (activeTab === "tiffin") {
-      const updated = tiffinRates.filter(t => t.sl !== sl).map((t, idx) => ({ ...t, sl: idx + 1 }));
+      const updated = tiffinRates
+        .filter((t) => t.sl !== sl)
+        .map((t, idx) => ({ ...t, sl: idx + 1 }));
       setTiffinRates(updated);
       localStorage.setItem("hris_tiffin_rates", JSON.stringify(updated));
     } else if (activeTab === "lunch") {
-      const updated = lunchRates.filter(l => l.sl !== sl).map((l, idx) => ({ ...l, sl: idx + 1 }));
+      const updated = lunchRates
+        .filter((l) => l.sl !== sl)
+        .map((l, idx) => ({ ...l, sl: idx + 1 }));
       setLunchRates(updated);
       localStorage.setItem("hris_lunch_rates", JSON.stringify(updated));
     } else if (activeTab === "conveyance") {
-      const updated = conveyances.filter(c => c.sl !== sl).map((c, idx) => ({ ...c, sl: idx + 1 }));
+      const updated = conveyances
+        .filter((c) => c.sl !== sl)
+        .map((c, idx) => ({ ...c, sl: idx + 1 }));
       setConveyances(updated);
       localStorage.setItem("hris_conveyance_setups", JSON.stringify(updated));
     } else if (activeTab === "bonus") {
-      const updated = bonuses.filter(b => b.sl !== sl).map((b, idx) => ({ ...b, sl: idx + 1 }));
+      const updated = bonuses.filter((b) => b.sl !== sl).map((b, idx) => ({ ...b, sl: idx + 1 }));
       setBonuses(updated);
       localStorage.setItem("hris_bonus_settings", JSON.stringify(updated));
     }
@@ -435,38 +1458,97 @@ function CompensationSetupPage() {
     e.preventDefault();
 
     if (activeTab === "allowance") {
-      if (!company || !applicableFrom || !applicableTo) { toast.error("Required fields must be filled."); return; }
+      if (!company || !applicableFrom || !applicableTo) {
+        toast.error("Required fields must be filled.");
+        return;
+      }
       let nextList = [...allowances];
       if (editSl !== null) {
-        nextList = allowances.map(a => a.sl === editSl ? { ...a, company, area, applicableFrom, applicableTo, employeeType, department, subDepartment, designation, workingHourFrom, workingHourTo, salaryFrom: Number(salaryFrom), salaryTo: Number(salaryTo), rateFor, basedOn, rate: Number(rate), divByHour, getAfterReq, getAfterReqRate: Number(getAfterReqRate), eotAfter: Number(eotAfter), lunch: Number(lunch), dinner: Number(dinner), isActive: allowanceIsActive } : a);
+        nextList = allowances.map((a) =>
+          a.sl === editSl
+            ? {
+                ...a,
+                company,
+                area,
+                applicableFrom,
+                applicableTo,
+                employeeType,
+                department,
+                subDepartment,
+                designation,
+                workingHourFrom,
+                workingHourTo,
+                salaryFrom: Number(salaryFrom),
+                salaryTo: Number(salaryTo),
+                rateFor,
+                basedOn,
+                rate: Number(rate),
+                divByHour,
+                getAfterReq,
+                getAfterReqRate: Number(getAfterReqRate),
+                eotAfter: Number(eotAfter),
+                lunch: Number(lunch),
+                dinner: Number(dinner),
+                isActive: allowanceIsActive,
+              }
+            : a,
+        );
       } else {
-        const sl = allowances.length > 0 ? Math.max(...allowances.map(a => a.sl)) + 1 : 1;
-        nextList.push({ sl, company, area, applicableFrom, applicableTo, employeeType, department, subDepartment, designation, workingHourFrom, workingHourTo, salaryFrom: Number(salaryFrom), salaryTo: Number(salaryTo), rateFor, basedOn, rate: Number(rate), divByHour, getAfterReq, getAfterReqRate: Number(getAfterReqRate), eotAfter: Number(eotAfter), lunch: Number(lunch), dinner: Number(dinner), isActive: allowanceIsActive });
+        const sl = allowances.length > 0 ? Math.max(...allowances.map((a) => a.sl)) + 1 : 1;
+        nextList.push({
+          sl,
+          company,
+          area,
+          applicableFrom,
+          applicableTo,
+          employeeType,
+          department,
+          subDepartment,
+          designation,
+          workingHourFrom,
+          workingHourTo,
+          salaryFrom: Number(salaryFrom),
+          salaryTo: Number(salaryTo),
+          rateFor,
+          basedOn,
+          rate: Number(rate),
+          divByHour,
+          getAfterReq,
+          getAfterReqRate: Number(getAfterReqRate),
+          eotAfter: Number(eotAfter),
+          lunch: Number(lunch),
+          dinner: Number(dinner),
+          isActive: allowanceIsActive,
+        });
       }
       setAllowances(nextList);
       localStorage.setItem("hris_allowance_rates", JSON.stringify(nextList));
     } else if (activeTab === "tiffin") {
       let nextList = [...tiffinRates];
       if (editSl !== null) {
-        nextList = tiffinRates.map(t => t.sl === editSl ? {
-          ...t,
-          company: tiffinCompany,
-          area: tiffinArea,
-          applicableFrom: tiffinApplicableFrom,
-          applicableTo: tiffinApplicableTo,
-          employeeType: tiffinEmpType,
-          department: tiffinDepartment,
-          section: tiffinSection,
-          designation: tiffinDesignation,
-          workingHourFrom: tiffinWorkingHourFrom,
-          workingHourTo: tiffinWorkingHourTo,
-          basedOnTiffin: tiffinBasedOn,
-          workingShift: tiffinWorkingShift,
-          rate: Number(tiffinRateVal),
-          isActive: tiffinIsActive
-        } : t);
+        nextList = tiffinRates.map((t) =>
+          t.sl === editSl
+            ? {
+                ...t,
+                company: tiffinCompany,
+                area: tiffinArea,
+                applicableFrom: tiffinApplicableFrom,
+                applicableTo: tiffinApplicableTo,
+                employeeType: tiffinEmpType,
+                department: tiffinDepartment,
+                section: tiffinSection,
+                designation: tiffinDesignation,
+                workingHourFrom: tiffinWorkingHourFrom,
+                workingHourTo: tiffinWorkingHourTo,
+                basedOnTiffin: tiffinBasedOn,
+                workingShift: tiffinWorkingShift,
+                rate: Number(tiffinRateVal),
+                isActive: tiffinIsActive,
+              }
+            : t,
+        );
       } else {
-        const sl = tiffinRates.length > 0 ? Math.max(...tiffinRates.map(t => t.sl)) + 1 : 1;
+        const sl = tiffinRates.length > 0 ? Math.max(...tiffinRates.map((t) => t.sl)) + 1 : 1;
         nextList.push({
           sl,
           company: tiffinCompany,
@@ -482,7 +1564,7 @@ function CompensationSetupPage() {
           basedOnTiffin: tiffinBasedOn,
           workingShift: tiffinWorkingShift,
           rate: Number(tiffinRateVal),
-          isActive: tiffinIsActive
+          isActive: tiffinIsActive,
         });
       }
       setTiffinRates(nextList);
@@ -490,30 +1572,82 @@ function CompensationSetupPage() {
     } else if (activeTab === "lunch") {
       let nextList = [...lunchRates];
       if (editSl !== null) {
-        nextList = lunchRates.map(l => l.sl === editSl ? { ...l, employeeType: lunchEmpType, rate: Number(lunchRateVal), isActive: lunchIsActive } : l);
+        nextList = lunchRates.map((l) =>
+          l.sl === editSl
+            ? {
+                ...l,
+                employeeType: lunchEmpType,
+                rate: Number(lunchRateVal),
+                isActive: lunchIsActive,
+              }
+            : l,
+        );
       } else {
-        const sl = lunchRates.length > 0 ? Math.max(...lunchRates.map(l => l.sl)) + 1 : 1;
-        nextList.push({ sl, employeeType: lunchEmpType, rate: Number(lunchRateVal), isActive: lunchIsActive });
+        const sl = lunchRates.length > 0 ? Math.max(...lunchRates.map((l) => l.sl)) + 1 : 1;
+        nextList.push({
+          sl,
+          employeeType: lunchEmpType,
+          rate: Number(lunchRateVal),
+          isActive: lunchIsActive,
+        });
       }
       setLunchRates(nextList);
       localStorage.setItem("hris_lunch_rates", JSON.stringify(nextList));
     } else if (activeTab === "conveyance") {
       let nextList = [...conveyances];
       if (editSl !== null) {
-        nextList = conveyances.map(c => c.sl === editSl ? { ...c, employeeType: convEmpType, amount: Number(convAmount), isActive: convIsActive } : c);
+        nextList = conveyances.map((c) =>
+          c.sl === editSl
+            ? {
+                ...c,
+                employeeType: convEmpType,
+                amount: Number(convAmount),
+                isActive: convIsActive,
+              }
+            : c,
+        );
       } else {
-        const sl = conveyances.length > 0 ? Math.max(...conveyances.map(c => c.sl)) + 1 : 1;
-        nextList.push({ sl, employeeType: convEmpType, amount: Number(convAmount), isActive: convIsActive });
+        const sl = conveyances.length > 0 ? Math.max(...conveyances.map((c) => c.sl)) + 1 : 1;
+        nextList.push({
+          sl,
+          employeeType: convEmpType,
+          amount: Number(convAmount),
+          isActive: convIsActive,
+        });
       }
       setConveyances(nextList);
       localStorage.setItem("hris_conveyance_setups", JSON.stringify(nextList));
     } else if (activeTab === "bonus") {
       let nextList = [...bonuses];
       if (editSl !== null) {
-        nextList = bonuses.map(b => b.sl === editSl ? { ...b, employeeType: bonusEmpType, daysFrom: Number(bonusDaysFrom), daysTo: Number(bonusDaysTo), basedOn: bonusBasedOn, bonusPercent: Number(bonusPercent), designation: bonusDesignation, includeServiceLength: bonusIncludeServiceLength, isActive: bonusIsActive } : b);
+        nextList = bonuses.map((b) =>
+          b.sl === editSl
+            ? {
+                ...b,
+                employeeType: bonusEmpType,
+                daysFrom: Number(bonusDaysFrom),
+                daysTo: Number(bonusDaysTo),
+                basedOn: bonusBasedOn,
+                bonusPercent: Number(bonusPercent),
+                designation: bonusDesignation,
+                includeServiceLength: bonusIncludeServiceLength,
+                isActive: bonusIsActive,
+              }
+            : b,
+        );
       } else {
-        const sl = bonuses.length > 0 ? Math.max(...bonuses.map(b => b.sl)) + 1 : 1;
-        nextList.push({ sl, employeeType: bonusEmpType, daysFrom: Number(bonusDaysFrom), daysTo: Number(bonusDaysTo), basedOn: bonusBasedOn, bonusPercent: Number(bonusPercent), designation: bonusDesignation, includeServiceLength: bonusIncludeServiceLength, isActive: bonusIsActive });
+        const sl = bonuses.length > 0 ? Math.max(...bonuses.map((b) => b.sl)) + 1 : 1;
+        nextList.push({
+          sl,
+          employeeType: bonusEmpType,
+          daysFrom: Number(bonusDaysFrom),
+          daysTo: Number(bonusDaysTo),
+          basedOn: bonusBasedOn,
+          bonusPercent: Number(bonusPercent),
+          designation: bonusDesignation,
+          includeServiceLength: bonusIncludeServiceLength,
+          isActive: bonusIsActive,
+        });
       }
       setBonuses(nextList);
       localStorage.setItem("hris_bonus_settings", JSON.stringify(nextList));
@@ -523,10 +1657,14 @@ function CompensationSetupPage() {
     setIsFormOpen(false);
   };
 
-  const insetWrapperClass = "group relative rounded-xl border border-border/80 focus-within:border-primary px-3.5 py-1.5 bg-muted/15 focus-within:bg-card transition-all duration-200";
-  const insetLabelClass = "text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block mb-0.5";
-  const insetInputClass = "w-full bg-transparent border-0 outline-none text-xs font-normal text-foreground focus:ring-0 p-0";
-  const insetSelectClass = "w-full bg-transparent border-0 outline-none text-xs font-normal text-foreground focus:ring-0 p-0 cursor-pointer";
+  const insetWrapperClass =
+    "group relative rounded-xl border border-border/80 focus-within:border-primary px-3.5 py-1.5 bg-muted/15 focus-within:bg-card transition-all duration-200";
+  const insetLabelClass =
+    "text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block mb-0.5";
+  const insetInputClass =
+    "w-full bg-transparent border-0 outline-none text-xs font-normal text-foreground focus:ring-0 p-0";
+  const insetSelectClass =
+    "w-full bg-transparent border-0 outline-none text-xs font-normal text-foreground focus:ring-0 p-0 cursor-pointer";
 
   // Tab Header Items
   const tabsList: { type: TabType; label: string; icon: any }[] = [
@@ -534,7 +1672,7 @@ function CompensationSetupPage() {
     { type: "tiffin", label: "Tiffin Rate", icon: Coffee },
     { type: "lunch", label: "Lunch Rate", icon: Coffee },
     { type: "conveyance", label: "Conveyance Setup", icon: Truck },
-    { type: "bonus", label: "Bonus Setting", icon: Gift }
+    { type: "bonus", label: "Bonus Setting", icon: Gift },
   ];
 
   return (
@@ -548,7 +1686,9 @@ function CompensationSetupPage() {
           <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-3" />
                 <span>Configure</span>
                 <ChevronRight className="size-3" />
@@ -559,7 +1699,7 @@ function CompensationSetupPage() {
                 Compensation Configuration
               </h1>
             </div>
-            <button 
+            <button
               onClick={() => openForm(null)}
               className="h-10 px-5 rounded-lg bg-primary text-primary-foreground font-black text-xs hover:bg-primary/90 transition-all shadow-sm flex items-center justify-center gap-2 uppercase tracking-wide"
             >
@@ -569,7 +1709,7 @@ function CompensationSetupPage() {
 
           {/* Horizontal Master Tabs */}
           <div className="flex flex-wrap gap-2 border-b border-border/50 pb-2">
-            {tabsList.map(tab => {
+            {tabsList.map((tab) => {
               const TabIcon = tab.icon;
               const isActive = activeTab === tab.type;
               return (
@@ -580,7 +1720,7 @@ function CompensationSetupPage() {
                     setSearchQuery("");
                   }}
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                    isActive 
+                    isActive
                       ? "bg-primary text-primary-foreground shadow-sm"
                       : "bg-card border border-border/85 hover:bg-muted text-muted-foreground hover:text-foreground"
                   }`}
@@ -596,29 +1736,29 @@ function CompensationSetupPage() {
           <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs flex flex-col md:flex-row gap-3 items-center justify-between">
             <div className="flex items-center gap-2 bg-muted/65 border border-border/40 rounded-lg px-3 py-1.5 w-full md:w-80">
               <Search className="size-4 text-muted-foreground/70" />
-              <input 
-                type="text" 
-                placeholder={`Search ${tabsList.find(t => t.type === activeTab)?.label}...`}
+              <input
+                type="text"
+                placeholder={`Search ${tabsList.find((t) => t.type === activeTab)?.label}...`}
                 value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="bg-transparent border-0 outline-none text-xs w-full text-foreground placeholder:text-muted-foreground/60 font-semibold"
               />
             </div>
 
             <div className="flex items-center gap-2 w-full md:w-auto justify-end">
-              <button 
+              <button
                 onClick={() => toast.success("Exporting to Excel...")}
                 className="h-9.5 px-3 rounded-lg border border-border/60 hover:bg-muted font-bold text-xs text-muted-foreground flex items-center gap-1.5 transition-all uppercase"
               >
                 <FileSpreadsheet className="size-4 text-emerald-600" /> EXCEL
               </button>
-              <button 
+              <button
                 onClick={() => window.print()}
                 className="h-9.5 px-3 rounded-lg border border-border/60 hover:bg-muted font-bold text-xs text-muted-foreground flex items-center gap-1.5 transition-all uppercase"
               >
                 <Printer className="size-4 text-blue-600" /> PRINT
               </button>
-              <button 
+              <button
                 onClick={() => toast.success("Generating PDF...")}
                 className="h-9.5 px-3 rounded-lg border border-border/60 hover:bg-muted font-bold text-xs text-muted-foreground flex items-center gap-1.5 transition-all uppercase"
               >
@@ -630,13 +1770,19 @@ function CompensationSetupPage() {
           {/* Master Table Router */}
           <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
-              
               {activeTab === "allowance" && (
-                <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "1800px" }}>
+                <table
+                  className="w-full text-left text-xs border-collapse whitespace-nowrap"
+                  style={{ minWidth: "1800px" }}
+                >
                   <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
                     <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">SL</th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">Actions</th>
+                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                        SL
+                      </th>
+                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
+                        Actions
+                      </th>
                       <th className="px-5 py-4 w-[120px] text-center">Applicable From</th>
                       <th className="px-5 py-4 w-[120px] text-center">Applicable To</th>
                       <th className="px-5 py-4 w-[120px]">Employee Type</th>
@@ -660,49 +1806,111 @@ function CompensationSetupPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/30 text-foreground">
-                    {allowances.filter(a => (a.company || "").toLowerCase().includes(searchQuery.toLowerCase())).map((item, idx) => (
-                      <tr key={item.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
-                        <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
-                        <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
-                          <div className="flex items-center justify-center gap-3">
-                            <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition"><Pencil className="size-4" /></button>
-                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition"><Trash2 className="size-4" /></button>
-                          </div>
-                        </td>
-                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.applicableFrom}</td>
-                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.applicableTo}</td>
-                        <td className="px-5 py-3.5 font-normal">{item.employeeType}</td>
-                        <td className="px-5 py-3.5 font-normal text-slate-800 dark:text-slate-200">{item.department}</td>
-                        <td className="px-5 py-3.5 font-normal text-slate-700 dark:text-slate-300">{item.subDepartment || "—"}</td>
-                        <td className="px-5 py-3.5 font-normal text-slate-800 dark:text-slate-200">{item.designation}</td>
-                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.workingHourFrom || "—"}</td>
-                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.workingHourTo || "—"}</td>
-                        <td className="px-5 py-3.5 text-right font-normal font-mono">{item.salaryFrom}</td>
-                        <td className="px-5 py-3.5 text-right font-normal font-mono">{item.salaryTo}</td>
-                        <td className="px-5 py-3.5 font-normal">{item.rateFor || "—"}</td>
-                        <td className="px-5 py-3.5 font-normal">{item.basedOn}</td>
-                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.rate}</td>
-                        <td className="px-5 py-3.5 text-center font-normal">{item.divByHour || "—"}</td>
-                        <td className="px-5 py-3.5 text-center font-normal">{item.getAfterReq}</td>
-                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.getAfterReqRate}</td>
-                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.eotAfter}</td>
-                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.lunch}</td>
-                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.dinner}</td>
-                        <td className="px-5 py-3.5 text-center">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}>{item.isActive}</span>
-                        </td>
-                      </tr>
-                    ))}
+                    {allowances
+                      .filter((a) =>
+                        (a.company || "").toLowerCase().includes(searchQuery.toLowerCase()),
+                      )
+                      .map((item, idx) => (
+                        <tr
+                          key={item.sl}
+                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                        >
+                          <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
+                            {idx + 1}
+                          </td>
+                          <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
+                            <div className="flex items-center justify-center gap-3">
+                              <button
+                                onClick={() => openForm(item.sl)}
+                                className="text-orange-500 hover:text-orange-600 transition"
+                              >
+                                <Pencil className="size-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(item.sl)}
+                                className="text-red-500 hover:text-red-650 transition"
+                              >
+                                <Trash2 className="size-4" />
+                              </button>
+                            </div>
+                          </td>
+                          <td className="px-5 py-3.5 text-center font-normal font-mono">
+                            {item.applicableFrom}
+                          </td>
+                          <td className="px-5 py-3.5 text-center font-normal font-mono">
+                            {item.applicableTo}
+                          </td>
+                          <td className="px-5 py-3.5 font-normal">{item.employeeType}</td>
+                          <td className="px-5 py-3.5 font-normal text-slate-800 dark:text-slate-200">
+                            {item.department}
+                          </td>
+                          <td className="px-5 py-3.5 font-normal text-slate-700 dark:text-slate-300">
+                            {item.subDepartment || "—"}
+                          </td>
+                          <td className="px-5 py-3.5 font-normal text-slate-800 dark:text-slate-200">
+                            {item.designation}
+                          </td>
+                          <td className="px-5 py-3.5 text-center font-normal font-mono">
+                            {item.workingHourFrom || "—"}
+                          </td>
+                          <td className="px-5 py-3.5 text-center font-normal font-mono">
+                            {item.workingHourTo || "—"}
+                          </td>
+                          <td className="px-5 py-3.5 text-right font-normal font-mono">
+                            {item.salaryFrom}
+                          </td>
+                          <td className="px-5 py-3.5 text-right font-normal font-mono">
+                            {item.salaryTo}
+                          </td>
+                          <td className="px-5 py-3.5 font-normal">{item.rateFor || "—"}</td>
+                          <td className="px-5 py-3.5 font-normal">{item.basedOn}</td>
+                          <td className="px-5 py-3.5 text-center font-normal font-mono">
+                            {item.rate}
+                          </td>
+                          <td className="px-5 py-3.5 text-center font-normal">
+                            {item.divByHour || "—"}
+                          </td>
+                          <td className="px-5 py-3.5 text-center font-normal">
+                            {item.getAfterReq}
+                          </td>
+                          <td className="px-5 py-3.5 text-center font-normal font-mono">
+                            {item.getAfterReqRate}
+                          </td>
+                          <td className="px-5 py-3.5 text-center font-normal font-mono">
+                            {item.eotAfter}
+                          </td>
+                          <td className="px-5 py-3.5 text-center font-normal font-mono">
+                            {item.lunch}
+                          </td>
+                          <td className="px-5 py-3.5 text-center font-normal font-mono">
+                            {item.dinner}
+                          </td>
+                          <td className="px-5 py-3.5 text-center">
+                            <span
+                              className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}
+                            >
+                              {item.isActive}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               )}
 
               {activeTab === "tiffin" && (
-                <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "1600px" }}>
+                <table
+                  className="w-full text-left text-xs border-collapse whitespace-nowrap"
+                  style={{ minWidth: "1600px" }}
+                >
                   <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
                     <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">SL</th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">Actions</th>
+                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                        SL
+                      </th>
+                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
+                        Actions
+                      </th>
                       <th className="px-5 py-4 w-[150px]">Company</th>
                       <th className="px-5 py-4 w-[120px]">Area</th>
                       <th className="px-5 py-4 w-[120px] text-center">Applicable From</th>
@@ -720,107 +1928,229 @@ function CompensationSetupPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/30 text-foreground">
-                    {tiffinRates.filter(t => (t.company || "").toLowerCase().includes(searchQuery.toLowerCase()) || (t.employeeType || "").toLowerCase().includes(searchQuery.toLowerCase())).map((item, idx) => (
-                      <tr key={item.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
-                        <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
-                        <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
-                          <div className="flex items-center justify-center gap-3">
-                            <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition"><Pencil className="size-4" /></button>
-                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition"><Trash2 className="size-4" /></button>
-                          </div>
-                        </td>
-                        <td className="px-5 py-3.5 font-normal">{item.company || "Aleya Apparels Ltd."}</td>
-                        <td className="px-5 py-3.5 font-normal">{item.area || "Aleya-Factory"}</td>
-                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.applicableFrom || "2026-01-01"}</td>
-                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.applicableTo || "2026-12-31"}</td>
-                        <td className="px-5 py-3.5 font-normal">{item.employeeType}</td>
-                        <td className="px-5 py-3.5 font-normal text-slate-800 dark:text-slate-200">{item.department || "All Departments"}</td>
-                        <td className="px-5 py-3.5 font-normal text-slate-700 dark:text-slate-300">{item.section || "ALL"}</td>
-                        <td className="px-5 py-3.5 font-normal text-slate-800 dark:text-slate-200">{item.designation || "ALL"}</td>
-                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.workingHourFrom || "08:00"}</td>
-                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.workingHourTo || "17:00"}</td>
-                        <td className="px-5 py-3.5 font-normal">{item.basedOnTiffin || "Hour"}</td>
-                        <td className="px-5 py-3.5 font-normal">{item.workingShift || "Day"}</td>
-                        <td className="px-5 py-3.5 text-right font-normal font-mono">{item.rate} BDT</td>
-                        <td className="px-5 py-3.5 text-center">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}>{item.isActive}</span>
-                        </td>
-                      </tr>
-                    ))}
+                    {tiffinRates
+                      .filter(
+                        (t) =>
+                          (t.company || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          (t.employeeType || "").toLowerCase().includes(searchQuery.toLowerCase()),
+                      )
+                      .map((item, idx) => (
+                        <tr
+                          key={item.sl}
+                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                        >
+                          <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
+                            {idx + 1}
+                          </td>
+                          <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
+                            <div className="flex items-center justify-center gap-3">
+                              <button
+                                onClick={() => openForm(item.sl)}
+                                className="text-orange-500 hover:text-orange-600 transition"
+                              >
+                                <Pencil className="size-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(item.sl)}
+                                className="text-red-500 hover:text-red-650 transition"
+                              >
+                                <Trash2 className="size-4" />
+                              </button>
+                            </div>
+                          </td>
+                          <td className="px-5 py-3.5 font-normal">
+                            {item.company || "Aleya Apparels Ltd."}
+                          </td>
+                          <td className="px-5 py-3.5 font-normal">
+                            {item.area || "Aleya-Factory"}
+                          </td>
+                          <td className="px-5 py-3.5 text-center font-normal font-mono">
+                            {item.applicableFrom || "2026-01-01"}
+                          </td>
+                          <td className="px-5 py-3.5 text-center font-normal font-mono">
+                            {item.applicableTo || "2026-12-31"}
+                          </td>
+                          <td className="px-5 py-3.5 font-normal">{item.employeeType}</td>
+                          <td className="px-5 py-3.5 font-normal text-slate-800 dark:text-slate-200">
+                            {item.department || "All Departments"}
+                          </td>
+                          <td className="px-5 py-3.5 font-normal text-slate-700 dark:text-slate-300">
+                            {item.section || "ALL"}
+                          </td>
+                          <td className="px-5 py-3.5 font-normal text-slate-800 dark:text-slate-200">
+                            {item.designation || "ALL"}
+                          </td>
+                          <td className="px-5 py-3.5 text-center font-normal font-mono">
+                            {item.workingHourFrom || "08:00"}
+                          </td>
+                          <td className="px-5 py-3.5 text-center font-normal font-mono">
+                            {item.workingHourTo || "17:00"}
+                          </td>
+                          <td className="px-5 py-3.5 font-normal">
+                            {item.basedOnTiffin || "Hour"}
+                          </td>
+                          <td className="px-5 py-3.5 font-normal">{item.workingShift || "Day"}</td>
+                          <td className="px-5 py-3.5 text-right font-normal font-mono">
+                            {item.rate} BDT
+                          </td>
+                          <td className="px-5 py-3.5 text-center">
+                            <span
+                              className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}
+                            >
+                              {item.isActive}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               )}
 
               {activeTab === "lunch" && (
-                <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "800px" }}>
+                <table
+                  className="w-full text-left text-xs border-collapse whitespace-nowrap"
+                  style={{ minWidth: "800px" }}
+                >
                   <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
                     <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">#</th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">Actions</th>
+                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                        #
+                      </th>
+                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
+                        Actions
+                      </th>
                       <th className="px-5 py-4 min-w-[300px]">Employee Type</th>
                       <th className="px-5 py-4 w-[150px] text-right">Lunch Rate</th>
                       <th className="px-5 py-4 w-[120px] text-center">IsActive</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/30 text-foreground">
-                    {lunchRates.filter(l => (l.employeeType || "").toLowerCase().includes(searchQuery.toLowerCase())).map((item, idx) => (
-                      <tr key={item.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
-                        <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
-                        <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
-                          <div className="flex items-center justify-center gap-3">
-                            <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition"><Pencil className="size-4" /></button>
-                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition"><Trash2 className="size-4" /></button>
-                          </div>
-                        </td>
-                        <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">{item.employeeType}</td>
-                        <td className="px-5 py-3.5 text-right font-normal font-mono">{item.rate} BDT</td>
-                        <td className="px-5 py-3.5 text-center">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}>{item.isActive}</span>
-                        </td>
-                      </tr>
-                    ))}
+                    {lunchRates
+                      .filter((l) =>
+                        (l.employeeType || "").toLowerCase().includes(searchQuery.toLowerCase()),
+                      )
+                      .map((item, idx) => (
+                        <tr
+                          key={item.sl}
+                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                        >
+                          <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
+                            {idx + 1}
+                          </td>
+                          <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
+                            <div className="flex items-center justify-center gap-3">
+                              <button
+                                onClick={() => openForm(item.sl)}
+                                className="text-orange-500 hover:text-orange-600 transition"
+                              >
+                                <Pencil className="size-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(item.sl)}
+                                className="text-red-500 hover:text-red-650 transition"
+                              >
+                                <Trash2 className="size-4" />
+                              </button>
+                            </div>
+                          </td>
+                          <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">
+                            {item.employeeType}
+                          </td>
+                          <td className="px-5 py-3.5 text-right font-normal font-mono">
+                            {item.rate} BDT
+                          </td>
+                          <td className="px-5 py-3.5 text-center">
+                            <span
+                              className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}
+                            >
+                              {item.isActive}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               )}
 
               {activeTab === "conveyance" && (
-                <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "800px" }}>
+                <table
+                  className="w-full text-left text-xs border-collapse whitespace-nowrap"
+                  style={{ minWidth: "800px" }}
+                >
                   <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
                     <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">#</th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">Actions</th>
+                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                        #
+                      </th>
+                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
+                        Actions
+                      </th>
                       <th className="px-5 py-4 min-w-[300px]">Employee Type</th>
                       <th className="px-5 py-4 w-[150px] text-right">Conveyance Amount</th>
                       <th className="px-5 py-4 w-[120px] text-center">IsActive</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/30 text-foreground">
-                    {conveyances.filter(c => (c.employeeType || "").toLowerCase().includes(searchQuery.toLowerCase())).map((item, idx) => (
-                      <tr key={item.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
-                        <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
-                        <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
-                          <div className="flex items-center justify-center gap-3">
-                            <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition"><Pencil className="size-4" /></button>
-                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition"><Trash2 className="size-4" /></button>
-                          </div>
-                        </td>
-                        <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">{item.employeeType}</td>
-                        <td className="px-5 py-3.5 text-right font-normal font-mono">{item.amount} BDT</td>
-                        <td className="px-5 py-3.5 text-center">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}>{item.isActive}</span>
-                        </td>
-                      </tr>
-                    ))}
+                    {conveyances
+                      .filter((c) =>
+                        (c.employeeType || "").toLowerCase().includes(searchQuery.toLowerCase()),
+                      )
+                      .map((item, idx) => (
+                        <tr
+                          key={item.sl}
+                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                        >
+                          <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
+                            {idx + 1}
+                          </td>
+                          <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
+                            <div className="flex items-center justify-center gap-3">
+                              <button
+                                onClick={() => openForm(item.sl)}
+                                className="text-orange-500 hover:text-orange-600 transition"
+                              >
+                                <Pencil className="size-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(item.sl)}
+                                className="text-red-500 hover:text-red-650 transition"
+                              >
+                                <Trash2 className="size-4" />
+                              </button>
+                            </div>
+                          </td>
+                          <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">
+                            {item.employeeType}
+                          </td>
+                          <td className="px-5 py-3.5 text-right font-normal font-mono">
+                            {item.amount} BDT
+                          </td>
+                          <td className="px-5 py-3.5 text-center">
+                            <span
+                              className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}
+                            >
+                              {item.isActive}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               )}
 
               {activeTab === "bonus" && (
-                <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "900px" }}>
+                <table
+                  className="w-full text-left text-xs border-collapse whitespace-nowrap"
+                  style={{ minWidth: "900px" }}
+                >
                   <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
                     <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">#</th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">Actions</th>
+                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                        #
+                      </th>
+                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
+                        Actions
+                      </th>
                       <th className="px-5 py-4 min-w-[180px]">Employee Type</th>
                       <th className="px-5 py-4 w-[120px] text-center">Days Form</th>
                       <th className="px-5 py-4 w-[120px] text-center">Days To</th>
@@ -832,31 +2162,63 @@ function CompensationSetupPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/30 text-foreground">
-                    {bonuses.filter(b => (b.employeeType || "").toLowerCase().includes(searchQuery.toLowerCase())).map((item, idx) => (
-                      <tr key={item.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
-                        <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
-                        <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
-                          <div className="flex items-center justify-center gap-3">
-                            <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition"><Pencil className="size-4" /></button>
-                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition"><Trash2 className="size-4" /></button>
-                          </div>
-                        </td>
-                        <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">{item.employeeType}</td>
-                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.daysFrom}</td>
-                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.daysTo}</td>
-                        <td className="px-5 py-3.5 font-normal">{item.basedOn}</td>
-                        <td className="px-5 py-3.5 text-center font-normal font-mono">{item.bonusPercent}%</td>
-                        <td className="px-5 py-3.5 font-normal">{item.designation || "ALL"}</td>
-                        <td className="px-5 py-3.5 text-center font-normal">{item.includeServiceLength || "Yes"}</td>
-                        <td className="px-5 py-3.5 text-center">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}>{item.isActive}</span>
-                        </td>
-                      </tr>
-                    ))}
+                    {bonuses
+                      .filter((b) =>
+                        (b.employeeType || "").toLowerCase().includes(searchQuery.toLowerCase()),
+                      )
+                      .map((item, idx) => (
+                        <tr
+                          key={item.sl}
+                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                        >
+                          <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
+                            {idx + 1}
+                          </td>
+                          <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
+                            <div className="flex items-center justify-center gap-3">
+                              <button
+                                onClick={() => openForm(item.sl)}
+                                className="text-orange-500 hover:text-orange-600 transition"
+                              >
+                                <Pencil className="size-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(item.sl)}
+                                className="text-red-500 hover:text-red-650 transition"
+                              >
+                                <Trash2 className="size-4" />
+                              </button>
+                            </div>
+                          </td>
+                          <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">
+                            {item.employeeType}
+                          </td>
+                          <td className="px-5 py-3.5 text-center font-normal font-mono">
+                            {item.daysFrom}
+                          </td>
+                          <td className="px-5 py-3.5 text-center font-normal font-mono">
+                            {item.daysTo}
+                          </td>
+                          <td className="px-5 py-3.5 font-normal">{item.basedOn}</td>
+                          <td className="px-5 py-3.5 text-center font-normal font-mono">
+                            {item.bonusPercent}%
+                          </td>
+                          <td className="px-5 py-3.5 font-normal">{item.designation || "ALL"}</td>
+                          <td className="px-5 py-3.5 text-center font-normal">
+                            {item.includeServiceLength || "Yes"}
+                          </td>
+                          <td className="px-5 py-3.5 text-center">
+                            <span
+                              className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}
+                            >
+                              {item.isActive}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               )}
-
             </div>
           </div>
         </div>
@@ -864,8 +2226,9 @@ function CompensationSetupPage() {
         {/* Master Modal Router */}
         {isFormOpen && (
           <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
-            <div className={`bg-card border border-border/80 w-full rounded-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 ${activeTab === 'tiffin' ? 'max-w-4xl' : 'max-w-2xl'}`}>
-              
+            <div
+              className={`bg-card border border-border/80 w-full rounded-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 ${activeTab === "tiffin" ? "max-w-4xl" : "max-w-2xl"}`}
+            >
               {/* Modal Header */}
               <div className="px-6 py-4.5 border-b border-border/50 bg-[#f8fafc] dark:bg-[#0f172a] flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
@@ -874,11 +2237,12 @@ function CompensationSetupPage() {
                   </div>
                   <div>
                     <h2 className="text-base font-black tracking-tight text-foreground">
-                      {editSl ? "Update" : "Create"} {tabsList.find(t => t.type === activeTab)?.label}
+                      {editSl ? "Update" : "Create"}{" "}
+                      {tabsList.find((t) => t.type === activeTab)?.label}
                     </h2>
                   </div>
                 </div>
-                <button 
+                <button
                   onClick={() => setIsFormOpen(false)}
                   className="size-8.5 rounded-xl hover:bg-muted/80 flex items-center justify-center transition-colors text-muted-foreground hover:text-foreground border border-border/20"
                 >
@@ -888,64 +2252,137 @@ function CompensationSetupPage() {
 
               {/* Modal Form Body */}
               <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
-                
                 {activeTab === "allowance" && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Company *</label>
-                      <input type="text" value={company} onChange={e => setCompany(e.target.value)} className={insetInputClass} required />
+                      <input
+                        type="text"
+                        value={company}
+                        onChange={(e) => setCompany(e.target.value)}
+                        className={insetInputClass}
+                        required
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Area *</label>
-                      <input type="text" value={area} onChange={e => setArea(e.target.value)} className={insetInputClass} required />
+                      <input
+                        type="text"
+                        value={area}
+                        onChange={(e) => setArea(e.target.value)}
+                        className={insetInputClass}
+                        required
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Applicable From *</label>
-                      <input type="date" value={applicableFrom} onChange={e => setApplicableFrom(e.target.value)} className={insetInputClass} required />
+                      <input
+                        type="date"
+                        value={applicableFrom}
+                        onChange={(e) => setApplicableFrom(e.target.value)}
+                        className={insetInputClass}
+                        required
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Applicable To *</label>
-                      <input type="date" value={applicableTo} onChange={e => setApplicableTo(e.target.value)} className={insetInputClass} required />
+                      <input
+                        type="date"
+                        value={applicableTo}
+                        onChange={(e) => setApplicableTo(e.target.value)}
+                        className={insetInputClass}
+                        required
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Employee Type *</label>
-                      <input type="text" value={employeeType} onChange={e => setEmployeeType(e.target.value)} className={insetInputClass} required />
+                      <input
+                        type="text"
+                        value={employeeType}
+                        onChange={(e) => setEmployeeType(e.target.value)}
+                        className={insetInputClass}
+                        required
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Department</label>
-                      <input type="text" value={department} onChange={e => setDepartment(e.target.value)} className={insetInputClass} />
+                      <input
+                        type="text"
+                        value={department}
+                        onChange={(e) => setDepartment(e.target.value)}
+                        className={insetInputClass}
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Section</label>
-                      <input type="text" value={subDepartment} onChange={e => setSubDepartment(e.target.value)} className={insetInputClass} />
+                      <input
+                        type="text"
+                        value={subDepartment}
+                        onChange={(e) => setSubDepartment(e.target.value)}
+                        className={insetInputClass}
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Designation</label>
-                      <input type="text" value={designation} onChange={e => setDesignation(e.target.value)} className={insetInputClass} />
+                      <input
+                        type="text"
+                        value={designation}
+                        onChange={(e) => setDesignation(e.target.value)}
+                        className={insetInputClass}
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Working Hour From</label>
-                      <input type="text" value={workingHourFrom} onChange={e => setWorkingHourFrom(e.target.value)} className={insetInputClass} />
+                      <input
+                        type="text"
+                        value={workingHourFrom}
+                        onChange={(e) => setWorkingHourFrom(e.target.value)}
+                        className={insetInputClass}
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Working Hour To</label>
-                      <input type="text" value={workingHourTo} onChange={e => setWorkingHourTo(e.target.value)} className={insetInputClass} />
+                      <input
+                        type="text"
+                        value={workingHourTo}
+                        onChange={(e) => setWorkingHourTo(e.target.value)}
+                        className={insetInputClass}
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Salary From</label>
-                      <input type="number" value={salaryFrom} onChange={e => setSalaryFrom(Number(e.target.value))} className={insetInputClass} />
+                      <input
+                        type="number"
+                        value={salaryFrom}
+                        onChange={(e) => setSalaryFrom(Number(e.target.value))}
+                        className={insetInputClass}
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Salary To</label>
-                      <input type="number" value={salaryTo} onChange={e => setSalaryTo(Number(e.target.value))} className={insetInputClass} />
+                      <input
+                        type="number"
+                        value={salaryTo}
+                        onChange={(e) => setSalaryTo(Number(e.target.value))}
+                        className={insetInputClass}
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Rate For</label>
-                      <input type="text" value={rateFor} onChange={e => setRateFor(e.target.value)} className={insetInputClass} />
+                      <input
+                        type="text"
+                        value={rateFor}
+                        onChange={(e) => setRateFor(e.target.value)}
+                        className={insetInputClass}
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Based On</label>
-                      <select value={basedOn} onChange={e => setBasedOn(e.target.value)} className={insetSelectClass}>
+                      <select
+                        value={basedOn}
+                        onChange={(e) => setBasedOn(e.target.value)}
+                        className={insetSelectClass}
+                      >
                         <option value="--Select--">--Select--</option>
                         <option value="Basic">Basic</option>
                         <option value="Gross">Gross</option>
@@ -954,38 +2391,77 @@ function CompensationSetupPage() {
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Rate</label>
-                      <input type="number" step="0.01" value={rate} onChange={e => setRate(Number(e.target.value))} className={insetInputClass} />
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={rate}
+                        onChange={(e) => setRate(Number(e.target.value))}
+                        className={insetInputClass}
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Div By Hour</label>
-                      <input type="text" value={divByHour} onChange={e => setDivByHour(e.target.value)} className={insetInputClass} />
+                      <input
+                        type="text"
+                        value={divByHour}
+                        onChange={(e) => setDivByHour(e.target.value)}
+                        className={insetInputClass}
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Get After Reguler</label>
-                      <select value={getAfterReq} onChange={e => setGetAfterReq(e.target.value)} className={insetSelectClass}>
+                      <select
+                        value={getAfterReq}
+                        onChange={(e) => setGetAfterReq(e.target.value)}
+                        className={insetSelectClass}
+                      >
                         <option value="No">No</option>
                         <option value="Yes">Yes</option>
                       </select>
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Rate</label>
-                      <input type="number" value={getAfterReqRate} onChange={e => setGetAfterReqRate(Number(e.target.value))} className={insetInputClass} />
+                      <input
+                        type="number"
+                        value={getAfterReqRate}
+                        onChange={(e) => setGetAfterReqRate(Number(e.target.value))}
+                        className={insetInputClass}
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>EOT After</label>
-                      <input type="number" value={eotAfter} onChange={e => setEotAfter(Number(e.target.value))} className={insetInputClass} />
+                      <input
+                        type="number"
+                        value={eotAfter}
+                        onChange={(e) => setEotAfter(Number(e.target.value))}
+                        className={insetInputClass}
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Lunch Break</label>
-                      <input type="number" value={lunch} onChange={e => setLunch(Number(e.target.value))} className={insetInputClass} />
+                      <input
+                        type="number"
+                        value={lunch}
+                        onChange={(e) => setLunch(Number(e.target.value))}
+                        className={insetInputClass}
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Dinner Break</label>
-                      <input type="number" value={dinner} onChange={e => setDinner(Number(e.target.value))} className={insetInputClass} />
+                      <input
+                        type="number"
+                        value={dinner}
+                        onChange={(e) => setDinner(Number(e.target.value))}
+                        className={insetInputClass}
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>IsActive *</label>
-                      <select value={allowanceIsActive} onChange={e => setAllowanceIsActive(e.target.value as any)} className={insetSelectClass}>
+                      <select
+                        value={allowanceIsActive}
+                        onChange={(e) => setAllowanceIsActive(e.target.value as any)}
+                        className={insetSelectClass}
+                      >
                         <option value="Active">Active</option>
                         <option value="Inactive">Inactive</option>
                       </select>
@@ -997,7 +2473,12 @@ function CompensationSetupPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Company *</label>
-                      <select value={tiffinCompany} onChange={e => setTiffinCompany(e.target.value)} className={insetSelectClass} required>
+                      <select
+                        value={tiffinCompany}
+                        onChange={(e) => setTiffinCompany(e.target.value)}
+                        className={insetSelectClass}
+                        required
+                      >
                         <option value="Aleya Apparels Ltd.">Aleya Apparels Ltd.</option>
                         <option value="Pakiza Knit Composite Ltd">Pakiza Knit Composite Ltd</option>
                         <option value="Cripton Group">Cripton Group</option>
@@ -1005,7 +2486,12 @@ function CompensationSetupPage() {
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Area *</label>
-                      <select value={tiffinArea} onChange={e => setTiffinArea(e.target.value)} className={insetSelectClass} required>
+                      <select
+                        value={tiffinArea}
+                        onChange={(e) => setTiffinArea(e.target.value)}
+                        className={insetSelectClass}
+                        required
+                      >
                         <option value="Aleya-Factory">Aleya-Factory</option>
                         <option value="Pakiza-Factory">Pakiza-Factory</option>
                         <option value="Factory">Factory</option>
@@ -1014,15 +2500,31 @@ function CompensationSetupPage() {
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Applicable From *</label>
-                      <input type="date" value={tiffinApplicableFrom} onChange={e => setTiffinApplicableFrom(e.target.value)} className={insetInputClass} required />
+                      <input
+                        type="date"
+                        value={tiffinApplicableFrom}
+                        onChange={(e) => setTiffinApplicableFrom(e.target.value)}
+                        className={insetInputClass}
+                        required
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Applicable To *</label>
-                      <input type="date" value={tiffinApplicableTo} onChange={e => setTiffinApplicableTo(e.target.value)} className={insetInputClass} required />
+                      <input
+                        type="date"
+                        value={tiffinApplicableTo}
+                        onChange={(e) => setTiffinApplicableTo(e.target.value)}
+                        className={insetInputClass}
+                        required
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Employee Type</label>
-                      <select value={tiffinEmpType} onChange={e => setTiffinEmpType(e.target.value)} className={insetSelectClass}>
+                      <select
+                        value={tiffinEmpType}
+                        onChange={(e) => setTiffinEmpType(e.target.value)}
+                        className={insetSelectClass}
+                      >
                         <option value="ALL">ALL</option>
                         <option value="Permanent">Permanent</option>
                         <option value="Casual">Casual</option>
@@ -1034,7 +2536,11 @@ function CompensationSetupPage() {
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Department</label>
-                      <select value={tiffinDepartment} onChange={e => setTiffinDepartment(e.target.value)} className={insetSelectClass}>
+                      <select
+                        value={tiffinDepartment}
+                        onChange={(e) => setTiffinDepartment(e.target.value)}
+                        className={insetSelectClass}
+                      >
                         <option value="All Departments">All Departments</option>
                         <option value="Production Dept">Production Dept</option>
                         <option value="Quality Assurance">Quality Assurance</option>
@@ -1043,7 +2549,11 @@ function CompensationSetupPage() {
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Section</label>
-                      <select value={tiffinSection} onChange={e => setTiffinSection(e.target.value)} className={insetSelectClass}>
+                      <select
+                        value={tiffinSection}
+                        onChange={(e) => setTiffinSection(e.target.value)}
+                        className={insetSelectClass}
+                      >
                         <option value="ALL">ALL</option>
                         <option value="Sewing Section">Sewing Section</option>
                         <option value="Cutting Section">Cutting Section</option>
@@ -1052,7 +2562,11 @@ function CompensationSetupPage() {
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Designation</label>
-                      <select value={tiffinDesignation} onChange={e => setTiffinDesignation(e.target.value)} className={insetSelectClass}>
+                      <select
+                        value={tiffinDesignation}
+                        onChange={(e) => setTiffinDesignation(e.target.value)}
+                        className={insetSelectClass}
+                      >
                         <option value="ALL">ALL</option>
                         <option value="Operator">Operator</option>
                         <option value="Helper">Helper</option>
@@ -1062,29 +2576,54 @@ function CompensationSetupPage() {
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Working Hour From</label>
-                      <input type="text" placeholder="e.g. 08:00" value={tiffinWorkingHourFrom} onChange={e => setTiffinWorkingHourFrom(e.target.value)} className={insetInputClass} />
+                      <input
+                        type="text"
+                        placeholder="e.g. 08:00"
+                        value={tiffinWorkingHourFrom}
+                        onChange={(e) => setTiffinWorkingHourFrom(e.target.value)}
+                        className={insetInputClass}
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Working Hour To</label>
-                      <input type="text" placeholder="e.g. 17:00" value={tiffinWorkingHourTo} onChange={e => setTiffinWorkingHourTo(e.target.value)} className={insetInputClass} />
+                      <input
+                        type="text"
+                        placeholder="e.g. 17:00"
+                        value={tiffinWorkingHourTo}
+                        onChange={(e) => setTiffinWorkingHourTo(e.target.value)}
+                        className={insetInputClass}
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>IsActive *</label>
-                      <select value={tiffinIsActive} onChange={e => setTiffinIsActive(e.target.value as any)} className={insetSelectClass}>
+                      <select
+                        value={tiffinIsActive}
+                        onChange={(e) => setTiffinIsActive(e.target.value as any)}
+                        className={insetSelectClass}
+                      >
                         <option value="Active">Active</option>
                         <option value="Inactive">Inactive</option>
                       </select>
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Based On Tiffin *</label>
-                      <select value={tiffinBasedOn} onChange={e => setTiffinBasedOn(e.target.value)} className={insetSelectClass} required>
+                      <select
+                        value={tiffinBasedOn}
+                        onChange={(e) => setTiffinBasedOn(e.target.value)}
+                        className={insetSelectClass}
+                        required
+                      >
                         <option value="Hour">Hour</option>
                         <option value="Flat">Flat</option>
                       </select>
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Working Shift</label>
-                      <select value={tiffinWorkingShift} onChange={e => setTiffinWorkingShift(e.target.value)} className={insetSelectClass}>
+                      <select
+                        value={tiffinWorkingShift}
+                        onChange={(e) => setTiffinWorkingShift(e.target.value)}
+                        className={insetSelectClass}
+                      >
                         <option value="Day">Day</option>
                         <option value="Night">Night</option>
                         <option value="All">All</option>
@@ -1092,7 +2631,14 @@ function CompensationSetupPage() {
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Rate</label>
-                      <input type="number" placeholder="Rate" value={tiffinRateVal} onChange={e => setTiffinRateVal(Number(e.target.value))} className={insetInputClass} required />
+                      <input
+                        type="number"
+                        placeholder="Rate"
+                        value={tiffinRateVal}
+                        onChange={(e) => setTiffinRateVal(Number(e.target.value))}
+                        className={insetInputClass}
+                        required
+                      />
                     </div>
                   </div>
                 )}
@@ -1101,15 +2647,31 @@ function CompensationSetupPage() {
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Employee Type *</label>
-                      <input type="text" value={lunchEmpType} onChange={e => setLunchEmpType(e.target.value)} className={insetInputClass} required />
+                      <input
+                        type="text"
+                        value={lunchEmpType}
+                        onChange={(e) => setLunchEmpType(e.target.value)}
+                        className={insetInputClass}
+                        required
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Lunch Rate (BDT) *</label>
-                      <input type="number" value={lunchRateVal} onChange={e => setLunchRateVal(Number(e.target.value))} className={insetInputClass} required />
+                      <input
+                        type="number"
+                        value={lunchRateVal}
+                        onChange={(e) => setLunchRateVal(Number(e.target.value))}
+                        className={insetInputClass}
+                        required
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>IsActive *</label>
-                      <select value={lunchIsActive} onChange={e => setLunchIsActive(e.target.value as any)} className={insetSelectClass}>
+                      <select
+                        value={lunchIsActive}
+                        onChange={(e) => setLunchIsActive(e.target.value as any)}
+                        className={insetSelectClass}
+                      >
                         <option value="Active">Active</option>
                         <option value="Inactive">Inactive</option>
                       </select>
@@ -1121,15 +2683,31 @@ function CompensationSetupPage() {
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Employee Type *</label>
-                      <input type="text" value={convEmpType} onChange={e => setConvEmpType(e.target.value)} className={insetInputClass} required />
+                      <input
+                        type="text"
+                        value={convEmpType}
+                        onChange={(e) => setConvEmpType(e.target.value)}
+                        className={insetInputClass}
+                        required
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Conveyance Amount (BDT) *</label>
-                      <input type="number" value={convAmount} onChange={e => setConvAmount(Number(e.target.value))} className={insetInputClass} required />
+                      <input
+                        type="number"
+                        value={convAmount}
+                        onChange={(e) => setConvAmount(Number(e.target.value))}
+                        className={insetInputClass}
+                        required
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>IsActive *</label>
-                      <select value={convIsActive} onChange={e => setConvIsActive(e.target.value as any)} className={insetSelectClass}>
+                      <select
+                        value={convIsActive}
+                        onChange={(e) => setConvIsActive(e.target.value as any)}
+                        className={insetSelectClass}
+                      >
                         <option value="Active">Active</option>
                         <option value="Inactive">Inactive</option>
                       </select>
@@ -1141,7 +2719,12 @@ function CompensationSetupPage() {
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Employee Type *</label>
-                      <select value={bonusEmpType} onChange={e => setBonusEmpType(e.target.value)} className={insetSelectClass} required>
+                      <select
+                        value={bonusEmpType}
+                        onChange={(e) => setBonusEmpType(e.target.value)}
+                        className={insetSelectClass}
+                        required
+                      >
                         <option value="ALL">ALL</option>
                         <option value="Worker">Worker</option>
                         <option value="Permanent">Permanent</option>
@@ -1158,15 +2741,31 @@ function CompensationSetupPage() {
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Days Form *</label>
-                      <input type="number" value={bonusDaysFrom} onChange={e => setBonusDaysFrom(Number(e.target.value))} className={insetInputClass} required />
+                      <input
+                        type="number"
+                        value={bonusDaysFrom}
+                        onChange={(e) => setBonusDaysFrom(Number(e.target.value))}
+                        className={insetInputClass}
+                        required
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Days To</label>
-                      <input type="number" value={bonusDaysTo} onChange={e => setBonusDaysTo(Number(e.target.value))} className={insetInputClass} />
+                      <input
+                        type="number"
+                        value={bonusDaysTo}
+                        onChange={(e) => setBonusDaysTo(Number(e.target.value))}
+                        className={insetInputClass}
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Based On *</label>
-                      <select value={bonusBasedOn} onChange={e => setBonusBasedOn(e.target.value)} className={insetSelectClass} required>
+                      <select
+                        value={bonusBasedOn}
+                        onChange={(e) => setBonusBasedOn(e.target.value)}
+                        className={insetSelectClass}
+                        required
+                      >
                         <option value="Basic">Basic</option>
                         <option value="Gross">Gross</option>
                         <option value="Flat">Flat</option>
@@ -1174,22 +2773,44 @@ function CompensationSetupPage() {
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Bonus (%) *</label>
-                      <input type="number" value={bonusPercent} onChange={e => setBonusPercent(Number(e.target.value))} className={insetInputClass} required />
+                      <input
+                        type="number"
+                        value={bonusPercent}
+                        onChange={(e) => setBonusPercent(Number(e.target.value))}
+                        className={insetInputClass}
+                        required
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Designation *</label>
-                      <input type="text" value={bonusDesignation} onChange={e => setBonusDesignation(e.target.value)} className={insetInputClass} placeholder="ALL" />
+                      <input
+                        type="text"
+                        value={bonusDesignation}
+                        onChange={(e) => setBonusDesignation(e.target.value)}
+                        className={insetInputClass}
+                        placeholder="ALL"
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Is Include Service Length *</label>
-                      <select value={bonusIncludeServiceLength} onChange={e => setBonusIncludeServiceLength(e.target.value as "Yes" | "No")} className={insetSelectClass}>
+                      <select
+                        value={bonusIncludeServiceLength}
+                        onChange={(e) =>
+                          setBonusIncludeServiceLength(e.target.value as "Yes" | "No")
+                        }
+                        className={insetSelectClass}
+                      >
                         <option value="Yes">Yes</option>
                         <option value="No">No</option>
                       </select>
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>IsActive *</label>
-                      <select value={bonusIsActive} onChange={e => setBonusIsActive(e.target.value as any)} className={insetSelectClass}>
+                      <select
+                        value={bonusIsActive}
+                        onChange={(e) => setBonusIsActive(e.target.value as any)}
+                        className={insetSelectClass}
+                      >
                         <option value="Active">Active</option>
                         <option value="Inactive">Inactive</option>
                       </select>

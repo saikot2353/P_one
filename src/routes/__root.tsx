@@ -79,20 +79,37 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Modern HR management software for high-performing teams." },
       { name: "author", content: "CRIPTON" },
       { property: "og:title", content: "CRIPTON HRIS" },
-      { property: "og:description", content: "Modern HR management software for high-performing teams." },
+      {
+        property: "og:description",
+        content: "Modern HR management software for high-performing teams.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "CRIPTON HRIS" },
-      { name: "twitter:description", content: "Modern HR management software for high-performing teams." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/05484a77-948f-46d7-a418-7e21a7ec3b5c/id-preview-327f3108--896dc413-e37e-4671-9344-6489d69a3e7d.lovable.app-1778999534611.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/05484a77-948f-46d7-a418-7e21a7ec3b5c/id-preview-327f3108--896dc413-e37e-4671-9344-6489d69a3e7d.lovable.app-1778999534611.png" },
+      {
+        name: "twitter:description",
+        content: "Modern HR management software for high-performing teams.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/05484a77-948f-46d7-a418-7e21a7ec3b5c/id-preview-327f3108--896dc413-e37e-4671-9344-6489d69a3e7d.lovable.app-1778999534611.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/05484a77-948f-46d7-a418-7e21a7ec3b5c/id-preview-327f3108--896dc413-e37e-4671-9344-6489d69a3e7d.lovable.app-1778999534611.png",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -177,9 +194,9 @@ function RootComponent() {
           "recruitment_config_multi_ss_v2",
           "recruitment_candidates",
           "recruitment_data_version",
-          "recruitment_synced_employees"
+          "recruitment_synced_employees",
         ];
-        keysToClear.forEach(key => localStorage.removeItem(key));
+        keysToClear.forEach((key) => localStorage.removeItem(key));
         localStorage.setItem(versionKey, "true");
         window.location.reload();
       }

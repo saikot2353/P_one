@@ -3,9 +3,24 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  Clock, ChevronRight, ListFilter, Check, FileSpreadsheet, Printer, FileDown, 
-  AlertCircle, Search, SlidersHorizontal, Trash2, RefreshCw, Sparkles, Calendar,
-  UserCheck, Users, X, Info
+  Clock,
+  ChevronRight,
+  ListFilter,
+  Check,
+  FileSpreadsheet,
+  Printer,
+  FileDown,
+  AlertCircle,
+  Search,
+  SlidersHorizontal,
+  Trash2,
+  RefreshCw,
+  Sparkles,
+  Calendar,
+  UserCheck,
+  Users,
+  X,
+  Info,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -13,7 +28,10 @@ export const Route = createFileRoute("/shift-control-center")({
   head: () => ({
     meta: [
       { title: "Shift Control Center — CRIPTON" },
-      { name: "description", content: "Simplified, practical Shift and Duty Roster management workspace." },
+      {
+        name: "description",
+        content: "Simplified, practical Shift and Duty Roster management workspace.",
+      },
     ],
   }),
   component: ShiftControlCenterPage,
@@ -44,20 +62,122 @@ interface RosterLog {
 }
 
 const initialEmployees: Employee[] = [
-  { id: "2023043910", name: "Tahmid Afsar Shapno", dept: "Core Development (HR)", designation: "Asst. Manager", unit: "PSL", line: "N/A", type: "Staff", currentShift: "General Shift" },
-  { id: "2022035599", name: "Dipon Saha", dept: "Core Development (HR)", designation: "Manager", unit: "PSL", line: "N/A", type: "Staff", currentShift: "Exe-Ptvl" },
-  { id: "2025057309", name: "Bani Amin Jwel", dept: "Core Development (HR)", designation: "Sr. Manager", unit: "PSL", line: "N/A", type: "Staff", currentShift: "General Shift" },
-  { id: "2025053125", name: "Al Riyad Karim", dept: "WEB-Team", designation: "Sr. Executive", unit: "PSL", line: "N/A", type: "Staff", currentShift: "General Shift" },
-  { id: "2021028542", name: "Zakir Hossain", dept: "Implementation & Support (HR)", designation: "Executive", unit: "PSL", line: "N/A", type: "Staff", currentShift: "Exe-Ptvl" },
-  { id: "2024052336", name: "Md. Badal Mia", dept: "Admin", designation: "Driver", unit: "PSL", line: "N/A", type: "Staff", currentShift: "General-Transport" },
-  { id: "2026059284", name: "Istiak Ahmed", dept: "Admin", designation: "Office Boy", unit: "PSL", line: "N/A", type: "Staff", currentShift: "General Shift" },
-  { id: "2022040132", name: "Md. Sakil", dept: "Admin", designation: "Asst. Cook", unit: "PTVL", line: "N/A", type: "Worker", currentShift: "General Shift" }
+  {
+    id: "2023043910",
+    name: "Tahmid Afsar Shapno",
+    dept: "Core Development (HR)",
+    designation: "Asst. Manager",
+    unit: "PSL",
+    line: "N/A",
+    type: "Staff",
+    currentShift: "General Shift",
+  },
+  {
+    id: "2022035599",
+    name: "Dipon Saha",
+    dept: "Core Development (HR)",
+    designation: "Manager",
+    unit: "PSL",
+    line: "N/A",
+    type: "Staff",
+    currentShift: "Exe-Ptvl",
+  },
+  {
+    id: "2025057309",
+    name: "Bani Amin Jwel",
+    dept: "Core Development (HR)",
+    designation: "Sr. Manager",
+    unit: "PSL",
+    line: "N/A",
+    type: "Staff",
+    currentShift: "General Shift",
+  },
+  {
+    id: "2025053125",
+    name: "Al Riyad Karim",
+    dept: "WEB-Team",
+    designation: "Sr. Executive",
+    unit: "PSL",
+    line: "N/A",
+    type: "Staff",
+    currentShift: "General Shift",
+  },
+  {
+    id: "2021028542",
+    name: "Zakir Hossain",
+    dept: "Implementation & Support (HR)",
+    designation: "Executive",
+    unit: "PSL",
+    line: "N/A",
+    type: "Staff",
+    currentShift: "Exe-Ptvl",
+  },
+  {
+    id: "2024052336",
+    name: "Md. Badal Mia",
+    dept: "Admin",
+    designation: "Driver",
+    unit: "PSL",
+    line: "N/A",
+    type: "Staff",
+    currentShift: "General-Transport",
+  },
+  {
+    id: "2026059284",
+    name: "Istiak Ahmed",
+    dept: "Admin",
+    designation: "Office Boy",
+    unit: "PSL",
+    line: "N/A",
+    type: "Staff",
+    currentShift: "General Shift",
+  },
+  {
+    id: "2022040132",
+    name: "Md. Sakil",
+    dept: "Admin",
+    designation: "Asst. Cook",
+    unit: "PTVL",
+    line: "N/A",
+    type: "Worker",
+    currentShift: "General Shift",
+  },
 ];
 
 const initialLedger: RosterLog[] = [
-  { id: "LOG-101", empId: "2023043910", name: "Tahmid Afsar Shapno", dept: "Core Development (HR)", baseShift: "General Shift", assignedShift: "Night Shift", startDate: "2026-06-15", endDate: "2026-06-20", type: "Temporary" },
-  { id: "LOG-102", empId: "2022035599", name: "Dipon Saha", dept: "Core Development (HR)", baseShift: "Exe-Ptvl", assignedShift: "Morning Shift", startDate: "2026-06-01", endDate: "2026-06-10", type: "Temporary" },
-  { id: "LOG-103", empId: "2021028542", name: "Zakir Hossain", dept: "Implementation & Support (HR)", baseShift: "Exe-Ptvl", assignedShift: "General Shift", startDate: "2026-06-10", endDate: "—", type: "Permanent" }
+  {
+    id: "LOG-101",
+    empId: "2023043910",
+    name: "Tahmid Afsar Shapno",
+    dept: "Core Development (HR)",
+    baseShift: "General Shift",
+    assignedShift: "Night Shift",
+    startDate: "2026-06-15",
+    endDate: "2026-06-20",
+    type: "Temporary",
+  },
+  {
+    id: "LOG-102",
+    empId: "2022035599",
+    name: "Dipon Saha",
+    dept: "Core Development (HR)",
+    baseShift: "Exe-Ptvl",
+    assignedShift: "Morning Shift",
+    startDate: "2026-06-01",
+    endDate: "2026-06-10",
+    type: "Temporary",
+  },
+  {
+    id: "LOG-103",
+    empId: "2021028542",
+    name: "Zakir Hossain",
+    dept: "Implementation & Support (HR)",
+    baseShift: "Exe-Ptvl",
+    assignedShift: "General Shift",
+    startDate: "2026-06-10",
+    endDate: "—",
+    type: "Permanent",
+  },
 ];
 
 const availableShifts = [
@@ -67,12 +187,12 @@ const availableShifts = [
   "Night Shift",
   "Evening Shift",
   "Exe-Ptvl",
-  "General-Transport"
+  "General-Transport",
 ];
 
 function ShiftControlCenterPage() {
   const [viewMode, setViewMode] = useState<"WORKSPACE" | "HISTORY">("WORKSPACE");
-  
+
   // Data States
   const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
   const [ledger, setLedger] = useState<RosterLog[]>(initialLedger);
@@ -101,14 +221,15 @@ function ShiftControlCenterPage() {
 
   // Get departments list dynamically
   const departments = useMemo(() => {
-    const depts = new Set(employees.map(e => e.dept));
+    const depts = new Set(employees.map((e) => e.dept));
     return ["ALL", ...Array.from(depts)];
   }, [employees]);
 
   // Workspace Employee Filter
   const filteredEmployees = useMemo(() => {
-    return employees.filter(emp => {
-      const matchesSearch = emp.name.toLowerCase().includes(searchQuery.toLowerCase()) || emp.id.includes(searchQuery);
+    return employees.filter((emp) => {
+      const matchesSearch =
+        emp.name.toLowerCase().includes(searchQuery.toLowerCase()) || emp.id.includes(searchQuery);
       const matchesDept = filterDept === "ALL" || emp.dept === filterDept;
       const matchesShift = filterShift === "ALL" || emp.currentShift === filterShift;
       const matchesUnit = filterUnit === "ALL" || emp.unit === filterUnit;
@@ -119,8 +240,11 @@ function ShiftControlCenterPage() {
 
   // History Ledger Filter
   const filteredLedger = useMemo(() => {
-    return ledger.filter(log => {
-      const matchesSearch = log.name.toLowerCase().includes(ledgerSearch.toLowerCase()) || log.empId.includes(ledgerSearch) || log.dept.toLowerCase().includes(ledgerSearch.toLowerCase());
+    return ledger.filter((log) => {
+      const matchesSearch =
+        log.name.toLowerCase().includes(ledgerSearch.toLowerCase()) ||
+        log.empId.includes(ledgerSearch) ||
+        log.dept.toLowerCase().includes(ledgerSearch.toLowerCase());
       const matchesStart = !ledgerStartDate || log.startDate >= ledgerStartDate;
       const matchesEnd = !ledgerEndDate || log.endDate <= ledgerEndDate;
       return matchesSearch && matchesStart && matchesEnd;
@@ -132,7 +256,7 @@ function ShiftControlCenterPage() {
     if (selectedIds.size === filteredEmployees.length) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(filteredEmployees.map(e => e.id)));
+      setSelectedIds(new Set(filteredEmployees.map((e) => e.id)));
     }
   };
 
@@ -157,16 +281,18 @@ function ShiftControlCenterPage() {
       return;
     }
 
-    const selectedEmployees = employees.filter(e => selectedIds.has(e.id));
-    
+    const selectedEmployees = employees.filter((e) => selectedIds.has(e.id));
+
     // 1. Update current shift of selected employees if permanent
     if (assignmentType === "Permanent") {
-      setEmployees(prev => prev.map(emp => {
-        if (selectedIds.has(emp.id)) {
-          return { ...emp, currentShift: targetShift };
-        }
-        return emp;
-      }));
+      setEmployees((prev) =>
+        prev.map((emp) => {
+          if (selectedIds.has(emp.id)) {
+            return { ...emp, currentShift: targetShift };
+          }
+          return emp;
+        }),
+      );
     }
 
     // 2. Add to history ledger log entries
@@ -179,24 +305,24 @@ function ShiftControlCenterPage() {
       assignedShift: targetShift,
       startDate: startDate,
       endDate: assignmentType === "Temporary" ? endDate : "—",
-      type: assignmentType
+      type: assignmentType,
     }));
 
-    setLedger(prev => [ ...newLogs, ...prev ]);
-    
+    setLedger((prev) => [...newLogs, ...prev]);
+
     // Clear selection & toast success
     setSelectedIds(new Set());
     toast.success(
       `Successfully assigned ${targetShift} (${assignmentType}) to ${selectedEmployees.length} employee(s)!`,
       {
-        description: `Effective starting ${startDate}${assignmentType === "Temporary" ? ` until ${endDate}` : ""}.`
-      }
+        description: `Effective starting ${startDate}${assignmentType === "Temporary" ? ` until ${endDate}` : ""}.`,
+      },
     );
   };
 
   // Remove Roster entry
   const handleDeleteLedgerEntry = (id: string, name: string) => {
-    setLedger(prev => prev.filter(log => log.id !== id));
+    setLedger((prev) => prev.filter((log) => log.id !== id));
     toast.success(`Removed shift assignment for ${name}.`);
   };
 
@@ -212,12 +338,13 @@ function ShiftControlCenterPage() {
         <Topbar />
 
         <div className="flex-1 flex flex-col overflow-hidden">
-          
           {/* Dashboard Sticky Header */}
           <div className="bg-card border-b border-border/60 p-4 md:px-6 md:py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shrink-0 shadow-xs">
             <div className="space-y-1">
               <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-2.5" />
                 <span className="text-muted-foreground/75">Manage Shift</span>
                 <ChevronRight className="size-2.5" />
@@ -261,17 +388,13 @@ function ShiftControlCenterPage() {
           {/* MAIN PAGE BODY */}
           <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50/50 dark:bg-slate-900/10">
             {viewMode === "WORKSPACE" ? (
-              
               /* ==================== WORKSPACE (ASSIGN SHIFTS) ==================== */
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                
                 {/* LEFT PANEL: Employee Filter and List (7 or 8 columns) */}
                 <div className="lg:col-span-8 flex flex-col gap-4">
-                  
                   {/* Top Filters bar */}
                   <div className="bg-card rounded-2xl border border-border/80 p-4 shadow-3xs flex flex-col gap-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      
                       {/* Search box */}
                       <div className="relative">
                         <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
@@ -292,9 +415,13 @@ function ShiftControlCenterPage() {
                           className="w-full h-10 px-3 rounded-xl bg-muted/50 border border-border/50 text-xs font-bold cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                         >
                           <option value="ALL">All Departments</option>
-                          {departments.filter(d => d !== "ALL").map(dept => (
-                            <option key={dept} value={dept}>{dept}</option>
-                          ))}
+                          {departments
+                            .filter((d) => d !== "ALL")
+                            .map((dept) => (
+                              <option key={dept} value={dept}>
+                                {dept}
+                              </option>
+                            ))}
                         </select>
                       </div>
 
@@ -306,11 +433,13 @@ function ShiftControlCenterPage() {
                           className="flex-1 h-10 px-3 rounded-xl bg-muted/50 border border-border/50 text-xs font-bold cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                         >
                           <option value="ALL">All Current Shifts</option>
-                          {availableShifts.map(s => (
-                            <option key={s} value={s}>{s}</option>
+                          {availableShifts.map((s) => (
+                            <option key={s} value={s}>
+                              {s}
+                            </option>
                           ))}
                         </select>
-                        
+
                         {/* Advanced toggle button */}
                         <button
                           onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
@@ -330,7 +459,9 @@ function ShiftControlCenterPage() {
                     {showAdvancedFilters && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 border-t border-border/30 animate-in fade-in slide-in-from-top-1">
                         <div>
-                          <label className="text-[10px] font-black uppercase text-muted-foreground/80 tracking-wider mb-1 block">Unit</label>
+                          <label className="text-[10px] font-black uppercase text-muted-foreground/80 tracking-wider mb-1 block">
+                            Unit
+                          </label>
                           <select
                             value={filterUnit}
                             onChange={(e) => setFilterUnit(e.target.value)}
@@ -342,7 +473,9 @@ function ShiftControlCenterPage() {
                           </select>
                         </div>
                         <div>
-                          <label className="text-[10px] font-black uppercase text-muted-foreground/80 tracking-wider mb-1 block">Employee Type</label>
+                          <label className="text-[10px] font-black uppercase text-muted-foreground/80 tracking-wider mb-1 block">
+                            Employee Type
+                          </label>
                           <select
                             value={filterType}
                             onChange={(e) => setFilterType(e.target.value)}
@@ -366,7 +499,7 @@ function ShiftControlCenterPage() {
                           Matching Employees ({filteredEmployees.length})
                         </span>
                       </div>
-                      
+
                       {selectedIds.size > 0 && (
                         <div className="flex items-center gap-2 animate-in fade-in zoom-in-95">
                           <span className="text-[10px] font-extrabold text-primary bg-primary/10 px-2.5 py-1 rounded-full border border-primary/10 flex items-center gap-1">
@@ -389,7 +522,10 @@ function ShiftControlCenterPage() {
                             <th className="px-4 py-3 w-12 text-center">
                               <input
                                 type="checkbox"
-                                checked={filteredEmployees.length > 0 && selectedIds.size === filteredEmployees.length}
+                                checked={
+                                  filteredEmployees.length > 0 &&
+                                  selectedIds.size === filteredEmployees.length
+                                }
                                 onChange={handleSelectAll}
                                 className="accent-primary size-4 rounded cursor-pointer"
                               />
@@ -410,7 +546,10 @@ function ShiftControlCenterPage() {
                                 }`}
                                 onClick={() => handleSelectRow(emp.id)}
                               >
-                                <td className="px-4 py-3 w-12 text-center" onClick={(e) => e.stopPropagation()}>
+                                <td
+                                  className="px-4 py-3 w-12 text-center"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
                                   <input
                                     type="checkbox"
                                     checked={isSelected}
@@ -420,33 +559,45 @@ function ShiftControlCenterPage() {
                                 </td>
                                 <td className="px-4 py-3">
                                   <div className="flex items-center gap-3">
-                                    <div className={`size-8 rounded-full flex items-center justify-center font-bold text-xs shadow-3xs transition-colors border ${
-                                      isSelected 
-                                        ? "bg-primary text-white border-primary" 
-                                        : "bg-muted text-muted-foreground border-border/40"
-                                    }`}>
+                                    <div
+                                      className={`size-8 rounded-full flex items-center justify-center font-bold text-xs shadow-3xs transition-colors border ${
+                                        isSelected
+                                          ? "bg-primary text-white border-primary"
+                                          : "bg-muted text-muted-foreground border-border/40"
+                                      }`}
+                                    >
                                       {emp.name.charAt(0)}
                                     </div>
                                     <div className="space-y-0.5">
-                                      <div className="font-extrabold text-foreground">{emp.name}</div>
-                                      <div className="font-mono text-[9px] font-black text-muted-foreground">{emp.id}</div>
+                                      <div className="font-extrabold text-foreground">
+                                        {emp.name}
+                                      </div>
+                                      <div className="font-mono text-[9px] font-black text-muted-foreground">
+                                        {emp.id}
+                                      </div>
                                     </div>
                                   </div>
                                 </td>
                                 <td className="px-4 py-3 space-y-0.5">
-                                  <div className="font-bold text-slate-700 dark:text-slate-300">{emp.dept}</div>
-                                  <div className="text-[10px] text-muted-foreground/75 font-semibold">{emp.designation}</div>
+                                  <div className="font-bold text-slate-700 dark:text-slate-300">
+                                    {emp.dept}
+                                  </div>
+                                  <div className="text-[10px] text-muted-foreground/75 font-semibold">
+                                    {emp.designation}
+                                  </div>
                                 </td>
                                 <td className="px-4 py-3">
-                                  <span className={`px-2.5 py-1.5 rounded-xl text-[10px] font-extrabold border shadow-3xs ${
-                                    emp.currentShift.includes("General")
-                                      ? "bg-blue-50/70 text-blue-700 border-blue-200 dark:bg-blue-900/10 dark:text-blue-400 dark:border-blue-900/30"
-                                      : emp.currentShift.includes("Night")
-                                      ? "bg-purple-50/70 text-purple-700 border-purple-200 dark:bg-purple-900/10 dark:text-purple-400 dark:border-purple-900/30"
-                                      : emp.currentShift.includes("Exe")
-                                      ? "bg-amber-50/70 text-amber-700 border-amber-200 dark:bg-amber-900/10 dark:text-amber-400 dark:border-amber-900/30"
-                                      : "bg-emerald-50/70 text-emerald-700 border-emerald-200 dark:bg-emerald-900/10 dark:text-emerald-400 dark:border-emerald-900/30"
-                                  }`}>
+                                  <span
+                                    className={`px-2.5 py-1.5 rounded-xl text-[10px] font-extrabold border shadow-3xs ${
+                                      emp.currentShift.includes("General")
+                                        ? "bg-blue-50/70 text-blue-700 border-blue-200 dark:bg-blue-900/10 dark:text-blue-400 dark:border-blue-900/30"
+                                        : emp.currentShift.includes("Night")
+                                          ? "bg-purple-50/70 text-purple-700 border-purple-200 dark:bg-purple-900/10 dark:text-purple-400 dark:border-purple-900/30"
+                                          : emp.currentShift.includes("Exe")
+                                            ? "bg-amber-50/70 text-amber-700 border-amber-200 dark:bg-amber-900/10 dark:text-amber-400 dark:border-amber-900/30"
+                                            : "bg-emerald-50/70 text-emerald-700 border-emerald-200 dark:bg-emerald-900/10 dark:text-emerald-400 dark:border-emerald-900/30"
+                                    }`}
+                                  >
                                     {emp.currentShift}
                                   </span>
                                 </td>
@@ -458,7 +609,9 @@ function ShiftControlCenterPage() {
                               <td colSpan={4} className="p-10 text-center">
                                 <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
                                   <AlertCircle className="size-7 text-muted-foreground/60" />
-                                  <span className="font-bold text-xs">No employees found matching the filters.</span>
+                                  <span className="font-bold text-xs">
+                                    No employees found matching the filters.
+                                  </span>
                                 </div>
                               </td>
                             </tr>
@@ -471,7 +624,6 @@ function ShiftControlCenterPage() {
 
                 {/* RIGHT PANEL: Sticky Assignment Console (4 columns) */}
                 <div className="lg:col-span-4 lg:sticky lg:top-4 space-y-4">
-                  
                   <div className="bg-card rounded-2xl border border-border/80 shadow-xs overflow-hidden">
                     {/* Header */}
                     <div className="p-4 border-b border-border/40 bg-muted/10 flex items-center justify-between">
@@ -484,34 +636,39 @@ function ShiftControlCenterPage() {
                     </div>
 
                     <div className="p-5 space-y-5">
-                      
                       {/* Step 1: Selected Targets Summary */}
                       <div className="space-y-2">
                         <label className="text-[9.5px] font-extrabold text-muted-foreground uppercase tracking-wide">
                           Step 1: Target Employees ({selectedIds.size})
                         </label>
-                        
+
                         {selectedIds.size === 0 ? (
                           <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-3.5 flex items-start gap-2.5 text-amber-700 dark:text-amber-400">
                             <Info className="size-4 shrink-0 mt-0.5" />
                             <div className="text-[10px] font-semibold leading-relaxed">
-                              Select employees using the checkboxes in the list to enable scheduling actions.
+                              Select employees using the checkboxes in the list to enable scheduling
+                              actions.
                             </div>
                           </div>
                         ) : (
                           <div className="bg-primary/5 border border-primary/10 rounded-xl p-3 max-h-[110px] overflow-y-auto space-y-1">
                             <div className="flex flex-wrap gap-1.5">
-                              {employees.filter(e => selectedIds.has(e.id)).map(emp => (
-                                <span 
-                                  key={emp.id} 
-                                  className="inline-flex items-center gap-1 bg-card border border-border/60 rounded-lg px-2 py-0.5 text-[9px] font-extrabold text-foreground"
-                                >
-                                  {emp.name.split(" ")[0]}
-                                  <button onClick={() => handleSelectRow(emp.id)} className="text-muted-foreground hover:text-rose-500 transition">
-                                    <X className="size-2.5" />
-                                  </button>
-                                </span>
-                              ))}
+                              {employees
+                                .filter((e) => selectedIds.has(e.id))
+                                .map((emp) => (
+                                  <span
+                                    key={emp.id}
+                                    className="inline-flex items-center gap-1 bg-card border border-border/60 rounded-lg px-2 py-0.5 text-[9px] font-extrabold text-foreground"
+                                  >
+                                    {emp.name.split(" ")[0]}
+                                    <button
+                                      onClick={() => handleSelectRow(emp.id)}
+                                      className="text-muted-foreground hover:text-rose-500 transition"
+                                    >
+                                      <X className="size-2.5" />
+                                    </button>
+                                  </span>
+                                ))}
                             </div>
                           </div>
                         )}
@@ -549,21 +706,27 @@ function ShiftControlCenterPage() {
                       {/* Step 3: Shift Select and Dates */}
                       <div className="space-y-4">
                         <div className="space-y-1.5">
-                          <label className="text-[9.5px] font-black uppercase text-rose-500 tracking-wide">Select New Shift *</label>
+                          <label className="text-[9.5px] font-black uppercase text-rose-500 tracking-wide">
+                            Select New Shift *
+                          </label>
                           <select
                             value={targetShift}
                             onChange={(e) => setTargetShift(e.target.value)}
                             className="w-full h-10 px-3.5 rounded-xl bg-muted/30 border border-primary/20 text-xs font-bold text-primary cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/20"
                           >
-                            {availableShifts.map(s => (
-                              <option key={s} value={s}>{s}</option>
+                            {availableShifts.map((s) => (
+                              <option key={s} value={s}>
+                                {s}
+                              </option>
                             ))}
                           </select>
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
                           <div className="space-y-1.5">
-                            <label className="text-[9.5px] font-black uppercase text-rose-500 tracking-wide">Start Date *</label>
+                            <label className="text-[9.5px] font-black uppercase text-rose-500 tracking-wide">
+                              Start Date *
+                            </label>
                             <input
                               type="date"
                               value={startDate}
@@ -574,7 +737,9 @@ function ShiftControlCenterPage() {
 
                           {assignmentType === "Temporary" ? (
                             <div className="space-y-1.5 animate-in zoom-in-95 duration-150">
-                              <label className="text-[9.5px] font-black uppercase text-rose-500 tracking-wide">End Date *</label>
+                              <label className="text-[9.5px] font-black uppercase text-rose-500 tracking-wide">
+                                End Date *
+                              </label>
                               <input
                                 type="date"
                                 value={endDate}
@@ -598,31 +763,27 @@ function ShiftControlCenterPage() {
                           selectedIds.size === 0
                             ? "bg-muted text-muted-foreground cursor-not-allowed border border-border/40"
                             : assignmentType === "Permanent"
-                            ? "bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900"
-                            : "bg-indigo-600 hover:bg-indigo-500 text-white"
+                              ? "bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900"
+                              : "bg-indigo-600 hover:bg-indigo-500 text-white"
                         }`}
                       >
                         <Check className="size-4" />
                         Apply Assignment ({selectedIds.size})
                       </button>
-
                     </div>
                   </div>
-
                 </div>
-
               </div>
             ) : (
-              
               /* ==================== HISTORY LEDGER VIEW ==================== */
               <div className="space-y-4 animate-in fade-in duration-200">
-                
                 {/* Advanced Ledger Filters bar */}
                 <div className="bg-card rounded-2xl border border-border/80 p-4 shadow-3xs">
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                    
                     <div>
-                      <label className="text-[9.5px] font-black uppercase text-muted-foreground/80 tracking-wider mb-1.5 block">Search Employee / Dept</label>
+                      <label className="text-[9.5px] font-black uppercase text-muted-foreground/80 tracking-wider mb-1.5 block">
+                        Search Employee / Dept
+                      </label>
                       <div className="relative">
                         <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
                         <input
@@ -636,7 +797,9 @@ function ShiftControlCenterPage() {
                     </div>
 
                     <div>
-                      <label className="text-[9.5px] font-black uppercase text-muted-foreground/80 tracking-wider mb-1.5 block">Start From Date</label>
+                      <label className="text-[9.5px] font-black uppercase text-muted-foreground/80 tracking-wider mb-1.5 block">
+                        Start From Date
+                      </label>
                       <input
                         type="date"
                         value={ledgerStartDate}
@@ -646,7 +809,9 @@ function ShiftControlCenterPage() {
                     </div>
 
                     <div>
-                      <label className="text-[9.5px] font-black uppercase text-muted-foreground/80 tracking-wider mb-1.5 block">End Until Date</label>
+                      <label className="text-[9.5px] font-black uppercase text-muted-foreground/80 tracking-wider mb-1.5 block">
+                        End Until Date
+                      </label>
                       <input
                         type="date"
                         value={ledgerEndDate}
@@ -656,7 +821,7 @@ function ShiftControlCenterPage() {
                     </div>
 
                     <div className="flex gap-2">
-                      <button 
+                      <button
                         onClick={() => {
                           setLedgerSearch("");
                           setLedgerStartDate("");
@@ -667,7 +832,6 @@ function ShiftControlCenterPage() {
                         Reset Filter
                       </button>
                     </div>
-
                   </div>
                 </div>
 
@@ -722,15 +886,21 @@ function ShiftControlCenterPage() {
                             <td className="px-4 py-3 font-bold text-muted-foreground">{i + 1}</td>
                             <td className="px-4 py-3">
                               <div className="font-extrabold text-foreground">{log.name}</div>
-                              <div className="font-mono text-[9px] font-bold text-muted-foreground">{log.empId}</div>
+                              <div className="font-mono text-[9px] font-bold text-muted-foreground">
+                                {log.empId}
+                              </div>
                             </td>
-                            <td className="px-4 py-3 text-slate-700 dark:text-slate-300 font-bold">{log.dept}</td>
+                            <td className="px-4 py-3 text-slate-700 dark:text-slate-300 font-bold">
+                              {log.dept}
+                            </td>
                             <td className="px-4 py-3">
-                              <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold border ${
-                                log.type === "Permanent"
-                                  ? "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
-                                  : "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/20 dark:text-indigo-400 dark:border-indigo-900/30"
-                              }`}>
+                              <span
+                                className={`px-2 py-0.5 rounded text-[10px] font-extrabold border ${
+                                  log.type === "Permanent"
+                                    ? "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+                                    : "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/20 dark:text-indigo-400 dark:border-indigo-900/30"
+                                }`}
+                              >
                                 {log.type}
                               </span>
                             </td>
@@ -758,7 +928,9 @@ function ShiftControlCenterPage() {
                             <td colSpan={9} className="p-10 text-center">
                               <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
                                 <AlertCircle className="size-7 text-muted-foreground/60" />
-                                <span className="font-bold text-xs">No records found matching filters.</span>
+                                <span className="font-bold text-xs">
+                                  No records found matching filters.
+                                </span>
                               </div>
                             </td>
                           </tr>
@@ -767,9 +939,7 @@ function ShiftControlCenterPage() {
                     </table>
                   </div>
                 </div>
-
               </div>
-
             )}
           </div>
         </div>

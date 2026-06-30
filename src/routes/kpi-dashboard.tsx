@@ -3,7 +3,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  ChevronRight, BarChart3, TrendingUp, Users, Target, Activity, Award, Star
+  ChevronRight,
+  BarChart3,
+  TrendingUp,
+  Users,
+  Target,
+  Activity,
+  Award,
+  Star,
 } from "lucide-react";
 import { loadAssessments, loadKpiCycles, loadGradeBands } from "@/lib/kpi-data";
 
@@ -25,13 +32,20 @@ function KpiDashboardPage() {
   const [activeCycle, setActiveCycle] = useState(cycles[0]?.id || "");
 
   // Analytics for active cycle
-  const cycleAssessments = useMemo(() => assessments.filter(a => a.cycleId === activeCycle), [assessments, activeCycle]);
-  
-  const completedAssessments = cycleAssessments.filter(a => a.status === "Completed");
-  
-  const avgScore = completedAssessments.length > 0 
-    ? Math.round(completedAssessments.reduce((sum, a) => sum + a.totalWeightedScore, 0) / completedAssessments.length)
-    : 0;
+  const cycleAssessments = useMemo(
+    () => assessments.filter((a) => a.cycleId === activeCycle),
+    [assessments, activeCycle],
+  );
+
+  const completedAssessments = cycleAssessments.filter((a) => a.status === "Completed");
+
+  const avgScore =
+    completedAssessments.length > 0
+      ? Math.round(
+          completedAssessments.reduce((sum, a) => sum + a.totalWeightedScore, 0) /
+            completedAssessments.length,
+        )
+      : 0;
 
   const topPerformers = useMemo(() => {
     return [...completedAssessments]
@@ -41,11 +55,11 @@ function KpiDashboardPage() {
 
   // Grade Distribution
   const gradeDistribution = useMemo(() => {
-    const dist: Record<string, { count: number, color: string }> = {};
-    bands.forEach(b => {
+    const dist: Record<string, { count: number; color: string }> = {};
+    bands.forEach((b) => {
       dist[b.grade] = { count: 0, color: b.color };
     });
-    completedAssessments.forEach(a => {
+    completedAssessments.forEach((a) => {
       if (dist[a.gradeResult]) {
         dist[a.gradeResult].count++;
       }
@@ -55,16 +69,18 @@ function KpiDashboardPage() {
 
   // Department Performance
   const deptPerformance = useMemo(() => {
-    const depts: Record<string, { count: number, totalScore: number }> = {};
-    completedAssessments.forEach(a => {
+    const depts: Record<string, { count: number; totalScore: number }> = {};
+    completedAssessments.forEach((a) => {
       if (!depts[a.department]) depts[a.department] = { count: 0, totalScore: 0 };
       depts[a.department].count++;
       depts[a.department].totalScore += a.totalWeightedScore;
     });
-    return Object.entries(depts).map(([dept, data]) => ({
-      department: dept,
-      avgScore: Math.round(data.totalScore / data.count)
-    })).sort((a, b) => b.avgScore - a.avgScore);
+    return Object.entries(depts)
+      .map(([dept, data]) => ({
+        department: dept,
+        avgScore: Math.round(data.totalScore / data.count),
+      }))
+      .sort((a, b) => b.avgScore - a.avgScore);
   }, [completedAssessments]);
 
   return (
@@ -74,12 +90,13 @@ function KpiDashboardPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 xl:p-8 space-y-6">
-
           {/* Header */}
           <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-2.5" />
                 <span className="text-muted-foreground/75">KPI</span>
                 <ChevronRight className="size-2.5" />
@@ -93,12 +110,16 @@ function KpiDashboardPage() {
 
             <div className="flex items-center gap-3">
               <span className="text-[10px] font-bold text-muted-foreground uppercase">Cycle:</span>
-              <select 
+              <select
                 value={activeCycle}
                 onChange={(e) => setActiveCycle(e.target.value)}
                 className="h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5] min-w-48"
               >
-                {cycles.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                {cycles.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -109,9 +130,13 @@ function KpiDashboardPage() {
               <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                 <Users className="size-16" />
               </div>
-              <span className="text-[10px] font-black uppercase text-muted-foreground tracking-wider block mb-1">Total Assessments</span>
+              <span className="text-[10px] font-black uppercase text-muted-foreground tracking-wider block mb-1">
+                Total Assessments
+              </span>
               <div className="flex items-end gap-3">
-                <span className="text-3xl font-black text-foreground">{cycleAssessments.length}</span>
+                <span className="text-3xl font-black text-foreground">
+                  {cycleAssessments.length}
+                </span>
               </div>
             </div>
 
@@ -119,10 +144,16 @@ function KpiDashboardPage() {
               <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-emerald-500">
                 <Target className="size-16" />
               </div>
-              <span className="text-[10px] font-black uppercase text-muted-foreground tracking-wider block mb-1">Completed</span>
+              <span className="text-[10px] font-black uppercase text-muted-foreground tracking-wider block mb-1">
+                Completed
+              </span>
               <div className="flex items-end gap-3">
-                <span className="text-3xl font-black text-emerald-500">{completedAssessments.length}</span>
-                <span className="text-xs font-bold text-muted-foreground mb-1.5">/ {cycleAssessments.length}</span>
+                <span className="text-3xl font-black text-emerald-500">
+                  {completedAssessments.length}
+                </span>
+                <span className="text-xs font-bold text-muted-foreground mb-1.5">
+                  / {cycleAssessments.length}
+                </span>
               </div>
             </div>
 
@@ -130,7 +161,9 @@ function KpiDashboardPage() {
               <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-[#1e88e5]">
                 <Activity className="size-16" />
               </div>
-              <span className="text-[10px] font-black uppercase text-muted-foreground tracking-wider block mb-1">Average Score</span>
+              <span className="text-[10px] font-black uppercase text-muted-foreground tracking-wider block mb-1">
+                Average Score
+              </span>
               <div className="flex items-end gap-3">
                 <span className="text-3xl font-black text-[#1e88e5]">{avgScore}%</span>
               </div>
@@ -140,15 +173,18 @@ function KpiDashboardPage() {
               <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-amber-500">
                 <TrendingUp className="size-16" />
               </div>
-              <span className="text-[10px] font-black uppercase text-muted-foreground tracking-wider block mb-1">Top Performers (A+)</span>
+              <span className="text-[10px] font-black uppercase text-muted-foreground tracking-wider block mb-1">
+                Top Performers (A+)
+              </span>
               <div className="flex items-end gap-3">
-                <span className="text-3xl font-black text-amber-500">{gradeDistribution["A+"]?.count || 0}</span>
+                <span className="text-3xl font-black text-amber-500">
+                  {gradeDistribution["A+"]?.count || 0}
+                </span>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            
             {/* Grade Distribution Bar Chart */}
             <div className="bg-card rounded-xl border border-border/80 shadow-xs flex flex-col">
               <div className="p-5 border-b border-border/30">
@@ -160,15 +196,16 @@ function KpiDashboardPage() {
               <div className="p-6 flex-1 flex flex-col justify-end gap-2 h-64">
                 <div className="flex items-end h-full gap-2 mt-auto">
                   {Object.entries(gradeDistribution).map(([grade, data]) => {
-                    const height = completedAssessments.length > 0 
-                      ? Math.max(5, (data.count / completedAssessments.length) * 100) 
-                      : 0;
+                    const height =
+                      completedAssessments.length > 0
+                        ? Math.max(5, (data.count / completedAssessments.length) * 100)
+                        : 0;
                     return (
                       <div key={grade} className="flex-1 flex flex-col items-center gap-2 group">
                         <div className="text-[10px] font-bold text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
                           {data.count}
                         </div>
-                        <div 
+                        <div
                           className="w-full rounded-t-sm transition-all duration-500 hover:brightness-110"
                           style={{ height: `${height}%`, backgroundColor: data.color }}
                         />
@@ -191,17 +228,29 @@ function KpiDashboardPage() {
               <div className="p-0">
                 <div className="divide-y divide-border/20">
                   {topPerformers.map((emp, idx) => (
-                    <div key={emp.id} className="p-4 flex items-center gap-4 hover:bg-muted/30 transition">
+                    <div
+                      key={emp.id}
+                      className="p-4 flex items-center gap-4 hover:bg-muted/30 transition"
+                    >
                       <div className="size-8 rounded-full bg-amber-500/10 text-amber-600 grid place-items-center font-black text-xs">
                         #{idx + 1}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-xs font-black text-foreground truncate">{emp.employeeName}</h4>
-                        <span className="text-[10px] font-bold text-muted-foreground truncate block">{emp.designation} • {emp.department}</span>
+                        <h4 className="text-xs font-black text-foreground truncate">
+                          {emp.employeeName}
+                        </h4>
+                        <span className="text-[10px] font-bold text-muted-foreground truncate block">
+                          {emp.designation} • {emp.department}
+                        </span>
                       </div>
                       <div className="text-right">
-                        <span className="text-sm font-black text-foreground">{emp.totalWeightedScore}%</span>
-                        <span className="text-[10px] font-black block" style={{ color: bands.find(b => b.grade === emp.gradeResult)?.color }}>
+                        <span className="text-sm font-black text-foreground">
+                          {emp.totalWeightedScore}%
+                        </span>
+                        <span
+                          className="text-[10px] font-black block"
+                          style={{ color: bands.find((b) => b.grade === emp.gradeResult)?.color }}
+                        >
                           {emp.gradeResult}
                         </span>
                       </div>
@@ -233,7 +282,7 @@ function KpiDashboardPage() {
                         <span className="text-[#1e88e5]">{dept.avgScore}%</span>
                       </div>
                       <div className="h-2 w-full rounded-full bg-muted/50 overflow-hidden">
-                        <div 
+                        <div
                           className="h-full bg-[#1e88e5] rounded-full transition-all duration-1000"
                           style={{ width: `${dept.avgScore}%` }}
                         />
@@ -248,7 +297,6 @@ function KpiDashboardPage() {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </main>

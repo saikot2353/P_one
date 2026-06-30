@@ -3,9 +3,20 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  Timer, ChevronRight, Search, Printer, Download, Clock,
-  CheckCircle2, AlertCircle, PlayCircle, Send, CheckSquare, Settings,
-  Wand2, Trash2
+  Timer,
+  ChevronRight,
+  Search,
+  Printer,
+  Download,
+  Clock,
+  CheckCircle2,
+  AlertCircle,
+  PlayCircle,
+  Send,
+  CheckSquare,
+  Settings,
+  Wand2,
+  Trash2,
 } from "lucide-react";
 
 export const Route = createFileRoute("/manage-overtime")({
@@ -57,20 +68,66 @@ function ManageOvertimePage() {
   const [selectedDept, setSelectedDept] = useState("ALL");
 
   const initialAttendance: AttendanceRecord[] = [
-    { id: "ATT-101", employeeId: "2021023079", employeeName: "Md. Monjur Alam", department: "Admin", designation: "Driver", inDate: attendanceDate, inTime: "08:56:51", outDate: attendanceDate, outTime: "10:15:11", calculatedOt: 0, reqOtInput: "", reqMotInput: "", reasonInput: "" },
-    { id: "ATT-102", employeeId: "2023045146", employeeName: "Asif Hossain", department: "Admin", designation: "Driver", inDate: attendanceDate, inTime: "09:47:19", outDate: attendanceDate, outTime: "22:00:00", calculatedOt: 4.5, reqOtInput: "", reqMotInput: "", reasonInput: "" },
-    { id: "ATT-103", employeeId: "2023043910", employeeName: "Tahmid Afsar Shapno", department: "Business Innovation", designation: "Asst. Manager", inDate: attendanceDate, inTime: "09:00:00", outDate: attendanceDate, outTime: "20:30:00", calculatedOt: 2.5, reqOtInput: "", reqMotInput: "", reasonInput: "" },
+    {
+      id: "ATT-101",
+      employeeId: "2021023079",
+      employeeName: "Md. Monjur Alam",
+      department: "Admin",
+      designation: "Driver",
+      inDate: attendanceDate,
+      inTime: "08:56:51",
+      outDate: attendanceDate,
+      outTime: "10:15:11",
+      calculatedOt: 0,
+      reqOtInput: "",
+      reqMotInput: "",
+      reasonInput: "",
+    },
+    {
+      id: "ATT-102",
+      employeeId: "2023045146",
+      employeeName: "Asif Hossain",
+      department: "Admin",
+      designation: "Driver",
+      inDate: attendanceDate,
+      inTime: "09:47:19",
+      outDate: attendanceDate,
+      outTime: "22:00:00",
+      calculatedOt: 4.5,
+      reqOtInput: "",
+      reqMotInput: "",
+      reasonInput: "",
+    },
+    {
+      id: "ATT-103",
+      employeeId: "2023043910",
+      employeeName: "Tahmid Afsar Shapno",
+      department: "Business Innovation",
+      designation: "Asst. Manager",
+      inDate: attendanceDate,
+      inTime: "09:00:00",
+      outDate: attendanceDate,
+      outTime: "20:30:00",
+      calculatedOt: 2.5,
+      reqOtInput: "",
+      reqMotInput: "",
+      reasonInput: "",
+    },
   ];
 
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>(initialAttendance);
   const [selectedAttendanceIds, setSelectedAttendanceIds] = useState<Set<string>>(new Set());
 
   // Handle Input Changes for OT/MOT/Reason
-  const handleOtChange = (id: string, field: "reqOtInput" | "reqMotInput" | "reasonInput", value: string) => {
-    setAttendanceRecords(prev => prev.map(r => r.id === id ? { ...r, [field]: value } : r));
+  const handleOtChange = (
+    id: string,
+    field: "reqOtInput" | "reqMotInput" | "reasonInput",
+    value: string,
+  ) => {
+    setAttendanceRecords((prev) => prev.map((r) => (r.id === id ? { ...r, [field]: value } : r)));
     // Automatically select the row if they type something
     if (value.trim() !== "") {
-      setSelectedAttendanceIds(prev => {
+      setSelectedAttendanceIds((prev) => {
         const newSet = new Set(prev);
         newSet.add(id);
         return newSet;
@@ -107,7 +164,7 @@ function ManageOvertimePage() {
   const stats = useMemo(() => {
     let approvedHours = 0;
     let pendingHours = 0;
-    submittedRecords.forEach(r => {
+    submittedRecords.forEach((r) => {
       const totalOt = r.reqOt + r.reqMot;
       if (r.status === "Approved") approvedHours += totalOt;
       if (r.status === "Pending") pendingHours += totalOt;
@@ -132,17 +189,19 @@ function ManageOvertimePage() {
     }
 
     const newSubmissions: SubmittedOTRecord[] = [];
-    
-    selectedAttendanceIds.forEach(id => {
-      const record = attendanceRecords.find(r => r.id === id);
+
+    selectedAttendanceIds.forEach((id) => {
+      const record = attendanceRecords.find((r) => r.id === id);
       if (record) {
         const reqOt = parseFloat(record.reqOtInput) || 0;
         const reqMot = parseFloat(record.reqMotInput) || 0;
 
         if (reqOt === 0 && reqMot === 0) return; // Ignore if no OT requested
-        if ((reqOt + reqMot) > 4 && !record.reasonInput.trim()) {
-           alert(`Error: Reason is mandatory for ${record.employeeName} because total OT exceeds 4 hours!`);
-           throw new Error("Missing Reason for High OT");
+        if (reqOt + reqMot > 4 && !record.reasonInput.trim()) {
+          alert(
+            `Error: Reason is mandatory for ${record.employeeName} because total OT exceeds 4 hours!`,
+          );
+          throw new Error("Missing Reason for High OT");
         }
 
         newSubmissions.push({
@@ -157,7 +216,7 @@ function ManageOvertimePage() {
           reqMot: reqMot,
           reason: record.reasonInput || "General Workload",
           status: "Pending",
-          submittedAt: new Date().toISOString()
+          submittedAt: new Date().toISOString(),
         });
       }
     });
@@ -167,19 +226,25 @@ function ManageOvertimePage() {
       return;
     }
 
-    setSubmittedRecords(prev => [...newSubmissions, ...prev]);
-    
+    setSubmittedRecords((prev) => [...newSubmissions, ...prev]);
+
     // Clear inputs and selection
-    setAttendanceRecords(prev => prev.map(r => selectedAttendanceIds.has(r.id) ? { ...r, reqOtInput: "", reqMotInput: "", reasonInput: "" } : r));
+    setAttendanceRecords((prev) =>
+      prev.map((r) =>
+        selectedAttendanceIds.has(r.id)
+          ? { ...r, reqOtInput: "", reqMotInput: "", reasonInput: "" }
+          : r,
+      ),
+    );
     setSelectedAttendanceIds(new Set());
-    
+
     alert(`Successfully submitted ${newSubmissions.length} OT requests!`);
     setActiveTab("history");
   };
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
-      setSelectedAttendanceIds(new Set(attendanceRecords.map(r => r.id)));
+      setSelectedAttendanceIds(new Set(attendanceRecords.map((r) => r.id)));
     } else {
       setSelectedAttendanceIds(new Set());
     }
@@ -190,22 +255,24 @@ function ManageOvertimePage() {
       alert("Please select records to auto-fill.");
       return;
     }
-    setAttendanceRecords(prev => prev.map(r => {
-      if (selectedAttendanceIds.has(r.id) && r.calculatedOt > 0) {
-        return { ...r, reqOtInput: r.calculatedOt.toString() };
-      }
-      return r;
-    }));
+    setAttendanceRecords((prev) =>
+      prev.map((r) => {
+        if (selectedAttendanceIds.has(r.id) && r.calculatedOt > 0) {
+          return { ...r, reqOtInput: r.calculatedOt.toString() };
+        }
+        return r;
+      }),
+    );
   };
 
   const handleCancelRequest = (id: string) => {
     if (confirm("Are you sure you want to cancel this pending OT request?")) {
-      setSubmittedRecords(prev => prev.filter(r => r.id !== id));
+      setSubmittedRecords((prev) => prev.filter((r) => r.id !== id));
     }
   };
 
   const toggleSelectRow = (id: string) => {
-    setSelectedAttendanceIds(prev => {
+    setSelectedAttendanceIds((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(id)) newSet.delete(id);
       else newSet.add(id);
@@ -224,7 +291,9 @@ function ManageOvertimePage() {
           <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-2.5" />
                 <span className="text-muted-foreground/75">Manage Overtime</span>
                 <ChevronRight className="size-2.5" />
@@ -235,7 +304,8 @@ function ManageOvertimePage() {
                 <span>Overtime Tracking & Submissions</span>
               </h1>
               <p className="text-xs text-muted-foreground mt-1">
-                Pull daily attendance records, input manual OT adjustments, and submit requisitions for approval.
+                Pull daily attendance records, input manual OT adjustments, and submit requisitions
+                for approval.
               </p>
             </div>
           </div>
@@ -245,8 +315,8 @@ function ManageOvertimePage() {
             <button
               onClick={() => setActiveTab("submit")}
               className={`px-5 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${
-                activeTab === "submit" 
-                  ? "bg-card text-blue-600 shadow-sm border border-border/50" 
+                activeTab === "submit"
+                  ? "bg-card text-blue-600 shadow-sm border border-border/50"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/80 border border-transparent"
               }`}
             >
@@ -257,16 +327,18 @@ function ManageOvertimePage() {
             <button
               onClick={() => setActiveTab("history")}
               className={`px-5 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${
-                activeTab === "history" 
-                  ? "bg-card text-blue-600 shadow-sm border border-border/50" 
+                activeTab === "history"
+                  ? "bg-card text-blue-600 shadow-sm border border-border/50"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/80 border border-transparent"
               }`}
             >
               <div className="flex items-center gap-2">
                 <CheckSquare className="size-4" /> My Submitted Requests
                 {stats.pendingHours > 0 && (
-                  <span className={`text-[9px] px-1.5 py-0.5 rounded-full ml-1 transition-colors ${activeTab === "history" ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400" : "bg-amber-500/20 text-amber-600"}`}>
-                    {submittedRecords.filter(r => r.status === "Pending").length}
+                  <span
+                    className={`text-[9px] px-1.5 py-0.5 rounded-full ml-1 transition-colors ${activeTab === "history" ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400" : "bg-amber-500/20 text-amber-600"}`}
+                  >
+                    {submittedRecords.filter((r) => r.status === "Pending").length}
                   </span>
                 )}
               </div>
@@ -275,31 +347,33 @@ function ManageOvertimePage() {
 
           {activeTab === "submit" && (
             <div className="space-y-6 animate-in fade-in duration-300">
-              
               {/* Submission Filters & Budget Dashboard */}
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                
                 {/* Search / Filters Panel */}
                 <div className="xl:col-span-2 bg-card rounded-xl border border-border/80 shadow-xs p-5">
                   <h3 className="text-sm font-black text-foreground flex items-center gap-2 mb-4">
                     <Search className="size-4 text-blue-500" /> Load Attendance Data
                   </h3>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="text-[10px] font-black text-muted-foreground uppercase mb-1.5 block">Attendance Date *</label>
-                      <input 
-                        type="date" 
+                      <label className="text-[10px] font-black text-muted-foreground uppercase mb-1.5 block">
+                        Attendance Date *
+                      </label>
+                      <input
+                        type="date"
                         value={attendanceDate}
-                        onChange={e => setAttendanceDate(e.target.value)}
+                        onChange={(e) => setAttendanceDate(e.target.value)}
                         className="w-full h-9 px-3 rounded-lg bg-muted border border-border/60 text-xs font-semibold outline-none focus:border-blue-500 transition shadow-sm"
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] font-black text-muted-foreground uppercase mb-1.5 block">Department *</label>
-                      <select 
+                      <label className="text-[10px] font-black text-muted-foreground uppercase mb-1.5 block">
+                        Department *
+                      </label>
+                      <select
                         value={selectedDept}
-                        onChange={e => setSelectedDept(e.target.value)}
+                        onChange={(e) => setSelectedDept(e.target.value)}
                         className="w-full h-9 px-3 rounded-lg bg-muted border border-border/60 text-xs font-semibold outline-none focus:border-blue-500 transition shadow-sm"
                       >
                         <option value="ALL">All Departments</option>
@@ -321,20 +395,32 @@ function ManageOvertimePage() {
                   <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
                     <Timer className="size-24" />
                   </div>
-                  <h3 className="text-[10px] font-black tracking-wider uppercase opacity-75 text-[#1e88e5] mb-3">OT Cost Overview</h3>
-                  
+                  <h3 className="text-[10px] font-black tracking-wider uppercase opacity-75 text-[#1e88e5] mb-3">
+                    OT Cost Overview
+                  </h3>
+
                   <div className="grid grid-cols-2 gap-4 relative z-10">
                     <div>
                       <div className="text-[10px] opacity-70 font-semibold mb-0.5">Budget Pool</div>
-                      <div className="text-lg font-black text-foreground">৳ {stats.budgetPool.toLocaleString()}</div>
+                      <div className="text-lg font-black text-foreground">
+                        ৳ {stats.budgetPool.toLocaleString()}
+                      </div>
                     </div>
                     <div>
-                      <div className="text-[10px] opacity-70 font-semibold mb-0.5">Approved Cost</div>
-                      <div className="text-lg font-black text-emerald-600">৳ {stats.approvedCost.toLocaleString()}</div>
+                      <div className="text-[10px] opacity-70 font-semibold mb-0.5">
+                        Approved Cost
+                      </div>
+                      <div className="text-lg font-black text-emerald-600">
+                        ৳ {stats.approvedCost.toLocaleString()}
+                      </div>
                     </div>
                     <div className="col-span-2 pt-3 border-t border-[#1e88e5]/10">
-                      <div className="text-[10px] opacity-70 font-semibold mb-0.5">Balance Remaining</div>
-                      <div className={`text-2xl font-black ${stats.remainingBudget < 10000 ? 'text-rose-600' : 'text-[#1e88e5]'}`}>
+                      <div className="text-[10px] opacity-70 font-semibold mb-0.5">
+                        Balance Remaining
+                      </div>
+                      <div
+                        className={`text-2xl font-black ${stats.remainingBudget < 10000 ? "text-rose-600" : "text-[#1e88e5]"}`}
+                      >
                         ৳ {stats.remainingBudget.toLocaleString()}
                       </div>
                     </div>
@@ -349,7 +435,7 @@ function ManageOvertimePage() {
                     Attendance List: {attendanceDate}
                   </h2>
                   <div className="flex items-center gap-2">
-                    <button 
+                    <button
                       onClick={handleAutoFillSysOT}
                       disabled={selectedAttendanceIds.size === 0}
                       className="h-9 px-4 bg-background border border-border/60 hover:bg-muted disabled:opacity-50 text-foreground font-bold text-xs rounded-lg shadow-sm flex items-center gap-2 transition"
@@ -357,9 +443,11 @@ function ManageOvertimePage() {
                       <Wand2 className="size-3.5 text-blue-500" />
                       Auto-Fill Sys OT
                     </button>
-                    <button 
+                    <button
                       onClick={() => {
-                        try { handleSubmitOT(); } catch(e) {}
+                        try {
+                          handleSubmitOT();
+                        } catch (e) {}
                       }}
                       disabled={selectedAttendanceIds.size === 0}
                       className="h-9 px-5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:hover:bg-emerald-600 text-white font-bold text-xs rounded-lg shadow-sm flex items-center gap-2 transition uppercase tracking-wider"
@@ -375,19 +463,30 @@ function ManageOvertimePage() {
                     <thead>
                       <tr className="bg-[#f1f5f9] dark:bg-[#0f172a] text-foreground font-bold border-b border-border/50 select-none whitespace-nowrap text-[11px]">
                         <th className="px-4 py-3 border-r border-border/30 w-10 text-center">
-                          <input 
-                            type="checkbox" 
+                          <input
+                            type="checkbox"
                             className="rounded border-border/60"
-                            checked={attendanceRecords.length > 0 && selectedAttendanceIds.size === attendanceRecords.length}
+                            checked={
+                              attendanceRecords.length > 0 &&
+                              selectedAttendanceIds.size === attendanceRecords.length
+                            }
                             onChange={handleSelectAll}
                           />
                         </th>
                         <th className="px-4 py-3 border-r border-border/30">Employee Details</th>
-                        <th className="px-4 py-3 text-center border-r border-border/30">In Date/Time</th>
-                        <th className="px-4 py-3 text-center border-r border-border/30">Out Date/Time</th>
+                        <th className="px-4 py-3 text-center border-r border-border/30">
+                          In Date/Time
+                        </th>
+                        <th className="px-4 py-3 text-center border-r border-border/30">
+                          Out Date/Time
+                        </th>
                         <th className="px-4 py-3 text-center border-r border-border/30">Sys. OT</th>
-                        <th className="px-4 py-3 text-center border-r border-border/30 w-24">Req. OT</th>
-                        <th className="px-4 py-3 text-center border-r border-border/30 w-24">Req. MOT</th>
+                        <th className="px-4 py-3 text-center border-r border-border/30 w-24">
+                          Req. OT
+                        </th>
+                        <th className="px-4 py-3 text-center border-r border-border/30 w-24">
+                          Req. MOT
+                        </th>
                         <th className="px-4 py-3 w-40">Justification / Reason</th>
                       </tr>
                     </thead>
@@ -395,13 +494,13 @@ function ManageOvertimePage() {
                       {attendanceRecords.map((row) => {
                         const isSelected = selectedAttendanceIds.has(row.id);
                         return (
-                          <tr 
-                            key={row.id} 
+                          <tr
+                            key={row.id}
                             className={`transition duration-75 ${isSelected ? "bg-emerald-500/5" : "hover:bg-[#f8fafc] dark:hover:bg-[#1e293b]/30"}`}
                           >
                             <td className="px-4 py-3 text-center border-r border-border/20">
-                              <input 
-                                type="checkbox" 
+                              <input
+                                type="checkbox"
                                 className="rounded border-border/60"
                                 checked={isSelected}
                                 onChange={() => toggleSelectRow(row.id)}
@@ -425,28 +524,36 @@ function ManageOvertimePage() {
                               {row.calculatedOt > 0 ? row.calculatedOt : "-"}
                             </td>
                             <td className="px-2 py-2 border-r border-border/20">
-                              <input 
-                                type="number" 
+                              <input
+                                type="number"
                                 value={row.reqOtInput}
-                                onChange={e => handleOtChange(row.id, "reqOtInput", e.target.value)}
+                                onChange={(e) =>
+                                  handleOtChange(row.id, "reqOtInput", e.target.value)
+                                }
                                 className={`w-full h-8 px-2 rounded-md bg-background border text-xs font-bold outline-none shadow-sm text-center transition ${parseFloat(row.reqOtInput) > 4 ? "border-rose-500 text-rose-600 bg-rose-500/5 focus:border-rose-600" : "border-border/60 focus:border-blue-500"}`}
-                                placeholder={row.calculatedOt > 0 ? row.calculatedOt.toString() : "0"}
+                                placeholder={
+                                  row.calculatedOt > 0 ? row.calculatedOt.toString() : "0"
+                                }
                               />
                             </td>
                             <td className="px-2 py-2 border-r border-border/20">
-                              <input 
-                                type="number" 
+                              <input
+                                type="number"
                                 value={row.reqMotInput}
-                                onChange={e => handleOtChange(row.id, "reqMotInput", e.target.value)}
+                                onChange={(e) =>
+                                  handleOtChange(row.id, "reqMotInput", e.target.value)
+                                }
                                 className={`w-full h-8 px-2 rounded-md bg-background border text-xs font-bold outline-none shadow-sm text-center transition ${parseFloat(row.reqMotInput) > 4 ? "border-rose-500 text-rose-600 bg-rose-500/5 focus:border-rose-600" : "border-border/60 focus:border-blue-500"}`}
                                 placeholder="0"
                               />
                             </td>
                             <td className="px-2 py-2">
-                              <input 
-                                type="text" 
+                              <input
+                                type="text"
                                 value={row.reasonInput}
-                                onChange={e => handleOtChange(row.id, "reasonInput", e.target.value)}
+                                onChange={(e) =>
+                                  handleOtChange(row.id, "reasonInput", e.target.value)
+                                }
                                 className="w-full h-8 px-2 rounded-md bg-background border border-border/60 text-xs outline-none focus:border-blue-500 shadow-sm"
                                 placeholder="e.g. Server Issue"
                               />
@@ -456,7 +563,10 @@ function ManageOvertimePage() {
                       })}
                       {attendanceRecords.length === 0 && (
                         <tr>
-                          <td colSpan={7} className="px-4 py-12 text-center text-muted-foreground font-medium">
+                          <td
+                            colSpan={7}
+                            className="px-4 py-12 text-center text-muted-foreground font-medium"
+                          >
                             No attendance records found for the selected date and department.
                           </td>
                         </tr>
@@ -472,11 +582,12 @@ function ManageOvertimePage() {
             <div className="space-y-6 animate-in fade-in duration-300">
               <div className="bg-card rounded-xl border border-border/80 shadow-xs overflow-hidden">
                 <div className="p-4 flex flex-wrap items-center justify-between gap-4 border-b border-border/40 bg-muted/10">
-                  <h2 className="text-sm font-black text-foreground">
-                    My Submitted OT Requests
-                  </h2>
+                  <h2 className="text-sm font-black text-foreground">My Submitted OT Requests</h2>
                   <div className="flex items-center gap-2">
-                    <button onClick={() => window.print()} className="h-9 px-4 rounded-lg border border-border/60 bg-background hover:bg-muted font-bold text-xs flex items-center gap-1.5 transition shadow-sm text-blue-600">
+                    <button
+                      onClick={() => window.print()}
+                      className="h-9 px-4 rounded-lg border border-border/60 bg-background hover:bg-muted font-bold text-xs flex items-center gap-1.5 transition shadow-sm text-blue-600"
+                    >
                       <Printer className="size-3.5" /> Print
                     </button>
                   </div>
@@ -489,16 +600,25 @@ function ManageOvertimePage() {
                         <th className="px-5 py-3 border-r border-border/30">Req ID</th>
                         <th className="px-5 py-3 border-r border-border/30">Employee Details</th>
                         <th className="px-5 py-3 text-center border-r border-border/30">OT Date</th>
-                        <th className="px-5 py-3 text-center border-r border-border/30">Requested Hours</th>
-                        <th className="px-5 py-3 text-center border-r border-border/30">Submitted At</th>
+                        <th className="px-5 py-3 text-center border-r border-border/30">
+                          Requested Hours
+                        </th>
+                        <th className="px-5 py-3 text-center border-r border-border/30">
+                          Submitted At
+                        </th>
                         <th className="px-5 py-3 text-center border-r border-border/30">Status</th>
                         <th className="px-5 py-3 text-center print:hidden">Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border/30 font-sans text-xs">
                       {submittedRecords.map((row) => (
-                        <tr key={row.id} className="hover:bg-[#f8fafc] dark:hover:bg-[#1e293b]/30 transition duration-75">
-                          <td className="px-5 py-3 font-mono font-bold text-foreground/70 border-r border-border/20">{row.id}</td>
+                        <tr
+                          key={row.id}
+                          className="hover:bg-[#f8fafc] dark:hover:bg-[#1e293b]/30 transition duration-75"
+                        >
+                          <td className="px-5 py-3 font-mono font-bold text-foreground/70 border-r border-border/20">
+                            {row.id}
+                          </td>
                           <td className="px-5 py-3 border-r border-border/20">
                             <div className="font-black text-foreground">{row.employeeName}</div>
                             <div className="text-[10px] text-muted-foreground font-mono mt-0.5">
@@ -509,7 +629,9 @@ function ManageOvertimePage() {
                             {row.otDate}
                           </td>
                           <td className="px-5 py-3 text-center border-r border-border/20">
-                            <div className="font-black text-foreground text-sm">{row.reqOt + row.reqMot} hrs</div>
+                            <div className="font-black text-foreground text-sm">
+                              {row.reqOt + row.reqMot} hrs
+                            </div>
                             <div className="text-[9px] text-muted-foreground font-mono">
                               (OT: {row.reqOt} | MOT: {row.reqMot})
                             </div>
@@ -551,7 +673,10 @@ function ManageOvertimePage() {
                       ))}
                       {submittedRecords.length === 0 && (
                         <tr>
-                          <td colSpan={6} className="px-5 py-12 text-center text-muted-foreground font-medium">
+                          <td
+                            colSpan={6}
+                            className="px-5 py-12 text-center text-muted-foreground font-medium"
+                          >
                             You have not submitted any overtime requests yet.
                           </td>
                         </tr>
@@ -562,11 +687,8 @@ function ManageOvertimePage() {
               </div>
             </div>
           )}
-
         </div>
       </main>
     </div>
   );
 }
-
-

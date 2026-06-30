@@ -3,8 +3,18 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { useState } from "react";
 import {
-  ChevronRight, Banknote, Search, Plus, Filter, Download,
-  Printer, FileText, Trash2, Edit, MoreHorizontal, FileSpreadsheet
+  ChevronRight,
+  Banknote,
+  Search,
+  Plus,
+  Filter,
+  Download,
+  Printer,
+  FileText,
+  Trash2,
+  Edit,
+  MoreHorizontal,
+  FileSpreadsheet,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -95,16 +105,146 @@ const employeeOptions = [
 
 // Dummy Data based on the user's screenshots
 const advanceData = [
-  { id: 1, empId: "2021028542", empName: "Zakir Hossain", designation: "Executive", type: "Office Executive", dept: "Implementation & Support (HR)", company: "Pakiza Software Limited", month: "04", year: "2026", amount: 15000.00, status: "Approved", remarks: "Salary Advance." },
-  { id: 2, empId: "2022041203", empName: "Khairul Bashar Masum", designation: "Asst. Manager", type: "Office Executive", dept: "HR Team", company: "Pakiza Software Limited", month: "02", year: "2026", amount: 5500.00, status: "Approved", remarks: "Salary Advance." },
-  { id: 3, empId: "2022041203", empName: "Khairul Bashar Masum", designation: "Asst. Manager", type: "Office Executive", dept: "HR Team", company: "Pakiza Software Limited", month: "04", year: "2026", amount: 3500.00, status: "Pending", remarks: "Salary Advance" },
-  { id: 4, empId: "2022041203", empName: "Khairul Bashar Masum", designation: "Asst. Manager", type: "Office Executive", dept: "HR Team", company: "Pakiza Software Limited", month: "01", year: "2026", amount: 5000.00, status: "Approved", remarks: "Salary Advance." },
-  { id: 5, empId: "2023043021", empName: "Easin Mia", designation: "Receptionist", type: "Office Executive", dept: "Admin", company: "Pakiza Software Limited", month: "01", year: "2026", amount: 10000.00, status: "Rejected", remarks: "Salary Advance." },
-  { id: 6, empId: "2023043577", empName: "Md. Mostakim Shah", designation: "Office Boy", type: "Office Staff", dept: "Admin", company: "Pakiza Software Limited", month: "01", year: "2026", amount: 5000.00, status: "Approved", remarks: "Salary Advance." },
-  { id: 7, empId: "2023043577", empName: "Md. Mostakim Shah", designation: "Office Boy", type: "Office Staff", dept: "Admin", company: "Pakiza Software Limited", month: "02", year: "2026", amount: 5000.00, status: "Approved", remarks: "Salary Advance." },
-  { id: 8, empId: "2023043910", empName: "Tahmid Afsar", designation: "Asst. Manager", type: "Office Executive", dept: "Project Resource & Strategy", company: "Pakiza Software Limited", month: "04", year: "2026", amount: 7500.00, status: "Approved", remarks: "Salary Advance" },
-  { id: 9, empId: "2023043974", empName: "Md. Anwar Hossain", designation: "Asst. Manager", type: "Office Executive", dept: "Merchandising-Purchase-MCD", company: "Pakiza Software Limited", month: "01", year: "2026", amount: 65000.00, status: "Approved", remarks: "Salary Advance." },
-  { id: 10, empId: "2023046001", empName: "Sohanur Rahman Schan", designation: "Executive", type: "Office Executive", dept: "Admin", company: "Pakiza Software Limited", month: "04", year: "2026", amount: 8333.00, status: "Approved", remarks: "Loan & Salary Advance" },
+  {
+    id: 1,
+    empId: "2021028542",
+    empName: "Zakir Hossain",
+    designation: "Executive",
+    type: "Office Executive",
+    dept: "Implementation & Support (HR)",
+    company: "Pakiza Software Limited",
+    month: "04",
+    year: "2026",
+    amount: 15000.0,
+    status: "Approved",
+    remarks: "Salary Advance.",
+  },
+  {
+    id: 2,
+    empId: "2022041203",
+    empName: "Khairul Bashar Masum",
+    designation: "Asst. Manager",
+    type: "Office Executive",
+    dept: "HR Team",
+    company: "Pakiza Software Limited",
+    month: "02",
+    year: "2026",
+    amount: 5500.0,
+    status: "Approved",
+    remarks: "Salary Advance.",
+  },
+  {
+    id: 3,
+    empId: "2022041203",
+    empName: "Khairul Bashar Masum",
+    designation: "Asst. Manager",
+    type: "Office Executive",
+    dept: "HR Team",
+    company: "Pakiza Software Limited",
+    month: "04",
+    year: "2026",
+    amount: 3500.0,
+    status: "Pending",
+    remarks: "Salary Advance",
+  },
+  {
+    id: 4,
+    empId: "2022041203",
+    empName: "Khairul Bashar Masum",
+    designation: "Asst. Manager",
+    type: "Office Executive",
+    dept: "HR Team",
+    company: "Pakiza Software Limited",
+    month: "01",
+    year: "2026",
+    amount: 5000.0,
+    status: "Approved",
+    remarks: "Salary Advance.",
+  },
+  {
+    id: 5,
+    empId: "2023043021",
+    empName: "Easin Mia",
+    designation: "Receptionist",
+    type: "Office Executive",
+    dept: "Admin",
+    company: "Pakiza Software Limited",
+    month: "01",
+    year: "2026",
+    amount: 10000.0,
+    status: "Rejected",
+    remarks: "Salary Advance.",
+  },
+  {
+    id: 6,
+    empId: "2023043577",
+    empName: "Md. Mostakim Shah",
+    designation: "Office Boy",
+    type: "Office Staff",
+    dept: "Admin",
+    company: "Pakiza Software Limited",
+    month: "01",
+    year: "2026",
+    amount: 5000.0,
+    status: "Approved",
+    remarks: "Salary Advance.",
+  },
+  {
+    id: 7,
+    empId: "2023043577",
+    empName: "Md. Mostakim Shah",
+    designation: "Office Boy",
+    type: "Office Staff",
+    dept: "Admin",
+    company: "Pakiza Software Limited",
+    month: "02",
+    year: "2026",
+    amount: 5000.0,
+    status: "Approved",
+    remarks: "Salary Advance.",
+  },
+  {
+    id: 8,
+    empId: "2023043910",
+    empName: "Tahmid Afsar",
+    designation: "Asst. Manager",
+    type: "Office Executive",
+    dept: "Project Resource & Strategy",
+    company: "Pakiza Software Limited",
+    month: "04",
+    year: "2026",
+    amount: 7500.0,
+    status: "Approved",
+    remarks: "Salary Advance",
+  },
+  {
+    id: 9,
+    empId: "2023043974",
+    empName: "Md. Anwar Hossain",
+    designation: "Asst. Manager",
+    type: "Office Executive",
+    dept: "Merchandising-Purchase-MCD",
+    company: "Pakiza Software Limited",
+    month: "01",
+    year: "2026",
+    amount: 65000.0,
+    status: "Approved",
+    remarks: "Salary Advance.",
+  },
+  {
+    id: 10,
+    empId: "2023046001",
+    empName: "Sohanur Rahman Schan",
+    designation: "Executive",
+    type: "Office Executive",
+    dept: "Admin",
+    company: "Pakiza Software Limited",
+    month: "04",
+    year: "2026",
+    amount: 8333.0,
+    status: "Approved",
+    remarks: "Loan & Salary Advance",
+  },
 ];
 
 function PayrollAdvancePage() {
@@ -112,14 +252,20 @@ function PayrollAdvancePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEmpId, setSelectedEmpId] = useState("");
 
-  const selectedEmployee = employeeOptions.find(emp => emp.value === selectedEmpId) || null;
+  const selectedEmployee = employeeOptions.find((emp) => emp.value === selectedEmpId) || null;
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "Approved": return <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-200">Approved</Badge>;
-      case "Pending": return <Badge className="bg-amber-500/10 text-amber-600 border-amber-200">Pending</Badge>;
-      case "Rejected": return <Badge className="bg-rose-500/10 text-rose-600 border-rose-200">Rejected</Badge>;
-      default: return <Badge variant="outline">{status}</Badge>;
+      case "Approved":
+        return (
+          <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-200">Approved</Badge>
+        );
+      case "Pending":
+        return <Badge className="bg-amber-500/10 text-amber-600 border-amber-200">Pending</Badge>;
+      case "Rejected":
+        return <Badge className="bg-rose-500/10 text-rose-600 border-rose-200">Rejected</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
     }
   };
 
@@ -131,7 +277,9 @@ function PayrollAdvancePage() {
         <div className="p-4 md:p-6 space-y-6 w-full">
           {/* Breadcrumb Navigation */}
           <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-            <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
+            <Link to="/" className="hover:text-foreground transition-colors">
+              Home
+            </Link>
             <ChevronRight className="size-3.5" />
             <span>Payroll</span>
             <ChevronRight className="size-3.5" />
@@ -161,7 +309,7 @@ function PayrollAdvancePage() {
               <Button variant="outline" size="sm" className="hidden sm:flex gap-2">
                 <FileText className="size-4" /> PDF
               </Button>
-              
+
               <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                 <DialogTrigger asChild>
                   <Button className="gap-2 shadow-sm">
@@ -180,45 +328,97 @@ function PayrollAdvancePage() {
                       {/* Left Column - Readonly Info */}
                       <div className="space-y-3">
                         <div className="grid grid-cols-[120px_1fr] items-center gap-4">
-                          <Label htmlFor="req-empid" className="text-xs font-medium text-muted-foreground">EmpId</Label>
-                          <SearchableSelect 
-                            options={employeeOptions} 
-                            value={selectedEmpId} 
-                            onChange={setSelectedEmpId} 
-                            placeholder="Search Emp ID..." 
+                          <Label
+                            htmlFor="req-empid"
+                            className="text-xs font-medium text-muted-foreground"
+                          >
+                            EmpId
+                          </Label>
+                          <SearchableSelect
+                            options={employeeOptions}
+                            value={selectedEmpId}
+                            onChange={setSelectedEmpId}
+                            placeholder="Search Emp ID..."
                             className="h-8 text-xs"
                           />
                         </div>
                         <div className="grid grid-cols-[120px_1fr] items-center gap-4">
-                          <Label className="text-xs font-medium text-muted-foreground">Company</Label>
-                          <Input readOnly value={selectedEmployee?.company || ""} placeholder="-" className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
+                          <Label className="text-xs font-medium text-muted-foreground">
+                            Company
+                          </Label>
+                          <Input
+                            readOnly
+                            value={selectedEmployee?.company || ""}
+                            placeholder="-"
+                            className="h-8 text-xs bg-muted/40 cursor-not-allowed"
+                          />
                         </div>
                         <div className="grid grid-cols-[120px_1fr] items-center gap-4">
-                          <Label className="text-xs font-medium text-muted-foreground">Employee Type</Label>
-                          <Input readOnly value={selectedEmployee?.type || ""} placeholder="-" className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
+                          <Label className="text-xs font-medium text-muted-foreground">
+                            Employee Type
+                          </Label>
+                          <Input
+                            readOnly
+                            value={selectedEmployee?.type || ""}
+                            placeholder="-"
+                            className="h-8 text-xs bg-muted/40 cursor-not-allowed"
+                          />
                         </div>
                         <div className="grid grid-cols-[120px_1fr] items-center gap-4">
-                          <Label className="text-xs font-medium text-muted-foreground">Department</Label>
-                          <Input readOnly value={selectedEmployee?.department || ""} placeholder="-" className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
+                          <Label className="text-xs font-medium text-muted-foreground">
+                            Department
+                          </Label>
+                          <Input
+                            readOnly
+                            value={selectedEmployee?.department || ""}
+                            placeholder="-"
+                            className="h-8 text-xs bg-muted/40 cursor-not-allowed"
+                          />
                         </div>
                         <div className="grid grid-cols-[120px_1fr] items-center gap-4">
-                          <Label className="text-xs font-medium text-muted-foreground">Designation</Label>
-                          <Input readOnly value={selectedEmployee?.designation || ""} placeholder="-" className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
+                          <Label className="text-xs font-medium text-muted-foreground">
+                            Designation
+                          </Label>
+                          <Input
+                            readOnly
+                            value={selectedEmployee?.designation || ""}
+                            placeholder="-"
+                            className="h-8 text-xs bg-muted/40 cursor-not-allowed"
+                          />
                         </div>
                         <div className="grid grid-cols-[120px_1fr] items-center gap-4">
-                          <Label className="text-xs font-medium text-muted-foreground">Basic Salary</Label>
-                          <Input readOnly value={selectedEmployee?.basic || ""} placeholder="-" className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
+                          <Label className="text-xs font-medium text-muted-foreground">
+                            Basic Salary
+                          </Label>
+                          <Input
+                            readOnly
+                            value={selectedEmployee?.basic || ""}
+                            placeholder="-"
+                            className="h-8 text-xs bg-muted/40 cursor-not-allowed"
+                          />
                         </div>
                         <div className="grid grid-cols-[120px_1fr] items-center gap-4">
-                          <Label className="text-xs font-medium text-muted-foreground">Gross Salary</Label>
-                          <Input readOnly value={selectedEmployee?.gross || ""} placeholder="-" className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
+                          <Label className="text-xs font-medium text-muted-foreground">
+                            Gross Salary
+                          </Label>
+                          <Input
+                            readOnly
+                            value={selectedEmployee?.gross || ""}
+                            placeholder="-"
+                            className="h-8 text-xs bg-muted/40 cursor-not-allowed"
+                          />
                         </div>
                       </div>
 
                       {/* Right Column - Inputs */}
                       <div className="space-y-3">
                         <div className="grid grid-cols-[120px_1fr] items-center gap-4">
-                          <Label htmlFor="req-month" className="text-xs font-medium text-muted-foreground">Month</Label>
+                          <Label
+                            htmlFor="req-month"
+                            className="text-xs font-medium text-muted-foreground"
+                          >
+                            Month
+                          </Label>
                           <Select defaultValue="06">
                             <SelectTrigger id="req-month" className="h-8 text-xs">
                               <SelectValue placeholder="Month" />
@@ -234,7 +434,12 @@ function PayrollAdvancePage() {
                           </Select>
                         </div>
                         <div className="grid grid-cols-[120px_1fr] items-center gap-4">
-                          <Label htmlFor="req-year" className="text-xs font-medium text-muted-foreground">Year</Label>
+                          <Label
+                            htmlFor="req-year"
+                            className="text-xs font-medium text-muted-foreground"
+                          >
+                            Year
+                          </Label>
                           <Select defaultValue="2026">
                             <SelectTrigger id="req-year" className="h-8 text-xs">
                               <SelectValue placeholder="Year" />
@@ -246,20 +451,48 @@ function PayrollAdvancePage() {
                           </Select>
                         </div>
                         <div className="grid grid-cols-[120px_1fr] items-center gap-4">
-                          <Label htmlFor="req-amount" className="text-xs font-medium text-muted-foreground">Advance Amount</Label>
-                          <Input id="req-amount" type="number" placeholder="0.00" className="h-8 text-xs" />
+                          <Label
+                            htmlFor="req-amount"
+                            className="text-xs font-medium text-muted-foreground"
+                          >
+                            Advance Amount
+                          </Label>
+                          <Input
+                            id="req-amount"
+                            type="number"
+                            placeholder="0.00"
+                            className="h-8 text-xs"
+                          />
                         </div>
                         <div className="grid grid-cols-[120px_1fr] items-start gap-4">
-                          <Label htmlFor="req-remarks" className="text-xs font-medium text-muted-foreground pt-2">Remark</Label>
-                          <textarea 
-                            id="req-remarks" 
-                            className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-xs shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" 
+                          <Label
+                            htmlFor="req-remarks"
+                            className="text-xs font-medium text-muted-foreground pt-2"
+                          >
+                            Remark
+                          </Label>
+                          <textarea
+                            id="req-remarks"
+                            className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-xs shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                           />
                         </div>
                         <div className="grid grid-cols-[120px_1fr] items-center gap-4 pt-2">
                           <div className="col-start-2 flex gap-2">
-                            <Button size="sm" type="submit" className="h-7 text-xs px-6" onClick={() => setIsModalOpen(false)}>Submit</Button>
-                            <Button size="sm" variant="outline" className="h-7 text-xs px-6 bg-muted/30">Reset</Button>
+                            <Button
+                              size="sm"
+                              type="submit"
+                              className="h-7 text-xs px-6"
+                              onClick={() => setIsModalOpen(false)}
+                            >
+                              Submit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 text-xs px-6 bg-muted/30"
+                            >
+                              Reset
+                            </Button>
                           </div>
                         </div>
                       </div>
@@ -274,16 +507,27 @@ function PayrollAdvancePage() {
                         <Table>
                           <TableHeader className="bg-muted/30">
                             <TableRow>
-                              <TableHead className="text-xs font-bold text-primary">Month</TableHead>
+                              <TableHead className="text-xs font-bold text-primary">
+                                Month
+                              </TableHead>
                               <TableHead className="text-xs font-bold text-primary">Year</TableHead>
-                              <TableHead className="text-xs font-bold text-primary">Advance</TableHead>
-                              <TableHead className="text-xs font-bold text-primary">Status</TableHead>
-                              <TableHead className="text-xs font-bold text-primary">Remark</TableHead>
+                              <TableHead className="text-xs font-bold text-primary">
+                                Advance
+                              </TableHead>
+                              <TableHead className="text-xs font-bold text-primary">
+                                Status
+                              </TableHead>
+                              <TableHead className="text-xs font-bold text-primary">
+                                Remark
+                              </TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
                             <TableRow className="hover:bg-transparent">
-                              <TableCell colSpan={5} className="text-center text-xs text-muted-foreground font-medium py-8 bg-muted/10">
+                              <TableCell
+                                colSpan={5}
+                                className="text-center text-xs text-muted-foreground font-medium py-8 bg-muted/10"
+                              >
                                 No data available!
                               </TableCell>
                             </TableRow>
@@ -294,7 +538,6 @@ function PayrollAdvancePage() {
                   </div>
                 </DialogContent>
               </Dialog>
-
             </div>
           </div>
 
@@ -402,11 +645,11 @@ function PayrollAdvancePage() {
                 </div>
               </div>
             )}
-            
+
             <div className="flex justify-center -mb-2">
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 className="text-xs text-muted-foreground hover:text-foreground h-7"
                 onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
               >
@@ -441,28 +684,41 @@ function PayrollAdvancePage() {
                       <TableCell className="font-medium text-primary">{row.empId}</TableCell>
                       <TableCell>
                         <div className="font-medium">{row.empName}</div>
-                        <div className="text-xs text-muted-foreground hidden lg:block">{row.type} • {row.company}</div>
+                        <div className="text-xs text-muted-foreground hidden lg:block">
+                          {row.type} • {row.company}
+                        </div>
                       </TableCell>
                       <TableCell>{row.designation}</TableCell>
                       <TableCell>{row.dept}</TableCell>
                       <TableCell>
-                        <div className="text-sm font-medium">{row.month}/{row.year}</div>
+                        <div className="text-sm font-medium">
+                          {row.month}/{row.year}
+                        </div>
                       </TableCell>
                       <TableCell className="text-right font-semibold text-foreground">
                         {row.amount.toFixed(2)}
                       </TableCell>
-                      <TableCell className="text-center">
-                        {getStatusBadge(row.status)}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground text-sm max-w-[200px] truncate" title={row.remarks}>
+                      <TableCell className="text-center">{getStatusBadge(row.status)}</TableCell>
+                      <TableCell
+                        className="text-muted-foreground text-sm max-w-[200px] truncate"
+                        title={row.remarks}
+                      >
                         {row.remarks}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2 opacity-70 hover:opacity-100 transition-opacity">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-50">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-50"
+                          >
                             <Edit className="size-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50"
+                          >
                             <Trash2 className="size-4" />
                           </Button>
                         </div>
@@ -472,22 +728,28 @@ function PayrollAdvancePage() {
                 </TableBody>
               </Table>
             </div>
-            
+
             {/* Pagination Placeholder */}
             <div className="p-4 border-t border-border/50 flex items-center justify-between text-sm text-muted-foreground bg-muted/20">
               <div>Showing 1 to 10 of 20 entries</div>
               <div className="flex items-center gap-1">
-                <Button variant="outline" size="sm" disabled>Previous</Button>
-                <Button variant="default" size="sm" className="h-8 w-8 p-0">1</Button>
-                <Button variant="outline" size="sm" className="h-8 w-8 p-0">2</Button>
-                <Button variant="outline" size="sm">Next</Button>
+                <Button variant="outline" size="sm" disabled>
+                  Previous
+                </Button>
+                <Button variant="default" size="sm" className="h-8 w-8 p-0">
+                  1
+                </Button>
+                <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                  2
+                </Button>
+                <Button variant="outline" size="sm">
+                  Next
+                </Button>
               </div>
             </div>
           </div>
-
         </div>
       </main>
     </div>
   );
 }
-

@@ -2,15 +2,30 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  ChevronRight, CalendarClock, Laptop, Package, Smartphone, Utensils,
-  Clock, CheckCircle2, XCircle, FileText, Send, Layers, ShieldCheck
+  ChevronRight,
+  CalendarClock,
+  Laptop,
+  Package,
+  Smartphone,
+  Utensils,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  FileText,
+  Send,
+  Layers,
+  ShieldCheck,
 } from "lucide-react";
 
 export const Route = createFileRoute("/ssp-new-requisition")({
   head: () => ({
     meta: [
       { title: "Self-Service Requisition Hub — CRIPTON" },
-      { name: "description", content: "Submit and monitor leave requests, ICT requisitions, SIM allocations, and conveyance expense claims." },
+      {
+        name: "description",
+        content:
+          "Submit and monitor leave requests, ICT requisitions, SIM allocations, and conveyance expense claims.",
+      },
     ],
   }),
   component: NewRequisitionPage,
@@ -27,7 +42,7 @@ function NewRequisitionPage() {
       iconColor: "text-blue-500",
       iconBg: "bg-blue-500/10 border-blue-500/20",
       badge: "Active",
-      badgeColor: "bg-blue-500/10 text-blue-500 border-blue-500/20"
+      badgeColor: "bg-blue-500/10 text-blue-500 border-blue-500/20",
     },
     {
       title: "ICT Requisition",
@@ -38,7 +53,7 @@ function NewRequisitionPage() {
       iconColor: "text-purple-500",
       iconBg: "bg-purple-500/10 border-purple-500/20",
       badge: "Active",
-      badgeColor: "bg-purple-500/10 text-purple-500 border-purple-500/20"
+      badgeColor: "bg-purple-500/10 text-purple-500 border-purple-500/20",
     },
     {
       title: "General Store Requisition",
@@ -49,7 +64,7 @@ function NewRequisitionPage() {
       iconColor: "text-emerald-500",
       iconBg: "bg-emerald-500/10 border-emerald-500/20",
       badge: "Available",
-      badgeColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+      badgeColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
     },
     {
       title: "Sim Requisition",
@@ -60,7 +75,7 @@ function NewRequisitionPage() {
       iconColor: "text-amber-500",
       iconBg: "bg-amber-500/10 border-amber-500/20",
       badge: "Available",
-      badgeColor: "bg-amber-500/10 text-amber-500 border-amber-500/20"
+      badgeColor: "bg-amber-500/10 text-amber-500 border-amber-500/20",
     },
     {
       title: "Lunch and Conveyance",
@@ -71,28 +86,108 @@ function NewRequisitionPage() {
       iconColor: "text-rose-500",
       iconBg: "bg-rose-500/10 border-rose-500/20",
       badge: "Claimable",
-      badgeColor: "bg-rose-500/10 text-rose-500 border-rose-500/20"
+      badgeColor: "bg-rose-500/10 text-rose-500 border-rose-500/20",
     },
   ];
 
   const recentRequisitions = [
-    { id: "REQ-2026-010", type: "Leave Application", date: "20/06/2026", details: "Sick Leave (1 Day)", status: "Pending" },
-    { id: "REQ-2026-009", type: "Conveyance Claim", date: "18/06/2026", details: "Client Visit Travel Allowance", status: "Approved" },
-    { id: "REQ-2026-008", type: "ICT Requisition", date: "17/06/2026", details: "Dell 24\" IPS Monitor", status: "Pending" },
-    { id: "REQ-2026-007", type: "Lunch Allowance", date: "15/06/2026", details: "Team Meeting Catering", status: "Approved" },
-    { id: "REQ-2026-006", type: "Sim Requisition", date: "12/06/2026", details: "Corporate Sim Card Request", status: "Approved" },
-    { id: "REQ-2026-005", type: "Leave Application", date: "10/06/2026", details: "Casual Leave (3 Days)", status: "Approved" },
-    { id: "REQ-2026-004", type: "ICT Requisition", date: "05/06/2026", details: "Logitech MX Master 3S Mouse", status: "Rejected" },
-    { id: "REQ-2026-003", type: "Conveyance Claim", date: "01/06/2026", details: "Daily Office Travel Allowance", status: "Approved" },
-    { id: "REQ-2026-002", type: "Leave Application", date: "28/05/2026", details: "Annual Leave (5 Days)", status: "Approved" },
-    { id: "REQ-2026-001", type: "ICT Requisition", date: "20/05/2026", details: "USB-C Hub Multiport Adapter", status: "Approved" },
+    {
+      id: "REQ-2026-010",
+      type: "Leave Application",
+      date: "20/06/2026",
+      details: "Sick Leave (1 Day)",
+      status: "Pending",
+    },
+    {
+      id: "REQ-2026-009",
+      type: "Conveyance Claim",
+      date: "18/06/2026",
+      details: "Client Visit Travel Allowance",
+      status: "Approved",
+    },
+    {
+      id: "REQ-2026-008",
+      type: "ICT Requisition",
+      date: "17/06/2026",
+      details: 'Dell 24" IPS Monitor',
+      status: "Pending",
+    },
+    {
+      id: "REQ-2026-007",
+      type: "Lunch Allowance",
+      date: "15/06/2026",
+      details: "Team Meeting Catering",
+      status: "Approved",
+    },
+    {
+      id: "REQ-2026-006",
+      type: "Sim Requisition",
+      date: "12/06/2026",
+      details: "Corporate Sim Card Request",
+      status: "Approved",
+    },
+    {
+      id: "REQ-2026-005",
+      type: "Leave Application",
+      date: "10/06/2026",
+      details: "Casual Leave (3 Days)",
+      status: "Approved",
+    },
+    {
+      id: "REQ-2026-004",
+      type: "ICT Requisition",
+      date: "05/06/2026",
+      details: "Logitech MX Master 3S Mouse",
+      status: "Rejected",
+    },
+    {
+      id: "REQ-2026-003",
+      type: "Conveyance Claim",
+      date: "01/06/2026",
+      details: "Daily Office Travel Allowance",
+      status: "Approved",
+    },
+    {
+      id: "REQ-2026-002",
+      type: "Leave Application",
+      date: "28/05/2026",
+      details: "Annual Leave (5 Days)",
+      status: "Approved",
+    },
+    {
+      id: "REQ-2026-001",
+      type: "ICT Requisition",
+      date: "20/05/2026",
+      details: "USB-C Hub Multiport Adapter",
+      status: "Approved",
+    },
   ];
 
   const stats = [
-    { label: "Total Submitted", value: "14", icon: FileText, color: "text-primary bg-primary/10 border-primary/20" },
-    { label: "Pending Reviews", value: "1", icon: Clock, color: "text-amber-500 bg-amber-500/10 border-amber-500/20" },
-    { label: "Approved Requisitions", value: "11", icon: CheckCircle2, color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20" },
-    { label: "Rejected Requests", value: "2", icon: XCircle, color: "text-rose-500 bg-rose-500/10 border-rose-500/20" },
+    {
+      label: "Total Submitted",
+      value: "14",
+      icon: FileText,
+      color: "text-primary bg-primary/10 border-primary/20",
+    },
+    {
+      label: "Pending Reviews",
+      value: "1",
+      icon: Clock,
+      color: "text-amber-500 bg-amber-500/10 border-amber-500/20",
+    },
+    {
+      label: "Approved Requisitions",
+      value: "11",
+      icon: CheckCircle2,
+      color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
+    },
+    {
+      label: "Rejected Requests",
+      value: "2",
+      icon: XCircle,
+      color: "text-rose-500 bg-rose-500/10 border-rose-500/20",
+    },
   ];
 
   return (
@@ -105,7 +200,9 @@ function NewRequisitionPage() {
           <div className="bg-card border border-border/80 rounded-lg p-4 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-2.5" />
                 <span className="text-muted-foreground/75">SSP</span>
                 <ChevronRight className="size-2.5" />
@@ -125,13 +222,20 @@ function NewRequisitionPage() {
 
           {/* Quick Metrics Ribbon */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            {stats.map(stat => (
-              <div key={stat.label} className="bg-card border border-border/80 p-3 rounded-lg shadow-xs flex items-center gap-3">
-                <div className={`size-8.5 rounded-md border flex items-center justify-center ${stat.color}`}>
+            {stats.map((stat) => (
+              <div
+                key={stat.label}
+                className="bg-card border border-border/80 p-3 rounded-lg shadow-xs flex items-center gap-3"
+              >
+                <div
+                  className={`size-8.5 rounded-md border flex items-center justify-center ${stat.color}`}
+                >
                   <stat.icon className="size-4" />
                 </div>
                 <div>
-                  <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">{stat.label}</span>
+                  <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">
+                    {stat.label}
+                  </span>
                   <span className="text-sm font-black text-foreground">{stat.value}</span>
                 </div>
               </div>
@@ -142,29 +246,41 @@ function NewRequisitionPage() {
             {/* Requisition Categories (col-span-2) */}
             <div className="lg:col-span-2 bg-card border border-border/80 p-4 rounded-lg shadow-xs space-y-3">
               <div>
-                <h3 className="text-xs font-black uppercase tracking-wider text-primary">Select Requisition Category</h3>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Choose a portal category to configure and submit a request</p>
+                <h3 className="text-xs font-black uppercase tracking-wider text-primary">
+                  Select Requisition Category
+                </h3>
+                <p className="text-[10px] text-muted-foreground mt-0.5">
+                  Choose a portal category to configure and submit a request
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-                {categories.map(category => (
+                {categories.map((category) => (
                   <Link
                     key={category.title}
                     to={category.to}
                     className={`group relative bg-muted/20 hover:bg-card border border-border hover:border-primary/30 rounded-lg p-5 shadow-xs transition-all duration-300 overflow-hidden flex flex-col gap-4 hover:-translate-y-0.5 ${category.to === "#" ? "pointer-events-none opacity-60" : ""}`}
                   >
                     <div className="flex items-center justify-between">
-                      <div className={`size-12 rounded-md border ${category.iconBg} flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3`}>
+                      <div
+                        className={`size-12 rounded-md border ${category.iconBg} flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3`}
+                      >
                         <category.icon className={`size-5.5 ${category.iconColor}`} />
                       </div>
-                      <span className={`text-[8.5px] font-black uppercase px-2 py-0.5 rounded border ${category.badgeColor}`}>
+                      <span
+                        className={`text-[8.5px] font-black uppercase px-2 py-0.5 rounded border ${category.badgeColor}`}
+                      >
                         {category.badge}
                       </span>
                     </div>
 
                     <div>
-                      <h3 className="text-sm font-black text-foreground group-hover:text-primary transition-colors duration-200">{category.title}</h3>
-                      <p className="text-[10px] text-muted-foreground leading-normal mt-1 font-medium">{category.desc}</p>
+                      <h3 className="text-sm font-black text-foreground group-hover:text-primary transition-colors duration-200">
+                        {category.title}
+                      </h3>
+                      <p className="text-[10px] text-muted-foreground leading-normal mt-1 font-medium">
+                        {category.desc}
+                      </p>
                     </div>
 
                     {category.to !== "#" && (
@@ -183,27 +299,46 @@ function NewRequisitionPage() {
               {/* Recent Activity Log */}
               <div className="bg-card border border-border/80 p-4 rounded-lg shadow-xs space-y-3">
                 <div className="border-b border-border/40 pb-2 flex items-center justify-between">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-primary">Recent Requisitions</span>
-                  <Link to="/ssp-my-requisition" className="text-[9px] font-black uppercase tracking-wider text-primary hover:text-primary-glow hover:underline transition-all">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-primary">
+                    Recent Requisitions
+                  </span>
+                  <Link
+                    to="/ssp-my-requisition"
+                    className="text-[9px] font-black uppercase tracking-wider text-primary hover:text-primary-glow hover:underline transition-all"
+                  >
                     View All
                   </Link>
                 </div>
 
                 <div className="divide-y divide-border/40 text-xs">
-                  {recentRequisitions.map(req => (
-                    <div key={req.id} className="py-2.5 flex items-center justify-between gap-3 first:pt-0 last:pb-0">
+                  {recentRequisitions.map((req) => (
+                    <div
+                      key={req.id}
+                      className="py-2.5 flex items-center justify-between gap-3 first:pt-0 last:pb-0"
+                    >
                       <div className="space-y-0.5 min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[9.5px] font-mono font-bold text-muted-foreground">{req.id}</span>
-                          <span className="text-[9.5px] font-black text-foreground truncate">{req.type}</span>
+                          <span className="text-[9.5px] font-mono font-bold text-muted-foreground">
+                            {req.id}
+                          </span>
+                          <span className="text-[9.5px] font-black text-foreground truncate">
+                            {req.type}
+                          </span>
                         </div>
-                        <span className="text-[9px] text-muted-foreground block truncate">{req.details} &bull; {req.date}</span>
+                        <span className="text-[9px] text-muted-foreground block truncate">
+                          {req.details} &bull; {req.date}
+                        </span>
                       </div>
 
-                      <span className={`text-[8.5px] font-black uppercase px-2 py-0.5 rounded border shrink-0 ${
-                        req.status === "Approved" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/25" :
-                        req.status === "Rejected" ? "bg-rose-500/10 text-rose-600 border-rose-500/25" : "bg-amber-500/10 text-amber-600 border-amber-500/25"
-                      }`}>
+                      <span
+                        className={`text-[8.5px] font-black uppercase px-2 py-0.5 rounded border shrink-0 ${
+                          req.status === "Approved"
+                            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/25"
+                            : req.status === "Rejected"
+                              ? "bg-rose-500/10 text-rose-600 border-rose-500/25"
+                              : "bg-amber-500/10 text-amber-600 border-amber-500/25"
+                        }`}
+                      >
                         {req.status}
                       </span>
                     </div>

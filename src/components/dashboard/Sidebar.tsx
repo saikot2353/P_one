@@ -1,12 +1,36 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
-  LayoutDashboard, SlidersHorizontal, UserRound, Clock, Coins,
-  Users, RefreshCw, FileText, BarChart3, ClipboardCheck,
-  CalendarDays, CalendarX, ShieldAlert, Fingerprint, Timer,
-  CreditCard, Cpu, ShieldCheck, Lightbulb, Settings,
-  LifeBuoy, ChevronDown, ChevronRight, File, Briefcase, UserPlus,
-  LogOut, HeartHandshake, Banknote, CheckCircle
+  LayoutDashboard,
+  SlidersHorizontal,
+  UserRound,
+  Clock,
+  Coins,
+  Users,
+  RefreshCw,
+  FileText,
+  BarChart3,
+  ClipboardCheck,
+  CalendarDays,
+  CalendarX,
+  ShieldAlert,
+  Fingerprint,
+  Timer,
+  CreditCard,
+  Cpu,
+  ShieldCheck,
+  Lightbulb,
+  Settings,
+  LifeBuoy,
+  ChevronDown,
+  ChevronRight,
+  File,
+  Briefcase,
+  UserPlus,
+  LogOut,
+  HeartHandshake,
+  Banknote,
+  CheckCircle,
 } from "lucide-react";
 
 interface NestedItem {
@@ -43,7 +67,7 @@ const nav: NavItem[] = [
       { label: "New Requisition", to: "/ssp-new-requisition" },
       { label: "My Requisition", to: "/ssp-my-requisition" },
       { label: "Attendance", to: "/ssp-attendance" },
-    ]
+    ],
   },
   {
     label: "Configure",
@@ -54,8 +78,8 @@ const nav: NavItem[] = [
       { label: "Shift & Time Rules", to: "/configure-time" },
       { label: "Allowances & Bonuses", to: "/configure-compensation" },
       { label: "Education & Training", to: "/configure-education" },
-      { label: "Leave & Policies", to: "/configure-policies" }
-    ]
+      { label: "Leave & Policies", to: "/configure-policies" },
+    ],
   },
   {
     label: "Approvals",
@@ -70,14 +94,24 @@ const nav: NavItem[] = [
           { label: "SSP Approval", to: "/ssp-approval", count: 5 },
           { label: "Personnel Approval", to: "/personnel-approval", count: 2 },
           { label: "Manual Attendance", to: "/pending-manual-attendance", count: 7 },
-          { label: "JD Approvals", to: "/hr-policy-jds", search: { mode: "list", filterWorkflow: "HR" }, count: 1 },
+          {
+            label: "JD Approvals",
+            to: "/hr-policy-jds",
+            search: { mode: "list", filterWorkflow: "HR" },
+            count: 1,
+          },
           { label: "Increment Gadget", to: "/approve-increment-gadget", count: 3 },
           { label: "Increment (HR)", to: "/approve-increment-hr", count: 2 },
           { label: "Final Increment", to: "/final-approve-increment", count: 1 },
           { label: "Budget Requisitions", to: "/budget-requisition-approvals" },
-          { label: "Transfer Approvals", to: "/transfer-control-center", search: { tab: "approve" }, count: 2 },
+          {
+            label: "Transfer Approvals",
+            to: "/transfer-control-center",
+            search: { tab: "approve" },
+            count: 2,
+          },
           { label: "Overtime Requisitions", to: "/approve-overtime", count: 1 },
-        ]
+        ],
       },
       {
         label: "Payroll Approval",
@@ -86,17 +120,17 @@ const nav: NavItem[] = [
           { label: "Advance Requisitions", to: "/approve-advance", count: 3 },
           { label: "Loan Applications", to: "/loan-approval", count: 5 },
           { label: "Salary Sheets", to: "/check-approve-salary", count: 6 },
-        ]
-      }
-    ]
+        ],
+      },
+    ],
   },
   {
     label: "Personnel Info",
     icon: UserRound,
     subitems: [
       { label: "Personnel List", to: "/personnel-list" },
-      { label: "ID Card Setup", to: "/id-card-setup" }
-    ]
+      { label: "ID Card Setup", to: "/id-card-setup" },
+    ],
   },
   {
     label: "Attendance",
@@ -106,7 +140,7 @@ const nav: NavItem[] = [
       { label: "Employee Job Card", to: "/employee-job-card" },
       { label: "Allowance Process", to: "/" },
       { label: "Allowance Requisition", to: "/" },
-    ]
+    ],
   },
   {
     label: "Roster",
@@ -114,12 +148,12 @@ const nav: NavItem[] = [
     subitems: [
       { label: "Create Roster", to: "/create-roster" },
       { label: "Company Holiday", to: "/company-holiday" },
-    ]
+    ],
   },
   {
     label: "Leave",
     to: "/leave",
-    icon: CalendarX
+    icon: CalendarX,
   },
   {
     label: "KPI Performance",
@@ -133,7 +167,7 @@ const nav: NavItem[] = [
       { label: "360° Peer Review", to: "/kpi-peer-review" },
       { label: "Assessment Workflow", to: "/kpi-assessment-workflow" },
       { label: "KPI Reports", to: "/kpi-report" },
-    ]
+    ],
   },
   {
     label: "Evaluation",
@@ -146,7 +180,7 @@ const nav: NavItem[] = [
       { label: "Increment Queue List", to: "/increment-queuelist" },
       { label: "Increment List", to: "/increment-list" },
       { label: "Increment History", to: "/increment-history" },
-    ]
+    ],
   },
   {
     label: "e-Recruitment",
@@ -173,7 +207,7 @@ const nav: NavItem[] = [
   {
     label: "Manage Shift",
     icon: Clock,
-    to: "/shift-control-center"
+    to: "/shift-control-center",
   },
   {
     label: "Manpower Budget",
@@ -183,7 +217,7 @@ const nav: NavItem[] = [
       { label: "Budget Planning Hub", to: "/budget-planning" },
       { label: "My Requisitions", to: "/budget-my-requisitions" },
       { label: "Overtime Control", to: "/budget-overtime" },
-    ]
+    ],
   },
   {
     label: "Transfer",
@@ -191,13 +225,13 @@ const nav: NavItem[] = [
     subitems: [
       { label: "Transfer History", to: "/transfer-control-center", search: { tab: "history" } },
       { label: "Print Transfer Letter", to: "/transfer-control-center", search: { tab: "print" } },
-    ]
+    ],
   },
   {
     label: "HR Policy",
     to: "/hr-policy-jds",
     search: { mode: "list", filterWorkflow: "ALL" },
-    icon: FileText
+    icon: FileText,
   },
   {
     label: "User Management",
@@ -205,7 +239,7 @@ const nav: NavItem[] = [
     subitems: [
       { label: "User List", to: "/user-management" },
       { label: "Permission Management", to: "/permission-management" },
-    ]
+    ],
   },
 
   {
@@ -214,7 +248,7 @@ const nav: NavItem[] = [
     subitems: [
       { label: "Zakat Management", to: "/zakat-management" },
       { label: "Financial Aid", to: "/financial-aid" },
-    ]
+    ],
   },
   {
     label: "Disciplinary Action",
@@ -223,14 +257,12 @@ const nav: NavItem[] = [
       { label: "Case Files", to: "/" },
       { label: "Warning Letters", to: "/" },
       { label: "Show Cause Notices", to: "/" },
-    ]
+    ],
   },
   {
     label: "Manage Overtime",
     icon: Timer,
-    subitems: [
-      { label: "OT Tracking & Submissions", to: "/manage-overtime" },
-    ]
+    subitems: [{ label: "OT Tracking & Submissions", to: "/manage-overtime" }],
   },
   {
     label: "Manage Allowance",
@@ -239,7 +271,7 @@ const nav: NavItem[] = [
       { label: "Allowance Setup", to: "/" },
       { label: "Employee Allowance", to: "/" },
       { label: "Tax Exemption Rules", to: "/" },
-    ]
+    ],
   },
   {
     label: "Payroll",
@@ -250,13 +282,11 @@ const nav: NavItem[] = [
         subitems: [
           { label: "Advance Req & List", to: "/payroll-advance" },
           { label: "Incentive Allowance", to: "/incentive-allowance" },
-        ]
+        ],
       },
       {
         label: "Loan",
-        subitems: [
-          { label: "Loan Management", to: "/loan-application" },
-        ]
+        subitems: [{ label: "Loan Management", to: "/loan-application" }],
       },
       { label: "Deductions", to: "/payroll-deductions" },
       {
@@ -265,9 +295,9 @@ const nav: NavItem[] = [
           { label: "Monthly Salary Process", to: "/monthly-salary-process" },
           { label: "Advance Salary Process", to: "/advance-salary-process" },
           { label: "Yearly Bonus Process", to: "/yearly-bonus-process" },
-        ]
+        ],
       },
-      { 
+      {
         label: "Benefits",
         subitems: [
           { label: "Master Data", to: "/payroll-benefits-master-data" },
@@ -275,13 +305,11 @@ const nav: NavItem[] = [
           { label: "Monthly Benefits", to: "/payroll-benefits-monthly" },
           { label: "Loan/Advance Req.", to: "/payroll-benefits-loan-req" },
           { label: "Loan Reschedule Sys.", to: "/payroll-benefits-loan-reschedule" },
-        ]
+        ],
       },
       {
         label: "Final Settlement",
-        subitems: [
-          { label: "Execute Final Settlement", to: "/payroll-final-settlement-execute" },
-        ]
+        subitems: [{ label: "Execute Final Settlement", to: "/payroll-final-settlement-execute" }],
       },
       {
         label: "Reports",
@@ -299,9 +327,9 @@ const nav: NavItem[] = [
           { label: "Earn Leave Pay Report", to: "#" },
           { label: "Allowance Payment", to: "#" },
           { label: "Final Settlement", to: "#" },
-        ]
+        ],
       },
-    ]
+    ],
   },
   {
     label: "Processes",
@@ -310,7 +338,7 @@ const nav: NavItem[] = [
       { label: "Payroll Processing", to: "/" },
       { label: "End of Month Close", to: "/" },
       { label: "Year End Process", to: "/" },
-    ]
+    ],
   },
   {
     label: "Compliance",
@@ -319,7 +347,7 @@ const nav: NavItem[] = [
       { label: "Statutory Compliance", to: "/" },
       { label: "Tax Reports", to: "/" },
       { label: "Audit Logs", to: "/" },
-    ]
+    ],
   },
   {
     label: "Idea Share",
@@ -327,7 +355,7 @@ const nav: NavItem[] = [
     subitems: [
       { label: "Idea Board", to: "/" },
       { label: "Innovation Submissions", to: "/" },
-    ]
+    ],
   },
   {
     label: "Event",
@@ -336,8 +364,8 @@ const nav: NavItem[] = [
       { label: "Upcoming Events", to: "/" },
       { label: "Holiday Celebrations", to: "/" },
       { label: "Team Building", to: "/" },
-    ]
-  }
+    ],
+  },
 ];
 
 export function Sidebar() {
@@ -347,18 +375,25 @@ export function Sidebar() {
 
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
-    nav.forEach(item => {
+    nav.forEach((item) => {
       if (item.subitems) {
-        const isChildActive = item.subitems.some(sub => {
+        const isChildActive = item.subitems.some((sub) => {
           if (sub.to && sub.to !== "/" && sub.to === currentPath) return true;
-          if (sub.subitems && sub.subitems.some(nested => nested.to !== "/" && nested.to === currentPath)) return true;
+          if (
+            sub.subitems &&
+            sub.subitems.some((nested) => nested.to !== "/" && nested.to === currentPath)
+          )
+            return true;
           return false;
         });
         if (isChildActive) {
           initial[item.label] = true;
         }
-        item.subitems.forEach(sub => {
-          if (sub.subitems && sub.subitems.some(nested => nested.to !== "/" && nested.to === currentPath)) {
+        item.subitems.forEach((sub) => {
+          if (
+            sub.subitems &&
+            sub.subitems.some((nested) => nested.to !== "/" && nested.to === currentPath)
+          ) {
             initial[sub.label] = true;
           }
         });
@@ -374,7 +409,7 @@ export function Sidebar() {
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          setOpenMenus(prev => ({ ...parsed, ...prev }));
+          setOpenMenus((prev) => ({ ...parsed, ...prev }));
         } catch (e) {}
       }
     }
@@ -418,29 +453,45 @@ export function Sidebar() {
           C
         </div>
         <div className="leading-tight">
-          <div className="font-extrabold tracking-tight text-[13px] text-sidebar-foreground">CRIPTON</div>
-          <div className="text-[9px] uppercase tracking-[0.25em] font-bold text-sidebar-primary">HRIS</div>
+          <div className="font-extrabold tracking-tight text-[13px] text-sidebar-foreground">
+            CRIPTON
+          </div>
+          <div className="text-[9px] uppercase tracking-[0.25em] font-bold text-sidebar-primary">
+            HRIS
+          </div>
         </div>
       </div>
-      <nav 
+      <nav
         ref={scrollRef}
         onScroll={handleScroll}
         className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-none"
       >
-        <div className="px-2.5 pb-2 text-[9px] font-extrabold uppercase tracking-widest text-sidebar-foreground/45">Workspace</div>
+        <div className="px-2.5 pb-2 text-[9px] font-extrabold uppercase tracking-widest text-sidebar-foreground/45">
+          Workspace
+        </div>
         {nav.map((item) => {
           const Icon = item.icon;
 
           // Determine parent active state dynamically
-          const isParentActive = item.to === currentPath || (item.subitems && item.subitems.some(sub => {
-            if (sub.to && sub.to !== "/" && sub.to === currentPath) return true;
-            if (sub.subitems && sub.subitems.some(nested => nested.to !== "/" && nested.to === currentPath)) return true;
-            return false;
-          }));
+          const isParentActive =
+            item.to === currentPath ||
+            (item.subitems &&
+              item.subitems.some((sub) => {
+                if (sub.to && sub.to !== "/" && sub.to === currentPath) return true;
+                if (
+                  sub.subitems &&
+                  sub.subitems.some((nested) => nested.to !== "/" && nested.to === currentPath)
+                )
+                  return true;
+                return false;
+              }));
 
           if (!item.subitems) {
             return (
-              <div key={item.label} className="border-b border-sidebar-border/30 last:border-0 pb-1">
+              <div
+                key={item.label}
+                className="border-b border-sidebar-border/30 last:border-0 pb-1"
+              >
                 <Link
                   to={item.to || "/"}
                   search={item.search}
@@ -463,7 +514,10 @@ export function Sidebar() {
 
           const isOpen = openMenus[item.label];
           return (
-            <div key={item.label} className="space-y-0.5 border-b border-sidebar-border/30 last:border-0 pb-1">
+            <div
+              key={item.label}
+              className="space-y-0.5 border-b border-sidebar-border/30 last:border-0 pb-1"
+            >
               <button
                 onClick={(e) => toggleMenu(item.label, e)}
                 className={[
@@ -476,7 +530,7 @@ export function Sidebar() {
                 <Icon
                   className={[
                     "size-3.5 transition-colors duration-300 group-hover:scale-110 group-hover:text-sidebar-primary",
-                    isParentActive ? "text-success font-black" : "text-sidebar-foreground/60"
+                    isParentActive ? "text-success font-black" : "text-sidebar-foreground/60",
                   ].join(" ")}
                 />
                 <span className="flex-1 truncate">{item.label}</span>
@@ -494,24 +548,35 @@ export function Sidebar() {
               <div
                 className={[
                   "overflow-hidden transition-all duration-300 space-y-0.5 pl-3.5 bg-sidebar-accent/25 rounded-xl",
-                  isOpen ? "max-h-[600px] opacity-100 py-1.5 mt-0.5" : "max-h-0 opacity-0"
+                  isOpen ? "max-h-[600px] opacity-100 py-1.5 mt-0.5" : "max-h-0 opacity-0",
                 ].join(" ")}
               >
                 {item.subitems.map((sub) => {
                   if (sub.subitems) {
                     const isSubOpen = openMenus[sub.label];
-                    const isSubActive = sub.subitems.some(nested => nested.to !== "/" && nested.to === currentPath);
+                    const isSubActive = sub.subitems.some(
+                      (nested) => nested.to !== "/" && nested.to === currentPath,
+                    );
                     return (
                       <div key={sub.label} className="space-y-0.5">
                         <button
                           onClick={(e) => toggleMenu(sub.label, e)}
                           className={[
                             "w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all duration-150",
-                            isSubActive ? "text-sidebar-foreground font-bold" : "text-sidebar-foreground/75 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                            isSubActive
+                              ? "text-sidebar-foreground font-bold"
+                              : "text-sidebar-foreground/75 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
                           ].join(" ")}
                         >
                           <div className="flex items-center gap-2">
-                            <File className={["size-3 shrink-0", isSubActive ? "text-primary font-black" : "text-sidebar-foreground/45"].join(" ")} />
+                            <File
+                              className={[
+                                "size-3 shrink-0",
+                                isSubActive
+                                  ? "text-primary font-black"
+                                  : "text-sidebar-foreground/45",
+                              ].join(" ")}
+                            />
                             <span className="truncate">{sub.label}</span>
                           </div>
                           {sub.count !== undefined && sub.count > 0 && (
@@ -528,7 +593,9 @@ export function Sidebar() {
                         <div
                           className={[
                             "overflow-hidden transition-all duration-300 space-y-0.5 pl-6",
-                            isSubOpen ? "max-h-[300px] opacity-100 py-0.5 mt-0.5" : "max-h-0 opacity-0"
+                            isSubOpen
+                              ? "max-h-[300px] opacity-100 py-0.5 mt-0.5"
+                              : "max-h-0 opacity-0",
                           ].join(" ")}
                         >
                           {sub.subitems.map((nested) => {
@@ -541,10 +608,15 @@ export function Sidebar() {
                                   "flex items-center gap-2 px-3 py-1.5 rounded-md text-[10px] font-medium transition-all duration-150",
                                   isNestedActive
                                     ? "bg-primary/10 text-primary font-bold shadow-2xs"
-                                    : "text-sidebar-foreground/60 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground"
+                                    : "text-sidebar-foreground/60 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground",
                                 ].join(" ")}
                               >
-                                <span className={["w-1.5 h-1.5 rounded-full shrink-0", isNestedActive ? "bg-primary" : "bg-sidebar-foreground/20"].join(" ")} />
+                                <span
+                                  className={[
+                                    "w-1.5 h-1.5 rounded-full shrink-0",
+                                    isNestedActive ? "bg-primary" : "bg-sidebar-foreground/20",
+                                  ].join(" ")}
+                                />
                                 <span className="truncate">{nested.label}</span>
                                 {nested.count !== undefined && nested.count > 0 && (
                                   <span className="ml-auto bg-amber-500/10 text-amber-600 text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none shadow-[0_0_8px_oklch(0.7_0.2_50/0.15)] border border-amber-500/20">
@@ -566,7 +638,7 @@ export function Sidebar() {
                     sub.to === currentPath &&
                     (!sub.search ||
                       Object.keys(sub.search).every(
-                        (key) => sub.search?.[key] === searchParams[key]
+                        (key) => sub.search?.[key] === searchParams[key],
                       ));
                   return (
                     <Link
@@ -577,10 +649,15 @@ export function Sidebar() {
                         "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all duration-150",
                         isSubActive
                           ? "bg-primary/10 text-primary font-bold shadow-2xs"
-                          : "text-sidebar-foreground/75 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                          : "text-sidebar-foreground/75 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
                       ].join(" ")}
                     >
-                      <File className={["size-3 shrink-0", isSubActive ? "text-primary font-black" : "text-sidebar-foreground/45"].join(" ")} />
+                      <File
+                        className={[
+                          "size-3 shrink-0",
+                          isSubActive ? "text-primary font-black" : "text-sidebar-foreground/45",
+                        ].join(" ")}
+                      />
                       <span className="truncate">{sub.label}</span>
                       {sub.count !== undefined && sub.count > 0 && (
                         <span className="ml-auto bg-amber-500/10 text-amber-600 text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none shadow-[0_0_8px_oklch(0.7_0.2_50/0.15)] border border-amber-500/20">
@@ -596,11 +673,19 @@ export function Sidebar() {
         })}
       </nav>
       <div className="p-3 border-t border-sidebar-border/60 space-y-1 bg-sidebar-accent/15">
-        <Link to="/configure-structure" className="group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-semibold text-sidebar-foreground/85 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all">
-          <Settings className="size-3.5 transition-transform duration-300 group-hover:rotate-45" /> Settings
+        <Link
+          to="/configure-structure"
+          className="group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-semibold text-sidebar-foreground/85 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all"
+        >
+          <Settings className="size-3.5 transition-transform duration-300 group-hover:rotate-45" />{" "}
+          Settings
         </Link>
-        <Link to="/" className="group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-semibold text-sidebar-foreground/85 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all">
-          <LifeBuoy className="size-3.5 transition-transform duration-300 group-hover:scale-110" /> Help & Support
+        <Link
+          to="/"
+          className="group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-semibold text-sidebar-foreground/85 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all"
+        >
+          <LifeBuoy className="size-3.5 transition-transform duration-300 group-hover:scale-110" />{" "}
+          Help & Support
         </Link>
         <button
           onClick={() => {
@@ -612,7 +697,9 @@ export function Sidebar() {
           className="w-full group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-semibold text-sidebar-foreground/85 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all text-left"
         >
           <LogOut className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 text-rose-500" />
-          <span className="text-rose-500/90 group-hover:text-rose-500 transition-colors">Log Out</span>
+          <span className="text-rose-500/90 group-hover:text-rose-500 transition-colors">
+            Log Out
+          </span>
         </button>
         <div className="mt-3 mx-1 p-3 rounded-xl bg-sidebar-accent/50 border border-sidebar-border hover:border-sidebar-border/80 transition-all duration-300">
           <div className="flex items-center gap-2.5">
@@ -623,8 +710,12 @@ export function Sidebar() {
               <span className="absolute -bottom-0.5 -right-0.5 size-2 rounded-full bg-success border-2 border-sidebar shadow-[0_0_6px_var(--success)]" />
             </div>
             <div className="min-w-0">
-              <div className="text-[11px] font-bold text-sidebar-foreground truncate">Tahmid Afsar Shapno</div>
-              <div className="text-[9px] text-sidebar-foreground/60 truncate font-semibold">HR Director</div>
+              <div className="text-[11px] font-bold text-sidebar-foreground truncate">
+                Tahmid Afsar Shapno
+              </div>
+              <div className="text-[9px] text-sidebar-foreground/60 truncate font-semibold">
+                HR Director
+              </div>
             </div>
           </div>
         </div>
@@ -632,4 +723,3 @@ export function Sidebar() {
     </aside>
   );
 }
-

@@ -4,8 +4,18 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { Badge } from "@/components/ui/badge";
 import {
-  Timer, ChevronRight, Search, Printer, CheckCircle2,
-  X, AlertCircle, ShieldCheck, Download, Eye, Clock, XCircle
+  Timer,
+  ChevronRight,
+  Search,
+  Printer,
+  CheckCircle2,
+  X,
+  AlertCircle,
+  ShieldCheck,
+  Download,
+  Eye,
+  Clock,
+  XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -69,8 +79,8 @@ function ApproveOvertimePage() {
   const stats = useMemo(() => {
     let totalReqHours = 0;
     let totalApprovedHours = 0;
-    
-    submittedRecords.forEach(r => {
+
+    submittedRecords.forEach((r) => {
       const hrs = r.reqOt + r.reqMot;
       totalReqHours += hrs;
       if (r.status === "Approved") totalApprovedHours += hrs;
@@ -85,12 +95,12 @@ function ApproveOvertimePage() {
       totalReqHours,
       approvedCost,
       remainingBudget,
-      pendingCount: submittedRecords.filter(r => r.status === "Pending").length
+      pendingCount: submittedRecords.filter((r) => r.status === "Pending").length,
     };
   }, [submittedRecords, budgetPool]);
 
   const filteredRecords = useMemo(() => {
-    return submittedRecords.filter(r => {
+    return submittedRecords.filter((r) => {
       if (selectedStatus !== "ALL" && r.status !== selectedStatus) return false;
       if (selectedDept !== "ALL" && r.department !== selectedDept) return false;
       if (dateFrom && r.otDate < dateFrom) return false;
@@ -109,14 +119,16 @@ function ApproveOvertimePage() {
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
-      setSelectedIds(new Set(filteredRecords.filter(r => r.status === "Pending").map(r => r.id)));
+      setSelectedIds(
+        new Set(filteredRecords.filter((r) => r.status === "Pending").map((r) => r.id)),
+      );
     } else {
       setSelectedIds(new Set());
     }
   };
 
   const handleSelectOne = (id: string) => {
-    setSelectedIds(prev => {
+    setSelectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
@@ -129,24 +141,33 @@ function ApproveOvertimePage() {
       const remarks = window.prompt("Please provide a reason for rejection:");
       if (remarks === null) return; // User cancelled
     }
-    setSubmittedRecords(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r));
+    setSubmittedRecords((prev) => prev.map((r) => (r.id === id ? { ...r, status: newStatus } : r)));
     toast.success(`Request ${newStatus.toLowerCase()} successfully!`);
   };
 
   const handleBulkApprove = () => {
     if (selectedIds.size === 0) return;
-    
+
     // Check Budget Warning
-    const totalPendingCost = submittedRecords.filter(r => selectedIds.has(r.id)).reduce((sum, r) => sum + (r.reqOt + r.reqMot) * 150, 0);
+    const totalPendingCost = submittedRecords
+      .filter((r) => selectedIds.has(r.id))
+      .reduce((sum, r) => sum + (r.reqOt + r.reqMot) * 150, 0);
     if (totalPendingCost > stats.remainingBudget) {
-      if (!confirm(`WARNING: Approving these ${selectedIds.size} requests will exceed the corporate OT budget by ৳ ${(totalPendingCost - stats.remainingBudget).toLocaleString()}! Proceed anyway?`)) {
+      if (
+        !confirm(
+          `WARNING: Approving these ${selectedIds.size} requests will exceed the corporate OT budget by ৳ ${(totalPendingCost - stats.remainingBudget).toLocaleString()}! Proceed anyway?`,
+        )
+      ) {
         return;
       }
     } else {
-      if (!confirm(`Are you sure you want to approve ${selectedIds.size} overtime requisitions?`)) return;
+      if (!confirm(`Are you sure you want to approve ${selectedIds.size} overtime requisitions?`))
+        return;
     }
 
-    setSubmittedRecords(prev => prev.map(r => selectedIds.has(r.id) ? { ...r, status: "Approved" } : r));
+    setSubmittedRecords((prev) =>
+      prev.map((r) => (selectedIds.has(r.id) ? { ...r, status: "Approved" } : r)),
+    );
     setSelectedIds(new Set());
     toast.success(`Successfully approved ${selectedIds.size} requests!`);
   };
@@ -155,7 +176,9 @@ function ApproveOvertimePage() {
     if (selectedIds.size === 0) return;
     const remarks = window.prompt("Please provide a reason for bulk rejection:");
     if (remarks === null) return;
-    setSubmittedRecords(prev => prev.map(r => selectedIds.has(r.id) ? { ...r, status: "Rejected" } : r));
+    setSubmittedRecords((prev) =>
+      prev.map((r) => (selectedIds.has(r.id) ? { ...r, status: "Rejected" } : r)),
+    );
     setSelectedIds(new Set());
     toast.success(`Successfully rejected ${selectedIds.size} requests!`);
   };
@@ -165,16 +188,33 @@ function ApproveOvertimePage() {
       alert("No records to export.");
       return;
     }
-    const headers = ["Req ID", "Employee Name", "Employee ID", "Department", "OT Date", "Requested Hours", "Status"];
-    const rows = filteredRecords.map(r => [
-      r.id, r.employeeName, r.employeeId, r.department, r.otDate, r.reqOt + r.reqMot, r.status
+    const headers = [
+      "Req ID",
+      "Employee Name",
+      "Employee ID",
+      "Department",
+      "OT Date",
+      "Requested Hours",
+      "Status",
+    ];
+    const rows = filteredRecords.map((r) => [
+      r.id,
+      r.employeeName,
+      r.employeeId,
+      r.department,
+      r.otDate,
+      r.reqOt + r.reqMot,
+      r.status,
     ]);
-    const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+    const csvContent = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", `ot_approval_report_${new Date().toISOString().split("T")[0]}.csv`);
+    link.setAttribute(
+      "download",
+      `ot_approval_report_${new Date().toISOString().split("T")[0]}.csv`,
+    );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -191,11 +231,15 @@ function ApproveOvertimePage() {
           <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-lg px-5 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0 print:hidden">
             <div>
               <div className="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">
-                <Link to="/" className="hover:text-[#2563eb] transition-colors">Home</Link>
+                <Link to="/" className="hover:text-[#2563eb] transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-2" />
                 <span className="hover:text-[#2563eb] transition-colors">HR Approvals</span>
                 <ChevronRight className="size-2" />
-                <span className="text-slate-600 dark:text-slate-300 font-semibold">OT Approvals</span>
+                <span className="text-slate-600 dark:text-slate-300 font-semibold">
+                  OT Approvals
+                </span>
               </div>
               <h1 className="text-lg font-bold tracking-tight text-slate-800 dark:text-slate-100 flex items-center gap-2">
                 <ShieldCheck className="size-5 text-emerald-600" />
@@ -207,24 +251,42 @@ function ApproveOvertimePage() {
           {/* KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3 shrink-0 print:hidden">
             <div className="bg-white dark:bg-slate-900 border border-[#1e88e5]/20 bg-[#1e88e5]/5 rounded-xl p-3 shadow-sm space-y-1">
-              <span className="text-[9px] font-black tracking-wider uppercase opacity-75 text-[#1e88e5]">Global OT Budget</span>
-              <div className="text-xl font-black text-[#1e88e5]">৳ {stats.budgetPool.toLocaleString()}</div>
-              <div className="text-[9px] font-semibold opacity-60 text-[#1e88e5]">Total Allocated Corporate Pool</div>
+              <span className="text-[9px] font-black tracking-wider uppercase opacity-75 text-[#1e88e5]">
+                Global OT Budget
+              </span>
+              <div className="text-xl font-black text-[#1e88e5]">
+                ৳ {stats.budgetPool.toLocaleString()}
+              </div>
+              <div className="text-[9px] font-semibold opacity-60 text-[#1e88e5]">
+                Total Allocated Corporate Pool
+              </div>
             </div>
-            <div className={`bg-white dark:bg-slate-900 border rounded-xl p-3 shadow-sm space-y-1 ${stats.remainingBudget < 10000 ? 'border-rose-500/20 bg-rose-500/5 text-rose-600' : 'border-indigo-500/10 bg-indigo-500/5 text-indigo-600'}`}>
-              <span className="text-[9px] font-black tracking-wider uppercase opacity-75">Remaining Balance</span>
+            <div
+              className={`bg-white dark:bg-slate-900 border rounded-xl p-3 shadow-sm space-y-1 ${stats.remainingBudget < 10000 ? "border-rose-500/20 bg-rose-500/5 text-rose-600" : "border-indigo-500/10 bg-indigo-500/5 text-indigo-600"}`}
+            >
+              <span className="text-[9px] font-black tracking-wider uppercase opacity-75">
+                Remaining Balance
+              </span>
               <div className="text-xl font-black">৳ {stats.remainingBudget.toLocaleString()}</div>
               <div className="text-[9px] font-semibold opacity-60">Available Budget for new OT</div>
             </div>
             <div className="bg-white dark:bg-slate-900 border border-emerald-500/10 bg-emerald-500/5 rounded-xl p-3 shadow-sm space-y-1 text-emerald-600">
-              <span className="text-[9px] font-black tracking-wider uppercase opacity-75">Approved Liability</span>
+              <span className="text-[9px] font-black tracking-wider uppercase opacity-75">
+                Approved Liability
+              </span>
               <div className="text-xl font-black">৳ {stats.approvedCost.toLocaleString()}</div>
-              <div className="text-[9px] font-semibold opacity-60">{stats.totalApprovedHours} hours approved</div>
+              <div className="text-[9px] font-semibold opacity-60">
+                {stats.totalApprovedHours} hours approved
+              </div>
             </div>
             <div className="bg-white dark:bg-slate-900 border border-amber-500/10 bg-amber-500/5 rounded-xl p-3 shadow-sm space-y-1 text-amber-600">
-              <span className="text-[9px] font-black tracking-wider uppercase opacity-75">Pending Action</span>
+              <span className="text-[9px] font-black tracking-wider uppercase opacity-75">
+                Pending Action
+              </span>
               <div className="text-xl font-black">{stats.pendingCount} Requests</div>
-              <div className="text-[9px] font-semibold opacity-60">Awaiting Management Approval</div>
+              <div className="text-[9px] font-semibold opacity-60">
+                Awaiting Management Approval
+              </div>
             </div>
           </div>
 
@@ -267,10 +329,16 @@ function ApproveOvertimePage() {
               </div>
 
               <div className="flex items-center gap-1.5 shrink-0">
-                <button onClick={handleExportCSV} className="h-8.5 px-3 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 transition text-emerald-600">
+                <button
+                  onClick={handleExportCSV}
+                  className="h-8.5 px-3 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 transition text-emerald-600"
+                >
                   <Download className="size-3.5" /> Export
                 </button>
-                <button onClick={() => window.print()} className="h-8.5 px-3 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 transition text-[#2563eb]">
+                <button
+                  onClick={() => window.print()}
+                  className="h-8.5 px-3 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 transition text-[#2563eb]"
+                >
                   <Printer className="size-3.5" /> Print
                 </button>
               </div>
@@ -278,13 +346,33 @@ function ApproveOvertimePage() {
 
             <div className="flex items-center gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2">
-                <label className="text-[9px] font-black text-slate-400 uppercase">Date Range:</label>
-                <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="h-7.5 px-2 rounded bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[11px] outline-none focus:border-[#2563eb]" />
+                <label className="text-[9px] font-black text-slate-400 uppercase">
+                  Date Range:
+                </label>
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  className="h-7.5 px-2 rounded bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[11px] outline-none focus:border-[#2563eb]"
+                />
                 <span className="text-slate-400">-</span>
-                <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="h-7.5 px-2 rounded bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[11px] outline-none focus:border-[#2563eb]" />
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  className="h-7.5 px-2 rounded bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[11px] outline-none focus:border-[#2563eb]"
+                />
               </div>
               {(dateFrom || dateTo) && (
-                <button onClick={() => { setDateFrom(""); setDateTo(""); }} className="text-[10px] text-rose-500 font-bold hover:underline">Clear Dates</button>
+                <button
+                  onClick={() => {
+                    setDateFrom("");
+                    setDateTo("");
+                  }}
+                  className="text-[10px] text-rose-500 font-bold hover:underline"
+                >
+                  Clear Dates
+                </button>
               )}
             </div>
           </div>
@@ -294,16 +382,27 @@ function ApproveOvertimePage() {
             {selectedIds.size > 0 && (
               <div className="p-3 bg-[#2563eb]/5 border-b border-[#2563eb]/10 flex items-center justify-between animate-in fade-in slide-in-from-top-2">
                 <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="bg-[#2563eb]/20 text-[#2563eb] hover:bg-[#2563eb]/20">
+                  <Badge
+                    variant="secondary"
+                    className="bg-[#2563eb]/20 text-[#2563eb] hover:bg-[#2563eb]/20"
+                  >
                     {selectedIds.size} Selected
                   </Badge>
-                  <span className="text-[11px] font-medium text-slate-500">records ready for action</span>
+                  <span className="text-[11px] font-medium text-slate-500">
+                    records ready for action
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={handleBulkReject} className="h-7.5 px-3 border border-rose-200 text-rose-600 hover:bg-rose-50 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all">
+                  <button
+                    onClick={handleBulkReject}
+                    className="h-7.5 px-3 border border-rose-200 text-rose-600 hover:bg-rose-50 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all"
+                  >
                     <XCircle className="size-3.5" /> Reject Selected
                   </button>
-                  <button onClick={handleBulkApprove} className="h-7.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all shadow-sm">
+                  <button
+                    onClick={handleBulkApprove}
+                    className="h-7.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all shadow-sm"
+                  >
                     <CheckCircle2 className="size-3.5" /> Approve Selected
                   </button>
                 </div>
@@ -316,42 +415,65 @@ function ApproveOvertimePage() {
                   <tr className="bg-slate-50 dark:bg-slate-950">
                     {selectedStatus === "Pending" && (
                       <th className="px-4 py-3 w-[50px] text-center border-r border-slate-200 dark:border-slate-800">
-                        <input 
-                          type="checkbox" 
-                          className="rounded border-slate-300 text-[#2563eb] focus:ring-[#2563eb]" 
+                        <input
+                          type="checkbox"
+                          className="rounded border-slate-300 text-[#2563eb] focus:ring-[#2563eb]"
                           onChange={handleSelectAll}
-                          checked={selectedIds.size === filteredRecords.filter(r => r.status === "Pending").length && selectedIds.size > 0}
+                          checked={
+                            selectedIds.size ===
+                              filteredRecords.filter((r) => r.status === "Pending").length &&
+                            selectedIds.size > 0
+                          }
                         />
                       </th>
                     )}
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest border-r border-slate-200 dark:border-slate-800 w-[100px]">Req ID</th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest border-r border-slate-200 dark:border-slate-800">Employee Details</th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center border-r border-slate-200 dark:border-slate-800 w-[120px]">OT Date</th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center border-r border-slate-200 dark:border-slate-800 w-[150px]">Requested Hours</th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center border-r border-slate-200 dark:border-slate-800 w-[120px]">Status</th>
-                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center w-[100px] print:hidden">Actions</th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest border-r border-slate-200 dark:border-slate-800 w-[100px]">
+                      Req ID
+                    </th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest border-r border-slate-200 dark:border-slate-800">
+                      Employee Details
+                    </th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center border-r border-slate-200 dark:border-slate-800 w-[120px]">
+                      OT Date
+                    </th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center border-r border-slate-200 dark:border-slate-800 w-[150px]">
+                      Requested Hours
+                    </th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center border-r border-slate-200 dark:border-slate-800 w-[120px]">
+                      Status
+                    </th>
+                    <th className="px-4 py-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center w-[100px] print:hidden">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 border-b border-slate-100 dark:divide-slate-800 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 font-semibold">
                   {filteredRecords.map((row) => {
                     const isChecked = selectedIds.has(row.id);
                     return (
-                      <tr key={row.id} className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${isChecked ? 'bg-[#2563eb]/5 dark:bg-[#2563eb]/10' : ''}`}>
+                      <tr
+                        key={row.id}
+                        className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${isChecked ? "bg-[#2563eb]/5 dark:bg-[#2563eb]/10" : ""}`}
+                      >
                         {selectedStatus === "Pending" && (
                           <td className="px-4 py-3 text-center border-r border-slate-200 dark:border-slate-800">
                             {row.status === "Pending" && (
-                              <input 
-                                type="checkbox" 
-                                className="rounded border-slate-300 text-[#2563eb] focus:ring-[#2563eb]" 
+                              <input
+                                type="checkbox"
+                                className="rounded border-slate-300 text-[#2563eb] focus:ring-[#2563eb]"
                                 checked={isChecked}
                                 onChange={() => handleSelectOne(row.id)}
                               />
                             )}
                           </td>
                         )}
-                        <td className="px-4 py-3 font-mono font-bold text-slate-500 border-r border-slate-200 dark:border-slate-800">{row.id}</td>
+                        <td className="px-4 py-3 font-mono font-bold text-slate-500 border-r border-slate-200 dark:border-slate-800">
+                          {row.id}
+                        </td>
                         <td className="px-4 py-3 border-r border-slate-200 dark:border-slate-800">
-                          <div className="font-bold text-slate-800 dark:text-slate-100">{row.employeeName}</div>
+                          <div className="font-bold text-slate-800 dark:text-slate-100">
+                            {row.employeeName}
+                          </div>
                           <div className="text-[10px] text-slate-500 font-mono mt-0.5">
                             {row.employeeId} • {row.department}
                           </div>
@@ -360,7 +482,9 @@ function ApproveOvertimePage() {
                           {row.otDate}
                         </td>
                         <td className="px-4 py-3 text-center border-r border-slate-200 dark:border-slate-800">
-                          <div className="font-black text-slate-800 dark:text-slate-100 text-sm">{row.reqOt + row.reqMot} hrs</div>
+                          <div className="font-black text-slate-800 dark:text-slate-100 text-sm">
+                            {row.reqOt + row.reqMot} hrs
+                          </div>
                           <div className="text-[9px] text-slate-500 font-mono mt-0.5">
                             (OT: {row.reqOt} | MOT: {row.reqMot})
                           </div>
@@ -385,7 +509,10 @@ function ApproveOvertimePage() {
                         <td className="px-4 py-3 text-center print:hidden">
                           <div className="flex items-center justify-center gap-1.5">
                             <button
-                              onClick={(e) => { e.stopPropagation(); setViewDetailsRecord(row); }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setViewDetailsRecord(row);
+                              }}
                               className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-[#2563eb] rounded transition"
                               title="View Details"
                             >
@@ -393,15 +520,21 @@ function ApproveOvertimePage() {
                             </button>
                             {row.status === "Pending" && (
                               <>
-                                <button 
-                                  onClick={(e) => { e.stopPropagation(); handleUpdateStatus(row.id, "Approved"); }}
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleUpdateStatus(row.id, "Approved");
+                                  }}
                                   className="p-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 text-emerald-500 rounded transition"
                                   title="Approve"
                                 >
                                   <CheckCircle2 className="size-3.5" />
                                 </button>
-                                <button 
-                                  onClick={(e) => { e.stopPropagation(); handleUpdateStatus(row.id, "Rejected"); }}
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleUpdateStatus(row.id, "Rejected");
+                                  }}
                                   className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-500/10 text-rose-500 rounded transition"
                                   title="Reject"
                                 >
@@ -428,9 +561,15 @@ function ApproveOvertimePage() {
             <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 px-5 py-2.5 border-t border-slate-100 dark:border-slate-800 shrink-0 print:hidden">
               <div>Showing {filteredRecords.length} records</div>
               <div className="flex items-center gap-1.5">
-                <button className="text-slate-400 hover:text-slate-600 transition-colors" disabled>Previous</button>
-                <button className="size-5.5 rounded bg-slate-700 dark:bg-slate-200 text-white dark:text-slate-900 flex items-center justify-center shadow-sm text-[9.5px]">1</button>
-                <button className="text-slate-400 hover:text-slate-600 transition-colors" disabled>Next</button>
+                <button className="text-slate-400 hover:text-slate-600 transition-colors" disabled>
+                  Previous
+                </button>
+                <button className="size-5.5 rounded bg-slate-700 dark:bg-slate-200 text-white dark:text-slate-900 flex items-center justify-center shadow-sm text-[9.5px]">
+                  1
+                </button>
+                <button className="text-slate-400 hover:text-slate-600 transition-colors" disabled>
+                  Next
+                </button>
               </div>
             </div>
           </div>
@@ -446,7 +585,7 @@ function ApproveOvertimePage() {
                 <Timer className="size-4.5 text-emerald-600" />
                 Overtime Justification
               </h3>
-              <button 
+              <button
                 onClick={() => setViewDetailsRecord(null)}
                 className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 rounded-lg transition"
               >
@@ -455,22 +594,36 @@ function ApproveOvertimePage() {
             </div>
             <div className="p-5 space-y-5">
               <div>
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Employee</label>
-                <div className="font-bold text-sm text-slate-800 dark:text-slate-100">{viewDetailsRecord.employeeName}</div>
-                <div className="text-xs text-slate-500 font-mono mt-0.5">{viewDetailsRecord.employeeId} • {viewDetailsRecord.department}</div>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+                  Employee
+                </label>
+                <div className="font-bold text-sm text-slate-800 dark:text-slate-100">
+                  {viewDetailsRecord.employeeName}
+                </div>
+                <div className="text-xs text-slate-500 font-mono mt-0.5">
+                  {viewDetailsRecord.employeeId} • {viewDetailsRecord.department}
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">OT Date</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+                    OT Date
+                  </label>
                   <div className="font-mono text-sm font-bold">{viewDetailsRecord.otDate}</div>
                 </div>
                 <div>
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Total Hours</label>
-                  <div className="font-black text-emerald-600 text-sm">{viewDetailsRecord.reqOt + viewDetailsRecord.reqMot} hrs</div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+                    Total Hours
+                  </label>
+                  <div className="font-black text-emerald-600 text-sm">
+                    {viewDetailsRecord.reqOt + viewDetailsRecord.reqMot} hrs
+                  </div>
                 </div>
               </div>
               <div className="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Manager's Reason</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">
+                  Manager's Reason
+                </label>
                 <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
                   {viewDetailsRecord.reason || "No specific reason provided."}
                 </p>

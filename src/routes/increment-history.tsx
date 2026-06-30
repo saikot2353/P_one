@@ -4,17 +4,39 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { rawIncrementRecords, RawIncrementRecord } from "./-increment-history-data";
 import {
-  Search, FileSpreadsheet, Printer, FileDown, Plus, Info,
-  Sparkles, X, Eye, ArrowUpDown, Filter, ChevronDown, ChevronRight, Check,
-  LayoutGrid, SlidersHorizontal, EyeOff, FileText, FileClock,
-  TrendingUp, DollarSign, UserCog
+  Search,
+  FileSpreadsheet,
+  Printer,
+  FileDown,
+  Plus,
+  Info,
+  Sparkles,
+  X,
+  Eye,
+  ArrowUpDown,
+  Filter,
+  ChevronDown,
+  ChevronRight,
+  Check,
+  LayoutGrid,
+  SlidersHorizontal,
+  EyeOff,
+  FileText,
+  FileClock,
+  TrendingUp,
+  DollarSign,
+  UserCog,
 } from "lucide-react";
 
 export const Route = createFileRoute("/increment-history")({
   head: () => ({
     meta: [
       { title: "Salary Increment History — CRIPTON HRIS" },
-      { name: "description", content: "Professional query-based historical database of salary increments featuring advanced column configurator toggles and sticky fixed left datagrid." },
+      {
+        name: "description",
+        content:
+          "Professional query-based historical database of salary increments featuring advanced column configurator toggles and sticky fixed left datagrid.",
+      },
     ],
   }),
   component: IncrementHistoryPage,
@@ -78,7 +100,9 @@ function IncrementHistoryPage() {
   // Sorting
   const [sortField, setSortField] = useState<keyof RawIncrementRecord | "">("");
   const [sortAsc, setSortAsc] = useState(true);
-  const [activeReportsTab, setActiveReportsTab] = useState<"history" | "summary" | "reports">("history");
+  const [activeReportsTab, setActiveReportsTab] = useState<"history" | "summary" | "reports">(
+    "history",
+  );
 
   // Trigger search locking
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -94,15 +118,16 @@ function IncrementHistoryPage() {
 
   // Dynamic values extracted from dataset to populate filters beautifully
   const departmentsList = useMemo(() => {
-    const depts = new Set(rawIncrementRecords.map(r => r.department));
+    const depts = new Set(rawIncrementRecords.map((r) => r.department));
     return Array.from(depts).sort();
   }, []);
 
   const sectionsList = useMemo(() => {
-    const filteredDepts = department === "All Departments"
-      ? rawIncrementRecords
-      : rawIncrementRecords.filter(r => r.department === department);
-    const sections = new Set(filteredDepts.map(r => r.section));
+    const filteredDepts =
+      department === "All Departments"
+        ? rawIncrementRecords
+        : rawIncrementRecords.filter((r) => r.department === department);
+    const sections = new Set(filteredDepts.map((r) => r.section));
     return Array.from(sections).sort();
   }, [department]);
 
@@ -140,22 +165,20 @@ function IncrementHistoryPage() {
     if (selectedEmpIds.length === filteredRecords.length) {
       setSelectedEmpIds([]);
     } else {
-      setSelectedEmpIds(filteredRecords.map(r => r.empId));
+      setSelectedEmpIds(filteredRecords.map((r) => r.empId));
     }
   };
 
   const toggleSelectEmp = (empId: string) => {
-    setSelectedEmpIds(prev =>
-      prev.includes(empId)
-        ? prev.filter(item => item !== empId)
-        : [...prev, empId]
+    setSelectedEmpIds((prev) =>
+      prev.includes(empId) ? prev.filter((item) => item !== empId) : [...prev, empId],
     );
   };
 
   const toggleColumn = (key: keyof typeof defaultColumns) => {
-    setVisibleCols(prev => ({
+    setVisibleCols((prev) => ({
       ...prev,
-      [key]: !prev[key]
+      [key]: !prev[key],
     }));
   };
 
@@ -178,23 +201,24 @@ function IncrementHistoryPage() {
 
     // 1. Department Filter
     if (appliedFilters.department !== "All Departments") {
-      list = list.filter(r => r.department === appliedFilters.department);
+      list = list.filter((r) => r.department === appliedFilters.department);
     }
 
     // 2. Section Filter
     if (appliedFilters.section !== "ALL") {
-      list = list.filter(r => r.section === appliedFilters.section);
+      list = list.filter((r) => r.section === appliedFilters.section);
     }
 
     // 3. Text Search (Matches ID, Name, Designation, Section)
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      list = list.filter(r =>
-        r.empId.toLowerCase().includes(q) ||
-        r.empName.toLowerCase().includes(q) ||
-        r.designation.toLowerCase().includes(q) ||
-        r.section.toLowerCase().includes(q) ||
-        r.department.toLowerCase().includes(q)
+      list = list.filter(
+        (r) =>
+          r.empId.toLowerCase().includes(q) ||
+          r.empName.toLowerCase().includes(q) ||
+          r.designation.toLowerCase().includes(q) ||
+          r.section.toLowerCase().includes(q) ||
+          r.department.toLowerCase().includes(q),
       );
     }
 
@@ -222,13 +246,17 @@ function IncrementHistoryPage() {
   }, []);
 
   const totalIncrementedIn2025 = useMemo(() => {
-    return rawIncrementRecords.filter(r => r.inc2025 !== "0" && r.inc2025 !== "0(0)").length;
+    return rawIncrementRecords.filter((r) => r.inc2025 !== "0" && r.inc2025 !== "0(0)").length;
   }, []);
 
   // Helper cell renderers
   const renderIncrementCell = (val: string) => {
     if (!val || val === "0" || val === "0.00") {
-      return <span className="text-muted-foreground/35 dark:text-slate-700 font-mono text-[10.5px]">—</span>;
+      return (
+        <span className="text-muted-foreground/35 dark:text-slate-700 font-mono text-[10.5px]">
+          —
+        </span>
+      );
     }
 
     // Check for Promotion indicator "(P)"
@@ -237,15 +265,26 @@ function IncrementHistoryPage() {
       const amount = parseInt(pMatch[1]).toLocaleString();
       return (
         <div className="flex items-center justify-center gap-0.5">
-          <span className="font-mono font-bold text-amber-600 dark:text-amber-400 text-[10.5px]">{amount}</span>
-          <span className="text-[7.5px] px-1 bg-amber-500/15 text-amber-600 border border-amber-500/20 rounded font-black select-none cursor-default" title="Promotion Granted">P</span>
+          <span className="font-mono font-bold text-amber-600 dark:text-amber-400 text-[10.5px]">
+            {amount}
+          </span>
+          <span
+            className="text-[7.5px] px-1 bg-amber-500/15 text-amber-600 border border-amber-500/20 rounded font-black select-none cursor-default"
+            title="Promotion Granted"
+          >
+            P
+          </span>
         </div>
       );
     }
 
     const numVal = parseInt(val);
     if (!isNaN(numVal)) {
-      return <span className="font-mono font-bold text-slate-700 dark:text-slate-300 text-[10.5px]">{numVal.toLocaleString()}</span>;
+      return (
+        <span className="font-mono font-bold text-slate-700 dark:text-slate-300 text-[10.5px]">
+          {numVal.toLocaleString()}
+        </span>
+      );
     }
 
     return <span className="font-mono font-semibold text-[10.5px]">{val}</span>;
@@ -253,7 +292,11 @@ function IncrementHistoryPage() {
 
   const renderTotalCell = (val: string) => {
     if (!val || val === "0(0)") {
-      return <span className="text-muted-foreground/30 dark:text-slate-700 font-mono text-[10.5px]">0</span>;
+      return (
+        <span className="text-muted-foreground/30 dark:text-slate-700 font-mono text-[10.5px]">
+          0
+        </span>
+      );
     }
 
     // Match structure e.g. "37000(1)" or "6000(0)"
@@ -265,7 +308,10 @@ function IncrementHistoryPage() {
         <div className="flex items-center justify-center gap-1">
           <span className="font-mono font-black text-primary text-[10.5px]">{amount}</span>
           {count > 0 && (
-            <span className="text-[7.5px] px-1 bg-primary/10 text-primary border border-primary/20 rounded font-black select-none" title={`${count} Promotion(s)`}>
+            <span
+              className="text-[7.5px] px-1 bg-primary/10 text-primary border border-primary/20 rounded font-black select-none"
+              title={`${count} Promotion(s)`}
+            >
               {count}
             </span>
           )}
@@ -280,7 +326,9 @@ function IncrementHistoryPage() {
   };
 
   const triggerBulkAction = (actionName: string) => {
-    alert(`Bulk Operation [${actionName}] applied successfully to ${selectedEmpIds.length} employees!`);
+    alert(
+      `Bulk Operation [${actionName}] applied successfully to ${selectedEmpIds.length} employees!`,
+    );
     setSelectedEmpIds([]);
   };
 
@@ -291,12 +339,13 @@ function IncrementHistoryPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 lg:p-8 space-y-6 print:p-0">
-
           {/* Breadcrumb and Page Header */}
           <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-2.5" />
                 <span className="hover:text-primary transition-colors">Human Resource</span>
                 <ChevronRight className="size-2.5" />
@@ -304,23 +353,37 @@ function IncrementHistoryPage() {
               </div>
               <div className="flex items-center gap-3">
                 <div className="size-2.5 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]" />
-                <h1 className="text-xl font-extrabold tracking-tight text-foreground">Increment HistoryList</h1>
+                <h1 className="text-xl font-extrabold tracking-tight text-foreground">
+                  Increment HistoryList
+                </h1>
               </div>
             </div>
 
             {/* Quick Metrics Bar (replicated from personnel list) */}
             <div className="flex items-center gap-3 flex-wrap">
               <div className="bg-card border border-border/70 rounded-xl px-3.5 py-1.5 shadow-2xs hover:shadow-xs transition duration-200">
-                <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80">Total Staff</div>
-                <div className="text-sm font-extrabold text-foreground mt-0.5">{rawIncrementRecords.length}</div>
+                <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80">
+                  Total Staff
+                </div>
+                <div className="text-sm font-extrabold text-foreground mt-0.5">
+                  {rawIncrementRecords.length}
+                </div>
               </div>
               <div className="bg-[oklch(0.98_0.02_160)] dark:bg-[oklch(0.20_0.035_165)] border border-[oklch(0.62_0.16_155/0.2)] rounded-xl px-3.5 py-1.5 shadow-2xs">
-                <div className="text-[9px] font-bold uppercase tracking-wider text-success/90">Incremented(2025)</div>
-                <div className="text-sm font-extrabold text-success mt-0.5">{totalIncrementedIn2025}</div>
+                <div className="text-[9px] font-bold uppercase tracking-wider text-success/90">
+                  Incremented(2025)
+                </div>
+                <div className="text-sm font-extrabold text-success mt-0.5">
+                  {totalIncrementedIn2025}
+                </div>
               </div>
               <div className="bg-card border border-border/70 rounded-xl px-3.5 py-1.5 shadow-2xs">
-                <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80">Total Gross Budget</div>
-                <div className="text-sm font-extrabold text-foreground mt-0.5">৳{(totalGrossPayroll / 100000).toFixed(1)}L</div>
+                <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80">
+                  Total Gross Budget
+                </div>
+                <div className="text-sm font-extrabold text-foreground mt-0.5">
+                  ৳{(totalGrossPayroll / 100000).toFixed(1)}L
+                </div>
               </div>
               <Link
                 to="/propose-increment"
@@ -367,24 +430,35 @@ function IncrementHistoryPage() {
                   >
                     <SlidersHorizontal className="size-4 text-primary" />
                     <span>Search Parameters & Filters</span>
-                    <ChevronDown className={`size-3.5 text-muted-foreground/60 transition-transform duration-300 ${isFilterCollapsed ? "-rotate-90" : ""}`} />
+                    <ChevronDown
+                      className={`size-3.5 text-muted-foreground/60 transition-transform duration-300 ${isFilterCollapsed ? "-rotate-90" : ""}`}
+                    />
                   </button>
-                  {(!isFilterCollapsed && (department !== "All Departments" || section !== "ALL" || empType !== "ALL")) && (
-                    <button
-                      onClick={resetFilters}
-                      className="text-[10px] font-bold text-destructive hover:underline"
-                    >
-                      Clear All Filters
-                    </button>
-                  )}
+                  {!isFilterCollapsed &&
+                    (department !== "All Departments" ||
+                      section !== "ALL" ||
+                      empType !== "ALL") && (
+                      <button
+                        onClick={resetFilters}
+                        className="text-[10px] font-bold text-destructive hover:underline"
+                      >
+                        Clear All Filters
+                      </button>
+                    )}
                 </div>
 
-                <div className={`transition-all duration-300 overflow-hidden ${isFilterCollapsed ? "max-h-0 opacity-0" : "max-h-[500px] opacity-100 p-5"}`}>
-                  <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-
+                <div
+                  className={`transition-all duration-300 overflow-hidden ${isFilterCollapsed ? "max-h-0 opacity-0" : "max-h-[500px] opacity-100 p-5"}`}
+                >
+                  <form
+                    onSubmit={handleSearchSubmit}
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4"
+                  >
                     {/* Company select */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Company</label>
+                      <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                        Company
+                      </label>
                       <div className="relative">
                         <select
                           value={company}
@@ -392,7 +466,9 @@ function IncrementHistoryPage() {
                           className="w-full h-9.5 pl-3 pr-8 rounded-xl bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition-all appearance-none font-semibold text-foreground/80 cursor-pointer"
                         >
                           <option value="Pakiza Software Limited">Pakiza Software Limited</option>
-                          <option value="Pakiza Software Limited (PIL-Operation)">Pakiza Software Limited (PIL-Operation)</option>
+                          <option value="Pakiza Software Limited (PIL-Operation)">
+                            Pakiza Software Limited (PIL-Operation)
+                          </option>
                         </select>
                         <ChevronDown className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
                       </div>
@@ -400,7 +476,9 @@ function IncrementHistoryPage() {
 
                     {/* Area select */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Area</label>
+                      <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                        Area
+                      </label>
                       <div className="relative">
                         <select
                           value={area}
@@ -416,7 +494,9 @@ function IncrementHistoryPage() {
 
                     {/* Employee Type select */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Employee Type</label>
+                      <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                        Employee Type
+                      </label>
                       <div className="relative">
                         <select
                           value={empType}
@@ -433,7 +513,9 @@ function IncrementHistoryPage() {
 
                     {/* Department select */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Department</label>
+                      <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                        Department
+                      </label>
                       <div className="relative">
                         <select
                           value={department}
@@ -444,8 +526,10 @@ function IncrementHistoryPage() {
                           className="w-full h-9.5 pl-3 pr-8 rounded-xl bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition-all appearance-none font-semibold text-foreground/80 cursor-pointer"
                         >
                           <option value="All Departments">All Departments</option>
-                          {departmentsList.map(d => (
-                            <option key={d} value={d}>{d}</option>
+                          {departmentsList.map((d) => (
+                            <option key={d} value={d}>
+                              {d}
+                            </option>
                           ))}
                         </select>
                         <ChevronDown className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
@@ -454,7 +538,9 @@ function IncrementHistoryPage() {
 
                     {/* Section select */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Section</label>
+                      <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                        Section
+                      </label>
                       <div className="relative">
                         <select
                           value={section}
@@ -462,8 +548,10 @@ function IncrementHistoryPage() {
                           className="w-full h-9.5 pl-3 pr-8 rounded-xl bg-muted border border-border/30 focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none text-xs transition-all appearance-none font-semibold text-foreground/80 cursor-pointer"
                         >
                           <option value="ALL">ALL</option>
-                          {sectionsList.map(s => (
-                            <option key={s} value={s}>{s}</option>
+                          {sectionsList.map((s) => (
+                            <option key={s} value={s}>
+                              {s}
+                            </option>
                           ))}
                         </select>
                         <ChevronDown className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
@@ -487,7 +575,6 @@ function IncrementHistoryPage() {
                         <span>Search</span>
                       </button>
                     </div>
-
                   </form>
                 </div>
               </div>
@@ -500,7 +587,9 @@ function IncrementHistoryPage() {
                       <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-primary/10 text-primary">
                         {selectedEmpIds.length} Selected
                       </span>
-                      <h3 className="text-xs font-extrabold text-foreground tracking-tight">Active Increment History Operations Console</h3>
+                      <h3 className="text-xs font-extrabold text-foreground tracking-tight">
+                        Active Increment History Operations Console
+                      </h3>
                     </div>
                     <button
                       onClick={() => setSelectedEmpIds([])}
@@ -516,21 +605,27 @@ function IncrementHistoryPage() {
                       className="flex flex-col items-center justify-center p-3 rounded-xl border border-border/40 bg-card text-center gap-1.5 transition-all hover:scale-102 hover:shadow-2xs text-blue-500 hover:bg-blue-500/5 hover:border-blue-500/30"
                     >
                       <Printer className="size-4.5" />
-                      <span className="text-[10px] font-bold tracking-tight whitespace-nowrap leading-none">Print Selected</span>
+                      <span className="text-[10px] font-bold tracking-tight whitespace-nowrap leading-none">
+                        Print Selected
+                      </span>
                     </button>
                     <button
                       onClick={() => triggerBulkAction("Bulk Export PDF Register")}
                       className="flex flex-col items-center justify-center p-3 rounded-xl border border-border/40 bg-card text-center gap-1.5 transition-all hover:scale-102 hover:shadow-2xs text-rose-500 hover:bg-rose-500/5 hover:border-rose-500/30"
                     >
                       <FileClock className="size-4.5" />
-                      <span className="text-[10px] font-bold tracking-tight whitespace-nowrap leading-none">PDF Register</span>
+                      <span className="text-[10px] font-bold tracking-tight whitespace-nowrap leading-none">
+                        PDF Register
+                      </span>
                     </button>
                     <button
                       onClick={() => triggerBulkAction("Consolidated Audit Review")}
                       className="flex flex-col items-center justify-center p-3 rounded-xl border border-border/40 bg-card text-center gap-1.5 transition-all hover:scale-102 hover:shadow-2xs text-emerald-500 hover:bg-emerald-500/5 hover:border-emerald-500/30"
                     >
                       <UserCog className="size-4.5" />
-                      <span className="text-[10px] font-bold tracking-tight whitespace-nowrap leading-none">Audit Review</span>
+                      <span className="text-[10px] font-bold tracking-tight whitespace-nowrap leading-none">
+                        Audit Review
+                      </span>
                     </button>
                   </div>
                 </div>
@@ -538,14 +633,16 @@ function IncrementHistoryPage() {
 
               {/* Action Row & Main Wide Table Panel (replicated from personnel list) */}
               <div className="bg-card rounded-lg border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300">
-
                 {/* Toolbar Header (replicated from personnel list) */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-5 border-b border-border/40 print:hidden">
-
                   {/* Export Buttons */}
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => alert("Excel payload generation active! 58 records serialized successfully.")}
+                      onClick={() =>
+                        alert(
+                          "Excel payload generation active! 58 records serialized successfully.",
+                        )
+                      }
                       className="h-8.5 px-3 rounded-lg border border-border/60 hover:bg-muted text-xs font-semibold text-foreground/80 hover:text-foreground transition duration-200 flex items-center gap-1.5"
                     >
                       <FileSpreadsheet className="size-3.5 text-emerald-500" />
@@ -569,7 +666,6 @@ function IncrementHistoryPage() {
 
                   {/* Toolbar Right: Search Bar & Column Configuration Toggle (replicated from personnel list) */}
                   <div className="flex items-center gap-3 ml-auto w-full md:w-auto">
-
                     {/* Search query field */}
                     <div className="relative flex-1 md:w-64 lg:w-72">
                       <Search className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
@@ -596,7 +692,9 @@ function IncrementHistoryPage() {
                       {isColSelectorOpen && (
                         <div className="absolute right-0 mt-1.5 w-56 rounded-xl bg-card border border-border/80 shadow-lg p-3 z-30 animate-in fade-in slide-in-from-top-1 duration-150 text-foreground">
                           <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/30">
-                            <span className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">Show Columns</span>
+                            <span className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/75">
+                              Show Columns
+                            </span>
                             <button
                               onClick={() => setVisibleCols(defaultColumns)}
                               className="text-[9px] font-bold text-primary hover:underline"
@@ -611,11 +709,18 @@ function IncrementHistoryPage() {
                                 onClick={() => toggleColumn(colKey as keyof typeof defaultColumns)}
                                 className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-left text-xs hover:bg-muted transition duration-150"
                               >
-                                <div className={`size-4 rounded-md border flex items-center justify-center transition-all ${visibleCols[colKey as keyof typeof defaultColumns] ? "bg-primary border-primary text-primary-foreground" : "border-border"}`}>
-                                  {visibleCols[colKey as keyof typeof defaultColumns] && <Check className="size-2.5 stroke-[3.5]" />}
+                                <div
+                                  className={`size-4 rounded-md border flex items-center justify-center transition-all ${visibleCols[colKey as keyof typeof defaultColumns] ? "bg-primary border-primary text-primary-foreground" : "border-border"}`}
+                                >
+                                  {visibleCols[colKey as keyof typeof defaultColumns] && (
+                                    <Check className="size-2.5 stroke-[3.5]" />
+                                  )}
                                 </div>
                                 <span className="font-medium text-foreground/80 capitalize">
-                                  {colKey.replace(/([A-Z])/g, " $1").toLowerCase().replace(/inc (\d+)/g, "Increment ($1)")}
+                                  {colKey
+                                    .replace(/([A-Z])/g, " $1")
+                                    .toLowerCase()
+                                    .replace(/inc (\d+)/g, "Increment ($1)")}
                                 </span>
                               </button>
                             ))}
@@ -623,9 +728,7 @@ function IncrementHistoryPage() {
                         </div>
                       )}
                     </div>
-
                   </div>
-
                 </div>
 
                 {/* HIGH-FIDELITY DATAGRID TABLE WITH STICKY FIXED LEFT SIDE COLUMNS (replicated from personnel list) */}
@@ -633,13 +736,15 @@ function IncrementHistoryPage() {
                   <table className="w-full border-collapse text-left text-xs whitespace-nowrap">
                     <thead>
                       <tr className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/60 bg-muted/40 border-b border-border/40">
-
                         {/* Sticky Actions and Checkbox Column */}
                         <th className="sticky left-0 bg-[#f1f5f9] dark:bg-[#0f172a] px-2 py-4 font-bold border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[110px] min-w-[110px] max-w-[110px] text-center">
                           <div className="flex items-center gap-2 justify-center">
                             <input
                               type="checkbox"
-                              checked={filteredRecords.length > 0 && selectedEmpIds.length === filteredRecords.length}
+                              checked={
+                                filteredRecords.length > 0 &&
+                                selectedEmpIds.length === filteredRecords.length
+                              }
                               onChange={toggleSelectAll}
                               className="rounded border-border text-primary focus:ring-primary/20 cursor-pointer"
                             />
@@ -648,33 +753,98 @@ function IncrementHistoryPage() {
                         </th>
 
                         {/* Fixed Sticky Header for ID and Name */}
-                        <th className="sticky left-[110px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-4 font-bold border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[100px] min-w-[100px] max-w-[100px]">Emp ID</th>
-                        <th className="sticky left-[210px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-4 font-bold border-r border-border/40 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[180px] min-w-[180px] max-w-[180px]">Name</th>
+                        <th className="sticky left-[110px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-4 font-bold border-r border-border/30 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[100px] min-w-[100px] max-w-[100px]">
+                          Emp ID
+                        </th>
+                        <th className="sticky left-[210px] bg-[#f1f5f9] dark:bg-[#0f172a] px-3 py-4 font-bold border-r border-border/40 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[180px] min-w-[180px] max-w-[180px]">
+                          Name
+                        </th>
 
                         {/* Standard Configurable headers */}
-                        {visibleCols.department && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Department</th>}
-                        {visibleCols.section && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Section</th>}
-                        {visibleCols.designation && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">Designation</th>}
-                        {visibleCols.joiningDate && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-center">Joining Date</th>}
-                        {visibleCols.salaryJoining && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-right">Salary(Joining)</th>}
-                        {visibleCols.salaryBasic && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-right">Salary(Basic)</th>}
-                        {visibleCols.salaryGross && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-right">Salary(Gross)</th>}
+                        {visibleCols.department && (
+                          <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">
+                            Department
+                          </th>
+                        )}
+                        {visibleCols.section && (
+                          <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">
+                            Section
+                          </th>
+                        )}
+                        {visibleCols.designation && (
+                          <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a]">
+                            Designation
+                          </th>
+                        )}
+                        {visibleCols.joiningDate && (
+                          <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-center">
+                            Joining Date
+                          </th>
+                        )}
+                        {visibleCols.salaryJoining && (
+                          <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-right">
+                            Salary(Joining)
+                          </th>
+                        )}
+                        {visibleCols.salaryBasic && (
+                          <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-right">
+                            Salary(Basic)
+                          </th>
+                        )}
+                        {visibleCols.salaryGross && (
+                          <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-right">
+                            Salary(Gross)
+                          </th>
+                        )}
 
                         {/* Configurable Years */}
-                        {["2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"].map(yr => {
+                        {[
+                          "2014",
+                          "2015",
+                          "2016",
+                          "2017",
+                          "2018",
+                          "2019",
+                          "2020",
+                          "2021",
+                          "2022",
+                          "2023",
+                          "2024",
+                          "2025",
+                        ].map((yr) => {
                           const colKey = `inc${yr}` as keyof typeof defaultColumns;
-                          return visibleCols[colKey] && (
-                            <th key={yr} className="px-4 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-center">
-                              Inc({yr})
-                            </th>
+                          return (
+                            visibleCols[colKey] && (
+                              <th
+                                key={yr}
+                                className="px-4 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-center"
+                              >
+                                Inc({yr})
+                              </th>
+                            )
                           );
                         })}
 
-                        {visibleCols.total && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-center">Total</th>}
-                        {visibleCols.lastIncDate && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-center">Last Inc Date</th>}
-                        {visibleCols.lastIncAmount && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-right">Last Inc Amount</th>}
-                        {visibleCols.lastPromotion && <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-center">Last Promotion</th>}
-
+                        {visibleCols.total && (
+                          <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-center">
+                            Total
+                          </th>
+                        )}
+                        {visibleCols.lastIncDate && (
+                          <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-center">
+                            Last Inc Date
+                          </th>
+                        )}
+                        {visibleCols.lastIncAmount && (
+                          <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-right">
+                            Last Inc Amount
+                          </th>
+                        )}
+                        {visibleCols.lastPromotion && (
+                          <th className="px-5 py-4 font-bold bg-[#f1f5f9] dark:bg-[#0f172a] text-center">
+                            Last Promotion
+                          </th>
+                        )}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border/45">
@@ -693,7 +863,10 @@ function IncrementHistoryPage() {
                             className={`group transition-all cursor-pointer ${isSelected ? "bg-[#f1f5f9] dark:bg-[#1e293b]" : "hover:bg-[#f8fafc] dark:hover:bg-[#1e293b]"}`}
                           >
                             {/* Sticky Left Actions and Checkbox Cell */}
-                            <td className={`sticky left-0 ${stickyCellBgClass} px-2 py-2 border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[110px] min-w-[110px] max-w-[110px] transition-all`} onClick={(event) => event.stopPropagation()}>
+                            <td
+                              className={`sticky left-0 ${stickyCellBgClass} px-2 py-2 border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[110px] min-w-[110px] max-w-[110px] transition-all`}
+                              onClick={(event) => event.stopPropagation()}
+                            >
                               <div className="flex items-center gap-1.5 justify-center">
                                 <input
                                   type="checkbox"
@@ -719,59 +892,121 @@ function IncrementHistoryPage() {
                             </td>
 
                             {/* Sticky Left Emp ID and Name Cell */}
-                            <td className={`sticky left-[110px] ${stickyCellBgClass} px-3 py-3.5 font-bold text-primary border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[100px] min-w-[100px] max-w-[100px] transition-all font-mono text-[11px]`}>
+                            <td
+                              className={`sticky left-[110px] ${stickyCellBgClass} px-3 py-3.5 font-bold text-primary border-r border-border/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] w-[100px] min-w-[100px] max-w-[100px] transition-all font-mono text-[11px]`}
+                            >
                               {row.empId}
                             </td>
-                            <td className={`sticky left-[210px] ${stickyCellBgClass} px-3 py-3.5 font-bold text-foreground border-r border-border/40 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[180px] min-w-[180px] max-w-[180px] transition-all`}>
+                            <td
+                              className={`sticky left-[210px] ${stickyCellBgClass} px-3 py-3.5 font-bold text-foreground border-r border-border/40 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] w-[180px] min-w-[180px] max-w-[180px] transition-all`}
+                            >
                               <div className="flex items-center gap-2">
                                 <div className="size-6.5 rounded-lg bg-primary/10 text-[9px] font-bold text-primary flex items-center justify-center shadow-2xs">
-                                  {row.empName.split(" ").map(s => s[0]).slice(0, 2).join("").toUpperCase()}
+                                  {row.empName
+                                    .split(" ")
+                                    .map((s) => s[0])
+                                    .slice(0, 2)
+                                    .join("")
+                                    .toUpperCase()}
                                 </div>
                                 <span className="truncate max-w-[125px]">{row.empName}</span>
                               </div>
                             </td>
 
                             {/* Configurable Cells */}
-                            {visibleCols.department && <td className="px-5 py-3.5 text-foreground/80 font-medium">{row.department}</td>}
-                            {visibleCols.section && <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">{row.section}</td>}
-                            {visibleCols.designation && <td className="px-5 py-3.5 font-semibold text-foreground">{row.designation}</td>}
-                            {visibleCols.joiningDate && <td className="px-5 py-3.5 text-center font-mono text-muted-foreground/80 font-semibold">{row.joiningDate}</td>}
+                            {visibleCols.department && (
+                              <td className="px-5 py-3.5 text-foreground/80 font-medium">
+                                {row.department}
+                              </td>
+                            )}
+                            {visibleCols.section && (
+                              <td className="px-5 py-3.5 text-muted-foreground/90 font-medium">
+                                {row.section}
+                              </td>
+                            )}
+                            {visibleCols.designation && (
+                              <td className="px-5 py-3.5 font-semibold text-foreground">
+                                {row.designation}
+                              </td>
+                            )}
+                            {visibleCols.joiningDate && (
+                              <td className="px-5 py-3.5 text-center font-mono text-muted-foreground/80 font-semibold">
+                                {row.joiningDate}
+                              </td>
+                            )}
                             {visibleCols.salaryJoining && (
                               <td className="px-5 py-3.5 text-right font-mono font-semibold text-foreground/90">
-                                ৳{row.salaryJoining.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                                ৳
+                                {row.salaryJoining.toLocaleString("en-IN", {
+                                  minimumFractionDigits: 2,
+                                })}
                               </td>
                             )}
                             {visibleCols.salaryBasic && (
                               <td className="px-5 py-3.5 text-right font-mono font-semibold text-foreground/90">
-                                ৳{row.salaryBasic.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                                ৳
+                                {row.salaryBasic.toLocaleString("en-IN", {
+                                  minimumFractionDigits: 2,
+                                })}
                               </td>
                             )}
                             {visibleCols.salaryGross && (
                               <td className="px-5 py-3.5 text-right font-mono font-bold text-primary">
-                                ৳{row.salaryGross.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                                ৳
+                                {row.salaryGross.toLocaleString("en-IN", {
+                                  minimumFractionDigits: 2,
+                                })}
                               </td>
                             )}
 
                             {/* Years values */}
-                            {["2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"].map(yr => {
+                            {[
+                              "2014",
+                              "2015",
+                              "2016",
+                              "2017",
+                              "2018",
+                              "2019",
+                              "2020",
+                              "2021",
+                              "2022",
+                              "2023",
+                              "2024",
+                              "2025",
+                            ].map((yr) => {
                               const colKey = `inc${yr}` as keyof typeof defaultColumns;
                               const rowVal = row[colKey as keyof RawIncrementRecord] as string;
-                              return visibleCols[colKey] && (
-                                <td key={yr} className="px-4 py-3.5 text-center">
-                                  {renderIncrementCell(rowVal)}
-                                </td>
+                              return (
+                                visibleCols[colKey] && (
+                                  <td key={yr} className="px-4 py-3.5 text-center">
+                                    {renderIncrementCell(rowVal)}
+                                  </td>
+                                )
                               );
                             })}
 
-                            {visibleCols.total && <td className="px-5 py-3.5 text-center">{renderTotalCell(row.total)}</td>}
-                            {visibleCols.lastIncDate && <td className="px-5 py-3.5 text-center font-mono text-muted-foreground/80 font-semibold">{row.lastIncDate || "—"}</td>}
-                            {visibleCols.lastIncAmount && (
-                              <td className="px-5 py-3.5 text-right font-mono font-semibold text-muted-foreground/80">
-                                {row.lastIncAmount ? `৳${parseFloat(row.lastIncAmount).toLocaleString()}` : "—"}
+                            {visibleCols.total && (
+                              <td className="px-5 py-3.5 text-center">
+                                {renderTotalCell(row.total)}
                               </td>
                             )}
-                            {visibleCols.lastPromotion && <td className="px-5 py-3.5 text-center font-mono text-muted-foreground/80 font-semibold">{row.lastPromotion || "—"}</td>}
-
+                            {visibleCols.lastIncDate && (
+                              <td className="px-5 py-3.5 text-center font-mono text-muted-foreground/80 font-semibold">
+                                {row.lastIncDate || "—"}
+                              </td>
+                            )}
+                            {visibleCols.lastIncAmount && (
+                              <td className="px-5 py-3.5 text-right font-mono font-semibold text-muted-foreground/80">
+                                {row.lastIncAmount
+                                  ? `৳${parseFloat(row.lastIncAmount).toLocaleString()}`
+                                  : "—"}
+                              </td>
+                            )}
+                            {visibleCols.lastPromotion && (
+                              <td className="px-5 py-3.5 text-center font-mono text-muted-foreground/80 font-semibold">
+                                {row.lastPromotion || "—"}
+                              </td>
+                            )}
                           </tr>
                         );
                       })}
@@ -781,13 +1016,20 @@ function IncrementHistoryPage() {
                           <td colSpan={30} className="px-5 py-16 text-center text-muted-foreground">
                             <div className="flex flex-col items-center justify-center gap-2">
                               <EyeOff className="size-8 text-muted-foreground/45" />
-                              <span className="font-semibold text-xs">No employees match the specified increment history search parameters.</span>
-                              <button onClick={resetFilters} className="text-[10px] font-bold text-primary hover:underline mt-1">Clear Filters</button>
+                              <span className="font-semibold text-xs">
+                                No employees match the specified increment history search
+                                parameters.
+                              </span>
+                              <button
+                                onClick={resetFilters}
+                                className="text-[10px] font-bold text-primary hover:underline mt-1"
+                              >
+                                Clear Filters
+                              </button>
                             </div>
                           </td>
                         </tr>
                       )}
-
                     </tbody>
                   </table>
                 </div>
@@ -803,16 +1045,28 @@ function IncrementHistoryPage() {
                       <span>View PDF Register</span>
                     </button>
                     <span className="text-[11px] font-semibold text-muted-foreground/80">
-                      Showing {filteredRecords.length > 0 ? 1 : 0} to {filteredRecords.length} of {rawIncrementRecords.length} entries
+                      Showing {filteredRecords.length > 0 ? 1 : 0} to {filteredRecords.length} of{" "}
+                      {rawIncrementRecords.length} entries
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <button className="h-8 px-3 rounded-lg border border-border/60 bg-card hover:bg-muted text-xs font-bold text-muted-foreground disabled:opacity-50 transition" disabled>Previous</button>
-                    <button className="h-8 w-8 rounded-lg bg-primary text-primary-foreground text-xs font-bold shadow-2xs">1</button>
-                    <button className="h-8 px-3 rounded-lg border border-border/60 bg-card hover:bg-muted text-xs font-bold text-muted-foreground disabled:opacity-50 transition" disabled>Next</button>
+                    <button
+                      className="h-8 px-3 rounded-lg border border-border/60 bg-card hover:bg-muted text-xs font-bold text-muted-foreground disabled:opacity-50 transition"
+                      disabled
+                    >
+                      Previous
+                    </button>
+                    <button className="h-8 w-8 rounded-lg bg-primary text-primary-foreground text-xs font-bold shadow-2xs">
+                      1
+                    </button>
+                    <button
+                      className="h-8 px-3 rounded-lg border border-border/60 bg-card hover:bg-muted text-xs font-bold text-muted-foreground disabled:opacity-50 transition"
+                      disabled
+                    >
+                      Next
+                    </button>
                   </div>
                 </div>
-
               </div>
             </>
           )}
@@ -822,14 +1076,24 @@ function IncrementHistoryPage() {
             <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4 animate-in fade-in duration-200">
               <div className="flex items-center justify-between pb-3 border-b border-border/20">
                 <div>
-                  <h3 className="text-xs font-black uppercase text-foreground">Departmental Increment Summary Ledger</h3>
-                  <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase">Active Cycle Breakdown • PSL Operation</p>
+                  <h3 className="text-xs font-black uppercase text-foreground">
+                    Departmental Increment Summary Ledger
+                  </h3>
+                  <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase">
+                    Active Cycle Breakdown • PSL Operation
+                  </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => alert("Summary report Excel export started.")} className="h-8 px-3 rounded-lg border border-border/40 bg-card hover:bg-muted text-xs font-bold text-muted-foreground transition flex items-center gap-1.5">
+                  <button
+                    onClick={() => alert("Summary report Excel export started.")}
+                    className="h-8 px-3 rounded-lg border border-border/40 bg-card hover:bg-muted text-xs font-bold text-muted-foreground transition flex items-center gap-1.5"
+                  >
                     <FileSpreadsheet className="size-3.5" /> Excel
                   </button>
-                  <button onClick={() => alert("Summary report PDF generation completed.")} className="h-8 px-3 rounded-lg border border-border/40 bg-card hover:bg-muted text-xs font-bold text-muted-foreground transition flex items-center gap-1.5">
+                  <button
+                    onClick={() => alert("Summary report PDF generation completed.")}
+                    className="h-8 px-3 rounded-lg border border-border/40 bg-card hover:bg-muted text-xs font-bold text-muted-foreground transition flex items-center gap-1.5"
+                  >
                     <FileDown className="size-3.5" /> PDF
                   </button>
                 </div>
@@ -852,26 +1116,128 @@ function IncrementHistoryPage() {
                   </thead>
                   <tbody className="divide-y divide-border/20">
                     {[
-                      { type: "Office Executive", dept: "Admin", unit: "N/A", line: "N/A", count: 1, amount: 5000, month: "Jan,2026", remarks: "null" },
-                      { type: "Office Executive", dept: "Admin", unit: "PSL", line: "N/A", count: 1, amount: 2500, month: "Jan,2026", remarks: "null" },
-                      { type: "Office Executive", dept: "APPS Team", unit: "PSL", line: "N/A", count: 1, amount: 10000, month: "Jan,2026", remarks: "null" },
-                      { type: "Office Executive", dept: "Business Analysis", unit: "PSL", line: "N/A", count: 1, amount: 2000, month: "Jan,2026", remarks: "null" },
-                      { type: "Office Executive", dept: "Core Development (HR)", unit: "PSL", line: "N/A", count: 3, amount: 24000, month: "Jan,2026", remarks: "null" },
-                      { type: "Office Executive", dept: "Core Sales", unit: "PSL", line: "N/A", count: 5, amount: 15000, month: "Jan,2026", remarks: "null" },
-                      { type: "Office Executive", dept: "DBA", unit: "PSL", line: "N/A", count: 1, amount: 2000, month: "Jan,2026", remarks: "null" },
-                      { type: "Office Executive", dept: "ERP Team", unit: "PSL", line: "N/A", count: 1, amount: 3000, month: "Jan,2026", remarks: "null" },
-                      { type: "Office Executive", dept: "ERP Team", unit: "PSL", line: "N/A", count: 1, amount: 6000, month: "Jan,2026", remarks: "null" },
-                      { type: "Office Executive", dept: "ERP Team", unit: "PSL", line: "N/A", count: 2, amount: 15000, month: "Jan,2026", remarks: "null" }
+                      {
+                        type: "Office Executive",
+                        dept: "Admin",
+                        unit: "N/A",
+                        line: "N/A",
+                        count: 1,
+                        amount: 5000,
+                        month: "Jan,2026",
+                        remarks: "null",
+                      },
+                      {
+                        type: "Office Executive",
+                        dept: "Admin",
+                        unit: "PSL",
+                        line: "N/A",
+                        count: 1,
+                        amount: 2500,
+                        month: "Jan,2026",
+                        remarks: "null",
+                      },
+                      {
+                        type: "Office Executive",
+                        dept: "APPS Team",
+                        unit: "PSL",
+                        line: "N/A",
+                        count: 1,
+                        amount: 10000,
+                        month: "Jan,2026",
+                        remarks: "null",
+                      },
+                      {
+                        type: "Office Executive",
+                        dept: "Business Analysis",
+                        unit: "PSL",
+                        line: "N/A",
+                        count: 1,
+                        amount: 2000,
+                        month: "Jan,2026",
+                        remarks: "null",
+                      },
+                      {
+                        type: "Office Executive",
+                        dept: "Core Development (HR)",
+                        unit: "PSL",
+                        line: "N/A",
+                        count: 3,
+                        amount: 24000,
+                        month: "Jan,2026",
+                        remarks: "null",
+                      },
+                      {
+                        type: "Office Executive",
+                        dept: "Core Sales",
+                        unit: "PSL",
+                        line: "N/A",
+                        count: 5,
+                        amount: 15000,
+                        month: "Jan,2026",
+                        remarks: "null",
+                      },
+                      {
+                        type: "Office Executive",
+                        dept: "DBA",
+                        unit: "PSL",
+                        line: "N/A",
+                        count: 1,
+                        amount: 2000,
+                        month: "Jan,2026",
+                        remarks: "null",
+                      },
+                      {
+                        type: "Office Executive",
+                        dept: "ERP Team",
+                        unit: "PSL",
+                        line: "N/A",
+                        count: 1,
+                        amount: 3000,
+                        month: "Jan,2026",
+                        remarks: "null",
+                      },
+                      {
+                        type: "Office Executive",
+                        dept: "ERP Team",
+                        unit: "PSL",
+                        line: "N/A",
+                        count: 1,
+                        amount: 6000,
+                        month: "Jan,2026",
+                        remarks: "null",
+                      },
+                      {
+                        type: "Office Executive",
+                        dept: "ERP Team",
+                        unit: "PSL",
+                        line: "N/A",
+                        count: 2,
+                        amount: 15000,
+                        month: "Jan,2026",
+                        remarks: "null",
+                      },
                     ].map((row, index) => (
                       <tr key={index} className="hover:bg-muted/40 transition">
-                        <td className="px-3 py-3 text-center font-mono font-bold text-muted-foreground/60">{index + 1}</td>
+                        <td className="px-3 py-3 text-center font-mono font-bold text-muted-foreground/60">
+                          {index + 1}
+                        </td>
                         <td className="px-4 py-3 font-extrabold text-foreground">{row.type}</td>
                         <td className="px-4 py-3 font-semibold text-foreground">{row.dept}</td>
-                        <td className="px-3 py-3 text-center font-mono text-muted-foreground">{row.unit}</td>
-                        <td className="px-3 py-3 text-center font-mono text-muted-foreground">{row.line}</td>
-                        <td className="px-3 py-3 text-center font-bold text-foreground">{row.count}</td>
-                        <td className="px-4 py-3 text-right font-mono font-black text-primary">৳{row.amount.toLocaleString()}</td>
-                        <td className="px-4 py-3 text-center font-semibold text-muted-foreground">{row.month}</td>
+                        <td className="px-3 py-3 text-center font-mono text-muted-foreground">
+                          {row.unit}
+                        </td>
+                        <td className="px-3 py-3 text-center font-mono text-muted-foreground">
+                          {row.line}
+                        </td>
+                        <td className="px-3 py-3 text-center font-bold text-foreground">
+                          {row.count}
+                        </td>
+                        <td className="px-4 py-3 text-right font-mono font-black text-primary">
+                          ৳{row.amount.toLocaleString()}
+                        </td>
+                        <td className="px-4 py-3 text-center font-semibold text-muted-foreground">
+                          {row.month}
+                        </td>
                         <td className="px-4 py-3 text-muted-foreground/50 italic">{row.remarks}</td>
                       </tr>
                     ))}
@@ -884,7 +1250,6 @@ function IncrementHistoryPage() {
           {/* TAB 3: PARAMETERIZED REPORTS (INCREMENT PROPOSAL REGISTER) */}
           {activeReportsTab === "reports" && (
             <div className="space-y-6 animate-in fade-in duration-200">
-
               {/* Filter Panel */}
               <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
                 <h3 className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-1.5">
@@ -893,33 +1258,44 @@ function IncrementHistoryPage() {
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
                   <div className="space-y-1.5">
-                    <label className="text-[9px] font-black uppercase text-muted-foreground">Year</label>
+                    <label className="text-[9px] font-black uppercase text-muted-foreground">
+                      Year
+                    </label>
                     <select className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
                       <option value="2026">2026</option>
                       <option value="2025">2025</option>
                     </select>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[9px] font-black uppercase text-muted-foreground">Month</label>
+                    <label className="text-[9px] font-black uppercase text-muted-foreground">
+                      Month
+                    </label>
                     <select className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
                       <option value="Jan">Jan</option>
                       <option value="Dec">Dec</option>
                     </select>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[9px] font-black uppercase text-muted-foreground">Company</label>
+                    <label className="text-[9px] font-black uppercase text-muted-foreground">
+                      Company
+                    </label>
                     <select className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
                       <option value="Pakiza">Pakiza Software Limited</option>
                     </select>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[9px] font-black uppercase text-muted-foreground">Area</label>
+                    <label className="text-[9px] font-black uppercase text-muted-foreground">
+                      Area
+                    </label>
                     <select className="w-full h-8.5 px-2.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold">
                       <option value="PSL">PSL-Operation</option>
                     </select>
                   </div>
                   <div className="space-y-1.5 flex items-end">
-                    <button onClick={() => alert("Report records filtered.")} className="w-full h-8.5 bg-primary hover:opacity-95 text-primary-foreground font-extrabold text-[10px] rounded-xl shadow-xs transition uppercase tracking-wider flex items-center justify-center gap-1">
+                    <button
+                      onClick={() => alert("Report records filtered.")}
+                      className="w-full h-8.5 bg-primary hover:opacity-95 text-primary-foreground font-extrabold text-[10px] rounded-xl shadow-xs transition uppercase tracking-wider flex items-center justify-center gap-1"
+                    >
                       <Search className="size-3.5" /> Compile Report
                     </button>
                   </div>
@@ -929,12 +1305,20 @@ function IncrementHistoryPage() {
               {/* Proposals Table */}
               <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-3 border-b border-border/20">
-                  <h3 className="text-xs font-black uppercase text-foreground">Compensation Appraisal & Increment Register</h3>
+                  <h3 className="text-xs font-black uppercase text-foreground">
+                    Compensation Appraisal & Increment Register
+                  </h3>
                   <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Proposal Register exported to Excel.")} className="h-8 px-3 rounded-lg border border-border/40 bg-card hover:bg-muted text-xs font-bold text-muted-foreground transition flex items-center gap-1.5">
+                    <button
+                      onClick={() => alert("Proposal Register exported to Excel.")}
+                      className="h-8 px-3 rounded-lg border border-border/40 bg-card hover:bg-muted text-xs font-bold text-muted-foreground transition flex items-center gap-1.5"
+                    >
                       <FileSpreadsheet className="size-3.5" /> Excel
                     </button>
-                    <button onClick={() => alert("Proposal Register printed.")} className="h-8 px-3 rounded-lg border border-border/40 bg-card hover:bg-muted text-xs font-bold text-muted-foreground transition flex items-center gap-1.5">
+                    <button
+                      onClick={() => alert("Proposal Register printed.")}
+                      className="h-8 px-3 rounded-lg border border-border/40 bg-card hover:bg-muted text-xs font-bold text-muted-foreground transition flex items-center gap-1.5"
+                    >
                       <Printer className="size-3.5" /> Print
                     </button>
                   </div>
@@ -958,41 +1342,99 @@ function IncrementHistoryPage() {
                     </thead>
                     <tbody className="divide-y divide-border/20">
                       {[
-                        { id: "2025053673", name: "Md Jahid Hasan Polok", dept: "Core Development", sec: "General ERP (Com, A/C, Fixed Asset, Vat)", descBefore: "Sr. Executive", descAfter: "Sr. Executive", prevGross: 40000.00 },
-                        { id: "2025056473", name: "Hasnain", dept: "HR, Admin and Compliance", sec: "Admin", descBefore: "Cleaner", descAfter: "Cleaner", prevGross: 11000.00 },
-                        { id: "2025057067", name: "Sunit Corneleous Sarker", dept: "Business Automation (HR)", sec: "Core Development (HR)", descBefore: "Executive", descAfter: "Executive", prevGross: 28000.00 },
-                        { id: "2025057437", name: "Towhidur Rahman", dept: "Implementation & Business Analysis", sec: "Business Analysis", descBefore: "Executive", descAfter: "Executive", prevGross: 25000.00 },
-                        { id: "2025055045", name: "Md. Mahfuzur Rahman", dept: "Business Automation (HR)", sec: "Implementation & Support (HR)", descBefore: "Jr. Executive", descAfter: "Jr. Executive", prevGross: 18000.00 }
+                        {
+                          id: "2025053673",
+                          name: "Md Jahid Hasan Polok",
+                          dept: "Core Development",
+                          sec: "General ERP (Com, A/C, Fixed Asset, Vat)",
+                          descBefore: "Sr. Executive",
+                          descAfter: "Sr. Executive",
+                          prevGross: 40000.0,
+                        },
+                        {
+                          id: "2025056473",
+                          name: "Hasnain",
+                          dept: "HR, Admin and Compliance",
+                          sec: "Admin",
+                          descBefore: "Cleaner",
+                          descAfter: "Cleaner",
+                          prevGross: 11000.0,
+                        },
+                        {
+                          id: "2025057067",
+                          name: "Sunit Corneleous Sarker",
+                          dept: "Business Automation (HR)",
+                          sec: "Core Development (HR)",
+                          descBefore: "Executive",
+                          descAfter: "Executive",
+                          prevGross: 28000.0,
+                        },
+                        {
+                          id: "2025057437",
+                          name: "Towhidur Rahman",
+                          dept: "Implementation & Business Analysis",
+                          sec: "Business Analysis",
+                          descBefore: "Executive",
+                          descAfter: "Executive",
+                          prevGross: 25000.0,
+                        },
+                        {
+                          id: "2025055045",
+                          name: "Md. Mahfuzur Rahman",
+                          dept: "Business Automation (HR)",
+                          sec: "Implementation & Support (HR)",
+                          descBefore: "Jr. Executive",
+                          descAfter: "Jr. Executive",
+                          prevGross: 18000.0,
+                        },
                       ].map((row, index) => (
                         <tr key={row.id} className="hover:bg-muted/40 transition">
-                          <td className="px-3 py-3 text-center font-mono font-bold text-muted-foreground/60">{index + 1}</td>
+                          <td className="px-3 py-3 text-center font-mono font-bold text-muted-foreground/60">
+                            {index + 1}
+                          </td>
                           <td className="px-4 py-3 text-center">
-                            <button onClick={() => alert(`Showing increment dossier for employee: ${row.name}`)} className="h-6 px-2.5 rounded bg-primary/10 hover:bg-primary/20 text-primary text-[10px] font-black uppercase transition inline-flex items-center gap-1">
+                            <button
+                              onClick={() =>
+                                alert(`Showing increment dossier for employee: ${row.name}`)
+                              }
+                              className="h-6 px-2.5 rounded bg-primary/10 hover:bg-primary/20 text-primary text-[10px] font-black uppercase transition inline-flex items-center gap-1"
+                            >
                               <Eye className="size-3" /> View
                             </button>
                           </td>
                           <td className="px-4 py-3 text-center">
-                            <button onClick={() => alert(`Showing promotion dossier for employee: ${row.name}`)} className="h-6 px-2.5 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 text-[10px] font-black uppercase transition inline-flex items-center gap-1">
+                            <button
+                              onClick={() =>
+                                alert(`Showing promotion dossier for employee: ${row.name}`)
+                              }
+                              className="h-6 px-2.5 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 text-[10px] font-black uppercase transition inline-flex items-center gap-1"
+                            >
                               <Sparkles className="size-3" /> Prom
                             </button>
                           </td>
-                          <td className="px-3 py-3 font-mono font-black text-foreground">{row.id}</td>
+                          <td className="px-3 py-3 font-mono font-black text-foreground">
+                            {row.id}
+                          </td>
                           <td className="px-4 py-3 font-extrabold text-foreground">{row.name}</td>
-                          <td className="px-4 py-3 text-muted-foreground font-semibold">{row.dept}</td>
+                          <td className="px-4 py-3 text-muted-foreground font-semibold">
+                            {row.dept}
+                          </td>
                           <td className="px-4 py-3 text-muted-foreground/80">{row.sec}</td>
-                          <td className="px-4 py-3 text-muted-foreground/80 font-bold">{row.descBefore}</td>
+                          <td className="px-4 py-3 text-muted-foreground/80 font-bold">
+                            {row.descBefore}
+                          </td>
                           <td className="px-4 py-3 text-primary font-extrabold">{row.descAfter}</td>
-                          <td className="px-4 py-3 text-right font-mono font-bold text-foreground">৳{row.prevGross.toFixed(2)}</td>
+                          <td className="px-4 py-3 text-right font-mono font-bold text-foreground">
+                            ৳{row.prevGross.toFixed(2)}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
               </div>
-
             </div>
           )}
-
         </div>
       </main>
 
@@ -1000,7 +1442,6 @@ function IncrementHistoryPage() {
       {selectedRecord && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
           <div className="bg-card w-full max-w-2xl rounded-lg border border-border shadow-2xl p-6 relative animate-in zoom-in-95 duration-200 text-foreground">
-
             <button
               onClick={() => setSelectedRecord(null)}
               className="absolute right-4 top-4 p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition"
@@ -1014,14 +1455,20 @@ function IncrementHistoryPage() {
             </h3>
 
             <div className="space-y-4 text-xs font-semibold">
-
               {/* Profile card */}
               <div className="p-4 rounded-xl bg-muted border border-border/65 flex items-center gap-3">
                 <div className="size-10 rounded-xl bg-gradient-to-br from-primary to-primary-glow text-white grid place-items-center text-xs font-black shadow-sm">
-                  {selectedRecord.empName.split(" ").map(n => n[0]).join("").substring(0, 3).toUpperCase()}
+                  {selectedRecord.empName
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .substring(0, 3)
+                    .toUpperCase()}
                 </div>
                 <div>
-                  <div className="font-extrabold text-foreground text-sm">{selectedRecord.empName}</div>
+                  <div className="font-extrabold text-foreground text-sm">
+                    {selectedRecord.empName}
+                  </div>
                   <div className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1.5 font-bold">
                     <span className="font-mono">{selectedRecord.empId}</span>
                     <span>•</span>
@@ -1033,16 +1480,28 @@ function IncrementHistoryPage() {
               {/* Salary bands details */}
               <div className="grid grid-cols-3 gap-3 text-center">
                 <div className="p-3 rounded-xl border border-border/80 bg-muted/40">
-                  <div className="text-[8.5px] uppercase tracking-wider text-muted-foreground font-bold">JOINING</div>
-                  <div className="text-xs font-mono font-bold mt-1 text-foreground/80">৳{selectedRecord.salaryJoining.toLocaleString()}</div>
+                  <div className="text-[8.5px] uppercase tracking-wider text-muted-foreground font-bold">
+                    JOINING
+                  </div>
+                  <div className="text-xs font-mono font-bold mt-1 text-foreground/80">
+                    ৳{selectedRecord.salaryJoining.toLocaleString()}
+                  </div>
                 </div>
                 <div className="p-3 rounded-xl border border-border/80 bg-muted/40">
-                  <div className="text-[8.5px] uppercase tracking-wider text-muted-foreground font-bold">BASIC</div>
-                  <div className="text-xs font-mono font-bold mt-1 text-foreground/80">৳{selectedRecord.salaryBasic.toLocaleString()}</div>
+                  <div className="text-[8.5px] uppercase tracking-wider text-muted-foreground font-bold">
+                    BASIC
+                  </div>
+                  <div className="text-xs font-mono font-bold mt-1 text-foreground/80">
+                    ৳{selectedRecord.salaryBasic.toLocaleString()}
+                  </div>
                 </div>
                 <div className="p-3 rounded-xl border border-primary/20 bg-primary/5">
-                  <div className="text-[8.5px] uppercase tracking-wider text-primary font-bold">GROSS</div>
-                  <div className="text-xs font-mono font-black mt-1 text-primary">৳{selectedRecord.salaryGross.toLocaleString()}</div>
+                  <div className="text-[8.5px] uppercase tracking-wider text-primary font-bold">
+                    GROSS
+                  </div>
+                  <div className="text-xs font-mono font-black mt-1 text-primary">
+                    ৳{selectedRecord.salaryGross.toLocaleString()}
+                  </div>
                 </div>
               </div>
 
@@ -1073,13 +1532,17 @@ function IncrementHistoryPage() {
                 {selectedRecord.lastIncAmount && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground/60">Last Increment Amount</span>
-                    <span className="font-mono text-foreground">৳{parseFloat(selectedRecord.lastIncAmount).toLocaleString()}</span>
+                    <span className="font-mono text-foreground">
+                      ৳{parseFloat(selectedRecord.lastIncAmount).toLocaleString()}
+                    </span>
                   </div>
                 )}
                 {selectedRecord.lastPromotion && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground/60">Last Promotion Date</span>
-                    <span className="font-mono text-foreground">{selectedRecord.lastPromotion}</span>
+                    <span className="font-mono text-foreground">
+                      {selectedRecord.lastPromotion}
+                    </span>
                   </div>
                 )}
               </div>
@@ -1093,7 +1556,6 @@ function IncrementHistoryPage() {
                   Close Summary
                 </button>
               </div>
-
             </div>
           </div>
         </div>
@@ -1103,7 +1565,6 @@ function IncrementHistoryPage() {
       {isPdfModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs p-4 animate-in fade-in duration-200">
           <div className="bg-card w-full max-w-5xl rounded-lg border border-border shadow-2xl p-6 relative flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 text-foreground">
-
             <button
               onClick={() => setIsPdfModalOpen(false)}
               className="absolute right-4 top-4 p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition"
@@ -1117,16 +1578,24 @@ function IncrementHistoryPage() {
                 <FileDown className="size-5.5 text-rose-500" />
                 <span>PDF Print Preview — Salary Increment History</span>
               </h3>
-              <p className="text-[10px] text-muted-foreground/75 font-bold mt-1 uppercase">Pakiza Software Limited • PSL-Operation Ledger</p>
+              <p className="text-[10px] text-muted-foreground/75 font-bold mt-1 uppercase">
+                Pakiza Software Limited • PSL-Operation Ledger
+              </p>
             </div>
 
             {/* Scrollable Document Body */}
-            <div id="pdf-print-area" className="flex-1 overflow-y-auto p-4 border border-border bg-white text-slate-900 rounded-xl space-y-6">
-
+            <div
+              id="pdf-print-area"
+              className="flex-1 overflow-y-auto p-4 border border-border bg-white text-slate-900 rounded-xl space-y-6"
+            >
               {/* Document Header */}
               <div className="text-center space-y-1.5 border-b border-slate-200 pb-4">
-                <h2 className="text-lg font-black tracking-tight text-slate-900">PAKIZA SOFTWARE LIMITED</h2>
-                <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">SALARY INCREMENT HISTORY REGISTER</p>
+                <h2 className="text-lg font-black tracking-tight text-slate-900">
+                  PAKIZA SOFTWARE LIMITED
+                </h2>
+                <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">
+                  SALARY INCREMENT HISTORY REGISTER
+                </p>
                 <div className="text-[9px] text-slate-400 font-bold flex justify-center gap-4 pt-1">
                   <span>AREA: PSL-OPERATION</span>
                   <span>•</span>
@@ -1157,17 +1626,39 @@ function IncrementHistoryPage() {
                   <tbody>
                     {filteredRecords.map((row, idx) => (
                       <tr key={row.sl} className="whitespace-nowrap hover:bg-slate-50">
-                        <td className="border border-slate-300 p-1 text-center text-slate-400 font-bold">{idx + 1}</td>
-                        <td className="border border-slate-300 p-1 font-mono font-bold">{row.empId}</td>
-                        <td className="border border-slate-300 p-1 font-extrabold text-slate-900">{row.empName}</td>
-                        <td className="border border-slate-300 p-1 text-slate-600">{row.section}</td>
-                        <td className="border border-slate-300 p-1 font-bold text-slate-700">{row.designation}</td>
-                        <td className="border border-slate-300 p-1 text-right font-mono text-slate-600">{row.salaryJoining.toLocaleString()}</td>
-                        <td className="border border-slate-300 p-1 text-right font-mono font-extrabold text-slate-900">{row.salaryGross.toLocaleString()}</td>
-                        <td className="border border-slate-300 p-1 text-center font-mono">{row.inc2023 !== "0" ? row.inc2023 : "—"}</td>
-                        <td className="border border-slate-300 p-1 text-center font-mono">{row.inc2024 !== "0" ? row.inc2024 : "—"}</td>
-                        <td className="border border-slate-300 p-1 text-center font-mono">{row.inc2025 !== "0" ? row.inc2025 : "—"}</td>
-                        <td className="border border-slate-300 p-1 text-center font-mono font-black text-slate-900">{row.total}</td>
+                        <td className="border border-slate-300 p-1 text-center text-slate-400 font-bold">
+                          {idx + 1}
+                        </td>
+                        <td className="border border-slate-300 p-1 font-mono font-bold">
+                          {row.empId}
+                        </td>
+                        <td className="border border-slate-300 p-1 font-extrabold text-slate-900">
+                          {row.empName}
+                        </td>
+                        <td className="border border-slate-300 p-1 text-slate-600">
+                          {row.section}
+                        </td>
+                        <td className="border border-slate-300 p-1 font-bold text-slate-700">
+                          {row.designation}
+                        </td>
+                        <td className="border border-slate-300 p-1 text-right font-mono text-slate-600">
+                          {row.salaryJoining.toLocaleString()}
+                        </td>
+                        <td className="border border-slate-300 p-1 text-right font-mono font-extrabold text-slate-900">
+                          {row.salaryGross.toLocaleString()}
+                        </td>
+                        <td className="border border-slate-300 p-1 text-center font-mono">
+                          {row.inc2023 !== "0" ? row.inc2023 : "—"}
+                        </td>
+                        <td className="border border-slate-300 p-1 text-center font-mono">
+                          {row.inc2024 !== "0" ? row.inc2024 : "—"}
+                        </td>
+                        <td className="border border-slate-300 p-1 text-center font-mono">
+                          {row.inc2025 !== "0" ? row.inc2025 : "—"}
+                        </td>
+                        <td className="border border-slate-300 p-1 text-center font-mono font-black text-slate-900">
+                          {row.total}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -1177,16 +1668,21 @@ function IncrementHistoryPage() {
               {/* Document Sign-offs */}
               <div className="grid grid-cols-3 gap-8 pt-10 text-[9px] font-bold text-slate-500 text-center">
                 <div className="space-y-1">
-                  <div className="w-32 border-t border-slate-300 mx-auto pt-1">Prepared By (HR)</div>
+                  <div className="w-32 border-t border-slate-300 mx-auto pt-1">
+                    Prepared By (HR)
+                  </div>
                 </div>
                 <div className="space-y-1">
-                  <div className="w-32 border-t border-slate-300 mx-auto pt-1">Verified By (Admin)</div>
+                  <div className="w-32 border-t border-slate-300 mx-auto pt-1">
+                    Verified By (Admin)
+                  </div>
                 </div>
                 <div className="space-y-1">
-                  <div className="w-32 border-t border-slate-300 mx-auto pt-1">Approved By (MD)</div>
+                  <div className="w-32 border-t border-slate-300 mx-auto pt-1">
+                    Approved By (MD)
+                  </div>
                 </div>
               </div>
-
             </div>
 
             {/* Modal Controls */}
@@ -1205,11 +1701,9 @@ function IncrementHistoryPage() {
                 <span>Print PDF Register</span>
               </button>
             </div>
-
           </div>
         </div>
       )}
-
     </div>
   );
 }

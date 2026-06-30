@@ -3,7 +3,16 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  ChevronRight, Search, FileSpreadsheet, Printer, FileDown, CalendarDays, CheckCircle2, ShieldCheck, HelpCircle, Trash2
+  ChevronRight,
+  Search,
+  FileSpreadsheet,
+  Printer,
+  FileDown,
+  CalendarDays,
+  CheckCircle2,
+  ShieldCheck,
+  HelpCircle,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -11,7 +20,11 @@ export const Route = createFileRoute("/earn-leave-submit")({
   head: () => ({
     meta: [
       { title: "Earn Leave Submit — CRIPTON" },
-      { name: "description", content: "Select processed employee earned leave records, configure disbursement details, and submit for clearance." },
+      {
+        name: "description",
+        content:
+          "Select processed employee earned leave records, configure disbursement details, and submit for clearance.",
+      },
     ],
   }),
   component: EarnLeaveSubmitPage,
@@ -45,7 +58,7 @@ const initialSubmitRows: EarnLeaveSubmitRow[] = [
     paymentMode: "Bank",
     bankName: "Dutch-Bangla Bank PLC",
     accountNo: "125.120.44391",
-    status: "Draft"
+    status: "Draft",
   },
   {
     id: "ELS-002",
@@ -53,13 +66,13 @@ const initialSubmitRows: EarnLeaveSubmitRow[] = [
     empName: "Dipon Saha",
     department: "Core Development (HR)",
     designation: "Senior Software Engineer",
-    totalDays: 5.60,
-    perDayRate: 2600.00,
+    totalDays: 5.6,
+    perDayRate: 2600.0,
     netPay: 14560,
     paymentMode: "Bank",
     bankName: "Dutch-Bangla Bank PLC",
     accountNo: "125.120.35599",
-    status: "Draft"
+    status: "Draft",
   },
   {
     id: "ELS-003",
@@ -67,14 +80,14 @@ const initialSubmitRows: EarnLeaveSubmitRow[] = [
     empName: "Sadiqul Islam",
     department: "Core Sales",
     designation: "Deputy Manager",
-    totalDays: 3.00,
-    perDayRate: 1100.00,
+    totalDays: 3.0,
+    perDayRate: 1100.0,
     netPay: 3300,
     paymentMode: "Cash",
     bankName: "",
     accountNo: "",
-    status: "Draft"
-  }
+    status: "Draft",
+  },
 ];
 
 function EarnLeaveSubmitPage() {
@@ -101,7 +114,7 @@ function EarnLeaveSubmitPage() {
     empType: "ALL",
     section: "ALL",
     unit: "ALL",
-    empIdFilter: ""
+    empIdFilter: "",
   });
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -112,13 +125,13 @@ function EarnLeaveSubmitPage() {
       empType,
       section,
       unit,
-      empIdFilter
+      empIdFilter,
     });
   };
 
   // Filter & Search calculation
   const filteredRows = useMemo(() => {
-    return rows.filter(r => {
+    return rows.filter((r) => {
       // 1. Employee ID Filter
       if (appliedFilters.empIdFilter.trim() && r.empId !== appliedFilters.empIdFilter.trim()) {
         return false;
@@ -142,18 +155,18 @@ function EarnLeaveSubmitPage() {
   }, [rows, appliedFilters, searchQuery]);
 
   // Handle Select All
-  const isAllSelected = filteredRows.length > 0 && filteredRows.every(r => selectedIds.has(r.id));
+  const isAllSelected = filteredRows.length > 0 && filteredRows.every((r) => selectedIds.has(r.id));
   const toggleSelectAll = () => {
     if (isAllSelected) {
-      setSelectedIds(prev => {
+      setSelectedIds((prev) => {
         const next = new Set(prev);
-        filteredRows.forEach(r => next.delete(r.id));
+        filteredRows.forEach((r) => next.delete(r.id));
         return next;
       });
     } else {
-      setSelectedIds(prev => {
+      setSelectedIds((prev) => {
         const next = new Set(prev);
-        filteredRows.forEach(r => next.add(r.id));
+        filteredRows.forEach((r) => next.add(r.id));
         return next;
       });
     }
@@ -161,7 +174,7 @@ function EarnLeaveSubmitPage() {
 
   // Handle Single Toggle Select
   const toggleSelect = (id: string) => {
-    setSelectedIds(prev => {
+    setSelectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
         next.delete(id);
@@ -174,7 +187,7 @@ function EarnLeaveSubmitPage() {
 
   // Handle inline edits (Payment Mode, Bank Name, Account No)
   const handleInlineChange = (id: string, field: keyof EarnLeaveSubmitRow, value: string) => {
-    setRows(prev => prev.map(r => r.id === id ? { ...r, [field]: value } : r));
+    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, [field]: value } : r)));
   };
 
   // Success Message
@@ -185,8 +198,10 @@ function EarnLeaveSubmitPage() {
       toast.error("Please select at least one record to submit!");
       return;
     }
-    setRows(prev => prev.map(r => selectedIds.has(r.id) ? { ...r, status: "Submitted" } : r));
-    toast.success(`Successfully submitted ${selectedIds.size} processed Earn Leave cash-disbursements for clearance!`);
+    setRows((prev) => prev.map((r) => (selectedIds.has(r.id) ? { ...r, status: "Submitted" } : r)));
+    toast.success(
+      `Successfully submitted ${selectedIds.size} processed Earn Leave cash-disbursements for clearance!`,
+    );
   };
 
   const handleDeleteSelected = () => {
@@ -195,16 +210,16 @@ function EarnLeaveSubmitPage() {
       return;
     }
     if (!confirm(`Are you sure you want to delete ${selectedIds.size} selected records?`)) return;
-    setRows(prev => prev.filter(r => !selectedIds.has(r.id)));
+    setRows((prev) => prev.filter((r) => !selectedIds.has(r.id)));
     toast.success(`Deleted ${selectedIds.size} records.`);
     setSelectedIds(new Set());
   };
 
   const handleSingleDelete = (id: string) => {
     if (!confirm("Are you sure you want to delete this record?")) return;
-    setRows(prev => prev.filter(r => r.id !== id));
+    setRows((prev) => prev.filter((r) => r.id !== id));
     toast.success("Record deleted successfully.");
-    setSelectedIds(prev => {
+    setSelectedIds((prev) => {
       const next = new Set(prev);
       next.delete(id);
       return next;
@@ -218,12 +233,13 @@ function EarnLeaveSubmitPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 lg:p-8 space-y-6">
-
           {/* Breadcrumb and Page Header */}
           <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-3" />
                 <span>Leave Management</span>
                 <ChevronRight className="size-3" />
@@ -250,8 +266,10 @@ function EarnLeaveSubmitPage() {
 
           {/* Configuration Filter Panel */}
           <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-xs">
-            <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-4 text-xs font-bold font-sans">
-
+            <form
+              onSubmit={handleSearchSubmit}
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-4 text-xs font-bold font-sans"
+            >
               {/* Year */}
               <div className="space-y-1.5">
                 <label className="text-[10px] text-slate-400 uppercase">Year</label>
@@ -328,7 +346,9 @@ function EarnLeaveSubmitPage() {
               <div className="space-y-1.5 sm:col-span-2">
                 <label className="text-[10px] text-slate-400 uppercase flex items-center justify-between">
                   <span>Employee ID Filter</span>
-                  <span className="text-[8px] text-slate-400 font-semibold lowercase italic">(Blank for all ready items)</span>
+                  <span className="text-[8px] text-slate-400 font-semibold lowercase italic">
+                    (Blank for all ready items)
+                  </span>
                 </label>
                 <input
                   type="text"
@@ -348,15 +368,12 @@ function EarnLeaveSubmitPage() {
                   Search
                 </button>
               </div>
-
             </form>
           </div>
 
           {/* Action Row & Utility Controls */}
           <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-6 shadow-sm space-y-5">
-
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-
               {/* Submit Selected & Delete Selected actions */}
               <div className="flex items-center gap-3">
                 <button
@@ -377,7 +394,6 @@ function EarnLeaveSubmitPage() {
 
               {/* Spreadsheet download utilities & Grid Search input */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-
                 <div className="flex items-center gap-1.5">
                   <button className="h-8.5 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 font-extrabold text-[11px] text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition">
                     <FileSpreadsheet className="size-3.5 text-emerald-500" />
@@ -403,9 +419,7 @@ function EarnLeaveSubmitPage() {
                     className="h-8.5 pl-9 pr-3 w-full sm:w-48 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px] font-bold outline-none focus:bg-white dark:focus:bg-slate-950 focus:border-primary transition"
                   />
                 </div>
-
               </div>
-
             </div>
 
             {/* Pink-Rose table sheet grid */}
@@ -421,17 +435,39 @@ function EarnLeaveSubmitPage() {
                         className="rounded border-slate-300 text-primary focus:ring-primary size-3.5 cursor-pointer"
                       />
                     </th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Emp ID</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Name</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Department</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">Designation</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">Earned Days</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-right">Per Day Rate</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-right">Net Pay</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center w-28">Payment Mode</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-left w-36">Bank Name</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-left w-36">Account No</th>
-                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">Status</th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">
+                      Emp ID
+                    </th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">
+                      Name
+                    </th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">
+                      Department
+                    </th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30">
+                      Designation
+                    </th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">
+                      Earned Days
+                    </th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-right">
+                      Per Day Rate
+                    </th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-right">
+                      Net Pay
+                    </th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center w-28">
+                      Payment Mode
+                    </th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-left w-36">
+                      Bank Name
+                    </th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-left w-36">
+                      Account No
+                    </th>
+                    <th className="px-3 py-3 border-r border-slate-200/50 dark:border-slate-800/30 text-center">
+                      Status
+                    </th>
                     <th className="px-3 py-3 text-center">Actions</th>
                   </tr>
                 </thead>
@@ -439,16 +475,21 @@ function EarnLeaveSubmitPage() {
                   {filteredRows.map((row) => {
                     const isSelected = selectedIds.has(row.id);
 
-                    let statusColor = "bg-amber-100 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400";
+                    let statusColor =
+                      "bg-amber-100 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400";
                     if (row.status === "Submitted") {
-                      statusColor = "bg-blue-100 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400";
+                      statusColor =
+                        "bg-blue-100 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400";
                     } else if (row.status === "Cleared") {
-                      statusColor = "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400";
+                      statusColor =
+                        "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400";
                     }
 
                     return (
-                      <tr key={row.id} className="hover:bg-slate-50/55 dark:hover:bg-slate-900/40 transition duration-75 whitespace-nowrap">
-
+                      <tr
+                        key={row.id}
+                        className="hover:bg-slate-50/55 dark:hover:bg-slate-900/40 transition duration-75 whitespace-nowrap"
+                      >
                         {/* Checkbox */}
                         <td className="px-3 py-3 text-center border-r border-slate-100 dark:border-slate-800/50">
                           <input
@@ -460,22 +501,38 @@ function EarnLeaveSubmitPage() {
                         </td>
 
                         {/* ID & Bio */}
-                        <td className="px-3 py-3 font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">{row.empId}</td>
-                        <td className="px-3 py-3 font-extrabold text-slate-900 dark:text-white border-r border-slate-100 dark:border-slate-800/50">{row.empName}</td>
-                        <td className="px-3 py-3 text-slate-650 dark:text-slate-350 border-r border-slate-100 dark:border-slate-800/50">{row.department}</td>
-                        <td className="px-3 py-3 text-slate-650 dark:text-slate-350 border-r border-slate-100 dark:border-slate-800/50">{row.designation}</td>
+                        <td className="px-3 py-3 font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">
+                          {row.empId}
+                        </td>
+                        <td className="px-3 py-3 font-extrabold text-slate-900 dark:text-white border-r border-slate-100 dark:border-slate-800/50">
+                          {row.empName}
+                        </td>
+                        <td className="px-3 py-3 text-slate-650 dark:text-slate-350 border-r border-slate-100 dark:border-slate-800/50">
+                          {row.department}
+                        </td>
+                        <td className="px-3 py-3 text-slate-650 dark:text-slate-350 border-r border-slate-100 dark:border-slate-800/50">
+                          {row.designation}
+                        </td>
 
                         {/* Calculations */}
-                        <td className="px-3 py-3 text-center font-mono font-bold border-r border-slate-100 dark:border-slate-800/50">{row.totalDays}</td>
-                        <td className="px-3 py-3 text-right font-mono border-r border-slate-100 dark:border-slate-800/50">{row.perDayRate.toFixed(2)}</td>
-                        <td className="px-3 py-3 text-right font-mono font-black text-slate-900 dark:text-white border-r border-slate-100 dark:border-slate-800/50">{row.netPay}</td>
+                        <td className="px-3 py-3 text-center font-mono font-bold border-r border-slate-100 dark:border-slate-800/50">
+                          {row.totalDays}
+                        </td>
+                        <td className="px-3 py-3 text-right font-mono border-r border-slate-100 dark:border-slate-800/50">
+                          {row.perDayRate.toFixed(2)}
+                        </td>
+                        <td className="px-3 py-3 text-right font-mono font-black text-slate-900 dark:text-white border-r border-slate-100 dark:border-slate-800/50">
+                          {row.netPay}
+                        </td>
 
                         {/* Inline Editable: Payment Mode */}
                         <td className="px-2.5 py-1.5 border-r border-slate-100 dark:border-slate-800/50">
                           <select
                             value={row.paymentMode}
                             disabled={row.status !== "Draft"}
-                            onChange={(e) => handleInlineChange(row.id, "paymentMode", e.target.value as any)}
+                            onChange={(e) =>
+                              handleInlineChange(row.id, "paymentMode", e.target.value as any)
+                            }
                             className="w-full h-7 px-1 rounded bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[10px] font-bold outline-none focus:border-primary"
                           >
                             <option value="Bank">Bank</option>
@@ -503,7 +560,9 @@ function EarnLeaveSubmitPage() {
                             type="text"
                             value={row.accountNo}
                             disabled={row.status !== "Draft" || row.paymentMode === "Cash"}
-                            onChange={(e) => handleInlineChange(row.id, "accountNo", e.target.value)}
+                            onChange={(e) =>
+                              handleInlineChange(row.id, "accountNo", e.target.value)
+                            }
                             placeholder="e.g. Acc Account no"
                             className="w-full h-7 px-2 rounded bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[10px] font-bold outline-none focus:bg-white focus:border-primary disabled:opacity-40"
                           />
@@ -511,7 +570,9 @@ function EarnLeaveSubmitPage() {
 
                         {/* Status */}
                         <td className="px-3 py-3 text-center border-r border-slate-100 dark:border-slate-800/50">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase ${statusColor}`}>
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase ${statusColor}`}
+                          >
                             {row.status}
                           </span>
                         </td>
@@ -526,7 +587,6 @@ function EarnLeaveSubmitPage() {
                             <Trash2 className="size-3.5" />
                           </button>
                         </td>
-
                       </tr>
                     );
                   })}
@@ -563,9 +623,7 @@ function EarnLeaveSubmitPage() {
                 </button>
               </div>
             </div>
-
           </div>
-
         </div>
       </main>
     </div>

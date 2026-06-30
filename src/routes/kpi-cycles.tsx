@@ -3,8 +3,19 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  ChevronRight, Plus, Search, Edit3, Trash2, X, Activity,
-  CalendarDays, CalendarRange, Users, AlertCircle, PlayCircle, CheckCircle2
+  ChevronRight,
+  Plus,
+  Search,
+  Edit3,
+  Trash2,
+  X,
+  Activity,
+  CalendarDays,
+  CalendarRange,
+  Users,
+  AlertCircle,
+  PlayCircle,
+  CheckCircle2,
 } from "lucide-react";
 import { type KpiCycle, loadKpiCycles, saveKpiCycles, DEPARTMENT_LIST } from "@/lib/kpi-data";
 
@@ -12,7 +23,10 @@ export const Route = createFileRoute("/kpi-cycles")({
   head: () => ({
     meta: [
       { title: "KPI Cycles — CRIPTON" },
-      { name: "description", content: "Manage appraisal periods and performance evaluation cycles." },
+      {
+        name: "description",
+        content: "Manage appraisal periods and performance evaluation cycles.",
+      },
     ],
   }),
   component: KpiCyclesPage,
@@ -35,32 +49,38 @@ function KpiCyclesPage() {
   }>({
     name: "",
     type: "Annual",
-    startDate: new Date().toISOString().split('T')[0],
-    endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+    startDate: new Date().toISOString().split("T")[0],
+    endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+      .toISOString()
+      .split("T")[0],
     status: "Draft",
-    departments: ["All Departments"]
+    departments: ["All Departments"],
   });
 
   const filteredCycles = useMemo(() => {
     let list = cycles;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      list = list.filter(c => c.name.toLowerCase().includes(q));
+      list = list.filter((c) => c.name.toLowerCase().includes(q));
     }
     return list;
   }, [cycles, searchQuery]);
 
-  const activeCount = cycles.filter(c => c.status === "Active").length;
-  const draftCount = cycles.filter(c => c.status === "Draft").length;
-  const closedCount = cycles.filter(c => c.status === "Closed").length;
+  const activeCount = cycles.filter((c) => c.status === "Active").length;
+  const draftCount = cycles.filter((c) => c.status === "Draft").length;
+  const closedCount = cycles.filter((c) => c.status === "Closed").length;
 
   const openAddModal = () => {
     setEditId(null);
     setForm({
-      name: "", type: "Annual",
-      startDate: new Date().toISOString().split('T')[0],
-      endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
-      status: "Draft", departments: ["All Departments"]
+      name: "",
+      type: "Annual",
+      startDate: new Date().toISOString().split("T")[0],
+      endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+        .toISOString()
+        .split("T")[0],
+      status: "Draft",
+      departments: ["All Departments"],
     });
     setShowModal(true);
   };
@@ -73,7 +93,7 @@ function KpiCyclesPage() {
       startDate: item.startDate,
       endDate: item.endDate,
       status: item.status,
-      departments: [...item.departments]
+      departments: [...item.departments],
     });
     setShowModal(true);
   };
@@ -92,21 +112,29 @@ function KpiCyclesPage() {
 
     let updated: KpiCycle[];
     if (editId) {
-      const existing = cycles.find(c => c.id === editId);
-      updated = cycles.map(c => c.id === editId ? { 
-        ...c, ...form,
-        totalEmployees: existing ? existing.totalEmployees : 0,
-        completedCount: existing ? existing.completedCount : 0
-      } : c);
+      const existing = cycles.find((c) => c.id === editId);
+      updated = cycles.map((c) =>
+        c.id === editId
+          ? {
+              ...c,
+              ...form,
+              totalEmployees: existing ? existing.totalEmployees : 0,
+              completedCount: existing ? existing.completedCount : 0,
+            }
+          : c,
+      );
     } else {
       const newId = `CYC-${String(cycles.length + 1).padStart(3, "0")}`;
-      updated = [...cycles, { 
-        id: newId, 
-        ...form,
-        totalEmployees: 0, // Would normally be calculated based on departments
-        completedCount: 0,
-        createdAt: new Date().toISOString().split('T')[0]
-      }];
+      updated = [
+        ...cycles,
+        {
+          id: newId,
+          ...form,
+          totalEmployees: 0, // Would normally be calculated based on departments
+          completedCount: 0,
+          createdAt: new Date().toISOString().split("T")[0],
+        },
+      ];
     }
     setCycles(updated);
     saveKpiCycles(updated);
@@ -114,7 +142,7 @@ function KpiCyclesPage() {
   };
 
   const handleDelete = (id: string) => {
-    const updated = cycles.filter(c => c.id !== id);
+    const updated = cycles.filter((c) => c.id !== id);
     setCycles(updated);
     saveKpiCycles(updated);
     setDeleteConfirm(null);
@@ -122,19 +150,27 @@ function KpiCyclesPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Active": return "bg-emerald-500/10 text-emerald-600 border-emerald-500/20";
-      case "Draft": return "bg-amber-500/10 text-amber-600 border-amber-500/20";
-      case "Closed": return "bg-slate-500/10 text-slate-600 border-slate-500/20";
-      case "Archived": return "bg-red-500/10 text-red-600 border-red-500/20";
-      default: return "bg-muted text-muted-foreground border-border";
+      case "Active":
+        return "bg-emerald-500/10 text-emerald-600 border-emerald-500/20";
+      case "Draft":
+        return "bg-amber-500/10 text-amber-600 border-amber-500/20";
+      case "Closed":
+        return "bg-slate-500/10 text-slate-600 border-slate-500/20";
+      case "Archived":
+        return "bg-red-500/10 text-red-600 border-red-500/20";
+      default:
+        return "bg-muted text-muted-foreground border-border";
     }
   };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case "Annual": return <CalendarRange className="size-4" />;
-      case "Mid-Year": return <Activity className="size-4" />;
-      default: return <CalendarDays className="size-4" />;
+      case "Annual":
+        return <CalendarRange className="size-4" />;
+      case "Mid-Year":
+        return <Activity className="size-4" />;
+      default:
+        return <CalendarDays className="size-4" />;
     }
   };
 
@@ -145,12 +181,13 @@ function KpiCyclesPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 xl:p-8 space-y-6">
-
           {/* Header */}
           <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-2.5" />
                 <span className="text-muted-foreground/75">KPI</span>
                 <ChevronRight className="size-2.5" />
@@ -160,7 +197,9 @@ function KpiCyclesPage() {
                 <CalendarRange className="size-5.5 text-primary" />
                 <span>KPI Assessment Cycles</span>
               </h1>
-              <p className="text-xs text-muted-foreground mt-1">Manage performance appraisal periods, mid-year reviews, and probation cycles</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Manage performance appraisal periods, mid-year reviews, and probation cycles
+              </p>
             </div>
 
             <button
@@ -175,19 +214,27 @@ function KpiCyclesPage() {
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs">
-              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">Total Cycles</span>
+              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">
+                Total Cycles
+              </span>
               <p className="text-2xl font-black text-foreground mt-1">{cycles.length}</p>
             </div>
             <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs">
-              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">Active Currently</span>
+              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">
+                Active Currently
+              </span>
               <p className="text-2xl font-black text-emerald-600 mt-1">{activeCount}</p>
             </div>
             <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs">
-              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">Draft / Planning</span>
+              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">
+                Draft / Planning
+              </span>
               <p className="text-2xl font-black text-amber-600 mt-1">{draftCount}</p>
             </div>
             <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs">
-              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">Closed</span>
+              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">
+                Closed
+              </span>
               <p className="text-2xl font-black text-slate-600 mt-1">{closedCount}</p>
             </div>
           </div>
@@ -209,15 +256,21 @@ function KpiCyclesPage() {
           {/* Cycle Cards */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {filteredCycles.map((cycle) => {
-              const progress = cycle.totalEmployees > 0 
-                ? Math.round((cycle.completedCount / cycle.totalEmployees) * 100) 
-                : 0;
-                
+              const progress =
+                cycle.totalEmployees > 0
+                  ? Math.round((cycle.completedCount / cycle.totalEmployees) * 100)
+                  : 0;
+
               return (
-                <div key={cycle.id} className="bg-card rounded-xl border border-border/80 shadow-xs overflow-hidden flex flex-col transition-all hover:border-[#1e88e5]/40 hover:shadow-md">
+                <div
+                  key={cycle.id}
+                  className="bg-card rounded-xl border border-border/80 shadow-xs overflow-hidden flex flex-col transition-all hover:border-[#1e88e5]/40 hover:shadow-md"
+                >
                   <div className="p-5 border-b border-border/30 flex items-start justify-between bg-muted/10">
                     <div className="flex items-center gap-3">
-                      <div className={`size-10 rounded-xl grid place-items-center ${getStatusColor(cycle.status)}`}>
+                      <div
+                        className={`size-10 rounded-xl grid place-items-center ${getStatusColor(cycle.status)}`}
+                      >
                         {getTypeIcon(cycle.type)}
                       </div>
                       <div>
@@ -229,8 +282,10 @@ function KpiCyclesPage() {
                         </div>
                       </div>
                     </div>
-                    
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[9px] font-extrabold uppercase border ${getStatusColor(cycle.status)}`}>
+
+                    <span
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[9px] font-extrabold uppercase border ${getStatusColor(cycle.status)}`}
+                    >
                       {cycle.status === "Active" && <PlayCircle className="size-3" />}
                       {cycle.status === "Closed" && <CheckCircle2 className="size-3" />}
                       {cycle.status}
@@ -240,24 +295,37 @@ function KpiCyclesPage() {
                   <div className="p-5 flex-1 space-y-5">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Timeline</span>
-                        <span className="text-xs font-mono font-semibold text-foreground">{cycle.startDate} to {cycle.endDate}</span>
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">
+                          Timeline
+                        </span>
+                        <span className="text-xs font-mono font-semibold text-foreground">
+                          {cycle.startDate} to {cycle.endDate}
+                        </span>
                       </div>
                       <div>
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Departments</span>
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">
+                          Departments
+                        </span>
                         <span className="text-xs font-semibold text-foreground">
-                          {cycle.departments.includes("All Departments") ? "Organization Wide" : `${cycle.departments.length} Departments`}
+                          {cycle.departments.includes("All Departments")
+                            ? "Organization Wide"
+                            : `${cycle.departments.length} Departments`}
                         </span>
                       </div>
                     </div>
 
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-[10px] font-black uppercase text-muted-foreground">
-                        <span className="flex items-center gap-1.5"><Users className="size-3" /> Progress ({cycle.completedCount} / {cycle.totalEmployees})</span>
-                        <span className={progress === 100 ? "text-emerald-500" : "text-[#1e88e5]"}>{progress}%</span>
+                        <span className="flex items-center gap-1.5">
+                          <Users className="size-3" /> Progress ({cycle.completedCount} /{" "}
+                          {cycle.totalEmployees})
+                        </span>
+                        <span className={progress === 100 ? "text-emerald-500" : "text-[#1e88e5]"}>
+                          {progress}%
+                        </span>
                       </div>
                       <div className="h-2 rounded-full bg-muted/50 border border-border/30 overflow-hidden flex">
-                        <div 
+                        <div
                           className={`h-full transition-all duration-1000 ${progress === 100 ? "bg-emerald-500" : "bg-[#1e88e5]"}`}
                           style={{ width: `${progress}%` }}
                         />
@@ -266,17 +334,23 @@ function KpiCyclesPage() {
                   </div>
 
                   <div className="p-3 border-t border-border/30 bg-muted/20 flex items-center justify-end gap-2">
-                    <button onClick={() => openEditModal(cycle)} className="h-8 px-4 rounded-lg bg-card border border-border/60 hover:bg-muted text-xs font-bold text-foreground transition flex items-center gap-1.5">
+                    <button
+                      onClick={() => openEditModal(cycle)}
+                      className="h-8 px-4 rounded-lg bg-card border border-border/60 hover:bg-muted text-xs font-bold text-foreground transition flex items-center gap-1.5"
+                    >
                       <Edit3 className="size-3" /> Edit
                     </button>
-                    <button onClick={() => setDeleteConfirm(cycle.id)} className="h-8 px-3 rounded-lg border border-transparent hover:bg-red-500/10 text-muted-foreground hover:text-red-500 transition grid place-items-center">
+                    <button
+                      onClick={() => setDeleteConfirm(cycle.id)}
+                      className="h-8 px-3 rounded-lg border border-transparent hover:bg-red-500/10 text-muted-foreground hover:text-red-500 transition grid place-items-center"
+                    >
                       <Trash2 className="size-4" />
                     </button>
                   </div>
                 </div>
               );
             })}
-            
+
             {filteredCycles.length === 0 && (
               <div className="col-span-1 lg:col-span-2 py-12 text-center text-xs font-bold text-muted-foreground border border-border/40 border-dashed rounded-xl">
                 No appraisal cycles found matching your criteria.
@@ -306,11 +380,14 @@ function KpiCyclesPage() {
 
             <form onSubmit={handleSave} className="p-6 space-y-5">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Cycle Name *</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                  Cycle Name *
+                </label>
                 <input
-                  type="text" required
+                  type="text"
+                  required
                   value={form.name}
-                  onChange={(e) => setForm(p => ({ ...p, name: e.target.value }))}
+                  onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
                   placeholder="e.g., Annual Performance Review 2026"
                   className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5]"
                 />
@@ -318,10 +395,14 @@ function KpiCyclesPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Type *</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Type *
+                  </label>
                   <select
                     value={form.type}
-                    onChange={(e) => setForm(p => ({ ...p, type: e.target.value as KpiCycle["type"] }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, type: e.target.value as KpiCycle["type"] }))
+                    }
                     className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5]"
                   >
                     <option value="Annual">Annual</option>
@@ -331,10 +412,14 @@ function KpiCyclesPage() {
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Status *</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Status *
+                  </label>
                   <select
                     value={form.status}
-                    onChange={(e) => setForm(p => ({ ...p, status: e.target.value as KpiCycle["status"] }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, status: e.target.value as KpiCycle["status"] }))
+                    }
                     className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5]"
                   >
                     <option value="Draft">Draft</option>
@@ -347,49 +432,66 @@ function KpiCyclesPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Start Date *</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Start Date *
+                  </label>
                   <input
-                    type="date" required
+                    type="date"
+                    required
                     value={form.startDate}
-                    onChange={(e) => setForm(p => ({ ...p, startDate: e.target.value }))}
+                    onChange={(e) => setForm((p) => ({ ...p, startDate: e.target.value }))}
                     className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold font-mono outline-none focus:border-[#1e88e5]"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">End Date *</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    End Date *
+                  </label>
                   <input
-                    type="date" required
+                    type="date"
+                    required
                     value={form.endDate}
-                    onChange={(e) => setForm(p => ({ ...p, endDate: e.target.value }))}
+                    onChange={(e) => setForm((p) => ({ ...p, endDate: e.target.value }))}
                     className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold font-mono outline-none focus:border-[#1e88e5]"
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Applicable Departments *</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                  Applicable Departments *
+                </label>
                 <select
                   multiple
                   value={form.departments}
                   onChange={(e) => {
-                    const values = Array.from(e.target.selectedOptions, option => option.value);
+                    const values = Array.from(e.target.selectedOptions, (option) => option.value);
                     if (values.includes("All Departments")) {
-                      setForm(p => ({ ...p, departments: ["All Departments"] }));
+                      setForm((p) => ({ ...p, departments: ["All Departments"] }));
                     } else {
-                      setForm(p => ({ ...p, departments: values }));
+                      setForm((p) => ({ ...p, departments: values }));
                     }
                   }}
                   className="w-full h-24 p-2 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-[#1e88e5] resize-y"
                 >
-                  {DEPARTMENT_LIST.map(d => <option key={d} value={d} className="p-1">{d}</option>)}
+                  {DEPARTMENT_LIST.map((d) => (
+                    <option key={d} value={d} className="p-1">
+                      {d}
+                    </option>
+                  ))}
                 </select>
-                <span className="text-[9px] text-muted-foreground">Hold Ctrl/Cmd to select multiple. Select "All Departments" to override.</span>
+                <span className="text-[9px] text-muted-foreground">
+                  Hold Ctrl/Cmd to select multiple. Select "All Departments" to override.
+                </span>
               </div>
 
               {form.status === "Active" && (
                 <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 flex items-start gap-2">
                   <AlertCircle className="size-4 shrink-0 mt-0.5" />
-                  <span className="text-[11px] font-semibold">Activating this cycle will make it available for employees to submit self-assessments and managers to begin evaluations.</span>
+                  <span className="text-[11px] font-semibold">
+                    Activating this cycle will make it available for employees to submit
+                    self-assessments and managers to begin evaluations.
+                  </span>
                 </div>
               )}
 
@@ -427,8 +529,18 @@ function KpiCyclesPage() {
               </div>
             </div>
             <div className="flex justify-end gap-3">
-              <button onClick={() => setDeleteConfirm(null)} className="h-8 px-4 border border-border/40 text-muted-foreground font-bold text-xs rounded-lg hover:bg-muted/50 transition">Cancel</button>
-              <button onClick={() => handleDelete(deleteConfirm)} className="h-8 px-4 bg-red-500 hover:bg-red-600 text-white font-extrabold text-xs rounded-lg shadow-sm transition uppercase">Delete</button>
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                className="h-8 px-4 border border-border/40 text-muted-foreground font-bold text-xs rounded-lg hover:bg-muted/50 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(deleteConfirm)}
+                className="h-8 px-4 bg-red-500 hover:bg-red-600 text-white font-extrabold text-xs rounded-lg shadow-sm transition uppercase"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>

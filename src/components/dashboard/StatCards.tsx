@@ -1,4 +1,13 @@
-import { Users, UserPlus, UserMinus, Clock4, Briefcase, ClipboardCheck, TrendingUp, TrendingDown } from "lucide-react";
+import {
+  Users,
+  UserPlus,
+  UserMinus,
+  Clock4,
+  Briefcase,
+  ClipboardCheck,
+  TrendingUp,
+  TrendingDown,
+} from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer } from "recharts";
 
 const spark = (seed: number) =>
@@ -6,13 +15,76 @@ const spark = (seed: number) =>
 
 type Tint = "primary" | "success" | "warning" | "info" | "violet" | "rose";
 
-const stats: { label: string; value: string; delta: string; up: boolean; icon: any; tint: Tint; data: any; subText: string }[] = [
-  { label: "Total Employees", value: "1,284", delta: "+4.6%", up: true, icon: Users, tint: "primary", data: spark(2), subText: "1,042 active · 242 remote" },
-  { label: "New Hires (MTD)", value: "37", delta: "+12.1%", up: true, icon: UserPlus, tint: "success", data: spark(5), subText: "14 onboarding · 23 placed" },
-  { label: "Attrition Rate", value: "2.4%", delta: "-0.6%", up: false, icon: UserMinus, tint: "warning", data: spark(3), subText: "Target <4.0% · 2 yr low" },
-  { label: "Avg. Working Hrs", value: "8.2h", delta: "+0.3h", up: true, icon: Clock4, tint: "info", data: spark(7), subText: "94.2% on-time presence" },
-  { label: "Open Reqs", value: "18", delta: "+3", up: true, icon: Briefcase, tint: "violet", data: spark(9), subText: "12 tech · 6 sales" },
-  { label: "Approvals", value: "45", delta: "-12", up: false, icon: ClipboardCheck, tint: "rose", data: spark(4), subText: "32 leave · 13 exp" },
+const stats: {
+  label: string;
+  value: string;
+  delta: string;
+  up: boolean;
+  icon: any;
+  tint: Tint;
+  data: any;
+  subText: string;
+}[] = [
+  {
+    label: "Total Employees",
+    value: "1,284",
+    delta: "+4.6%",
+    up: true,
+    icon: Users,
+    tint: "primary",
+    data: spark(2),
+    subText: "1,042 active · 242 remote",
+  },
+  {
+    label: "New Hires (MTD)",
+    value: "37",
+    delta: "+12.1%",
+    up: true,
+    icon: UserPlus,
+    tint: "success",
+    data: spark(5),
+    subText: "14 onboarding · 23 placed",
+  },
+  {
+    label: "Attrition Rate",
+    value: "2.4%",
+    delta: "-0.6%",
+    up: false,
+    icon: UserMinus,
+    tint: "warning",
+    data: spark(3),
+    subText: "Target <4.0% · 2 yr low",
+  },
+  {
+    label: "Avg. Working Hrs",
+    value: "8.2h",
+    delta: "+0.3h",
+    up: true,
+    icon: Clock4,
+    tint: "info",
+    data: spark(7),
+    subText: "94.2% on-time presence",
+  },
+  {
+    label: "Open Reqs",
+    value: "18",
+    delta: "+3",
+    up: true,
+    icon: Briefcase,
+    tint: "violet",
+    data: spark(9),
+    subText: "12 tech · 6 sales",
+  },
+  {
+    label: "Approvals",
+    value: "45",
+    delta: "-12",
+    up: false,
+    icon: ClipboardCheck,
+    tint: "rose",
+    data: spark(4),
+    subText: "32 leave · 13 exp",
+  },
 ];
 
 const tintMap: Record<Tint, { card: string; iconBg: string; stroke: string; ring: string }> = {
@@ -68,17 +140,31 @@ export function StatCards() {
           >
             <div className="flex items-start justify-between gap-2 relative z-10">
               <div className="min-w-0 flex-1">
-                <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80">{s.label}</div>
-                <div className="mt-1 text-xl font-extrabold tracking-tight leading-none text-foreground">{s.value}</div>
+                <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80">
+                  {s.label}
+                </div>
+                <div className="mt-1 text-xl font-extrabold tracking-tight leading-none text-foreground">
+                  {s.value}
+                </div>
                 <div className="mt-2 flex flex-wrap items-center gap-1">
-                  <span className={`inline-flex items-center gap-0.5 px-1 py-0.5 rounded-full text-[8.5px] font-bold bg-background/60 backdrop-blur-xs border border-border/30 shadow-2xs ${s.up ? "text-success" : "text-destructive"}`}>
-                    {s.up ? <TrendingUp className="size-2.5" /> : <TrendingDown className="size-2.5" />}
+                  <span
+                    className={`inline-flex items-center gap-0.5 px-1 py-0.5 rounded-full text-[8.5px] font-bold bg-background/60 backdrop-blur-xs border border-border/30 shadow-2xs ${s.up ? "text-success" : "text-destructive"}`}
+                  >
+                    {s.up ? (
+                      <TrendingUp className="size-2.5" />
+                    ) : (
+                      <TrendingDown className="size-2.5" />
+                    )}
                     {s.delta}
                   </span>
-                  <span className="text-[9px] text-muted-foreground/80 font-medium truncate flex-1 leading-tight">{s.subText}</span>
+                  <span className="text-[9px] text-muted-foreground/80 font-medium truncate flex-1 leading-tight">
+                    {s.subText}
+                  </span>
                 </div>
               </div>
-              <div className={`size-7 rounded-lg grid place-items-center transition-transform duration-300 group-hover:scale-105 ${t.iconBg} shrink-0`}>
+              <div
+                className={`size-7 rounded-lg grid place-items-center transition-transform duration-300 group-hover:scale-105 ${t.iconBg} shrink-0`}
+              >
                 <Icon className="size-3.5" />
               </div>
             </div>
@@ -92,7 +178,13 @@ export function StatCards() {
                       <stop offset="100%" stopColor={t.stroke} stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <Area type="monotone" dataKey="v" stroke={t.stroke} strokeWidth={1.5} fill={`url(#${gradId})`} />
+                  <Area
+                    type="monotone"
+                    dataKey="v"
+                    stroke={t.stroke}
+                    strokeWidth={1.5}
+                    fill={`url(#${gradId})`}
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             </div>

@@ -4,24 +4,46 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { employeesData } from "@/routes/personnel-list";
-import { 
-  UserRound, Printer, Upload, Palette, FileText, 
-  Check, RefreshCcw, Sparkles, Info, Eye, Plus, Trash2, 
-  Layers, Users, Search, SlidersHorizontal, ChevronRight,
-  GripVertical, ArrowUp, ArrowDown
+import {
+  UserRound,
+  Printer,
+  Upload,
+  Palette,
+  FileText,
+  Check,
+  RefreshCcw,
+  Sparkles,
+  Info,
+  Eye,
+  Plus,
+  Trash2,
+  Layers,
+  Users,
+  Search,
+  SlidersHorizontal,
+  ChevronRight,
+  GripVertical,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 
 export const Route = createFileRoute("/id-card-setup")({
   head: () => ({
     meta: [
       { title: "ID Card Setup — CRIPTON" },
-      { name: "description", content: "Design, configure, save templates, and bulk-print employee ID cards." },
+      {
+        name: "description",
+        content: "Design, configure, save templates, and bulk-print employee ID cards.",
+      },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" }
-    ]
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap",
+      },
+    ],
   }),
   component: IDCardSetupPage,
 });
@@ -71,9 +93,10 @@ const SYSTEM_TEMPLATES: CardTemplate[] = [
     showDepartment: true,
     showDesignation: true,
     showBarcode: true,
-    backText: "This card is the property of CRIPTON GROUP.\nIf found, please return to the nearest HR Department or mail to:\nHouse 12, Road 5, Sector 3, Uttara, Dhaka-1230.\nTel: +880 2 8901234 | Email: hr@cripton.com",
+    backText:
+      "This card is the property of CRIPTON GROUP.\nIf found, please return to the nearest HR Department or mail to:\nHouse 12, Road 5, Sector 3, Uttara, Dhaka-1230.\nTel: +880 2 8901234 | Email: hr@cripton.com",
     elementOrder: ["header", "photo", "identity", "details", "footer"],
-    isSystem: true
+    isSystem: true,
   },
   {
     id: "sys-factory",
@@ -88,9 +111,10 @@ const SYSTEM_TEMPLATES: CardTemplate[] = [
     showDepartment: true,
     showDesignation: true,
     showBarcode: true,
-    backText: "If found, please return to:\nPakiza Textile Factory, Savar, Dhaka.\nIn case of emergency, contact factory admin office.",
+    backText:
+      "If found, please return to:\nPakiza Textile Factory, Savar, Dhaka.\nIn case of emergency, contact factory admin office.",
     elementOrder: ["header", "photo", "identity", "details", "footer"],
-    isSystem: true
+    isSystem: true,
   },
   {
     id: "sys-creative",
@@ -105,10 +129,11 @@ const SYSTEM_TEMPLATES: CardTemplate[] = [
     showDepartment: true,
     showDesignation: true,
     showBarcode: true,
-    backText: "This card is the property of Pakiza Software.\nUnauthorized use is strictly prohibited and subject to disciplinary action.\nWeb: www.pakizasoftware.com",
+    backText:
+      "This card is the property of Pakiza Software.\nUnauthorized use is strictly prohibited and subject to disciplinary action.\nWeb: www.pakizasoftware.com",
     elementOrder: ["header", "photo", "identity", "details", "footer"],
-    isSystem: true
-  }
+    isSystem: true,
+  },
 ];
 
 function IDCardSetupPage() {
@@ -121,14 +146,14 @@ function IDCardSetupPage() {
   const [companyName, setCompanyName] = useState<string>("PAKIZA SOFTWARE");
   const [logoUrl, setLogoUrl] = useState<string>(DEFAULT_LOGO_SVG);
   const [signatureUrl, setSignatureUrl] = useState<string>(DEFAULT_SIGNATURE_SVG);
-  
+
   // Drag and Drop Layout Elements Order
   const [elementOrder, setElementOrder] = useState<string[]>([
     "header",
     "photo",
     "identity",
     "details",
-    "footer"
+    "footer",
   ]);
 
   // Toggle visible elements
@@ -137,10 +162,10 @@ function IDCardSetupPage() {
   const [showDepartment, setShowDepartment] = useState<boolean>(true);
   const [showDesignation, setShowDesignation] = useState<boolean>(true);
   const [showBarcode, setShowBarcode] = useState<boolean>(true);
-  
+
   // Custom text on back side
   const [backText, setBackText] = useState<string>(
-    "This card is the property of PAKIZA SOFTWARE.\nIf found, please return to the nearest HR Department or mail to:\nHouse 12, Road 5, Sector 3, Uttara, Dhaka-1230.\nTel: +880 2 8901234 | Email: hr@cripton.com"
+    "This card is the property of PAKIZA SOFTWARE.\nIf found, please return to the nearest HR Department or mail to:\nHouse 12, Road 5, Sector 3, Uttara, Dhaka-1230.\nTel: +880 2 8901234 | Email: hr@cripton.com",
   );
 
   // Single Designer Specific state
@@ -205,7 +230,7 @@ function IDCardSetupPage() {
       showDesignation,
       showBarcode,
       backText,
-      elementOrder
+      elementOrder,
     };
 
     const updated = [...savedTemplates, newTemplate];
@@ -237,33 +262,33 @@ function IDCardSetupPage() {
   // Delete a template
   const handleDeleteTemplate = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const updated = savedTemplates.filter(t => t.id !== id);
+    const updated = savedTemplates.filter((t) => t.id !== id);
     saveTemplatesToStorage(updated);
   };
 
   // Get selected employee details for single view
   const selectedEmployee = useMemo(() => {
-    return employeesData.find(emp => emp.id === selectedEmpId) || employeesData[0];
+    return employeesData.find((emp) => emp.id === selectedEmpId) || employeesData[0];
   }, [selectedEmpId]);
 
   // Map employees for the SearchableSelect
   const employeeOptions = useMemo(() => {
-    return employeesData.map(emp => ({
+    return employeesData.map((emp) => ({
       value: emp.id,
-      label: `${emp.name} (${emp.id}) - ${emp.title}`
+      label: `${emp.name} (${emp.id}) - ${emp.title}`,
     }));
   }, []);
 
   // Filtered employees list for bulk printing
   const filteredEmployees = useMemo(() => {
-    return employeesData.filter(emp => {
-      const matchesSearch = 
+    return employeesData.filter((emp) => {
+      const matchesSearch =
         emp.name.toLowerCase().includes(bulkSearchQuery.toLowerCase()) ||
         emp.id.includes(bulkSearchQuery) ||
         emp.title.toLowerCase().includes(bulkSearchQuery.toLowerCase());
-      
+
       const matchesDept = bulkDeptFilter === "ALL" || emp.dept === bulkDeptFilter;
-      
+
       return matchesSearch && matchesDept;
     });
   }, [bulkSearchQuery, bulkDeptFilter]);
@@ -271,7 +296,7 @@ function IDCardSetupPage() {
   // Unique departments for filtering
   const departmentsList = useMemo(() => {
     const depts = new Set<string>();
-    employeesData.forEach(emp => {
+    employeesData.forEach((emp) => {
       if (emp.dept) depts.add(emp.dept);
     });
     return Array.from(depts);
@@ -279,13 +304,13 @@ function IDCardSetupPage() {
 
   // Handle Bulk Selection
   const toggleSelectAllBulk = () => {
-    const filteredIds = filteredEmployees.map(emp => emp.id);
-    const allSelected = filteredIds.every(id => bulkSelectedEmpIds.includes(id));
-    
+    const filteredIds = filteredEmployees.map((emp) => emp.id);
+    const allSelected = filteredIds.every((id) => bulkSelectedEmpIds.includes(id));
+
     if (allSelected) {
-      setBulkSelectedEmpIds(prev => prev.filter(id => !filteredIds.includes(id)));
+      setBulkSelectedEmpIds((prev) => prev.filter((id) => !filteredIds.includes(id)));
     } else {
-      setBulkSelectedEmpIds(prev => {
+      setBulkSelectedEmpIds((prev) => {
         const union = new Set([...prev, ...filteredIds]);
         return Array.from(union);
       });
@@ -293,8 +318,8 @@ function IDCardSetupPage() {
   };
 
   const toggleSelectEmployeeBulk = (id: string) => {
-    setBulkSelectedEmpIds(prev => 
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    setBulkSelectedEmpIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
     );
   };
 
@@ -322,7 +347,7 @@ function IDCardSetupPage() {
   const moveElement = (index: number, direction: "up" | "down") => {
     const newIndex = direction === "up" ? index - 1 : index + 1;
     if (newIndex < 0 || newIndex >= elementOrder.length) return;
-    
+
     const copy = [...elementOrder];
     const temp = copy[index];
     copy[index] = copy[newIndex];
@@ -371,7 +396,7 @@ function IDCardSetupPage() {
     setLogoUrl(DEFAULT_LOGO_SVG);
     setSignatureUrl(DEFAULT_SIGNATURE_SVG);
     setBackText(
-      "This card is the property of PAKIZA SOFTWARE.\nIf found, please return to the nearest HR Department or mail to:\nHouse 12, Road 5, Sector 3, Uttara, Dhaka-1230.\nTel: +880 2 8901234 | Email: hr@cripton.com"
+      "This card is the property of PAKIZA SOFTWARE.\nIf found, please return to the nearest HR Department or mail to:\nHouse 12, Road 5, Sector 3, Uttara, Dhaka-1230.\nTel: +880 2 8901234 | Email: hr@cripton.com",
     );
     setShowBloodGroup(true);
     setShowJoinDate(true);
@@ -388,30 +413,21 @@ function IDCardSetupPage() {
     const bars: React.ReactNode[] = [];
     let currentX = 10;
     const height = 24;
-    
+
     const idDigits = id.replace(/\D/g, "") || "123456789";
-    const pattern = idDigits.split("").map(d => parseInt(d, 10));
-    
+    const pattern = idDigits.split("").map((d) => parseInt(d, 10));
+
     for (let i = 0; i < 28; i++) {
       const digit = pattern[i % pattern.length];
-      const width = (digit % 3 === 0) ? 2.0 : (digit % 2 === 0) ? 1.0 : 0.5;
+      const width = digit % 3 === 0 ? 2.0 : digit % 2 === 0 ? 1.0 : 0.5;
       const isSpace = i % 2 === 1;
-      
+
       if (!isSpace) {
-        bars.push(
-          <rect 
-            key={i} 
-            x={currentX} 
-            y={0} 
-            width={width} 
-            height={height} 
-            fill="black" 
-          />
-        );
+        bars.push(<rect key={i} x={currentX} y={0} width={width} height={height} fill="black" />);
       }
       currentX += width + 0.8;
     }
-    
+
     return (
       <div className="flex flex-col items-center justify-center mt-1 font-mono text-[7.5px] text-gray-800">
         <svg width={currentX + 10} height={height} className="overflow-visible">
@@ -435,27 +451,54 @@ function IDCardSetupPage() {
         {/* Timing Patterns */}
         <path d="M8,6 h13 M6,8 v13" stroke="currentColor" strokeWidth="0.8" strokeDasharray="1,1" />
         {/* Simulated data blocks for premium look */}
-        <path d="M9,0 h2 v2 h-2 z M13,0 h1 v3 h-1 z M16,1 h3 v1 h-3 z M20,2 h1 v2 h-1 z" fill="currentColor" />
-        <path d="M8,9 h3 v1 h-3 z M12,8 h2 v3 h-2 z M16,9 h1 v2 h-1 z M19,8 h2 v2 h-2 z" fill="currentColor" />
-        <path d="M9,13 h1 v2 h-1 z M11,12 h3 v1 h-3 z M15,14 h3 v1 h-3 z M19,12 h1 v3 h-1 z" fill="currentColor" />
-        <path d="M8,17 h2 v1 h-2 z M11,16 h1 v3 h-1 z M13,18 h2 v1 h-2 z M17,16 h3 v2 h-3 z" fill="currentColor" />
-        <path d="M9,20 h3 v1 h-3 z M13,20 h2 v1 h-2 z M16,21 h1 v1 h-1 z M18,20 h2 v2 h-2 z" fill="currentColor" />
-        <path d="M10,23 h2 v1 h-2 z M13,24 h1 v3 h-1 z M16,23 h3 v1 h-3 z M20,25 h1 v1 h-1 z" fill="currentColor" />
-        <path d="M8,26 h3 v1 h-3 z M12,28 h2 v1 h-2 z M16,27 h1 v2 h-1 z M19,26 h2 v2 h-2 z" fill="currentColor" />
+        <path
+          d="M9,0 h2 v2 h-2 z M13,0 h1 v3 h-1 z M16,1 h3 v1 h-3 z M20,2 h1 v2 h-1 z"
+          fill="currentColor"
+        />
+        <path
+          d="M8,9 h3 v1 h-3 z M12,8 h2 v3 h-2 z M16,9 h1 v2 h-1 z M19,8 h2 v2 h-2 z"
+          fill="currentColor"
+        />
+        <path
+          d="M9,13 h1 v2 h-1 z M11,12 h3 v1 h-3 z M15,14 h3 v1 h-3 z M19,12 h1 v3 h-1 z"
+          fill="currentColor"
+        />
+        <path
+          d="M8,17 h2 v1 h-2 z M11,16 h1 v3 h-1 z M13,18 h2 v1 h-2 z M17,16 h3 v2 h-3 z"
+          fill="currentColor"
+        />
+        <path
+          d="M9,20 h3 v1 h-3 z M13,20 h2 v1 h-2 z M16,21 h1 v1 h-1 z M18,20 h2 v2 h-2 z"
+          fill="currentColor"
+        />
+        <path
+          d="M10,23 h2 v1 h-2 z M13,24 h1 v3 h-1 z M16,23 h3 v1 h-3 z M20,25 h1 v1 h-1 z"
+          fill="currentColor"
+        />
+        <path
+          d="M8,26 h3 v1 h-3 z M12,28 h2 v1 h-2 z M16,27 h1 v2 h-1 z M19,26 h2 v2 h-2 z"
+          fill="currentColor"
+        />
       </svg>
     );
   };
 
   // Render Front Side of ID Card (Vertical)
-  const renderVerticalFront = (emp: typeof employeesData[0]) => {
+  const renderVerticalFront = (emp: (typeof employeesData)[0]) => {
     return (
-      <div 
+      <div
         className="size-full flex flex-col justify-between relative bg-gradient-to-b from-[#ffffff] via-[#fbfcfd] to-[#f6f8fb] overflow-hidden"
         style={{ fontFamily: "'Inter', sans-serif" }}
       >
         {/* Holographic security seal in the top-right corner */}
         <div className="absolute right-4.5 top-4.5 size-7 rounded-full opacity-[0.12] bg-gradient-to-tr from-cyan-400 via-pink-400 to-yellow-400 mix-blend-overlay border border-white/50 flex items-center justify-center pointer-events-none z-30">
-          <svg className="size-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            className="size-4 text-white"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <circle cx="12" cy="12" r="10" />
             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
             <path d="M2 12h20" />
@@ -479,27 +522,30 @@ function IDCardSetupPage() {
         </div>
 
         {/* Outer Accent Border */}
-        <div className="absolute inset-0 border-[1.5px] rounded-2xl pointer-events-none z-45" style={{ borderColor: themeColor }} />
+        <div
+          className="absolute inset-0 border-[1.5px] rounded-2xl pointer-events-none z-45"
+          style={{ borderColor: themeColor }}
+        />
 
         {/* Map through ordered layout elements */}
         {elementOrder.map((elementId, index) => {
           switch (elementId) {
             case "header":
               return (
-                <div 
-                  key="header" 
+                <div
+                  key="header"
                   className="relative z-10 pt-6 pb-8 px-5 flex items-center justify-between shrink-0 rounded-b-[24px]"
-                  style={{ 
-                    background: `linear-gradient(135deg, ${themeColor} 0%, ${themeColor}dd 100%)`
+                  style={{
+                    background: `linear-gradient(135deg, ${themeColor} 0%, ${themeColor}dd 100%)`,
                   }}
                 >
                   <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_30%_20%,white_0%,transparent_60%)] pointer-events-none" />
                   <div className="flex items-center gap-2.5 z-10">
                     {logoUrl && (
-                      <img 
-                        src={logoUrl} 
-                        alt="Logo" 
-                        className="h-9 w-9 object-contain bg-white/95 rounded-lg p-1 border border-white/20 shadow-2xs" 
+                      <img
+                        src={logoUrl}
+                        alt="Logo"
+                        className="h-9 w-9 object-contain bg-white/95 rounded-lg p-1 border border-white/20 shadow-2xs"
                       />
                     )}
                     <div className="min-w-0 leading-none">
@@ -517,12 +563,12 @@ function IDCardSetupPage() {
             case "photo":
               const isAfterHeader = index > 0 && elementOrder[index - 1] === "header";
               return (
-                <div 
-                  key="photo" 
+                <div
+                  key="photo"
                   className={`relative z-20 flex justify-center shrink-0 ${isAfterHeader ? "-mt-7" : "py-3"}`}
                 >
                   <div className="relative">
-                    <div 
+                    <div
                       className="size-30 rounded-[22px] bg-slate-100 border-[3.5px] overflow-hidden flex items-center justify-center shadow-lg relative z-10"
                       style={{ borderColor: themeColor }}
                     >
@@ -542,11 +588,11 @@ function IDCardSetupPage() {
                   </h4>
                   {showDesignation && (
                     <div className="mt-2 flex justify-center">
-                      <span 
+                      <span
                         className="text-[9px] font-extrabold px-3 py-1 rounded-full uppercase tracking-widest leading-none shadow-3xs border border-current/15"
-                        style={{ 
+                        style={{
                           color: themeColor,
-                          backgroundColor: themeColor + "0d"
+                          backgroundColor: themeColor + "0d",
                         }}
                       >
                         {emp.title}
@@ -563,7 +609,17 @@ function IDCardSetupPage() {
                   <div className="bg-white/90 border border-slate-200/50 rounded-2xl p-3.5 space-y-2.5 text-[9.5px] font-medium shadow-sm">
                     <div className="flex justify-between items-center pb-1.5 border-b border-slate-100">
                       <span className="text-slate-400 font-bold uppercase tracking-wider flex items-center gap-2">
-                        <svg className="size-3.5 text-slate-400/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="9" cy="10" r="2" /><path d="M15 8h2M15 12h2M15 16h2" /></svg>
+                        <svg
+                          className="size-3.5 text-slate-400/80"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <rect x="3" y="4" width="18" height="16" rx="2" />
+                          <circle cx="9" cy="10" r="2" />
+                          <path d="M15 8h2M15 12h2M15 16h2" />
+                        </svg>
                         Emp ID
                       </span>
                       <span className="font-extrabold text-slate-700">{emp.id}</span>
@@ -571,16 +627,37 @@ function IDCardSetupPage() {
                     {showDepartment && (
                       <div className="flex justify-between items-center pb-1.5 border-b border-slate-100">
                         <span className="text-slate-400 font-bold uppercase tracking-wider flex items-center gap-2">
-                          <svg className="size-3.5 text-slate-400/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 21h18M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16M9 9h6M9 13h6M9 17h6" /></svg>
+                          <svg
+                            className="size-3.5 text-slate-400/80"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <path d="M3 21h18M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16M9 9h6M9 13h6M9 17h6" />
+                          </svg>
                           Dept
                         </span>
-                        <span className="font-extrabold text-slate-700 truncate max-w-[125px]">{emp.dept}</span>
+                        <span className="font-extrabold text-slate-700 truncate max-w-[125px]">
+                          {emp.dept}
+                        </span>
                       </div>
                     )}
                     {showJoinDate && (
                       <div className="flex justify-between items-center pb-1.5 border-b border-slate-100">
                         <span className="text-slate-400 font-bold uppercase tracking-wider flex items-center gap-2">
-                          <svg className="size-3.5 text-slate-400/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                          <svg
+                            className="size-3.5 text-slate-400/80"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <rect x="3" y="4" width="18" height="18" rx="2" />
+                            <line x1="16" y1="2" x2="16" y2="6" />
+                            <line x1="8" y1="2" x2="8" y2="6" />
+                            <line x1="3" y1="10" x2="21" y2="10" />
+                          </svg>
                           Joined
                         </span>
                         <span className="font-extrabold text-slate-700">{emp.joinDate}</span>
@@ -589,10 +666,18 @@ function IDCardSetupPage() {
                     {showBloodGroup && (
                       <div className="flex justify-between items-center">
                         <span className="text-slate-400 font-bold uppercase tracking-wider flex items-center gap-2">
-                          <svg className="size-3.5 text-red-500/90" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
+                          <svg
+                            className="size-3.5 text-red-500/90"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                          >
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                          </svg>
                           Blood
                         </span>
-                        <span className="font-black text-red-600 bg-red-500/5 px-2 py-0.5 rounded border border-red-500/10">{emp.blood || "—"}</span>
+                        <span className="font-black text-red-600 bg-red-500/5 px-2 py-0.5 rounded border border-red-500/10">
+                          {emp.blood || "—"}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -603,10 +688,14 @@ function IDCardSetupPage() {
               return (
                 <div key="footer" className="relative z-10 shrink-0">
                   {/* Elegant dark charcoal footer bar */}
-                  <div 
-                    className="w-full py-3 text-center text-[9px] font-black text-white tracking-[0.2em] uppercase flex items-center justify-center gap-1.5 bg-slate-900 shadow-lg"
-                  >
-                    <svg className="size-3.5 text-white/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <div className="w-full py-3 text-center text-[9px] font-black text-white tracking-[0.2em] uppercase flex items-center justify-center gap-1.5 bg-slate-900 shadow-lg">
+                    <svg
+                      className="size-3.5 text-white/80"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                    >
                       <circle cx="12" cy="12" r="10" />
                       <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
                       <path d="M2 12h20" />
@@ -625,19 +714,22 @@ function IDCardSetupPage() {
   };
 
   // Render Front Side of ID Card (Horizontal)
-  const renderHorizontalFront = (emp: typeof employeesData[0]) => {
+  const renderHorizontalFront = (emp: (typeof employeesData)[0]) => {
     return (
-      <div 
+      <div
         className="size-full flex justify-between relative bg-gradient-to-r from-white via-[#fbfcfd] to-[#f6f8fb] p-5 overflow-hidden"
         style={{ fontFamily: "'Inter', sans-serif" }}
       >
         {/* Outer Border */}
-        <div className="absolute inset-0 border-[1.5px] rounded-2xl pointer-events-none z-40" style={{ borderColor: themeColor }} />
+        <div
+          className="absolute inset-0 border-[1.5px] rounded-2xl pointer-events-none z-40"
+          style={{ borderColor: themeColor }}
+        />
 
         {/* Left Side: Photo and Footer info */}
         <div className="w-[30%] flex flex-col justify-between items-center z-10 h-full py-1">
           <div className="relative">
-            <div 
+            <div
               className="size-24 rounded-[18px] bg-slate-100 border-[2.5px] overflow-hidden flex items-center justify-center shadow-md relative z-10"
               style={{ borderColor: themeColor }}
             >
@@ -645,10 +737,18 @@ function IDCardSetupPage() {
             </div>
             <div className="absolute -inset-[2.5px] rounded-[20px] border-[1.5px] border-white z-20 pointer-events-none" />
           </div>
-          
+
           <div className="text-[8.5px] font-bold text-slate-800 tracking-wider mt-2 flex items-center gap-1">
-            <svg className="size-2.5 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /><path d="M2 12h20" />
+            <svg
+              className="size-2.5 text-slate-600"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+              <path d="M2 12h20" />
             </svg>
             www.pakizasoftware.com
           </div>
@@ -659,7 +759,11 @@ function IDCardSetupPage() {
           {/* Logo Header */}
           <div className="flex items-center gap-2">
             {logoUrl && (
-              <img src={logoUrl} alt="Logo" className="h-8.5 w-8.5 object-contain bg-white rounded-md p-0.5 border" />
+              <img
+                src={logoUrl}
+                alt="Logo"
+                className="h-8.5 w-8.5 object-contain bg-white rounded-md p-0.5 border"
+              />
             )}
             <div className="min-w-0 leading-tight">
               <span className="text-[12px] font-black text-slate-850 uppercase block">
@@ -678,11 +782,11 @@ function IDCardSetupPage() {
             </h4>
             {showDesignation && (
               <div className="mt-1 flex">
-                <span 
+                <span
                   className="text-[7.5px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider"
-                  style={{ 
+                  style={{
                     color: themeColor,
-                    backgroundColor: themeColor + "15"
+                    backgroundColor: themeColor + "15",
                   }}
                 >
                   {emp.title}
@@ -705,7 +809,9 @@ function IDCardSetupPage() {
             )}
             {showJoinDate && (
               <div>
-                <span className="text-slate-400 font-bold block uppercase text-[6.5px]">Join Date</span>
+                <span className="text-slate-400 font-bold block uppercase text-[6.5px]">
+                  Join Date
+                </span>
                 <span className="font-extrabold text-slate-700">{emp.joinDate}</span>
               </div>
             )}
@@ -722,14 +828,17 @@ function IDCardSetupPage() {
   };
 
   // Render Back Side of ID Card (Vertical)
-  const renderVerticalBack = (emp: typeof employeesData[0]) => {
+  const renderVerticalBack = (emp: (typeof employeesData)[0]) => {
     return (
-      <div 
+      <div
         className="size-full flex flex-col justify-between relative bg-gradient-to-b from-white via-[#fbfcfd] to-[#f6f8fb] overflow-hidden"
         style={{ fontFamily: "'Inter', sans-serif" }}
       >
         {/* Outer Accent Border */}
-        <div className="absolute inset-0 border-[1.5px] rounded-2xl pointer-events-none z-45" style={{ borderColor: themeColor }} />
+        <div
+          className="absolute inset-0 border-[1.5px] rounded-2xl pointer-events-none z-45"
+          style={{ borderColor: themeColor }}
+        />
 
         {/* Subtle background network lines graphic */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-0 overflow-hidden">
@@ -747,7 +856,7 @@ function IDCardSetupPage() {
 
         {/* Top Header Block */}
         <div className="pt-6 px-5 shrink-0 z-10">
-          <div 
+          <div
             className="w-full py-2 rounded-lg text-center font-extrabold text-white text-[11.5px] uppercase tracking-[0.25em] shadow-xs"
             style={{ backgroundColor: themeColor }}
           >
@@ -757,7 +866,6 @@ function IDCardSetupPage() {
 
         {/* Middle Two-Column Grid - Perfectly Aligned */}
         <div className="flex-1 px-5 py-4 flex items-center justify-between gap-5 z-10">
-          
           {/* Left Column: QR Code Container + Left Details */}
           <div className="w-[47%] flex flex-col justify-between h-full py-1">
             {/* Elegant QR Code Frame */}
@@ -770,15 +878,21 @@ function IDCardSetupPage() {
             {/* Left Details */}
             <div className="space-y-2 text-[9.5px] mt-3">
               <div>
-                <span className="text-slate-400 font-extrabold block text-[7px] uppercase tracking-wider">D O B</span>
+                <span className="text-slate-400 font-extrabold block text-[7px] uppercase tracking-wider">
+                  D O B
+                </span>
                 <span className="font-bold text-slate-800">{emp.dob || "22/12/1999"}</span>
               </div>
               <div>
-                <span className="text-slate-400 font-extrabold block text-[7px] uppercase tracking-wider">Gender</span>
+                <span className="text-slate-400 font-extrabold block text-[7px] uppercase tracking-wider">
+                  Gender
+                </span>
                 <span className="font-bold text-slate-800">{emp.gender || "Male"}</span>
               </div>
               <div>
-                <span className="text-slate-400 font-extrabold block text-[7px] uppercase tracking-wider">Joining Date</span>
+                <span className="text-slate-400 font-extrabold block text-[7px] uppercase tracking-wider">
+                  Joining Date
+                </span>
                 <span className="font-bold text-slate-800">{emp.joinDate}</span>
               </div>
             </div>
@@ -804,22 +918,33 @@ function IDCardSetupPage() {
             {/* Right Details */}
             <div className="space-y-4 text-[9.5px] mt-1 z-10 flex-1 flex flex-col justify-center">
               <div>
-                <span className="text-slate-400 font-extrabold block text-[7px] uppercase tracking-wider">Employee No.</span>
-                <span className="font-extrabold text-slate-800 text-[11px] mt-0.5 block">{emp.id}</span>
+                <span className="text-slate-400 font-extrabold block text-[7px] uppercase tracking-wider">
+                  Employee No.
+                </span>
+                <span className="font-extrabold text-slate-800 text-[11px] mt-0.5 block">
+                  {emp.id}
+                </span>
               </div>
               <div>
-                <span className="text-slate-400 font-extrabold block text-[7px] uppercase tracking-wider">Blood Group</span>
-                <span className="font-black text-red-600 bg-red-500/5 px-2 py-0.5 rounded border border-red-500/10 mt-1 inline-block">{emp.blood || "—"}</span>
+                <span className="text-slate-400 font-extrabold block text-[7px] uppercase tracking-wider">
+                  Blood Group
+                </span>
+                <span className="font-black text-red-600 bg-red-500/5 px-2 py-0.5 rounded border border-red-500/10 mt-1 inline-block">
+                  {emp.blood || "—"}
+                </span>
               </div>
             </div>
           </div>
-
         </div>
 
         {/* Signature Block with Line */}
         <div className="px-5 text-center shrink-0 z-10 flex flex-col items-center py-1">
           {signatureUrl && (
-            <img src={signatureUrl} alt="Signature" className="h-7.5 w-18 object-contain mix-blend-multiply filter contrast-125" />
+            <img
+              src={signatureUrl}
+              alt="Signature"
+              className="h-7.5 w-18 object-contain mix-blend-multiply filter contrast-125"
+            />
           )}
           <div className="w-24 h-[1px] bg-slate-300 my-1" />
           <span className="text-[7px] text-slate-400 font-extrabold tracking-widest uppercase">
@@ -835,7 +960,7 @@ function IDCardSetupPage() {
         </div>
 
         {/* Solid Colored Footer Notice */}
-        <div 
+        <div
           className="w-full py-2.5 text-center text-[7.5px] font-black text-white uppercase tracking-[0.18em] shrink-0"
           style={{ backgroundColor: themeColor }}
         >
@@ -846,14 +971,17 @@ function IDCardSetupPage() {
   };
 
   // Render Back Side of ID Card (Horizontal)
-  const renderHorizontalBack = (emp: typeof employeesData[0]) => {
+  const renderHorizontalBack = (emp: (typeof employeesData)[0]) => {
     return (
-      <div 
+      <div
         className="size-full flex flex-col justify-between relative bg-gradient-to-b from-white via-[#fbfcfd] to-[#f6f8fb] p-4 overflow-hidden"
         style={{ fontFamily: "'Inter', sans-serif" }}
       >
         {/* Outer Border */}
-        <div className="absolute inset-0 border-[1.5px] rounded-2xl pointer-events-none z-40" style={{ borderColor: themeColor }} />
+        <div
+          className="absolute inset-0 border-[1.5px] rounded-2xl pointer-events-none z-40"
+          style={{ borderColor: themeColor }}
+        />
 
         {/* Top bar */}
         <div className="flex justify-between items-center pb-2 border-b border-slate-100 z-10">
@@ -863,7 +991,7 @@ function IDCardSetupPage() {
             )}
             {companyName}
           </span>
-          <div 
+          <div
             className="px-2.5 py-0.5 rounded-md text-white text-[7.5px] font-extrabold uppercase tracking-wider"
             style={{ backgroundColor: themeColor }}
           >
@@ -881,19 +1009,27 @@ function IDCardSetupPage() {
           {/* Details Grid */}
           <div className="flex-1 grid grid-cols-2 gap-x-3 gap-y-1.5 text-[8.5px] leading-tight">
             <div>
-              <span className="text-slate-400 font-extrabold block text-[6px] uppercase tracking-wider">Employee No</span>
+              <span className="text-slate-400 font-extrabold block text-[6px] uppercase tracking-wider">
+                Employee No
+              </span>
               <span className="font-bold text-slate-800">{emp.id}</span>
             </div>
             <div>
-              <span className="text-slate-400 font-extrabold block text-[6px] uppercase tracking-wider">Blood Group</span>
+              <span className="text-slate-400 font-extrabold block text-[6px] uppercase tracking-wider">
+                Blood Group
+              </span>
               <span className="font-extrabold text-red-600">{emp.blood || "—"}</span>
             </div>
             <div>
-              <span className="text-slate-400 font-extrabold block text-[6px] uppercase tracking-wider">D O B</span>
+              <span className="text-slate-400 font-extrabold block text-[6px] uppercase tracking-wider">
+                D O B
+              </span>
               <span className="font-bold text-slate-800">{emp.dob || "22/12/1999"}</span>
             </div>
             <div>
-              <span className="text-slate-400 font-extrabold block text-[6px] uppercase tracking-wider">Joining Date</span>
+              <span className="text-slate-400 font-extrabold block text-[6px] uppercase tracking-wider">
+                Joining Date
+              </span>
               <span className="font-bold text-slate-800">{emp.joinDate}</span>
             </div>
           </div>
@@ -901,7 +1037,11 @@ function IDCardSetupPage() {
           {/* Signature */}
           <div className="shrink-0 flex flex-col items-center justify-center pl-3 border-l border-slate-150 h-14">
             {signatureUrl && (
-              <img src={signatureUrl} alt="Signature" className="h-5.5 w-14 object-contain mix-blend-multiply" />
+              <img
+                src={signatureUrl}
+                alt="Signature"
+                className="h-5.5 w-14 object-contain mix-blend-multiply"
+              />
             )}
             <div className="w-14 h-[1px] bg-slate-300 my-0.5" />
             <span className="text-[6px] text-slate-400 font-extrabold tracking-wider uppercase">
@@ -912,14 +1052,18 @@ function IDCardSetupPage() {
 
         {/* Bottom Address / Notice text */}
         <div className="flex justify-between items-center border-t border-slate-100 pt-2 z-10 text-[7px] text-slate-400 font-semibold">
-          <span className="truncate max-w-[220px]">{backText.split("\n")[0] || "If found, please return to office."}</span>
-          <span className="text-[7.5px] font-extrabold text-slate-700">info@pakizasoftware.com</span>
+          <span className="truncate max-w-[220px]">
+            {backText.split("\n")[0] || "If found, please return to office."}
+          </span>
+          <span className="text-[7.5px] font-extrabold text-slate-700">
+            info@pakizasoftware.com
+          </span>
         </div>
       </div>
     );
   };
 
-  const renderCardFront = (emp: typeof employeesData[0], sizeStyle = {}) => {
+  const renderCardFront = (emp: (typeof employeesData)[0], sizeStyle = {}) => {
     if (orientation === "vertical") {
       return renderVerticalFront(emp);
     } else {
@@ -927,7 +1071,7 @@ function IDCardSetupPage() {
     }
   };
 
-  const renderCardBack = (emp: typeof employeesData[0], sizeStyle = {}) => {
+  const renderCardBack = (emp: (typeof employeesData)[0], sizeStyle = {}) => {
     if (orientation === "vertical") {
       return renderVerticalBack(emp);
     } else {
@@ -946,7 +1090,6 @@ function IDCardSetupPage() {
 
         {/* Main Content Container */}
         <main className="flex-1 p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
-          
           {/* Header Row */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/40 pb-5">
             <div>
@@ -959,10 +1102,11 @@ function IDCardSetupPage() {
                 </h1>
               </div>
               <p className="text-xs text-muted-foreground mt-1 max-w-xl">
-                Configure brand templates, design custom cards, and print individual or bulk employee badges in high-resolution.
+                Configure brand templates, design custom cards, and print individual or bulk
+                employee badges in high-resolution.
               </p>
             </div>
-            
+
             {/* Tab Swapping Controls */}
             <div className="flex items-center p-1 bg-muted/80 rounded-xl border border-border/30 self-start md:self-auto">
               <button
@@ -999,10 +1143,8 @@ function IDCardSetupPage() {
           {activeTab === "design" ? (
             /* ==================== CARD DESIGNER VIEW ==================== */
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              
               {/* Left Column: Configuration Forms (7 cols) */}
               <div className="lg:col-span-7 space-y-6">
-                
                 {/* Save & Load Templates Section */}
                 <div className="p-5 rounded-2xl bg-card border border-border/40 space-y-4 shadow-sm">
                   <div className="flex items-center justify-between pb-3 border-b border-border/20">
@@ -1023,31 +1165,37 @@ function IDCardSetupPage() {
                   {/* System & User Templates Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {/* Render System Templates */}
-                    {SYSTEM_TEMPLATES.map(t => (
+                    {SYSTEM_TEMPLATES.map((t) => (
                       <div
                         key={t.id}
                         onClick={() => handleLoadTemplate(t)}
                         className="p-3 rounded-xl border border-border/40 hover:border-primary/50 hover:bg-muted/30 cursor-pointer transition flex items-center justify-between group"
                       >
                         <div className="min-w-0">
-                          <span className="text-xs font-bold text-foreground block truncate">{t.name}</span>
+                          <span className="text-xs font-bold text-foreground block truncate">
+                            {t.name}
+                          </span>
                           <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">
                             {t.orientation} • {t.themeColor}
                           </span>
                         </div>
-                        <span className="text-[9px] font-extrabold text-primary bg-primary/10 px-1.5 py-0.5 rounded uppercase">System</span>
+                        <span className="text-[9px] font-extrabold text-primary bg-primary/10 px-1.5 py-0.5 rounded uppercase">
+                          System
+                        </span>
                       </div>
                     ))}
 
                     {/* Render User Templates */}
-                    {savedTemplates.map(t => (
+                    {savedTemplates.map((t) => (
                       <div
                         key={t.id}
                         onClick={() => handleLoadTemplate(t)}
                         className="p-3 rounded-xl border border-border/40 hover:border-primary/50 hover:bg-muted/30 cursor-pointer transition flex items-center justify-between group"
                       >
                         <div className="min-w-0">
-                          <span className="text-xs font-bold text-foreground block truncate">{t.name}</span>
+                          <span className="text-xs font-bold text-foreground block truncate">
+                            {t.name}
+                          </span>
                           <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">
                             {t.orientation} • {t.themeColor}
                           </span>
@@ -1065,7 +1213,8 @@ function IDCardSetupPage() {
 
                     {savedTemplates.length === 0 && (
                       <div className="md:col-span-2 text-center p-3 rounded-xl border border-dashed border-border/40 text-xs text-muted-foreground font-medium">
-                        No custom templates saved. Configure a style and click "Create Template" to store it.
+                        No custom templates saved. Configure a style and click "Create Template" to
+                        store it.
                       </div>
                     )}
                   </div>
@@ -1074,7 +1223,9 @@ function IDCardSetupPage() {
                 {/* Step 1: Select Employee */}
                 <div className="p-5 rounded-2xl bg-card border border-border/40 space-y-4 shadow-sm">
                   <div className="flex items-center gap-2.5 pb-3 border-b border-border/20">
-                    <span className="flex items-center justify-center size-6 rounded-lg bg-primary/10 text-primary text-xs font-extrabold">1</span>
+                    <span className="flex items-center justify-center size-6 rounded-lg bg-primary/10 text-primary text-xs font-extrabold">
+                      1
+                    </span>
                     <h3 className="text-sm font-bold text-foreground">Select Employee Profile</h3>
                   </div>
 
@@ -1093,19 +1244,27 @@ function IDCardSetupPage() {
                   {selectedEmployee && (
                     <div className="grid grid-cols-2 gap-3 p-3.5 rounded-xl bg-muted/40 border border-border/30 text-xs font-sans">
                       <div>
-                        <span className="text-muted-foreground block text-[10px] font-semibold uppercase tracking-wide">Name</span>
+                        <span className="text-muted-foreground block text-[10px] font-semibold uppercase tracking-wide">
+                          Name
+                        </span>
                         <span className="font-bold text-foreground">{selectedEmployee.name}</span>
                       </div>
                       <div>
-                        <span className="text-muted-foreground block text-[10px] font-semibold uppercase tracking-wide">ID Number</span>
+                        <span className="text-muted-foreground block text-[10px] font-semibold uppercase tracking-wide">
+                          ID Number
+                        </span>
                         <span className="font-bold text-foreground">{selectedEmployee.id}</span>
                       </div>
                       <div className="mt-1.5">
-                        <span className="text-muted-foreground block text-[10px] font-semibold uppercase tracking-wide">Designation</span>
+                        <span className="text-muted-foreground block text-[10px] font-semibold uppercase tracking-wide">
+                          Designation
+                        </span>
                         <span className="font-bold text-foreground">{selectedEmployee.title}</span>
                       </div>
                       <div className="mt-1.5">
-                        <span className="text-muted-foreground block text-[10px] font-semibold uppercase tracking-wide">Department</span>
+                        <span className="text-muted-foreground block text-[10px] font-semibold uppercase tracking-wide">
+                          Department
+                        </span>
                         <span className="font-bold text-foreground">{selectedEmployee.dept}</span>
                       </div>
                     </div>
@@ -1117,12 +1276,15 @@ function IDCardSetupPage() {
                   <div className="flex items-center justify-between pb-3 border-b border-border/20">
                     <div className="flex items-center gap-2.5">
                       <GripVertical className="size-4.5 text-primary" />
-                      <h3 className="text-sm font-bold text-foreground">Card Elements Layout (Drag & Drop)</h3>
+                      <h3 className="text-sm font-bold text-foreground">
+                        Card Elements Layout (Drag & Drop)
+                      </h3>
                     </div>
                   </div>
 
                   <p className="text-xs text-muted-foreground font-medium">
-                    Drag and drop items to rearrange their vertical order on the front side of the ID card, or use the up/down arrows.
+                    Drag and drop items to rearrange their vertical order on the front side of the
+                    ID card, or use the up/down arrows.
                   </p>
 
                   <div className="space-y-2">
@@ -1132,7 +1294,7 @@ function IDCardSetupPage() {
                         photo: "Employee Photo",
                         identity: "Identity (Name & Designation)",
                         details: "Details Block (ID, Dept, Blood, Join Date)",
-                        footer: "Footer (Website Link)"
+                        footer: "Footer (Website Link)",
                       };
 
                       return (
@@ -1147,7 +1309,9 @@ function IDCardSetupPage() {
                         >
                           <div className="flex items-center gap-3">
                             <GripVertical className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                            <span className="text-xs font-bold text-foreground">{labelMap[elementId]}</span>
+                            <span className="text-xs font-bold text-foreground">
+                              {labelMap[elementId]}
+                            </span>
                           </div>
 
                           <div className="flex items-center gap-1.5">
@@ -1179,13 +1343,19 @@ function IDCardSetupPage() {
                 {/* Step 2: Branding & Color Theme */}
                 <div className="p-5 rounded-2xl bg-card border border-border/40 space-y-5 shadow-sm">
                   <div className="flex items-center gap-2.5 pb-3 border-b border-border/20">
-                    <span className="flex items-center justify-center size-6 rounded-lg bg-primary/10 text-primary text-xs font-extrabold">2</span>
-                    <h3 className="text-sm font-bold text-foreground">Brand & Color Configuration</h3>
+                    <span className="flex items-center justify-center size-6 rounded-lg bg-primary/10 text-primary text-xs font-extrabold">
+                      2
+                    </span>
+                    <h3 className="text-sm font-bold text-foreground">
+                      Brand & Color Configuration
+                    </h3>
                   </div>
 
                   {/* Company Name */}
                   <div className="space-y-2">
-                    <label className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">Company Name / Header</label>
+                    <label className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">
+                      Company Name / Header
+                    </label>
                     <input
                       type="text"
                       value={companyName}
@@ -1199,7 +1369,9 @@ function IDCardSetupPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-1">
                     {/* Orientation */}
                     <div className="space-y-2">
-                      <label className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">Card Layout Style</label>
+                      <label className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">
+                        Card Layout Style
+                      </label>
                       <div className="grid grid-cols-2 gap-2 p-1 bg-muted rounded-xl border border-border/30">
                         <button
                           type="button"
@@ -1233,7 +1405,7 @@ function IDCardSetupPage() {
                       </label>
                       <div className="flex items-center gap-2">
                         <div className="flex gap-1.5">
-                          {PRESET_COLORS.map(color => (
+                          {PRESET_COLORS.map((color) => (
                             <button
                               key={color.value}
                               type="button"
@@ -1241,7 +1413,9 @@ function IDCardSetupPage() {
                               style={{ backgroundColor: color.value }}
                               title={color.name}
                               className={`size-6 rounded-full border-2 transition-transform cursor-pointer hover:scale-110 flex items-center justify-center ${
-                                themeColor === color.value ? "border-foreground" : "border-transparent"
+                                themeColor === color.value
+                                  ? "border-foreground"
+                                  : "border-transparent"
                               }`}
                             >
                               {themeColor === color.value && (
@@ -1250,7 +1424,7 @@ function IDCardSetupPage() {
                             </button>
                           ))}
                         </div>
-                        
+
                         <div className="relative size-6 rounded-full overflow-hidden border border-border/60 hover:scale-105 transition cursor-pointer">
                           <input
                             type="color"
@@ -1258,8 +1432,8 @@ function IDCardSetupPage() {
                             onChange={(e) => setThemeColor(e.target.value)}
                             className="absolute inset-0 size-full p-0 border-0 opacity-0 cursor-pointer"
                           />
-                          <div 
-                            className="size-full bg-gradient-to-tr from-red-500 via-green-500 to-blue-500" 
+                          <div
+                            className="size-full bg-gradient-to-tr from-red-500 via-green-500 to-blue-500"
                             style={{ backgroundColor: themeColor }}
                           />
                         </div>
@@ -1270,7 +1444,9 @@ function IDCardSetupPage() {
                   {/* Upload Logo & Signature */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
                     <div className="space-y-2">
-                      <label className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">Company Logo</label>
+                      <label className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">
+                        Company Logo
+                      </label>
                       <div className="flex gap-2">
                         <input
                           type="file"
@@ -1300,7 +1476,9 @@ function IDCardSetupPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">Authorized Signature</label>
+                      <label className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">
+                        Authorized Signature
+                      </label>
                       <div className="flex gap-2">
                         <input
                           type="file"
@@ -1334,7 +1512,9 @@ function IDCardSetupPage() {
                 {/* Step 3: Card Content & Fields */}
                 <div className="p-5 rounded-2xl bg-card border border-border/40 space-y-4 shadow-sm">
                   <div className="flex items-center gap-2.5 pb-3 border-b border-border/20">
-                    <span className="flex items-center justify-center size-6 rounded-lg bg-primary/10 text-primary text-xs font-extrabold">3</span>
+                    <span className="flex items-center justify-center size-6 rounded-lg bg-primary/10 text-primary text-xs font-extrabold">
+                      3
+                    </span>
                     <h3 className="text-sm font-bold text-foreground">Content Customization</h3>
                   </div>
 
@@ -1410,7 +1590,6 @@ function IDCardSetupPage() {
                     />
                   </div>
                 </div>
-
               </div>
 
               {/* Right Column: Interactive 3D Preview Panel (5 cols) */}
@@ -1431,7 +1610,7 @@ function IDCardSetupPage() {
                   </div>
 
                   {/* 3D Card Scene */}
-                  <div 
+                  <div
                     className="relative select-none animate-in fade-in zoom-in-95 duration-200"
                     style={{
                       perspective: "1200px",
@@ -1448,7 +1627,7 @@ function IDCardSetupPage() {
                       onClick={() => setIsFlipped(!isFlipped)}
                     >
                       {/* CARD FRONT */}
-                      <div 
+                      <div
                         className="absolute inset-0 w-full h-full bg-white text-slate-900 rounded-2xl shadow-xl border border-slate-200 overflow-hidden"
                         style={{
                           backfaceVisibility: "hidden",
@@ -1459,7 +1638,7 @@ function IDCardSetupPage() {
                       </div>
 
                       {/* CARD BACK */}
-                      <div 
+                      <div
                         className="absolute inset-0 w-full h-full bg-white text-slate-900 rounded-2xl shadow-xl border border-slate-200 overflow-hidden"
                         style={{
                           transform: "rotateY(180deg)",
@@ -1486,32 +1665,37 @@ function IDCardSetupPage() {
                   <ul className="space-y-2 text-xs text-muted-foreground font-medium">
                     <li className="flex gap-2">
                       <Check className="size-4 text-green-500 shrink-0 mt-0.5" />
-                      <span>For CR80 plastic card printers, choose <strong>54mm x 86mm</strong> card size in print settings.</span>
+                      <span>
+                        For CR80 plastic card printers, choose <strong>54mm x 86mm</strong> card
+                        size in print settings.
+                      </span>
                     </li>
                     <li className="flex gap-2">
                       <Check className="size-4 text-green-500 shrink-0 mt-0.5" />
-                      <span>To ensure background colors and waves print correctly, enable <strong>Background graphics</strong> in your browser's print options.</span>
+                      <span>
+                        To ensure background colors and waves print correctly, enable{" "}
+                        <strong>Background graphics</strong> in your browser's print options.
+                      </span>
                     </li>
                   </ul>
                 </div>
               </div>
-
             </div>
           ) : (
             /* ==================== BULK CARD PRINTER VIEW ==================== */
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              
               {/* Left Column: Filter and select (7 cols) */}
               <div className="lg:col-span-7 space-y-6">
-                
                 {/* Bulk Controls */}
                 <div className="p-5 rounded-2xl bg-card border border-border/40 space-y-5 shadow-sm">
                   <div className="flex items-center justify-between pb-3 border-b border-border/20">
                     <div className="flex items-center gap-2.5">
                       <Users className="size-4.5 text-primary" />
-                      <h3 className="text-sm font-bold text-foreground">Filter Employee Profiles</h3>
+                      <h3 className="text-sm font-bold text-foreground">
+                        Filter Employee Profiles
+                      </h3>
                     </div>
-                    
+
                     <button
                       onClick={handlePrint}
                       disabled={bulkSelectedEmpIds.length === 0}
@@ -1526,7 +1710,9 @@ function IDCardSetupPage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Search query */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">Search Staff</label>
+                      <label className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
+                        Search Staff
+                      </label>
                       <div className="relative">
                         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/75" />
                         <input
@@ -1541,40 +1727,52 @@ function IDCardSetupPage() {
 
                     {/* Department Filter */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">Department</label>
+                      <label className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
+                        Department
+                      </label>
                       <select
                         value={bulkDeptFilter}
                         onChange={(e) => setBulkDeptFilter(e.target.value)}
                         className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs font-bold outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition cursor-pointer text-foreground"
                       >
                         <option value="ALL">All Departments</option>
-                        {departmentsList.map(dept => (
-                          <option key={dept} value={dept}>{dept}</option>
+                        {departmentsList.map((dept) => (
+                          <option key={dept} value={dept}>
+                            {dept}
+                          </option>
                         ))}
                       </select>
                     </div>
 
                     {/* Template Filter */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">Card Template</label>
+                      <label className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
+                        Card Template
+                      </label>
                       <select
                         onChange={(e) => {
                           const val = e.target.value;
-                          const t = [...SYSTEM_TEMPLATES, ...savedTemplates].find(temp => temp.id === val);
+                          const t = [...SYSTEM_TEMPLATES, ...savedTemplates].find(
+                            (temp) => temp.id === val,
+                          );
                           if (t) handleLoadTemplate(t);
                         }}
                         className="w-full h-10 px-3 rounded-xl bg-muted border border-border/40 text-xs font-bold outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition cursor-pointer text-foreground"
                       >
                         <option value="">Select Template...</option>
                         <optgroup label="System Templates">
-                          {SYSTEM_TEMPLATES.map(t => (
-                            <option key={t.id} value={t.id}>{t.name}</option>
+                          {SYSTEM_TEMPLATES.map((t) => (
+                            <option key={t.id} value={t.id}>
+                              {t.name}
+                            </option>
                           ))}
                         </optgroup>
                         {savedTemplates.length > 0 && (
                           <optgroup label="Custom Templates">
-                            {savedTemplates.map(t => (
-                              <option key={t.id} value={t.id}>{t.name}</option>
+                            {savedTemplates.map((t) => (
+                              <option key={t.id} value={t.id}>
+                                {t.name}
+                              </option>
                             ))}
                           </optgroup>
                         )}
@@ -1584,12 +1782,16 @@ function IDCardSetupPage() {
 
                   {/* Print Layout Mode Toggle */}
                   <div className="space-y-2 pt-1">
-                    <label className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">Bulk Print Layout Mode</label>
+                    <label className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
+                      Bulk Print Layout Mode
+                    </label>
                     <div className="grid grid-cols-3 gap-2 p-1 bg-muted rounded-xl border border-border/30">
                       <button
                         onClick={() => setBulkPrintMode("both")}
                         className={`h-8 rounded-lg text-xs font-bold transition flex items-center justify-center cursor-pointer ${
-                          bulkPrintMode === "both" ? "bg-card text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+                          bulkPrintMode === "both"
+                            ? "bg-card text-foreground shadow-xs"
+                            : "text-muted-foreground hover:text-foreground"
                         }`}
                       >
                         Front & Back
@@ -1597,7 +1799,9 @@ function IDCardSetupPage() {
                       <button
                         onClick={() => setBulkPrintMode("front")}
                         className={`h-8 rounded-lg text-xs font-bold transition flex items-center justify-center cursor-pointer ${
-                          bulkPrintMode === "front" ? "bg-card text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+                          bulkPrintMode === "front"
+                            ? "bg-card text-foreground shadow-xs"
+                            : "text-muted-foreground hover:text-foreground"
                         }`}
                       >
                         Fronts Only
@@ -1605,7 +1809,9 @@ function IDCardSetupPage() {
                       <button
                         onClick={() => setBulkPrintMode("back")}
                         className={`h-8 rounded-lg text-xs font-bold transition flex items-center justify-center cursor-pointer ${
-                          bulkPrintMode === "back" ? "bg-card text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+                          bulkPrintMode === "back"
+                            ? "bg-card text-foreground shadow-xs"
+                            : "text-muted-foreground hover:text-foreground"
                         }`}
                       >
                         Backs Only
@@ -1620,24 +1826,23 @@ function IDCardSetupPage() {
                     <div className="text-xs font-bold text-foreground">
                       Showing {filteredEmployees.length} of {employeesData.length} employees
                     </div>
-                    
+
                     <button
                       type="button"
                       onClick={toggleSelectAllBulk}
                       className="text-xs text-primary font-bold hover:underline cursor-pointer"
                     >
-                      {filteredEmployees.every(emp => bulkSelectedEmpIds.includes(emp.id))
+                      {filteredEmployees.every((emp) => bulkSelectedEmpIds.includes(emp.id))
                         ? "Deselect All Filtered"
-                        : "Select All Filtered"
-                      }
+                        : "Select All Filtered"}
                     </button>
                   </div>
 
                   <div className="border border-border/30 rounded-xl overflow-hidden divide-y divide-border/20 max-h-96 overflow-y-auto">
-                    {filteredEmployees.map(emp => {
+                    {filteredEmployees.map((emp) => {
                       const isSelected = bulkSelectedEmpIds.includes(emp.id);
                       return (
-                        <div 
+                        <div
                           key={emp.id}
                           onClick={() => toggleSelectEmployeeBulk(emp.id)}
                           className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition ${
@@ -1647,18 +1852,22 @@ function IDCardSetupPage() {
                           <input
                             type="checkbox"
                             checked={isSelected}
-                            onChange={() => {}} 
+                            onChange={() => {}}
                             className="rounded border-border text-primary focus:ring-primary/25 size-4"
                           />
-                          
+
                           <div className="size-8 rounded-lg bg-slate-850/10 border flex items-center justify-center shrink-0">
                             <UserRound className="size-4.5 text-muted-foreground" />
                           </div>
 
                           <div className="flex-1 min-w-0">
                             <div className="flex justify-between items-center">
-                              <span className="text-xs font-bold text-foreground truncate">{emp.name}</span>
-                              <span className="text-[10px] text-muted-foreground font-semibold">{emp.id}</span>
+                              <span className="text-xs font-bold text-foreground truncate">
+                                {emp.name}
+                              </span>
+                              <span className="text-[10px] text-muted-foreground font-semibold">
+                                {emp.id}
+                              </span>
                             </div>
                             <div className="flex justify-between text-[10px] text-muted-foreground font-semibold mt-0.5">
                               <span className="truncate">{emp.title}</span>
@@ -1676,7 +1885,6 @@ function IDCardSetupPage() {
                     )}
                   </div>
                 </div>
-
               </div>
 
               {/* Right Column: Bulk Print Preview (5 cols) */}
@@ -1684,7 +1892,7 @@ function IDCardSetupPage() {
                 <div className="p-5 rounded-2xl bg-card border border-border/40 shadow-sm space-y-4 flex flex-col">
                   <div className="pb-3 border-b border-border/20">
                     <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
-                      <Printer className="size-4 text-primary" /> 
+                      <Printer className="size-4 text-primary" />
                       Bulk Preview ({bulkSelectedEmpIds.length} Cards)
                     </h3>
                   </div>
@@ -1692,23 +1900,23 @@ function IDCardSetupPage() {
                   {bulkSelectedEmpIds.length > 0 ? (
                     <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
                       <div className="grid grid-cols-2 gap-4">
-                        {bulkSelectedEmpIds.map(id => {
-                          const emp = employeesData.find(e => e.id === id);
+                        {bulkSelectedEmpIds.map((id) => {
+                          const emp = employeesData.find((e) => e.id === id);
                           if (!emp) return null;
                           return (
-                            <div 
+                            <div
                               key={emp.id}
                               className="border border-border/30 rounded-xl overflow-hidden aspect-[1.58] bg-white relative shadow-sm"
-                              style={{ 
+                              style={{
                                 height: orientation === "vertical" ? "210px" : "135px",
                                 width: orientation === "vertical" ? "210px" : "135px",
-                                margin: "0 auto"
+                                margin: "0 auto",
                               }}
                             >
                               {/* Scale down the card to fit the preview grid */}
-                              <div 
+                              <div
                                 className="absolute origin-top-left scale-[0.48]"
-                                style={{ 
+                                style={{
                                   width: orientation === "vertical" ? "280px" : "440px",
                                   height: orientation === "vertical" ? "440px" : "280px",
                                 }}
@@ -1728,14 +1936,16 @@ function IDCardSetupPage() {
 
                   <div className="text-xs text-muted-foreground bg-muted/40 p-3.5 rounded-xl border border-border/20 flex gap-2">
                     <Info className="size-4 text-primary shrink-0 mt-0.5" />
-                    <span>The bulk preview shows the card fronts. Clicking <strong>Print Selected</strong> will print all fronts and backs based on your layout mode.</span>
+                    <span>
+                      The bulk preview shows the card fronts. Clicking{" "}
+                      <strong>Print Selected</strong> will print all fronts and backs based on your
+                      layout mode.
+                    </span>
                   </div>
                 </div>
               </div>
-
             </div>
           )}
-
         </main>
       </div>
 
@@ -1744,10 +1954,12 @@ function IDCardSetupPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
           <div className="bg-card border border-border/50 rounded-2xl p-6 w-full max-w-md shadow-xl space-y-4 animate-in zoom-in-95 duration-200">
             <h3 className="text-base font-black text-foreground">Save ID Card Template</h3>
-            
+
             <form onSubmit={handleSaveTemplate} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">Template Name</label>
+                <label className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">
+                  Template Name
+                </label>
                 <input
                   type="text"
                   required
@@ -1840,7 +2052,7 @@ function IDCardSetupPage() {
             <div className="print-card-pair-wrapper col-span-2 justify-center">
               {/* Front */}
               {(bulkPrintMode === "both" || bulkPrintMode === "front") && (
-                <div 
+                <div
                   className="print-card-item"
                   style={{
                     width: orientation === "vertical" ? "54mm" : "86mm",
@@ -1850,10 +2062,10 @@ function IDCardSetupPage() {
                   {renderCardFront(selectedEmployee)}
                 </div>
               )}
-              
+
               {/* Back */}
               {(bulkPrintMode === "both" || bulkPrintMode === "back") && (
-                <div 
+                <div
                   className="print-card-item"
                   style={{
                     width: orientation === "vertical" ? "54mm" : "86mm",
@@ -1866,14 +2078,14 @@ function IDCardSetupPage() {
             </div>
           ) : (
             /* Bulk Cards Print Layout */
-            bulkSelectedEmpIds.map(id => {
-              const emp = employeesData.find(e => e.id === id);
+            bulkSelectedEmpIds.map((id) => {
+              const emp = employeesData.find((e) => e.id === id);
               if (!emp) return null;
               return (
                 <div key={emp.id} className="print-card-pair-wrapper">
                   {/* Front */}
                   {(bulkPrintMode === "both" || bulkPrintMode === "front") && (
-                    <div 
+                    <div
                       className="print-card-item"
                       style={{
                         width: orientation === "vertical" ? "54mm" : "86mm",
@@ -1883,10 +2095,10 @@ function IDCardSetupPage() {
                       {renderCardFront(emp)}
                     </div>
                   )}
-                  
+
                   {/* Back */}
                   {(bulkPrintMode === "both" || bulkPrintMode === "back") && (
-                    <div 
+                    <div
                       className="print-card-item"
                       style={{
                         width: orientation === "vertical" ? "54mm" : "86mm",
@@ -1902,7 +2114,6 @@ function IDCardSetupPage() {
           )}
         </div>
       </div>
-
     </div>
   );
 }

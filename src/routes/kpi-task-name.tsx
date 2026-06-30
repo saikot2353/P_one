@@ -3,20 +3,38 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  ChevronRight, Plus, Search, Edit3, Trash2, X, CheckCircle2,
-  BarChart3, AlertCircle, Target, Layers, Filter
+  ChevronRight,
+  Plus,
+  Search,
+  Edit3,
+  Trash2,
+  X,
+  CheckCircle2,
+  BarChart3,
+  AlertCircle,
+  Target,
+  Layers,
+  Filter,
 } from "lucide-react";
 import {
-  type KpiCriteria, type ScoringRubric,
-  loadKpiCriteria, saveKpiCriteria,
-  getCategoryBg, CATEGORY_LIST, DEPARTMENT_LIST
+  type KpiCriteria,
+  type ScoringRubric,
+  loadKpiCriteria,
+  saveKpiCriteria,
+  getCategoryBg,
+  CATEGORY_LIST,
+  DEPARTMENT_LIST,
 } from "@/lib/kpi-data";
 
 export const Route = createFileRoute("/kpi-task-name")({
   head: () => ({
     meta: [
       { title: "KPI Criteria Setup — CRIPTON" },
-      { name: "description", content: "Configure weighted KPI evaluation criteria with categories, scoring rubrics, and department assignments." },
+      {
+        name: "description",
+        content:
+          "Configure weighted KPI evaluation criteria with categories, scoring rubrics, and department assignments.",
+      },
     ],
   }),
   component: KpiCriteriaSetupPage,
@@ -48,24 +66,28 @@ function KpiCriteriaSetupPage() {
     maxScore: 10,
     scoringRubric: { excellent: "", good: "", average: "", poor: "" },
     department: "All Departments",
-    status: "Active"
+    status: "Active",
   });
 
   // Computed
   const totalWeight = useMemo(() => criteria.reduce((s, c) => s + c.weight, 0), [criteria]);
-  const activeCount = useMemo(() => criteria.filter(c => c.status === "Active").length, [criteria]);
+  const activeCount = useMemo(
+    () => criteria.filter((c) => c.status === "Active").length,
+    [criteria],
+  );
 
   const filtered = useMemo(() => {
     let list = criteria;
     if (activeCategory !== "All") {
-      list = list.filter(c => c.category === activeCategory);
+      list = list.filter((c) => c.category === activeCategory);
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      list = list.filter(c =>
-        c.criteriaName.toLowerCase().includes(q) ||
-        c.criteriaDetail.toLowerCase().includes(q) ||
-        c.category.toLowerCase().includes(q)
+      list = list.filter(
+        (c) =>
+          c.criteriaName.toLowerCase().includes(q) ||
+          c.criteriaDetail.toLowerCase().includes(q) ||
+          c.category.toLowerCase().includes(q),
       );
     }
     return list;
@@ -74,8 +96,8 @@ function KpiCriteriaSetupPage() {
   // Category weight breakdown
   const categoryWeights = useMemo(() => {
     const map: Record<string, number> = {};
-    CATEGORY_LIST.forEach(cat => {
-      map[cat] = criteria.filter(c => c.category === cat).reduce((s, c) => s + c.weight, 0);
+    CATEGORY_LIST.forEach((cat) => {
+      map[cat] = criteria.filter((c) => c.category === cat).reduce((s, c) => s + c.weight, 0);
     });
     return map;
   }, [criteria]);
@@ -83,10 +105,14 @@ function KpiCriteriaSetupPage() {
   const openAddModal = () => {
     setEditId(null);
     setForm({
-      category: "Core Competency", criteriaName: "", criteriaDetail: "",
-      weight: 5, maxScore: 10,
+      category: "Core Competency",
+      criteriaName: "",
+      criteriaDetail: "",
+      weight: 5,
+      maxScore: 10,
       scoringRubric: { excellent: "", good: "", average: "", poor: "" },
-      department: "All Departments", status: "Active"
+      department: "All Departments",
+      status: "Active",
     });
     setShowModal(true);
   };
@@ -101,7 +127,7 @@ function KpiCriteriaSetupPage() {
       maxScore: item.maxScore,
       scoringRubric: { ...item.scoringRubric },
       department: item.department,
-      status: item.status
+      status: item.status,
     });
     setShowModal(true);
   };
@@ -115,7 +141,7 @@ function KpiCriteriaSetupPage() {
 
     let updated: KpiCriteria[];
     if (editId) {
-      updated = criteria.map(c => c.id === editId ? { ...c, ...form } : c);
+      updated = criteria.map((c) => (c.id === editId ? { ...c, ...form } : c));
     } else {
       const newId = `KPI-${String(criteria.length + 1).padStart(3, "0")}`;
       updated = [...criteria, { id: newId, ...form }];
@@ -126,14 +152,18 @@ function KpiCriteriaSetupPage() {
   };
 
   const handleDelete = (id: string) => {
-    const updated = criteria.filter(c => c.id !== id);
+    const updated = criteria.filter((c) => c.id !== id);
     setCriteria(updated);
     saveKpiCriteria(updated);
     setDeleteConfirm(null);
   };
 
   const handleToggleStatus = (id: string) => {
-    const updated = criteria.map(c => c.id === id ? { ...c, status: c.status === "Active" ? "Inactive" as const : "Active" as const } : c);
+    const updated = criteria.map((c) =>
+      c.id === id
+        ? { ...c, status: c.status === "Active" ? ("Inactive" as const) : ("Active" as const) }
+        : c,
+    );
     setCriteria(updated);
     saveKpiCriteria(updated);
   };
@@ -145,12 +175,13 @@ function KpiCriteriaSetupPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 xl:p-8 space-y-6">
-
           {/* Header */}
           <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-2.5" />
                 <span className="text-muted-foreground/75">KPI</span>
                 <ChevronRight className="size-2.5" />
@@ -160,7 +191,9 @@ function KpiCriteriaSetupPage() {
                 <Target className="size-5.5 text-primary" />
                 <span>KPI Criteria Setup</span>
               </h1>
-              <p className="text-xs text-muted-foreground mt-1">Configure weighted evaluation criteria with scoring rubrics and category assignments</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Configure weighted evaluation criteria with scoring rubrics and category assignments
+              </p>
             </div>
 
             <button
@@ -180,10 +213,13 @@ function KpiCriteriaSetupPage() {
                 Weight Distribution
               </h3>
               <div className="flex items-center gap-2">
-                <span className={`text-xs font-black px-3 py-1 rounded-lg border ${totalWeight === 100
-                    ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
-                    : "bg-red-500/10 text-red-600 border-red-500/20 animate-pulse"
-                  }`}>
+                <span
+                  className={`text-xs font-black px-3 py-1 rounded-lg border ${
+                    totalWeight === 100
+                      ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                      : "bg-red-500/10 text-red-600 border-red-500/20 animate-pulse"
+                  }`}
+                >
                   Total: {totalWeight}%
                 </span>
                 {totalWeight !== 100 && (
@@ -197,14 +233,14 @@ function KpiCriteriaSetupPage() {
 
             {/* Visual bar */}
             <div className="h-8 rounded-lg overflow-hidden flex bg-muted/30 border border-border/30">
-              {CATEGORY_LIST.map(cat => {
+              {CATEGORY_LIST.map((cat) => {
                 const w = categoryWeights[cat] || 0;
                 if (w === 0) return null;
                 const colors: Record<string, string> = {
                   "Core Competency": "bg-blue-500",
-                  "Technical": "bg-violet-500",
-                  "Behavioral": "bg-amber-500",
-                  "Organizational": "bg-emerald-500"
+                  Technical: "bg-violet-500",
+                  Behavioral: "bg-amber-500",
+                  Organizational: "bg-emerald-500",
                 };
                 return (
                   <div
@@ -221,21 +257,25 @@ function KpiCriteriaSetupPage() {
 
             {/* Category cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {CATEGORY_LIST.map(cat => {
+              {CATEGORY_LIST.map((cat) => {
                 const w = categoryWeights[cat] || 0;
-                const count = criteria.filter(c => c.category === cat).length;
+                const count = criteria.filter((c) => c.category === cat).length;
                 const colors: Record<string, string> = {
                   "Core Competency": "border-blue-500/20 bg-blue-500/5",
-                  "Technical": "border-violet-500/20 bg-violet-500/5",
-                  "Behavioral": "border-amber-500/20 bg-amber-500/5",
-                  "Organizational": "border-emerald-500/20 bg-emerald-500/5"
+                  Technical: "border-violet-500/20 bg-violet-500/5",
+                  Behavioral: "border-amber-500/20 bg-amber-500/5",
+                  Organizational: "border-emerald-500/20 bg-emerald-500/5",
                 };
                 return (
                   <div key={cat} className={`p-3 rounded-xl border ${colors[cat]} space-y-1`}>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">{cat}</span>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                      {cat}
+                    </span>
                     <div className="flex items-end gap-2">
                       <span className="text-lg font-black text-foreground">{w}%</span>
-                      <span className="text-[10px] font-bold text-muted-foreground mb-0.5">{count} criteria</span>
+                      <span className="text-[10px] font-bold text-muted-foreground mb-0.5">
+                        {count} criteria
+                      </span>
                     </div>
                   </div>
                 );
@@ -246,19 +286,29 @@ function KpiCriteriaSetupPage() {
           {/* Stats row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs">
-              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">Total Criteria</span>
+              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">
+                Total Criteria
+              </span>
               <p className="text-2xl font-black text-foreground mt-1">{criteria.length}</p>
             </div>
             <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs">
-              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">Active</span>
+              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">
+                Active
+              </span>
               <p className="text-2xl font-black text-emerald-600 mt-1">{activeCount}</p>
             </div>
             <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs">
-              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">Inactive</span>
-              <p className="text-2xl font-black text-amber-600 mt-1">{criteria.length - activeCount}</p>
+              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">
+                Inactive
+              </span>
+              <p className="text-2xl font-black text-amber-600 mt-1">
+                {criteria.length - activeCount}
+              </p>
             </div>
             <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs">
-              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">Max Score Each</span>
+              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">
+                Max Score Each
+              </span>
               <p className="text-2xl font-black text-primary mt-1">10</p>
             </div>
           </div>
@@ -267,17 +317,20 @@ function KpiCriteriaSetupPage() {
           <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs flex flex-col sm:flex-row items-center gap-4">
             <div className="flex items-center gap-1.5">
               <Filter className="size-3.5 text-muted-foreground" />
-              <span className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Filter:</span>
+              <span className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">
+                Filter:
+              </span>
             </div>
             <div className="flex flex-wrap gap-1.5">
-              {["All", ...CATEGORY_LIST].map(cat => (
+              {["All", ...CATEGORY_LIST].map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`h-7 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all duration-150 border ${activeCategory === cat
+                  className={`h-7 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all duration-150 border ${
+                    activeCategory === cat
                       ? "bg-[#1e88e5] text-white border-[#1e88e5] shadow-sm"
                       : "bg-card text-muted-foreground border-border/40 hover:bg-muted/50"
-                    }`}
+                  }`}
                 >
                   {cat}
                 </button>
@@ -315,32 +368,45 @@ function KpiCriteriaSetupPage() {
                 <tbody className="divide-y divide-border/20">
                   {filtered.map((item, idx) => (
                     <tr key={item.id} className="hover:bg-muted/20 transition duration-100 group">
-                      <td className="px-4 py-3 text-center text-xs font-mono text-muted-foreground/50 font-bold">{idx + 1}</td>
+                      <td className="px-4 py-3 text-center text-xs font-mono text-muted-foreground/50 font-bold">
+                        {idx + 1}
+                      </td>
                       <td className="px-4 py-3">
-                        <span className={`inline-flex px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase border ${getCategoryBg(item.category)}`}>
+                        <span
+                          className={`inline-flex px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase border ${getCategoryBg(item.category)}`}
+                        >
                           {item.category.split(" ")[0]}
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="text-xs font-bold text-foreground block">{item.criteriaName}</span>
-                        <span className="text-[10px] text-muted-foreground/70 block mt-0.5 max-w-md truncate">{item.criteriaDetail}</span>
+                        <span className="text-xs font-bold text-foreground block">
+                          {item.criteriaName}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground/70 block mt-0.5 max-w-md truncate">
+                          {item.criteriaDetail}
+                        </span>
                       </td>
                       <td className="px-4 py-3 text-center">
                         <span className="text-xs font-black text-primary">{item.weight}%</span>
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <span className="text-xs font-bold text-foreground/70">{item.maxScore}</span>
+                        <span className="text-xs font-bold text-foreground/70">
+                          {item.maxScore}
+                        </span>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="text-[10px] font-semibold text-muted-foreground">{item.department}</span>
+                        <span className="text-[10px] font-semibold text-muted-foreground">
+                          {item.department}
+                        </span>
                       </td>
                       <td className="px-4 py-3 text-center">
                         <button
                           onClick={() => handleToggleStatus(item.id)}
-                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase border cursor-pointer transition hover:opacity-80 ${item.status === "Active"
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase border cursor-pointer transition hover:opacity-80 ${
+                            item.status === "Active"
                               ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
                               : "bg-slate-500/10 text-slate-500 border-slate-500/20"
-                            }`}
+                          }`}
                         >
                           {item.status === "Active" && <CheckCircle2 className="size-2.5" />}
                           {item.status}
@@ -369,7 +435,10 @@ function KpiCriteriaSetupPage() {
 
                   {filtered.length === 0 && (
                     <tr>
-                      <td colSpan={8} className="text-center py-12 text-xs font-bold text-muted-foreground">
+                      <td
+                        colSpan={8}
+                        className="text-center py-12 text-xs font-bold text-muted-foreground"
+                      >
                         No criteria found matching your search.
                       </td>
                     </tr>
@@ -379,11 +448,19 @@ function KpiCriteriaSetupPage() {
             </div>
 
             <div className="px-4 py-3 border-t border-border/30 text-[11px] font-semibold text-muted-foreground flex items-center justify-between">
-              <span>Showing {filtered.length} of {criteria.length} criteria</span>
-              <span>Total Weight: <span className={`font-black ${totalWeight === 100 ? "text-emerald-600" : "text-red-500"}`}>{totalWeight}%</span></span>
+              <span>
+                Showing {filtered.length} of {criteria.length} criteria
+              </span>
+              <span>
+                Total Weight:{" "}
+                <span
+                  className={`font-black ${totalWeight === 100 ? "text-emerald-600" : "text-red-500"}`}
+                >
+                  {totalWeight}%
+                </span>
+              </span>
             </div>
           </div>
-
         </div>
       </main>
 
@@ -403,52 +480,75 @@ function KpiCriteriaSetupPage() {
                 <Target className="size-5 text-primary" />
                 {editId ? "Edit KPI Criteria" : "Add New KPI Criteria"}
               </h3>
-              <p className="text-[11px] text-muted-foreground mt-1">Define criteria with weight, rubric, and department assignment</p>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Define criteria with weight, rubric, and department assignment
+              </p>
             </div>
 
             <form onSubmit={handleSave} className="p-6 space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Category *</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Category *
+                  </label>
                   <select
                     value={form.category}
-                    onChange={(e) => setForm(p => ({ ...p, category: e.target.value as KpiCriteria["category"] }))}
+                    onChange={(e) =>
+                      setForm((p) => ({
+                        ...p,
+                        category: e.target.value as KpiCriteria["category"],
+                      }))
+                    }
                     className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5]"
                   >
-                    {CATEGORY_LIST.map(c => <option key={c} value={c}>{c}</option>)}
+                    {CATEGORY_LIST.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Department</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Department
+                  </label>
                   <select
                     value={form.department}
-                    onChange={(e) => setForm(p => ({ ...p, department: e.target.value }))}
+                    onChange={(e) => setForm((p) => ({ ...p, department: e.target.value }))}
                     className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5]"
                   >
-                    {DEPARTMENT_LIST.map(d => <option key={d} value={d}>{d}</option>)}
+                    {DEPARTMENT_LIST.map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Criteria Name *</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                  Criteria Name *
+                </label>
                 <input
                   type="text"
                   required
                   value={form.criteriaName}
-                  onChange={(e) => setForm(p => ({ ...p, criteriaName: e.target.value }))}
+                  onChange={(e) => setForm((p) => ({ ...p, criteriaName: e.target.value }))}
                   placeholder="e.g., Decision Making & Problem Solving"
                   className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5]"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Description *</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                  Description *
+                </label>
                 <textarea
                   required
                   value={form.criteriaDetail}
-                  onChange={(e) => setForm(p => ({ ...p, criteriaDetail: e.target.value }))}
+                  onChange={(e) => setForm((p) => ({ ...p, criteriaDetail: e.target.value }))}
                   placeholder="Detailed description of what this criteria measures..."
                   className="w-full h-20 p-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none resize-none focus:border-[#1e88e5]"
                 />
@@ -456,33 +556,45 @@ function KpiCriteriaSetupPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Weight (%) *</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Weight (%) *
+                  </label>
                   <input
                     type="number"
                     required
                     min={1}
                     max={50}
                     value={form.weight}
-                    onChange={(e) => setForm(p => ({ ...p, weight: parseInt(e.target.value) || 0 }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, weight: parseInt(e.target.value) || 0 }))
+                    }
                     className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold font-mono outline-none focus:border-[#1e88e5]"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Max Score</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Max Score
+                  </label>
                   <input
                     type="number"
                     min={1}
                     max={100}
                     value={form.maxScore}
-                    onChange={(e) => setForm(p => ({ ...p, maxScore: parseInt(e.target.value) || 10 }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, maxScore: parseInt(e.target.value) || 10 }))
+                    }
                     className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold font-mono outline-none focus:border-[#1e88e5]"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Status</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Status
+                  </label>
                   <select
                     value={form.status}
-                    onChange={(e) => setForm(p => ({ ...p, status: e.target.value as "Active" | "Inactive" }))}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, status: e.target.value as "Active" | "Inactive" }))
+                    }
                     className="w-full h-9 px-3 rounded-lg bg-muted/40 border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5]"
                   >
                     <option value="Active">Active</option>
@@ -498,19 +610,26 @@ function KpiCriteriaSetupPage() {
                   Scoring Rubric
                 </span>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {(["excellent", "good", "average", "poor"] as const).map(level => {
+                  {(["excellent", "good", "average", "poor"] as const).map((level) => {
                     const colors: Record<string, string> = {
                       excellent: "border-l-emerald-500",
                       good: "border-l-blue-500",
                       average: "border-l-amber-500",
-                      poor: "border-l-red-500"
+                      poor: "border-l-red-500",
                     };
                     return (
                       <div key={level} className={`space-y-1 border-l-2 ${colors[level]} pl-3`}>
-                        <label className="text-[9px] font-extrabold uppercase text-muted-foreground tracking-wider capitalize">{level}</label>
+                        <label className="text-[9px] font-extrabold uppercase text-muted-foreground tracking-wider capitalize">
+                          {level}
+                        </label>
                         <textarea
                           value={form.scoringRubric[level]}
-                          onChange={(e) => setForm(p => ({ ...p, scoringRubric: { ...p.scoringRubric, [level]: e.target.value } }))}
+                          onChange={(e) =>
+                            setForm((p) => ({
+                              ...p,
+                              scoringRubric: { ...p.scoringRubric, [level]: e.target.value },
+                            }))
+                          }
                           placeholder={`Describe ${level} performance...`}
                           className="w-full h-14 p-2 rounded-lg bg-muted/30 border border-border/30 text-[10.5px] font-semibold outline-none resize-none focus:border-[#1e88e5]"
                         />

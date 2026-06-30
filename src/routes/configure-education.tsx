@@ -3,8 +3,19 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  ChevronRight, Search, Plus, Pencil, Trash2, X,
-  FileSpreadsheet, Printer, FileText, Award, Building, BookOpen, GraduationCap
+  ChevronRight,
+  Search,
+  Plus,
+  Pencil,
+  Trash2,
+  X,
+  FileSpreadsheet,
+  Printer,
+  FileText,
+  Award,
+  Building,
+  BookOpen,
+  GraduationCap,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -12,7 +23,11 @@ export const Route = createFileRoute("/configure-education")({
   head: () => ({
     meta: [
       { title: "Education & Training Setup — CRIPTON HRIS" },
-      { name: "description", content: "Manage and configure qualifications, institutions, results, and training categories." },
+      {
+        name: "description",
+        content:
+          "Manage and configure qualifications, institutions, results, and training categories.",
+      },
     ],
   }),
   component: EducationSetupPage,
@@ -70,13 +85,17 @@ const DEFAULT_QUALIFICATIONS: Qualification[] = [
   { sl: 17, education: "Ph.D", isActive: "Active" },
   { sl: 18, education: "Diploma in Engineering", isActive: "Active" },
   { sl: 19, education: "Diploma in Textile", isActive: "Active" },
-  { sl: 20, education: "LLB", isActive: "Active" }
+  { sl: 20, education: "LLB", isActive: "Active" },
 ];
 
 const DEFAULT_INSTITUTIONS: Institution[] = [
   { sl: 1, education: "University of Dhaka", isActive: "Active" },
   { sl: 2, education: "National University", isActive: "Active" },
-  { sl: 3, education: "Bangladesh University of Engineering and Technology (BUET)", isActive: "Active" },
+  {
+    sl: 3,
+    education: "Bangladesh University of Engineering and Technology (BUET)",
+    isActive: "Active",
+  },
   { sl: 4, education: "University of Rajshahi", isActive: "Active" },
   { sl: 5, education: "University of Chittagong", isActive: "Active" },
   { sl: 6, education: "Jahangirnagar University", isActive: "Active" },
@@ -93,7 +112,7 @@ const DEFAULT_INSTITUTIONS: Institution[] = [
   { sl: 17, education: "Ahsanullah University of Science and Technology", isActive: "Active" },
   { sl: 18, education: "Dhaka College", isActive: "Active" },
   { sl: 19, education: "Eden Mohila College", isActive: "Active" },
-  { sl: 20, education: "Tejgaon College", isActive: "Active" }
+  { sl: 20, education: "Tejgaon College", isActive: "Active" },
 ];
 
 const DEFAULT_RESULTS: ResultItem[] = [
@@ -116,7 +135,7 @@ const DEFAULT_RESULTS: ResultItem[] = [
   { sl: 17, result: "CGPA 3.00 - 3.24", isActive: "Active" },
   { sl: 18, result: "CGPA 2.50 - 2.99", isActive: "Active" },
   { sl: 19, result: "CGPA 2.00 - 2.49", isActive: "Active" },
-  { sl: 20, result: "Pass", isActive: "Active" }
+  { sl: 20, result: "Pass", isActive: "Active" },
 ];
 
 const DEFAULT_TRAININGS: TrainingCategory[] = [
@@ -139,7 +158,7 @@ const DEFAULT_TRAININGS: TrainingCategory[] = [
   { sl: 17, name: "Supply Chain & Material Control", isActive: "Active" },
   { sl: 18, name: "Customer Support & Service Excellence", isActive: "Active" },
   { sl: 19, name: "Gender Equality & Harassment Prevention", isActive: "Active" },
-  { sl: 20, name: "Waste Management & Sustainability", isActive: "Active" }
+  { sl: 20, name: "Waste Management & Sustainability", isActive: "Active" },
 ];
 
 function EducationSetupPage() {
@@ -181,12 +200,20 @@ function EducationSetupPage() {
     };
 
     // Qualifications
-    const qualificationsData = safeParse("hris_educational_qualifications", DEFAULT_QUALIFICATIONS, "education");
+    const qualificationsData = safeParse(
+      "hris_educational_qualifications",
+      DEFAULT_QUALIFICATIONS,
+      "education",
+    );
     setQualifications(qualificationsData);
     localStorage.setItem("hris_educational_qualifications", JSON.stringify(qualificationsData));
 
     // Institutions
-    const institutionsData = safeParse("hris_educational_institutions", DEFAULT_INSTITUTIONS, "education");
+    const institutionsData = safeParse(
+      "hris_educational_institutions",
+      DEFAULT_INSTITUTIONS,
+      "education",
+    );
     setInstitutions(institutionsData);
     localStorage.setItem("hris_educational_institutions", JSON.stringify(institutionsData));
 
@@ -224,19 +251,19 @@ function EducationSetupPage() {
   const openForm = (sl: number | null) => {
     setEditSl(sl);
     if (activeTab === "qualification") {
-      const item = qualifications.find(q => q.sl === sl);
+      const item = qualifications.find((q) => q.sl === sl);
       setQualTitle(item?.education || "");
       setQualIsActive(item?.isActive || "Active");
     } else if (activeTab === "institution") {
-      const item = institutions.find(i => i.sl === sl);
+      const item = institutions.find((i) => i.sl === sl);
       setInstTitle(item?.education || "");
       setInstIsActive(item?.isActive || "Active");
     } else if (activeTab === "result") {
-      const item = results.find(r => r.sl === sl);
+      const item = results.find((r) => r.sl === sl);
       setResTitle(item?.result || "");
       setResIsActive(item?.isActive || "Active");
     } else if (activeTab === "training") {
-      const item = trainings.find(t => t.sl === sl);
+      const item = trainings.find((t) => t.sl === sl);
       setTrainName(item?.name || "");
       setTrainIsActive(item?.isActive || "Active");
     }
@@ -247,19 +274,23 @@ function EducationSetupPage() {
     if (!confirm("Are you sure you want to delete this setting?")) return;
 
     if (activeTab === "qualification") {
-      const updated = qualifications.filter(q => q.sl !== sl).map((q, idx) => ({ ...q, sl: idx + 1 }));
+      const updated = qualifications
+        .filter((q) => q.sl !== sl)
+        .map((q, idx) => ({ ...q, sl: idx + 1 }));
       setQualifications(updated);
       localStorage.setItem("hris_educational_qualifications", JSON.stringify(updated));
     } else if (activeTab === "institution") {
-      const updated = institutions.filter(i => i.sl !== sl).map((i, idx) => ({ ...i, sl: idx + 1 }));
+      const updated = institutions
+        .filter((i) => i.sl !== sl)
+        .map((i, idx) => ({ ...i, sl: idx + 1 }));
       setInstitutions(updated);
       localStorage.setItem("hris_educational_institutions", JSON.stringify(updated));
     } else if (activeTab === "result") {
-      const updated = results.filter(r => r.sl !== sl).map((r, idx) => ({ ...r, sl: idx + 1 }));
+      const updated = results.filter((r) => r.sl !== sl).map((r, idx) => ({ ...r, sl: idx + 1 }));
       setResults(updated);
       localStorage.setItem("hris_educational_results", JSON.stringify(updated));
     } else if (activeTab === "training") {
-      const updated = trainings.filter(t => t.sl !== sl).map((t, idx) => ({ ...t, sl: idx + 1 }));
+      const updated = trainings.filter((t) => t.sl !== sl).map((t, idx) => ({ ...t, sl: idx + 1 }));
       setTrainings(updated);
       localStorage.setItem("hris_training_categories", JSON.stringify(updated));
     }
@@ -271,45 +302,65 @@ function EducationSetupPage() {
     e.preventDefault();
 
     if (activeTab === "qualification") {
-      if (!qualTitle) { toast.error("Title is required."); return; }
+      if (!qualTitle) {
+        toast.error("Title is required.");
+        return;
+      }
       let nextList = [...qualifications];
       if (editSl !== null) {
-        nextList = qualifications.map(q => q.sl === editSl ? { ...q, education: qualTitle, isActive: qualIsActive } : q);
+        nextList = qualifications.map((q) =>
+          q.sl === editSl ? { ...q, education: qualTitle, isActive: qualIsActive } : q,
+        );
       } else {
-        const sl = qualifications.length > 0 ? Math.max(...qualifications.map(q => q.sl)) + 1 : 1;
+        const sl = qualifications.length > 0 ? Math.max(...qualifications.map((q) => q.sl)) + 1 : 1;
         nextList.push({ sl, education: qualTitle, isActive: qualIsActive });
       }
       setQualifications(nextList);
       localStorage.setItem("hris_educational_qualifications", JSON.stringify(nextList));
     } else if (activeTab === "institution") {
-      if (!instTitle) { toast.error("Institution name is required."); return; }
+      if (!instTitle) {
+        toast.error("Institution name is required.");
+        return;
+      }
       let nextList = [...institutions];
       if (editSl !== null) {
-        nextList = institutions.map(i => i.sl === editSl ? { ...i, education: instTitle, isActive: instIsActive } : i);
+        nextList = institutions.map((i) =>
+          i.sl === editSl ? { ...i, education: instTitle, isActive: instIsActive } : i,
+        );
       } else {
-        const sl = institutions.length > 0 ? Math.max(...institutions.map(i => i.sl)) + 1 : 1;
+        const sl = institutions.length > 0 ? Math.max(...institutions.map((i) => i.sl)) + 1 : 1;
         nextList.push({ sl, education: instTitle, isActive: instIsActive });
       }
       setInstitutions(nextList);
       localStorage.setItem("hris_educational_institutions", JSON.stringify(nextList));
     } else if (activeTab === "result") {
-      if (!resTitle) { toast.error("Result name is required."); return; }
+      if (!resTitle) {
+        toast.error("Result name is required.");
+        return;
+      }
       let nextList = [...results];
       if (editSl !== null) {
-        nextList = results.map(r => r.sl === editSl ? { ...r, result: resTitle, isActive: resIsActive } : r);
+        nextList = results.map((r) =>
+          r.sl === editSl ? { ...r, result: resTitle, isActive: resIsActive } : r,
+        );
       } else {
-        const sl = results.length > 0 ? Math.max(...results.map(r => r.sl)) + 1 : 1;
+        const sl = results.length > 0 ? Math.max(...results.map((r) => r.sl)) + 1 : 1;
         nextList.push({ sl, result: resTitle, isActive: resIsActive });
       }
       setResults(nextList);
       localStorage.setItem("hris_educational_results", JSON.stringify(nextList));
     } else if (activeTab === "training") {
-      if (!trainName) { toast.error("Training name is required."); return; }
+      if (!trainName) {
+        toast.error("Training name is required.");
+        return;
+      }
       let nextList = [...trainings];
       if (editSl !== null) {
-        nextList = trainings.map(t => t.sl === editSl ? { ...t, name: trainName, isActive: trainIsActive } : t);
+        nextList = trainings.map((t) =>
+          t.sl === editSl ? { ...t, name: trainName, isActive: trainIsActive } : t,
+        );
       } else {
-        const sl = trainings.length > 0 ? Math.max(...trainings.map(t => t.sl)) + 1 : 1;
+        const sl = trainings.length > 0 ? Math.max(...trainings.map((t) => t.sl)) + 1 : 1;
         nextList.push({ sl, name: trainName, isActive: trainIsActive });
       }
       setTrainings(nextList);
@@ -320,17 +371,21 @@ function EducationSetupPage() {
     setIsFormOpen(false);
   };
 
-  const insetWrapperClass = "group relative rounded-xl border border-border/80 focus-within:border-primary px-3.5 py-1.5 bg-muted/15 focus-within:bg-card transition-all duration-200";
-  const insetLabelClass = "text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block mb-0.5";
-  const insetInputClass = "w-full bg-transparent border-0 outline-none text-xs font-normal text-foreground focus:ring-0 p-0";
-  const insetSelectClass = "w-full bg-transparent border-0 outline-none text-xs font-normal text-foreground focus:ring-0 p-0 cursor-pointer";
+  const insetWrapperClass =
+    "group relative rounded-xl border border-border/80 focus-within:border-primary px-3.5 py-1.5 bg-muted/15 focus-within:bg-card transition-all duration-200";
+  const insetLabelClass =
+    "text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block mb-0.5";
+  const insetInputClass =
+    "w-full bg-transparent border-0 outline-none text-xs font-normal text-foreground focus:ring-0 p-0";
+  const insetSelectClass =
+    "w-full bg-transparent border-0 outline-none text-xs font-normal text-foreground focus:ring-0 p-0 cursor-pointer";
 
   // Tab Header Items
   const tabsList: { type: TabType; label: string; icon: any }[] = [
     { type: "qualification", label: "Educational Qualification", icon: Award },
     { type: "institution", label: "Education Institution", icon: Building },
     { type: "result", label: "Education Result", icon: BookOpen },
-    { type: "training", label: "Training Category", icon: GraduationCap }
+    { type: "training", label: "Training Category", icon: GraduationCap },
   ];
 
   return (
@@ -344,7 +399,9 @@ function EducationSetupPage() {
           <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-3" />
                 <span>Configure</span>
                 <ChevronRight className="size-3" />
@@ -365,7 +422,7 @@ function EducationSetupPage() {
 
           {/* Horizontal Master Tabs */}
           <div className="flex flex-wrap gap-2 border-b border-border/50 pb-2">
-            {tabsList.map(tab => {
+            {tabsList.map((tab) => {
               const TabIcon = tab.icon;
               const isActive = activeTab === tab.type;
               return (
@@ -375,10 +432,11 @@ function EducationSetupPage() {
                     setActiveTab(tab.type);
                     setSearchQuery("");
                   }}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all ${isActive
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all ${
+                    isActive
                       ? "bg-primary text-primary-foreground shadow-sm"
                       : "bg-card border border-border/85 hover:bg-muted text-muted-foreground hover:text-foreground"
-                    }`}
+                  }`}
                 >
                   <TabIcon className="size-4" />
                   {tab.label}
@@ -393,9 +451,9 @@ function EducationSetupPage() {
               <Search className="size-4 text-muted-foreground/70" />
               <input
                 type="text"
-                placeholder={`Search ${tabsList.find(t => t.type === activeTab)?.label}...`}
+                placeholder={`Search ${tabsList.find((t) => t.type === activeTab)?.label}...`}
                 value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="bg-transparent border-0 outline-none text-xs w-full text-foreground placeholder:text-muted-foreground/60 font-semibold"
               />
             </div>
@@ -425,127 +483,253 @@ function EducationSetupPage() {
           {/* Master Table Router */}
           <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
-
               {activeTab === "qualification" && (
-                <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "800px" }}>
+                <table
+                  className="w-full text-left text-xs border-collapse whitespace-nowrap"
+                  style={{ minWidth: "800px" }}
+                >
                   <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
                     <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">#</th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">Actions</th>
+                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                        #
+                      </th>
+                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
+                        Actions
+                      </th>
                       <th className="px-5 py-4 min-w-[300px]">Education / Qualification</th>
                       <th className="px-5 py-4 w-[120px] text-center">IsActive</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/30 text-foreground">
-                    {qualifications.filter(q => (q.education || "").toLowerCase().includes(searchQuery.toLowerCase())).map((item, idx) => (
-                      <tr key={item.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
-                        <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
-                        <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
-                          <div className="flex items-center justify-center gap-3">
-                            <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition"><Pencil className="size-4" /></button>
-                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition"><Trash2 className="size-4" /></button>
-                          </div>
-                        </td>
-                        <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">{item.education}</td>
-                        <td className="px-5 py-3.5 text-center">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}>{item.isActive}</span>
-                        </td>
-                      </tr>
-                    ))}
+                    {qualifications
+                      .filter((q) =>
+                        (q.education || "").toLowerCase().includes(searchQuery.toLowerCase()),
+                      )
+                      .map((item, idx) => (
+                        <tr
+                          key={item.sl}
+                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                        >
+                          <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
+                            {idx + 1}
+                          </td>
+                          <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
+                            <div className="flex items-center justify-center gap-3">
+                              <button
+                                onClick={() => openForm(item.sl)}
+                                className="text-orange-500 hover:text-orange-600 transition"
+                              >
+                                <Pencil className="size-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(item.sl)}
+                                className="text-red-500 hover:text-red-650 transition"
+                              >
+                                <Trash2 className="size-4" />
+                              </button>
+                            </div>
+                          </td>
+                          <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">
+                            {item.education}
+                          </td>
+                          <td className="px-5 py-3.5 text-center">
+                            <span
+                              className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}
+                            >
+                              {item.isActive}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               )}
 
               {activeTab === "institution" && (
-                <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "800px" }}>
+                <table
+                  className="w-full text-left text-xs border-collapse whitespace-nowrap"
+                  style={{ minWidth: "800px" }}
+                >
                   <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
                     <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">#</th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">Actions</th>
+                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                        #
+                      </th>
+                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
+                        Actions
+                      </th>
                       <th className="px-5 py-4 min-w-[300px]">Education (Institution Name)</th>
                       <th className="px-5 py-4 w-[120px] text-center">IsActive</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/30 text-foreground">
-                    {institutions.filter(i => (i.education || "").toLowerCase().includes(searchQuery.toLowerCase())).map((item, idx) => (
-                      <tr key={item.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
-                        <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
-                        <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
-                          <div className="flex items-center justify-center gap-3">
-                            <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition"><Pencil className="size-4" /></button>
-                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition"><Trash2 className="size-4" /></button>
-                          </div>
-                        </td>
-                        <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">{item.education}</td>
-                        <td className="px-5 py-3.5 text-center">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}>{item.isActive}</span>
-                        </td>
-                      </tr>
-                    ))}
+                    {institutions
+                      .filter((i) =>
+                        (i.education || "").toLowerCase().includes(searchQuery.toLowerCase()),
+                      )
+                      .map((item, idx) => (
+                        <tr
+                          key={item.sl}
+                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                        >
+                          <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
+                            {idx + 1}
+                          </td>
+                          <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
+                            <div className="flex items-center justify-center gap-3">
+                              <button
+                                onClick={() => openForm(item.sl)}
+                                className="text-orange-500 hover:text-orange-600 transition"
+                              >
+                                <Pencil className="size-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(item.sl)}
+                                className="text-red-500 hover:text-red-650 transition"
+                              >
+                                <Trash2 className="size-4" />
+                              </button>
+                            </div>
+                          </td>
+                          <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">
+                            {item.education}
+                          </td>
+                          <td className="px-5 py-3.5 text-center">
+                            <span
+                              className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}
+                            >
+                              {item.isActive}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               )}
 
               {activeTab === "result" && (
-                <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "800px" }}>
+                <table
+                  className="w-full text-left text-xs border-collapse whitespace-nowrap"
+                  style={{ minWidth: "800px" }}
+                >
                   <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
                     <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">#</th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">Actions</th>
+                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                        #
+                      </th>
+                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
+                        Actions
+                      </th>
                       <th className="px-5 py-4 min-w-[300px]">Result / Division</th>
                       <th className="px-5 py-4 w-[120px] text-center">IsActive</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/30 text-foreground">
-                    {results.filter(r => (r.result || "").toLowerCase().includes(searchQuery.toLowerCase())).map((item, idx) => (
-                      <tr key={item.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
-                        <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
-                        <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
-                          <div className="flex items-center justify-center gap-3">
-                            <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition"><Pencil className="size-4" /></button>
-                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition"><Trash2 className="size-4" /></button>
-                          </div>
-                        </td>
-                        <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">{item.result}</td>
-                        <td className="px-5 py-3.5 text-center">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}>{item.isActive}</span>
-                        </td>
-                      </tr>
-                    ))}
+                    {results
+                      .filter((r) =>
+                        (r.result || "").toLowerCase().includes(searchQuery.toLowerCase()),
+                      )
+                      .map((item, idx) => (
+                        <tr
+                          key={item.sl}
+                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                        >
+                          <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
+                            {idx + 1}
+                          </td>
+                          <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
+                            <div className="flex items-center justify-center gap-3">
+                              <button
+                                onClick={() => openForm(item.sl)}
+                                className="text-orange-500 hover:text-orange-600 transition"
+                              >
+                                <Pencil className="size-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(item.sl)}
+                                className="text-red-500 hover:text-red-650 transition"
+                              >
+                                <Trash2 className="size-4" />
+                              </button>
+                            </div>
+                          </td>
+                          <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">
+                            {item.result}
+                          </td>
+                          <td className="px-5 py-3.5 text-center">
+                            <span
+                              className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}
+                            >
+                              {item.isActive}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               )}
 
               {activeTab === "training" && (
-                <table className="w-full text-left text-xs border-collapse whitespace-nowrap" style={{ minWidth: "800px" }}>
+                <table
+                  className="w-full text-left text-xs border-collapse whitespace-nowrap"
+                  style={{ minWidth: "800px" }}
+                >
                   <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
                     <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">#</th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">Actions</th>
+                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                        #
+                      </th>
+                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
+                        Actions
+                      </th>
                       <th className="px-5 py-4 min-w-[300px]">Training Name</th>
                       <th className="px-5 py-4 w-[120px] text-center">IsActive</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/30 text-foreground">
-                    {trainings.filter(t => (t.name || "").toLowerCase().includes(searchQuery.toLowerCase())).map((item, idx) => (
-                      <tr key={item.sl} className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all">
-                        <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">{idx + 1}</td>
-                        <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
-                          <div className="flex items-center justify-center gap-3">
-                            <button onClick={() => openForm(item.sl)} className="text-orange-500 hover:text-orange-600 transition"><Pencil className="size-4" /></button>
-                            <button onClick={() => handleDelete(item.sl)} className="text-red-500 hover:text-red-650 transition"><Trash2 className="size-4" /></button>
-                          </div>
-                        </td>
-                        <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">{item.name}</td>
-                        <td className="px-5 py-3.5 text-center">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}>{item.isActive}</span>
-                        </td>
-                      </tr>
-                    ))}
+                    {trainings
+                      .filter((t) =>
+                        (t.name || "").toLowerCase().includes(searchQuery.toLowerCase()),
+                      )
+                      .map((item, idx) => (
+                        <tr
+                          key={item.sl}
+                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                        >
+                          <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
+                            {idx + 1}
+                          </td>
+                          <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
+                            <div className="flex items-center justify-center gap-3">
+                              <button
+                                onClick={() => openForm(item.sl)}
+                                className="text-orange-500 hover:text-orange-600 transition"
+                              >
+                                <Pencil className="size-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(item.sl)}
+                                className="text-red-500 hover:text-red-650 transition"
+                              >
+                                <Trash2 className="size-4" />
+                              </button>
+                            </div>
+                          </td>
+                          <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">
+                            {item.name}
+                          </td>
+                          <td className="px-5 py-3.5 text-center">
+                            <span
+                              className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}
+                            >
+                              {item.isActive}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               )}
-
             </div>
           </div>
         </div>
@@ -554,7 +738,6 @@ function EducationSetupPage() {
         {isFormOpen && (
           <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
             <div className="bg-card border border-border/80 w-full max-w-2xl rounded-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
-
               {/* Modal Header */}
               <div className="px-6 py-4.5 border-b border-border/50 bg-[#f8fafc] dark:bg-[#0f172a] flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
@@ -563,7 +746,8 @@ function EducationSetupPage() {
                   </div>
                   <div>
                     <h2 className="text-base font-black tracking-tight text-foreground">
-                      {editSl ? "Update" : "Create"} {tabsList.find(t => t.type === activeTab)?.label}
+                      {editSl ? "Update" : "Create"}{" "}
+                      {tabsList.find((t) => t.type === activeTab)?.label}
                     </h2>
                   </div>
                 </div>
@@ -577,16 +761,26 @@ function EducationSetupPage() {
 
               {/* Modal Form Body */}
               <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
-
                 {activeTab === "qualification" && (
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Education / Qualification Title *</label>
-                      <input type="text" placeholder="e.g. Alim, B.A, B.B.A" value={qualTitle} onChange={e => setQualTitle(e.target.value)} className={insetInputClass} required />
+                      <input
+                        type="text"
+                        placeholder="e.g. Alim, B.A, B.B.A"
+                        value={qualTitle}
+                        onChange={(e) => setQualTitle(e.target.value)}
+                        className={insetInputClass}
+                        required
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>IsActive *</label>
-                      <select value={qualIsActive} onChange={e => setQualIsActive(e.target.value as any)} className={insetSelectClass}>
+                      <select
+                        value={qualIsActive}
+                        onChange={(e) => setQualIsActive(e.target.value as any)}
+                        className={insetSelectClass}
+                      >
                         <option value="Active">Active</option>
                         <option value="Inactive">Inactive</option>
                       </select>
@@ -598,11 +792,22 @@ function EducationSetupPage() {
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Institution Name *</label>
-                      <input type="text" placeholder="Institution Name" value={instTitle} onChange={e => setInstTitle(e.target.value)} className={insetInputClass} required />
+                      <input
+                        type="text"
+                        placeholder="Institution Name"
+                        value={instTitle}
+                        onChange={(e) => setInstTitle(e.target.value)}
+                        className={insetInputClass}
+                        required
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>IsActive *</label>
-                      <select value={instIsActive} onChange={e => setInstIsActive(e.target.value as any)} className={insetSelectClass}>
+                      <select
+                        value={instIsActive}
+                        onChange={(e) => setInstIsActive(e.target.value as any)}
+                        className={insetSelectClass}
+                      >
                         <option value="Active">Active</option>
                         <option value="Inactive">Inactive</option>
                       </select>
@@ -614,11 +819,22 @@ function EducationSetupPage() {
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Result / Division Title *</label>
-                      <input type="text" placeholder="e.g. A+, First Division" value={resTitle} onChange={e => setResTitle(e.target.value)} className={insetInputClass} required />
+                      <input
+                        type="text"
+                        placeholder="e.g. A+, First Division"
+                        value={resTitle}
+                        onChange={(e) => setResTitle(e.target.value)}
+                        className={insetInputClass}
+                        required
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>IsActive *</label>
-                      <select value={resIsActive} onChange={e => setResIsActive(e.target.value as any)} className={insetSelectClass}>
+                      <select
+                        value={resIsActive}
+                        onChange={(e) => setResIsActive(e.target.value as any)}
+                        className={insetSelectClass}
+                      >
                         <option value="Active">Active</option>
                         <option value="Inactive">Inactive</option>
                       </select>
@@ -630,11 +846,22 @@ function EducationSetupPage() {
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Training Category Name *</label>
-                      <input type="text" placeholder="Training name" value={trainName} onChange={e => setTrainName(e.target.value)} className={insetInputClass} required />
+                      <input
+                        type="text"
+                        placeholder="Training name"
+                        value={trainName}
+                        onChange={(e) => setTrainName(e.target.value)}
+                        className={insetInputClass}
+                        required
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>IsActive *</label>
-                      <select value={trainIsActive} onChange={e => setTrainIsActive(e.target.value as any)} className={insetSelectClass}>
+                      <select
+                        value={trainIsActive}
+                        onChange={(e) => setTrainIsActive(e.target.value as any)}
+                        className={insetSelectClass}
+                      >
                         <option value="Active">Active</option>
                         <option value="Inactive">Inactive</option>
                       </select>

@@ -3,10 +3,28 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import {
-  ChevronRight, Search, FileSpreadsheet, Printer, FileDown,
-  CheckCircle2, Lock, Unlock, ArrowRight, ShieldCheck, HelpCircle,
-  RefreshCw, Trash2, Plus, Minus, Calculator, Landmark, Coins,
-  Smartphone, UserCheck, Eye, EyeOff
+  ChevronRight,
+  Search,
+  FileSpreadsheet,
+  Printer,
+  FileDown,
+  CheckCircle2,
+  Lock,
+  Unlock,
+  ArrowRight,
+  ShieldCheck,
+  HelpCircle,
+  RefreshCw,
+  Trash2,
+  Plus,
+  Minus,
+  Calculator,
+  Landmark,
+  Coins,
+  Smartphone,
+  UserCheck,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -14,7 +32,11 @@ export const Route = createFileRoute("/earn-leave-workflow")({
   head: () => ({
     meta: [
       { title: "Earn Leave Workflow Center — CRIPTON" },
-      { name: "description", content: "Unified multi-tier workflow panel containing Earn Leave Submit, Check Verification, and HRD Authorizations." },
+      {
+        name: "description",
+        content:
+          "Unified multi-tier workflow panel containing Earn Leave Submit, Check Verification, and HRD Authorizations.",
+      },
     ],
   }),
   component: EarnLeaveWorkflowPage,
@@ -48,7 +70,7 @@ const initialWorkflowRows: EarnLeaveWorkflowRow[] = [
     paymentMode: "Bank",
     bankName: "Dutch-Bangla Bank PLC",
     accountNo: "125.120.44391",
-    status: "Draft"
+    status: "Draft",
   },
   {
     id: "ELW-002",
@@ -56,13 +78,13 @@ const initialWorkflowRows: EarnLeaveWorkflowRow[] = [
     empName: "Dipon Saha",
     department: "Core Development (HR)",
     designation: "Senior Software Engineer",
-    totalDays: 5.60,
-    perDayRate: 2600.00,
+    totalDays: 5.6,
+    perDayRate: 2600.0,
     netPay: 14560,
     paymentMode: "Bank",
     bankName: "Dutch-Bangla Bank PLC",
     accountNo: "125.120.35599",
-    status: "Draft"
+    status: "Draft",
   },
   {
     id: "ELW-003",
@@ -70,13 +92,13 @@ const initialWorkflowRows: EarnLeaveWorkflowRow[] = [
     empName: "Sadiqul Islam",
     department: "Core Sales",
     designation: "Deputy Manager",
-    totalDays: 3.00,
-    perDayRate: 1100.00,
+    totalDays: 3.0,
+    perDayRate: 1100.0,
     netPay: 3300,
     paymentMode: "Cash",
     bankName: "",
     accountNo: "",
-    status: "Submitted"
+    status: "Submitted",
   },
   {
     id: "ELW-004",
@@ -84,13 +106,13 @@ const initialWorkflowRows: EarnLeaveWorkflowRow[] = [
     empName: "Mst. Jahanara Khatun",
     department: "Sewing",
     designation: "Asst. Operator",
-    totalDays: 12.00,
-    perDayRate: 230.50,
+    totalDays: 12.0,
+    perDayRate: 230.5,
     netPay: 2766,
     paymentMode: "bKash",
     bankName: "",
     accountNo: "01712345678",
-    status: "Submitted"
+    status: "Submitted",
   },
   {
     id: "ELW-005",
@@ -98,13 +120,13 @@ const initialWorkflowRows: EarnLeaveWorkflowRow[] = [
     empName: "Mst. Mukta Khatun",
     department: "Sewing",
     designation: "Operator",
-    totalDays: 14.50,
-    perDayRate: 250.00,
+    totalDays: 14.5,
+    perDayRate: 250.0,
     netPay: 3625,
     paymentMode: "Rocket",
     bankName: "",
     accountNo: "01812345678",
-    status: "Checked"
+    status: "Checked",
   },
   {
     id: "ELW-006",
@@ -112,13 +134,13 @@ const initialWorkflowRows: EarnLeaveWorkflowRow[] = [
     empName: "Md. Shantona Khatun",
     department: "Sewing",
     designation: "Asst. Operator",
-    totalDays: 8.00,
-    perDayRate: 220.00,
+    totalDays: 8.0,
+    perDayRate: 220.0,
     netPay: 1760,
     paymentMode: "Cash",
     bankName: "",
     accountNo: "",
-    status: "Checked"
+    status: "Checked",
   },
   {
     id: "ELW-007",
@@ -126,13 +148,13 @@ const initialWorkflowRows: EarnLeaveWorkflowRow[] = [
     empName: "Most. Fote Khatun",
     department: "Sewing",
     designation: "Asst. Operator",
-    totalDays: 10.00,
-    perDayRate: 220.00,
+    totalDays: 10.0,
+    perDayRate: 220.0,
     netPay: 2200,
     paymentMode: "Bank",
     bankName: "Pubali Bank PLC",
     accountNo: "33429817298",
-    status: "Authorized (HRD)"
+    status: "Authorized (HRD)",
   },
   {
     id: "ELW-008",
@@ -140,13 +162,13 @@ const initialWorkflowRows: EarnLeaveWorkflowRow[] = [
     empName: "Amina Khatun",
     department: "Store",
     designation: "Jr. Needle Man",
-    totalDays: 6.50,
-    perDayRate: 240.00,
+    totalDays: 6.5,
+    perDayRate: 240.0,
     netPay: 1560,
     paymentMode: "bKash",
     bankName: "",
     accountNo: "01998765432",
-    status: "Draft"
+    status: "Draft",
   },
   {
     id: "ELW-009",
@@ -154,13 +176,13 @@ const initialWorkflowRows: EarnLeaveWorkflowRow[] = [
     empName: "Mst. Morzina Khatun",
     department: "Sewing",
     designation: "Quality Ins.",
-    totalDays: 5.00,
-    perDayRate: 280.00,
+    totalDays: 5.0,
+    perDayRate: 280.0,
     netPay: 1400,
     paymentMode: "Bank",
     bankName: "Sonali Bank PLC",
     accountNo: "12093847293",
-    status: "Draft"
+    status: "Draft",
   },
   {
     id: "ELW-010",
@@ -168,14 +190,14 @@ const initialWorkflowRows: EarnLeaveWorkflowRow[] = [
     empName: "Md. Yeasin Ali",
     department: "Sewing",
     designation: "Supervisor",
-    totalDays: 7.50,
-    perDayRate: 310.00,
+    totalDays: 7.5,
+    perDayRate: 310.0,
     netPay: 2325,
     paymentMode: "Rocket",
     bankName: "",
     accountNo: "01512345678",
-    status: "Submitted"
-  }
+    status: "Submitted",
+  },
 ];
 
 function EarnLeaveWorkflowPage() {
@@ -202,7 +224,9 @@ function EarnLeaveWorkflowPage() {
   const [newDesig, setNewDesig] = useState("Asst. Operator");
   const [newDays, setNewDays] = useState("5");
   const [newRate, setNewRate] = useState("250");
-  const [newPaymentMode, setNewPaymentMode] = useState<"Bank" | "Cash" | "bKash" | "Rocket">("Cash");
+  const [newPaymentMode, setNewPaymentMode] = useState<"Bank" | "Cash" | "bKash" | "Rocket">(
+    "Cash",
+  );
   const [newBankName, setNewBankName] = useState("");
   const [newAccountNo, setNewAccountNo] = useState("");
 
@@ -212,7 +236,7 @@ function EarnLeaveWorkflowPage() {
     empType: "ALL",
     section: "ALL",
     unit: "ALL",
-    empIdFilter: ""
+    empIdFilter: "",
   });
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -223,17 +247,17 @@ function EarnLeaveWorkflowPage() {
       empType,
       section,
       unit,
-      empIdFilter
+      empIdFilter,
     });
   };
 
   // Stepper Badge Counts (Calculated dynamically)
   const stepCounts = useMemo(() => {
     return {
-      drafts: rows.filter(r => r.status === "Draft").length,
-      submitted: rows.filter(r => r.status === "Submitted").length,
-      checked: rows.filter(r => r.status === "Checked").length,
-      authorized: rows.filter(r => r.status === "Authorized (HRD)").length,
+      drafts: rows.filter((r) => r.status === "Draft").length,
+      submitted: rows.filter((r) => r.status === "Submitted").length,
+      checked: rows.filter((r) => r.status === "Checked").length,
+      authorized: rows.filter((r) => r.status === "Authorized (HRD)").length,
     };
   }, [rows]);
 
@@ -245,7 +269,7 @@ function EarnLeaveWorkflowPage() {
 
   // Filter calculation logic
   const filteredRows = useMemo(() => {
-    return rows.filter(r => {
+    return rows.filter((r) => {
       // 1. Step Status Filter (if enabled)
       if (filterByStepStatus) {
         if (currentStep === 1 && r.status !== "Draft") return false;
@@ -278,34 +302,39 @@ function EarnLeaveWorkflowPage() {
   const kpis = useMemo(() => {
     const totalNetPay = filteredRows.reduce((sum, r) => sum + r.netPay, 0);
     const totalDays = filteredRows.reduce((sum, r) => sum + r.totalDays, 0);
-    const paymentCounts = filteredRows.reduce((acc, r) => {
-      acc[r.paymentMode] = (acc[r.paymentMode] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const paymentCounts = filteredRows.reduce(
+      (acc, r) => {
+        acc[r.paymentMode] = (acc[r.paymentMode] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     return {
       totalNetPay,
       totalDays: Math.round(totalDays * 100) / 100,
       paymentSummary: `Bank: ${paymentCounts.Bank || 0} | Cash: ${paymentCounts.Cash || 0} | Mobile: ${(paymentCounts.bKash || 0) + (paymentCounts.Rocket || 0)}`,
-      count: filteredRows.length
+      count: filteredRows.length,
     };
   }, [filteredRows]);
 
   // Inline Row Editor
   const handleRowEdit = (id: string, field: keyof EarnLeaveWorkflowRow, value: any) => {
-    setRows(prev => prev.map(r => {
-      if (r.id === id) {
-        const updated = { ...r, [field]: value };
-        // Recalculate netPay when days or rate change
-        if (field === "totalDays" || field === "perDayRate") {
-          const d = field === "totalDays" ? Number(value) : r.totalDays;
-          const pr = field === "perDayRate" ? Number(value) : r.perDayRate;
-          updated.netPay = Math.round(d * pr);
+    setRows((prev) =>
+      prev.map((r) => {
+        if (r.id === id) {
+          const updated = { ...r, [field]: value };
+          // Recalculate netPay when days or rate change
+          if (field === "totalDays" || field === "perDayRate") {
+            const d = field === "totalDays" ? Number(value) : r.totalDays;
+            const pr = field === "perDayRate" ? Number(value) : r.perDayRate;
+            updated.netPay = Math.round(d * pr);
+          }
+          return updated;
         }
-        return updated;
-      }
-      return r;
-    }));
+        return r;
+      }),
+    );
   };
 
   // Single Row Transition Actions
@@ -326,9 +355,9 @@ function EarnLeaveWorkflowPage() {
       return;
     }
 
-    setRows(prev => prev.map(r => r.id === id ? { ...r, status: nextStatus } : r));
+    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, status: nextStatus } : r)));
     toast.success(message);
-    setSelectedIds(prev => {
+    setSelectedIds((prev) => {
       const next = new Set(prev);
       next.delete(id);
       return next;
@@ -356,14 +385,14 @@ function EarnLeaveWorkflowPage() {
       message = `Authorized ${selectedIds.size} payouts for payout release!`;
     }
 
-    setRows(prev => prev.map(r => selectedIds.has(r.id) ? { ...r, status: nextStatus } : r));
+    setRows((prev) => prev.map((r) => (selectedIds.has(r.id) ? { ...r, status: nextStatus } : r)));
     toast.success(message);
 
     // Auto-advance step if everything in current filtered list was checked
-    const remainingCount = filteredRows.filter(r => !selectedIds.has(r.id)).length;
+    const remainingCount = filteredRows.filter((r) => !selectedIds.has(r.id)).length;
     if (remainingCount === 0 && currentStep < 3) {
       setTimeout(() => {
-        setCurrentStep(prev => (prev + 1) as any);
+        setCurrentStep((prev) => (prev + 1) as any);
         toast.info(`Advancing to Step ${currentStep + 1}`);
       }, 1000);
     }
@@ -377,16 +406,16 @@ function EarnLeaveWorkflowPage() {
       return;
     }
     if (!confirm(`Are you sure you want to delete ${selectedIds.size} selected records?`)) return;
-    setRows(prev => prev.filter(r => !selectedIds.has(r.id)));
+    setRows((prev) => prev.filter((r) => !selectedIds.has(r.id)));
     toast.success(`Deleted ${selectedIds.size} records.`);
     setSelectedIds(new Set());
   };
 
   const handleSingleDelete = (id: string) => {
     if (!confirm("Are you sure you want to delete this record?")) return;
-    setRows(prev => prev.filter(r => r.id !== id));
+    setRows((prev) => prev.filter((r) => r.id !== id));
     toast.success("Record deleted successfully.");
-    setSelectedIds(prev => {
+    setSelectedIds((prev) => {
       const next = new Set(prev);
       next.delete(id);
       return next;
@@ -425,10 +454,10 @@ function EarnLeaveWorkflowPage() {
       paymentMode: newPaymentMode,
       bankName: newPaymentMode === "Bank" ? newBankName.trim() : "",
       accountNo: newPaymentMode !== "Cash" ? newAccountNo.trim() : "",
-      status: "Draft"
+      status: "Draft",
     };
 
-    setRows(prev => [newRow, ...prev]);
+    setRows((prev) => [newRow, ...prev]);
     toast.success(`Added processed record for ${newEmpName}!`);
 
     // Reset inputs
@@ -442,26 +471,26 @@ function EarnLeaveWorkflowPage() {
   };
 
   // Bulk selections logic
-  const isAllSelected = filteredRows.length > 0 && filteredRows.every(r => selectedIds.has(r.id));
-  
+  const isAllSelected = filteredRows.length > 0 && filteredRows.every((r) => selectedIds.has(r.id));
+
   const toggleSelectAll = () => {
     if (isAllSelected) {
-      setSelectedIds(prev => {
+      setSelectedIds((prev) => {
         const next = new Set(prev);
-        filteredRows.forEach(r => next.delete(r.id));
+        filteredRows.forEach((r) => next.delete(r.id));
         return next;
       });
     } else {
-      setSelectedIds(prev => {
+      setSelectedIds((prev) => {
         const next = new Set(prev);
-        filteredRows.forEach(r => next.add(r.id));
+        filteredRows.forEach((r) => next.add(r.id));
         return next;
       });
     }
   };
 
   const toggleSelect = (id: string) => {
-    setSelectedIds(prev => {
+    setSelectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
         next.delete(id);
@@ -479,12 +508,13 @@ function EarnLeaveWorkflowPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 lg:p-8 space-y-5">
-
           {/* Breadcrumb Header */}
           <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
-                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
                 <ChevronRight className="size-3" />
                 <span>Leave Management</span>
                 <ChevronRight className="size-3" />
@@ -524,14 +554,22 @@ function EarnLeaveWorkflowPage() {
                   <Calculator className="size-4" />
                   <span>Quick-Add Processed Accrual Record</span>
                 </h3>
-                <span className="text-[9px] uppercase font-bold text-slate-400">Creates Draft Item</span>
+                <span className="text-[9px] uppercase font-bold text-slate-400">
+                  Creates Draft Item
+                </span>
               </div>
 
-              <form onSubmit={handleQuickAdd} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3.5 text-[11px] font-bold">
+              <form
+                onSubmit={handleQuickAdd}
+                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3.5 text-[11px] font-bold"
+              >
                 <div className="space-y-1">
                   <label className="text-[9px] uppercase text-slate-400">Employee ID *</label>
                   <input
-                    type="text" required value={newEmpId} onChange={(e) => setNewEmpId(e.target.value)}
+                    type="text"
+                    required
+                    value={newEmpId}
+                    onChange={(e) => setNewEmpId(e.target.value)}
                     placeholder="e.g. 2023043910"
                     className="w-full h-8 px-2.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 outline-none focus:border-primary transition font-mono"
                   />
@@ -539,7 +577,10 @@ function EarnLeaveWorkflowPage() {
                 <div className="space-y-1">
                   <label className="text-[9px] uppercase text-slate-400">Employee Name *</label>
                   <input
-                    type="text" required value={newEmpName} onChange={(e) => setNewEmpName(e.target.value)}
+                    type="text"
+                    required
+                    value={newEmpName}
+                    onChange={(e) => setNewEmpName(e.target.value)}
                     placeholder="e.g. John Doe"
                     className="w-full h-8 px-2.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 outline-none focus:border-primary transition"
                   />
@@ -547,7 +588,8 @@ function EarnLeaveWorkflowPage() {
                 <div className="space-y-1">
                   <label className="text-[9px] uppercase text-slate-400">Department</label>
                   <select
-                    value={newDept} onChange={(e) => setNewDept(e.target.value)}
+                    value={newDept}
+                    onChange={(e) => setNewDept(e.target.value)}
                     className="w-full h-8 px-2.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 outline-none cursor-pointer"
                   >
                     <option value="Project Resource & Strategy">Project Resource & Strategy</option>
@@ -560,7 +602,8 @@ function EarnLeaveWorkflowPage() {
                 <div className="space-y-1">
                   <label className="text-[9px] uppercase text-slate-400">Designation</label>
                   <select
-                    value={newDesig} onChange={(e) => setNewDesig(e.target.value)}
+                    value={newDesig}
+                    onChange={(e) => setNewDesig(e.target.value)}
                     className="w-full h-8 px-2.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 outline-none cursor-pointer"
                   >
                     <option value="Asst. Manager">Asst. Manager</option>
@@ -576,21 +619,28 @@ function EarnLeaveWorkflowPage() {
                 <div className="space-y-1">
                   <label className="text-[9px] uppercase text-slate-400">Earned Days</label>
                   <input
-                    type="number" step="0.01" value={newDays} onChange={(e) => setNewDays(e.target.value)}
+                    type="number"
+                    step="0.01"
+                    value={newDays}
+                    onChange={(e) => setNewDays(e.target.value)}
                     className="w-full h-8 px-2.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 outline-none font-mono"
                   />
                 </div>
                 <div className="space-y-1">
                   <label className="text-[9px] uppercase text-slate-400">Per Day Rate (BDT)</label>
                   <input
-                    type="number" step="0.01" value={newRate} onChange={(e) => setNewRate(e.target.value)}
+                    type="number"
+                    step="0.01"
+                    value={newRate}
+                    onChange={(e) => setNewRate(e.target.value)}
                     className="w-full h-8 px-2.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 outline-none font-mono"
                   />
                 </div>
                 <div className="space-y-1">
                   <label className="text-[9px] uppercase text-slate-400">Payment Mode</label>
                   <select
-                    value={newPaymentMode} onChange={(e) => setNewPaymentMode(e.target.value as any)}
+                    value={newPaymentMode}
+                    onChange={(e) => setNewPaymentMode(e.target.value as any)}
                     className="w-full h-8 px-2.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 outline-none cursor-pointer"
                   >
                     <option value="Cash">Cash (Cash Office)</option>
@@ -604,7 +654,9 @@ function EarnLeaveWorkflowPage() {
                   <div className="space-y-1">
                     <label className="text-[9px] uppercase text-slate-400">Bank Name</label>
                     <input
-                      type="text" value={newBankName} onChange={(e) => setNewBankName(e.target.value)}
+                      type="text"
+                      value={newBankName}
+                      onChange={(e) => setNewBankName(e.target.value)}
                       placeholder="e.g. Dutch-Bangla Bank"
                       className="w-full h-8 px-2.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 outline-none"
                     />
@@ -617,7 +669,9 @@ function EarnLeaveWorkflowPage() {
                       {newPaymentMode === "Bank" ? "Account No" : "Wallet Number"}
                     </label>
                     <input
-                      type="text" value={newAccountNo} onChange={(e) => setNewAccountNo(e.target.value)}
+                      type="text"
+                      value={newAccountNo}
+                      onChange={(e) => setNewAccountNo(e.target.value)}
                       placeholder={newPaymentMode === "Bank" ? "125.120.xxxxx" : "017xxxxxxxx"}
                       className="w-full h-8 px-2.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 outline-none font-mono"
                     />
@@ -638,7 +692,6 @@ function EarnLeaveWorkflowPage() {
 
           {/* Stepper Workflow Cards Panel (Interactive Tabs) */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-
             {/* Step 1: Submit */}
             <button
               onClick={() => handleStepClick(1)}
@@ -650,14 +703,22 @@ function EarnLeaveWorkflowPage() {
             >
               <div className="flex items-start justify-between w-full">
                 <div className="flex items-center gap-2.5">
-                  <div className={`size-7 rounded-lg flex items-center justify-center font-black text-xs ${
-                    currentStep === 1 ? "bg-blue-500 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500"
-                  }`}>
+                  <div
+                    className={`size-7 rounded-lg flex items-center justify-center font-black text-xs ${
+                      currentStep === 1
+                        ? "bg-blue-500 text-white"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-500"
+                    }`}
+                  >
                     1
                   </div>
                   <div>
-                    <h4 className="text-xs font-black text-slate-800 dark:text-white">L1: Submission (Clerk)</h4>
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Drafts stage</span>
+                    <h4 className="text-xs font-black text-slate-800 dark:text-white">
+                      L1: Submission (Clerk)
+                    </h4>
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">
+                      Drafts stage
+                    </span>
                   </div>
                 </div>
                 <span className="px-2 py-0.5 bg-blue-500/10 border border-blue-500/20 text-blue-500 rounded text-[9px] font-black uppercase">
@@ -680,14 +741,22 @@ function EarnLeaveWorkflowPage() {
             >
               <div className="flex items-start justify-between w-full">
                 <div className="flex items-center gap-2.5">
-                  <div className={`size-7 rounded-lg flex items-center justify-center font-black text-xs ${
-                    currentStep === 2 ? "bg-purple-500 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500"
-                  }`}>
+                  <div
+                    className={`size-7 rounded-lg flex items-center justify-center font-black text-xs ${
+                      currentStep === 2
+                        ? "bg-purple-500 text-white"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-500"
+                    }`}
+                  >
                     2
                   </div>
                   <div>
-                    <h4 className="text-xs font-black text-slate-800 dark:text-white">L2: Verification (Check Officer)</h4>
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Officer stage</span>
+                    <h4 className="text-xs font-black text-slate-800 dark:text-white">
+                      L2: Verification (Check Officer)
+                    </h4>
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">
+                      Officer stage
+                    </span>
                   </div>
                 </div>
                 <span className="px-2 py-0.5 bg-purple-500/10 border border-purple-500/20 text-purple-500 rounded text-[9px] font-black uppercase">
@@ -710,14 +779,22 @@ function EarnLeaveWorkflowPage() {
             >
               <div className="flex items-start justify-between w-full">
                 <div className="flex items-center gap-2.5">
-                  <div className={`size-7 rounded-lg flex items-center justify-center font-black text-xs ${
-                    currentStep === 3 ? "bg-emerald-500 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500"
-                  }`}>
+                  <div
+                    className={`size-7 rounded-lg flex items-center justify-center font-black text-xs ${
+                      currentStep === 3
+                        ? "bg-emerald-500 text-white"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-500"
+                    }`}
+                  >
                     3
                   </div>
                   <div>
-                    <h4 className="text-xs font-black text-slate-800 dark:text-white">L3: Authorization (Director HRD)</h4>
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Director stage</span>
+                    <h4 className="text-xs font-black text-slate-800 dark:text-white">
+                      L3: Authorization (Director HRD)
+                    </h4>
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">
+                      Director stage
+                    </span>
                   </div>
                 </div>
                 <span className="px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded text-[9px] font-black uppercase">
@@ -728,18 +805,18 @@ function EarnLeaveWorkflowPage() {
                 Confirm compliance checklist, authorize disbursements & issue clearance.
               </div>
             </button>
-
           </div>
 
           {/* KPI Mini metrics summary strip */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-4.5 shadow-3xs">
-            
             <div className="flex items-center gap-3">
               <div className="size-9 rounded-lg bg-blue-500/10 dark:bg-blue-500/[0.03] border border-blue-500/20 flex items-center justify-center text-blue-500 shrink-0">
                 <UserCheck className="size-4.5" />
               </div>
               <div className="min-w-0">
-                <span className="text-[9px] font-extrabold uppercase text-slate-400 tracking-wide block">Ledger Volume</span>
+                <span className="text-[9px] font-extrabold uppercase text-slate-400 tracking-wide block">
+                  Ledger Volume
+                </span>
                 <span className="text-sm font-black text-slate-900 dark:text-white leading-tight block">
                   {kpis.count} Profile{kpis.count !== 1 && "s"}
                 </span>
@@ -751,7 +828,9 @@ function EarnLeaveWorkflowPage() {
                 <Coins className="size-4.5" />
               </div>
               <div className="min-w-0">
-                <span className="text-[9px] font-extrabold uppercase text-slate-400 tracking-wide block">Accrued days</span>
+                <span className="text-[9px] font-extrabold uppercase text-slate-400 tracking-wide block">
+                  Accrued days
+                </span>
                 <span className="text-sm font-black text-slate-900 dark:text-white leading-tight block">
                   {kpis.totalDays} Day{kpis.totalDays !== 1 && "s"}
                 </span>
@@ -763,7 +842,9 @@ function EarnLeaveWorkflowPage() {
                 <Landmark className="size-4.5" />
               </div>
               <div className="min-w-0">
-                <span className="text-[9px] font-extrabold uppercase text-slate-400 tracking-wide block">Net Cash value</span>
+                <span className="text-[9px] font-extrabold uppercase text-slate-400 tracking-wide block">
+                  Net Cash value
+                </span>
                 <span className="text-sm font-black text-emerald-600 dark:text-emerald-400 leading-tight block">
                   {kpis.totalNetPay.toLocaleString()} ৳
                 </span>
@@ -775,24 +856,22 @@ function EarnLeaveWorkflowPage() {
                 <Smartphone className="size-4.5" />
               </div>
               <div className="min-w-0">
-                <span className="text-[9px] font-extrabold uppercase text-slate-400 tracking-wide block">Payment channels</span>
+                <span className="text-[9px] font-extrabold uppercase text-slate-400 tracking-wide block">
+                  Payment channels
+                </span>
                 <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 leading-tight block truncate">
                   {kpis.paymentSummary}
                 </span>
               </div>
             </div>
-
           </div>
 
           {/* Main Action Details Panel */}
           <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs space-y-4">
-            
             {/* Header controls inside table card */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 dark:border-slate-800/80 pb-4">
-              
               {/* Left actions */}
               <div className="flex items-center gap-2.5">
-                
                 {/* Click action for active step */}
                 <button
                   onClick={handleBulkAction}
@@ -825,7 +904,6 @@ function EarnLeaveWorkflowPage() {
 
               {/* Right filters & controls */}
               <div className="flex flex-wrap items-center gap-3">
-                
                 {/* Step filter toggle check */}
                 <label className="flex items-center gap-2 px-3 h-8 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 cursor-pointer select-none">
                   {filterByStepStatus ? (
@@ -844,13 +922,22 @@ function EarnLeaveWorkflowPage() {
 
                 {/* Print capabilities */}
                 <div className="flex items-center gap-1">
-                  <button className="h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-500 transition" title="Export Excel">
+                  <button
+                    className="h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-500 transition"
+                    title="Export Excel"
+                  >
                     <FileSpreadsheet className="size-4 text-emerald-500" />
                   </button>
-                  <button className="h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-500 transition" title="Print Grid">
+                  <button
+                    className="h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-500 transition"
+                    title="Print Grid"
+                  >
                     <Printer className="size-4 text-blue-500" />
                   </button>
-                  <button className="h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-500 transition" title="Save PDF">
+                  <button
+                    className="h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-500 transition"
+                    title="Save PDF"
+                  >
                     <FileDown className="size-4 text-rose-500" />
                   </button>
                 </div>
@@ -865,9 +952,7 @@ function EarnLeaveWorkflowPage() {
                     className="h-8 pl-8 pr-2.5 w-40 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[10px] font-extrabold outline-none focus:bg-white dark:focus:bg-slate-950 focus:border-primary transition"
                   />
                 </div>
-
               </div>
-
             </div>
 
             {/* Compact spreadsheet table */}
@@ -883,43 +968,79 @@ function EarnLeaveWorkflowPage() {
                         className="rounded border-slate-300 text-primary focus:ring-primary size-3 cursor-pointer"
                       />
                     </th>
-                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 w-20">Emp ID</th>
-                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 w-36">Name</th>
-                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30">Department</th>
-                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30">Designation</th>
-                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 text-center w-20">Days</th>
-                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 text-right w-24">Rate (BDT)</th>
-                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 text-right w-24">Net Pay</th>
-                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 text-center w-24">Payment Mode</th>
-                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 text-left w-36">Bank Name</th>
-                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 text-left w-36">Account No</th>
-                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 text-center w-20">Status</th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 w-20">
+                      Emp ID
+                    </th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 w-36">
+                      Name
+                    </th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30">
+                      Department
+                    </th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30">
+                      Designation
+                    </th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 text-center w-20">
+                      Days
+                    </th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 text-right w-24">
+                      Rate (BDT)
+                    </th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 text-right w-24">
+                      Net Pay
+                    </th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 text-center w-24">
+                      Payment Mode
+                    </th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 text-left w-36">
+                      Bank Name
+                    </th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 text-left w-36">
+                      Account No
+                    </th>
+                    <th className="px-2.5 py-2.5 border-r border-slate-200/50 dark:border-slate-800/30 text-center w-20">
+                      Status
+                    </th>
                     <th className="px-2.5 py-2.5 text-center w-32">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
                   {filteredRows.map((row) => {
                     const isSelected = selectedIds.has(row.id);
-                    
-                    let statusColor = "bg-amber-100 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400";
+
+                    let statusColor =
+                      "bg-amber-100 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400";
                     if (row.status === "Submitted") {
-                      statusColor = "bg-blue-100 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400";
+                      statusColor =
+                        "bg-blue-100 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400";
                     } else if (row.status === "Checked") {
-                      statusColor = "bg-purple-100 text-purple-700 dark:bg-purple-950/20 dark:text-purple-400";
+                      statusColor =
+                        "bg-purple-100 text-purple-700 dark:bg-purple-950/20 dark:text-purple-400";
                     } else if (row.status === "Authorized (HRD)") {
-                      statusColor = "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400";
+                      statusColor =
+                        "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400";
                     }
 
                     // Payment Mode Pills styling
-                    let paymentBadge = "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300";
-                    if (row.paymentMode === "Bank") paymentBadge = "bg-sky-100 text-sky-700 dark:bg-sky-950/30 dark:text-sky-400";
-                    if (row.paymentMode === "bKash") paymentBadge = "bg-pink-100 text-pink-700 dark:bg-pink-950/30 dark:text-pink-400";
-                    if (row.paymentMode === "Rocket") paymentBadge = "bg-violet-100 text-violet-700 dark:bg-violet-950/30 dark:text-violet-400";
-                    if (row.paymentMode === "Cash") paymentBadge = "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400";
+                    let paymentBadge =
+                      "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300";
+                    if (row.paymentMode === "Bank")
+                      paymentBadge = "bg-sky-100 text-sky-700 dark:bg-sky-950/30 dark:text-sky-400";
+                    if (row.paymentMode === "bKash")
+                      paymentBadge =
+                        "bg-pink-100 text-pink-700 dark:bg-pink-950/30 dark:text-pink-400";
+                    if (row.paymentMode === "Rocket")
+                      paymentBadge =
+                        "bg-violet-100 text-violet-700 dark:bg-violet-950/30 dark:text-violet-400";
+                    if (row.paymentMode === "Cash")
+                      paymentBadge =
+                        "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400";
 
                     return (
-                      <tr key={row.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/40 transition duration-75 whitespace-nowrap">
-                        
+                      <tr
+                        key={row.id}
+                        className="hover:bg-slate-50/50 dark:hover:bg-slate-900/40 transition duration-75 whitespace-nowrap"
+                      >
                         <td className="px-2.5 py-1.5 text-center border-r border-slate-100 dark:border-slate-800/50">
                           <input
                             type="checkbox"
@@ -929,10 +1050,27 @@ function EarnLeaveWorkflowPage() {
                           />
                         </td>
 
-                        <td className="px-2.5 py-1.5 font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">{row.empId}</td>
-                        <td className="px-2.5 py-1.5 font-extrabold text-slate-900 dark:text-white border-r border-slate-100 dark:border-slate-800/50 truncate max-w-[120px]" title={row.empName}>{row.empName}</td>
-                        <td className="px-2.5 py-1.5 text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50 truncate max-w-[110px]" title={row.department}>{row.department}</td>
-                        <td className="px-2.5 py-1.5 text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50 truncate max-w-[110px]" title={row.designation}>{row.designation}</td>
+                        <td className="px-2.5 py-1.5 font-mono font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800/50">
+                          {row.empId}
+                        </td>
+                        <td
+                          className="px-2.5 py-1.5 font-extrabold text-slate-900 dark:text-white border-r border-slate-100 dark:border-slate-800/50 truncate max-w-[120px]"
+                          title={row.empName}
+                        >
+                          {row.empName}
+                        </td>
+                        <td
+                          className="px-2.5 py-1.5 text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50 truncate max-w-[110px]"
+                          title={row.department}
+                        >
+                          {row.department}
+                        </td>
+                        <td
+                          className="px-2.5 py-1.5 text-slate-600 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800/50 truncate max-w-[110px]"
+                          title={row.designation}
+                        >
+                          {row.designation}
+                        </td>
 
                         {/* Inline editable Earned Days */}
                         <td className="px-1.5 py-1 border-r border-slate-100 dark:border-slate-800/50">
@@ -941,7 +1079,9 @@ function EarnLeaveWorkflowPage() {
                             step="0.01"
                             disabled={row.status === "Authorized (HRD)"}
                             value={row.totalDays}
-                            onChange={(e) => handleRowEdit(row.id, "totalDays", parseFloat(e.target.value) || 0)}
+                            onChange={(e) =>
+                              handleRowEdit(row.id, "totalDays", parseFloat(e.target.value) || 0)
+                            }
                             className="w-full h-6 px-1 rounded bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[10px] font-mono font-bold text-center focus:border-primary outline-none disabled:opacity-50"
                           />
                         </td>
@@ -953,7 +1093,9 @@ function EarnLeaveWorkflowPage() {
                             step="0.01"
                             disabled={row.status === "Authorized (HRD)"}
                             value={row.perDayRate}
-                            onChange={(e) => handleRowEdit(row.id, "perDayRate", parseFloat(e.target.value) || 0)}
+                            onChange={(e) =>
+                              handleRowEdit(row.id, "perDayRate", parseFloat(e.target.value) || 0)
+                            }
                             className="w-full h-6 px-1 text-right rounded bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[10px] font-mono focus:border-primary outline-none disabled:opacity-50"
                           />
                         </td>
@@ -968,13 +1110,35 @@ function EarnLeaveWorkflowPage() {
                           <select
                             value={row.paymentMode}
                             disabled={row.status === "Authorized (HRD)"}
-                            onChange={(e) => handleRowEdit(row.id, "paymentMode", e.target.value as any)}
+                            onChange={(e) =>
+                              handleRowEdit(row.id, "paymentMode", e.target.value as any)
+                            }
                             className={`w-full h-6 px-0.5 rounded border border-slate-200 dark:border-slate-800 text-[9px] font-black focus:border-primary outline-none cursor-pointer ${paymentBadge}`}
                           >
-                            <option value="Cash" className="bg-white dark:bg-slate-950 text-slate-700">Cash</option>
-                            <option value="Bank" className="bg-white dark:bg-slate-950 text-slate-700">Bank</option>
-                            <option value="bKash" className="bg-white dark:bg-slate-950 text-slate-700">bKash</option>
-                            <option value="Rocket" className="bg-white dark:bg-slate-950 text-slate-700">Rocket</option>
+                            <option
+                              value="Cash"
+                              className="bg-white dark:bg-slate-950 text-slate-700"
+                            >
+                              Cash
+                            </option>
+                            <option
+                              value="Bank"
+                              className="bg-white dark:bg-slate-950 text-slate-700"
+                            >
+                              Bank
+                            </option>
+                            <option
+                              value="bKash"
+                              className="bg-white dark:bg-slate-950 text-slate-700"
+                            >
+                              bKash
+                            </option>
+                            <option
+                              value="Rocket"
+                              className="bg-white dark:bg-slate-950 text-slate-700"
+                            >
+                              Rocket
+                            </option>
                           </select>
                         </td>
 
@@ -982,7 +1146,9 @@ function EarnLeaveWorkflowPage() {
                         <td className="px-1.5 py-1 border-r border-slate-100 dark:border-slate-800/50">
                           <input
                             type="text"
-                            disabled={row.status === "Authorized (HRD)" || row.paymentMode !== "Bank"}
+                            disabled={
+                              row.status === "Authorized (HRD)" || row.paymentMode !== "Bank"
+                            }
                             value={row.bankName}
                             onChange={(e) => handleRowEdit(row.id, "bankName", e.target.value)}
                             placeholder="Bank Name"
@@ -994,7 +1160,9 @@ function EarnLeaveWorkflowPage() {
                         <td className="px-1.5 py-1 border-r border-slate-100 dark:border-slate-800/50">
                           <input
                             type="text"
-                            disabled={row.status === "Authorized (HRD)" || row.paymentMode === "Cash"}
+                            disabled={
+                              row.status === "Authorized (HRD)" || row.paymentMode === "Cash"
+                            }
                             value={row.accountNo}
                             onChange={(e) => handleRowEdit(row.id, "accountNo", e.target.value)}
                             placeholder="Acc No / Wallet No"
@@ -1004,7 +1172,9 @@ function EarnLeaveWorkflowPage() {
 
                         {/* Status Badge */}
                         <td className="px-2.5 py-1.5 text-center border-r border-slate-100 dark:border-slate-800/50">
-                          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black uppercase ${statusColor}`}>
+                          <span
+                            className={`inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black uppercase ${statusColor}`}
+                          >
                             {row.status === "Authorized (HRD)" ? "Authorized" : row.status}
                           </span>
                         </td>
@@ -1012,7 +1182,6 @@ function EarnLeaveWorkflowPage() {
                         {/* Context-aware Actions Cell */}
                         <td className="px-2.5 py-1.5 text-center">
                           <div className="flex items-center justify-center gap-1.5">
-                            
                             {/* State transitions */}
                             {row.status === "Draft" && (
                               <button
@@ -1057,7 +1226,6 @@ function EarnLeaveWorkflowPage() {
                             </button>
                           </div>
                         </td>
-
                       </tr>
                     );
                   })}
@@ -1094,9 +1262,7 @@ function EarnLeaveWorkflowPage() {
                 </button>
               </div>
             </div>
-
           </div>
-
         </div>
       </main>
     </div>

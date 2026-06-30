@@ -1,8 +1,18 @@
 import {
-  Users, UserPlus, UserMinus, UserX,
-  Wallet, UserCheck, Briefcase, UserCog,
-  Clock, Clock4, Banknote, HandCoins,
-  TrendingUp, TrendingDown
+  Users,
+  UserPlus,
+  UserMinus,
+  UserX,
+  Wallet,
+  UserCheck,
+  Briefcase,
+  UserCog,
+  Clock,
+  Clock4,
+  Banknote,
+  HandCoins,
+  TrendingUp,
+  TrendingDown,
 } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer } from "recharts";
 
@@ -52,28 +62,118 @@ const tintMap: Record<Tint, { card: string; iconBg: string; stroke: string; ring
 
 const stats = {
   headcount: [
-    { label: "Total Employee", value: "2,515", delta: "+4.6%", up: true, icon: Users, tint: "primary", data: spark(1) },
-    { label: "New Joining", value: "101", delta: "+12.1%", up: true, icon: UserPlus, tint: "success", data: spark(2) },
-    { label: "Resigned", value: "3", delta: "-0.6%", up: false, icon: UserMinus, tint: "rose", data: spark(3) },
-    { label: "Lefty", value: "177", delta: "+1.2%", up: true, icon: UserX, tint: "warning", data: spark(4) },
+    {
+      label: "Total Employee",
+      value: "2,515",
+      delta: "+4.6%",
+      up: true,
+      icon: Users,
+      tint: "primary",
+      data: spark(1),
+    },
+    {
+      label: "New Joining",
+      value: "101",
+      delta: "+12.1%",
+      up: true,
+      icon: UserPlus,
+      tint: "success",
+      data: spark(2),
+    },
+    {
+      label: "Resigned",
+      value: "3",
+      delta: "-0.6%",
+      up: false,
+      icon: UserMinus,
+      tint: "rose",
+      data: spark(3),
+    },
+    {
+      label: "Lefty",
+      value: "177",
+      delta: "+1.2%",
+      up: true,
+      icon: UserX,
+      tint: "warning",
+      data: spark(4),
+    },
   ],
   attendance: {
     summary: {
-      present: { label: "Today Present", value: "2,408", ratio: "95.8%", delta: "+0.8%", up: true, icon: UserCheck, tint: "success" },
-      absent: { label: "Today Absent", value: "104", ratio: "4.1%", delta: "-0.8%", up: false, icon: UserX, tint: "rose" },
+      present: {
+        label: "Today Present",
+        value: "2,408",
+        ratio: "95.8%",
+        delta: "+0.8%",
+        up: true,
+        icon: UserCheck,
+        tint: "success",
+      },
+      absent: {
+        label: "Today Absent",
+        value: "104",
+        ratio: "4.1%",
+        delta: "-0.8%",
+        up: false,
+        icon: UserX,
+        tint: "rose",
+      },
     },
     details: [
-      { label: "Worker Absent", value: "74", delta: "-2.3%", up: true, icon: Briefcase, tint: "warning" },
-      { label: "Staff Absent", value: "30", delta: "+0.5%", up: false, icon: UserCog, tint: "rose" },
-      { label: "Worker Late", value: "109", delta: "+5.1%", up: false, icon: Clock, tint: "violet" },
+      {
+        label: "Worker Absent",
+        value: "74",
+        delta: "-2.3%",
+        up: true,
+        icon: Briefcase,
+        tint: "warning",
+      },
+      {
+        label: "Staff Absent",
+        value: "30",
+        delta: "+0.5%",
+        up: false,
+        icon: UserCog,
+        tint: "rose",
+      },
+      {
+        label: "Worker Late",
+        value: "109",
+        delta: "+5.1%",
+        up: false,
+        icon: Clock,
+        tint: "violet",
+      },
       { label: "Staff Late", value: "37", delta: "-1.2%", up: true, icon: Clock4, tint: "info" },
-    ]
+    ],
   },
   finance: [
-    { label: "Gross Salary", value: "46,418,240 ৳", delta: "+2.4%", up: true, icon: Wallet, tint: "info" },
-    { label: "Total OT AMT", value: "7,080,012 ৳", delta: "+15%", up: true, icon: Banknote, tint: "primary" },
-    { label: "Total Hold Salary", value: "0 ৳", delta: "0.0%", up: true, icon: HandCoins, tint: "success" },
-  ]
+    {
+      label: "Gross Salary",
+      value: "46,418,240 ৳",
+      delta: "+2.4%",
+      up: true,
+      icon: Wallet,
+      tint: "info",
+    },
+    {
+      label: "Total OT AMT",
+      value: "7,080,012 ৳",
+      delta: "+15%",
+      up: true,
+      icon: Banknote,
+      tint: "primary",
+    },
+    {
+      label: "Total Hold Salary",
+      value: "0 ৳",
+      delta: "0.0%",
+      up: true,
+      icon: HandCoins,
+      tint: "success",
+    },
+  ],
 };
 
 function StatCard({ s }: { s: any }) {
@@ -82,20 +182,32 @@ function StatCard({ s }: { s: any }) {
   const gradId = `g-${s.label.replace(/[^a-zA-Z0-9]/g, "-")}`;
 
   return (
-    <div className={`group relative overflow-hidden rounded-lg border p-3.5 ring-1 ${t.ring} ${t.card} transition-all duration-350 hover:-translate-y-0.5 hover:shadow-md`}>
+    <div
+      className={`group relative overflow-hidden rounded-lg border p-3.5 ring-1 ${t.ring} ${t.card} transition-all duration-350 hover:-translate-y-0.5 hover:shadow-md`}
+    >
       <div className="flex items-start justify-between gap-2 relative z-10">
         <div className="min-w-0 flex-1">
-          <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80">{s.label}</div>
-          <div className="mt-1 text-xl font-extrabold tracking-tight leading-none text-foreground">{s.value}</div>
+          <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80">
+            {s.label}
+          </div>
+          <div className="mt-1 text-xl font-extrabold tracking-tight leading-none text-foreground">
+            {s.value}
+          </div>
           <div className="mt-2 flex flex-wrap items-center gap-1">
-            <span className={`inline-flex items-center gap-0.5 px-1 py-0.5 rounded-full text-[8.5px] font-bold bg-background/60 backdrop-blur-xs border border-border/30 shadow-2xs ${s.up ? "text-success" : "text-destructive"}`}>
+            <span
+              className={`inline-flex items-center gap-0.5 px-1 py-0.5 rounded-full text-[8.5px] font-bold bg-background/60 backdrop-blur-xs border border-border/30 shadow-2xs ${s.up ? "text-success" : "text-destructive"}`}
+            >
               {s.up ? <TrendingUp className="size-2.5" /> : <TrendingDown className="size-2.5" />}
               {s.delta}
             </span>
-            <span className="text-[9px] text-muted-foreground/80 font-medium truncate flex-1 leading-tight">vs last mo.</span>
+            <span className="text-[9px] text-muted-foreground/80 font-medium truncate flex-1 leading-tight">
+              vs last mo.
+            </span>
           </div>
         </div>
-        <div className={`size-7 rounded-lg grid place-items-center transition-transform duration-300 group-hover:scale-105 ${t.iconBg} shrink-0`}>
+        <div
+          className={`size-7 rounded-lg grid place-items-center transition-transform duration-300 group-hover:scale-105 ${t.iconBg} shrink-0`}
+        >
           <Icon className="size-3.5" />
         </div>
       </div>
@@ -109,7 +221,13 @@ function StatCard({ s }: { s: any }) {
                 <stop offset="100%" stopColor={t.stroke} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <Area type="monotone" dataKey="v" stroke={t.stroke} strokeWidth={1.5} fill={`url(#${gradId})`} />
+            <Area
+              type="monotone"
+              dataKey="v"
+              stroke={t.stroke}
+              strokeWidth={1.5}
+              fill={`url(#${gradId})`}
+            />
           </AreaChart>
         </ResponsiveContainer>
       </div>
@@ -117,15 +235,15 @@ function StatCard({ s }: { s: any }) {
   );
 }
 
-function MasterCard({ title, children }: { title: string, children: React.ReactNode }) {
+function MasterCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="bg-card border border-border/50 rounded-xl overflow-hidden shadow-xs">
       <div className="bg-muted/30 px-4 py-2.5 border-b border-border/40">
-        <h3 className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/85">{title}</h3>
+        <h3 className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground/85">
+          {title}
+        </h3>
       </div>
-      <div className="p-3.5">
-        {children}
-      </div>
+      <div className="p-3.5">{children}</div>
     </div>
   );
 }
@@ -135,7 +253,9 @@ export function DailyQuickStats() {
     <div className="space-y-4">
       <MasterCard title="Headcount & Movement Dashboard">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-          {stats.headcount.map(s => <StatCard key={s.label} s={s} />)}
+          {stats.headcount.map((s) => (
+            <StatCard key={s.label} s={s} />
+          ))}
         </div>
       </MasterCard>
 
@@ -144,10 +264,14 @@ export function DailyQuickStats() {
           {/* Attendance Overview Left Column (5/12 grid span) */}
           <div className="lg:col-span-5 flex flex-col justify-between p-4 rounded-xl border border-border/40 bg-muted/10 relative overflow-hidden">
             <div>
-              <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/70">Attendance Ratio</span>
+              <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/70">
+                Attendance Ratio
+              </span>
               <div className="mt-2 flex items-baseline gap-4">
                 <div>
-                  <div className="text-2xl font-extrabold tracking-tight text-foreground">{stats.attendance.summary.present.value}</div>
+                  <div className="text-2xl font-extrabold tracking-tight text-foreground">
+                    {stats.attendance.summary.present.value}
+                  </div>
                   <div className="text-[9.5px] font-semibold text-success flex items-center gap-1 mt-0.5">
                     <span className="inline-block size-2 rounded-full bg-success"></span>
                     Present ({stats.attendance.summary.present.ratio})
@@ -155,7 +279,9 @@ export function DailyQuickStats() {
                 </div>
                 <div className="border-l border-border/60 h-8 self-center"></div>
                 <div>
-                  <div className="text-2xl font-extrabold tracking-tight text-foreground">{stats.attendance.summary.absent.value}</div>
+                  <div className="text-2xl font-extrabold tracking-tight text-foreground">
+                    {stats.attendance.summary.absent.value}
+                  </div>
                   <div className="text-[9.5px] font-semibold text-destructive flex items-center gap-1 mt-0.5">
                     <span className="inline-block size-2 rounded-full bg-destructive"></span>
                     Absent ({stats.attendance.summary.absent.ratio})
@@ -193,7 +319,7 @@ export function DailyQuickStats() {
 
           {/* Details & Late Grid Right Column (7/12 grid span) */}
           <div className="lg:col-span-7 grid grid-cols-2 gap-3">
-            {stats.attendance.details.map(s => {
+            {stats.attendance.details.map((s) => {
               const Icon = s.icon;
               const t = tintMap[s.tint as Tint];
               return (
@@ -205,11 +331,21 @@ export function DailyQuickStats() {
                     <Icon className="size-4" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/75 truncate">{s.label}</div>
+                    <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/75 truncate">
+                      {s.label}
+                    </div>
                     <div className="flex items-baseline gap-2 mt-0.5">
-                      <span className="text-lg font-extrabold tracking-tight text-foreground">{s.value}</span>
-                      <span className={`inline-flex items-center gap-0.5 text-[8.5px] font-bold ${s.up ? "text-success" : "text-destructive"}`}>
-                        {s.up ? <TrendingUp className="size-2.5" /> : <TrendingDown className="size-2.5" />}
+                      <span className="text-lg font-extrabold tracking-tight text-foreground">
+                        {s.value}
+                      </span>
+                      <span
+                        className={`inline-flex items-center gap-0.5 text-[8.5px] font-bold ${s.up ? "text-success" : "text-destructive"}`}
+                      >
+                        {s.up ? (
+                          <TrendingUp className="size-2.5" />
+                        ) : (
+                          <TrendingDown className="size-2.5" />
+                        )}
                         {s.delta}
                       </span>
                     </div>
@@ -223,7 +359,7 @@ export function DailyQuickStats() {
 
       <MasterCard title="Payroll & Finances">
         <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border/60 bg-muted/10 rounded-xl border border-border/40 overflow-hidden">
-          {stats.finance.map(s => {
+          {stats.finance.map((s) => {
             const Icon = s.icon;
             const t = tintMap[s.tint as Tint];
             return (
@@ -232,14 +368,26 @@ export function DailyQuickStats() {
                 className="flex items-center justify-between gap-4 p-4 hover:bg-muted/20 transition-all duration-300"
               >
                 <div className="min-w-0 flex-1">
-                  <div className="text-[9.5px] font-bold uppercase tracking-wider text-muted-foreground/75">{s.label}</div>
-                  <div className="mt-1 text-lg font-extrabold tracking-tight text-foreground leading-none">{s.value}</div>
+                  <div className="text-[9.5px] font-bold uppercase tracking-wider text-muted-foreground/75">
+                    {s.label}
+                  </div>
+                  <div className="mt-1 text-lg font-extrabold tracking-tight text-foreground leading-none">
+                    {s.value}
+                  </div>
                   <div className="mt-2 flex items-center gap-1.5">
-                    <span className={`inline-flex items-center gap-0.5 px-1 py-0.5 rounded-full text-[8.5px] font-bold ${s.up ? "text-success bg-success/10" : "text-destructive bg-destructive/10"}`}>
-                      {s.up ? <TrendingUp className="size-2.5" /> : <TrendingDown className="size-2.5" />}
+                    <span
+                      className={`inline-flex items-center gap-0.5 px-1 py-0.5 rounded-full text-[8.5px] font-bold ${s.up ? "text-success bg-success/10" : "text-destructive bg-destructive/10"}`}
+                    >
+                      {s.up ? (
+                        <TrendingUp className="size-2.5" />
+                      ) : (
+                        <TrendingDown className="size-2.5" />
+                      )}
                       {s.delta}
                     </span>
-                    <span className="text-[9px] text-muted-foreground/70 font-medium">vs last mo.</span>
+                    <span className="text-[9px] text-muted-foreground/70 font-medium">
+                      vs last mo.
+                    </span>
                   </div>
                 </div>
                 <div className={`size-9 rounded-lg grid place-items-center ${t.iconBg} shrink-0`}>
