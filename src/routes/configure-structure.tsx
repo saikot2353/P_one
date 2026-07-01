@@ -1599,15 +1599,15 @@ function StructureSetupPage() {
         nextList = orgs.map((o) =>
           o.sl === editSl
             ? {
-                ...o,
-                code: orgCode,
-                nameEng: orgNameEng,
-                nameBng: orgNameBng,
-                shortName: orgShortName,
-                addressEng: orgAddressEng,
-                addressBng: orgAddressBng,
-                isActive: orgIsActive,
-              }
+              ...o,
+              code: orgCode,
+              nameEng: orgNameEng,
+              nameBng: orgNameBng,
+              shortName: orgShortName,
+              addressEng: orgAddressEng,
+              addressBng: orgAddressBng,
+              isActive: orgIsActive,
+            }
             : o,
         );
       } else {
@@ -1635,17 +1635,17 @@ function StructureSetupPage() {
         nextList = areas.map((a) =>
           a.sl === editSl
             ? {
-                ...a,
-                code: areaCode,
-                companyName: areaCompany,
-                nameEng: areaNameEng,
-                nameBng: areaNameBng,
-                shortName: areaShortName,
-                addressEng: areaAddressEng,
-                addressBng: areaAddressBng,
-                purchase: areaPurchase,
-                isActive: areaIsActive,
-              }
+              ...a,
+              code: areaCode,
+              companyName: areaCompany,
+              nameEng: areaNameEng,
+              nameBng: areaNameBng,
+              shortName: areaShortName,
+              addressEng: areaAddressEng,
+              addressBng: areaAddressBng,
+              purchase: areaPurchase,
+              isActive: areaIsActive,
+            }
             : a,
         );
       } else {
@@ -1697,13 +1697,13 @@ function StructureSetupPage() {
         nextList = departments.map((d) =>
           d.sl === editSl
             ? {
-                ...d,
-                code: depCode,
-                nameEng: depNameEng,
-                nameBng: depNameBng,
-                shortName: depShortName,
-                isActive: depIsActive,
-              }
+              ...d,
+              code: depCode,
+              nameEng: depNameEng,
+              nameBng: depNameBng,
+              shortName: depShortName,
+              isActive: depIsActive,
+            }
             : d,
         );
       } else {
@@ -1729,14 +1729,14 @@ function StructureSetupPage() {
         nextList = sections.map((s) =>
           s.sl === editSl
             ? {
-                ...s,
-                departmentName: secDept,
-                code: secCode,
-                nameEng: secNameEng,
-                nameBng: secNameBng,
-                shortName: secShortName,
-                isActive: secIsActive,
-              }
+              ...s,
+              departmentName: secDept,
+              code: secCode,
+              nameEng: secNameEng,
+              nameBng: secNameBng,
+              shortName: secShortName,
+              isActive: secIsActive,
+            }
             : s,
         );
       } else {
@@ -1763,12 +1763,12 @@ function StructureSetupPage() {
         nextList = units.map((u) =>
           u.sl === editSl
             ? {
-                ...u,
-                nameEng: unitNameEng,
-                nameBng: unitNameBng,
-                sortOrder: Number(unitSort),
-                isActive: unitIsActive,
-              }
+              ...u,
+              nameEng: unitNameEng,
+              nameBng: unitNameBng,
+              sortOrder: Number(unitSort),
+              isActive: unitIsActive,
+            }
             : u,
         );
       } else {
@@ -1793,13 +1793,13 @@ function StructureSetupPage() {
         nextList = lines.map((l) =>
           l.sl === editSl
             ? {
-                ...l,
-                companyName: lineCompany,
-                lineEng: lineEng,
-                lineBng: lineBng,
-                sortOrder: Number(lineSort),
-                isActive: lineIsActive,
-              }
+              ...l,
+              companyName: lineCompany,
+              lineEng: lineEng,
+              lineBng: lineBng,
+              sortOrder: Number(lineSort),
+              isActive: lineIsActive,
+            }
             : l,
         );
       } else {
@@ -1821,14 +1821,10 @@ function StructureSetupPage() {
     setIsFormOpen(false);
   };
 
-  const insetWrapperClass =
-    "group relative rounded-xl border border-border/80 focus-within:border-primary px-3.5 py-1.5 bg-muted/15 focus-within:bg-card transition-all duration-200";
-  const insetLabelClass =
-    "text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block mb-0.5";
-  const insetInputClass =
-    "w-full bg-transparent border-0 outline-none text-xs font-normal text-foreground focus:ring-0 p-0";
-  const insetSelectClass =
-    "w-full bg-transparent border-0 outline-none text-xs font-normal text-foreground focus:ring-0 p-0 cursor-pointer";
+  const insetWrapperClass = "space-y-1.5";
+  const insetLabelClass = "text-xs font-semibold text-foreground/80 block";
+  const insetInputClass = "w-full h-10 px-3.5 rounded-lg border border-border/60 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-sm outline-none";
+  const insetSelectClass = "w-full h-10 px-3.5 rounded-lg border border-border/60 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-sm outline-none cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[position:right_12px_center]";
 
   // Tab Header Items
   const tabsList: { type: TabType; label: string; icon: any }[] = [
@@ -1849,32 +1845,32 @@ function StructureSetupPage() {
 
         <div className="p-4 md:p-6 lg:p-8 space-y-2 max-w-[1800px] mx-auto w-full">
           {/* Breadcrumb & Header */}
-          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-border/30">
             <div>
-              <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground/60 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">
                   Home
                 </Link>
-                <ChevronRight className="size-3" />
+                <ChevronRight className="size-3.5" />
                 <span>Configure</span>
-                <ChevronRight className="size-3" />
-                <span className="text-primary font-black">Structure Setup</span>
+                <ChevronRight className="size-3.5" />
+                <span className="text-primary font-bold">Structure Setup</span>
               </div>
-              <h1 className="text-xl font-black tracking-tight flex items-center gap-2">
-                <Building2 className="size-5.5 text-primary" />
+              <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+                <Building2 className="size-6 text-primary" />
                 Structure Configuration
               </h1>
             </div>
             <button
               onClick={() => openForm(null)}
-              className="h-10 px-5 rounded-lg bg-primary text-primary-foreground font-black text-xs hover:bg-primary/90 transition-all shadow-sm flex items-center justify-center gap-2 uppercase tracking-wide"
+              className="h-10 px-5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
             >
-              <Plus className="size-4 animate-bounce" /> Add New Record
+              <Plus className="size-4.5" /> Add New Record
             </button>
           </div>
 
           {/* Horizontal Master Tabs */}
-          <div className="flex flex-wrap gap-2 border-b border-border/50 pb-2">
+          <div className="flex flex-wrap gap-2 pt-2 pb-4">
             {tabsList.map((tab) => {
               const TabIcon = tab.icon;
               const isActive = activeTab === tab.type;
@@ -1885,11 +1881,10 @@ function StructureSetupPage() {
                     setActiveTab(tab.type);
                     setSearchQuery("");
                   }}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                    isActive
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "bg-card border border-border/85 hover:bg-muted text-muted-foreground hover:text-foreground"
-                  }`}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm transition-all ${isActive
+                    ? "bg-primary text-primary-foreground font-semibold shadow-sm"
+                    : "bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground font-medium"
+                    }`}
                 >
                   <TabIcon className="size-4" />
                   {tab.label}
@@ -1899,36 +1894,36 @@ function StructureSetupPage() {
           </div>
 
           {/* Search bar & Actions toolbar */}
-          <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs flex flex-col md:flex-row gap-3 items-center justify-between">
-            <div className="flex items-center gap-2 bg-muted/65 border border-border/40 rounded-lg px-3 py-1.5 w-full md:w-80">
-              <Search className="size-4 text-muted-foreground/70" />
+          <div className="flex flex-col md:flex-row gap-3 items-center justify-between pb-4">
+            <div className="w-full md:w-80 h-10 px-3.5 rounded-lg border border-border/60 bg-muted/10 hover:bg-muted/20 focus-within:bg-background focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 transition-all flex items-center gap-2.5 shadow-sm">
+              <Search className="size-4.5 text-muted-foreground/70" />
               <input
                 type="text"
                 placeholder={`Search ${tabsList.find((t) => t.type === activeTab)?.label}...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent border-0 outline-none text-xs w-full text-foreground placeholder:text-muted-foreground/60 font-semibold"
+                className="bg-transparent border-0 outline-none text-sm w-full text-foreground placeholder:text-muted-foreground/50 font-medium"
               />
             </div>
 
-            <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+            <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
               <button
                 onClick={() => toast.success("Exporting to Excel...")}
-                className="h-9.5 px-3 rounded-lg border border-border/60 hover:bg-muted font-bold text-xs text-muted-foreground flex items-center gap-1.5 transition-all uppercase"
+                className="h-10 px-4 rounded-xl border border-border/40 hover:bg-muted font-semibold text-xs text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors shadow-sm"
               >
-                <FileSpreadsheet className="size-4 text-emerald-600" /> EXCEL
+                <FileSpreadsheet className="size-4.5 text-emerald-600" /> Excel
               </button>
               <button
                 onClick={() => window.print()}
-                className="h-9.5 px-3 rounded-lg border border-border/60 hover:bg-muted font-bold text-xs text-muted-foreground flex items-center gap-1.5 transition-all uppercase"
+                className="h-10 px-4 rounded-xl border border-border/40 hover:bg-muted font-semibold text-xs text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors shadow-sm"
               >
-                <Printer className="size-4 text-blue-600" /> PRINT
+                <Printer className="size-4.5 text-blue-600" /> Print
               </button>
               <button
                 onClick={() => toast.success("Generating PDF...")}
-                className="h-9.5 px-3 rounded-lg border border-border/60 hover:bg-muted font-bold text-xs text-muted-foreground flex items-center gap-1.5 transition-all uppercase"
+                className="h-10 px-4 rounded-xl border border-border/40 hover:bg-muted font-semibold text-xs text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors shadow-sm"
               >
-                <FileText className="size-4 text-red-600" /> PDF
+                <FileText className="size-4.5 text-red-600" /> PDF
               </button>
             </div>
           </div>
@@ -1941,12 +1936,12 @@ function StructureSetupPage() {
                   className="w-full text-left text-xs border-collapse whitespace-nowrap"
                   style={{ minWidth: "1000px" }}
                 >
-                  <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
-                    <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                  <thead className="bg-muted/30 text-muted-foreground uppercase font-semibold tracking-wider text-xs border-b border-border/40">
+                    <tr className="bg-transparent">
+                      <th className="sticky left-0 bg-transparent px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
                         #
                       </th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[140px] text-center border-r border-border/30 z-20">
+                      <th className="sticky left-[60px] bg-transparent px-5 py-4 w-[140px] text-center border-r border-border/30 z-20">
                         Actions
                       </th>
                       <th className="px-5 py-4 w-[120px]">Company Code</th>
@@ -1965,7 +1960,7 @@ function StructureSetupPage() {
                       .map((item, idx) => (
                         <tr
                           key={item.sl}
-                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                          className="group hover:bg-muted/50 transition-all"
                         >
                           <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
                             {idx + 1}
@@ -1999,7 +1994,7 @@ function StructureSetupPage() {
                             </div>
                           </td>
                           <td className="px-5 py-3.5 font-normal font-mono">{item.code}</td>
-                          <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">
+                          <td className="px-5 py-3.5 font-normal text-foreground font-medium">
                             {item.nameEng}
                           </td>
                           <td className="px-5 py-3.5 font-normal text-slate-700 dark:text-slate-300">
@@ -2030,12 +2025,12 @@ function StructureSetupPage() {
                   className="w-full text-left text-xs border-collapse whitespace-nowrap"
                   style={{ minWidth: "1200px" }}
                 >
-                  <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
-                    <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                  <thead className="bg-muted/30 text-muted-foreground uppercase font-semibold tracking-wider text-xs border-b border-border/40">
+                    <tr className="bg-transparent">
+                      <th className="sticky left-0 bg-transparent px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
                         #
                       </th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
+                      <th className="sticky left-[60px] bg-transparent px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
                         Actions
                       </th>
                       <th className="px-5 py-4 w-[100px]">Area Code</th>
@@ -2055,7 +2050,7 @@ function StructureSetupPage() {
                       .map((item, idx) => (
                         <tr
                           key={item.sl}
-                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                          className="group hover:bg-muted/50 transition-all"
                         >
                           <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
                             {idx + 1}
@@ -2080,7 +2075,7 @@ function StructureSetupPage() {
                           <td className="px-5 py-3.5 font-normal text-slate-700 dark:text-slate-300">
                             {item.companyName}
                           </td>
-                          <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">
+                          <td className="px-5 py-3.5 font-normal text-foreground font-medium">
                             {item.nameEng}
                           </td>
                           <td className="px-5 py-3.5 font-normal text-slate-700 dark:text-slate-300">
@@ -2149,7 +2144,7 @@ function StructureSetupPage() {
                   {/* Redesigned Mapping Table */}
                   <div className="overflow-x-auto mt-4">
                     <table className="w-full text-left text-xs border-collapse whitespace-nowrap">
-                      <thead className="bg-[#cbd5e1] dark:bg-slate-800 text-slate-750 dark:text-slate-200 uppercase font-bold text-[10px]">
+                      <thead className="bg-muted/30 text-muted-foreground uppercase font-semibold tracking-wider text-xs border-b border-border/40">
                         <tr>
                           <th className="px-4 py-3 w-[40px] text-center">
                             <input
@@ -2252,12 +2247,12 @@ function StructureSetupPage() {
                   className="w-full text-left text-xs border-collapse whitespace-nowrap"
                   style={{ minWidth: "800px" }}
                 >
-                  <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
-                    <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                  <thead className="bg-muted/30 text-muted-foreground uppercase font-semibold tracking-wider text-xs border-b border-border/40">
+                    <tr className="bg-transparent">
+                      <th className="sticky left-0 bg-transparent px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
                         #
                       </th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[140px] text-center border-r border-border/30 z-20">
+                      <th className="sticky left-[60px] bg-transparent px-5 py-4 w-[140px] text-center border-r border-border/30 z-20">
                         Actions
                       </th>
                       <th className="px-5 py-4 w-[120px]">Code</th>
@@ -2275,7 +2270,7 @@ function StructureSetupPage() {
                       .map((item, idx) => (
                         <tr
                           key={item.sl}
-                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                          className="group hover:bg-muted/50 transition-all"
                         >
                           <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
                             {idx + 1}
@@ -2312,7 +2307,7 @@ function StructureSetupPage() {
                             </div>
                           </td>
                           <td className="px-5 py-3.5 font-normal font-mono">{item.code || "—"}</td>
-                          <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">
+                          <td className="px-5 py-3.5 font-normal text-foreground font-medium">
                             {item.nameEng}
                           </td>
                           <td className="px-5 py-3.5 font-normal text-slate-700 dark:text-slate-300">
@@ -2337,12 +2332,12 @@ function StructureSetupPage() {
                   className="w-full text-left text-xs border-collapse whitespace-nowrap"
                   style={{ minWidth: "1000px" }}
                 >
-                  <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
-                    <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                  <thead className="bg-muted/30 text-muted-foreground uppercase font-semibold tracking-wider text-xs border-b border-border/40">
+                    <tr className="bg-transparent">
+                      <th className="sticky left-0 bg-transparent px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
                         #
                       </th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
+                      <th className="sticky left-[60px] bg-transparent px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
                         Actions
                       </th>
                       <th className="px-5 py-4 min-w-[200px]">Department</th>
@@ -2361,7 +2356,7 @@ function StructureSetupPage() {
                       .map((item, idx) => (
                         <tr
                           key={item.sl}
-                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                          className="group hover:bg-muted/50 transition-all"
                         >
                           <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
                             {idx + 1}
@@ -2386,7 +2381,7 @@ function StructureSetupPage() {
                             {item.departmentName}
                           </td>
                           <td className="px-5 py-3.5 font-normal font-mono">{item.code || "—"}</td>
-                          <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">
+                          <td className="px-5 py-3.5 font-normal text-foreground font-medium">
                             {item.nameEng}
                           </td>
                           <td className="px-5 py-3.5 font-normal text-slate-700 dark:text-slate-300">
@@ -2411,12 +2406,12 @@ function StructureSetupPage() {
                   className="w-full text-left text-xs border-collapse whitespace-nowrap"
                   style={{ minWidth: "800px" }}
                 >
-                  <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
-                    <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                  <thead className="bg-muted/30 text-muted-foreground uppercase font-semibold tracking-wider text-xs border-b border-border/40">
+                    <tr className="bg-transparent">
+                      <th className="sticky left-0 bg-transparent px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
                         #
                       </th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
+                      <th className="sticky left-[60px] bg-transparent px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
                         Actions
                       </th>
                       <th className="px-5 py-4 min-w-[200px]">Name (Eng)</th>
@@ -2433,7 +2428,7 @@ function StructureSetupPage() {
                       .map((item, idx) => (
                         <tr
                           key={item.sl}
-                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                          className="group hover:bg-muted/50 transition-all"
                         >
                           <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
                             {idx + 1}
@@ -2454,7 +2449,7 @@ function StructureSetupPage() {
                               </button>
                             </div>
                           </td>
-                          <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">
+                          <td className="px-5 py-3.5 font-normal text-foreground font-medium">
                             {item.nameEng}
                           </td>
                           <td className="px-5 py-3.5 font-normal text-slate-700 dark:text-slate-300">
@@ -2481,12 +2476,12 @@ function StructureSetupPage() {
                   className="w-full text-left text-xs border-collapse whitespace-nowrap"
                   style={{ minWidth: "900px" }}
                 >
-                  <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
-                    <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                  <thead className="bg-muted/30 text-muted-foreground uppercase font-semibold tracking-wider text-xs border-b border-border/40">
+                    <tr className="bg-transparent">
+                      <th className="sticky left-0 bg-transparent px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
                         #
                       </th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
+                      <th className="sticky left-[60px] bg-transparent px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
                         Actions
                       </th>
                       <th className="px-5 py-4 min-w-[200px]">Company</th>
@@ -2504,7 +2499,7 @@ function StructureSetupPage() {
                       .map((item, idx) => (
                         <tr
                           key={item.sl}
-                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                          className="group hover:bg-muted/50 transition-all"
                         >
                           <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
                             {idx + 1}
@@ -2528,7 +2523,7 @@ function StructureSetupPage() {
                           <td className="px-5 py-3.5 font-normal text-slate-700 dark:text-slate-300">
                             {item.companyName}
                           </td>
-                          <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">
+                          <td className="px-5 py-3.5 font-normal text-foreground font-medium">
                             {item.lineEng}
                           </td>
                           <td className="px-5 py-3.5 font-normal text-slate-700 dark:text-slate-300">
@@ -2556,15 +2551,15 @@ function StructureSetupPage() {
         {/* Master Modal Router */}
         {isFormOpen && (
           <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
-            <div className="bg-card border border-border/80 w-full max-w-2xl rounded-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="bg-card w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-border/40">
               {/* Modal Header */}
-              <div className="px-6 py-4.5 border-b border-border/50 bg-[#f8fafc] dark:bg-[#0f172a] flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="size-9 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
+              <div className="px-6 py-5 border-b border-border/30 bg-transparent flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="size-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20 shadow-sm">
                     <Building2 className="size-5" />
                   </div>
                   <div>
-                    <h2 className="text-base font-black tracking-tight text-foreground">
+                    <h2 className="text-lg font-bold tracking-tight text-foreground">
                       {editSl ? "Update" : "Create"}{" "}
                       {tabsList.find((t) => t.type === activeTab)?.label}
                     </h2>
@@ -2572,9 +2567,9 @@ function StructureSetupPage() {
                 </div>
                 <button
                   onClick={() => setIsFormOpen(false)}
-                  className="size-8.5 rounded-xl hover:bg-muted/80 flex items-center justify-center transition-colors text-muted-foreground hover:text-foreground border border-border/20"
+                  className="size-9 rounded-xl hover:bg-muted flex items-center justify-center transition-colors text-muted-foreground hover:text-foreground"
                 >
-                  <X className="size-4" />
+                  <X className="size-4.5" />
                 </button>
               </div>
 
@@ -3026,19 +3021,19 @@ function StructureSetupPage() {
                 )}
 
                 {/* Modal Footer Actions */}
-                <div className="border-t border-border/50 pt-5 flex items-center justify-between gap-3 bg-[#f8fafc] dark:bg-[#0f172a] -mx-6 -mb-6 p-6">
+                <div className="border-t border-border/30 pt-4 flex items-center justify-end gap-3 bg-muted/10 -mx-6 -mb-6 p-6">
                   <button
                     type="button"
                     onClick={() => setIsFormOpen(false)}
-                    className="h-10 px-6 rounded-lg bg-[#f39c12] hover:bg-[#e67e22] text-white font-black text-xs transition-all uppercase tracking-wider shadow-sm hover:shadow"
+                    className="h-10 px-5 rounded-xl bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground font-medium text-sm transition-colors"
                   >
-                    CLOSE
+                    Cancel
                   </button>
                   <button
                     type="submit"
-                    className={`h-10 px-8 rounded-lg text-white font-black text-xs shadow-md hover:shadow-lg transition-all uppercase tracking-wider flex items-center gap-1.5 bg-[#2ecc71] hover:bg-[#27ae60]`}
+                    className="h-10 px-6 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center"
                   >
-                    {editSl ? "UPDATE" : "CREATE"}
+                    {editSl ? "Update" : "Create"}
                   </button>
                 </div>
               </form>
@@ -3047,21 +3042,21 @@ function StructureSetupPage() {
         )}
         {/* Designation Assignment Modal */}
         {isAssignModalOpen && assigningDept && (
-          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-300">
-            <div className="bg-card border border-border/80 w-full max-w-4xl rounded-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-300">
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+            <div className="bg-card w-full max-w-4xl rounded-2xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-border/40">
               {/* Modal Header */}
-              <div className="px-6 py-5 border-b border-border/40 bg-gradient-to-r from-muted/50 via-card to-muted/30 dark:from-[#0f172a] dark:to-[#1e293b] flex items-center justify-between">
+              <div className="px-6 py-5 border-b border-border/30 bg-transparent flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="size-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary border border-primary/20 shadow-inner">
-                    <SlidersHorizontal className="size-5.5" />
+                  <div className="size-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20 shadow-sm">
+                    <SlidersHorizontal className="size-5" />
                   </div>
                   <div>
-                    <h2 className="text-base font-extrabold tracking-tight text-foreground flex items-center gap-2">
+                    <h2 className="text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
                       Assign & Order Designations
                     </h2>
-                    <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">
+                    <p className="text-xs text-muted-foreground font-medium mt-0.5">
                       Department:{" "}
-                      <span className="text-primary font-black px-2 py-0.5 rounded-md bg-primary/10 border border-primary/15">
+                      <span className="text-primary font-bold px-2 py-0.5 rounded-md bg-primary/10 border border-primary/15">
                         {assigningDept.nameEng} ({assigningDept.code})
                       </span>
                     </p>
@@ -3069,7 +3064,7 @@ function StructureSetupPage() {
                 </div>
                 <button
                   onClick={() => setIsAssignModalOpen(false)}
-                  className="size-9 rounded-xl hover:bg-muted/80 flex items-center justify-center transition-all text-muted-foreground hover:text-foreground border border-border/30 hover:border-border/60 hover:scale-105"
+                  className="size-9 rounded-xl hover:bg-muted flex items-center justify-center transition-colors text-muted-foreground hover:text-foreground"
                 >
                   <X className="size-4.5" />
                 </button>
@@ -3117,16 +3112,16 @@ function StructureSetupPage() {
                         </select>
                       </div>
 
-                      <div className="relative flex py-1 items-center">
+                      {/* <div className="relative flex py-1 items-center">
                         <div className="flex-grow border-t border-border/30"></div>
                         <span className="flex-shrink mx-4 text-[10px] text-slate-400 font-extrabold uppercase tracking-widest">
                           OR
                         </span>
                         <div className="flex-grow border-t border-border/30"></div>
-                      </div>
+                      </div> */}
 
                       {/* Custom designation field */}
-                      <div className={insetWrapperClass}>
+                      {/* <div className={insetWrapperClass}>
                         <label className={insetLabelClass}>Register Custom</label>
                         <div className="flex items-center gap-2 mt-1">
                           <input
@@ -3170,7 +3165,7 @@ function StructureSetupPage() {
                             ADD
                           </button>
                         </div>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </div>
@@ -3273,13 +3268,13 @@ function StructureSetupPage() {
               </div>
 
               {/* Modal Footer */}
-              <div className="border-t border-border/40 pt-5 flex items-center justify-between gap-3 bg-gradient-to-r from-muted/30 to-muted/10 dark:from-[#0f172a] dark:to-[#121b2e] p-6">
+              <div className="border-t border-border/30 pt-4 flex items-center justify-end gap-3 bg-muted/10 p-6">
                 <button
                   type="button"
                   onClick={() => setIsAssignModalOpen(false)}
-                  className="h-10.5 px-6 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-extrabold text-xs transition-all uppercase tracking-wider border border-border/50"
+                  className="h-10 px-5 rounded-xl bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground font-medium text-sm transition-colors"
                 >
-                  CANCEL
+                  Cancel
                 </button>
                 <button
                   type="button"
@@ -3293,9 +3288,9 @@ function StructureSetupPage() {
                     toast.success("Designations assigned and ordered successfully!");
                     setIsAssignModalOpen(false);
                   }}
-                  className="h-10.5 px-9 rounded-xl text-white font-black text-xs shadow-md hover:shadow-lg transition-all uppercase tracking-wider flex items-center gap-2 bg-[#2ecc71] hover:bg-[#27ae60] active:scale-98"
+                  className="h-10 px-6 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center"
                 >
-                  SAVE CHANGES
+                  Save Changes
                 </button>
               </div>
             </div>
@@ -3317,14 +3312,10 @@ function StructureSetupPage() {
               }));
             };
 
-            const sel =
-              "w-full bg-transparent border-0 outline-none text-sm font-medium text-foreground cursor-pointer focus:ring-0 p-0";
-            const lbl =
-              "text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1";
-            const wrap =
-              "group relative rounded-xl border border-border/60 hover:border-primary/50 focus-within:border-primary/80 focus-within:ring-2 focus-within:ring-primary/10 px-4 py-2.5 bg-muted/20 hover:bg-muted/40 focus-within:bg-card transition-all duration-300";
-            const inp =
-              "w-full bg-transparent border-0 outline-none text-sm font-medium text-foreground focus:ring-0 p-0 placeholder:text-muted-foreground/50";
+            const sel = "w-full h-10 px-3.5 rounded-lg border border-border/60 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-sm outline-none cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[position:right_12px_center]";
+            const lbl = "text-xs font-semibold text-foreground/80 block";
+            const wrap = "space-y-1.5";
+            const inp = "w-full h-10 px-3.5 rounded-lg border border-border/60 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-sm outline-none";
 
             const SectionHeader = ({ title, icon: Icon }: { title: string; icon: any }) => (
               <div className="flex items-center gap-2.5 mb-4 pb-2 border-b border-border/50">
@@ -3336,23 +3327,23 @@ function StructureSetupPage() {
             );
 
             return (
-              <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
-                <div className="bg-card border border-border/80 w-full max-w-[1000px] rounded-2xl shadow-2xl flex flex-col max-h-[95vh] overflow-hidden animate-in zoom-in-95 duration-300">
+              <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+                <div className="bg-card w-full max-w-[1000px] rounded-2xl shadow-2xl flex flex-col max-h-[95vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-border/40">
                   {/* Modal Header */}
-                  <div className="px-6 py-5 border-b border-border/50 bg-gradient-to-r from-muted/30 to-background flex items-center justify-between">
-                    <div className="flex items-center gap-3.5">
-                      <div className="size-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary shadow-inner border border-primary/20">
+                  <div className="px-6 py-5 border-b border-border/30 bg-transparent flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="size-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary shadow-sm border border-primary/20">
                         <Settings className="size-5" />
                       </div>
                       <div>
-                        <h2 className="text-base font-black tracking-tight text-foreground">
+                        <h2 className="text-lg font-bold tracking-tight text-foreground">
                           Company Basic Settings
                         </h2>
                         <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                          <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/15">
                             {settingsCompany.code}
                           </span>
-                          <p className="text-xs text-muted-foreground font-semibold">
+                          <p className="text-xs text-muted-foreground font-medium">
                             {settingsCompany.nameEng}
                           </p>
                         </div>
@@ -3360,9 +3351,9 @@ function StructureSetupPage() {
                     </div>
                     <button
                       onClick={() => setIsSettingsOpen(false)}
-                      className="size-9 rounded-xl bg-muted/50 hover:bg-destructive/10 hover:text-destructive flex items-center justify-center transition-colors text-muted-foreground border border-border/50 hover:border-destructive/30"
+                      className="size-9 rounded-xl hover:bg-muted flex items-center justify-center transition-colors text-muted-foreground hover:text-foreground"
                     >
-                      <X className="size-4" />
+                      <X className="size-4.5" />
                     </button>
                   </div>
 
@@ -3637,13 +3628,13 @@ function StructureSetupPage() {
                   </div>
 
                   {/* Modal Footer */}
-                  <div className="border-t border-border/50 flex items-center justify-end gap-3 bg-card px-6 py-5">
+                  <div className="border-t border-border/30 pt-4 flex items-center justify-end gap-3 bg-muted/10 p-6 -mx-6 -mb-6">
                     <button
                       type="button"
                       onClick={() => setIsSettingsOpen(false)}
-                      className="h-11 px-6 rounded-xl bg-muted/80 hover:bg-muted text-foreground font-bold text-xs transition-colors tracking-wide"
+                      className="h-10 px-5 rounded-xl bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground font-medium text-sm transition-colors"
                     >
-                      CANCEL
+                      Cancel
                     </button>
                     <button
                       type="button"
@@ -3654,9 +3645,9 @@ function StructureSetupPage() {
                         toast.success("Company Basic Settings updated successfully!");
                         setIsSettingsOpen(false);
                       }}
-                      className="h-11 px-8 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 transition-all tracking-wide"
+                      className="h-10 px-6 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
                     >
-                      SAVE CHANGES
+                      Save Changes
                     </button>
                   </div>
                 </div>
