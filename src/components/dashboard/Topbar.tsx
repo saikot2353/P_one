@@ -620,6 +620,9 @@ function getCategoryIcon(parent: string) {
 }
 
 export function Topbar() {
+  if (typeof window !== "undefined" && window.location.search.includes("embed=true")) {
+    return null;
+  }
   const [theme, setTheme] = useState(() => {
     if (typeof window !== "undefined") {
       return document.documentElement.classList.contains("dark") ? "dark" : "light";

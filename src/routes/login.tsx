@@ -1000,7 +1000,7 @@ function LoginPage() {
     if (typeof window !== "undefined") {
       localStorage.setItem("cripton_logged_in", "true");
     }
-    navigate({ to: "/" });
+    navigate({ to: "/module-selection" });
   }, [selectedCompany, selectedSection, navigate]);
 
   const allowedCompanies = useMemo(() => {

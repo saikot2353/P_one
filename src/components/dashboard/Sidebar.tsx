@@ -33,14 +33,14 @@ import {
   CheckCircle,
 } from "lucide-react";
 
-interface NestedItem {
+export interface NestedItem {
   label: string;
   to: string;
   search?: Record<string, any>;
   count?: number;
 }
 
-interface SubItem {
+export interface SubItem {
   label: string;
   to?: string;
   search?: Record<string, any>;
@@ -48,7 +48,7 @@ interface SubItem {
   count?: number;
 }
 
-interface NavItem {
+export interface NavItem {
   label: string;
   to?: string;
   icon: any;
@@ -58,7 +58,7 @@ interface NavItem {
   count?: number;
 }
 
-const nav: NavItem[] = [
+export const nav: NavItem[] = [
   { label: "Dashboard", to: "/", icon: LayoutDashboard },
   {
     label: "SSP",
@@ -446,6 +446,12 @@ export function Sidebar() {
     }));
   };
 
+  const filteredNav = nav;
+
+  if (typeof window !== "undefined" && window.location.search.includes("embed=true")) {
+    return null;
+  }
+
   return (
     <aside className="hidden lg:flex w-64 h-screen sticky top-0 shrink-0 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300">
       <div className="px-5 py-4 flex items-center gap-2.5 border-b border-sidebar-border/80">
@@ -469,7 +475,7 @@ export function Sidebar() {
         <div className="px-2.5 pb-2 text-[9px] font-extrabold uppercase tracking-widest text-sidebar-foreground/45">
           Workspace
         </div>
-        {nav.map((item) => {
+        {filteredNav.map((item) => {
           const Icon = item.icon;
 
           // Determine parent active state dynamically

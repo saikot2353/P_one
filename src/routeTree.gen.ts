@@ -42,7 +42,9 @@ import { Route as PayrollLoanRouteImport } from './routes/payroll-loan'
 import { Route as PayrollDeductionsRouteImport } from './routes/payroll-deductions'
 import { Route as PayrollBenefitsRouteImport } from './routes/payroll-benefits'
 import { Route as PayrollAdvanceRouteImport } from './routes/payroll-advance'
+import { Route as MyDashboardRouteImport } from './routes/my-dashboard'
 import { Route as MonthlySalaryProcessRouteImport } from './routes/monthly-salary-process'
+import { Route as ModuleSelectionRouteImport } from './routes/module-selection'
 import { Route as ManualAttendanceRouteImport } from './routes/manual-attendance'
 import { Route as ManageOvertimeRouteImport } from './routes/manage-overtime'
 import { Route as LoginRouteImport } from './routes/login'
@@ -277,9 +279,19 @@ const PayrollAdvanceRoute = PayrollAdvanceRouteImport.update({
   path: '/payroll-advance',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MyDashboardRoute = MyDashboardRouteImport.update({
+  id: '/my-dashboard',
+  path: '/my-dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MonthlySalaryProcessRoute = MonthlySalaryProcessRouteImport.update({
   id: '/monthly-salary-process',
   path: '/monthly-salary-process',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModuleSelectionRoute = ModuleSelectionRouteImport.update({
+  id: '/module-selection',
+  path: '/module-selection',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ManualAttendanceRoute = ManualAttendanceRouteImport.update({
@@ -661,7 +673,9 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
+  '/module-selection': typeof ModuleSelectionRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
+  '/my-dashboard': typeof MyDashboardRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
   '/payroll-deductions': typeof PayrollDeductionsRoute
@@ -760,7 +774,9 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
+  '/module-selection': typeof ModuleSelectionRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
+  '/my-dashboard': typeof MyDashboardRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
   '/payroll-deductions': typeof PayrollDeductionsRoute
@@ -860,7 +876,9 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
+  '/module-selection': typeof ModuleSelectionRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
+  '/my-dashboard': typeof MyDashboardRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
   '/payroll-deductions': typeof PayrollDeductionsRoute
@@ -961,7 +979,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
+    | '/module-selection'
     | '/monthly-salary-process'
+    | '/my-dashboard'
     | '/payroll-advance'
     | '/payroll-benefits'
     | '/payroll-deductions'
@@ -1060,7 +1080,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
+    | '/module-selection'
     | '/monthly-salary-process'
+    | '/my-dashboard'
     | '/payroll-advance'
     | '/payroll-benefits'
     | '/payroll-deductions'
@@ -1159,7 +1181,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
+    | '/module-selection'
     | '/monthly-salary-process'
+    | '/my-dashboard'
     | '/payroll-advance'
     | '/payroll-benefits'
     | '/payroll-deductions'
@@ -1259,7 +1283,9 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ManageOvertimeRoute: typeof ManageOvertimeRoute
   ManualAttendanceRoute: typeof ManualAttendanceRoute
+  ModuleSelectionRoute: typeof ModuleSelectionRoute
   MonthlySalaryProcessRoute: typeof MonthlySalaryProcessRoute
+  MyDashboardRoute: typeof MyDashboardRoute
   PayrollAdvanceRoute: typeof PayrollAdvanceRoute
   PayrollBenefitsRoute: typeof PayrollBenefitsRoute
   PayrollDeductionsRoute: typeof PayrollDeductionsRoute
@@ -1532,11 +1558,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PayrollAdvanceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/my-dashboard': {
+      id: '/my-dashboard'
+      path: '/my-dashboard'
+      fullPath: '/my-dashboard'
+      preLoaderRoute: typeof MyDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/monthly-salary-process': {
       id: '/monthly-salary-process'
       path: '/monthly-salary-process'
       fullPath: '/monthly-salary-process'
       preLoaderRoute: typeof MonthlySalaryProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/module-selection': {
+      id: '/module-selection'
+      path: '/module-selection'
+      fullPath: '/module-selection'
+      preLoaderRoute: typeof ModuleSelectionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/manual-attendance': {
@@ -2043,7 +2083,9 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ManageOvertimeRoute: ManageOvertimeRoute,
   ManualAttendanceRoute: ManualAttendanceRoute,
+  ModuleSelectionRoute: ModuleSelectionRoute,
   MonthlySalaryProcessRoute: MonthlySalaryProcessRoute,
+  MyDashboardRoute: MyDashboardRoute,
   PayrollAdvanceRoute: PayrollAdvanceRoute,
   PayrollBenefitsRoute: PayrollBenefitsRoute,
   PayrollDeductionsRoute: PayrollDeductionsRoute,
