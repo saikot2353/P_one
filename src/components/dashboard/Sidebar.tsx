@@ -78,6 +78,7 @@ export const nav: NavItem[] = [
       { label: "Job & Employee Setup", to: "/configure-employment" },
       { label: "Shift & Time Rules", to: "/configure-time" },
       { label: "Allowances & Bonuses", to: "/configure-compensation" },
+      { label: "Tax & Compliance Setup", to: "/configure-tax" },
       { label: "Education & Training", to: "/configure-education" },
       { label: "Leave & Policies", to: "/configure-policies" },
     ],

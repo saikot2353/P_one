@@ -84,6 +84,7 @@ import { Route as EarnLeaveProcessRouteImport } from './routes/earn-leave-proces
 import { Route as ERecruitmentFormRouteImport } from './routes/e-recruitment-form'
 import { Route as CreateRosterRouteImport } from './routes/create-roster'
 import { Route as ConfigureTimeRouteImport } from './routes/configure-time'
+import { Route as ConfigureTaxRouteImport } from './routes/configure-tax'
 import { Route as ConfigureStructureRouteImport } from './routes/configure-structure'
 import { Route as ConfigurePoliciesRouteImport } from './routes/configure-policies'
 import { Route as ConfigurePersonnelRouteImport } from './routes/configure-personnel'
@@ -490,6 +491,11 @@ const ConfigureTimeRoute = ConfigureTimeRouteImport.update({
   path: '/configure-time',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConfigureTaxRoute = ConfigureTaxRouteImport.update({
+  id: '/configure-tax',
+  path: '/configure-tax',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConfigureStructureRoute = ConfigureStructureRouteImport.update({
   id: '/configure-structure',
   path: '/configure-structure',
@@ -641,6 +647,7 @@ export interface FileRoutesByFullPath {
   '/configure-personnel': typeof ConfigurePersonnelRoute
   '/configure-policies': typeof ConfigurePoliciesRoute
   '/configure-structure': typeof ConfigureStructureRoute
+  '/configure-tax': typeof ConfigureTaxRoute
   '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
   '/e-recruitment-form': typeof ERecruitmentFormRoute
@@ -743,6 +750,7 @@ export interface FileRoutesByTo {
   '/configure-personnel': typeof ConfigurePersonnelRoute
   '/configure-policies': typeof ConfigurePoliciesRoute
   '/configure-structure': typeof ConfigureStructureRoute
+  '/configure-tax': typeof ConfigureTaxRoute
   '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
   '/e-recruitment-form': typeof ERecruitmentFormRoute
@@ -846,6 +854,7 @@ export interface FileRoutesById {
   '/configure-personnel': typeof ConfigurePersonnelRoute
   '/configure-policies': typeof ConfigurePoliciesRoute
   '/configure-structure': typeof ConfigureStructureRoute
+  '/configure-tax': typeof ConfigureTaxRoute
   '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
   '/e-recruitment-form': typeof ERecruitmentFormRoute
@@ -950,6 +959,7 @@ export interface FileRouteTypes {
     | '/configure-personnel'
     | '/configure-policies'
     | '/configure-structure'
+    | '/configure-tax'
     | '/configure-time'
     | '/create-roster'
     | '/e-recruitment-form'
@@ -1052,6 +1062,7 @@ export interface FileRouteTypes {
     | '/configure-personnel'
     | '/configure-policies'
     | '/configure-structure'
+    | '/configure-tax'
     | '/configure-time'
     | '/create-roster'
     | '/e-recruitment-form'
@@ -1154,6 +1165,7 @@ export interface FileRouteTypes {
     | '/configure-personnel'
     | '/configure-policies'
     | '/configure-structure'
+    | '/configure-tax'
     | '/configure-time'
     | '/create-roster'
     | '/e-recruitment-form'
@@ -1257,6 +1269,7 @@ export interface RootRouteChildren {
   ConfigurePersonnelRoute: typeof ConfigurePersonnelRoute
   ConfigurePoliciesRoute: typeof ConfigurePoliciesRoute
   ConfigureStructureRoute: typeof ConfigureStructureRoute
+  ConfigureTaxRoute: typeof ConfigureTaxRoute
   ConfigureTimeRoute: typeof ConfigureTimeRoute
   CreateRosterRoute: typeof CreateRosterRoute
   ERecruitmentFormRoute: typeof ERecruitmentFormRoute
@@ -1865,6 +1878,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConfigureTimeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/configure-tax': {
+      id: '/configure-tax'
+      path: '/configure-tax'
+      fullPath: '/configure-tax'
+      preLoaderRoute: typeof ConfigureTaxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/configure-structure': {
       id: '/configure-structure'
       path: '/configure-structure'
@@ -2065,6 +2085,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConfigurePersonnelRoute: ConfigurePersonnelRoute,
   ConfigurePoliciesRoute: ConfigurePoliciesRoute,
   ConfigureStructureRoute: ConfigureStructureRoute,
+  ConfigureTaxRoute: ConfigureTaxRoute,
   ConfigureTimeRoute: ConfigureTimeRoute,
   CreateRosterRoute: CreateRosterRoute,
   ERecruitmentFormRoute: ERecruitmentFormRoute,

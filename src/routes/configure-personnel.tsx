@@ -4,6 +4,7 @@ import { Topbar } from "@/components/dashboard/Topbar";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import {
   Settings,
+  Search,
   Building2,
   FileCheck2,
   Banknote,
@@ -32,6 +33,7 @@ const TABS = [
 function ConfigurePersonnelPage() {
   const [activeTab, setActiveTab] = useState("field_visibility");
   const [selectedCompany, setSelectedCompany] = useState("Cripton Tech");
+  const [searchQuery, setSearchQuery] = useState("");
   
   // Dummy data for toggles
   const [fields, setFields] = useState<Record<string, boolean>>({
@@ -298,6 +300,22 @@ function ConfigurePersonnelPage() {
 
   const totalSalaryPercentage = Object.values(salaryProps).reduce((a, b) => a + Number(b), 0);
 
+  const formatLabel = (key: string) => {
+    let lbl = key.replace(/([A-Z])/g, " $1").trim();
+    lbl = lbl.charAt(0).toUpperCase() + lbl.slice(1);
+    lbl = lbl.replace(/Eng$/, " (English)").replace(/Bng$/, " (Bangla)");
+    lbl = lbl.replace(/Id$/i, " ID").replace(/Dob/i, "Date of Birth").replace(/Nid/i, "NID");
+    lbl = lbl.replace(/^Pres /, "Present ").replace(/^Perm /, "Permanent ").replace(/^Offc /, "Official ");
+    lbl = lbl.replace(/^Ref[12] /, "Reference ");
+    if (key === "blood") return "Blood Group";
+    if (key === "dept") return "Department";
+    if (key === "sect") return "Section";
+    if (key === "rcNotes") return "Recruitment Notes";
+    if (key === "pfDeduction") return "PF Deduction";
+    return lbl;
+  };
+
+
   return (
     <div className="flex min-h-screen bg-muted/10 w-full overflow-hidden">
       <Sidebar />
@@ -373,17 +391,31 @@ function ConfigurePersonnelPage() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                  {Object.entries(fields).map(([key, value]) => (
-                    <div key={key} className="flex items-center justify-between p-4 rounded-xl border border-border/50 bg-muted/10 hover:bg-muted/20 transition-colors">
-                      <span className="text-sm font-semibold text-foreground capitalize">
-                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                
+                <div className="relative mb-4">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/50" />
+                  <input
+                    type="text"
+                    placeholder="Search fields..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full h-10 pl-9 pr-4 rounded-xl border border-border/60 bg-muted/10 focus:bg-background focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-sm outline-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                  {Object.entries(fields)
+                    .filter(([key]) => formatLabel(key).toLowerCase().includes(searchQuery.toLowerCase()))
+                    .map(([key, value]) => (
+                    <div key={key} className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-border/50 bg-muted/10 hover:bg-muted/20 transition-colors gap-2">
+                      <span className="text-xs font-semibold text-foreground truncate" title={formatLabel(key)}>
+                        {formatLabel(key)}
                       </span>
                       <button
                         onClick={() => handleFieldToggle(key as keyof typeof fields)}
-                        className={`w-11 h-6 rounded-full transition-colors relative flex items-center ${value ? 'bg-primary' : 'bg-muted-foreground/30'}`}
+                        className={`w-8 h-4.5 rounded-full transition-colors relative flex items-center shrink-0 ${value ? "bg-primary" : "bg-muted-foreground/30"}`}
                       >
-                        <div className={`size-4 bg-white rounded-full shadow-sm transform transition-transform ${value ? 'translate-x-6' : 'translate-x-1'}`} />
+                        <div className={`size-3.5 bg-white rounded-full shadow-sm transform transition-transform ${value ? "translate-x-4" : "translate-x-0.5"}`} />
                       </button>
                     </div>
                   ))}
@@ -432,17 +464,31 @@ function ConfigurePersonnelPage() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                  {Object.entries(mandatoryFields).map(([key, value]) => (
-                    <div key={key} className="flex items-center justify-between p-4 rounded-xl border border-border/50 bg-rose-500/5 hover:bg-rose-500/10 transition-colors">
-                      <span className="text-sm font-semibold text-foreground capitalize">
-                        {key.replace(/([A-Z])/g, ' $1').trim()} Required?
+                
+                <div className="relative mb-4">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/50" />
+                  <input
+                    type="text"
+                    placeholder="Search mandatory fields..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full h-10 pl-9 pr-4 rounded-xl border border-border/60 bg-muted/10 focus:bg-background focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-sm outline-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                  {Object.entries(mandatoryFields)
+                    .filter(([key]) => formatLabel(key).toLowerCase().includes(searchQuery.toLowerCase()))
+                    .map(([key, value]) => (
+                    <div key={key} className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-border/50 bg-rose-500/5 hover:bg-rose-500/10 transition-colors gap-2">
+                      <span className="text-xs font-semibold text-foreground truncate" title={formatLabel(key)}>
+                        {formatLabel(key)}
                       </span>
                       <button
                         onClick={() => handleMandatoryToggle(key as keyof typeof mandatoryFields)}
-                        className={`w-11 h-6 rounded-full transition-colors relative flex items-center ${value ? 'bg-rose-500' : 'bg-muted-foreground/30'}`}
+                        className={`w-8 h-4.5 rounded-full transition-colors relative flex items-center shrink-0 ${value ? "bg-rose-500" : "bg-muted-foreground/30"}`}
                       >
-                        <div className={`size-4 bg-white rounded-full shadow-sm transform transition-transform ${value ? 'translate-x-6' : 'translate-x-1'}`} />
+                        <div className={`size-3.5 bg-white rounded-full shadow-sm transform transition-transform ${value ? "translate-x-4" : "translate-x-0.5"}`} />
                       </button>
                     </div>
                   ))}
