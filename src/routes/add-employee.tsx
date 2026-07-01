@@ -214,6 +214,7 @@ function AddEmployeePage() {
     utilityAllowance: "",
 
     // 3. Salary & Bank Details
+    bankPay: "",
     bankName: "Dutch-Bangla Bank Limited",
     bankAccount: "",
     bankBranch: "Mirpur Circle-10",
@@ -3329,13 +3330,32 @@ function AddEmployeePage() {
                         </label>
                         <SearchableSelect
                           value={form.paymentMode}
-                          onChange={() => {}}
+                          onChange={(val) => handleChange("paymentMode", val)}
                           options={[
                             { value: "Bank Transfer", label: "Bank Transfer" },
+                            { value: "Bank Pay", label: "Bank Pay" },
                             { value: "Cash", label: "Cash payment" },
                             { value: "Mobile Banking", label: "Mobile Banking (bKash/Nagad)" },
                           ]}
                         />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
+                          Bank Pay Amount
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-extrabold text-muted-foreground/60">
+                            ৳
+                          </span>
+                          <input
+                            type="number"
+                            value={form.bankPay}
+                            onChange={(e) => handleChange("bankPay", e.target.value)}
+                            className="h-10 pl-7.5 pr-3.5 rounded-xl border border-border bg-card text-sm font-semibold font-mono w-full"
+                            placeholder="0.00"
+                          />
+                        </div>
                       </div>
 
                       <div className="space-y-1.5">

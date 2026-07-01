@@ -86,6 +86,7 @@ import { Route as CreateRosterRouteImport } from './routes/create-roster'
 import { Route as ConfigureTimeRouteImport } from './routes/configure-time'
 import { Route as ConfigureStructureRouteImport } from './routes/configure-structure'
 import { Route as ConfigurePoliciesRouteImport } from './routes/configure-policies'
+import { Route as ConfigurePersonnelRouteImport } from './routes/configure-personnel'
 import { Route as ConfigureEmploymentRouteImport } from './routes/configure-employment'
 import { Route as ConfigureEducationRouteImport } from './routes/configure-education'
 import { Route as ConfigureCompensationRouteImport } from './routes/configure-compensation'
@@ -499,6 +500,11 @@ const ConfigurePoliciesRoute = ConfigurePoliciesRouteImport.update({
   path: '/configure-policies',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConfigurePersonnelRoute = ConfigurePersonnelRouteImport.update({
+  id: '/configure-personnel',
+  path: '/configure-personnel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConfigureEmploymentRoute = ConfigureEmploymentRouteImport.update({
   id: '/configure-employment',
   path: '/configure-employment',
@@ -632,6 +638,7 @@ export interface FileRoutesByFullPath {
   '/configure-compensation': typeof ConfigureCompensationRoute
   '/configure-education': typeof ConfigureEducationRoute
   '/configure-employment': typeof ConfigureEmploymentRoute
+  '/configure-personnel': typeof ConfigurePersonnelRoute
   '/configure-policies': typeof ConfigurePoliciesRoute
   '/configure-structure': typeof ConfigureStructureRoute
   '/configure-time': typeof ConfigureTimeRoute
@@ -733,6 +740,7 @@ export interface FileRoutesByTo {
   '/configure-compensation': typeof ConfigureCompensationRoute
   '/configure-education': typeof ConfigureEducationRoute
   '/configure-employment': typeof ConfigureEmploymentRoute
+  '/configure-personnel': typeof ConfigurePersonnelRoute
   '/configure-policies': typeof ConfigurePoliciesRoute
   '/configure-structure': typeof ConfigureStructureRoute
   '/configure-time': typeof ConfigureTimeRoute
@@ -835,6 +843,7 @@ export interface FileRoutesById {
   '/configure-compensation': typeof ConfigureCompensationRoute
   '/configure-education': typeof ConfigureEducationRoute
   '/configure-employment': typeof ConfigureEmploymentRoute
+  '/configure-personnel': typeof ConfigurePersonnelRoute
   '/configure-policies': typeof ConfigurePoliciesRoute
   '/configure-structure': typeof ConfigureStructureRoute
   '/configure-time': typeof ConfigureTimeRoute
@@ -938,6 +947,7 @@ export interface FileRouteTypes {
     | '/configure-compensation'
     | '/configure-education'
     | '/configure-employment'
+    | '/configure-personnel'
     | '/configure-policies'
     | '/configure-structure'
     | '/configure-time'
@@ -1039,6 +1049,7 @@ export interface FileRouteTypes {
     | '/configure-compensation'
     | '/configure-education'
     | '/configure-employment'
+    | '/configure-personnel'
     | '/configure-policies'
     | '/configure-structure'
     | '/configure-time'
@@ -1140,6 +1151,7 @@ export interface FileRouteTypes {
     | '/configure-compensation'
     | '/configure-education'
     | '/configure-employment'
+    | '/configure-personnel'
     | '/configure-policies'
     | '/configure-structure'
     | '/configure-time'
@@ -1242,6 +1254,7 @@ export interface RootRouteChildren {
   ConfigureCompensationRoute: typeof ConfigureCompensationRoute
   ConfigureEducationRoute: typeof ConfigureEducationRoute
   ConfigureEmploymentRoute: typeof ConfigureEmploymentRoute
+  ConfigurePersonnelRoute: typeof ConfigurePersonnelRoute
   ConfigurePoliciesRoute: typeof ConfigurePoliciesRoute
   ConfigureStructureRoute: typeof ConfigureStructureRoute
   ConfigureTimeRoute: typeof ConfigureTimeRoute
@@ -1866,6 +1879,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConfigurePoliciesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/configure-personnel': {
+      id: '/configure-personnel'
+      path: '/configure-personnel'
+      fullPath: '/configure-personnel'
+      preLoaderRoute: typeof ConfigurePersonnelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/configure-employment': {
       id: '/configure-employment'
       path: '/configure-employment'
@@ -2042,6 +2062,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConfigureCompensationRoute: ConfigureCompensationRoute,
   ConfigureEducationRoute: ConfigureEducationRoute,
   ConfigureEmploymentRoute: ConfigureEmploymentRoute,
+  ConfigurePersonnelRoute: ConfigurePersonnelRoute,
   ConfigurePoliciesRoute: ConfigurePoliciesRoute,
   ConfigureStructureRoute: ConfigureStructureRoute,
   ConfigureTimeRoute: ConfigureTimeRoute,

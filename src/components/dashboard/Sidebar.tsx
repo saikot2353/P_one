@@ -74,6 +74,7 @@ export const nav: NavItem[] = [
     icon: SlidersHorizontal,
     subitems: [
       { label: "Structure Setup", to: "/configure-structure" },
+      { label: "Personnel File Configure", to: "/configure-personnel" },
       { label: "Job & Employee Setup", to: "/configure-employment" },
       { label: "Shift & Time Rules", to: "/configure-time" },
       { label: "Allowances & Bonuses", to: "/configure-compensation" },

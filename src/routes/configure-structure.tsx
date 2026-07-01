@@ -1845,7 +1845,7 @@ function StructureSetupPage() {
 
         <div className="p-4 md:p-6 lg:p-8 space-y-2 max-w-[1800px] mx-auto w-full">
           {/* Breadcrumb & Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-border/30">
+          <div className="bg-card rounded-2xl border border-border/50 p-5 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground/60 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">
@@ -1870,7 +1870,7 @@ function StructureSetupPage() {
           </div>
 
           {/* Horizontal Master Tabs */}
-          <div className="flex flex-wrap gap-2 pt-2 pb-4">
+          <div className="flex flex-wrap gap-2 pt-2 pb-5 border-b border-border/40 mb-4">
             {tabsList.map((tab) => {
               const TabIcon = tab.icon;
               const isActive = activeTab === tab.type;
@@ -1894,7 +1894,7 @@ function StructureSetupPage() {
           </div>
 
           {/* Search bar & Actions toolbar */}
-          <div className="flex flex-col md:flex-row gap-3 items-center justify-between pb-4">
+          <div className="bg-card rounded-2xl border border-border/50 p-4 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
             <div className="w-full md:w-80 h-10 px-3.5 rounded-lg border border-border/60 bg-muted/10 hover:bg-muted/20 focus-within:bg-background focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 transition-all flex items-center gap-2.5 shadow-sm">
               <Search className="size-4.5 text-muted-foreground/70" />
               <input

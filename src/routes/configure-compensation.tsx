@@ -1683,32 +1683,32 @@ function CompensationSetupPage() {
 
         <div className="p-4 md:p-6 lg:p-8 space-y-2 max-w-[1800px] mx-auto w-full">
           {/* Breadcrumb & Header */}
-          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-card rounded-2xl border border-border/50 p-5 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground/60 uppercase tracking-wider mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">
                   Home
                 </Link>
-                <ChevronRight className="size-3" />
+                <ChevronRight className="size-3.5" />
                 <span>Configure</span>
-                <ChevronRight className="size-3" />
-                <span className="text-primary font-black">Allowances & Bonuses</span>
+                <ChevronRight className="size-3.5" />
+                <span className="text-primary font-bold">Allowances & Bonuses</span>
               </div>
-              <h1 className="text-xl font-black tracking-tight flex items-center gap-2">
-                <Coins className="size-5.5 text-primary" />
+              <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+                <Coins className="size-6 text-primary" />
                 Compensation Configuration
               </h1>
             </div>
             <button
               onClick={() => openForm(null)}
-              className="h-10 px-5 rounded-lg bg-primary text-primary-foreground font-black text-xs hover:bg-primary/90 transition-all shadow-sm flex items-center justify-center gap-2 uppercase tracking-wide"
+              className="h-10 px-5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
             >
-              <Plus className="size-4 animate-bounce" /> Add New Record
+              <Plus className="size-4.5" /> Add New Record
             </button>
           </div>
 
           {/* Horizontal Master Tabs */}
-          <div className="flex flex-wrap gap-2 border-b border-border/50 pb-2">
+          <div className="flex flex-wrap gap-2 pt-2 pb-5 border-b border-border/40 mb-4">
             {tabsList.map((tab) => {
               const TabIcon = tab.icon;
               const isActive = activeTab === tab.type;
@@ -1721,8 +1721,8 @@ function CompensationSetupPage() {
                   }}
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all ${
                     isActive
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "bg-card border border-border/85 hover:bg-muted text-muted-foreground hover:text-foreground"
+                      ? "bg-primary text-primary-foreground font-semibold shadow-sm"
+                      : "bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground font-medium"
                   }`}
                 >
                   <TabIcon className="size-4" />
@@ -1733,36 +1733,36 @@ function CompensationSetupPage() {
           </div>
 
           {/* Search bar & Actions toolbar */}
-          <div className="bg-card rounded-lg border border-border/80 p-4 shadow-xs flex flex-col md:flex-row gap-3 items-center justify-between">
-            <div className="flex items-center gap-2 bg-muted/65 border border-border/40 rounded-lg px-3 py-1.5 w-full md:w-80">
-              <Search className="size-4 text-muted-foreground/70" />
+          <div className="bg-card rounded-2xl border border-border/50 p-4 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
+            <div className="w-full md:w-80 h-10 px-3.5 rounded-lg border border-border/60 bg-muted/10 hover:bg-muted/20 focus-within:bg-background focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 transition-all flex items-center gap-2.5 shadow-sm">
+              <Search className="size-4.5 text-muted-foreground/70" />
               <input
                 type="text"
                 placeholder={`Search ${tabsList.find((t) => t.type === activeTab)?.label}...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent border-0 outline-none text-xs w-full text-foreground placeholder:text-muted-foreground/60 font-semibold"
+                className="bg-transparent border-0 outline-none text-sm w-full text-foreground placeholder:text-muted-foreground/50 font-medium"
               />
             </div>
 
-            <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+            <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
               <button
                 onClick={() => toast.success("Exporting to Excel...")}
-                className="h-9.5 px-3 rounded-lg border border-border/60 hover:bg-muted font-bold text-xs text-muted-foreground flex items-center gap-1.5 transition-all uppercase"
+                className="h-10 px-4 rounded-xl border border-border/40 hover:bg-muted font-semibold text-xs text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors shadow-sm"
               >
-                <FileSpreadsheet className="size-4 text-emerald-600" /> EXCEL
+                <FileSpreadsheet className="size-4.5 text-emerald-600" /> Excel
               </button>
               <button
                 onClick={() => window.print()}
-                className="h-9.5 px-3 rounded-lg border border-border/60 hover:bg-muted font-bold text-xs text-muted-foreground flex items-center gap-1.5 transition-all uppercase"
+                className="h-10 px-4 rounded-xl border border-border/40 hover:bg-muted font-semibold text-xs text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors shadow-sm"
               >
-                <Printer className="size-4 text-blue-600" /> PRINT
+                <Printer className="size-4.5 text-blue-600" /> Print
               </button>
               <button
                 onClick={() => toast.success("Generating PDF...")}
-                className="h-9.5 px-3 rounded-lg border border-border/60 hover:bg-muted font-bold text-xs text-muted-foreground flex items-center gap-1.5 transition-all uppercase"
+                className="h-10 px-4 rounded-xl border border-border/40 hover:bg-muted font-semibold text-xs text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors shadow-sm"
               >
-                <FileText className="size-4 text-red-600" /> PDF
+                <FileText className="size-4.5 text-red-600" /> PDF
               </button>
             </div>
           </div>
@@ -1775,12 +1775,12 @@ function CompensationSetupPage() {
                   className="w-full text-left text-xs border-collapse whitespace-nowrap"
                   style={{ minWidth: "1800px" }}
                 >
-                  <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
-                    <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                  <thead className="bg-muted/30 text-muted-foreground uppercase font-semibold tracking-wider text-xs border-b border-border/40">
+                    <tr className="bg-transparent">
+                      <th className="sticky left-0 bg-transparent px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
                         SL
                       </th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
+                      <th className="sticky left-[60px] bg-transparent px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
                         Actions
                       </th>
                       <th className="px-5 py-4 w-[120px] text-center">Applicable From</th>
@@ -1813,7 +1813,7 @@ function CompensationSetupPage() {
                       .map((item, idx) => (
                         <tr
                           key={item.sl}
-                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                          className="group hover:bg-muted/50 transition-all"
                         >
                           <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
                             {idx + 1}
@@ -1903,12 +1903,12 @@ function CompensationSetupPage() {
                   className="w-full text-left text-xs border-collapse whitespace-nowrap"
                   style={{ minWidth: "1600px" }}
                 >
-                  <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
-                    <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                  <thead className="bg-muted/30 text-muted-foreground uppercase font-semibold tracking-wider text-xs border-b border-border/40">
+                    <tr className="bg-transparent">
+                      <th className="sticky left-0 bg-transparent px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
                         SL
                       </th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
+                      <th className="sticky left-[60px] bg-transparent px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
                         Actions
                       </th>
                       <th className="px-5 py-4 w-[150px]">Company</th>
@@ -1937,7 +1937,7 @@ function CompensationSetupPage() {
                       .map((item, idx) => (
                         <tr
                           key={item.sl}
-                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                          className="group hover:bg-muted/50 transition-all"
                         >
                           <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
                             {idx + 1}
@@ -2011,12 +2011,12 @@ function CompensationSetupPage() {
                   className="w-full text-left text-xs border-collapse whitespace-nowrap"
                   style={{ minWidth: "800px" }}
                 >
-                  <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
-                    <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                  <thead className="bg-muted/30 text-muted-foreground uppercase font-semibold tracking-wider text-xs border-b border-border/40">
+                    <tr className="bg-transparent">
+                      <th className="sticky left-0 bg-transparent px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
                         #
                       </th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
+                      <th className="sticky left-[60px] bg-transparent px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
                         Actions
                       </th>
                       <th className="px-5 py-4 min-w-[300px]">Employee Type</th>
@@ -2032,7 +2032,7 @@ function CompensationSetupPage() {
                       .map((item, idx) => (
                         <tr
                           key={item.sl}
-                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                          className="group hover:bg-muted/50 transition-all"
                         >
                           <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
                             {idx + 1}
@@ -2053,7 +2053,7 @@ function CompensationSetupPage() {
                               </button>
                             </div>
                           </td>
-                          <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">
+                          <td className="px-5 py-3.5 font-normal text-foreground font-medium">
                             {item.employeeType}
                           </td>
                           <td className="px-5 py-3.5 text-right font-normal font-mono">
@@ -2077,12 +2077,12 @@ function CompensationSetupPage() {
                   className="w-full text-left text-xs border-collapse whitespace-nowrap"
                   style={{ minWidth: "800px" }}
                 >
-                  <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
-                    <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                  <thead className="bg-muted/30 text-muted-foreground uppercase font-semibold tracking-wider text-xs border-b border-border/40">
+                    <tr className="bg-transparent">
+                      <th className="sticky left-0 bg-transparent px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
                         #
                       </th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
+                      <th className="sticky left-[60px] bg-transparent px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
                         Actions
                       </th>
                       <th className="px-5 py-4 min-w-[300px]">Employee Type</th>
@@ -2098,7 +2098,7 @@ function CompensationSetupPage() {
                       .map((item, idx) => (
                         <tr
                           key={item.sl}
-                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                          className="group hover:bg-muted/50 transition-all"
                         >
                           <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
                             {idx + 1}
@@ -2119,7 +2119,7 @@ function CompensationSetupPage() {
                               </button>
                             </div>
                           </td>
-                          <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">
+                          <td className="px-5 py-3.5 font-normal text-foreground font-medium">
                             {item.employeeType}
                           </td>
                           <td className="px-5 py-3.5 text-right font-normal font-mono">
@@ -2143,12 +2143,12 @@ function CompensationSetupPage() {
                   className="w-full text-left text-xs border-collapse whitespace-nowrap"
                   style={{ minWidth: "900px" }}
                 >
-                  <thead className="text-muted-foreground uppercase font-black tracking-wider text-[10px] border-b border-border/50">
-                    <tr className="bg-[#f8fafc] dark:bg-[#0f172a]">
-                      <th className="sticky left-0 bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                  <thead className="bg-muted/30 text-muted-foreground uppercase font-semibold tracking-wider text-xs border-b border-border/40">
+                    <tr className="bg-transparent">
+                      <th className="sticky left-0 bg-transparent px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
                         #
                       </th>
-                      <th className="sticky left-[60px] bg-[#f8fafc] dark:bg-[#0f172a] px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
+                      <th className="sticky left-[60px] bg-transparent px-5 py-4 w-[110px] text-center border-r border-border/30 z-20">
                         Actions
                       </th>
                       <th className="px-5 py-4 min-w-[180px]">Employee Type</th>
@@ -2169,7 +2169,7 @@ function CompensationSetupPage() {
                       .map((item, idx) => (
                         <tr
                           key={item.sl}
-                          className="group hover:bg-[#f1f5f9] dark:hover:bg-[#1c283d] transition-all"
+                          className="group hover:bg-muted/50 transition-all"
                         >
                           <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
                             {idx + 1}
@@ -2190,7 +2190,7 @@ function CompensationSetupPage() {
                               </button>
                             </div>
                           </td>
-                          <td className="px-5 py-3.5 font-normal text-slate-900 dark:text-slate-100">
+                          <td className="px-5 py-3.5 font-normal text-foreground font-medium">
                             {item.employeeType}
                           </td>
                           <td className="px-5 py-3.5 text-center font-normal font-mono">
@@ -2230,13 +2230,13 @@ function CompensationSetupPage() {
               className={`bg-card border border-border/80 w-full rounded-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 ${activeTab === "tiffin" ? "max-w-4xl" : "max-w-2xl"}`}
             >
               {/* Modal Header */}
-              <div className="px-6 py-4.5 border-b border-border/50 bg-[#f8fafc] dark:bg-[#0f172a] flex items-center justify-between">
+              <div className="px-6 py-4.5 border-b border-border/50 bg-transparent flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <div className="size-9 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
                     <Coins className="size-5" />
                   </div>
                   <div>
-                    <h2 className="text-base font-black tracking-tight text-foreground">
+                    <h2 className="text-lg font-bold tracking-tight text-foreground">
                       {editSl ? "Update" : "Create"}{" "}
                       {tabsList.find((t) => t.type === activeTab)?.label}
                     </h2>
@@ -2819,7 +2819,7 @@ function CompensationSetupPage() {
                 )}
 
                 {/* Modal Footer Actions */}
-                <div className="border-t border-border/50 pt-5 flex items-center justify-between gap-3 bg-[#f8fafc] dark:bg-[#0f172a] -mx-6 -mb-6 p-6">
+                <div className="border-t border-border/50 pt-5 flex items-center justify-between gap-3 bg-transparent -mx-6 -mb-6 p-6">
                   <button
                     type="button"
                     onClick={() => setIsFormOpen(false)}
