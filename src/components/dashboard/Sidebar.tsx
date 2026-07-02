@@ -31,6 +31,9 @@ import {
   HeartHandshake,
   Banknote,
   CheckCircle,
+  Blocks,
+  ArrowLeft,
+  MessageSquare,
 } from "lucide-react";
 
 export interface NestedItem {
@@ -60,6 +63,7 @@ export interface NavItem {
 
 export const nav: NavItem[] = [
   { label: "Dashboard", to: "/", icon: LayoutDashboard },
+  { label: "Messenger", to: "/messenger", icon: MessageSquare },
   {
     label: "SSP",
     icon: Briefcase,
@@ -456,19 +460,41 @@ export function Sidebar() {
 
   return (
     <aside className="hidden lg:flex w-64 h-screen sticky top-0 shrink-0 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300">
-      <div className="px-5 py-4 flex items-center gap-2.5 border-b border-sidebar-border/80">
-        <div className="size-8.5 rounded-xl bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center font-extrabold text-primary-foreground shadow-[0_4px_12px_oklch(0.48_0.19_255/0.25)] text-sm tracking-tight transition-transform duration-300 hover:rotate-6">
-          C
+      <Link
+        to="/module-selection"
+        className="px-5 py-4 flex items-center gap-2.5 border-b border-sidebar-border/80 group transition-all duration-300 hover:bg-sidebar-accent/30 cursor-pointer relative z-50"
+      >
+        {/* Beautiful Hover Tooltip */}
+        <div className="absolute left-[70px] top-[80%] opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 pointer-events-none z-50">
+          <div className="bg-primary text-primary-foreground text-[10px] font-bold px-2.5 py-1.5 rounded-lg shadow-xl flex items-center gap-1.5 whitespace-nowrap">
+            <LayoutDashboard className="size-3" />
+            Switch to Another Module
+          </div>
         </div>
+
+        {/* 3D Flip Logo */}
+        <div className="relative size-8.5 rounded-xl text-sm tracking-tight [perspective:1000px]">
+          <div className="relative w-full h-full transition-transform duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+            {/* Front: Logo */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary-glow font-extrabold text-primary-foreground shadow-[0_4px_12px_oklch(0.48_0.19_255/0.25)] flex items-center justify-center rounded-xl [backface-visibility:hidden]">
+              C
+            </div>
+            {/* Back: Back Button */}
+            <div className="absolute inset-0 bg-sidebar-primary text-primary-foreground flex items-center justify-center rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden] shadow-md border-2 border-primary/20">
+              <ArrowLeft className="size-4.5" />
+            </div>
+          </div>
+        </div>
+        
         <div className="leading-tight">
-          <div className="font-extrabold tracking-tight text-[13px] text-sidebar-foreground">
+          <div className="font-extrabold tracking-tight text-[13px] text-sidebar-foreground group-hover:text-primary transition-colors duration-300">
             CRIPTON
           </div>
           <div className="text-[9px] uppercase tracking-[0.25em] font-bold text-sidebar-primary">
             HRIS
           </div>
         </div>
-      </div>
+      </Link>
       <nav
         ref={scrollRef}
         onScroll={handleScroll}
@@ -698,7 +724,7 @@ export function Sidebar() {
         <button
           onClick={() => {
             if (typeof window !== "undefined") {
-              localStorage.removeItem("cripton_logged_in");
+              localStorage.removeItem("cripton_logged_in_strict");
               window.location.href = "/login";
             }
           }}

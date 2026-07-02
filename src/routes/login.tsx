@@ -922,8 +922,19 @@ function LoginPage() {
   const handleLogin = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      const finalEmail = (email || "").trim() || "admin";
-      const finalPassword = password || "password123";
+      const finalEmail = (email || "").trim();
+      const finalPassword = password || "";
+
+      if (finalEmail !== "Shapno") {
+        toast.error("Invalid User ID! Access denied.");
+        return;
+      }
+      
+      if (finalPassword !== "87654321!") {
+        toast.error("Incorrect Password!");
+        return;
+      }
+
       setIsLoading(true);
 
       // Simulate network delay for premium visual load
@@ -998,7 +1009,7 @@ function LoginPage() {
     await new Promise((r) => setTimeout(r, 900));
     setIsLoading(false);
     if (typeof window !== "undefined") {
-      localStorage.setItem("cripton_logged_in", "true");
+      localStorage.setItem("cripton_logged_in_strict", "true");
     }
     navigate({ to: "/module-selection" });
   }, [selectedCompany, selectedSection, navigate]);

@@ -28,6 +28,7 @@ import {
   UserPlus,
   SlidersHorizontal,
   Briefcase,
+  Blocks,
 } from "lucide-react";
 import avatarImg from "./avatar.png";
 

@@ -45,6 +45,7 @@ import { Route as PayrollAdvanceRouteImport } from './routes/payroll-advance'
 import { Route as MyDashboardRouteImport } from './routes/my-dashboard'
 import { Route as MonthlySalaryProcessRouteImport } from './routes/monthly-salary-process'
 import { Route as ModuleSelectionRouteImport } from './routes/module-selection'
+import { Route as MessengerRouteImport } from './routes/messenger'
 import { Route as ManualAttendanceRouteImport } from './routes/manual-attendance'
 import { Route as ManageOvertimeRouteImport } from './routes/manage-overtime'
 import { Route as LoginRouteImport } from './routes/login'
@@ -294,6 +295,11 @@ const MonthlySalaryProcessRoute = MonthlySalaryProcessRouteImport.update({
 const ModuleSelectionRoute = ModuleSelectionRouteImport.update({
   id: '/module-selection',
   path: '/module-selection',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MessengerRoute = MessengerRouteImport.update({
+  id: '/messenger',
+  path: '/messenger',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ManualAttendanceRoute = ManualAttendanceRouteImport.update({
@@ -687,6 +693,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
+  '/messenger': typeof MessengerRoute
   '/module-selection': typeof ModuleSelectionRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
@@ -790,6 +797,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
+  '/messenger': typeof MessengerRoute
   '/module-selection': typeof ModuleSelectionRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
@@ -894,6 +902,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
+  '/messenger': typeof MessengerRoute
   '/module-selection': typeof ModuleSelectionRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
@@ -999,6 +1008,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
+    | '/messenger'
     | '/module-selection'
     | '/monthly-salary-process'
     | '/my-dashboard'
@@ -1102,6 +1112,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
+    | '/messenger'
     | '/module-selection'
     | '/monthly-salary-process'
     | '/my-dashboard'
@@ -1205,6 +1216,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
+    | '/messenger'
     | '/module-selection'
     | '/monthly-salary-process'
     | '/my-dashboard'
@@ -1309,6 +1321,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ManageOvertimeRoute: typeof ManageOvertimeRoute
   ManualAttendanceRoute: typeof ManualAttendanceRoute
+  MessengerRoute: typeof MessengerRoute
   ModuleSelectionRoute: typeof ModuleSelectionRoute
   MonthlySalaryProcessRoute: typeof MonthlySalaryProcessRoute
   MyDashboardRoute: typeof MyDashboardRoute
@@ -1603,6 +1616,13 @@ declare module '@tanstack/react-router' {
       path: '/module-selection'
       fullPath: '/module-selection'
       preLoaderRoute: typeof ModuleSelectionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/messenger': {
+      id: '/messenger'
+      path: '/messenger'
+      fullPath: '/messenger'
+      preLoaderRoute: typeof MessengerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/manual-attendance': {
@@ -2125,6 +2145,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ManageOvertimeRoute: ManageOvertimeRoute,
   ManualAttendanceRoute: ManualAttendanceRoute,
+  MessengerRoute: MessengerRoute,
   ModuleSelectionRoute: ModuleSelectionRoute,
   MonthlySalaryProcessRoute: MonthlySalaryProcessRoute,
   MyDashboardRoute: MyDashboardRoute,

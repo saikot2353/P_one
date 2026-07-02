@@ -7,8 +7,56 @@ import {
   GripVertical,
   LayoutDashboard,
   ChevronDown,
-  Search
+  Search,
+  Calendar,
+  Gift,
+  Briefcase,
+  ArrowRight,
+  Clock,
+  PieChart as PieChartIcon,
+  BarChart3,
+  TrendingUp,
+  FileCheck,
+  AlertCircle,
+  Users,
+  Phone,
+  Mail,
+  MoreHorizontal
 } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+
+const teamMembers = [
+  { id: '2024049326', name: 'Hanif Uddin', role: 'Sr. Executive', phone: '01963978074', email: 'hanif.inno@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2024049326' },
+  { id: '2026058726', name: 'Parvej Mahmud', role: 'Executive', phone: '01521205808', email: 'parvej.inno@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2026058726' },
+  { id: '2026058686', name: 'Md. Abdur Rahaman', role: 'Executive', phone: '01531959653', email: 'rahaman.inno@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2026058686' },
+  { id: '2023043910', name: 'Tahmid Afsar', role: 'Asst. Manager', phone: '01750021154', email: 'tahmid.bd@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2023043910' },
+  { id: '2025054609', name: 'Md Mahir Shahriyar', role: 'Jr. Executive', phone: '01713060427', email: '', image: 'https://i.pravatar.cc/150?u=2025054609' },
+  { id: '2023044078', name: 'Md. Anik Islam', role: 'Deputy Manager', phone: '01324726844', email: 'anik.ba@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2023044078' },
+  { id: '2024049166', name: 'MD Maimoon Hossain Shomoy', role: 'Sr. Executive', phone: '01796221964', email: 'shomoy.inno@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2024049166' },
+  { id: '2024051510', name: 'Md. Sadmanur Islam Shishir', role: 'Jr. Executive', phone: '01946432534', email: 'shishir.inno@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2024051510' },
+  { id: '2025053125', name: 'Al Riyad Karim', role: 'Sr. Executive', phone: '01732461622', email: '', image: 'https://i.pravatar.cc/150?u=2025053125' },
+  { id: '2025054707', name: 'Allama Bakhtiyar Nafis', role: 'Jr. Executive', phone: '01724654380', email: 'nafis.inno@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2025054707' },
+  { id: '2025054710', name: 'Raihan Jami Khan', role: 'Jr. Executive', phone: '01786076080', email: 'jami.inno@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2025054710' },
+  { id: '2026059418', name: 'Md Robayet Hasan Yeasin', role: 'Jr. Executive', phone: '01748570672', email: 'yeasin.inno@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2026059418' },
+  { id: '2026059427', name: 'Mir Md Moshiu Islam', role: 'Jr. Executive', phone: '01898899180', email: 'moshiu.inno@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2026059427' },
+  { id: '2026059573', name: 'Md. Piyash Hasan', role: 'Executive', phone: '01790800372', email: 'piyash.inno@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2026059573' },
+  { id: '2026060310', name: 'Md. Shahid Hasan', role: 'Sr. Executive', phone: '', email: '', image: 'https://i.pravatar.cc/150?u=2026060310' }
+];
+
+const attendanceData = [
+  { name: 'Present', value: 85, color: '#10b981' },
+  { name: 'Absent', value: 5, color: '#ef4444' },
+  { name: 'Leave', value: 10, color: '#f59e0b' },
+];
+
+const ontimeVsLateData = [
+  { month: 'Jan', onTime: 95, late: 12 },
+  { month: 'Feb', onTime: 98, late: 8 },
+  { month: 'Mar', onTime: 92, late: 15 },
+  { month: 'Apr', onTime: 99, late: 5 },
+  { month: 'May', onTime: 102, late: 10 },
+  { month: 'Jun', onTime: 94, late: 14 },
+];
 import { nav } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 
@@ -70,7 +118,7 @@ nav.forEach(item => {
 
 export default function MyDashboard() {
   const [layout, setLayout] = useState<LayoutSection[]>([]);
-  const [activeUrl, setActiveUrl] = useState<string | null>(null);
+  const [activeUrl, setActiveUrl] = useState<string | null>('__overview__');
   const [openSidebarSections, setOpenSidebarSections] = useState<Record<string, boolean>>({});
   const [openPoolGroups, setOpenPoolGroups] = useState<Record<string, boolean>>({});
   
@@ -254,9 +302,21 @@ export default function MyDashboard() {
           </div>
           
           <button
-            onClick={() => setActiveUrl(null)}
+            onClick={() => setActiveUrl('__overview__')}
+            className={`w-full group flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12px] font-semibold transition-all duration-200 mb-1 ${
+              activeUrl === '__overview__'
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            }`}
+          >
+            <LayoutDashboard className="size-4" />
+            <span>Dashboard Overview</span>
+          </button>
+          
+          <button
+            onClick={() => setActiveUrl('__config__')}
             className={`w-full group flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12px] font-semibold transition-all duration-200 ${
-              activeUrl === null
+              activeUrl === '__config__' || activeUrl === null
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
             }`}
@@ -313,16 +373,230 @@ export default function MyDashboard() {
       <main className="flex-1 min-w-0 flex flex-col relative overflow-hidden bg-muted/20">
         <Topbar />
 
-        {activeUrl ? (
-          /* Render Iframe of the module */
-          <div className="flex-1 w-full h-full p-2 bg-background">
-            <iframe 
-              src={`${activeUrl}?embed=true`} 
-              className="w-full h-full border-0 rounded-lg shadow-sm ring-1 ring-border"
-              title="Module View"
-            />
+        {activeUrl === '__overview__' ? (
+          /* Main Dashboard Overview Area */
+          <div className="flex-1 overflow-y-auto p-4 md:p-6 xl:p-8 space-y-6 bg-background">
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-2xl font-bold tracking-tight">Organization Overview</h1>
+              <button className="text-xs font-semibold px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition-opacity">
+                Download Report
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Left Column (Stats + Charts) */}
+              <div className="lg:col-span-2 space-y-6">
+                {/* Top Stats */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-5 rounded-2xl border border-border/80 bg-card shadow-sm">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <p className="text-sm font-medium mb-1 text-muted-foreground">Total Requisitions</p>
+                        <h4 className="text-3xl font-extrabold text-foreground">1,248</h4>
+                      </div>
+                      <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center">
+                        <FileCheck size={20} />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-medium">
+                      <span className="text-emerald-500 flex items-center gap-0.5"><TrendingUp size={12} /> +12.5%</span>
+                      <span className="text-muted-foreground/70">vs last month</span>
+                    </div>
+                  </div>
+                  
+                  <div className="p-5 rounded-2xl border border-border/80 bg-card shadow-sm">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <p className="text-sm font-medium mb-1 text-muted-foreground">Pending Requisitions</p>
+                        <h4 className="text-3xl font-extrabold text-amber-500">42</h4>
+                      </div>
+                      <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
+                        <AlertCircle size={20} />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-medium">
+                      <span className="text-rose-500 flex items-center gap-0.5"><TrendingUp size={12} /> +4.2%</span>
+                      <span className="text-muted-foreground/70">requires action</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Charts Row */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Bar Chart */}
+                  <div className="p-5 rounded-2xl border border-border/80 bg-card shadow-sm flex flex-col">
+                    <div className="flex items-center justify-between mb-6">
+                      <h4 className="font-bold text-sm flex items-center gap-2 text-foreground"><BarChart3 size={16} className="text-indigo-500"/> Ontime vs Late</h4>
+                    </div>
+                    <div className="h-48 w-full mt-auto text-xs">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={ontimeVsLateData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                          <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} dy={10} />
+                          <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
+                          <RechartsTooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                          <Bar dataKey="onTime" name="On Time" fill="#10b981" radius={[4, 4, 0, 0]} barSize={12} />
+                          <Bar dataKey="late" name="Late" fill="#ef4444" radius={[4, 4, 0, 0]} barSize={12} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  {/* Pie Chart */}
+                  <div className="p-5 rounded-2xl border border-border/80 bg-card shadow-sm flex flex-col">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="font-bold text-sm flex items-center gap-2 text-foreground"><PieChartIcon size={16} className="text-purple-500"/> Attendance Summary</h4>
+                    </div>
+                    <div className="h-48 w-full mt-auto flex items-center justify-center relative text-xs">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={attendanceData}
+                            innerRadius={50}
+                            outerRadius={70}
+                            paddingAngle={5}
+                            dataKey="value"
+                            stroke="none"
+                          >
+                            {attendanceData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <RechartsTooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                        <span className="text-2xl font-extrabold text-foreground">85%</span>
+                        <span className="text-[9px] uppercase tracking-wider font-bold text-muted-foreground">Present</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column (Upcoming Events) */}
+              <div className="p-5 rounded-2xl border border-border/80 bg-card shadow-sm flex flex-col">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h4 className="font-bold text-sm text-foreground">Upcoming</h4>
+                    <p className="text-[10px] mt-0.5 text-muted-foreground">Events & milestones this week</p>
+                  </div>
+                  <button className="text-[10px] font-bold flex items-center gap-1 text-primary hover:text-primary/80 transition-colors">
+                    Calendar <ArrowRight size={12} />
+                  </button>
+                </div>
+
+                <div className="space-y-4 flex-1">
+                  {/* Event 1 */}
+                  <div className="flex items-start gap-3 group">
+                    <div className="mt-0.5 p-2 rounded-lg bg-rose-500/10 text-rose-500">
+                      <Gift size={16} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <h5 className="font-semibold text-sm text-foreground group-hover:text-rose-500 transition-colors">Anika Mehta's birthday</h5>
+                        <button className="text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground">View</button>
+                      </div>
+                      <p className="text-xs font-medium mt-0.5 text-muted-foreground">Today</p>
+                    </div>
+                  </div>
+                  
+                  {/* Event 2 */}
+                  <div className="flex items-start gap-3 group">
+                    <div className="mt-0.5 p-2 rounded-lg bg-amber-500/10 text-amber-500">
+                      <Briefcase size={16} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <h5 className="font-semibold text-sm text-foreground group-hover:text-amber-500 transition-colors">5 yrs — Jordan Park</h5>
+                        <button className="text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground">View</button>
+                      </div>
+                      <p className="text-xs font-medium mt-0.5 text-muted-foreground">Tomorrow</p>
+                    </div>
+                  </div>
+
+                  {/* Event 3 */}
+                  <div className="flex items-start gap-3 group">
+                    <div className="mt-0.5 p-2 rounded-lg bg-blue-500/10 text-blue-500">
+                      <Users size={16} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <h5 className="font-semibold text-sm text-foreground group-hover:text-blue-500 transition-colors">Interview · Senior PM</h5>
+                        <button className="text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground">View</button>
+                      </div>
+                      <p className="text-xs font-medium mt-0.5 text-muted-foreground">Jun 11, 2:00 PM</p>
+                    </div>
+                  </div>
+
+                  {/* Event 4 */}
+                  <div className="flex items-start gap-3 group">
+                    <div className="mt-0.5 p-2 rounded-lg bg-purple-500/10 text-purple-500">
+                      <Calendar size={16} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <h5 className="font-semibold text-sm text-foreground group-hover:text-purple-500 transition-colors">All-hands meeting</h5>
+                      </div>
+                      <p className="text-xs font-medium mt-0.5 text-muted-foreground">Jun 14, 10:00 AM</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <button className="w-full mt-4 py-2 text-xs font-bold rounded-lg border border-border bg-muted/50 hover:bg-muted text-foreground transition-colors">
+                  View Full Calendar
+                </button>
+              </div>
+            </div>
+
+            {/* My Team Members Section */}
+            <div className="mt-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold tracking-tight text-foreground">My Team Members</h2>
+                <button className="text-xs font-semibold px-4 py-2 rounded-lg border border-border bg-card hover:bg-muted text-foreground transition-colors">
+                  View All
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                {teamMembers.map(member => (
+                  <div key={member.id} className="p-3 rounded-xl border border-border/60 bg-card shadow-xs hover:shadow-sm hover:border-primary/30 transition-all group flex items-center gap-3">
+                    <div className="relative shrink-0">
+                      <img 
+                        src={member.image} 
+                        alt={member.name} 
+                        className="w-10 h-10 rounded-full object-cover border-2 border-background shadow-xs"
+                      />
+                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-[1.5px] border-background rounded-full"></span>
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-foreground text-[13px] truncate group-hover:text-primary transition-colors">{member.name}</h4>
+                      <p className="text-[10px] text-muted-foreground font-medium truncate">{member.role} <span className="opacity-50 mx-0.5">•</span> {member.id}</p>
+                      <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-1 truncate">
+                        <Phone size={10} className="text-primary/70" /> 
+                        {member.phone || 'N/A'}
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center gap-1 shrink-0">
+                      {member.email ? (
+                        <a href={`mailto:${member.email}`} title="Send Email" className="p-1.5 rounded-md bg-muted/50 hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors">
+                          <Mail size={14} />
+                        </a>
+                      ) : (
+                        <div className="p-1.5 rounded-md bg-transparent text-muted-foreground/20 cursor-not-allowed">
+                          <Mail size={14} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
           </div>
-        ) : (
+        ) : activeUrl === '__config__' || activeUrl === null ? (
           /* Main Configuration Content Area */
           <div className="flex-1 overflow-y-auto p-4 md:p-6 xl:p-8 space-y-6">
             <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -497,6 +771,15 @@ export default function MyDashboard() {
                 )}
               </div>
             </div>
+          </div>
+        ) : (
+          /* Render Iframe of the module */
+          <div className="flex-1 w-full h-full p-2 bg-background">
+            <iframe 
+              src={`${activeUrl}?embed=true`} 
+              className="w-full h-full border-0 rounded-lg shadow-sm ring-1 ring-border"
+              title="Module View"
+            />
           </div>
         )}
       </main>

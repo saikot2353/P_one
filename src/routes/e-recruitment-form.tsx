@@ -13,7 +13,6 @@ import {
   Camera,
   Upload,
   Trash2,
-  Copy,
   CheckCircle2,
   Info,
   Contact2,
@@ -1205,7 +1204,6 @@ function ERecruitmentForm() {
                   onChange={(e) => setCopyAddress(e.target.checked)}
                   className="size-3.5 accent-primary cursor-pointer rounded"
                 />
-                <Copy className="size-3 text-muted-foreground" />
                 <span className="text-[10.5px] text-foreground font-bold whitespace-nowrap">
                   Same as Present Address
                 </span>

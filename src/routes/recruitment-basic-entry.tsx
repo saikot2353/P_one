@@ -12,7 +12,6 @@ import {
   Camera,
   Upload,
   Trash2,
-  Copy,
   CheckCircle2,
   Info,
   Contact2,
@@ -601,12 +600,11 @@ function RecruitmentBasicEntry() {
               <label className="flex items-center gap-2 cursor-pointer bg-card hover:bg-muted border border-border/80 rounded-xl px-3.5 py-1.5 transition-all shadow-2xs">
                 <input
                   type="checkbox"
+                  className="size-3 rounded border-gray-300 text-primary focus:ring-primary"
                   id="copyAddress"
                   checked={copyAddress}
                   onChange={(e) => setCopyAddress(e.target.checked)}
-                  className="size-3.5 accent-primary cursor-pointer rounded"
                 />
-                <Copy className="size-3 text-muted-foreground" />
                 <span className="text-[10.5px] text-foreground font-bold whitespace-nowrap">
                   Same as Present Address
                 </span>

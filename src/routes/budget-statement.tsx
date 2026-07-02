@@ -34,6 +34,7 @@ export const Route = createFileRoute("/budget-statement")({
 });
 
 interface StatementRecord {
+  year: string;
   sl: number;
   type: string;
   dept: string;
@@ -54,6 +55,7 @@ const mockStatementData: StatementRecord[] = [
     dept: "Fashion 1",
     section: "F-1 Sewing",
     designation: "Medical Asst.",
+    year: Math.random() > 0.5 ? "2026" : "2025",
     manpower: 1,
     budget: 0,
     requested: 0,
@@ -67,6 +69,7 @@ const mockStatementData: StatementRecord[] = [
     dept: "Fashion 2",
     section: "F-2 Sewing",
     designation: "Asst. Supervisor",
+    year: Math.random() > 0.5 ? "2026" : "2025",
     manpower: 1,
     budget: 0,
     requested: 0,
@@ -80,6 +83,7 @@ const mockStatementData: StatementRecord[] = [
     dept: "Fashion 2",
     section: "F-2 Sewing",
     designation: "Supervisor",
+    year: Math.random() > 0.5 ? "2026" : "2025",
     manpower: 1,
     budget: 0,
     requested: 0,
@@ -93,6 +97,7 @@ const mockStatementData: StatementRecord[] = [
     dept: "Fashion-3",
     section: "F-3 Sewing",
     designation: "Supervisor",
+    year: Math.random() > 0.5 ? "2026" : "2025",
     manpower: 2,
     budget: 0,
     requested: 0,
@@ -106,6 +111,7 @@ const mockStatementData: StatementRecord[] = [
     dept: "Fashion 1",
     section: "F-1 Finishing",
     designation: "Folding Man",
+    year: Math.random() > 0.5 ? "2026" : "2025",
     manpower: 3,
     budget: 0,
     requested: 0,
@@ -119,6 +125,7 @@ const mockStatementData: StatementRecord[] = [
     dept: "Fashion 1",
     section: "F-1 Finishing",
     designation: "Iron Man",
+    year: Math.random() > 0.5 ? "2026" : "2025",
     manpower: 4,
     budget: 0,
     requested: 0,
@@ -132,6 +139,7 @@ const mockStatementData: StatementRecord[] = [
     dept: "Fashion 1",
     section: "F-1 Finishing",
     designation: "Jr. Folding Man",
+    year: Math.random() > 0.5 ? "2026" : "2025",
     manpower: 1,
     budget: 0,
     requested: 0,
@@ -145,6 +153,7 @@ const mockStatementData: StatementRecord[] = [
     dept: "Fashion 1",
     section: "F-1 Sewing",
     designation: "Jr. Operator",
+    year: Math.random() > 0.5 ? "2026" : "2025",
     manpower: 1,
     budget: 0,
     requested: 0,
@@ -158,6 +167,7 @@ const mockStatementData: StatementRecord[] = [
     dept: "Fashion 1",
     section: "F-1 Sewing",
     designation: "Operator",
+    year: Math.random() > 0.5 ? "2026" : "2025",
     manpower: 25,
     budget: 0,
     requested: 0,
@@ -171,6 +181,7 @@ const mockStatementData: StatementRecord[] = [
     dept: "Fashion 2",
     section: "F-2 Finishing",
     designation: "Folding Man",
+    year: Math.random() > 0.5 ? "2026" : "2025",
     manpower: 2,
     budget: 0,
     requested: 0,
@@ -184,6 +195,7 @@ const mockStatementData: StatementRecord[] = [
     dept: "Fashion 2",
     section: "F-2 Finishing",
     designation: "Iron Man",
+    year: Math.random() > 0.5 ? "2026" : "2025",
     manpower: 2,
     budget: 0,
     requested: 0,
@@ -197,6 +209,7 @@ const mockStatementData: StatementRecord[] = [
     dept: "Fashion 2",
     section: "F-2 Sewing",
     designation: "Folding Man",
+    year: Math.random() > 0.5 ? "2026" : "2025",
     manpower: 1,
     budget: 0,
     requested: 0,
@@ -210,6 +223,7 @@ const mockStatementData: StatementRecord[] = [
     dept: "Fashion 2",
     section: "F-2 Sewing",
     designation: "Jr. Operator",
+    year: Math.random() > 0.5 ? "2026" : "2025",
     manpower: 12,
     budget: 0,
     requested: 0,
@@ -225,12 +239,14 @@ function BudgetStatementPage() {
 
   // Filters state
   const [filterRegion, setFilterRegion] = useState("KAC Fashion- Factory");
+  const [filterYear, setFilterYear] = useState(new Date().getFullYear().toString());
   const [filterEmpType, setFilterEmpType] = useState("ALL");
   const [filterDept, setFilterDept] = useState("All Departments");
   const [filterSection, setFilterSection] = useState("All Sections");
   const [filterDesignation, setFilterDesignation] = useState("ALL");
 
   const [activeFilters, setActiveFilters] = useState({
+    year: new Date().getFullYear().toString(),
     region: "KAC Fashion- Factory",
     empType: "ALL",
     dept: "All Departments",
@@ -240,6 +256,7 @@ function BudgetStatementPage() {
 
   const handleSearchTrigger = () => {
     setActiveFilters({
+      year: filterYear,
       region: filterRegion,
       empType: filterEmpType,
       dept: filterDept,
@@ -251,6 +268,9 @@ function BudgetStatementPage() {
 
   const filteredData = useMemo(() => {
     return data.filter((item) => {
+      // Year Filter
+      if (activeFilters.year !== "ALL" && item.year !== activeFilters.year) return false;
+
       // 1. Employee Type Filter
       if (activeFilters.empType !== "ALL" && item.type !== activeFilters.empType) return false;
 
@@ -340,7 +360,25 @@ function BudgetStatementPage() {
           </div>
 
           {/* Region and Filters bar (Top Block - matching screenshot 1/3) */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs grid grid-cols-2 md:grid-cols-5 xl:grid-cols-6 gap-3.5 items-end">
+          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3.5 items-end">
+            
+            {/* Year */}
+            <div className="space-y-1.5">
+              <label className="text-[9.5px] font-extrabold uppercase text-muted-foreground tracking-wider block">
+                Year
+              </label>
+              <select
+                value={filterYear}
+                onChange={(e) => setFilterYear(e.target.value)}
+                className="w-full h-8.5 px-2.5 rounded-lg bg-muted border border-border/40 text-xs font-bold outline-none cursor-pointer"
+              >
+                <option value="ALL">All Years</option>
+                <option value="2026">2026</option>
+                <option value="2025">2025</option>
+                <option value="2024">2024</option>
+              </select>
+            </div>
+
             {/* Region */}
             <div className="space-y-1.5">
               <label className="text-[9.5px] font-extrabold uppercase text-muted-foreground tracking-wider block">
