@@ -62,7 +62,8 @@ export interface NavItem {
 }
 
 export const nav: NavItem[] = [
-  { label: "Dashboard", to: "/", icon: LayoutDashboard },
+  { label: "Management Dashboard", to: "/", icon: LayoutDashboard },
+  { label: "My Dashboard", to: "/my-dashboard", icon: LayoutDashboard },
   { label: "Messenger", to: "/messenger", icon: MessageSquare },
   {
     label: "SSP",
