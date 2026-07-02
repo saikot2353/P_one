@@ -30,7 +30,6 @@ import {
   Briefcase,
   Blocks,
 } from "lucide-react";
-import avatarImg from "./avatar.png";
 
 interface SearchMenuLink {
   label: string;
@@ -955,7 +954,7 @@ export function Topbar() {
             </div>
           </div>
           <div className="size-9 rounded-full overflow-hidden border border-border/80 shadow-2xs flex-shrink-0 bg-muted">
-            <img src={avatarImg} alt="Tahmid Afsar" className="size-full object-cover" />
+            <img src="https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg" alt="Tahmid Afsar" className="size-full object-cover" />
           </div>
         </div>
       </div>

@@ -34,6 +34,7 @@ import {
   Blocks,
   ArrowLeft,
   MessageSquare,
+  BookUser,
 } from "lucide-react";
 
 export interface NestedItem {
@@ -62,9 +63,9 @@ export interface NavItem {
 }
 
 export const nav: NavItem[] = [
-  { label: "Management Dashboard", to: "/", icon: LayoutDashboard },
-  { label: "My Dashboard", to: "/my-dashboard", icon: LayoutDashboard },
+  { label: "Dashboard", to: "/", icon: LayoutDashboard },
   { label: "Messenger", to: "/messenger", icon: MessageSquare },
+  { label: "Phonebook", to: "/phonebook", icon: BookUser },
   {
     label: "SSP",
     icon: Briefcase,

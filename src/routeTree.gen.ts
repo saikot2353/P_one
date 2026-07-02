@@ -33,6 +33,7 @@ import { Route as RecruitmentBasicInfoListRouteImport } from './routes/recruitme
 import { Route as RecruitmentBasicEntryRouteImport } from './routes/recruitment-basic-entry'
 import { Route as RecruitmentAssessmentListRouteImport } from './routes/recruitment-assessment-list'
 import { Route as ProposeIncrementRouteImport } from './routes/propose-increment'
+import { Route as PhonebookRouteImport } from './routes/phonebook'
 import { Route as PersonnelListRouteImport } from './routes/personnel-list'
 import { Route as PersonnelApprovalRouteImport } from './routes/personnel-approval'
 import { Route as PermissionManagementRouteImport } from './routes/permission-management'
@@ -235,6 +236,11 @@ const RecruitmentAssessmentListRoute =
 const ProposeIncrementRoute = ProposeIncrementRouteImport.update({
   id: '/propose-increment',
   path: '/propose-increment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PhonebookRoute = PhonebookRouteImport.update({
+  id: '/phonebook',
+  path: '/phonebook',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PersonnelListRoute = PersonnelListRouteImport.update({
@@ -706,6 +712,7 @@ export interface FileRoutesByFullPath {
   '/permission-management': typeof PermissionManagementRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
   '/personnel-list': typeof PersonnelListRoute
+  '/phonebook': typeof PhonebookRoute
   '/propose-increment': typeof ProposeIncrementRoute
   '/recruitment-assessment-list': typeof RecruitmentAssessmentListRoute
   '/recruitment-basic-entry': typeof RecruitmentBasicEntryRoute
@@ -810,6 +817,7 @@ export interface FileRoutesByTo {
   '/permission-management': typeof PermissionManagementRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
   '/personnel-list': typeof PersonnelListRoute
+  '/phonebook': typeof PhonebookRoute
   '/propose-increment': typeof ProposeIncrementRoute
   '/recruitment-assessment-list': typeof RecruitmentAssessmentListRoute
   '/recruitment-basic-entry': typeof RecruitmentBasicEntryRoute
@@ -915,6 +923,7 @@ export interface FileRoutesById {
   '/permission-management': typeof PermissionManagementRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
   '/personnel-list': typeof PersonnelListRoute
+  '/phonebook': typeof PhonebookRoute
   '/propose-increment': typeof ProposeIncrementRoute
   '/recruitment-assessment-list': typeof RecruitmentAssessmentListRoute
   '/recruitment-basic-entry': typeof RecruitmentBasicEntryRoute
@@ -1021,6 +1030,7 @@ export interface FileRouteTypes {
     | '/permission-management'
     | '/personnel-approval'
     | '/personnel-list'
+    | '/phonebook'
     | '/propose-increment'
     | '/recruitment-assessment-list'
     | '/recruitment-basic-entry'
@@ -1125,6 +1135,7 @@ export interface FileRouteTypes {
     | '/permission-management'
     | '/personnel-approval'
     | '/personnel-list'
+    | '/phonebook'
     | '/propose-increment'
     | '/recruitment-assessment-list'
     | '/recruitment-basic-entry'
@@ -1229,6 +1240,7 @@ export interface FileRouteTypes {
     | '/permission-management'
     | '/personnel-approval'
     | '/personnel-list'
+    | '/phonebook'
     | '/propose-increment'
     | '/recruitment-assessment-list'
     | '/recruitment-basic-entry'
@@ -1334,6 +1346,7 @@ export interface RootRouteChildren {
   PermissionManagementRoute: typeof PermissionManagementRoute
   PersonnelApprovalRoute: typeof PersonnelApprovalRoute
   PersonnelListRoute: typeof PersonnelListRoute
+  PhonebookRoute: typeof PhonebookRoute
   ProposeIncrementRoute: typeof ProposeIncrementRoute
   RecruitmentAssessmentListRoute: typeof RecruitmentAssessmentListRoute
   RecruitmentBasicEntryRoute: typeof RecruitmentBasicEntryRoute
@@ -1532,6 +1545,13 @@ declare module '@tanstack/react-router' {
       path: '/propose-increment'
       fullPath: '/propose-increment'
       preLoaderRoute: typeof ProposeIncrementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/phonebook': {
+      id: '/phonebook'
+      path: '/phonebook'
+      fullPath: '/phonebook'
+      preLoaderRoute: typeof PhonebookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/personnel-list': {
@@ -2158,6 +2178,7 @@ const rootRouteChildren: RootRouteChildren = {
   PermissionManagementRoute: PermissionManagementRoute,
   PersonnelApprovalRoute: PersonnelApprovalRoute,
   PersonnelListRoute: PersonnelListRoute,
+  PhonebookRoute: PhonebookRoute,
   ProposeIncrementRoute: ProposeIncrementRoute,
   RecruitmentAssessmentListRoute: RecruitmentAssessmentListRoute,
   RecruitmentBasicEntryRoute: RecruitmentBasicEntryRoute,

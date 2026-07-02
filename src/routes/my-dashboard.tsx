@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { 
-  Settings, 
-  Plus, 
-  Trash2, 
+import {
+  Settings,
+  Plus,
+  Trash2,
   GripVertical,
   LayoutDashboard,
   ChevronDown,
@@ -28,20 +28,20 @@ import {
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const teamMembers = [
-  { id: '2024049326', name: 'Hanif Uddin', role: 'Sr. Executive', phone: '01963978074', email: 'hanif.inno@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2024049326' },
-  { id: '2026058726', name: 'Parvej Mahmud', role: 'Executive', phone: '01521205808', email: 'parvej.inno@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2026058726' },
-  { id: '2026058686', name: 'Md. Abdur Rahaman', role: 'Executive', phone: '01531959653', email: 'rahaman.inno@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2026058686' },
-  { id: '2023043910', name: 'Tahmid Afsar', role: 'Asst. Manager', phone: '01750021154', email: 'tahmid.bd@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2023043910' },
-  { id: '2025054609', name: 'Md Mahir Shahriyar', role: 'Jr. Executive', phone: '01713060427', email: '', image: 'https://i.pravatar.cc/150?u=2025054609' },
-  { id: '2023044078', name: 'Md. Anik Islam', role: 'Deputy Manager', phone: '01324726844', email: 'anik.ba@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2023044078' },
-  { id: '2024049166', name: 'MD Maimoon Hossain Shomoy', role: 'Sr. Executive', phone: '01796221964', email: 'shomoy.inno@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2024049166' },
-  { id: '2024051510', name: 'Md. Sadmanur Islam Shishir', role: 'Jr. Executive', phone: '01946432534', email: 'shishir.inno@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2024051510' },
-  { id: '2025053125', name: 'Al Riyad Karim', role: 'Sr. Executive', phone: '01732461622', email: '', image: 'https://i.pravatar.cc/150?u=2025053125' },
-  { id: '2025054707', name: 'Allama Bakhtiyar Nafis', role: 'Jr. Executive', phone: '01724654380', email: 'nafis.inno@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2025054707' },
-  { id: '2025054710', name: 'Raihan Jami Khan', role: 'Jr. Executive', phone: '01786076080', email: 'jami.inno@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2025054710' },
-  { id: '2026059418', name: 'Md Robayet Hasan Yeasin', role: 'Jr. Executive', phone: '01748570672', email: 'yeasin.inno@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2026059418' },
-  { id: '2026059427', name: 'Mir Md Moshiu Islam', role: 'Jr. Executive', phone: '01898899180', email: 'moshiu.inno@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2026059427' },
-  { id: '2026059573', name: 'Md. Piyash Hasan', role: 'Executive', phone: '01790800372', email: 'piyash.inno@pakizasoftware.com', image: 'https://i.pravatar.cc/150?u=2026059573' },
+  { id: '2024049326', name: 'Hanif Uddin', role: 'Sr. Executive', phone: '01963978074', email: 'hanif.inno@pakizasoftware.com', image: 'https://bpm.pakizaknit.com/Photo/EmpPicture/9caa5b84-6645-47c9-a35f-906ec1002c4d.jpg' },
+  { id: '2026058726', name: 'Parvej Mahmud', role: 'Executive', phone: '01521205808', email: 'parvej.inno@pakizasoftware.com', image: 'https://bpm.pakizaknit.com/Photo/EmpPicture/b224da2f-32a6-4ab5-b98d-2fa9bddc2faa.jpg' },
+  { id: '2026058686', name: 'Md. Abdur Rahaman', role: 'Executive', phone: '01531959653', email: 'rahaman.inno@pakizasoftware.com', image: 'https://bpm.pakizaknit.com/Photo/EmpPicture/c32e2945-6433-43f7-835d-fd238617c955.jpg' },
+  { id: '2023043910', name: 'Tahmid Afsar', role: 'Asst. Manager', phone: '01750021154', email: 'tahmid.bd@pakizasoftware.com', image: 'https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg' },
+  { id: '2025054609', name: 'Md Mahir Shahriyar', role: 'Jr. Executive', phone: '01713060427', email: '', image: 'https://bpm.pakizaknit.com/Photo/EmpPicture/b314987a-a621-4906-9a64-2a18104da3e6.jpg' },
+  { id: '2023044078', name: 'Md. Anik Islam', role: 'Deputy Manager', phone: '01324726844', email: 'anik.ba@pakizasoftware.com', image: 'https://bpm.pakizaknit.com/Photo/EmpPicture/3bc63d43-b2f2-49aa-b0a2-1e7eda819a65.jpg' },
+  { id: '2024049166', name: 'MD Maimoon Hossain Shomoy', role: 'Sr. Executive', phone: '01796221964', email: 'shomoy.inno@pakizasoftware.com', image: 'https://bpm.pakizaknit.com/Photo/EmpPicture/988bc5ac-552c-48bd-9d6f-cc2329c56d08.jpg' },
+  { id: '2024051510', name: 'Md. Sadmanur Islam Shishir', role: 'Jr. Executive', phone: '01946432534', email: 'shishir.inno@pakizasoftware.com', image: 'https://bpm.pakizaknit.com/Photo/EmpPicture/e4668770-dddd-4026-b3e6-963fbeedb13a.jpg' },
+  { id: '2025053125', name: 'Al Riyad Karim', role: 'Sr. Executive', phone: '01732461622', email: '', image: 'https://bpm.pakizaknit.com/Photo/EmpPicture/7668c174-80e8-49bf-808f-5b6624c853a0.jpg' },
+  { id: '2025054707', name: 'Allama Bakhtiyar Nafis', role: 'Jr. Executive', phone: '01724654380', email: 'nafis.inno@pakizasoftware.com', image: 'https://bpm.pakizaknit.com/Photo/EmpPicture/abd4f21d-eb54-4cc6-a197-ca373e4693be.jpg' },
+  { id: '2025054710', name: 'Raihan Jami Khan', role: 'Jr. Executive', phone: '01786076080', email: 'jami.inno@pakizasoftware.com', image: 'https://bpm.pakizaknit.com/Photo/EmpPicture/93e35c4c-f827-4152-8faa-34ed422a1629.jpg' },
+  { id: '2026059418', name: 'Md Robayet Hasan Yeasin', role: 'Jr. Executive', phone: '01748570672', email: 'yeasin.inno@pakizasoftware.com', image: 'https://bpm.pakizaknit.com/Photo/EmpPicture/4e73fa2f-e1d4-4b6a-90f8-153d977f9e63.jpg' },
+  { id: '2026059427', name: 'Mir Md Moshiu Islam', role: 'Jr. Executive', phone: '01898899180', email: 'moshiu.inno@pakizasoftware.com', image: 'https://bpm.pakizaknit.com/Photo/EmpPicture/108e0e41-f8c9-439c-aa94-46a83b263b3a.jpg' },
+  { id: '2026059573', name: 'Md. Piyash Hasan', role: 'Executive', phone: '01790800372', email: 'piyash.inno@pakizasoftware.com', image: 'https://bpm.pakizaknit.com/Photo/EmpPicture/0fa2e575-f1e5-4490-9e5b-6b89d039ce10.jpg' },
   { id: '2026060310', name: 'Md. Shahid Hasan', role: 'Sr. Executive', phone: '', email: '', image: 'https://i.pravatar.cc/150?u=2026060310' }
 ];
 
@@ -123,11 +123,11 @@ export default function MyDashboard() {
   const [activeUrl, setActiveUrl] = useState<string | null>('__overview__');
   const [openSidebarSections, setOpenSidebarSections] = useState<Record<string, boolean>>({});
   const [openPoolGroups, setOpenPoolGroups] = useState<Record<string, boolean>>({});
-  
+
   const [newSectionName, setNewSectionName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedModule, setSelectedModule] = useState("All");
-  
+
   // Drag state
   const [draggedItemId, setDraggedItemId] = useState<string | null>(null);
   const [dragSource, setDragSource] = useState<string | null>(null); // 'pool' or sectionId
@@ -201,7 +201,7 @@ export default function MyDashboard() {
 
     if (dragSource === targetSectionId) {
       // Just reordering within same section - skipped for simple implementation
-      return; 
+      return;
     }
 
     let newLayout = [...layout];
@@ -242,7 +242,7 @@ export default function MyDashboard() {
     if (!draggedItemId || !dragSource) return;
 
     let newLayout = JSON.parse(JSON.stringify(layout)) as LayoutSection[]; // deep clone
-    
+
     // Remove from source
     if (dragSource !== 'pool') {
       const sourceSec = newLayout.find(s => s.id === dragSource);
@@ -297,31 +297,29 @@ export default function MyDashboard() {
             </div>
           </div>
         </div>
-        
+
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-none">
           <div className="px-2.5 pb-2 text-[9px] font-extrabold uppercase tracking-widest text-sidebar-foreground/45">
             Overview
           </div>
-          
+
           <button
             onClick={() => setActiveUrl('__overview__')}
-            className={`w-full group flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12px] font-semibold transition-all duration-200 mb-1 ${
-              activeUrl === '__overview__'
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-            }`}
+            className={`w-full group flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12px] font-semibold transition-all duration-200 mb-1 ${activeUrl === '__overview__'
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              }`}
           >
             <LayoutDashboard className="size-4" />
             <span>Dashboard Overview</span>
           </button>
-          
+
           <button
             onClick={() => setActiveUrl('__config__')}
-            className={`w-full group flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12px] font-semibold transition-all duration-200 ${
-              activeUrl === '__config__' || activeUrl === null
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-            }`}
+            className={`w-full group flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12px] font-semibold transition-all duration-200 ${activeUrl === '__config__' || activeUrl === null
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              }`}
           >
             <Settings className="size-4" />
             <span>Configuration Builder</span>
@@ -337,7 +335,7 @@ export default function MyDashboard() {
             return (
               <div key={section.id} className="mt-1">
                 <button
-                  onClick={() => setOpenSidebarSections(prev => ({...prev, [section.id]: !isOpen}))}
+                  onClick={() => setOpenSidebarSections(prev => ({ ...prev, [section.id]: !isOpen }))}
                   className="w-full group flex items-center justify-between px-3 py-2.5 rounded-lg text-[12px] font-semibold text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200"
                 >
                   <span>{section.name}</span>
@@ -353,11 +351,10 @@ export default function MyDashboard() {
                         <button
                           key={item.id}
                           onClick={() => setActiveUrl(item.to)}
-                          className={`w-full group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[11px] font-medium transition-all duration-200 ${
-                            activeUrl === item.to
-                              ? "bg-primary text-primary-foreground shadow-sm"
-                              : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                          }`}
+                          className={`w-full group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[11px] font-medium transition-all duration-200 ${activeUrl === item.to
+                            ? "bg-primary text-primary-foreground shadow-sm"
+                            : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                            }`}
                         >
                           <Icon className="size-3.5" />
                           <span>{item.name}</span>
@@ -372,26 +369,19 @@ export default function MyDashboard() {
         </nav>
       </aside>
 
-      <main className="flex-1 min-w-0 flex flex-col relative overflow-hidden bg-background">
-        {/* Animated Background Orbs */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-          <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-primary/10 blur-[120px] animate-pulse" style={{ animationDuration: '8s' }}></div>
-          <div className="absolute top-[20%] -right-[10%] w-[40%] h-[60%] rounded-full bg-blue-500/10 blur-[120px] animate-pulse" style={{ animationDuration: '12s' }}></div>
-          <div className="absolute -bottom-[20%] left-[20%] w-[60%] h-[50%] rounded-full bg-emerald-500/10 blur-[120px] animate-pulse" style={{ animationDuration: '10s' }}></div>
-        </div>
-
+      <main className="flex-1 min-w-0 flex flex-col relative overflow-hidden bg-muted/20">
         <Topbar />
 
         {activeUrl === '__overview__' ? (
           /* Main Dashboard Overview Area */
-          <div className="flex-1 overflow-y-auto p-4 md:p-6 xl:p-8 space-y-6 bg-transparent relative z-10">
+          <div className="flex-1 overflow-y-auto p-4 md:p-6 xl:p-8 space-y-6 bg-background">
             <div className="flex items-center justify-between mb-6">
               <h1 className="text-2xl font-bold tracking-tight">Organization Overview</h1>
               <button className="text-xs font-semibold px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition-opacity">
                 Download Report
               </button>
             </div>
-            
+
             {/* Top Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
               <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm">
@@ -409,7 +399,7 @@ export default function MyDashboard() {
                   <span className="text-muted-foreground/70">vs last month</span>
                 </div>
               </div>
-              
+
               <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm">
                 <div className="flex justify-between items-start mb-4">
                   <div>
@@ -439,8 +429,8 @@ export default function MyDashboard() {
                 </div>
                 <div className="flex items-center gap-2 text-xs font-medium">
                   <div className="flex -space-x-2">
-                    <img className="w-5 h-5 rounded-full border border-card" src="https://i.pravatar.cc/150?u=2024049326" alt="avatar" />
-                    <img className="w-5 h-5 rounded-full border border-card" src="https://i.pravatar.cc/150?u=2026058726" alt="avatar" />
+                    <img className="w-5 h-5 rounded-full border border-card" src="https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg" alt="avatar" />
+                    <img className="w-5 h-5 rounded-full border border-card" src="https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg" alt="avatar" />
                   </div>
                   <span className="text-muted-foreground/70 truncate">HR Dept & Management Group</span>
                 </div>
@@ -452,7 +442,7 @@ export default function MyDashboard() {
               {/* Bar Chart */}
               <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm flex flex-col">
                 <div className="flex items-center justify-between mb-6">
-                  <h4 className="font-bold text-sm flex items-center gap-2 text-foreground"><BarChart3 size={16} className="text-indigo-500"/> Ontime vs Late</h4>
+                  <h4 className="font-bold text-sm flex items-center gap-2 text-foreground"><BarChart3 size={16} className="text-indigo-500" /> Ontime vs Late</h4>
                 </div>
                 <div className="h-64 w-full mt-auto text-xs">
                   <ResponsiveContainer width="100%" height="100%">
@@ -471,7 +461,7 @@ export default function MyDashboard() {
               {/* Pie Chart */}
               <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm flex flex-col">
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-bold text-sm flex items-center gap-2 text-foreground"><PieChartIcon size={16} className="text-purple-500"/> Attendance Summary</h4>
+                  <h4 className="font-bold text-sm flex items-center gap-2 text-foreground"><PieChartIcon size={16} className="text-purple-500" /> Attendance Summary</h4>
                 </div>
                 <div className="h-64 w-full mt-auto flex items-center justify-center relative text-xs">
                   <ResponsiveContainer width="100%" height="100%">
@@ -500,7 +490,7 @@ export default function MyDashboard() {
             </div>
 
             {/* Widgets Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               {/* Upcoming Events */}
               <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm flex flex-col">
                 <div className="flex items-center justify-between mb-6">
@@ -526,7 +516,7 @@ export default function MyDashboard() {
                       <p className="text-xs font-medium mt-0.5 text-muted-foreground">Today</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start gap-3 group">
                     <div className="mt-0.5 p-2 rounded-lg bg-amber-500/10 text-amber-500">
                       <Briefcase size={16} />
@@ -565,7 +555,7 @@ export default function MyDashboard() {
                     </div>
                   </div>
                 </div>
-                
+
                 <button className="w-full mt-4 py-2 text-xs font-bold rounded-lg border border-border bg-muted/50 hover:bg-muted text-foreground transition-colors">
                   View Full Calendar
                 </button>
@@ -576,7 +566,7 @@ export default function MyDashboard() {
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="font-bold text-[13px] text-foreground">Leave Balance</h4>
                 </div>
-                
+
                 {/* Casual Leave */}
                 <div className="flex flex-col gap-2">
                   <div className="flex justify-between items-center">
@@ -591,9 +581,9 @@ export default function MyDashboard() {
                     <span>Enjoyed: <strong className="text-foreground text-[10px] ml-0.5">3</strong></span>
                   </div>
                 </div>
-                
+
                 <div className="h-px w-full bg-border/50 my-2"></div>
-                
+
                 {/* Sick Leave */}
                 <div className="flex flex-col gap-2">
                   <div className="flex justify-between items-center">
@@ -626,6 +616,81 @@ export default function MyDashboard() {
                   </div>
                 </div>
               </div>
+
+              {/* Recent Messages */}
+              <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm flex flex-col">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h4 className="font-bold text-sm text-foreground">Recent Messages</h4>
+                    <p className="text-[10px] mt-0.5 text-muted-foreground">Unread and latest conversations</p>
+                  </div>
+                  <button onClick={() => window.location.href = '/messenger'} className="text-[10px] font-bold flex items-center gap-1 text-primary hover:text-primary/80 transition-colors cursor-pointer">
+                    View All <ArrowRight size={12} />
+                  </button>
+                </div>
+
+                <div className="space-y-4 flex-1">
+                  <div className="flex items-start gap-3 group cursor-pointer" onClick={() => window.location.href = '/messenger'}>
+                    <div className="relative shrink-0">
+                      <div className="w-9 h-9 rounded-full bg-blue-500/10 text-blue-600 flex items-center justify-center border-2 border-background font-bold text-sm shadow-sm">HR</div>
+                      <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 border-2 border-background rounded-full animate-pulse shadow-sm"></span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start">
+                        <h5 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors truncate">HR Department</h5>
+                        <span className="text-[10px] font-bold text-primary">10:42 AM</span>
+                      </div>
+                      <p className="text-[11px] font-bold mt-0.5 text-foreground truncate">Sarah: Please review the updated policy document.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 group cursor-pointer" onClick={() => window.location.href = '/messenger'}>
+                    <div className="relative shrink-0">
+                      <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop" alt="user" className="w-9 h-9 rounded-full object-cover border-2 border-background shadow-sm" />
+                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-background rounded-full shadow-sm"></span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start">
+                        <h5 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors truncate">Michael Chen</h5>
+                        <span className="text-[10px] font-medium text-muted-foreground">Yesterday</span>
+                      </div>
+                      <p className="text-[11px] font-medium mt-0.5 text-muted-foreground truncate">Are we still on for the 3PM sync?</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 group cursor-pointer" onClick={() => window.location.href = '/messenger'}>
+                    <div className="relative shrink-0">
+                      <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop" alt="user" className="w-9 h-9 rounded-full object-cover border-2 border-background shadow-sm" />
+                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-amber-500 border-2 border-background rounded-full shadow-sm"></span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start">
+                        <h5 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors truncate">Alice Smith</h5>
+                        <span className="text-[10px] font-medium text-muted-foreground">Mon</span>
+                      </div>
+                      <p className="text-[11px] font-medium mt-0.5 text-muted-foreground truncate">Thanks for sending over the assets!</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3 group cursor-pointer" onClick={() => window.location.href = '/messenger'}>
+                    <div className="relative shrink-0">
+                      <div className="w-9 h-9 rounded-full bg-purple-500/10 text-purple-600 flex items-center justify-center border-2 border-background font-bold text-sm shadow-sm">IT</div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start">
+                        <h5 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors truncate">IT Support</h5>
+                        <span className="text-[10px] font-medium text-muted-foreground">Mon</span>
+                      </div>
+                      <p className="text-[11px] font-medium mt-0.5 text-muted-foreground truncate">Ticket #4042 has been marked resolved.</p>
+                    </div>
+                  </div>
+
+                </div>
+
+                <button onClick={() => window.location.href = '/messenger'} className="w-full mt-4 py-2 text-xs font-bold rounded-lg border border-border bg-primary text-primary-foreground hover:opacity-90 shadow-sm transition-opacity cursor-pointer">
+                  Open Messenger
+                </button>
+              </div>
             </div>
 
             {/* My Team Members Section */}
@@ -641,23 +706,23 @@ export default function MyDashboard() {
                 {teamMembers.map(member => (
                   <div key={member.id} className="p-3 rounded-xl border border-border/60 bg-card shadow-xs hover:shadow-sm hover:border-primary/30 transition-all group flex items-center gap-3">
                     <div className="relative shrink-0">
-                      <img 
-                        src={member.image} 
-                        alt={member.name} 
-                        className="w-10 h-10 rounded-full object-cover border-2 border-background shadow-xs"
+                      <img
+                        src={member.image}
+                        alt={member.name}
+                        className="w-10 h-10 rounded-full object-fill border-2 border-background shadow-xs"
                       />
                       <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-[1.5px] border-background rounded-full"></span>
                     </div>
-                    
+
                     <div className="flex-1 min-w-0">
                       <h4 className="font-bold text-foreground text-[13px] truncate group-hover:text-primary transition-colors">{member.name}</h4>
                       <p className="text-[10px] text-muted-foreground font-medium truncate">{member.role} <span className="opacity-50 mx-0.5">•</span> {member.id}</p>
                       <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-1 truncate">
-                        <Phone size={10} className="text-primary/70" /> 
+                        <Phone size={10} className="text-primary/70" />
                         {member.phone || 'N/A'}
                       </p>
                     </div>
-                    
+
                     <div className="flex items-center gap-1 shrink-0">
                       {member.email ? (
                         <a href={`mailto:${member.email}`} title="Send Email" className="p-1.5 rounded-md bg-muted/50 hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors">
@@ -673,7 +738,7 @@ export default function MyDashboard() {
                 ))}
               </div>
             </div>
-            
+
           </div>
         ) : activeUrl === '__config__' || activeUrl === null ? (
           /* Main Configuration Content Area */
@@ -688,7 +753,7 @@ export default function MyDashboard() {
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <input 
+                <input
                   type="text"
                   placeholder="New Section Name"
                   value={newSectionName}
@@ -696,7 +761,7 @@ export default function MyDashboard() {
                   onKeyDown={(e) => e.key === 'Enter' && addSection()}
                   className="h-9 px-3 text-sm rounded-lg border border-border/80 bg-background outline-none focus:border-primary"
                 />
-                <button 
+                <button
                   onClick={addSection}
                   className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 flex items-center gap-2"
                 >
@@ -706,9 +771,9 @@ export default function MyDashboard() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-              
+
               {/* Pool of Unassigned Items */}
-              <div 
+              <div
                 className="col-span-1 bg-card rounded-xl border border-border/80 p-0 shadow-sm h-[600px] flex flex-col overflow-hidden"
                 onDragOver={handleDragOver}
                 onDrop={handleDropOnPool}
@@ -718,9 +783,9 @@ export default function MyDashboard() {
                     <span>Available Menus</span>
                     <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">{filteredUnassignedItems.length}</span>
                   </h3>
-                  
+
                   <div className="flex gap-2">
-                    <select 
+                    <select
                       value={selectedModule}
                       onChange={(e) => setSelectedModule(e.target.value)}
                       className="w-1/3 h-9 px-2 text-xs rounded-lg border border-border/60 bg-background outline-none focus:border-primary/60 transition-colors cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[position:right_8px_center]"
@@ -732,7 +797,7 @@ export default function MyDashboard() {
                     </select>
                     <div className="relative flex-1">
                       <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
-                      <input 
+                      <input
                         type="text"
                         placeholder="Search menus..."
                         value={searchQuery}
@@ -742,28 +807,28 @@ export default function MyDashboard() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex-1 overflow-y-auto p-2 space-y-3 scrollbar-thin">
                   {Object.entries(groupedPool).map(([groupName, items]) => {
                     // Automatically open group if searching, otherwise use state
                     const isOpen = searchQuery ? true : openPoolGroups[groupName] !== false;
-                    
+
                     return (
                       <div key={groupName} className="rounded-lg border border-border/40 overflow-hidden">
                         <button
-                          onClick={() => setOpenPoolGroups(prev => ({...prev, [groupName]: !isOpen}))}
+                          onClick={() => setOpenPoolGroups(prev => ({ ...prev, [groupName]: !isOpen }))}
                           className="w-full flex items-center justify-between px-3 py-2 bg-muted/30 hover:bg-muted/50 transition-colors"
                         >
                           <span className="text-xs font-bold text-foreground/80">{groupName} <span className="text-muted-foreground font-medium ml-1">({items.length})</span></span>
                           <ChevronDown className={`size-3.5 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
                         </button>
-                        
+
                         {isOpen && (
                           <div className="p-2 space-y-1.5 bg-card">
                             {items.map(item => {
                               const Icon = item.icon;
                               return (
-                                <div 
+                                <div
                                   key={item.id}
                                   draggable
                                   onDragStart={(e) => handleDragStart(e, item.id, 'pool')}
@@ -781,7 +846,7 @@ export default function MyDashboard() {
                       </div>
                     );
                   })}
-                  
+
                   {Object.keys(groupedPool).length === 0 && (
                     <div className="h-full flex flex-col items-center justify-center p-8 text-center text-sm text-muted-foreground/60">
                       <Search className="size-8 text-muted-foreground/20 mb-2" />
@@ -801,22 +866,22 @@ export default function MyDashboard() {
                   </div>
                 ) : (
                   layout.map(section => (
-                    <div 
-                      key={section.id} 
+                    <div
+                      key={section.id}
                       className="bg-card rounded-xl border border-border/80 shadow-sm overflow-hidden"
                       onDragOver={handleDragOver}
                       onDrop={(e) => handleDropOnSection(e, section.id)}
                     >
                       <div className="bg-muted/40 px-4 py-3 flex items-center justify-between border-b border-border/60">
                         <h3 className="font-bold text-foreground">{section.name}</h3>
-                        <button 
+                        <button
                           onClick={() => deleteSection(section.id)}
                           className="text-muted-foreground hover:text-destructive transition-colors p-1"
                         >
                           <Trash2 size={16} />
                         </button>
                       </div>
-                      
+
                       <div className="p-3 min-h-[100px] flex flex-col gap-2">
                         {section.items.length === 0 ? (
                           <div className="flex-1 flex items-center justify-center text-xs text-muted-foreground/50 border-2 border-dashed border-border/50 rounded-lg">
@@ -828,7 +893,7 @@ export default function MyDashboard() {
                             if (!item) return null;
                             const Icon = item.icon;
                             return (
-                              <div 
+                              <div
                                 key={item.id}
                                 draggable
                                 onDragStart={(e) => handleDragStart(e, item.id, section.id)}
@@ -854,8 +919,8 @@ export default function MyDashboard() {
         ) : (
           /* Render Iframe of the module */
           <div className="flex-1 w-full h-full p-2 bg-background">
-            <iframe 
-              src={`${activeUrl}?embed=true`} 
+            <iframe
+              src={`${activeUrl}?embed=true`}
               className="w-full h-full border-0 rounded-lg shadow-sm ring-1 ring-border"
               title="Module View"
             />

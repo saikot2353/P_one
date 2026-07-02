@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   XCircle,
   Clock,
+  MessageCircle,
 } from "lucide-react";
 
 const requests = [
@@ -275,6 +276,88 @@ export function RecruitmentPipeline() {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+export function RecentMessages() {
+  return (
+    <div className="rounded-lg bg-card border border-border/70 p-4 shadow-xs transition-all duration-300 hover:shadow-md hover:border-border/95 relative group xl:col-span-1 flex flex-col">
+      <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary/10 via-primary/30 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h3 className="font-bold tracking-tight text-[13px] text-foreground">
+            Recent Messages
+          </h3>
+          <p className="text-xs text-muted-foreground/80 mt-0.5">
+            Active conversations
+          </p>
+        </div>
+        <button onClick={() => window.location.href = '/messenger'} className="text-xs font-semibold text-primary inline-flex items-center gap-1 hover:underline hover:opacity-90 transition-opacity">
+          Open <ArrowUpRight className="size-3.5" />
+        </button>
+      </div>
+
+      <ul className="space-y-2 flex-1">
+        <li
+          onClick={() => window.location.href = '/messenger'}
+          className="flex items-center gap-3 p-2 rounded-xl hover:bg-muted/50 transition-all duration-200 group/evt border border-transparent hover:border-border/40 cursor-pointer"
+        >
+          <div className="relative shrink-0">
+            <div className="size-8 rounded-lg grid place-items-center bg-blue-500/10 text-blue-600 font-bold text-[10px] shadow-2xs">
+              HR
+            </div>
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 border-[1.5px] border-background rounded-full animate-pulse shadow-sm"></span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex justify-between items-start">
+              <div className="text-[11px] font-semibold text-foreground truncate group-hover/evt:text-primary transition-colors">HR Department</div>
+              <span className="text-[9px] font-bold text-primary">10:42 AM</span>
+            </div>
+            <div className="text-[10px] text-foreground font-bold mt-0.5 truncate">
+              Sarah: Please review the policy.
+            </div>
+          </div>
+        </li>
+
+        <li
+          onClick={() => window.location.href = '/messenger'}
+          className="flex items-center gap-3 p-2 rounded-xl hover:bg-muted/50 transition-all duration-200 group/evt border border-transparent hover:border-border/40 cursor-pointer"
+        >
+          <div className="relative shrink-0">
+            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop" alt="user" className="size-8 rounded-lg object-cover shadow-2xs border border-background" />
+            <span className="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-emerald-500 border-[1.5px] border-background rounded-full shadow-sm"></span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex justify-between items-start">
+              <div className="text-[11px] font-semibold text-foreground truncate group-hover/evt:text-primary transition-colors">Michael Chen</div>
+              <span className="text-[9px] text-muted-foreground font-medium">Yesterday</span>
+            </div>
+            <div className="text-[10px] text-muted-foreground font-medium mt-0.5 truncate">
+              Are we still on for 3PM?
+            </div>
+          </div>
+        </li>
+
+        <li
+          onClick={() => window.location.href = '/messenger'}
+          className="flex items-center gap-3 p-2 rounded-xl hover:bg-muted/50 transition-all duration-200 group/evt border border-transparent hover:border-border/40 cursor-pointer"
+        >
+          <div className="relative shrink-0">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop" alt="user" className="size-8 rounded-lg object-cover shadow-2xs border border-background" />
+            <span className="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-amber-500 border-[1.5px] border-background rounded-full shadow-sm"></span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex justify-between items-start">
+              <div className="text-[11px] font-semibold text-foreground truncate group-hover/evt:text-primary transition-colors">Alice Smith</div>
+              <span className="text-[9px] text-muted-foreground font-medium">Mon</span>
+            </div>
+            <div className="text-[10px] text-muted-foreground font-medium mt-0.5 truncate">
+              Thanks for the update!
+            </div>
+          </div>
+        </li>
+      </ul>
     </div>
   );
 }
