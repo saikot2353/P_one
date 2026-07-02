@@ -372,12 +372,19 @@ export default function MyDashboard() {
         </nav>
       </aside>
 
-      <main className="flex-1 min-w-0 flex flex-col relative overflow-hidden bg-muted/20">
+      <main className="flex-1 min-w-0 flex flex-col relative overflow-hidden bg-background">
+        {/* Animated Background Orbs */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+          <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-primary/10 blur-[120px] animate-pulse" style={{ animationDuration: '8s' }}></div>
+          <div className="absolute top-[20%] -right-[10%] w-[40%] h-[60%] rounded-full bg-blue-500/10 blur-[120px] animate-pulse" style={{ animationDuration: '12s' }}></div>
+          <div className="absolute -bottom-[20%] left-[20%] w-[60%] h-[50%] rounded-full bg-emerald-500/10 blur-[120px] animate-pulse" style={{ animationDuration: '10s' }}></div>
+        </div>
+
         <Topbar />
 
         {activeUrl === '__overview__' ? (
           /* Main Dashboard Overview Area */
-          <div className="flex-1 overflow-y-auto p-4 md:p-6 xl:p-8 space-y-6 bg-background">
+          <div className="flex-1 overflow-y-auto p-4 md:p-6 xl:p-8 space-y-6 bg-transparent relative z-10">
             <div className="flex items-center justify-between mb-6">
               <h1 className="text-2xl font-bold tracking-tight">Organization Overview</h1>
               <button className="text-xs font-semibold px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition-opacity">
