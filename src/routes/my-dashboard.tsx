@@ -21,7 +21,9 @@ import {
   Users,
   Phone,
   Mail,
-  MoreHorizontal
+  MoreHorizontal,
+  MessageCircle,
+  Coffee
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
@@ -383,99 +385,117 @@ export default function MyDashboard() {
               </button>
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Left Column (Stats + Charts) */}
-              <div className="lg:col-span-2 space-y-6">
-                {/* Top Stats */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-5 rounded-2xl border border-border/80 bg-card shadow-sm">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <p className="text-sm font-medium mb-1 text-muted-foreground">Total Requisitions</p>
-                        <h4 className="text-3xl font-extrabold text-foreground">1,248</h4>
-                      </div>
-                      <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center">
-                        <FileCheck size={20} />
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs font-medium">
-                      <span className="text-emerald-500 flex items-center gap-0.5"><TrendingUp size={12} /> +12.5%</span>
-                      <span className="text-muted-foreground/70">vs last month</span>
-                    </div>
+            {/* Top Stats */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+              <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <p className="text-sm font-medium mb-1 text-muted-foreground">Total Requisitions</p>
+                    <h4 className="text-3xl font-extrabold text-foreground">1,248</h4>
                   </div>
-                  
-                  <div className="p-5 rounded-2xl border border-border/80 bg-card shadow-sm">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <p className="text-sm font-medium mb-1 text-muted-foreground">Pending Requisitions</p>
-                        <h4 className="text-3xl font-extrabold text-amber-500">42</h4>
-                      </div>
-                      <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
-                        <AlertCircle size={20} />
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs font-medium">
-                      <span className="text-rose-500 flex items-center gap-0.5"><TrendingUp size={12} /> +4.2%</span>
-                      <span className="text-muted-foreground/70">requires action</span>
-                    </div>
+                  <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center">
+                    <FileCheck size={20} />
                   </div>
                 </div>
-
-                {/* Charts Row */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Bar Chart */}
-                  <div className="p-5 rounded-2xl border border-border/80 bg-card shadow-sm flex flex-col">
-                    <div className="flex items-center justify-between mb-6">
-                      <h4 className="font-bold text-sm flex items-center gap-2 text-foreground"><BarChart3 size={16} className="text-indigo-500"/> Ontime vs Late</h4>
-                    </div>
-                    <div className="h-48 w-full mt-auto text-xs">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={ontimeVsLateData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                          <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} dy={10} />
-                          <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
-                          <RechartsTooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                          <Bar dataKey="onTime" name="On Time" fill="#10b981" radius={[4, 4, 0, 0]} barSize={12} />
-                          <Bar dataKey="late" name="Late" fill="#ef4444" radius={[4, 4, 0, 0]} barSize={12} />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
+                <div className="flex items-center gap-2 text-xs font-medium">
+                  <span className="text-emerald-500 flex items-center gap-0.5"><TrendingUp size={12} /> +12.5%</span>
+                  <span className="text-muted-foreground/70">vs last month</span>
+                </div>
+              </div>
+              
+              <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <p className="text-sm font-medium mb-1 text-muted-foreground">Pending Requisitions</p>
+                    <h4 className="text-3xl font-extrabold text-amber-500">42</h4>
                   </div>
-
-                  {/* Pie Chart */}
-                  <div className="p-5 rounded-2xl border border-border/80 bg-card shadow-sm flex flex-col">
-                    <div className="flex items-center justify-between mb-4">
-                      <h4 className="font-bold text-sm flex items-center gap-2 text-foreground"><PieChartIcon size={16} className="text-purple-500"/> Attendance Summary</h4>
-                    </div>
-                    <div className="h-48 w-full mt-auto flex items-center justify-center relative text-xs">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={attendanceData}
-                            innerRadius={50}
-                            outerRadius={70}
-                            paddingAngle={5}
-                            dataKey="value"
-                            stroke="none"
-                          >
-                            {attendanceData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color} />
-                            ))}
-                          </Pie>
-                          <RechartsTooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                        </PieChart>
-                      </ResponsiveContainer>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                        <span className="text-2xl font-extrabold text-foreground">85%</span>
-                        <span className="text-[9px] uppercase tracking-wider font-bold text-muted-foreground">Present</span>
-                      </div>
-                    </div>
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
+                    <AlertCircle size={20} />
                   </div>
+                </div>
+                <div className="flex items-center gap-2 text-xs font-medium">
+                  <span className="text-rose-500 flex items-center gap-0.5"><TrendingUp size={12} /> +4.2%</span>
+                  <span className="text-muted-foreground/70">requires action</span>
                 </div>
               </div>
 
-              {/* Right Column (Upcoming Events) */}
-              <div className="p-5 rounded-2xl border border-border/80 bg-card shadow-sm flex flex-col">
+              <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm group hover:border-primary/30 transition-colors cursor-pointer" onClick={() => window.location.href = '/messenger'}>
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <p className="text-sm font-medium mb-1 text-muted-foreground group-hover:text-primary transition-colors">Unread Messages</p>
+                    <h4 className="text-3xl font-extrabold text-foreground">5 <span className="text-sm font-semibold text-muted-foreground">New</span></h4>
+                  </div>
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center relative">
+                    <MessageCircle size={20} />
+                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 border-2 border-card rounded-full animate-pulse"></span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-xs font-medium">
+                  <div className="flex -space-x-2">
+                    <img className="w-5 h-5 rounded-full border border-card" src="https://i.pravatar.cc/150?u=2024049326" alt="avatar" />
+                    <img className="w-5 h-5 rounded-full border border-card" src="https://i.pravatar.cc/150?u=2026058726" alt="avatar" />
+                  </div>
+                  <span className="text-muted-foreground/70 truncate">HR Dept & Management Group</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Charts Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+              {/* Bar Chart */}
+              <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm flex flex-col">
+                <div className="flex items-center justify-between mb-6">
+                  <h4 className="font-bold text-sm flex items-center gap-2 text-foreground"><BarChart3 size={16} className="text-indigo-500"/> Ontime vs Late</h4>
+                </div>
+                <div className="h-64 w-full mt-auto text-xs">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={ontimeVsLateData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                      <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} dy={10} />
+                      <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
+                      <RechartsTooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                      <Bar dataKey="onTime" name="On Time" fill="#10b981" radius={[4, 4, 0, 0]} barSize={12} />
+                      <Bar dataKey="late" name="Late" fill="#ef4444" radius={[4, 4, 0, 0]} barSize={12} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Pie Chart */}
+              <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm flex flex-col">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-bold text-sm flex items-center gap-2 text-foreground"><PieChartIcon size={16} className="text-purple-500"/> Attendance Summary</h4>
+                </div>
+                <div className="h-64 w-full mt-auto flex items-center justify-center relative text-xs">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={attendanceData}
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                        stroke="none"
+                      >
+                        {attendanceData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <RechartsTooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <span className="text-3xl font-extrabold text-foreground">85%</span>
+                    <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mt-1">Present</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Widgets Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Upcoming Events */}
+              <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm flex flex-col">
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <h4 className="font-bold text-sm text-foreground">Upcoming</h4>
@@ -487,7 +507,6 @@ export default function MyDashboard() {
                 </div>
 
                 <div className="space-y-4 flex-1">
-                  {/* Event 1 */}
                   <div className="flex items-start gap-3 group">
                     <div className="mt-0.5 p-2 rounded-lg bg-rose-500/10 text-rose-500">
                       <Gift size={16} />
@@ -501,7 +520,6 @@ export default function MyDashboard() {
                     </div>
                   </div>
                   
-                  {/* Event 2 */}
                   <div className="flex items-start gap-3 group">
                     <div className="mt-0.5 p-2 rounded-lg bg-amber-500/10 text-amber-500">
                       <Briefcase size={16} />
@@ -515,7 +533,6 @@ export default function MyDashboard() {
                     </div>
                   </div>
 
-                  {/* Event 3 */}
                   <div className="flex items-start gap-3 group">
                     <div className="mt-0.5 p-2 rounded-lg bg-blue-500/10 text-blue-500">
                       <Users size={16} />
@@ -529,7 +546,6 @@ export default function MyDashboard() {
                     </div>
                   </div>
 
-                  {/* Event 4 */}
                   <div className="flex items-start gap-3 group">
                     <div className="mt-0.5 p-2 rounded-lg bg-purple-500/10 text-purple-500">
                       <Calendar size={16} />
@@ -546,6 +562,62 @@ export default function MyDashboard() {
                 <button className="w-full mt-4 py-2 text-xs font-bold rounded-lg border border-border bg-muted/50 hover:bg-muted text-foreground transition-colors">
                   View Full Calendar
                 </button>
+              </div>
+
+              {/* Detailed Leave Balance */}
+              <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm flex flex-col justify-between">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-bold text-[13px] text-foreground">Leave Balance</h4>
+                </div>
+                
+                {/* Casual Leave */}
+                <div className="flex flex-col gap-2">
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-bold text-[11px] tracking-wider text-foreground">CASUAL LEAVE</h4>
+                    <span className="bg-blue-500/10 text-blue-600 font-bold text-[10px] px-2 py-0.5 rounded-full">7 left</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-muted/70 rounded-full overflow-hidden">
+                    <div className="h-full bg-blue-500 rounded-full" style={{ width: '70%' }}></div>
+                  </div>
+                  <div className="flex justify-between items-center text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
+                    <span>Assigned: <strong className="text-foreground text-[10px] ml-0.5">10</strong></span>
+                    <span>Enjoyed: <strong className="text-foreground text-[10px] ml-0.5">3</strong></span>
+                  </div>
+                </div>
+                
+                <div className="h-px w-full bg-border/50 my-2"></div>
+                
+                {/* Sick Leave */}
+                <div className="flex flex-col gap-2">
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-bold text-[11px] tracking-wider text-foreground">SICK LEAVE</h4>
+                    <span className="bg-emerald-500/10 text-emerald-600 font-bold text-[10px] px-2 py-0.5 rounded-full">12 left</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-muted/70 rounded-full overflow-hidden">
+                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: '14%' }}></div>
+                  </div>
+                  <div className="flex justify-between items-center text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
+                    <span>Assigned: <strong className="text-foreground text-[10px] ml-0.5">14</strong></span>
+                    <span>Enjoyed: <strong className="text-foreground text-[10px] ml-0.5">2</strong></span>
+                  </div>
+                </div>
+
+                <div className="h-px w-full bg-border/50 my-2"></div>
+
+                {/* Earned Leave */}
+                <div className="flex flex-col gap-2">
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-bold text-[11px] tracking-wider text-foreground">EARNED LEAVE</h4>
+                    <span className="bg-amber-500/10 text-amber-600 font-bold text-[10px] px-2 py-0.5 rounded-full">18 left</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-muted/70 rounded-full overflow-hidden">
+                    <div className="h-full bg-amber-500 rounded-full" style={{ width: '0%' }}></div>
+                  </div>
+                  <div className="flex justify-between items-center text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
+                    <span>Assigned: <strong className="text-foreground text-[10px] ml-0.5">18</strong></span>
+                    <span>Enjoyed: <strong className="text-foreground text-[10px] ml-0.5">0</strong></span>
+                  </div>
+                </div>
               </div>
             </div>
 
