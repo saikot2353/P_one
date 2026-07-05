@@ -1400,23 +1400,31 @@ function CompanySetupPage() {
     setMappings(mappingsData);
     localStorage.setItem("hris_company_mappings", JSON.stringify(mappingsData));
 
+    const assignDefaultCompany = (items: any[]) => {
+      const defaultCompany = orgsData[0]?.nameEng || "Pakiza Knit Composite Ltd";
+      return items.map((item) => ({
+        ...item,
+        companyName: item.companyName || defaultCompany,
+      }));
+    };
+
     // Departments
-    const departmentsData = safeParse("hris_departments", DEFAULT_DEPARTMENTS);
+    const departmentsData = assignDefaultCompany(safeParse("hris_departments", DEFAULT_DEPARTMENTS));
     setDepartments(departmentsData);
     localStorage.setItem("hris_departments", JSON.stringify(departmentsData));
 
     // Sections
-    const sectionsData = safeParse("hris_sections", DEFAULT_SECTIONS);
+    const sectionsData = assignDefaultCompany(safeParse("hris_sections", DEFAULT_SECTIONS));
     setSections(sectionsData);
     localStorage.setItem("hris_sections", JSON.stringify(sectionsData));
 
     // Units
-    const unitsData = safeParse("hris_units", DEFAULT_UNITS);
+    const unitsData = assignDefaultCompany(safeParse("hris_units", DEFAULT_UNITS));
     setUnits(unitsData);
     localStorage.setItem("hris_units", JSON.stringify(unitsData));
 
     // Lines
-    const linesData = safeParse("hris_lines", DEFAULT_LINES);
+    const linesData = assignDefaultCompany(safeParse("hris_lines", DEFAULT_LINES));
     setLines(linesData);
     localStorage.setItem("hris_lines", JSON.stringify(linesData));
 

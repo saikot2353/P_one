@@ -40,6 +40,7 @@ export function SearchableSelect({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
+          type="button"
           role="combobox"
           aria-expanded={open}
           className={cn(
@@ -55,7 +56,7 @@ export function SearchableSelect({
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-[var(--radix-popover-trigger-width)] p-0 shadow-lg border-border/50 rounded-xl overflow-hidden"
+        className="w-[var(--radix-popover-trigger-width)] p-0 shadow-lg border-border/50 rounded-xl overflow-hidden z-[100]"
         align="start"
       >
         <Command>
@@ -69,9 +70,12 @@ export function SearchableSelect({
                 <CommandItem
                   key={option.value}
                   value={option.label}
-                  onSelect={() => {
-                    onChange(option.value);
-                    setOpen(false);
+                  onSelect={(currentValue) => {
+                    const selected = options.find((o) => o.label.toLowerCase() === currentValue.toLowerCase());
+                    if (selected) {
+                      onChange(selected.value);
+                      setOpen(false);
+                    }
                   }}
                   className="text-xs rounded-lg cursor-pointer data-[selected=true]:bg-primary/10 data-[selected=true]:text-primary my-0.5"
                 >
