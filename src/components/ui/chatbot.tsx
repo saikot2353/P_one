@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Bot, X, Send, Sparkles, User, ExternalLink, Paperclip, Mic, Loader2 } from "lucide-react";
+import { Bot, BotMessageSquare, X, Send, Sparkles, User, ExternalLink, Paperclip, Mic, Loader2, ChevronRight } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 
 type Message = {
@@ -60,7 +60,12 @@ export function Chatbot() {
     let botMessage: Message = {
       id: Date.now().toString(),
       sender: "bot",
-      text: "I'm not quite sure how to help with that yet. You can ask me about navigating to modules like 'leave', 'attendance', 'payroll', or ask for an employee's information.",
+      text: (
+        <div className="flex flex-col gap-2">
+          <span>I'm not quite sure how to help with that yet.</span>
+          <span className="text-muted-foreground">You can ask me about navigating to modules like <strong>Leave</strong>, <strong>Attendance</strong>, <strong>Payroll</strong>, or ask for an employee's information.</span>
+        </div>
+      ),
     };
 
     // Navigation logic
@@ -69,15 +74,20 @@ export function Chatbot() {
         id: Date.now().toString(),
         sender: "bot",
         text: (
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col gap-3">
             <span>To apply for leave, you should navigate through the SSP menu. Here is the exact path:</span>
-            <div className="flex items-center flex-wrap gap-1.5 p-2 bg-background/50 rounded-lg border border-border/60 font-semibold text-[11px] tracking-wide shadow-inner text-primary">
-              <span className="bg-background px-1.5 py-0.5 rounded shadow-sm border border-border/50">SSP</span>
-              <span className="text-muted-foreground">&rsaquo;</span>
-              <span className="bg-background px-1.5 py-0.5 rounded shadow-sm border border-border/50">New Requisition</span>
-              <span className="text-muted-foreground">&rsaquo;</span>
-              <span className="bg-background px-1.5 py-0.5 rounded shadow-sm border border-border/50 text-foreground">Leave Application</span>
+            
+            <div className="flex flex-col gap-2 p-3 bg-primary/5 rounded-xl border border-primary/10 mt-1 mb-1">
+              <div className="text-[10px] font-bold text-primary/70 uppercase tracking-wider mb-0.5">Navigation Path</div>
+              <div className="flex flex-wrap items-center gap-2 text-[11.5px] font-semibold text-foreground">
+                <div className="flex items-center justify-center px-2.5 py-1.5 bg-background rounded-lg shadow-sm border border-border/60 text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground">SSP</div>
+                <ChevronRight className="size-3.5 text-muted-foreground/60 shrink-0" />
+                <div className="flex items-center justify-center px-2.5 py-1.5 bg-background rounded-lg shadow-sm border border-border/60 text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground">New Requisition</div>
+                <ChevronRight className="size-3.5 text-muted-foreground/60 shrink-0" />
+                <div className="flex items-center justify-center px-2.5 py-1.5 bg-primary text-primary-foreground rounded-lg shadow-sm">Leave Application</div>
+              </div>
             </div>
+
             <span>I can take you there directly right now!</span>
           </div>
         ),
@@ -87,7 +97,12 @@ export function Chatbot() {
       botMessage = {
         id: Date.now().toString(),
         sender: "bot",
-        text: "You can manage and apply for leave in the Leave module. Let me take you there!",
+        text: (
+          <div className="flex flex-col gap-1.5">
+            <span className="font-semibold text-foreground/90">Leave Management</span>
+            <span>You can manage and apply for leave in the Leave module. Let me take you there!</span>
+          </div>
+        ),
         action: { label: "Go to Leave Module", path: "/leave-management" },
       };
     } else if (text.includes("recruit") || text.includes("hire") || text.includes("apply")) {
@@ -124,7 +139,21 @@ export function Chatbot() {
       botMessage = {
         id: Date.now().toString(),
         sender: "bot",
-        text: "Here is the information I found:\n\n**John Doe** (ID: 10245)\nDepartment: Business Innovation\nDesignation: Senior PM\nGross Salary: $4,500/month\nStatus: Active",
+        text: (
+          <div className="flex flex-col gap-3">
+            <span>Here is the information I found:</span>
+            <div className="bg-background/40 p-3 rounded-lg border border-border/50 text-[11.5px] space-y-1.5 shadow-inner">
+              <div className="flex items-center justify-between border-b border-border/50 pb-1.5 mb-1.5">
+                <span className="font-bold text-foreground text-xs">John Doe</span>
+                <span className="px-1.5 py-0.5 bg-primary/10 text-primary rounded font-semibold text-[10px]">ID: 10245</span>
+              </div>
+              <div className="grid grid-cols-[80px_1fr] gap-2"><span className="text-muted-foreground">Department:</span> <span className="font-medium">Business Innovation</span></div>
+              <div className="grid grid-cols-[80px_1fr] gap-2"><span className="text-muted-foreground">Designation:</span> <span className="font-medium">Senior PM</span></div>
+              <div className="grid grid-cols-[80px_1fr] gap-2"><span className="text-muted-foreground">Gross Salary:</span> <span className="font-medium">$4,500/month</span></div>
+              <div className="grid grid-cols-[80px_1fr] gap-2"><span className="text-muted-foreground">Status:</span> <span className="text-emerald-500 font-semibold">Active</span></div>
+            </div>
+          </div>
+        ),
       };
     } else if (text.includes("hello") || text.includes("hi") || text.includes("hey")) {
       botMessage = {
@@ -155,7 +184,7 @@ export function Chatbot() {
           <div className="relative p-4 px-5 flex items-center justify-between text-white">
             <div className="flex items-center gap-3.5">
               <div className="relative p-2.5 bg-white/20 rounded-2xl backdrop-blur-md shadow-inner border border-white/10 group">
-                <Bot className="size-5.5 text-white drop-shadow-md group-hover:scale-110 transition-transform duration-300" />
+                <BotMessageSquare className="size-5.5 text-white drop-shadow-md group-hover:scale-110 transition-transform duration-300" />
                 <div className="absolute -bottom-1 -right-1 size-3.5 bg-emerald-400 border-2 border-indigo-600 rounded-full"></div>
               </div>
               <div className="flex flex-col">
@@ -200,7 +229,7 @@ export function Chatbot() {
                 )}
                 
                 <div
-                  className={`p-3.5 text-[13.5px] leading-relaxed shadow-sm relative group ${
+                  className={`p-3 text-[12.5px] leading-relaxed shadow-sm relative group ${
                     msg.sender === "user"
                       ? "bg-primary text-primary-foreground rounded-2xl rounded-br-sm shadow-primary/20"
                       : "bg-card border border-border/60 text-foreground rounded-2xl rounded-bl-sm shadow-black/5"
@@ -214,10 +243,10 @@ export function Chatbot() {
                         setIsOpen(false);
                         navigate({ to: msg.action!.path as any });
                       }}
-                      className="mt-3.5 w-full flex items-center justify-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary font-bold py-2.5 px-4 rounded-xl transition-all duration-300 border border-primary/20 text-xs cursor-pointer group/btn"
+                      className="mt-3 w-full flex items-center justify-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary font-bold py-2 px-4 rounded-xl transition-all duration-300 border border-primary/20 text-[11px] uppercase tracking-wide cursor-pointer group/btn"
                     >
                       {msg.action.label}
-                      <ExternalLink className="size-3.5 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+                      <ExternalLink className="size-3 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                     </button>
                   )}
                 </div>
@@ -231,10 +260,10 @@ export function Chatbot() {
                 <div className="shrink-0 size-7.5 rounded-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-blue-600 text-white shadow-md border border-indigo-200/20 mb-1">
                   <Bot className="size-4" />
                 </div>
-                <div className="p-4 bg-card border border-border/60 text-foreground rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-1.5 h-[42px]">
-                  <span className="size-1.5 bg-primary/60 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                  <span className="size-1.5 bg-primary/60 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                  <span className="size-1.5 bg-primary/60 rounded-full animate-bounce"></span>
+                <div className="p-3 bg-card border border-border/60 text-foreground rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-1.5 h-[38px]">
+                  <span className="size-1 bg-primary/60 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                  <span className="size-1 bg-primary/60 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                  <span className="size-1 bg-primary/60 rounded-full animate-bounce"></span>
                 </div>
               </div>
             </div>
@@ -294,7 +323,7 @@ export function Chatbot() {
         {isOpen ? (
           <X className="size-6 transition-transform duration-500 rotate-0" />
         ) : (
-          <Bot className="size-6 transition-transform duration-500 group-hover:scale-110" />
+          <BotMessageSquare className="size-6 transition-transform duration-500 group-hover:scale-110" />
         )}
       </button>
     </div>

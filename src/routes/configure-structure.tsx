@@ -32,18 +32,27 @@ export const Route = createFileRoute("/configure-structure")({
       {
         name: "description",
         content:
-          "Configure company structures, operating areas, departments, sections, units, lines, and mappings.",
+          "Configure company structures, operating areas, and mappings.",
       },
     ],
   }),
   component: StructureSetupPage,
 });
 
-type TabType = "company" | "area" | "mapping" | "department" | "section" | "unit" | "line";
+type TabType = "group" | "company" | "area" | "mapping";
 
 // ----------------------------------------------------
 // Interfaces
 // ----------------------------------------------------
+interface Group {
+  sl: number;
+  code: string;
+  nameEng: string;
+  nameBng: string;
+  shortName: string;
+  isActive: "Active" | "Inactive";
+}
+
 interface Organization {
   sl: number;
   code: string;
@@ -115,6 +124,17 @@ interface Line {
 // ----------------------------------------------------
 // Defaults
 // ----------------------------------------------------
+const DEFAULT_GROUPS: Group[] = [
+  {
+    sl: 1,
+    code: "GRP-01",
+    nameEng: "Pakiza Group",
+    nameBng: "পাকিজা গ্রুপ",
+    shortName: "PG",
+    isActive: "Active",
+  },
+];
+
 const DEFAULT_ORGS: Organization[] = [
   {
     sl: 1,
@@ -1326,10 +1346,11 @@ const DEFAULT_COMPANY_SETTINGS: CompanyBasicSettings = {
 };
 
 function StructureSetupPage() {
-  const [activeTab, setActiveTab] = useState<TabType>("company");
+  const [activeTab, setActiveTab] = useState<TabType>("group");
   const [searchQuery, setSearchQuery] = useState("");
 
   // Lists State
+  const [groups, setGroups] = useState<Group[]>([]);
   const [orgs, setOrgs] = useState<Organization[]>([]);
   const [areas, setAreas] = useState<Area[]>([]);
   const [mappings, setMappings] = useState<CompanyMapping[]>([]);
@@ -1379,6 +1400,11 @@ function StructureSetupPage() {
         return defaultVal;
       }
     };
+
+    // Groups
+    const groupsData = safeParse("hris_groups", DEFAULT_GROUPS);
+    setGroups(groupsData);
+    localStorage.setItem("hris_groups", JSON.stringify(groupsData));
 
     // Organizations
     const orgsData = safeParse("hris_organizations", DEFAULT_ORGS);
@@ -1437,6 +1463,13 @@ function StructureSetupPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editSl, setEditSl] = useState<number | null>(null);
 
+  // Form states - Group
+  const [groupCode, setGroupCode] = useState("");
+  const [groupNameEng, setGroupNameEng] = useState("");
+  const [groupNameBng, setGroupNameBng] = useState("");
+  const [groupShortName, setGroupShortName] = useState("");
+  const [groupIsActive, setGroupIsActive] = useState<"Active" | "Inactive">("Active");
+
   // Form states - Company
   const [orgCode, setOrgCode] = useState("");
   const [orgNameEng, setOrgNameEng] = useState("");
@@ -1492,7 +1525,14 @@ function StructureSetupPage() {
 
   const openForm = (sl: number | null) => {
     setEditSl(sl);
-    if (activeTab === "company") {
+    if (activeTab === "group") {
+      const item = groups.find((g) => g.sl === sl);
+      setGroupCode(item?.code || "");
+      setGroupNameEng(item?.nameEng || "");
+      setGroupNameBng(item?.nameBng || "");
+      setGroupShortName(item?.shortName || "");
+      setGroupIsActive(item?.isActive || "Active");
+    } else if (activeTab === "company") {
       const item = orgs.find((o) => o.sl === sl);
       setOrgCode(item?.code || "");
       setOrgNameEng(item?.nameEng || "");
@@ -1552,7 +1592,11 @@ function StructureSetupPage() {
   const handleDelete = (sl: number) => {
     if (!confirm("Are you sure you want to delete this setting?")) return;
 
-    if (activeTab === "company") {
+    if (activeTab === "group") {
+      const updated = groups.filter((g) => g.sl !== sl).map((g, idx) => ({ ...g, sl: idx + 1 }));
+      setGroups(updated);
+      localStorage.setItem("hris_groups", JSON.stringify(updated));
+    } else if (activeTab === "company") {
       const updated = orgs.filter((o) => o.sl !== sl).map((o, idx) => ({ ...o, sl: idx + 1 }));
       setOrgs(updated);
       localStorage.setItem("hris_organizations", JSON.stringify(updated));
@@ -1589,7 +1633,39 @@ function StructureSetupPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (activeTab === "company") {
+    if (activeTab === "group") {
+      if (!groupNameEng) {
+        toast.error("English name is required.");
+        return;
+      }
+      let nextList = [...groups];
+      if (editSl !== null) {
+        nextList = groups.map((g) =>
+          g.sl === editSl
+            ? {
+                ...g,
+                code: groupCode,
+                nameEng: groupNameEng,
+                nameBng: groupNameBng,
+                shortName: groupShortName,
+                isActive: groupIsActive,
+              }
+            : g,
+        );
+      } else {
+        const sl = groups.length > 0 ? Math.max(...groups.map((g) => g.sl)) + 1 : 1;
+        nextList.push({
+          sl,
+          code: groupCode,
+          nameEng: groupNameEng,
+          nameBng: groupNameBng,
+          shortName: groupShortName,
+          isActive: groupIsActive,
+        });
+      }
+      setGroups(nextList);
+      localStorage.setItem("hris_groups", JSON.stringify(nextList));
+    } else if (activeTab === "company") {
       if (!orgNameEng) {
         toast.error("English name is required.");
         return;
@@ -1828,13 +1904,9 @@ function StructureSetupPage() {
 
   // Tab Header Items
   const tabsList: { type: TabType; label: string; icon: any }[] = [
+    { type: "group", label: "Group Setup", icon: Building2 },
     { type: "company", label: "Company Profile", icon: Building2 },
     { type: "area", label: "Area Name", icon: MapPin },
-    { type: "mapping", label: "Company Mapping", icon: Layers },
-    { type: "department", label: "Department", icon: Users2 },
-    { type: "section", label: "Section", icon: Grid },
-    { type: "unit", label: "Unit", icon: Building2 },
-    { type: "line", label: "Line", icon: Grid },
   ];
 
   return (
@@ -1931,6 +2003,78 @@ function StructureSetupPage() {
           {/* Master Table Router */}
           <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
+              {activeTab === "group" && (
+                <table
+                  className="w-full text-left text-xs border-collapse whitespace-nowrap"
+                  style={{ minWidth: "1000px" }}
+                >
+                  <thead className="bg-muted/30 text-muted-foreground uppercase font-semibold tracking-wider text-xs border-b border-border/40">
+                    <tr className="bg-transparent">
+                      <th className="sticky left-0 bg-transparent px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                        #
+                      </th>
+                      <th className="sticky left-[60px] bg-transparent px-5 py-4 w-[140px] text-center border-r border-border/30 z-20">
+                        Actions
+                      </th>
+                      <th className="px-5 py-4 w-[120px]">Group Code</th>
+                      <th className="px-5 py-4 min-w-[200px]">Group Name (Eng)</th>
+                      <th className="px-5 py-4 min-w-[200px]">Group Name (Bng)</th>
+                      <th className="px-5 py-4 w-[120px]">Short Name</th>
+                      <th className="px-5 py-4 w-[120px] text-center">IsActive</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/30 text-foreground">
+                    {groups
+                      .filter((g) =>
+                        (g.nameEng || "").toLowerCase().includes(searchQuery.toLowerCase()),
+                      )
+                      .map((item, idx) => (
+                        <tr
+                          key={item.sl}
+                          className="group hover:bg-muted/50 transition-all"
+                        >
+                          <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
+                            {idx + 1}
+                          </td>
+                          <td className="sticky left-[60px] bg-inherit px-5 py-3.5 border-r border-border/30 z-10 text-center">
+                            <div className="flex items-center justify-center gap-3">
+                              <button
+                                onClick={() => openForm(item.sl)}
+                                className="text-orange-500 hover:text-orange-600 transition"
+                                title="Edit"
+                              >
+                                <Pencil className="size-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(item.sl)}
+                                className="text-red-500 hover:text-red-650 transition"
+                                title="Delete"
+                              >
+                                <Trash2 className="size-4" />
+                              </button>
+                            </div>
+                          </td>
+                          <td className="px-5 py-3.5 font-normal font-mono">{item.code}</td>
+                          <td className="px-5 py-3.5 font-normal text-foreground font-medium">
+                            {item.nameEng}
+                          </td>
+                          <td className="px-5 py-3.5 font-normal text-slate-700 dark:text-slate-300">
+                            {item.nameBng || "—"}
+                          </td>
+                          <td className="px-5 py-3.5 font-normal">{item.shortName || "—"}</td>
+                          <td className="px-5 py-3.5 text-center">
+                            <span
+                              className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-normal border ${item.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}`}
+                            >
+                              {item.isActive}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              )}
+
               {activeTab === "company" && (
                 <table
                   className="w-full text-left text-xs border-collapse whitespace-nowrap"
@@ -2575,6 +2719,64 @@ function StructureSetupPage() {
 
               {/* Modal Form Body */}
               <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
+                {activeTab === "group" && (
+                  <div className="space-y-4">
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Group Code *</label>
+                      <input
+                        type="text"
+                        placeholder="Group Code"
+                        value={groupCode}
+                        onChange={(e) => setGroupCode(e.target.value)}
+                        className={insetInputClass}
+                        required
+                      />
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Group Name (English) *</label>
+                      <input
+                        type="text"
+                        placeholder="Group Name (Eng)"
+                        value={groupNameEng}
+                        onChange={(e) => setGroupNameEng(e.target.value)}
+                        className={insetInputClass}
+                        required
+                      />
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Group Name (Bengali)</label>
+                      <input
+                        type="text"
+                        placeholder="Group Name (Bng)"
+                        value={groupNameBng}
+                        onChange={(e) => setGroupNameBng(e.target.value)}
+                        className={insetInputClass}
+                      />
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Short Name</label>
+                      <input
+                        type="text"
+                        placeholder="Short Name"
+                        value={groupShortName}
+                        onChange={(e) => setGroupShortName(e.target.value)}
+                        className={insetInputClass}
+                      />
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Status</label>
+                      <select
+                        value={groupIsActive}
+                        onChange={(e) => setGroupIsActive(e.target.value as "Active" | "Inactive")}
+                        className={insetSelectClass}
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+
                 {activeTab === "company" && (
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>

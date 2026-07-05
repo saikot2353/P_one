@@ -334,12 +334,13 @@ function AllApprovalsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/50 dark:bg-[#0B1120]">
+    <div className="min-h-screen flex bg-slate-50/50 dark:bg-[#0B1120] text-foreground">
       <Sidebar />
-      <div className="lg:pl-72 flex flex-col min-h-screen transition-all duration-300">
+      <main className="flex-1 min-w-0 flex flex-col h-screen overflow-hidden">
         <Topbar />
 
-        <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto w-full space-y-6">
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+          <div className="max-w-[1600px] mx-auto w-full space-y-6">
           {/* Header Section */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
             <div>
@@ -617,8 +618,9 @@ function AllApprovalsPage() {
               </div>
             </div>
           </div>
-        </main>
-      </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }

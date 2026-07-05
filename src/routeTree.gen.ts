@@ -93,6 +93,7 @@ import { Route as ConfigurePersonnelRouteImport } from './routes/configure-perso
 import { Route as ConfigureEmploymentRouteImport } from './routes/configure-employment'
 import { Route as ConfigureEducationRouteImport } from './routes/configure-education'
 import { Route as ConfigureCompensationRouteImport } from './routes/configure-compensation'
+import { Route as CompanySetupRouteImport } from './routes/company-setup'
 import { Route as CompanyHolidayRouteImport } from './routes/company-holiday'
 import { Route as CheckApproveSalaryRouteImport } from './routes/check-approve-salary'
 import { Route as BudgetStatementRouteImport } from './routes/budget-statement'
@@ -538,6 +539,11 @@ const ConfigureCompensationRoute = ConfigureCompensationRouteImport.update({
   path: '/configure-compensation',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompanySetupRoute = CompanySetupRouteImport.update({
+  id: '/company-setup',
+  path: '/company-setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CompanyHolidayRoute = CompanyHolidayRouteImport.update({
   id: '/company-holiday',
   path: '/company-holiday',
@@ -653,6 +659,7 @@ export interface FileRoutesByFullPath {
   '/budget-statement': typeof BudgetStatementRoute
   '/check-approve-salary': typeof CheckApproveSalaryRoute
   '/company-holiday': typeof CompanyHolidayRoute
+  '/company-setup': typeof CompanySetupRoute
   '/configure-compensation': typeof ConfigureCompensationRoute
   '/configure-education': typeof ConfigureEducationRoute
   '/configure-employment': typeof ConfigureEmploymentRoute
@@ -758,6 +765,7 @@ export interface FileRoutesByTo {
   '/budget-statement': typeof BudgetStatementRoute
   '/check-approve-salary': typeof CheckApproveSalaryRoute
   '/company-holiday': typeof CompanyHolidayRoute
+  '/company-setup': typeof CompanySetupRoute
   '/configure-compensation': typeof ConfigureCompensationRoute
   '/configure-education': typeof ConfigureEducationRoute
   '/configure-employment': typeof ConfigureEmploymentRoute
@@ -864,6 +872,7 @@ export interface FileRoutesById {
   '/budget-statement': typeof BudgetStatementRoute
   '/check-approve-salary': typeof CheckApproveSalaryRoute
   '/company-holiday': typeof CompanyHolidayRoute
+  '/company-setup': typeof CompanySetupRoute
   '/configure-compensation': typeof ConfigureCompensationRoute
   '/configure-education': typeof ConfigureEducationRoute
   '/configure-employment': typeof ConfigureEmploymentRoute
@@ -971,6 +980,7 @@ export interface FileRouteTypes {
     | '/budget-statement'
     | '/check-approve-salary'
     | '/company-holiday'
+    | '/company-setup'
     | '/configure-compensation'
     | '/configure-education'
     | '/configure-employment'
@@ -1076,6 +1086,7 @@ export interface FileRouteTypes {
     | '/budget-statement'
     | '/check-approve-salary'
     | '/company-holiday'
+    | '/company-setup'
     | '/configure-compensation'
     | '/configure-education'
     | '/configure-employment'
@@ -1181,6 +1192,7 @@ export interface FileRouteTypes {
     | '/budget-statement'
     | '/check-approve-salary'
     | '/company-holiday'
+    | '/company-setup'
     | '/configure-compensation'
     | '/configure-education'
     | '/configure-employment'
@@ -1287,6 +1299,7 @@ export interface RootRouteChildren {
   BudgetStatementRoute: typeof BudgetStatementRoute
   CheckApproveSalaryRoute: typeof CheckApproveSalaryRoute
   CompanyHolidayRoute: typeof CompanyHolidayRoute
+  CompanySetupRoute: typeof CompanySetupRoute
   ConfigureCompensationRoute: typeof ConfigureCompensationRoute
   ConfigureEducationRoute: typeof ConfigureEducationRoute
   ConfigureEmploymentRoute: typeof ConfigureEmploymentRoute
@@ -1967,6 +1980,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConfigureCompensationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/company-setup': {
+      id: '/company-setup'
+      path: '/company-setup'
+      fullPath: '/company-setup'
+      preLoaderRoute: typeof CompanySetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/company-holiday': {
       id: '/company-holiday'
       path: '/company-holiday'
@@ -2119,6 +2139,7 @@ const rootRouteChildren: RootRouteChildren = {
   BudgetStatementRoute: BudgetStatementRoute,
   CheckApproveSalaryRoute: CheckApproveSalaryRoute,
   CompanyHolidayRoute: CompanyHolidayRoute,
+  CompanySetupRoute: CompanySetupRoute,
   ConfigureCompensationRoute: ConfigureCompensationRoute,
   ConfigureEducationRoute: ConfigureEducationRoute,
   ConfigureEmploymentRoute: ConfigureEmploymentRoute,
