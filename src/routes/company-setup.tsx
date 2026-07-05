@@ -24,6 +24,7 @@ import {
   Settings,
 } from "lucide-react";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { MultiSelect } from "@/components/ui/multi-select";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/company-setup")({
@@ -1455,6 +1456,7 @@ function CompanySetupPage() {
   const [copySourceCompany, setCopySourceCompany] = useState("");
   const [copyTargetCompany, setCopyTargetCompany] = useState("");
   const [selectedCopyItems, setSelectedCopyItems] = useState<number[]>([]);
+  const [formSelectedCompanies, setFormSelectedCompanies] = useState<string[]>([]);
 
   // Form states - Company
   const [orgCode, setOrgCode] = useState("");
@@ -1543,6 +1545,7 @@ function CompanySetupPage() {
       setDepNameBng(item?.nameBng || "");
       setDepShortName(item?.shortName || "");
       setDepIsActive(item?.isActive || "Active");
+      setFormSelectedCompanies(item?.companyName ? [item.companyName] : []);
     } else if (activeTab === "section") {
       const item = sections.find((s) => s.sl === sl);
       setSecDept(item?.departmentName || departments[0]?.nameEng || "");
@@ -1551,12 +1554,14 @@ function CompanySetupPage() {
       setSecNameBng(item?.nameBng || "");
       setSecShortName(item?.shortName || "");
       setSecIsActive(item?.isActive || "Active");
+      setFormSelectedCompanies(item?.companyName ? [item.companyName] : []);
     } else if (activeTab === "unit") {
       const item = units.find((u) => u.sl === sl);
       setUnitNameEng(item?.nameEng || "");
       setUnitNameBng(item?.nameBng || "");
       setUnitSort(item?.sortOrder || units.length + 1);
       setUnitIsActive(item?.isActive || "Active");
+      setFormSelectedCompanies(item?.companyName ? [item.companyName] : []);
     } else if (activeTab === "line") {
       const item = lines.find((l) => l.sl === sl);
       setLineCompany(item?.companyName || orgs[0]?.nameEng || "");
@@ -1564,6 +1569,7 @@ function CompanySetupPage() {
       setLineBng(item?.lineBng || "");
       setLineSort(item?.sortOrder || lines.length + 1);
       setLineIsActive(item?.isActive || "Active");
+      setFormSelectedCompanies(item?.companyName ? [item.companyName] : []);
     }
     setIsFormOpen(true);
   };
@@ -1711,6 +1717,10 @@ function CompanySetupPage() {
         toast.error("Department name is required.");
         return;
       }
+      if (formSelectedCompanies.length === 0) {
+        toast.error("Please select at least one concern.");
+        return;
+      }
       let nextList = [...departments];
       if (editSl !== null) {
         nextList = departments.map((d) =>
@@ -1722,18 +1732,36 @@ function CompanySetupPage() {
               nameBng: depNameBng,
               shortName: depShortName,
               isActive: depIsActive,
+              companyName: formSelectedCompanies[0],
             }
             : d,
         );
+        if (formSelectedCompanies.length > 1) {
+          formSelectedCompanies.slice(1).forEach((company) => {
+            const sl = nextList.length > 0 ? Math.max(...nextList.map((d) => d.sl)) + 1 : 1;
+            nextList.push({
+              sl,
+              code: depCode,
+              nameEng: depNameEng,
+              nameBng: depNameBng,
+              shortName: depShortName,
+              isActive: depIsActive,
+              companyName: company,
+            });
+          });
+        }
       } else {
-        const sl = departments.length > 0 ? Math.max(...departments.map((d) => d.sl)) + 1 : 1;
-        nextList.push({
-          sl,
-          code: depCode,
-          nameEng: depNameEng,
-          nameBng: depNameBng,
-          shortName: depShortName,
-          isActive: depIsActive,
+        formSelectedCompanies.forEach((company) => {
+          const sl = nextList.length > 0 ? Math.max(...nextList.map((d) => d.sl)) + 1 : 1;
+          nextList.push({
+            sl,
+            code: depCode,
+            nameEng: depNameEng,
+            nameBng: depNameBng,
+            shortName: depShortName,
+            isActive: depIsActive,
+            companyName: company,
+          });
         });
       }
       setDepartments(nextList);
@@ -1741,6 +1769,10 @@ function CompanySetupPage() {
     } else if (activeTab === "section") {
       if (!secNameEng) {
         toast.error("Section name is required.");
+        return;
+      }
+      if (formSelectedCompanies.length === 0) {
+        toast.error("Please select at least one concern.");
         return;
       }
       let nextList = [...sections];
@@ -1755,19 +1787,38 @@ function CompanySetupPage() {
               nameBng: secNameBng,
               shortName: secShortName,
               isActive: secIsActive,
+              companyName: formSelectedCompanies[0],
             }
             : s,
         );
+        if (formSelectedCompanies.length > 1) {
+          formSelectedCompanies.slice(1).forEach((company) => {
+            const sl = nextList.length > 0 ? Math.max(...nextList.map((s) => s.sl)) + 1 : 1;
+            nextList.push({
+              sl,
+              departmentName: secDept,
+              code: secCode,
+              nameEng: secNameEng,
+              nameBng: secNameBng,
+              shortName: secShortName,
+              isActive: secIsActive,
+              companyName: company,
+            });
+          });
+        }
       } else {
-        const sl = sections.length > 0 ? Math.max(...sections.map((s) => s.sl)) + 1 : 1;
-        nextList.push({
-          sl,
-          departmentName: secDept,
-          code: secCode,
-          nameEng: secNameEng,
-          nameBng: secNameBng,
-          shortName: secShortName,
-          isActive: secIsActive,
+        formSelectedCompanies.forEach((company) => {
+          const sl = nextList.length > 0 ? Math.max(...nextList.map((s) => s.sl)) + 1 : 1;
+          nextList.push({
+            sl,
+            departmentName: secDept,
+            code: secCode,
+            nameEng: secNameEng,
+            nameBng: secNameBng,
+            shortName: secShortName,
+            isActive: secIsActive,
+            companyName: company,
+          });
         });
       }
       setSections(nextList);
@@ -1775,6 +1826,10 @@ function CompanySetupPage() {
     } else if (activeTab === "unit") {
       if (!unitNameEng) {
         toast.error("Unit name is required.");
+        return;
+      }
+      if (formSelectedCompanies.length === 0) {
+        toast.error("Please select at least one concern.");
         return;
       }
       let nextList = [...units];
@@ -1787,17 +1842,34 @@ function CompanySetupPage() {
               nameBng: unitNameBng,
               sortOrder: Number(unitSort),
               isActive: unitIsActive,
+              companyName: formSelectedCompanies[0],
             }
             : u,
         );
+        if (formSelectedCompanies.length > 1) {
+          formSelectedCompanies.slice(1).forEach((company) => {
+            const sl = nextList.length > 0 ? Math.max(...nextList.map((u) => u.sl)) + 1 : 1;
+            nextList.push({
+              sl,
+              nameEng: unitNameEng,
+              nameBng: unitNameBng,
+              sortOrder: Number(unitSort),
+              isActive: unitIsActive,
+              companyName: company,
+            });
+          });
+        }
       } else {
-        const sl = units.length > 0 ? Math.max(...units.map((u) => u.sl)) + 1 : 1;
-        nextList.push({
-          sl,
-          nameEng: unitNameEng,
-          nameBng: unitNameBng,
-          sortOrder: Number(unitSort),
-          isActive: unitIsActive,
+        formSelectedCompanies.forEach((company) => {
+          const sl = nextList.length > 0 ? Math.max(...nextList.map((u) => u.sl)) + 1 : 1;
+          nextList.push({
+            sl,
+            nameEng: unitNameEng,
+            nameBng: unitNameBng,
+            sortOrder: Number(unitSort),
+            isActive: unitIsActive,
+            companyName: company,
+          });
         });
       }
       setUnits(nextList);
@@ -1807,13 +1879,17 @@ function CompanySetupPage() {
         toast.error("Line name is required.");
         return;
       }
+      if (formSelectedCompanies.length === 0) {
+        toast.error("Please select at least one concern.");
+        return;
+      }
       let nextList = [...lines];
       if (editSl !== null) {
         nextList = lines.map((l) =>
           l.sl === editSl
             ? {
               ...l,
-              companyName: lineCompany,
+              companyName: formSelectedCompanies[0],
               lineEng: lineEng,
               lineBng: lineBng,
               sortOrder: Number(lineSort),
@@ -1821,15 +1897,30 @@ function CompanySetupPage() {
             }
             : l,
         );
+        if (formSelectedCompanies.length > 1) {
+          formSelectedCompanies.slice(1).forEach((company) => {
+            const sl = nextList.length > 0 ? Math.max(...nextList.map((l) => l.sl)) + 1 : 1;
+            nextList.push({
+              sl,
+              companyName: company,
+              lineEng,
+              lineBng,
+              sortOrder: Number(lineSort),
+              isActive: lineIsActive,
+            });
+          });
+        }
       } else {
-        const sl = lines.length > 0 ? Math.max(...lines.map((l) => l.sl)) + 1 : 1;
-        nextList.push({
-          sl,
-          companyName: lineCompany,
-          lineEng,
-          lineBng,
-          sortOrder: Number(lineSort),
-          isActive: lineIsActive,
+        formSelectedCompanies.forEach((company) => {
+          const sl = nextList.length > 0 ? Math.max(...nextList.map((l) => l.sl)) + 1 : 1;
+          nextList.push({
+            sl,
+            companyName: company,
+            lineEng,
+            lineBng,
+            sortOrder: Number(lineSort),
+            isActive: lineIsActive,
+          });
         });
       }
       setLines(nextList);
@@ -3012,6 +3103,15 @@ function CompanySetupPage() {
                 {activeTab === "department" && (
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Concern (Company) *</label>
+                      <MultiSelect
+                        options={orgs.map((org) => ({ value: org.nameEng, label: org.nameEng }))}
+                        selected={formSelectedCompanies}
+                        onChange={setFormSelectedCompanies}
+                        placeholder="Select Concerns..."
+                      />
+                    </div>
+                    <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Department Code *</label>
                       <input
                         type="text"
@@ -3069,6 +3169,15 @@ function CompanySetupPage() {
 
                 {activeTab === "section" && (
                   <div className="space-y-4">
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Concern (Company) *</label>
+                      <MultiSelect
+                        options={orgs.map((org) => ({ value: org.nameEng, label: org.nameEng }))}
+                        selected={formSelectedCompanies}
+                        onChange={setFormSelectedCompanies}
+                        placeholder="Select Concerns..."
+                      />
+                    </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Department *</label>
                       <select
@@ -3142,6 +3251,15 @@ function CompanySetupPage() {
                 {activeTab === "unit" && (
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Concern (Company) *</label>
+                      <MultiSelect
+                        options={orgs.map((org) => ({ value: org.nameEng, label: org.nameEng }))}
+                        selected={formSelectedCompanies}
+                        onChange={setFormSelectedCompanies}
+                        placeholder="Select Concerns..."
+                      />
+                    </div>
+                    <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Unit Name (Eng) *</label>
                       <input
                         type="text"
@@ -3189,18 +3307,13 @@ function CompanySetupPage() {
                 {activeTab === "line" && (
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Company *</label>
-                      <select
-                        value={lineCompany}
-                        onChange={(e) => setLineCompany(e.target.value)}
-                        className={insetSelectClass}
-                      >
-                        {orgs.map((o) => (
-                          <option key={o.sl} value={o.nameEng}>
-                            {o.nameEng}
-                          </option>
-                        ))}
-                      </select>
+                      <label className={insetLabelClass}>Concern (Company) *</label>
+                      <MultiSelect
+                        options={orgs.map((org) => ({ value: org.nameEng, label: org.nameEng }))}
+                        selected={formSelectedCompanies}
+                        onChange={setFormSelectedCompanies}
+                        placeholder="Select Concerns..."
+                      />
                     </div>
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Line Name (Eng) *</label>
