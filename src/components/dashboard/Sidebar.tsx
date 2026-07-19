@@ -88,6 +88,7 @@ export const nav: NavItem[] = [
       { label: "Tax & Compliance Setup", to: "/configure-tax" },
       { label: "Education & Training", to: "/configure-education" },
       { label: "Leave & Policies", to: "/configure-policies" },
+      { label: "Letter Setup", to: "/configure-letter" },
     ],
   },
   {
