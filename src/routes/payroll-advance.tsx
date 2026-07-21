@@ -316,14 +316,21 @@ function PayrollAdvancePage() {
                     <Plus className="size-4" /> New Requisition
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-4xl overflow-y-auto max-h-[90vh] p-6">
-                  <DialogHeader className="mb-4">
-                    <DialogTitle className="text-xl">New Advance Requisition</DialogTitle>
-                    <DialogDescription>
-                      Create a new salary or general advance request for an employee.
-                    </DialogDescription>
+                <DialogContent className="sm:max-w-4xl p-0 bg-white border-0 shadow-2xl overflow-hidden rounded-xl">
+                  <DialogHeader className="px-6 py-5 border-b border-slate-100 flex flex-row items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                        <Banknote className="size-5" />
+                      </div>
+                      <div>
+                        <DialogTitle className="text-lg font-bold text-slate-800">New Advance Requisition</DialogTitle>
+                        <DialogDescription className="text-xs text-slate-500 mt-1">
+                          Create a new salary or general advance request for an employee.
+                        </DialogDescription>
+                      </div>
+                    </div>
                   </DialogHeader>
-                  <div className="py-2">
+                  <div className="px-6 py-5 max-h-[75vh] overflow-y-auto bg-slate-50/50">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 mb-6">
                       {/* Left Column - Readonly Info */}
                       <div className="space-y-3">
@@ -476,25 +483,7 @@ function PayrollAdvancePage() {
                             className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-xs shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                           />
                         </div>
-                        <div className="grid grid-cols-[120px_1fr] items-center gap-4 pt-2">
-                          <div className="col-start-2 flex gap-2">
-                            <Button
-                              size="sm"
-                              type="submit"
-                              className="h-7 text-xs px-6"
-                              onClick={() => setIsModalOpen(false)}
-                            >
-                              Submit
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-7 text-xs px-6 bg-muted/30"
-                            >
-                              Reset
-                            </Button>
-                          </div>
-                        </div>
+                        {/* Buttons moved to footer */}
                       </div>
                     </div>
 
@@ -536,6 +525,21 @@ function PayrollAdvancePage() {
                       </div>
                     </div>
                   </div>
+                  <DialogFooter className="px-6 py-5 border-t border-slate-100 bg-white flex justify-end gap-3">
+                    <Button
+                      variant="ghost"
+                      className="text-slate-600 font-medium px-4 hover:bg-slate-100"
+                      onClick={() => setIsModalOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm px-6"
+                      onClick={() => setIsModalOpen(false)}
+                    >
+                      Create
+                    </Button>
+                  </DialogFooter>
                 </DialogContent>
               </Dialog>
             </div>

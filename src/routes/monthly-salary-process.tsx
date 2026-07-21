@@ -1,28 +1,9 @@
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  ChevronRight,
-  Calculator,
-  CheckCircle2,
-  Search,
-  Play,
-  FileText,
-  Printer,
-  FileDown,
-  Send,
-} from "lucide-react";
+import { Search, FileText, Printer, FileDown } from "lucide-react";
 
 export const Route = createFileRoute("/monthly-salary-process")({
   head: () => ({
@@ -35,610 +16,314 @@ export const Route = createFileRoute("/monthly-salary-process")({
 });
 
 function MonthlySalaryProcessPage() {
-  const [activeTab, setActiveTab] = useState("processing");
   const [isDataLoaded, setIsDataLoaded] = useState(false);
-  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [selectedRows, setSelectedRows] = useState<number[]>([]);
-  const [submittedRows, setSubmittedRows] = useState<number[]>([]);
 
   // Mock data for dropdowns
   const years = ["2026", "2025", "2024"];
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const processTypes = ["Final", "Advance", "Bonus"];
   const salaryTypes = ["ALL", "Regular", "Contractual"];
 
-  // Mock employee data
+  // Mock comprehensive employee data based on screenshot
   const mockData = [
     {
       id: 1,
-      sl: "01",
-      code: "EMP-001",
-      name: "Tahmid Afsar Shapno",
-      wd: 26,
-      present: 26,
-      absent: 0,
-      leave: 0,
+      empId: "2023043910",
+      name: "Tahmid Afsar",
+      wd: 27,
+      present: 14,
+      absent: 1,
+      leave: 1,
       holiday: 4,
-      basic: 45000,
-      gross: 75000,
-      ot: 12,
-      otPay: 2500,
-      attBonus: 1000,
-      tax: 1500,
-      absDeduct: 0,
-      advance: 0,
-      stamp: 10,
-      totalPay: 76990,
-      bankPay: 76990,
-      cashPay: 0,
-      empId: "1001",
-      empIdOff: "O-1001",
-      type: "Regular",
-      dept: "IT",
-      desig: "HR Director",
+      basic: 31200,
+      gross: 52000,
+      ot: "0",
+      otPay: "0",
+      attBonus: "0",
+      allowance: "0",
+      lunchDeduct: "0",
+      pf: "0",
+      tax: "0",
+      absentDeduct: "1040",
+      advance: "0",
+      adjust: "0.00",
+      wagelyAdv: "0.00",
+      loan: "0"
     },
     {
       id: 2,
-      sl: "02",
-      code: "EMP-002",
-      name: "Rajebul Hasan Rajon",
-      wd: 26,
-      present: 24,
-      absent: 2,
+      empId: "2023044078",
+      name: "Md. Anik Islam",
+      wd: 30,
+      present: 5,
+      absent: 1,
       leave: 0,
-      holiday: 4,
-      basic: 35000,
-      gross: 60000,
-      ot: 0,
-      otPay: 0,
-      attBonus: 0,
-      tax: 800,
-      absDeduct: 2300,
-      advance: 5000,
-      stamp: 10,
-      totalPay: 51890,
-      bankPay: 20000,
-      cashPay: 31890,
-      empId: "1002",
-      empIdOff: "O-1002",
-      type: "Regular",
-      dept: "Operations",
-      desig: "Manager",
+      holiday: 1,
+      basic: 47400,
+      gross: 79000,
+      ot: "0.00",
+      otPay: "0",
+      attBonus: "0",
+      allowance: "0",
+      lunchDeduct: "0",
+      pf: "0",
+      tax: "0",
+      absentDeduct: "1580",
+      advance: "0",
+      adjust: "0.00",
+      wagelyAdv: "0.00",
+      loan: "10"
     },
     {
       id: 3,
-      sl: "03",
-      code: "EMP-003",
-      name: "John Doe",
-      wd: 26,
-      present: 26,
+      empId: "2026058686",
+      name: "Md. Abdur Rahaman",
+      wd: 12,
+      present: 8,
       absent: 0,
-      leave: 0,
-      holiday: 4,
-      basic: 20000,
-      gross: 35000,
-      ot: 20,
-      otPay: 4000,
-      attBonus: 1000,
-      tax: 0,
-      absDeduct: 0,
-      advance: 0,
-      stamp: 10,
-      totalPay: 39990,
-      bankPay: 39990,
-      cashPay: 0,
-      empId: "1003",
-      empIdOff: "O-1003",
-      type: "Contractual",
-      dept: "Operations",
-      desig: "Executive",
+      leave: 1,
+      holiday: 3,
+      basic: 30000,
+      gross: 50000,
+      ot: "0.00",
+      otPay: "0",
+      attBonus: "0",
+      allowance: "0",
+      lunchDeduct: "1250",
+      pf: "0",
+      tax: "0",
+      absentDeduct: "0",
+      advance: "0",
+      adjust: "0.00",
+      wagelyAdv: "0.00",
+      loan: "0"
     },
   ];
 
   const handleFetchData = () => {
     setIsDataLoaded(true);
-    setIsFilterModalOpen(false);
-  };
-
-  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked) {
-      setSelectedRows(mockData.filter((d) => !submittedRows.includes(d.id)).map((d) => d.id));
-    } else {
-      setSelectedRows([]);
-    }
-  };
-
-  const handleSelectRow = (id: number) => {
-    setSelectedRows((prev) => (prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]));
-  };
-
-  const handleSubmit = () => {
-    if (selectedRows.length === 0) return;
-    alert(`Successfully submitted salary for ${selectedRows.length} employees!`);
-
-    setSubmittedRows((prev) => [...prev, ...selectedRows]);
-    setSelectedRows([]);
-    setActiveTab("submitted");
   };
 
   return (
-    <div className="min-h-screen flex bg-background text-foreground">
+    <div className="min-h-screen flex bg-[#f8f9fa] text-slate-800">
       <Sidebar />
-      <main className="flex-1 min-w-0 flex flex-col relative overflow-y-auto bg-muted/20">
+      <main className="flex-1 min-w-0 flex flex-col relative overflow-y-auto">
         <Topbar />
 
-        <div className="p-4 md:p-6 space-y-6 w-full">
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-            <Link to="/" className="hover:text-foreground transition-colors">
-              Home
-            </Link>
-            <ChevronRight className="size-3.5" />
-            <span>Payroll</span>
-            <ChevronRight className="size-3.5" />
-            <span className="text-foreground font-semibold">Monthly Salary Process</span>
-          </div>
-
-          {/* Header */}
-          <div className="bg-card border border-border/60 rounded-lg p-6 shadow-sm">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
-                  <div className="p-2 bg-primary/10 rounded-md border border-primary/20 text-primary">
-                    <Calculator className="size-5" />
-                  </div>
-                  Monthly Salary Process & Submit
-                </h1>
-                <p className="text-sm text-muted-foreground mt-2 max-w-2xl">
-                  Unified workspace to process salary calculations, review breakdowns, and submit
-                  for final approval.
-                </p>
+        <div className="p-4 md:p-6 space-y-4 w-full">
+          {/* Header Form Layout directly on page */}
+          <div className="bg-white border border-slate-200/60 shadow-sm p-6 pt-4 space-y-6">
+            
+            {/* Row 1 */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+              <div className="col-span-2">
+                <label className="text-[11px] text-slate-400 font-medium block mb-1">Year</label>
+                <select className="w-full h-8 bg-transparent border-0 border-b border-slate-300 text-sm font-medium focus:ring-0 focus:border-blue-500 px-0 rounded-none">
+                  <option>2026</option>
+                  <option>2025</option>
+                </select>
               </div>
-
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="flex bg-muted/30 border border-border/60 rounded-md p-0.5 shadow-sm">
-                  <Button variant="ghost" size="sm" className="h-9 px-3 text-xs font-medium">
-                    <FileDown className="size-4 mr-1.5 text-emerald-600" />
-                    EXCEL
-                  </Button>
-                  <div className="w-px bg-border/60 my-1"></div>
-                  <Button variant="ghost" size="sm" className="h-9 px-3 text-xs font-medium">
-                    <Printer className="size-4 mr-1.5 text-blue-600" />
-                    PRINT
-                  </Button>
-                  <div className="w-px bg-border/60 my-1"></div>
-                  <Button variant="ghost" size="sm" className="h-9 px-3 text-xs font-medium">
-                    <FileText className="size-4 mr-1.5 text-rose-600" />
-                    PDF
-                  </Button>
-                </div>
-
-                <Dialog open={isFilterModalOpen} onOpenChange={setIsFilterModalOpen}>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="default"
-                      className="bg-primary hover:bg-primary/90 text-white border-0 shadow-sm font-semibold h-9 px-4"
-                    >
-                      <Play className="size-4 mr-2 fill-current" />
-                      PROCESS
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[850px] max-h-[90vh] overflow-y-auto bg-slate-50 border-slate-200 shadow-2xl p-6">
-                    <DialogHeader className="mb-4">
-                      <DialogTitle className="flex items-center gap-2 text-slate-700 text-lg font-semibold">
-                        <Search className="size-5 text-slate-400" />
-                        Filter Configuration
-                      </DialogTitle>
-                    </DialogHeader>
-
-                    <div className="py-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {/* Period & Process */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-slate-500 mb-1.5 block">
-                          Year
-                        </label>
-                        <select className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                          {years.map((y) => (
-                            <option key={y} value={y}>
-                              {y}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-slate-500 mb-1.5 block">
-                          Month
-                        </label>
-                        <select className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                          <option value="Jun">Jun</option>
-                          {months.map((m) => (
-                            <option key={m} value={m}>
-                              {m}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-slate-500 mb-1.5 block">
-                          Process Type
-                        </label>
-                        <select className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                          {processTypes.map((t) => (
-                            <option key={t} value={t}>
-                              {t}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-slate-500 mb-1.5 block">
-                          Salary Type
-                        </label>
-                        <select className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                          {salaryTypes.map((t) => (
-                            <option key={t} value={t}>
-                              {t}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      {/* Organization */}
-                      <div className="space-y-1.5 lg:col-span-2">
-                        <label className="text-xs font-semibold text-slate-500 mb-1.5 block">
-                          Company
-                        </label>
-                        <select className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                          <option>Pakiza Software Limited</option>
-                        </select>
-                      </div>
-                      <div className="space-y-1.5 lg:col-span-2">
-                        <label className="text-xs font-semibold text-slate-500 mb-1.5 block">
-                          Area Name
-                        </label>
-                        <select className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                          <option>PSL-Operation</option>
-                        </select>
-                      </div>
-
-                      {/* Detailed Organization & Employee */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-slate-500 mb-1.5 block">
-                          Department
-                        </label>
-                        <select className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                          <option>ALL</option>
-                        </select>
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-slate-500 mb-1.5 block">
-                          Unit / Section
-                        </label>
-                        <select className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                          <option>ALL</option>
-                        </select>
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-slate-500 mb-1.5 block">
-                          Employee Type
-                        </label>
-                        <select className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                          <option>ALL</option>
-                        </select>
-                      </div>
-                      <div className="space-y-1.5">
-                        <div className="flex items-center justify-between">
-                          <label className="text-xs font-semibold text-slate-500 mb-1.5 block">
-                            Employee ID
-                          </label>
-                          <div className="flex items-center gap-2 text-[10px]">
-                            <label className="flex items-center gap-1 cursor-pointer">
-                              <input
-                                type="radio"
-                                name="empid_type"
-                                defaultChecked
-                                className="accent-primary"
-                              />{" "}
-                              System
-                            </label>
-                            <label className="flex items-center gap-1 cursor-pointer">
-                              <input type="radio" name="empid_type" className="accent-primary" />{" "}
-                              Office
-                            </label>
-                          </div>
-                        </div>
-                        <input
-                          type="text"
-                          placeholder="Use comma as separator"
-                          className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                        />
-                      </div>
-                    </div>
-
-                    <DialogFooter className="pt-6 mt-4 border-t border-slate-200/60">
-                      <Button
-                        variant="outline"
-                        className="h-10 rounded-lg border-slate-200 text-slate-600 hover:bg-slate-100 font-medium px-6"
-                        onClick={() => setIsFilterModalOpen(false)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        variant="default"
-                        className="h-10 rounded-lg bg-[#279863] hover:bg-[#208050] text-white font-medium px-6 shadow-sm"
-                        onClick={handleFetchData}
-                      >
-                        <Search className="size-4 mr-1.5" />
-                        FETCH DATA
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+              <div className="col-span-2">
+                <label className="text-[11px] text-slate-400 font-medium block mb-1">Month</label>
+                <select className="w-full h-8 bg-transparent border-0 border-b border-slate-300 text-sm font-medium focus:ring-0 focus:border-blue-500 px-0 rounded-none">
+                  <option>Jul</option>
+                  <option>Aug</option>
+                </select>
+              </div>
+              <div className="col-span-3">
+                <label className="text-[11px] text-slate-400 font-medium block mb-1">Process Type</label>
+                <select className="w-full h-8 bg-transparent border-0 border-b border-slate-300 text-sm font-medium focus:ring-0 focus:border-blue-500 px-0 rounded-none">
+                  <option>Final</option>
+                  <option>Advance</option>
+                </select>
+              </div>
+              <div className="col-span-3">
+                <label className="text-[11px] text-slate-400 font-medium block mb-1">Salary Type</label>
+                <select className="w-full h-8 bg-transparent border-0 border-b border-slate-300 text-sm font-medium focus:ring-0 focus:border-blue-500 px-0 rounded-none">
+                  <option>ALL</option>
+                  <option>Regular</option>
+                </select>
+              </div>
+              <div className="col-span-2 flex justify-start">
+                <Button className="bg-[#ef4444] hover:bg-[#dc2626] text-white font-bold h-8 px-6 text-xs shadow-sm rounded">
+                  PROCESS
+                </Button>
               </div>
             </div>
-          </div>
 
-          {/* Data Tables */}
-          <div className="bg-card border border-border/60 rounded-lg shadow-sm overflow-hidden flex flex-col">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <div className="p-2 border-b border-border/60 flex items-center justify-between bg-muted/10">
-                <TabsList className="bg-background/50 border border-border/40 p-1">
-                  <TabsTrigger value="processing" className="text-xs px-4">
-                    Processing Details
-                  </TabsTrigger>
-                  <TabsTrigger value="submitted" className="text-xs px-4">
-                    Submitted List
-                  </TabsTrigger>
-                </TabsList>
-
-                <div className="relative max-w-xs w-full mr-2">
-                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                  <input
-                    type="text"
-                    placeholder="Search in table..."
-                    className="w-full h-8 pl-9 pr-3 rounded-md border border-input bg-background text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                  />
-                </div>
+            {/* Row 2 */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+              <div className="col-span-4">
+                <label className="text-[11px] text-slate-400 font-medium block mb-1">Company</label>
+                <select className="w-full h-8 bg-transparent border-0 border-b border-slate-300 text-sm font-medium focus:ring-0 focus:border-blue-500 px-0 rounded-none">
+                  <option>Pakiza Software Limited</option>
+                </select>
               </div>
-
-              {/* Tab 1: Processing Details */}
-              <TabsContent value="processing" className="m-0 border-0 outline-none">
-                <div className="bg-primary/5 px-4 py-2 text-xs border-b border-primary/10 flex items-center gap-2 text-primary">
-                  <CheckCircle2 className="size-4" />
-                  <span>
-                    Review feedback and select employees before submitting the salary. The{" "}
-                    <strong>SUBMIT</strong> button will be enabled below.
-                  </span>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-xs text-left">
-                    <thead className="bg-muted/30 text-muted-foreground font-semibold border-b border-border/60">
-                      <tr>
-                        <th className="px-4 py-3 whitespace-nowrap w-10">
-                          <input
-                            type="checkbox"
-                            className="rounded border-input accent-primary size-4 cursor-pointer"
-                            checked={
-                              isDataLoaded &&
-                              mockData.filter((r) => !submittedRows.includes(r.id)).length > 0 &&
-                              selectedRows.length ===
-                                mockData.filter((r) => !submittedRows.includes(r.id)).length
-                            }
-                            onChange={handleSelectAll}
-                            disabled={
-                              !isDataLoaded ||
-                              mockData.filter((r) => !submittedRows.includes(r.id)).length === 0
-                            }
-                          />
-                        </th>
-                        <th className="px-4 py-3 whitespace-nowrap">Feedback</th>
-                        <th className="px-4 py-3 whitespace-nowrap min-w-[150px]">
-                          Review Comments
-                        </th>
-                        <th className="px-4 py-3 whitespace-nowrap">Emp Id</th>
-                        <th className="px-4 py-3 whitespace-nowrap">Emp ID(Off)</th>
-                        <th className="px-4 py-3 whitespace-nowrap min-w-[150px]">Name</th>
-                        <th className="px-4 py-3 whitespace-nowrap">Employee Type</th>
-                        <th className="px-4 py-3 whitespace-nowrap">Department</th>
-                        <th className="px-4 py-3 whitespace-nowrap">Designation</th>
-                        <th className="px-4 py-3 whitespace-nowrap text-right">Total Pay</th>
-                        <th className="px-4 py-3 whitespace-nowrap text-right text-emerald-600">
-                          Bank Pay
-                        </th>
-                        <th className="px-4 py-3 whitespace-nowrap text-right text-amber-600">
-                          Cash Pay
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border/40">
-                      {!isDataLoaded ||
-                      mockData.filter((r) => !submittedRows.includes(r.id)).length === 0 ? (
-                        <tr>
-                          <td colSpan={12} className="px-4 py-12 text-center text-muted-foreground">
-                            <div className="flex flex-col items-center justify-center gap-2">
-                              <Search className="size-8 opacity-20" />
-                              <p>
-                                {!isDataLoaded
-                                  ? "No records found for processing. Click Fetch Data."
-                                  : "All salaries have been submitted."}
-                              </p>
-                            </div>
-                          </td>
-                        </tr>
-                      ) : (
-                        mockData
-                          .filter((r) => !submittedRows.includes(r.id))
-                          .map((row) => (
-                            <tr
-                              key={`proc-${row.id}`}
-                              className={`hover:bg-muted/30 transition-colors ${selectedRows.includes(row.id) ? "bg-primary/5" : ""}`}
-                            >
-                              <td className="px-4 py-2">
-                                <input
-                                  type="checkbox"
-                                  className="rounded border-input accent-primary size-4 cursor-pointer"
-                                  checked={selectedRows.includes(row.id)}
-                                  onChange={() => handleSelectRow(row.id)}
-                                />
-                              </td>
-                              <td className="px-4 py-2">
-                                <input
-                                  type="text"
-                                  placeholder="Add feedback..."
-                                  className="h-7 text-xs rounded border border-input bg-background px-2 w-full focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                                />
-                              </td>
-                              <td className="px-4 py-2">
-                                <input
-                                  type="text"
-                                  placeholder="Comments..."
-                                  className="h-7 text-xs rounded border border-input bg-background px-2 w-full focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                                />
-                              </td>
-                              <td className="px-4 py-2">{row.empId}</td>
-                              <td className="px-4 py-2">{row.empIdOff}</td>
-                              <td className="px-4 py-2 font-medium">{row.name}</td>
-                              <td className="px-4 py-2">{row.type}</td>
-                              <td className="px-4 py-2">{row.dept}</td>
-                              <td className="px-4 py-2">{row.desig}</td>
-                              <td className="px-4 py-2 text-right font-bold">
-                                {row.totalPay.toLocaleString()}
-                              </td>
-                              <td className="px-4 py-2 text-right font-semibold text-emerald-600">
-                                {row.bankPay.toLocaleString()}
-                              </td>
-                              <td className="px-4 py-2 text-right font-semibold text-amber-600">
-                                {row.cashPay.toLocaleString()}
-                              </td>
-                            </tr>
-                          ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </TabsContent>
-
-              {/* Tab 2: Submitted List */}
-              <TabsContent value="submitted" className="m-0 border-0 outline-none">
-                <div className="bg-emerald-500/5 px-4 py-2 text-xs border-b border-emerald-500/10 flex items-center gap-2 text-emerald-600">
-                  <CheckCircle2 className="size-4" />
-                  <span>
-                    List of employees whose salaries have already been submitted successfully.
-                  </span>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-xs text-left">
-                    <thead className="bg-muted/30 text-muted-foreground font-semibold border-b border-border/60">
-                      <tr>
-                        <th className="px-4 py-3 whitespace-nowrap">Status</th>
-                        <th className="px-4 py-3 whitespace-nowrap">Feedback</th>
-                        <th className="px-4 py-3 whitespace-nowrap min-w-[150px]">
-                          Review Comments
-                        </th>
-                        <th className="px-4 py-3 whitespace-nowrap">Emp Id</th>
-                        <th className="px-4 py-3 whitespace-nowrap">Emp ID(Off)</th>
-                        <th className="px-4 py-3 whitespace-nowrap min-w-[150px]">Name</th>
-                        <th className="px-4 py-3 whitespace-nowrap">Employee Type</th>
-                        <th className="px-4 py-3 whitespace-nowrap">Department</th>
-                        <th className="px-4 py-3 whitespace-nowrap">Designation</th>
-                        <th className="px-4 py-3 whitespace-nowrap text-right">Total Pay</th>
-                        <th className="px-4 py-3 whitespace-nowrap text-right text-emerald-600">
-                          Bank Pay
-                        </th>
-                        <th className="px-4 py-3 whitespace-nowrap text-right text-amber-600">
-                          Cash Pay
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border/40">
-                      {mockData.filter((r) => submittedRows.includes(r.id)).length === 0 ? (
-                        <tr>
-                          <td colSpan={12} className="px-4 py-12 text-center text-muted-foreground">
-                            <div className="flex flex-col items-center justify-center gap-2">
-                              <FileText className="size-8 opacity-20" />
-                              <p>No submitted records yet.</p>
-                            </div>
-                          </td>
-                        </tr>
-                      ) : (
-                        mockData
-                          .filter((r) => submittedRows.includes(r.id))
-                          .map((row) => (
-                            <tr
-                              key={`sub-${row.id}`}
-                              className="hover:bg-muted/30 transition-colors bg-muted/5"
-                            >
-                              <td className="px-4 py-2">
-                                <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                                  <CheckCircle2 className="size-3" /> Submitted
-                                </span>
-                              </td>
-                              <td className="px-4 py-2 text-muted-foreground">-</td>
-                              <td className="px-4 py-2 text-muted-foreground">Approved</td>
-                              <td className="px-4 py-2">{row.empId}</td>
-                              <td className="px-4 py-2">{row.empIdOff}</td>
-                              <td className="px-4 py-2 font-medium">{row.name}</td>
-                              <td className="px-4 py-2">{row.type}</td>
-                              <td className="px-4 py-2">{row.dept}</td>
-                              <td className="px-4 py-2">{row.desig}</td>
-                              <td className="px-4 py-2 text-right font-bold">
-                                {row.totalPay.toLocaleString()}
-                              </td>
-                              <td className="px-4 py-2 text-right font-semibold text-emerald-600">
-                                {row.bankPay.toLocaleString()}
-                              </td>
-                              <td className="px-4 py-2 text-right font-semibold text-amber-600">
-                                {row.cashPay.toLocaleString()}
-                              </td>
-                            </tr>
-                          ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </TabsContent>
-            </Tabs>
-
-            {/* Pagination Footer */}
-            <div className="p-3 border-t border-border/60 bg-muted/10 flex items-center justify-between text-xs text-muted-foreground">
-              <div>
-                Showing {isDataLoaded ? mockData.length : 0} to {isDataLoaded ? mockData.length : 0}{" "}
-                of {isDataLoaded ? mockData.length : 0} entries
+              <div className="col-span-4">
+                <label className="text-[11px] text-slate-400 font-medium block mb-1">Area Name</label>
+                <select className="w-full h-8 bg-transparent border-0 border-b border-slate-300 text-sm font-medium focus:ring-0 focus:border-blue-500 px-0 rounded-none">
+                  <option>PSL-Operation</option>
+                </select>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1">
-                  <Button variant="outline" size="sm" className="h-7 px-2.5 text-[10px]" disabled>
-                    Previous
-                  </Button>
-                  <Button variant="outline" size="sm" className="h-7 px-2.5 text-[10px]" disabled>
-                    Next
-                  </Button>
-                </div>
-                <Button
-                  variant="default"
-                  className="bg-blue-600 hover:bg-blue-700 text-white border-0 h-8 disabled:opacity-50 disabled:cursor-not-allowed px-4 font-semibold shadow-sm"
-                  disabled={!isDataLoaded || selectedRows.length === 0}
-                  onClick={handleSubmit}
+              <div className="col-span-4">
+                <label className="text-[11px] text-slate-400 font-medium block mb-1">Employee Type</label>
+                <select className="w-full h-8 bg-transparent border-0 border-b border-slate-300 text-sm font-medium focus:ring-0 focus:border-blue-500 px-0 rounded-none">
+                  <option>ALL</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Row 3 */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+              <div className="col-span-3">
+                <label className="text-[11px] text-slate-400 font-medium block mb-1">Department</label>
+                <select className="w-full h-8 bg-transparent border-0 border-b border-slate-300 text-sm font-medium focus:ring-0 focus:border-blue-500 px-0 rounded-none">
+                  <option>ALL</option>
+                </select>
+              </div>
+              <div className="col-span-2">
+                <label className="text-[11px] text-slate-400 font-medium block mb-1">Unit</label>
+                <select className="w-full h-8 bg-transparent border-0 border-b border-slate-300 text-sm font-medium focus:ring-0 focus:border-blue-500 px-0 rounded-none">
+                  <option>ALL</option>
+                </select>
+              </div>
+              <div className="col-span-3">
+                <label className="text-[11px] text-slate-400 font-medium block mb-1">Employee Id</label>
+                <input
+                  type="text"
+                  placeholder="Use comma as separator"
+                  className="w-full h-8 bg-transparent border-0 border-b border-slate-300 text-sm font-medium placeholder:text-slate-400 placeholder:font-normal focus:ring-0 focus:border-blue-500 px-0 rounded-none"
+                />
+              </div>
+              <div className="col-span-4 flex justify-start">
+                <Button 
+                  className="bg-[#8bc34a] hover:bg-[#7cb342] text-white font-bold h-8 px-6 text-xs shadow-sm rounded uppercase"
+                  onClick={handleFetchData}
                 >
-                  <Send className="size-3.5 mr-1.5" />
-                  SUBMIT {selectedRows.length > 0 ? `(${selectedRows.length})` : ""}
+                  Get Processed Data
                 </Button>
               </div>
             </div>
           </div>
+
+          {/* Table Container */}
+          <div className="bg-white border border-slate-200/60 shadow-sm flex flex-col min-h-[500px]">
+            
+            {/* Top Action Bar */}
+            <div className="p-4 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4">
+              <div className="flex rounded-md border border-slate-200 overflow-hidden shadow-sm">
+                <Button variant="ghost" size="sm" className="h-8 px-4 text-[11px] font-bold text-slate-600 bg-white hover:bg-slate-50 border-r border-slate-200 rounded-none">
+                  <FileDown className="size-3.5 mr-1.5" />
+                  EXCEL
+                </Button>
+                <Button variant="ghost" size="sm" className="h-8 px-4 text-[11px] font-bold text-slate-600 bg-white hover:bg-slate-50 border-r border-slate-200 rounded-none">
+                  <Printer className="size-3.5 mr-1.5" />
+                  PRINT
+                </Button>
+                <Button variant="ghost" size="sm" className="h-8 px-4 text-[11px] font-bold text-slate-600 bg-white hover:bg-slate-50 rounded-none">
+                  <FileText className="size-3.5 mr-1.5" />
+                  PDF
+                </Button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-[13px] font-medium text-slate-600">Search:</span>
+                <input
+                  type="text"
+                  className="h-8 w-48 rounded border border-slate-300 bg-white px-3 text-sm focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            {/* Data Table */}
+            <div className="flex-1 overflow-x-auto relative">
+              <table className="w-full text-left text-xs whitespace-nowrap min-w-[1500px]">
+                <thead className="text-[11px] bg-[#e9ecef] text-slate-600 font-semibold border-b border-slate-300 sticky top-0 z-10">
+                  <tr>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1">SL <span className="text-[9px] opacity-40">▼</span></th>
+                    <th className="px-3 py-3 border-r border-slate-200 text-center w-12"></th>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1">Emp Id <span className="text-[9px] opacity-40">▼</span></th>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1 min-w-[180px]">Name <span className="text-[9px] opacity-40">▼</span></th>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1">WD <span className="text-[9px] opacity-40">▼</span></th>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1">Present <span className="text-[9px] opacity-40">▼</span></th>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1">Absent <span className="text-[9px] opacity-40">▼</span></th>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1">Leave <span className="text-[9px] opacity-40">▼</span></th>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1">Holiday <span className="text-[9px] opacity-40">▼</span></th>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1">Basic <span className="text-[9px] opacity-40">▼</span></th>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1">Gross <span className="text-[9px] opacity-40">▼</span></th>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1">OT <span className="text-[9px] opacity-40">▼</span></th>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1">OT Pay <span className="text-[9px] opacity-40">▼</span></th>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1">Att. Bonus <span className="text-[9px] opacity-40">▼</span></th>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1">Allowance <span className="text-[9px] opacity-40">▼</span></th>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1">Lunch Deduct <span className="text-[9px] opacity-40">▼</span></th>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1">PF <span className="text-[9px] opacity-40">▼</span></th>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1">Tax <span className="text-[9px] opacity-40">▼</span></th>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1">Absent Deduction <span className="text-[9px] opacity-40">▼</span></th>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1">Advance <span className="text-[9px] opacity-40">▼</span></th>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1">Adjust <span className="text-[9px] opacity-40">▼</span></th>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1">Wagely Adv <span className="text-[9px] opacity-40">▼</span></th>
+                    <th className="px-3 py-3 border-r border-slate-200 flex items-center gap-1">Loan <span className="text-[9px] opacity-40">▼</span></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 bg-white text-slate-700">
+                  {!isDataLoaded ? (
+                    <tr>
+                      <td colSpan={23} className="px-6 py-12 text-center text-slate-400">
+                        Click "GET PROCESSED DATA" to load the monthly salary report.
+                      </td>
+                    </tr>
+                  ) : (
+                    mockData.map((row) => (
+                      <tr key={row.id} className="hover:bg-slate-50 transition-colors odd:bg-white even:bg-[#f8f9fa]">
+                        <td className="px-3 py-2.5 font-medium">{row.id}</td>
+                        <td className="px-3 py-2.5 text-center">
+                          <button className="bg-[#8bc34a] hover:bg-[#7cb342] text-white p-1 rounded transition-colors shadow-sm">
+                            <Search className="size-3.5" strokeWidth={3} />
+                          </button>
+                        </td>
+                        <td className="px-3 py-2.5">{row.empId}</td>
+                        <td className="px-3 py-2.5 font-medium min-w-[180px]">{row.name}</td>
+                        <td className="px-3 py-2.5">{row.wd}</td>
+                        <td className="px-3 py-2.5">{row.present}</td>
+                        <td className="px-3 py-2.5">{row.absent}</td>
+                        <td className="px-3 py-2.5">{row.leave}</td>
+                        <td className="px-3 py-2.5">{row.holiday}</td>
+                        <td className="px-3 py-2.5">{row.basic}</td>
+                        <td className="px-3 py-2.5">{row.gross}</td>
+                        <td className="px-3 py-2.5">{row.ot}</td>
+                        <td className="px-3 py-2.5">{row.otPay}</td>
+                        <td className="px-3 py-2.5">{row.attBonus}</td>
+                        <td className="px-3 py-2.5">{row.allowance}</td>
+                        <td className="px-3 py-2.5">{row.lunchDeduct}</td>
+                        <td className="px-3 py-2.5">{row.pf}</td>
+                        <td className="px-3 py-2.5">{row.tax}</td>
+                        <td className="px-3 py-2.5">{row.absentDeduct}</td>
+                        <td className="px-3 py-2.5">{row.advance}</td>
+                        <td className="px-3 py-2.5">{row.adjust}</td>
+                        <td className="px-3 py-2.5">{row.wagelyAdv}</td>
+                        <td className="px-3 py-2.5">{row.loan}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination Footer */}
+            {isDataLoaded && (
+              <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-white text-xs text-slate-500">
+                <div>
+                  Showing 1 to {mockData.length} of {mockData.length} entries
+                </div>
+                <div className="flex gap-1 items-center">
+                  <span className="cursor-not-allowed text-slate-400 mr-2">Previous</span>
+                  <button className="h-6 w-6 rounded bg-[#8bc34a] text-white flex items-center justify-center font-bold">1</button>
+                  <span className="cursor-not-allowed text-slate-400 ml-2">Next</span>
+                </div>
+              </div>
+            )}
+          </div>
+
         </div>
       </main>
     </div>
