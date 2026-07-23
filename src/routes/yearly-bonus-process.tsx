@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
@@ -35,12 +35,64 @@ export const Route = createFileRoute("/yearly-bonus-process")({
   component: YearlyBonusProcessPage,
 });
 
+interface FestivalBonusRule {
+  id: string;
+  minTenureMonths: number;
+  maxTenureMonths: number;
+  bonusType: "basic-percent" | "gross-percent" | "flat";
+  bonusValue: number;
+}
+
 function YearlyBonusProcessPage() {
   const [activeTab, setActiveTab] = useState("processing");
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const [submittedRows, setSubmittedRows] = useState<number[]>([]);
+
+  // Filter states
+  const [effectiveDate, setEffectiveDate] = useState("2026-06-23");
+  const [bonusType, setBonusType] = useState("Eid-ul-Fitr");
+  const [year, setYear] = useState("2026");
+  const [month, setMonth] = useState("Jun");
+  const [employeeType, setEmployeeType] = useState("ALL");
+  const [department, setDepartment] = useState("All Departments");
+
+  // Load rules from local storage
+  const [bonusRules, setBonusRules] = useState<FestivalBonusRule[]>([]);
+
+  useEffect(() => {
+    const storedRules = localStorage.getItem("payroll_bonus_rules");
+    if (storedRules) {
+      try {
+        const parsed = JSON.parse(storedRules);
+        if (Array.isArray(parsed)) {
+          setBonusRules(parsed);
+          return;
+        }
+      } catch (e) {
+        console.error("Failed to parse bonus rules", e);
+      }
+    }
+    // Fallback defaults matching user tenure requirements
+    setBonusRules([
+      { id: "1", minTenureMonths: 0, maxTenureMonths: 3, bonusType: "flat", bonusValue: 1000 },
+      { id: "2", minTenureMonths: 3, maxTenureMonths: 6, bonusType: "basic-percent", bonusValue: 50 },
+      { id: "3", minTenureMonths: 6, maxTenureMonths: 12, bonusType: "basic-percent", bonusValue: 80 },
+      { id: "4", minTenureMonths: 12, maxTenureMonths: 999, bonusType: "basic-percent", bonusValue: 100 }
+    ]);
+  }, []);
+
+  // Helper calculation for tenure months
+  const getTenureMonths = (joinDateStr: string, effectiveDateStr: string) => {
+    const join = new Date(joinDateStr);
+    const eff = new Date(effectiveDateStr);
+    if (isNaN(join.getTime()) || isNaN(eff.getTime())) return 0;
+    const diffYears = eff.getFullYear() - join.getFullYear();
+    const diffMonths = eff.getMonth() - join.getMonth();
+    const months = diffYears * 12 + diffMonths;
+    return months >= 0 ? months : 0;
+  };
 
   // Mock data for dropdowns
   const years = ["2026", "2025", "2024"];
@@ -61,8 +113,8 @@ function YearlyBonusProcessPage() {
   const bonusTypes = ["--Select--", "Eid-ul-Fitr", "Eid-ul-Adha", "Durga Puja", "Christmas"];
   const employeeTypes = ["ALL", "Regular", "Contractual"];
 
-  // Mock employee data for bonus
-  const mockData = [
+  // Mock base employees
+  const mockBaseEmployees = [
     {
       id: 1,
       empId: "1001",
@@ -75,8 +127,6 @@ function YearlyBonusProcessPage() {
       joinDate: "2020-01-15",
       basic: 45000,
       gross: 75000,
-      percentage: 100,
-      bonusAmount: 45000,
     },
     {
       id: 2,
@@ -90,8 +140,6 @@ function YearlyBonusProcessPage() {
       joinDate: "2021-03-10",
       basic: 35000,
       gross: 60000,
-      percentage: 100,
-      bonusAmount: 35000,
     },
     {
       id: 3,
@@ -102,13 +150,55 @@ function YearlyBonusProcessPage() {
       dept: "Operations",
       section: "Logistics",
       desig: "Executive",
-      joinDate: "2023-06-01",
+      joinDate: "2025-11-20", // joined recently
       basic: 20000,
       gross: 35000,
-      percentage: 50,
-      bonusAmount: 10000,
     },
+    {
+      id: 4,
+      empId: "1004",
+      empIdOff: "O-1004",
+      name: "Sarah Kabir",
+      type: "Regular",
+      dept: "HR",
+      section: "Admin",
+      desig: "Specialist",
+      joinDate: "2026-02-10", // joined ~4 months before effective date
+      basic: 30000,
+      gross: 50000,
+    }
   ];
+
+  // Dynamically compute bonus values based on local storage tenure rule matching
+  const processedEmployees = useMemo(() => {
+    return mockBaseEmployees.map((emp) => {
+      const tenure = getTenureMonths(emp.joinDate, effectiveDate);
+      const rule = bonusRules.find(r => tenure >= r.minTenureMonths && tenure < r.maxTenureMonths);
+      
+      let percentage = 0;
+      let bonusAmount = 0;
+      
+      if (rule) {
+        if (rule.bonusType === "basic-percent") {
+          percentage = rule.bonusValue;
+          bonusAmount = Math.round(emp.basic * (rule.bonusValue / 100));
+        } else if (rule.bonusType === "gross-percent") {
+          percentage = rule.bonusValue;
+          bonusAmount = Math.round(emp.gross * (rule.bonusValue / 100));
+        } else if (rule.bonusType === "flat") {
+          percentage = 100;
+          bonusAmount = rule.bonusValue;
+        }
+      }
+      
+      return {
+        ...emp,
+        percentage,
+        bonusAmount,
+        tenureMonths: tenure
+      };
+    });
+  }, [bonusRules, effectiveDate]);
 
   const handleFetchData = () => {
     setIsDataLoaded(true);
@@ -117,7 +207,7 @@ function YearlyBonusProcessPage() {
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
-      setSelectedRows(mockData.filter((d) => !submittedRows.includes(d.id)).map((d) => d.id));
+      setSelectedRows(processedEmployees.filter((d) => !submittedRows.includes(d.id)).map((d) => d.id));
     } else {
       setSelectedRows([]);
     }
@@ -203,7 +293,7 @@ function YearlyBonusProcessPage() {
                   <DialogTrigger asChild>
                     <Button
                       variant="default"
-                      className="bg-primary hover:bg-primary/90 text-white border-0 shadow-sm font-semibold h-9 px-4"
+                      className="bg-primary hover:bg-primary/90 text-white border-0 shadow-sm font-semibold h-9 px-4 cursor-pointer"
                     >
                       <Play className="size-4 mr-2 fill-current" />
                       PROCESS
@@ -223,7 +313,11 @@ function YearlyBonusProcessPage() {
                         <label className="text-xs font-semibold text-slate-500 mb-1.5 block">
                           Bonus For
                         </label>
-                        <select className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                        <select 
+                          value={bonusType}
+                          onChange={(e) => setBonusType(e.target.value)}
+                          className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                        >
                           {bonusTypes.map((b) => (
                             <option key={b} value={b}>
                               {b}
@@ -237,7 +331,8 @@ function YearlyBonusProcessPage() {
                         </label>
                         <input
                           type="date"
-                          defaultValue="2026-06-23"
+                          value={effectiveDate}
+                          onChange={(e) => setEffectiveDate(e.target.value)}
                           className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                         />
                       </div>
@@ -245,7 +340,11 @@ function YearlyBonusProcessPage() {
                         <label className="text-xs font-semibold text-slate-500 mb-1.5 block">
                           Year
                         </label>
-                        <select className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                        <select 
+                          value={year}
+                          onChange={(e) => setYear(e.target.value)}
+                          className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                        >
                           {years.map((y) => (
                             <option key={y} value={y}>
                               {y}
@@ -257,8 +356,11 @@ function YearlyBonusProcessPage() {
                         <label className="text-xs font-semibold text-slate-500 mb-1.5 block">
                           Month
                         </label>
-                        <select className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                          <option value="Jun">Jun</option>
+                        <select 
+                          value={month}
+                          onChange={(e) => setMonth(e.target.value)}
+                          className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                        >
                           {months.map((m) => (
                             <option key={m} value={m}>
                               {m}
@@ -272,7 +374,11 @@ function YearlyBonusProcessPage() {
                         <label className="text-xs font-semibold text-slate-500 mb-1.5 block">
                           Employee Type
                         </label>
-                        <select className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                        <select 
+                          value={employeeType}
+                          onChange={(e) => setEmployeeType(e.target.value)}
+                          className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                        >
                           {employeeTypes.map((t) => (
                             <option key={t} value={t}>
                               {t}
@@ -284,10 +390,15 @@ function YearlyBonusProcessPage() {
                         <label className="text-xs font-semibold text-slate-500 mb-1.5 block">
                           Department
                         </label>
-                        <select className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                          <option>All Departments</option>
-                          <option>IT</option>
-                          <option>Operations</option>
+                        <select 
+                          value={department}
+                          onChange={(e) => setDepartment(e.target.value)}
+                          className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                        >
+                          <option value="All Departments">All Departments</option>
+                          <option value="IT">IT</option>
+                          <option value="Operations">Operations</option>
+                          <option value="HR">HR</option>
                         </select>
                       </div>
                       <div className="space-y-1.5">
@@ -334,14 +445,14 @@ function YearlyBonusProcessPage() {
                     <DialogFooter className="pt-6 mt-4 border-t border-slate-200/60">
                       <Button
                         variant="outline"
-                        className="h-10 rounded-lg border-slate-200 text-slate-600 hover:bg-slate-100 font-medium px-6"
+                        className="h-10 rounded-lg border-slate-200 text-slate-600 hover:bg-slate-100 font-medium px-6 cursor-pointer"
                         onClick={() => setIsFilterModalOpen(false)}
                       >
                         Cancel
                       </Button>
                       <Button
                         variant="default"
-                        className="h-10 rounded-lg bg-[#279863] hover:bg-[#208050] text-white font-medium px-6 shadow-sm"
+                        className="h-10 rounded-lg bg-[#279863] hover:bg-[#208050] text-white font-medium px-6 shadow-sm cursor-pointer"
                         onClick={handleFetchData}
                       >
                         <Search className="size-4 mr-1.5" />
@@ -396,14 +507,14 @@ function YearlyBonusProcessPage() {
                             className="rounded border-input accent-primary size-4 cursor-pointer"
                             checked={
                               isDataLoaded &&
-                              mockData.filter((r) => !submittedRows.includes(r.id)).length > 0 &&
+                              processedEmployees.filter((r) => !submittedRows.includes(r.id)).length > 0 &&
                               selectedRows.length ===
-                                mockData.filter((r) => !submittedRows.includes(r.id)).length
+                                processedEmployees.filter((r) => !submittedRows.includes(r.id)).length
                             }
                             onChange={handleSelectAll}
                             disabled={
                               !isDataLoaded ||
-                              mockData.filter((r) => !submittedRows.includes(r.id)).length === 0
+                              processedEmployees.filter((r) => !submittedRows.includes(r.id)).length === 0
                             }
                           />
                         </th>
@@ -415,9 +526,10 @@ function YearlyBonusProcessPage() {
                         <th className="px-4 py-3 whitespace-nowrap">Section</th>
                         <th className="px-4 py-3 whitespace-nowrap">Designation</th>
                         <th className="px-4 py-3 whitespace-nowrap">Join Date</th>
+                        <th className="px-4 py-3 whitespace-nowrap">Tenure</th>
                         <th className="px-4 py-3 whitespace-nowrap text-right">Basic</th>
                         <th className="px-4 py-3 whitespace-nowrap text-right">Gross</th>
-                        <th className="px-4 py-3 whitespace-nowrap text-center">Bonus(%)</th>
+                        <th className="px-4 py-3 whitespace-nowrap text-center">Bonus(%) / Flat</th>
                         <th className="px-4 py-3 whitespace-nowrap text-right font-bold text-primary">
                           Bonus Amount
                         </th>
@@ -425,21 +537,21 @@ function YearlyBonusProcessPage() {
                     </thead>
                     <tbody className="divide-y divide-border/40">
                       {!isDataLoaded ||
-                      mockData.filter((r) => !submittedRows.includes(r.id)).length === 0 ? (
+                      processedEmployees.filter((r) => !submittedRows.includes(r.id)).length === 0 ? (
                         <tr>
-                          <td colSpan={13} className="px-4 py-12 text-center text-muted-foreground">
+                          <td colSpan={14} className="px-4 py-12 text-center text-muted-foreground">
                             <div className="flex flex-col items-center justify-center gap-2">
                               <Search className="size-8 opacity-20" />
                               <p>
                                 {!isDataLoaded
                                   ? "No records found for processing. Click SEARCH or PROCESS."
                                   : "All bonuses have been submitted."}
-                              </p>
+                                </p>
                             </div>
                           </td>
                         </tr>
                       ) : (
-                        mockData
+                        processedEmployees
                           .filter((r) => !submittedRows.includes(r.id))
                           .map((row) => (
                             <tr
@@ -468,9 +580,16 @@ function YearlyBonusProcessPage() {
                               <td className="px-4 py-2">{row.section}</td>
                               <td className="px-4 py-2">{row.desig}</td>
                               <td className="px-4 py-2">{row.joinDate}</td>
+                              <td className="px-4 py-2 font-semibold text-slate-700">
+                                {row.tenureMonths} mths
+                              </td>
                               <td className="px-4 py-2 text-right">{row.basic.toLocaleString()}</td>
                               <td className="px-4 py-2 text-right">{row.gross.toLocaleString()}</td>
-                              <td className="px-4 py-2 text-center">{row.percentage}%</td>
+                              <td className="px-4 py-2 text-center font-bold">
+                                {row.percentage === 100 && row.bonusAmount !== row.basic && row.bonusAmount !== row.gross 
+                                  ? "Flat Payout" 
+                                  : `${row.percentage}%`}
+                              </td>
                               <td className="px-4 py-2 text-right font-bold">
                                 {row.bonusAmount.toLocaleString()}
                               </td>
@@ -480,6 +599,42 @@ function YearlyBonusProcessPage() {
                     </tbody>
                   </table>
                 </div>
+
+                {/* Processing actions */}
+                {isDataLoaded &&
+                  processedEmployees.filter((r) => !submittedRows.includes(r.id)).length > 0 && (
+                    <div className="p-4 border-t border-border/60 flex items-center justify-between bg-muted/5">
+                      <div className="text-xs text-muted-foreground">
+                        Selected <span className="font-bold text-foreground">{selectedRows.length}</span> of{" "}
+                        <span className="font-bold text-foreground">
+                          {processedEmployees.filter((r) => !submittedRows.includes(r.id)).length}
+                        </span>{" "}
+                        employees
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-rose-600 hover:bg-rose-50 hover:text-rose-700 h-9 font-semibold text-xs"
+                          onClick={handleDelete}
+                          disabled={selectedRows.length === 0}
+                        >
+                          <Trash2 className="size-4 mr-1.5" />
+                          DELETE
+                        </Button>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="bg-primary hover:bg-primary/90 text-white border-0 shadow-sm h-9 px-5 font-semibold text-xs flex items-center gap-1.5 cursor-pointer"
+                          onClick={handleSubmit}
+                          disabled={selectedRows.length === 0}
+                        >
+                          <Send className="size-3.5" />
+                          SUBMIT TO APPROVAL
+                        </Button>
+                      </div>
+                    </div>
+                  )}
               </TabsContent>
 
               {/* Tab 2: Submitted List */}
@@ -501,38 +656,32 @@ function YearlyBonusProcessPage() {
                         <th className="px-4 py-3 whitespace-nowrap">Section</th>
                         <th className="px-4 py-3 whitespace-nowrap">Designation</th>
                         <th className="px-4 py-3 whitespace-nowrap">Join Date</th>
+                        <th className="px-4 py-3 whitespace-nowrap">Tenure</th>
                         <th className="px-4 py-3 whitespace-nowrap text-right">Basic</th>
                         <th className="px-4 py-3 whitespace-nowrap text-right">Gross</th>
-                        <th className="px-4 py-3 whitespace-nowrap text-center">Bonus(%)</th>
+                        <th className="px-4 py-3 whitespace-nowrap text-center">Bonus(%) / Flat</th>
                         <th className="px-4 py-3 whitespace-nowrap text-right font-bold text-emerald-600">
                           Bonus Amount
                         </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border/40">
-                      {mockData.filter((r) => submittedRows.includes(r.id)).length === 0 ? (
+                      {processedEmployees.filter((r) => submittedRows.includes(r.id)).length === 0 ? (
                         <tr>
-                          <td colSpan={13} className="px-4 py-12 text-center text-muted-foreground">
-                            <div className="flex flex-col items-center justify-center gap-2">
-                              <FileText className="size-8 opacity-20" />
-                              <p>No submitted records yet.</p>
-                            </div>
+                          <td colSpan={14} className="px-4 py-12 text-center text-muted-foreground">
+                            No submitted records found.
                           </td>
                         </tr>
                       ) : (
-                        mockData
+                        processedEmployees
                           .filter((r) => submittedRows.includes(r.id))
                           .map((row) => (
-                            <tr
-                              key={`sub-${row.id}`}
-                              className="hover:bg-muted/30 transition-colors bg-muted/5"
-                            >
-                              <td className="px-4 py-2">
-                                <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                                  <CheckCircle2 className="size-3" /> Submitted
-                                </span>
+                            <tr key={`sub-${row.id}`} className="hover:bg-muted/20 transition-colors">
+                              <td className="px-4 py-2 font-medium text-emerald-600 flex items-center gap-1">
+                                <CheckCircle2 className="size-3.5" />
+                                Submitted
                               </td>
-                              <td className="px-4 py-2 text-muted-foreground">-</td>
+                              <td className="px-4 py-2 text-muted-foreground/60">—</td>
                               <td className="px-4 py-2">{row.empId}</td>
                               <td className="px-4 py-2">{row.empIdOff}</td>
                               <td className="px-4 py-2 font-medium">{row.name}</td>
@@ -540,10 +689,17 @@ function YearlyBonusProcessPage() {
                               <td className="px-4 py-2">{row.section}</td>
                               <td className="px-4 py-2">{row.desig}</td>
                               <td className="px-4 py-2">{row.joinDate}</td>
+                              <td className="px-4 py-2 font-semibold text-slate-700">
+                                {row.tenureMonths} mths
+                              </td>
                               <td className="px-4 py-2 text-right">{row.basic.toLocaleString()}</td>
                               <td className="px-4 py-2 text-right">{row.gross.toLocaleString()}</td>
-                              <td className="px-4 py-2 text-center">{row.percentage}%</td>
-                              <td className="px-4 py-2 text-right font-bold text-emerald-600">
+                              <td className="px-4 py-2 text-center font-bold">
+                                {row.percentage === 100 && row.bonusAmount !== row.basic && row.bonusAmount !== row.gross 
+                                  ? "Flat Payout" 
+                                  : `${row.percentage}%`}
+                              </td>
+                              <td className="px-4 py-2 text-right font-bold">
                                 {row.bonusAmount.toLocaleString()}
                               </td>
                             </tr>
@@ -555,42 +711,19 @@ function YearlyBonusProcessPage() {
               </TabsContent>
             </Tabs>
 
-            {/* Pagination Footer */}
-            <div className="p-3 border-t border-border/60 bg-muted/10 flex items-center justify-between text-xs text-muted-foreground">
-              <div>
-                Showing {isDataLoaded ? mockData.length : 0} to {isDataLoaded ? mockData.length : 0}{" "}
-                of {isDataLoaded ? mockData.length : 0} entries
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1">
-                  <Button variant="outline" size="sm" className="h-7 px-2.5 text-[10px]" disabled>
-                    Previous
-                  </Button>
-                  <Button variant="outline" size="sm" className="h-7 px-2.5 text-[10px]" disabled>
-                    Next
-                  </Button>
-                </div>
-
-                <div className="flex items-center gap-2 ml-4">
-                  <Button
-                    variant="outline"
-                    className="border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-600 h-8 disabled:opacity-50 disabled:cursor-not-allowed px-4 font-semibold shadow-sm"
-                    disabled={!isDataLoaded || selectedRows.length === 0}
-                    onClick={handleDelete}
-                  >
-                    <Trash2 className="size-3.5 mr-1.5" />
-                    DELETE
-                  </Button>
-                  <Button
-                    variant="default"
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white border-0 h-8 disabled:opacity-50 disabled:cursor-not-allowed px-4 font-semibold shadow-sm"
-                    disabled={!isDataLoaded || selectedRows.length === 0}
-                    onClick={handleSubmit}
-                  >
-                    <Send className="size-3.5 mr-1.5" />
-                    SUBMIT {selectedRows.length > 0 ? `(${selectedRows.length})` : ""}
-                  </Button>
-                </div>
+            {/* Pagination / Total count */}
+            <div className="px-4 py-3 bg-muted/10 border-t border-border/60 text-xs text-muted-foreground flex justify-between items-center font-medium">
+              <span>
+                Showing {isDataLoaded ? processedEmployees.length : 0} to {isDataLoaded ? processedEmployees.length : 0}{" "}
+                of {isDataLoaded ? processedEmployees.length : 0} entries
+              </span>
+              <div className="flex gap-1.5">
+                <Button variant="outline" size="sm" className="h-7 px-2.5 text-[10px] font-semibold" disabled>
+                  Previous
+                </Button>
+                <Button variant="outline" size="sm" className="h-7 px-2.5 text-[10px] font-semibold" disabled>
+                  Next
+                </Button>
               </div>
             </div>
           </div>
