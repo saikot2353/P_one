@@ -86,6 +86,7 @@ export const nav: NavItem[] = [
       { label: "Shift & Time Rules", to: "/configure-time" },
       { label: "Allowances & Bonuses", to: "/configure-compensation" },
       { label: "Tax & Compliance Setup", to: "/configure-tax" },
+      { label: "Payroll Configuration", to: "/payroll-configure" },
       { label: "Education & Training", to: "/configure-education" },
       { label: "Leave & Policies", to: "/configure-policies" },
       { label: "Letter Setup", to: "/configure-letter" },
@@ -321,6 +322,7 @@ export const nav: NavItem[] = [
         label: "Final Settlement",
         subitems: [{ label: "Execute Final Settlement", to: "/payroll-final-settlement-execute" }],
       },
+      { label: "Payroll Configuration", to: "/payroll-configure" },
       {
         label: "Reports",
         subitems: [

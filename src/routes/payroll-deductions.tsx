@@ -55,6 +55,10 @@ interface DeductionTemplate {
   excludedMonths: string[]; // e.g. ["Jun", "Jul"] - skips in these months every year
   customExcludedPeriods: string[]; // e.g. ["2026-12"] - skips in specific year-month
   employeeExclusions?: { empId: string; periods: string[] }[]; // employee-level suspensions
+  prorataEnabled: boolean; // pro-rata adjustments for late joiners
+  prorataDateThreshold: number; // joining day threshold (e.g. 10th)
+  prorataReductionType: "percent" | "flat"; // discount type: percentage or fixed flat Tk
+  prorataReductionValue: number; // discount value (e.g. 50% or 500 Tk flat discount)
 }
 
 export const Route = createFileRoute("/payroll-deductions")({
@@ -70,7 +74,21 @@ export const Route = createFileRoute("/payroll-deductions")({
 // Months and Years constants
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const YEARS = ["2024", "2025", "2026", "2027", "2028", "2029", "2030"];
-const DEDUCTION_TYPES = ["Penalty", "Damage", "Lunch Deduction", "Transport Deduction", "Other"];
+const DEFAULT_DEDUCTION_TYPES = ["Penalty", "Damage", "Lunch Deduction", "Transport Deduction", "Other"];
+
+// Parse joining date to check if joining date is in the processing year/month
+const isJoiningMonth = (joinDateStr: string, processYear: number, processMonthStr: string) => {
+  if (!joinDateStr) return { matches: false, joinDay: 1 };
+  const parts = joinDateStr.split("/");
+  if (parts.length !== 3) return { matches: false, joinDay: 1 };
+  const joinDay = Number(parts[0]);
+  const joinMonthNum = Number(parts[1]);
+  const joinYear = Number(parts[2]);
+
+  const processMonthNum = MONTHS.indexOf(processMonthStr) + 1;
+  const matches = joinYear === processYear && joinMonthNum === processMonthNum;
+  return { matches, joinDay };
+};
 
 // Calculate whether a deduction should apply or skip (Safe against undefined array fields)
 const checkDeductionStatus = (
@@ -127,7 +145,7 @@ const checkDeductionStatus = (
   return { isSkipped: false };
 };
 
-// Mock Employee DB with salaries to calculate percentage-based deductions
+// Mock Employee DB with standardized early/late joining dates for testing
 interface EmployeeRecord {
   id: number;
   empId: string;
@@ -137,14 +155,15 @@ interface EmployeeRecord {
   designation: string;
   basic: number;
   gross: number;
+  joinDate: string; // Standard joining date
 }
 
 const MOCK_EMPLOYEES: EmployeeRecord[] = [
-  { id: 1, empId: "2025057068", name: "Riazul Islam", empType: "Office Executive", department: "Accounts & Vat", designation: "Asst. Manager", basic: 42000, gross: 70000 },
-  { id: 2, empId: "2023046001", name: "Sohanur Rahman Sohan", empType: "Office Executive", department: "Admin", designation: "Executive", basic: 30000, gross: 50000 },
-  { id: 3, empId: "2023043021", name: "Easin Mia", empType: "Office Executive", department: "Admin", designation: "Receptionist", basic: 15000, gross: 25000 },
-  { id: 4, empId: "2026059411", name: "Jannatul Maowa", empType: "Office Executive", department: "Admin", designation: "Jr. Executive", basic: 18000, gross: 30000 },
-  { id: 5, empId: "2024049326", name: "Hanif Uddin", empType: "Office Executive", department: "APPS Team", designation: "Sr. Executive", basic: 36000, gross: 60000 }
+  { id: 1, empId: "2025057068", name: "Riazul Islam", empType: "Office Executive", department: "Accounts & Vat", designation: "Asst. Manager", basic: 42000, gross: 70000, joinDate: "01/08/2023" },
+  { id: 2, empId: "2023046001", name: "Sohanur Rahman Sohan", empType: "Office Executive", department: "Admin", designation: "Executive", basic: 30000, gross: 50000, joinDate: "15/02/2023" },
+  { id: 3, empId: "2023043021", name: "Easin Mia", empType: "Office Executive", department: "Admin", designation: "Receptionist", basic: 15000, gross: 25000, joinDate: "05/07/2026" }, // early joiner
+  { id: 4, empId: "2026059411", name: "Jannatul Maowa", empType: "Office Executive", department: "Admin", designation: "Jr. Executive", basic: 18000, gross: 30000, joinDate: "15/07/2026" }, // late joiner (>10th)
+  { id: 5, empId: "2024049326", name: "Hanif Uddin", empType: "Office Executive", department: "APPS Team", designation: "Sr. Executive", basic: 36000, gross: 60000, joinDate: "10/11/2024" }
 ];
 
 // Helper to evaluate final monetary value based on calculation type
@@ -173,7 +192,11 @@ const DEFAULT_TEMPLATES: DeductionTemplate[] = [
     excludeRamadan: false,
     excludedMonths: [],
     customExcludedPeriods: [],
-    employeeExclusions: []
+    employeeExclusions: [],
+    prorataEnabled: false,
+    prorataDateThreshold: 10,
+    prorataReductionType: "percent",
+    prorataReductionValue: 50
   },
   {
     id: 2,
@@ -189,7 +212,11 @@ const DEFAULT_TEMPLATES: DeductionTemplate[] = [
     customExcludedPeriods: [],
     employeeExclusions: [
       { empId: "2023046001", periods: ["2026-07"] } // Sohanur Rahman opted out of lunch in July 2026
-    ]
+    ],
+    prorataEnabled: true, // Pro-rata enabled for late joiners
+    prorataDateThreshold: 10, // Joined after 10th gets half deduction
+    prorataReductionType: "percent",
+    prorataReductionValue: 50
   },
   {
     id: 3,
@@ -203,7 +230,11 @@ const DEFAULT_TEMPLATES: DeductionTemplate[] = [
     excludeRamadan: false,
     excludedMonths: ["Jun", "Jul"], // e.g. annual summer break
     customExcludedPeriods: [],
-    employeeExclusions: []
+    employeeExclusions: [],
+    prorataEnabled: false,
+    prorataDateThreshold: 10,
+    prorataReductionType: "percent",
+    prorataReductionValue: 50
   },
   {
     id: 4,
@@ -219,7 +250,11 @@ const DEFAULT_TEMPLATES: DeductionTemplate[] = [
     excludeRamadan: false,
     excludedMonths: [],
     customExcludedPeriods: [],
-    employeeExclusions: []
+    employeeExclusions: [],
+    prorataEnabled: false,
+    prorataDateThreshold: 10,
+    prorataReductionType: "percent",
+    prorataReductionValue: 50
   }
 ];
 
@@ -275,6 +310,12 @@ function PayrollDeductionsPage() {
   const [exceptionMonth, setExceptionMonth] = useState("Jul");
   const [exceptionYear, setExceptionYear] = useState("2026");
 
+  // Late Joiners pro-rata controls states
+  const [formProrataEnabled, setFormProrataEnabled] = useState(false);
+  const [formProrataDateThreshold, setFormProrataDateThreshold] = useState("10");
+  const [formProrataReductionType, setFormProrataReductionType] = useState<"percent" | "flat">("percent");
+  const [formProrataReductionValue, setFormProrataReductionValue] = useState("50");
+
   // Target preview audit period selector in Dialog
   const [dialogAuditMonth, setDialogAuditMonth] = useState("Jul");
   const [dialogAuditYear, setDialogAuditYear] = useState("2026");
@@ -289,8 +330,21 @@ function PayrollDeductionsPage() {
     totalCount: number;
   }[]>([]);
 
+  const [deductionTypes, setDeductionTypes] = useState<string[]>(DEFAULT_DEDUCTION_TYPES);
+
   // Load from localStorage only after component mounts to avoid SSR hydration mismatches
   useEffect(() => {
+    // Load dynamic deduction categories
+    const storedCats = localStorage.getItem("payroll_deduction_types");
+    if (storedCats) {
+      try {
+        const parsed = JSON.parse(storedCats);
+        if (Array.isArray(parsed)) setDeductionTypes(parsed);
+      } catch (e) {
+        console.error("Failed to parse deduction types", e);
+      }
+    }
+
     const stored = localStorage.getItem("payroll_deduction_templates");
     if (stored) {
       try {
@@ -310,7 +364,11 @@ function PayrollDeductionsPage() {
             excludeRamadan: !!t.excludeRamadan,
             excludedMonths: Array.isArray(t.excludedMonths) ? t.excludedMonths : [],
             customExcludedPeriods: Array.isArray(t.customExcludedPeriods) ? t.customExcludedPeriods : [],
-            employeeExclusions: Array.isArray(t.employeeExclusions) ? t.employeeExclusions : []
+            employeeExclusions: Array.isArray(t.employeeExclusions) ? t.employeeExclusions : [],
+            prorataEnabled: !!t.prorataEnabled,
+            prorataDateThreshold: t.prorataDateThreshold || 10,
+            prorataReductionType: t.prorataReductionType || "percent",
+            prorataReductionValue: t.prorataReductionValue !== undefined ? t.prorataReductionValue : (t.prorataReductionPercent !== undefined ? t.prorataReductionPercent : 50)
           }));
           setTemplates(migrated);
         }
@@ -409,6 +467,10 @@ function PayrollDeductionsPage() {
     setExceptionEmpId("");
     setExceptionMonth("Jul");
     setExceptionYear("2026");
+    setFormProrataEnabled(false);
+    setFormProrataDateThreshold("10");
+    setFormProrataReductionType("percent");
+    setFormProrataReductionValue("50");
     setIsPreviewLoaded(false);
     setActiveTab("general");
   };
@@ -437,6 +499,11 @@ function PayrollDeductionsPage() {
     setFormExcludedMonths(template.excludedMonths || []);
     setFormCustomExcludedPeriods(template.customExcludedPeriods || []);
     setFormEmployeeExclusions(template.employeeExclusions || []);
+
+    setFormProrataEnabled(!!template.prorataEnabled);
+    setFormProrataDateThreshold(String(template.prorataDateThreshold || 10));
+    setFormProrataReductionType(template.prorataReductionType || "percent");
+    setFormProrataReductionValue(String(template.prorataReductionValue !== undefined ? template.prorataReductionValue : 50));
     
     setIsPreviewLoaded(false);
     setActiveTab("general");
@@ -564,6 +631,10 @@ function PayrollDeductionsPage() {
       excludedMonths: formRecurrence === "monthly" ? formExcludedMonths : [],
       customExcludedPeriods: formRecurrence === "monthly" ? formCustomExcludedPeriods : [],
       employeeExclusions: formRecurrence === "monthly" ? formEmployeeExclusions : [],
+      prorataEnabled: formRecurrence === "monthly" ? formProrataEnabled : false,
+      prorataDateThreshold: formRecurrence === "monthly" ? Number(formProrataDateThreshold) : 10,
+      prorataReductionType: formRecurrence === "monthly" ? formProrataReductionType : "percent",
+      prorataReductionValue: formRecurrence === "monthly" ? Number(formProrataReductionValue) : 50,
     };
 
     if (editingTemplate) {
@@ -594,7 +665,11 @@ function PayrollDeductionsPage() {
       excludeRamadan: formExcludeRamadan,
       excludedMonths: formExcludedMonths,
       customExcludedPeriods: formCustomExcludedPeriods,
-      employeeExclusions: formEmployeeExclusions
+      employeeExclusions: formEmployeeExclusions,
+      prorataEnabled: formProrataEnabled,
+      prorataDateThreshold: Number(formProrataDateThreshold),
+      prorataReductionType: formProrataReductionType,
+      prorataReductionValue: Number(formProrataReductionValue)
     };
 
     const results = [];
@@ -617,7 +692,7 @@ function PayrollDeductionsPage() {
     return results;
   };
 
-  // Run simulation calculations taking designated months and employee exclusions into account
+  // Run simulation calculations taking designated months, employee exclusions, and pro-rata rules into account
   const handleRunSimulation = () => {
     const results = templates.map((t) => {
       const designatedRamMonth = ramadanMonthMap[Number(simYear)] || "Feb";
@@ -709,7 +784,7 @@ function PayrollDeductionsPage() {
                   Deduction Templates
                 </h1>
                 <p className="text-sm text-slate-500 max-w-3xl leading-relaxed">
-                  Manage fixed and recurring salary deduction profiles. Exclude specific employees during custom months (e.g. lunch cancellations), and manually designate the active <strong>Ramadan Month (Rojar Mash)</strong> to automatically bypass rules.
+                  Manage fixed and recurring salary deduction profiles. Exclude specific employees during custom months (e.g. lunch cancellations), manually designate the active <strong>Ramadan Month</strong>, and configure **dynamic pro-rata reductions** for late-joining staff.
                 </p>
               </div>
 
@@ -725,15 +800,15 @@ function PayrollDeductionsPage() {
             </div>
           </div>
 
-          {/* Active Period Dashboard (Configurable month and designated Ramadan) */}
+          {/* Active Period Dashboard */}
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-5 shadow-xs">
             <div className="space-y-1">
-              <span className="text-[10px] uppercase tracking-wider font-extrabold text-blue-500">Active Audit Settings</span>
+              <span className="text-[10px] uppercase tracking-wider font-extrabold text-blue-550">Active Audit Settings</span>
               <h2 className="text-base font-extrabold text-slate-800 flex flex-wrap items-center gap-2">
                 Evaluating Templates for: 
-                <span className="text-blue-600 underline decoration-indigo-300 underline-offset-4 font-bold">{activeProcessMonth} {activeProcessYear}</span>
+                <span className="text-blue-650 underline decoration-indigo-300 underline-offset-4 font-bold">{activeProcessMonth} {activeProcessYear}</span>
                 <span className="text-slate-400 font-normal">| Designated Ramadan:</span>
-                <span className="inline-flex items-center gap-1 text-xs text-amber-700 font-extrabold bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-lg">
+                <span className="inline-flex items-center gap-1 text-xs text-amber-705 font-extrabold bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-lg">
                   🌙 {ramadanMonthMap[Number(activeProcessYear)] || "Feb"} {activeProcessYear}
                 </span>
               </h2>
@@ -781,7 +856,7 @@ function PayrollDeductionsPage() {
             </div>
           </div>
 
-          {/* Bulk Action Controls bar (visible when rows are checked) */}
+          {/* Bulk Action Controls bar */}
           {bulkSelectedIds.length > 0 && (
             <div className="bg-slate-900 text-white p-4 rounded-xl flex items-center justify-between shadow-lg animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div className="flex items-center gap-3">
@@ -910,6 +985,11 @@ function PayrollDeductionsPage() {
                                   🌙 Excludes Ramadan (designated)
                                 </span>
                               )}
+                              {row.recurrence === "monthly" && row.prorataEnabled && (
+                                <span className="inline-flex items-center gap-1 text-[10px] text-indigo-650 font-bold bg-indigo-50 border border-indigo-100/50 rounded px-1.5 py-0.5 w-fit mt-1">
+                                  📊 Late Joinee Pro-rata ({row.prorataReductionType === "percent" ? `${row.prorataReductionValue}%` : `৳${row.prorataReductionValue}`} off)
+                                </span>
+                              )}
                             </div>
                           </td>
                           <td className="p-4">
@@ -921,9 +1001,29 @@ function PayrollDeductionsPage() {
                           <td className="p-4">
                             <div className="flex flex-col">
                               {row.amountType === "flat" ? (
-                                <span className="font-extrabold text-slate-900">৳ {Number(row.amount).toLocaleString()}</span>
+                                <>
+                                  <span className="font-extrabold text-slate-900">৳ {Number(row.amount).toLocaleString()}</span>
+                                  {row.prorataEnabled && (
+                                    <span className="text-[10px] text-slate-400 font-semibold font-sans" title={`Pro-rated for late joiners (after day ${row.prorataDateThreshold})`}>
+                                      ৳ {row.prorataReductionType === "percent"
+                                        ? Math.round(Number(row.amount) * (100 - row.prorataReductionValue) / 100).toLocaleString()
+                                        : Math.max(0, Number(row.amount) - row.prorataReductionValue).toLocaleString()
+                                      } (after {row.prorataDateThreshold}th)
+                                    </span>
+                                  )}
+                                </>
                               ) : (
-                                <span className="font-extrabold text-slate-900">{row.amount}% <span className="text-[10px] text-slate-400 font-bold">of {row.amountType === "percent-basic" ? "Basic" : "Gross"}</span></span>
+                                <>
+                                  <span className="font-extrabold text-slate-900">{row.amount}% <span className="text-[10px] text-slate-400 font-bold">of {row.amountType === "percent-basic" ? "Basic" : "Gross"}</span></span>
+                                  {row.prorataEnabled && (
+                                    <span className="text-[10px] text-slate-400 font-semibold font-sans" title={`Pro-rated for late joiners (after day ${row.prorataDateThreshold})`}>
+                                      {row.prorataReductionType === "percent"
+                                        ? `${Number(row.amount) * (100 - row.prorataReductionValue) / 100}%`
+                                        : `rate - ৳${row.prorataReductionValue}`
+                                      } of {row.amountType === "percent-basic" ? "Basic" : "Gross"} (after {row.prorataDateThreshold}th)
+                                    </span>
+                                  )}
+                                </>
                               )}
                             </div>
                           </td>
@@ -937,7 +1037,7 @@ function PayrollDeductionsPage() {
                                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
                                   <Clock className="size-3.5" /> Monthly Recurring
                                 </span>
-                                <div className="text-[10px] text-slate-400 leading-tight">
+                                <div className="text-[10px] text-slate-400 leading-tight font-medium">
                                   {row.excludedMonths && row.excludedMonths.length > 0 && `Skip: ${row.excludedMonths.join(", ")}. `}
                                   {row.customExcludedPeriods && row.customExcludedPeriods.length > 0 && `Exceptions: ${row.customExcludedPeriods.join(", ")}.`}
                                   {row.employeeExclusions && row.employeeExclusions.length > 0 && `Overrides: ${row.employeeExclusions.length} staff.`}
@@ -973,7 +1073,7 @@ function PayrollDeductionsPage() {
                                   ✓ Running
                                 </span>
                                 <span className="text-[9px] font-extrabold text-indigo-500">
-                                  ({runStatus.excludedCount} staff overrides)
+                                  ({runStatus.excludedCount} overrides)
                                 </span>
                               </div>
                             ) : (
@@ -989,7 +1089,7 @@ function PayrollDeductionsPage() {
                               className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border transition-all ${
                                 row.status === "Active"
                                   ? "bg-emerald-50 text-emerald-600 border-emerald-200/60 hover:bg-emerald-100 hover:-translate-y-0.5"
-                                  : "bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200 hover:-translate-y-0.5"
+                                  : "bg-slate-100 text-slate-550 border-slate-200 hover:bg-slate-200 hover:-translate-y-0.5"
                               }`}
                             >
                               {row.status}
@@ -999,21 +1099,21 @@ function PayrollDeductionsPage() {
                             <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
                               <button
                                 onClick={() => handleEditClick(row)}
-                                className="p-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-colors border border-slate-200/50 cursor-pointer"
+                                className="p-2 bg-slate-100 text-slate-650 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-colors border border-slate-200/50 cursor-pointer"
                                 title="Edit Template"
                               >
                                 <Edit className="size-3.5" />
                               </button>
                               <button
                                 onClick={() => handleDuplicateTemplate(row)}
-                                className="p-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-colors border border-slate-200/50 cursor-pointer"
+                                className="p-2 bg-slate-100 text-slate-655 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-colors border border-slate-200/50 cursor-pointer"
                                 title="Duplicate Template"
                               >
                                 <Copy className="size-3.5" />
                               </button>
                               <button
                                 onClick={() => handleDeleteTemplate(row.id)}
-                                className="p-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-rose-50 hover:text-rose-600 transition-colors border border-slate-200/50 cursor-pointer"
+                                className="p-2 bg-slate-100 text-slate-655 rounded-xl hover:bg-rose-50 hover:text-rose-600 transition-colors border border-slate-200/50 cursor-pointer"
                                 title="Delete Template"
                               >
                                 <Trash2 className="size-3.5" />
@@ -1069,7 +1169,7 @@ function PayrollDeductionsPage() {
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-600 block">Simulation Year</label>
+                      <label className="text-xs font-bold text-slate-655 block">Simulation Year</label>
                       <select
                         value={simYear}
                         onChange={(e) => setSimYear(e.target.value)}
@@ -1080,7 +1180,7 @@ function PayrollDeductionsPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-600 block">Simulation Month</label>
+                      <label className="text-xs font-bold text-slate-655 block">Simulation Month</label>
                       <select
                         value={simMonth}
                         onChange={(e) => setSimMonth(e.target.value)}
@@ -1091,11 +1191,11 @@ function PayrollDeductionsPage() {
                     </div>
                   </div>
 
-                  <div className="bg-amber-50/40 border border-amber-200/50 rounded-xl p-4 space-y-2 text-xs text-amber-800">
+                  <div className="bg-amber-50/40 border border-amber-200/50 rounded-xl p-4 space-y-2 text-xs text-amber-800 font-sans">
                     <span className="font-extrabold flex items-center gap-1.5 text-amber-900">
                       🌙 Configured Ramadan for {simYear}:
                     </span>
-                    <p className="font-bold text-amber-950 text-sm">{ramadanMonthMap[Number(simYear)] || "Feb"} {simYear}</p>
+                    <p className="font-bold text-amber-955 text-sm">{ramadanMonthMap[Number(simYear)] || "Feb"} {simYear}</p>
                     
                     {simMonth === (ramadanMonthMap[Number(simYear)] || "Feb") ? (
                       <div className="flex items-start gap-1.5 text-rose-600 font-bold bg-rose-50 border border-rose-100 p-2.5 rounded-lg mt-2">
@@ -1114,7 +1214,7 @@ function PayrollDeductionsPage() {
                 <div className="border-t border-slate-200/80 pt-5 mt-4 space-y-3.5">
                   <div className="flex justify-between items-center text-xs font-semibold text-slate-500">
                     <span>Applied Templates:</span>
-                    <span className="font-bold text-slate-700">
+                    <span className="font-bold text-slate-750">
                       {simResults.filter(r => !r.status.isSkipped && r.template.status === "Active").length} of {templates.filter(t => t.status === "Active").length}
                     </span>
                   </div>
@@ -1132,11 +1232,25 @@ function PayrollDeductionsPage() {
                         ৳ {simResults
                           .filter(r => r.template.status === "Active")
                           .reduce((sum, r) => {
-                            // Sum evaluating flat or percentage amounts across our mock employee list with exclusions
+                            // Sum evaluating flat or percentage amounts across our mock employee list with exclusions and pro-rata adjustments
                             const totalVal = MOCK_EMPLOYEES.reduce((empSum, emp) => {
                               const status = checkDeductionStatus(r.template, Number(simYear), simMonth, ramadanMonthMap[Number(simYear)] || "Feb", emp.empId);
                               if (status.isSkipped) return empSum;
-                              const amt = getEvaluatedAmount(r.template.amount, r.template.amountType, emp.basic, emp.gross);
+                              
+                              let amt = getEvaluatedAmount(r.template.amount, r.template.amountType, emp.basic, emp.gross);
+                              // Apply pro-rata reduction for late joiners
+                              if (r.template.prorataEnabled) {
+                                const checkJoin = isJoiningMonth(emp.joinDate, Number(simYear), simMonth);
+                                if (checkJoin.matches && checkJoin.joinDay > r.template.prorataDateThreshold) {
+                                  const val = r.template.prorataReductionValue || 0;
+                                  if (r.template.prorataReductionType === "percent") {
+                                    const factor = (100 - val) / 100;
+                                    amt = Math.round(amt * factor);
+                                  } else {
+                                    amt = Math.max(0, amt - val);
+                                  }
+                                }
+                              }
                               return empSum + amt;
                             }, 0);
                             return sum + totalVal;
@@ -1162,7 +1276,22 @@ function PayrollDeductionsPage() {
                     const totalVal = MOCK_EMPLOYEES.reduce((sum, emp) => {
                       const indStatus = checkDeductionStatus(template, Number(simYear), simMonth, ramadanMonthMap[Number(simYear)] || "Feb", emp.empId);
                       if (indStatus.isSkipped) return sum;
-                      return sum + getEvaluatedAmount(template.amount, template.amountType, emp.basic, emp.gross);
+                      
+                      let amt = getEvaluatedAmount(template.amount, template.amountType, emp.basic, emp.gross);
+                      // Apply pro-rata logic
+                      if (template.prorataEnabled) {
+                        const checkJoin = isJoiningMonth(emp.joinDate, Number(simYear), simMonth);
+                        if (checkJoin.matches && checkJoin.joinDay > template.prorataDateThreshold) {
+                          const val = template.prorataReductionValue || 0;
+                          if (template.prorataReductionType === "percent") {
+                            const factor = (100 - val) / 100;
+                            amt = Math.round(amt * factor);
+                          } else {
+                            amt = Math.max(0, amt - val);
+                          }
+                        }
+                      }
+                      return sum + amt;
                     }, 0);
 
                     const runCount = totalCount - skippedCount;
@@ -1172,9 +1301,9 @@ function PayrollDeductionsPage() {
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
                             <span className="font-bold text-slate-800 text-sm">{template.name}</span>
-                            <span className="text-[10px] font-semibold bg-slate-100 text-slate-600 rounded px-1.5 py-0.5">{template.type}</span>
+                            <span className="text-[10px] font-semibold bg-slate-100 text-slate-655 rounded px-1.5 py-0.5">{template.type}</span>
                           </div>
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400 font-medium">
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400 font-medium font-sans">
                             {template.amountType === "flat" ? (
                               <span>Rate: ৳{Number(template.amount).toLocaleString()} flat</span>
                             ) : (
@@ -1183,7 +1312,7 @@ function PayrollDeductionsPage() {
                             <span>•</span>
                             <span>{template.recurrence === "one-time" ? "One-Time" : "Monthly schedule"}</span>
                             <span>•</span>
-                            <span className="text-slate-500 font-bold">Simulated Total ({runCount}/{totalCount} running): ৳{totalVal.toLocaleString()}</span>
+                            <span className="text-slate-550 font-bold">Simulated Total ({runCount}/{totalCount} running): ৳{totalVal.toLocaleString()}</span>
                           </div>
                         </div>
 
@@ -1191,7 +1320,7 @@ function PayrollDeductionsPage() {
                           {status.isSkipped ? (
                             <div className="inline-flex flex-col sm:items-end gap-1">
                               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 border border-amber-200 text-amber-700">
-                                <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                                <span className="h-1.5 w-1.5 rounded-full bg-amber-550" />
                                 SKIPPED
                               </span>
                               <span className="text-[10px] text-slate-500 font-bold block max-w-[240px] leading-tight">
@@ -1201,17 +1330,17 @@ function PayrollDeductionsPage() {
                           ) : skippedCount > 0 ? (
                             <div className="inline-flex flex-col sm:items-end gap-1">
                               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-50 border border-indigo-200 text-indigo-700">
-                                <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
+                                <span className="h-1.5 w-1.5 rounded-full bg-indigo-550" />
                                 ACTIVE (WITH EXCLUSIONS)
                               </span>
-                              <span className="text-[10px] text-slate-500 font-bold block">
+                              <span className="text-[10px] text-slate-550 font-bold block">
                                 {skippedCount} staff excluded (৳{totalVal.toLocaleString()})
                               </span>
                             </div>
                           ) : (
                             <div className="inline-flex flex-col sm:items-end gap-1">
                               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 border border-emerald-200 text-emerald-700">
-                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-550" />
                                 APPLIED
                               </span>
                               <span className="text-[10px] text-emerald-600 font-bold block">
@@ -1291,7 +1420,7 @@ function PayrollDeductionsPage() {
             </div>
 
             {/* Scrollable Form Body */}
-            <div className="px-6 py-5 max-h-[60vh] overflow-y-auto bg-slate-50/40">
+            <div className="px-6 py-5 max-h-[60vh] overflow-y-auto bg-slate-50/40 font-sans">
               {activeTab === "general" ? (
                 /* TAB 1: GENERAL SETTINGS & TARGETING */
                 <div className="space-y-5">
@@ -1311,7 +1440,7 @@ function PayrollDeductionsPage() {
 
                       {/* Calculation rate type */}
                       <div className="sm:col-span-3 space-y-1.5">
-                        <label className="text-xs font-bold text-slate-500 block">Deduction Method</label>
+                        <label className="text-xs font-bold text-slate-555 block">Deduction Method</label>
                         <select
                           value={formAmountType}
                           onChange={(e) => setFormAmountType(e.target.value as any)}
@@ -1350,7 +1479,7 @@ function PayrollDeductionsPage() {
                           className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 focus:outline-none transition-all font-semibold cursor-pointer font-sans"
                         >
                           <option>---Select---</option>
-                          {DEDUCTION_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+                          {deductionTypes.map((t) => <option key={t} value={t}>{t}</option>)}
                         </select>
                       </div>
 
@@ -1366,6 +1495,90 @@ function PayrollDeductionsPage() {
                           <option value="Contractual">Contractual Staff</option>
                         </select>
                       </div>
+                    </div>
+
+                    {/* Pro-rata Late-Joining Adjustment Setup inside Deduction Rate Card */}
+                    <div className="pt-4 border-t border-slate-100 space-y-3.5">
+                      <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={formProrataEnabled}
+                          onChange={(e) => setFormProrataEnabled(e.target.checked)}
+                          className="accent-blue-600 size-4.5 rounded cursor-pointer"
+                        />
+                        <span className="text-xs font-extrabold text-slate-700 uppercase tracking-wide">
+                          📊 Enable Late-Joiner Pro-rata Adjustment
+                        </span>
+                      </label>
+                      
+                      {formProrataEnabled && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50/50 p-4.5 rounded-xl border border-slate-200/50 animate-in fade-in duration-200">
+                          <div className="space-y-1.5 col-span-2 sm:col-span-1">
+                            <label className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Joining Day Threshold</label>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-slate-500 font-medium">If joining after day:</span>
+                              <select
+                                value={formProrataDateThreshold}
+                                onChange={(e) => setFormProrataDateThreshold(e.target.value)}
+                                className="h-9 w-20 rounded-xl border border-slate-200 bg-white px-2.5 text-xs font-bold text-slate-750 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 focus:outline-none cursor-pointer"
+                              >
+                                {Array.from({ length: 31 }).map((_, i) => (
+                                  <option key={i+1} value={i+1}>{i+1}th</option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
+
+                          <div className="space-y-1.5 col-span-2 sm:col-span-1">
+                            <label className="text-[10px] text-slate-450 font-extrabold uppercase tracking-wider block">Discount/Reduction Adjustment</label>
+                            <div className="flex gap-2 items-center flex-wrap">
+                              <select
+                                value={formProrataReductionType}
+                                onChange={(e) => setFormProrataReductionType(e.target.value as any)}
+                                className="h-9 rounded-xl border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700 cursor-pointer"
+                              >
+                                <option value="percent">Percentage (%)</option>
+                                <option value="flat">Fixed Amount (৳)</option>
+                              </select>
+                              <div className="relative w-24">
+                                <input
+                                  type="number"
+                                  value={formProrataReductionValue}
+                                  onChange={(e) => setFormProrataReductionValue(e.target.value)}
+                                  className="w-full h-9 rounded-xl border border-slate-200 bg-white pl-3.5 pr-8 text-xs font-bold text-slate-700 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 focus:outline-none font-mono"
+                                />
+                                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-extrabold">
+                                  {formProrataReductionType === "percent" ? "%" : "৳"}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Dynamic Pro-rated amount calculated text preview */}
+                          <div className="sm:col-span-2 pt-3 border-t border-slate-200/50 flex items-center justify-between">
+                            <span className="text-[10px] text-slate-400 font-bold uppercase">Dynamic Pro-rata Rate Preview</span>
+                            <span className="text-xs font-extrabold text-blue-650 font-mono">
+                              {formAmountType === "flat" ? (
+                                <>
+                                  Base: ৳{(Number(formAmount) || 0).toLocaleString()} ➔ Pro-rated: <span className="text-blue-600 underline">৳{
+                                    formProrataReductionType === "percent"
+                                      ? Math.round((Number(formAmount) || 0) * (100 - (Number(formProrataReductionValue) || 0)) / 100).toLocaleString()
+                                      : Math.max(0, (Number(formAmount) || 0) - (Number(formProrataReductionValue) || 0)).toLocaleString()
+                                  }</span>
+                                </>
+                              ) : (
+                                <>
+                                  Base: {formAmount}% ➔ Pro-rated: <span className="text-blue-600 underline">{
+                                    formProrataReductionType === "percent"
+                                      ? `${(Number(formAmount) || 0) * (100 - (Number(formProrataReductionValue) || 0)) / 100}%`
+                                      : `${formAmount}% minus ৳${formProrataReductionValue}`
+                                  } of {formAmountType === "percent-basic" ? "Basic" : "Gross"}</span>
+                                </>
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -1387,7 +1600,7 @@ function PayrollDeductionsPage() {
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-500 block">Section</label>
+                        <label className="text-xs font-bold text-slate-550 block">Section</label>
                         <select
                           value={formSection}
                           onChange={(e) => setFormSection(e.target.value)}
@@ -1400,7 +1613,7 @@ function PayrollDeductionsPage() {
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-500 block">Emp IDs (Comma separated)</label>
+                        <label className="text-xs font-bold text-slate-550 block">Emp IDs (Comma separated)</label>
                         <input
                           type="text"
                           placeholder="e.g. 2025057068"
@@ -1412,7 +1625,7 @@ function PayrollDeductionsPage() {
                     </div>
                   </div>
 
-                  {/* Collapsible preview table inside general tab */}
+                  {/* Group Audit Preview */}
                   <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
                     <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-2">
@@ -1424,14 +1637,14 @@ function PayrollDeductionsPage() {
                         <select
                           value={dialogAuditMonth}
                           onChange={(e) => setDialogAuditMonth(e.target.value)}
-                          className="h-8 rounded-lg border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700"
+                          className="h-8 rounded-lg border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700 cursor-pointer"
                         >
                           {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
                         </select>
                         <select
                           value={dialogAuditYear}
                           onChange={(e) => setDialogAuditYear(e.target.value)}
-                          className="h-8 rounded-lg border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700"
+                          className="h-8 rounded-lg border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700 cursor-pointer"
                         >
                           {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
                         </select>
@@ -1439,7 +1652,7 @@ function PayrollDeductionsPage() {
                           type="button"
                           variant="outline"
                           size="sm"
-                          className="h-8 border-slate-200 text-xs font-bold bg-white text-slate-600 rounded-lg hover:bg-slate-50 cursor-pointer"
+                          className="h-8 border-slate-200 text-xs font-bold bg-white text-slate-655 rounded-lg hover:bg-slate-50 cursor-pointer"
                           onClick={handleFetchPreview}
                         >
                           Run Audit ({dialogAuditMonth})
@@ -1479,24 +1692,52 @@ function PayrollDeductionsPage() {
                                 excludeRamadan: formExcludeRamadan,
                                 excludedMonths: formExcludedMonths,
                                 customExcludedPeriods: formCustomExcludedPeriods,
-                                employeeExclusions: formEmployeeExclusions
+                                employeeExclusions: formEmployeeExclusions,
+                                prorataEnabled: formProrataEnabled,
+                                prorataDateThreshold: Number(formProrataDateThreshold),
+                                prorataReductionType: formProrataReductionType,
+                                prorataReductionValue: Number(formProrataReductionValue)
                               };
                               const auditRamadanMonth = ramadanMonthMap[Number(dialogAuditYear)] || "Feb";
                               const statusRes = checkDeductionStatus(tempTemplate, Number(dialogAuditYear), dialogAuditMonth, auditRamadanMonth, row.empId);
-                              const finalVal = statusRes.isSkipped ? 0 : getEvaluatedAmount(formAmount, formAmountType, row.basic, row.gross);
                               
+                              let finalVal = statusRes.isSkipped ? 0 : getEvaluatedAmount(formAmount, formAmountType, row.basic, row.gross);
+                              let isProratedApplied = false;
+
+                              // Apply pro-rata check in target audit
+                              if (!statusRes.isSkipped && formProrataEnabled) {
+                                const checkJoin = isJoiningMonth(row.joinDate, Number(dialogAuditYear), dialogAuditMonth);
+                                if (checkJoin.matches && checkJoin.joinDay > Number(formProrataDateThreshold)) {
+                                  const val = Number(formProrataReductionValue) || 0;
+                                  if (formProrataReductionType === "percent") {
+                                    const factor = (100 - val) / 100;
+                                    finalVal = Math.round(finalVal * factor);
+                                  } else {
+                                    finalVal = Math.max(0, finalVal - val);
+                                  }
+                                  isProratedApplied = true;
+                                }
+                              }
+
                               return (
                                 <tr key={row.id} className="hover:bg-slate-50/50">
                                   <td className="px-4 py-2.5 font-bold text-slate-700">{row.empId}</td>
                                   <td className="px-4 py-2.5 font-bold text-slate-800">{row.name}</td>
                                   <td className="px-4 py-2.5 text-slate-500">{row.department}</td>
-                                  <td className="px-4 py-2.5 text-right font-medium text-slate-600 font-mono">৳{row.basic.toLocaleString()}</td>
-                                  <td className="px-4 py-2.5 text-right font-medium text-slate-600 font-mono">৳{row.gross.toLocaleString()}</td>
+                                  <td className="px-4 py-2.5 text-right font-medium text-slate-655 font-mono">৳{row.basic.toLocaleString()}</td>
+                                  <td className="px-4 py-2.5 text-right font-medium text-slate-655 font-mono">৳{row.gross.toLocaleString()}</td>
                                   <td className="px-4 py-2.5 text-right pr-6 font-extrabold font-mono">
                                     {statusRes.isSkipped ? (
                                       <span className="inline-flex items-center gap-1 text-[9px] text-amber-600 font-bold bg-amber-50 border border-amber-200/50 px-2 py-0.5 rounded" title={statusRes.reason}>
                                         ⚠️ Excluded
                                       </span>
+                                    ) : isProratedApplied ? (
+                                      <div className="flex flex-col items-end">
+                                        <span className="text-blue-600">৳{finalVal.toLocaleString()}</span>
+                                        <span className="text-[8px] text-indigo-500 font-extrabold">
+                                          Pro-rated (-{formProrataReductionType === "percent" ? `${formProrataReductionValue}%` : `৳${formProrataReductionValue}`})
+                                        </span>
+                                      </div>
                                     ) : (
                                       <span className="text-blue-600">৳{finalVal.toLocaleString()}</span>
                                     )}
@@ -1582,7 +1823,7 @@ function PayrollDeductionsPage() {
                               className="accent-amber-600 size-4.5 rounded mt-0.5 cursor-pointer"
                             />
                             <div className="space-y-0.5">
-                              <span className="text-sm font-extrabold text-amber-950 flex items-center gap-1.5">
+                              <span className="text-sm font-extrabold text-amber-955 flex items-center gap-1.5">
                                 🌙 Auto-Skip during Ramadan (Rojar Mash)
                               </span>
                               <span className="text-xs text-amber-700 block leading-relaxed font-medium">
@@ -1628,7 +1869,7 @@ function PayrollDeductionsPage() {
                         {/* Custom Exclusion Tags */}
                         <div className="space-y-2">
                           <div className="space-y-0.5">
-                            <label className="text-xs font-bold text-slate-600 block">
+                            <label className="text-xs font-bold text-slate-655 block">
                               Single Period Exceptions
                             </label>
                             <span className="text-[10px] text-slate-400 block font-medium">Add exceptions for a single specific year/month only (e.g. suspension due to relocation).</span>
@@ -1672,7 +1913,7 @@ function PayrollDeductionsPage() {
                                 return (
                                   <span
                                     key={period}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 border border-slate-200 text-slate-600 shadow-xs font-sans"
+                                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 border border-slate-200 text-slate-655 shadow-xs font-sans"
                                   >
                                     {monthName} {yearStr}
                                     <button
@@ -1696,7 +1937,7 @@ function PayrollDeductionsPage() {
                   <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
                     <div className="flex items-center gap-2 border-b border-slate-100 pb-2.5">
                       <Info className="size-4 text-indigo-500" />
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">Dynamic Schedule Timeline Preview</h4>
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-750">Dynamic Schedule Timeline Preview</h4>
                     </div>
                     
                     <p className="text-[11px] text-slate-400 font-medium">Verify how your rules evaluate over the next 12 calendar periods:</p>
@@ -1748,7 +1989,7 @@ function PayrollDeductionsPage() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-end bg-slate-50/50 p-4 rounded-xl border border-slate-200/40">
                       <div className="sm:col-span-5 space-y-1.5">
-                        <label className="text-xs font-bold text-slate-500 block">Select Employee</label>
+                        <label className="text-xs font-bold text-slate-550 block">Select Employee</label>
                         <select
                           value={exceptionEmpId}
                           onChange={(e) => setExceptionEmpId(e.target.value)}
@@ -1764,7 +2005,7 @@ function PayrollDeductionsPage() {
                       </div>
 
                       <div className="sm:col-span-3 space-y-1.5">
-                        <label className="text-xs font-bold text-slate-500 block">Month</label>
+                        <label className="text-xs font-bold text-slate-550 block">Month</label>
                         <select
                           value={exceptionMonth}
                           onChange={(e) => setExceptionMonth(e.target.value)}
@@ -1777,7 +2018,7 @@ function PayrollDeductionsPage() {
                       </div>
 
                       <div className="sm:col-span-2 space-y-1.5">
-                        <label className="text-xs font-bold text-slate-500 block">Year</label>
+                        <label className="text-xs font-bold text-slate-555 block">Year</label>
                         <select
                           value={exceptionYear}
                           onChange={(e) => setExceptionYear(e.target.value)}
@@ -1890,7 +2131,7 @@ function PayrollDeductionsPage() {
                   <button
                     type="button"
                     onClick={() => setActiveTab("schedule")}
-                    className="h-10 px-5 text-xs font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-all cursor-pointer select-none"
+                    className="h-10 px-5 text-xs font-bold text-slate-555 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-all cursor-pointer select-none"
                   >
                     Back to Recurrence
                   </button>
@@ -1900,7 +2141,7 @@ function PayrollDeductionsPage() {
               <div className="flex gap-2.5">
                 <Button
                   variant="ghost"
-                  className="text-slate-600 font-bold px-4 rounded-xl hover:bg-slate-100 h-10 select-none text-xs cursor-pointer"
+                  className="text-slate-655 font-bold px-4 rounded-xl hover:bg-slate-100 h-10 select-none text-xs cursor-pointer"
                   onClick={() => setIsModalOpen(false)}
                 >
                   Cancel
