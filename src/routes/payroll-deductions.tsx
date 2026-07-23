@@ -8,7 +8,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { 
   ChevronRight, 
@@ -16,7 +15,6 @@ import {
   FileText, 
   Printer, 
   FileDown, 
-  MinusCircle, 
   Save, 
   Plus, 
   Edit, 
@@ -31,14 +29,14 @@ import {
   TrendingDown,
   Tag,
   Users,
-  Building2,
   CalendarDays,
   FileCheck,
   AlertTriangle,
   ClipboardList,
   Copy,
   Moon,
-  ArrowRight
+  ArrowRight,
+  UserCheck
 } from "lucide-react";
 
 // Define Deduction Template Interface
@@ -56,6 +54,7 @@ interface DeductionTemplate {
   excludeRamadan: boolean;
   excludedMonths: string[]; // e.g. ["Jun", "Jul"] - skips in these months every year
   customExcludedPeriods: string[]; // e.g. ["2026-12"] - skips in specific year-month
+  employeeExclusions?: { empId: string; periods: string[] }[]; // employee-level suspensions
 }
 
 export const Route = createFileRoute("/payroll-deductions")({
@@ -73,66 +72,31 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 const YEARS = ["2024", "2025", "2026", "2027", "2028", "2029", "2030"];
 const DEDUCTION_TYPES = ["Penalty", "Damage", "Lunch Deduction", "Transport Deduction", "Other"];
 
-// Ramadan/Roza dates mapping (Approximate overlap with Gregorian months)
-const RAMADAN_RANGES: Record<number, { start: Date; end: Date; desc: string }> = {
-  2024: { start: new Date(2024, 2, 11), end: new Date(2024, 3, 9), desc: "Mar 11 – Apr 9" },
-  2025: { start: new Date(2025, 2, 1), end: new Date(2025, 2, 30), desc: "Mar 1 – Mar 30" },
-  2026: { start: new Date(2026, 1, 18), end: new Date(2026, 2, 19), desc: "Feb 18 – Mar 19" },
-  2027: { start: new Date(2027, 1, 8), end: new Date(2027, 2, 9), desc: "Feb 8 – Mar 9" },
-  2028: { start: new Date(2028, 0, 28), end: new Date(2028, 1, 26), desc: "Jan 28 – Feb 26" },
-  2029: { start: new Date(2029, 0, 16), end: new Date(2029, 1, 14), desc: "Jan 16 – Feb 14" },
-  2030: { start: new Date(2030, 0, 5), end: new Date(2030, 1, 3), desc: "Jan 5 – Feb 3" },
-};
-
-// Check if a specific month/year overlaps with Ramadan (taking optional calibration offset into account)
-const getRamadanOverlap = (year: number, monthStr: string, calibrationOffsetDays: number = 0) => {
-  const monthIdx = MONTHS.indexOf(monthStr);
-  if (monthIdx === -1) return false;
-
-  const baseRange = RAMADAN_RANGES[year];
-  if (!baseRange) return false;
-
-  // Apply calibration offset in days to the Ramadan dates
-  const adjustedStart = new Date(baseRange.start.getTime());
-  adjustedStart.setDate(adjustedStart.getDate() + calibrationOffsetDays);
-  
-  const adjustedEnd = new Date(baseRange.end.getTime());
-  adjustedEnd.setDate(adjustedEnd.getDate() + calibrationOffsetDays);
-
-  const monthStart = new Date(year, monthIdx, 1);
-  const monthEnd = new Date(year, monthIdx + 1, 0);
-
-  return adjustedStart <= monthEnd && monthStart <= adjustedEnd;
-};
-
-// Returns adjusted range string description
-const getCalibratedRamadanRangeDesc = (year: number, offsetDays: number = 0) => {
-  const baseRange = RAMADAN_RANGES[year];
-  if (!baseRange) return "Variable";
-  if (offsetDays === 0) return baseRange.desc;
-
-  const adjStart = new Date(baseRange.start.getTime());
-  adjStart.setDate(adjStart.getDate() + offsetDays);
-
-  const adjEnd = new Date(baseRange.end.getTime());
-  adjEnd.setDate(adjEnd.getDate() + offsetDays);
-
-  const options: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
-  return `${adjStart.toLocaleDateString("en-US", options)} – ${adjEnd.toLocaleDateString("en-US", options)}`;
-};
-
 // Calculate whether a deduction should apply or skip (Safe against undefined array fields)
 const checkDeductionStatus = (
   template: DeductionTemplate,
   year: number,
   monthStr: string,
-  calibrationOffsetDays: number = 0
+  designatedRamadanMonth?: string,
+  empId?: string
 ): { isSkipped: boolean; reason?: string } => {
   if (template.status === "Inactive") {
     return { isSkipped: true, reason: "Inactive Template" };
   }
 
-  // 1. One-time recurrence evaluation
+  // 1. Employee-specific override exclusions (Checked first)
+  if (empId && template.employeeExclusions) {
+    const empExcl = template.employeeExclusions.find(x => x.empId === empId);
+    if (empExcl) {
+      const monthNum = String(MONTHS.indexOf(monthStr) + 1).padStart(2, "0");
+      const periodStr = `${year}-${monthNum}`;
+      if (empExcl.periods && empExcl.periods.includes(periodStr)) {
+        return { isSkipped: true, reason: `Employee Opt-Out for ${monthStr} ${year}` };
+      }
+    }
+  }
+
+  // 2. One-time recurrence evaluation
   if (template.recurrence === "one-time") {
     if (template.oneTimeMonth !== monthStr || template.oneTimeYear !== String(year)) {
       return { isSkipped: true, reason: `One-time: runs only in ${template.oneTimeMonth || "Jul"} ${template.oneTimeYear || "2026"}` };
@@ -140,11 +104,10 @@ const checkDeductionStatus = (
     return { isSkipped: false };
   }
 
-  // 2. Monthly recurring rules evaluation
-  // A. Ramadan exclusion
-  if (template.excludeRamadan && getRamadanOverlap(year, monthStr, calibrationOffsetDays)) {
-    const rangeDesc = getCalibratedRamadanRangeDesc(year, calibrationOffsetDays);
-    return { isSkipped: true, reason: `Ramadan Exception (${rangeDesc})` };
+  // 3. Monthly recurring rules evaluation
+  // A. Configured designated Ramadan Month override
+  if (template.excludeRamadan && designatedRamadanMonth === monthStr) {
+    return { isSkipped: true, reason: `Ramadan Exception Designated Month (${monthStr})` };
   }
 
   // B. Specific calendar month of year exclusion
@@ -209,7 +172,8 @@ const DEFAULT_TEMPLATES: DeductionTemplate[] = [
     recurrence: "monthly",
     excludeRamadan: false,
     excludedMonths: [],
-    customExcludedPeriods: []
+    customExcludedPeriods: [],
+    employeeExclusions: []
   },
   {
     id: 2,
@@ -222,7 +186,10 @@ const DEFAULT_TEMPLATES: DeductionTemplate[] = [
     recurrence: "monthly",
     excludeRamadan: true, // skipped during Ramadan
     excludedMonths: [],
-    customExcludedPeriods: []
+    customExcludedPeriods: [],
+    employeeExclusions: [
+      { empId: "2023046001", periods: ["2026-07"] } // Sohanur Rahman opted out of lunch in July 2026
+    ]
   },
   {
     id: 3,
@@ -235,7 +202,8 @@ const DEFAULT_TEMPLATES: DeductionTemplate[] = [
     recurrence: "monthly",
     excludeRamadan: false,
     excludedMonths: ["Jun", "Jul"], // e.g. annual summer break
-    customExcludedPeriods: []
+    customExcludedPeriods: [],
+    employeeExclusions: []
   },
   {
     id: 4,
@@ -250,13 +218,19 @@ const DEFAULT_TEMPLATES: DeductionTemplate[] = [
     oneTimeYear: "2026",
     excludeRamadan: false,
     excludedMonths: [],
-    customExcludedPeriods: []
+    customExcludedPeriods: [],
+    employeeExclusions: []
   }
 ];
 
 function PayrollDeductionsPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [templates, setTemplates] = useState<DeductionTemplate[]>(DEFAULT_TEMPLATES);
+
+  // Designated Ramadan months per year mapping
+  const [ramadanMonthMap, setRamadanMonthMap] = useState<Record<number, string>>(() => {
+    return { 2024: "Mar", 2025: "Mar", 2026: "Feb", 2027: "Feb", 2028: "Jan", 2029: "Jan", 2030: "Jan" }; // Default maps
+  });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPreviewLoaded, setIsPreviewLoaded] = useState(false);
@@ -269,8 +243,8 @@ function PayrollDeductionsPage() {
   const [activeProcessMonth, setActiveProcessMonth] = useState("Jul");
   const [activeProcessYear, setActiveProcessYear] = useState("2026");
 
-  // Modal active tab state: "general" | "schedule"
-  const [activeTab, setActiveTab] = useState<"general" | "schedule">("general");
+  // Modal active tab state: "general" | "schedule" | "exceptions"
+  const [activeTab, setActiveTab] = useState<"general" | "schedule" | "exceptions">("general");
 
   // Form Editing State
   const [editingTemplate, setEditingTemplate] = useState<DeductionTemplate | null>(null);
@@ -295,11 +269,25 @@ function PayrollDeductionsPage() {
   const [formExclusionYear, setFormExclusionYear] = useState("2026");
   const [formCustomExcludedPeriods, setFormCustomExcludedPeriods] = useState<string[]>([]);
 
-  // Simulation & Calibration States
-  const [simMonth, setSimMonth] = useState("Mar"); // Mar 2026 contains Ramadan
+  // Employee Specific Exclusions form states
+  const [formEmployeeExclusions, setFormEmployeeExclusions] = useState<{ empId: string; periods: string[] }[]>([]);
+  const [exceptionEmpId, setExceptionEmpId] = useState("");
+  const [exceptionMonth, setExceptionMonth] = useState("Jul");
+  const [exceptionYear, setExceptionYear] = useState("2026");
+
+  // Target preview audit period selector in Dialog
+  const [dialogAuditMonth, setDialogAuditMonth] = useState("Jul");
+  const [dialogAuditYear, setDialogAuditYear] = useState("2026");
+
+  // Simulation States
+  const [simMonth, setSimMonth] = useState("Mar"); // Mar 2026
   const [simYear, setSimYear] = useState("2026");
-  const [ramadanCalibrationOffset, setRamadanCalibrationOffset] = useState(0); // Offset in days: -2 to +2
-  const [simResults, setSimResults] = useState<{ template: DeductionTemplate; status: { isSkipped: boolean; reason?: string } }[]>([]);
+  const [simResults, setSimResults] = useState<{ 
+    template: DeductionTemplate; 
+    status: { isSkipped: boolean; reason?: string };
+    skippedCount: number;
+    totalCount: number;
+  }[]>([]);
 
   // Load from localStorage only after component mounts to avoid SSR hydration mismatches
   useEffect(() => {
@@ -321,7 +309,8 @@ function PayrollDeductionsPage() {
             oneTimeYear: t.oneTimeYear || "2026",
             excludeRamadan: !!t.excludeRamadan,
             excludedMonths: Array.isArray(t.excludedMonths) ? t.excludedMonths : [],
-            customExcludedPeriods: Array.isArray(t.customExcludedPeriods) ? t.customExcludedPeriods : []
+            customExcludedPeriods: Array.isArray(t.customExcludedPeriods) ? t.customExcludedPeriods : [],
+            employeeExclusions: Array.isArray(t.employeeExclusions) ? t.employeeExclusions : []
           }));
           setTemplates(migrated);
         }
@@ -329,15 +318,34 @@ function PayrollDeductionsPage() {
         console.error("Failed to parse templates from localStorage", e);
       }
     }
+
+    const storedRamadan = localStorage.getItem("payroll_ramadan_months");
+    if (storedRamadan) {
+      try {
+        const parsed = JSON.parse(storedRamadan);
+        if (parsed && typeof parsed === "object") {
+          setRamadanMonthMap(prev => ({ ...prev, ...parsed }));
+        }
+      } catch (e) {
+        console.error("Failed to parse ramadanMonthMap from localStorage", e);
+      }
+    }
+
     setIsMounted(true);
   }, []);
 
-  // Sync templates to localStorage (only after mount!)
+  // Sync templates and settings to localStorage (only after mount!)
   useEffect(() => {
     if (isMounted) {
       localStorage.setItem("payroll_deduction_templates", JSON.stringify(templates));
     }
   }, [templates, isMounted]);
+
+  useEffect(() => {
+    if (isMounted) {
+      localStorage.setItem("payroll_ramadan_months", JSON.stringify(ramadanMonthMap));
+    }
+  }, [ramadanMonthMap, isMounted]);
 
   // Bulk toggle selections helper
   const handleToggleBulkSelectRow = (id: number) => {
@@ -397,6 +405,10 @@ function PayrollDeductionsPage() {
     setFormExcludeRamadan(false);
     setFormExcludedMonths([]);
     setFormCustomExcludedPeriods([]);
+    setFormEmployeeExclusions([]);
+    setExceptionEmpId("");
+    setExceptionMonth("Jul");
+    setExceptionYear("2026");
     setIsPreviewLoaded(false);
     setActiveTab("general");
   };
@@ -424,6 +436,7 @@ function PayrollDeductionsPage() {
     setFormExcludeRamadan(template.excludeRamadan);
     setFormExcludedMonths(template.excludedMonths || []);
     setFormCustomExcludedPeriods(template.customExcludedPeriods || []);
+    setFormEmployeeExclusions(template.employeeExclusions || []);
     
     setIsPreviewLoaded(false);
     setActiveTab("general");
@@ -471,6 +484,49 @@ function PayrollDeductionsPage() {
     setFormCustomExcludedPeriods(formCustomExcludedPeriods.filter((p) => p !== periodStr));
   };
 
+  // Add individual employee specific override exceptions
+  const handleAddEmployeeException = () => {
+    if (!exceptionEmpId) {
+      alert("Please select a targeted employee.");
+      return;
+    }
+    const monthNum = String(MONTHS.indexOf(exceptionMonth) + 1).padStart(2, "0");
+    const periodStr = `${exceptionYear}-${monthNum}`;
+
+    const existingIdx = formEmployeeExclusions.findIndex(x => x.empId === exceptionEmpId);
+    if (existingIdx > -1) {
+      const existingPeriods = formEmployeeExclusions[existingIdx].periods;
+      if (existingPeriods.includes(periodStr)) {
+        alert("This period is already excluded for the selected staff member.");
+        return;
+      }
+      const updated = [...formEmployeeExclusions];
+      updated[existingIdx] = {
+        ...updated[existingIdx],
+        periods: [...existingPeriods, periodStr]
+      };
+      setFormEmployeeExclusions(updated);
+    } else {
+      setFormEmployeeExclusions([
+        ...formEmployeeExclusions,
+        { empId: exceptionEmpId, periods: [periodStr] }
+      ]);
+    }
+  };
+
+  const handleRemoveEmployeeExceptionPeriod = (empId: string, periodStr: string) => {
+    const updated = formEmployeeExclusions.map(x => {
+      if (x.empId === empId) {
+        return {
+          ...x,
+          periods: x.periods.filter(p => p !== periodStr)
+        };
+      }
+      return x;
+    }).filter(x => x.periods.length > 0);
+    setFormEmployeeExclusions(updated);
+  };
+
   const toggleFormExcludedMonth = (month: string) => {
     if (formExcludedMonths.includes(month)) {
       setFormExcludedMonths(formExcludedMonths.filter((m) => m !== month));
@@ -507,6 +563,7 @@ function PayrollDeductionsPage() {
       excludeRamadan: formRecurrence === "monthly" ? formExcludeRamadan : false,
       excludedMonths: formRecurrence === "monthly" ? formExcludedMonths : [],
       customExcludedPeriods: formRecurrence === "monthly" ? formCustomExcludedPeriods : [],
+      employeeExclusions: formRecurrence === "monthly" ? formEmployeeExclusions : [],
     };
 
     if (editingTemplate) {
@@ -537,12 +594,14 @@ function PayrollDeductionsPage() {
       excludeRamadan: formExcludeRamadan,
       excludedMonths: formExcludedMonths,
       customExcludedPeriods: formCustomExcludedPeriods,
+      employeeExclusions: formEmployeeExclusions
     };
 
     const results = [];
     for (let i = 0; i < 12; i++) {
       const monthStr = MONTHS[currentMonthIdx];
-      const statusRes = checkDeductionStatus(tempTemplate, currentYear, monthStr, ramadanCalibrationOffset);
+      const designatedRamMonth = ramadanMonthMap[currentYear] || "Feb";
+      const statusRes = checkDeductionStatus(tempTemplate, currentYear, monthStr, designatedRamMonth);
       results.push({
         monthStr,
         year: currentYear,
@@ -558,18 +617,41 @@ function PayrollDeductionsPage() {
     return results;
   };
 
-  // Run simulation calculation
+  // Run simulation calculations taking designated months and employee exclusions into account
   const handleRunSimulation = () => {
     const results = templates.map((t) => {
-      const status = checkDeductionStatus(t, Number(simYear), simMonth, ramadanCalibrationOffset);
-      return { template: t, status };
+      const designatedRamMonth = ramadanMonthMap[Number(simYear)] || "Feb";
+      
+      // Check status for each mock employee to get exact count
+      const employeeStatuses = MOCK_EMPLOYEES.map(emp => {
+        return checkDeductionStatus(t, Number(simYear), simMonth, designatedRamMonth, emp.empId);
+      });
+      
+      const skippedCount = employeeStatuses.filter(s => s.isSkipped).length;
+      const totalCount = MOCK_EMPLOYEES.length;
+      
+      // Determine overall status for this template
+      let overallStatus = { isSkipped: false, reason: "" };
+      if (t.status === "Inactive") {
+        overallStatus = { isSkipped: true, reason: "Inactive Template" };
+      } else if (skippedCount === totalCount) {
+        const generalStatus = checkDeductionStatus(t, Number(simYear), simMonth, designatedRamMonth);
+        overallStatus = { isSkipped: true, reason: generalStatus.reason || "All staff excluded" };
+      }
+
+      return { 
+        template: t, 
+        status: overallStatus,
+        skippedCount,
+        totalCount
+      };
     });
     setSimResults(results);
   };
 
   useEffect(() => {
     handleRunSimulation();
-  }, [templates, simMonth, simYear, ramadanCalibrationOffset]);
+  }, [templates, simMonth, simYear, ramadanMonthMap]);
 
   const filteredTemplates = templates.filter((t) =>
     t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -578,12 +660,21 @@ function PayrollDeductionsPage() {
 
   // Computes how each template runs in the ACTIVE listing month selection
   const templatesRunStatusMap = useMemo(() => {
-    const record: Record<number, { isSkipped: boolean; reason?: string }> = {};
+    const record: Record<number, { isSkipped: boolean; reason?: string; excludedCount: number }> = {};
+    const periodStr = `${activeProcessYear}-${String(MONTHS.indexOf(activeProcessMonth) + 1).padStart(2, "0")}`;
+    
     templates.forEach(t => {
-      record[t.id] = checkDeductionStatus(t, Number(activeProcessYear), activeProcessMonth, ramadanCalibrationOffset);
+      const generalStatus = checkDeductionStatus(t, Number(activeProcessYear), activeProcessMonth, ramadanMonthMap[Number(activeProcessYear)] || "Feb");
+      const excludedCount = t.employeeExclusions?.filter(x => x.periods.includes(periodStr)).length || 0;
+      
+      record[t.id] = {
+        isSkipped: generalStatus.isSkipped,
+        reason: generalStatus.reason,
+        excludedCount
+      };
     });
     return record;
-  }, [templates, activeProcessMonth, activeProcessYear, ramadanCalibrationOffset]);
+  }, [templates, activeProcessMonth, activeProcessYear, ramadanMonthMap]);
 
   return (
     <div className="min-h-screen flex bg-slate-50/70 text-slate-800 font-sans">
@@ -603,7 +694,7 @@ function PayrollDeductionsPage() {
             <span className="text-slate-600">Deduction Rules</span>
           </div>
 
-          {/* Header Card with Gradient and Icons */}
+          {/* Header Card with Gradient */}
           <div className="relative bg-white border border-slate-200/80 rounded-2xl p-6 md:p-8 shadow-sm overflow-hidden">
             <div className="absolute right-0 top-0 w-80 h-80 bg-blue-50/40 rounded-full blur-3xl -z-10 translate-x-1/3 -translate-y-1/3" />
             <div className="absolute left-1/3 bottom-0 w-60 h-60 bg-rose-50/30 rounded-full blur-2xl -z-10 translate-y-1/2" />
@@ -618,14 +709,14 @@ function PayrollDeductionsPage() {
                   Deduction Templates
                 </h1>
                 <p className="text-sm text-slate-500 max-w-3xl leading-relaxed">
-                  Manage fixed and recurring salary deduction profiles. Use automated exclusion controls to easily pause deductions in fasting seasons like <strong>Ramadan (Rojar Mash)</strong>, custom monthly windows, or off-peak periods without touching individual records.
+                  Manage fixed and recurring salary deduction profiles. Exclude specific employees during custom months (e.g. lunch cancellations), and manually designate the active <strong>Ramadan Month (Rojar Mash)</strong> to automatically bypass rules.
                 </p>
               </div>
 
               <div>
                 <Button
                   onClick={handleCreateNewClick}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold h-11 px-6 rounded-xl transition-all shadow-md shadow-blue-500/10 flex items-center gap-2 hover:-translate-y-0.5 active:translate-y-0"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold h-11 px-6 rounded-xl transition-all shadow-md shadow-blue-500/10 flex items-center gap-2 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
                 >
                   <Plus className="size-5" />
                   NEW TEMPLATE
@@ -634,36 +725,57 @@ function PayrollDeductionsPage() {
             </div>
           </div>
 
-          {/* Active Period Dashboard (Interactive list status override) */}
+          {/* Active Period Dashboard (Configurable month and designated Ramadan) */}
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-5 shadow-xs">
             <div className="space-y-1">
-              <span className="text-[10px] uppercase tracking-wider font-extrabold text-blue-500">Active Audit Period</span>
-              <h2 className="text-base font-extrabold text-slate-800 flex items-center gap-2">
+              <span className="text-[10px] uppercase tracking-wider font-extrabold text-blue-500">Active Audit Settings</span>
+              <h2 className="text-base font-extrabold text-slate-800 flex flex-wrap items-center gap-2">
                 Evaluating Templates for: 
-                <span className="text-blue-600 underline decoration-indigo-300 underline-offset-4">{activeProcessMonth} {activeProcessYear}</span>
+                <span className="text-blue-600 underline decoration-indigo-300 underline-offset-4 font-bold">{activeProcessMonth} {activeProcessYear}</span>
+                <span className="text-slate-400 font-normal">| Designated Ramadan:</span>
+                <span className="inline-flex items-center gap-1 text-xs text-amber-700 font-extrabold bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-lg">
+                  🌙 {ramadanMonthMap[Number(activeProcessYear)] || "Feb"} {activeProcessYear}
+                </span>
               </h2>
-              <p className="text-xs text-slate-400">Main table statuses and evaluation logs react dynamically to this setting to preview output.</p>
+              <p className="text-xs text-slate-400">Main table statuses, target previews, and simulators calculate based on these configurations.</p>
             </div>
 
-            <div className="flex gap-3 w-full md:w-auto">
-              <div className="flex-1 md:flex-none">
-                <label className="text-[9px] text-slate-400 font-extrabold uppercase block mb-1">Month</label>
+            <div className="flex gap-3 w-full md:w-auto flex-wrap">
+              <div>
+                <label className="text-[9px] text-slate-450 font-extrabold uppercase block mb-1">Month</label>
                 <select
                   value={activeProcessMonth}
                   onChange={(e) => setActiveProcessMonth(e.target.value)}
-                  className="w-full md:w-32 h-9 rounded-xl border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-700 shadow-xs cursor-pointer focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500"
+                  className="w-full md:w-28 h-9 rounded-xl border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-700 shadow-xs cursor-pointer focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 focus:outline-none"
                 >
                   {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
                 </select>
               </div>
-              <div className="flex-1 md:flex-none">
-                <label className="text-[9px] text-slate-400 font-extrabold uppercase block mb-1">Year</label>
+              
+              <div>
+                <label className="text-[9px] text-slate-450 font-extrabold uppercase block mb-1">Year</label>
                 <select
                   value={activeProcessYear}
                   onChange={(e) => setActiveProcessYear(e.target.value)}
-                  className="w-full md:w-32 h-9 rounded-xl border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-700 shadow-xs cursor-pointer focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500"
+                  className="w-full md:w-28 h-9 rounded-xl border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-700 shadow-xs cursor-pointer focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 focus:outline-none"
                 >
                   {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-[9px] text-amber-600 font-extrabold uppercase block mb-1 flex items-center gap-1">
+                  <Moon className="size-3 text-amber-500" /> Designated Ramadan
+                </label>
+                <select
+                  value={ramadanMonthMap[Number(activeProcessYear)] || "Feb"}
+                  onChange={(e) => {
+                    const selMonth = e.target.value;
+                    setRamadanMonthMap(prev => ({ ...prev, [Number(activeProcessYear)]: selMonth }));
+                  }}
+                  className="w-full md:w-36 h-9 rounded-xl border border-amber-200 bg-amber-50/20 px-2.5 text-xs font-extrabold text-amber-800 shadow-xs cursor-pointer focus:ring-4 focus:ring-amber-500/5 focus:border-amber-400 focus:outline-none"
+                >
+                  {MONTHS.map(m => <option key={m} value={m}>{m} (Ramadan)</option>)}
                 </select>
               </div>
             </div>
@@ -761,7 +873,7 @@ function PayrollDeductionsPage() {
                     <th className="p-4">Base Rate</th>
                     <th className="p-4">Schedule Pattern</th>
                     <th className="p-4">Target Scope</th>
-                    <th className="p-4 text-center w-40">Period Run Audit</th>
+                    <th className="p-4 text-center w-48">Period Run Audit ({activeProcessMonth})</th>
                     <th className="p-4 text-center w-24">Status</th>
                     <th className="p-4 text-center pr-6 w-36">Actions</th>
                   </tr>
@@ -795,7 +907,7 @@ function PayrollDeductionsPage() {
                               <span className="font-bold text-slate-800 group-hover:text-blue-600 transition-colors">{row.name}</span>
                               {row.recurrence === "monthly" && row.excludeRamadan && (
                                 <span className="inline-flex items-center gap-1 text-[10px] text-amber-600 font-bold bg-amber-50 border border-amber-100/50 rounded px-1.5 py-0.5 w-fit mt-1">
-                                  🌙 Excludes Ramadan (Rojar)
+                                  🌙 Excludes Ramadan (designated)
                                 </span>
                               )}
                             </div>
@@ -828,6 +940,7 @@ function PayrollDeductionsPage() {
                                 <div className="text-[10px] text-slate-400 leading-tight">
                                   {row.excludedMonths && row.excludedMonths.length > 0 && `Skip: ${row.excludedMonths.join(", ")}. `}
                                   {row.customExcludedPeriods && row.customExcludedPeriods.length > 0 && `Exceptions: ${row.customExcludedPeriods.join(", ")}.`}
+                                  {row.employeeExclusions && row.employeeExclusions.length > 0 && `Overrides: ${row.employeeExclusions.length} staff.`}
                                 </div>
                               </div>
                             )}
@@ -847,11 +960,20 @@ function PayrollDeductionsPage() {
                               </span>
                             ) : runStatus?.isSkipped ? (
                               <div className="inline-flex flex-col items-center gap-0.5">
-                                <span className="inline-flex items-center gap-1 text-[10px] text-amber-600 font-bold bg-amber-50 border border-amber-200/50 px-2 py-0.5 rounded">
+                                <span className="inline-flex items-center gap-1 text-[10px] text-amber-600 font-bold bg-amber-50 border border-amber-200/50 px-2 py-0.5 rounded animate-pulse">
                                   ⚠️ Suspended
                                 </span>
                                 <span className="text-[8px] text-slate-400 block max-w-[150px] truncate" title={runStatus.reason}>
                                   {runStatus.reason}
+                                </span>
+                              </div>
+                            ) : runStatus && runStatus.excludedCount > 0 ? (
+                              <div className="inline-flex flex-col items-center gap-0.5">
+                                <span className="inline-flex items-center gap-1 text-[10px] text-indigo-600 font-bold bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded">
+                                  ✓ Running
+                                </span>
+                                <span className="text-[9px] font-extrabold text-indigo-500">
+                                  ({runStatus.excludedCount} staff overrides)
                                 </span>
                               </div>
                             ) : (
@@ -927,7 +1049,7 @@ function PayrollDeductionsPage() {
                 </div>
                 <div>
                   <h2 className="text-lg font-extrabold text-slate-900">Period Run Simulator & Exception Log</h2>
-                  <p className="text-xs text-slate-500 mt-1">Audit deduction logic and calibrate Ramadan lunar dates sighting offsets before starting monthly salary calculations.</p>
+                  <p className="text-xs text-slate-500 mt-1">Audit deduction calculations, simulated totals, and exclusions before running monthly salaries.</p>
                 </div>
               </div>
               
@@ -969,46 +1091,24 @@ function PayrollDeductionsPage() {
                     </div>
                   </div>
 
-                  {/* Ramadan calibration settings block */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-600 flex items-center gap-1">
-                      <Moon className="size-3.5 text-blue-600" />
-                      Ramadan Moon Sighting Calibration
-                    </label>
-                    <select
-                      value={ramadanCalibrationOffset}
-                      onChange={(e) => setRamadanCalibrationOffset(Number(e.target.value))}
-                      className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-xs focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 focus:outline-none transition-all cursor-pointer"
-                    >
-                      <option value="-2">-2 days (Earlier moon sighting)</option>
-                      <option value="-1">-1 day</option>
-                      <option value="0">0 days (Standard Calculation)</option>
-                      <option value="1">+1 day (Delayed moon sighting)</option>
-                      <option value="2">+2 days</option>
-                    </select>
-                    <span className="text-[10px] text-slate-400 block leading-tight font-medium">Calibrate Hijri calendar offsets to match the national moon-sighting committee announcements.</span>
+                  <div className="bg-amber-50/40 border border-amber-200/50 rounded-xl p-4 space-y-2 text-xs text-amber-800">
+                    <span className="font-extrabold flex items-center gap-1.5 text-amber-900">
+                      🌙 Configured Ramadan for {simYear}:
+                    </span>
+                    <p className="font-bold text-amber-950 text-sm">{ramadanMonthMap[Number(simYear)] || "Feb"} {simYear}</p>
+                    
+                    {simMonth === (ramadanMonthMap[Number(simYear)] || "Feb") ? (
+                      <div className="flex items-start gap-1.5 text-rose-600 font-bold bg-rose-50 border border-rose-100 p-2.5 rounded-lg mt-2">
+                        <AlertTriangle className="size-4 shrink-0 mt-0.5" />
+                        <p className="leading-snug font-semibold">Simulated month overlaps designated Ramadan. Ramadan exclusions are active.</p>
+                      </div>
+                    ) : (
+                      <div className="flex items-start gap-1.5 text-emerald-600 font-bold bg-emerald-50 border border-emerald-100 p-2.5 rounded-lg mt-2">
+                        <CheckCircle2 className="size-4 shrink-0 mt-0.5" />
+                        <p className="leading-snug font-semibold">No Ramadan overlap. Monthly templates apply normally.</p>
+                      </div>
+                    )}
                   </div>
-
-                  {RAMADAN_RANGES[Number(simYear)] && (
-                    <div className="bg-amber-50/40 border border-amber-200/50 rounded-xl p-4 space-y-2 text-xs text-amber-800">
-                      <span className="font-extrabold flex items-center gap-1.5 text-amber-900">
-                        🌙 Ramadan Calendar for {simYear} (Calibrated):
-                      </span>
-                      <p className="font-bold text-amber-950 text-sm">{getCalibratedRamadanRangeDesc(Number(simYear), ramadanCalibrationOffset)}</p>
-                      
-                      {getRamadanOverlap(Number(simYear), simMonth, ramadanCalibrationOffset) ? (
-                        <div className="flex items-start gap-1.5 text-rose-600 font-bold bg-rose-50 border border-rose-100 p-2.5 rounded-lg mt-2">
-                          <AlertTriangle className="size-4 shrink-0 mt-0.5" />
-                          <p className="leading-snug font-semibold">Selected month overlaps with Ramadan fasting. Ramadan-suspension rules are active.</p>
-                        </div>
-                      ) : (
-                        <div className="flex items-start gap-1.5 text-emerald-600 font-bold bg-emerald-50 border border-emerald-100 p-2.5 rounded-lg mt-2">
-                          <CheckCircle2 className="size-4 shrink-0 mt-0.5" />
-                          <p className="leading-snug font-semibold">No Ramadan overlap. Templates will apply normally.</p>
-                        </div>
-                      )}
-                    </div>
-                  )}
                 </div>
 
                 <div className="border-t border-slate-200/80 pt-5 mt-4 space-y-3.5">
@@ -1019,7 +1119,7 @@ function PayrollDeductionsPage() {
                     </span>
                   </div>
                   <div className="flex justify-between items-center text-xs font-semibold text-slate-500">
-                    <span>Excluded (Suspended):</span>
+                    <span>Skipped (Total Suspensions):</span>
                     <span className="font-bold text-rose-600">
                       {simResults.filter(r => r.status.isSkipped && r.template.status === "Active").length}
                     </span>
@@ -1030,10 +1130,12 @@ function PayrollDeductionsPage() {
                       <span className="text-[10px] uppercase font-bold tracking-wider opacity-85 block">Simulated Total</span>
                       <span className="text-xl font-extrabold font-mono">
                         ৳ {simResults
-                          .filter(r => !r.status.isSkipped && r.template.status === "Active")
+                          .filter(r => r.template.status === "Active")
                           .reduce((sum, r) => {
-                            // Sum evaluating flat or percentage amounts across our mock employee list
+                            // Sum evaluating flat or percentage amounts across our mock employee list with exclusions
                             const totalVal = MOCK_EMPLOYEES.reduce((empSum, emp) => {
+                              const status = checkDeductionStatus(r.template, Number(simYear), simMonth, ramadanMonthMap[Number(simYear)] || "Feb", emp.empId);
+                              if (status.isSkipped) return empSum;
                               const amt = getEvaluatedAmount(r.template.amount, r.template.amountType, emp.basic, emp.gross);
                               return empSum + amt;
                             }, 0);
@@ -1055,10 +1157,15 @@ function PayrollDeductionsPage() {
                 </div>
                 
                 <div className="flex-1 overflow-x-auto divide-y divide-slate-100 max-h-[420px] overflow-y-auto">
-                  {simResults.map(({ template, status }) => {
+                  {simResults.map(({ template, status, skippedCount, totalCount }) => {
+                    // Calculate exact running amount based on excluded staff members
                     const totalVal = MOCK_EMPLOYEES.reduce((sum, emp) => {
+                      const indStatus = checkDeductionStatus(template, Number(simYear), simMonth, ramadanMonthMap[Number(simYear)] || "Feb", emp.empId);
+                      if (indStatus.isSkipped) return sum;
                       return sum + getEvaluatedAmount(template.amount, template.amountType, emp.basic, emp.gross);
                     }, 0);
+
+                    const runCount = totalCount - skippedCount;
 
                     return (
                       <div key={template.id} className="p-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-white/60 hover:bg-white transition-colors">
@@ -1076,7 +1183,7 @@ function PayrollDeductionsPage() {
                             <span>•</span>
                             <span>{template.recurrence === "one-time" ? "One-Time" : "Monthly schedule"}</span>
                             <span>•</span>
-                            <span className="text-slate-500 font-bold">Estimated Audit Total (5 staff): ৳{totalVal.toLocaleString()}</span>
+                            <span className="text-slate-500 font-bold">Simulated Total ({runCount}/{totalCount} running): ৳{totalVal.toLocaleString()}</span>
                           </div>
                         </div>
 
@@ -1085,10 +1192,20 @@ function PayrollDeductionsPage() {
                             <div className="inline-flex flex-col sm:items-end gap-1">
                               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 border border-amber-200 text-amber-700">
                                 <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-                                EXCLUDED
+                                SKIPPED
                               </span>
                               <span className="text-[10px] text-slate-500 font-bold block max-w-[240px] leading-tight">
                                 {status.reason}
+                              </span>
+                            </div>
+                          ) : skippedCount > 0 ? (
+                            <div className="inline-flex flex-col sm:items-end gap-1">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-50 border border-indigo-200 text-indigo-700">
+                                <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
+                                ACTIVE (WITH EXCLUSIONS)
+                              </span>
+                              <span className="text-[10px] text-slate-500 font-bold block">
+                                {skippedCount} staff excluded (৳{totalVal.toLocaleString()})
                               </span>
                             </div>
                           ) : (
@@ -1098,7 +1215,7 @@ function PayrollDeductionsPage() {
                                 APPLIED
                               </span>
                               <span className="text-[10px] text-emerald-600 font-bold block">
-                                Will run (estimated ৳{totalVal.toLocaleString()})
+                                Running for all {totalCount} targeted staff
                               </span>
                             </div>
                           )}
@@ -1128,7 +1245,7 @@ function PayrollDeductionsPage() {
                   <DialogTitle className="text-lg font-extrabold text-slate-800">
                     {editingTemplate ? "Edit Deduction Template" : "Create Deduction Template"}
                   </DialogTitle>
-                  <p className="text-xs text-slate-400 mt-0.5 font-medium">Setup rates, dynamic percentages, target staff scopes, and exclusions.</p>
+                  <p className="text-xs text-slate-400 mt-0.5 font-medium">Setup rates, target staff, calendar exclusions, and individual overrides.</p>
                 </div>
               </div>
             </div>
@@ -1158,6 +1275,18 @@ function PayrollDeductionsPage() {
               >
                 <CalendarDays className="size-4" />
                 2. Recurrence & Exclusions
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("exceptions")}
+                className={`px-4 py-2 text-xs font-extrabold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 select-none cursor-pointer ${
+                  activeTab === "exceptions"
+                    ? "border-blue-600 text-blue-600"
+                    : "border-transparent text-slate-400 hover:text-slate-700"
+                }`}
+              >
+                <Users className="size-4" />
+                3. Employee Exceptions
               </button>
             </div>
 
@@ -1285,24 +1414,41 @@ function PayrollDeductionsPage() {
 
                   {/* Collapsible preview table inside general tab */}
                   <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
-                    <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                    <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="size-4 text-slate-400" />
-                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Preview Target Employees & Calculated Values</span>
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Group Audit Preview</span>
                       </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="h-8 border-slate-200 text-xs font-bold bg-white text-slate-600 rounded-lg hover:bg-slate-50 cursor-pointer"
-                        onClick={handleFetchPreview}
-                      >
-                        Run Group Audit
-                      </Button>
+                      
+                      <div className="flex gap-2 items-center flex-wrap">
+                        <select
+                          value={dialogAuditMonth}
+                          onChange={(e) => setDialogAuditMonth(e.target.value)}
+                          className="h-8 rounded-lg border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700"
+                        >
+                          {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
+                        </select>
+                        <select
+                          value={dialogAuditYear}
+                          onChange={(e) => setDialogAuditYear(e.target.value)}
+                          className="h-8 rounded-lg border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700"
+                        >
+                          {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                        </select>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-8 border-slate-200 text-xs font-bold bg-white text-slate-600 rounded-lg hover:bg-slate-50 cursor-pointer"
+                          onClick={handleFetchPreview}
+                        >
+                          Run Audit ({dialogAuditMonth})
+                        </Button>
+                      </div>
                     </div>
                     {!isPreviewLoaded ? (
                       <div className="p-8 text-center text-slate-400 text-xs font-medium">
-                        Click "Run Group Audit" to simulate which employees will be targeted and view exact calculated rates based on calculations settings.
+                        Click "Run Audit" to simulate targeted employees and view calculations for {dialogAuditMonth} {dialogAuditYear}.
                       </div>
                     ) : (
                       <div className="overflow-x-auto max-h-[220px] overflow-y-auto">
@@ -1314,12 +1460,31 @@ function PayrollDeductionsPage() {
                               <th className="px-4 py-3">Department</th>
                               <th className="px-4 py-3 text-right">Basic Salary</th>
                               <th className="px-4 py-3 text-right">Gross Salary</th>
-                              <th className="px-4 py-3 text-right pr-6 w-36">Evaluated Deduction</th>
+                              <th className="px-4 py-3 text-right pr-6 w-44">Deduction Status</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-100">
                             {MOCK_EMPLOYEES.map((row) => {
-                              const finalVal = getEvaluatedAmount(formAmount, formAmountType, row.basic, row.gross);
+                              const tempTemplate: DeductionTemplate = {
+                                id: 0,
+                                name: formName,
+                                type: formType,
+                                amount: formAmount || "0",
+                                amountType: formAmountType,
+                                targetGroup: "",
+                                status: "Active",
+                                recurrence: formRecurrence,
+                                oneTimeMonth: formOneTimeMonth,
+                                oneTimeYear: formOneTimeYear,
+                                excludeRamadan: formExcludeRamadan,
+                                excludedMonths: formExcludedMonths,
+                                customExcludedPeriods: formCustomExcludedPeriods,
+                                employeeExclusions: formEmployeeExclusions
+                              };
+                              const auditRamadanMonth = ramadanMonthMap[Number(dialogAuditYear)] || "Feb";
+                              const statusRes = checkDeductionStatus(tempTemplate, Number(dialogAuditYear), dialogAuditMonth, auditRamadanMonth, row.empId);
+                              const finalVal = statusRes.isSkipped ? 0 : getEvaluatedAmount(formAmount, formAmountType, row.basic, row.gross);
+                              
                               return (
                                 <tr key={row.id} className="hover:bg-slate-50/50">
                                   <td className="px-4 py-2.5 font-bold text-slate-700">{row.empId}</td>
@@ -1327,7 +1492,15 @@ function PayrollDeductionsPage() {
                                   <td className="px-4 py-2.5 text-slate-500">{row.department}</td>
                                   <td className="px-4 py-2.5 text-right font-medium text-slate-600 font-mono">৳{row.basic.toLocaleString()}</td>
                                   <td className="px-4 py-2.5 text-right font-medium text-slate-600 font-mono">৳{row.gross.toLocaleString()}</td>
-                                  <td className="px-4 py-2.5 text-right pr-6 font-extrabold text-blue-600 bg-blue-50/30 font-mono">৳{finalVal.toLocaleString()}</td>
+                                  <td className="px-4 py-2.5 text-right pr-6 font-extrabold font-mono">
+                                    {statusRes.isSkipped ? (
+                                      <span className="inline-flex items-center gap-1 text-[9px] text-amber-600 font-bold bg-amber-50 border border-amber-200/50 px-2 py-0.5 rounded" title={statusRes.reason}>
+                                        ⚠️ Excluded
+                                      </span>
+                                    ) : (
+                                      <span className="text-blue-600">৳{finalVal.toLocaleString()}</span>
+                                    )}
+                                  </td>
                                 </tr>
                               );
                             })}
@@ -1337,7 +1510,7 @@ function PayrollDeductionsPage() {
                     )}
                   </div>
                 </div>
-              ) : (
+              ) : activeTab === "schedule" ? (
                 /* TAB 2: SCHEDULING & EXCLUSIONS */
                 <div className="space-y-5">
                   <div className="bg-white p-5 rounded-2xl border border-slate-200/70 shadow-xs space-y-5">
@@ -1413,22 +1586,10 @@ function PayrollDeductionsPage() {
                                 🌙 Auto-Skip during Ramadan (Rojar Mash)
                               </span>
                               <span className="text-xs text-amber-700 block leading-relaxed font-medium">
-                                Enable this to automatically suspend lunch or utility deductions during the variable Ramadan dates.
+                                Enable this to automatically suspend deductions during the designated Ramadan month of that process year.
                               </span>
                             </div>
                           </label>
-
-                          {formExcludeRamadan && (
-                            <div className="pl-7 pt-1.5 text-[11px] text-amber-800 space-y-1 border-t border-amber-200/30">
-                              <p className="font-extrabold text-amber-900 uppercase tracking-wider text-[9px]">Calculated Ramadan Month Ranges (Calibrated):</p>
-                              <div className="grid grid-cols-2 gap-1 font-semibold">
-                                <span>• 2025: March</span>
-                                <span>• 2026: {getCalibratedRamadanRangeDesc(2026, ramadanCalibrationOffset)}</span>
-                                <span>• 2027: {getCalibratedRamadanRangeDesc(2027, ramadanCalibrationOffset)}</span>
-                                <span>• 2028: {getCalibratedRamadanRangeDesc(2028, ramadanCalibrationOffset)}</span>
-                              </div>
-                            </div>
-                          )}
                         </div>
 
                         {/* General Annual Calendar Month Exclusion */}
@@ -1470,7 +1631,7 @@ function PayrollDeductionsPage() {
                             <label className="text-xs font-bold text-slate-600 block">
                               Single Period Exceptions
                             </label>
-                            <span className="text-[10px] text-slate-400 block font-medium">Add exceptions for a single specific year/month only (e.g. suspension due to office relocation).</span>
+                            <span className="text-[10px] text-slate-400 block font-medium">Add exceptions for a single specific year/month only (e.g. suspension due to relocation).</span>
                           </div>
                           
                           <div className="flex gap-2.5 items-end max-w-md">
@@ -1531,14 +1692,14 @@ function PayrollDeductionsPage() {
                     )}
                   </div>
 
-                  {/* 12-Month Preview Box at the bottom of Schedule Tab */}
+                  {/* 12-Month Preview Box */}
                   <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
                     <div className="flex items-center gap-2 border-b border-slate-100 pb-2.5">
                       <Info className="size-4 text-indigo-500" />
                       <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">Dynamic Schedule Timeline Preview</h4>
                     </div>
                     
-                    <p className="text-[11px] text-slate-400 font-medium">Verify how your rules evaluate over the next 12 calendar periods (calibrated with offset):</p>
+                    <p className="text-[11px] text-slate-400 font-medium">Verify how your rules evaluate over the next 12 calendar periods:</p>
                     
                     <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 pt-1">
                       {getTimelinePreview().map((item, idx) => (
@@ -1576,6 +1737,131 @@ function PayrollDeductionsPage() {
                     </div>
                   </div>
                 </div>
+              ) : (
+                /* TAB 3: INDIVIDUAL STAFF EXCEPTIONS */
+                <div className="space-y-5">
+                  <div className="bg-white p-5 rounded-2xl border border-slate-200/70 shadow-xs space-y-5">
+                    <div className="space-y-0.5">
+                      <label className="text-xs font-bold text-slate-650 block">Employee-Specific Monthly Exceptions</label>
+                      <span className="text-[10px] text-slate-400 block font-medium">Add exceptions to suspend this deduction for a specific employee ID during designated months.</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-end bg-slate-50/50 p-4 rounded-xl border border-slate-200/40">
+                      <div className="sm:col-span-5 space-y-1.5">
+                        <label className="text-xs font-bold text-slate-500 block">Select Employee</label>
+                        <select
+                          value={exceptionEmpId}
+                          onChange={(e) => setExceptionEmpId(e.target.value)}
+                          className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-xs cursor-pointer focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500"
+                        >
+                          <option value="">-- Select Staff Member --</option>
+                          {MOCK_EMPLOYEES.map((emp) => (
+                            <option key={emp.id} value={emp.empId}>
+                              {emp.name} ({emp.empId})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="sm:col-span-3 space-y-1.5">
+                        <label className="text-xs font-bold text-slate-500 block">Month</label>
+                        <select
+                          value={exceptionMonth}
+                          onChange={(e) => setExceptionMonth(e.target.value)}
+                          className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 cursor-pointer"
+                        >
+                          {MONTHS.map((m) => (
+                            <option key={m} value={m}>{m}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="sm:col-span-2 space-y-1.5">
+                        <label className="text-xs font-bold text-slate-500 block">Year</label>
+                        <select
+                          value={exceptionYear}
+                          onChange={(e) => setExceptionYear(e.target.value)}
+                          className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 cursor-pointer"
+                        >
+                          {YEARS.map((y) => (
+                            <option key={y} value={y}>{y}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <Button
+                          type="button"
+                          onClick={handleAddEmployeeException}
+                          className="w-full h-10 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs cursor-pointer"
+                        >
+                          Add Rule
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Active Employee Specific Exception Rules List */}
+                    <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-xs bg-white">
+                      <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Active Individual Overrides</span>
+                      </div>
+                      
+                      {formEmployeeExclusions.length === 0 ? (
+                        <div className="p-8 text-center text-slate-400 text-xs font-medium">
+                          No employee exceptions defined. This rule applies to all targeted staff members.
+                        </div>
+                      ) : (
+                        <div className="overflow-x-auto max-h-[260px] overflow-y-auto">
+                          <table className="w-full text-xs text-left border-collapse">
+                            <thead className="text-[9px] font-bold tracking-wider text-slate-400 bg-slate-50/50 border-b border-slate-100 uppercase">
+                              <tr>
+                                <th className="px-4 py-2 w-12 text-center">Sl</th>
+                                <th className="px-4 py-2">Employee ID</th>
+                                <th className="px-4 py-2">Staff Name</th>
+                                <th className="px-4 py-2">Suspended Month Exception Periods</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                              {formEmployeeExclusions.map((excl, idx) => {
+                                const staff = MOCK_EMPLOYEES.find(e => e.empId === excl.empId);
+                                return (
+                                  <tr key={excl.empId} className="hover:bg-slate-50/30">
+                                    <td className="px-4 py-2 text-slate-400 font-bold text-center">{idx + 1}</td>
+                                    <td className="px-4 py-2 font-bold text-slate-700">{excl.empId}</td>
+                                    <td className="px-4 py-2 font-semibold text-slate-800">{staff ? staff.name : "Unknown"}</td>
+                                    <td className="px-4 py-2">
+                                      <div className="flex flex-wrap gap-1.5">
+                                        {excl.periods.map(p => {
+                                          const [yStr, mNum] = p.split("-");
+                                          const mName = MONTHS[Number(mNum) - 1];
+                                          return (
+                                            <span 
+                                              key={p} 
+                                              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/50"
+                                            >
+                                              {mName} {yStr}
+                                              <button
+                                                type="button"
+                                                onClick={() => handleRemoveEmployeeExceptionPeriod(excl.empId, p)}
+                                                className="text-amber-500 hover:text-rose-600 transition-colors ml-1"
+                                              >
+                                                <X className="size-3 cursor-pointer" />
+                                              </button>
+                                            </span>
+                                          );
+                                        })}
+                                      </div>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
 
@@ -1588,16 +1874,25 @@ function PayrollDeductionsPage() {
                     onClick={() => setActiveTab("schedule")}
                     className="h-10 px-5 text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all flex items-center gap-1.5 border border-blue-100 cursor-pointer select-none"
                   >
-                    Next Step: Recurrence
+                    Next: Recurrence
+                    <ArrowRight className="size-4" />
+                  </button>
+                ) : activeTab === "schedule" ? (
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("exceptions")}
+                    className="h-10 px-5 text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all flex items-center gap-1.5 border border-blue-100 cursor-pointer select-none"
+                  >
+                    Next: Employee Exceptions
                     <ArrowRight className="size-4" />
                   </button>
                 ) : (
                   <button
                     type="button"
-                    onClick={() => setActiveTab("general")}
+                    onClick={() => setActiveTab("schedule")}
                     className="h-10 px-5 text-xs font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-all cursor-pointer select-none"
                   >
-                    Back to General
+                    Back to Recurrence
                   </button>
                 )}
               </div>
