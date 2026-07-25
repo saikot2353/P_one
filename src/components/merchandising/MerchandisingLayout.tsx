@@ -16,7 +16,8 @@ import {
   Moon,
   ArrowLeft,
   Settings,
-  Activity
+  Activity,
+  Calendar
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -86,6 +87,7 @@ export default function MerchandisingLayout({
 interface SubCategoryItem {
   label: string;
   to?: string;
+  search?: Record<string, any>;
 }
 
 interface MenuCategory {
@@ -108,80 +110,55 @@ interface MenuCategory {
       key: "masterSettings",
       label: "Master Settings",
       icon: Settings,
-      subitems: [
-        { label: "Company & Buyer Setup", to: "/merchandising-master-settings" },
-        { label: "Material Library (Yarn/Fabric)", to: "/merchandising-master-settings" },
-        { label: "Specifications & Parameters", to: "/merchandising-master-settings" },
-        { label: "Process & Loss Setup", to: "/merchandising-master-settings" },
-        { label: "Financial Config", to: "/merchandising-master-settings" },
-      ],
+      to: "/merchandising-master-settings",
     },
     {
       key: "capacity",
       label: "Capacity Planning",
       icon: Activity,
-      subitems: [
-        { label: "Monthly Capacity Booking", to: "/merchandising-capacity-planning" },
-        { label: "Capacity Approvals", to: "/merchandising-capacity-planning" },
-      ],
+      to: "/merchandising-capacity-planning",
     },
     {
       key: "sample",
       label: "Sample & Development",
       icon: Scissors,
-      subitems: [
-        { label: "Sample Requisition", to: "/merchandising-sample-tracker" },
-        { label: "Sample Tracker List", to: "/merchandising-sample-tracker" },
-        { label: "Buyer Feedback & PP Approval", to: "/merchandising-sample-tracker" },
-      ],
+      to: "/merchandising-sample-tracker",
     },
     {
-      key: "orders",
-      label: "Orders & Costing",
+      key: "order-list",
+      label: "Order Master Ledger",
       icon: Layers,
-      subitems: [
-        { label: "Order Master Ledger", to: "/merchandising-order-list" },
-        { label: "Unified Order Entry", to: "/merchandising-order-profile" },
-      ],
+      to: "/merchandising-order-list",
+    },
+    {
+      key: "order-profile",
+      label: "Order Entry & Costing (KDS)",
+      icon: FileText,
+      to: "/merchandising-order-profile",
     },
     {
       key: "sourcing",
       label: "Sourcing & Bookings",
       icon: Wind,
-      subitems: [
-        { label: "Auto Yarn Booking", to: "/merchandising-material-bookings" },
-        { label: "Fabric Booking", to: "/merchandising-material-bookings" },
-        { label: "Trims & Accessories WO", to: "/merchandising-material-bookings" },
-      ],
+      to: "/merchandising-material-bookings",
     },
     {
       key: "services",
       label: "Service Work Orders",
       icon: Briefcase,
-      subitems: [
-        { label: "Dyeing Work Orders", to: "/merchandising-work-orders" },
-        { label: "Washing & Printing WO", to: "/merchandising-work-orders" },
-        { label: "AOP & Embroidery WO", to: "/merchandising-work-orders" },
-      ],
+      to: "/merchandising-work-orders",
     },
     {
       key: "tna",
-      label: "TNA Calendar",
-      icon: FileText,
-      subitems: [
-        { label: "TNA Follow-Up Calendar", to: "/merchandising-tna-calendar" },
-        { label: "Milestone Tracking Board", to: "/merchandising-tna-calendar" },
-      ],
+      label: "TNA Critical Path",
+      icon: Calendar,
+      to: "/merchandising-tna-calendar",
     },
     {
       key: "reports",
       label: "Reports & Analytics",
       icon: TrendingUp,
-      subitems: [
-        { label: "Daily Order Status Report", to: "/merchandising-reports" },
-        { label: "Buyer Share & Shipment", to: "/merchandising-reports" },
-        { label: "Material Stock Ledger", to: "/merchandising-reports" },
-      ],
+      to: "/merchandising-reports",
     },
   ];
 
@@ -291,6 +268,7 @@ interface MenuCategory {
                           <Link
                             key={sIdx}
                             to={sub.to}
+                            search={sub.search}
                             className={`block w-full text-left text-[11px] font-semibold py-1.5 px-2 rounded-md transition ${
                               isSubActive
                                 ? "text-teal-500 dark:text-teal-400 bg-sidebar-accent/30 font-extrabold"

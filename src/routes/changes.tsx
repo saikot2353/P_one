@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v19");
+    const saved = localStorage.getItem("system_changes_v20");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -185,7 +185,15 @@ function ChangesPage() {
           module: "Merchandising",
           link: "/merchandising-master-settings",
           descriptionEn: "Built the complete RMG Merchandising ERP Suite! Created 7 brand-new dedicated pages: Master Settings (Buyer config, Fabric/Yarn specs, Process Loss %, Trims master), Capacity Planning & Booking (SMV calculator, Monthly limits, Over-booking alerts), Sample Development Tracker (Proto/Fit/PP requisitions & Buyer feedback), Material Bookings (Auto Yarn Kg calculator, Fabric & Trims WOs), Service Work Orders (Washing, Printing, Dyeing, Embroidery sub-contracts), TNA Critical Path Calendar (11 Milestones timeline), and MM BI Reports (PO Order status, Buyer export share). All sidebar links are fully connected.",
-          descriptionBn: "সম্পূর্ণ আরএমজি মার্চেন্ডাইজিং ইআরপি স্যুট তৈরি করা হয়েছে! ৭টি নতুন পেজ যোগ করা হয়েছে: মাস্টার সেটিংস (বায়ার কনফিগ, ফ্রেব্রিক/ইয়ার্ন স্পেকস, প্রসেস লস %, ট্রিমস ক্যাটালগ), ক্যাপাসিটি প্ল্যানিং (এসএমভি ক্যালকুলেটর, মান্থলি বুকিং ও ওভারবুকিং অ্যালার্ট), স্যাম্পল ট্র্যাকার (প্রোটো/ফিট/পিপি রিকুইজিশন ও বায়ার ফিডব্যাক), মেটেরিয়াল বুকিং (অটো ইয়ার্ন কেজি ক্যালকুলেটর, ফেব্রিক ও ট্রিমস বুকিং), সার্ভিস ওয়ার্ক অর্ডার (ওয়াশিং, প্রিন্টিং, ডাইং, এমব্রয়ডারি সাব-কন্ট্রাক্ট), টিএনএ ক্যালেন্ডার (১১টি মাইলস্টোন টাইমলাইন) এবং এমএম বিআই রিপোর্টস। সাইডবারের সব লিংক সচল করা হয়েছে।",
+        },
+        {
+          id: "19",
+          date: "2026-07-25T21:51",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Completely eliminated duplicate navigation in the Merchandising module! Replaced redundant accordion sub-menus in the sidebar with clean, direct-action top-level navigation links. Sub-view switching is now handled exclusively by the sleek horizontal top tab bar on each dedicated module page for a 100% stable, uncluttered user experience.",
+          descriptionBn: "মার্চেন্ডাইজিং মডিউলের সম্পূর্ণ ডুপ্লিকেট নেভিগেশন দূর করা হয়েছে! সাইডবারের বাড়তি সাব-মেনু একর্ডিয়নগুলো সরিয়ে সরাসরি ডিরেক্ট-লিংক মেনু করা হয়েছে। এখন থেকে সব সাব-ভিউ পরিবর্তন প্রতিটি পেজের পরিচ্ছন্ন টপ হরিজন্টাল ট্যাব বার দিয়ে পরিচালিত হবে, যা ইউজার এক্সপেরিয়েন্সকে করেছে ১০০% স্থিতিশীল ও সুন্দর।",
         },
       ]);
     }
