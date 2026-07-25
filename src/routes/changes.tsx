@@ -21,14 +21,14 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v6");
+    const saved = localStorage.getItem("system_changes_v7");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
       setRecords([
         {
           id: "1",
-          date: "2026-07-25",
+          date: "2026-07-25T10:15",
           type: "New Addition",
           module: "Module Selection",
           link: "/module-selection",
@@ -37,7 +37,7 @@ function ChangesPage() {
         },
         {
           id: "2",
-          date: "2026-07-25",
+          date: "2026-07-25T11:45",
           type: "Modify",
           module: "Order Profile",
           link: "/merchandising-order-profile",
@@ -46,7 +46,7 @@ function ChangesPage() {
         },
         {
           id: "3",
-          date: "2026-07-25",
+          date: "2026-07-25T12:10",
           type: "Modify",
           module: "Order Profile",
           link: "/merchandising-order-profile",
@@ -55,7 +55,7 @@ function ChangesPage() {
         },
         {
           id: "4",
-          date: "2026-07-25",
+          date: "2026-07-25T13:00",
           type: "Modify",
           module: "Order Profile",
           link: "/merchandising-order-profile",
@@ -64,7 +64,7 @@ function ChangesPage() {
         },
         {
           id: "5",
-          date: "2026-07-25",
+          date: "2026-07-25T13:45",
           type: "Modify",
           module: "Global System",
           link: "/",
@@ -73,7 +73,7 @@ function ChangesPage() {
         },
         {
           id: "6",
-          date: "2026-07-25",
+          date: "2026-07-25T14:50",
           type: "Modify",
           module: "Personnel List",
           link: "/personnel-list",
@@ -86,13 +86,13 @@ function ChangesPage() {
 
   const saveRecords = (newRecords: ChangeRecord[]) => {
     setRecords(newRecords);
-    localStorage.setItem("system_changes_v6", JSON.stringify(newRecords));
+    localStorage.setItem("system_changes_v7", JSON.stringify(newRecords));
   };
 
   const addRow = () => {
     const newRecord: ChangeRecord = {
       id: Date.now().toString(),
-      date: new Date().toISOString().split("T")[0],
+      date: new Date().toISOString().slice(0, 16),
       type: "New Addition",
       module: "",
       descriptionEn: "",
@@ -149,55 +149,55 @@ function ChangesPage() {
 
       {/* Spreadsheet Container */}
       <div className="flex-1 overflow-auto bg-slate-50 relative">
-        <table className="w-full border-collapse bg-white table-fixed">
+        <table className="w-full border-collapse bg-white table-fixed min-w-[1400px]">
           <thead className="sticky top-0 z-10">
-            <tr className="bg-[#f3f4f6] text-slate-600 text-[13px] text-center border-b border-slate-300 font-normal">
+            <tr className="bg-[#f3f4f6] text-slate-600 text-[11px] text-center border-b border-slate-300 font-normal">
               <th className="w-10 border-r border-slate-300 bg-slate-200"></th>
-              <th className="w-32 border-r border-slate-300 py-1.5 font-semibold text-slate-700">A (Date)</th>
+              <th className="w-44 border-r border-slate-300 py-1.5 font-semibold text-slate-700">A (Date & Time)</th>
               <th className="w-48 border-r border-slate-300 py-1.5 font-semibold text-slate-700">B (Type)</th>
               <th className="w-64 border-r border-slate-300 py-1.5 font-semibold text-slate-700">C (Module/Area)</th>
-              <th className="w-1/3 border-r border-slate-300 py-1.5 font-semibold text-left pl-3 text-slate-700">D (English)</th>
-              <th className="w-1/3 border-r border-slate-300 py-1.5 font-semibold text-left pl-3 text-slate-700">E (Bangla)</th>
+              <th className="w-[450px] border-r border-slate-300 py-1.5 font-semibold text-left pl-3 text-slate-700">D (English)</th>
+              <th className="w-[450px] border-r border-slate-300 py-1.5 font-semibold text-left pl-3 text-slate-700">E (Bangla)</th>
             </tr>
           </thead>
           <tbody>
             {records.map((row, idx) => (
-              <tr key={row.id} className="text-[13px] group hover:bg-[#e5f1eb] transition-colors">
+              <tr key={row.id} className="text-[11px] group hover:bg-[#e5f1eb] transition-colors">
                 <td className="border-b border-r border-slate-300 bg-slate-100 text-center text-xs text-slate-500 py-1 sticky left-0 z-10 w-10 select-none">
                   {idx + 1}
                 </td>
-                <td className="border-b border-r border-slate-300 p-0 h-[28px]">
+                <td className="border-b border-r border-slate-300 p-0 align-top">
                   <input
-                    type="date"
+                    type="datetime-local"
                     value={row.date}
                     onChange={(e) => updateRecord(row.id, "date", e.target.value)}
-                    className="w-full h-full px-2 py-1 outline-none focus:ring-2 focus:ring-inset focus:ring-[#107c41] bg-transparent text-slate-800"
+                    className="w-full h-full min-h-[48px] px-2 py-2 outline-none focus:ring-2 focus:ring-inset focus:ring-[#107c41] bg-transparent text-slate-800 text-[11px]"
                   />
                 </td>
-                <td className="border-b border-r border-slate-300 p-0 h-[28px]">
+                <td className="border-b border-r border-slate-300 p-0 align-top">
                   <select
                     value={row.type}
                     onChange={(e) => updateRecord(row.id, "type", e.target.value as any)}
-                    className="w-full h-full px-2 py-1 outline-none focus:ring-2 focus:ring-inset focus:ring-[#107c41] bg-transparent text-slate-800 appearance-none"
+                    className="w-full h-full min-h-[48px] px-2 py-2 outline-none focus:ring-2 focus:ring-inset focus:ring-[#107c41] bg-transparent text-slate-800 appearance-none text-[11px]"
                   >
                     <option value="">Select Type...</option>
                     <option value="New Addition">New Addition</option>
                     <option value="Modify">Modify</option>
                   </select>
                 </td>
-                <td className="border-b border-r border-slate-300 p-0 h-[28px] group relative">
-                  <div className="flex items-center w-full h-full">
+                <td className="border-b border-r border-slate-300 p-0 group relative align-top">
+                  <div className="flex items-start w-full h-full min-h-[48px]">
                     <input
                       type="text"
                       value={row.module}
                       placeholder="e.g. Dashboard"
                       onChange={(e) => updateRecord(row.id, "module", e.target.value)}
-                      className="flex-1 min-w-0 h-full px-2 py-1 outline-none focus:ring-2 focus:ring-inset focus:ring-[#107c41] bg-transparent text-slate-800 placeholder:text-slate-300"
+                      className="flex-1 min-w-0 h-full px-2 py-2 outline-none focus:ring-2 focus:ring-inset focus:ring-[#107c41] bg-transparent text-slate-800 placeholder:text-slate-300 text-[11px]"
                     />
                     {row.link && (
                       <Link
                         to={row.link as any}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 mr-1 text-[#107c41] hover:bg-[#107c41]/10 rounded flex items-center justify-center shrink-0"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 mt-1 mr-1 text-[#107c41] hover:bg-[#107c41]/10 rounded flex items-center justify-center shrink-0"
                         title={`Open ${row.module}`}
                       >
                         <ExternalLink className="size-3.5" />
@@ -205,22 +205,22 @@ function ChangesPage() {
                     )}
                   </div>
                 </td>
-                <td className="border-b border-r border-slate-300 p-0 h-[28px]">
-                  <input
-                    type="text"
+                <td className="border-b border-r border-slate-300 p-0 align-top">
+                  <textarea
+                    rows={3}
                     value={row.descriptionEn}
                     placeholder="Enter change details..."
                     onChange={(e) => updateRecord(row.id, "descriptionEn", e.target.value)}
-                    className="w-full h-full px-3 py-1 outline-none focus:ring-2 focus:ring-inset focus:ring-[#107c41] bg-transparent text-slate-800 placeholder:text-slate-300"
+                    className="w-full h-full px-3 py-2 outline-none focus:ring-2 focus:ring-inset focus:ring-[#107c41] bg-transparent text-slate-800 placeholder:text-slate-300 text-[11px] resize-none overflow-y-auto"
                   />
                 </td>
-                <td className="border-b border-r border-slate-300 p-0 h-[28px]">
-                  <input
-                    type="text"
+                <td className="border-b border-r border-slate-300 p-0 align-top">
+                  <textarea
+                    rows={3}
                     value={row.descriptionBn}
                     placeholder="বাংলায় বিবরণ লিখুন..."
                     onChange={(e) => updateRecord(row.id, "descriptionBn", e.target.value)}
-                    className="w-full h-full px-3 py-1 outline-none focus:ring-2 focus:ring-inset focus:ring-[#107c41] bg-transparent text-slate-800 placeholder:text-slate-300"
+                    className="w-full h-full px-3 py-2 outline-none focus:ring-2 focus:ring-inset focus:ring-[#107c41] bg-transparent text-slate-800 placeholder:text-slate-300 text-[11px] resize-none overflow-y-auto"
                   />
                 </td>
               </tr>
