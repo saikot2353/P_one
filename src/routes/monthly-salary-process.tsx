@@ -1037,6 +1037,11 @@ interface ProcessedSalaryRecord {
   bankName: string;
   accountNo: string;
   netSalary: number;
+  ot?: string | number;
+  otPay?: number;
+  allowance?: number;
+  transportDeduct?: number;
+  pf?: number;
 }
 
 // Parse joining date to check if joining date is in the processing year/month
