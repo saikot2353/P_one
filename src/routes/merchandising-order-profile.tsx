@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import MerchandisingLayout from "../components/merchandising/MerchandisingLayout";
-import { List, Plus, X, UploadCloud, Save, ArrowRight, LayoutGrid } from "lucide-react";
+import { List, Plus, X, UploadCloud, Save, ArrowRight, LayoutGrid, Layers } from "lucide-react";
 
 type OrderProfileSearch = {
   type?: "Knit" | "Woven" | "Sweater";

@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v18");
+    const saved = localStorage.getItem("system_changes_v19");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -154,7 +154,7 @@ function ChangesPage() {
         {
           id: "15",
           date: "2026-07-25T17:47",
-          type: "New",
+          type: "New Addition",
           module: "Benefits",
           link: "/payroll-benefits-common",
           descriptionEn: "Brand new Common Benefits page built! You can now filter employees by type, department, section, and benefit category, then enter individual benefit amounts in an editable table. Features include select-all checkboxes, live amount totals, search, pagination, Excel/Print/PDF export, and a Save button with a confirmation toast.",
@@ -163,7 +163,7 @@ function ChangesPage() {
         {
           id: "16",
           date: "2026-07-25T17:50",
-          type: "New",
+          type: "New Addition",
           module: "Benefits",
           link: "/payroll-benefits-monthly",
           descriptionEn: "New Monthly Benefits page is live! Filter by month, year, benefit type, benefit name, employee type, department, unit, or employee ID. Add new records via the '+' button or the FAB, edit or delete existing ones, and view full details in a clean modal. Modals match the rest of the system's style — orange CLOSE, green SUBMIT.",
@@ -177,6 +177,15 @@ function ChangesPage() {
           link: "/merchandising-dashboard",
           descriptionEn: "Restructured the entire Merchandising module sidebar menu into 9 clean, task-oriented categories matching BD garments industry standard workflow stages. Also upgraded the Order Entry form workspace into a Unified Order & Costing Hub, adding a segmented Knit | Woven | Sweater type selector with dynamically conditional fields for Yarn counts, GSM, Weave density, or Sweater Gauges.",
           descriptionBn: "মার্চেন্ডাইজিং মডিউলের সম্পূর্ণ সাইডবার মেনু ৯টি সহজে ব্যবহারযোগ্য ক্যাটাগরিতে পুনর্গঠন করা হয়েছে যা বাংলাদেশের গার্মেন্টস শিল্পের কাজের ধাপগুলোর সাথে সামঞ্জস্যপূর্ণ। তাছাড়া অর্ডার এন্ট্রি ফর্মটিকে একটি ইউনিফাইড অর্ডার এবং কস্টিং হাবে রূপান্তর করা হয়েছে, যেখানে নিট, ওভেন এবং সোয়েটার অর্ডারের জন্য আলাদা আলাদা কন্ডিশনাল প্যারামিটার যেমন জিএসএম, ইয়ার্ন কাউন্ট, উইভ ডেনসিটি এবং সোয়েটার গজ ফিল্ডগুলো স্বয়ংক্রিয়ভাবে চলে আসবে।",
+        },
+        {
+          id: "18",
+          date: "2026-07-25T21:40",
+          type: "New Addition",
+          module: "Merchandising",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Built the complete RMG Merchandising ERP Suite! Created 7 brand-new dedicated pages: Master Settings (Buyer config, Fabric/Yarn specs, Process Loss %, Trims master), Capacity Planning & Booking (SMV calculator, Monthly limits, Over-booking alerts), Sample Development Tracker (Proto/Fit/PP requisitions & Buyer feedback), Material Bookings (Auto Yarn Kg calculator, Fabric & Trims WOs), Service Work Orders (Washing, Printing, Dyeing, Embroidery sub-contracts), TNA Critical Path Calendar (11 Milestones timeline), and MM BI Reports (PO Order status, Buyer export share). All sidebar links are fully connected.",
+          descriptionBn: "সম্পূর্ণ আরএমজি মার্চেন্ডাইজিং ইআরপি স্যুট তৈরি করা হয়েছে! ৭টি নতুন পেজ যোগ করা হয়েছে: মাস্টার সেটিংস (বায়ার কনফিগ, ফ্রেব্রিক/ইয়ার্ন স্পেকস, প্রসেস লস %, ট্রিমস ক্যাটালগ), ক্যাপাসিটি প্ল্যানিং (এসএমভি ক্যালকুলেটর, মান্থলি বুকিং ও ওভারবুকিং অ্যালার্ট), স্যাম্পল ট্র্যাকার (প্রোটো/ফিট/পিপি রিকুইজিশন ও বায়ার ফিডব্যাক), মেটেরিয়াল বুকিং (অটো ইয়ার্ন কেজি ক্যালকুলেটর, ফেব্রিক ও ট্রিমস বুকিং), সার্ভিস ওয়ার্ক অর্ডার (ওয়াশিং, প্রিন্টিং, ডাইং, এমব্রয়ডারি সাব-কন্ট্রাক্ট), টিএনএ ক্যালেন্ডার (১১টি মাইলস্টোন টাইমলাইন) এবং এমএম বিআই রিপোর্টস। সাইডবারের সব লিংক সচল করা হয়েছে।",
         },
       ]);
     }

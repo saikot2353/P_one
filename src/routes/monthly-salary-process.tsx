@@ -1503,22 +1503,22 @@ function MonthlySalaryProcessPage() {
     setEditLeave(record.leave);
     setEditHoliday(record.holiday);
 
-    setEditBasic(record.basic);
-    setEditGross(record.gross);
-    setEditOtHours(record.ot);
-    setEditOtPay(record.otPay);
-    setEditAttBonus(record.attBonus);
-    setEditAllowance(record.allowance);
+    setEditBasic(record.basic ?? 0);
+    setEditGross(record.gross ?? 0);
+    setEditOtHours(record.ot != null ? String(record.ot) : "0");
+    setEditOtPay(record.otPay ?? 0);
+    setEditAttBonus(record.attBonus ?? 0);
+    setEditAllowance(record.allowance ?? 0);
 
-    setEditLunchDeduct(record.lunchDeduct);
-    setEditTransportDeduct(record.transportDeduct);
-    setEditPf(record.pf);
-    setEditTax(record.tax);
-    setEditAbsentDeduct(record.absentDeduct);
-    setEditAdvance(record.advance);
-    setEditWagelyAdv(record.wagelyAdv);
-    setEditLoan(record.loan);
-    setEditAdjust(record.adjust);
+    setEditLunchDeduct(record.lunchDeduct ?? 0);
+    setEditTransportDeduct(record.transportDeduct ?? 0);
+    setEditPf(record.pf ?? 0);
+    setEditTax(record.tax ?? 0);
+    setEditAbsentDeduct(record.absentDeduct ?? 0);
+    setEditAdvance(record.advance ?? 0);
+    setEditWagelyAdv(record.wagelyAdv ?? 0);
+    setEditLoan(record.loan ?? 0);
+    setEditAdjust(record.adjust ?? 0);
   };
 
   // Live Audited net salary calculation in dialog

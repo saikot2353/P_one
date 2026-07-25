@@ -15,7 +15,8 @@ import {
   Sun,
   Moon,
   ArrowLeft,
-  Settings
+  Settings,
+  Activity
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -82,8 +83,21 @@ export default function MerchandisingLayout({
     });
   };
 
+interface SubCategoryItem {
+  label: string;
+  to?: string;
+}
+
+interface MenuCategory {
+  key: string;
+  label: string;
+  icon: any;
+  to?: string;
+  subitems?: SubCategoryItem[];
+}
+
   // Structured menu items matching Bangladesh garments merchandising stages
-  const menuCategories = [
+  const menuCategories: MenuCategory[] = [
     {
       key: "dashboard",
       label: "Dashboard",
@@ -95,11 +109,11 @@ export default function MerchandisingLayout({
       label: "Master Settings",
       icon: Settings,
       subitems: [
-        { label: "Company & Buyer Setup" },
-        { label: "Material Library (Yarn/Fabric)" },
-        { label: "Specifications & Parameters" },
-        { label: "Process & Loss Setup" },
-        { label: "Financial Config" },
+        { label: "Company & Buyer Setup", to: "/merchandising-master-settings" },
+        { label: "Material Library (Yarn/Fabric)", to: "/merchandising-master-settings" },
+        { label: "Specifications & Parameters", to: "/merchandising-master-settings" },
+        { label: "Process & Loss Setup", to: "/merchandising-master-settings" },
+        { label: "Financial Config", to: "/merchandising-master-settings" },
       ],
     },
     {
@@ -107,8 +121,8 @@ export default function MerchandisingLayout({
       label: "Capacity Planning",
       icon: Activity,
       subitems: [
-        { label: "Monthly Capacity Booking" },
-        { label: "Capacity Approvals" },
+        { label: "Monthly Capacity Booking", to: "/merchandising-capacity-planning" },
+        { label: "Capacity Approvals", to: "/merchandising-capacity-planning" },
       ],
     },
     {
@@ -116,9 +130,9 @@ export default function MerchandisingLayout({
       label: "Sample & Development",
       icon: Scissors,
       subitems: [
-        { label: "Sample Requisition" },
-        { label: "Sample Tracker List" },
-        { label: "Buyer Feedback & PP Approval" },
+        { label: "Sample Requisition", to: "/merchandising-sample-tracker" },
+        { label: "Sample Tracker List", to: "/merchandising-sample-tracker" },
+        { label: "Buyer Feedback & PP Approval", to: "/merchandising-sample-tracker" },
       ],
     },
     {
@@ -128,8 +142,6 @@ export default function MerchandisingLayout({
       subitems: [
         { label: "Order Master Ledger", to: "/merchandising-order-list" },
         { label: "Unified Order Entry", to: "/merchandising-order-profile" },
-        { label: "CAD Consumption Sheets" },
-        { label: "KDS & Costing Sheets" },
       ],
     },
     {
@@ -137,9 +149,9 @@ export default function MerchandisingLayout({
       label: "Sourcing & Bookings",
       icon: Wind,
       subitems: [
-        { label: "Yarn Booking" },
-        { label: "Fabric Booking" },
-        { label: "Trims & Accessories WO" },
+        { label: "Auto Yarn Booking", to: "/merchandising-material-bookings" },
+        { label: "Fabric Booking", to: "/merchandising-material-bookings" },
+        { label: "Trims & Accessories WO", to: "/merchandising-material-bookings" },
       ],
     },
     {
@@ -147,9 +159,9 @@ export default function MerchandisingLayout({
       label: "Service Work Orders",
       icon: Briefcase,
       subitems: [
-        { label: "Dyeing Work Orders" },
-        { label: "Washing & Printing WO" },
-        { label: "AOP & Embroidery WO" },
+        { label: "Dyeing Work Orders", to: "/merchandising-work-orders" },
+        { label: "Washing & Printing WO", to: "/merchandising-work-orders" },
+        { label: "AOP & Embroidery WO", to: "/merchandising-work-orders" },
       ],
     },
     {
@@ -157,18 +169,18 @@ export default function MerchandisingLayout({
       label: "TNA Calendar",
       icon: FileText,
       subitems: [
-        { label: "TNA Follow-Up Calendar" },
-        { label: "Milestone Tracking Board" }
-      ]
+        { label: "TNA Follow-Up Calendar", to: "/merchandising-tna-calendar" },
+        { label: "Milestone Tracking Board", to: "/merchandising-tna-calendar" },
+      ],
     },
     {
       key: "reports",
       label: "Reports & Analytics",
       icon: TrendingUp,
       subitems: [
-        { label: "Daily Order Status Report" },
-        { label: "Buyer Share & Shipment" },
-        { label: "Material Stock Ledger" },
+        { label: "Daily Order Status Report", to: "/merchandising-reports" },
+        { label: "Buyer Share & Shipment", to: "/merchandising-reports" },
+        { label: "Material Stock Ledger", to: "/merchandising-reports" },
       ],
     },
   ];
@@ -267,7 +279,14 @@ export default function MerchandisingLayout({
                       if (sub.to) {
                         const isSubActive =
                           (sub.to === "/merchandising-order-list" && activePath === "order-list") ||
-                          (sub.to === "/merchandising-order-profile" && activePath === "order-profile");
+                          (sub.to === "/merchandising-order-profile" && activePath === "order-profile") ||
+                          (sub.to === "/merchandising-master-settings" && activePath === "masterSettings") ||
+                          (sub.to === "/merchandising-capacity-planning" && activePath === "capacity") ||
+                          (sub.to === "/merchandising-sample-tracker" && activePath === "sample") ||
+                          (sub.to === "/merchandising-material-bookings" && activePath === "sourcing") ||
+                          (sub.to === "/merchandising-work-orders" && activePath === "services") ||
+                          (sub.to === "/merchandising-tna-calendar" && activePath === "tna") ||
+                          (sub.to === "/merchandising-reports" && activePath === "reports");
                         return (
                           <Link
                             key={sIdx}
