@@ -39,7 +39,7 @@ function PayrollBenefitsPage() {
           desc: "Configure master data for benefits.",
           to: "#",
         },
-        { title: "Common Benefits", icon: Gift, desc: "Setup common benefit policies.", to: "#" },
+        { title: "Common Benefits", icon: Gift, desc: "Assign common benefit amounts to employees.", to: "/payroll-benefits-common" },
         {
           title: "Common Benefit List",
           icon: List,
@@ -49,8 +49,8 @@ function PayrollBenefitsPage() {
         {
           title: "Monthly Benefits",
           icon: FileText,
-          desc: "Process monthly employee benefits.",
-          to: "#",
+          desc: "Assign and track one-time monthly benefit entries per employee.",
+          to: "/payroll-benefits-monthly",
         },
         {
           title: "Exclude Benefit",

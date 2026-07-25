@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v15");
+    const saved = localStorage.getItem("system_changes_v17");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -150,6 +150,24 @@ function ChangesPage() {
           link: "/evaluation-propose",
           descriptionEn: "Fixed the double-navigation issue in the Evaluation module! Before, there were both sidebar sub-items AND a tab bar — which was confusing. Now the sidebar shows a single 'Evaluation' link, and the tab bar at the top of each page handles all navigation within the module. The sidebar also stays highlighted on all Evaluation pages.",
           descriptionBn: "ইভ্যালুয়েশন মডিউলের ডাবল নেভিগেশন সমস্যা ঠিক করা হয়েছে! আগে সাইডবারে সাব-মেনু ছিল এবং পেজেও ট্যাব বার ছিল — দুটো একসাথে থাকায় বিভ্রান্তি হচ্ছিল। এখন সাইডবারে শুধু একটি 'Evaluation' লিংক আছে, আর পেজের উপরের ট্যাব বার থেকেই সব সাবপেজে যাওয়া যাবে। যেকোনো ইভ্যালুয়েশন পেজে থাকলে সাইডবারের 'Evaluation' আইটেমটি হাইলাইটেড থাকবে।",
+        },
+        {
+          id: "15",
+          date: "2026-07-25T17:47",
+          type: "New",
+          module: "Benefits",
+          link: "/payroll-benefits-common",
+          descriptionEn: "Brand new Common Benefits page built! You can now filter employees by type, department, section, and benefit category, then enter individual benefit amounts in an editable table. Features include select-all checkboxes, live amount totals, search, pagination, Excel/Print/PDF export, and a Save button with a confirmation toast.",
+          descriptionBn: "নতুন Common Benefits পেজ তৈরি হয়েছে! এখন আপনি এমপ্লয়ি টাইপ, ডিপার্টমেন্ট, সেকশন এবং বেনিফিট ক্যাটাগরি দিয়ে ফিল্টার করে প্রতিটি এমপ্লয়ির জন্য বেনিফিট অ্যামাউন্ট সরাসরি টেবিলে এন্ট্রি দিতে পারবেন। সিলেক্ট-অল চেকবক্স, লাইভ অ্যামাউন্ট টোটাল, সার্চ, পেজিনেশন, Excel/Print/PDF এক্সপোর্ট এবং সেভ বাটন সহ কনফার্মেশন নোটিফিকেশনও আছে।",
+        },
+        {
+          id: "16",
+          date: "2026-07-25T17:50",
+          type: "New",
+          module: "Benefits",
+          link: "/payroll-benefits-monthly",
+          descriptionEn: "New Monthly Benefits page is live! Filter by month, year, benefit type, benefit name, employee type, department, unit, or employee ID. Add new records via the '+' button or the FAB, edit or delete existing ones, and view full details in a clean modal. Modals match the rest of the system's style — orange CLOSE, green SUBMIT.",
+          descriptionBn: "নতুন Monthly Benefits পেজ তৈরি হয়েছে! মাস, বছর, বেনিফিট টাইপ, বেনিফিট নাম, এমপ্লয়ি টাইপ, ডিপার্টমেন্ট, ইউনিট বা এমপ্লয়ি আইডি দিয়ে ফিল্টার করা যাবে। '+' বাটন বা ফ্লোটিং বাটন দিয়ে নতুন রেকর্ড যোগ করা যাবে, সম্পাদনা বা মুছে ফেলা যাবে। মোডাল বাকি সিস্টেমের মতোই — অরেঞ্জ CLOSE, সবুজ SUBMIT।",
         },
       ]);
     }

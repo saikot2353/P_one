@@ -42,6 +42,8 @@ import { Route as PayrollReportsRouteImport } from './routes/payroll-reports'
 import { Route as PayrollLoanRouteImport } from './routes/payroll-loan'
 import { Route as PayrollDeductionsRouteImport } from './routes/payroll-deductions'
 import { Route as PayrollConfigureRouteImport } from './routes/payroll-configure'
+import { Route as PayrollBenefitsMonthlyRouteImport } from './routes/payroll-benefits-monthly'
+import { Route as PayrollBenefitsCommonRouteImport } from './routes/payroll-benefits-common'
 import { Route as PayrollBenefitsRouteImport } from './routes/payroll-benefits'
 import { Route as PayrollAdvanceRouteImport } from './routes/payroll-advance'
 import { Route as MyDashboardRouteImport } from './routes/my-dashboard'
@@ -288,6 +290,16 @@ const PayrollDeductionsRoute = PayrollDeductionsRouteImport.update({
 const PayrollConfigureRoute = PayrollConfigureRouteImport.update({
   id: '/payroll-configure',
   path: '/payroll-configure',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayrollBenefitsMonthlyRoute = PayrollBenefitsMonthlyRouteImport.update({
+  id: '/payroll-benefits-monthly',
+  path: '/payroll-benefits-monthly',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayrollBenefitsCommonRoute = PayrollBenefitsCommonRouteImport.update({
+  id: '/payroll-benefits-common',
+  path: '/payroll-benefits-common',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PayrollBenefitsRoute = PayrollBenefitsRouteImport.update({
@@ -754,6 +766,8 @@ export interface FileRoutesByFullPath {
   '/my-dashboard': typeof MyDashboardRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
+  '/payroll-benefits-common': typeof PayrollBenefitsCommonRoute
+  '/payroll-benefits-monthly': typeof PayrollBenefitsMonthlyRoute
   '/payroll-configure': typeof PayrollConfigureRoute
   '/payroll-deductions': typeof PayrollDeductionsRoute
   '/payroll-loan': typeof PayrollLoanRoute
@@ -866,6 +880,8 @@ export interface FileRoutesByTo {
   '/my-dashboard': typeof MyDashboardRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
+  '/payroll-benefits-common': typeof PayrollBenefitsCommonRoute
+  '/payroll-benefits-monthly': typeof PayrollBenefitsMonthlyRoute
   '/payroll-configure': typeof PayrollConfigureRoute
   '/payroll-deductions': typeof PayrollDeductionsRoute
   '/payroll-loan': typeof PayrollLoanRoute
@@ -979,6 +995,8 @@ export interface FileRoutesById {
   '/my-dashboard': typeof MyDashboardRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
+  '/payroll-benefits-common': typeof PayrollBenefitsCommonRoute
+  '/payroll-benefits-monthly': typeof PayrollBenefitsMonthlyRoute
   '/payroll-configure': typeof PayrollConfigureRoute
   '/payroll-deductions': typeof PayrollDeductionsRoute
   '/payroll-loan': typeof PayrollLoanRoute
@@ -1093,6 +1111,8 @@ export interface FileRouteTypes {
     | '/my-dashboard'
     | '/payroll-advance'
     | '/payroll-benefits'
+    | '/payroll-benefits-common'
+    | '/payroll-benefits-monthly'
     | '/payroll-configure'
     | '/payroll-deductions'
     | '/payroll-loan'
@@ -1205,6 +1225,8 @@ export interface FileRouteTypes {
     | '/my-dashboard'
     | '/payroll-advance'
     | '/payroll-benefits'
+    | '/payroll-benefits-common'
+    | '/payroll-benefits-monthly'
     | '/payroll-configure'
     | '/payroll-deductions'
     | '/payroll-loan'
@@ -1317,6 +1339,8 @@ export interface FileRouteTypes {
     | '/my-dashboard'
     | '/payroll-advance'
     | '/payroll-benefits'
+    | '/payroll-benefits-common'
+    | '/payroll-benefits-monthly'
     | '/payroll-configure'
     | '/payroll-deductions'
     | '/payroll-loan'
@@ -1430,6 +1454,8 @@ export interface RootRouteChildren {
   MyDashboardRoute: typeof MyDashboardRoute
   PayrollAdvanceRoute: typeof PayrollAdvanceRoute
   PayrollBenefitsRoute: typeof PayrollBenefitsRoute
+  PayrollBenefitsCommonRoute: typeof PayrollBenefitsCommonRoute
+  PayrollBenefitsMonthlyRoute: typeof PayrollBenefitsMonthlyRoute
   PayrollConfigureRoute: typeof PayrollConfigureRoute
   PayrollDeductionsRoute: typeof PayrollDeductionsRoute
   PayrollLoanRoute: typeof PayrollLoanRoute
@@ -1700,6 +1726,20 @@ declare module '@tanstack/react-router' {
       path: '/payroll-configure'
       fullPath: '/payroll-configure'
       preLoaderRoute: typeof PayrollConfigureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payroll-benefits-monthly': {
+      id: '/payroll-benefits-monthly'
+      path: '/payroll-benefits-monthly'
+      fullPath: '/payroll-benefits-monthly'
+      preLoaderRoute: typeof PayrollBenefitsMonthlyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payroll-benefits-common': {
+      id: '/payroll-benefits-common'
+      path: '/payroll-benefits-common'
+      fullPath: '/payroll-benefits-common'
+      preLoaderRoute: typeof PayrollBenefitsCommonRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/payroll-benefits': {
@@ -2318,6 +2358,8 @@ const rootRouteChildren: RootRouteChildren = {
   MyDashboardRoute: MyDashboardRoute,
   PayrollAdvanceRoute: PayrollAdvanceRoute,
   PayrollBenefitsRoute: PayrollBenefitsRoute,
+  PayrollBenefitsCommonRoute: PayrollBenefitsCommonRoute,
+  PayrollBenefitsMonthlyRoute: PayrollBenefitsMonthlyRoute,
   PayrollConfigureRoute: PayrollConfigureRoute,
   PayrollDeductionsRoute: PayrollDeductionsRoute,
   PayrollLoanRoute: PayrollLoanRoute,
