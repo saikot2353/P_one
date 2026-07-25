@@ -1145,6 +1145,10 @@ function PersonnelListPage() {
             </div>
           </div>
 
+          {/* SPLIT LAYOUT WRAPPER */}
+          <div className="flex flex-col xl:flex-row gap-4 items-start w-full">
+            {/* Left side (Filters and Table) */}
+            <div className={`flex-1 min-w-0 flex flex-col gap-4 transition-all duration-300 ${selectedEmpIds.length > 0 ? "w-full xl:w-[75%]" : "w-full"}`}>
           {/* Collapsible Advanced Filters Section */}
           <div className="bg-card rounded-lg border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300">
             <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-primary/10 via-primary/45 to-primary/10" />
@@ -1374,252 +1378,6 @@ function PersonnelListPage() {
               </button>
             </div>
           )}
-
-          {/* Personnel Operations & Document Hub */}
-          <div className="bg-card rounded-lg border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300">
-            <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-emerald-500 via-primary to-indigo-500" />
-
-            {selectedEmpIds.length === 0 ? (
-              <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-5 bg-gradient-to-r from-card via-muted/5 to-card">
-                <div className="flex items-center gap-3">
-                  <div className="size-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-2xs">
-                    <Sparkles className="size-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-foreground">
-                      Personnel Operations & Document Center
-                    </h3>
-                    <p className="text-xs text-muted-foreground/80 mt-0.5 font-normal">
-                      Generate statutory letters, print certificates, and manage employee profiles
-                      in bulk.
-                    </p>
-                  </div>
-                </div>
-                <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-indigo-500/5 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-normal shadow-3xs">
-                  <Info className="size-3.5 text-indigo-500 shrink-0" />
-                  <span>Select employees in the table below to activate bulk tools & printing</span>
-                </div>
-              </div>
-            ) : (
-              <div className="p-5 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                {/* Active Selection Header */}
-                <div className="flex items-center justify-between gap-4 pb-3 border-b border-border/40">
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-primary/10 text-primary">
-                      {selectedEmpIds.length} Selected
-                    </span>
-                    <h3 className="text-xs font-extrabold text-foreground tracking-tight">
-                      Active Operations & Print Console
-                    </h3>
-                  </div>
-                  <button
-                    onClick={() => setSelectedEmpIds([])}
-                    className="text-[10px] font-extrabold text-muted-foreground hover:text-primary transition"
-                  >
-                    Clear Selection
-                  </button>
-                </div>
-
-                {/* Operations Grid */}
-                <div className="grid grid-cols-1 xl:grid-cols-12 gap-5">
-                  {/* Left Console: Documents Grid */}
-                  <div className="xl:col-span-8 space-y-4">
-                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/80 uppercase tracking-widest">
-                      <FileSignature className="size-3.5 text-primary" />
-                      <span>Document Generation & Printing Hub</span>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {/* Column A: Letters & Agreements */}
-                      <div className="space-y-2 bg-muted/15 border border-border/20 rounded-xl p-3.5">
-                        <div className="text-[10px] font-extrabold text-foreground/90 uppercase tracking-wider pb-1.5 border-b border-border/30 flex items-center gap-1.5">
-                          <FileSignature className="size-3.5 text-indigo-500" />
-                          <span>Letters & Agreements</span>
-                        </div>
-                        <div className="space-y-1.5">
-                          {[
-                            "Offer Letter",
-                            "Joining Letter",
-                            "Appointment Letter",
-                            "Resignation Letter",
-                            "Confirmation Letter",
-                            "Experience Certificate",
-                            "NOC Letter",
-                            "Salary Certificate",
-                          ].map((doc) => (
-                            <button
-                              key={doc}
-                              disabled={activeDocGenerating !== null}
-                              onClick={() => triggerDocGeneration(doc)}
-                              className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-border/50 bg-card hover:bg-primary/5 hover:border-primary/30 text-left text-xs font-semibold text-foreground/80 hover:text-foreground transition-all duration-150 disabled:opacity-50"
-                            >
-                              {activeDocGenerating === doc ? (
-                                <RefreshCw className="size-3.5 animate-spin text-primary" />
-                              ) : (
-                                <FileSignature className="size-3.5 text-indigo-500" />
-                              )}
-                              <span className="truncate">{doc}</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Column B: Forms & Service Book */}
-                      <div className="space-y-2 bg-muted/15 border border-border/20 rounded-xl p-3.5">
-                        <div className="text-[10px] font-extrabold text-foreground/90 uppercase tracking-wider pb-1.5 border-b border-border/30 flex items-center gap-1.5">
-                          <ShieldCheck className="size-3.5 text-emerald-500" />
-                          <span>Statutory & Forms</span>
-                        </div>
-                        <div className="space-y-1.5">
-                          {[
-                            "Nominee Form",
-                            "Age Verification",
-                            "Application Form",
-                            "Service Book",
-                            "Emp Check List",
-                            "Performance Appraisal",
-                            "BI Verification",
-                            "Police Verification",
-                          ].map((doc) => (
-                            <button
-                              key={doc}
-                              disabled={activeDocGenerating !== null}
-                              onClick={() => triggerDocGeneration(doc)}
-                              className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-border/50 bg-card hover:bg-primary/5 hover:border-primary/30 text-left text-xs font-semibold text-foreground/80 hover:text-foreground transition-all duration-150 disabled:opacity-50"
-                            >
-                              {activeDocGenerating === doc ? (
-                                <RefreshCw className="size-3.5 animate-spin text-primary" />
-                              ) : (
-                                <ShieldCheck className="size-3.5 text-emerald-500" />
-                              )}
-                              <span className="truncate">{doc}</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Column C: Identity & Clearance */}
-                      <div className="space-y-2 bg-muted/15 border border-border/20 rounded-xl p-3.5">
-                        <div className="text-[10px] font-extrabold text-foreground/90 uppercase tracking-wider pb-1.5 border-b border-border/30 flex items-center gap-1.5">
-                          <CreditCard className="size-3.5 text-amber-500" />
-                          <span>Identity & Clearance</span>
-                        </div>
-                        <div className="space-y-1.5">
-                          {[
-                            "ID Card",
-                            "Employee Info",
-                            "Sticker Format",
-                            "Clearance Doc",
-                            "Personal Resume",
-                            "Report Set",
-                            "Zero Abuse EXE",
-                            "Service CoC",
-                          ].map((doc) => (
-                            <button
-                              key={doc}
-                              disabled={activeDocGenerating !== null}
-                              onClick={() => triggerDocGeneration(doc)}
-                              className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-border/50 bg-card hover:bg-primary/5 hover:border-primary/30 text-left text-xs font-semibold text-foreground/80 hover:text-foreground transition-all duration-150 disabled:opacity-50"
-                            >
-                              {activeDocGenerating === doc ? (
-                                <RefreshCw className="size-3.5 animate-spin text-primary" />
-                              ) : (
-                                <CreditCard className="size-3.5 text-amber-500" />
-                              )}
-                              <span className="truncate">{doc}</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Right Console: Bulk Operations */}
-                  <div className="xl:col-span-4 space-y-4">
-                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/80 uppercase tracking-widest">
-                      <UserCog className="size-3.5 text-primary" />
-                      <span>Personnel Operations Center</span>
-                    </div>
-
-                    <div className="bg-muted/15 border border-border/20 rounded-xl p-3.5 h-[calc(100%-1.75rem)] flex flex-col justify-between gap-3">
-                      <div className="grid grid-cols-2 gap-2">
-                        {[
-                          {
-                            name: "Make Permanent",
-                            icon: UserCheck,
-                            color:
-                              "hover:bg-emerald-500/10 hover:border-emerald-500/30 text-emerald-600 dark:text-emerald-400",
-                          },
-                          {
-                            name: "Status Update",
-                            icon: UserCog,
-                            color:
-                              "hover:bg-indigo-500/10 hover:border-indigo-500/30 text-indigo-600 dark:text-indigo-400",
-                          },
-                          {
-                            name: "OT Status Update",
-                            icon: Clock,
-                            color:
-                              "hover:bg-amber-500/10 hover:border-amber-500/30 text-amber-600 dark:text-amber-400",
-                          },
-                          {
-                            name: "Shift Rotation",
-                            icon: CalendarRange,
-                            color:
-                              "hover:bg-rose-500/10 hover:border-rose-500/30 text-rose-600 dark:text-rose-400",
-                          },
-                          {
-                            name: "Set Holiday",
-                            icon: CalendarHeart,
-                            color:
-                              "hover:bg-cyan-500/10 hover:border-cyan-500/30 text-cyan-600 dark:text-cyan-400",
-                          },
-                          {
-                            name: "Set A/C IsActive",
-                            icon: Power,
-                            color:
-                              "hover:bg-purple-500/10 hover:border-purple-500/30 text-purple-600 dark:text-purple-400",
-                          },
-                          {
-                            name: "ID Card IssueDate",
-                            icon: FileClock,
-                            color:
-                              "hover:bg-fuchsia-500/10 hover:border-fuchsia-500/30 text-fuchsia-600 dark:text-fuchsia-400",
-                          },
-                          {
-                            name: "Revenue Mapping",
-                            icon: DollarSign,
-                            color:
-                              "hover:bg-teal-500/10 hover:border-teal-500/30 text-teal-600 dark:text-teal-400",
-                          },
-                        ].map((op) => {
-                          const IconComponent = op.icon;
-                          return (
-                            <button
-                              key={op.name}
-                              onClick={() => triggerBulkAction(op.name)}
-                              className={`flex flex-col items-center justify-center p-3 rounded-xl border border-border/40 bg-card text-center gap-1.5 transition-all hover:scale-102 hover:shadow-2xs ${op.color}`}
-                            >
-                              <IconComponent className="size-4.5" />
-                              <span className="text-[10px] font-bold tracking-tight whitespace-nowrap leading-none">
-                                {op.name}
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      <div className="bg-primary/5 border border-primary/10 rounded-xl p-3 text-[10px] text-muted-foreground/80 leading-relaxed">
-                        💡 <span className="font-extrabold text-foreground">Bulk operations</span>{" "}
-                        applied here will simultaneously update the corporate records for all{" "}
-                        {selectedEmpIds.length} checked personnel.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
 
           {/* Data Grid Card Container */}
           <div className="bg-card rounded-lg border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300">
@@ -1908,6 +1666,261 @@ function PersonnelListPage() {
               </div>
             </div>
           </div>
+
+            </div> {/* End Left Column */}
+
+            {/* Right Column (Sidebar) */}
+            {selectedEmpIds.length > 0 && (
+              <div className="w-full xl:w-[25%] shrink-0 sticky top-4 animate-in slide-in-from-right-4 duration-300 space-y-4 max-h-[calc(100vh-2rem)] overflow-y-auto pb-4">
+                          {/* Personnel Operations & Document Hub */}
+          <div className="bg-card rounded-lg border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300">
+            <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-emerald-500 via-primary to-indigo-500" />
+
+            {selectedEmpIds.length === 0 ? (
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-5 bg-gradient-to-r from-card via-muted/5 to-card">
+                <div className="flex items-center gap-3">
+                  <div className="size-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-2xs">
+                    <Sparkles className="size-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-foreground">
+                      Personnel Operations & Document Center
+                    </h3>
+                    <p className="text-xs text-muted-foreground/80 mt-0.5 font-normal">
+                      Generate statutory letters, print certificates, and manage employee profiles
+                      in bulk.
+                    </p>
+                  </div>
+                </div>
+                <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-indigo-500/5 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-normal shadow-3xs">
+                  <Info className="size-3.5 text-indigo-500 shrink-0" />
+                  <span>Select employees in the table below to activate bulk tools & printing</span>
+                </div>
+              </div>
+            ) : (
+              <div className="p-5 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                {/* Active Selection Header */}
+                <div className="flex items-center justify-between gap-4 pb-3 border-b border-border/40">
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-primary/10 text-primary">
+                      {selectedEmpIds.length} Selected
+                    </span>
+                    <h3 className="text-xs font-extrabold text-foreground tracking-tight">
+                      Active Operations & Print Console
+                    </h3>
+                  </div>
+                  <button
+                    onClick={() => setSelectedEmpIds([])}
+                    className="text-[10px] font-extrabold text-muted-foreground hover:text-primary transition"
+                  >
+                    Clear Selection
+                  </button>
+                </div>
+
+                {/* Operations Grid */}
+                <div className="flex flex-col gap-5">
+                  {/* Left Console: Documents Grid */}
+                  <div className="w-full space-y-4">
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/80 uppercase tracking-widest">
+                      <FileSignature className="size-3.5 text-primary" />
+                      <span>Document Generation & Printing Hub</span>
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                      {/* Column A: Letters & Agreements */}
+                      <div className="space-y-2 bg-muted/15 border border-border/20 rounded-xl p-3.5">
+                        <div className="text-[10px] font-extrabold text-foreground/90 uppercase tracking-wider pb-1.5 border-b border-border/30 flex items-center gap-1.5">
+                          <FileSignature className="size-3.5 text-indigo-500" />
+                          <span>Letters & Agreements</span>
+                        </div>
+                        <div className="space-y-1.5">
+                          {[
+                            "Offer Letter",
+                            "Joining Letter",
+                            "Appointment Letter",
+                            "Resignation Letter",
+                            "Confirmation Letter",
+                            "Experience Certificate",
+                            "NOC Letter",
+                            "Salary Certificate",
+                          ].map((doc) => (
+                            <button
+                              key={doc}
+                              disabled={activeDocGenerating !== null}
+                              onClick={() => triggerDocGeneration(doc)}
+                              className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-border/50 bg-card hover:bg-primary/5 hover:border-primary/30 text-left text-xs font-semibold text-foreground/80 hover:text-foreground transition-all duration-150 disabled:opacity-50"
+                            >
+                              {activeDocGenerating === doc ? (
+                                <RefreshCw className="size-3.5 animate-spin text-primary" />
+                              ) : (
+                                <FileSignature className="size-3.5 text-indigo-500" />
+                              )}
+                              <span className="truncate">{doc}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Column B: Forms & Service Book */}
+                      <div className="space-y-2 bg-muted/15 border border-border/20 rounded-xl p-3.5">
+                        <div className="text-[10px] font-extrabold text-foreground/90 uppercase tracking-wider pb-1.5 border-b border-border/30 flex items-center gap-1.5">
+                          <ShieldCheck className="size-3.5 text-emerald-500" />
+                          <span>Statutory & Forms</span>
+                        </div>
+                        <div className="space-y-1.5">
+                          {[
+                            "Nominee Form",
+                            "Age Verification",
+                            "Application Form",
+                            "Service Book",
+                            "Emp Check List",
+                            "Performance Appraisal",
+                            "BI Verification",
+                            "Police Verification",
+                          ].map((doc) => (
+                            <button
+                              key={doc}
+                              disabled={activeDocGenerating !== null}
+                              onClick={() => triggerDocGeneration(doc)}
+                              className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-border/50 bg-card hover:bg-primary/5 hover:border-primary/30 text-left text-xs font-semibold text-foreground/80 hover:text-foreground transition-all duration-150 disabled:opacity-50"
+                            >
+                              {activeDocGenerating === doc ? (
+                                <RefreshCw className="size-3.5 animate-spin text-primary" />
+                              ) : (
+                                <ShieldCheck className="size-3.5 text-emerald-500" />
+                              )}
+                              <span className="truncate">{doc}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Column C: Identity & Clearance */}
+                      <div className="space-y-2 bg-muted/15 border border-border/20 rounded-xl p-3.5">
+                        <div className="text-[10px] font-extrabold text-foreground/90 uppercase tracking-wider pb-1.5 border-b border-border/30 flex items-center gap-1.5">
+                          <CreditCard className="size-3.5 text-amber-500" />
+                          <span>Identity & Clearance</span>
+                        </div>
+                        <div className="space-y-1.5">
+                          {[
+                            "ID Card",
+                            "Employee Info",
+                            "Sticker Format",
+                            "Clearance Doc",
+                            "Personal Resume",
+                            "Report Set",
+                            "Zero Abuse EXE",
+                            "Service CoC",
+                          ].map((doc) => (
+                            <button
+                              key={doc}
+                              disabled={activeDocGenerating !== null}
+                              onClick={() => triggerDocGeneration(doc)}
+                              className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-border/50 bg-card hover:bg-primary/5 hover:border-primary/30 text-left text-xs font-semibold text-foreground/80 hover:text-foreground transition-all duration-150 disabled:opacity-50"
+                            >
+                              {activeDocGenerating === doc ? (
+                                <RefreshCw className="size-3.5 animate-spin text-primary" />
+                              ) : (
+                                <CreditCard className="size-3.5 text-amber-500" />
+                              )}
+                              <span className="truncate">{doc}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Console: Bulk Operations */}
+                  <div className="w-full space-y-4">
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/80 uppercase tracking-widest">
+                      <UserCog className="size-3.5 text-primary" />
+                      <span>Personnel Operations Center</span>
+                    </div>
+
+                    <div className="bg-muted/15 border border-border/20 rounded-xl p-3.5 h-[calc(100%-1.75rem)] flex flex-col justify-between gap-3">
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          {
+                            name: "Make Permanent",
+                            icon: UserCheck,
+                            color:
+                              "hover:bg-emerald-500/10 hover:border-emerald-500/30 text-emerald-600 dark:text-emerald-400",
+                          },
+                          {
+                            name: "Status Update",
+                            icon: UserCog,
+                            color:
+                              "hover:bg-indigo-500/10 hover:border-indigo-500/30 text-indigo-600 dark:text-indigo-400",
+                          },
+                          {
+                            name: "OT Status Update",
+                            icon: Clock,
+                            color:
+                              "hover:bg-amber-500/10 hover:border-amber-500/30 text-amber-600 dark:text-amber-400",
+                          },
+                          {
+                            name: "Shift Rotation",
+                            icon: CalendarRange,
+                            color:
+                              "hover:bg-rose-500/10 hover:border-rose-500/30 text-rose-600 dark:text-rose-400",
+                          },
+                          {
+                            name: "Set Holiday",
+                            icon: CalendarHeart,
+                            color:
+                              "hover:bg-cyan-500/10 hover:border-cyan-500/30 text-cyan-600 dark:text-cyan-400",
+                          },
+                          {
+                            name: "Set A/C IsActive",
+                            icon: Power,
+                            color:
+                              "hover:bg-purple-500/10 hover:border-purple-500/30 text-purple-600 dark:text-purple-400",
+                          },
+                          {
+                            name: "ID Card IssueDate",
+                            icon: FileClock,
+                            color:
+                              "hover:bg-fuchsia-500/10 hover:border-fuchsia-500/30 text-fuchsia-600 dark:text-fuchsia-400",
+                          },
+                          {
+                            name: "Revenue Mapping",
+                            icon: DollarSign,
+                            color:
+                              "hover:bg-teal-500/10 hover:border-teal-500/30 text-teal-600 dark:text-teal-400",
+                          },
+                        ].map((op) => {
+                          const IconComponent = op.icon;
+                          return (
+                            <button
+                              key={op.name}
+                              onClick={() => triggerBulkAction(op.name)}
+                              className={`flex flex-col items-center justify-center p-3 rounded-xl border border-border/40 bg-card text-center gap-1.5 transition-all hover:scale-102 hover:shadow-2xs ${op.color}`}
+                            >
+                              <IconComponent className="size-4.5" />
+                              <span className="text-[10px] font-bold tracking-tight whitespace-nowrap leading-none">
+                                {op.name}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <div className="bg-primary/5 border border-primary/10 rounded-xl p-3 text-[10px] text-muted-foreground/80 leading-relaxed">
+                        💡 <span className="font-extrabold text-foreground">Bulk operations</span>{" "}
+                        applied here will simultaneously update the corporate records for all{" "}
+                        {selectedEmpIds.length} checked personnel.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+              </div>
+            )}
+
+          </div> {/* End Split Layout Wrapper */}
         </div>
 
         {/* Column Arrangement Modal */}

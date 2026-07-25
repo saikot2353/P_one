@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { ArrowLeft, Save, Plus, FileSpreadsheet } from "lucide-react";
+import { ArrowLeft, Save, Plus, FileSpreadsheet, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/changes")({
@@ -12,24 +12,73 @@ type ChangeRecord = {
   date: string;
   type: "Modify" | "New Addition" | "";
   module: string;
-  description: string;
+  link?: string;
+  descriptionEn: string;
+  descriptionBn: string;
 };
 
 function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes");
+    const saved = localStorage.getItem("system_changes_v6");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
       setRecords([
         {
           id: "1",
-          date: new Date().toISOString().split("T")[0],
+          date: "2026-07-25",
           type: "New Addition",
           module: "Module Selection",
-          description: "Added a new menu 'Changes!' to track system updates like an Excel sheet.",
+          link: "/module-selection",
+          descriptionEn: "Created this 'Changes!' page! It works just like Excel, so you can easily track and edit all the new updates happening in the system.",
+          descriptionBn: "নতুন 'Changes!' পেজ তৈরি করা হয়েছে! এটি এক্সেলের মতো কাজ করে, তাই আপনি সহজেই সিস্টেমের নতুন আপডেটগুলো ট্র্যাক ও এডিট করতে পারবেন।",
+        },
+        {
+          id: "2",
+          date: "2026-07-25",
+          type: "Modify",
+          module: "Order Profile",
+          link: "/merchandising-order-profile",
+          descriptionEn: "Made the Basic Information section much cleaner! It's now laid out in 4 neat columns, making it much easier to read and prettier to look at.",
+          descriptionBn: "বেসিক ইনফরমেশন সেকশনটি আরও সুন্দর করা হয়েছে! এটি এখন ৪টি কলামে সাজানো, ফলে পড়া সহজ এবং দেখতে আরও ভালো লাগছে।",
+        },
+        {
+          id: "3",
+          date: "2026-07-25",
+          type: "Modify",
+          module: "Order Profile",
+          link: "/merchandising-order-profile",
+          descriptionEn: "Fixed the messy tables for Yarn, Fabric, and Trim! They are now combined into one perfectly aligned master table.",
+          descriptionBn: "Yarn, Fabric এবং Trim-এর ছড়ানো টেবিলগুলো ঠিক করা হয়েছে! এগুলোকে এখন একটি সুন্দর সাজানো মাস্টার টেবিলে একত্রিত করা হয়েছে।",
+        },
+        {
+          id: "4",
+          date: "2026-07-25",
+          type: "Modify",
+          module: "Order Profile",
+          link: "/merchandising-order-profile",
+          descriptionEn: "Made the tables more compact by reducing the text size and spacing. Now everything fits on the screen without having to scroll left and right!",
+          descriptionBn: "টেক্সট সাইজ এবং স্পেসিং কমিয়ে টেবিলগুলোকে আরও কম্প্যাক্ট করা হয়েছে। এখন ডানে-বামে স্ক্রল করা ছাড়াই সব এক স্ক্রিনে ফিট হয়ে যাবে!",
+        },
+        {
+          id: "5",
+          date: "2026-07-25",
+          type: "Modify",
+          module: "Global System",
+          link: "/",
+          descriptionEn: "Switched the entire system to default to Light Mode! Everything will look bright and clear right from the start.",
+          descriptionBn: "সিস্টেমের ডিফল্ট থিম হিসেবে লাইট মোড সেট করা হয়েছে! এখন সবকিছু শুরু থেকেই উজ্জ্বল এবং পরিষ্কার দেখাবে।",
+        },
+        {
+          id: "6",
+          date: "2026-07-25",
+          type: "Modify",
+          module: "Personnel List",
+          link: "/personnel-list",
+          descriptionEn: "Moved the 'Operations' tools to a sidebar! Now, when you select an employee, the tools automatically pop up on the right side. You can still see the main table and continue clicking other employees to update multiple at once.",
+          descriptionBn: "অপারেশন টুলসগুলোকে সাইডবারে সরানো হয়েছে! এখন মেইন টেবিল থেকে যেকোনো এমপ্লয়ি সিলেক্ট করলেই টুলসগুলো ডানপাশে স্লাইড হয়ে খুলবে। আপনি তখনও মেইন টেবিল দেখতে পাবেন এবং একসাথে একাধিক কাজ করার জন্য অন্য এমপ্লয়ি সিলেক্ট করতে পারবেন।",
         },
       ]);
     }
@@ -37,7 +86,7 @@ function ChangesPage() {
 
   const saveRecords = (newRecords: ChangeRecord[]) => {
     setRecords(newRecords);
-    localStorage.setItem("system_changes", JSON.stringify(newRecords));
+    localStorage.setItem("system_changes_v6", JSON.stringify(newRecords));
   };
 
   const addRow = () => {
@@ -46,7 +95,8 @@ function ChangesPage() {
       date: new Date().toISOString().split("T")[0],
       type: "New Addition",
       module: "",
-      description: "",
+      descriptionEn: "",
+      descriptionBn: "",
     };
     saveRecords([...records, newRecord]);
   };
@@ -106,7 +156,8 @@ function ChangesPage() {
               <th className="w-32 border-r border-slate-300 py-1.5 font-semibold text-slate-700">A (Date)</th>
               <th className="w-48 border-r border-slate-300 py-1.5 font-semibold text-slate-700">B (Type)</th>
               <th className="w-64 border-r border-slate-300 py-1.5 font-semibold text-slate-700">C (Module/Area)</th>
-              <th className="border-r border-slate-300 py-1.5 font-semibold text-left pl-3 text-slate-700">D (Description)</th>
+              <th className="w-1/3 border-r border-slate-300 py-1.5 font-semibold text-left pl-3 text-slate-700">D (English)</th>
+              <th className="w-1/3 border-r border-slate-300 py-1.5 font-semibold text-left pl-3 text-slate-700">E (Bangla)</th>
             </tr>
           </thead>
           <tbody>
@@ -134,21 +185,41 @@ function ChangesPage() {
                     <option value="Modify">Modify</option>
                   </select>
                 </td>
+                <td className="border-b border-r border-slate-300 p-0 h-[28px] group relative">
+                  <div className="flex items-center w-full h-full">
+                    <input
+                      type="text"
+                      value={row.module}
+                      placeholder="e.g. Dashboard"
+                      onChange={(e) => updateRecord(row.id, "module", e.target.value)}
+                      className="flex-1 min-w-0 h-full px-2 py-1 outline-none focus:ring-2 focus:ring-inset focus:ring-[#107c41] bg-transparent text-slate-800 placeholder:text-slate-300"
+                    />
+                    {row.link && (
+                      <Link
+                        to={row.link as any}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 mr-1 text-[#107c41] hover:bg-[#107c41]/10 rounded flex items-center justify-center shrink-0"
+                        title={`Open ${row.module}`}
+                      >
+                        <ExternalLink className="size-3.5" />
+                      </Link>
+                    )}
+                  </div>
+                </td>
                 <td className="border-b border-r border-slate-300 p-0 h-[28px]">
                   <input
                     type="text"
-                    value={row.module}
-                    placeholder="e.g. Dashboard"
-                    onChange={(e) => updateRecord(row.id, "module", e.target.value)}
-                    className="w-full h-full px-2 py-1 outline-none focus:ring-2 focus:ring-inset focus:ring-[#107c41] bg-transparent text-slate-800 placeholder:text-slate-300"
+                    value={row.descriptionEn}
+                    placeholder="Enter change details..."
+                    onChange={(e) => updateRecord(row.id, "descriptionEn", e.target.value)}
+                    className="w-full h-full px-3 py-1 outline-none focus:ring-2 focus:ring-inset focus:ring-[#107c41] bg-transparent text-slate-800 placeholder:text-slate-300"
                   />
                 </td>
                 <td className="border-b border-r border-slate-300 p-0 h-[28px]">
                   <input
                     type="text"
-                    value={row.description}
-                    placeholder="Enter change details..."
-                    onChange={(e) => updateRecord(row.id, "description", e.target.value)}
+                    value={row.descriptionBn}
+                    placeholder="বাংলায় বিবরণ লিখুন..."
+                    onChange={(e) => updateRecord(row.id, "descriptionBn", e.target.value)}
                     className="w-full h-full px-3 py-1 outline-none focus:ring-2 focus:ring-inset focus:ring-[#107c41] bg-transparent text-slate-800 placeholder:text-slate-300"
                   />
                 </td>
