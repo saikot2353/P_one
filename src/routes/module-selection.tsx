@@ -17,6 +17,7 @@ import {
   Sun,
   Moon,
   Store,
+  ListChecks,
 } from "lucide-react";
 
 export const Route = createFileRoute("/module-selection")({
@@ -151,6 +152,15 @@ const modules = [
     color: "from-indigo-500 to-blue-600",
     shadow: "shadow-indigo-500/20",
     path: "/my-dashboard",
+  },
+  {
+    id: "changes",
+    name: "Changes!",
+    description: "System updates and additions",
+    icon: ListChecks,
+    color: "from-teal-500 to-emerald-600",
+    shadow: "shadow-teal-500/20",
+    path: "/changes",
   },
 ];
 

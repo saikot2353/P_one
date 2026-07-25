@@ -101,6 +101,7 @@ import { Route as ConfigureCompensationRouteImport } from './routes/configure-co
 import { Route as CompanySetupRouteImport } from './routes/company-setup'
 import { Route as CompanyHolidayRouteImport } from './routes/company-holiday'
 import { Route as CheckApproveSalaryRouteImport } from './routes/check-approve-salary'
+import { Route as ChangesRouteImport } from './routes/changes'
 import { Route as BudgetStatementRouteImport } from './routes/budget-statement'
 import { Route as BudgetRequisitionApprovalsRouteImport } from './routes/budget-requisition-approvals'
 import { Route as BudgetPlanningRouteImport } from './routes/budget-planning'
@@ -585,6 +586,11 @@ const CheckApproveSalaryRoute = CheckApproveSalaryRouteImport.update({
   path: '/check-approve-salary',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChangesRoute = ChangesRouteImport.update({
+  id: '/changes',
+  path: '/changes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BudgetStatementRoute = BudgetStatementRouteImport.update({
   id: '/budget-statement',
   path: '/budget-statement',
@@ -688,6 +694,7 @@ export interface FileRoutesByFullPath {
   '/budget-planning': typeof BudgetPlanningRoute
   '/budget-requisition-approvals': typeof BudgetRequisitionApprovalsRoute
   '/budget-statement': typeof BudgetStatementRoute
+  '/changes': typeof ChangesRoute
   '/check-approve-salary': typeof CheckApproveSalaryRoute
   '/company-holiday': typeof CompanyHolidayRoute
   '/company-setup': typeof CompanySetupRoute
@@ -799,6 +806,7 @@ export interface FileRoutesByTo {
   '/budget-planning': typeof BudgetPlanningRoute
   '/budget-requisition-approvals': typeof BudgetRequisitionApprovalsRoute
   '/budget-statement': typeof BudgetStatementRoute
+  '/changes': typeof ChangesRoute
   '/check-approve-salary': typeof CheckApproveSalaryRoute
   '/company-holiday': typeof CompanyHolidayRoute
   '/company-setup': typeof CompanySetupRoute
@@ -911,6 +919,7 @@ export interface FileRoutesById {
   '/budget-planning': typeof BudgetPlanningRoute
   '/budget-requisition-approvals': typeof BudgetRequisitionApprovalsRoute
   '/budget-statement': typeof BudgetStatementRoute
+  '/changes': typeof ChangesRoute
   '/check-approve-salary': typeof CheckApproveSalaryRoute
   '/company-holiday': typeof CompanyHolidayRoute
   '/company-setup': typeof CompanySetupRoute
@@ -1024,6 +1033,7 @@ export interface FileRouteTypes {
     | '/budget-planning'
     | '/budget-requisition-approvals'
     | '/budget-statement'
+    | '/changes'
     | '/check-approve-salary'
     | '/company-holiday'
     | '/company-setup'
@@ -1135,6 +1145,7 @@ export interface FileRouteTypes {
     | '/budget-planning'
     | '/budget-requisition-approvals'
     | '/budget-statement'
+    | '/changes'
     | '/check-approve-salary'
     | '/company-holiday'
     | '/company-setup'
@@ -1246,6 +1257,7 @@ export interface FileRouteTypes {
     | '/budget-planning'
     | '/budget-requisition-approvals'
     | '/budget-statement'
+    | '/changes'
     | '/check-approve-salary'
     | '/company-holiday'
     | '/company-setup'
@@ -1358,6 +1370,7 @@ export interface RootRouteChildren {
   BudgetPlanningRoute: typeof BudgetPlanningRoute
   BudgetRequisitionApprovalsRoute: typeof BudgetRequisitionApprovalsRoute
   BudgetStatementRoute: typeof BudgetStatementRoute
+  ChangesRoute: typeof ChangesRoute
   CheckApproveSalaryRoute: typeof CheckApproveSalaryRoute
   CompanyHolidayRoute: typeof CompanyHolidayRoute
   CompanySetupRoute: typeof CompanySetupRoute
@@ -2102,6 +2115,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckApproveSalaryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/changes': {
+      id: '/changes'
+      path: '/changes'
+      fullPath: '/changes'
+      preLoaderRoute: typeof ChangesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/budget-statement': {
       id: '/budget-statement'
       path: '/budget-statement'
@@ -2238,6 +2258,7 @@ const rootRouteChildren: RootRouteChildren = {
   BudgetPlanningRoute: BudgetPlanningRoute,
   BudgetRequisitionApprovalsRoute: BudgetRequisitionApprovalsRoute,
   BudgetStatementRoute: BudgetStatementRoute,
+  ChangesRoute: ChangesRoute,
   CheckApproveSalaryRoute: CheckApproveSalaryRoute,
   CompanyHolidayRoute: CompanyHolidayRoute,
   CompanySetupRoute: CompanySetupRoute,
