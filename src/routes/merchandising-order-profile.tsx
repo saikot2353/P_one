@@ -101,32 +101,32 @@ export default function MerchandisingOrderProfilePage() {
     navigate({ to: "/merchandising-order-list" });
   };
 
-  // Modern Input Component
+  // Clean Input Component
   const InputField = ({ label, value, onChange, required = false, type = "text", placeholder = "" }: any) => (
     <div className="flex flex-col gap-1.5 w-full">
-      <label className="text-[12px] font-semibold text-slate-700 dark:text-slate-300">
-        {label} {required && <span className="text-rose-500 font-bold">*</span>}
+      <label className="text-[11.5px] font-bold text-slate-600 dark:text-slate-400 tracking-tight">
+        {label} {required && <span className="text-rose-500 ml-0.5">*</span>}
       </label>
       <input
         type={type}
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className="w-full text-[13px] px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all text-slate-800 dark:text-slate-100"
+        className="w-full text-[13px] px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[6px] hover:border-slate-300 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 transition-all text-slate-800 dark:text-slate-100 placeholder:text-slate-400 shadow-sm shadow-slate-100/50"
       />
     </div>
   );
 
-  // Modern Select Component
+  // Clean Select Component
   const SelectField = ({ label, value, onChange, options, required = false }: any) => (
     <div className="flex flex-col gap-1.5 w-full">
-      <label className="text-[12px] font-semibold text-slate-700 dark:text-slate-300">
-        {label} {required && <span className="text-rose-500 font-bold">*</span>}
+      <label className="text-[11.5px] font-bold text-slate-600 dark:text-slate-400 tracking-tight">
+        {label} {required && <span className="text-rose-500 ml-0.5">*</span>}
       </label>
       <select
         value={value}
         onChange={onChange}
-        className="w-full text-[13px] px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all text-slate-800 dark:text-slate-100 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[position:right_0.75rem_center]"
+        className="w-full text-[13px] px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[6px] hover:border-slate-300 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 transition-all text-slate-800 dark:text-slate-100 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[position:right_0.75rem_center] shadow-sm shadow-slate-100/50"
       >
         {options.map((opt: any) => (
           <option key={opt.value || opt} value={opt.value || opt}>
@@ -161,16 +161,9 @@ export default function MerchandisingOrderProfilePage() {
         </div>
 
         {/* SECTION 1: Order Basic Information */}
-        <section className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20">
-            <h2 className="text-base font-bold text-slate-800 dark:text-white flex items-center gap-2">
-              <span className="w-1.5 h-5 bg-teal-500 rounded-full inline-block"></span>
-              Basic Information
-            </h2>
-          </div>
-          
-          <div className="p-6 flex flex-col xl:flex-row gap-8">
-            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-5">
+        <section className="bg-white dark:bg-slate-900 rounded-2xl p-6 lg:p-8">
+          <div className="flex flex-col xl:flex-row gap-10">
+            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-6">
               <InputField label="Job No" value={basicInfo.jobNo} onChange={(e: any) => setBasicInfo({...basicInfo, jobNo: e.target.value})} />
               <InputField label="Query No" value={basicInfo.queryNo} onChange={(e: any) => setBasicInfo({...basicInfo, queryNo: e.target.value})} />
               <InputField label="Order Quantity" type="number" value={basicInfo.orderQty} onChange={(e: any) => setBasicInfo({...basicInfo, orderQty: e.target.value})} />
@@ -189,19 +182,19 @@ export default function MerchandisingOrderProfilePage() {
               <InputField label="Style No" required value={basicInfo.styleNo} onChange={(e: any) => setBasicInfo({...basicInfo, styleNo: e.target.value})} />
               
               <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-[12px] font-semibold text-slate-700 dark:text-slate-300">
-                  Item Type <span className="text-rose-500 font-bold">*</span>
+                <label className="text-[11.5px] font-bold text-slate-600 dark:text-slate-400 tracking-tight">
+                  Item Type <span className="text-rose-500 ml-0.5">*</span>
                 </label>
                 <div className="flex items-center gap-2">
                   <select
                     value={basicInfo.itemType}
                     onChange={(e) => setBasicInfo({...basicInfo, itemType: e.target.value})}
-                    className="flex-1 text-[13px] px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all"
+                    className="flex-1 text-[13px] px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[6px] hover:border-slate-300 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 transition-all text-slate-800 dark:text-slate-100 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[position:right_0.75rem_center] shadow-sm shadow-slate-100/50"
                   >
                     <option value="">select...</option>
                   </select>
-                  <button className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 p-2 rounded-lg border border-slate-300 dark:border-slate-700 transition-colors text-slate-600 dark:text-slate-300">
-                    <List size={16} />
+                  <button className="bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 h-[34px] w-[34px] rounded-[6px] border border-slate-200 dark:border-slate-700 transition-colors text-slate-500 flex items-center justify-center">
+                    <List size={14} />
                   </button>
                 </div>
               </div>
@@ -219,16 +212,16 @@ export default function MerchandisingOrderProfilePage() {
               <SelectField label="Pay Term" value={basicInfo.payTerm} onChange={(e: any) => setBasicInfo({...basicInfo, payTerm: e.target.value})} options={["120 Days BBLC", "90 Days LC", "Cash"]} />
               <InputField label="Tenor" value={basicInfo.tenor} onChange={(e: any) => setBasicInfo({...basicInfo, tenor: e.target.value})} />
 
-              <div className="sm:col-span-2 lg:col-span-3 xl:col-span-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="sm:col-span-2 xl:col-span-4 grid grid-cols-1 sm:grid-cols-2 gap-5 mt-1">
                 <InputField label="Special Instructions" placeholder="Any specific requirements..." value={basicInfo.specialInstructions} onChange={(e: any) => setBasicInfo({...basicInfo, specialInstructions: e.target.value})} />
                 <InputField label="Penalty Clauses" placeholder="e.g. 5% off for 1 week delay" value={basicInfo.penaltyClauses} onChange={(e: any) => setBasicInfo({...basicInfo, penaltyClauses: e.target.value})} />
               </div>
             </div>
 
             {/* Image Uploader */}
-            <div className="w-full xl:w-56 shrink-0 flex flex-col items-center">
-              <label className="text-[12px] font-semibold text-slate-700 dark:text-slate-300 w-full text-left mb-1.5">Style Reference Image</label>
-              <div className="w-full aspect-square rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 flex flex-col items-center justify-center relative overflow-hidden group hover:border-teal-500 hover:bg-teal-50/50 dark:hover:bg-teal-900/10 transition-colors cursor-pointer">
+            <div className="w-full xl:w-[260px] shrink-0 flex flex-col">
+              <label className="text-[11.5px] font-bold text-slate-600 dark:text-slate-400 tracking-tight mb-1.5">Style Reference Image</label>
+              <div className="w-full h-full min-h-[220px] rounded-[10px] border-[1.5px] border-dashed border-slate-300 dark:border-slate-700 bg-[#f8fafc] dark:bg-slate-900/50 flex flex-col items-center justify-center relative overflow-hidden group hover:bg-slate-50 transition-colors cursor-pointer">
                 {imagePreview ? (
                   <>
                     <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
@@ -238,11 +231,11 @@ export default function MerchandisingOrderProfilePage() {
                   </>
                 ) : (
                   <div className="text-center p-4">
-                    <div className="bg-slate-200 dark:bg-slate-800 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3 group-hover:bg-teal-100 dark:group-hover:bg-teal-900/40 transition-colors">
-                      <UploadCloud className="text-slate-500 dark:text-slate-400 group-hover:text-teal-600 dark:group-hover:text-teal-400" size={24} />
+                    <div className="bg-[#e2e8f0] dark:bg-slate-800 rounded-full w-[40px] h-[40px] flex items-center justify-center mx-auto mb-3 text-slate-500">
+                      <UploadCloud size={18} strokeWidth={2.5} />
                     </div>
-                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 block mb-1">Upload Design</span>
-                    <span className="text-[11px] text-slate-500">JPG, PNG or PDF</span>
+                    <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 block mb-1">Upload Design</span>
+                    <span className="text-[9px] text-slate-400 font-medium tracking-wide">JPG, PNG or PDF</span>
                   </div>
                 )}
                 <input type="file" className="hidden" onChange={handleImageChange} accept="image/*" />
@@ -364,183 +357,158 @@ export default function MerchandisingOrderProfilePage() {
                 Enable Additional Costing
               </label>
             </div>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[1500px] text-left text-[12px] text-slate-700 dark:text-slate-300 border-collapse border border-slate-300 dark:border-slate-700 bg-white">
-              <thead className="bg-[#dee2e6] dark:bg-slate-800/50 text-[11px] font-bold text-slate-800 dark:text-slate-300">
+          </div>          <div className="overflow-x-auto">
+            <table className="w-full text-left text-[9px] whitespace-nowrap text-slate-700 dark:text-slate-300 border-collapse border border-slate-300 dark:border-slate-700 bg-white tracking-tight">
+              <thead className="bg-[#dee2e6] dark:bg-slate-800/50 font-bold text-slate-800 dark:text-slate-300">
                 <tr>
-                  <th className="px-2 py-2 border border-slate-300 dark:border-slate-700 w-10 text-center">#</th>
-                  <th className="px-2 py-2 border border-slate-300 dark:border-slate-700">Style No</th>
-                  <th className="px-2 py-2 border border-slate-300 dark:border-slate-700">Colour</th>
-                  <th className="px-2 py-2 border border-slate-300 dark:border-slate-700">Item Name</th>
-                  <th className="px-2 py-2 border border-slate-300 dark:border-slate-700">OrderQty</th>
-                  <th className="px-2 py-2 border border-slate-300 dark:border-slate-700">Size Group</th>
-                  <th className="px-2 py-2 border border-slate-300 dark:border-slate-700">Sizes</th>
-                  <th className="px-2 py-2 border border-slate-300 dark:border-slate-700">SizesQty</th>
-                  <th className="px-2 py-2 border border-slate-300 dark:border-slate-700">Print</th>
-                  <th className="px-2 py-2 border border-slate-300 dark:border-slate-700">Embroidery</th>
-                  <th className="px-2 py-2 border border-slate-300 dark:border-slate-700">Wash</th>
-                  <th className="px-2 py-2 border border-slate-300 dark:border-slate-700">Special</th>
-                  <th className="px-2 py-2 border border-slate-300 dark:border-slate-700">UnitPrice</th>
-                  <th className="px-2 py-2 border border-slate-300 dark:border-slate-700">DeliveryDate</th>
-                  <th className="px-2 py-2 border border-slate-300 dark:border-slate-700 text-center w-14">∇</th>
+                  <th className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700 text-center">#</th>
+                  <th className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700">Style No</th>
+                  <th className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700">Colour</th>
+                  <th className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700">Item Name</th>
+                  <th className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700">OrderQty</th>
+                  <th className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700">Size Group</th>
+                  <th className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700">Sizes</th>
+                  <th className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700">SizesQty</th>
+                  <th className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700">Print</th>
+                  <th className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700">Embroidery</th>
+                  <th className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700">Wash</th>
+                  <th className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700">Special</th>
+                  <th className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700">UnitPrice</th>
+                  <th className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700">DeliveryDate</th>
+                  <th className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700 text-center" colSpan={2}>∇</th>
                 </tr>
               </thead>
               <tbody>
                 {/* Master Data Row */}
-                <tr className="bg-[#f5cbab] dark:bg-orange-900/10 text-slate-800 dark:text-slate-300">
-                  <td className="px-2 py-3 border border-slate-300 dark:border-slate-700 text-center font-bold">1</td>
-                  <td className="px-2 py-3 border border-slate-300 dark:border-slate-700 font-medium">ABC</td>
-                  <td className="px-2 py-3 border border-slate-300 dark:border-slate-700">01 White</td>
-                  <td className="px-2 py-3 border border-slate-300 dark:border-slate-700">Boyes T-Shirts - Short Sleeves</td>
-                  <td className="px-2 py-3 border border-slate-300 dark:border-slate-700">7000</td>
-                  <td className="px-2 py-3 border border-slate-300 dark:border-slate-700">XS-3XL</td>
-                  <td className="px-2 py-3 border border-slate-300 dark:border-slate-700">XS,S,M,L,XL,2XL,3XL</td>
-                  <td className="px-2 py-3 border border-slate-300 dark:border-slate-700 text-[10px]">1050,1050,1050,1050,1050,700,1050</td>
-                  <td className="px-2 py-3 border border-slate-300 dark:border-slate-700">Pigment (Chest)</td>
-                  <td className="px-2 py-3 border border-slate-300 dark:border-slate-700">Plain</td>
-                  <td className="px-2 py-3 border border-slate-300 dark:border-slate-700">Garment dyed</td>
-                  <td className="px-2 py-3 border border-slate-300 dark:border-slate-700"></td>
-                  <td className="px-2 py-3 border border-slate-300 dark:border-slate-700">5</td>
-                  <td className="px-2 py-3 border border-slate-300 dark:border-slate-700 text-[11px]">31/07/2026</td>
-                  <td className="px-2 py-3 border border-slate-300 dark:border-slate-700">
-                     <div className="flex flex-col items-center justify-center gap-1">
-                       <button className="text-red-500 font-bold text-sm">✕</button>
-                       <button className="text-amber-500 font-bold text-sm">✎</button>
+                <tr className="bg-[#f5cbab] dark:bg-orange-900/10 text-slate-800 dark:text-slate-300 font-medium">
+                  <td className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700 text-center font-bold">1</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700 font-bold">ABC</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700">01 White</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700 whitespace-normal">Boyes T-Shirts - Short Sleeves</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700">7000</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700">XS-3XL</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700 text-[8px] truncate max-w-[80px]" title="XS,S,M,L,XL,2XL,3XL">XS,S,M,L,XL,2XL,3XL</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700 text-[8px] truncate max-w-[80px]" title="1050,1050,1050,1050,1050,700,1050">1050,1050,1050,1050...</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700">Pigment</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700">Plain</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700">Garment dyed</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700"></td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700">5</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700">31/07/2026</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 dark:border-slate-700" colSpan={2}>
+                     <div className="flex items-center justify-center gap-1">
+                       <button className="text-red-500 font-bold text-xs">✕</button>
+                       <button className="text-amber-500 font-bold text-xs">✎</button>
                      </div>
                   </td>
                 </tr>
 
-                {/* FABRIC ROW */}
-                <tr>
-                  <td colSpan={15} className="p-0 border border-slate-300 dark:border-slate-700">
-                    <table className="w-full text-left text-[11px] text-slate-700 dark:text-slate-300 border-collapse">
-                      <thead className="bg-[#e2efda] text-slate-800 font-bold">
-                        <tr>
-                          <th className="px-2 py-2 border-r border-b border-slate-300 text-center w-10 text-blue-500 text-lg" rowSpan={3}>
-                            <svg className="w-5 h-5 mx-auto" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>
-                          </th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300 w-8 text-center">#</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">GMT Item</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">GMT Qty</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">PrintType</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">BodyPart</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">FabType</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Construction</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">GSM</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Composition</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Dyeing</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Finishing</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Consump Qty</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Source</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">FabQty</th>
-                          <th className="px-1 py-1 border-b border-slate-300 text-center w-16">
-                             <button onClick={() => setShowFabricModal(true)} className="bg-white hover:bg-slate-100 transition-colors border border-slate-400 px-1 py-0.5 rounded text-[9px] w-full text-slate-800 flex items-center justify-center gap-1 shadow-sm font-semibold">+ Fabric</button>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="bg-white hover:bg-slate-50 transition-colors">
-                          <td className="px-2 py-3 border-r border-b border-slate-300 text-center">1</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">Boyes T-Shirts - Short Sleeves</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">7000.0000</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">YD</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">Body</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">Knit</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">Single Jersey</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">160</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">98% Cotton 2% Spandex</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">Black,Dark(65.00)</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">Heat Set,Stenter,Compacting</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">2.8050</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">Production</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">1718.0627</td>
-                          <td className="px-2 py-3 border-b border-slate-300 text-center">
-                             <div className="flex items-center justify-center gap-1.5"><button className="text-red-500 font-bold">✕</button><button className="text-amber-500 font-bold">✎</button></div>
-                          </td>
-                        </tr>
-                        <tr className="bg-white hover:bg-slate-50 transition-colors">
-                          <td className="px-2 py-3 border-r border-b border-slate-300 text-center">2</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">Boyes T-Shirts - Short Sleeves</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">7000.0000</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">AOP</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">Rib</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">Knit</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">2X2 Lycra Rib</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">240</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">98% Cotton 2% Spandex</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">Black,Dark(65.00)</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">Brushing,Compacting,Heat Set</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">0.5891</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">Production</td>
-                          <td className="px-2 py-3 border-r border-b border-slate-300">360.7933</td>
-                          <td className="px-2 py-3 border-b border-slate-300 text-center">
-                             <div className="flex items-center justify-center gap-1.5"><button className="text-red-500 font-bold">✕</button><button className="text-amber-500 font-bold">✎</button></div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                {/* FABRIC HEADER */}
+                <tr className="bg-[#e2efda] text-slate-800 font-bold">
+                  <td className="px-0.5 py-0.5 border border-slate-300 text-center text-blue-500 bg-white" rowSpan={3}>
+                    <svg className="w-3.5 h-3.5 mx-auto" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>
                   </td>
-                </tr>
-                
-                {/* YARN ROW */}
-                <tr>
-                  <td colSpan={15} className="p-0 border border-slate-300 dark:border-slate-700">
-                    <table className="w-full text-left text-[11px] text-slate-700 dark:text-slate-300 border-collapse">
-                      <thead className="bg-[#f3e8f6] text-slate-800 font-bold">
-                        <tr>
-                          <th className="px-2 py-2 border-r border-b border-slate-300 text-center w-10">#</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">BodyPart</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Yarn Type</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Count</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Composition</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Color</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Yarn(%)</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Yarn Consumption Qty</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">YarnQty</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Spandex(%)</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Spandex Count</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Spandex Consumption Qty</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Spandex Qty</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Required Date</th>
-                          <th className="px-1 py-1 border-b border-slate-300 text-center w-16">
-                             <button onClick={() => setShowYarnModal(true)} className="bg-white hover:bg-slate-100 transition-colors border border-slate-400 px-1 py-0.5 rounded text-[9px] w-full text-slate-800 flex items-center justify-center gap-1 shadow-sm font-semibold">+ Yarn</button>
-                          </th>
-                        </tr>
-                      </thead>
-                    </table>
+                  <td className="px-0.5 py-0.5 border border-slate-300 text-center">#</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">GMT Item</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">GMT Qty</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">PrintType</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">BodyPart</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">FabType</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Construction</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">GSM</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Composition</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Dyeing</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Finishing</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Consump Qty</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Source</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">FabQty</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 text-center w-16">
+                     <button onClick={() => setShowFabricModal(true)} className="bg-white hover:bg-slate-100 transition-colors border border-slate-400 px-1 py-0.5 rounded text-[8px] w-full text-slate-800 flex items-center justify-center gap-1 shadow-sm font-semibold">+ Fabric</button>
                   </td>
                 </tr>
 
-                {/* TRIMS ROW */}
-                <tr>
-                  <td colSpan={15} className="p-0 border border-slate-300 dark:border-slate-700">
-                    <table className="w-full text-left text-[11px] text-slate-700 dark:text-slate-300 border-collapse">
-                      <thead className="bg-[#fff2cc] text-slate-800 font-bold">
-                        <tr>
-                          <th className="px-2 py-2 border-r border-b border-slate-300 text-center w-10">#</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">GMT Item</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Trim Name</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Color Sensetivity</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Base UOM</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Market UOM</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">UomFactor</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Buffer(%)</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Req for Per Dzn RMG</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">TotalQty</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">UnitRate</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">TotalPrice</th>
-                          <th className="px-2 py-2 border-r border-b border-slate-300">Description</th>
-                          <th className="px-1 py-1 border-b border-slate-300 text-center w-16">
-                             <button onClick={() => setShowTrimsModal(true)} className="bg-white hover:bg-slate-100 transition-colors border border-slate-400 px-1 py-0.5 rounded text-[9px] w-full text-slate-800 flex items-center justify-center gap-1 shadow-sm font-semibold">+ Trims</button>
-                          </th>
-                        </tr>
-                      </thead>
-                    </table>
+                {/* FABRIC DATA 1 */}
+                <tr className="bg-white hover:bg-slate-50 transition-colors">
+                  <td className="px-0.5 py-0.5 border border-slate-300 text-center">1</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 whitespace-normal">Boyes T-Shirts - Short Sleeves</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">7000.00</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">YD</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Body</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Knit</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 whitespace-normal">Single Jersey</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">160</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 whitespace-normal">98% Cotton 2% Spandex</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 whitespace-normal">Black,Dark</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 whitespace-normal">Heat Set,Stenter,Compacting</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">2.8050</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Production</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">1718.06</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 text-center">
+                     <div className="flex items-center justify-center gap-1"><button className="text-red-500 font-bold text-xs">✕</button><button className="text-amber-500 font-bold text-xs">✎</button></div>
                   </td>
                 </tr>
 
+                {/* FABRIC DATA 2 */}
+                <tr className="bg-white hover:bg-slate-50 transition-colors">
+                  <td className="px-0.5 py-0.5 border border-slate-300 text-center">2</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 whitespace-normal">Boyes T-Shirts - Short Sleeves</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">7000.00</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">AOP</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Rib</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Knit</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 whitespace-normal">2X2 Lycra Rib</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">240</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 whitespace-normal">98% Cotton 2% Spandex</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 whitespace-normal">Black,Dark</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 whitespace-normal">Brushing,Compacting,Heat Set</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">0.5891</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Production</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">360.79</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 text-center">
+                     <div className="flex items-center justify-center gap-1"><button className="text-red-500 font-bold text-xs">✕</button><button className="text-amber-500 font-bold text-xs">✎</button></div>
+                  </td>
+                </tr>
+
+                {/* YARN HEADER */}
+                <tr className="bg-[#f3e8f6] text-slate-800 font-bold">
+                  <td className="px-0.5 py-0.5 border border-slate-300 text-center">#</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">BodyPart</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Yarn Type</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Count</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Composition</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Color</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Yarn(%)</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Yarn Consump</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">YarnQty</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Spandex(%)</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Spndx Cnt</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Spndx Consmp</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Spndx Qty</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Req Date</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 text-center" colSpan={2}>
+                     <button onClick={() => setShowYarnModal(true)} className="bg-white hover:bg-slate-100 transition-colors border border-slate-400 px-1 py-0.5 rounded text-[8px] w-full text-slate-800 flex items-center justify-center gap-1 shadow-sm font-semibold">+ Yarn</button>
+                  </td>
+                </tr>
+
+                {/* TRIMS HEADER */}
+                <tr className="bg-[#fff2cc] text-slate-800 font-bold">
+                  <td className="px-0.5 py-0.5 border border-slate-300 text-center">#</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">GMT Item</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Trim Name</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Color Sense</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Base UOM</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Market UOM</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">UomFactor</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Buffer(%)</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Req Per Dzn</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">TotalQty</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">UnitRate</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">TotalPrice</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300">Description</td>
+                  <td className="px-0.5 py-0.5 border border-slate-300 text-center" colSpan={3}>
+                     <button onClick={() => setShowTrimsModal(true)} className="bg-white hover:bg-slate-100 transition-colors border border-slate-400 px-1 py-0.5 rounded text-[8px] w-full text-slate-800 flex items-center justify-center gap-1 shadow-sm font-semibold">+ Trims</button>
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
