@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v8");
+    const saved = localStorage.getItem("system_changes_v13");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -87,6 +87,51 @@ function ChangesPage() {
           link: "/payroll-deductions",
           descriptionEn: "Removed the 'Auto-Skip during Ramadan' option and the 'Single Period Exceptions' configuration from the Payroll Deductions setup panel.",
           descriptionBn: "পেরোল ডিডাকশন প্যানেল থেকে 'রোজার মাসে অটো-স্কিপ' অপশন এবং 'সিঙ্গেল পিরিয়ড এক্সেপশন' সেটিং অপশনগুলো বাদ দেওয়া হয়েছে।",
+        },
+        {
+          id: "8",
+          date: "2026-07-25T15:35",
+          type: "Modify",
+          module: "User Management",
+          link: "/user-management",
+          descriptionEn: "Merged Company and Section access options into a nested view where Areas (renamed from Sections) show up directly under their selected Company. Renamed all 'Section' terms to 'Area'.",
+          descriptionBn: "ইউজার ম্যানেজমেন্টে কোম্পানি এবং সেকশন এক্সেস অপশনগুলোকে একত্রিত করা হয়েছে। এখন কোম্পানি সিলেক্ট করলেই তার ভেতরের এরিয়া (সেকশন এর নতুন নাম এরিয়া) অপশনগুলো নিচে দেখা যাবে। এছাড়া সব জায়গায় 'সেকশন' শব্দের নাম পরিবর্তন করে 'এরিয়া' করা হয়েছে।",
+        },
+        {
+          id: "9",
+          date: "2026-07-25T15:40",
+          type: "Modify",
+          module: "Salary Process",
+          link: "/monthly-salary-process",
+          descriptionEn: "Refactored the Payroll Adjustments editing dialog in Monthly Salary Process. Removed Section 1 (Attendance Parameters) and Section 2 (Monthly Earnings) fields. Upgraded Section 3 (Monthly Deductions & Exceptions) into a premium card-based layout with customized Lucide icons and currency symbols.",
+          descriptionBn: "মান্থলি স্যালারি প্রসেসের পেরোল অ্যাডজাস্টমেন্ট এডিট ডায়ালগ রিফ্যাক্টর করা হয়েছে। সেকশন ১ (অ্যাটেনডেন্স প্যারামিটার) এবং সেকশন ২ (মান্থলি আর্নিংস) এর ইনপুটগুলো বাদ দেওয়া হয়েছে। এছাড়া সেকশন ৩ (মান্থলি ডিডাকশন অ্যান্ড এক্সেপশনস) এর ইনপুটগুলোকে আকর্ষণীয় কার্ড ডিজাইনে সাজানো হয়েছে এবং সাথে আইকন ও টাকার সাইন যোগ করা হয়েছে।",
+        },
+        {
+          id: "10",
+          date: "2026-07-25T15:43",
+          type: "Modify",
+          module: "Salary Process",
+          link: "/monthly-salary-process",
+          descriptionEn: "Upgraded the Monthly Salary Process data table to match the detailed 58-column spreadsheet layout. Loaded the full 14 employees roster matching the active bank and account details exactly.",
+          descriptionBn: "মান্থলি স্যালারি প্রসেস টেবিলটিকে ৫৮টি কলামবিশিষ্ট বিশদ স্প্রেডশিট লেআউটে উন্নীত করা হয়েছে। ব্যাংক ও অ্যাকাউন্ট নম্বরসহ ১৪ জন এমপ্লয়ির সম্পুর্ণ ডেটাবেস যুক্ত করা হয়েছে।",
+        },
+        {
+          id: "11",
+          date: "2026-07-25T15:46",
+          type: "Modify",
+          module: "Salary Process",
+          link: "/monthly-salary-process",
+          descriptionEn: "Added a custom column rearrangement and show/hide toggle panel to the Monthly Salary Process page, enabling draggable reordering, visibility control, and template saving matching the personnel list page design.",
+          descriptionBn: "মান্থলি স্যালারি প্রসেস পেজে কলামের ক্রম পরিবর্তন এবং হাইড/শো করার অপশন যুক্ত করা হয়েছে। এর মাধ্যমে ড্র্যাগ করে কলাম সাজানো যাবে, কলামের দৃশ্যমানতা নিয়ন্ত্রণ করা যাবে এবং পার্সোনেল লিস্ট পেজের মতো কাস্টম লেআউট টেমপ্লেট সেভ করা যাবে।",
+        },
+        {
+          id: "12",
+          date: "2026-07-25T15:48",
+          type: "Modify",
+          module: "Salary Process",
+          link: "/monthly-salary-process",
+          descriptionEn: "Updated default column visibility to show all 58 columns on load, and removed the currency Taka (৳) symbol from the table cell amounts.",
+          descriptionBn: "সবগুলো ৫৮টি কলাম লোড হওয়ার সাথে সাথে দৃশ্যমান রাখতে ডিফল্ট সেটিং আপডেট করা হয়েছে এবং টেবিল সেলের অ্যামাউন্ট থেকে টাকা (৳) চিহ্ন বাদ দেওয়া হয়েছে।",
         },
       ]);
     }

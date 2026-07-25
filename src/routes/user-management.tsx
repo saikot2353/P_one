@@ -28,6 +28,8 @@ import {
   Mail,
   Phone,
   Lock,
+  Building2,
+  MapPin,
 } from "lucide-react";
 import { toast } from "sonner";
 import { employeesData } from "@/routes/personnel-list";
@@ -1610,7 +1612,7 @@ function UserManagementPage() {
                                 <div className="flex flex-wrap gap-1 mt-0.5">
                                   {item.sectionAccess.includes("All") ? (
                                     <span className="px-2 py-0.5 rounded bg-teal-500/10 text-teal-600 border border-teal-500/20 text-[8.5px] font-semibold uppercase">
-                                      All Sections
+                                      All Areas
                                     </span>
                                   ) : (
                                     item.sectionAccess.map((s) => (
@@ -2087,235 +2089,266 @@ function UserManagementPage() {
                     </select>
                   </div>
 
-                  {/* Company Access Checklist Cards */}
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-                      Company Access *
+                  {/* Company & Area Access Checklist Cards */}
+                  <div className="space-y-3.5">
+                    <label className="text-[10.5px] font-bold text-slate-600 dark:text-slate-350 uppercase tracking-wider block">
+                      Company & Area Access *
                     </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                      {/* All Companies Option Card */}
+                    
+                    <div className="space-y-4">
+                      {/* All Companies Card */}
                       <label
-                        className={`flex items-start gap-3.5 p-3 rounded-xl border cursor-pointer select-none transition ${
+                        className={`flex items-start gap-3.5 p-4 rounded-2xl border cursor-pointer select-none transition-all duration-200 shadow-3xs hover:shadow-2xs ${
                           userCompanyAccess.includes("All")
-                            ? "bg-primary/5 border-primary text-primary"
-                            : "bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100/50"
+                            ? "bg-emerald-500/[0.04] dark:bg-emerald-500/[0.02] border-emerald-500/40 text-emerald-950 dark:text-emerald-300 ring-2 ring-emerald-500/5"
+                            : "bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-100/70"
                         }`}
                       >
-                        <input
-                          type="checkbox"
-                          checked={userCompanyAccess.includes("All")}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setUserCompanyAccess([
-                                "All",
-                                "Pakiza Software Limited",
-                                "Pakiza Knit Composite Ltd",
-                                "Pakiza Group",
-                              ]);
-                            } else {
-                              setUserCompanyAccess([]);
-                            }
-                          }}
-                          className="size-4.5 rounded border-slate-300 dark:border-slate-700 text-primary cursor-pointer transition focus:ring-0 mt-0.5"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <div className="text-[11px] font-medium">All Companies</div>
-                          <div className="text-[9px] text-slate-500 dark:text-slate-400 font-normal">
-                            Full, unrestricted administrative directory visibility
+                        <div className="pt-0.5">
+                          <input
+                            type="checkbox"
+                            checked={userCompanyAccess.includes("All")}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setUserCompanyAccess([
+                                  "All",
+                                  "Pakiza Software Limited",
+                                  "Pakiza Knit Composite Ltd",
+                                  "Pakiza Group",
+                                ]);
+                                setUserSectionAccess(["All"]);
+                              } else {
+                                setUserCompanyAccess([]);
+                                setUserSectionAccess([]);
+                              }
+                            }}
+                            className="size-4.5 rounded border-slate-300 dark:border-slate-700 text-emerald-600 cursor-pointer focus:ring-0"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0 flex items-center gap-3">
+                          <div className={`size-9 rounded-xl flex items-center justify-center border shrink-0 transition-colors ${
+                            userCompanyAccess.includes("All")
+                              ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600"
+                              : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-400"
+                          }`}>
+                            <ShieldCheck className="size-5" />
+                          </div>
+                          <div>
+                            <div className="text-[11.5px] font-bold tracking-tight">All Companies & Areas</div>
+                            <div className="text-[9.5px] text-slate-500 dark:text-slate-400 font-medium">
+                              Grant comprehensive access to all organizational directories and sections
+                            </div>
                           </div>
                         </div>
                       </label>
 
-                      {/* Individual Companies Card List */}
+                      {/* Individual Companies and their Areas */}
                       {[
                         {
                           value: "Pakiza Software Limited",
                           label: "Pakiza Software Ltd",
-                          desc: "Access software ops & setup divisions",
+                          desc: "Access software operations & setup modules",
+                          areas: [
+                            { value: "PSL-Operation", label: "PSL-Operation" },
+                            { value: "PSL-Head Office", label: "PSL-Head Office" },
+                          ]
                         },
                         {
                           value: "Pakiza Knit Composite Ltd",
                           label: "Pakiza Knit Composite Ltd",
-                          desc: "Access factory systems & operations",
+                          desc: "Access manufacturing systems & plant data",
+                          areas: [
+                            { value: "PKC-Dyeing", label: "PKC-Dyeing" },
+                            { value: "PKC-Sewing", label: "PKC-Sewing" },
+                            { value: "PKC-Cutting", label: "PKC-Cutting" },
+                          ]
                         },
                         {
                           value: "Pakiza Group",
                           label: "Pakiza Group",
-                          desc: "Access group-wide central systems",
+                          desc: "Access corporate centralized systems",
+                          areas: [
+                            { value: "PG-Corporate", label: "PG-Corporate" },
+                            { value: "PG-Textile Sales", label: "PG-Textile Sales" },
+                          ]
                         },
                       ].map((c) => {
-                        const isChecked =
+                        const isCompanyChecked =
                           userCompanyAccess.includes(c.value) || userCompanyAccess.includes("All");
-                        const isDisabled = userCompanyAccess.includes("All");
+                        const isCompanyDisabled = userCompanyAccess.includes("All");
+                        
                         return (
-                          <label
-                            key={c.value}
-                            className={`flex items-start gap-3.5 p-3 rounded-xl border transition ${
-                              isDisabled
-                                ? "opacity-60 cursor-not-allowed"
-                                : "cursor-pointer select-none"
-                            } ${
-                              isChecked
-                                ? "bg-primary/5 border-primary/50 text-primary"
-                                : "bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100/50"
+                          <div 
+                            key={c.value} 
+                            className={`border rounded-2xl overflow-hidden transition-all duration-300 shadow-3xs ${
+                              isCompanyChecked 
+                                ? "border-primary/30 dark:border-primary/20 bg-slate-50/20 dark:bg-slate-900/10" 
+                                : "border-slate-200 dark:border-slate-800/80 bg-transparent"
                             }`}
                           >
-                            <input
-                              type="checkbox"
-                              checked={isChecked}
-                              disabled={isDisabled}
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  const next = [...userCompanyAccess, c.value];
-                                  const allIndividually = [
-                                    "Pakiza Software Limited",
-                                    "Pakiza Knit Composite Ltd",
-                                    "Pakiza Group",
-                                  ].every((co) => next.includes(co));
-                                  if (allIndividually) {
-                                    setUserCompanyAccess([
-                                      "All",
-                                      "Pakiza Software Limited",
-                                      "Pakiza Knit Composite Ltd",
-                                      "Pakiza Group",
-                                    ]);
-                                  } else {
-                                    setUserCompanyAccess(next);
-                                  }
-                                } else {
-                                  setUserCompanyAccess(
-                                    userCompanyAccess.filter((v) => v !== c.value && v !== "All"),
-                                  );
-                                }
-                              }}
-                              className="size-4.5 rounded border-slate-300 dark:border-slate-700 text-primary cursor-pointer transition focus:ring-0 mt-0.5"
-                            />
-                            <div className="flex-1 min-w-0">
-                              <div className="text-[11px] font-medium">{c.label}</div>
-                              <div className="text-[9px] text-slate-500 dark:text-slate-400 font-normal">
-                                {c.desc}
-                              </div>
-                            </div>
-                          </label>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Section Access Checklist Cards */}
-                  <div className="space-y-2 mt-4">
-                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-                      Section Access
-                    </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                      <label
-                        className={`flex items-start gap-3.5 p-3 rounded-xl border cursor-pointer select-none transition ${
-                          userSectionAccess.includes("All")
-                            ? "bg-primary/5 border-primary text-primary"
-                            : "bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100/50"
-                        }`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={userSectionAccess.includes("All")}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setUserSectionAccess(["All"]);
-                            } else {
-                              setUserSectionAccess([]);
-                            }
-                          }}
-                          className="size-4.5 rounded border-slate-300 dark:border-slate-700 text-primary cursor-pointer transition focus:ring-0 mt-0.5"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <div className="text-[11px] font-medium">All Sections</div>
-                          <div className="text-[9px] text-slate-500 dark:text-slate-400 font-normal">
-                            Full access to all sections
-                          </div>
-                        </div>
-                      </label>
-
-                      {[
-                        {
-                          value: "PSL-Operation",
-                          label: "PSL-Operation",
-                          co: "Pakiza Software Limited",
-                        },
-                        {
-                          value: "PSL-Head Office",
-                          label: "PSL-Head Office",
-                          co: "Pakiza Software Limited",
-                        },
-                        {
-                          value: "PKC-Dyeing",
-                          label: "PKC-Dyeing",
-                          co: "Pakiza Knit Composite Ltd",
-                        },
-                        {
-                          value: "PKC-Sewing",
-                          label: "PKC-Sewing",
-                          co: "Pakiza Knit Composite Ltd",
-                        },
-                        {
-                          value: "PKC-Cutting",
-                          label: "PKC-Cutting",
-                          co: "Pakiza Knit Composite Ltd",
-                        },
-                        { value: "PG-Corporate", label: "PG-Corporate", co: "Pakiza Group" },
-                        {
-                          value: "PG-Textile Sales",
-                          label: "PG-Textile Sales",
-                          co: "Pakiza Group",
-                        },
-                      ]
-                        .filter(
-                          (s) =>
-                            userCompanyAccess.includes("All") || userCompanyAccess.includes(s.co),
-                        )
-                        .map((s) => {
-                          const isChecked =
-                            userSectionAccess.includes(s.value) ||
-                            userSectionAccess.includes("All");
-                          const isDisabled = userSectionAccess.includes("All");
-                          return (
+                            {/* Company Row */}
                             <label
-                              key={s.value}
-                              className={`flex items-start gap-3.5 p-3 rounded-xl border transition ${
-                                isDisabled
+                              className={`flex items-center gap-3.5 p-3.5 select-none transition-all duration-200 ${
+                                isCompanyDisabled
                                   ? "opacity-60 cursor-not-allowed"
-                                  : "cursor-pointer select-none"
+                                  : "cursor-pointer"
                               } ${
-                                isChecked
-                                  ? "bg-primary/5 border-primary/50 text-primary"
-                                  : "bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100/50"
+                                isCompanyChecked
+                                  ? "bg-primary/[0.04] dark:bg-primary/[0.02] text-primary"
+                                  : "bg-slate-50/50 dark:bg-slate-950/40 text-slate-700 dark:text-slate-300 hover:bg-slate-100/50"
                               }`}
                             >
                               <input
                                 type="checkbox"
-                                checked={isChecked}
-                                disabled={isDisabled}
+                                checked={isCompanyChecked}
+                                disabled={isCompanyDisabled}
                                 onChange={(e) => {
                                   if (e.target.checked) {
-                                    setUserSectionAccess(
-                                      [...userSectionAccess, s.value].filter((v) => v !== "All"),
-                                    );
+                                    const next = [...userCompanyAccess, c.value];
+                                    const allIndividually = [
+                                      "Pakiza Software Limited",
+                                      "Pakiza Knit Composite Ltd",
+                                      "Pakiza Group",
+                                    ].every((co) => next.includes(co));
+                                    if (allIndividually) {
+                                      setUserCompanyAccess([
+                                        "All",
+                                        "Pakiza Software Limited",
+                                        "Pakiza Knit Composite Ltd",
+                                        "Pakiza Group",
+                                      ]);
+                                      setUserSectionAccess(["All"]);
+                                    } else {
+                                      setUserCompanyAccess(next);
+                                      // Auto-check all areas of this company on selection
+                                      const companyAreaValues = c.areas.map(a => a.value);
+                                      setUserSectionAccess(prev => {
+                                        const filtered = prev.filter(v => v !== "All");
+                                        const newAreas = [...filtered, ...companyAreaValues].filter((v, i, self) => self.indexOf(v) === i);
+                                        return newAreas;
+                                      });
+                                    }
                                   } else {
-                                    setUserSectionAccess(
-                                      userSectionAccess.filter((v) => v !== s.value && v !== "All"),
+                                    setUserCompanyAccess(
+                                      userCompanyAccess.filter((v) => v !== c.value && v !== "All"),
+                                    );
+                                    // Remove all areas of this company on unselection
+                                    const companyAreaValues = c.areas.map(a => a.value);
+                                    setUserSectionAccess(prev => 
+                                      prev.filter(v => v !== "All" && !companyAreaValues.includes(v))
                                     );
                                   }
                                 }}
-                                className="size-4.5 rounded border-slate-300 dark:border-slate-700 text-primary cursor-pointer transition focus:ring-0 mt-0.5"
+                                className="size-4.5 rounded border-slate-300 dark:border-slate-700 text-primary cursor-pointer focus:ring-0 shrink-0"
                               />
+                              
+                              <div className={`size-8 rounded-lg flex items-center justify-center border shrink-0 transition-colors ${
+                                isCompanyChecked
+                                  ? "bg-primary/10 border-primary/20 text-primary"
+                                  : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-400"
+                              }`}>
+                                <Building2 className="size-4.5" />
+                              </div>
+
                               <div className="flex-1 min-w-0">
-                                <div className="text-[11px] font-medium">{s.label}</div>
-                                <div className="text-[9px] text-slate-500 dark:text-slate-400 font-normal">
-                                  {s.co}
+                                <div className="text-[11px] font-bold tracking-tight">{c.label}</div>
+                                <div className="text-[9.5px] text-slate-500 dark:text-slate-400 font-normal leading-normal">
+                                  {c.desc}
                                 </div>
                               </div>
+
+                              <div className="shrink-0 flex items-center gap-1">
+                                {isCompanyChecked && (
+                                  <span className="text-[8px] font-bold uppercase tracking-wider bg-primary/10 text-primary px-1.5 py-0.5 rounded-md">
+                                    Active
+                                  </span>
+                                )}
+                              </div>
                             </label>
-                          );
-                        })}
+
+                            {/* Nested Areas List */}
+                            {isCompanyChecked && (
+                              <div className="p-4 bg-white dark:bg-slate-950/40 border-t border-slate-100 dark:border-slate-800/80 flex gap-4">
+                                {/* Visual Connecting Line */}
+                                <div className="w-0.5 bg-gradient-to-b from-primary/30 to-slate-200 dark:to-slate-800 rounded-full my-1 shrink-0" />
+                                
+                                <div className="flex-1 space-y-2.5">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <span className="text-[9px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                                      <MapPin className="size-3 text-slate-400" />
+                                      Area Permissions
+                                    </span>
+                                    {!isCompanyDisabled && (
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const companyAreaValues = c.areas.map(a => a.value);
+                                          const hasAllChecked = companyAreaValues.every(val => userSectionAccess.includes(val));
+                                          if (hasAllChecked) {
+                                            setUserSectionAccess(prev => prev.filter(v => !companyAreaValues.includes(v)));
+                                          } else {
+                                            setUserSectionAccess(prev => {
+                                              const filtered = prev.filter(v => v !== "All");
+                                              return [...filtered, ...companyAreaValues].filter((v, i, self) => self.indexOf(v) === i);
+                                            });
+                                          }
+                                        }}
+                                        className="text-[9px] font-bold text-primary hover:text-primary/80 transition-colors hover:underline cursor-pointer"
+                                      >
+                                        {c.areas.map(a => a.value).every(val => userSectionAccess.includes(val)) ? "Deselect All" : "Select All"}
+                                      </button>
+                                    )}
+                                  </div>
+                                  
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                    {c.areas.map((a) => {
+                                      const isAreaChecked =
+                                        userSectionAccess.includes(a.value) || userSectionAccess.includes("All");
+                                      const isAreaDisabled = userSectionAccess.includes("All");
+
+                                      return (
+                                        <label
+                                          key={a.value}
+                                          className={`flex items-center gap-2.5 p-2.5 rounded-xl border text-[11px] font-semibold transition-all duration-150 ${
+                                            isAreaDisabled
+                                              ? "opacity-60 cursor-not-allowed"
+                                              : "cursor-pointer select-none"
+                                          } ${
+                                            isAreaChecked
+                                              ? "bg-primary/[0.02] dark:bg-primary/[0.01] border-primary/25 text-primary shadow-4xs"
+                                              : "bg-slate-50/50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800/80 text-slate-655 dark:text-slate-400 hover:bg-slate-100/40"
+                                          }`}
+                                        >
+                                          <input
+                                            type="checkbox"
+                                            checked={isAreaChecked}
+                                            disabled={isAreaDisabled}
+                                            onChange={(e) => {
+                                              if (e.target.checked) {
+                                                setUserSectionAccess(
+                                                  [...userSectionAccess, a.value].filter((v) => v !== "All")
+                                                );
+                                              } else {
+                                                setUserSectionAccess(
+                                                  userSectionAccess.filter((v) => v !== a.value && v !== "All")
+                                                );
+                                              }
+                                            }}
+                                            className="size-3.5 rounded border-slate-300 dark:border-slate-700 text-primary cursor-pointer focus:ring-0 shrink-0"
+                                          />
+                                          <div className="flex-1 min-w-0 leading-tight">
+                                            {a.label}
+                                          </div>
+                                        </label>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
