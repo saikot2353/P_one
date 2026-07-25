@@ -32,12 +32,10 @@ interface OrderStyle {
   embroidery: string; wash: string; special: string; unitPrice: number; deliveryDate: string;
 }
 
-export default function MerchandisingOrderProfilePage() {
+function MerchandisingOrderProfilePage() {
   const navigate = useNavigate();
   const search = Route.useSearch();
-  const orderType = search.type || "Knit";
-
-  // 1. Order Basic Information State
+  const orderType = search.type || "Knit";  // 1. Order Basic Information State with dynamic RMG parameters
   const [basicInfo, setBasicInfo] = useState({
     jobNo: "5", queryNo: "5", orderQty: 7000, queryType: "Regular",
     refNo: "PO#12", queryDate: "2026-07-23", buyingHouse: "ITPS", buyerName: "ITPS",
@@ -45,7 +43,19 @@ export default function MerchandisingOrderProfilePage() {
     styleNo: "", itemType: "", buyerAgent: "select...", buyerBrand: "",
     qualityLevel: "AQL Standard", season: "ANS-SS27", factory: "select...",
     currency: "USD", exchangeRate: 121, shippingMode: "Sea", payTerm: "120 Days BBLC",
-    tenor: "", specialInstructions: "", penaltyClauses: "", repeatedJobNo: "select..."
+    tenor: "", specialInstructions: "", penaltyClauses: "", repeatedJobNo: "select...",
+    // Knit specific
+    fabricGsm: "160",
+    knitStructure: "Single Jersey",
+    yarnComposition: "98% Cotton 2% Spandex",
+    // Woven specific
+    warpWeftCount: "40s x 40s",
+    fabricConstruction: "133 x 72",
+    weaveDensity: "2/1 Twill",
+    // Sweater specific
+    gauge: "12GG",
+    yarnPly: "2/32 Nm",
+    knittingPattern: "Jacquard",
   });
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -104,7 +114,7 @@ export default function MerchandisingOrderProfilePage() {
   // Clean Input Component
   const InputField = ({ label, value, onChange, required = false, type = "text", placeholder = "" }: any) => (
     <div className="flex flex-col gap-1.5 w-full">
-      <label className="text-[11.5px] font-bold text-slate-600 dark:text-slate-400 tracking-tight">
+      <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 tracking-tight">
         {label} {required && <span className="text-rose-500 ml-0.5">*</span>}
       </label>
       <input
@@ -112,7 +122,7 @@ export default function MerchandisingOrderProfilePage() {
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className="w-full text-[13px] px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[6px] hover:border-slate-300 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 transition-all text-slate-800 dark:text-slate-100 placeholder:text-slate-400 shadow-sm shadow-slate-100/50"
+        className="w-full text-xs px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg hover:border-slate-350 focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 transition-all text-slate-800 dark:text-slate-100 placeholder:text-slate-400 shadow-2xs"
       />
     </div>
   );
@@ -120,13 +130,13 @@ export default function MerchandisingOrderProfilePage() {
   // Clean Select Component
   const SelectField = ({ label, value, onChange, options, required = false }: any) => (
     <div className="flex flex-col gap-1.5 w-full">
-      <label className="text-[11.5px] font-bold text-slate-600 dark:text-slate-400 tracking-tight">
+      <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 tracking-tight">
         {label} {required && <span className="text-rose-500 ml-0.5">*</span>}
       </label>
       <select
         value={value}
         onChange={onChange}
-        className="w-full text-[13px] px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[6px] hover:border-slate-300 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 transition-all text-slate-800 dark:text-slate-100 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[position:right_0.75rem_center] shadow-sm shadow-slate-100/50"
+        className="w-full text-xs px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg hover:border-slate-350 focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 transition-all text-slate-800 dark:text-slate-100 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[position:right_0.75rem_center] shadow-2xs"
       >
         {options.map((opt: any) => (
           <option key={opt.value || opt} value={opt.value || opt}>
@@ -141,78 +151,187 @@ export default function MerchandisingOrderProfilePage() {
     <MerchandisingLayout
       activePath="order-profile"
       breadcrumbs={[{ label: "Manage Order" }, { label: "Order Profile" }]}
-      title="Order Profile"
+      title="Unified Order Workspace"
     >
       <div className="p-4 md:p-6 lg:p-8 bg-slate-50 dark:bg-slate-950 min-h-full font-sans space-y-6">
         
         {/* Header Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Order Details</h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage specifications and styles for Job No {basicInfo.jobNo}</p>
+            <h1 className="text-xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+              <span className="p-1.5 bg-teal-500/10 text-teal-500 rounded-lg"><Layers className="size-5"/></span>
+              Unified Order Entry
+            </h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Configure style parameters, material requirements, and details for Job #{basicInfo.jobNo}</p>
           </div>
           <button
             onClick={handleUpdateOrder}
-            className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-lg shadow-sm font-semibold transition-all active:scale-95"
+            className="flex items-center gap-2 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-650 hover:to-emerald-700 text-white px-5 py-2.5 rounded-xl shadow-md shadow-teal-500/10 font-bold text-xs transition-all active:scale-97 cursor-pointer"
           >
             <Save className="size-4" />
             Save & Update
           </button>
         </div>
 
+        {/* Segmented Order Type Toggle at the Top */}
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <span className="text-[11px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 block mb-1">Garment Division</span>
+            <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Select order type to configure specific product parameters</span>
+          </div>
+
+          <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-250 dark:border-slate-800">
+            {["Knit", "Woven", "Sweater"].map((t) => {
+              const isSel = basicInfo.orderType === t;
+              return (
+                <button
+                  key={t}
+                  onClick={() => setBasicInfo({ ...basicInfo, orderType: t as any })}
+                  className={`px-5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    isSel
+                      ? "bg-white dark:bg-slate-900 text-teal-600 dark:text-teal-400 shadow-xs"
+                      : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                  }`}
+                >
+                  {t} Order
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* SECTION 1: Order Basic Information */}
-        <section className="bg-white dark:bg-slate-900 rounded-2xl p-6 lg:p-8">
-          <div className="flex flex-col xl:flex-row gap-10">
-            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-6">
-              <InputField label="Job No" value={basicInfo.jobNo} onChange={(e: any) => setBasicInfo({...basicInfo, jobNo: e.target.value})} />
-              <InputField label="Query No" value={basicInfo.queryNo} onChange={(e: any) => setBasicInfo({...basicInfo, queryNo: e.target.value})} />
-              <InputField label="Order Quantity" type="number" value={basicInfo.orderQty} onChange={(e: any) => setBasicInfo({...basicInfo, orderQty: e.target.value})} />
-              <SelectField label="Query Type" required value={basicInfo.queryType} onChange={(e: any) => setBasicInfo({...basicInfo, queryType: e.target.value})} options={["Regular", "Urgent"]} />
+        <section className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
+          <div className="flex flex-col xl:flex-row gap-8">
+            <div className="flex-1 space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-4">
+                <InputField label="Job No" value={basicInfo.jobNo} onChange={(e: any) => setBasicInfo({...basicInfo, jobNo: e.target.value})} />
+                <InputField label="Query No" value={basicInfo.queryNo} onChange={(e: any) => setBasicInfo({...basicInfo, queryNo: e.target.value})} />
+                <InputField label="Order Quantity" type="number" value={basicInfo.orderQty} onChange={(e: any) => setBasicInfo({...basicInfo, orderQty: e.target.value})} />
+                <SelectField label="Query Type" required value={basicInfo.queryType} onChange={(e: any) => setBasicInfo({...basicInfo, queryType: e.target.value})} options={["Regular", "Urgent"]} />
 
-              <InputField label="Ref No" value={basicInfo.refNo} onChange={(e: any) => setBasicInfo({...basicInfo, refNo: e.target.value})} />
-              <InputField label="Query Date" required type="date" value={basicInfo.queryDate} onChange={(e: any) => setBasicInfo({...basicInfo, queryDate: e.target.value})} />
-              <SelectField label="Buying House" value={basicInfo.buyingHouse} onChange={(e: any) => setBasicInfo({...basicInfo, buyingHouse: e.target.value})} options={["ITPS"]} />
-              <SelectField label="Buyer Name" required value={basicInfo.buyerName} onChange={(e: any) => setBasicInfo({...basicInfo, buyerName: e.target.value})} options={["ITPS"]} />
+                <InputField label="Ref No" value={basicInfo.refNo} onChange={(e: any) => setBasicInfo({...basicInfo, refNo: e.target.value})} />
+                <InputField label="Query Date" required type="date" value={basicInfo.queryDate} onChange={(e: any) => setBasicInfo({...basicInfo, queryDate: e.target.value})} />
+                <SelectField label="Buying House" value={basicInfo.buyingHouse} onChange={(e: any) => setBasicInfo({...basicInfo, buyingHouse: e.target.value})} options={["ITPS"]} />
+                <SelectField label="Buyer Name" required value={basicInfo.buyerName} onChange={(e: any) => setBasicInfo({...basicInfo, buyerName: e.target.value})} options={["ITPS"]} />
 
-              <SelectField label="Department" required value={basicInfo.department} onChange={(e: any) => setBasicInfo({...basicInfo, department: e.target.value})} options={["Boys", "Girls", "Men", "Women"]} />
-              <SelectField label="Order Type" value={basicInfo.orderType} onChange={(e: any) => setBasicInfo({...basicInfo, orderType: e.target.value})} options={["Knit", "Woven", "Sweater"]} />
-              <InputField label="OPD" required type="date" value={basicInfo.opd} onChange={(e: any) => setBasicInfo({...basicInfo, opd: e.target.value})} />
-              <InputField label="Ship Date" required type="date" value={basicInfo.shipDate} onChange={(e: any) => setBasicInfo({...basicInfo, shipDate: e.target.value})} />
-
-              <InputField label="Style No" required value={basicInfo.styleNo} onChange={(e: any) => setBasicInfo({...basicInfo, styleNo: e.target.value})} />
-              
-              <div className="flex flex-col gap-1.5 w-full">
-                <label className="text-[11.5px] font-bold text-slate-600 dark:text-slate-400 tracking-tight">
-                  Item Type <span className="text-rose-500 ml-0.5">*</span>
-                </label>
-                <div className="flex items-center gap-2">
-                  <select
-                    value={basicInfo.itemType}
-                    onChange={(e) => setBasicInfo({...basicInfo, itemType: e.target.value})}
-                    className="flex-1 text-[13px] px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[6px] hover:border-slate-300 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 transition-all text-slate-800 dark:text-slate-100 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[position:right_0.75rem_center] shadow-sm shadow-slate-100/50"
-                  >
-                    <option value="">select...</option>
-                  </select>
-                  <button className="bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 h-[34px] w-[34px] rounded-[6px] border border-slate-200 dark:border-slate-700 transition-colors text-slate-500 flex items-center justify-center">
-                    <List size={14} />
-                  </button>
+                <SelectField label="Department" required value={basicInfo.department} onChange={(e: any) => setBasicInfo({...basicInfo, department: e.target.value})} options={["Boys", "Girls", "Men", "Women"]} />
+                <InputField label="OPD" required type="date" value={basicInfo.opd} onChange={(e: any) => setBasicInfo({...basicInfo, opd: e.target.value})} />
+                <InputField label="Ship Date" required type="date" value={basicInfo.shipDate} onChange={(e: any) => setBasicInfo({...basicInfo, shipDate: e.target.value})} />
+                <InputField label="Style No" required value={basicInfo.styleNo} onChange={(e: any) => setBasicInfo({...basicInfo, styleNo: e.target.value})} />
+                
+                <div className="flex flex-col gap-1.5 w-full">
+                  <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 tracking-tight">
+                    Item Type <span className="text-rose-500 ml-0.5">*</span>
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={basicInfo.itemType}
+                      onChange={(e) => setBasicInfo({...basicInfo, itemType: e.target.value})}
+                      className="flex-1 text-xs px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg hover:border-slate-350 focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 transition-all text-slate-800 dark:text-slate-100 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[position:right_0.75rem_center] shadow-2xs"
+                    >
+                      <option value="">Select Item...</option>
+                      <option value="T-Shirt">T-Shirt</option>
+                      <option value="Polo Shirt">Polo Shirt</option>
+                      <option value="Jacket">Jacket</option>
+                      <option value="Trousers">Trousers</option>
+                      <option value="Sweater">Sweater</option>
+                    </select>
+                    <button className="bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 h-[34px] w-[34px] rounded-lg border border-slate-200 dark:border-slate-750 transition-colors text-slate-500 flex items-center justify-center cursor-pointer">
+                      <List size={14} />
+                    </button>
+                  </div>
                 </div>
+
+                <SelectField label="Buyer Agent" value={basicInfo.buyerAgent} onChange={(e: any) => setBasicInfo({...basicInfo, buyerAgent: e.target.value})} options={["select...", "Agent Alpha", "Agent Beta"]} />
+                <SelectField label="Buyer Brand" value={basicInfo.buyerBrand} onChange={(e: any) => setBasicInfo({...basicInfo, buyerBrand: e.target.value})} options={["", "Brand Core", "Brand Premium"]} />
+                <SelectField label="Quality Level" required value={basicInfo.qualityLevel} onChange={(e: any) => setBasicInfo({...basicInfo, qualityLevel: e.target.value})} options={["AQL Standard", "AQL Premium"]} />
+
+                <SelectField label="Season" required value={basicInfo.season} onChange={(e: any) => setBasicInfo({...basicInfo, season: e.target.value})} options={["ANS-SS27", "FW27"]} />
+                <SelectField label="Factory" value={basicInfo.factory} onChange={(e: any) => setBasicInfo({...basicInfo, factory: e.target.value})} options={["select...", "PSL Composite", "PSKC Factory"]} />
+                <SelectField label="Currency" value={basicInfo.currency} onChange={(e: any) => setBasicInfo({...basicInfo, currency: e.target.value})} options={["USD", "EUR", "BDT"]} />
+                <InputField label="Exchange Rate" value={basicInfo.exchangeRate} onChange={(e: any) => setBasicInfo({...basicInfo, exchangeRate: e.target.value})} />
+
+                <SelectField label="Shipping Mode" value={basicInfo.shippingMode} onChange={(e: any) => setBasicInfo({...basicInfo, shippingMode: e.target.value})} options={["Sea", "Air", "Road"]} />
+                <SelectField label="Pay Term" value={basicInfo.payTerm} onChange={(e: any) => setBasicInfo({...basicInfo, payTerm: e.target.value})} options={["120 Days BBLC", "90 Days LC", "Cash"]} />
+                <InputField label="Tenor" value={basicInfo.tenor} onChange={(e: any) => setBasicInfo({...basicInfo, tenor: e.target.value})} />
               </div>
 
-              <SelectField label="Buyer Agent" value={basicInfo.buyerAgent} onChange={(e: any) => setBasicInfo({...basicInfo, buyerAgent: e.target.value})} options={["select..."]} />
-              <SelectField label="Buyer Brand" value={basicInfo.buyerBrand} onChange={(e: any) => setBasicInfo({...basicInfo, buyerBrand: e.target.value})} options={[""]} />
+              {/* Dynamic Division-specific configuration block */}
+              <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 mt-2 space-y-3">
+                <div className="flex items-center gap-1.5 border-b border-slate-200 dark:border-slate-850 pb-2 mb-2">
+                  <div className="w-1 h-3.5 bg-teal-500 rounded-full" />
+                  <span className="text-[10px] font-black uppercase tracking-wider text-teal-650 dark:text-teal-400">
+                    {basicInfo.orderType} Specific Configuration
+                  </span>
+                </div>
 
-              <SelectField label="Quality Level" required value={basicInfo.qualityLevel} onChange={(e: any) => setBasicInfo({...basicInfo, qualityLevel: e.target.value})} options={["AQL Standard", "AQL Premium"]} />
-              <SelectField label="Season" required value={basicInfo.season} onChange={(e: any) => setBasicInfo({...basicInfo, season: e.target.value})} options={["ANS-SS27", "FW27"]} />
-              <SelectField label="Factory" value={basicInfo.factory} onChange={(e: any) => setBasicInfo({...basicInfo, factory: e.target.value})} options={["select..."]} />
-              <SelectField label="Currency" value={basicInfo.currency} onChange={(e: any) => setBasicInfo({...basicInfo, currency: e.target.value})} options={["USD", "EUR", "BDT"]} />
+                {basicInfo.orderType === "Knit" && (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <InputField
+                      label="Fabric GSM"
+                      value={basicInfo.fabricGsm}
+                      onChange={(e: any) => setBasicInfo({ ...basicInfo, fabricGsm: e.target.value })}
+                    />
+                    <SelectField
+                      label="Knit Structure"
+                      value={basicInfo.knitStructure}
+                      onChange={(e: any) => setBasicInfo({ ...basicInfo, knitStructure: e.target.value })}
+                      options={["Single Jersey", "1x1 Rib", "Interlock", "French Terry", "Pique"]}
+                    />
+                    <InputField
+                      label="Yarn Composition"
+                      value={basicInfo.yarnComposition}
+                      onChange={(e: any) => setBasicInfo({ ...basicInfo, yarnComposition: e.target.value })}
+                    />
+                  </div>
+                )}
 
-              <InputField label="Exchange Rate" value={basicInfo.exchangeRate} onChange={(e: any) => setBasicInfo({...basicInfo, exchangeRate: e.target.value})} />
-              <SelectField label="Shipping Mode" value={basicInfo.shippingMode} onChange={(e: any) => setBasicInfo({...basicInfo, shippingMode: e.target.value})} options={["Sea", "Air", "Road"]} />
-              <SelectField label="Pay Term" value={basicInfo.payTerm} onChange={(e: any) => setBasicInfo({...basicInfo, payTerm: e.target.value})} options={["120 Days BBLC", "90 Days LC", "Cash"]} />
-              <InputField label="Tenor" value={basicInfo.tenor} onChange={(e: any) => setBasicInfo({...basicInfo, tenor: e.target.value})} />
+                {basicInfo.orderType === "Woven" && (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <InputField
+                      label="Warp x Weft Count"
+                      value={basicInfo.warpWeftCount}
+                      onChange={(e: any) => setBasicInfo({ ...basicInfo, warpWeftCount: e.target.value })}
+                    />
+                    <InputField
+                      label="Fabric Construction Density"
+                      value={basicInfo.fabricConstruction}
+                      onChange={(e: any) => setBasicInfo({ ...basicInfo, fabricConstruction: e.target.value })}
+                    />
+                    <SelectField
+                      label="Weave Density / Pattern"
+                      value={basicInfo.weaveDensity}
+                      onChange={(e: any) => setBasicInfo({ ...basicInfo, weaveDensity: e.target.value })}
+                      options={["2/1 Twill", "Plain/Poplin", "Satin/Sateen", "Canvas", "Oxford"]}
+                    />
+                  </div>
+                )}
 
-              <div className="sm:col-span-2 xl:col-span-4 grid grid-cols-1 sm:grid-cols-2 gap-5 mt-1">
+                {basicInfo.orderType === "Sweater" && (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <SelectField
+                      label="Machine Gauge (GG)"
+                      value={basicInfo.gauge}
+                      onChange={(e: any) => setBasicInfo({ ...basicInfo, gauge: e.target.value })}
+                      options={["12GG", "7GG", "3GG", "5GG", "14GG"]}
+                    />
+                    <InputField
+                      label="Yarn Ply / Count"
+                      value={basicInfo.yarnPly}
+                      onChange={(e: any) => setBasicInfo({ ...basicInfo, yarnPly: e.target.value })}
+                    />
+                    <SelectField
+                      label="Knitting Pattern Type"
+                      value={basicInfo.knittingPattern}
+                      onChange={(e: any) => setBasicInfo({ ...basicInfo, knittingPattern: e.target.value })}
+                      options={["Jacquard", "Cable", "Ribbing", "Pointelle", "Flat Knit"]}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
                 <InputField label="Special Instructions" placeholder="Any specific requirements..." value={basicInfo.specialInstructions} onChange={(e: any) => setBasicInfo({...basicInfo, specialInstructions: e.target.value})} />
                 <InputField label="Penalty Clauses" placeholder="e.g. 5% off for 1 week delay" value={basicInfo.penaltyClauses} onChange={(e: any) => setBasicInfo({...basicInfo, penaltyClauses: e.target.value})} />
               </div>
@@ -220,7 +339,7 @@ export default function MerchandisingOrderProfilePage() {
 
             {/* Image Uploader */}
             <div className="w-full xl:w-[260px] shrink-0 flex flex-col">
-              <label className="text-[11.5px] font-bold text-slate-600 dark:text-slate-400 tracking-tight mb-1.5">Style Reference Image</label>
+              <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 tracking-tight mb-1.5">Style Reference Image</label>
               <div className="w-full h-full min-h-[220px] rounded-[10px] border-[1.5px] border-dashed border-slate-300 dark:border-slate-700 bg-[#f8fafc] dark:bg-slate-900/50 flex flex-col items-center justify-center relative overflow-hidden group hover:bg-slate-50 transition-colors cursor-pointer">
                 {imagePreview ? (
                   <>
@@ -243,6 +362,7 @@ export default function MerchandisingOrderProfilePage() {
             </div>
           </div>
         </section>
+
 
         {/* SECTION 2: Style Breakdown & Costing */}
         <section className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">

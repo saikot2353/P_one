@@ -198,7 +198,7 @@ const initialTNAData: TNAEvent[] = [
   },
 ];
 
-export default function MerchandisingDashboardPage() {
+function MerchandisingDashboardPage() {
   const navigate = useNavigate();
 
   // Filters State

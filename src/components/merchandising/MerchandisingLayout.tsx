@@ -44,13 +44,13 @@ export default function MerchandisingLayout({
   
   // Sidebar expanded sections
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    masterSettings: false,
+    capacity: false,
     sample: false,
-    manageOrder: true, // Expanded by default as requested
-    orderSheet: false,
-    yarnBookings: false,
-    workOrder: false,
-    mmReports: false,
-    report: false
+    orders: true, // Expand orders by default
+    sourcing: false,
+    services: false,
+    reports: false,
   });
 
   useEffect(() => {
@@ -77,10 +77,101 @@ export default function MerchandisingLayout({
   };
 
   const handleMockClick = (name: string) => {
-    toast.info(`Navigation: ${name}`, {
-      description: "This is a mock menu item under the Merchandising module."
+    toast.info(`Workflow Workspace: ${name}`, {
+      description: "This garments merchandising workspace is configured under the master database layout."
     });
   };
+
+  // Structured menu items matching Bangladesh garments merchandising stages
+  const menuCategories = [
+    {
+      key: "dashboard",
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      to: "/merchandising-dashboard",
+    },
+    {
+      key: "masterSettings",
+      label: "Master Settings",
+      icon: Settings,
+      subitems: [
+        { label: "Company & Buyer Setup" },
+        { label: "Material Library (Yarn/Fabric)" },
+        { label: "Specifications & Parameters" },
+        { label: "Process & Loss Setup" },
+        { label: "Financial Config" },
+      ],
+    },
+    {
+      key: "capacity",
+      label: "Capacity Planning",
+      icon: Activity,
+      subitems: [
+        { label: "Monthly Capacity Booking" },
+        { label: "Capacity Approvals" },
+      ],
+    },
+    {
+      key: "sample",
+      label: "Sample & Development",
+      icon: Scissors,
+      subitems: [
+        { label: "Sample Requisition" },
+        { label: "Sample Tracker List" },
+        { label: "Buyer Feedback & PP Approval" },
+      ],
+    },
+    {
+      key: "orders",
+      label: "Orders & Costing",
+      icon: Layers,
+      subitems: [
+        { label: "Order Master Ledger", to: "/merchandising-order-list" },
+        { label: "Unified Order Entry", to: "/merchandising-order-profile" },
+        { label: "CAD Consumption Sheets" },
+        { label: "KDS & Costing Sheets" },
+      ],
+    },
+    {
+      key: "sourcing",
+      label: "Sourcing & Bookings",
+      icon: Wind,
+      subitems: [
+        { label: "Yarn Booking" },
+        { label: "Fabric Booking" },
+        { label: "Trims & Accessories WO" },
+      ],
+    },
+    {
+      key: "services",
+      label: "Service Work Orders",
+      icon: Briefcase,
+      subitems: [
+        { label: "Dyeing Work Orders" },
+        { label: "Washing & Printing WO" },
+        { label: "AOP & Embroidery WO" },
+      ],
+    },
+    {
+      key: "tna",
+      label: "TNA Calendar",
+      icon: FileText,
+      subitems: [
+        { label: "TNA Follow-Up Calendar" },
+        { label: "Milestone Tracking Board" }
+      ]
+    },
+    {
+      key: "reports",
+      label: "Reports & Analytics",
+      icon: TrendingUp,
+      subitems: [
+        { label: "Daily Order Status Report" },
+        { label: "Buyer Share & Shipment" },
+        { label: "Material Stock Ledger" },
+      ],
+    },
+  ];
 
   return (
     <div className={`min-h-screen flex bg-background text-foreground transition-all duration-355 font-sans ${theme === "dark" ? "dark bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-900"}`}>
@@ -131,56 +222,83 @@ export default function MerchandisingLayout({
             Workspace
           </div>
 
-          {/* 1. Dashboard Link */}
-          <Link
-            to="/merchandising-dashboard"
-            className={`group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-bold transition-all duration-200 ${
-              activePath === "dashboard"
-                ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-2xs"
-                : "text-sidebar-foreground/75 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground"
-            }`}
-          >
-            <LayoutDashboard className="size-3.5 transition-transform duration-300 group-hover:scale-110" />
-            <span>Dashboard</span>
-            {activePath === "dashboard" && (
-              <span className="ml-auto size-1.5 rounded-full bg-sidebar-primary shadow-[0_0_8px_var(--sidebar-primary)] animate-pulse" />
-            )}
-          </Link>
-
-          {/* 2. Collapsible: Manage Order */}
-          <div className="space-y-1">
-            <button
-              onClick={() => toggleSection("manageOrder")}
-              className="w-full group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-bold text-sidebar-foreground/75 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground transition-all duration-200"
-            >
-              <Layers className="size-3.5" />
-              <span>Manage Order</span>
-              <ChevronDown
-                size={14}
-                className={`ml-auto transition-transform duration-200 ${
-                  expandedSections.manageOrder ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-            {expandedSections.manageOrder && (
-              <div className="pl-4 pr-1 py-1 space-y-0.5 border-l border-sidebar-border/40 ml-4.5">
-                
-                {/* Active link: Order List */}
+          {menuCategories.map((cat) => {
+            const Icon = cat.icon;
+            if (cat.to) {
+              const isActive = activePath === cat.key;
+              return (
                 <Link
-                  to="/merchandising-order-list"
-                  className={`block w-full text-left text-[11px] font-semibold py-1.5 px-2 rounded-md ${
-                    activePath === "order-list"
-                      ? "text-teal-500 dark:text-teal-400 bg-sidebar-accent/30 font-bold"
-                      : "text-sidebar-foreground/60 hover:text-sidebar-primary"
+                  key={cat.key}
+                  to={cat.to}
+                  className={`group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-bold transition-all duration-200 ${
+                    isActive
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-2xs"
+                      : "text-sidebar-foreground/75 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground"
                   }`}
                 >
-                  Order List
+                  <Icon className="size-3.5 transition-transform duration-300 group-hover:scale-110" />
+                  <span>{cat.label}</span>
+                  {isActive && (
+                    <span className="ml-auto size-1.5 rounded-full bg-sidebar-primary shadow-[0_0_8px_var(--sidebar-primary)] animate-pulse" />
+                  )}
                 </Link>
-              </div>
-            )}
-          </div>
+              );
+            }
 
+            const isExpanded = expandedSections[cat.key];
+            return (
+              <div key={cat.key} className="space-y-1">
+                <button
+                  onClick={() => toggleSection(cat.key)}
+                  className="w-full group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-bold text-sidebar-foreground/75 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground transition-all duration-200"
+                >
+                  <Icon className="size-3.5 text-sidebar-foreground/60" />
+                  <span>{cat.label}</span>
+                  <ChevronDown
+                    size={13}
+                    className={`ml-auto transition-transform duration-200 text-sidebar-foreground/40 ${
+                      isExpanded ? "rotate-180 text-teal-500" : ""
+                    }`}
+                  />
+                </button>
+                {isExpanded && cat.subitems && (
+                  <div className="pl-4 pr-1 py-1 space-y-0.5 border-l border-sidebar-border/40 ml-4.5">
+                    {cat.subitems.map((sub, sIdx) => {
+                      if (sub.to) {
+                        const isSubActive =
+                          (sub.to === "/merchandising-order-list" && activePath === "order-list") ||
+                          (sub.to === "/merchandising-order-profile" && activePath === "order-profile");
+                        return (
+                          <Link
+                            key={sIdx}
+                            to={sub.to}
+                            className={`block w-full text-left text-[11px] font-semibold py-1.5 px-2 rounded-md transition ${
+                              isSubActive
+                                ? "text-teal-500 dark:text-teal-400 bg-sidebar-accent/30 font-extrabold"
+                                : "text-sidebar-foreground/65 hover:text-teal-555 hover:bg-sidebar-accent/15"
+                            }`}
+                          >
+                            {sub.label}
+                          </Link>
+                        );
+                      }
+                      return (
+                        <button
+                          key={sIdx}
+                          onClick={() => handleMockClick(sub.label)}
+                          className="block w-full text-left text-[11px] font-semibold py-1.5 px-2 rounded-md text-sidebar-foreground/50 hover:text-teal-555 hover:bg-sidebar-accent/15 transition cursor-pointer"
+                        >
+                          {sub.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </nav>
+
 
         {/* Sidebar Footer Info */}
         <div className="p-4 border-t border-sidebar-border/30 text-[10px] text-sidebar-foreground/60 font-semibold space-y-1">

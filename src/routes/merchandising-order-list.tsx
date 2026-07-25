@@ -75,7 +75,7 @@ const mockOrders: OrderSummaryItem[] = [
   }
 ];
 
-export default function MerchandisingOrderListPage() {
+function MerchandisingOrderListPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [showCreateDropdown, setShowCreateDropdown] = useState(false);
