@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { rawIncrementRecords, RawIncrementRecord } from "./-increment-history-data";
+import { EvaluationTabNav } from "@/components/evaluation/EvaluationTabNav";
 import {
   Search,
   FileSpreadsheet,
@@ -347,16 +348,17 @@ function IncrementHistoryPage() {
                   Home
                 </Link>
                 <ChevronRight className="size-2.5" />
-                <span className="hover:text-primary transition-colors">Human Resource</span>
+                <span className="hover:text-primary transition-colors">Evaluation</span>
                 <ChevronRight className="size-2.5" />
-                <span className="text-foreground">Increment HistoryList</span>
+                <span className="text-foreground">Increment History</span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="size-2.5 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]" />
                 <h1 className="text-xl font-extrabold tracking-tight text-foreground">
-                  Increment HistoryList
+                  Increment History
                 </h1>
               </div>
+              <p className="text-xs text-muted-foreground mt-1 ml-6">Year-wise salary increment log for all employees</p>
             </div>
 
             {/* Quick Metrics Bar (replicated from personnel list) */}
@@ -393,6 +395,9 @@ function IncrementHistoryPage() {
               </Link>
             </div>
           </div>
+
+          {/* Evaluation Module Tab Nav */}
+          <EvaluationTabNav />
 
           {/* Tab Selector Hub */}
           <div className="bg-card rounded-lg border border-border/80 p-1.5 shadow-2xs flex gap-1 print:hidden">

@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
+import { EvaluationTabNav } from "@/components/evaluation/EvaluationTabNav";
 import {
   Search,
   FileSpreadsheet,
@@ -530,7 +531,7 @@ function EvaluationProposePage() {
       <main className="flex-1 min-w-0 flex flex-col relative">
         <Topbar />
 
-        <div className="p-4 md:p-6 lg:p-8 space-y-6">
+        <div className="p-4 md:p-6 lg:p-8 space-y-5">
           {/* Header Dashboard Card */}
           <div className="bg-card rounded-lg border border-border/85 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -539,16 +540,20 @@ function EvaluationProposePage() {
                   Home
                 </Link>
                 <ChevronRight className="size-3" />
-                <span>Human Resource</span>
+                <span>Evaluation</span>
                 <ChevronRight className="size-3" />
                 <span className="text-primary font-black">Evaluation Propose</span>
               </div>
               <h1 className="text-xl font-black text-foreground tracking-tight flex items-center gap-2">
                 <Sparkles className="size-5.5 text-primary" />
-                <span>Evaluation Propose Workspace</span>
+                <span>Evaluation Propose</span>
               </h1>
+              <p className="text-xs text-muted-foreground mt-1">Review employee tenure &amp; eligibility before submitting increment proposals</p>
             </div>
           </div>
+
+          {/* Evaluation Module Tab Nav */}
+          <EvaluationTabNav />
 
           {/* PARAMETRIC FILTERS ROW */}
           <form

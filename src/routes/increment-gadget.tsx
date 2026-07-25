@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
+import { EvaluationTabNav } from "@/components/evaluation/EvaluationTabNav";
 import {
   ChevronRight,
   Sparkles,
@@ -751,16 +752,20 @@ function IncrementGadgetPage() {
                   Home
                 </Link>
                 <ChevronRight className="size-3" />
-                <span>Human Resource</span>
+                <span>Evaluation</span>
                 <ChevronRight className="size-3" />
-                <span className="text-primary font-black">Increment Gadget</span>
+                <span className="text-primary font-black">Increment Configurator</span>
               </div>
               <h1 className="text-xl font-black text-foreground tracking-tight flex items-center gap-2">
                 <Layers className="size-5.5 text-primary" />
-                <span>Increment Gadget</span>
+                <span>Increment Configurator</span>
               </h1>
+              <p className="text-xs text-muted-foreground mt-1">Configure parametric wage matrix and appraisal rules</p>
             </div>
           </div>
+
+          {/* Evaluation Module Tab Nav */}
+          <EvaluationTabNav />
 
           {/* GADGET CONTROLS PANEL 1: Top parameters */}
           <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">

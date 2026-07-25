@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
+import { EvaluationTabNav } from "@/components/evaluation/EvaluationTabNav";
 import {
   ChevronRight,
   Sparkles,
@@ -933,16 +934,20 @@ function ProposeIncrementPage() {
                   Home
                 </Link>
                 <ChevronRight className="size-3" />
-                <span>Human Resource</span>
+                <span>Evaluation</span>
                 <ChevronRight className="size-3" />
                 <span className="text-primary font-black">Propose Increment</span>
               </div>
               <h1 className="text-xl font-black text-foreground tracking-tight flex items-center gap-2">
                 <Sparkles className="size-5.5 text-primary animate-pulse" />
-                <span>Propose Increment Register</span>
+                <span>Propose Increment</span>
               </h1>
+              <p className="text-xs text-muted-foreground mt-1">Submit and manage performance-based salary increment proposals</p>
             </div>
           </div>
+
+          {/* Evaluation Module Tab Nav */}
+          <EvaluationTabNav />
 
           {/* PARAMETRIC FILTERS ROW */}
           <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">

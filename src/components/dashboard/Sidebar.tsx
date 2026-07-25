@@ -60,6 +60,7 @@ export interface NavItem {
   subitems?: SubItem[];
   search?: Record<string, any>;
   count?: number;
+  activeRoutes?: string[];
 }
 
 export const nav: NavItem[] = [
@@ -183,14 +184,15 @@ export const nav: NavItem[] = [
   {
     label: "Evaluation",
     icon: ClipboardCheck,
-    subitems: [
-      { label: "Increment Configurator", to: "/increment-gadget" },
-      { label: "Evaluation Propose", to: "/evaluation-propose" },
-      { label: "Propose Increment", to: "/propose-increment" },
-      { label: "Increment Summary", to: "/increment-summary" },
-      { label: "Increment Queue List", to: "/increment-queuelist" },
-      { label: "Increment List", to: "/increment-list" },
-      { label: "Increment History", to: "/increment-history" },
+    to: "/evaluation-propose",
+    activeRoutes: [
+      "/evaluation-propose",
+      "/increment-gadget",
+      "/propose-increment",
+      "/increment-summary",
+      "/increment-queuelist",
+      "/increment-list",
+      "/increment-history",
     ],
   },
   {
@@ -515,6 +517,7 @@ export function Sidebar() {
           // Determine parent active state dynamically
           const isParentActive =
             item.to === currentPath ||
+            (item.activeRoutes && item.activeRoutes.some((r) => r === currentPath)) ||
             (item.subitems &&
               item.subitems.some((sub) => {
                 if (sub.to && sub.to !== "/" && sub.to === currentPath) return true;

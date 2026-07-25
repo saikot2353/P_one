@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v13");
+    const saved = localStorage.getItem("system_changes_v15");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -132,6 +132,24 @@ function ChangesPage() {
           link: "/monthly-salary-process",
           descriptionEn: "Updated default column visibility to show all 58 columns on load, and removed the currency Taka (৳) symbol from the table cell amounts.",
           descriptionBn: "সবগুলো ৫৮টি কলাম লোড হওয়ার সাথে সাথে দৃশ্যমান রাখতে ডিফল্ট সেটিং আপডেট করা হয়েছে এবং টেবিল সেলের অ্যামাউন্ট থেকে টাকা (৳) চিহ্ন বাদ দেওয়া হয়েছে।",
+        },
+        {
+          id: "13",
+          date: "2026-07-25T16:20",
+          type: "Modify",
+          module: "Evaluation",
+          link: "/evaluation-propose",
+          descriptionEn: "Redesigned all 7 Evaluation sub-pages to be simpler and easier to use! Added a shared horizontal tab navigation bar across all pages so you can jump between Configurator, Evaluation Propose, Propose Increment, Summary, Queue & Approvals, Increment List, and History without using the sidebar. Also cleaned up breadcrumbs, added short descriptions to each page, and renamed jargon-heavy labels (e.g. 'Increment Gadget' is now 'Configurator'). Created a documentation file explaining how the full workflow works.",
+          descriptionBn: "ইভ্যালুয়েশন মডিউলের সবগুলো ৭টি সাবপেজ আরও সহজ ও সুন্দর করা হয়েছে! এখন প্রতিটি পেজের উপরে একটি হরিজন্টাল ট্যাব বার আছে — Configurator, Evaluation Propose, Propose Increment, Summary, Queue & Approvals, Increment List, এবং History — যেটা দিয়ে সাইডবার ছাড়াই যেকোনো পেজে যাওয়া যাবে। ব্রেডক্রাম্ব ঠিক করা হয়েছে, প্রতিটি পেজে ছোট বিবরণ যোগ করা হয়েছে, এবং 'Increment Gadget' এর মতো কঠিন নামগুলো সহজ করা হয়েছে। এছাড়া সম্পূর্ণ ওয়ার্কফ্লো ব্যাখ্যা করে একটি ডকুমেন্টেশন ফাইলও তৈরি করা হয়েছে।",
+        },
+        {
+          id: "14",
+          date: "2026-07-25T16:25",
+          type: "Modify",
+          module: "Evaluation",
+          link: "/evaluation-propose",
+          descriptionEn: "Fixed the double-navigation issue in the Evaluation module! Before, there were both sidebar sub-items AND a tab bar — which was confusing. Now the sidebar shows a single 'Evaluation' link, and the tab bar at the top of each page handles all navigation within the module. The sidebar also stays highlighted on all Evaluation pages.",
+          descriptionBn: "ইভ্যালুয়েশন মডিউলের ডাবল নেভিগেশন সমস্যা ঠিক করা হয়েছে! আগে সাইডবারে সাব-মেনু ছিল এবং পেজেও ট্যাব বার ছিল — দুটো একসাথে থাকায় বিভ্রান্তি হচ্ছিল। এখন সাইডবারে শুধু একটি 'Evaluation' লিংক আছে, আর পেজের উপরের ট্যাব বার থেকেই সব সাবপেজে যাওয়া যাবে। যেকোনো ইভ্যালুয়েশন পেজে থাকলে সাইডবারের 'Evaluation' আইটেমটি হাইলাইটেড থাকবে।",
         },
       ]);
     }

@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { rawQueueRecords, QueueRecord } from "./-increment-queue-data";
+import { EvaluationTabNav } from "@/components/evaluation/EvaluationTabNav";
 import {
   Search,
   FileSpreadsheet,
@@ -495,16 +496,17 @@ function IncrementQueueListPage() {
                   Home
                 </Link>
                 <ChevronRight className="size-2.5" />
-                <span className="hover:text-primary transition-colors">Human Resource</span>
+                <span className="hover:text-primary transition-colors">Evaluation</span>
                 <ChevronRight className="size-2.5" />
-                <span className="text-foreground">Increment Approvals Console</span>
+                <span className="text-foreground">Queue & Approvals</span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="size-2.5 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]" />
                 <h1 className="text-xl font-extrabold tracking-tight text-foreground">
-                  Approvals Console
+                  Queue & Approvals Console
                 </h1>
               </div>
+              <p className="text-xs text-muted-foreground mt-1 ml-6">Approve pending increments — Gadget Queue, HR Endorsements, and MD Final Approvals</p>
             </div>
 
             {/* Quick Metrics Bar */}
@@ -535,6 +537,9 @@ function IncrementQueueListPage() {
               </div>
             </div>
           </div>
+
+          {/* Evaluation Module Tab Nav */}
+          <EvaluationTabNav />
 
           {/* Console Tab Selector */}
           <div className="bg-card rounded-lg border border-border/80 p-1.5 shadow-2xs flex gap-1 print:hidden">
