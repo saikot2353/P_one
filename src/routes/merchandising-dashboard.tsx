@@ -700,11 +700,11 @@ export default function MerchandisingDashboardPage() {
             {/* Responsive Table Grid */}
             <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800/60 scrollbar-thin">
               <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800 text-[11px] font-semibold text-left">
-                <thead className="bg-slate-50 dark:bg-slate-900/80 text-slate-500 uppercase tracking-wider">
+                <thead className="bg-slate-50 dark:bg-slate-900/80 text-slate-500 uppercase tracking-wider whitespace-nowrap">
                   <tr>
-                    <th className="px-3 py-3 font-extrabold">SL</th>
-                    <th className="px-3 py-3 font-extrabold">Order Status</th>
-                    <th className="px-3 py-3 font-extrabold">Buyer Name</th>
+                    <th className="px-3 py-3 font-extrabold sticky left-0 bg-slate-50 dark:bg-slate-900 z-20 min-w-[50px] w-[50px] max-w-[50px] text-center border-r border-slate-200 dark:border-slate-800">SL</th>
+                    <th className="px-3 py-3 font-extrabold sticky left-[50px] bg-slate-50 dark:bg-slate-900 z-20 min-w-[120px] w-[120px] max-w-[120px] text-center border-r border-slate-200 dark:border-slate-800">Order Status</th>
+                    <th className="px-3 py-3 font-extrabold sticky left-[170px] bg-slate-50 dark:bg-slate-900 z-20 min-w-[200px] w-[200px] max-w-[200px] border-r border-slate-200 dark:border-slate-800 shadow-[2px_0_5px_rgba(0,0,0,0.05)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">Buyer Name</th>
                     <th className="px-3 py-3 font-extrabold text-right">Avg.SMV</th>
                     <th className="px-3 py-3 font-extrabold text-right">OrderQty</th>
                     <th className="px-3 py-3 font-extrabold text-right">Ex-Fac.Qty</th>
@@ -719,17 +719,17 @@ export default function MerchandisingDashboardPage() {
                     <th className="px-3 py-3 font-extrabold text-right">AvgBasicRate</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-slate-700 dark:text-slate-300 whitespace-nowrap">
                   {filteredOrders.length > 0 ? (
                     filteredOrders.map((o) => (
-                      <tr key={o.sl} className="hover:bg-slate-100/50 dark:hover:bg-slate-800/40 transition-colors">
-                        <td className="px-3 py-3">{o.sl}</td>
-                        <td className="px-3 py-3">
+                      <tr key={o.sl} className="group hover:bg-slate-100/50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-3 py-3 sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-100 dark:group-hover:bg-slate-800 z-10 text-center border-r border-slate-200 dark:border-slate-800 transition-colors">{o.sl}</td>
+                        <td className="px-3 py-3 sticky left-[50px] bg-white dark:bg-slate-900 group-hover:bg-slate-100 dark:group-hover:bg-slate-800 z-10 text-center border-r border-slate-200 dark:border-slate-800 transition-colors">
                           <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[10px]">
                             {o.status}
                           </span>
                         </td>
-                        <td className="px-3 py-3 text-teal-600 dark:text-teal-400 font-bold hover:underline cursor-pointer">
+                        <td className="px-3 py-3 sticky left-[170px] bg-white dark:bg-slate-900 group-hover:bg-slate-100 dark:group-hover:bg-slate-800 z-10 border-r border-slate-200 dark:border-slate-800 shadow-[2px_0_5px_rgba(0,0,0,0.05)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)] font-bold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer transition-colors">
                           {o.buyer}
                         </td>
                         <td className="px-3 py-3 text-right">{o.avgSmv.toFixed(3)}</td>
@@ -756,7 +756,9 @@ export default function MerchandisingDashboardPage() {
 
                   {/* Totals Row */}
                   <tr className="bg-slate-50 dark:bg-slate-900/50 font-bold text-slate-900 dark:text-white border-t border-slate-200 dark:border-slate-800">
-                    <td colSpan={3} className="px-3 py-3 uppercase tracking-wider text-xs">Total</td>
+                    <td className="px-3 py-3 sticky left-0 bg-slate-50 dark:bg-slate-900 z-10 border-r border-slate-200 dark:border-slate-800 text-center"></td>
+                    <td className="px-3 py-3 sticky left-[50px] bg-slate-50 dark:bg-slate-900 z-10 border-r border-slate-200 dark:border-slate-800 text-center"></td>
+                    <td className="px-3 py-3 sticky left-[170px] bg-slate-50 dark:bg-slate-900 z-10 border-r border-slate-200 dark:border-slate-850 shadow-[2px_0_5px_rgba(0,0,0,0.05)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)] uppercase tracking-wider text-xs font-black">Total</td>
                     <td className="px-3 py-3 text-right">0.000</td>
                     <td className="px-3 py-3 text-right">{totals.qty.toLocaleString()}</td>
                     <td className="px-3 py-3 text-right">{totals.exQty}</td>
@@ -962,11 +964,11 @@ export default function MerchandisingDashboardPage() {
             {/* Table Area */}
             <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800/60 scrollbar-thin">
               <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800 text-[11px] font-semibold text-left">
-                <thead className="bg-slate-50 dark:bg-slate-900/80 text-slate-500 uppercase tracking-wider">
+                <thead className="bg-slate-50 dark:bg-slate-900/80 text-slate-500 uppercase tracking-wider whitespace-nowrap">
                   <tr>
-                    <th className="px-3 py-3 font-extrabold">SL</th>
-                    <th className="px-3 py-3 font-extrabold">Actions</th>
-                    <th className="px-3 py-3 font-extrabold">Event Name</th>
+                    <th className="px-3 py-3 font-extrabold sticky left-0 bg-slate-50 dark:bg-slate-900 z-20 min-w-[50px] w-[50px] max-w-[50px] text-center border-r border-slate-200 dark:border-slate-800">SL</th>
+                    <th className="px-3 py-3 font-extrabold sticky left-[50px] bg-slate-50 dark:bg-slate-900 z-20 min-w-[100px] w-[100px] max-w-[100px] text-center border-r border-slate-200 dark:border-slate-800">Actions</th>
+                    <th className="px-3 py-3 font-extrabold sticky left-[150px] bg-slate-50 dark:bg-slate-900 z-20 min-w-[180px] w-[180px] max-w-[180px] border-r border-slate-200 dark:border-slate-800 shadow-[2px_0_5px_rgba(0,0,0,0.05)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">Event Name</th>
                     <th className="px-3 py-3 font-extrabold">TNA Date</th>
                     <th className="px-3 py-3 font-extrabold">TNA Lead</th>
                     <th className="px-3 py-3 font-extrabold">Up Date</th>
@@ -980,21 +982,21 @@ export default function MerchandisingDashboardPage() {
                     <th className="px-3 py-3 font-extrabold text-right">LeadDay</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-slate-700 dark:text-slate-300 whitespace-nowrap">
                   {loadTNA ? (
                     tnaDataList.length > 0 ? (
                       tnaDataList.map((t) => (
-                        <tr key={t.sl} className="hover:bg-slate-100/50 dark:hover:bg-slate-800/40 transition-colors">
-                          <td className="px-3 py-3">{t.sl}</td>
-                          <td className="px-3 py-3">
+                        <tr key={t.sl} className="group hover:bg-slate-100/50 dark:hover:bg-slate-800/40 transition-colors">
+                          <td className="px-3 py-3 sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-100 dark:group-hover:bg-slate-800 z-10 text-center border-r border-slate-200 dark:border-slate-800 transition-colors">{t.sl}</td>
+                          <td className="px-3 py-3 sticky left-[50px] bg-white dark:bg-slate-900 group-hover:bg-slate-100 dark:group-hover:bg-slate-800 z-10 text-center border-r border-slate-200 dark:border-slate-800 transition-colors">
                             <button
                               onClick={() => toast.info(`Action Log for Event ${t.sl}`)}
-                              className="px-2 py-0.5 rounded bg-teal-500/10 hover:bg-teal-500/20 text-teal-600 dark:text-teal-400 border border-teal-500/25 text-[10px] cursor-pointer"
+                              className="px-2 py-0.5 rounded bg-teal-500/10 hover:bg-teal-500/20 text-teal-600 dark:text-teal-400 border border-teal-500/25 text-[10px] cursor-pointer font-bold transition-all active:scale-95"
                             >
                               Details
                             </button>
                           </td>
-                          <td className="px-3 py-3 text-slate-900 dark:text-white font-bold">{t.eventName}</td>
+                          <td className="px-3 py-3 sticky left-[150px] bg-white dark:bg-slate-900 group-hover:bg-slate-100 dark:group-hover:bg-slate-800 z-10 border-r border-slate-200 dark:border-slate-800 shadow-[2px_0_5px_rgba(0,0,0,0.05)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)] text-slate-900 dark:text-white font-bold transition-colors">{t.eventName}</td>
                           <td className="px-3 py-3">{t.tnaDate}</td>
                           <td className="px-3 py-3 text-teal-600 dark:text-teal-400">{t.tnaLead}</td>
                           <td className="px-3 py-3">{t.upDate}</td>
