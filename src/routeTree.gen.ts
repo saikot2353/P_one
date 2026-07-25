@@ -48,6 +48,8 @@ import { Route as MyDashboardRouteImport } from './routes/my-dashboard'
 import { Route as MonthlySalaryProcessRouteImport } from './routes/monthly-salary-process'
 import { Route as ModuleSelectionRouteImport } from './routes/module-selection'
 import { Route as MessengerRouteImport } from './routes/messenger'
+import { Route as MerchandisingOrderProfileRouteImport } from './routes/merchandising-order-profile'
+import { Route as MerchandisingOrderListRouteImport } from './routes/merchandising-order-list'
 import { Route as MerchandisingDashboardRouteImport } from './routes/merchandising-dashboard'
 import { Route as ManualAttendanceRouteImport } from './routes/manual-attendance'
 import { Route as ManageOvertimeRouteImport } from './routes/manage-overtime'
@@ -315,6 +317,17 @@ const ModuleSelectionRoute = ModuleSelectionRouteImport.update({
 const MessengerRoute = MessengerRouteImport.update({
   id: '/messenger',
   path: '/messenger',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MerchandisingOrderProfileRoute =
+  MerchandisingOrderProfileRouteImport.update({
+    id: '/merchandising-order-profile',
+    path: '/merchandising-order-profile',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const MerchandisingOrderListRoute = MerchandisingOrderListRouteImport.update({
+  id: '/merchandising-order-list',
+  path: '/merchandising-order-list',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MerchandisingDashboardRoute = MerchandisingDashboardRouteImport.update({
@@ -726,6 +739,8 @@ export interface FileRoutesByFullPath {
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/merchandising-dashboard': typeof MerchandisingDashboardRoute
+  '/merchandising-order-list': typeof MerchandisingOrderListRoute
+  '/merchandising-order-profile': typeof MerchandisingOrderProfileRoute
   '/messenger': typeof MessengerRoute
   '/module-selection': typeof ModuleSelectionRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
@@ -835,6 +850,8 @@ export interface FileRoutesByTo {
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/merchandising-dashboard': typeof MerchandisingDashboardRoute
+  '/merchandising-order-list': typeof MerchandisingOrderListRoute
+  '/merchandising-order-profile': typeof MerchandisingOrderProfileRoute
   '/messenger': typeof MessengerRoute
   '/module-selection': typeof ModuleSelectionRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
@@ -945,6 +962,8 @@ export interface FileRoutesById {
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/merchandising-dashboard': typeof MerchandisingDashboardRoute
+  '/merchandising-order-list': typeof MerchandisingOrderListRoute
+  '/merchandising-order-profile': typeof MerchandisingOrderProfileRoute
   '/messenger': typeof MessengerRoute
   '/module-selection': typeof ModuleSelectionRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
@@ -1056,6 +1075,8 @@ export interface FileRouteTypes {
     | '/manage-overtime'
     | '/manual-attendance'
     | '/merchandising-dashboard'
+    | '/merchandising-order-list'
+    | '/merchandising-order-profile'
     | '/messenger'
     | '/module-selection'
     | '/monthly-salary-process'
@@ -1165,6 +1186,8 @@ export interface FileRouteTypes {
     | '/manage-overtime'
     | '/manual-attendance'
     | '/merchandising-dashboard'
+    | '/merchandising-order-list'
+    | '/merchandising-order-profile'
     | '/messenger'
     | '/module-selection'
     | '/monthly-salary-process'
@@ -1274,6 +1297,8 @@ export interface FileRouteTypes {
     | '/manage-overtime'
     | '/manual-attendance'
     | '/merchandising-dashboard'
+    | '/merchandising-order-list'
+    | '/merchandising-order-profile'
     | '/messenger'
     | '/module-selection'
     | '/monthly-salary-process'
@@ -1384,6 +1409,8 @@ export interface RootRouteChildren {
   ManageOvertimeRoute: typeof ManageOvertimeRoute
   ManualAttendanceRoute: typeof ManualAttendanceRoute
   MerchandisingDashboardRoute: typeof MerchandisingDashboardRoute
+  MerchandisingOrderListRoute: typeof MerchandisingOrderListRoute
+  MerchandisingOrderProfileRoute: typeof MerchandisingOrderProfileRoute
   MessengerRoute: typeof MessengerRoute
   ModuleSelectionRoute: typeof ModuleSelectionRoute
   MonthlySalaryProcessRoute: typeof MonthlySalaryProcessRoute
@@ -1702,6 +1729,20 @@ declare module '@tanstack/react-router' {
       path: '/messenger'
       fullPath: '/messenger'
       preLoaderRoute: typeof MessengerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/merchandising-order-profile': {
+      id: '/merchandising-order-profile'
+      path: '/merchandising-order-profile'
+      fullPath: '/merchandising-order-profile'
+      preLoaderRoute: typeof MerchandisingOrderProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/merchandising-order-list': {
+      id: '/merchandising-order-list'
+      path: '/merchandising-order-list'
+      fullPath: '/merchandising-order-list'
+      preLoaderRoute: typeof MerchandisingOrderListRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/merchandising-dashboard': {
@@ -2248,6 +2289,8 @@ const rootRouteChildren: RootRouteChildren = {
   ManageOvertimeRoute: ManageOvertimeRoute,
   ManualAttendanceRoute: ManualAttendanceRoute,
   MerchandisingDashboardRoute: MerchandisingDashboardRoute,
+  MerchandisingOrderListRoute: MerchandisingOrderListRoute,
+  MerchandisingOrderProfileRoute: MerchandisingOrderProfileRoute,
   MessengerRoute: MessengerRoute,
   ModuleSelectionRoute: ModuleSelectionRoute,
   MonthlySalaryProcessRoute: MonthlySalaryProcessRoute,
