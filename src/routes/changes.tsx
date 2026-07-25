@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { ArrowLeft, Save, Plus, FileSpreadsheet, ExternalLink } from "lucide-react";
-import { toast } from "sonner";
+import { ArrowLeft, FileSpreadsheet, ExternalLink } from "lucide-react";
 
 export const Route = createFileRoute("/changes")({
   component: ChangesPage,
@@ -21,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v7");
+    const saved = localStorage.getItem("system_changes_v8");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -80,31 +79,20 @@ function ChangesPage() {
           descriptionEn: "Moved the 'Operations' tools to a sidebar! Now, when you select an employee, the tools automatically pop up on the right side. You can still see the main table and continue clicking other employees to update multiple at once.",
           descriptionBn: "অপারেশন টুলসগুলোকে সাইডবারে সরানো হয়েছে! এখন মেইন টেবিল থেকে যেকোনো এমপ্লয়ি সিলেক্ট করলেই টুলসগুলো ডানপাশে স্লাইড হয়ে খুলবে। আপনি তখনও মেইন টেবিল দেখতে পাবেন এবং একসাথে একাধিক কাজ করার জন্য অন্য এমপ্লয়ি সিলেক্ট করতে পারবেন।",
         },
+        {
+          id: "7",
+          date: "2026-07-25T15:08",
+          type: "Modify",
+          module: "Payroll Deductions",
+          link: "/payroll-deductions",
+          descriptionEn: "Removed the 'Auto-Skip during Ramadan' option and the 'Single Period Exceptions' configuration from the Payroll Deductions setup panel.",
+          descriptionBn: "পেরোল ডিডাকশন প্যানেল থেকে 'রোজার মাসে অটো-স্কিপ' অপশন এবং 'সিঙ্গেল পিরিয়ড এক্সেপশন' সেটিং অপশনগুলো বাদ দেওয়া হয়েছে।",
+        },
       ]);
     }
   }, []);
 
-  const saveRecords = (newRecords: ChangeRecord[]) => {
-    setRecords(newRecords);
-    localStorage.setItem("system_changes_v7", JSON.stringify(newRecords));
-  };
 
-  const addRow = () => {
-    const newRecord: ChangeRecord = {
-      id: Date.now().toString(),
-      date: new Date().toISOString().slice(0, 16),
-      type: "New Addition",
-      module: "",
-      descriptionEn: "",
-      descriptionBn: "",
-    };
-    saveRecords([...records, newRecord]);
-  };
-
-  const updateRecord = (id: string, field: keyof ChangeRecord, value: string) => {
-    const updated = records.map((r) => (r.id === id ? { ...r, [field]: value } : r));
-    saveRecords(updated);
-  };
 
   return (
     <div className="min-h-screen bg-white font-sans text-slate-800 flex flex-col">
@@ -119,22 +107,7 @@ function ChangesPage() {
             System Changes Tracker
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={addRow}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-300 rounded text-sm hover:bg-slate-50 transition-colors shadow-sm font-medium"
-          >
-            <Plus size={16} />
-            Insert Row
-          </button>
-          <button
-            onClick={() => toast.success("Changes saved successfully!")}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#107c41] text-white rounded text-sm hover:bg-[#0c5e31] transition-colors shadow-sm font-medium"
-          >
-            <Save size={16} />
-            Save
-          </button>
-        </div>
+
       </div>
 
       {/* Excel Formula Bar Fake */}
@@ -170,15 +143,15 @@ function ChangesPage() {
                   <input
                     type="datetime-local"
                     value={row.date}
-                    onChange={(e) => updateRecord(row.id, "date", e.target.value)}
-                    className="w-full h-full min-h-[48px] px-2 py-2 outline-none focus:ring-2 focus:ring-inset focus:ring-[#107c41] bg-transparent text-slate-800 text-[11px]"
+                    readOnly
+                    className="w-full h-full min-h-[48px] px-2 py-2 outline-none bg-transparent text-slate-800 text-[11px]"
                   />
                 </td>
                 <td className="border-b border-r border-slate-300 p-0 align-top">
                   <select
                     value={row.type}
-                    onChange={(e) => updateRecord(row.id, "type", e.target.value as any)}
-                    className="w-full h-full min-h-[48px] px-2 py-2 outline-none focus:ring-2 focus:ring-inset focus:ring-[#107c41] bg-transparent text-slate-800 appearance-none text-[11px]"
+                    disabled
+                    className="w-full h-full min-h-[48px] px-2 py-2 outline-none bg-transparent text-slate-800 appearance-none text-[11px]"
                   >
                     <option value="">Select Type...</option>
                     <option value="New Addition">New Addition</option>
@@ -191,8 +164,8 @@ function ChangesPage() {
                       type="text"
                       value={row.module}
                       placeholder="e.g. Dashboard"
-                      onChange={(e) => updateRecord(row.id, "module", e.target.value)}
-                      className="flex-1 min-w-0 h-full px-2 py-2 outline-none focus:ring-2 focus:ring-inset focus:ring-[#107c41] bg-transparent text-slate-800 placeholder:text-slate-300 text-[11px]"
+                      readOnly
+                      className="flex-1 min-w-0 h-full px-2 py-2 outline-none bg-transparent text-slate-800 placeholder:text-slate-300 text-[11px]"
                     />
                     {row.link && (
                       <Link
@@ -210,8 +183,8 @@ function ChangesPage() {
                     rows={3}
                     value={row.descriptionEn}
                     placeholder="Enter change details..."
-                    onChange={(e) => updateRecord(row.id, "descriptionEn", e.target.value)}
-                    className="w-full h-full px-3 py-2 outline-none focus:ring-2 focus:ring-inset focus:ring-[#107c41] bg-transparent text-slate-800 placeholder:text-slate-300 text-[11px] resize-none overflow-y-auto"
+                    readOnly
+                    className="w-full h-full px-3 py-2 outline-none bg-transparent text-slate-800 placeholder:text-slate-300 text-[11px] resize-none overflow-y-auto"
                   />
                 </td>
                 <td className="border-b border-r border-slate-300 p-0 align-top">
@@ -219,8 +192,8 @@ function ChangesPage() {
                     rows={3}
                     value={row.descriptionBn}
                     placeholder="বাংলায় বিবরণ লিখুন..."
-                    onChange={(e) => updateRecord(row.id, "descriptionBn", e.target.value)}
-                    className="w-full h-full px-3 py-2 outline-none focus:ring-2 focus:ring-inset focus:ring-[#107c41] bg-transparent text-slate-800 placeholder:text-slate-300 text-[11px] resize-none overflow-y-auto"
+                    readOnly
+                    className="w-full h-full px-3 py-2 outline-none bg-transparent text-slate-800 placeholder:text-slate-300 text-[11px] resize-none overflow-y-auto"
                   />
                 </td>
               </tr>

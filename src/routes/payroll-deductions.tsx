@@ -1813,26 +1813,6 @@ function PayrollDeductionsPage() {
                     ) : (
                       /* Recurring calendar exclusions */
                       <div className="space-y-5">
-                        {/* Ramadan Callout */}
-                        <div className="bg-amber-50/40 border border-amber-200/60 rounded-xl p-4.5 space-y-2.5">
-                          <label className="flex items-start gap-3 cursor-pointer select-none">
-                            <input
-                              type="checkbox"
-                              checked={formExcludeRamadan}
-                              onChange={(e) => setFormExcludeRamadan(e.target.checked)}
-                              className="accent-amber-600 size-4.5 rounded mt-0.5 cursor-pointer"
-                            />
-                            <div className="space-y-0.5">
-                              <span className="text-sm font-extrabold text-amber-955 flex items-center gap-1.5">
-                                🌙 Auto-Skip during Ramadan (Rojar Mash)
-                              </span>
-                              <span className="text-xs text-amber-700 block leading-relaxed font-medium">
-                                Enable this to automatically suspend deductions during the designated Ramadan month of that process year.
-                              </span>
-                            </div>
-                          </label>
-                        </div>
-
                         {/* General Annual Calendar Month Exclusion */}
                         <div className="space-y-2">
                           <div className="space-y-0.5">
@@ -1864,70 +1844,6 @@ function PayrollDeductionsPage() {
                               );
                             })}
                           </div>
-                        </div>
-
-                        {/* Custom Exclusion Tags */}
-                        <div className="space-y-2">
-                          <div className="space-y-0.5">
-                            <label className="text-xs font-bold text-slate-655 block">
-                              Single Period Exceptions
-                            </label>
-                            <span className="text-[10px] text-slate-400 block font-medium">Add exceptions for a single specific year/month only (e.g. suspension due to relocation).</span>
-                          </div>
-                          
-                          <div className="flex gap-2.5 items-end max-w-md">
-                            <div className="flex-1 space-y-1">
-                              <label className="text-[9px] text-slate-400 uppercase font-extrabold tracking-wider">Month</label>
-                              <select
-                                value={formExclusionMonth}
-                                onChange={(e) => setFormExclusionMonth(e.target.value)}
-                                className="w-full h-9 rounded-xl border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700 cursor-pointer font-sans"
-                              >
-                                {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
-                              </select>
-                            </div>
-                            <div className="flex-1 space-y-1">
-                              <label className="text-[9px] text-slate-400 uppercase font-extrabold tracking-wider">Year</label>
-                              <select
-                                value={formExclusionYear}
-                                onChange={(e) => setFormExclusionYear(e.target.value)}
-                                className="w-full h-9 rounded-xl border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700 cursor-pointer font-sans"
-                              >
-                                {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-                              </select>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={handleAddCustomExclusion}
-                              className="bg-slate-800 text-white h-9 px-4 text-xs font-bold rounded-xl hover:bg-slate-900 border-0 transition-colors shadow-xs select-none cursor-pointer"
-                            >
-                              Add
-                            </button>
-                          </div>
-
-                          {formCustomExcludedPeriods.length > 0 && (
-                            <div className="flex flex-wrap gap-2 pt-1">
-                              {formCustomExcludedPeriods.map((period) => {
-                                const [yearStr, monthNum] = period.split("-");
-                                const monthName = MONTHS[Number(monthNum) - 1];
-                                return (
-                                  <span
-                                    key={period}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 border border-slate-200 text-slate-655 shadow-xs font-sans"
-                                  >
-                                    {monthName} {yearStr}
-                                    <button
-                                      type="button"
-                                      onClick={() => handleRemoveCustomExclusion(period)}
-                                      className="text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
-                                    >
-                                      <X className="size-3" />
-                                    </button>
-                                  </span>
-                                );
-                              })}
-                            </div>
-                          )}
                         </div>
                       </div>
                     )}
