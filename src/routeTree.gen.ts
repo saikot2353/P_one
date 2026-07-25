@@ -48,6 +48,7 @@ import { Route as MyDashboardRouteImport } from './routes/my-dashboard'
 import { Route as MonthlySalaryProcessRouteImport } from './routes/monthly-salary-process'
 import { Route as ModuleSelectionRouteImport } from './routes/module-selection'
 import { Route as MessengerRouteImport } from './routes/messenger'
+import { Route as MerchandisingDashboardRouteImport } from './routes/merchandising-dashboard'
 import { Route as ManualAttendanceRouteImport } from './routes/manual-attendance'
 import { Route as ManageOvertimeRouteImport } from './routes/manage-overtime'
 import { Route as LoginRouteImport } from './routes/login'
@@ -314,6 +315,11 @@ const ModuleSelectionRoute = ModuleSelectionRouteImport.update({
 const MessengerRoute = MessengerRouteImport.update({
   id: '/messenger',
   path: '/messenger',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MerchandisingDashboardRoute = MerchandisingDashboardRouteImport.update({
+  id: '/merchandising-dashboard',
+  path: '/merchandising-dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ManualAttendanceRoute = ManualAttendanceRouteImport.update({
@@ -719,6 +725,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
+  '/merchandising-dashboard': typeof MerchandisingDashboardRoute
   '/messenger': typeof MessengerRoute
   '/module-selection': typeof ModuleSelectionRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
@@ -827,6 +834,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
+  '/merchandising-dashboard': typeof MerchandisingDashboardRoute
   '/messenger': typeof MessengerRoute
   '/module-selection': typeof ModuleSelectionRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
@@ -936,6 +944,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
+  '/merchandising-dashboard': typeof MerchandisingDashboardRoute
   '/messenger': typeof MessengerRoute
   '/module-selection': typeof ModuleSelectionRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
@@ -1046,6 +1055,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
+    | '/merchandising-dashboard'
     | '/messenger'
     | '/module-selection'
     | '/monthly-salary-process'
@@ -1154,6 +1164,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
+    | '/merchandising-dashboard'
     | '/messenger'
     | '/module-selection'
     | '/monthly-salary-process'
@@ -1262,6 +1273,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
+    | '/merchandising-dashboard'
     | '/messenger'
     | '/module-selection'
     | '/monthly-salary-process'
@@ -1371,6 +1383,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ManageOvertimeRoute: typeof ManageOvertimeRoute
   ManualAttendanceRoute: typeof ManualAttendanceRoute
+  MerchandisingDashboardRoute: typeof MerchandisingDashboardRoute
   MessengerRoute: typeof MessengerRoute
   ModuleSelectionRoute: typeof ModuleSelectionRoute
   MonthlySalaryProcessRoute: typeof MonthlySalaryProcessRoute
@@ -1689,6 +1702,13 @@ declare module '@tanstack/react-router' {
       path: '/messenger'
       fullPath: '/messenger'
       preLoaderRoute: typeof MessengerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/merchandising-dashboard': {
+      id: '/merchandising-dashboard'
+      path: '/merchandising-dashboard'
+      fullPath: '/merchandising-dashboard'
+      preLoaderRoute: typeof MerchandisingDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/manual-attendance': {
@@ -2227,6 +2247,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ManageOvertimeRoute: ManageOvertimeRoute,
   ManualAttendanceRoute: ManualAttendanceRoute,
+  MerchandisingDashboardRoute: MerchandisingDashboardRoute,
   MessengerRoute: MessengerRoute,
   ModuleSelectionRoute: ModuleSelectionRoute,
   MonthlySalaryProcessRoute: MonthlySalaryProcessRoute,

@@ -1,0 +1,1085 @@
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState, useMemo } from "react";
+import {
+  Store,
+  LayoutDashboard,
+  FilePlus,
+  Scissors,
+  Droplet,
+  Grid,
+  Printer,
+  Layers,
+  Activity,
+  Wind,
+  FileWarning,
+  RefreshCw,
+  BarChart2,
+  Calendar,
+  TrendingUp,
+  ChevronDown,
+  ChevronRight,
+  Search,
+  Download,
+  AlertTriangle,
+  CheckCircle,
+  FileText,
+  Briefcase,
+  Users,
+  Bell,
+  Sliders,
+  DollarSign,
+  PieChart as PieChartIcon,
+  Percent,
+  Play,
+  ArrowLeft,
+  Sun,
+  Moon,
+  Info
+} from "lucide-react";
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip as RechartsTooltip,
+  Legend,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  LineChart,
+  Line,
+  AreaChart,
+  Area
+} from "recharts";
+import { toast } from "sonner";
+
+export const Route = createFileRoute("/merchandising-dashboard")({
+  head: () => ({
+    meta: [
+      { title: "Merchandising Dashboard — CRIPTON" },
+      {
+        name: "description",
+        content: "Advanced Merchandising Dashboard with analytics, order status, capacity control, and TNA tracking.",
+      },
+    ],
+  }),
+  component: MerchandisingDashboardPage,
+});
+
+// Sidebar Navigation config
+interface SidebarItem {
+  label: string;
+  icon: any;
+  to?: string;
+  subitems?: { label: string; to?: string }[];
+}
+
+const sidebarMenu: SidebarItem[] = [
+  { label: "Trims WO Submit", icon: FilePlus },
+  { label: "Trims WO List", icon: Scissors },
+  { label: "Wash WO", icon: Droplet },
+  { label: "Wash WO Submit", icon: Droplet },
+  { label: "Wash WO List", icon: Droplet },
+  { label: "AOP WO", icon: Grid },
+  { label: "AOP Submit WO", icon: Grid },
+  { label: "AOP WO List", icon: Grid },
+  { label: "Print WO", icon: Printer },
+  { label: "Print Submit WO", icon: Printer },
+  { label: "Print WO List", icon: Printer },
+  { label: "Emb WO", icon: Layers },
+  { label: "Emb WO Submit", icon: Layers },
+  { label: "Emb WO List", icon: Layers },
+  { label: "Dyed Yarn Work Order", icon: Wind },
+  { label: "Revise Work Order", icon: RefreshCw },
+  {
+    label: "MM Reports",
+    icon: BarChart2,
+    subitems: [
+      { label: "Daily Order Report" },
+      { label: "Date Wise Fabric Booking" },
+    ],
+  },
+  {
+    label: "Report",
+    icon: TrendingUp,
+    subitems: [
+      { label: "Buyer Share Report" },
+      { label: "Shipment Status Report" },
+      { label: "SMV Utilization Report" },
+    ],
+  },
+];
+
+// Demo TNA Data
+interface TNAEvent {
+  sl: number;
+  eventName: string;
+  tnaDate: string;
+  tnaLead: string;
+  upDate: string;
+  remarks: string;
+  buyerName: string;
+  po: string;
+  style: string;
+  styleDesc: string;
+  shipment: string;
+  orderQty: number;
+  leadDay: number;
+  status: "Completed" | "Pending" | "Critical";
+}
+
+const initialTNAData: TNAEvent[] = [
+  {
+    sl: 1,
+    eventName: "Fabric Booking Approval",
+    tnaDate: "2026-07-10",
+    tnaLead: "15 Days",
+    upDate: "2026-07-12",
+    remarks: "Completed on schedule",
+    buyerName: "ITPS",
+    po: "PO-2026-ITPS",
+    style: "ST-8822",
+    styleDesc: "Men's Crew Neck T-Shirt",
+    shipment: "2026-08-15",
+    orderQty: 12000,
+    leadDay: 22,
+    status: "Completed",
+  },
+  {
+    sl: 2,
+    eventName: "Trims & Accessories Sourcing",
+    tnaDate: "2026-07-15",
+    tnaLead: "10 Days",
+    upDate: "2026-07-16",
+    remarks: "Thread shipment arrived",
+    buyerName: "ITPS",
+    po: "PO-2026-ITPS",
+    style: "ST-8822",
+    styleDesc: "Men's Crew Neck T-Shirt",
+    shipment: "2026-08-15",
+    orderQty: 11000,
+    leadDay: 18,
+    status: "Completed",
+  },
+  {
+    sl: 3,
+    eventName: "Embroidery Sample Strike-off",
+    tnaDate: "2026-07-22",
+    tnaLead: "5 Days",
+    upDate: "2026-07-25",
+    remarks: "Waiting for buyer size-set comments",
+    buyerName: "A-M-London Fashion Ltd",
+    po: "PO-AM-LND",
+    style: "ST-1092",
+    styleDesc: "Women's Denim Jacket",
+    shipment: "2026-08-30",
+    orderQty: 21,
+    leadDay: 35,
+    status: "Pending",
+  },
+  {
+    sl: 4,
+    eventName: "Bulk Cutting Release",
+    tnaDate: "2026-07-24",
+    tnaLead: "12 Days",
+    upDate: "-",
+    remarks: "Blocked due to fabric print inspection delay",
+    buyerName: "ITPS",
+    po: "PO-2026-ITPS",
+    style: "ST-8822",
+    styleDesc: "Men's Crew Neck T-Shirt",
+    shipment: "2026-08-15",
+    orderQty: 23000,
+    leadDay: 12,
+    status: "Critical",
+  },
+];
+
+export default function MerchandisingDashboardPage() {
+  const navigate = useNavigate();
+
+  // Filters State
+  const [filterYear, setFilterYear] = useState("2026");
+  const [filterMonth, setFilterMonth] = useState("July");
+  const [filterSMV, setFilterSMV] = useState("3.3");
+
+  // Interactive controls
+  const [simulateCapacity, setSimulateCapacity] = useState(false);
+  const [orderSearch, setOrderSearch] = useState("");
+  const [tnaSearch, setTnaSearch] = useState("");
+  const [loadTNA, setLoadTNA] = useState(false);
+  const [openSidebarMenus, setOpenSidebarMenus] = useState<Record<string, boolean>>({});
+
+  // Theme support
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    if (nextTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  };
+
+  const handleExport = (type: string) => {
+    toast.success(`${type} Export Triggered`, {
+      description: "Compiling document records and rendering download package...",
+    });
+  };
+
+  const toggleSidebarMenu = (label: string) => {
+    setOpenSidebarMenus((prev) => ({
+      ...prev,
+      [label]: !prev[label],
+    }));
+  };
+
+  // Order summary data
+  const orderSummaryData = useMemo(() => {
+    return [
+      {
+        sl: 1,
+        status: "Confirmed",
+        buyer: "A-M-London Fashion Ltd",
+        avgSmv: 0.0,
+        qty: 21,
+        exQty: 0,
+        exVal: 0,
+        yetQty: 21,
+        yetVal: 141,
+        exBalPct: "100.00%",
+        orderVal: 140.91,
+        avgRate: 6.71,
+        cmVal: 0.0,
+        buyerShare: 0.09,
+        avgBasicRate: 0.0,
+      },
+      {
+        sl: 2,
+        status: "Confirmed",
+        buyer: "ITPS",
+        avgSmv: 0.0,
+        qty: 23000,
+        exQty: 0,
+        exVal: 0,
+        yetQty: 23000,
+        yetVal: 58952,
+        exBalPct: "100.00%",
+        orderVal: 58952.0,
+        avgRate: 2.56,
+        cmVal: 0.0,
+        buyerShare: 99.91,
+        avgBasicRate: 0.0,
+      },
+    ];
+  }, []);
+
+  // Filtered orders
+  const filteredOrders = useMemo(() => {
+    return orderSummaryData.filter(
+      (o) =>
+        o.buyer.toLowerCase().includes(orderSearch.toLowerCase()) ||
+        o.status.toLowerCase().includes(orderSearch.toLowerCase())
+    );
+  }, [orderSummaryData, orderSearch]);
+
+  // Order summary totals
+  const totals = useMemo(() => {
+    const orderQtySum = filteredOrders.reduce((sum, o) => sum + o.qty, 0);
+    const exQtySum = filteredOrders.reduce((sum, o) => sum + o.exQty, 0);
+    const exValSum = filteredOrders.reduce((sum, o) => sum + o.exVal, 0);
+    const yetQtySum = filteredOrders.reduce((sum, o) => sum + o.yetQty, 0);
+    const yetValSum = filteredOrders.reduce((sum, o) => sum + o.yetVal, 0);
+    const orderValSum = filteredOrders.reduce((sum, o) => sum + o.orderVal, 0);
+    const averageRate = orderQtySum > 0 ? Number((orderValSum / orderQtySum).toFixed(2)) : 0;
+
+    return {
+      qty: orderQtySum,
+      exQty: exQtySum,
+      exVal: exValSum,
+      yetQty: yetQtySum,
+      yetVal: yetValSum,
+      orderVal: orderValSum,
+      avgRate: averageRate,
+    };
+  }, [filteredOrders]);
+
+  // TNA data
+  const tnaDataList = useMemo(() => {
+    if (!loadTNA) return [];
+    return initialTNAData.filter(
+      (t) =>
+        t.buyerName.toLowerCase().includes(tnaSearch.toLowerCase()) ||
+        t.eventName.toLowerCase().includes(tnaSearch.toLowerCase()) ||
+        t.po.toLowerCase().includes(tnaSearch.toLowerCase()) ||
+        t.style.toLowerCase().includes(tnaSearch.toLowerCase())
+    );
+  }, [loadTNA, tnaSearch]);
+
+  // Recharts color palettes
+  const COLORS = ["#14b8a6", "#3b82f6", "#ef4444", "#f59e0b"];
+
+  // Buyer Share data for chart
+  const buyerShareChartData = [
+    { name: "ITPS", value: 23000, share: 99.91 },
+    { name: "A-M-London Fashion", value: 21, share: 0.09 },
+  ];
+
+  // Month-wise Capacity trend
+  const capacityTrendData = [
+    { month: "Jan", Capacity: 22000, Orders: 20400 },
+    { month: "Feb", Capacity: 22000, Orders: 18500 },
+    { month: "Mar", Capacity: 25000, Orders: 24200 },
+    { month: "Apr", Capacity: 25000, Orders: 21000 },
+    { month: "May", Capacity: 25000, Orders: 23900 },
+    { month: "Jun", Capacity: 28000, Orders: 27500 },
+    { month: "Jul", Capacity: simulateCapacity ? 25000 : 0, Orders: 23021 },
+  ];
+
+  return (
+    <div className={`min-h-screen flex bg-background text-foreground transition-colors duration-300 ${theme === "dark" ? "dark bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-900"}`}>
+      
+      {/* ─────────── CUSTOM SIDEBAR ─────────── */}
+      <aside className="hidden lg:flex w-64 h-screen sticky top-0 shrink-0 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300">
+        <Link
+          to="/module-selection"
+          className="px-5 py-4 flex items-center gap-2.5 border-b border-sidebar-border/80 group transition-all duration-300 hover:bg-sidebar-accent/30 cursor-pointer relative z-50"
+        >
+          {/* Beautiful Hover Tooltip */}
+          <div className="absolute left-[70px] top-[80%] opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 pointer-events-none z-50">
+            <div className="bg-primary text-primary-foreground text-[10px] font-bold px-2.5 py-1.5 rounded-lg shadow-xl flex items-center gap-1.5 whitespace-nowrap">
+              <LayoutDashboard className="size-3" />
+              Switch to Another Module
+            </div>
+          </div>
+
+          {/* 3D Flip Logo */}
+          <div className="relative size-8.5 rounded-xl text-sm tracking-tight [perspective:1000px]">
+            <div className="relative w-full h-full transition-transform duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+              {/* Front: Logo */}
+              <div className="absolute inset-0 bg-gradient-to-br from-teal-500 to-emerald-600 font-extrabold text-primary-foreground shadow-[0_4px_12px_oklch(0.48_0.19_255/0.25)] flex items-center justify-center rounded-xl [backface-visibility:hidden]">
+                M
+              </div>
+              {/* Back: Back Button */}
+              <div className="absolute inset-0 bg-sidebar-primary text-primary-foreground flex items-center justify-center rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden] shadow-md border-2 border-primary/20">
+                <ArrowLeft className="size-4.5" />
+              </div>
+            </div>
+          </div>
+          
+          <div className="leading-tight">
+            <div className="font-extrabold tracking-tight text-[13px] text-sidebar-foreground group-hover:text-primary transition-colors duration-300">
+              CRIPTON
+            </div>
+            <div className="text-[8px] uppercase tracking-[0.12em] font-bold text-teal-600 dark:text-teal-400">
+              MERCHANDISING
+            </div>
+          </div>
+        </Link>
+        
+        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-none">
+          <div className="px-2.5 pb-2 text-[9px] font-extrabold uppercase tracking-widest text-sidebar-foreground/45">
+            Workspace
+          </div>
+
+          <div className="border-b border-sidebar-border/30 last:border-0 pb-1">
+            <Link
+              to="/merchandising-dashboard"
+              className="group flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12px] font-semibold bg-sidebar-accent text-sidebar-accent-foreground shadow-2xs transition-all duration-200"
+            >
+              <LayoutDashboard className="size-3.5 transition-transform duration-300 group-hover:scale-110 group-hover:text-sidebar-primary" />
+              <span>Dashboard</span>
+              <span className="ml-auto size-1.5 rounded-full bg-sidebar-primary shadow-[0_0_8px_var(--sidebar-primary)] animate-pulse" />
+            </Link>
+          </div>
+        </nav>
+
+        {/* Sidebar Footer Info */}
+        <div className="p-4 border-t border-sidebar-border/30 text-[10px] text-sidebar-foreground/60 font-semibold space-y-1">
+          <div>Logged in as Admin</div>
+          <div className="text-sidebar-foreground/40">PSKC - Composite Fac.</div>
+        </div>
+      </aside>
+
+      {/* ─────────── MAIN LAYOUT CONTAINER ─────────── */}
+      <main className="flex-1 min-w-0 flex flex-col overflow-x-hidden">
+        
+        {/* Custom Header / Topbar */}
+        <header className="px-6 py-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/40 backdrop-blur-md sticky top-0 z-40">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate({ to: "/module-selection" })}
+              className="lg:hidden p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 cursor-pointer"
+            >
+              <ArrowLeft size={16} />
+            </button>
+            <div>
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 dark:text-slate-500">
+                <span>Home</span>
+                <ChevronRight size={12} />
+                <span>Merchandising</span>
+                <ChevronRight size={12} />
+                <span className="text-teal-500 dark:text-teal-400">Dashboard</span>
+              </div>
+              <h1 className="text-lg lg:text-xl font-bold tracking-tight mt-1 text-slate-900 dark:text-white">
+                Dashboard Overview
+              </h1>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:scale-105 transition-transform cursor-pointer"
+              title="Toggle Theme"
+            >
+              {theme === "dark" ? <Sun size={16} className="text-amber-400" /> : <Moon size={16} />}
+            </button>
+
+            {/* Notification Badge */}
+            <div className="relative cursor-pointer hover:opacity-85 transition-opacity">
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-teal-500 text-[9px] font-extrabold text-white">
+                1
+              </span>
+              <Bell size={18} className="text-slate-600 dark:text-slate-400" />
+            </div>
+
+            {/* Profile pill matching screenshot */}
+            <div className="flex items-center gap-2.5 border-l border-slate-200 dark:border-slate-800 pl-4">
+              <div className="leading-tight hidden sm:block text-right">
+                <p className="text-xs font-bold text-slate-900 dark:text-slate-100">Admin</p>
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold">
+                  Pole Star Knit Composite Ltd. (PSKC- Factory)
+                </p>
+              </div>
+              <div className="size-8 rounded-full bg-gradient-to-br from-teal-500 to-indigo-600 flex items-center justify-center font-extrabold text-white text-xs shadow-sm">
+                AD
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Dashboard Body Scroll area */}
+        <div className="p-4 lg:p-6 space-y-6">
+
+          {/* ─────────── FILTER & CAPACITY SIMULATOR PANEL ─────────── */}
+          <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900 shadow-sm relative overflow-hidden">
+            
+            {/* Header / Interactive switch */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-4 border-b border-slate-100 dark:border-slate-800">
+              <div>
+                <h2 className="text-xs font-bold uppercase tracking-wider text-teal-600 dark:text-teal-400">
+                  Order Summary Parameters
+                </h2>
+                <p className="text-[11px] text-slate-400 mt-0.5 font-semibold">
+                  Adjust date parameters and SMV targets below
+                </p>
+              </div>
+              
+              {/* Capacity Simulator Switch */}
+              <div className="inline-flex items-center gap-3 bg-slate-100 dark:bg-slate-800/50 p-1.5 rounded-xl border border-slate-200 dark:border-slate-700/50">
+                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 pl-1.5">
+                  Simulate Capacity Loading
+                </span>
+                <button
+                  onClick={() => {
+                    setSimulateCapacity(!simulateCapacity);
+                    toast.info(
+                      simulateCapacity ? "Capacity Simulation Off" : "Capacity Simulation Active",
+                      { description: simulateCapacity ? "Capacity statistics set to empty state." : "Loaded 25,000 Pcs capacity." }
+                    );
+                  }}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-300 cursor-pointer ${
+                    simulateCapacity ? "bg-teal-500" : "bg-slate-300 dark:bg-slate-700"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform duration-300 ${
+                      simulateCapacity ? "translate-x-4.5" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+
+            {/* Inputs / Filters form */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Year</label>
+                <select
+                  value={filterYear}
+                  onChange={(e) => setFilterYear(e.target.value)}
+                  className="w-full text-xs font-semibold px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-teal-500 text-slate-800 dark:text-slate-200 transition-colors"
+                >
+                  <option value="2026">2026</option>
+                  <option value="2025">2025</option>
+                  <option value="2024">2024</option>
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Month</label>
+                <select
+                  value={filterMonth}
+                  onChange={(e) => setFilterMonth(e.target.value)}
+                  className="w-full text-xs font-semibold px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-teal-500 text-slate-800 dark:text-slate-200 transition-colors"
+                >
+                  <option value="July">July</option>
+                  <option value="August">August</option>
+                  <option value="September">September</option>
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">SMV Target</label>
+                <input
+                  type="text"
+                  value={filterSMV}
+                  onChange={(e) => setFilterSMV(e.target.value)}
+                  className="w-full text-xs font-semibold px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-teal-500 text-slate-800 dark:text-slate-200 transition-colors"
+                  placeholder="3.3"
+                />
+              </div>
+
+              <button
+                onClick={() => toast.success("Filters applied successfully")}
+                className="w-full bg-teal-500 hover:bg-teal-600 text-white text-xs font-bold py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-teal-500/10 active:scale-95"
+              >
+                <Play size={12} className="fill-white" />
+                <span>SUBMIT</span>
+              </button>
+            </div>
+
+            {/* Status Alert Banner */}
+            <div className="mt-5">
+              {simulateCapacity ? (
+                <div className="flex items-center gap-2.5 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 animate-fadeIn text-xs font-bold">
+                  <CheckCircle size={16} className="shrink-0" />
+                  <span>Capacity data successfully loaded for {filterMonth} {filterYear}! Setup target SMV {filterSMV}.</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2.5 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 animate-pulse text-xs font-bold">
+                  <AlertTriangle size={16} className="shrink-0 text-rose-500" />
+                  <span>Sorry, Capacity Data Not Found! Please toggle the capacity simulator switch above to load demo capacity parameters.</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ─────────── KEY METRICS CARDS ─────────── */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            
+            {/* Card 1: Capacity */}
+            <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900 shadow-sm relative group hover:border-teal-500/40 transition-colors duration-300">
+              <div className="flex justify-between items-start mb-2">
+                <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Capacity (Pcs)
+                </span>
+                <span className="w-8 h-8 rounded-lg bg-teal-500/10 text-teal-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Briefcase size={16} />
+                </span>
+              </div>
+              <h3 className="text-2xl font-black text-slate-800 dark:text-slate-100">
+                {simulateCapacity ? "25,000" : "00"}
+              </h3>
+              <p className="text-[10px] text-slate-400 mt-1 font-semibold">
+                Approved master layout capacity
+              </p>
+            </div>
+
+            {/* Card 2: Order Qty */}
+            <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900 shadow-sm relative group hover:border-teal-500/40 transition-colors duration-300">
+              <div className="flex justify-between items-start mb-2">
+                <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Order Qty (Pcs)
+                </span>
+                <span className="w-8 h-8 rounded-lg bg-teal-500/10 text-teal-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Store size={16} />
+                </span>
+              </div>
+              <h3 className="text-2xl font-black text-slate-800 dark:text-slate-100">
+                23,021
+              </h3>
+              <p className="text-[10px] text-slate-400 mt-1 font-semibold">
+                Confirmed buyer order placements
+              </p>
+            </div>
+
+            {/* Card 3: Balance */}
+            <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900 shadow-sm relative group hover:border-teal-500/40 transition-colors duration-300">
+              <div className="flex justify-between items-start mb-2">
+                <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Balance (Pcs)
+                </span>
+                <span className="w-8 h-8 rounded-lg bg-teal-500/10 text-teal-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Percent size={16} />
+                </span>
+              </div>
+              <h3 className={`text-2xl font-black transition-colors ${
+                simulateCapacity ? "text-emerald-500" : "text-rose-500"
+              }`}>
+                {simulateCapacity ? "+1,979" : "-23,021"}
+              </h3>
+              <p className="text-[10px] text-slate-400 mt-1 font-semibold">
+                Remaining production buffer capacity
+              </p>
+            </div>
+
+            {/* Card 4: Avg SMV */}
+            <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900 shadow-sm relative group hover:border-teal-500/40 transition-colors duration-300">
+              <div className="flex justify-between items-start mb-2">
+                <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Avg SMV
+                </span>
+                <span className="w-8 h-8 rounded-lg bg-teal-500/10 text-teal-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Sliders size={16} />
+                </span>
+              </div>
+              <h3 className="text-2xl font-black text-slate-800 dark:text-slate-100">
+                0.00
+              </h3>
+              <p className="text-[10px] text-slate-400 mt-1 font-semibold">
+                Average Standard Minute Value
+              </p>
+            </div>
+          </div>
+
+          {/* ─────────── SECTION: ORDER SUMMARY TABLE ─────────── */}
+          <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900 shadow-sm space-y-4">
+            
+            {/* Table Control Area */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="font-bold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-teal-500" />
+                Confirmed Orders Ledger
+              </h3>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/50 p-1 rounded-lg border border-slate-200 dark:border-slate-700/60">
+                  <button
+                    onClick={() => handleExport("EXCEL")}
+                    className="px-2.5 py-1 text-[10px] font-bold rounded hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:shadow-xs transition-all cursor-pointer"
+                  >
+                    EXCEL
+                  </button>
+                  <button
+                    onClick={() => handleExport("PRINT")}
+                    className="px-2.5 py-1 text-[10px] font-bold rounded hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:shadow-xs transition-all cursor-pointer"
+                  >
+                    PRINT
+                  </button>
+                  <button
+                    onClick={() => handleExport("PDF")}
+                    className="px-2.5 py-1 text-[10px] font-bold rounded hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:shadow-xs transition-all cursor-pointer"
+                  >
+                    PDF
+                  </button>
+                </div>
+
+                {/* Search Bar */}
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
+                    <Search size={12} />
+                  </span>
+                  <input
+                    type="text"
+                    value={orderSearch}
+                    onChange={(e) => setOrderSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-teal-500 text-xs text-slate-800 dark:text-slate-200 transition-colors w-full sm:w-48"
+                    placeholder="Search buyer..."
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Responsive Table Grid */}
+            <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800/60 scrollbar-thin">
+              <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800 text-[11px] font-semibold text-left">
+                <thead className="bg-slate-50 dark:bg-slate-900/80 text-slate-500 uppercase tracking-wider">
+                  <tr>
+                    <th className="px-3 py-3 font-extrabold">SL</th>
+                    <th className="px-3 py-3 font-extrabold">Order Status</th>
+                    <th className="px-3 py-3 font-extrabold">Buyer Name</th>
+                    <th className="px-3 py-3 font-extrabold text-right">Avg.SMV</th>
+                    <th className="px-3 py-3 font-extrabold text-right">OrderQty</th>
+                    <th className="px-3 py-3 font-extrabold text-right">Ex-Fac.Qty</th>
+                    <th className="px-3 py-3 font-extrabold text-right">Ex-Fac.Val</th>
+                    <th className="px-3 py-3 font-extrabold text-right">YetTo.Ex-Fac.Qty</th>
+                    <th className="px-3 py-3 font-extrabold text-right">YetTo.Ex-Fac.Val</th>
+                    <th className="px-3 py-3 font-extrabold text-right">Ex-Fac.Bal(%)</th>
+                    <th className="px-3 py-3 font-extrabold text-right">Order Value</th>
+                    <th className="px-3 py-3 font-extrabold text-right">Avg.Rate</th>
+                    <th className="px-3 py-3 font-extrabold text-right">CM Value</th>
+                    <th className="px-3 py-3 font-extrabold text-right">Buyer Share</th>
+                    <th className="px-3 py-3 font-extrabold text-right">AvgBasicRate</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                  {filteredOrders.length > 0 ? (
+                    filteredOrders.map((o) => (
+                      <tr key={o.sl} className="hover:bg-slate-100/50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-3 py-3">{o.sl}</td>
+                        <td className="px-3 py-3">
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[10px]">
+                            {o.status}
+                          </span>
+                        </td>
+                        <td className="px-3 py-3 text-teal-600 dark:text-teal-400 font-bold hover:underline cursor-pointer">
+                          {o.buyer}
+                        </td>
+                        <td className="px-3 py-3 text-right">{o.avgSmv.toFixed(3)}</td>
+                        <td className="px-3 py-3 text-right font-bold">{o.qty.toLocaleString()}</td>
+                        <td className="px-3 py-3 text-right">{o.exQty}</td>
+                        <td className="px-3 py-3 text-right">{o.exVal}</td>
+                        <td className="px-3 py-3 text-right">{o.yetQty.toLocaleString()}</td>
+                        <td className="px-3 py-3 text-right font-bold">{o.yetVal.toLocaleString()}</td>
+                        <td className="px-3 py-3 text-right text-emerald-500">{o.exBalPct}</td>
+                        <td className="px-3 py-3 text-right">{o.orderVal.toFixed(2)}</td>
+                        <td className="px-3 py-3 text-right">{o.avgRate.toFixed(2)}</td>
+                        <td className="px-3 py-3 text-right">{o.cmVal.toFixed(3)}</td>
+                        <td className="px-3 py-3 text-right text-blue-500 dark:text-blue-400">{o.buyerShare.toFixed(2)}%</td>
+                        <td className="px-3 py-3 text-right">{o.avgBasicRate.toFixed(2)}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={15} className="px-4 py-8 text-center text-slate-400 font-medium bg-slate-50/50 dark:bg-slate-900/10">
+                        No orders matching the search query
+                      </td>
+                    </tr>
+                  )}
+
+                  {/* Totals Row */}
+                  <tr className="bg-slate-50 dark:bg-slate-900/50 font-bold text-slate-900 dark:text-white border-t border-slate-200 dark:border-slate-800">
+                    <td colSpan={3} className="px-3 py-3 uppercase tracking-wider text-xs">Total</td>
+                    <td className="px-3 py-3 text-right">0.000</td>
+                    <td className="px-3 py-3 text-right">{totals.qty.toLocaleString()}</td>
+                    <td className="px-3 py-3 text-right">{totals.exQty}</td>
+                    <td className="px-3 py-3 text-right">{totals.exVal}</td>
+                    <td className="px-3 py-3 text-right">{totals.yetQty.toLocaleString()}</td>
+                    <td className="px-3 py-3 text-right">{totals.yetVal.toLocaleString()}</td>
+                    <td className="px-3 py-3 text-right text-emerald-500">100.00%</td>
+                    <td className="px-3 py-3 text-right">{totals.orderVal.toFixed(2)}</td>
+                    <td className="px-3 py-3 text-right">{totals.avgRate.toFixed(2)}</td>
+                    <td className="px-3 py-3 text-right">0.000</td>
+                    <td className="px-3 py-3 text-right">100.00%</td>
+                    <td className="px-3 py-3 text-right">0.00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+              <span className="text-[10px] text-slate-400 font-semibold">
+                Showing 1 to {filteredOrders.length} of {filteredOrders.length} entries
+              </span>
+              
+              <button
+                onClick={() => handleExport("PDF")}
+                className="bg-teal-500/10 hover:bg-teal-500/20 text-teal-600 dark:text-teal-400 border border-teal-500/20 text-[10px] font-bold px-4 py-2 rounded-lg cursor-pointer transition-colors active:scale-95"
+              >
+                VIEW PDF
+              </button>
+            </div>
+          </div>
+
+          {/* ─────────── ADVANCED GRAPHICS SECTION ─────────── */}
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+            
+            {/* Chart 1: Buyer Share Pie Chart */}
+            <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900 shadow-sm flex flex-col justify-between">
+              <div>
+                <h3 className="font-bold text-xs text-slate-800 dark:text-slate-100 uppercase tracking-wider">
+                  Buyer Share Distribution
+                </h3>
+                <p className="text-[10px] text-slate-400 font-semibold mt-0.5">
+                  Order breakdown percentage between buyers
+                </p>
+              </div>
+
+              <div className="h-56 mt-4 flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={buyerShareChartData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={3}
+                      dataKey="value"
+                    >
+                      {buyerShareChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <RechartsTooltip
+                      contentStyle={{ background: "#0f172a", border: "none", borderRadius: "8px", fontSize: "11px" }}
+                      itemStyle={{ color: "#fff" }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="flex justify-center gap-6 text-[10px] font-bold border-t border-slate-100 dark:border-slate-800 pt-3">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-teal-500" />
+                  <span>ITPS (99.91%)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+                  <span>AM-London (0.09%)</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Chart 2: Capacity vs Orders Monthly trend */}
+            <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900 shadow-sm flex flex-col justify-between xl:col-span-2">
+              <div>
+                <h3 className="font-bold text-xs text-slate-800 dark:text-slate-100 uppercase tracking-wider">
+                  Monthly Orders vs Production Capacity
+                </h3>
+                <p className="text-[10px] text-slate-400 font-semibold mt-0.5">
+                  Historical capacity utilisation trends
+                </p>
+              </div>
+
+              <div className="h-56 mt-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={capacityTrendData}>
+                    <defs>
+                      <linearGradient id="colorCap" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="#14b8a6" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorOrd" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" className="dark:hidden" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" className="hidden dark:block" />
+                    <XAxis dataKey="month" stroke="#94a3b8" fontSize={10} />
+                    <YAxis stroke="#94a3b8" fontSize={10} />
+                    <RechartsTooltip
+                      contentStyle={{ background: "#0f172a", border: "none", borderRadius: "8px", fontSize: "11px" }}
+                      itemStyle={{ color: "#fff" }}
+                    />
+                    <Legend wrapperStyle={{ fontSize: "10px", fontWeight: "bold" }} />
+                    <Area type="monotone" dataKey="Capacity" stroke="#14b8a6" fillOpacity={1} fill="url(#colorCap)" strokeWidth={2} />
+                    <Area type="monotone" dataKey="Orders" stroke="#3b82f6" fillOpacity={1} fill="url(#colorOrd)" strokeWidth={2} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+
+          {/* ─────────── SECTION: TNA FOLLOW UP ─────────── */}
+          <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900 shadow-sm space-y-4">
+            
+            {/* Header / Interactive data trigger */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div>
+                <h3 className="font-bold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-teal-500 animate-ping" />
+                  TNA FollowUp (Time & Action Milestones)
+                </h3>
+                <p className="text-[10px] text-slate-400 font-semibold mt-0.5">
+                  Critical path and milestone delay indicators
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                {/* Simulated Load Data Button */}
+                {!loadTNA ? (
+                  <button
+                    onClick={() => {
+                      setLoadTNA(true);
+                      toast.success("Demo TNA Data Loaded Successfully", {
+                        description: "Parsed 4 milestone schedules for ITPS and AM-London.",
+                      });
+                    }}
+                    className="bg-amber-500 hover:bg-amber-600 text-slate-900 text-[10px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm active:scale-95"
+                  >
+                    <RefreshCw size={12} className="animate-[spin_4s_linear_infinite]" />
+                    <span>LOAD DEMO TNA DATA</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setLoadTNA(false);
+                      toast.info("Cleared TNA Data", { description: "Resetting TNA ledger state." });
+                    }}
+                    className="bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <span>RESET TABLE</span>
+                  </button>
+                )}
+
+                <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/50 p-1 rounded-lg border border-slate-200 dark:border-slate-700/60">
+                  <button
+                    onClick={() => handleExport("TNA EXCEL")}
+                    className="px-2.5 py-1 text-[10px] font-bold rounded hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:shadow-xs transition-all cursor-pointer"
+                  >
+                    EXCEL
+                  </button>
+                  <button
+                    onClick={() => handleExport("TNA PRINT")}
+                    className="px-2.5 py-1 text-[10px] font-bold rounded hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:shadow-xs transition-all cursor-pointer"
+                  >
+                    PRINT
+                  </button>
+                  <button
+                    onClick={() => handleExport("TNA PDF")}
+                    className="px-2.5 py-1 text-[10px] font-bold rounded hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:shadow-xs transition-all cursor-pointer"
+                  >
+                    PDF
+                  </button>
+                </div>
+
+                {/* Search Bar */}
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
+                    <Search size={12} />
+                  </span>
+                  <input
+                    type="text"
+                    value={tnaSearch}
+                    onChange={(e) => setTnaSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-teal-500 text-xs text-slate-800 dark:text-slate-200 transition-colors w-full sm:w-48"
+                    placeholder="Filter TNA milestones..."
+                    disabled={!loadTNA}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Table Area */}
+            <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800/60 scrollbar-thin">
+              <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800 text-[11px] font-semibold text-left">
+                <thead className="bg-slate-50 dark:bg-slate-900/80 text-slate-500 uppercase tracking-wider">
+                  <tr>
+                    <th className="px-3 py-3 font-extrabold">SL</th>
+                    <th className="px-3 py-3 font-extrabold">Actions</th>
+                    <th className="px-3 py-3 font-extrabold">Event Name</th>
+                    <th className="px-3 py-3 font-extrabold">TNA Date</th>
+                    <th className="px-3 py-3 font-extrabold">TNA Lead</th>
+                    <th className="px-3 py-3 font-extrabold">Up Date</th>
+                    <th className="px-3 py-3 font-extrabold">Remarks</th>
+                    <th className="px-3 py-3 font-extrabold">Buyer Name</th>
+                    <th className="px-3 py-3 font-extrabold">PO</th>
+                    <th className="px-3 py-3 font-extrabold">Style/Kimbol</th>
+                    <th className="px-3 py-3 font-extrabold">Style Desc</th>
+                    <th className="px-3 py-3 font-extrabold">Shipment</th>
+                    <th className="px-3 py-3 font-extrabold text-right">Order Quantity</th>
+                    <th className="px-3 py-3 font-extrabold text-right">LeadDay</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                  {loadTNA ? (
+                    tnaDataList.length > 0 ? (
+                      tnaDataList.map((t) => (
+                        <tr key={t.sl} className="hover:bg-slate-100/50 dark:hover:bg-slate-800/40 transition-colors">
+                          <td className="px-3 py-3">{t.sl}</td>
+                          <td className="px-3 py-3">
+                            <button
+                              onClick={() => toast.info(`Action Log for Event ${t.sl}`)}
+                              className="px-2 py-0.5 rounded bg-teal-500/10 hover:bg-teal-500/20 text-teal-600 dark:text-teal-400 border border-teal-500/25 text-[10px] cursor-pointer"
+                            >
+                              Details
+                            </button>
+                          </td>
+                          <td className="px-3 py-3 text-slate-900 dark:text-white font-bold">{t.eventName}</td>
+                          <td className="px-3 py-3">{t.tnaDate}</td>
+                          <td className="px-3 py-3 text-teal-600 dark:text-teal-400">{t.tnaLead}</td>
+                          <td className="px-3 py-3">{t.upDate}</td>
+                          <td className="px-3 py-3">
+                            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] ${
+                              t.status === "Completed"
+                                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-bold"
+                                : t.status === "Pending"
+                                ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 animate-pulse font-bold"
+                                : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 font-bold"
+                            }`}>
+                              {t.remarks}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3">{t.buyerName}</td>
+                          <td className="px-3 py-3 text-slate-400">{t.po}</td>
+                          <td className="px-3 py-3">{t.style}</td>
+                          <td className="px-3 py-3">{t.styleDesc}</td>
+                          <td className="px-3 py-3">{t.shipment}</td>
+                          <td className="px-3 py-3 text-right font-bold">{t.orderQty.toLocaleString()}</td>
+                          <td className="px-3 py-3 text-right text-indigo-500 dark:text-indigo-400">{t.leadDay} Days</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={14} className="px-4 py-8 text-center text-slate-400 font-medium bg-slate-50/50 dark:bg-slate-900/10">
+                          No matching Time & Action events found.
+                        </td>
+                      </tr>
+                    )
+                  ) : (
+                    <tr>
+                      <td colSpan={14} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500 bg-slate-50/30 dark:bg-slate-900/5">
+                        <div className="flex flex-col items-center justify-center gap-2">
+                          <Info size={20} className="text-slate-400" />
+                          <span>No data available in table</span>
+                          <button
+                            onClick={() => {
+                              setLoadTNA(true);
+                              toast.success("Demo TNA Data Loaded Successfully");
+                            }}
+                            className="mt-2 text-teal-600 dark:text-teal-400 hover:underline text-[10px] font-bold uppercase tracking-wider cursor-pointer"
+                          >
+                            Load Demo TNA Records
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {loadTNA && (
+              <div className="flex items-center justify-between pt-2">
+                <span className="text-[10px] text-slate-400 font-semibold">
+                  Showing {tnaDataList.length} of {tnaDataList.length} entries
+                </span>
+                
+                <div className="flex items-center gap-1.5 text-[10px] font-bold">
+                  <span className="px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed">Previous</span>
+                  <span className="px-2.5 py-1 rounded bg-teal-500 text-white cursor-default">1</span>
+                  <span className="px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed">Next</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <footer className="pt-6 pb-4 text-center text-[10px] font-semibold text-slate-400 border-t border-slate-200 dark:border-slate-800/80 mt-auto bg-white/30 dark:bg-slate-950/20">
+          © 2026 CRIPTON HRIS & MERCHANDISING — Crafted for Modern Manufacturing and Planning.
+        </footer>
+      </main>
+
+      {/* Global CSS animation injections */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(6px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.4s ease-out forwards;
+        }
+      `}} />
+    </div>
+  );
+}

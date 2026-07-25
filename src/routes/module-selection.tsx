@@ -16,6 +16,7 @@ import {
   ChevronRight,
   Sun,
   Moon,
+  Store,
 } from "lucide-react";
 
 export const Route = createFileRoute("/module-selection")({
@@ -51,6 +52,15 @@ const modules = [
     color: "from-blue-500 to-indigo-600",
     shadow: "shadow-blue-500/20",
     path: "/",
+  },
+  {
+    id: "merchandising",
+    name: "Merchandising",
+    description: "Product catalog and sales planning",
+    icon: Store,
+    color: "from-teal-500 to-emerald-600",
+    shadow: "shadow-teal-500/20",
+    path: "/merchandising-dashboard",
   },
   {
     id: "finance",
