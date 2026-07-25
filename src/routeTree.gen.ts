@@ -58,6 +58,7 @@ import { Route as MerchandisingOrderProfileRouteImport } from './routes/merchand
 import { Route as MerchandisingOrderListRouteImport } from './routes/merchandising-order-list'
 import { Route as MerchandisingMaterialBookingsRouteImport } from './routes/merchandising-material-bookings'
 import { Route as MerchandisingMasterSettingsRouteImport } from './routes/merchandising-master-settings'
+import { Route as MerchandisingInquiryRouteImport } from './routes/merchandising-inquiry'
 import { Route as MerchandisingDashboardRouteImport } from './routes/merchandising-dashboard'
 import { Route as MerchandisingCapacityPlanningRouteImport } from './routes/merchandising-capacity-planning'
 import { Route as ManualAttendanceRouteImport } from './routes/manual-attendance'
@@ -384,6 +385,11 @@ const MerchandisingMasterSettingsRoute =
     path: '/merchandising-master-settings',
     getParentRoute: () => rootRouteImport,
   } as any)
+const MerchandisingInquiryRoute = MerchandisingInquiryRouteImport.update({
+  id: '/merchandising-inquiry',
+  path: '/merchandising-inquiry',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MerchandisingDashboardRoute = MerchandisingDashboardRouteImport.update({
   id: '/merchandising-dashboard',
   path: '/merchandising-dashboard',
@@ -806,6 +812,7 @@ export interface FileRoutesByFullPath {
   '/manual-attendance': typeof ManualAttendanceRoute
   '/merchandising-capacity-planning': typeof MerchandisingCapacityPlanningRoute
   '/merchandising-dashboard': typeof MerchandisingDashboardRoute
+  '/merchandising-inquiry': typeof MerchandisingInquiryRoute
   '/merchandising-master-settings': typeof MerchandisingMasterSettingsRoute
   '/merchandising-material-bookings': typeof MerchandisingMaterialBookingsRoute
   '/merchandising-order-list': typeof MerchandisingOrderListRoute
@@ -927,6 +934,7 @@ export interface FileRoutesByTo {
   '/manual-attendance': typeof ManualAttendanceRoute
   '/merchandising-capacity-planning': typeof MerchandisingCapacityPlanningRoute
   '/merchandising-dashboard': typeof MerchandisingDashboardRoute
+  '/merchandising-inquiry': typeof MerchandisingInquiryRoute
   '/merchandising-master-settings': typeof MerchandisingMasterSettingsRoute
   '/merchandising-material-bookings': typeof MerchandisingMaterialBookingsRoute
   '/merchandising-order-list': typeof MerchandisingOrderListRoute
@@ -1049,6 +1057,7 @@ export interface FileRoutesById {
   '/manual-attendance': typeof ManualAttendanceRoute
   '/merchandising-capacity-planning': typeof MerchandisingCapacityPlanningRoute
   '/merchandising-dashboard': typeof MerchandisingDashboardRoute
+  '/merchandising-inquiry': typeof MerchandisingInquiryRoute
   '/merchandising-master-settings': typeof MerchandisingMasterSettingsRoute
   '/merchandising-material-bookings': typeof MerchandisingMaterialBookingsRoute
   '/merchandising-order-list': typeof MerchandisingOrderListRoute
@@ -1172,6 +1181,7 @@ export interface FileRouteTypes {
     | '/manual-attendance'
     | '/merchandising-capacity-planning'
     | '/merchandising-dashboard'
+    | '/merchandising-inquiry'
     | '/merchandising-master-settings'
     | '/merchandising-material-bookings'
     | '/merchandising-order-list'
@@ -1293,6 +1303,7 @@ export interface FileRouteTypes {
     | '/manual-attendance'
     | '/merchandising-capacity-planning'
     | '/merchandising-dashboard'
+    | '/merchandising-inquiry'
     | '/merchandising-master-settings'
     | '/merchandising-material-bookings'
     | '/merchandising-order-list'
@@ -1414,6 +1425,7 @@ export interface FileRouteTypes {
     | '/manual-attendance'
     | '/merchandising-capacity-planning'
     | '/merchandising-dashboard'
+    | '/merchandising-inquiry'
     | '/merchandising-master-settings'
     | '/merchandising-material-bookings'
     | '/merchandising-order-list'
@@ -1536,6 +1548,7 @@ export interface RootRouteChildren {
   ManualAttendanceRoute: typeof ManualAttendanceRoute
   MerchandisingCapacityPlanningRoute: typeof MerchandisingCapacityPlanningRoute
   MerchandisingDashboardRoute: typeof MerchandisingDashboardRoute
+  MerchandisingInquiryRoute: typeof MerchandisingInquiryRoute
   MerchandisingMasterSettingsRoute: typeof MerchandisingMasterSettingsRoute
   MerchandisingMaterialBookingsRoute: typeof MerchandisingMaterialBookingsRoute
   MerchandisingOrderListRoute: typeof MerchandisingOrderListRoute
@@ -1934,6 +1947,13 @@ declare module '@tanstack/react-router' {
       path: '/merchandising-master-settings'
       fullPath: '/merchandising-master-settings'
       preLoaderRoute: typeof MerchandisingMasterSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/merchandising-inquiry': {
+      id: '/merchandising-inquiry'
+      path: '/merchandising-inquiry'
+      fullPath: '/merchandising-inquiry'
+      preLoaderRoute: typeof MerchandisingInquiryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/merchandising-dashboard': {
@@ -2496,6 +2516,7 @@ const rootRouteChildren: RootRouteChildren = {
   ManualAttendanceRoute: ManualAttendanceRoute,
   MerchandisingCapacityPlanningRoute: MerchandisingCapacityPlanningRoute,
   MerchandisingDashboardRoute: MerchandisingDashboardRoute,
+  MerchandisingInquiryRoute: MerchandisingInquiryRoute,
   MerchandisingMasterSettingsRoute: MerchandisingMasterSettingsRoute,
   MerchandisingMaterialBookingsRoute: MerchandisingMaterialBookingsRoute,
   MerchandisingOrderListRoute: MerchandisingOrderListRoute,

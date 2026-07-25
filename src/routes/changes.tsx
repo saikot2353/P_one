@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v20");
+    const saved = localStorage.getItem("system_changes_v22");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -185,6 +185,7 @@ function ChangesPage() {
           module: "Merchandising",
           link: "/merchandising-master-settings",
           descriptionEn: "Built the complete RMG Merchandising ERP Suite! Created 7 brand-new dedicated pages: Master Settings (Buyer config, Fabric/Yarn specs, Process Loss %, Trims master), Capacity Planning & Booking (SMV calculator, Monthly limits, Over-booking alerts), Sample Development Tracker (Proto/Fit/PP requisitions & Buyer feedback), Material Bookings (Auto Yarn Kg calculator, Fabric & Trims WOs), Service Work Orders (Washing, Printing, Dyeing, Embroidery sub-contracts), TNA Critical Path Calendar (11 Milestones timeline), and MM BI Reports (PO Order status, Buyer export share). All sidebar links are fully connected.",
+          descriptionBn: "সম্পূর্ণ আরএমজি মার্চেন্ডাইজিং ইআরপি স্যুট তৈরি করা হয়েছে! ৭টি নতুন পেজ যোগ করা হয়েছে: মাস্টার সেটিংস, ক্যাপাসিটি প্ল্যানিং, স্যাম্পল ট্র্যাকার, মেটেরিয়াল বুকিং, সার্ভিস ওয়ার্ক অর্ডার, টিএনএ ক্যালেন্ডার এবং এমএম বিআই রিপোর্টস। সাইডবারের সব লিংক সচল করা হয়েছে।",
         },
         {
           id: "19",
@@ -194,6 +195,24 @@ function ChangesPage() {
           link: "/merchandising-master-settings",
           descriptionEn: "Completely eliminated duplicate navigation in the Merchandising module! Replaced redundant accordion sub-menus in the sidebar with clean, direct-action top-level navigation links. Sub-view switching is now handled exclusively by the sleek horizontal top tab bar on each dedicated module page for a 100% stable, uncluttered user experience.",
           descriptionBn: "মার্চেন্ডাইজিং মডিউলের সম্পূর্ণ ডুপ্লিকেট নেভিগেশন দূর করা হয়েছে! সাইডবারের বাড়তি সাব-মেনু একর্ডিয়নগুলো সরিয়ে সরাসরি ডিরেক্ট-লিংক মেনু করা হয়েছে। এখন থেকে সব সাব-ভিউ পরিবর্তন প্রতিটি পেজের পরিচ্ছন্ন টপ হরিজন্টাল ট্যাব বার দিয়ে পরিচালিত হবে, যা ইউজার এক্সপেরিয়েন্সকে করেছে ১০০% স্থিতিশীল ও সুন্দর।",
+        },
+        {
+          id: "20",
+          date: "2026-07-25T22:00",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-dashboard",
+          descriptionEn: "Deep-researched and rebuilt the entire Merchandising sidebar navigation from scratch based on real Bangladesh RMG ERP standards (OCMS BD, PrideSys, Infocrat). New structure: 'Master Settings' accordion (5 sub-items linking directly to specific database tabs), 'Orders & Costing' accordion (Order Ledger + New Order Entry), and 6 clean flat-link items (Sample, Material Booking, Work Orders, TNA, Capacity, Reports). Active state auto-highlights the correct parent and child. Smart auto-expand: accordion opens automatically when you navigate to its page.",
+          descriptionBn: "বাংলাদেশের বাস্তব আরএমজি ইআরপি সিস্টেমের (OCMS BD, PrideSys, Infocrat) স্ট্যান্ডার্ড অনুযায়ী মার্চেন্ডাইজিং সাইডবার নেভিগেশন সম্পূর্ণ নতুনভাবে তৈরি করা হয়েছে। নতুন স্ট্রাকচার: 'মাস্টার সেটিংস' একর্ডিয়ন (৫টি সাব-আইটেম যা সরাসরি নির্দিষ্ট ট্যাব খোলে), 'অর্ডার ও কস্টিং' একর্ডিয়ন (অর্ডার লেজার + নতুন অর্ডার এন্ট্রি), এবং ৬টি সরাসরি ফ্ল্যাট লিংক (স্যাম্পল, মেটেরিয়াল বুকিং, ওয়ার্ক অর্ডার, টিএনএ, ক্যাপাসিটি, রিপোর্টস)। সক্রিয় পেজের সাথে মিলিয়ে সাইডবার আইটেম স্বয়ংক্রিয়ভাবে হাইলাইট ও একর্ডিয়ন খোলে।",
+        },
+        {
+          id: "21",
+          date: "2026-07-25T22:09",
+          type: "New Addition",
+          module: "Merchandising",
+          link: "/merchandising-inquiry",
+          descriptionEn: "Added the missing first stage of the garments order lifecycle: 'Buyer Inquiry & Pre-Costing Quotation' page. The Orders & Costing sidebar accordion now correctly shows all 3 workflow steps in order: Buyer Inquiry & Quotation → Purchase Order (PO) Register → Order Entry & Costing (KDS). The new inquiry page includes: Inquiry Register (log buyer style inquiries with AQL, payment terms, ship date), a live Pre-Costing Engine (auto-calculates Quoted FOB from fabric consumption, CMT, trims, overheads and profit margin), and a Quotation Status Kanban Board (Draft → Sent to Buyer → Buyer Approved → Converted to PO).",
+          descriptionBn: "গার্মেন্টস অর্ডার লাইফসাইকেলের প্রথম ধাপ যোগ করা হয়েছে: 'বায়ার ইনকোয়ারি এবং প্রি-কস্টিং কোটেশন' পেজ। এখন সাইডবারে 'অর্ডার ও কস্টিং' সেকশনে সঠিক ক্রমে তিনটি ধাপ দেখাচ্ছে: বায়ার ইনকোয়ারি → পিও রেজিস্টার → অর্ডার এন্ট্রি। নতুন পেজে আছে: ইনকোয়ারি রেজিস্টার (বায়ারের স্টাইল ইনকোয়ারি, একিউএল, পেমেন্ট টার্মস লগ), লাইভ প্রি-কস্টিং ইঞ্জিন (ফ্যাব্রিক কনসাম্পশন, সিএমটি, ট্রিমস, ওভারহেড থেকে এফওবি অটো-ক্যালকুলেট) এবং কোটেশন স্ট্যাটাস কানবান বোর্ড (ড্রাফট → বায়ারে পাঠানো → বায়ার অ্যাপ্রুভড → পিওতে রূপান্তর)।",
         },
       ]);
     }
