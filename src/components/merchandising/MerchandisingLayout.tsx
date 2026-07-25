@@ -40,7 +40,7 @@ export default function MerchandisingLayout({
   const navigate = useNavigate();
   
   // Theme state
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
   
   // Sidebar expanded sections
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({

@@ -156,7 +156,7 @@ const modules = [
 
 export default function ModuleSelectionPage() {
   const navigate = useNavigate();
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme>("light");
   const [hoveredModule, setHoveredModule] = useState<string | null>(null);
 
   // Auto-detect system theme initially, or load from localStorage
@@ -164,7 +164,7 @@ export default function ModuleSelectionPage() {
     const saved = localStorage.getItem("app-theme");
     if (saved === "light" || saved === "dark") {
       setTheme(saved);
-    } else if (window.matchMedia("(prefers-color-scheme: light)").matches) {
+    } else {
       setTheme("light");
     }
   }, []);

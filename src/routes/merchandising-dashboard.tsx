@@ -214,7 +214,7 @@ export default function MerchandisingDashboardPage() {
   const [openSidebarMenus, setOpenSidebarMenus] = useState<Record<string, boolean>>({});
 
   // Theme support
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
 
   const toggleTheme = () => {
     const nextTheme = theme === "dark" ? "light" : "dark";
