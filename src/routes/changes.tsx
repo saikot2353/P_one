@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v24");
+    const saved = localStorage.getItem("system_changes_v30");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -231,6 +231,60 @@ function ChangesPage() {
           link: "/company-setup",
           descriptionEn: "Reorganized the Company Basic Settings modal with interactive category filter tabs (All Settings, Approvals & Governance, Attendance & Work, OT & Allowances, Leave & Holidays, Salary & Validation, ID & System Setup) and 6 structured 4-column responsive grid cards with clear red asterisks for required fields.",
           descriptionBn: "কোম্পানি বেসিক সেটিংস মোডালকে চমৎকার ইন্টারেক্টিভ ক্যাটাগরি ফিল্টার ট্যাব (অল সেটিংস, অ্যাপ্রুভালস, অ্যাটেনডেন্স, ওভারটাইম, লিভ ও হোলিডে, স্যালারি, আইডি ও সিস্টেম সেটিংস) এবং ৬টি সুন্দর ৪-কলাম রেসপন্সিভ গ্রিড কার্ডের মাধ্যমে সুবিন্যস্ত ও গোছানো হয়েছে।",
+        },
+        {
+          id: "24",
+          date: "2026-07-27T11:26",
+          type: "New Addition",
+          module: "Payroll",
+          link: "/payroll-benefits-master-data",
+          descriptionEn: "Built the complete Payroll Master Data (Master Information) page matching the enterprise standard screen! Features Master For category selection (Common Benefit Add/Deduct, Individual Benefit Add/Deduct, Bonus Type / Festival Master), inline entry form (Name, Comments, Status), table row editing via pencil icon, Excel/Print/PDF exports, status filters, live search, and dynamic record counters.",
+          descriptionBn: "পে রোল মাস্টার ইনফরমেশন পেজটি সম্পূর্ণরূপে তৈরি করা হয়েছে! এতে রয়েছে মাস্টার ফর ক্যাটাগরি নির্বাচন (কমোন বেনিফিট অ্যাড/ডিডাক্ট, ইন্ডিভিজুয়াল বেনিফিট, বোনাস টাইপ/ফেস্টিভ্যাল মাস্টার), ইনলাইন এন্ট্রি ফর্ম (নেম, কমেন্টস, স্ট্যাটাস), পেন্সিল আইকন দিয়ে টেবিল রো এডিটিং, এক্সেল/প্রিন্ট/পিডিএফ এক্সপোর্ট, লাইভ সার্চ এবং পারসিস্টেন্ট ডাটা স্টোরেজ।",
+        },
+        {
+          id: "25",
+          date: "2026-07-27T11:45",
+          type: "Modify",
+          module: "Payroll",
+          link: "/payroll-benefits-master-data",
+          descriptionEn: "Completely redesigned the Payroll Master Data page for zero-scroll list efficiency! Replaced static top form with an instant List View first design, top horizontal category pills filter, status badges, one-click table row status toggling, and a prominent '+ Add Master Item' primary button that opens a sleek backdrop modal for adding and editing master options without pushing data down.",
+          descriptionBn: "পে রোল মাস্টার ডাটা পেজটি জিরো-স্ক্রোল লিস্ট ফার্স্ট ডিজাইনে সম্পূর্ণ পুনর্গঠন করা হয়েছে! আগে ফর্মের কারণে স্ক্রোল করতে হতো, এখন পেজ লোডেই পুরো ডাটা টেবিল দৃশ্যমান। ক্যাটাগরি ফিল্টার পিলস, সরাসরি টেবিল রো থেকে এক-ক্লিকে স্ট্যাটাস পরিবর্তন এবং ডানে নতুন '+ Add Master Item' বাটন যোগ করা হয়েছে যা ক্লিকে পপআপ মোডালে এন্ট্রি ও এডিটের ব্যবস্থা রাখে।",
+        },
+        {
+          id: "26",
+          date: "2026-07-27T11:48",
+          type: "Modify",
+          module: "Payroll",
+          link: "/payroll-benefits-master-data",
+          descriptionEn: "Cleaned and refined the Master Information page to exact original specifications! Removed redundant top navigation pills and horizontal category scroll bars, restoring the ultra-clean enterprise Master Information layout with a 4-column entry form (Master For, Name, Comments, Status), table export controls (Excel, Print, PDF), pencil edit actions, and bottom SUBMIT button.",
+          descriptionBn: "মাস্টার ইনফরমেশন পেজটি একদম নিখুঁত এবং রিয়াল-ওয়ার্ল্ড এন্টারপ্রাইজ লেআউটে রিফাইন করা হয়েছে! অপ্রয়োজনীয় নেভিগেশন পিলস এবং অতিরিক্ত ক্যাটাগরি স্ক্রোল বার বাদ দিয়ে ৪-কলাম এন্ট্রি ফর্ম (মাস্টার ফর, নেম, কমেন্টস, স্ট্যাটাস), টেবিল এক্সপোর্ট (এক্সেল, প্রিন্ট, পিডিএফ), পেন্সিল এডিট একশন এবং নিচের দিকে সাবমিট বাটন সহ পেজটি একদম ক্লিয়ার করা হয়েছে।",
+        },
+        {
+          id: "27",
+          date: "2026-07-27T11:49",
+          type: "Modify",
+          module: "Payroll",
+          link: "/payroll-benefits-master-data",
+          descriptionEn: "Elevated the Master Information page with stunning modern aesthetics and placed all 4 form fields (Master For *, Name *, Comments, Status *) inside an interactive '+ Add Master Item' modal popup! Features an indigo-purple gradient hero banner, real-time KPI stats (Total Items, Active, Inactive), category dropdown filter, search box, export options, and one-click status toggling.",
+          descriptionBn: "পে রোল মাস্টার ইনফরমেশন পেজটি আধুনিক প্রিমিয়াম লুক ও ফিল দিয়ে সাজানো হয়েছে! ৪টি ফিল্ড (মাস্টার ফর, নেম, কমেন্টস, স্ট্যাটাস) নতুন '+ Add Master Item' পপআপ মোডালের ভেতর নিয়ে নেওয়া হয়েছে। পেজের ওপরে স্টানিং হিরো ব্যানার, রিয়েল-টাইম কেপিআই স্ট্যাটস, ক্যাটাগরি ড্রপডাউন এবং টেবিল এডিটিং যুক্ত করা হয়েছে।",
+        },
+        {
+          id: "28",
+          date: "2026-07-27T11:52",
+          type: "Modify",
+          module: "Payroll",
+          link: "/payroll-benefits-master-data",
+          descriptionEn: "Updated all primary action buttons on the Payroll Master Data page (including the main header button, footer button, and modal submit button) to use the project's standard primary brand color (bg-primary) for visual consistency.",
+          descriptionBn: "পে রোল মাস্টার ডাটা পেজের সকল প্রাইমারি অ্যাকশন বাটন (প্রধান হেডার বাটন, ফুটার বাটন এবং মোডাল সাবমিট বাটন) প্রোজেক্টের স্ট্যান্ডার্ড ব্র্যান্ড কালার (bg-primary) এ পরিবর্তন করা হয়েছে যাতে ডিজাইনে সামঞ্জস্য থাকে।",
+        },
+        {
+          id: "29",
+          date: "2026-07-27T11:53",
+          type: "Modify",
+          module: "Payroll",
+          link: "/payroll-benefits",
+          descriptionEn: "Removed redundant 'Loan/Advance Req.' and 'Loan Reschedule Sys.' submenus under the Benefits section in both the main sidebar navigation and the Payroll Benefits overview dashboard page.",
+          descriptionBn: "বেনিফিটস সেকশনের অধীনে থাকা অপ্রয়োজনীয় 'Loan/Advance Req.' এবং 'Loan Reschedule Sys.' সাবমেনু দুটি মেইন সাইডবার নেভিগেশন এবং পে রোল বেনিফিটস ওভারভিউ ড্যাশবোর্ড পেজ থেকে বাদ দেওয়া হয়েছে।",
         },
       ]);
     }

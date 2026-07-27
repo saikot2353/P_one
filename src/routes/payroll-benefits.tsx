@@ -37,7 +37,7 @@ function PayrollBenefitsPage() {
           title: "Master Data",
           icon: Database,
           desc: "Configure master data for benefits.",
-          to: "#",
+          to: "/payroll-benefits-master-data",
         },
         { title: "Common Benefits", icon: Gift, desc: "Assign common benefit amounts to employees.", to: "/payroll-benefits-common" },
         {
@@ -59,21 +59,6 @@ function PayrollBenefitsPage() {
           to: "#",
         },
         { title: "Benefit List", icon: List, desc: "Comprehensive list of all benefits.", to: "#" },
-      ],
-    },
-    {
-      title: "Requests & Reschedules",
-      description: "Handle benefit-related requests and modifications.",
-      icon: Send,
-      items: [
-        { title: "Req Advance", icon: Send, desc: "Request an advance against benefits.", to: "#" },
-        { title: "Req Loan", icon: Send, desc: "Request a loan against benefits.", to: "#" },
-        {
-          title: "LoanReschedule",
-          icon: Clock,
-          desc: "Reschedule existing benefit loans.",
-          to: "#",
-        },
       ],
     },
     {

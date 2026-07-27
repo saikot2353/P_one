@@ -316,8 +316,6 @@ export const nav: NavItem[] = [
           { label: "Master Data", to: "/payroll-benefits-master-data" },
           { label: "Common Benefits", to: "/payroll-benefits-common" },
           { label: "Monthly Benefits", to: "/payroll-benefits-monthly" },
-          { label: "Loan/Advance Req.", to: "/payroll-benefits-loan-req" },
-          { label: "Loan Reschedule Sys.", to: "/payroll-benefits-loan-reschedule" },
         ],
       },
       {
