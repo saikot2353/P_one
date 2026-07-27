@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v22");
+    const saved = localStorage.getItem("system_changes_v23");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -140,7 +140,7 @@ function ChangesPage() {
           module: "Evaluation",
           link: "/evaluation-propose",
           descriptionEn: "Redesigned all 7 Evaluation sub-pages to be simpler and easier to use! Added a shared horizontal tab navigation bar across all pages so you can jump between Configurator, Evaluation Propose, Propose Increment, Summary, Queue & Approvals, Increment List, and History without using the sidebar. Also cleaned up breadcrumbs, added short descriptions to each page, and renamed jargon-heavy labels (e.g. 'Increment Gadget' is now 'Configurator'). Created a documentation file explaining how the full workflow works.",
-          descriptionBn: "ইভ্যালুয়েশন মডিউলের সবগুলো ৭টি সাবপেজ আরও সহজ ও সুন্দর করা হয়েছে! এখন প্রতিটি পেজের উপরে একটি হরিজন্টাল ট্যাব বার আছে — Configurator, Evaluation Propose, Propose Increment, Summary, Queue & Approvals, Increment List, এবং History — যেটা দিয়ে সাইডবার ছাড়াই যেকোনো পেজে যাওয়া যাবে। ব্রেডক্রাম্ব ঠিক করা হয়েছে, প্রতিটি পেজে ছোট বিবরণ যোগ করা হয়েছে, এবং 'Increment Gadget' এর মতো কঠিন নামগুলো সহজ করা হয়েছে। এছাড়া সম্পূর্ণ ওয়ার্কফ্লো ব্যাখ্যা করে একটি ডকুমেন্টেশন ফাইলও তৈরি করা হয়েছে।",
+          descriptionBn: "ইভ্যালুয়েশন মডিউলের সবগুলো ৭টি সাবপেজ আরও সহজ ও সুন্দর করা হয়েছে! এখন প্রতিটি পেজের উপরে একটি হরিজন্টাল ট্যাব বার আছে — Configurator, Evaluation Propose, Propose Increment, Summary, Queue & Approvals, Increment List, এবং History — যেটাতে দিয়ে সাইডবার ছাড়াই যেকোনো পেজে যাওয়া যাবে। ব্রেডক্রাম্ব ঠিক করা হয়েছে, প্রতিটি পেজে ছোট বিবরণ যোগ করা হয়েছে, এবং 'Increment Gadget' এর মতো কঠিন নামগুলো সহজ করা হয়েছে। এছাড়া সম্পূর্ণ ওয়ার্কফ্লো ব্যাখ্যা করে একটি ডকুমেন্টেশন ফাইলও তৈরি করা হয়েছে।",
         },
         {
           id: "14",
@@ -213,6 +213,15 @@ function ChangesPage() {
           link: "/merchandising-inquiry",
           descriptionEn: "Added the missing first stage of the garments order lifecycle: 'Buyer Inquiry & Pre-Costing Quotation' page. The Orders & Costing sidebar accordion now correctly shows all 3 workflow steps in order: Buyer Inquiry & Quotation → Purchase Order (PO) Register → Order Entry & Costing (KDS). The new inquiry page includes: Inquiry Register (log buyer style inquiries with AQL, payment terms, ship date), a live Pre-Costing Engine (auto-calculates Quoted FOB from fabric consumption, CMT, trims, overheads and profit margin), and a Quotation Status Kanban Board (Draft → Sent to Buyer → Buyer Approved → Converted to PO).",
           descriptionBn: "গার্মেন্টস অর্ডার লাইফসাইকেলের প্রথম ধাপ যোগ করা হয়েছে: 'বায়ার ইনকোয়ারি এবং প্রি-কস্টিং কোটেশন' পেজ। এখন সাইডবারে 'অর্ডার ও কস্টিং' সেকশনে সঠিক ক্রমে তিনটি ধাপ দেখাচ্ছে: বায়ার ইনকোয়ারি → পিও রেজিস্টার → অর্ডার এন্ট্রি। নতুন পেজে আছে: ইনকোয়ারি রেজিস্টার (বায়ারের স্টাইল ইনকোয়ারি, একিউএল, পেমেন্ট টার্মস লগ), লাইভ প্রি-কস্টিং ইঞ্জিন (ফ্যাব্রিক কনসাম্পশন, সিএমটি, ট্রিমস, ওভারহেড থেকে এফওবি অটো-ক্যালকুলেট) এবং কোটেশন স্ট্যাটাস কানবান বোর্ড (ড্রাফট → বায়ারে পাঠানো → বায়ার অ্যাপ্রুভড → পিওতে রূপান্তর)।",
+        },
+        {
+          id: "22",
+          date: "2026-07-27T10:10",
+          type: "Modify",
+          module: "Company Setup",
+          link: "/company-setup",
+          descriptionEn: "Added all 15 missing parameters to the Company Basic Settings modal matching the enterprise standard layout! Included New Employee Approval, Authorization (L/E), Absent Deduct Based On, ML Count, ML Stamp, WithOut In Absent, Searching By, Holiday Tiffin, Holiday Night, Early Out, Early Out Based On, Salary Breakdown Round, Sandwich Holiday, Sandwich Employee Type, and Late Time Calculation.",
+          descriptionBn: "কোম্পানি বেসিক সেটিংস মোডালে এন্টারপ্রাইজ স্ট্যান্ডার্ড লেআউট অনুযায়ী ১৫টি নতুন ফিল্ড যুক্ত করা হয়েছে! যার মধ্যে রয়েছে নিউ এমপ্লয়ি অ্যাপ্রুভাল, অথরাইজেশন (এল/ই), অ্যাবসেন্ট ডিডাক্ট বেসড অন, এমএল কাউন্ট, এমএল স্ট্যাম্প, উইদাউট ইন অ্যাবসেন্ট, সার্চিং বাই, হোলিডে টিফিন, হোলিডে নাইট, আর্লি আউট, আর্লি আউট বেসড অন, স্যালারি ব্রেকডাউন রাউন্ড, স্যান্ডউইচ হোলিডে, স্যান্ডউইচ এমপ্লয়ি টাইপ এবং লেট টাইম ক্যালকুলেশন।",
         },
       ]);
     }

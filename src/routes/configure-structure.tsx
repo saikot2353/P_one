@@ -1311,15 +1311,30 @@ interface CompanyBasicSettings {
   systemId: string;
   deptWiseSection: string;
   employeeEditApproval: string;
+  newEmployeeApproval: string;
   dashboard: string;
+  authorizationLE: string;
   absentBasedOnInOut: string;
+  absentDeductBasedOn: string;
   otRequisition: string;
+  mlCount: string;
+  mlStamp: string;
   ageVerification: string;
   maxAge: string;
   minAge: string;
+  withoutInAbsent: string;
   minServiceLengthForLeave: string;
   autoSalaryProcess: string;
   otRateCalculation: string;
+  searchingBy: string;
+  holidayTiffin: string;
+  holidayNight: string;
+  earlyOut: string;
+  earlyOutBasedOn: string;
+  salaryBreakdownRound: string;
+  sandwichHoliday: string;
+  sandwichEmployeeType: string;
+  lateTimeCalculation: string;
 }
 
 const DEFAULT_COMPANY_SETTINGS: CompanyBasicSettings = {
@@ -1333,16 +1348,31 @@ const DEFAULT_COMPANY_SETTINGS: CompanyBasicSettings = {
   officeId: "No",
   systemId: "Yes",
   deptWiseSection: "Yes",
-  employeeEditApproval: "Yes",
+  employeeEditApproval: "No",
+  newEmployeeApproval: "No",
   dashboard: "None",
+  authorizationLE: "Early Out",
   absentBasedOnInOut: "No",
-  otRequisition: "Yes",
-  ageVerification: "No",
-  maxAge: "",
-  minAge: "",
-  minServiceLengthForLeave: "",
+  absentDeductBasedOn: "Basic / 30 days",
+  otRequisition: "No",
+  mlCount: "120",
+  mlStamp: "0",
+  ageVerification: "Yes",
+  maxAge: "70",
+  minAge: "18",
+  withoutInAbsent: "Yes",
+  minServiceLengthForLeave: "0",
   autoSalaryProcess: "No",
   otRateCalculation: "Regular",
+  searchingBy: "System ID",
+  holidayTiffin: "No",
+  holidayNight: "No",
+  earlyOut: "Yes",
+  earlyOutBasedOn: "Gross/30",
+  salaryBreakdownRound: "Yes",
+  sandwichHoliday: "No",
+  sandwichEmployeeType: "ALL",
+  lateTimeCalculation: "Late Time",
 };
 
 function StructureSetupPage() {
@@ -1370,6 +1400,7 @@ function StructureSetupPage() {
   // Company Basic Settings state
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [settingsCompany, setSettingsCompany] = useState<Organization | null>(null);
+  const [settingsTab, setSettingsTab] = useState("all");
   const [companySettings, setCompanySettings] = useState<Record<number, CompanyBasicSettings>>({});
 
   // Load from LocalStorage
@@ -3530,7 +3561,7 @@ function StructureSetupPage() {
 
             return (
               <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
-                <div className="bg-card w-full max-w-[1000px] rounded-2xl shadow-2xl flex flex-col max-h-[95vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-border/40">
+                <div className="bg-card w-full max-w-[1150px] rounded-2xl shadow-2xl flex flex-col max-h-[95vh] overflow-hidden animate-in zoom-in-95 duration-200 border border-border/40">
                   {/* Modal Header */}
                   <div className="px-6 py-5 border-b border-border/30 bg-transparent flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -3560,270 +3591,414 @@ function StructureSetupPage() {
                   </div>
 
                   {/* Modal Body */}
-                  <div className="flex-1 overflow-y-auto p-6 bg-muted/5">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* General Settings */}
-                      <div className="bg-card p-5 rounded-2xl border border-border/50 shadow-sm">
-                        <SectionHeader title="General Settings" icon={Building2} />
-                        <div className="space-y-4">
-                          <div className={wrap}>
-                            <label className={lbl}>Company Type *</label>
-                            <select
-                              value={cfg.companyType}
-                              onChange={(e) => update("companyType", e.target.value)}
-                              className={sel}
-                            >
-                              <option value="Knit">Knit</option>
-                              <option value="Woven">Woven</option>
-                              <option value="Spinning">Spinning</option>
-                              <option value="Dyeing">Dyeing</option>
-                              <option value="Composite">Composite</option>
-                            </select>
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className={wrap}>
-                              <label className={lbl}>Company Data *</label>
-                              <select
-                                value={cfg.companyData}
-                                onChange={(e) => update("companyData", e.target.value)}
-                                className={sel}
-                              >
-                                <option value="Combined">Combined</option>
-                                <option value="Separate">Separate</option>
-                              </select>
-                            </div>
-                            <div className={wrap}>
-                              <label className={lbl}>Dashboard *</label>
-                              <select
-                                value={cfg.dashboard}
-                                onChange={(e) => update("dashboard", e.target.value)}
-                                className={sel}
-                              >
-                                <option value="None">None</option>
-                                <option value="Basic">Basic</option>
-                                <option value="Advanced">Advanced</option>
-                              </select>
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className={wrap}>
-                              <label className={lbl}>Encryption *</label>
-                              <select
-                                value={cfg.encryption}
-                                onChange={(e) => update("encryption", e.target.value)}
-                                className={sel}
-                              >
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                              </select>
-                            </div>
-                            <div className={wrap}>
-                              <label className={lbl}>SSP Portal *</label>
-                              <select
-                                value={cfg.ssp}
-                                onChange={(e) => update("ssp", e.target.value)}
-                                className={sel}
-                              >
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                              </select>
-                            </div>
-                          </div>
+                  <div className="flex-1 overflow-y-auto p-6 bg-muted/5 space-y-6">
+                    {/* 1. Approval & General Governance */}
+                    <div className="bg-card p-5 rounded-2xl border border-border/50 shadow-sm space-y-4">
+                      <SectionHeader title="Approval & General Governance" icon={Building2} />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className={wrap}>
+                          <label className={lbl}>Employee Edit Approval *</label>
+                          <select
+                            value={cfg.employeeEditApproval}
+                            onChange={(e) => update("employeeEditApproval", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>New Employee Approval *</label>
+                          <select
+                            value={cfg.newEmployeeApproval}
+                            onChange={(e) => update("newEmployeeApproval", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>Dashboard *</label>
+                          <select
+                            value={cfg.dashboard}
+                            onChange={(e) => update("dashboard", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="None">None</option>
+                            <option value="Basic">Basic</option>
+                            <option value="Advanced">Advanced</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>Authorization(L/E) *</label>
+                          <select
+                            value={cfg.authorizationLE}
+                            onChange={(e) => update("authorizationLE", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="Early Out">Early Out</option>
+                            <option value="Late In">Late In</option>
+                            <option value="Both">Both</option>
+                            <option value="None">None</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>Searching By *</label>
+                          <select
+                            value={cfg.searchingBy}
+                            onChange={(e) => update("searchingBy", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="System ID">System ID</option>
+                            <option value="Office ID">Office ID</option>
+                            <option value="Finger ID">Finger ID</option>
+                            <option value="Custom ID">Custom ID</option>
+                            <option value="Both">Both</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>Company Type *</label>
+                          <select
+                            value={cfg.companyType}
+                            onChange={(e) => update("companyType", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="Knit">Knit</option>
+                            <option value="Woven">Woven</option>
+                            <option value="Spinning">Spinning</option>
+                            <option value="Dyeing">Dyeing</option>
+                            <option value="Composite">Composite</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>Company Data *</label>
+                          <select
+                            value={cfg.companyData}
+                            onChange={(e) => update("companyData", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="Combined">Combined</option>
+                            <option value="Separate">Separate</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>SSP Portal *</label>
+                          <select
+                            value={cfg.ssp}
+                            onChange={(e) => update("ssp", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                          </select>
                         </div>
                       </div>
+                    </div>
 
-                      {/* ID & Structure Config */}
-                      <div className="bg-card p-5 rounded-2xl border border-border/50 shadow-sm">
-                        <SectionHeader title="ID & Structure Configuration" icon={Grid} />
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className={wrap}>
-                              <label className={lbl}>ID Format *</label>
-                              <input
-                                type="text"
-                                value={cfg.idFormat}
-                                onChange={(e) => update("idFormat", e.target.value)}
-                                className={inp}
-                                placeholder="e.g. 000000"
-                              />
-                            </div>
-                            <div className={wrap}>
-                              <label className={lbl}>Join Year w/ ID *</label>
-                              <select
-                                value={cfg.joinYearWithId}
-                                onChange={(e) => update("joinYearWithId", e.target.value)}
-                                className={sel}
-                              >
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                              </select>
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className={wrap}>
-                              <label className={lbl}>Office ID *</label>
-                              <select
-                                value={cfg.officeId}
-                                onChange={(e) => update("officeId", e.target.value)}
-                                className={sel}
-                              >
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                              </select>
-                            </div>
-                            <div className={wrap}>
-                              <label className={lbl}>System ID *</label>
-                              <select
-                                value={cfg.systemId}
-                                onChange={(e) => update("systemId", e.target.value)}
-                                className={sel}
-                              >
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                              </select>
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className={wrap}>
-                              <label className={lbl}>Company ID *</label>
-                              <select
-                                value={cfg.companyId}
-                                onChange={(e) => update("companyId", e.target.value)}
-                                className={sel}
-                              >
-                                <option value="Combined">Combined</option>
-                                <option value="Separate">Separate</option>
-                              </select>
-                            </div>
-                            <div className={wrap}>
-                              <label className={lbl}>Dept Wise Section *</label>
-                              <select
-                                value={cfg.deptWiseSection}
-                                onChange={(e) => update("deptWiseSection", e.target.value)}
-                                className={sel}
-                              >
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                              </select>
-                            </div>
-                          </div>
+                    {/* 2. Attendance & Work Rules */}
+                    <div className="bg-card p-5 rounded-2xl border border-border/50 shadow-sm space-y-4">
+                      <SectionHeader title="Attendance & Work Rules" icon={Briefcase} />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className={wrap}>
+                          <label className={lbl}>Absent Based on In/Out *</label>
+                          <select
+                            value={cfg.absentBasedOnInOut}
+                            onChange={(e) => update("absentBasedOnInOut", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>Absent Deduct Based On *</label>
+                          <select
+                            value={cfg.absentDeductBasedOn}
+                            onChange={(e) => update("absentDeductBasedOn", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="Basic / 30 days">Basic / 30 days</option>
+                            <option value="Gross / 30 days">Gross / 30 days</option>
+                            <option value="Basic / 26 days">Basic / 26 days</option>
+                            <option value="Gross / 26 days">Gross / 26 days</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>WithOut In Absent *</label>
+                          <select
+                            value={cfg.withoutInAbsent}
+                            onChange={(e) => update("withoutInAbsent", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>Early Out *</label>
+                          <select
+                            value={cfg.earlyOut}
+                            onChange={(e) => update("earlyOut", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>Early Out Based On *</label>
+                          <select
+                            value={cfg.earlyOutBasedOn}
+                            onChange={(e) => update("earlyOutBasedOn", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="Gross/30">Gross/30</option>
+                            <option value="Basic/30">Basic/30</option>
+                            <option value="Gross/26">Gross/26</option>
+                            <option value="Basic/26">Basic/26</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>Late Time Calculation *</label>
+                          <select
+                            value={cfg.lateTimeCalculation}
+                            onChange={(e) => update("lateTimeCalculation", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="Late Time">Late Time</option>
+                            <option value="Grace Time">Grace Time</option>
+                            <option value="Shift Time">Shift Time</option>
+                            <option value="Exact Punch">Exact Punch</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>OT Requisition *</label>
+                          <select
+                            value={cfg.otRequisition}
+                            onChange={(e) => update("otRequisition", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>OT Rate Calculation *</label>
+                          <select
+                            value={cfg.otRateCalculation}
+                            onChange={(e) => update("otRateCalculation", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="Regular">Regular</option>
+                            <option value="Double">Double</option>
+                            <option value="Custom">Custom</option>
+                          </select>
                         </div>
                       </div>
+                    </div>
 
-                      {/* Operational & Attendance */}
-                      <div className="bg-card p-5 rounded-2xl border border-border/50 shadow-sm">
-                        <SectionHeader title="Operational & Attendance" icon={Briefcase} />
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className={wrap}>
-                              <label className={lbl}>Absent By In/Out *</label>
-                              <select
-                                value={cfg.absentBasedOnInOut}
-                                onChange={(e) => update("absentBasedOnInOut", e.target.value)}
-                                className={sel}
-                              >
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                              </select>
-                            </div>
-                            <div className={wrap}>
-                              <label className={lbl}>OT Requisition *</label>
-                              <select
-                                value={cfg.otRequisition}
-                                onChange={(e) => update("otRequisition", e.target.value)}
-                                className={sel}
-                              >
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                              </select>
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className={wrap}>
-                              <label className={lbl}>OT Rate Calc *</label>
-                              <select
-                                value={cfg.otRateCalculation}
-                                onChange={(e) => update("otRateCalculation", e.target.value)}
-                                className={sel}
-                              >
-                                <option value="Regular">Regular</option>
-                                <option value="Double">Double</option>
-                                <option value="Custom">Custom</option>
-                              </select>
-                            </div>
-                            <div className={wrap}>
-                              <label className={lbl}>Auto Salary Process *</label>
-                              <select
-                                value={cfg.autoSalaryProcess}
-                                onChange={(e) => update("autoSalaryProcess", e.target.value)}
-                                className={sel}
-                              >
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                              </select>
-                            </div>
-                          </div>
-                          <div className={wrap}>
-                            <label className={lbl}>Employee Edit Approval *</label>
-                            <select
-                              value={cfg.employeeEditApproval}
-                              onChange={(e) => update("employeeEditApproval", e.target.value)}
-                              className={sel}
-                            >
-                              <option value="Yes">Yes</option>
-                              <option value="No">No</option>
-                            </select>
-                          </div>
+                    {/* 3. Leave, Holiday & Allowance Rules */}
+                    <div className="bg-card p-5 rounded-2xl border border-border/50 shadow-sm space-y-4">
+                      <SectionHeader title="Leave, Holiday & Special Rules" icon={Layers} />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className={wrap}>
+                          <label className={lbl}>Min Service Length Required For Leave(Month)</label>
+                          <input
+                            type="number"
+                            value={cfg.minServiceLengthForLeave}
+                            onChange={(e) => update("minServiceLengthForLeave", e.target.value)}
+                            className={inp}
+                            placeholder="0"
+                          />
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>ML Count *</label>
+                          <input
+                            type="number"
+                            value={cfg.mlCount}
+                            onChange={(e) => update("mlCount", e.target.value)}
+                            className={inp}
+                            placeholder="120"
+                          />
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>ML Stamp *</label>
+                          <input
+                            type="number"
+                            value={cfg.mlStamp}
+                            onChange={(e) => update("mlStamp", e.target.value)}
+                            className={inp}
+                            placeholder="0"
+                          />
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>Sandwich Holiday *</label>
+                          <select
+                            value={cfg.sandwichHoliday}
+                            onChange={(e) => update("sandwichHoliday", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>Sandwich Employee Type</label>
+                          <input
+                            type="text"
+                            value={cfg.sandwichEmployeeType}
+                            onChange={(e) => update("sandwichEmployeeType", e.target.value)}
+                            className={inp}
+                            placeholder="ALL"
+                          />
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>Holiday Tiffin *</label>
+                          <select
+                            value={cfg.holidayTiffin}
+                            onChange={(e) => update("holidayTiffin", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>Holiday Night *</label>
+                          <select
+                            value={cfg.holidayNight}
+                            onChange={(e) => update("holidayNight", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                          </select>
                         </div>
                       </div>
+                    </div>
 
-                      {/* Verification & Validations */}
-                      <div className="bg-card p-5 rounded-2xl border border-border/50 shadow-sm">
-                        <SectionHeader title="Verification & Limits" icon={Layers} />
-                        <div className="space-y-4">
-                          <div className={wrap}>
-                            <label className={lbl}>Age Verification *</label>
-                            <select
-                              value={cfg.ageVerification}
-                              onChange={(e) => update("ageVerification", e.target.value)}
-                              className={sel}
-                            >
-                              <option value="Yes">Yes</option>
-                              <option value="No">No</option>
-                            </select>
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className={wrap}>
-                              <label className={lbl}>Min Age (Years) *</label>
-                              <input
-                                type="number"
-                                value={cfg.minAge}
-                                onChange={(e) => update("minAge", e.target.value)}
-                                className={inp}
-                                placeholder="e.g. 18"
-                              />
-                            </div>
-                            <div className={wrap}>
-                              <label className={lbl}>Max Age (Years) *</label>
-                              <input
-                                type="number"
-                                value={cfg.maxAge}
-                                onChange={(e) => update("maxAge", e.target.value)}
-                                className={inp}
-                                placeholder="e.g. 60"
-                              />
-                            </div>
-                          </div>
-                          <div className={wrap}>
-                            <label className={lbl}>Min Service For Leave</label>
-                            <input
-                              type="number"
-                              value={cfg.minServiceLengthForLeave}
-                              onChange={(e) => update("minServiceLengthForLeave", e.target.value)}
-                              className={inp}
-                              placeholder="e.g. 6 months"
-                            />
-                          </div>
+                    {/* 4. Salary, Verification & Structure Config */}
+                    <div className="bg-card p-5 rounded-2xl border border-border/50 shadow-sm space-y-4">
+                      <SectionHeader title="Salary, Age Verification & ID Config" icon={Grid} />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className={wrap}>
+                          <label className={lbl}>Auto Salary Process *</label>
+                          <select
+                            value={cfg.autoSalaryProcess}
+                            onChange={(e) => update("autoSalaryProcess", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>Salary BreakDown Round *</label>
+                          <select
+                            value={cfg.salaryBreakdownRound}
+                            onChange={(e) => update("salaryBreakdownRound", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>Age Verification *</label>
+                          <select
+                            value={cfg.ageVerification}
+                            onChange={(e) => update("ageVerification", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>Min Age *</label>
+                          <input
+                            type="number"
+                            value={cfg.minAge}
+                            onChange={(e) => update("minAge", e.target.value)}
+                            className={inp}
+                            placeholder="18"
+                          />
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>Max Age *</label>
+                          <input
+                            type="number"
+                            value={cfg.maxAge}
+                            onChange={(e) => update("maxAge", e.target.value)}
+                            className={inp}
+                            placeholder="70"
+                          />
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>ID Format *</label>
+                          <input
+                            type="text"
+                            value={cfg.idFormat}
+                            onChange={(e) => update("idFormat", e.target.value)}
+                            className={inp}
+                            placeholder="000000"
+                          />
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>Join Year w/ ID *</label>
+                          <select
+                            value={cfg.joinYearWithId}
+                            onChange={(e) => update("joinYearWithId", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>Office ID *</label>
+                          <select
+                            value={cfg.officeId}
+                            onChange={(e) => update("officeId", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>System ID *</label>
+                          <select
+                            value={cfg.systemId}
+                            onChange={(e) => update("systemId", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>Company ID *</label>
+                          <select
+                            value={cfg.companyId}
+                            onChange={(e) => update("companyId", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="Combined">Combined</option>
+                            <option value="Separate">Separate</option>
+                          </select>
+                        </div>
+                        <div className={wrap}>
+                          <label className={lbl}>Dept Wise Section *</label>
+                          <select
+                            value={cfg.deptWiseSection}
+                            onChange={(e) => update("deptWiseSection", e.target.value)}
+                            className={sel}
+                          >
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                          </select>
                         </div>
                       </div>
                     </div>
