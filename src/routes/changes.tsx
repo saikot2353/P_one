@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v23");
+    const saved = localStorage.getItem("system_changes_v24");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -222,6 +222,15 @@ function ChangesPage() {
           link: "/company-setup",
           descriptionEn: "Added all 15 missing parameters to the Company Basic Settings modal matching the enterprise standard layout! Included New Employee Approval, Authorization (L/E), Absent Deduct Based On, ML Count, ML Stamp, WithOut In Absent, Searching By, Holiday Tiffin, Holiday Night, Early Out, Early Out Based On, Salary Breakdown Round, Sandwich Holiday, Sandwich Employee Type, and Late Time Calculation.",
           descriptionBn: "কোম্পানি বেসিক সেটিংস মোডালে এন্টারপ্রাইজ স্ট্যান্ডার্ড লেআউট অনুযায়ী ১৫টি নতুন ফিল্ড যুক্ত করা হয়েছে! যার মধ্যে রয়েছে নিউ এমপ্লয়ি অ্যাপ্রুভাল, অথরাইজেশন (এল/ই), অ্যাবসেন্ট ডিডাক্ট বেসড অন, এমএল কাউন্ট, এমএল স্ট্যাম্প, উইদাউট ইন অ্যাবসেন্ট, সার্চিং বাই, হোলিডে টিফিন, হোলিডে নাইট, আর্লি আউট, আর্লি আউট বেসড অন, স্যালারি ব্রেকডাউন রাউন্ড, স্যান্ডউইচ হোলিডে, স্যান্ডউইচ এমপ্লয়ি টাইপ এবং লেট টাইম ক্যালকুলেশন।",
+        },
+        {
+          id: "23",
+          date: "2026-07-27T10:12",
+          type: "Modify",
+          module: "Company Setup",
+          link: "/company-setup",
+          descriptionEn: "Reorganized the Company Basic Settings modal with interactive category filter tabs (All Settings, Approvals & Governance, Attendance & Work, OT & Allowances, Leave & Holidays, Salary & Validation, ID & System Setup) and 6 structured 4-column responsive grid cards with clear red asterisks for required fields.",
+          descriptionBn: "কোম্পানি বেসিক সেটিংস মোডালকে চমৎকার ইন্টারেক্টিভ ক্যাটাগরি ফিল্টার ট্যাব (অল সেটিংস, অ্যাপ্রুভালস, অ্যাটেনডেন্স, ওভারটাইম, লিভ ও হোলিডে, স্যালারি, আইডি ও সিস্টেম সেটিংস) এবং ৬টি সুন্দর ৪-কলাম রেসপন্সিভ গ্রিড কার্ডের মাধ্যমে সুবিন্যস্ত ও গোছানো হয়েছে।",
         },
       ]);
     }

@@ -22,6 +22,7 @@ import {
   SlidersHorizontal,
   GripVertical,
   Settings,
+  Coins,
 } from "lucide-react";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { MultiSelect } from "@/components/ui/multi-select";
@@ -4255,48 +4256,6 @@ function CompanySetupPage() {
                         Save Settings
                       </button>
                     </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })()}                     </div>
-                        <div className={wrap}>
-                          <label className={lbl}>Dept Wise Section *</label>
-                          <select
-                            value={cfg.deptWiseSection}
-                            onChange={(e) => update("deptWiseSection", e.target.value)}
-                            className={sel}
-                          >
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Modal Footer */}
-                  <div className="border-t border-border/30 pt-4 flex items-center justify-end gap-3 bg-muted/10 p-6 -mx-6 -mb-6">
-                    <button
-                      type="button"
-                      onClick={() => setIsSettingsOpen(false)}
-                      className="h-10 px-5 rounded-xl bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground font-medium text-sm transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const updated = { ...companySettings, [sl]: cfg };
-                        setCompanySettings(updated);
-                        localStorage.setItem("hris_company_settings", JSON.stringify(updated));
-                        toast.success("Company Basic Settings updated successfully!");
-                        setIsSettingsOpen(false);
-                      }}
-                      className="h-10 px-6 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
-                    >
-                      Save Changes
-                    </button>
                   </div>
                 </div>
               </div>
