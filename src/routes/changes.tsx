@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v34");
+    const saved = localStorage.getItem("system_changes_v41");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -303,6 +303,69 @@ function ChangesPage() {
           link: "/company-setup",
           descriptionEn: "Added a new 'Half Leave' Yes/No setting dropdown to the Company Architecture & ID Setup configuration panel on the Company Setup page.",
           descriptionBn: "কোম্পানি সেটআপ পেজের কোম্পানি আর্কিটেকচার অ্যান্ড আইডি সেটআপ প্যানেলে একটি নতুন 'Half Leave' (Yes/No) সেটিং ড্রপডাউন যুক্ত করা হয়েছে।"
+        },
+        {
+          id: "32",
+          date: "2026-07-29T10:10",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-dashboard",
+          descriptionEn: "Simplified the Merchandising module sidebar menu by removing all other links and keeping only the Dashboard and Order Entry & Costing workspace.",
+          descriptionBn: "মার্চেন্ডাইজিং মডিউলের সাইডবার মেনু থেকে অন্যান্য সব লিংক বাদ দিয়ে শুধুমাত্র ড্যাশবোর্ড এবং অর্ডার এন্ট্রি ও কস্টিং ওয়ার্কস্পেস রেখে একে সহজ করা হয়েছে।",
+        },
+        {
+          id: "33",
+          date: "2026-07-29T10:12",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Added the new 'MERC Master Setting' accordion sidebar menu containing 34 custom submenus, correctly mapped to default RMG database tabs.",
+          descriptionBn: "৩৪টি সাব-মেনু বিশিষ্ট নতুন 'MERC Master Setting' সাইডবার একর্ডিয়ন মেনু যুক্ত করা হয়েছে এবং সেগুলোকে যথোপযুক্ত RMG ডেটাবেস ট্যাবের সাথে সংযুক্ত করা হয়েছে।",
+        },
+        {
+          id: "34",
+          date: "2026-07-29T10:15",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Refactored the MERC Master Settings to use a clean split layout. The sidebar menu now has a single direct link, and the settings page groups all 34 sub-settings into interactive sub-tabs nested within the 5 main database categories. Also built a fully functional generic CRUD Master DB manager.",
+          descriptionBn: "MERC মাস্টার সেটিংস পেজটিকে চমৎকার স্প্লিট লেআউটে রূপান্তর করা হয়েছে। সাইডবারে এখন একটি সরাসরি লিংক রয়েছে এবং পেজের ভেতরে ৩৪টি প্যারামিটারকে ৫টি মূল ক্যাটাগরির ভেতরে সাব-ট্যাব আকারে সাজানো হয়েছে। এছাড়া একটি ফুল-ফাংশনাল জেনেরিক CRUD মাস্টার ডাটাবেস ম্যানেজার তৈরি করা হয়েছে।",
+        },
+        {
+          id: "35",
+          date: "2026-07-29T10:23",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Reorganized the Merchandising Settings hierarchy to match the requested 8-category taxonomy (Company Configuration, Business Partners, Product Masters, Fabric Masters, Yarn Masters, Color & Processing, Costing, and Quality). Renamed the sidebar settings menu to 'Merchandising Settings'.",
+          descriptionBn: "মার্চেন্ডাইজিং সেটিংসের স্তরবিন্যাস পরিবর্তন করে অনুরোধকৃত ৮টি ক্যাটাগরিতে (কোম্পানি কনফিগারেশন, বিজনেস পার্টনার, প্রোডাক্ট মাস্টার্স, ফেব্রিক মাস্টার্স, ইয়ার্ন মাস্টার্স, কালার ও প্রসেসিং, কস্টিং, এবং কোয়ালিটি) সাজানো হয়েছে। সাইডবারের মেনুর নাম পরিবর্তন করে 'Merchandising Settings' রাখা হয়েছে।",
+        },
+        {
+          id: "36",
+          date: "2026-07-29T10:25",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Implemented a fully nested three-level accordion layout in the Merchandising Settings sidebar. Clicking 'Merchandising Settings' now reveals the 8 sub-categories, and clicking each sub-category reveals its corresponding parameter configuration links.",
+          descriptionBn: "মার্চেন্ডাইজিং সেটিংসের সাইডবারে একটি সম্পূর্ণ ত্রিমাত্রিক একর্ডিয়ন লেআউট তৈরি করা হয়েছে। 'Merchandising Settings' এ ক্লিক করলে ৮টি সাব-ক্যাটাগরি দৃশ্যমান হয়, এবং প্রতিটি সাব-ক্যাটাগরিতে ক্লিক করলে তার অন্তর্ভুক্ত প্যারামিটার কনফিগারেশন লিংকগুলো দেখা যায়।",
+        },
+        {
+          id: "37",
+          date: "2026-07-29T11:20",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Fixed the sidebar scrolling behavior by removing nested max-height restrictions and duplicate scrollbars from the nested subGroup accordion containers, allowing the entire sidebar pane to scroll naturally.",
+          descriptionBn: "সাইডবার স্ক্রোলিং সমস্যা সমাধান করা হয়েছে। সাব-গ্রুপ একর্ডিয়ন কন্টেইনার থেকে অতিরিক্ত ম্যাক্স-হাইট এবং ডুপ্লিকেট স্ক্রোলবার সরিয়ে ফেলা হয়েছে, যার ফলে সম্পূর্ণ সাইডবারটি এখন স্বাচ্ছন্দ্যে স্ক্রোল করা যায়।",
+        },
+        {
+          id: "38",
+          date: "2026-07-29T11:25",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Fixed text alignment issues on the accordion header buttons by adding the 'text-left' class, ensuring wrapped texts are properly left-aligned.",
+          descriptionBn: "একর্ডিয়ন হেডার বাটনগুলোর টেক্সট অ্যালাইনমেন্ট ফিক্স করা হয়েছে। 'text-left' ক্লাস যোগ করার মাধ্যমে নিশ্চিত করা হয়েছে যে র‍্যাপ হওয়া লেখাগুলো বাঁ দিকে সমানভাবে বিন্যস্ত থাকবে।",
         },
       ]);
     }

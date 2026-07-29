@@ -38,12 +38,19 @@ interface SubCategoryItem {
   search?: Record<string, string>;
 }
 
+interface MenuSubGroup {
+  key: string;
+  label: string;
+  items: SubCategoryItem[];
+}
+
 interface MenuCategory {
   key: string;
   label: string;
   icon: React.ElementType;
   to?: string;
   subitems?: SubCategoryItem[];
+  subGroups?: MenuSubGroup[];
 }
 
 export default function MerchandisingLayout({
@@ -57,12 +64,57 @@ export default function MerchandisingLayout({
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
   const getInitialExpanded = (ap: string): Record<string, boolean> => ({
-    masterSettings: ap === "masterSettings",
+    masterSettings: ap === "masterSettings" || ap === "merchandising-master-settings",
     orders: ap === "order-list" || ap === "order-profile" || ap === "inquiry",
   });
 
+  const getInitialSubGroups = (searchTab: string): Record<string, boolean> => {
+    const mapping: Record<string, string> = {
+      "company-wise-merc-setting": "company",
+      "costing-configuration-cpm": "company",
+      "payment-terms": "company",
+      "buying-house": "partners",
+      "buyer-name": "partners",
+      "buyer-wise-brand": "partners",
+      "buying-agent": "partners",
+      "supplier": "partners",
+      "item-department": "product",
+      "gmt-item-name": "product",
+      "body-part": "product",
+      "season": "product",
+      "sample-type": "product",
+      "size-group": "product",
+      "uom": "product",
+      "fabric-gsm": "fabric",
+      "fabric-nature": "fabric",
+      "fabric-construction": "fabric",
+      "fabric-yarn-composotion": "fabric",
+      "dyeing": "fabric",
+      "finishing": "fabric",
+      "shade-range": "fabric",
+      "yarn-brand": "yarn",
+      "yarn-type": "yarn",
+      "yarn-count": "yarn",
+      "yarn-po-type": "yarn",
+      "yarn-po-settings": "yarn",
+      "gmt-fabric-color-name": "color",
+      "fabric-print-color-type": "color",
+      "print-emb-wash-special-type": "color",
+      "aop-process": "color",
+      "additional-cost-entry": "costing",
+      "rmg-process-loss": "costing",
+      "quality-label": "quality",
+    };
+    return searchTab && mapping[searchTab] ? { [mapping[searchTab]]: true } : {};
+  };
+
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(
     () => getInitialExpanded(activePath)
+  );
+
+  const initialSearchTab = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("tab") || "" : "";
+  const [expandedSubGroups, setExpandedSubGroups] = useState<Record<string, boolean>>(
+    () => getInitialSubGroups(initialSearchTab)
   );
 
   useEffect(() => {
@@ -72,7 +124,10 @@ export default function MerchandisingLayout({
 
   useEffect(() => {
     setExpandedSections(getInitialExpanded(activePath));
+    const currentTab = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("tab") || "" : "";
+    setExpandedSubGroups(prev => ({ ...prev, ...getInitialSubGroups(currentTab) }));
   }, [activePath]);
+
 
   const toggleTheme = () => {
     const nextTheme = theme === "dark" ? "light" : "dark";
@@ -100,102 +155,99 @@ export default function MerchandisingLayout({
       to: "/merchandising-dashboard",
     },
     {
-      // ACCORDION: 5 sub-items, each opens a specific tab on the Master Settings page
-      key: "masterSettings",
-      label: "Master Settings",
-      icon: Settings,
-      subitems: [
-        {
-          label: "Company & Buyer Setup",
-          to: "/merchandising-master-settings",
-          subActiveKey: "masterSettings",
-          search: { tab: "buyers" },
-        },
-        {
-          label: "Material Library (Yarn/Fabric)",
-          to: "/merchandising-master-settings",
-          subActiveKey: "masterSettings",
-          search: { tab: "fabrics" },
-        },
-        {
-          label: "Specifications & Parameters",
-          to: "/merchandising-master-settings",
-          subActiveKey: "masterSettings",
-          search: { tab: "specs" },
-        },
-        {
-          label: "Process & Loss Setup %",
-          to: "/merchandising-master-settings",
-          subActiveKey: "masterSettings",
-          search: { tab: "loss" },
-        },
-        {
-          label: "Financial Config & Trims",
-          to: "/merchandising-master-settings",
-          subActiveKey: "masterSettings",
-          search: { tab: "financial" },
-        },
-      ],
-    },
-    {
-      // ACCORDION: Inquiry → PO Register → Order Entry (correct BD garments lifecycle)
-      key: "orders",
-      label: "Orders & Costing",
+      key: "order-profile",
+      label: "Order Entry & Costing",
       icon: Layers,
-      subitems: [
+      to: "/merchandising-order-profile",
+    },
+    {
+      key: "masterSettings",
+      label: "Merchandising Settings",
+      icon: Settings,
+      subGroups: [
         {
-          label: "Buyer Inquiry & Quotation",
-          to: "/merchandising-inquiry",
-          subActiveKey: "inquiry",
+          key: "company",
+          label: "Company Configuration",
+          items: [
+            { label: "Company Wise MERC Setting", to: "/merchandising-master-settings", search: { tab: "company-wise-merc-setting" } },
+            { label: "Costing Configuration (CPM)", to: "/merchandising-master-settings", search: { tab: "costing-configuration-cpm" } },
+            { label: "Payment Terms", to: "/merchandising-master-settings", search: { tab: "payment-terms" } },
+          ]
         },
         {
-          label: "Purchase Order (PO) Register",
-          to: "/merchandising-order-list",
-          subActiveKey: "order-list",
+          key: "partners",
+          label: "Business Partners",
+          items: [
+            { label: "Buying House", to: "/merchandising-master-settings", search: { tab: "buying-house" } },
+            { label: "Buyer", to: "/merchandising-master-settings", search: { tab: "buyer-name" } },
+            { label: "Buyer Brand", to: "/merchandising-master-settings", search: { tab: "buyer-wise-brand" } },
+            { label: "Buying Agent", to: "/merchandising-master-settings", search: { tab: "buying-agent" } },
+            { label: "Supplier", to: "/merchandising-master-settings", search: { tab: "supplier" } },
+          ]
         },
         {
-          label: "Order Entry & Costing (KDS)",
-          to: "/merchandising-order-profile",
-          subActiveKey: "order-profile",
+          key: "product",
+          label: "Product Masters",
+          items: [
+            { label: "Item Department", to: "/merchandising-master-settings", search: { tab: "item-department" } },
+            { label: "Garment Item", to: "/merchandising-master-settings", search: { tab: "gmt-item-name" } },
+            { label: "Body Part", to: "/merchandising-master-settings", search: { tab: "body-part" } },
+            { label: "Season", to: "/merchandising-master-settings", search: { tab: "season" } },
+            { label: "Sample Type", to: "/merchandising-master-settings", search: { tab: "sample-type" } },
+            { label: "Size Group", to: "/merchandising-master-settings", search: { tab: "size-group" } },
+            { label: "UOM", to: "/merchandising-master-settings", search: { tab: "uom" } },
+          ]
         },
-      ],
-    },
-    // ── FLAT DIRECT LINKS ──────────────────────────────────────────────────────
-    {
-      key: "sample",
-      label: "Sample & Development",
-      icon: Scissors,
-      to: "/merchandising-sample-tracker",
-    },
-    {
-      key: "sourcing",
-      label: "Material Booking",
-      icon: Wind,
-      to: "/merchandising-material-bookings",
-    },
-    {
-      key: "services",
-      label: "Service Work Orders",
-      icon: Briefcase,
-      to: "/merchandising-work-orders",
-    },
-    {
-      key: "tna",
-      label: "TNA Critical Path",
-      icon: Calendar,
-      to: "/merchandising-tna-calendar",
-    },
-    {
-      key: "capacity",
-      label: "Capacity Planning",
-      icon: Activity,
-      to: "/merchandising-capacity-planning",
-    },
-    {
-      key: "reports",
-      label: "Reports & Analytics",
-      icon: TrendingUp,
-      to: "/merchandising-reports",
+        {
+          key: "fabric",
+          label: "Fabric Masters",
+          items: [
+            { label: "Fabric GSM", to: "/merchandising-master-settings", search: { tab: "fabric-gsm" } },
+            { label: "Fabric Nature", to: "/merchandising-master-settings", search: { tab: "fabric-nature" } },
+            { label: "Fabric Construction", to: "/merchandising-master-settings", search: { tab: "fabric-construction" } },
+            { label: "Fabric Composition", to: "/merchandising-master-settings", search: { tab: "fabric-yarn-composotion" } },
+            { label: "Dyeing", to: "/merchandising-master-settings", search: { tab: "dyeing" } },
+            { label: "Finishing", to: "/merchandising-master-settings", search: { tab: "finishing" } },
+            { label: "Shade Range", to: "/merchandising-master-settings", search: { tab: "shade-range" } },
+          ]
+        },
+        {
+          key: "yarn",
+          label: "Yarn Masters",
+          items: [
+            { label: "Yarn Brand", to: "/merchandising-master-settings", search: { tab: "yarn-brand" } },
+            { label: "Yarn Type", to: "/merchandising-master-settings", search: { tab: "yarn-type" } },
+            { label: "Yarn Count", to: "/merchandising-master-settings", search: { tab: "yarn-count" } },
+            { label: "Yarn PO Type", to: "/merchandising-master-settings", search: { tab: "yarn-po-type" } },
+            { label: "Yarn PO Settings", to: "/merchandising-master-settings", search: { tab: "yarn-po-settings" } },
+          ]
+        },
+        {
+          key: "color",
+          label: "Color & Processing",
+          items: [
+            { label: "Garment & Fabric Color", to: "/merchandising-master-settings", search: { tab: "gmt-fabric-color-name" } },
+            { label: "Print/Color Type", to: "/merchandising-master-settings", search: { tab: "fabric-print-color-type" } },
+            { label: "Print/Embroidery/Wash Type", to: "/merchandising-master-settings", search: { tab: "print-emb-wash-special-type" } },
+            { label: "AOP Process", to: "/merchandising-master-settings", search: { tab: "aop-process" } },
+          ]
+        },
+        {
+          key: "costing",
+          label: "Costing",
+          items: [
+            { label: "Additional Cost", to: "/merchandising-master-settings", search: { tab: "additional-cost-entry" } },
+            { label: "Process Loss", to: "/merchandising-master-settings", search: { tab: "rmg-process-loss" } },
+          ]
+        },
+        {
+          key: "quality",
+          label: "Quality",
+          items: [
+            { label: "Quality Label", to: "/merchandising-master-settings", search: { tab: "quality-label" } },
+          ]
+        }
+      ]
     },
   ];
 
@@ -278,6 +330,115 @@ export default function MerchandisingLayout({
               );
             }
 
+            // ── ACCORDION GROUP WITH SUBGROUPS ───────────────────────────────
+            if (cat.subGroups) {
+              const isExpanded = expandedSections[cat.key];
+              // check if any item in any subGroup is active
+              const isParentActive = cat.subGroups.some(
+                (g) => g.items.some((item) => {
+                  const currentTab = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("tab") : "";
+                  return (item.search?.tab === currentTab);
+                })
+              );
+
+              return (
+                <div key={cat.key}>
+                  {/* Accordion Header */}
+                  <button
+                    onClick={() => toggleSection(cat.key)}
+                    className={`w-full group flex items-center text-left gap-2.5 px-3 py-2 rounded-lg text-[12px] font-bold transition-all duration-200 cursor-pointer ${
+                      isParentActive
+                        ? "bg-teal-500/15 text-teal-600 dark:text-teal-400 border border-teal-500/20 font-extrabold"
+                        : "text-sidebar-foreground/75 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground"
+                    }`}
+                  >
+                    <Icon
+                      className={`size-3.5 ${
+                        isParentActive
+                          ? "text-teal-500"
+                          : "text-sidebar-foreground/60 group-hover:scale-110 transition-transform duration-300"
+                      }`}
+                    />
+                    <span>{cat.label}</span>
+                    <ChevronDown
+                      size={13}
+                      className={`ml-auto transition-transform duration-250 ${
+                        isExpanded ? "rotate-180 text-teal-500" : "text-sidebar-foreground/40"
+                      }`}
+                    />
+                  </button>
+
+                  {/* Sub-Groups Accordions (CSS max-height animation) */}
+                  <div
+                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                      isExpanded ? "max-h-[2500px] opacity-100" : "max-h-0 opacity-0"
+                    }`}
+                  >
+                    <div className="pl-3 pr-1 py-1 space-y-1.5 border-l border-teal-500/25 ml-[22px] mt-0.5 mb-1">
+                      {cat.subGroups.map((group) => {
+                        const isSubGroupExpanded = expandedSubGroups[group.key];
+                        const isGroupActive = group.items.some((item) => {
+                          const currentTab = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("tab") : "";
+                          return (item.search?.tab === currentTab);
+                        });
+
+                        return (
+                          <div key={group.key} className="space-y-0.5">
+                            {/* Sub-group Header */}
+                            <button
+                              onClick={() => {
+                                setExpandedSubGroups(prev => ({
+                                  ...prev,
+                                  [group.key]: !prev[group.key]
+                                }));
+                              }}
+                              className={`w-full text-left text-[11px] font-bold py-1 px-2 rounded-md transition-all duration-150 flex items-center justify-between cursor-pointer ${
+                                isGroupActive
+                                  ? "text-teal-600 dark:text-teal-400 font-extrabold"
+                                  : "text-sidebar-foreground/75 hover:text-teal-500 hover:bg-sidebar-accent/10"
+                              }`}
+                            >
+                              <span>{group.label}</span>
+                              <ChevronDown
+                                size={11}
+                                className={`transition-transform duration-200 ${
+                                  isSubGroupExpanded ? "rotate-180 text-teal-500" : "text-sidebar-foreground/40"
+                                }`}
+                              />
+                            </button>
+
+                            {/* Sub-group Items */}
+                            {isSubGroupExpanded && (
+                              <div className="pl-2.5 py-0.5 space-y-0.5 border-l border-slate-200 dark:border-slate-800 ml-2">
+                                {group.items.map((sub, sIdx) => {
+                                  const currentTab = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("tab") : "";
+                                  const isSubActive = sub.search?.tab === currentTab;
+                                  return (
+                                    <Link
+                                      key={sIdx}
+                                      to={sub.to}
+                                      search={sub.search as any}
+                                      className={`block w-full text-left text-[10.5px] font-medium py-1 px-2 rounded transition-all duration-155 ${
+                                        isSubActive
+                                          ? "text-teal-500 dark:text-teal-400 bg-teal-500/10 font-bold"
+                                          : "text-sidebar-foreground/60 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-sidebar-accent/15"
+                                      }`}
+                                    >
+                                      {sub.label}
+                                    </Link>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
             // ── ACCORDION GROUP ──────────────────────────────────────────────
             if (cat.subitems) {
               const isExpanded = expandedSections[cat.key];
@@ -290,7 +451,7 @@ export default function MerchandisingLayout({
                   {/* Accordion Header */}
                   <button
                     onClick={() => toggleSection(cat.key)}
-                    className={`w-full group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-bold transition-all duration-200 cursor-pointer ${
+                    className={`w-full group flex items-center text-left gap-2.5 px-3 py-2 rounded-lg text-[12px] font-bold transition-all duration-200 cursor-pointer ${
                       isParentActive
                         ? "bg-teal-500/15 text-teal-600 dark:text-teal-400 border border-teal-500/20"
                         : "text-sidebar-foreground/75 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground"
@@ -315,12 +476,13 @@ export default function MerchandisingLayout({
                   {/* Sub-Items (CSS max-height animation) */}
                   <div
                     className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                      isExpanded ? "max-h-72 opacity-100" : "max-h-0 opacity-0"
+                      isExpanded ? "max-h-[1200px] opacity-100" : "max-h-0 opacity-0"
                     }`}
                   >
-                    <div className="pl-3 pr-1 py-1 space-y-0.5 border-l-2 border-teal-500/25 ml-[22px] mt-0.5 mb-1">
+                    <div className="pl-3 pr-1 py-1 space-y-0.5 border-l-2 border-teal-500/25 ml-[22px] mt-0.5 mb-1 max-h-[500px] overflow-y-auto scrollbar-none">
                       {cat.subitems.map((sub, sIdx) => {
-                        const isSubActive = sub.subActiveKey === activePath;
+                        const currentTab = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("tab") : "";
+                        const isSubActive = sub.subActiveKey === activePath && (!sub.search?.tab || sub.search.tab === currentTab);
                         return (
                           <Link
                             key={sIdx}
