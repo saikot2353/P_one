@@ -227,7 +227,7 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     salaryFrom: 20000,
     salaryTo: 35000,
     rateFor: "Holiday",
-    basedOn: "Flat Rate",
+    basedOn: "Fixed Rate",
     rate: 1000,
     divByHour: "No",
     getAfterReq: "No",
@@ -277,7 +277,7 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     salaryFrom: 10000,
     salaryTo: 22000,
     rateFor: "Night Shift",
-    basedOn: "Flat Rate",
+    basedOn: "Fixed Rate",
     rate: 150,
     divByHour: "No",
     getAfterReq: "Yes",
@@ -327,7 +327,7 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     salaryFrom: 9500,
     salaryTo: 15000,
     rateFor: "Holiday",
-    basedOn: "Flat Rate",
+    basedOn: "Fixed Rate",
     rate: 500,
     divByHour: "No",
     getAfterReq: "No",
@@ -402,7 +402,7 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     salaryFrom: 30000,
     salaryTo: 55000,
     rateFor: "Holiday",
-    basedOn: "Flat Rate",
+    basedOn: "Fixed Rate",
     rate: 1500,
     divByHour: "No",
     getAfterReq: "No",
@@ -427,7 +427,7 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     salaryFrom: 12000,
     salaryTo: 20000,
     rateFor: "Holiday",
-    basedOn: "Flat Rate",
+    basedOn: "Fixed Rate",
     rate: 800,
     divByHour: "No",
     getAfterReq: "No",
@@ -502,7 +502,7 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     salaryFrom: 11000,
     salaryTo: 22000,
     rateFor: "Night Shift",
-    basedOn: "Flat Rate",
+    basedOn: "Fixed Rate",
     rate: 200,
     divByHour: "No",
     getAfterReq: "No",
@@ -577,7 +577,7 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     salaryFrom: 12000,
     salaryTo: 20000,
     rateFor: "Attendance Bonus",
-    basedOn: "Flat Rate",
+    basedOn: "Fixed Rate",
     rate: 500,
     divByHour: "No",
     getAfterReq: "No",
@@ -1467,30 +1467,30 @@ function CompensationSetupPage() {
         nextList = allowances.map((a) =>
           a.sl === editSl
             ? {
-                ...a,
-                company,
-                area,
-                applicableFrom,
-                applicableTo,
-                employeeType,
-                department,
-                subDepartment,
-                designation,
-                workingHourFrom,
-                workingHourTo,
-                salaryFrom: Number(salaryFrom),
-                salaryTo: Number(salaryTo),
-                rateFor,
-                basedOn,
-                rate: Number(rate),
-                divByHour,
-                getAfterReq,
-                getAfterReqRate: Number(getAfterReqRate),
-                eotAfter: Number(eotAfter),
-                lunch: Number(lunch),
-                dinner: Number(dinner),
-                isActive: allowanceIsActive,
-              }
+              ...a,
+              company,
+              area,
+              applicableFrom,
+              applicableTo,
+              employeeType,
+              department,
+              subDepartment,
+              designation,
+              workingHourFrom,
+              workingHourTo,
+              salaryFrom: Number(salaryFrom),
+              salaryTo: Number(salaryTo),
+              rateFor,
+              basedOn,
+              rate: Number(rate),
+              divByHour,
+              getAfterReq,
+              getAfterReqRate: Number(getAfterReqRate),
+              eotAfter: Number(eotAfter),
+              lunch: Number(lunch),
+              dinner: Number(dinner),
+              isActive: allowanceIsActive,
+            }
             : a,
         );
       } else {
@@ -1529,22 +1529,22 @@ function CompensationSetupPage() {
         nextList = tiffinRates.map((t) =>
           t.sl === editSl
             ? {
-                ...t,
-                company: tiffinCompany,
-                area: tiffinArea,
-                applicableFrom: tiffinApplicableFrom,
-                applicableTo: tiffinApplicableTo,
-                employeeType: tiffinEmpType,
-                department: tiffinDepartment,
-                section: tiffinSection,
-                designation: tiffinDesignation,
-                workingHourFrom: tiffinWorkingHourFrom,
-                workingHourTo: tiffinWorkingHourTo,
-                basedOnTiffin: tiffinBasedOn,
-                workingShift: tiffinWorkingShift,
-                rate: Number(tiffinRateVal),
-                isActive: tiffinIsActive,
-              }
+              ...t,
+              company: tiffinCompany,
+              area: tiffinArea,
+              applicableFrom: tiffinApplicableFrom,
+              applicableTo: tiffinApplicableTo,
+              employeeType: tiffinEmpType,
+              department: tiffinDepartment,
+              section: tiffinSection,
+              designation: tiffinDesignation,
+              workingHourFrom: tiffinWorkingHourFrom,
+              workingHourTo: tiffinWorkingHourTo,
+              basedOnTiffin: tiffinBasedOn,
+              workingShift: tiffinWorkingShift,
+              rate: Number(tiffinRateVal),
+              isActive: tiffinIsActive,
+            }
             : t,
         );
       } else {
@@ -1575,11 +1575,11 @@ function CompensationSetupPage() {
         nextList = lunchRates.map((l) =>
           l.sl === editSl
             ? {
-                ...l,
-                employeeType: lunchEmpType,
-                rate: Number(lunchRateVal),
-                isActive: lunchIsActive,
-              }
+              ...l,
+              employeeType: lunchEmpType,
+              rate: Number(lunchRateVal),
+              isActive: lunchIsActive,
+            }
             : l,
         );
       } else {
@@ -1599,11 +1599,11 @@ function CompensationSetupPage() {
         nextList = conveyances.map((c) =>
           c.sl === editSl
             ? {
-                ...c,
-                employeeType: convEmpType,
-                amount: Number(convAmount),
-                isActive: convIsActive,
-              }
+              ...c,
+              employeeType: convEmpType,
+              amount: Number(convAmount),
+              isActive: convIsActive,
+            }
             : c,
         );
       } else {
@@ -1623,16 +1623,16 @@ function CompensationSetupPage() {
         nextList = bonuses.map((b) =>
           b.sl === editSl
             ? {
-                ...b,
-                employeeType: bonusEmpType,
-                daysFrom: Number(bonusDaysFrom),
-                daysTo: Number(bonusDaysTo),
-                basedOn: bonusBasedOn,
-                bonusPercent: Number(bonusPercent),
-                designation: bonusDesignation,
-                includeServiceLength: bonusIncludeServiceLength,
-                isActive: bonusIsActive,
-              }
+              ...b,
+              employeeType: bonusEmpType,
+              daysFrom: Number(bonusDaysFrom),
+              daysTo: Number(bonusDaysTo),
+              basedOn: bonusBasedOn,
+              bonusPercent: Number(bonusPercent),
+              designation: bonusDesignation,
+              includeServiceLength: bonusIncludeServiceLength,
+              isActive: bonusIsActive,
+            }
             : b,
         );
       } else {
@@ -1719,11 +1719,10 @@ function CompensationSetupPage() {
                     setActiveTab(tab.type);
                     setSearchQuery("");
                   }}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                    isActive
-                      ? "bg-primary text-primary-foreground font-semibold shadow-sm"
-                      : "bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground font-medium"
-                  }`}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all ${isActive
+                    ? "bg-primary text-primary-foreground font-semibold shadow-sm"
+                    : "bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground font-medium"
+                    }`}
                 >
                   <TabIcon className="size-4" />
                   {tab.label}
@@ -2386,7 +2385,7 @@ function CompensationSetupPage() {
                         <option value="--Select--">--Select--</option>
                         <option value="Basic">Basic</option>
                         <option value="Gross">Gross</option>
-                        <option value="Flat">Flat</option>
+                        <option value="Fixed">Fixed</option>
                       </select>
                     </div>
                     <div className={insetWrapperClass}>
@@ -2614,7 +2613,7 @@ function CompensationSetupPage() {
                         required
                       >
                         <option value="Hour">Hour</option>
-                        <option value="Flat">Flat</option>
+                        <option value="Fixed">Fixed</option>
                       </select>
                     </div>
                     <div className={insetWrapperClass}>
@@ -2768,7 +2767,7 @@ function CompensationSetupPage() {
                       >
                         <option value="Basic">Basic</option>
                         <option value="Gross">Gross</option>
-                        <option value="Flat">Flat</option>
+                        <option value="Fixed">Fixed</option>
                       </select>
                     </div>
                     <div className={insetWrapperClass}>

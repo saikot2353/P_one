@@ -554,7 +554,7 @@ const DEFAULT_OT_CONFIGS: OtConfig[] = [
     section: "ALL",
     designation: "ALL",
     unit: "ALL",
-    otCalculationType: "Flat Hour",
+    otCalculationType: "Fixed Hour",
     bufferMinutes: 15,
     isActive: "Active",
   },
@@ -576,7 +576,7 @@ const DEFAULT_OT_CONFIGS: OtConfig[] = [
     section: "Sewing Section",
     designation: "Supervisor",
     unit: "ALL",
-    otCalculationType: "Flat Hour",
+    otCalculationType: "Fixed Hour",
     bufferMinutes: 15,
     isActive: "Active",
   },
@@ -587,7 +587,7 @@ const DEFAULT_OT_CONFIGS: OtConfig[] = [
     section: "ALL",
     designation: "ALL",
     unit: "ALL",
-    otCalculationType: "Flat Hour",
+    otCalculationType: "Fixed Hour",
     bufferMinutes: 30,
     isActive: "Active",
   },
@@ -609,7 +609,7 @@ const DEFAULT_OT_CONFIGS: OtConfig[] = [
     section: "Sewing Section",
     designation: "Helper",
     unit: "ALL",
-    otCalculationType: "Flat Hour",
+    otCalculationType: "Fixed Hour",
     bufferMinutes: 10,
     isActive: "Active",
   },
@@ -620,7 +620,7 @@ const DEFAULT_OT_CONFIGS: OtConfig[] = [
     section: "Sewing Section",
     designation: "Helper",
     unit: "ALL",
-    otCalculationType: "Flat Hour",
+    otCalculationType: "Fixed Hour",
     bufferMinutes: 15,
     isActive: "Active",
   },
@@ -642,7 +642,7 @@ const DEFAULT_OT_CONFIGS: OtConfig[] = [
     section: "ALL",
     designation: "ALL",
     unit: "ALL",
-    otCalculationType: "Flat Hour",
+    otCalculationType: "Fixed Hour",
     bufferMinutes: 15,
     isActive: "Active",
   },
@@ -664,7 +664,7 @@ const DEFAULT_OT_CONFIGS: OtConfig[] = [
     section: "ALL",
     designation: "ALL",
     unit: "ALL",
-    otCalculationType: "Flat Hour",
+    otCalculationType: "Fixed Hour",
     bufferMinutes: 10,
     isActive: "Active",
   },
@@ -675,7 +675,7 @@ const DEFAULT_OT_CONFIGS: OtConfig[] = [
     section: "ALL",
     designation: "ALL",
     unit: "ALL",
-    otCalculationType: "Flat Hour",
+    otCalculationType: "Fixed Hour",
     bufferMinutes: 15,
     isActive: "Active",
   },
@@ -686,7 +686,7 @@ const DEFAULT_OT_CONFIGS: OtConfig[] = [
     section: "ALL",
     designation: "ALL",
     unit: "ALL",
-    otCalculationType: "Flat Hour",
+    otCalculationType: "Fixed Hour",
     bufferMinutes: 20,
     isActive: "Active",
   },
@@ -697,7 +697,7 @@ const DEFAULT_OT_CONFIGS: OtConfig[] = [
     section: "ALL",
     designation: "ALL",
     unit: "ALL",
-    otCalculationType: "Flat Hour",
+    otCalculationType: "Fixed Hour",
     bufferMinutes: 15,
     isActive: "Active",
   },
@@ -730,7 +730,7 @@ const DEFAULT_OT_CONFIGS: OtConfig[] = [
     section: "ALL",
     designation: "ALL",
     unit: "ALL",
-    otCalculationType: "Flat Hour",
+    otCalculationType: "Fixed Hour",
     bufferMinutes: 15,
     isActive: "Active",
   },
@@ -741,7 +741,7 @@ const DEFAULT_OT_CONFIGS: OtConfig[] = [
     section: "Sewing Section",
     designation: "Helper",
     unit: "ALL",
-    otCalculationType: "Flat Hour",
+    otCalculationType: "Fixed Hour",
     bufferMinutes: 10,
     isActive: "Active",
   },
@@ -752,7 +752,7 @@ const DEFAULT_OT_CONFIGS: OtConfig[] = [
     section: "ALL",
     designation: "ALL",
     unit: "ALL",
-    otCalculationType: "Flat Hour",
+    otCalculationType: "Fixed Hour",
     bufferMinutes: 30,
     isActive: "Active",
   },
@@ -763,7 +763,7 @@ const DEFAULT_OT_CONFIGS: OtConfig[] = [
     section: "ALL",
     designation: "ALL",
     unit: "ALL",
-    otCalculationType: "Flat Hour",
+    otCalculationType: "Fixed Hour",
     bufferMinutes: 20,
     isActive: "Active",
   },
@@ -1008,7 +1008,7 @@ function TimeSetupPage() {
 
   // Form states - OT Configuration
   const [otEmpType, setOtEmpType] = useState("ALL");
-  const [otCalcType, setOtCalcType] = useState("Flat Hour");
+  const [otCalcType, setOtCalcType] = useState("Fixed Hour");
   const [otBuffer, setOtBuffer] = useState<number>(15);
   const [otIsActive, setOtIsActive] = useState<"Active" | "Inactive">("Active");
 
@@ -1071,7 +1071,7 @@ function TimeSetupPage() {
       const item = otConfigs.find((o) => o.sl === sl);
       setOtInfoItem(
         item ||
-          ({ sl: 0, employeeType: "ALL", isActive: "Active", otCalculationType: "General" } as any),
+        ({ sl: 0, employeeType: "ALL", isActive: "Active", otCalculationType: "General" } as any),
       );
       setOiEmployeeType(item?.employeeType || "ALL");
       setOiDepartment(item?.department || "All Departments");
@@ -1191,25 +1191,25 @@ function TimeSetupPage() {
         nextList = shifts.map((s) =>
           s.sl === editSl
             ? {
-                ...s,
-                nameEng: shiftNameEng,
-                nameBng: shiftNameBng,
-                startTime: shiftStart,
-                endTime: shiftEnd,
-                lateTime: shiftLate,
-                startTimeFrom: shiftStartFrom,
-                endTimeTo: shiftEndTo,
-                lateCount: shiftLateCount,
-                sortOrder: Number(shiftSort),
-                isActive: shiftIsActive,
-                isRotate: shiftIsRotate,
-                rotationCriteria: shiftRotation,
-                shiftChangeDay,
-                isLateDeduction: shiftIsLateDeduct,
-                deductionFrom: shiftDeductFrom,
-                deductionPer: shiftDeductPer,
-                deductionAfterDay: shiftDeductAfterDay,
-              }
+              ...s,
+              nameEng: shiftNameEng,
+              nameBng: shiftNameBng,
+              startTime: shiftStart,
+              endTime: shiftEnd,
+              lateTime: shiftLate,
+              startTimeFrom: shiftStartFrom,
+              endTimeTo: shiftEndTo,
+              lateCount: shiftLateCount,
+              sortOrder: Number(shiftSort),
+              isActive: shiftIsActive,
+              isRotate: shiftIsRotate,
+              rotationCriteria: shiftRotation,
+              shiftChangeDay,
+              isLateDeduction: shiftIsLateDeduct,
+              deductionFrom: shiftDeductFrom,
+              deductionPer: shiftDeductPer,
+              deductionAfterDay: shiftDeductAfterDay,
+            }
             : s,
         );
       } else {
@@ -1243,12 +1243,12 @@ function TimeSetupPage() {
         nextList = otConfigs.map((o) =>
           o.sl === editSl
             ? {
-                ...o,
-                employeeType: otEmpType,
-                otCalculationType: otCalcType,
-                bufferMinutes: Number(otBuffer),
-                isActive: otIsActive,
-              }
+              ...o,
+              employeeType: otEmpType,
+              otCalculationType: otCalcType,
+              bufferMinutes: Number(otBuffer),
+              isActive: otIsActive,
+            }
             : o,
         );
       } else {
@@ -1404,11 +1404,10 @@ function TimeSetupPage() {
                     setActiveTab(tab.type);
                     setSearchQuery("");
                   }}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                    isActive
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all ${isActive
                       ? "bg-primary text-primary-foreground font-semibold shadow-sm"
                       : "bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground font-medium"
-                  }`}
+                    }`}
                 >
                   <TabIcon className="size-4" />
                   {tab.label}
@@ -2144,7 +2143,7 @@ function TimeSetupPage() {
                         onChange={(e) => setOtCalcType(e.target.value)}
                         className={insetSelectClass}
                       >
-                        <option value="Flat Hour">Flat Hour</option>
+                        <option value="Fixed Hour">Fixed Hour</option>
                         <option value="Basic Ratio">Basic Ratio</option>
                         <option value="Gross Ratio">Gross Ratio</option>
                       </select>
@@ -2841,22 +2840,22 @@ function TimeSetupPage() {
                     const updated = shifts.map((s) =>
                       s.sl === shiftInfoItem.sl
                         ? {
-                            ...s,
-                            nameEng: siNameEng,
-                            nameBng: siNameBng,
-                            startTime: siStartTime,
-                            endTime: siEndTime,
-                            lateTime: siLateTime,
-                            lateCount: siLateCount,
-                            startTimeFrom: siStartTimeFrom,
-                            endTimeTo: siEndTimeTo,
-                            sortOrder: siSortOrder,
-                            isActive: siIsActive,
-                            isRotate: siIsRotate,
-                            rotationCriteria: siRotationCriteria,
-                            shiftChangeDay: siShiftChangeDay === "Select.." ? "" : siShiftChangeDay,
-                            isLateDeduction: siIsLateDeduction,
-                          }
+                          ...s,
+                          nameEng: siNameEng,
+                          nameBng: siNameBng,
+                          startTime: siStartTime,
+                          endTime: siEndTime,
+                          lateTime: siLateTime,
+                          lateCount: siLateCount,
+                          startTimeFrom: siStartTimeFrom,
+                          endTimeTo: siEndTimeTo,
+                          sortOrder: siSortOrder,
+                          isActive: siIsActive,
+                          isRotate: siIsRotate,
+                          rotationCriteria: siRotationCriteria,
+                          shiftChangeDay: siShiftChangeDay === "Select.." ? "" : siShiftChangeDay,
+                          isLateDeduction: siIsLateDeduction,
+                        }
                         : s,
                     );
                     setShifts(updated);
@@ -3255,7 +3254,7 @@ function TimeSetupPage() {
                           className={insetSelectClass}
                         >
                           <option value="General">General</option>
-                          <option value="Flat Hour">Flat Hour</option>
+                          <option value="Fixed Hour">Fixed Hour</option>
                           <option value="Basic Ratio">Basic Ratio</option>
                           <option value="Gross Ratio">Gross Ratio</option>
                         </select>

@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v30");
+    const saved = localStorage.getItem("system_changes_v34");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -285,6 +285,24 @@ function ChangesPage() {
           link: "/payroll-benefits",
           descriptionEn: "Removed redundant 'Loan/Advance Req.' and 'Loan Reschedule Sys.' submenus under the Benefits section in both the main sidebar navigation and the Payroll Benefits overview dashboard page.",
           descriptionBn: "বেনিফিটস সেকশনের অধীনে থাকা অপ্রয়োজনীয় 'Loan/Advance Req.' এবং 'Loan Reschedule Sys.' সাবমেনু দুটি মেইন সাইডবার নেভিগেশন এবং পে রোল বেনিফিটস ওভারভিউ ড্যাশবোর্ড পেজ থেকে বাদ দেওয়া হয়েছে।",
+        },
+        {
+          id: "30",
+          date: "2026-07-28T14:55",
+          type: "Modify",
+          module: "Benefits",
+          link: "/payroll-benefits-common",
+          descriptionEn: "Redesigned the Common Benefits page into a highly user-friendly dual-view layout. Replaced the modal with a spacious full-screen Configure Workspace, featuring dynamic employee lists, default quick-fill amounts, individual overrides, and manual employee add/remove controls.",
+          descriptionBn: "কমন বেনিফিটস পেজটিকে আরও ইউজার-ফ্রেন্ডলি করতে ডুয়াল-ভিউ লেআউটে রিডিজাইন করা হয়েছে। মোডালের পরিবর্তে ফুল-স্ক্রিন কনফিগারেশন ওয়ার্কস্পেস যুক্ত করা হয়েছে, যেখানে ডাইনামিক এমপ্লয়ি লিস্ট, ডিফল্ট কুইক-ফিল অ্যামাউন্ট, প্রতি এমপ্লয়ির জন্য কাস্টম অ্যামাউন্ট এবং ম্যানুয়ালি এমপ্লয়ি যুক্ত/বাদ দেওয়ার সুবিধা রয়েছে।",
+        },
+        {
+          id: "31",
+          date: "2026-07-28T15:56",
+          type: "Modify",
+          module: "Company Setup",
+          link: "/company-setup",
+          descriptionEn: "Added a new 'Half Leave' Yes/No setting dropdown to the Company Architecture & ID Setup configuration panel on the Company Setup page.",
+          descriptionBn: "কোম্পানি সেটআপ পেজের কোম্পানি আর্কিটেকচার অ্যান্ড আইডি সেটআপ প্যানেলে একটি নতুন 'Half Leave' (Yes/No) সেটিং ড্রপডাউন যুক্ত করা হয়েছে।"
         },
       ]);
     }

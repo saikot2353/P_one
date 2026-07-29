@@ -1321,6 +1321,7 @@ interface CompanyBasicSettings {
   sandwichHoliday: string;
   sandwichEmployeeType: string;
   lateTimeCalculation: string;
+  halfLeave: string;
 }
 
 const DEFAULT_COMPANY_SETTINGS: CompanyBasicSettings = {
@@ -1359,6 +1360,7 @@ const DEFAULT_COMPANY_SETTINGS: CompanyBasicSettings = {
   sandwichHoliday: "No",
   sandwichEmployeeType: "ALL",
   lateTimeCalculation: "Late Time",
+  halfLeave: "No",
 };
 
 function CompanySetupPage() {
@@ -4109,7 +4111,7 @@ function CompanySetupPage() {
                     {/* 6. Company Architecture & ID Setup */}
                     {isTabVisible("system") && (
                       <div className="bg-card p-5 rounded-2xl border border-border/50 shadow-sm space-y-4">
-                        <SectionHeader title="Company Architecture & ID Setup" badge="10 Fields" icon={Settings} />
+                        <SectionHeader title="Company Architecture & ID Setup" badge="11 Fields" icon={Settings} />
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                           <div className={wrap}>
                             <label className={lbl}>Company Type <span className="text-rose-500">*</span></label>
@@ -4217,6 +4219,17 @@ function CompanySetupPage() {
                             <select
                               value={cfg.encryption}
                               onChange={(e) => update("encryption", e.target.value)}
+                              className={sel}
+                            >
+                              <option value="Yes">Yes</option>
+                              <option value="No">No</option>
+                            </select>
+                          </div>
+                          <div className={wrap}>
+                            <label className={lbl}>Half Leave <span className="text-rose-500">*</span></label>
+                            <select
+                              value={cfg.halfLeave}
+                              onChange={(e) => update("halfLeave", e.target.value)}
                               className={sel}
                             >
                               <option value="Yes">Yes</option>
