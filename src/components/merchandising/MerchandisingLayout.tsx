@@ -17,6 +17,7 @@ import {
   Settings,
   Activity,
   Calendar,
+  Search,
 } from "lucide-react";
 
 interface BreadcrumbItem {
@@ -49,6 +50,7 @@ interface MenuCategory {
   label: string;
   icon: React.ElementType;
   to?: string;
+  search?: Record<string, string>;
   subitems?: SubCategoryItem[];
   subGroups?: MenuSubGroup[];
 }
@@ -65,7 +67,8 @@ export default function MerchandisingLayout({
 
   const getInitialExpanded = (ap: string): Record<string, boolean> => ({
     masterSettings: ap === "masterSettings" || ap === "merchandising-master-settings",
-    orders: ap === "order-list" || ap === "order-profile" || ap === "inquiry",
+    "order-management": ap === "order-list" || ap === "order-profile" || ap === "merchandising-order-list" || ap === "merchandising-order-profile",
+    capacity: ap === "capacity-planning" || ap === "merchandising-capacity-planning",
   });
 
   const getInitialSubGroups = (searchTab: string): Record<string, boolean> => {
@@ -81,7 +84,7 @@ export default function MerchandisingLayout({
       "item-department": "product",
       "gmt-item-name": "product",
       "body-part": "product",
-      "season": "product",
+      "season": "season",
       "sample-type": "product",
       "size-group": "product",
       "uom": "product",
@@ -148,18 +151,6 @@ export default function MerchandisingLayout({
 
   // ── Definitive BD RMG ERP Menu Structure ──────────────────────────────────────
   const menuCategories: MenuCategory[] = [
-    {
-      key: "dashboard",
-      label: "Dashboard",
-      icon: LayoutDashboard,
-      to: "/merchandising-dashboard",
-    },
-    {
-      key: "order-profile",
-      label: "Order Entry & Costing",
-      icon: Layers,
-      to: "/merchandising-order-profile",
-    },
     {
       key: "masterSettings",
       label: "Merchandising Settings",
@@ -249,6 +240,76 @@ export default function MerchandisingLayout({
         }
       ]
     },
+    {
+      key: "dashboard",
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      to: "/merchandising-dashboard",
+    },
+    {
+      key: "capacity",
+      label: "Capacity",
+      icon: Activity,
+      subitems: [
+        { label: "Monthly Capacity", to: "/merchandising-capacity-planning", subActiveKey: "capacity-planning", search: { tab: "monthly" } },
+        { label: "Capacity Allocation", to: "/merchandising-capacity-planning", subActiveKey: "capacity-planning", search: { tab: "allocation" } },
+        { label: "Capacity Distribution", to: "/merchandising-capacity-planning", subActiveKey: "capacity-planning", search: { tab: "distribution" } },
+        { label: "Sales Target Entry", to: "/merchandising-capacity-planning", subActiveKey: "capacity-planning", search: { tab: "sales" } },
+      ],
+    },
+    {
+      key: "inquiry",
+      label: "Inquiry",
+      icon: Search,
+      to: "/merchandising-inquiry",
+      search: { tab: "register" },
+    },
+    {
+      key: "quotation",
+      label: "Quotation",
+      icon: FileText,
+      to: "/merchandising-inquiry",
+      search: { tab: "status" },
+    },
+    {
+      key: "po-management",
+      label: "PO Management",
+      icon: Briefcase,
+      to: "/merchandising-order-profile",
+    },
+    {
+      key: "pre-costing",
+      label: "Pre Costing",
+      icon: TrendingUp,
+      to: "/merchandising-inquiry",
+      search: { tab: "costing" },
+    },
+    {
+      key: "order-management",
+      label: "Order Management",
+      icon: Layers,
+      subitems: [
+        { label: "Order List", to: "/merchandising-order-list", subActiveKey: "order-list" },
+        { label: "Cad Consumption Update", to: "/merchandising-order-profile", subActiveKey: "order-profile", search: { tab: "cad" } },
+        { label: "Order Profile", to: "/merchandising-order-profile", subActiveKey: "order-profile" },
+        { label: "Edit Order All Part", to: "/merchandising-order-profile", subActiveKey: "order-profile", search: { action: "edit" } },
+        { label: "PO Ship Date Update", to: "/merchandising-order-profile", subActiveKey: "order-profile", search: { tab: "ship" } },
+      ],
+    },
+    {
+      key: "yarn-booking",
+      label: "Yarn Booking",
+      icon: Wind,
+      to: "/merchandising-material-bookings",
+      search: { tab: "yarnCalc" },
+    },
+    {
+      key: "fabric-booking",
+      label: "Fabric Booking",
+      icon: Scissors,
+      to: "/merchandising-material-bookings",
+      search: { tab: "fabric" },
+    },
   ];
 
   return (
@@ -306,11 +367,16 @@ export default function MerchandisingLayout({
 
             // ── FLAT DIRECT LINK ─────────────────────────────────────────────
             if (cat.to && !cat.subitems) {
-              const isActive = activePath === cat.key;
+              const currentTab = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("tab") : "";
+              const isActive = cat.search?.tab
+                ? (currentTab === cat.search.tab && (activePath === cat.key || activePath === "inquiry" || activePath === "sourcing"))
+                : (activePath === cat.key && !currentTab);
+
               return (
                 <Link
                   key={cat.key}
                   to={cat.to}
+                  search={cat.search as any}
                   className={`group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-bold transition-all duration-200 ${
                     isActive
                       ? "bg-teal-500/15 text-teal-600 dark:text-teal-400 border border-teal-500/20"

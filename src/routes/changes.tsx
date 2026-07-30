@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v45");
+    const saved = localStorage.getItem("system_changes_v51");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -402,6 +402,51 @@ function ChangesPage() {
           link: "/add-employee",
           descriptionEn: "Implemented robust file uploading, size validation (5MB max), extension validation (.pdf, .jpg, .jpeg, .png), upload progress indicators, and an interactive secure document preview modal for academic and experience attachments.",
           descriptionBn: "একাডেমিক এবং অভিজ্ঞতা সনদের অ্যাটাচমেন্টের জন্য শক্তিশালী ফাইল আপলোডিং, ফাইলের সাইজ ভ্যালিডেশন (সর্বোচ্চ ৫ মেগাবাইট), ফাইল এক্সটেনশন ভ্যালিডেশন (.pdf, .jpg, .jpeg, .png), আপলোড প্রোগ্রেস বার এবং একটি ইন্টারেক্টিভ সিকিউর ডকুমেন্ট প্রিভিউ মোডাল তৈরি করা হয়েছে।",
+        },
+        {
+          id: "43",
+          date: "2026-07-30T12:00",
+          type: "Modify",
+          module: "Personnel File",
+          link: "/add-employee",
+          descriptionEn: "Added a smart missing attachment warning modal on form submit. It detects which academic degrees and work experience entries are filled in but missing a supporting document, lists them by name, and lets the user go back to attach files or proceed anyway.",
+          descriptionBn: "ফর্ম সাবমিটের সময় একটি স্মার্ট মিসিং অ্যাটাচমেন্ট ওয়ার্নিং মোডাল যুক্ত করা হয়েছে। এটি স্বয়ংক্রিয়ভাবে শনাক্ত করে কোন একাডেমিক ডিগ্রি বা কর্মঅভিজ্ঞতার এন্ট্রিতে ডকুমেন্ট আপলোড করা হয়নি, সেগুলোর নাম দিয়ে একটি তালিকা দেখায়, এবং ব্যবহারকারীকে ফিরে গিয়ে ডকুমেন্ট যোগ করার বা এড়িয়ে সাবমিট করার সুযোগ দেয়।",
+        },
+        {
+          id: "44",
+          date: "2026-07-30T12:12",
+          type: "Modify",
+          module: "Personnel File",
+          link: "/add-employee",
+          descriptionEn: "Implemented the dynamic pre-upload attachment ID generation and saved qualification/experience details with attachment tokens in localStorage during employee creation.",
+          descriptionBn: "এমপ্লয়ি ক্রিয়েশন ফর্মে ডাইনামিক প্রি-আপলোড অ্যাটাচমেন্ট আইডি জেনারেশন ইমপ্লিমেন্ট করা হয়েছে এবং লোকাল স্টোরেজে কোয়ালিফিকেশন ও এক্সপেরিয়েন্স ডেটা অ্যাটাচমেন্ট টোকেনসহ সংরক্ষণ করার ব্যবস্থা করা হয়েছে।",
+        },
+        {
+          id: "45",
+          date: "2026-07-30T14:18",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-dashboard",
+          descriptionEn: "Restructured the Merchandising module sidebar menu to align with the core RMG workflow: Inquiry, Quotation, PO Management, Pre Costing, Order Management (with sub-menus), Yarn Booking, and Fabric Booking, with the Merchandising Settings category moved to the top.",
+          descriptionBn: "মার্চেন্ডাইজিং মডিউলের সাইডবার মেনু আরএমজি ওয়ার্কফ্লো অনুযায়ী সাজানো হয়েছে (Inquiry, Quotation, PO Management, Pre Costing, Order Management sub-menus, Yarn Booking এবং Fabric Booking) এবং 'Merchandising Settings' মেনুটিকে সবার উপরে নিয়ে যাওয়া হয়েছে।",
+        },
+        {
+          id: "46",
+          date: "2026-07-30T14:24",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-dashboard",
+          descriptionEn: "Added 'Capacity' section with sub-menus (Monthly Capacity, Capacity Allocation, Capacity Distribution, Sales Target Entry) right after the Dashboard category in the Merchandising module sidebar.",
+          descriptionBn: "মার্চেন্ডাইজিং সাইডবারে Dashboard-এর পর নতুন 'Capacity' মেনু এবং তার সাব-মেনুসমূহ (Monthly Capacity, Capacity Allocation, Capacity Distribution, Sales Target Entry) যুক্ত করা হয়েছে।",
+        },
+        {
+          id: "47",
+          date: "2026-07-30T14:30",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-capacity-planning",
+          descriptionEn: "Implemented the fully interactive Capacity Allocation module, including a spreadsheet-style Master Ledger view with filters/searches/exports, and an inline day-by-day calculation form for month-wise line capacity allocation.",
+          descriptionBn: "মার্চেন্ডাইজিং ক্যাড ক্যাপাসিটি প্ল্যানিং মডিউলে একটি সম্পূর্ণ ইন্টারঅ্যাক্টিভ 'Capacity Allocation' ফিচার যোগ করা হয়েছে। এর মধ্যে ফিল্টার/সার্চ/এক্সপোর্ট সহ স্প্রেডশিট-স্টাইলের মাস্টার লেজার ভিউ এবং দিনভিত্তিক ক্যাপাসিটি হিসাবের জন্য ফর্ম ওয়ার্কস্পেস অন্তর্ভুক্ত রয়েছে।",
         },
       ]);
     }

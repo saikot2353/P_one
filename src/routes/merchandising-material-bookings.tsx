@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import MerchandisingLayout from "../components/merchandising/MerchandisingLayout";
 import {
   Wind,
@@ -44,6 +44,13 @@ const initialBookings: BookingRecord[] = [
 
 function MerchandisingMaterialBookingsPage() {
   const [activeTab, setActiveTab] = useState<"yarnCalc" | "fabric" | "trims">("yarnCalc");
+  
+  const searchTab = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("tab") : null;
+  useEffect(() => {
+    if (searchTab === "yarnCalc" || searchTab === "fabric" || searchTab === "trims") {
+      setActiveTab(searchTab);
+    }
+  }, [searchTab]);
   const [bookings, setBookings] = useState<BookingRecord[]>(initialBookings);
 
   // Yarn Calculator States

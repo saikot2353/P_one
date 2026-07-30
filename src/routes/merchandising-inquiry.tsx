@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MerchandisingLayout from "../components/merchandising/MerchandisingLayout";
 import {
   Search,
@@ -128,6 +128,13 @@ function StatusBadge({ status }: { status: InquiryStatus }) {
 
 function MerchandisingInquiryPage() {
   const [activeTab, setActiveTab] = useState<"register" | "costing" | "status">("register");
+  
+  const searchTab = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("tab") : null;
+  useEffect(() => {
+    if (searchTab === "register" || searchTab === "costing" || searchTab === "status") {
+      setActiveTab(searchTab);
+    }
+  }, [searchTab]);
   const [inquiries, setInquiries] = useState<Inquiry[]>(SAMPLE_INQUIRIES);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<InquiryStatus | "All">("All");

@@ -49,6 +49,7 @@ import {
   Cpu,
   Scan,
   Loader2,
+  AlertTriangle,
 } from "lucide-react";
 
 export const Route = createFileRoute("/add-employee")({
@@ -86,6 +87,12 @@ function AddEmployeePage() {
   // Custom addition modal states
   const [addingField, setAddingField] = useState<string | null>(null);
   const [customValue, setCustomValue] = useState("");
+
+  // Missing attachment warning state
+  const [missingAttachments, setMissingAttachments] = useState<{
+    type: "education" | "experience";
+    label: string;
+  }[] | null>(null);
 
   // Practical File Upload states
   const [uploadingState, setUploadingState] = useState<{
@@ -138,14 +145,15 @@ function AddEmployeePage() {
           clearInterval(interval);
           setUploadingState(null);
           
+          const generatedAttachmentId = "att_" + Math.floor(100000 + Math.random() * 900000).toString(16);
           const updatedFileName = `${file.name} (${fileSizeStr})`;
           if (listType === "education") {
             setEducationList((prev) =>
-              prev.map((item, i) => (i === index ? { ...item, attachment: updatedFileName } : item))
+              prev.map((item, i) => (i === index ? { ...item, attachment: updatedFileName, attachmentId: generatedAttachmentId } : item))
             );
           } else {
             setExperienceList((prev) =>
-              prev.map((item, i) => (i === index ? { ...item, attachment: updatedFileName } : item))
+              prev.map((item, i) => (i === index ? { ...item, attachment: updatedFileName, attachmentId: generatedAttachmentId } : item))
             );
           }
           toast.success(`${file.name} uploaded successfully!`);
@@ -365,6 +373,7 @@ function AddEmployeePage() {
       passingYear: "2022",
       resultGpa: "3.85",
       attachment: "",
+      attachmentId: "",
     },
   ]);
   const [experienceList, setExperienceList] = useState<any[]>([
@@ -375,6 +384,7 @@ function AddEmployeePage() {
       toDate: "2025-02-28",
       leavingReason: "Career Growth",
       attachment: "",
+      attachmentId: "",
     },
   ]);
   const [certifications, setCertifications] = useState<any[]>([
@@ -422,7 +432,16 @@ function AddEmployeePage() {
   // Spreadsheet-style helper functions for inline editing
   const handleEduChange = (index: number, field: string, value: string) => {
     setEducationList((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)),
+      prev.map((item, i) => {
+        if (i === index) {
+          const updated = { ...item, [field]: value };
+          if (field === "attachment" && !value) {
+            updated.attachmentId = "";
+          }
+          return updated;
+        }
+        return item;
+      }),
     );
   };
   const addEduRow = () => {
@@ -434,13 +453,23 @@ function AddEmployeePage() {
         passingYear: "",
         resultGpa: "",
         attachment: "",
+        attachmentId: "",
       },
     ]);
   };
 
   const handleExpChange = (index: number, field: string, value: string) => {
     setExperienceList((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)),
+      prev.map((item, i) => {
+        if (i === index) {
+          const updated = { ...item, [field]: value };
+          if (field === "attachment" && !value) {
+            updated.attachmentId = "";
+          }
+          return updated;
+        }
+        return item;
+      }),
     );
   };
   const addExpRow = () => {
@@ -614,70 +643,78 @@ function AddEmployeePage() {
     return isValid;
   };
 
+  const finalizeSave = () => {
+    if (typeof window !== "undefined") {
+      const synced = localStorage.getItem("recruitment_synced_employees");
+      let list: any[] = [];
+      if (synced) {
+        try {
+          list = JSON.parse(synced);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      // Map the form state to match personnel-list structure
+      const newEmp = {
+        id: form.id,
+        offcId: form.offcId || "—",
+        name: form.nameEng,
+        type: form.empType,
+        dept: form.dept,
+        sect: form.sect,
+        title: form.title,
+        unit: form.unit,
+        line: form.line,
+        grade: form.grade,
+        shift: form.shift,
+        joinDate: form.joinDate,
+        confirmDate: form.confirmDate || "—",
+        holiday: form.holiday || "—",
+        blood: form.blood,
+        gross: form.gross,
+        basic: (parseFloat(form.gross) * 0.6).toFixed(2),
+        email: form.offcEmail || "—",
+        officeMob: form.offcMobile || "—",
+        personalContact: form.personalContact || "—",
+        gender: form.gender,
+        dob: form.dob,
+        status: "Working",
+        empStatus: form.empStatus,
+        acStatus: "Active",
+        allowanceOption: form.allowanceOption,
+        attendanceBonusRate: form.attendanceBonusRate,
+        holidayRate: form.holidayRate,
+        behaviorBonus: form.behaviorBonus,
+        transportAllowance: form.transportAllowance,
+        mobileAllowance: form.mobileAllowance,
+        lunchAllowance: form.lunchAllowance,
+        specialAllowance: form.specialAllowance,
+        internetAllowance: form.internetAllowance,
+        utilityAllowance: form.utilityAllowance,
+        taxDeduction: form.taxDeduction,
+        gratuity: form.gratuity,
+        bankPay: form.bankPay,
+        cashPay: form.cashPay,
+        bankName: form.bankName,
+        bankAccount: form.bankAccount,
+        educationList: educationList,
+        experienceList: experienceList,
+        certifications: certifications,
+        trainingList: trainingList,
+        involvements: involvements,
+      };
+      list.push(newEmp);
+      localStorage.setItem("recruitment_synced_employees", JSON.stringify(list));
+    }
+    setMissingAttachments(null);
+    setShowSuccessModal(true);
+  };
+
   const handleSave = (e: any) => {
     e.preventDefault();
-    if (validateFields()) {
-      if (typeof window !== "undefined") {
-        const synced = localStorage.getItem("recruitment_synced_employees");
-        let list = [];
-        if (synced) {
-          try {
-            list = JSON.parse(synced);
-          } catch (err) {
-            console.error(err);
-          }
-        }
-        
-        // Map the form state to match personnel-list structure
-        const newEmp = {
-          id: form.id,
-          offcId: form.offcId || "—",
-          name: form.nameEng,
-          type: form.empType,
-          dept: form.dept,
-          sect: form.sect,
-          title: form.title,
-          unit: form.unit,
-          line: form.line,
-          grade: form.grade,
-          shift: form.shift,
-          joinDate: form.joinDate,
-          confirmDate: form.confirmDate || "—",
-          holiday: form.holiday || "—",
-          blood: form.blood,
-          gross: form.gross,
-          basic: (parseFloat(form.gross) * 0.6).toFixed(2),
-          email: form.offcEmail || "—",
-          officeMob: form.offcMobile || "—",
-          personalContact: form.personalContact || "—",
-          gender: form.gender,
-          dob: form.dob,
-          status: "Working",
-          empStatus: form.empStatus,
-          acStatus: "Active",
-          allowanceOption: form.allowanceOption,
-          attendanceBonusRate: form.attendanceBonusRate,
-          holidayRate: form.holidayRate,
-          behaviorBonus: form.behaviorBonus,
-          transportAllowance: form.transportAllowance,
-          mobileAllowance: form.mobileAllowance,
-          lunchAllowance: form.lunchAllowance,
-          specialAllowance: form.specialAllowance,
-          internetAllowance: form.internetAllowance,
-          utilityAllowance: form.utilityAllowance,
-          taxDeduction: form.taxDeduction,
-          gratuity: form.gratuity,
-          bankPay: form.bankPay,
-          cashPay: form.cashPay,
-          bankName: form.bankName,
-          bankAccount: form.bankAccount,
-        };
-        list.push(newEmp);
-        localStorage.setItem("recruitment_synced_employees", JSON.stringify(list));
-      }
-      setShowSuccessModal(true);
-    } else {
-      // Find which section has errors and jump to it
+    if (!validateFields()) {
+      // Jump to the tab that has errors
       if (
         !form.nameEng ||
         !form.dob ||
@@ -693,6 +730,40 @@ function AddEmployeePage() {
       } else if (!form.gross) {
         setActiveTab("financial_employment");
       }
+      return;
+    }
+
+    // Collect rows that have content but are missing an attachment
+    const missing: { type: "education" | "experience"; label: string }[] = [];
+
+    educationList.forEach((edu) => {
+      const hasContent = edu.degree || edu.institute || edu.passingYear || edu.resultGpa;
+      if (hasContent && !edu.attachment) {
+        missing.push({
+          type: "education",
+          label: edu.degree
+            ? `${edu.degree}${edu.institute ? " — " + edu.institute : ""}`
+            : edu.institute || "Unnamed Education Entry",
+        });
+      }
+    });
+
+    experienceList.forEach((exp) => {
+      const hasContent = exp.company || exp.designation || exp.fromDate || exp.toDate;
+      if (hasContent && !exp.attachment) {
+        missing.push({
+          type: "experience",
+          label: exp.company
+            ? `${exp.company}${exp.designation ? " — " + exp.designation : ""}`
+            : exp.designation || "Unnamed Experience Entry",
+        });
+      }
+    });
+
+    if (missing.length > 0) {
+      setMissingAttachments(missing);
+    } else {
+      finalizeSave();
     }
   };
 
@@ -5383,6 +5454,107 @@ function AddEmployeePage() {
           </form>
         </div>
       </main>
+
+      {/* MISSING ATTACHMENTS WARNING MODAL */}
+      {missingAttachments && missingAttachments.length > 0 && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-card border border-border/80 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="flex items-center gap-3 p-5 border-b border-border/30 bg-amber-500/5">
+              <div className="size-9 rounded-xl bg-amber-500/15 flex items-center justify-center shrink-0">
+                <AlertTriangle className="size-4.5 text-amber-500" />
+              </div>
+              <div>
+                <h3 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
+                  Missing Attachment Documents
+                </h3>
+                <p className="text-[10px] text-muted-foreground mt-0.5">
+                  {missingAttachments.length} credential{missingAttachments.length > 1 ? "s" : ""} without supporting document
+                </p>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="p-5 space-y-4">
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                The following entries don't have an attached document. Since attachments are <span className="text-amber-600 font-bold">optional</span>, you can proceed without them — but documents help verify the credentials.
+              </p>
+
+              {/* Missing list grouped by type */}
+              <div className="space-y-2.5">
+                {/* Education group */}
+                {missingAttachments.filter(m => m.type === "education").length > 0 && (
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-1.5 text-[9px] font-extrabold uppercase tracking-wider text-indigo-500">
+                      <GraduationCap className="size-3" /> Academic Credentials
+                    </div>
+                    <div className="space-y-1">
+                      {missingAttachments.filter(m => m.type === "education").map((item, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-indigo-500/5 border border-indigo-500/15"
+                        >
+                          <div className="size-1.5 rounded-full bg-amber-500 shrink-0" />
+                          <span className="text-[10px] font-semibold text-foreground/80 truncate">{item.label}</span>
+                          <span className="ml-auto shrink-0 text-[9px] font-black uppercase tracking-wider text-amber-600 bg-amber-500/10 px-1.5 py-0.5 rounded-md border border-amber-500/20">
+                            No Doc
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Experience group */}
+                {missingAttachments.filter(m => m.type === "experience").length > 0 && (
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-1.5 text-[9px] font-extrabold uppercase tracking-wider text-emerald-500">
+                      <Briefcase className="size-3" /> Work Experience
+                    </div>
+                    <div className="space-y-1">
+                      {missingAttachments.filter(m => m.type === "experience").map((item, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-emerald-500/5 border border-emerald-500/15"
+                        >
+                          <div className="size-1.5 rounded-full bg-amber-500 shrink-0" />
+                          <span className="text-[10px] font-semibold text-foreground/80 truncate">{item.label}</span>
+                          <span className="ml-auto shrink-0 text-[9px] font-black uppercase tracking-wider text-amber-600 bg-amber-500/10 px-1.5 py-0.5 rounded-md border border-amber-500/20">
+                            No Doc
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer actions */}
+            <div className="flex items-center justify-between gap-3 px-5 py-4 border-t border-border/30 bg-muted/20">
+              <button
+                type="button"
+                onClick={() => {
+                  setMissingAttachments(null);
+                  setActiveTab("career_qualifications");
+                  setOpenSections(prev => ({ ...prev, academic: true, experience: true }));
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="h-9 px-4 rounded-xl border border-amber-500/40 text-amber-600 hover:bg-amber-500/10 text-[11px] font-bold flex items-center gap-1.5 transition duration-200 cursor-pointer"
+              >
+                <Upload className="size-3.5" /> Go Back & Attach
+              </button>
+              <button
+                type="button"
+                onClick={() => finalizeSave()}
+                className="h-9 px-5 rounded-xl bg-primary text-primary-foreground text-[11px] font-bold flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer"
+              >
+                <Save className="size-3.5" /> Proceed Anyway
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ATTACHMENT PREVIEW MODAL OVERLAY */}
       {previewFile && (
