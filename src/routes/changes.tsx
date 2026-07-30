@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v51");
+    const saved = localStorage.getItem("system_changes_v53");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -447,6 +447,24 @@ function ChangesPage() {
           link: "/merchandising-capacity-planning",
           descriptionEn: "Implemented the fully interactive Capacity Allocation module, including a spreadsheet-style Master Ledger view with filters/searches/exports, and an inline day-by-day calculation form for month-wise line capacity allocation.",
           descriptionBn: "মার্চেন্ডাইজিং ক্যাড ক্যাপাসিটি প্ল্যানিং মডিউলে একটি সম্পূর্ণ ইন্টারঅ্যাক্টিভ 'Capacity Allocation' ফিচার যোগ করা হয়েছে। এর মধ্যে ফিল্টার/সার্চ/এক্সপোর্ট সহ স্প্রেডশিট-স্টাইলের মাস্টার লেজার ভিউ এবং দিনভিত্তিক ক্যাপাসিটি হিসাবের জন্য ফর্ম ওয়ার্কস্পেস অন্তর্ভুক্ত রয়েছে।",
+        },
+        {
+          id: "48",
+          date: "2026-07-30T14:46",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-capacity-planning",
+          descriptionEn: "Implemented the 'Monthly Capacity' configuration panel inside the capacity planning module. Added Status, Year, and Month filters, spreadsheet export capabilities, and loaded realistic month-wise line machine/SMV capacity calculation entries as seed data.",
+          descriptionBn: "ক্যাপাসিটি প্ল্যানিং মডিউলের অধীনে 'Monthly Capacity' প্যানেল ইমপ্লিমেন্ট করা হয়েছে। এর মধ্যে স্ট্যাটাস, বছর, এবং মাস ফিল্টার, স্প্রেডশিট এক্সপোর্ট এবং বিভিন্ন মাসের মেশিন/এসএমভি ক্যাপাসিটি ক্যালকুলেশন সংক্রান্ত ডেমো ডেটা যুক্ত করা হয়েছে।",
+        },
+        {
+          id: "49",
+          date: "2026-07-30T14:48",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-capacity-planning",
+          descriptionEn: "Implemented the 'Capacity Distribution' workspace and list ledger in the capacity planning module. Features auto-lookup of month-wise capacities, multi-buyer selection (Zara, Mango, Fatface, etc.), allocation ratio validation, and real-time distribution summaries.",
+          descriptionBn: "ক্যাপাসিটি প্ল্যানিং মডিউলে 'Capacity Distribution' পেজ ও লেজার তৈরি করা হয়েছে। এর মাধ্যমে মাসভিত্তিক মোট ক্যাপাসিটি রিয়েল-টাইমে সার্চ করা, নির্দিষ্ট বায়ারদের (যেমন: Zara, Mango, Fatface ইত্যাদি) মধ্যে শতাংশ ভাগ করে দেওয়া এবং রিয়েল-টাইমে মোট বণ্টনের যোগফল হিসাবের ব্যবস্থা করা হয়েছে।",
         },
       ]);
     }
