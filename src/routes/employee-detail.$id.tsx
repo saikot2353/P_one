@@ -161,6 +161,22 @@ function EmployeeDetailPage() {
   const pfVal = (grossNum * 0.6 * 0.1).toFixed(2);
   const festivalBonusVal = basicVal;
 
+  const getAllowanceVal = (val: any, fallback: number) => {
+    return (val !== undefined && val !== null && val !== "") ? parseFloat(val) : fallback;
+  };
+
+  const specialAllowanceVal = getAllowanceVal(selectedEmp.specialAllowance, 5000);
+  const mobileAllowanceVal = getAllowanceVal(selectedEmp.mobileAllowance, 1000);
+  const internetAllowanceVal = getAllowanceVal(selectedEmp.internetAllowance, 1500);
+  const utilityAllowanceVal = getAllowanceVal(selectedEmp.utilityAllowance, 2000);
+  const transportAllowanceVal = getAllowanceVal(selectedEmp.transportAllowance, 0);
+  const lunchAllowanceVal = getAllowanceVal(selectedEmp.lunchAllowance, 0);
+  const taxDeductionVal = getAllowanceVal(selectedEmp.taxDeduction, 0);
+  const gratuityVal = getAllowanceVal(selectedEmp.gratuity, 0);
+
+  const totalAllowanceVal = specialAllowanceVal + mobileAllowanceVal + internetAllowanceVal + utilityAllowanceVal + transportAllowanceVal + lunchAllowanceVal;
+  const netPayableVal = grossNum + totalAllowanceVal - taxDeductionVal;
+
   const nameBngVal =
     selectedEmp.name === "Tahmid Afsar Shapno"
       ? "তাহমিদ আফসার স্বপন"
@@ -1094,7 +1110,7 @@ function EmployeeDetailPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
                     {/* 2. Supplementary Allowances & Taxes */}
                     <div className="space-y-3">
                       <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-amber-500 border-b border-border/20 pb-1.5">
@@ -1105,47 +1121,126 @@ function EmployeeDetailPage() {
                           <span className="text-muted-foreground font-sans font-bold">
                             Special Allowance
                           </span>
-                          <span className="font-bold text-foreground">৳5,000</span>
+                          <span className="font-bold text-foreground">
+                            ৳{specialAllowanceVal.toLocaleString("en-IN")}
+                          </span>
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-muted-foreground font-sans font-bold">
                             Mobile Allowance
                           </span>
-                          <span className="font-bold text-foreground">৳1,000</span>
+                          <span className="font-bold text-foreground">
+                            ৳{mobileAllowanceVal.toLocaleString("en-IN")}
+                          </span>
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-muted-foreground font-sans font-bold">
                             Internet Allowance
                           </span>
-                          <span className="font-bold text-foreground">৳1,500</span>
+                          <span className="font-bold text-foreground">
+                            ৳{internetAllowanceVal.toLocaleString("en-IN")}
+                          </span>
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-muted-foreground font-sans font-bold">
                             Utility Allowance
                           </span>
-                          <span className="font-bold text-foreground">৳2,000</span>
+                          <span className="font-bold text-foreground">
+                            ৳{utilityAllowanceVal.toLocaleString("en-IN")}
+                          </span>
                         </div>
                         <div className="flex justify-between items-center pt-2 border-t border-amber-500/20 text-rose-500">
                           <span className="font-sans font-bold">Tax Deduction</span>
-                          <span className="font-bold">৳0</span>
+                          <span className="font-bold">
+                            ৳{taxDeductionVal.toLocaleString("en-IN")}
+                          </span>
                         </div>
                         <div className="flex justify-between items-center text-rose-500">
                           <span className="font-sans font-bold">Gratuity Contribution</span>
-                          <span className="font-bold">৳0</span>
+                          <span className="font-bold">
+                            ৳{gratuityVal.toLocaleString("en-IN")}
+                          </span>
                         </div>
 
                         <div className="flex justify-between items-center pt-3 mt-1 border-t border-amber-500/20">
                           <span className="font-sans font-extrabold text-foreground uppercase text-[10px]">
                             Total Allowance
                           </span>
-                          <span className="font-black text-foreground">৳9,500</span>
+                          <span className="font-black text-foreground">
+                            ৳{totalAllowanceVal.toLocaleString("en-IN")}
+                          </span>
                         </div>
                         <div className="flex justify-between items-center pt-1">
                           <span className="font-sans font-extrabold text-emerald-600 uppercase text-[10px]">
                             Est. Net Payable
                           </span>
                           <span className="font-black text-emerald-600">
-                            ৳{(grossNum + 9500).toLocaleString("en-IN")}
+                            ৳{netPayableVal.toLocaleString("en-IN")}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 2.5. Overtime & Bonus Allowance settings */}
+                    <div className="space-y-3">
+                      <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-[#7cb342] border-b border-border/20 pb-1.5">
+                        Overtime & Bonus Allowance
+                      </h4>
+                      <div className="bg-[#7cb342]/5 border border-[#7cb342]/20 rounded-xl p-4 space-y-2 text-xs font-mono">
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground font-sans font-bold">
+                            Allowance Option
+                          </span>
+                          <span className="font-bold text-foreground">
+                            {selectedEmp.allowanceOption || "OverTime"}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground font-sans font-bold">
+                            Attendance Bonus Rate
+                          </span>
+                          <span className="font-bold text-[#7cb342]">
+                            ৳{parseFloat(selectedEmp.attendanceBonusRate || "425").toLocaleString("en-IN")}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground font-sans font-bold">
+                            Holiday Rate
+                          </span>
+                          <span className="font-bold text-foreground">
+                            ৳{parseFloat(selectedEmp.holidayRate || "0").toLocaleString("en-IN")}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground font-sans font-bold">
+                            Behavior Bonus
+                          </span>
+                          <span className="font-bold text-[#7cb342]">
+                            ৳{parseFloat(selectedEmp.behaviorBonus || "100").toLocaleString("en-IN")}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground font-sans font-bold">
+                            Transport Allowance
+                          </span>
+                          <span className="font-bold text-foreground">
+                            ৳{parseFloat(selectedEmp.transportAllowance || "0").toLocaleString("en-IN")}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground font-sans font-bold">
+                            Mobile Allowance (Alt)
+                          </span>
+                          <span className="font-bold text-foreground">
+                            ৳{parseFloat(selectedEmp.mobileAllowance || "0").toLocaleString("en-IN")}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground font-sans font-bold">
+                            Lunch Allowance
+                          </span>
+                          <span className="font-bold text-foreground">
+                            ৳{parseFloat(selectedEmp.lunchAllowance || "0").toLocaleString("en-IN")}
                           </span>
                         </div>
                       </div>
@@ -1160,140 +1255,34 @@ function EmployeeDetailPage() {
                         <div className="grid grid-cols-2 gap-3 text-xs">
                           <div className="space-y-0.5">
                             <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Payment Mode
+                              Bank Pay
                             </div>
-                            <div className="font-bold text-indigo-600">Bank Transfer</div>
+                            <div className="font-bold text-indigo-600 font-mono">
+                              ৳{parseFloat(selectedEmp.bankPay || "0").toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                            </div>
+                          </div>
+                          <div className="space-y-0.5">
+                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                              Cash Pay
+                            </div>
+                            <div className="font-bold text-emerald-600 font-mono">
+                              ৳{parseFloat(selectedEmp.cashPay || "0").toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                            </div>
                           </div>
                           <div className="space-y-0.5">
                             <div className="text-[9px] font-bold text-muted-foreground uppercase">
                               Bank Name
                             </div>
-                            <div className="font-bold">Dutch-Bangla Bank Limited</div>
+                            <div className="font-bold">
+                              {selectedEmp.bankName || "Dutch-Bangla Bank Limited"}
+                            </div>
                           </div>
-                          <div className="space-y-0.5 col-span-2">
+                          <div className="space-y-0.5">
                             <div className="text-[9px] font-bold text-muted-foreground uppercase">
                               Account Number
                             </div>
-                            <div className="font-bold font-mono text-sm tracking-widest bg-indigo-500/10 px-3 py-2 rounded border border-indigo-500/20 w-fit">
-                              102.120.99827
-                            </div>
-                          </div>
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Branch Name
-                            </div>
-                            <div className="font-bold">Mirpur Circle-10</div>
-                          </div>
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Routing Number
-                            </div>
-                            <div className="font-bold font-mono">090261987</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                    {/* 4. Corporate Job Description & Charter */}
-                    <div className="space-y-3">
-                      <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary border-b border-border/20 pb-1.5">
-                        Corporate Job Description & Charter
-                      </h4>
-                      <div className="bg-muted/5 border border-border/40 rounded-xl p-4 space-y-4">
-                        <div className="space-y-1.5">
-                          <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1.5">
-                            <Briefcase className="size-3" /> Key Roles & Responsibilities
-                          </div>
-                          <div className="text-xs font-semibold leading-relaxed">
-                            Senior Software Engineer responsible for building high-scale payroll and
-                            HR modules using modern web technologies.
-                          </div>
-                        </div>
-                        <div className="space-y-1.5 pt-2 border-t border-border/20">
-                          <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1.5">
-                            <TrendingUp className="size-3" /> KPIs / Deliverables
-                          </div>
-                          <div className="text-xs font-semibold leading-relaxed">
-                            Fullstack web app development, Git source code management, DB schema
-                            optimization.
-                          </div>
-                        </div>
-                        <div className="space-y-1.5 pt-2 border-t border-border/20">
-                          <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1.5">
-                            <Users className="size-3" /> Reporting Structure
-                          </div>
-                          <div className="text-xs font-semibold space-y-1">
-                            <div>
-                              <span className="text-muted-foreground/80">Primary:</span>{" "}
-                              <span className="font-bold text-primary">Tahmid Afsar Shapno</span>{" "}
-                              (Head Of Department)
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground/80">Alternate:</span>{" "}
-                              <span className="font-bold">Chief Operations Officer</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* 5. Corporate Equipment & Asset Assignment */}
-                    <div className="space-y-3">
-                      <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 border-b border-border/20 pb-1.5">
-                        Corporate Equipment & Asset Assignment
-                      </h4>
-                      <div className="bg-slate-500/5 border border-slate-500/20 rounded-xl p-4 space-y-4 h-full">
-                        <div className="grid grid-cols-2 gap-4 text-xs">
-                          <div className="space-y-2">
-                            <div className="space-y-0.5">
-                              <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1">
-                                <Laptop className="size-3" /> Laptop Brand/Model
-                              </div>
-                              <div className="font-bold">Apple MacBook Pro 16"</div>
-                            </div>
-                            <div className="space-y-0.5">
-                              <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                                Asset Tag
-                              </div>
-                              <div className="font-bold font-mono text-slate-600 bg-slate-500/10 px-2 py-0.5 rounded w-fit border border-slate-500/20">
-                                COMP-2026-089
-                              </div>
-                            </div>
-                          </div>
-                          <div className="space-y-2">
-                            <div className="space-y-0.5">
-                              <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1">
-                                <PhoneCall className="size-3" /> Mobile Asset Model
-                              </div>
-                              <div className="font-bold">iPhone 15</div>
-                            </div>
-                            <div className="space-y-0.5">
-                              <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                                Asset ID
-                              </div>
-                              <div className="font-bold font-mono text-slate-600 bg-slate-500/10 px-2 py-0.5 rounded w-fit border border-slate-500/20">
-                                MOB-2026-112
-                              </div>
-                            </div>
-                          </div>
-                          <div className="space-y-2 col-span-2 pt-2 border-t border-slate-500/20">
-                            <div className="flex items-center justify-between">
-                              <div className="space-y-0.5">
-                                <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1">
-                                  <ShieldCheck className="size-3" /> Access Card Tag ID
-                                </div>
-                                <div className="font-bold font-mono text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded w-fit border border-emerald-500/20">
-                                  AC-559021
-                                </div>
-                              </div>
-                              <div className="space-y-0.5 text-right">
-                                <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                                  Issuance Date
-                                </div>
-                                <div className="font-bold font-mono">19/05/2026</div>
-                              </div>
+                            <div className="font-bold font-mono">
+                              {selectedEmp.bankAccount || "102.120.99827"}
                             </div>
                           </div>
                         </div>
@@ -1351,7 +1340,8 @@ function EmployeeDetailPage() {
                   ];
 
                   return (
-                    <div className="space-y-6 animate-in fade-in duration-300">
+                    <>
+                      <div className="space-y-6 animate-in fade-in duration-300">
                       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                         {/* LEFT COLUMN: Career timeline & Involvements (7 Cols) */}
                         <div className="lg:col-span-7 space-y-6">
@@ -1655,8 +1645,114 @@ function EmployeeDetailPage() {
                         </div>
                       </div>
                     </div>
-                  );
-                })()}
+
+                    {/* Corporate Job Description & Assets Assignment shifted to Qualification tab */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
+                      {/* 4. Corporate Job Description & Charter */}
+                      <div className="space-y-3">
+                        <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary border-b border-border/20 pb-1.5">
+                          Corporate Job Description & Charter
+                        </h4>
+                        <div className="bg-muted/5 border border-border/40 rounded-xl p-4 space-y-4">
+                          <div className="space-y-1.5">
+                            <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1.5">
+                              <Briefcase className="size-3" /> Key Roles & Responsibilities
+                            </div>
+                            <div className="text-xs font-semibold leading-relaxed">
+                              {selectedEmp.jobDescription || "Senior Software Engineer responsible for building high-scale payroll and HR modules using modern web technologies."}
+                            </div>
+                          </div>
+                          <div className="space-y-1.5 pt-2 border-t border-border/20">
+                            <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1.5">
+                              <TrendingUp className="size-3" /> KPIs / Deliverables
+                            </div>
+                            <div className="text-xs font-semibold leading-relaxed">
+                              {selectedEmp.keyDeliverables || "Fullstack web app development, Git source code management, DB schema optimization."}
+                            </div>
+                          </div>
+                          <div className="space-y-1.5 pt-2 border-t border-border/20">
+                            <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1.5">
+                              <Users className="size-3" /> Reporting Structure
+                            </div>
+                            <div className="text-xs font-semibold space-y-1">
+                              <div>
+                                <span className="text-muted-foreground/80">Primary:</span>{" "}
+                                <span className="font-bold text-primary">{selectedEmp.primaryManager || "Tahmid Afsar Shapno"}</span>{" "}
+                                (Head Of Department)
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground/80">Alternate:</span>{" "}
+                                <span className="font-bold">{selectedEmp.alternateManager || "Chief Operations Officer"}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 5. Corporate Equipment & Asset Assignment */}
+                      <div className="space-y-3">
+                        <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 border-b border-border/20 pb-1.5">
+                          Corporate Equipment & Asset Assignment
+                        </h4>
+                        <div className="bg-slate-500/5 border border-slate-500/20 rounded-xl p-4 space-y-4 h-full">
+                          <div className="grid grid-cols-2 gap-4 text-xs">
+                            <div className="space-y-2">
+                              <div className="space-y-0.5">
+                                <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1">
+                                  <Laptop className="size-3" /> Laptop Brand/Model
+                                </div>
+                                <div className="font-bold">{selectedEmp.laptopBrand || 'Apple MacBook Pro 16"'}</div>
+                              </div>
+                              <div className="space-y-0.5">
+                                <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                                  Asset Tag
+                                </div>
+                                <div className="font-bold font-mono text-slate-600 bg-slate-500/10 px-2 py-0.5 rounded w-fit border border-slate-500/20">
+                                  {selectedEmp.laptopAssetTag || "COMP-2026-089"}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="space-y-0.5">
+                                <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1">
+                                  <PhoneCall className="size-3" /> Mobile Asset Model
+                                </div>
+                                <div className="font-bold">{selectedEmp.mobileAssetModel || "iPhone 15"}</div>
+                              </div>
+                              <div className="space-y-0.5">
+                                <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                                  Asset ID
+                                </div>
+                                <div className="font-bold font-mono text-slate-600 bg-slate-500/10 px-2 py-0.5 rounded w-fit border border-slate-500/20">
+                                  {selectedEmp.mobileAssetId || "MOB-2026-112"}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="space-y-2 col-span-2 pt-2 border-t border-slate-500/20">
+                              <div className="flex items-center justify-between">
+                                <div className="space-y-0.5">
+                                  <div className="text-[9px] font-bold text-muted-foreground uppercase flex items-center gap-1">
+                                    <ShieldCheck className="size-3" /> Access Card Tag ID
+                                  </div>
+                                  <div className="font-bold font-mono text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded w-fit border border-emerald-500/20">
+                                    {selectedEmp.accessCardId || "AC-559021"}
+                                  </div>
+                                </div>
+                                <div className="space-y-0.5 text-right">
+                                  <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                                    Issuance Date
+                                  </div>
+                                  <div className="font-bold font-mono">{selectedEmp.equipmentIssuedDate || "19/05/2026"}</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
 
               {/* 4. FAMILY & DEPENDENTS */}
               {activeTab === "family" && (

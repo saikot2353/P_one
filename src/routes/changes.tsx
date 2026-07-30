@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v41");
+    const saved = localStorage.getItem("system_changes_v45");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -366,6 +366,42 @@ function ChangesPage() {
           link: "/merchandising-master-settings",
           descriptionEn: "Fixed text alignment issues on the accordion header buttons by adding the 'text-left' class, ensuring wrapped texts are properly left-aligned.",
           descriptionBn: "একর্ডিয়ন হেডার বাটনগুলোর টেক্সট অ্যালাইনমেন্ট ফিক্স করা হয়েছে। 'text-left' ক্লাস যোগ করার মাধ্যমে নিশ্চিত করা হয়েছে যে র‍্যাপ হওয়া লেখাগুলো বাঁ দিকে সমানভাবে বিন্যস্ত থাকবে।",
+        },
+        {
+          id: "39",
+          date: "2026-07-30T10:59",
+          type: "New Addition",
+          module: "Personnel File",
+          link: "/add-employee",
+          descriptionEn: "Added a new 'Allowance' card to the personnel file creation page and updated the employee detail view to show these overtime, holiday rate, behavior bonus, and transport/mobile/lunch allowances dynamically.",
+          descriptionBn: "পার্সোনেল ফাইল ক্রিয়েশন পেজে একটি নতুন 'Allowance' কার্ড যুক্ত করা হয়েছে এবং এমপ্লয়ি ডিটেইলস ভিউতে ওভারটাইম, হোলিডে রেট, বিহেভিয়ার বোনাস এবং ট্রান্সপোর্ট/মোবাইল/লাঞ্চ অ্যালাউন্সগুলো ডাইনামিকলি দেখানোর ব্যবস্থা করা হয়েছে।",
+        },
+        {
+          id: "40",
+          date: "2026-07-30T11:05",
+          type: "Modify",
+          module: "Personnel File",
+          link: "/add-employee",
+          descriptionEn: "Simplified the Disbursement Routing & Bank Details card to show only Bank Pay, Cash Pay, Bank Name, and Account Number in both employee creation and employee detail views.",
+          descriptionBn: "এমপ্লয়ি ক্রিয়েশন এবং এমপ্লয়ি ডিটেইলস উভয় পেজেই ব্যাংক ডিটেইলস কার্ডটি সহজ করা হয়েছে যাতে শুধুমাত্র ব্যাংক পে, ক্যাশ পে, ব্যাংকের নাম এবং অ্যাকাউন্ট নম্বর দেখা যায়।",
+        },
+        {
+          id: "41",
+          date: "2026-07-30T11:10",
+          type: "Modify",
+          module: "Personnel File",
+          link: "/add-employee",
+          descriptionEn: "Shifted Corporate Job Description & Charter and Corporate Equipment & Asset Assignment sections from Financial & Employment to Qualifications & Experience tab on both employee creation and details screens. Removed the Submit button from the custom Allowance card.",
+          descriptionBn: "এমপ্লয়ি ক্রিয়েশন এবং ডিটেইলস উভয় পেজেই করপোরেট জব ডেসক্রিপশন এবং করপোরেট ইকুইপমেন্ট সেকশন দুটিকে ফিন্যান্সিয়াল অ্যান্ড এমপ্লয়মেন্ট ট্যাব থেকে কোয়ালিফিকেশন অ্যান্ড এক্সপেরিয়েন্স ট্যাবে স্থানান্তরিত করা হয়েছে। কাস্টম অ্যালাউন্স কার্ড থেকে সাবমিট বাটনটি সরিয়ে ফেলা হয়েছে।",
+        },
+        {
+          id: "42",
+          date: "2026-07-30T11:15",
+          type: "Modify",
+          module: "Personnel File",
+          link: "/add-employee",
+          descriptionEn: "Implemented robust file uploading, size validation (5MB max), extension validation (.pdf, .jpg, .jpeg, .png), upload progress indicators, and an interactive secure document preview modal for academic and experience attachments.",
+          descriptionBn: "একাডেমিক এবং অভিজ্ঞতা সনদের অ্যাটাচমেন্টের জন্য শক্তিশালী ফাইল আপলোডিং, ফাইলের সাইজ ভ্যালিডেশন (সর্বোচ্চ ৫ মেগাবাইট), ফাইল এক্সটেনশন ভ্যালিডেশন (.pdf, .jpg, .jpeg, .png), আপলোড প্রোগ্রেস বার এবং একটি ইন্টারেক্টিভ সিকিউর ডকুমেন্ট প্রিভিউ মোডাল তৈরি করা হয়েছে।",
         },
       ]);
     }

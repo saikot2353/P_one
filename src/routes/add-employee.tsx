@@ -87,6 +87,75 @@ function AddEmployeePage() {
   const [addingField, setAddingField] = useState<string | null>(null);
   const [customValue, setCustomValue] = useState("");
 
+  // Practical File Upload states
+  const [uploadingState, setUploadingState] = useState<{
+    listType: "education" | "experience";
+    index: number;
+    progress: number;
+  } | null>(null);
+  const [previewFile, setPreviewFile] = useState<{
+    name: string;
+    size: string;
+    type: string;
+  } | null>(null);
+
+  const handleRowFileUpload = (listType: "education" | "experience", index: number) => {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".pdf,.jpg,.jpeg,.png";
+    
+    fileInput.onchange = (e: any) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      
+      // Extension validation
+      const allowedExtensions = ["pdf", "jpg", "jpeg", "png"];
+      const fileExtension = file.name.split(".").pop()?.toLowerCase();
+      if (!fileExtension || !allowedExtensions.includes(fileExtension)) {
+        toast.error("Only PDF, JPG, JPEG, and PNG files are allowed!");
+        return;
+      }
+      
+      // Size validation (5MB max)
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        toast.error("File size exceeds the 5MB limit!");
+        return;
+      }
+      
+      const fileSizeStr = file.size > 1024 * 1024 
+        ? `${(file.size / (1024 * 1024)).toFixed(2)} MB`
+        : `${(file.size / 1024).toFixed(1)} KB`;
+        
+      let currentProgress = 0;
+      setUploadingState({ listType, index, progress: 0 });
+      
+      const interval = setInterval(() => {
+        currentProgress += 10;
+        setUploadingState({ listType, index, progress: currentProgress });
+        
+        if (currentProgress >= 100) {
+          clearInterval(interval);
+          setUploadingState(null);
+          
+          const updatedFileName = `${file.name} (${fileSizeStr})`;
+          if (listType === "education") {
+            setEducationList((prev) =>
+              prev.map((item, i) => (i === index ? { ...item, attachment: updatedFileName } : item))
+            );
+          } else {
+            setExperienceList((prev) =>
+              prev.map((item, i) => (i === index ? { ...item, attachment: updatedFileName } : item))
+            );
+          }
+          toast.success(`${file.name} uploaded successfully!`);
+        }
+      }, 100);
+    };
+    
+    fileInput.click();
+  };
+
   // NID OCR Simulation States
   const [isNidScanning, setIsNidScanning] = useState(false);
   const [nidScanProgress, setNidScanProgress] = useState(0);
@@ -209,12 +278,19 @@ function AddEmployeePage() {
     // 2. Allowance Info
     gross: "",
     specialAllowance: "",
-    mobileAllowance: "",
+    mobileAllowance: "0",
     internetAllowance: "",
     utilityAllowance: "",
+    allowanceOption: "OverTime",
+    attendanceBonusRate: "425",
+    holidayRate: "0",
+    behaviorBonus: "100",
+    transportAllowance: "0",
+    lunchAllowance: "0",
 
     // 3. Salary & Bank Details
     bankPay: "",
+    cashPay: "",
     bankName: "Dutch-Bangla Bank Limited",
     bankAccount: "",
     bankBranch: "Mirpur Circle-10",
@@ -541,6 +617,64 @@ function AddEmployeePage() {
   const handleSave = (e: any) => {
     e.preventDefault();
     if (validateFields()) {
+      if (typeof window !== "undefined") {
+        const synced = localStorage.getItem("recruitment_synced_employees");
+        let list = [];
+        if (synced) {
+          try {
+            list = JSON.parse(synced);
+          } catch (err) {
+            console.error(err);
+          }
+        }
+        
+        // Map the form state to match personnel-list structure
+        const newEmp = {
+          id: form.id,
+          offcId: form.offcId || "—",
+          name: form.nameEng,
+          type: form.empType,
+          dept: form.dept,
+          sect: form.sect,
+          title: form.title,
+          unit: form.unit,
+          line: form.line,
+          grade: form.grade,
+          shift: form.shift,
+          joinDate: form.joinDate,
+          confirmDate: form.confirmDate || "—",
+          holiday: form.holiday || "—",
+          blood: form.blood,
+          gross: form.gross,
+          basic: (parseFloat(form.gross) * 0.6).toFixed(2),
+          email: form.offcEmail || "—",
+          officeMob: form.offcMobile || "—",
+          personalContact: form.personalContact || "—",
+          gender: form.gender,
+          dob: form.dob,
+          status: "Working",
+          empStatus: form.empStatus,
+          acStatus: "Active",
+          allowanceOption: form.allowanceOption,
+          attendanceBonusRate: form.attendanceBonusRate,
+          holidayRate: form.holidayRate,
+          behaviorBonus: form.behaviorBonus,
+          transportAllowance: form.transportAllowance,
+          mobileAllowance: form.mobileAllowance,
+          lunchAllowance: form.lunchAllowance,
+          specialAllowance: form.specialAllowance,
+          internetAllowance: form.internetAllowance,
+          utilityAllowance: form.utilityAllowance,
+          taxDeduction: form.taxDeduction,
+          gratuity: form.gratuity,
+          bankPay: form.bankPay,
+          cashPay: form.cashPay,
+          bankName: form.bankName,
+          bankAccount: form.bankAccount,
+        };
+        list.push(newEmp);
+        localStorage.setItem("recruitment_synced_employees", JSON.stringify(list));
+      }
       setShowSuccessModal(true);
     } else {
       // Find which section has errors and jump to it
@@ -3309,6 +3443,123 @@ function AddEmployeePage() {
                     </div>
                   </div>
 
+                  {/* Custom Allowance Section matching Client Requirements */}
+                  <div className="bg-card border border-border/60 rounded-lg p-5 shadow-2xs space-y-4">
+                    <div className="border-b border-border/30 pb-2.5 flex items-center gap-2">
+                      <h3 className="text-xs font-extrabold text-[#7cb342] uppercase tracking-widest">
+                        Allowance
+                      </h3>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
+                      {/* Allowance Option */}
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                          Allowance Option
+                        </label>
+                        <select
+                          value={form.allowanceOption}
+                          onChange={(e) => handleChange("allowanceOption", e.target.value)}
+                          className="w-full bg-transparent border-t-0 border-x-0 border-b border-border/60 pb-1.5 text-xs font-bold text-foreground focus:outline-none focus:border-[#7cb342] focus:ring-0 cursor-pointer"
+                        >
+                          <option value="N/A">N/A</option>
+                          <option value="OverTime">OverTime</option>
+                          <option value="Fixed OverTime">Fixed OverTime</option>
+                          <option value="OverTime + Fixed OverTime">OverTime + Fixed OverTime</option>
+                          <option value="Allowance">Allowance</option>
+                          <option value="Not Allowed">Not Allowed</option>
+                        </select>
+                      </div>
+
+                      {/* Attendance Bonus Rate */}
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                          Attendance Bonus Rate
+                        </label>
+                        <input
+                          type="number"
+                          value={form.attendanceBonusRate}
+                          onChange={(e) => handleChange("attendanceBonusRate", e.target.value)}
+                          className="w-full bg-transparent border-t-0 border-x-0 border-b border-border/60 pb-1.5 text-xs font-bold text-foreground focus:outline-none focus:border-[#7cb342] focus:ring-0 font-mono"
+                          placeholder="0"
+                        />
+                      </div>
+
+                      {/* Holiday Rate */}
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                          Holiday Rate
+                        </label>
+                        <input
+                          type="number"
+                          value={form.holidayRate}
+                          onChange={(e) => handleChange("holidayRate", e.target.value)}
+                          className="w-full bg-transparent border-t-0 border-x-0 border-b border-border/60 pb-1.5 text-xs font-bold text-foreground focus:outline-none focus:border-[#7cb342] focus:ring-0 font-mono"
+                          placeholder="0"
+                        />
+                      </div>
+
+                      {/* Behavior Bonus */}
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                          Behavior Bonus
+                        </label>
+                        <input
+                          type="number"
+                          value={form.behaviorBonus}
+                          onChange={(e) => handleChange("behaviorBonus", e.target.value)}
+                          className="w-full bg-transparent border-t-0 border-x-0 border-b border-border/60 pb-1.5 text-xs font-bold text-foreground focus:outline-none focus:border-[#7cb342] focus:ring-0 font-mono"
+                          placeholder="0"
+                        />
+                      </div>
+
+                      {/* Transport Allownce */}
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                          Transport Allownce
+                        </label>
+                        <input
+                          type="number"
+                          value={form.transportAllowance}
+                          onChange={(e) => handleChange("transportAllowance", e.target.value)}
+                          className="w-full bg-transparent border-t-0 border-x-0 border-b border-border/60 pb-1.5 text-xs font-bold text-foreground focus:outline-none focus:border-[#7cb342] focus:ring-0 font-mono"
+                          placeholder="0"
+                        />
+                      </div>
+
+                      {/* Mobile Allownce */}
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                          Mobile Allownce
+                        </label>
+                        <input
+                          type="number"
+                          value={form.mobileAllowance}
+                          onChange={(e) => handleChange("mobileAllowance", e.target.value)}
+                          className="w-full bg-transparent border-t-0 border-x-0 border-b border-border/60 pb-1.5 text-xs font-bold text-foreground focus:outline-none focus:border-[#7cb342] focus:ring-0 font-mono"
+                          placeholder="0"
+                        />
+                      </div>
+
+                      {/* Lunch Allownce */}
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                          Lunch Allownce
+                        </label>
+                        <input
+                          type="number"
+                          value={form.lunchAllowance}
+                          onChange={(e) => handleChange("lunchAllowance", e.target.value)}
+                          className="w-full bg-transparent border-t-0 border-x-0 border-b border-border/60 pb-1.5 text-xs font-bold text-foreground focus:outline-none focus:border-[#7cb342] focus:ring-0 font-mono"
+                          placeholder="0"
+                        />
+                      </div>
+                      
+                      {/* Empty column spacer */}
+                      <div className="hidden sm:block" />
+                    </div>
+                  </div>
+
                   {/* Disbursement Routing (Bank Details) */}
                   <div className="space-y-5 bg-card border border-border/60 rounded-lg p-5 shadow-2xs">
                     <div className="border-b border-border/30 pb-2.5 flex items-center gap-2">
@@ -3323,36 +3574,38 @@ function AddEmployeePage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-muted-foreground uppercase">
-                          Payment Mode
-                        </label>
-                        <SearchableSelect
-                          value={form.paymentMode}
-                          onChange={(val) => handleChange("paymentMode", val)}
-                          options={[
-                            { value: "Bank Transfer", label: "Bank Transfer" },
-                            { value: "Bank Pay", label: "Bank Pay" },
-                            { value: "Cash", label: "Cash payment" },
-                            { value: "Mobile Banking", label: "Mobile Banking (bKash/Nagad)" },
-                          ]}
-                        />
-                      </div>
-
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
-                          Bank Pay Amount
+                          Bank Pay
                         </label>
                         <div className="relative">
-                          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-extrabold text-muted-foreground/60">
+                          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground/60">
                             ৳
                           </span>
                           <input
                             type="number"
                             value={form.bankPay}
                             onChange={(e) => handleChange("bankPay", e.target.value)}
-                            className="h-10 pl-7.5 pr-3.5 rounded-xl border border-border bg-card text-sm font-semibold font-mono w-full"
+                            className="h-10 pl-7.5 pr-3.5 rounded-xl border border-border bg-card text-xs font-semibold font-mono w-full focus:outline-none"
+                            placeholder="0.00"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
+                          Cash Pay
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground/60">
+                            ৳
+                          </span>
+                          <input
+                            type="number"
+                            value={form.cashPay}
+                            onChange={(e) => handleChange("cashPay", e.target.value)}
+                            className="h-10 pl-7.5 pr-3.5 rounded-xl border border-border bg-card text-xs font-semibold font-mono w-full focus:outline-none"
                             placeholder="0.00"
                           />
                         </div>
@@ -3366,7 +3619,7 @@ function AddEmployeePage() {
                           type="text"
                           value={form.bankName}
                           onChange={(e) => handleChange("bankName", e.target.value)}
-                          className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full"
+                          className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full focus:outline-none"
                           placeholder="e.g. Dutch-Bangla Bank"
                         />
                       </div>
@@ -3379,24 +3632,46 @@ function AddEmployeePage() {
                           type="text"
                           value={form.bankAccount}
                           onChange={(e) => handleChange("bankAccount", e.target.value)}
-                          className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full font-mono"
+                          className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full font-mono focus:outline-none"
                           placeholder="e.g. 102.120.99827"
                         />
                       </div>
-
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-muted-foreground uppercase">
-                          Routing Number
-                        </label>
-                        <input
-                          type="text"
-                          value={form.routingNumber}
-                          onChange={(e) => handleChange("routingNumber", e.target.value)}
-                          className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full font-mono"
-                          placeholder="e.g. 020260120"
-                        />
-                      </div>
                     </div>
+                  </div>
+
+                  {/* Wizard Step Navigation Footer */}
+                  <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-border/20 mt-6">
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toast.success("Progress saved. Exiting...");
+                          window.location.href = "/";
+                        }}
+                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
+                      >
+                        Save and Exit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toast.success("Progress saved as draft successfully!");
+                        }}
+                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
+                      >
+                        Save as Draft
+                      </button>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab("career_qualifications");
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200"
+                    >
+                      Next Section <ArrowRight className="size-4" />
+                    </button>
                   </div>
                 </div>
               )}
@@ -3529,15 +3804,41 @@ function AddEmployeePage() {
                                     />
                                   </td>
                                   <td className="px-4 py-2 text-center">
-                                    {edu.attachment ? (
+                                    {uploadingState && uploadingState.listType === "education" && uploadingState.index === index ? (
+                                      <div className="w-[130px] mx-auto space-y-1">
+                                        <div className="flex justify-between text-[8px] font-bold text-primary">
+                                          <span>Uploading...</span>
+                                          <span>{uploadingState.progress}%</span>
+                                        </div>
+                                        <div className="w-full bg-muted-foreground/10 rounded-full h-1">
+                                          <div 
+                                            className="bg-primary h-1 rounded-full transition-all duration-100" 
+                                            style={{ width: `${uploadingState.progress}%` }}
+                                          />
+                                        </div>
+                                      </div>
+                                    ) : edu.attachment ? (
                                       <div className="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg gap-1.5 max-w-[150px] mx-auto animate-in fade-in duration-200">
-                                        <span className="text-[10px] font-mono font-bold text-emerald-600 truncate">
-                                          {edu.attachment}
-                                        </span>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            const parts = edu.attachment.split(" (");
+                                            setPreviewFile({
+                                              name: parts[0],
+                                              size: parts[1]?.replace(")", "") || "Unknown",
+                                              type: parts[0].split(".").pop() || "pdf"
+                                            });
+                                          }}
+                                          className="text-[9px] font-mono font-bold text-emerald-600 truncate hover:underline text-left flex items-center gap-1 cursor-pointer"
+                                          title="Click to preview file"
+                                        >
+                                          <FileText className="size-3 text-emerald-600 shrink-0" />
+                                          <span className="truncate max-w-[90px]">{edu.attachment.split(" (")[0]}</span>
+                                        </button>
                                         <button
                                           type="button"
                                           onClick={() => handleEduChange(index, "attachment", "")}
-                                          className="text-rose-500 hover:text-rose-600 font-black text-[10px] shrink-0"
+                                          className="text-rose-500 hover:text-rose-600 font-black text-[10px] shrink-0 cursor-pointer"
                                           title="Remove certificate attachment"
                                         >
                                           ✕
@@ -3546,8 +3847,8 @@ function AddEmployeePage() {
                                     ) : (
                                       <button
                                         type="button"
-                                        onClick={() => triggerRowMockUpload("education", index)}
-                                        className="h-7 px-2.5 rounded-lg border border-dashed border-primary/30 hover:border-primary hover:bg-primary/5 text-primary text-[10px] font-bold flex items-center justify-center gap-1 mx-auto transition duration-200"
+                                        onClick={() => handleRowFileUpload("education", index)}
+                                        className="h-7 px-2.5 rounded-lg border border-dashed border-primary/30 hover:border-primary hover:bg-primary/5 text-primary text-[10px] font-bold flex items-center justify-center gap-1 mx-auto transition duration-200 cursor-pointer"
                                       >
                                         <Upload className="size-3 text-primary/75" /> Upload File
                                       </button>
@@ -3700,15 +4001,41 @@ function AddEmployeePage() {
                                     />
                                   </td>
                                   <td className="px-4 py-2 text-center">
-                                    {exp.attachment ? (
+                                    {uploadingState && uploadingState.listType === "experience" && uploadingState.index === index ? (
+                                      <div className="w-[130px] mx-auto space-y-1">
+                                        <div className="flex justify-between text-[8px] font-bold text-primary">
+                                          <span>Uploading...</span>
+                                          <span>{uploadingState.progress}%</span>
+                                        </div>
+                                        <div className="w-full bg-muted-foreground/10 rounded-full h-1">
+                                          <div 
+                                            className="bg-primary h-1 rounded-full transition-all duration-100" 
+                                            style={{ width: `${uploadingState.progress}%` }}
+                                          />
+                                        </div>
+                                      </div>
+                                    ) : exp.attachment ? (
                                       <div className="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg gap-1.5 max-w-[150px] mx-auto animate-in fade-in duration-200">
-                                        <span className="text-[10px] font-mono font-bold text-emerald-600 truncate">
-                                          {exp.attachment}
-                                        </span>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            const parts = exp.attachment.split(" (");
+                                            setPreviewFile({
+                                              name: parts[0],
+                                              size: parts[1]?.replace(")", "") || "Unknown",
+                                              type: parts[0].split(".").pop() || "pdf"
+                                            });
+                                          }}
+                                          className="text-[9px] font-mono font-bold text-emerald-600 truncate hover:underline text-left flex items-center gap-1 cursor-pointer"
+                                          title="Click to preview file"
+                                        >
+                                          <FileText className="size-3 text-emerald-600 shrink-0" />
+                                          <span className="truncate max-w-[90px]">{exp.attachment.split(" (")[0]}</span>
+                                        </button>
                                         <button
                                           type="button"
                                           onClick={() => handleExpChange(index, "attachment", "")}
-                                          className="text-rose-500 hover:text-rose-600 font-black text-[10px] shrink-0"
+                                          className="text-rose-500 hover:text-rose-600 font-black text-[10px] shrink-0 cursor-pointer"
                                           title="Remove experience attachment"
                                         >
                                           ✕
@@ -3717,8 +4044,8 @@ function AddEmployeePage() {
                                     ) : (
                                       <button
                                         type="button"
-                                        onClick={() => triggerRowMockUpload("experience", index)}
-                                        className="h-7 px-2.5 rounded-lg border border-dashed border-primary/30 hover:border-primary hover:bg-primary/5 text-primary text-[10px] font-bold flex items-center justify-center gap-1 mx-auto transition duration-200"
+                                        onClick={() => handleRowFileUpload("experience", index)}
+                                        className="h-7 px-2.5 rounded-lg border border-dashed border-primary/30 hover:border-primary hover:bg-primary/5 text-primary text-[10px] font-bold flex items-center justify-center gap-1 mx-auto transition duration-200 cursor-pointer"
                                       >
                                         <Upload className="size-3 text-primary/75" /> Upload File
                                       </button>
@@ -4167,40 +4494,6 @@ function AddEmployeePage() {
                     )}
                   </div>
 
-                  {/* Unified Bottom Action Bar */}
-                  <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-border/20 mt-6">
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          toast.success("Progress saved. Exiting...");
-                          window.location.href = "/";
-                        }}
-                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
-                      >
-                        Save and Exit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          toast.success("Progress saved as draft successfully!");
-                        }}
-                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
-                      >
-                        Save as Draft
-                      </button>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveTab("family_dependents");
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
-                      className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200"
-                    >
-                      Next Section <ArrowRight className="size-4" />
-                    </button>
-                  </div>
                 </div>
               )}
 
@@ -4707,7 +5000,7 @@ function AddEmployeePage() {
               )}
 
               {/* SUBSECTION: JOB DESCRIPTION */}
-              {activeTab === "financial_employment" && (
+              {activeTab === "career_qualifications" && (
                 <div className="space-y-6 animate-in fade-in duration-200">
                   <div className="border-b border-border/30 pb-3 flex items-center gap-2">
                     <FileText className="size-4.5 text-primary" />
@@ -4966,7 +5259,7 @@ function AddEmployeePage() {
               )}
 
               {/* SUBSECTION: EMPLOYEE EQUIPMENT */}
-              {activeTab === "financial_employment" && (
+              {activeTab === "career_qualifications" && (
                 <div className="space-y-6 animate-in fade-in duration-200">
                   <div className="border-b border-border/30 pb-3 flex items-center gap-2">
                     <Laptop className="size-4.5 text-primary animate-pulse" />
@@ -5075,7 +5368,8 @@ function AddEmployeePage() {
                     <button
                       type="button"
                       onClick={() => {
-                        setActiveTab("career_qualifications");
+                        setActiveTab("personal_identity");
+                        setSubSection("references");
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
                       className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200"
@@ -5089,6 +5383,75 @@ function AddEmployeePage() {
           </form>
         </div>
       </main>
+
+      {/* ATTACHMENT PREVIEW MODAL OVERLAY */}
+      {previewFile && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-card border border-border/80 rounded-lg shadow-2xl p-5 w-full max-w-2xl overflow-hidden flex flex-col gap-4 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-border/30 pb-2.5">
+              <div className="flex items-center gap-2">
+                <FileText className="size-4.5 text-primary animate-pulse" />
+                <div>
+                  <h3 className="text-xs font-extrabold text-foreground uppercase tracking-widest truncate max-w-[300px]">
+                    {previewFile.name}
+                  </h3>
+                  <p className="text-[9px] text-muted-foreground mt-0.5 font-mono">
+                    File Size: {previewFile.size} | Type: {previewFile.type.toUpperCase()}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setPreviewFile(null)}
+                className="text-muted-foreground hover:text-foreground cursor-pointer text-sm font-bold p-1 rounded-lg hover:bg-muted/50 transition"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+            
+            {/* Premium Mock File Content Viewer */}
+            <div className="bg-muted/30 border border-border/40 rounded-xl p-6 h-96 flex flex-col items-center justify-center relative overflow-hidden select-none">
+              <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px] dark:bg-[radial-gradient(#334155_1px,transparent_1px)] opacity-50" />
+              
+              <div className="z-10 text-center space-y-4 max-w-sm">
+                <div className="size-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 shadow-md">
+                  <FileText className="size-8 animate-bounce" />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="text-xs font-bold text-foreground">Secure Document Viewer</h4>
+                  <p className="text-[10px] text-muted-foreground leading-relaxed">
+                    This is a secure local sandbox visualization of the uploaded digital file. Verification checks are automatically verified.
+                  </p>
+                </div>
+                
+                <div className="pt-2">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                    <ShieldCheck className="size-3.5" /> Checked & Secured by SAIF
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setPreviewFile(null)}
+                className="h-9 px-4 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition cursor-pointer"
+              >
+                Close Preview
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  toast.success(`Downloading ${previewFile.name}...`);
+                }}
+                className="h-9 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm hover:shadow-md transition cursor-pointer"
+              >
+                Download File
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* CUSTOM ADD OPTION MODAL OVERLAY */}
       {addingField && (
