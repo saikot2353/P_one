@@ -199,6 +199,169 @@ const initialBodyParts: BodyPartSpec[] = [
   { id: "bp-22", name: "Neck Tape", shortName: "", bodyFor: "Others", nature: "", status: "Active" },
 ];
 
+// ── Season & Sample Type Types & Initial Data ───────────────────────────
+interface SeasonSpec {
+  id: string;
+  seasonName: string;
+  status: "Active" | "Inactive";
+}
+
+const initialSeasons: SeasonSpec[] = [
+  { id: "sea-1", seasonName: "ANS-SS27", status: "Active" },
+  { id: "sea-2", seasonName: "AW25", status: "Active" },
+  { id: "sea-3", seasonName: "AW26MC", status: "Active" },
+  { id: "sea-4", seasonName: "FALL", status: "Active" },
+  { id: "sea-5", seasonName: "Spring", status: "Active" },
+  { id: "sea-6", seasonName: "Spring-Summer", status: "Active" },
+  { id: "sea-7", seasonName: "SS26", status: "Active" },
+  { id: "sea-8", seasonName: "Summer", status: "Active" },
+  { id: "sea-9", seasonName: "Winter", status: "Active" },
+];
+
+interface SampleTypeSpec {
+  id: string;
+  sampleName: string;
+  sampleCategory: string;
+  sampleNature: string;
+  status: "Active" | "Inactive";
+}
+
+const initialSampleTypes: SampleTypeSpec[] = [
+  { id: "smp-1", sampleName: "Bulk Sample", sampleCategory: "PP", sampleNature: "Knit", status: "Active" },
+  { id: "smp-2", sampleName: "Buying Sample", sampleCategory: "Development", sampleNature: "Knit", status: "Active" },
+  { id: "smp-3", sampleName: "Buying Sample", sampleCategory: "Others", sampleNature: "Knit", status: "Active" },
+];
+
+
+// ── Size Group & UoM Types & Initial Data ───────────────────────────────
+interface SizeGroupSpec {
+  id: string;
+  groupName: string;
+  size: string;
+  status: "Active" | "Inactive" | "";
+}
+
+const initialSizeGroups: SizeGroupSpec[] = [
+  { id: "szg-1", groupName: "0-3-18-24", size: "0-3,3-6,6-9,9-12,12-18,18-24", status: "Active" },
+  { id: "szg-2", groupName: "1/2-11/12", size: "1/2,3/4,5/6,7/8,9/10,11/12", status: "Active" },
+  { id: "szg-3", groupName: "104,170", size: "104/110,116/122,170,176", status: "Active" },
+  { id: "szg-4", groupName: "128/134-176", size: "128/134,152/158,140/146,164/170,176", status: "Active" },
+  { id: "szg-5", groupName: "128-176", size: "128,134,140,146,152,158,164,170,176", status: "Active" },
+  { id: "szg-6", groupName: "130-170", size: "130,140,150,160,170", status: "Active" },
+  { id: "szg-7", groupName: "2-16", size: "2,4,6,8,10,12,14,16,18", status: "Active" },
+  { id: "szg-8", groupName: "2-3/7-8", size: "2-3,3-4,5-6,7-8", status: "" },
+  { id: "szg-9", groupName: "2-3-13", size: "2-3,3-4,5-6,7-8,9,11,13", status: "Active" },
+  { id: "szg-10", groupName: "2-8", size: "2,4,6,8", status: "Active" },
+  { id: "szg-11", groupName: "28-42", size: "28,30,32,34,36,38,40,42", status: "Active" },
+  { id: "szg-12", groupName: "28-44", size: "28,30,32,34,36,38,40,42,44,46,48,50", status: "Active" },
+  { id: "szg-13", groupName: "2L-3L-2S-3S", size: "XS,S,M,L,LL,2S,3S,2L,3L,4L,5L,2L,6L,8L,10L", status: "Active" },
+  { id: "szg-14", groupName: "2XL-3XL", size: "2XL,3XL", status: "Active" },
+  { id: "szg-15", groupName: "30-48", size: "28,30,32,34,36,38,40,42,44,46,48", status: "Active" },
+  { id: "szg-16", groupName: "34-76", size: "34,58,70,76", status: "Active" },
+  { id: "szg-17", groupName: "4-16", size: "4,8,12,16", status: "Active" },
+  { id: "szg-18", groupName: "4XL-5XL", size: "4XL,5XL", status: "Active" },
+  { id: "szg-19", groupName: "5_6-13", size: "5_6,7_8,9_10,11_12,13_", status: "Active" },
+  { id: "szg-20", groupName: "6-20", size: "6,8,10,12,14,16,18,20", status: "Active" },
+  { id: "szg-21", groupName: "6-22", size: "6,8,10,12,14,16,18,20,22", status: "Active" },
+  { id: "szg-22", groupName: "6-24", size: "6,8,10,12,14,16,18,20,22,24", status: "Active" },
+];
+
+interface UomSpec {
+  id: string;
+  unitGroupName: string;
+  status: "Active" | "Inactive";
+}
+
+const initialUoms: UomSpec[] = [
+  { id: "uom-1", unitGroupName: "GG", status: "Active" },
+  { id: "uom-2", unitGroupName: "KG", status: "Active" },
+  { id: "uom-3", unitGroupName: "METER", status: "Active" },
+  { id: "uom-4", unitGroupName: "PCS", status: "Active" },
+  { id: "uom-5", unitGroupName: "YARD", status: "Inactive" },
+  { id: "uom-6", unitGroupName: "YRDS", status: "Active" },
+];
+
+
+// ── Fabric GSM, Nature, Construction Types & Initial Data ────────────────
+interface FabricGsmSpec {
+  id: string;
+  name: string;
+  createdDate: string;
+}
+
+const initialFabricGsms: FabricGsmSpec[] = [
+  { id: "gsm-1", name: "120-125", createdDate: "" },
+  { id: "gsm-2", name: "150", createdDate: "13/01/2026" },
+  { id: "gsm-3", name: "160", createdDate: "14/08/2024" },
+  { id: "gsm-4", name: "165", createdDate: "08/05/2025" },
+  { id: "gsm-5", name: "170-180", createdDate: "" },
+  { id: "gsm-6", name: "180", createdDate: "14/08/2024" },
+  { id: "gsm-7", name: "185", createdDate: "20/10/2025" },
+  { id: "gsm-8", name: "190", createdDate: "04/03/2025" },
+  { id: "gsm-9", name: "200", createdDate: "01/11/2025" },
+  { id: "gsm-10", name: "200-210", createdDate: "27/10/2025" },
+  { id: "gsm-11", name: "220", createdDate: "08/07/2025" },
+  { id: "gsm-12", name: "220", createdDate: "17/11/2025" },
+  { id: "gsm-13", name: "230", createdDate: "07/01/2026" },
+  { id: "gsm-14", name: "240", createdDate: "01/01/2026" },
+  { id: "gsm-15", name: "250", createdDate: "03/12/2024" },
+  { id: "gsm-16", name: "260", createdDate: "03/02/2026" },
+  { id: "gsm-17", name: "280", createdDate: "04/09/2025" },
+  { id: "gsm-18", name: "290", createdDate: "05/07/2025" },
+  { id: "gsm-19", name: "300", createdDate: "20/10/2025" },
+  { id: "gsm-20", name: "310", createdDate: "03/11/2025" },
+  { id: "gsm-21", name: "320", createdDate: "21/01/2026" },
+  { id: "gsm-22", name: "325", createdDate: "21/01/2026" },
+];
+
+interface FabricNatureSpec {
+  id: string;
+  fabricType: string;
+  rate: number;
+  status: "Active" | "Inactive";
+}
+
+const initialFabricNatures: FabricNatureSpec[] = [
+  { id: "nat-1", fabricType: "Knit", rate: 0, status: "Active" },
+  { id: "nat-2", fabricType: "Linen", rate: 0, status: "Active" },
+  { id: "nat-3", fabricType: "Nylon", rate: 0, status: "Active" },
+  { id: "nat-4", fabricType: "Polyester", rate: 0, status: "Active" },
+  { id: "nat-5", fabricType: "Sweater", rate: 0, status: "Active" },
+  { id: "nat-6", fabricType: "Woven", rate: 0, status: "Active" },
+];
+
+interface FabricConstructionSpec {
+  id: string;
+  name: string;
+  rate: number;
+  createdDate: string;
+}
+
+const initialFabricConstructions: FabricConstructionSpec[] = [
+  { id: "con-1", name: "100% Cotton Heavy Jersey", rate: 0.00, createdDate: "31/01/2026" },
+  { id: "con-2", name: "1X1 RIB", rate: 3.80, createdDate: "05/07/2025" },
+  { id: "con-3", name: "2X1 Rib", rate: 0.00, createdDate: "20/11/2025" },
+  { id: "con-4", name: "2X2 Lycra Rib", rate: 0.00, createdDate: "03/11/2025" },
+  { id: "con-5", name: "4X1 RIB", rate: 0.00, createdDate: "08/05/2025" },
+  { id: "con-6", name: "70E X 16L-70D(80%poly,20%CTN)/74X51", rate: 0.00, createdDate: "05/05/2026" },
+  { id: "con-7", name: "BCI Melange", rate: 0.00, createdDate: "20/10/2025" },
+  { id: "con-8", name: "BCI PC", rate: 0.00, createdDate: "20/10/2025" },
+  { id: "con-9", name: "Flannel", rate: 0.00, createdDate: "21/01/2026" },
+  { id: "con-10", name: "Flat knit", rate: 0.00, createdDate: "20/10/2025" },
+  { id: "con-11", name: "Fleece", rate: 0.00, createdDate: "08/10/2025" },
+  { id: "con-12", name: "Fleece Brush", rate: 0.00, createdDate: "21/01/2026" },
+  { id: "con-13", name: "Fleece Melange", rate: 0.00, createdDate: "06/01/2026" },
+  { id: "con-14", name: "Interlock", rate: 0.00, createdDate: "04/01/2026" },
+  { id: "con-15", name: "Lycra Rib 1X1", rate: 0.00, createdDate: "28/10/2025" },
+  { id: "con-16", name: "Lycra S/J", rate: 0.00, createdDate: "28/10/2025" },
+  { id: "con-17", name: "Melange", rate: 3.30, createdDate: "05/07/2025" },
+  { id: "con-18", name: "Micro Fleece", rate: 1.40, createdDate: "12/11/2024" },
+  { id: "con-19", name: "Mono Fleece", rate: 1.23, createdDate: "14/11/2024" },
+  { id: "con-20", name: "Ottoman", rate: 0.00, createdDate: "01/11/2025" },
+  { id: "con-21", name: "PIQUE", rate: 1.00, createdDate: "03/07/2025" },
+  { id: "con-22", name: "Polyester 100%", rate: 0.00, createdDate: "20/10/2025" },
+];
+
 // ── Supplier Types & Initial Data ──────────────────────────────────────
 interface Supplier {
   id: string;
@@ -971,6 +1134,337 @@ function MerchandisingMasterSettingsPage() {
       toast.success("Body Part created successfully!");
     }
     setBodyPartModal({ open: false });
+  };
+
+  // Season States
+  const [settingsSeasons, setSettingsSeasons] = useState<SeasonSpec[]>(initialSeasons);
+  const [settingsSeasonModal, setSettingsSeasonModal] = useState<{ open: boolean; item?: SeasonSpec }>({ open: false });
+  const [settingsSeasonForm, setSettingsSeasonForm] = useState<Partial<SeasonSpec>>({
+    seasonName: "",
+    status: "Active"
+  });
+  const [settingsSeasonSearch, setSettingsSeasonSearch] = useState("");
+
+  const handleOpenSettingsSeasonModal = (item?: SeasonSpec) => {
+    if (item) {
+      setSettingsSeasonForm(item);
+      setSettingsSeasonModal({ open: true, item });
+    } else {
+      setSettingsSeasonForm({
+        seasonName: "",
+        status: "Active"
+      });
+      setSettingsSeasonModal({ open: true });
+    }
+  };
+
+  const handleSaveSettingsSeason = () => {
+    if (!settingsSeasonForm.seasonName?.trim()) {
+      toast.error("Season Name is required!");
+      return;
+    }
+
+    if (settingsSeasonModal.item) {
+      // Edit mode
+      setSettingsSeasons(prev => prev.map(s => s.id === settingsSeasonModal.item!.id ? { ...s, ...settingsSeasonForm } as SeasonSpec : s));
+      toast.success("Season updated successfully!");
+    } else {
+      // Add mode
+      const newId = `sea-${Date.now()}`;
+      setSettingsSeasons(prev => [...prev, { ...settingsSeasonForm, id: newId } as SeasonSpec]);
+      toast.success("Season created successfully!");
+    }
+    setSettingsSeasonModal({ open: false });
+  };
+
+  // Sample Type States
+  const [sampleTypes, setSampleTypes] = useState<SampleTypeSpec[]>(initialSampleTypes);
+  const [sampleTypeModal, setSampleTypeModal] = useState<{ open: boolean; item?: SampleTypeSpec }>({ open: false });
+  const [sampleTypeForm, setSampleTypeForm] = useState<Partial<SampleTypeSpec>>({
+    sampleName: "",
+    sampleCategory: "",
+    sampleNature: "",
+    status: "Active"
+  });
+  const [sampleTypeSearch, setSampleTypeSearch] = useState("");
+
+  const handleOpenSampleTypeModal = (item?: SampleTypeSpec) => {
+    if (item) {
+      setSampleTypeForm(item);
+      setSampleTypeModal({ open: true, item });
+    } else {
+      setSampleTypeForm({
+        sampleName: "",
+        sampleCategory: "",
+        sampleNature: "",
+        status: "Active"
+      });
+      setSampleTypeModal({ open: true });
+    }
+  };
+
+  const handleSaveSampleType = () => {
+    if (!sampleTypeForm.sampleName?.trim()) {
+      toast.error("Sample Name is required!");
+      return;
+    }
+    if (!sampleTypeForm.sampleCategory?.trim()) {
+      toast.error("Sample Category is required!");
+      return;
+    }
+    if (!sampleTypeForm.sampleNature?.trim()) {
+      toast.error("Sample Nature is required!");
+      return;
+    }
+
+    if (sampleTypeModal.item) {
+      // Edit mode
+      setSampleTypes(prev => prev.map(s => s.id === sampleTypeModal.item!.id ? { ...s, ...sampleTypeForm } as SampleTypeSpec : s));
+      toast.success("Sample Type updated successfully!");
+    } else {
+      // Add mode
+      const newId = `smp-${Date.now()}`;
+      setSampleTypes(prev => [...prev, { ...sampleTypeForm, id: newId } as SampleTypeSpec]);
+      toast.success("Sample Type created successfully!");
+    }
+    setSampleTypeModal({ open: false });
+  };
+
+  const handleDeleteSampleType = (id: string) => {
+    setSampleTypes(prev => prev.filter(s => s.id !== id));
+    toast.success("Sample Type deleted successfully!");
+  };
+
+
+  // Size Group States
+  const [sizeGroups, setSizeGroups] = useState<SizeGroupSpec[]>(initialSizeGroups);
+  const [sizeGroupModal, setSizeGroupModal] = useState<{ open: boolean; item?: SizeGroupSpec }>({ open: false });
+  const [sizeGroupForm, setSizeGroupForm] = useState<Partial<SizeGroupSpec>>({
+    groupName: "",
+    size: "",
+    status: "Active"
+  });
+  const [sizeGroupSearch, setSizeGroupSearch] = useState("");
+
+  const handleOpenSizeGroupModal = (item?: SizeGroupSpec) => {
+    if (item) {
+      setSizeGroupForm(item);
+      setSizeGroupModal({ open: true, item });
+    } else {
+      setSizeGroupForm({
+        groupName: "",
+        size: "",
+        status: "Active"
+      });
+      setSizeGroupModal({ open: true });
+    }
+  };
+
+  const handleSaveSizeGroup = () => {
+    if (!sizeGroupForm.groupName?.trim()) {
+      toast.error("Group Name is required!");
+      return;
+    }
+    if (!sizeGroupForm.size?.trim()) {
+      toast.error("Size is required!");
+      return;
+    }
+
+    if (sizeGroupModal.item) {
+      // Edit mode
+      setSizeGroups(prev => prev.map(s => s.id === sizeGroupModal.item!.id ? { ...s, ...sizeGroupForm } as SizeGroupSpec : s));
+      toast.success("Size Group updated successfully!");
+    } else {
+      // Add mode
+      const newId = `szg-${Date.now()}`;
+      setSizeGroups(prev => [...prev, { ...sizeGroupForm, id: newId } as SizeGroupSpec]);
+      toast.success("Size Group created successfully!");
+    }
+    setSizeGroupModal({ open: false });
+  };
+
+  // UOM States
+  const [uoms, setUoms] = useState<UomSpec[]>(initialUoms);
+  const [uomModal, setUomModal] = useState<{ open: boolean; item?: UomSpec }>({ open: false });
+  const [uomForm, setUomForm] = useState<Partial<UomSpec>>({
+    unitGroupName: "",
+    status: "Active"
+  });
+  const [uomSearch, setUomSearch] = useState("");
+
+  const handleOpenUomModal = (item?: UomSpec) => {
+    if (item) {
+      setUomForm(item);
+      setUomModal({ open: true, item });
+    } else {
+      setUomForm({
+        unitGroupName: "",
+        status: "Active"
+      });
+      setUomModal({ open: true });
+    }
+  };
+
+  const handleSaveUom = () => {
+    if (!uomForm.unitGroupName?.trim()) {
+      toast.error("Unit Group Name is required!");
+      return;
+    }
+
+    if (uomModal.item) {
+      // Edit mode
+      setUoms(prev => prev.map(u => u.id === uomModal.item!.id ? { ...u, ...uomForm } as UomSpec : u));
+      toast.success("UOM updated successfully!");
+    } else {
+      // Add mode
+      const newId = `uom-${Date.now()}`;
+      setUoms(prev => [...prev, { ...uomForm, id: newId } as UomSpec]);
+      toast.success("UOM created successfully!");
+    }
+    setUomModal({ open: false });
+  };
+
+
+  // Fabric GSM States
+  const [fabricGsms, setFabricGsms] = useState<FabricGsmSpec[]>(initialFabricGsms);
+  const [fabricGsmModal, setFabricGsmModal] = useState<{ open: boolean; item?: FabricGsmSpec }>({ open: false });
+  const [fabricGsmForm, setFabricGsmForm] = useState<Partial<FabricGsmSpec>>({
+    name: "",
+    createdDate: ""
+  });
+  const [fabricGsmSearch, setFabricGsmSearch] = useState("");
+
+  const handleOpenFabricGsmModal = (item?: FabricGsmSpec) => {
+    if (item) {
+      setFabricGsmForm(item);
+      setFabricGsmModal({ open: true, item });
+    } else {
+      setFabricGsmForm({
+        name: "",
+        createdDate: new Date().toLocaleDateString("en-GB")
+      });
+      setFabricGsmModal({ open: true });
+    }
+  };
+
+  const handleSaveFabricGsm = () => {
+    if (!fabricGsmForm.name?.trim()) {
+      toast.error("Fabric GSM is required!");
+      return;
+    }
+
+    if (fabricGsmModal.item) {
+      // Edit mode
+      setFabricGsms(prev => prev.map(f => f.id === fabricGsmModal.item!.id ? { ...f, ...fabricGsmForm } as FabricGsmSpec : f));
+      toast.success("Fabric GSM updated successfully!");
+    } else {
+      // Add mode
+      const newId = `gsm-${Date.now()}`;
+      setFabricGsms(prev => [...prev, { ...fabricGsmForm, id: newId, createdDate: fabricGsmForm.createdDate || new Date().toLocaleDateString("en-GB") } as FabricGsmSpec]);
+      toast.success("Fabric GSM created successfully!");
+    }
+    setFabricGsmModal({ open: false });
+  };
+
+  const handleDeleteFabricGsm = (id: string) => {
+    setFabricGsms(prev => prev.filter(f => f.id !== id));
+    toast.success("Fabric GSM deleted successfully!");
+  };
+
+  // Fabric Nature States
+  const [fabricNatures, setFabricNatures] = useState<FabricNatureSpec[]>(initialFabricNatures);
+  const [fabricNatureModal, setFabricNatureModal] = useState<{ open: boolean; item?: FabricNatureSpec }>({ open: false });
+  const [fabricNatureForm, setFabricNatureForm] = useState<Partial<FabricNatureSpec>>({
+    fabricType: "",
+    rate: 0,
+    status: "Active"
+  });
+  const [fabricNatureSearch, setFabricNatureSearch] = useState("");
+
+  const handleOpenFabricNatureModal = (item?: FabricNatureSpec) => {
+    if (item) {
+      setFabricNatureForm(item);
+      setFabricNatureModal({ open: true, item });
+    } else {
+      setFabricNatureForm({
+        fabricType: "",
+        rate: 0,
+        status: "Active"
+      });
+      setFabricNatureModal({ open: true });
+    }
+  };
+
+  const handleSaveFabricNature = () => {
+    if (!fabricNatureForm.fabricType?.trim()) {
+      toast.error("Fabric Type is required!");
+      return;
+    }
+
+    if (fabricNatureModal.item) {
+      // Edit mode
+      setFabricNatures(prev => prev.map(f => f.id === fabricNatureModal.item!.id ? { ...f, ...fabricNatureForm } as FabricNatureSpec : f));
+      toast.success("Fabric Nature updated successfully!");
+    } else {
+      // Add mode
+      const newId = `nat-${Date.now()}`;
+      setFabricNatures(prev => [...prev, { ...fabricNatureForm, id: newId } as FabricNatureSpec]);
+      toast.success("Fabric Nature created successfully!");
+    }
+    setFabricNatureModal({ open: false });
+  };
+
+  const handleDeleteFabricNature = (id: string) => {
+    setFabricNatures(prev => prev.filter(f => f.id !== id));
+    toast.success("Fabric Nature deleted successfully!");
+  };
+
+  // Fabric Construction States
+  const [fabricConstructions, setFabricConstructions] = useState<FabricConstructionSpec[]>(initialFabricConstructions);
+  const [fabricConstructionModal, setFabricConstructionModal] = useState<{ open: boolean; item?: FabricConstructionSpec }>({ open: false });
+  const [fabricConstructionForm, setFabricConstructionForm] = useState<Partial<FabricConstructionSpec>>({
+    name: "",
+    rate: 0,
+    createdDate: ""
+  });
+  const [fabricConstructionSearch, setFabricConstructionSearch] = useState("");
+
+  const handleOpenFabricConstructionModal = (item?: FabricConstructionSpec) => {
+    if (item) {
+      setFabricConstructionForm(item);
+      setFabricConstructionModal({ open: true, item });
+    } else {
+      setFabricConstructionForm({
+        name: "",
+        rate: 0,
+        createdDate: new Date().toLocaleDateString("en-GB")
+      });
+      setFabricConstructionModal({ open: true });
+    }
+  };
+
+  const handleSaveFabricConstruction = () => {
+    if (!fabricConstructionForm.name?.trim()) {
+      toast.error("Fabric Construction Name is required!");
+      return;
+    }
+
+    if (fabricConstructionModal.item) {
+      // Edit mode
+      setFabricConstructions(prev => prev.map(f => f.id === fabricConstructionModal.item!.id ? { ...f, ...fabricConstructionForm } as FabricConstructionSpec : f));
+      toast.success("Fabric Construction updated successfully!");
+    } else {
+      // Add mode
+      const newId = `con-${Date.now()}`;
+      setFabricConstructions(prev => [...prev, { ...fabricConstructionForm, id: newId, createdDate: fabricConstructionForm.createdDate || new Date().toLocaleDateString("en-GB") } as FabricConstructionSpec]);
+      toast.success("Fabric Construction created successfully!");
+    }
+    setFabricConstructionModal({ open: false });
+  };
+
+  const handleDeleteFabricConstruction = (id: string) => {
+    setFabricConstructions(prev => prev.filter(f => f.id !== id));
+    toast.success("Fabric Construction deleted successfully!");
   };
 
   // Costing Configuration States
@@ -2737,7 +3231,7 @@ function MerchandisingMasterSettingsPage() {
                     </div>
                   )}
                 </div>
-              ) : ["buyer-name", "fabric-construction", "additional-cost-entry", "rmg-process-loss", "item-department", "gmt-item-name", "body-part"].includes(searchTab) ? null : (
+              ) : ["buyer-name", "fabric-construction", "additional-cost-entry", "rmg-process-loss", "item-department", "gmt-item-name", "body-part", "season", "sample-type", "size-group", "uom", "fabric-gsm", "fabric-nature"].includes(searchTab) ? null : (
                 renderDynamicMasterDB(searchTab, tabLabel)
               )}
         </div>
@@ -3419,6 +3913,707 @@ function MerchandisingMasterSettingsPage() {
                         className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
                       >
                         {bodyPartModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        {/* SEASON REGISTRY */}
+        {searchTab === "season" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Action Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Exported to Excel")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => toast.success("Exported to PDF")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  PDF
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={settingsSeasonSearch}
+                    onChange={(e) => setSettingsSeasonSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-48 text-slate-800 dark:text-slate-100"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+                <button
+                  onClick={() => handleOpenSettingsSeasonModal()}
+                  className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                >
+                  <Plus size={14} /> Add New
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th className="px-4 py-3 text-center w-20">Actions</th>
+                    <th className="px-4 py-3 text-center w-16">SL</th>
+                    <th className="px-4 py-3">Season Name</th>
+                    <th className="px-4 py-3 text-center w-24">IsActive</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                  {settingsSeasons
+                    .filter(s => 
+                      s.seasonName.toLowerCase().includes(settingsSeasonSearch.toLowerCase())
+                    )
+                    .map((s, idx) => (
+                      <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-4 py-2.5 text-center">
+                          <button
+                            onClick={() => handleOpenSettingsSeasonModal(s)}
+                            className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                            title="Edit"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                        </td>
+                        <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                        <td className="px-4 py-2.5 text-slate-800 dark:text-slate-200 font-bold">{s.seasonName}</td>
+                        <td className="px-4 py-2.5 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                            s.status === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
+                          }`}>
+                            {s.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 1 to {settingsSeasons.length} of {settingsSeasons.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2.5 py-1 rounded bg-teal-500 text-white shadow-sm">1</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* Modal */}
+            {settingsSeasonModal.open && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                  <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                      {settingsSeasonModal.item ? "Update Season Information" : "Add New Season"}
+                    </h3>
+                    <button onClick={() => setSettingsSeasonModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 space-y-4">
+                    {/* Season Name */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Season Name <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={settingsSeasonForm.seasonName || ""}
+                        onChange={(e) => setSettingsSeasonForm({ ...settingsSeasonForm, seasonName: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. ANS-SS27"
+                      />
+                    </div>
+
+                    {/* IsActive */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">IsActive <span className="text-rose-500">*</span></label>
+                      <select
+                        value={settingsSeasonForm.status || "Active"}
+                        onChange={(e) => setSettingsSeasonForm({ ...settingsSeasonForm, status: e.target.value as "Active" | "Inactive" })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <button
+                        type="button"
+                        onClick={() => setSettingsSeasonModal({ open: false })}
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        onClick={handleSaveSettingsSeason}
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        {settingsSeasonModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* SAMPLE TYPE REGISTRY */}
+        {searchTab === "sample-type" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Action Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Exported to Excel")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => toast.success("Exported to PDF")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  PDF
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={sampleTypeSearch}
+                    onChange={(e) => setSampleTypeSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-48 text-slate-800 dark:text-slate-100"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+                <button
+                  onClick={() => handleOpenSampleTypeModal()}
+                  className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                >
+                  <Plus size={14} /> Add New
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th className="px-4 py-3 text-center w-24">Actions</th>
+                    <th className="px-4 py-3 text-center w-16">Serial</th>
+                    <th className="px-4 py-3">Sample Name</th>
+                    <th className="px-4 py-3">SampleCategory</th>
+                    <th className="px-4 py-3">Sample Nature</th>
+                    <th className="px-4 py-3 text-center w-24">IsActive</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                  {sampleTypes
+                    .filter(s => 
+                      s.sampleName.toLowerCase().includes(sampleTypeSearch.toLowerCase()) ||
+                      s.sampleCategory.toLowerCase().includes(sampleTypeSearch.toLowerCase()) ||
+                      s.sampleNature.toLowerCase().includes(sampleTypeSearch.toLowerCase())
+                    )
+                    .map((s, idx) => (
+                      <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-4 py-2.5 text-center flex items-center justify-center gap-1">
+                          <button
+                            onClick={() => handleOpenSampleTypeModal(s)}
+                            className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                            title="Edit"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm("Are you sure you want to delete this sample type?")) {
+                                handleDeleteSampleType(s.id);
+                              }
+                            }}
+                            className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition cursor-pointer"
+                            title="Delete"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </td>
+                        <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                        <td className="px-4 py-2.5 text-slate-800 dark:text-slate-200 font-bold">{s.sampleName}</td>
+                        <td className="px-4 py-2.5 text-slate-700 dark:text-slate-300">{s.sampleCategory}</td>
+                        <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{s.sampleNature}</td>
+                        <td className="px-4 py-2.5 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                            s.status === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
+                          }`}>
+                            {s.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 1 to {sampleTypes.length} of {sampleTypes.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2.5 py-1 rounded bg-teal-500 text-white shadow-sm">1</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* Modal */}
+            {sampleTypeModal.open && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                  <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                      Sample Type
+                    </h3>
+                    <button onClick={() => setSampleTypeModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 space-y-4">
+                    {/* Sample Name */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Sample Name <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={sampleTypeForm.sampleName || ""}
+                        onChange={(e) => setSampleTypeForm({ ...sampleTypeForm, sampleName: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. Bulk Sample"
+                      />
+                    </div>
+
+                    {/* Sample Category */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Sample Category <span className="text-rose-500">*</span></label>
+                      <select
+                        value={sampleTypeForm.sampleCategory || ""}
+                        onChange={(e) => setSampleTypeForm({ ...sampleTypeForm, sampleCategory: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="">--Select--</option>
+                        <option value="PP">PP</option>
+                        <option value="Development">Development</option>
+                        <option value="Others">Others</option>
+                      </select>
+                    </div>
+
+                    {/* Sample Nature */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Sample Nature <span className="text-rose-500">*</span></label>
+                      <select
+                        value={sampleTypeForm.sampleNature || ""}
+                        onChange={(e) => setSampleTypeForm({ ...sampleTypeForm, sampleNature: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="">--Select--</option>
+                        <option value="Knit">Knit</option>
+                        <option value="Woven">Woven</option>
+                        <option value="Sweater">Sweater</option>
+                      </select>
+                    </div>
+
+                    {/* IsActive */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">IsActive <span className="text-rose-500">*</span></label>
+                      <select
+                        value={sampleTypeForm.status || "Active"}
+                        onChange={(e) => setSampleTypeForm({ ...sampleTypeForm, status: e.target.value as "Active" | "Inactive" })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <button
+                        type="button"
+                        onClick={() => setSampleTypeModal({ open: false })}
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        onClick={handleSaveSampleType}
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        {sampleTypeModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* SIZE GROUP REGISTRY */}
+        {searchTab === "size-group" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Action Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Exported to Excel")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => toast.success("Exported to PDF")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  PDF
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={sizeGroupSearch}
+                    onChange={(e) => setSizeGroupSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-48 text-slate-800 dark:text-slate-100"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+                <button
+                  onClick={() => handleOpenSizeGroupModal()}
+                  className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                >
+                  <Plus size={14} /> Add New
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th className="px-4 py-3 text-center w-20">Actions</th>
+                    <th className="px-4 py-3 text-center w-16">SL</th>
+                    <th className="px-4 py-3">Group Name</th>
+                    <th className="px-4 py-3">Size</th>
+                    <th className="px-4 py-3 text-center w-24">IsActive</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                  {sizeGroups
+                    .filter(s => 
+                      s.groupName.toLowerCase().includes(sizeGroupSearch.toLowerCase()) ||
+                      s.size.toLowerCase().includes(sizeGroupSearch.toLowerCase())
+                    )
+                    .map((s, idx) => (
+                      <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-4 py-2.5 text-center">
+                          <button
+                            onClick={() => handleOpenSizeGroupModal(s)}
+                            className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                            title="Edit"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                        </td>
+                        <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                        <td className="px-4 py-2.5 text-slate-850 dark:text-slate-200 font-bold">{s.groupName}</td>
+                        <td className="px-4 py-2.5 text-slate-700 dark:text-slate-350">{s.size}</td>
+                        <td className="px-4 py-2.5 text-center">
+                          {s.status ? (
+                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                              s.status === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
+                            }`}>
+                              {s.status}
+                            </span>
+                          ) : (
+                            <span className="text-slate-300">—</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 1 to {sizeGroups.length} of {sizeGroups.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2.5 py-1 rounded bg-teal-500 text-white shadow-sm">1</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* Modal */}
+            {sizeGroupModal.open && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                  <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                      {sizeGroupModal.item ? "Update Size Group" : "Add New Size Group"}
+                    </h3>
+                    <button onClick={() => setSizeGroupModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 space-y-4">
+                    {/* Group Name */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Group Name <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={sizeGroupForm.groupName || ""}
+                        onChange={(e) => setSizeGroupForm({ ...sizeGroupForm, groupName: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. 2-8"
+                      />
+                    </div>
+
+                    {/* Size */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Size <span className="text-rose-500">*</span></label>
+                      <textarea
+                        value={sizeGroupForm.size || ""}
+                        onChange={(e) => setSizeGroupForm({ ...sizeGroupForm, size: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30 h-20"
+                        placeholder="e.g. 2,4,6,8"
+                      />
+                    </div>
+
+                    {/* IsActive */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">IsActive <span className="text-rose-500">*</span></label>
+                      <select
+                        value={sizeGroupForm.status || "Active"}
+                        onChange={(e) => setSizeGroupForm({ ...sizeGroupForm, status: e.target.value as "Active" | "Inactive" | "" })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="">--Select--</option>
+                      </select>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <button
+                        type="button"
+                        onClick={() => setSizeGroupModal({ open: false })}
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        onClick={handleSaveSizeGroup}
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        {sizeGroupModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* UOM REGISTRY */}
+        {searchTab === "uom" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Action Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Exported to Excel")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => toast.success("Exported to PDF")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  PDF
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={uomSearch}
+                    onChange={(e) => setUomSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-48 text-slate-800 dark:text-slate-100"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+                <button
+                  onClick={() => handleOpenUomModal()}
+                  className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                >
+                  <Plus size={14} /> Add New
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th className="px-4 py-3 text-center w-20">Actions</th>
+                    <th className="px-4 py-3 text-center w-16">SL</th>
+                    <th className="px-4 py-3">Unit Group Name</th>
+                    <th className="px-4 py-3 text-center w-24">IsActive</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                  {uoms
+                    .filter(u => 
+                      u.unitGroupName.toLowerCase().includes(uomSearch.toLowerCase())
+                    )
+                    .map((u, idx) => (
+                      <tr key={u.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-4 py-2.5 text-center">
+                          <button
+                            onClick={() => handleOpenUomModal(u)}
+                            className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                            title="Edit"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                        </td>
+                        <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                        <td className="px-4 py-2.5 text-slate-800 dark:text-slate-200 font-bold">{u.unitGroupName}</td>
+                        <td className="px-4 py-2.5 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                            u.status === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
+                          }`}>
+                            {u.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 1 to {uoms.length} of {uoms.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2.5 py-1 rounded bg-teal-500 text-white shadow-sm">1</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* Modal */}
+            {uomModal.open && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                  <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                      Add New Mesaurment Head
+                    </h3>
+                    <button onClick={() => setUomModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 space-y-4">
+                    {/* Unit Group Name */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Unit Group Name <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={uomForm.unitGroupName || ""}
+                        onChange={(e) => setUomForm({ ...uomForm, unitGroupName: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. PCS"
+                      />
+                    </div>
+
+                    {/* IsActive */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">IsActive <span className="text-rose-500">*</span></label>
+                      <select
+                        value={uomForm.status || "Active"}
+                        onChange={(e) => setUomForm({ ...uomForm, status: e.target.value as "Active" | "Inactive" })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <button
+                        type="button"
+                        onClick={() => setUomModal({ open: false })}
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        onClick={handleSaveUom}
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        {uomModal.item ? "UPDATE" : "CREATE"}
                       </button>
                     </div>
                   </div>
@@ -4582,64 +5777,491 @@ function MerchandisingMasterSettingsPage() {
 
 
 
-        {searchTab === "fabric-construction" ? (
-                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
-                  <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">Fabric & Yarn Specification Master Library ({filteredFabrics.length})</span>
-                    <button
-                      onClick={() => handleOpenFabricModal()}
-                      className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 cursor-pointer shadow-sm"
-                    >
-                      <Plus size={14} /> Add Fabric Spec
+        {/* FABRIC GSM REGISTRY */}
+        {searchTab === "fabric-gsm" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Action Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Exported to Excel")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => toast.success("Exported to PDF")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  PDF
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={fabricGsmSearch}
+                    onChange={(e) => setFabricGsmSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-48 text-slate-800 dark:text-slate-100"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+                <button
+                  onClick={() => handleOpenFabricGsmModal()}
+                  className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                >
+                  <Plus size={14} /> Add New
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th className="px-4 py-3 text-center w-24">Actions</th>
+                    <th className="px-4 py-3 text-center w-20">Serial</th>
+                    <th className="px-4 py-3">Name</th>
+                    <th className="px-4 py-3">Created Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                  {fabricGsms
+                    .filter(f => 
+                      f.name.toLowerCase().includes(fabricGsmSearch.toLowerCase()) ||
+                      f.createdDate.toLowerCase().includes(fabricGsmSearch.toLowerCase())
+                    )
+                    .map((f, idx) => (
+                      <tr key={f.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-4 py-2.5 text-center">
+                          <div className="flex items-center justify-center gap-1">
+                            <button
+                              onClick={() => handleOpenFabricGsmModal(f)}
+                              className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                              title="Edit"
+                            >
+                              <Pencil size={13} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteFabricGsm(f.id)}
+                              className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition cursor-pointer"
+                              title="Delete"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
+                        </td>
+                        <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                        <td className="px-4 py-2.5 text-slate-800 dark:text-slate-200 font-bold">{f.name}</td>
+                        <td className="px-4 py-2.5 text-slate-500 font-mono text-[11px]">{f.createdDate || ""}</td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 1 to {fabricGsms.length} of {fabricGsms.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2.5 py-1 rounded bg-teal-500 text-white shadow-sm">1</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* Modal */}
+            {fabricGsmModal.open && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                  <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                      Fabric GSM
+                    </h3>
+                    <button onClick={() => setFabricGsmModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={16} />
                     </button>
                   </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-xs text-left">
-                      <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
-                        <tr>
-                          <th className="px-4 py-3">Fabric Type</th>
-                          <th className="px-4 py-3">Construction</th>
-                          <th className="px-4 py-3">Yarn Count</th>
-                          <th className="px-4 py-3">Composition</th>
-                          <th className="px-4 py-3 text-right">Standard GSM</th>
-                          <th className="px-4 py-3 text-right">Spandex %</th>
-                          <th className="px-4 py-3">Shrinkage %</th>
-                          <th className="px-4 py-3 text-center">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-200 dark:divide-slate-800 font-semibold">
-                        {filteredFabrics.map((f) => (
-                          <tr key={f.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                            <td className="px-4 py-3 font-bold text-slate-900 dark:text-white">{f.fabricType}</td>
-                            <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{f.construction}</td>
-                            <td className="px-4 py-3 font-mono text-teal-600 dark:text-teal-400 font-bold">{f.yarnCount}</td>
-                            <td className="px-4 py-3">{f.composition}</td>
-                            <td className="px-4 py-3 text-right font-mono font-bold">{f.gsm} gsm</td>
-                            <td className="px-4 py-3 text-right font-mono">{f.spandexPct}%</td>
-                            <td className="px-4 py-3 text-slate-500 font-mono text-[11px]">{f.shrinkagePct}</td>
-                            <td className="px-4 py-3 text-center">
-                              <div className="flex items-center justify-center gap-1">
-                                <button
-                                  onClick={() => handleOpenFabricModal(f)}
-                                  className="p-1 text-slate-500 hover:text-teal-500 hover:bg-slate-100 rounded transition cursor-pointer"
-                                >
-                                  <Pencil size={14} />
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteFabric(f.id)}
-                                  className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition cursor-pointer"
-                                >
-                                  <Trash2 size={14} />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+
+                  <div className="p-6 space-y-4">
+                    {/* GSM Name */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Fabric GSM <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={fabricGsmForm.name || ""}
+                        onChange={(e) => setFabricGsmForm({ ...fabricGsmForm, name: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. 170-180"
+                      />
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <button
+                        type="button"
+                        onClick={() => setFabricGsmModal({ open: false })}
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        onClick={handleSaveFabricGsm}
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        {fabricGsmModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
                   </div>
                 </div>
-        ) : null}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* FABRIC NATURE REGISTRY */}
+        {searchTab === "fabric-nature" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Action Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Exported to Excel")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => toast.success("Exported to PDF")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  PDF
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={fabricNatureSearch}
+                    onChange={(e) => setFabricNatureSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-48 text-slate-800 dark:text-slate-100"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+                <button
+                  onClick={() => handleOpenFabricNatureModal()}
+                  className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                >
+                  <Plus size={14} /> Add New
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th className="px-4 py-3 text-center w-20">Actions</th>
+                    <th className="px-4 py-3 text-center w-16">SL</th>
+                    <th className="px-4 py-3">Fabric Type</th>
+                    <th className="px-4 py-3 text-right pr-8">Rate</th>
+                    <th className="px-4 py-3 text-center w-24">IsActive</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                  {fabricNatures
+                    .filter(f => 
+                      f.fabricType.toLowerCase().includes(fabricNatureSearch.toLowerCase())
+                    )
+                    .map((f, idx) => (
+                      <tr key={f.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-4 py-2.5 text-center">
+                          <button
+                            onClick={() => handleOpenFabricNatureModal(f)}
+                            className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                            title="Edit"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                        </td>
+                        <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                        <td className="px-4 py-2.5 text-slate-805 dark:text-slate-200 font-bold">{f.fabricType}</td>
+                        <td className="px-4 py-2.5 text-right font-mono text-slate-700 pr-8">{f.rate}</td>
+                        <td className="px-4 py-2.5 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                            f.status === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
+                          }`}>
+                            {f.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 1 to {fabricNatures.length} of {fabricNatures.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2.5 py-1 rounded bg-teal-500 text-white shadow-sm">1</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* Modal */}
+            {fabricNatureModal.open && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                  <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                      {fabricNatureModal.item ? "Update Fabric Type" : "Add New Fabric Type"}
+                    </h3>
+                    <button onClick={() => setFabricNatureModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 space-y-4">
+                    {/* Fabric Type */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Fabric Type <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={fabricNatureForm.fabricType || ""}
+                        onChange={(e) => setFabricNatureForm({ ...fabricNatureForm, fabricType: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. Knit"
+                      />
+                    </div>
+
+                    {/* Rate */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Rate</label>
+                      <input
+                        type="number"
+                        value={fabricNatureForm.rate ?? 0}
+                        onChange={(e) => setFabricNatureForm({ ...fabricNatureForm, rate: Number(e.target.value) })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      />
+                    </div>
+
+                    {/* IsActive */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">IsActive <span className="text-rose-500">*</span></label>
+                      <select
+                        value={fabricNatureForm.status || "Active"}
+                        onChange={(e) => setFabricNatureForm({ ...fabricNatureForm, status: e.target.value as "Active" | "Inactive" })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <button
+                        type="button"
+                        onClick={() => setFabricNatureModal({ open: false })}
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        onClick={handleSaveFabricNature}
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        {fabricNatureModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* FABRIC CONSTRUCTION REGISTRY */}
+        {searchTab === "fabric-construction" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Action Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Exported to Excel")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => toast.success("Exported to PDF")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  PDF
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={fabricConstructionSearch}
+                    onChange={(e) => setFabricConstructionSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-48 text-slate-800 dark:text-slate-100"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+                <button
+                  onClick={() => handleOpenFabricConstructionModal()}
+                  className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                >
+                  <Plus size={14} /> Add New
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th className="px-4 py-3 text-center w-24">Actions</th>
+                    <th className="px-4 py-3 text-center w-20">Serial</th>
+                    <th className="px-4 py-3">Name</th>
+                    <th className="px-4 py-3 text-right pr-12">Rate</th>
+                    <th className="px-4 py-3">Created Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                  {fabricConstructions
+                    .filter(f => 
+                      f.name.toLowerCase().includes(fabricConstructionSearch.toLowerCase()) ||
+                      f.createdDate.toLowerCase().includes(fabricConstructionSearch.toLowerCase())
+                    )
+                    .map((f, idx) => (
+                      <tr key={f.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-4 py-2.5 text-center">
+                          <div className="flex items-center justify-center gap-1">
+                            <button
+                              onClick={() => handleOpenFabricConstructionModal(f)}
+                              className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                              title="Edit"
+                            >
+                              <Pencil size={13} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteFabricConstruction(f.id)}
+                              className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition cursor-pointer"
+                              title="Delete"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
+                        </td>
+                        <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                        <td className="px-4 py-2.5 text-slate-805 dark:text-slate-200 font-bold">{f.name}</td>
+                        <td className="px-4 py-2.5 text-right font-mono text-slate-700 pr-12">{f.rate.toFixed(2)}</td>
+                        <td className="px-4 py-2.5 text-slate-500 font-mono text-[11px]">{f.createdDate || ""}</td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 1 to {fabricConstructions.length} of {fabricConstructions.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2.5 py-1 rounded bg-teal-500 text-white shadow-sm">1</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* Modal */}
+            {fabricConstructionModal.open && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                  <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                      {fabricConstructionModal.item ? "Update Fabric Construction" : "Add New Fabric Construction"}
+                    </h3>
+                    <button onClick={() => setFabricConstructionModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 space-y-4">
+                    {/* Construction Name */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Fabric Construction Name <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={fabricConstructionForm.name || ""}
+                        onChange={(e) => setFabricConstructionForm({ ...fabricConstructionForm, name: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. 100% Cotton Heavy Jersey"
+                      />
+                    </div>
+
+                    {/* Rate */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Rate</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={fabricConstructionForm.rate ?? 0}
+                        onChange={(e) => setFabricConstructionForm({ ...fabricConstructionForm, rate: Number(e.target.value) })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      />
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <button
+                        type="button"
+                        onClick={() => setFabricConstructionModal({ open: false })}
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        onClick={handleSaveFabricConstruction}
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        {fabricConstructionModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
 
 

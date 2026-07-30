@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v73");
+    const saved = localStorage.getItem("system_changes_v76");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -636,6 +636,33 @@ function ChangesPage() {
           link: "/merchandising-master-settings",
           descriptionEn: "Implemented beautiful, fully-functional custom layouts and modals for 'Item Department', 'Garment Item Name (GMT Item Name)', and 'Body Part' tabs based on layout screenshots. Added Excel/Print/Pdf options, search filters, default entries, and select dropdowns.",
           descriptionBn: "'Item Department', 'Garment Item Name (GMT Item Name)' এবং 'Body Part' ট্যাবগুলোর জন্য লেআউট স্ক্রিনশট অনুযায়ী আকর্ষণীয় কাস্টম লেআউট এবং মোডাল ভিউ যুক্ত করা হয়েছে। এতে এক্সেল/প্রিন্ট/পিডিএফ রফতানি, সার্চ ফিল্টার, ডিফল্ট তথ্যসমূহ এবং সিলেক্ট ড্রপডাউন অন্তর্ভুক্ত রয়েছে।",
+        },
+        {
+          id: "69",
+          date: "2026-07-30T18:11",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Added beautiful, fully-functional custom styled registry tables, filters, and add/edit modals for both 'Season' and 'Sample Type' tabs, resolving a React state namespace collision with the pre-existing accordion seasons state.",
+          descriptionBn: "'Season' এবং 'Sample Type' ট্যাবদ্বয়ের জন্য আকর্ষণীয় কাস্টম রেজিস্ট্রি টেবিল, ফিল্টার এবং অ্যাড/এডিট মোডাল তৈরি করা হয়েছে। একই সাথে বায়ার প্রোফাইল একোর্ডিয়নের নিজস্ব 'seasons' স্ট্যাটের সাথে নেমস্পেস সংঘর্ষের সমাধান করা হয়েছে।",
+        },
+        {
+          id: "70",
+          date: "2026-07-30T18:18",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Implemented custom styled registry tables, pagination indicators, action sheets, search functions, and input/select modals for both 'Size Group' (Group size) and 'UoM' (Unit of Measurement) settings tabs matching design specifications.",
+          descriptionBn: "'Size Group' (গ্রুপ সাইজ) এবং 'UoM' (পরিমাপক একক) ট্যাবদ্বয়ের জন্য ডিজাইন স্পেসিফিকেশন অনুযায়ী কাস্টম রেজিস্ট্রি টেবিল, অ্যাকশন শিট, সার্চ এবং অ্যাড/এডিট মোডাল ভিউ যুক্ত করা হয়েছে।",
+        },
+        {
+          id: "71",
+          date: "2026-07-30T18:32",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Implemented custom registry layouts, actions, live searches, export mock actions, and dialog modals for 'Fabric GSM', 'Fabric Nature' (Fabric Type), and 'Fabric Construction' tabs matching screen layouts.",
+          descriptionBn: "'Fabric GSM', 'Fabric Nature' (Fabric Type) এবং 'Fabric Construction' ট্যাবগুলোর জন্য লেআউট ডিজাইন অনুযায়ী কাস্টম রেজিস্ট্রি টেবিল, অ্যাকশন, সার্চ এবং অ্যাড/এডিট মোডাল ভিউ যুক্ত করা হয়েছে।",
         },
       ]);
     }
