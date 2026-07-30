@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v55");
+    const saved = localStorage.getItem("system_changes_v56");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -483,6 +483,15 @@ function ChangesPage() {
           link: "/merchandising-capacity-distribution",
           descriptionEn: "Refactored the Capacity Distribution list layout and edit controls to match the user's reference columns: SL, edit pencil, Company Name, Location, Year, Month, Total Capacity (Min), and Total Capacity (Pcs). Also refactored the creation/editing view to open in a wide modal overlay with a dual-panel layout.",
           descriptionBn: "ইউজারের দেয়া স্ক্রিনশট অনুযায়ী ক্যাপাসিটি ডিস্ট্রিবিউশন টেবিলের কলামসমূহ এবং এডিট পেন্সিল পজিশন বিন্যস্ত করা হয়েছে। এছাড়া এলোকেশন পেজের মতো ডিস্ট্রিবিউশন তৈরি ও এডিট করার ফর্মটিকেও ব্যাকড্রপ-ব্লারড মোডালে রুপান্তর করা হয়েছে।",
+        },
+        {
+          id: "52",
+          date: "2026-07-30T15:00",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-sales-target-entry",
+          descriptionEn: "Refactored the Sales Target Entry page. List view now features columns: SL, edit pencil, Year, and Buyer Name. Added a backdrop-blurred wide modal for creating/editing targets with top controls: Year, Buyer, and GET MONTH button, along with a bottom-scrollable 12-month details grid showing: SL, Month, Quantity (Pcs), Amount (USD), Minute, Margin (USD), CM, RM, Avg SMV, Avg Eff, Mgt Notes, and a blue Team ACTION button.",
+          descriptionBn: "সেলস টার্গেট এন্ট্রি পেজটি রিফ্যাক্টর করা হয়েছে। লিস্ট ভিউ টেবিলে SL, এডিট পেন্সিল, বছর এবং বায়ার নামের কলাম রয়েছে। এছাড়া টার্গেট তৈরি ও এডিট করার জন্য ব্যাকড্রপ-ব্লারড মোডাল যুক্ত করা হয়েছে যেখানে বছর, বায়ার এবং GET MONTH বাটনের সাহায্যে ১২ মাসের ছক জেনারেট করা ও কলামসমূহের মোট যোগফল রিয়েল-টাইমে ক্যালকুলেট করার ব্যবস্থা রয়েছে।",
         },
       ]);
     }
