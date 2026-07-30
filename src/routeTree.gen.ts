@@ -54,14 +54,17 @@ import { Route as MessengerRouteImport } from './routes/messenger'
 import { Route as MerchandisingWorkOrdersRouteImport } from './routes/merchandising-work-orders'
 import { Route as MerchandisingTnaCalendarRouteImport } from './routes/merchandising-tna-calendar'
 import { Route as MerchandisingSampleTrackerRouteImport } from './routes/merchandising-sample-tracker'
+import { Route as MerchandisingSalesTargetEntryRouteImport } from './routes/merchandising-sales-target-entry'
 import { Route as MerchandisingReportsRouteImport } from './routes/merchandising-reports'
 import { Route as MerchandisingOrderProfileRouteImport } from './routes/merchandising-order-profile'
 import { Route as MerchandisingOrderListRouteImport } from './routes/merchandising-order-list'
+import { Route as MerchandisingMonthlyCapacityRouteImport } from './routes/merchandising-monthly-capacity'
 import { Route as MerchandisingMaterialBookingsRouteImport } from './routes/merchandising-material-bookings'
 import { Route as MerchandisingMasterSettingsRouteImport } from './routes/merchandising-master-settings'
 import { Route as MerchandisingInquiryRouteImport } from './routes/merchandising-inquiry'
 import { Route as MerchandisingDashboardRouteImport } from './routes/merchandising-dashboard'
-import { Route as MerchandisingCapacityPlanningRouteImport } from './routes/merchandising-capacity-planning'
+import { Route as MerchandisingCapacityDistributionRouteImport } from './routes/merchandising-capacity-distribution'
+import { Route as MerchandisingCapacityAllocationRouteImport } from './routes/merchandising-capacity-allocation'
 import { Route as ManualAttendanceRouteImport } from './routes/manual-attendance'
 import { Route as ManageOvertimeRouteImport } from './routes/manage-overtime'
 import { Route as LoginRouteImport } from './routes/login'
@@ -364,6 +367,12 @@ const MerchandisingSampleTrackerRoute =
     path: '/merchandising-sample-tracker',
     getParentRoute: () => rootRouteImport,
   } as any)
+const MerchandisingSalesTargetEntryRoute =
+  MerchandisingSalesTargetEntryRouteImport.update({
+    id: '/merchandising-sales-target-entry',
+    path: '/merchandising-sales-target-entry',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const MerchandisingReportsRoute = MerchandisingReportsRouteImport.update({
   id: '/merchandising-reports',
   path: '/merchandising-reports',
@@ -380,6 +389,12 @@ const MerchandisingOrderListRoute = MerchandisingOrderListRouteImport.update({
   path: '/merchandising-order-list',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MerchandisingMonthlyCapacityRoute =
+  MerchandisingMonthlyCapacityRouteImport.update({
+    id: '/merchandising-monthly-capacity',
+    path: '/merchandising-monthly-capacity',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const MerchandisingMaterialBookingsRoute =
   MerchandisingMaterialBookingsRouteImport.update({
     id: '/merchandising-material-bookings',
@@ -402,10 +417,16 @@ const MerchandisingDashboardRoute = MerchandisingDashboardRouteImport.update({
   path: '/merchandising-dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MerchandisingCapacityPlanningRoute =
-  MerchandisingCapacityPlanningRouteImport.update({
-    id: '/merchandising-capacity-planning',
-    path: '/merchandising-capacity-planning',
+const MerchandisingCapacityDistributionRoute =
+  MerchandisingCapacityDistributionRouteImport.update({
+    id: '/merchandising-capacity-distribution',
+    path: '/merchandising-capacity-distribution',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const MerchandisingCapacityAllocationRoute =
+  MerchandisingCapacityAllocationRouteImport.update({
+    id: '/merchandising-capacity-allocation',
+    path: '/merchandising-capacity-allocation',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ManualAttendanceRoute = ManualAttendanceRouteImport.update({
@@ -817,14 +838,17 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
-  '/merchandising-capacity-planning': typeof MerchandisingCapacityPlanningRoute
+  '/merchandising-capacity-allocation': typeof MerchandisingCapacityAllocationRoute
+  '/merchandising-capacity-distribution': typeof MerchandisingCapacityDistributionRoute
   '/merchandising-dashboard': typeof MerchandisingDashboardRoute
   '/merchandising-inquiry': typeof MerchandisingInquiryRoute
   '/merchandising-master-settings': typeof MerchandisingMasterSettingsRoute
   '/merchandising-material-bookings': typeof MerchandisingMaterialBookingsRoute
+  '/merchandising-monthly-capacity': typeof MerchandisingMonthlyCapacityRoute
   '/merchandising-order-list': typeof MerchandisingOrderListRoute
   '/merchandising-order-profile': typeof MerchandisingOrderProfileRoute
   '/merchandising-reports': typeof MerchandisingReportsRoute
+  '/merchandising-sales-target-entry': typeof MerchandisingSalesTargetEntryRoute
   '/merchandising-sample-tracker': typeof MerchandisingSampleTrackerRoute
   '/merchandising-tna-calendar': typeof MerchandisingTnaCalendarRoute
   '/merchandising-work-orders': typeof MerchandisingWorkOrdersRoute
@@ -940,14 +964,17 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
-  '/merchandising-capacity-planning': typeof MerchandisingCapacityPlanningRoute
+  '/merchandising-capacity-allocation': typeof MerchandisingCapacityAllocationRoute
+  '/merchandising-capacity-distribution': typeof MerchandisingCapacityDistributionRoute
   '/merchandising-dashboard': typeof MerchandisingDashboardRoute
   '/merchandising-inquiry': typeof MerchandisingInquiryRoute
   '/merchandising-master-settings': typeof MerchandisingMasterSettingsRoute
   '/merchandising-material-bookings': typeof MerchandisingMaterialBookingsRoute
+  '/merchandising-monthly-capacity': typeof MerchandisingMonthlyCapacityRoute
   '/merchandising-order-list': typeof MerchandisingOrderListRoute
   '/merchandising-order-profile': typeof MerchandisingOrderProfileRoute
   '/merchandising-reports': typeof MerchandisingReportsRoute
+  '/merchandising-sales-target-entry': typeof MerchandisingSalesTargetEntryRoute
   '/merchandising-sample-tracker': typeof MerchandisingSampleTrackerRoute
   '/merchandising-tna-calendar': typeof MerchandisingTnaCalendarRoute
   '/merchandising-work-orders': typeof MerchandisingWorkOrdersRoute
@@ -1064,14 +1091,17 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
-  '/merchandising-capacity-planning': typeof MerchandisingCapacityPlanningRoute
+  '/merchandising-capacity-allocation': typeof MerchandisingCapacityAllocationRoute
+  '/merchandising-capacity-distribution': typeof MerchandisingCapacityDistributionRoute
   '/merchandising-dashboard': typeof MerchandisingDashboardRoute
   '/merchandising-inquiry': typeof MerchandisingInquiryRoute
   '/merchandising-master-settings': typeof MerchandisingMasterSettingsRoute
   '/merchandising-material-bookings': typeof MerchandisingMaterialBookingsRoute
+  '/merchandising-monthly-capacity': typeof MerchandisingMonthlyCapacityRoute
   '/merchandising-order-list': typeof MerchandisingOrderListRoute
   '/merchandising-order-profile': typeof MerchandisingOrderProfileRoute
   '/merchandising-reports': typeof MerchandisingReportsRoute
+  '/merchandising-sales-target-entry': typeof MerchandisingSalesTargetEntryRoute
   '/merchandising-sample-tracker': typeof MerchandisingSampleTrackerRoute
   '/merchandising-tna-calendar': typeof MerchandisingTnaCalendarRoute
   '/merchandising-work-orders': typeof MerchandisingWorkOrdersRoute
@@ -1189,14 +1219,17 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
-    | '/merchandising-capacity-planning'
+    | '/merchandising-capacity-allocation'
+    | '/merchandising-capacity-distribution'
     | '/merchandising-dashboard'
     | '/merchandising-inquiry'
     | '/merchandising-master-settings'
     | '/merchandising-material-bookings'
+    | '/merchandising-monthly-capacity'
     | '/merchandising-order-list'
     | '/merchandising-order-profile'
     | '/merchandising-reports'
+    | '/merchandising-sales-target-entry'
     | '/merchandising-sample-tracker'
     | '/merchandising-tna-calendar'
     | '/merchandising-work-orders'
@@ -1312,14 +1345,17 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
-    | '/merchandising-capacity-planning'
+    | '/merchandising-capacity-allocation'
+    | '/merchandising-capacity-distribution'
     | '/merchandising-dashboard'
     | '/merchandising-inquiry'
     | '/merchandising-master-settings'
     | '/merchandising-material-bookings'
+    | '/merchandising-monthly-capacity'
     | '/merchandising-order-list'
     | '/merchandising-order-profile'
     | '/merchandising-reports'
+    | '/merchandising-sales-target-entry'
     | '/merchandising-sample-tracker'
     | '/merchandising-tna-calendar'
     | '/merchandising-work-orders'
@@ -1435,14 +1471,17 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
-    | '/merchandising-capacity-planning'
+    | '/merchandising-capacity-allocation'
+    | '/merchandising-capacity-distribution'
     | '/merchandising-dashboard'
     | '/merchandising-inquiry'
     | '/merchandising-master-settings'
     | '/merchandising-material-bookings'
+    | '/merchandising-monthly-capacity'
     | '/merchandising-order-list'
     | '/merchandising-order-profile'
     | '/merchandising-reports'
+    | '/merchandising-sales-target-entry'
     | '/merchandising-sample-tracker'
     | '/merchandising-tna-calendar'
     | '/merchandising-work-orders'
@@ -1559,14 +1598,17 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ManageOvertimeRoute: typeof ManageOvertimeRoute
   ManualAttendanceRoute: typeof ManualAttendanceRoute
-  MerchandisingCapacityPlanningRoute: typeof MerchandisingCapacityPlanningRoute
+  MerchandisingCapacityAllocationRoute: typeof MerchandisingCapacityAllocationRoute
+  MerchandisingCapacityDistributionRoute: typeof MerchandisingCapacityDistributionRoute
   MerchandisingDashboardRoute: typeof MerchandisingDashboardRoute
   MerchandisingInquiryRoute: typeof MerchandisingInquiryRoute
   MerchandisingMasterSettingsRoute: typeof MerchandisingMasterSettingsRoute
   MerchandisingMaterialBookingsRoute: typeof MerchandisingMaterialBookingsRoute
+  MerchandisingMonthlyCapacityRoute: typeof MerchandisingMonthlyCapacityRoute
   MerchandisingOrderListRoute: typeof MerchandisingOrderListRoute
   MerchandisingOrderProfileRoute: typeof MerchandisingOrderProfileRoute
   MerchandisingReportsRoute: typeof MerchandisingReportsRoute
+  MerchandisingSalesTargetEntryRoute: typeof MerchandisingSalesTargetEntryRoute
   MerchandisingSampleTrackerRoute: typeof MerchandisingSampleTrackerRoute
   MerchandisingTnaCalendarRoute: typeof MerchandisingTnaCalendarRoute
   MerchandisingWorkOrdersRoute: typeof MerchandisingWorkOrdersRoute
@@ -1935,6 +1977,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MerchandisingSampleTrackerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/merchandising-sales-target-entry': {
+      id: '/merchandising-sales-target-entry'
+      path: '/merchandising-sales-target-entry'
+      fullPath: '/merchandising-sales-target-entry'
+      preLoaderRoute: typeof MerchandisingSalesTargetEntryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/merchandising-reports': {
       id: '/merchandising-reports'
       path: '/merchandising-reports'
@@ -1954,6 +2003,13 @@ declare module '@tanstack/react-router' {
       path: '/merchandising-order-list'
       fullPath: '/merchandising-order-list'
       preLoaderRoute: typeof MerchandisingOrderListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/merchandising-monthly-capacity': {
+      id: '/merchandising-monthly-capacity'
+      path: '/merchandising-monthly-capacity'
+      fullPath: '/merchandising-monthly-capacity'
+      preLoaderRoute: typeof MerchandisingMonthlyCapacityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/merchandising-material-bookings': {
@@ -1984,11 +2040,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MerchandisingDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/merchandising-capacity-planning': {
-      id: '/merchandising-capacity-planning'
-      path: '/merchandising-capacity-planning'
-      fullPath: '/merchandising-capacity-planning'
-      preLoaderRoute: typeof MerchandisingCapacityPlanningRouteImport
+    '/merchandising-capacity-distribution': {
+      id: '/merchandising-capacity-distribution'
+      path: '/merchandising-capacity-distribution'
+      fullPath: '/merchandising-capacity-distribution'
+      preLoaderRoute: typeof MerchandisingCapacityDistributionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/merchandising-capacity-allocation': {
+      id: '/merchandising-capacity-allocation'
+      path: '/merchandising-capacity-allocation'
+      fullPath: '/merchandising-capacity-allocation'
+      preLoaderRoute: typeof MerchandisingCapacityAllocationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/manual-attendance': {
@@ -2535,14 +2598,18 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ManageOvertimeRoute: ManageOvertimeRoute,
   ManualAttendanceRoute: ManualAttendanceRoute,
-  MerchandisingCapacityPlanningRoute: MerchandisingCapacityPlanningRoute,
+  MerchandisingCapacityAllocationRoute: MerchandisingCapacityAllocationRoute,
+  MerchandisingCapacityDistributionRoute:
+    MerchandisingCapacityDistributionRoute,
   MerchandisingDashboardRoute: MerchandisingDashboardRoute,
   MerchandisingInquiryRoute: MerchandisingInquiryRoute,
   MerchandisingMasterSettingsRoute: MerchandisingMasterSettingsRoute,
   MerchandisingMaterialBookingsRoute: MerchandisingMaterialBookingsRoute,
+  MerchandisingMonthlyCapacityRoute: MerchandisingMonthlyCapacityRoute,
   MerchandisingOrderListRoute: MerchandisingOrderListRoute,
   MerchandisingOrderProfileRoute: MerchandisingOrderProfileRoute,
   MerchandisingReportsRoute: MerchandisingReportsRoute,
+  MerchandisingSalesTargetEntryRoute: MerchandisingSalesTargetEntryRoute,
   MerchandisingSampleTrackerRoute: MerchandisingSampleTrackerRoute,
   MerchandisingTnaCalendarRoute: MerchandisingTnaCalendarRoute,
   MerchandisingWorkOrdersRoute: MerchandisingWorkOrdersRoute,

@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v53");
+    const saved = localStorage.getItem("system_changes_v55");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -465,6 +465,24 @@ function ChangesPage() {
           link: "/merchandising-capacity-planning",
           descriptionEn: "Implemented the 'Capacity Distribution' workspace and list ledger in the capacity planning module. Features auto-lookup of month-wise capacities, multi-buyer selection (Zara, Mango, Fatface, etc.), allocation ratio validation, and real-time distribution summaries.",
           descriptionBn: "ক্যাপাসিটি প্ল্যানিং মডিউলে 'Capacity Distribution' পেজ ও লেজার তৈরি করা হয়েছে। এর মাধ্যমে মাসভিত্তিক মোট ক্যাপাসিটি রিয়েল-টাইমে সার্চ করা, নির্দিষ্ট বায়ারদের (যেমন: Zara, Mango, Fatface ইত্যাদি) মধ্যে শতাংশ ভাগ করে দেওয়া এবং রিয়েল-টাইমে মোট বণ্টনের যোগফল হিসাবের ব্যবস্থা করা হয়েছে।",
+        },
+        {
+          id: "50",
+          date: "2026-07-30T14:55",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-monthly-capacity",
+          descriptionEn: "Refactored the capacity planning module from a single tabbed route to four separate, independent URLs/pages: /merchandising-monthly-capacity, /merchandising-capacity-allocation, /merchandising-capacity-distribution, and /merchandising-sales-target-entry. Updated the merchandising sidebar layout and navigation routes accordingly.",
+          descriptionBn: "ক্যাপাসিটি প্ল্যানিং মডিউলকে একটি মাত্র ট্যাবড ইউআরএল থেকে পরিবর্তন করে ৪টি আলাদা ইউআরএল ও পেজে বিভক্ত করা হয়েছে: /merchandising-monthly-capacity, /merchandising-capacity-allocation, /merchandising-capacity-distribution এবং /merchandising-sales-target-entry। সেই সাথে মার্চেন্ডাইজিং সাইডবার লেআউট ও নেভিগেশন লিংকসমূহ আপডেট করা হয়েছে।",
+        },
+        {
+          id: "51",
+          date: "2026-07-30T14:58",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-capacity-distribution",
+          descriptionEn: "Refactored the Capacity Distribution list layout and edit controls to match the user's reference columns: SL, edit pencil, Company Name, Location, Year, Month, Total Capacity (Min), and Total Capacity (Pcs). Also refactored the creation/editing view to open in a wide modal overlay with a dual-panel layout.",
+          descriptionBn: "ইউজারের দেয়া স্ক্রিনশট অনুযায়ী ক্যাপাসিটি ডিস্ট্রিবিউশন টেবিলের কলামসমূহ এবং এডিট পেন্সিল পজিশন বিন্যস্ত করা হয়েছে। এছাড়া এলোকেশন পেজের মতো ডিস্ট্রিবিউশন তৈরি ও এডিট করার ফর্মটিকেও ব্যাকড্রপ-ব্লারড মোডালে রুপান্তর করা হয়েছে।",
         },
       ]);
     }

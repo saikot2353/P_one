@@ -68,7 +68,7 @@ export default function MerchandisingLayout({
   const getInitialExpanded = (ap: string): Record<string, boolean> => ({
     masterSettings: ap === "masterSettings" || ap === "merchandising-master-settings",
     "order-management": ap === "order-list" || ap === "order-profile" || ap === "merchandising-order-list" || ap === "merchandising-order-profile",
-    capacity: ap === "capacity-planning" || ap === "merchandising-capacity-planning",
+    capacity: ap === "capacity-planning" || ap === "merchandising-capacity-planning" || ap === "monthly-capacity" || ap === "capacity-allocation" || ap === "capacity-distribution" || ap === "sales-target-entry",
   });
 
   const getInitialSubGroups = (searchTab: string): Record<string, boolean> => {
@@ -251,10 +251,10 @@ export default function MerchandisingLayout({
       label: "Capacity",
       icon: Activity,
       subitems: [
-        { label: "Monthly Capacity", to: "/merchandising-capacity-planning", subActiveKey: "capacity-planning", search: { tab: "monthly" } },
-        { label: "Capacity Allocation", to: "/merchandising-capacity-planning", subActiveKey: "capacity-planning", search: { tab: "allocation" } },
-        { label: "Capacity Distribution", to: "/merchandising-capacity-planning", subActiveKey: "capacity-planning", search: { tab: "distribution" } },
-        { label: "Sales Target Entry", to: "/merchandising-capacity-planning", subActiveKey: "capacity-planning", search: { tab: "sales" } },
+        { label: "Monthly Capacity", to: "/merchandising-monthly-capacity", subActiveKey: "monthly-capacity" },
+        { label: "Capacity Allocation", to: "/merchandising-capacity-allocation", subActiveKey: "capacity-allocation" },
+        { label: "Capacity Distribution", to: "/merchandising-capacity-distribution", subActiveKey: "capacity-distribution" },
+        { label: "Sales Target Entry", to: "/merchandising-sales-target-entry", subActiveKey: "sales-target-entry" },
       ],
     },
     {
