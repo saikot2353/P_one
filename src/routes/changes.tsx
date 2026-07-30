@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v65");
+    const saved = localStorage.getItem("system_changes_v73");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -564,6 +564,78 @@ function ChangesPage() {
           link: "/merchandising-master-settings?tab=payment-terms",
           descriptionEn: "Built a dedicated Payment Terms tab with a clean data table (Actions, SL, Name, IsActive) pre-loaded with 10 standard terms (120/180/30/60/90 Days BBLC, At Sight, Cash, FOD, Others, TT). Added Create and Update modals with Short Name and IsActive fields.",
           descriptionBn: "Payment Terms ট্যাবের জন্য একটি পূর্ণাঙ্গ ডেটা টেবিল (Actions, SL, Name, IsActive) তৈরি করা হয়েছে। এতে ১০টি স্ট্যান্ডার্ড টার্ম (120/180/30/60/90 Days BBLC, At Sight, Cash, FOD, Others, TT) আগে থেকেই লোড করা আছে। Short Name এবং IsActive ফিল্ডসহ Create ও Update মোডাল যুক্ত করা হয়েছে।",
+        },
+        {
+          id: "61",
+          date: "2026-07-30T16:11",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings?tab=buying-house",
+          descriptionEn: "Created a dedicated Buying House tab with a detailed data table (Actions, SL, Short Name, Full Name, Contact Person, Address, Phone, Email, Fax, IsActive) pre-populated with standard houses (ITPS, JMS Buyer, KLD, PFD). Added fully validated Create/Update modals.",
+          descriptionBn: "Buying House ট্যাবের জন্য একটি কাস্টম ডেটা টেবিল এবং সম্পূর্ণ ভ্যালিডেশনসহ Create/Update মোডাল যুক্ত করা হয়েছে। এতে পূর্বে থেকেই ITPS, JMS Buyer, KLD, PFD ইত্যাদি স্ট্যান্ডার্ড হাউসের ডেটা লোড করা আছে।",
+        },
+        {
+          id: "62",
+          date: "2026-07-30T16:15",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings?tab=buyer-wise-brand",
+          descriptionEn: "Implemented a dedicated Buyer Brand tab with a custom table (Actions, SL, Buyer Name, Brand, IsActive). Integrated dynamic Buyer selection dropdown populated from registered buyers list and added Create/Update modals.",
+          descriptionBn: "Buyer Brand ট্যাবের জন্য একটি নতুন ভিউ তৈরি করা হয়েছে যেখানে প্রতি ক্রেতার জন্য ব্র্যান্ড অ্যাসাইন করার ব্যবস্থা রয়েছে। ক্রেতা সিলেক্ট করার জন্য ডায়নামিক ড্রপডাউন এবং ক্রিয়েট ও আপডেট মোডাল যুক্ত করা হয়েছে।",
+        },
+        {
+          id: "63",
+          date: "2026-07-30T16:20",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings?tab=buying-agent",
+          descriptionEn: "Added a dedicated Buying Agent tab with a detailed data table (Actions, SL, Short Name, Full Name, Address, Phone, Email, Fax, IsActive) preloaded with initial agent (JMS Buyer Agent) and added fully validated Create/Update modals.",
+          descriptionBn: "Buying Agent ট্যাবের জন্য একটি কাস্টম ডেটা টেবিল এবং সম্পূর্ণ ভ্যালিডেশনসহ Create/Update মোডাল যুক্ত করা হয়েছে। এতে পূর্বে থেকেই JMS Buyer Agent এর ডেটা লোড করা আছে।",
+        },
+        {
+          id: "64",
+          date: "2026-07-30T16:24",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings?tab=supplier",
+          descriptionEn: "Created a dedicated Supplier tab with a clean table (Actions, SL, Company Name, Name, Designation, Address, E-mail, Cell, IsActive) preloaded with 10 standard supplier entries, along with custom validated Create/Update modals.",
+          descriptionBn: "Supplier ট্যাবের জন্য একটি কাস্টম ডেটা টেবিল এবং সম্পূর্ণ ভ্যালিডেশনসহ Create/Update মোডাল যুক্ত করা হয়েছে। এতে পূর্বে থেকেই ১০টি স্ট্যান্ডার্ড সাপ্লায়ারের ডেটা লোড করা আছে।",
+        },
+        {
+          id: "65",
+          date: "2026-07-30T16:29",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings?tab=buyer-name",
+          descriptionEn: "Replaced the simple buyer modal with a comprehensive, beautiful 14-accordion 'Buyer Profile' editor. Updated the buyer table to match screenshots with Excel/Print/Pdf options, country filters, and 15 default entries.",
+          descriptionBn: "সাধারণ বায়ার মোডাল পরিবর্তন করে একটি ১৪-অ্যাকর্ডিয়ন বিশিষ্ট চমৎকার 'Buyer Profile' এডিটর ভিউ তৈরি করা হয়েছে। বায়ার তালিকা টেবিলটিতে এক্সেল/প্রিন্ট/পিডিএফ বাটন, কান্ট্রি ফিল্টার এবং ১৫টি ডিফল্ট এন্ট্রি যুক্ত করা হয়েছে।",
+        },
+        {
+          id: "66",
+          date: "2026-07-30T17:07",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Extracted renderDynamicMasterDB logic into a standalone React component (DynamicMasterDBManager) to avoid conditional React hooks rendering and fix the Rules of Hooks violation.",
+          descriptionBn: "Rules of Hooks লঙ্ঘন এড়াতে এবং কন্ডিশনাল হুক রেন্ডারিং সমস্যার সমাধান করতে renderDynamicMasterDB ফাংশনটিকে একটি নতুন স্ট্যান্ডঅ্যালোন রিঅ্যাক্ট কম্পোনেন্টে (DynamicMasterDBManager) রূপান্তর করা হয়েছে।",
+        },
+        {
+          id: "67",
+          date: "2026-07-30T17:55",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Fixed layout overlap bug by making the main switch fallback conditional. Now, custom tabs (buyer-name, fabric-construction, additional-cost-entry, rmg-process-loss) correctly hide the generic fallback table, preventing duplicate elements from showing.",
+          descriptionBn: "লেআউট ওভারল্যাপ বাগটি দূর করার জন্য কন্ডিশনাল রেন্ডারিং ব্যবহার করা হয়েছে। এর ফলে কাস্টম ট্যাবসমূহে (buyer-name, fabric-construction, additional-cost-entry, rmg-process-loss) সাধারণ টেবিলটি আর পুনরাবৃত্তি হবে না।",
+        },
+        {
+          id: "68",
+          date: "2026-07-30T18:05",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Implemented beautiful, fully-functional custom layouts and modals for 'Item Department', 'Garment Item Name (GMT Item Name)', and 'Body Part' tabs based on layout screenshots. Added Excel/Print/Pdf options, search filters, default entries, and select dropdowns.",
+          descriptionBn: "'Item Department', 'Garment Item Name (GMT Item Name)' এবং 'Body Part' ট্যাবগুলোর জন্য লেআউট স্ক্রিনশট অনুযায়ী আকর্ষণীয় কাস্টম লেআউট এবং মোডাল ভিউ যুক্ত করা হয়েছে। এতে এক্সেল/প্রিন্ট/পিডিএফ রফতানি, সার্চ ফিল্টার, ডিফল্ট তথ্যসমূহ এবং সিলেক্ট ড্রপডাউন অন্তর্ভুক্ত রয়েছে।",
         },
       ]);
     }

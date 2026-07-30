@@ -47,6 +47,182 @@ const initialPaymentTerms: PaymentTerm[] = [
   { id: "pt-9",  shortName: "Others",          status: "Active" },
   { id: "pt-10", shortName: "TT",              status: "Active" },
 ];
+
+// ── Buying House Types & Initial Data ─────────────────────────────────
+interface BuyingHouse {
+  id: string;
+  shortName: string;
+  fullName: string;
+  contactPerson: string;
+  address: string;
+  phone: string;
+  email: string;
+  fax: string;
+  status: "Active" | "Inactive";
+}
+
+const initialBuyingHouses: BuyingHouse[] = [
+  { id: "bh-1", shortName: "ITPS",      fullName: "ITPS",       contactPerson: "",      address: "",                     phone: "",            email: "",               fax: "", status: "Active" },
+  { id: "bh-2", shortName: "JMS Buyer", fullName: "JMS Buyer",  contactPerson: "",      address: "",                     phone: "",            email: "",               fax: "", status: "Active" },
+  { id: "bh-3", shortName: "KLD",       fullName: "KL Design",  contactPerson: "--",    address: "Banchara",             phone: "",            email: "",               fax: "", status: "Active" },
+  { id: "bh-4", shortName: "PFD",       fullName: "PFD",        contactPerson: "Mamun", address: "Khan ABC Trade place.", phone: "01833504887", email: "qwer@gmail.com", fax: "", status: "Active" },
+];
+
+// ── Buyer Brand Types & Initial Data ──────────────────────────────────────
+interface BuyerWiseBrand {
+  id: string;
+  buyerName: string;
+  brand: string;
+  status: "Active" | "Inactive";
+}
+
+const initialBuyerWiseBrands: BuyerWiseBrand[] = [
+  { id: "bwb-1", buyerName: "A-M-London Fashion Ltd", brand: "ASOS", status: "Active" },
+  { id: "bwb-2", buyerName: "ARDENE", brand: "ARDENE", status: "Active" },
+  { id: "bwb-3", buyerName: "JMS", brand: "JMS Brand", status: "Active" },
+  { id: "bwb-4", buyerName: "MOUNTAIN WAREHOUSE LTD.", brand: "ANIMAL", status: "Active" },
+  { id: "bwb-5", buyerName: "Next", brand: "Next", status: "Active" },
+];
+
+// ── Buying Agent Types & Initial Data ─────────────────────────────────────
+interface BuyingAgent {
+  id: string;
+  shortName: string;
+  fullName: string;
+  address: string;
+  phone: string;
+  email: string;
+  fax: string;
+  status: "Active" | "Inactive";
+}
+
+const initialBuyingAgents: BuyingAgent[] = [
+  { id: "ba-1", shortName: "JMS Buyer Agent", fullName: "JMS Buyer Agent", address: "", phone: "", email: "", fax: "", status: "Active" },
+];
+
+// ── Item Department Types & Initial Data ─────────────────────────────────
+interface ItemDepartment {
+  id: string;
+  departmentName: string;
+  buyerName: string;
+  teamName: string;
+  status: "Active" | "Inactive";
+}
+
+const defaultTeams = [
+  "Marketing Team A",
+  "Marketing Team B",
+  "Merchandising Team Gold",
+  "Merchandising Team Silver",
+  "RMG Design Crew"
+];
+
+const initialItemDepartments: ItemDepartment[] = [
+  { id: "idp-1", departmentName: "Adults", buyerName: "", teamName: "", status: "Active" },
+  { id: "idp-2", departmentName: "Boys", buyerName: "", teamName: "", status: "Active" },
+  { id: "idp-3", departmentName: "Girls", buyerName: "", teamName: "", status: "Active" },
+  { id: "idp-4", departmentName: "Kids", buyerName: "", teamName: "", status: "Active" },
+  { id: "idp-5", departmentName: "Ladies", buyerName: "", teamName: "", status: "Active" },
+  { id: "idp-6", departmentName: "Mens", buyerName: "", teamName: "", status: "Active" },
+  { id: "idp-7", departmentName: "Unisex", buyerName: "", teamName: "", status: "Active" },
+  { id: "idp-8", departmentName: "Womens", buyerName: "", teamName: "", status: "Active" },
+];
+
+// ── Garment Item Types & Initial Data ──────────────────────────────────────
+interface GarmentItem {
+  id: string;
+  itemName: string;
+  commercialName: string;
+  productType: string;
+  standardEfficiency: string;
+  smv: string;
+  buyerName: string;
+  bodyPart: string;
+  status: "Active" | "Inactive";
+}
+
+const initialGarmentItems: GarmentItem[] = [
+  { id: "gmt-1", itemName: "Apron", commercialName: "Apron", productType: "Top", standardEfficiency: "", smv: "", buyerName: "", bodyPart: "", status: "Active" },
+  { id: "gmt-2", itemName: "Blouson/Jacket", commercialName: "Fresh Market Blouson", productType: "Top", standardEfficiency: "", smv: "", buyerName: "", bodyPart: "", status: "Active" },
+  { id: "gmt-3", itemName: "Boyes Sweat Cardigan", commercialName: "Boyes Sweat Cardigan", productType: "Top", standardEfficiency: "", smv: "", buyerName: "", bodyPart: "", status: "Active" },
+  { id: "gmt-4", itemName: "Boyes T-Shirts - Short Sleeves", commercialName: "Boyes T-Shirts - Short Sleeves", productType: "Top", standardEfficiency: "", smv: "", buyerName: "", bodyPart: "", status: "Active" },
+  { id: "gmt-5", itemName: "Boy's Short", commercialName: "Boy's Short", productType: "Top", standardEfficiency: "", smv: "", buyerName: "", bodyPart: "", status: "Active" },
+  { id: "gmt-6", itemName: "Boys Sweat Cardigan", commercialName: "Boys Sweat Cardigan", productType: "Top", standardEfficiency: "", smv: "", buyerName: "GARCIA", bodyPart: "", status: "Active" },
+  { id: "gmt-7", itemName: "Boy's T-Shirt Ls", commercialName: "Boy's T-Shirt Ls", productType: "Top", standardEfficiency: "", smv: "", buyerName: "GARCIA", bodyPart: "", status: "Active" },
+  { id: "gmt-8", itemName: "Floral Shirt", commercialName: "Floral Shirt", productType: "", standardEfficiency: "", smv: "", buyerName: "GOR FACTORY SA", bodyPart: "Body", status: "Active" },
+  { id: "gmt-9", itemName: "Girl's Short", commercialName: "Girl's Short", productType: "Top", standardEfficiency: "", smv: "", buyerName: "", bodyPart: "", status: "Active" },
+  { id: "gmt-10", itemName: "Girls T-Shirt Long Sleeve", commercialName: "Girls T-Shirt LS", productType: "Top", standardEfficiency: "", smv: "", buyerName: "", bodyPart: "", status: "Active" },
+  { id: "gmt-11", itemName: "Girl's T-Shirt Ls", commercialName: "Girl's T-Shirt Ls", productType: "Top", standardEfficiency: "", smv: "", buyerName: "GARCIA", bodyPart: "", status: "Active" },
+  { id: "gmt-12", itemName: "Hoodie", commercialName: "Hoodie", productType: "Top", standardEfficiency: "", smv: "", buyerName: "", bodyPart: "", status: "Active" },
+  { id: "gmt-13", itemName: "Jacket", commercialName: "", productType: "", standardEfficiency: "", smv: "", buyerName: "", bodyPart: "", status: "Active" },
+  { id: "gmt-14", itemName: "Jeans Shirt", commercialName: "", productType: "", standardEfficiency: "", smv: "", buyerName: "", bodyPart: "Body", status: "Active" },
+  { id: "gmt-15", itemName: "Ladies Knitted S/S V Neck T-Shirt", commercialName: "Ladies Knitted S/S V Neck T-Shirt", productType: "Top", standardEfficiency: "", smv: "", buyerName: "", bodyPart: "Body", status: "Active" },
+  { id: "gmt-16", itemName: "Ladies/L Tee Shirt", commercialName: "Ladies/L Tee Shirt", productType: "Top", standardEfficiency: "", smv: "", buyerName: "A-M-London Fashion Ltd", bodyPart: "", status: "Active" },
+  { id: "gmt-17", itemName: "Ladis T-Shirt Long Sleeve", commercialName: "Ladis T-Shirt Long Sleeve", productType: "Top", standardEfficiency: "", smv: "", buyerName: "GARCIA", bodyPart: "", status: "Active" },
+  { id: "gmt-18", itemName: "Ladis T-Shirt Long Sleeve", commercialName: "Ladis T-Shirt LS", productType: "Top", standardEfficiency: "", smv: "", buyerName: "GARCIA", bodyPart: "", status: "Active" },
+  { id: "gmt-19", itemName: "Main Fabric Bottom", commercialName: "", productType: "", standardEfficiency: "", smv: "", buyerName: "", bodyPart: "", status: "Active" },
+  { id: "gmt-20", itemName: "Mens Polo Crosswell 3PK", commercialName: "", productType: "Top", standardEfficiency: "", smv: "", buyerName: "A-M-London Fashion Ltd", bodyPart: "", status: "Active" },
+];
+
+// ── Body Part Types & Initial Data ──────────────────────────────────────
+interface BodyPartSpec {
+  id: string;
+  name: string;
+  shortName: string;
+  bodyFor: string;
+  nature: string;
+  status: "Active" | "Inactive";
+}
+
+const initialBodyParts: BodyPartSpec[] = [
+  { id: "bp-1", name: "Collar", shortName: "Collar", bodyFor: "Collar", nature: "Production", status: "Active" },
+  { id: "bp-2", name: "Long Sleeves", shortName: "", bodyFor: "Others", nature: "Production", status: "Active" },
+  { id: "bp-3", name: "Placket", shortName: "Placket", bodyFor: "Others", nature: "Production", status: "Active" },
+  { id: "bp-4", name: "Chest", shortName: "Chest", bodyFor: "Bottom", nature: "Production", status: "Active" },
+  { id: "bp-5", name: "Sleeve", shortName: "Sleeve", bodyFor: "Bottom", nature: "Production", status: "Active" },
+  { id: "bp-6", name: "Front & Back Body Part", shortName: "Main Body", bodyFor: "Body", nature: "", status: "Active" },
+  { id: "bp-7", name: "Cuff", shortName: "Cuff", bodyFor: "Cuff", nature: "Production", status: "Active" },
+  { id: "bp-8", name: "Main Body", shortName: "Main Body", bodyFor: "Body", nature: "Production", status: "Active" },
+  { id: "bp-9", name: "Body", shortName: "Contrast Body Part", bodyFor: "Body", nature: "Production", status: "Active" },
+  { id: "bp-10", name: "Short Sleeves", shortName: "", bodyFor: "Others", nature: "Production", status: "Active" },
+  { id: "bp-11", name: "Lining", shortName: "Lining", bodyFor: "", nature: "Cost Head", status: "Active" },
+  { id: "bp-12", name: "Zipper Piping", shortName: "", bodyFor: "Top", nature: "", status: "Active" },
+  { id: "bp-13", name: "Neck Binding", shortName: "Neck Binding", bodyFor: "Others", nature: "Production", status: "Active" },
+  { id: "bp-14", name: "Front Right part", shortName: "", bodyFor: "Bottom", nature: "", status: "Active" },
+  { id: "bp-15", name: "Back Top Part", shortName: "", bodyFor: "Top", nature: "Production", status: "Active" },
+  { id: "bp-16", name: "Non-Cuff", shortName: "Non-cuff", bodyFor: "FlatKnit", nature: "Production", status: "Active" },
+  { id: "bp-17", name: "Rib", shortName: "Rib", bodyFor: "RIB", nature: "Production", status: "Active" },
+  { id: "bp-18", name: "Main Fabric Top", shortName: "Main Fabric Top", bodyFor: "Top", nature: "Production", status: "Active" },
+  { id: "bp-19", name: "Body Front Part", shortName: "", bodyFor: "Body", nature: "Cost Head", status: "Active" },
+  { id: "bp-20", name: "Shell", shortName: "Shell", bodyFor: "Body", nature: "Cost Head", status: "Active" },
+  { id: "bp-21", name: "Aplick part", shortName: "Aplick part", bodyFor: "Body", nature: "Production", status: "Active" },
+  { id: "bp-22", name: "Neck Tape", shortName: "", bodyFor: "Others", nature: "", status: "Active" },
+];
+
+// ── Supplier Types & Initial Data ──────────────────────────────────────
+interface Supplier {
+  id: string;
+  companyName: string;
+  contactName: string;
+  designation: string;
+  address: string;
+  email: string;
+  cell: string;
+  status: "Active" | "Inactive";
+}
+
+const initialSuppliers: Supplier[] = [
+  { id: "sup-1",  companyName: "A. Rashid Sikder Ind. Limited.", contactName: "Md. Shahidul Haque", designation: "xyz",     address: "210,212,Deshipara,Gazipursadar,Gazipur,Bangladesh.", email: "s.haque1967@yahoo.com",     cell: "01600000001", status: "Active" },
+  { id: "sup-2",  companyName: "A.B.M Knitwear",                 contactName: "Mr. Sabuj",           designation: "Manager", address: "Mosharaf Trade Center, Rajabari,Konabari",          email: "abmknitwear2022@gmail.com", cell: "01775-707184",  status: "Active" },
+  { id: "sup-3",  companyName: "ABIR ABDULLAH KNIT FABRICS",     contactName: "Mr",                  designation: "Manager", address: "BSCIC, Industrial Area, Konabari,Gazipur",          email: "@",                         cell: "0123456789",    status: "Active" },
+  { id: "sup-4",  companyName: "ANISA'S APPARELS LTD.",          contactName: "N/A",                 designation: "N/A",     address: "Hatimara, Kashimpur,Gazipur",                       email: "N/A",                       cell: "01897865479",   status: "Active" },
+  { id: "sup-5",  companyName: "Arif Knitspin Limited",          contactName: "Arif Knitspin Limited", designation: "Xyz",   address: "Jamirdia, Masterbari, Valuka, Mymensingh",          email: "@gmail.com",                cell: "098765",        status: "Active" },
+  { id: "sup-6",  companyName: "Armada Spinning Mills Limited",  contactName: "Tareq",               designation: "AGM",     address: "Sreepur,Gazipur 1740, Dhaka, Bangladesh",           email: "abc",                       cell: "01634846",      status: "Active" },
+  { id: "sup-7",  companyName: "ARS KNIT FABRICE",               contactName: "Mr",                  designation: "Manager", address: "Bsicc Konabari, Gazipur",                           email: "",                          cell: "",              status: "Active" },
+  { id: "sup-8",  companyName: "B.B Fashion",                    contactName: "xyz",                 designation: "Manager", address: "Molla Market,(2nd Floor)Board Bazar,Gazipur",       email: "@",                         cell: "01725642370",   status: "Active" },
+  { id: "sup-9",  companyName: "Changzhou Shenghongjing Textile",contactName: "Jeery",               designation: "chains",  address: "chaina",                                            email: "chaina",                    cell: "0987654",       status: "Active" },
+  { id: "sup-10", companyName: "DULALI KNIT WEAR",               contactName: "N/A",                 designation: "N/A",     address: "Konabari Gazipur",                                  email: "N/A",                       cell: "N/A",           status: "Active" },
+];
 import {
   Settings,
   Plus,
@@ -73,6 +249,7 @@ import {
   Download,
   AlignLeft,
   Folder,
+  Tag,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -96,12 +273,18 @@ interface BuyerSetting {
   id: string;
   shortCode: string;
   buyerName: string;
+  fullName: string;
   buyingHouse: string;
   country: string;
   aqlStandard: string;
   payTerms: string;
   currency: string;
   contactEmail: string;
+  phone: string;
+  address: string;
+  prdLeadDays: number;
+  defPayDays: number;
+  exfactLeadDays: number;
   status: "Active" | "Inactive";
 }
 
@@ -145,10 +328,21 @@ interface SpecParameter {
 
 // Initial Mock Data
 const initialBuyers: BuyerSetting[] = [
-  { id: "b-1", shortCode: "ITPS", buyerName: "ITPS Sourcing Group", buyingHouse: "ITPS BD Sourcing", country: "United Kingdom", aqlStandard: "AQL 2.5", payTerms: "120 Days BBLC", currency: "USD", contactEmail: "buyer@itps-uk.com", status: "Active" },
-  { id: "b-2", shortCode: "AML", buyerName: "A-M-London Fashion Ltd", buyingHouse: "London Buying Group", country: "United Kingdom", aqlStandard: "AQL 1.5", payTerms: "90 Days LC", currency: "USD", contactEmail: "sourcing@am-london.co.uk", status: "Active" },
-  { id: "b-3", shortCode: "NORD", buyerName: "Nordic Wear AS", buyingHouse: "Scandi Trading Ltd", country: "Norway", aqlStandard: "AQL 2.5", payTerms: "At Sight LC", currency: "EUR", contactEmail: "po@nordicwear.no", status: "Active" },
-  { id: "b-4", shortCode: "ZARA", buyerName: "Inditex Zara BD", buyingHouse: "Inditex Dhaka Office", country: "Spain", aqlStandard: "AQL 1.5", payTerms: "90 Days BBLC", currency: "EUR", contactEmail: "zara-bd@inditex.es", status: "Active" },
+  { id: "b-1", shortCode: "A-M-London Fashion Ltd", buyerName: "A-M-London Fashion Ltd", fullName: "A-M-London Fashion Ltd", country: "Afghanistan", aqlStandard: "AQL 2.5", payTerms: "120 Days BBLC", currency: "USD", contactEmail: "info@am-london.com", phone: "", address: "", prdLeadDays: 0, defPayDays: 0, exfactLeadDays: 0, buyingHouse: "Direct", status: "Active" },
+  { id: "b-2", shortCode: "ARDENE", buyerName: "ARDENE", fullName: "ARDENE", country: "Canada", aqlStandard: "AQL 2.5", payTerms: "120 Days BBLC", currency: "USD", contactEmail: "info@ardene.com", phone: "", address: "", prdLeadDays: 0, defPayDays: 0, exfactLeadDays: 0, buyingHouse: "Direct", status: "Active" },
+  { id: "b-3", shortCode: "AS COLOUR LTD.", buyerName: "AS COLOUR LTD.", fullName: "AS COLOUR LTD.", country: "Australia", aqlStandard: "AQL 2.5", payTerms: "120 Days BBLC", currency: "USD", contactEmail: "info@ascolour.com", phone: "", address: "USA, 1234", prdLeadDays: 0, defPayDays: 0, exfactLeadDays: 0, buyingHouse: "Direct", status: "Active" },
+  { id: "b-4", shortCode: "Chasin", buyerName: "Chasin", fullName: "Chasin", country: "Netherlands", aqlStandard: "AQL 2.5", payTerms: "120 Days BBLC", currency: "USD", contactEmail: "info@chasin.com", phone: "", address: "", prdLeadDays: 0, defPayDays: 0, exfactLeadDays: 0, buyingHouse: "Direct", status: "Active" },
+  { id: "b-5", shortCode: "COPPEL CORPORATION", buyerName: "COPPEL CORPORATION", fullName: "COPPEL CORPORATION", country: "Mexico", aqlStandard: "AQL 2.5", payTerms: "120 Days BBLC", currency: "USD", contactEmail: "info@coppel.com", phone: "", address: "", prdLeadDays: 0, defPayDays: 0, exfactLeadDays: 0, buyingHouse: "Direct", status: "Active" },
+  { id: "b-6", shortCode: "DEFACTO", buyerName: "DEFACTO", fullName: "DEFACTO", country: "Kazakhstan", aqlStandard: "AQL 2.5", payTerms: "120 Days BBLC", currency: "USD", contactEmail: "info@defacto.com", phone: "", address: "", prdLeadDays: 0, defPayDays: 0, exfactLeadDays: 0, buyingHouse: "Direct", status: "Active" },
+  { id: "b-7", shortCode: "DHL", buyerName: "DHL", fullName: "DHL", country: "Afghanistan", aqlStandard: "AQL 2.5", payTerms: "120 Days BBLC", currency: "USD", contactEmail: "info@dhl.com", phone: "", address: "", prdLeadDays: 0, defPayDays: 0, exfactLeadDays: 0, buyingHouse: "Direct", status: "Active" },
+  { id: "b-8", shortCode: "DOUR", buyerName: "DOUR", fullName: "DOUR", country: "Bangladesh", aqlStandard: "AQL 2.5", payTerms: "120 Days BBLC", currency: "USD", contactEmail: "info@dour.com", phone: "", address: "", prdLeadDays: 0, defPayDays: 0, exfactLeadDays: 0, buyingHouse: "Direct", status: "Active" },
+  { id: "b-9", shortCode: "GARCIA", buyerName: "GARCIA", fullName: "GARCIA", country: "Netherlands", aqlStandard: "AQL 2.5", payTerms: "120 Days BBLC", currency: "USD", contactEmail: "info@garcia.com", phone: "", address: "", prdLeadDays: 0, defPayDays: 0, exfactLeadDays: 0, buyingHouse: "Direct", status: "Active" },
+  { id: "b-10", shortCode: "GOR FACTORY SA", buyerName: "GOR FACTORY SA", fullName: "GOR FACTORY SA", country: "Netherlands", aqlStandard: "AQL 2.5", payTerms: "120 Days BBLC", currency: "USD", contactEmail: "info@gorfactory.com", phone: "", address: "", prdLeadDays: 0, defPayDays: 0, exfactLeadDays: 0, buyingHouse: "Direct", status: "Active" },
+  { id: "b-11", shortCode: "ITPS", buyerName: "ITPS", fullName: "ITPS", country: "Belgium", aqlStandard: "AQL 2.5", payTerms: "120 Days BBLC", currency: "USD", contactEmail: "info@itps.com", phone: "", address: "", prdLeadDays: 0, defPayDays: 0, exfactLeadDays: 0, buyingHouse: "Direct", status: "Active" },
+  { id: "b-12", shortCode: "JMS", buyerName: "JMS", fullName: "JMS", country: "Germany", aqlStandard: "AQL 2.5", payTerms: "120 Days BBLC", currency: "USD", contactEmail: "OPQ@gmail.com", phone: "016773242342", address: "USA", prdLeadDays: 0, defPayDays: 0, exfactLeadDays: 0, buyingHouse: "Direct", status: "Active" },
+  { id: "b-13", shortCode: "JOMO FASHION", buyerName: "JOMO FASHION", fullName: "JOMO FASHION", country: "Netherlands", aqlStandard: "AQL 2.5", payTerms: "120 Days BBLC", currency: "USD", contactEmail: "info@jomofashion.com", phone: "", address: "", prdLeadDays: 0, defPayDays: 0, exfactLeadDays: 0, buyingHouse: "Direct", status: "Active" },
+  { id: "b-14", shortCode: "M & A Sourcing (DHL)", buyerName: "M & A Sourcing (DHL)", fullName: "M & A Sourcing (DHL)", country: "Germany", aqlStandard: "AQL 2.5", payTerms: "120 Days BBLC", currency: "USD", contactEmail: "info@masourcing.com", phone: "", address: "", prdLeadDays: 0, defPayDays: 0, exfactLeadDays: 0, buyingHouse: "Direct", status: "Active" },
+  { id: "b-15", shortCode: "MADE BY GREEN", buyerName: "MADE BY GREEN", fullName: "MADE BY GREEN", country: "Australia", aqlStandard: "AQL 2.5", payTerms: "120 Days BBLC", currency: "USD", contactEmail: "info@madebygreen.com", phone: "", address: "", prdLeadDays: 0, defPayDays: 0, exfactLeadDays: 0, buyingHouse: "Direct", status: "Active" },
 ];
 
 const initialFabrics: FabricSpec[] = [
@@ -367,6 +561,238 @@ const genericMockData: Record<string, { id: string; name: string; desc: string; 
   ],
 };
 
+interface GenericDbItem {
+  id: string;
+  name: string;
+  desc: string;
+  status: "Active" | "Inactive";
+}
+
+const DynamicMasterDBManager = ({
+  subTabId,
+  label,
+  genericDb,
+  setGenericDb,
+  searchQuery,
+}: {
+  subTabId: string;
+  label: string;
+  genericDb: Record<string, GenericDbItem[]>;
+  setGenericDb: React.Dispatch<React.SetStateAction<Record<string, GenericDbItem[]>>>;
+  searchQuery: string;
+}) => {
+  const data = genericDb[subTabId] || [];
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editItem, setEditItem] = useState<GenericDbItem | null>(null);
+  const [formName, setFormName] = useState("");
+  const [formDesc, setFormDesc] = useState("");
+  const [formStatus, setFormStatus] = useState<"Active" | "Inactive">("Active");
+
+  const handleOpenModal = (item?: GenericDbItem | null) => {
+    if (item) {
+      setEditItem(item);
+      setFormName(item.name);
+      setFormDesc(item.desc);
+      setFormStatus(item.status);
+    } else {
+      setEditItem(null);
+      setFormName("");
+      setFormDesc("");
+      setFormStatus("Active");
+    }
+    setModalOpen(true);
+  };
+
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formName.trim()) {
+      toast.error("Name is required");
+      return;
+    }
+
+    if (editItem) {
+      setGenericDb(prev => ({
+        ...prev,
+        [subTabId]: prev[subTabId].map(i => i.id === editItem.id ? { ...i, name: formName, desc: formDesc, status: formStatus } : i)
+      }));
+      toast.success(`${label} updated successfully`);
+    } else {
+      const newId = `${subTabId.slice(0, 3).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
+      const newItem = {
+        id: newId,
+        name: formName,
+        desc: formDesc,
+        status: formStatus
+      };
+      setGenericDb(prev => ({
+        ...prev,
+        [subTabId]: [...(prev[subTabId] || []), newItem]
+      }));
+      toast.success(`New ${label} added successfully`);
+    }
+    setModalOpen(false);
+  };
+
+  const handleDelete = (id: string) => {
+    setGenericDb(prev => ({
+      ...prev,
+      [subTabId]: prev[subTabId].filter(i => i.id !== id)
+    }));
+    toast.success(`${label} deleted successfully`);
+  };
+
+  const filteredGeneric = data.filter(i =>
+    i.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    i.desc.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
+      <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
+          {label} Registry ({filteredGeneric.length})
+        </span>
+        <button
+          onClick={() => handleOpenModal()}
+          className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 cursor-pointer shadow-sm animate-all active:scale-95 duration-100"
+        >
+          <Plus size={14} /> Add New Entry
+        </button>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs text-left">
+          <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+            <tr>
+              <th className="px-4 py-3">Code / ID</th>
+              <th className="px-4 py-3">Name / Title</th>
+              <th className="px-4 py-3">Description / Comments</th>
+              <th className="px-4 py-3 text-center">Status</th>
+              <th className="px-4 py-3 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-200 dark:divide-slate-800 font-semibold">
+            {filteredGeneric.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="px-4 py-8 text-center text-slate-400 dark:text-slate-500 italic">
+                  No records found. Click "Add New Entry" to create one.
+                </td>
+              </tr>
+            ) : (
+              filteredGeneric.map((item) => (
+                <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                  <td className="px-4 py-3 font-mono font-bold text-slate-400">{item.id}</td>
+                  <td className="px-4 py-3 font-bold text-teal-600 dark:text-teal-400">{item.name}</td>
+                  <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{item.desc}</td>
+                  <td className="px-4 py-3 text-center">
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                      item.status === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
+                    }`}>
+                      {item.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <div className="flex items-center justify-center gap-1">
+                      <button
+                        onClick={() => handleOpenModal(item)}
+                        className="p-1 text-slate-500 hover:text-teal-500 hover:bg-slate-100 rounded transition cursor-pointer"
+                        title="Edit"
+                      >
+                        <Pencil size={14} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition cursor-pointer"
+                        title="Delete"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Backdrop modal */}
+      {modalOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-[100] p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-800 flex items-center justify-between">
+              <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                {editItem ? `Edit ${label}` : `Add New ${label}`}
+              </h3>
+              <button onClick={() => setModalOpen(false)} className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                <X size={16} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSave} className="p-6 space-y-4">
+              <div>
+                <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">
+                  Name / Title <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formName}
+                  onChange={(e) => setFormName(e.target.value)}
+                  className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                  placeholder={`e.g. ${label} Option`}
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">
+                  Description / Comments
+                </label>
+                <textarea
+                  rows={3}
+                  value={formDesc}
+                  onChange={(e) => setFormDesc(e.target.value)}
+                  className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30 resize-none"
+                  placeholder="Enter additional details..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">
+                  Status
+                </label>
+                <select
+                  value={formStatus}
+                  onChange={(e) => setFormStatus(e.target.value as any)}
+                  className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                <button
+                  type="button"
+                  onClick={() => setModalOpen(false)}
+                  className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 function MerchandisingMasterSettingsPage() {
   const search = Route.useSearch();
   const searchTab = search?.tab || "company-wise-merc-setting";
@@ -383,217 +809,14 @@ function MerchandisingMasterSettingsPage() {
 
   // Dynamic Master DB Manager
   const renderDynamicMasterDB = (subTabId: string, label: string) => {
-    const data = genericDb[subTabId] || [];
-    const [modalOpen, setModalOpen] = useState(false);
-    const [editItem, setEditItem] = useState<{ id: string; name: string; desc: string; status: "Active" | "Inactive" } | null>(null);
-    const [formName, setFormName] = useState("");
-    const [formDesc, setFormDesc] = useState("");
-    const [formStatus, setFormStatus] = useState<"Active" | "Inactive">("Active");
-
-    const handleOpenModal = (item?: typeof editItem) => {
-      if (item) {
-        setEditItem(item);
-        setFormName(item.name);
-        setFormDesc(item.desc);
-        setFormStatus(item.status);
-      } else {
-        setEditItem(null);
-        setFormName("");
-        setFormDesc("");
-        setFormStatus("Active");
-      }
-      setModalOpen(true);
-    };
-
-    const handleSave = (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!formName.trim()) {
-        toast.error("Name is required");
-        return;
-      }
-
-      if (editItem) {
-        // Edit
-        setGenericDb(prev => ({
-          ...prev,
-          [subTabId]: prev[subTabId].map(i => i.id === editItem.id ? { ...i, name: formName, desc: formDesc, status: formStatus } : i)
-        }));
-        toast.success(`${label} updated successfully`);
-      } else {
-        // Add
-        const newId = `${subTabId.slice(0, 3).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
-        const newItem = {
-          id: newId,
-          name: formName,
-          desc: formDesc,
-          status: formStatus
-        };
-        setGenericDb(prev => ({
-          ...prev,
-          [subTabId]: [...(prev[subTabId] || []), newItem]
-        }));
-        toast.success(`New ${label} added successfully`);
-      }
-      setModalOpen(false);
-    };
-
-    const handleDelete = (id: string) => {
-      setGenericDb(prev => ({
-        ...prev,
-        [subTabId]: prev[subTabId].filter(i => i.id !== id)
-      }));
-      toast.success(`${label} deleted successfully`);
-    };
-
-    const filteredGeneric = data.filter(i =>
-      i.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      i.desc.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
     return (
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
-        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-          <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
-            {label} Registry ({filteredGeneric.length})
-          </span>
-          <button
-            onClick={() => handleOpenModal()}
-            className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 cursor-pointer shadow-sm animate-all active:scale-95 duration-100"
-          >
-            <Plus size={14} /> Add New Entry
-          </button>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs text-left">
-            <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
-              <tr>
-                <th className="px-4 py-3">Code / ID</th>
-                <th className="px-4 py-3">Name / Title</th>
-                <th className="px-4 py-3">Description / Comments</th>
-                <th className="px-4 py-3 text-center">Status</th>
-                <th className="px-4 py-3 text-center">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800 font-semibold">
-              {filteredGeneric.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-slate-400 dark:text-slate-500 italic">
-                    No records found. Click "Add New Entry" to create one.
-                  </td>
-                </tr>
-              ) : (
-                filteredGeneric.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                    <td className="px-4 py-3 font-mono font-bold text-slate-400">{item.id}</td>
-                    <td className="px-4 py-3 font-bold text-teal-600 dark:text-teal-400">{item.name}</td>
-                    <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{item.desc}</td>
-                    <td className="px-4 py-3 text-center">
-                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
-                        item.status === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
-                      }`}>
-                        {item.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <button
-                          onClick={() => handleOpenModal(item)}
-                          className="p-1 text-slate-500 hover:text-teal-500 hover:bg-slate-100 rounded transition cursor-pointer"
-                          title="Edit"
-                        >
-                          <Pencil size={14} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(item.id)}
-                          className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition cursor-pointer"
-                          title="Delete"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Backdrop modal */}
-        {modalOpen && (
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-[100] p-4">
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-              <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-800 flex items-center justify-between">
-                <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                  {editItem ? `Edit ${label}` : `Add New ${label}`}
-                </h3>
-                <button onClick={() => setModalOpen(false)} className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
-                  <X size={16} />
-                </button>
-              </div>
-
-              <form onSubmit={handleSave} className="p-6 space-y-4">
-                <div>
-                  <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">
-                    Name / Title <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formName}
-                    onChange={(e) => setFormName(e.target.value)}
-                    className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
-                    placeholder={`e.g. ${label} Option`}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">
-                    Description / Comments
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={formDesc}
-                    onChange={(e) => setFormDesc(e.target.value)}
-                    className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30 resize-none"
-                    placeholder="Enter additional details..."
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">
-                    Status
-                  </label>
-                  <select
-                    value={formStatus}
-                    onChange={(e) => setFormStatus(e.target.value as any)}
-                    className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
-                  >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                  </select>
-                </div>
-
-                <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
-                  <button
-                    type="button"
-                    onClick={() => setModalOpen(false)}
-                    className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
-                  >
-                    Save Changes
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-      </div>
+      <DynamicMasterDBManager
+        subTabId={subTabId}
+        label={label}
+        genericDb={genericDb}
+        setGenericDb={setGenericDb}
+        searchQuery={searchQuery}
+      />
     );
   };
 
@@ -603,6 +826,152 @@ function MerchandisingMasterSettingsPage() {
   const [processLosses, setProcessLosses] = useState<ProcessLoss[]>(initialProcessLoss);
   const [trims, setTrims] = useState<TrimsMaster[]>(initialTrims);
   const [specs, setSpecs] = useState<SpecParameter[]>(initialSpecs);
+
+  // Item Department States
+  const [itemDepartments, setItemDepartments] = useState<ItemDepartment[]>(initialItemDepartments);
+  const [itemDeptModal, setItemDeptModal] = useState<{ open: boolean; item?: ItemDepartment }>({ open: false });
+  const [itemDeptForm, setItemDeptForm] = useState<Partial<ItemDepartment>>({
+    departmentName: "",
+    buyerName: "",
+    teamName: "",
+    status: "Active"
+  });
+  const [itemDeptSearch, setItemDeptSearch] = useState("");
+
+  const handleOpenItemDeptModal = (item?: ItemDepartment) => {
+    if (item) {
+      setItemDeptForm(item);
+      setItemDeptModal({ open: true, item });
+    } else {
+      setItemDeptForm({
+        departmentName: "",
+        buyerName: "",
+        teamName: "",
+        status: "Active"
+      });
+      setItemDeptModal({ open: true });
+    }
+  };
+
+  const handleSaveItemDept = () => {
+    if (!itemDeptForm.departmentName?.trim()) {
+      toast.error("Department Name is required!");
+      return;
+    }
+
+    if (itemDeptModal.item) {
+      // Edit mode
+      setItemDepartments(prev => prev.map(d => d.id === itemDeptModal.item!.id ? { ...d, ...itemDeptForm } as ItemDepartment : d));
+      toast.success("Department updated successfully!");
+    } else {
+      // Add mode
+      const newId = `idp-${Date.now()}`;
+      setItemDepartments(prev => [...prev, { ...itemDeptForm, id: newId } as ItemDepartment]);
+      toast.success("Department created successfully!");
+    }
+    setItemDeptModal({ open: false });
+  };
+
+  // Garment Item States
+  const [garmentItems, setGarmentItems] = useState<GarmentItem[]>(initialGarmentItems);
+  const [gmtItemModal, setGmtItemModal] = useState<{ open: boolean; item?: GarmentItem }>({ open: false });
+  const [gmtItemForm, setGmtItemForm] = useState<Partial<GarmentItem>>({
+    itemName: "",
+    commercialName: "",
+    productType: "",
+    standardEfficiency: "",
+    smv: "",
+    buyerName: "",
+    bodyPart: "ALL",
+    status: "Active"
+  });
+  const [gmtItemSearch, setGmtItemSearch] = useState("");
+  const [gmtItemBuyerFilter, setGmtItemBuyerFilter] = useState("All");
+
+  const handleOpenGmtItemModal = (item?: GarmentItem) => {
+    if (item) {
+      setGmtItemForm(item);
+      setGmtItemModal({ open: true, item });
+    } else {
+      setGmtItemForm({
+        itemName: "",
+        commercialName: "",
+        productType: "",
+        standardEfficiency: "",
+        smv: "",
+        buyerName: "",
+        bodyPart: "ALL",
+        status: "Active"
+      });
+      setGmtItemModal({ open: true });
+    }
+  };
+
+  const handleSaveGmtItem = () => {
+    if (!gmtItemForm.itemName?.trim()) {
+      toast.error("Item Name is required!");
+      return;
+    }
+
+    if (gmtItemModal.item) {
+      // Edit mode
+      setGarmentItems(prev => prev.map(i => i.id === gmtItemModal.item!.id ? { ...i, ...gmtItemForm } as GarmentItem : i));
+      toast.success("Garment Item updated successfully!");
+    } else {
+      // Add mode
+      const newId = `gmt-${Date.now()}`;
+      setGarmentItems(prev => [...prev, { ...gmtItemForm, id: newId } as GarmentItem]);
+      toast.success("Garment Item created successfully!");
+    }
+    setGmtItemModal({ open: false });
+  };
+
+  // Body Part States
+  const [bodyParts, setBodyParts] = useState<BodyPartSpec[]>(initialBodyParts);
+  const [bodyPartModal, setBodyPartModal] = useState<{ open: boolean; item?: BodyPartSpec }>({ open: false });
+  const [bodyPartForm, setBodyPartForm] = useState<Partial<BodyPartSpec>>({
+    name: "",
+    shortName: "",
+    bodyFor: "",
+    nature: "",
+    status: "Active"
+  });
+  const [bodyPartSearch, setBodyPartSearch] = useState("");
+
+  const handleOpenBodyPartModal = (item?: BodyPartSpec) => {
+    if (item) {
+      setBodyPartForm(item);
+      setBodyPartModal({ open: true, item });
+    } else {
+      setBodyPartForm({
+        name: "",
+        shortName: "",
+        bodyFor: "",
+        nature: "",
+        status: "Active"
+      });
+      setBodyPartModal({ open: true });
+    }
+  };
+
+  const handleSaveBodyPart = () => {
+    if (!bodyPartForm.name?.trim()) {
+      toast.error("Name is required!");
+      return;
+    }
+
+    if (bodyPartModal.item) {
+      // Edit mode
+      setBodyParts(prev => prev.map(p => p.id === bodyPartModal.item!.id ? { ...p, ...bodyPartForm } as BodyPartSpec : p));
+      toast.success("Body Part updated successfully!");
+    } else {
+      // Add mode
+      const newId = `bp-${Date.now()}`;
+      setBodyParts(prev => [...prev, { ...bodyPartForm, id: newId } as BodyPartSpec]);
+      toast.success("Body Part created successfully!");
+    }
+    setBodyPartModal({ open: false });
+  };
 
   // Costing Configuration States
   const [costingConfigs, setCostingConfigs] = useState<CostingConfig[]>(initialCostingConfigs);
@@ -712,6 +1081,190 @@ function MerchandisingMasterSettingsPage() {
     p.shortName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // ── Buying House State & Handlers ───────────────────────────────
+  const [buyingHouses, setBuyingHouses] = useState<BuyingHouse[]>(initialBuyingHouses);
+  const [buyingHouseModal, setBuyingHouseModal] = useState<{ open: boolean; item?: BuyingHouse }>({ open: false });
+  const [buyingHouseForm, setBuyingHouseForm] = useState<Partial<BuyingHouse>>({
+    shortName: "", fullName: "", contactPerson: "", address: "", phone: "", email: "", fax: "", status: "Active",
+  });
+
+  const handleOpenBuyingHouseModal = (item?: BuyingHouse) => {
+    if (item) {
+      setBuyingHouseForm(item);
+      setBuyingHouseModal({ open: true, item });
+    } else {
+      setBuyingHouseForm({ shortName: "", fullName: "", contactPerson: "", address: "", phone: "", email: "", fax: "", status: "Active" });
+      setBuyingHouseModal({ open: true });
+    }
+  };
+
+  const handleSaveBuyingHouse = () => {
+    if (!buyingHouseForm.shortName?.trim()) { toast.error("Short Name is required"); return; }
+    if (!buyingHouseForm.fullName?.trim()) { toast.error("Full Name is required"); return; }
+    if (buyingHouseModal.item) {
+      setBuyingHouses(prev => prev.map(b => b.id === buyingHouseModal.item!.id ? { ...b, ...buyingHouseForm } as BuyingHouse : b));
+      toast.success("Buying House updated!");
+    } else {
+      const newB: BuyingHouse = {
+        id: `bh-${Date.now()}`,
+        shortName: buyingHouseForm.shortName!,
+        fullName: buyingHouseForm.fullName!,
+        contactPerson: buyingHouseForm.contactPerson || "",
+        address: buyingHouseForm.address || "",
+        phone: buyingHouseForm.phone || "",
+        email: buyingHouseForm.email || "",
+        fax: buyingHouseForm.fax || "",
+        status: buyingHouseForm.status || "Active",
+      };
+      setBuyingHouses(prev => [...prev, newB]);
+      toast.success("Buying House added!");
+    }
+    setBuyingHouseModal({ open: false });
+  };
+
+  const filteredBuyingHouses = buyingHouses.filter(b =>
+    b.shortName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    b.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    b.contactPerson.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // ── Buyer Wise Brand State & Handlers ───────────────────────────
+  const [buyerWiseBrands, setBuyerWiseBrands] = useState<BuyerWiseBrand[]>(initialBuyerWiseBrands);
+  const [buyerWiseBrandModal, setBuyerWiseBrandModal] = useState<{ open: boolean; item?: BuyerWiseBrand }>({ open: false });
+  const [buyerWiseBrandForm, setBuyerWiseBrandForm] = useState<Partial<BuyerWiseBrand>>({
+    buyerName: "", brand: "", status: "Active",
+  });
+
+  const handleOpenBuyerWiseBrandModal = (item?: BuyerWiseBrand) => {
+    if (item) {
+      setBuyerWiseBrandForm(item);
+      setBuyerWiseBrandModal({ open: true, item });
+    } else {
+      setBuyerWiseBrandForm({ buyerName: "", brand: "", status: "Active" });
+      setBuyerWiseBrandModal({ open: true });
+    }
+  };
+
+  const handleSaveBuyerWiseBrand = () => {
+    if (!buyerWiseBrandForm.buyerName?.trim()) { toast.error("Buyer Name is required"); return; }
+    if (!buyerWiseBrandForm.brand?.trim()) { toast.error("Brand is required"); return; }
+    if (buyerWiseBrandModal.item) {
+      setBuyerWiseBrands(prev => prev.map(b => b.id === buyerWiseBrandModal.item!.id ? { ...b, ...buyerWiseBrandForm } as BuyerWiseBrand : b));
+      toast.success("Buyer Wise Brand updated!");
+    } else {
+      const newB: BuyerWiseBrand = {
+        id: `bwb-${Date.now()}`,
+        buyerName: buyerWiseBrandForm.buyerName!,
+        brand: buyerWiseBrandForm.brand!,
+        status: buyerWiseBrandForm.status || "Active",
+      };
+      setBuyerWiseBrands(prev => [...prev, newB]);
+      toast.success("Buyer Wise Brand added!");
+    }
+    setBuyerWiseBrandModal({ open: false });
+  };
+
+  const filteredBuyerWiseBrands = buyerWiseBrands.filter(b =>
+    b.buyerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    b.brand.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // ── Buying Agent State & Handlers ──────────────────────────────
+  const [buyingAgents, setBuyingAgents] = useState<BuyingAgent[]>(initialBuyingAgents);
+  const [buyingAgentModal, setBuyingAgentModal] = useState<{ open: boolean; item?: BuyingAgent }>({ open: false });
+  const [buyingAgentForm, setBuyingAgentForm] = useState<Partial<BuyingAgent>>({
+    shortName: "", fullName: "", address: "", phone: "", email: "", fax: "", status: "Active",
+  });
+
+  const handleOpenBuyingAgentModal = (item?: BuyingAgent) => {
+    if (item) {
+      setBuyingAgentForm(item);
+      setBuyingAgentModal({ open: true, item });
+    } else {
+      setBuyingAgentForm({ shortName: "", fullName: "", address: "", phone: "", email: "", fax: "", status: "Active" });
+      setBuyingAgentModal({ open: true });
+    }
+  };
+
+  const handleSaveBuyingAgent = () => {
+    if (!buyingAgentForm.shortName?.trim()) { toast.error("Short Name is required"); return; }
+    if (!buyingAgentForm.fullName?.trim()) { toast.error("Full Name is required"); return; }
+    if (buyingAgentModal.item) {
+      setBuyingAgents(prev => prev.map(a => a.id === buyingAgentModal.item!.id ? { ...a, ...buyingAgentForm } as BuyingAgent : a));
+      toast.success("Buying Agent updated!");
+    } else {
+      const newA: BuyingAgent = {
+        id: `ba-${Date.now()}`,
+        shortName: buyingAgentForm.shortName!,
+        fullName: buyingAgentForm.fullName!,
+        address: buyingAgentForm.address || "",
+        phone: buyingAgentForm.phone || "",
+        email: buyingAgentForm.email || "",
+        fax: buyingAgentForm.fax || "",
+        status: buyingAgentForm.status || "Active",
+      };
+      setBuyingAgents(prev => [...prev, newA]);
+      toast.success("Buying Agent added!");
+    }
+    setBuyingAgentModal({ open: false });
+  };
+
+  const filteredBuyingAgents = buyingAgents.filter(a =>
+    a.shortName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    a.fullName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // ── Supplier State & Handlers ───────────────────────────────────
+  const [suppliers, setSuppliers] = useState<Supplier[]>(initialSuppliers);
+  const [supplierModal, setSupplierModal] = useState<{ open: boolean; item?: Supplier }>({ open: false });
+  const [supplierForm, setSupplierForm] = useState<Partial<Supplier>>({
+    companyName: "", contactName: "", designation: "", address: "", email: "", cell: "", status: "Active",
+  });
+
+  const handleOpenSupplierModal = (item?: Supplier) => {
+    if (item) {
+      setSupplierForm(item);
+      setSupplierModal({ open: true, item });
+    } else {
+      setSupplierForm({ companyName: "", contactName: "", designation: "", address: "", email: "", cell: "", status: "Active" });
+      setSupplierModal({ open: true });
+    }
+  };
+
+  const handleSaveSupplier = () => {
+    if (!supplierForm.companyName?.trim()) { toast.error("Company Name is required"); return; }
+    if (!supplierForm.contactName?.trim()) { toast.error("Contact Name is required"); return; }
+    if (!supplierForm.designation?.trim()) { toast.error("Designation is required"); return; }
+    if (!supplierForm.address?.trim()) { toast.error("Address is required"); return; }
+    if (!supplierForm.email?.trim()) { toast.error("E-mail is required"); return; }
+    if (!supplierForm.cell?.trim()) { toast.error("Cell is required"); return; }
+
+    if (supplierModal.item) {
+      setSuppliers(prev => prev.map(s => s.id === supplierModal.item!.id ? { ...s, ...supplierForm } as Supplier : s));
+      toast.success("Supplier updated!");
+    } else {
+      const newS: Supplier = {
+        id: `sup-${Date.now()}`,
+        companyName: supplierForm.companyName!,
+        contactName: supplierForm.contactName!,
+        designation: supplierForm.designation!,
+        address: supplierForm.address!,
+        email: supplierForm.email!,
+        cell: supplierForm.cell!,
+        status: supplierForm.status || "Active",
+      };
+      setSuppliers(prev => [newS, ...prev]);
+      toast.success("Supplier registered!");
+    }
+    setSupplierModal({ open: false });
+  };
+
+  const filteredSuppliersList = suppliers.filter(s =>
+    s.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    s.contactName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    s.address.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   // Modal States
   const [buyerModal, setBuyerModal] = useState<{ open: boolean; item?: BuyerSetting }>({ open: false });
   const [fabricModal, setFabricModal] = useState<{ open: boolean; item?: FabricSpec }>({ open: false });
@@ -723,14 +1276,79 @@ function MerchandisingMasterSettingsPage() {
   const [buyerForm, setBuyerForm] = useState<Partial<BuyerSetting>>({
     shortCode: "",
     buyerName: "",
+    fullName: "",
     buyingHouse: "",
-    country: "United Kingdom",
+    country: "Bangladesh",
     aqlStandard: "AQL 2.5",
     payTerms: "120 Days BBLC",
     currency: "USD",
     contactEmail: "",
+    phone: "",
+    address: "",
+    prdLeadDays: 0,
+    defPayDays: 0,
+    exfactLeadDays: 0,
     status: "Active",
   });
+
+  // ── Buyer Profile Accordion states & sub-tables ───────────────────────────
+  const [profileViewMode, setProfileViewMode] = useState<boolean>(false);
+  const [profileBuyerId, setProfileBuyerId] = useState<string | null>(null);
+  const [expandedAccordion, setExpandedAccordion] = useState<string | null>("basic-info");
+  const [countryFilter, setCountryFilter] = useState<string>("All");
+
+  // Accordion form inputs & listing states
+  const [contactPersons, setContactPersons] = useState<{ id: string; name: string; designation: string; phone: string; email: string; status: string }[]>([
+    { id: "cp-1", name: "John Doe", designation: "Merchant Head", phone: "01712345678", email: "john@am-london.com", status: "Active" }
+  ]);
+  const [contactPersonForm, setContactPersonForm] = useState({ name: "", designation: "", phone: "", email: "", status: "Active" });
+
+  const [applicants, setApplicants] = useState<{ id: string; name: string }[]>([
+    { id: "ap-1", name: "London Retail Sourcing" }
+  ]);
+  const [applicantForm, setApplicantForm] = useState({ name: "" });
+
+  const [notifyingParties, setNotifyingParties] = useState<{ id: string; name: string }[]>([
+    { id: "np-1", name: "DHL Logistics BD" }
+  ]);
+  const [notifyingPartyForm, setNotifyingPartyForm] = useState({ name: "" });
+
+  const [consignees, setConsignees] = useState<{ id: string; name: string }[]>([
+    { id: "cs-1", name: "A-M-London Logistics Depot" }
+  ]);
+  const [consigneeForm, setConsigneeForm] = useState({ name: "" });
+
+  const [banks, setBanks] = useState<{ id: string; bank: string; branch: string; address: string; cpName: string; phone: string; email: string; status: string }[]>([
+    { id: "bk-1", bank: "Standard Chartered", branch: "Dhaka Branch", address: "Gulshan, Dhaka", cpName: "Rahman", phone: "017555666", email: "rahman@sc.com", status: "Active" }
+  ]);
+  const [bankForm, setBankForm] = useState({ bank: "Standard Chartered", branch: "", address: "", cpName: "", phone: "", email: "", status: "Active" });
+
+  const [departments, setDepartments] = useState<{ id: string; department: string; teamName: string; status: string }[]>([
+    { id: "dp-1", department: "Merchandising", teamName: "Team Gold", status: "Active" }
+  ]);
+  const [departmentForm, setDepartmentForm] = useState({ department: "Merchandising", teamName: "Team Gold", status: "Active" });
+
+  const [nominatedSuppliers, setNominatedSuppliers] = useState<{ id: string; supplier: string; person: string; address: string; phone: string; email: string }[]>([
+    { id: "ns-1", supplier: "Pacific Denim Mills Ltd.", person: "Mr. Karim", address: "Gazipur", phone: "017222333", email: "karim@pacific.com" }
+  ]);
+  const [nominatedSupplierForm, setNominatedSupplierForm] = useState({ supplier: "Pacific Denim Mills Ltd.", person: "", address: "", phone: "", email: "" });
+
+  const [sizeBreakdowns, setSizeBreakdowns] = useState<{ id: string; sizeGroup: string; sizeBreakdown: string; sizeRatio: string }[]>([
+    { id: "sz-1", sizeGroup: "Men's Knit", sizeBreakdown: "S, M, L, XL", sizeRatio: "1:2:2:1" }
+  ]);
+  const [sizeForm, setSizeForm] = useState({ sizeGroup: "Men's Knit", sizeBreakdown: "", sizeRatio: "" });
+
+  const [seasons, setSeasons] = useState<{ id: string; seasonName: string; status: string }[]>([
+    { id: "ss-1", seasonName: "Autumn/Winter 2026", status: "Active" }
+  ]);
+  const [seasonForm, setSeasonForm] = useState({ seasonName: "", status: "Active" });
+
+  const [shippings, setShippings] = useState<{ id: string; country: string; code: string; shippingAddr: string; destPort: string; portCode: string; shippingMark: string; consigneeAddr: string; cargoShipAddr: string; status: string }[]>([
+    { id: "sh-1", country: "Afghanistan", code: "AFG", shippingAddr: "Kabul Depot", destPort: "Chittagong", portCode: "CGP", shippingMark: "AML-AFG-01", consigneeAddr: "Kabul Main", cargoShipAddr: "Kabul Main", status: "Active" }
+  ]);
+  const [shippingForm, setShippingForm] = useState({ country: "Afghanistan", code: "", shippingAddr: "", destPort: "", portCode: "", shippingMark: "", consigneeAddr: "", cargoShipAddr: "", status: "Active" });
+
+  const [costingInfo, setCostingInfo] = useState({ cmp: 0.09, smv: 5.0, efficiency: 0.0, commercialCost: 0.0, financialCost: 0.0, commission: 0.0 });
 
   const [fabricForm, setFabricForm] = useState<Partial<FabricSpec>>({
     fabricType: "Single Jersey",
@@ -793,26 +1411,32 @@ function MerchandisingMasterSettingsPage() {
       return;
     }
 
-    if (buyerModal.item) {
-      setBuyers(prev => prev.map(b => b.id === buyerModal.item!.id ? ({ ...b, ...buyerForm } as BuyerSetting) : b));
+    if (profileBuyerId) {
+      setBuyers(prev => prev.map(b => b.id === profileBuyerId ? ({ ...b, ...buyerForm } as BuyerSetting) : b));
       toast.success(`Buyer ${buyerForm.buyerName} updated successfully!`);
     } else {
       const newB: BuyerSetting = {
         id: `b-${Date.now()}`,
         shortCode: buyerForm.shortCode || buyerForm.buyerName.substring(0, 4).toUpperCase(),
         buyerName: buyerForm.buyerName,
-        buyingHouse: buyerForm.buyingHouse || "Direct Buyer",
+        fullName: buyerForm.fullName || buyerForm.buyerName,
+        buyingHouse: buyerForm.buyingHouse || "Direct",
         country: buyerForm.country || "Bangladesh",
         aqlStandard: buyerForm.aqlStandard || "AQL 2.5",
         payTerms: buyerForm.payTerms || "120 Days BBLC",
         currency: buyerForm.currency || "USD",
         contactEmail: buyerForm.contactEmail || "info@buyer.com",
+        phone: buyerForm.phone || "",
+        address: buyerForm.address || "",
+        prdLeadDays: Number(buyerForm.prdLeadDays || 0),
+        defPayDays: Number(buyerForm.defPayDays || 0),
+        exfactLeadDays: Number(buyerForm.exfactLeadDays || 0),
         status: buyerForm.status || "Active",
       };
       setBuyers([newB, ...buyers]);
+      setProfileBuyerId(newB.id); // set ID so other accordion lists work with this new buyer
       toast.success(`New Buyer ${newB.buyerName} registered!`);
     }
-    setBuyerModal({ open: false });
   };
 
   const handleDeleteBuyer = (id: string) => {
@@ -1434,78 +2058,2526 @@ function MerchandisingMasterSettingsPage() {
                     </div>
                   )}
                 </div>
-              ) : (
+              ) : searchTab === "buying-house" ? (
+                <div className="space-y-0">
+                  {/* Table Header */}
+                  <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                      <Building2 className="size-4 text-teal-500" /> Buying House — {filteredBuyingHouses.length} Record{filteredBuyingHouses.length !== 1 ? "s" : ""}
+                    </span>
+                    <button
+                      onClick={() => handleOpenBuyingHouseModal()}
+                      className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 duration-100"
+                    >
+                      <Plus size={14} /> Add New
+                    </button>
+                  </div>
+
+                  {/* Table */}
+                  <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+                    <table className="w-full text-xs text-left">
+                      <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                        <tr>
+                          <th className="px-4 py-3 text-center w-20">Actions</th>
+                          <th className="px-4 py-3 text-center w-12">SL</th>
+                          <th className="px-4 py-3">Short Name</th>
+                          <th className="px-4 py-3">Full Name</th>
+                          <th className="px-4 py-3">Contact Person</th>
+                          <th className="px-4 py-3">Address</th>
+                          <th className="px-4 py-3">Phone</th>
+                          <th className="px-4 py-3">Email</th>
+                          <th className="px-4 py-3">Fax</th>
+                          <th className="px-4 py-3">IsActive</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                        {filteredBuyingHouses.map((b, idx) => (
+                          <tr key={b.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                            <td className="px-4 py-2.5 text-center">
+                              <button
+                                onClick={() => handleOpenBuyingHouseModal(b)}
+                                className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                                title="Edit"
+                              >
+                                <Pencil size={13} />
+                              </button>
+                            </td>
+                            <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                            <td className="px-4 py-2.5 font-bold text-slate-800 dark:text-slate-200">{b.shortName}</td>
+                            <td className="px-4 py-2.5 text-slate-700 dark:text-slate-300">{b.fullName}</td>
+                            <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{b.contactPerson}</td>
+                            <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{b.address}</td>
+                            <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{b.phone}</td>
+                            <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{b.email}</td>
+                            <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{b.fax}</td>
+                            <td className="px-4 py-2.5">
+                              <span className={`text-xs font-semibold ${
+                                b.status === "Active" ? "text-emerald-600" : "text-slate-400"
+                              }`}>{b.status}</span>
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredBuyingHouses.length === 0 && (
+                          <tr>
+                            <td colSpan={10} className="px-4 py-8 text-center text-slate-400 text-xs">No buying houses found.</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <p className="text-[11px] text-slate-400 pt-1">
+                    Showing 1 to {filteredBuyingHouses.length} of {buyingHouses.length} entries
+                  </p>
+
+                  {/* Modal */}
+                  {buyingHouseModal.open && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4">
+                      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-150">
+                        <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30">
+                          <h3 className="font-bold text-sm text-slate-800 dark:text-white flex items-center gap-2">
+                            <Building2 className="size-4 text-teal-500" />
+                            {buyingHouseModal.item ? "Update Buyinghouse Information" : "Add New Buyinghouse"}
+                          </h3>
+                          <button onClick={() => setBuyingHouseModal({ open: false })} className="text-slate-400 hover:text-slate-600 cursor-pointer"><X size={16} /></button>
+                        </div>
+
+                        <div className="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
+                          {/* Short Name */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Short Name <span className="text-rose-500">*</span></label>
+                            <input type="text" value={buyingHouseForm.shortName || ""}
+                              onChange={(e) => setBuyingHouseForm({ ...buyingHouseForm, shortName: e.target.value })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                            />
+                          </div>
+                          {/* Full Name */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Full Name <span className="text-rose-500">*</span></label>
+                            <input type="text" value={buyingHouseForm.fullName || ""}
+                              onChange={(e) => setBuyingHouseForm({ ...buyingHouseForm, fullName: e.target.value })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                            />
+                          </div>
+                          {/* Contact Person */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Contact Person</label>
+                            <input type="text" value={buyingHouseForm.contactPerson || ""}
+                              onChange={(e) => setBuyingHouseForm({ ...buyingHouseForm, contactPerson: e.target.value })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                            />
+                          </div>
+                          {/* Address */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Address</label>
+                            <input type="text" value={buyingHouseForm.address || ""}
+                              onChange={(e) => setBuyingHouseForm({ ...buyingHouseForm, address: e.target.value })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                            />
+                          </div>
+                          {/* Phone */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Phone</label>
+                            <input type="text" value={buyingHouseForm.phone || ""}
+                              onChange={(e) => setBuyingHouseForm({ ...buyingHouseForm, phone: e.target.value })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                            />
+                          </div>
+                          {/* Email */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Email</label>
+                            <input type="email" value={buyingHouseForm.email || ""}
+                              onChange={(e) => setBuyingHouseForm({ ...buyingHouseForm, email: e.target.value })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                            />
+                          </div>
+                          {/* Fax */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Fax</label>
+                            <input type="text" value={buyingHouseForm.fax || ""}
+                              onChange={(e) => setBuyingHouseForm({ ...buyingHouseForm, fax: e.target.value })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                            />
+                          </div>
+                          {/* IsActive */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">IsActive <span className="text-rose-500">*</span></label>
+                            <select
+                              value={buyingHouseForm.status || "Active"}
+                              onChange={(e) => setBuyingHouseForm({ ...buyingHouseForm, status: e.target.value as "Active" | "Inactive" })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                            >
+                              <option value="Active">Active</option>
+                              <option value="Inactive">Inactive</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="px-5 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex justify-between items-center">
+                          <button
+                            onClick={() => setBuyingHouseModal({ open: false })}
+                            className="px-4 py-2 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-lg shadow-sm transition cursor-pointer"
+                          >
+                            CLOSE
+                          </button>
+                          <button
+                            onClick={handleSaveBuyingHouse}
+                            className="px-5 py-2 text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-600 rounded-lg shadow-sm transition cursor-pointer"
+                          >
+                            {buyingHouseModal.item ? "UPDATE" : "CREATE"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : searchTab === "buyer-wise-brand" ? (
+                <div className="space-y-0">
+                  {/* Table Header */}
+                  <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                      <Tag className="size-4 text-teal-500" /> Buyer Brand — {filteredBuyerWiseBrands.length} Record{filteredBuyerWiseBrands.length !== 1 ? "s" : ""}
+                    </span>
+                    <button
+                      onClick={() => handleOpenBuyerWiseBrandModal()}
+                      className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 duration-100"
+                    >
+                      <Plus size={14} /> Add New
+                    </button>
+                  </div>
+
+                  {/* Table */}
+                  <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+                    <table className="w-full text-xs text-left">
+                      <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                        <tr>
+                          <th className="px-4 py-3 text-center w-20">Actions</th>
+                          <th className="px-4 py-3 text-center w-16">SL</th>
+                          <th className="px-4 py-3">BuyerName</th>
+                          <th className="px-4 py-3">Brand</th>
+                          <th className="px-4 py-3">IsActive</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                        {filteredBuyerWiseBrands.map((b, idx) => (
+                          <tr key={b.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                            <td className="px-4 py-2.5 text-center">
+                              <button
+                                onClick={() => handleOpenBuyerWiseBrandModal(b)}
+                                className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                                title="Edit"
+                              >
+                                <Pencil size={13} />
+                              </button>
+                            </td>
+                            <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                            <td className="px-4 py-2.5 text-slate-800 dark:text-slate-200">{b.buyerName}</td>
+                            <td className="px-4 py-2.5 text-slate-700 dark:text-slate-300">{b.brand}</td>
+                            <td className="px-4 py-2.5">
+                              <span className={`text-xs font-semibold ${
+                                b.status === "Active" ? "text-emerald-600" : "text-slate-400"
+                              }`}>{b.status}</span>
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredBuyerWiseBrands.length === 0 && (
+                          <tr>
+                            <td colSpan={5} className="px-4 py-8 text-center text-slate-400 text-xs">No buyer brands found.</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <p className="text-[11px] text-slate-400 pt-1">
+                    Showing 1 to {filteredBuyerWiseBrands.length} of {buyerWiseBrands.length} entries
+                  </p>
+
+                  {/* Modal */}
+                  {buyerWiseBrandModal.open && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4">
+                      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-150">
+                        <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30">
+                          <h3 className="font-bold text-sm text-slate-800 dark:text-white flex items-center gap-2">
+                            <Tag className="size-4 text-teal-500" />
+                            {buyerWiseBrandModal.item ? "Update BuyerWise Brand Information" : "Add New BuyerWise Brand"}
+                          </h3>
+                          <button onClick={() => setBuyerWiseBrandModal({ open: false })} className="text-slate-400 hover:text-slate-600 cursor-pointer"><X size={16} /></button>
+                        </div>
+
+                        <div className="p-5 space-y-4">
+                          {/* Buyer Dropdown */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Buyer <span className="text-rose-500">*</span></label>
+                            <select
+                              value={buyerWiseBrandForm.buyerName || ""}
+                              onChange={(e) => setBuyerWiseBrandForm({ ...buyerWiseBrandForm, buyerName: e.target.value })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                            >
+                              <option value=""></option>
+                              {buyers.map(b => (
+                                <option key={b.id} value={b.buyerName}>{b.buyerName}</option>
+                              ))}
+                              {Array.from(new Set(buyerWiseBrands.map(b => b.buyerName)))
+                                .filter(name => !buyers.some(b => b.buyerName === name))
+                                .map(name => (
+                                  <option key={name} value={name}>{name}</option>
+                                ))}
+                            </select>
+                          </div>
+
+                          {/* Brand Input */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Brand <span className="text-rose-500">*</span></label>
+                            <input
+                              type="text"
+                              value={buyerWiseBrandForm.brand || ""}
+                              onChange={(e) => setBuyerWiseBrandForm({ ...buyerWiseBrandForm, brand: e.target.value })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                              placeholder="e.g. ASOS"
+                            />
+                          </div>
+
+                          {/* IsActive */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">IsActive <span className="text-rose-500">*</span></label>
+                            <select
+                              value={buyerWiseBrandForm.status || "Active"}
+                              onChange={(e) => setBuyerWiseBrandForm({ ...buyerWiseBrandForm, status: e.target.value as "Active" | "Inactive" })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                            >
+                              <option value="Active">Active</option>
+                              <option value="Inactive">Inactive</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="px-5 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex justify-between items-center">
+                          <button
+                            onClick={() => setBuyerWiseBrandModal({ open: false })}
+                            className="px-4 py-2 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-lg shadow-sm transition cursor-pointer"
+                          >
+                            CLOSE
+                          </button>
+                          <button
+                            onClick={handleSaveBuyerWiseBrand}
+                            className="px-5 py-2 text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-600 rounded-lg shadow-sm transition cursor-pointer"
+                          >
+                            {buyerWiseBrandModal.item ? "UPDATE" : "CREATE"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : searchTab === "buying-agent" ? (
+                <div className="space-y-0">
+                  {/* Table Header */}
+                  <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                      <Briefcase className="size-4 text-teal-500" /> Buying Agent — {filteredBuyingAgents.length} Record{filteredBuyingAgents.length !== 1 ? "s" : ""}
+                    </span>
+                    <button
+                      onClick={() => handleOpenBuyingAgentModal()}
+                      className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 duration-100"
+                    >
+                      <Plus size={14} /> Add New
+                    </button>
+                  </div>
+
+                  {/* Table */}
+                  <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+                    <table className="w-full text-xs text-left">
+                      <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                        <tr>
+                          <th className="px-4 py-3 text-center w-20">Actions</th>
+                          <th className="px-4 py-3 text-center w-16">SL</th>
+                          <th className="px-4 py-3">Short Name</th>
+                          <th className="px-4 py-3">Full Name</th>
+                          <th className="px-4 py-3">Address</th>
+                          <th className="px-4 py-3">Phone</th>
+                          <th className="px-4 py-3">Email</th>
+                          <th className="px-4 py-3">Fax</th>
+                          <th className="px-4 py-3">IsActive</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                        {filteredBuyingAgents.map((a, idx) => (
+                          <tr key={a.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                            <td className="px-4 py-2.5 text-center">
+                              <button
+                                onClick={() => handleOpenBuyingAgentModal(a)}
+                                className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                                title="Edit"
+                              >
+                                <Pencil size={13} />
+                              </button>
+                            </td>
+                            <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                            <td className="px-4 py-2.5 text-slate-800 dark:text-slate-200 font-bold">{a.shortName}</td>
+                            <td className="px-4 py-2.5 text-slate-700 dark:text-slate-300">{a.fullName}</td>
+                            <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{a.address}</td>
+                            <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{a.phone}</td>
+                            <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{a.email}</td>
+                            <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{a.fax}</td>
+                            <td className="px-4 py-2.5">
+                              <span className={`text-xs font-semibold ${
+                                a.status === "Active" ? "text-emerald-600" : "text-slate-400"
+                              }`}>{a.status}</span>
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredBuyingAgents.length === 0 && (
+                          <tr>
+                            <td colSpan={9} className="px-4 py-8 text-center text-slate-400 text-xs">No buying agents found.</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <p className="text-[11px] text-slate-400 pt-1">
+                    Showing 1 to {filteredBuyingAgents.length} of {buyingAgents.length} entries
+                  </p>
+
+                  {/* Modal */}
+                  {buyingAgentModal.open && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4">
+                      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-150">
+                        <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30">
+                          <h3 className="font-bold text-sm text-slate-800 dark:text-white flex items-center gap-2">
+                            <Briefcase className="size-4 text-teal-500" />
+                            {buyingAgentModal.item ? "Update Buying Agent Information" : "Add New Buying Agent"}
+                          </h3>
+                          <button onClick={() => setBuyingAgentModal({ open: false })} className="text-slate-400 hover:text-slate-600 cursor-pointer"><X size={16} /></button>
+                        </div>
+
+                        <div className="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
+                          {/* Short Name */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Short Name <span className="text-rose-500">*</span></label>
+                            <input
+                              type="text"
+                              value={buyingAgentForm.shortName || ""}
+                              onChange={(e) => setBuyingAgentForm({ ...buyingAgentForm, shortName: e.target.value })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                              placeholder="e.g. JMS Buyer Agent"
+                            />
+                          </div>
+
+                          {/* Full Name */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Full Name <span className="text-rose-500">*</span></label>
+                            <input
+                              type="text"
+                              value={buyingAgentForm.fullName || ""}
+                              onChange={(e) => setBuyingAgentForm({ ...buyingAgentForm, fullName: e.target.value })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                              placeholder="e.g. JMS Buyer Agent"
+                            />
+                          </div>
+
+                          {/* Address */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Address</label>
+                            <input
+                              type="text"
+                              value={buyingAgentForm.address || ""}
+                              onChange={(e) => setBuyingAgentForm({ ...buyingAgentForm, address: e.target.value })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                            />
+                          </div>
+
+                          {/* Phone / Email Grid */}
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Phone</label>
+                              <input
+                                type="text"
+                                value={buyingAgentForm.phone || ""}
+                                onChange={(e) => setBuyingAgentForm({ ...buyingAgentForm, phone: e.target.value })}
+                                className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Email</label>
+                              <input
+                                type="email"
+                                value={buyingAgentForm.email || ""}
+                                onChange={(e) => setBuyingAgentForm({ ...buyingAgentForm, email: e.target.value })}
+                                className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Fax / IsActive Grid */}
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Fax</label>
+                              <input
+                                type="text"
+                                value={buyingAgentForm.fax || ""}
+                                onChange={(e) => setBuyingAgentForm({ ...buyingAgentForm, fax: e.target.value })}
+                                className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">IsActive</label>
+                              <select
+                                value={buyingAgentForm.status || "Active"}
+                                onChange={(e) => setBuyingAgentForm({ ...buyingAgentForm, status: e.target.value as "Active" | "Inactive" })}
+                                className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                              >
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="px-5 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex justify-between items-center">
+                          <button
+                            onClick={() => setBuyingAgentModal({ open: false })}
+                            className="px-4 py-2 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-lg shadow-sm transition cursor-pointer"
+                          >
+                            CLOSE
+                          </button>
+                          <button
+                            onClick={handleSaveBuyingAgent}
+                            className="px-5 py-2 text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-600 rounded-lg shadow-sm transition cursor-pointer"
+                          >
+                            {buyingAgentModal.item ? "UPDATE" : "CREATE"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : searchTab === "supplier" ? (
+                <div className="space-y-0">
+                  {/* Table Header */}
+                  <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                      <Briefcase className="size-4 text-teal-500" /> Supplier — {filteredSuppliersList.length} Record{filteredSuppliersList.length !== 1 ? "s" : ""}
+                    </span>
+                    <button
+                      onClick={() => handleOpenSupplierModal()}
+                      className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 duration-100"
+                    >
+                      <Plus size={14} /> Add New
+                    </button>
+                  </div>
+
+                  {/* Table */}
+                  <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+                    <table className="w-full text-xs text-left">
+                      <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                        <tr>
+                          <th className="px-4 py-3 text-center w-20">Actions</th>
+                          <th className="px-4 py-3 text-center w-16">SL</th>
+                          <th className="px-4 py-3">Company Name</th>
+                          <th className="px-4 py-3">Name</th>
+                          <th className="px-4 py-3">Designation</th>
+                          <th className="px-4 py-3">Address</th>
+                          <th className="px-4 py-3">E-mail</th>
+                          <th className="px-4 py-3">Cell</th>
+                          <th className="px-4 py-3">IsActive</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                        {filteredSuppliersList.map((s, idx) => (
+                          <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                            <td className="px-4 py-2.5 text-center">
+                              <button
+                                onClick={() => handleOpenSupplierModal(s)}
+                                className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                                title="Edit"
+                              >
+                                <Pencil size={13} />
+                              </button>
+                            </td>
+                            <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                            <td className="px-4 py-2.5 text-slate-800 dark:text-slate-200 font-bold">{s.companyName}</td>
+                            <td className="px-4 py-2.5 text-slate-700 dark:text-slate-300">{s.contactName}</td>
+                            <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{s.designation}</td>
+                            <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{s.address}</td>
+                            <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{s.email}</td>
+                            <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{s.cell}</td>
+                            <td className="px-4 py-2.5">
+                              <span className={`text-xs font-semibold ${
+                                s.status === "Active" ? "text-emerald-600" : "text-slate-400"
+                              }`}>{s.status}</span>
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredSuppliersList.length === 0 && (
+                          <tr>
+                            <td colSpan={9} className="px-4 py-8 text-center text-slate-400 text-xs">No suppliers found.</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <p className="text-[11px] text-slate-400 pt-1">
+                    Showing 1 to {filteredSuppliersList.length} of {suppliers.length} entries
+                  </p>
+
+                  {/* Modal */}
+                  {supplierModal.open && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4">
+                      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-150">
+                        <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30">
+                          <h3 className="font-bold text-sm text-slate-800 dark:text-white flex items-center gap-2">
+                            <Briefcase className="size-4 text-teal-500" />
+                            {supplierModal.item ? "Update Supplier Information" : "Add New Supplier"}
+                          </h3>
+                          <button onClick={() => setSupplierModal({ open: false })} className="text-slate-400 hover:text-slate-600 cursor-pointer"><X size={16} /></button>
+                        </div>
+
+                        <div className="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
+                          {/* Company Name */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Company Name <span className="text-rose-500">*</span></label>
+                            <input
+                              type="text"
+                              value={supplierForm.companyName || ""}
+                              onChange={(e) => setSupplierForm({ ...supplierForm, companyName: e.target.value })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                              placeholder="e.g. A. Rashid Sikder Ind. Limited."
+                            />
+                          </div>
+
+                          {/* Name */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Name <span className="text-rose-500">*</span></label>
+                            <input
+                              type="text"
+                              value={supplierForm.contactName || ""}
+                              onChange={(e) => setSupplierForm({ ...supplierForm, contactName: e.target.value })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                              placeholder="e.g. Md. Shahidul Haque"
+                            />
+                          </div>
+
+                          {/* Designation */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Designation <span className="text-rose-500">*</span></label>
+                            <input
+                              type="text"
+                              value={supplierForm.designation || ""}
+                              onChange={(e) => setSupplierForm({ ...supplierForm, designation: e.target.value })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                              placeholder="e.g. Manager"
+                            />
+                          </div>
+
+                          {/* Address */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Address <span className="text-rose-500">*</span></label>
+                            <input
+                              type="text"
+                              value={supplierForm.address || ""}
+                              onChange={(e) => setSupplierForm({ ...supplierForm, address: e.target.value })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                            />
+                          </div>
+
+                          {/* E-mail */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">E-mail <span className="text-rose-500">*</span></label>
+                            <input
+                              type="text"
+                              value={supplierForm.email || ""}
+                              onChange={(e) => setSupplierForm({ ...supplierForm, email: e.target.value })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                            />
+                          </div>
+
+                          {/* Cell */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Cell <span className="text-rose-500">*</span></label>
+                            <input
+                              type="text"
+                              value={supplierForm.cell || ""}
+                              onChange={(e) => setSupplierForm({ ...supplierForm, cell: e.target.value })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                            />
+                          </div>
+
+                          {/* IsActive */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">IsActive <span className="text-rose-500">*</span></label>
+                            <select
+                              value={supplierForm.status || "Active"}
+                              onChange={(e) => setSupplierForm({ ...supplierForm, status: e.target.value as "Active" | "Inactive" })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                            >
+                              <option value="Active">Active</option>
+                              <option value="Inactive">Inactive</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="px-5 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex justify-between items-center">
+                          <button
+                            onClick={() => setSupplierModal({ open: false })}
+                            className="px-4 py-2 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-lg shadow-sm transition cursor-pointer"
+                          >
+                            CLOSE
+                          </button>
+                          <button
+                            onClick={handleSaveSupplier}
+                            className="px-5 py-2 text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-600 rounded-lg shadow-sm transition cursor-pointer"
+                          >
+                            {supplierModal.item ? "UPDATE" : "CREATE"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : ["buyer-name", "fabric-construction", "additional-cost-entry", "rmg-process-loss", "item-department", "gmt-item-name", "body-part"].includes(searchTab) ? null : (
                 renderDynamicMasterDB(searchTab, tabLabel)
               )}
         </div>
 
-        {searchTab === "buyer-name" ? (
-                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
-                  <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">Registered RMG Buyers ({filteredBuyers.length})</span>
-                    <button
-                      onClick={() => handleOpenBuyerModal()}
-                      className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 cursor-pointer shadow-sm"
-                    >
-                      <Plus size={14} /> Register New Buyer
+        {/* ITEM DEPARTMENT REGISTRY */}
+        {searchTab === "item-department" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Action Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Exported to Excel")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => toast.success("Exported to PDF")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  PDF
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={itemDeptSearch}
+                    onChange={(e) => setItemDeptSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-48 text-slate-800 dark:text-slate-100"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+                <button
+                  onClick={() => handleOpenItemDeptModal()}
+                  className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                >
+                  <Plus size={14} /> Add New
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th className="px-4 py-3 text-center w-20">Actions</th>
+                    <th className="px-4 py-3 text-center w-16">SL</th>
+                    <th className="px-4 py-3">Department Name</th>
+                    <th className="px-4 py-3">Buyer Name</th>
+                    <th className="px-4 py-3">Team Name</th>
+                    <th className="px-4 py-3 text-center w-24">IsActive</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                  {itemDepartments
+                    .filter(d => 
+                      d.departmentName.toLowerCase().includes(itemDeptSearch.toLowerCase()) ||
+                      d.buyerName.toLowerCase().includes(itemDeptSearch.toLowerCase()) ||
+                      d.teamName.toLowerCase().includes(itemDeptSearch.toLowerCase())
+                    )
+                    .map((d, idx) => (
+                      <tr key={d.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-4 py-2.5 text-center">
+                          <button
+                            onClick={() => handleOpenItemDeptModal(d)}
+                            className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                            title="Edit"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                        </td>
+                        <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                        <td className="px-4 py-2.5 text-slate-800 dark:text-slate-200 font-bold">{d.departmentName}</td>
+                        <td className="px-4 py-2.5 text-slate-700 dark:text-slate-300">{d.buyerName || <span className="text-slate-300 dark:text-slate-700">—</span>}</td>
+                        <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{d.teamName || <span className="text-slate-300 dark:text-slate-700">—</span>}</td>
+                        <td className="px-4 py-2.5 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                            d.status === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
+                          }`}>
+                            {d.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 1 to {itemDepartments.length} of {itemDepartments.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2.5 py-1 rounded bg-teal-500 text-white shadow-sm">1</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* Modal */}
+            {itemDeptModal.open && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                  <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                      {itemDeptModal.item ? "Update Department" : "Add New Department"}
+                    </h3>
+                    <button onClick={() => setItemDeptModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={16} />
                     </button>
                   </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-xs text-left">
-                      <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
-                        <tr>
-                          <th className="px-4 py-3">Code</th>
-                          <th className="px-4 py-3">Buyer Name</th>
-                          <th className="px-4 py-3">Buying House / Agent</th>
-                          <th className="px-4 py-3">Country</th>
-                          <th className="px-4 py-3">AQL Standard</th>
-                          <th className="px-4 py-3">Payment Term</th>
-                          <th className="px-4 py-3">Currency</th>
-                          <th className="px-4 py-3 text-center">Status</th>
-                          <th className="px-4 py-3 text-center">Action</th>
+
+                  <div className="p-6 space-y-4">
+                    {/* Department Name */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">Department Name <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={itemDeptForm.departmentName || ""}
+                        onChange={(e) => setItemDeptForm({ ...itemDeptForm, departmentName: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. Adults"
+                      />
+                    </div>
+
+                    {/* Buyer Name */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">Buyer Name</label>
+                      <select
+                        value={itemDeptForm.buyerName || ""}
+                        onChange={(e) => setItemDeptForm({ ...itemDeptForm, buyerName: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="">Select Buyer...</option>
+                        {buyers.map(b => (
+                          <option key={b.id} value={b.buyerName}>{b.buyerName}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Team Name */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">Team Name</label>
+                      <select
+                        value={itemDeptForm.teamName || ""}
+                        onChange={(e) => setItemDeptForm({ ...itemDeptForm, teamName: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="">Select Team...</option>
+                        {defaultTeams.map(t => (
+                          <option key={t} value={t}>{t}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* IsActive */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">IsActive <span className="text-rose-500">*</span></label>
+                      <select
+                        value={itemDeptForm.status || "Active"}
+                        onChange={(e) => setItemDeptForm({ ...itemDeptForm, status: e.target.value as "Active" | "Inactive" })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <button
+                        type="button"
+                        onClick={() => setItemDeptModal({ open: false })}
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        onClick={handleSaveItemDept}
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        {itemDeptModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* GARMENT ITEM NAME REGISTRY */}
+        {searchTab === "gmt-item-name" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Top Filter Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 flex flex-wrap items-end gap-3 shadow-xs">
+              <div className="flex flex-col gap-1.5">
+                <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-505">Buyer Name</span>
+                <select
+                  value={gmtItemBuyerFilter}
+                  onChange={(e) => setGmtItemBuyerFilter(e.target.value)}
+                  className="text-xs px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg focus:outline-none focus:border-teal-500 w-56 font-semibold text-slate-800 dark:text-slate-100"
+                >
+                  <option value="All">All Buyers...</option>
+                  {buyers.map(b => (
+                    <option key={b.id} value={b.buyerName}>{b.buyerName}</option>
+                  ))}
+                </select>
+              </div>
+              <button
+                onClick={() => toast.success("Filtered successfully")}
+                className="px-4 py-1.5 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-lg transition shadow-sm active:scale-95 cursor-pointer uppercase tracking-wider"
+              >
+                Search
+              </button>
+            </div>
+
+            {/* Main Registry */}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
+              <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-800/20">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => toast.success("Exported to Excel")}
+                    className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                  >
+                    Excel
+                  </button>
+                  <button
+                    onClick={() => window.print()}
+                    className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                  >
+                    Print
+                  </button>
+                  <button
+                    onClick={() => toast.success("Exported to PDF")}
+                    className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                  >
+                    PDF
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search items..."
+                      value={gmtItemSearch}
+                      onChange={(e) => setGmtItemSearch(e.target.value)}
+                      className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-48 text-slate-800 dark:text-slate-100"
+                    />
+                    <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  </div>
+                  <button
+                    onClick={() => handleOpenGmtItemModal()}
+                    className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                  >
+                    <Plus size={14} /> Add New Item
+                  </button>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs text-left">
+                  <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                    <tr>
+                      <th className="px-4 py-3 text-center w-20">Actions</th>
+                      <th className="px-4 py-3 text-center w-16">SL</th>
+                      <th className="px-4 py-3">Item Name</th>
+                      <th className="px-4 py-3">Commercial Name</th>
+                      <th className="px-4 py-3">Product Type</th>
+                      <th className="px-4 py-3 text-right">Standard Efficiency</th>
+                      <th className="px-4 py-3 text-right">SMV</th>
+                      <th className="px-4 py-3">Buyer Name</th>
+                      <th className="px-4 py-3">Body Part</th>
+                      <th className="px-4 py-3 text-center w-24">IsActive</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                    {garmentItems
+                      .filter(i => {
+                        const matchesSearch = 
+                          i.itemName.toLowerCase().includes(gmtItemSearch.toLowerCase()) ||
+                          i.commercialName.toLowerCase().includes(gmtItemSearch.toLowerCase()) ||
+                          i.buyerName.toLowerCase().includes(gmtItemSearch.toLowerCase());
+                        const matchesBuyer = gmtItemBuyerFilter === "All" || i.buyerName === gmtItemBuyerFilter;
+                        return matchesSearch && matchesBuyer;
+                      })
+                      .map((i, idx) => (
+                        <tr key={i.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                          <td className="px-4 py-2.5 text-center">
+                            <button
+                              onClick={() => handleOpenGmtItemModal(i)}
+                              className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                              title="Edit"
+                            >
+                              <Pencil size={13} />
+                            </button>
+                          </td>
+                          <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                          <td className="px-4 py-2.5 text-slate-800 dark:text-slate-200 font-bold">{i.itemName}</td>
+                          <td className="px-4 py-2.5 text-slate-700 dark:text-slate-300">{i.commercialName || <span className="text-slate-300">—</span>}</td>
+                          <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{i.productType || <span className="text-slate-300">—</span>}</td>
+                          <td className="px-4 py-2.5 text-right font-mono">{i.standardEfficiency || <span className="text-slate-300">—</span>}</td>
+                          <td className="px-4 py-2.5 text-right font-mono">{i.smv || <span className="text-slate-300">—</span>}</td>
+                          <td className="px-4 py-2.5 text-slate-750 dark:text-slate-300">{i.buyerName || <span className="text-slate-300">—</span>}</td>
+                          <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{i.bodyPart || <span className="text-slate-300">—</span>}</td>
+                          <td className="px-4 py-2.5 text-center">
+                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                              i.status === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
+                            }`}>
+                              {i.status}
+                            </span>
+                          </td>
                         </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-200 dark:divide-slate-800 font-semibold">
-                        {filteredBuyers.map((b) => (
-                          <tr key={b.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                            <td className="px-4 py-3 font-mono font-bold text-slate-400">{b.shortCode}</td>
-                            <td className="px-4 py-3 font-bold text-teal-600 dark:text-teal-400">{b.buyerName}</td>
-                            <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{b.buyingHouse}</td>
-                            <td className="px-4 py-3">{b.country}</td>
-                            <td className="px-4 py-3 font-mono">{b.aqlStandard}</td>
-                            <td className="px-4 py-3">{b.payTerms}</td>
-                            <td className="px-4 py-3 font-mono font-bold">{b.currency}</td>
-                            <td className="px-4 py-3 text-center">
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 1 to {garmentItems.length} of {garmentItems.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2.5 py-1 rounded bg-teal-500 text-white shadow-sm">1</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* Modal */}
+            {gmtItemModal.open && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                  <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                      {gmtItemModal.item ? "Update Item Name Information" : "Add New Item"}
+                    </h3>
+                    <button onClick={() => setGmtItemModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                    {/* Item Name */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Item Name <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={gmtItemForm.itemName || ""}
+                        onChange={(e) => setGmtItemForm({ ...gmtItemForm, itemName: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. Apron"
+                      />
+                    </div>
+
+                    {/* Commercial Name */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Commercial Name</label>
+                      <input
+                        type="text"
+                        value={gmtItemForm.commercialName || ""}
+                        onChange={(e) => setGmtItemForm({ ...gmtItemForm, commercialName: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. Apron"
+                      />
+                    </div>
+
+                    {/* Product Type */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Product Type</label>
+                      <select
+                        value={gmtItemForm.productType || ""}
+                        onChange={(e) => setGmtItemForm({ ...gmtItemForm, productType: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="">Select Product Type...</option>
+                        <option value="Top">Top</option>
+                        <option value="Bottom">Bottom</option>
+                        <option value="Innerwear">Innerwear</option>
+                        <option value="Outwear">Outwear</option>
+                      </select>
+                    </div>
+
+                    {/* Body Part */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Body Part</label>
+                      <input
+                        type="text"
+                        value={gmtItemForm.bodyPart || ""}
+                        onChange={(e) => setGmtItemForm({ ...gmtItemForm, bodyPart: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="ALL"
+                      />
+                    </div>
+
+                    {/* Standard Efficiency */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Standard Efficiency</label>
+                      <input
+                        type="text"
+                        value={gmtItemForm.standardEfficiency || ""}
+                        onChange={(e) => setGmtItemForm({ ...gmtItemForm, standardEfficiency: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      />
+                    </div>
+
+                    {/* SMV */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">SMV</label>
+                      <input
+                        type="text"
+                        value={gmtItemForm.smv || ""}
+                        onChange={(e) => setGmtItemForm({ ...gmtItemForm, smv: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      />
+                    </div>
+
+                    {/* Buyer Name */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Buyer Name</label>
+                      <select
+                        value={gmtItemForm.buyerName || ""}
+                        onChange={(e) => setGmtItemForm({ ...gmtItemForm, buyerName: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="">Select Buyer...</option>
+                        {buyers.map(b => (
+                          <option key={b.id} value={b.buyerName}>{b.buyerName}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* IsActive */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">IsActive <span className="text-rose-500">*</span></label>
+                      <select
+                        value={gmtItemForm.status || "Active"}
+                        onChange={(e) => setGmtItemForm({ ...gmtItemForm, status: e.target.value as "Active" | "Inactive" })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <button
+                        type="button"
+                        onClick={() => setGmtItemModal({ open: false })}
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        onClick={handleSaveGmtItem}
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        {gmtItemModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* BODY PART REGISTRY */}
+        {searchTab === "body-part" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Action Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Exported to Excel")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => toast.success("Exported to PDF")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  PDF
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={bodyPartSearch}
+                    onChange={(e) => setBodyPartSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-48 text-slate-800 dark:text-slate-100"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+                <button
+                  onClick={() => handleOpenBodyPartModal()}
+                  className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                >
+                  <Plus size={14} /> Add New
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th className="px-4 py-3 text-center w-20">Actions</th>
+                    <th className="px-4 py-3 text-center w-16">SL</th>
+                    <th className="px-4 py-3">Name</th>
+                    <th className="px-4 py-3">ShortName</th>
+                    <th className="px-4 py-3">Body For</th>
+                    <th className="px-4 py-3">Nature</th>
+                    <th className="px-4 py-3 text-center w-24">IsActive</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                  {bodyParts
+                    .filter(p => 
+                      p.name.toLowerCase().includes(bodyPartSearch.toLowerCase()) ||
+                      p.shortName.toLowerCase().includes(bodyPartSearch.toLowerCase()) ||
+                      p.bodyFor.toLowerCase().includes(bodyPartSearch.toLowerCase())
+                    )
+                    .map((p, idx) => (
+                      <tr key={p.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-4 py-2.5 text-center">
+                          <button
+                            onClick={() => handleOpenBodyPartModal(p)}
+                            className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                            title="Edit"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                        </td>
+                        <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                        <td className="px-4 py-2.5 text-slate-800 dark:text-slate-200 font-bold">{p.name}</td>
+                        <td className="px-4 py-2.5 text-slate-700 dark:text-slate-300">{p.shortName || <span className="text-slate-300 dark:text-slate-750">—</span>}</td>
+                        <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{p.bodyFor || <span className="text-slate-300 dark:text-slate-750">—</span>}</td>
+                        <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{p.nature || <span className="text-slate-300 dark:text-slate-750">—</span>}</td>
+                        <td className="px-4 py-2.5 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                            p.status === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
+                          }`}>
+                            {p.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 1 to {bodyParts.length} of {bodyParts.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2.5 py-1 rounded bg-teal-500 text-white shadow-sm">1</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* Modal */}
+            {bodyPartModal.open && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                  <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                      {bodyPartModal.item ? "Update Body Part Information" : "Add New Body Part"}
+                    </h3>
+                    <button onClick={() => setBodyPartModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 space-y-4">
+                    {/* Name */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">Name <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={bodyPartForm.name || ""}
+                        onChange={(e) => setBodyPartForm({ ...bodyPartForm, name: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. Collar"
+                      />
+                    </div>
+
+                    {/* Short Name */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">Short Name</label>
+                      <input
+                        type="text"
+                        value={bodyPartForm.shortName || ""}
+                        onChange={(e) => setBodyPartForm({ ...bodyPartForm, shortName: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. Collar"
+                      />
+                    </div>
+
+                    {/* Body For */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">Body For</label>
+                      <select
+                        value={bodyPartForm.bodyFor || ""}
+                        onChange={(e) => setBodyPartForm({ ...bodyPartForm, bodyFor: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="">--Select--</option>
+                        <option value="Collar">Collar</option>
+                        <option value="Body">Body</option>
+                        <option value="Bottom">Bottom</option>
+                        <option value="Top">Top</option>
+                        <option value="Cuff">Cuff</option>
+                        <option value="FlatKnit">FlatKnit</option>
+                        <option value="RIB">RIB</option>
+                        <option value="Others">Others</option>
+                      </select>
+                    </div>
+
+                    {/* Nature */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">Nature</label>
+                      <select
+                        value={bodyPartForm.nature || ""}
+                        onChange={(e) => setBodyPartForm({ ...bodyPartForm, nature: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="">Select Nature...</option>
+                        <option value="Production">Production</option>
+                        <option value="Cost Head">Cost Head</option>
+                      </select>
+                    </div>
+
+                    {/* IsActive */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">IsActive <span className="text-rose-500">*</span></label>
+                      <select
+                        value={bodyPartForm.status || "Active"}
+                        onChange={(e) => setBodyPartForm({ ...bodyPartForm, status: e.target.value as "Active" | "Inactive" })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <button
+                        type="button"
+                        onClick={() => setBodyPartModal({ open: false })}
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        type="submit"
+                        onClick={handleSaveBodyPart}
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        {bodyPartModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {searchTab === "buyer-name" ? (
+          profileViewMode ? (
+            /* ────────────────────────────────────────────────────────── */
+            /* BUYER PROFILE ACCORDION VIEW                               */
+            /* ────────────────────────────────────────────────────────── */
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md overflow-hidden p-6 space-y-6">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+                <div>
+                  <h2 className="text-base font-extrabold text-slate-800 dark:text-white">Buyer Profile</h2>
+                  <p className="text-xs text-slate-400">Configure comprehensive details for registered buyers</p>
+                </div>
+                <button
+                  onClick={() => setProfileViewMode(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition cursor-pointer"
+                >
+                  ← Back to List
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {/* 1. Basic Information */}
+                <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setExpandedAccordion(expandedAccordion === "basic-info" ? null : "basic-info")}
+                    className={`w-full text-left px-5 py-3.5 font-bold text-xs flex justify-between items-center transition ${
+                      expandedAccordion === "basic-info" ? "bg-purple-50 dark:bg-purple-950/20 text-purple-900 dark:text-purple-300" : "bg-slate-50 dark:bg-slate-800/40 text-slate-700 dark:text-slate-300"
+                    }`}
+                  >
+                    <span>Basic Information</span>
+                    <span className="text-lg">{expandedAccordion === "basic-info" ? "−" : "+"}</span>
+                  </button>
+                  {expandedAccordion === "basic-info" && (
+                    <div className="p-5 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Name <span className="text-rose-500">*</span></label>
+                          <input type="text" value={buyerForm.buyerName || ""}
+                            onChange={(e) => setBuyerForm({ ...buyerForm, buyerName: e.target.value })}
+                            className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-teal-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Short Name</label>
+                          <input type="text" value={buyerForm.shortCode || ""}
+                            onChange={(e) => setBuyerForm({ ...buyerForm, shortCode: e.target.value })}
+                            className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-teal-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Full Name <span className="text-rose-500">*</span></label>
+                          <input type="text" value={buyerForm.fullName || ""}
+                            onChange={(e) => setBuyerForm({ ...buyerForm, fullName: e.target.value })}
+                            className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-teal-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Cut-Off Use <span className="text-rose-500">*</span></label>
+                          <select className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-teal-500">
+                            <option>No</option>
+                            <option>Yes</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Currency <span className="text-rose-500">*</span></label>
+                          <select value={buyerForm.currency || "USD"}
+                            onChange={(e) => setBuyerForm({ ...buyerForm, currency: e.target.value })}
+                            className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-teal-500"
+                          >
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="BDT">BDT</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">BuyerType <span className="text-rose-500">*</span></label>
+                          <select className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-teal-500">
+                            <option>Buyer</option>
+                            <option>Agent</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Partial Realization <span className="text-rose-500">*</span></label>
+                          <select className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-teal-500">
+                            <option>No</option>
+                            <option>Yes</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Country</label>
+                          <select value={buyerForm.country || "Bangladesh"}
+                            onChange={(e) => setBuyerForm({ ...buyerForm, country: e.target.value })}
+                            className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-teal-500"
+                          >
+                            <option value="Afghanistan">Afghanistan</option>
+                            <option value="Bangladesh">Bangladesh</option>
+                            <option value="Canada">Canada</option>
+                            <option value="Australia">Australia</option>
+                            <option value="Netherlands">Netherlands</option>
+                            <option value="Germany">Germany</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">CreditLimit</label>
+                          <input type="text" className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-teal-500" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">VAT No</label>
+                          <input type="text" className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-teal-500" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">BIN No</label>
+                          <input type="text" className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-teal-500" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">TIN No</label>
+                          <input type="text" className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-teal-500" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Registration No</label>
+                          <input type="text" className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-teal-500" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Quality Level</label>
+                          <select className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-teal-500">
+                            <option>AQL 2.5</option>
+                            <option>AQL 1.5</option>
+                            <option>AQL 4.0</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Status <span className="text-rose-500">*</span></label>
+                          <select value={buyerForm.status || "Active"}
+                            onChange={(e) => setBuyerForm({ ...buyerForm, status: e.target.value as "Active" | "Inactive" })}
+                            className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-teal-500"
+                          >
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                          </select>
+                        </div>
+                        <div>{/* Empty column for alignment */}</div>
+                      </div>
+
+                      <button
+                        onClick={handleSaveBuyer}
+                        className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-lg transition shadow cursor-pointer"
+                      >
+                        SUBMIT
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* 2. Accounts Information */}
+                <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setExpandedAccordion(expandedAccordion === "accounts" ? null : "accounts")}
+                    className={`w-full text-left px-5 py-3.5 font-bold text-xs flex justify-between items-center transition ${
+                      expandedAccordion === "accounts" ? "bg-purple-50 dark:bg-purple-950/20 text-purple-900 dark:text-purple-300" : "bg-slate-50 dark:bg-slate-800/40 text-slate-700 dark:text-slate-300"
+                    }`}
+                  >
+                    <span>Accounts Information</span>
+                    <span className="text-lg">{expandedAccordion === "accounts" ? "−" : "+"}</span>
+                  </button>
+                  {expandedAccordion === "accounts" && (
+                    <div className="p-5 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                        {["Account Name", "Discount Account", "Commission Account", "Fraction Account", "Sales Account", "Return Account", "AIT Account", "VAT Account", "VAT Offset", "Others Account", "Other Offset"].map((field) => (
+                          <div key={field}>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">{field}</label>
+                            <input type="text" className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none" />
+                          </div>
+                        ))}
+                      </div>
+                      <button className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-lg transition shadow">Submit</button>
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. Contact Information */}
+                <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setExpandedAccordion(expandedAccordion === "contact-info" ? null : "contact-info")}
+                    className={`w-full text-left px-5 py-3.5 font-bold text-xs flex justify-between items-center transition ${
+                      expandedAccordion === "contact-info" ? "bg-purple-50 dark:bg-purple-950/20 text-purple-900 dark:text-purple-300" : "bg-slate-50 dark:bg-slate-800/40 text-slate-700 dark:text-slate-300"
+                    }`}
+                  >
+                    <span>Contact Information</span>
+                    <span className="text-lg">{expandedAccordion === "contact-info" ? "−" : "+"}</span>
+                  </button>
+                  {expandedAccordion === "contact-info" && (
+                    <div className="p-5 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                        {["Address 1", "Address 2", "Address 3", "Phone/Cell No", "Email Address", "Fax", "Website Address"].map((field) => (
+                          <div key={field}>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">{field}</label>
+                            <input type="text" className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-teal-500" />
+                          </div>
+                        ))}
+                      </div>
+                      <button className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-lg transition shadow">Submit</button>
+                    </div>
+                  )}
+                </div>
+
+                {/* 4. Contact Person */}
+                <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setExpandedAccordion(expandedAccordion === "contact-person" ? null : "contact-person")}
+                    className={`w-full text-left px-5 py-3.5 font-bold text-xs flex justify-between items-center transition ${
+                      expandedAccordion === "contact-person" ? "bg-purple-50 dark:bg-purple-950/20 text-purple-900 dark:text-purple-300" : "bg-slate-50 dark:bg-slate-800/40 text-slate-700 dark:text-slate-300"
+                    }`}
+                  >
+                    <span>Contact Person</span>
+                    <span className="text-lg">{expandedAccordion === "contact-person" ? "−" : "+"}</span>
+                  </button>
+                  {expandedAccordion === "contact-person" && (
+                    <div className="p-5 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Person Name <span className="text-rose-500">*</span></label>
+                          <input type="text" value={contactPersonForm.name} onChange={(e) => setContactPersonForm({ ...contactPersonForm, name: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Designations</label>
+                          <input type="text" value={contactPersonForm.designation} onChange={(e) => setContactPersonForm({ ...contactPersonForm, designation: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Phone/Cell No <span className="text-rose-500">*</span></label>
+                          <input type="text" value={contactPersonForm.phone} onChange={(e) => setContactPersonForm({ ...contactPersonForm, phone: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Email Address</label>
+                          <input type="text" value={contactPersonForm.email} onChange={(e) => setContactPersonForm({ ...contactPersonForm, email: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            if (!contactPersonForm.name || !contactPersonForm.phone) { toast.error("Required fields missing"); return; }
+                            setContactPersons([...contactPersons, { ...contactPersonForm, id: `cp-${Date.now()}` }]);
+                            setContactPersonForm({ name: "", designation: "", phone: "", email: "", status: "Active" });
+                            toast.success("Contact added");
+                          }}
+                          className="px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs rounded-lg transition"
+                        >
+                          Submit
+                        </button>
+                        <button onClick={() => setContactPersonForm({ name: "", designation: "", phone: "", email: "", status: "Active" })} className="px-5 py-2 bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition">Reset</button>
+                      </div>
+
+                      {/* Mini Table */}
+                      <table className="w-full text-xs text-left border border-slate-100 mt-2">
+                        <thead className="bg-slate-50 uppercase text-[9px] font-extrabold text-slate-400">
+                          <tr>
+                            <th className="px-3 py-2">Sl</th>
+                            <th className="px-3 py-2">Name</th>
+                            <th className="px-3 py-2">Desi</th>
+                            <th className="px-3 py-2">Phone</th>
+                            <th className="px-3 py-2">Email</th>
+                            <th className="px-3 py-2">Status</th>
+                            <th className="px-3 py-2 text-center">∇</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 font-semibold">
+                          {contactPersons.map((cp, idx) => (
+                            <tr key={cp.id}>
+                              <td className="px-3 py-2 text-slate-400">{idx + 1}</td>
+                              <td className="px-3 py-2 font-bold">{cp.name}</td>
+                              <td className="px-3 py-2">{cp.designation}</td>
+                              <td className="px-3 py-2 font-mono">{cp.phone}</td>
+                              <td className="px-3 py-2">{cp.email}</td>
+                              <td className="px-3 py-2 text-emerald-600">{cp.status}</td>
+                              <td className="px-3 py-2 text-center">
+                                <button onClick={() => setContactPersons(contactPersons.filter(c => c.id !== cp.id))} className="text-rose-500 hover:bg-rose-50 rounded p-1">×</button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+                {/* 5. Applicant Information */}
+                <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setExpandedAccordion(expandedAccordion === "applicant" ? null : "applicant")}
+                    className={`w-full text-left px-5 py-3.5 font-bold text-xs flex justify-between items-center transition ${
+                      expandedAccordion === "applicant" ? "bg-purple-50 dark:bg-purple-950/20 text-purple-900 dark:text-purple-300" : "bg-slate-50 dark:bg-slate-800/40 text-slate-700 dark:text-slate-300"
+                    }`}
+                  >
+                    <span>Applicant Information</span>
+                    <span className="text-lg">{expandedAccordion === "applicant" ? "−" : "+"}</span>
+                  </button>
+                  {expandedAccordion === "applicant" && (
+                    <div className="p-5 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 space-y-4">
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Applicant Name <span className="text-rose-500">*</span></label>
+                        <input type="text" value={applicantForm.name} onChange={(e) => setApplicantForm({ name: e.target.value })} className="w-full max-w-sm text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            if (!applicantForm.name) return;
+                            setApplicants([...applicants, { id: `ap-${Date.now()}`, name: applicantForm.name }]);
+                            setApplicantForm({ name: "" });
+                          }}
+                          className="px-5 py-2 bg-orange-500 text-white font-bold text-xs rounded-lg"
+                        >Submit</button>
+                        <button onClick={() => setApplicantForm({ name: "" })} className="px-5 py-2 bg-slate-200 text-slate-700 font-bold text-xs rounded-lg">Reset</button>
+                      </div>
+
+                      <table className="w-full text-xs text-left border border-slate-100 mt-2">
+                        <thead className="bg-slate-50 uppercase text-[9px] font-extrabold text-slate-400">
+                          <tr>
+                            <th className="px-3 py-2 w-12">Sl</th>
+                            <th className="px-3 py-2">Applicant Name</th>
+                            <th className="px-3 py-2 text-center w-12">∇</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 font-semibold">
+                          {applicants.map((ap, idx) => (
+                            <tr key={ap.id}>
+                              <td className="px-3 py-2 text-slate-400">{idx + 1}</td>
+                              <td className="px-3 py-2 font-bold">{ap.name}</td>
+                              <td className="px-3 py-2 text-center">
+                                <button onClick={() => setApplicants(applicants.filter(a => a.id !== ap.id))} className="text-rose-500">×</button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+                {/* 6. Notifying Party Information */}
+                <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setExpandedAccordion(expandedAccordion === "notifying-party" ? null : "notifying-party")}
+                    className={`w-full text-left px-5 py-3.5 font-bold text-xs flex justify-between items-center transition ${
+                      expandedAccordion === "notifying-party" ? "bg-purple-50 dark:bg-purple-950/20 text-purple-900 dark:text-purple-300" : "bg-slate-50 dark:bg-slate-800/40 text-slate-700 dark:text-slate-300"
+                    }`}
+                  >
+                    <span>Notifying Party Information</span>
+                    <span className="text-lg">{expandedAccordion === "notifying-party" ? "−" : "+"}</span>
+                  </button>
+                  {expandedAccordion === "notifying-party" && (
+                    <div className="p-5 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 space-y-4">
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Notifying Party <span className="text-rose-500">*</span></label>
+                        <input type="text" value={notifyingPartyForm.name} onChange={(e) => setNotifyingPartyForm({ name: e.target.value })} className="w-full max-w-sm text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            if (!notifyingPartyForm.name) return;
+                            setNotifyingParties([...notifyingParties, { id: `np-${Date.now()}`, name: notifyingPartyForm.name }]);
+                            setNotifyingPartyForm({ name: "" });
+                          }}
+                          className="px-5 py-2 bg-orange-500 text-white font-bold text-xs rounded-lg"
+                        >Submit</button>
+                        <button onClick={() => setNotifyingPartyForm({ name: "" })} className="px-5 py-2 bg-slate-200 text-slate-700 font-bold text-xs rounded-lg">Reset</button>
+                      </div>
+
+                      <table className="w-full text-xs text-left border border-slate-100 mt-2">
+                        <thead className="bg-slate-50 uppercase text-[9px] font-extrabold text-slate-400">
+                          <tr>
+                            <th className="px-3 py-2 w-12">Sl</th>
+                            <th className="px-3 py-2">Notifying Party</th>
+                            <th className="px-3 py-2 text-center w-12">∇</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 font-semibold">
+                          {notifyingParties.map((np, idx) => (
+                            <tr key={np.id}>
+                              <td className="px-3 py-2 text-slate-400">{idx + 1}</td>
+                              <td className="px-3 py-2 font-bold">{np.name}</td>
+                              <td className="px-3 py-2 text-center">
+                                <button onClick={() => setNotifyingParties(notifyingParties.filter(n => n.id !== np.id))} className="text-rose-500">×</button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+                {/* 7. Consignee Information */}
+                <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setExpandedAccordion(expandedAccordion === "consignee" ? null : "consignee")}
+                    className={`w-full text-left px-5 py-3.5 font-bold text-xs flex justify-between items-center transition ${
+                      expandedAccordion === "consignee" ? "bg-purple-50 dark:bg-purple-950/20 text-purple-900 dark:text-purple-300" : "bg-slate-50 dark:bg-slate-800/40 text-slate-700 dark:text-slate-300"
+                    }`}
+                  >
+                    <span>Consignee Information</span>
+                    <span className="text-lg">{expandedAccordion === "consignee" ? "−" : "+"}</span>
+                  </button>
+                  {expandedAccordion === "consignee" && (
+                    <div className="p-5 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 space-y-4">
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Consignee <span className="text-rose-500">*</span></label>
+                        <input type="text" value={consigneeForm.name} onChange={(e) => setConsigneeForm({ name: e.target.value })} className="w-full max-w-sm text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            if (!consigneeForm.name) return;
+                            setConsignees([...consignees, { id: `cs-${Date.now()}`, name: consigneeForm.name }]);
+                            setConsigneeForm({ name: "" });
+                          }}
+                          className="px-5 py-2 bg-orange-500 text-white font-bold text-xs rounded-lg"
+                        >Submit</button>
+                        <button onClick={() => setConsigneeForm({ name: "" })} className="px-5 py-2 bg-slate-200 text-slate-700 font-bold text-xs rounded-lg">Reset</button>
+                      </div>
+
+                      <table className="w-full text-xs text-left border border-slate-100 mt-2">
+                        <thead className="bg-slate-50 uppercase text-[9px] font-extrabold text-slate-400">
+                          <tr>
+                            <th className="px-3 py-2 w-12">Sl</th>
+                            <th className="px-3 py-2">Consignee Party</th>
+                            <th className="px-3 py-2 text-center w-12">∇</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 font-semibold">
+                          {consignees.map((cs, idx) => (
+                            <tr key={cs.id}>
+                              <td className="px-3 py-2 text-slate-400">{idx + 1}</td>
+                              <td className="px-3 py-2 font-bold">{cs.name}</td>
+                              <td className="px-3 py-2 text-center">
+                                <button onClick={() => setConsignees(consignees.filter(c => c.id !== cs.id))} className="text-rose-500">×</button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+                {/* 8. Bank Information */}
+                <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setExpandedAccordion(expandedAccordion === "bank" ? null : "bank")}
+                    className={`w-full text-left px-5 py-3.5 font-bold text-xs flex justify-between items-center transition ${
+                      expandedAccordion === "bank" ? "bg-purple-50 dark:bg-purple-950/20 text-purple-900 dark:text-purple-300" : "bg-slate-50 dark:bg-slate-800/40 text-slate-700 dark:text-slate-300"
+                    }`}
+                  >
+                    <span>Bank Information</span>
+                    <span className="text-lg">{expandedAccordion === "bank" ? "−" : "+"}</span>
+                  </button>
+                  {expandedAccordion === "bank" && (
+                    <div className="p-5 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Bank Name <span className="text-rose-500">*</span></label>
+                          <select value={bankForm.bank} onChange={(e) => setBankForm({ ...bankForm, bank: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg">
+                            <option>Standard Chartered</option>
+                            <option>HSBC</option>
+                            <option>Dhaka Bank</option>
+                            <option>Islami Bank</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Branch Name</label>
+                          <input type="text" value={bankForm.branch} onChange={(e) => setBankForm({ ...bankForm, branch: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Branch Address <span className="text-rose-500">*</span></label>
+                          <input type="text" value={bankForm.address} onChange={(e) => setBankForm({ ...bankForm, address: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Contact Person</label>
+                          <input type="text" value={bankForm.cpName} onChange={(e) => setBankForm({ ...bankForm, cpName: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Phone/Cell No</label>
+                          <input type="text" value={bankForm.phone} onChange={(e) => setBankForm({ ...bankForm, phone: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Email Address</label>
+                          <input type="text" value={bankForm.email} onChange={(e) => setBankForm({ ...bankForm, email: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Status</label>
+                          <select value={bankForm.status} onChange={(e) => setBankForm({ ...bankForm, status: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            if (!bankForm.bank || !bankForm.address) return;
+                            setBanks([...banks, { ...bankForm, id: `bk-${Date.now()}` }]);
+                            setBankForm({ bank: "Standard Chartered", branch: "", address: "", cpName: "", phone: "", email: "", status: "Active" });
+                          }}
+                          className="px-5 py-2 bg-orange-500 text-white font-bold text-xs rounded-lg"
+                        >Submit</button>
+                        <button onClick={() => setBankForm({ bank: "Standard Chartered", branch: "", address: "", cpName: "", phone: "", email: "", status: "Active" })} className="px-5 py-2 bg-slate-200 text-slate-700 font-bold text-xs rounded-lg">Reset</button>
+                      </div>
+
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-xs text-left border border-slate-100 mt-2">
+                          <thead className="bg-slate-50 uppercase text-[9px] font-extrabold text-slate-400">
+                            <tr>
+                              <th className="px-3 py-2">Sl</th>
+                              <th className="px-3 py-2">Bank</th>
+                              <th className="px-3 py-2">Branch</th>
+                              <th className="px-3 py-2">Address</th>
+                              <th className="px-3 py-2">CPName</th>
+                              <th className="px-3 py-2">Phone</th>
+                              <th className="px-3 py-2">Email</th>
+                              <th className="px-3 py-2">Status</th>
+                              <th className="px-3 py-2 text-center">∇</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 font-semibold">
+                            {banks.map((bk, idx) => (
+                              <tr key={bk.id}>
+                                <td className="px-3 py-2 text-slate-400">{idx + 1}</td>
+                                <td className="px-3 py-2 font-bold">{bk.bank}</td>
+                                <td className="px-3 py-2">{bk.branch}</td>
+                                <td className="px-3 py-2">{bk.address}</td>
+                                <td className="px-3 py-2">{bk.cpName}</td>
+                                <td className="px-3 py-2 font-mono">{bk.phone}</td>
+                                <td className="px-3 py-2">{bk.email}</td>
+                                <td className="px-3 py-2 text-emerald-600">{bk.status}</td>
+                                <td className="px-3 py-2 text-center">
+                                  <button onClick={() => setBanks(banks.filter(b => b.id !== bk.id))} className="text-rose-500">×</button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 9. Team & Department */}
+                <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setExpandedAccordion(expandedAccordion === "team" ? null : "team")}
+                    className={`w-full text-left px-5 py-3.5 font-bold text-xs flex justify-between items-center transition ${
+                      expandedAccordion === "team" ? "bg-purple-50 dark:bg-purple-950/20 text-purple-900 dark:text-purple-300" : "bg-slate-50 dark:bg-slate-800/40 text-slate-700 dark:text-slate-300"
+                    }`}
+                  >
+                    <span>Team & Department</span>
+                    <span className="text-lg">{expandedAccordion === "team" ? "−" : "+"}</span>
+                  </button>
+                  {expandedAccordion === "team" && (
+                    <div className="p-5 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Department <span className="text-rose-500">*</span></label>
+                          <input type="text" value={departmentForm.department} onChange={(e) => setDepartmentForm({ ...departmentForm, department: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Merchan Team <span className="text-rose-500">*</span></label>
+                          <select value={departmentForm.teamName} onChange={(e) => setDepartmentForm({ ...departmentForm, teamName: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg">
+                            <option>Team Gold</option>
+                            <option>Team Silver</option>
+                            <option>Team Bronze</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Status</label>
+                          <select value={departmentForm.status} onChange={(e) => setDepartmentForm({ ...departmentForm, status: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            if (!departmentForm.department) return;
+                            setDepartments([...departments, { ...departmentForm, id: `dp-${Date.now()}` }]);
+                            setDepartmentForm({ department: "Merchandising", teamName: "Team Gold", status: "Active" });
+                          }}
+                          className="px-5 py-2 bg-orange-500 text-white font-bold text-xs rounded-lg"
+                        >Submit</button>
+                        <button onClick={() => setDepartmentForm({ department: "Merchandising", teamName: "Team Gold", status: "Active" })} className="px-5 py-2 bg-slate-200 text-slate-700 font-bold text-xs rounded-lg">Reset</button>
+                      </div>
+
+                      <table className="w-full text-xs text-left border border-slate-100 mt-2">
+                        <thead className="bg-slate-50 uppercase text-[9px] font-extrabold text-slate-400">
+                          <tr>
+                            <th className="px-3 py-2">Sl</th>
+                            <th className="px-3 py-2">Department</th>
+                            <th className="px-3 py-2">Team Name</th>
+                            <th className="px-3 py-2">Status</th>
+                            <th className="px-3 py-2 text-center">∇</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 font-semibold">
+                          {departments.map((dp, idx) => (
+                            <tr key={dp.id}>
+                              <td className="px-3 py-2 text-slate-400">{idx + 1}</td>
+                              <td className="px-3 py-2 font-bold">{dp.department}</td>
+                              <td className="px-3 py-2">{dp.teamName}</td>
+                              <td className="px-3 py-2 text-emerald-600">{dp.status}</td>
+                              <td className="px-3 py-2 text-center">
+                                <button onClick={() => setDepartments(departments.filter(d => d.id !== dp.id))} className="text-rose-500">×</button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+                {/* 10. Nominated Suppliers */}
+                <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setExpandedAccordion(expandedAccordion === "nominated-suppliers" ? null : "nominated-suppliers")}
+                    className={`w-full text-left px-5 py-3.5 font-bold text-xs flex justify-between items-center transition ${
+                      expandedAccordion === "nominated-suppliers" ? "bg-purple-50 dark:bg-purple-950/20 text-purple-900 dark:text-purple-300" : "bg-slate-50 dark:bg-slate-800/40 text-slate-700 dark:text-slate-300"
+                    }`}
+                  >
+                    <span>Nominated Suppliers</span>
+                    <span className="text-lg">{expandedAccordion === "nominated-suppliers" ? "−" : "+"}</span>
+                  </button>
+                  {expandedAccordion === "nominated-suppliers" && (
+                    <div className="p-5 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 space-y-4">
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Supplier Name <span className="text-rose-500">*</span></label>
+                        <select value={nominatedSupplierForm.supplier}
+                          onChange={(e) => {
+                            const found = suppliers.find(s => s.companyName === e.target.value);
+                            setNominatedSupplierForm({
+                              supplier: e.target.value,
+                              person: found?.contactName || "",
+                              address: found?.address || "",
+                              phone: found?.cell || "",
+                              email: found?.email || ""
+                            });
+                          }}
+                          className="w-full max-w-sm text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg"
+                        >
+                          {suppliers.map(s => <option key={s.id} value={s.companyName}>{s.companyName}</option>)}
+                          {suppliers.length === 0 && <option>Pacific Denim Mills Ltd.</option>}
+                        </select>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            setNominatedSuppliers([...nominatedSuppliers, { ...nominatedSupplierForm, id: `ns-${Date.now()}` }]);
+                            setNominatedSupplierForm({ supplier: suppliers[0]?.companyName || "Pacific Denim Mills Ltd.", person: "", address: "", phone: "", email: "" });
+                          }}
+                          className="px-5 py-2 bg-orange-500 text-white font-bold text-xs rounded-lg"
+                        >Submit</button>
+                        <button onClick={() => setNominatedSupplierForm({ supplier: "Pacific Denim Mills Ltd.", person: "", address: "", phone: "", email: "" })} className="px-5 py-2 bg-slate-200 text-slate-700 font-bold text-xs rounded-lg">Reset</button>
+                      </div>
+
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-xs text-left border border-slate-100 mt-2">
+                          <thead className="bg-slate-50 uppercase text-[9px] font-extrabold text-slate-400">
+                            <tr>
+                              <th className="px-3 py-2">Sl</th>
+                              <th className="px-3 py-2">Supplier</th>
+                              <th className="px-3 py-2">Person</th>
+                              <th className="px-3 py-2">Address</th>
+                              <th className="px-3 py-2">Phone</th>
+                              <th className="px-3 py-2">Email</th>
+                              <th className="px-3 py-2 text-center">∇</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 font-semibold">
+                            {nominatedSuppliers.map((ns, idx) => (
+                              <tr key={ns.id}>
+                                <td className="px-3 py-2 text-slate-400">{idx + 1}</td>
+                                <td className="px-3 py-2 font-bold">{ns.supplier}</td>
+                                <td className="px-3 py-2">{ns.person}</td>
+                                <td className="px-3 py-2">{ns.address}</td>
+                                <td className="px-3 py-2 font-mono">{ns.phone}</td>
+                                <td className="px-3 py-2">{ns.email}</td>
+                                <td className="px-3 py-2 text-center">
+                                  <button onClick={() => setNominatedSuppliers(nominatedSuppliers.filter(n => n.id !== ns.id))} className="text-rose-500">×</button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 11. Nominated Size Breakdown */}
+                <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setExpandedAccordion(expandedAccordion === "sizes" ? null : "sizes")}
+                    className={`w-full text-left px-5 py-3.5 font-bold text-xs flex justify-between items-center transition ${
+                      expandedAccordion === "sizes" ? "bg-purple-50 dark:bg-purple-950/20 text-purple-900 dark:text-purple-300" : "bg-slate-50 dark:bg-slate-800/40 text-slate-700 dark:text-slate-300"
+                    }`}
+                  >
+                    <span>Nominated Size Breakdown</span>
+                    <span className="text-lg">{expandedAccordion === "sizes" ? "−" : "+"}</span>
+                  </button>
+                  {expandedAccordion === "sizes" && (
+                    <div className="p-5 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Size Group <span className="text-rose-500">*</span></label>
+                          <select value={sizeForm.sizeGroup} onChange={(e) => setSizeForm({ ...sizeForm, sizeGroup: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg">
+                            <option>Men's Knit</option>
+                            <option>Boys Woven</option>
+                            <option>Girls Basic</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Size Breakdown</label>
+                          <input type="text" value={sizeForm.sizeBreakdown} placeholder="e.g. S, M, L" onChange={(e) => setSizeForm({ ...sizeForm, sizeBreakdown: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Size Ratio</label>
+                          <input type="text" value={sizeForm.sizeRatio} placeholder="e.g. 1:2:1" onChange={(e) => setSizeForm({ ...sizeForm, sizeRatio: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            if (!sizeForm.sizeGroup) return;
+                            setSizeBreakdowns([...sizeBreakdowns, { ...sizeForm, id: `sz-${Date.now()}` }]);
+                            setSizeForm({ sizeGroup: "Men's Knit", sizeBreakdown: "", sizeRatio: "" });
+                          }}
+                          className="px-5 py-2 bg-orange-500 text-white font-bold text-xs rounded-lg"
+                        >Submit</button>
+                        <button onClick={() => setSizeForm({ sizeGroup: "Men's Knit", sizeBreakdown: "", sizeRatio: "" })} className="px-5 py-2 bg-slate-200 text-slate-700 font-bold text-xs rounded-lg">Reset</button>
+                      </div>
+
+                      <table className="w-full text-xs text-left border border-slate-100 mt-2">
+                        <thead className="bg-slate-50 uppercase text-[9px] font-extrabold text-slate-400">
+                          <tr>
+                            <th className="px-3 py-2">Sl</th>
+                            <th className="px-3 py-2">Size Group</th>
+                            <th className="px-3 py-2">Size Breakdown</th>
+                            <th className="px-3 py-2">Size Ratio</th>
+                            <th className="px-3 py-2 text-center">∇</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 font-semibold">
+                          {sizeBreakdowns.map((sz, idx) => (
+                            <tr key={sz.id}>
+                              <td className="px-3 py-2 text-slate-400">{idx + 1}</td>
+                              <td className="px-3 py-2 font-bold">{sz.sizeGroup}</td>
+                              <td className="px-3 py-2 font-mono">{sz.sizeBreakdown}</td>
+                              <td className="px-3 py-2 font-mono">{sz.sizeRatio}</td>
+                              <td className="px-3 py-2 text-center">
+                                <button onClick={() => setSizeBreakdowns(sizeBreakdowns.filter(s => s.id !== sz.id))} className="text-rose-500">×</button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+                {/* 12. Season Information */}
+                <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setExpandedAccordion(expandedAccordion === "season" ? null : "season")}
+                    className={`w-full text-left px-5 py-3.5 font-bold text-xs flex justify-between items-center transition ${
+                      expandedAccordion === "season" ? "bg-purple-50 dark:bg-purple-950/20 text-purple-900 dark:text-purple-300" : "bg-slate-50 dark:bg-slate-800/40 text-slate-700 dark:text-slate-300"
+                    }`}
+                  >
+                    <span>Season Information</span>
+                    <span className="text-lg">{expandedAccordion === "season" ? "−" : "+"}</span>
+                  </button>
+                  {expandedAccordion === "season" && (
+                    <div className="p-5 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Season Name <span className="text-rose-500">*</span></label>
+                          <input type="text" value={seasonForm.seasonName} onChange={(e) => setSeasonForm({ ...seasonForm, seasonName: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Status</label>
+                          <select value={seasonForm.status} onChange={(e) => setSeasonForm({ ...seasonForm, status: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            if (!seasonForm.seasonName) return;
+                            setSeasons([...seasons, { ...seasonForm, id: `ss-${Date.now()}` }]);
+                            setSeasonForm({ seasonName: "", status: "Active" });
+                          }}
+                          className="px-5 py-2 bg-orange-500 text-white font-bold text-xs rounded-lg"
+                        >Submit</button>
+                        <button onClick={() => setSeasonForm({ seasonName: "", status: "Active" })} className="px-5 py-2 bg-slate-200 text-slate-700 font-bold text-xs rounded-lg">Reset</button>
+                      </div>
+
+                      <table className="w-full text-xs text-left border border-slate-100 mt-2">
+                        <thead className="bg-slate-50 uppercase text-[9px] font-extrabold text-slate-400">
+                          <tr>
+                            <th className="px-3 py-2 w-12">Sl</th>
+                            <th className="px-3 py-2">Season Name</th>
+                            <th className="px-3 py-2">Status</th>
+                            <th className="px-3 py-2 text-center w-12">∇</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 font-semibold">
+                          {seasons.map((ss, idx) => (
+                            <tr key={ss.id}>
+                              <td className="px-3 py-2 text-slate-400">{idx + 1}</td>
+                              <td className="px-3 py-2 font-bold">{ss.seasonName}</td>
+                              <td className="px-3 py-2 text-emerald-600">{ss.status}</td>
+                              <td className="px-3 py-2 text-center">
+                                <button onClick={() => setSeasons(seasons.filter(s => s.id !== ss.id))} className="text-rose-500">×</button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+                {/* 13. Shipping Information */}
+                <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setExpandedAccordion(expandedAccordion === "shipping" ? null : "shipping")}
+                    className={`w-full text-left px-5 py-3.5 font-bold text-xs flex justify-between items-center transition ${
+                      expandedAccordion === "shipping" ? "bg-purple-50 dark:bg-purple-950/20 text-purple-900 dark:text-purple-300" : "bg-slate-50 dark:bg-slate-800/40 text-slate-700 dark:text-slate-300"
+                    }`}
+                  >
+                    <span>Shipping Information</span>
+                    <span className="text-lg">{expandedAccordion === "shipping" ? "−" : "+"}</span>
+                  </button>
+                  {expandedAccordion === "shipping" && (
+                    <div className="p-5 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Country Name <span className="text-rose-500">*</span></label>
+                          <select value={shippingForm.country} onChange={(e) => setShippingForm({ ...shippingForm, country: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg">
+                            <option value="Afghanistan">Afghanistan</option>
+                            <option value="Bangladesh">Bangladesh</option>
+                            <option value="Canada">Canada</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Code</label>
+                          <input type="text" value={shippingForm.code} onChange={(e) => setShippingForm({ ...shippingForm, code: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Shipping Address</label>
+                          <input type="text" value={shippingForm.shippingAddr} onChange={(e) => setShippingForm({ ...shippingForm, shippingAddr: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Dest Port <span className="text-rose-500">*</span></label>
+                          <input type="text" value={shippingForm.destPort} onChange={(e) => setShippingForm({ ...shippingForm, destPort: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Dest Port Code <span className="text-rose-500">*</span></label>
+                          <input type="text" value={shippingForm.portCode} onChange={(e) => setShippingForm({ ...shippingForm, portCode: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Shipping Mark</label>
+                          <input type="text" value={shippingForm.shippingMark} onChange={(e) => setShippingForm({ ...shippingForm, shippingMark: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Status</label>
+                          <select value={shippingForm.status} onChange={(e) => setShippingForm({ ...shippingForm, status: e.target.value })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            if (!shippingForm.country || !shippingForm.destPort) return;
+                            setShippings([...shippings, { ...shippingForm, id: `sh-${Date.now()}`, consigneeAddr: "", cargoShipAddr: "" }]);
+                            setShippingForm({ country: "Afghanistan", code: "", shippingAddr: "", destPort: "", portCode: "", shippingMark: "", consigneeAddr: "", cargoShipAddr: "", status: "Active" });
+                          }}
+                          className="px-5 py-2 bg-orange-500 text-white font-bold text-xs rounded-lg"
+                        >Submit</button>
+                        <button onClick={() => setShippingForm({ country: "Afghanistan", code: "", shippingAddr: "", destPort: "", portCode: "", shippingMark: "", consigneeAddr: "", cargoShipAddr: "", status: "Active" })} className="px-5 py-2 bg-slate-200 text-slate-700 font-bold text-xs rounded-lg">Reset</button>
+                      </div>
+
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-xs text-left border border-slate-100 mt-2">
+                          <thead className="bg-slate-50 uppercase text-[9px] font-extrabold text-slate-400">
+                            <tr>
+                              <th className="px-3 py-2">Sl</th>
+                              <th className="px-3 py-2">Country</th>
+                              <th className="px-3 py-2">Code</th>
+                              <th className="px-3 py-2">ShippingAddr</th>
+                              <th className="px-3 py-2">Dest Port</th>
+                              <th className="px-3 py-2">Port Code</th>
+                              <th className="px-3 py-2">Shipping Mark</th>
+                              <th className="px-3 py-2 text-center">∇</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 font-semibold">
+                            {shippings.map((sh, idx) => (
+                              <tr key={sh.id}>
+                                <td className="px-3 py-2 text-slate-400">{idx + 1}</td>
+                                <td className="px-3 py-2 font-bold">{sh.country}</td>
+                                <td className="px-3 py-2">{sh.code}</td>
+                                <td className="px-3 py-2">{sh.shippingAddr}</td>
+                                <td className="px-3 py-2">{sh.destPort}</td>
+                                <td className="px-3 py-2 font-mono">{sh.portCode}</td>
+                                <td className="px-3 py-2">{sh.shippingMark}</td>
+                                <td className="px-3 py-2 text-center">
+                                  <button onClick={() => setShippings(shippings.filter(s => s.id !== sh.id))} className="text-rose-500">×</button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 14. Buyer Costing Information */}
+                <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setExpandedAccordion(expandedAccordion === "costing-info" ? null : "costing-info")}
+                    className={`w-full text-left px-5 py-3.5 font-bold text-xs flex justify-between items-center transition ${
+                      expandedAccordion === "costing-info" ? "bg-purple-50 dark:bg-purple-950/20 text-purple-900 dark:text-purple-300" : "bg-slate-50 dark:bg-slate-800/40 text-slate-700 dark:text-slate-300"
+                    }`}
+                  >
+                    <span>Buyer Costing Information</span>
+                    <span className="text-lg">{expandedAccordion === "costing-info" ? "−" : "+"}</span>
+                  </button>
+                  {expandedAccordion === "costing-info" && (
+                    <div className="p-5 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">CMP <span className="text-rose-500">*</span></label>
+                          <input type="number" step="0.01" value={costingInfo.cmp} onChange={(e) => setCostingInfo({ ...costingInfo, cmp: Number(e.target.value) })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">SMV <span className="text-rose-500">*</span></label>
+                          <input type="number" step="0.1" value={costingInfo.smv} onChange={(e) => setCostingInfo({ ...costingInfo, smv: Number(e.target.value) })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Efficiency <span className="text-rose-500">*</span></label>
+                          <input type="number" step="0.01" value={costingInfo.efficiency} onChange={(e) => setCostingInfo({ ...costingInfo, efficiency: Number(e.target.value) })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Commercial Cost (%) <span className="text-rose-500">*</span></label>
+                          <input type="number" step="0.01" value={costingInfo.commercialCost} onChange={(e) => setCostingInfo({ ...costingInfo, commercialCost: Number(e.target.value) })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Financial Cost (%) <span className="text-rose-500">*</span></label>
+                          <input type="number" step="0.01" value={costingInfo.financialCost} onChange={(e) => setCostingInfo({ ...costingInfo, financialCost: Number(e.target.value) })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Commission (%) <span className="text-rose-500">*</span></label>
+                          <input type="number" step="0.01" value={costingInfo.commission} onChange={(e) => setCostingInfo({ ...costingInfo, commission: Number(e.target.value) })} className="w-full text-xs px-3 py-2 bg-transparent border border-slate-300 rounded-lg" />
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={() => { toast.success("Buyer costing updated!"); setProfileViewMode(false); }} className="px-5 py-2 bg-blue-500 text-white font-bold text-xs rounded-lg transition shadow">Submit</button>
+                        <button onClick={() => setCostingInfo({ cmp: 0.09, smv: 5.0, efficiency: 0.0, commercialCost: 0.0, financialCost: 0.0, commission: 0.0 })} className="px-5 py-2 bg-slate-200 text-slate-700 font-bold text-xs rounded-lg">Reset</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+              </div>
+            </div>
+          ) : (
+            /* ────────────────────────────────────────────────────────── */
+            /* BUYERS LIST VIEW                                           */
+            /* ────────────────────────────────────────────────────────── */
+            <div className="space-y-4 relative">
+              {/* Country Search Bar at top */}
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-wrap items-center gap-3 shadow-xs">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-slate-600 dark:text-slate-400">Country Name</span>
+                  <select
+                    value={countryFilter}
+                    onChange={(e) => setCountryFilter(e.target.value)}
+                    className="text-xs px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg focus:outline-none focus:border-teal-500"
+                  >
+                    <option value="All">All...</option>
+                    <option value="Afghanistan">Afghanistan</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Australia">Australia</option>
+                    <option value="Netherlands">Netherlands</option>
+                    <option value="Germany">Germany</option>
+                    <option value="Bangladesh">Bangladesh</option>
+                  </select>
+                </div>
+                <button className="px-4 py-1.5 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-lg transition active:scale-95 cursor-pointer">
+                  SEARCH
+                </button>
+              </div>
+
+              {/* Data Table */}
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
+                <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
+                    <button className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-lg transition flex items-center gap-1 shadow-sm">
+                      Excel
+                    </button>
+                    <button className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-lg transition flex items-center gap-1 shadow-sm">
+                      Print
+                    </button>
+                    <button className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-lg transition flex items-center gap-1 shadow-sm">
+                      PDF
+                    </button>
+                  </div>
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">Registered RMG Buyers ({filteredBuyers.length})</span>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs text-left">
+                    <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                      <tr>
+                        <th className="px-3 py-3 text-center w-12">∇</th>
+                        <th className="px-3 py-3 text-center w-24">Actions</th>
+                        <th className="px-3 py-3">Full Name</th>
+                        <th className="px-3 py-3">Short Name</th>
+                        <th className="px-3 py-3">Name</th>
+                        <th className="px-3 py-3">Phone</th>
+                        <th className="px-3 py-3">Email</th>
+                        <th className="px-3 py-3">Address</th>
+                        <th className="px-3 py-3">Country</th>
+                        <th className="px-3 py-3 text-center">IsActive</th>
+                        <th className="px-3 py-3 text-right">PrdLeadDays</th>
+                        <th className="px-3 py-3 text-right">DefPayDays</th>
+                        <th className="px-3 py-3 text-right">ExfactLeadDays</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                      {filteredBuyers
+                        .filter(b => countryFilter === "All" || b.country === countryFilter)
+                        .map((b, idx) => (
+                          <tr key={b.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                            <td className="px-3 py-2 text-center text-slate-400 font-bold">{String(idx + 1).padStart(2, "0")}</td>
+                            <td className="px-3 py-2 text-center">
+                              <div className="flex items-center justify-center gap-1.5">
+                                <button
+                                  onClick={() => {
+                                    setBuyerForm(b);
+                                    setProfileBuyerId(b.id);
+                                    setProfileViewMode(true);
+                                    setExpandedAccordion("basic-info");
+                                  }}
+                                  className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                                  title="Edit Profile"
+                                >
+                                  <Pencil size={13} />
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setBuyerForm(b);
+                                    setProfileBuyerId(b.id);
+                                    setProfileViewMode(true);
+                                    setExpandedAccordion("basic-info");
+                                  }}
+                                  className="p-1 text-blue-500 hover:bg-blue-500/10 rounded transition cursor-pointer"
+                                  title="View Details"
+                                >
+                                  <Search size={13} />
+                                </button>
+                              </div>
+                            </td>
+                            <td className="px-3 py-2 text-slate-800 dark:text-slate-200 font-bold">{b.fullName}</td>
+                            <td className="px-3 py-2 text-slate-600 dark:text-slate-400">{b.shortCode}</td>
+                            <td className="px-3 py-2 text-slate-700 dark:text-slate-300">{b.buyerName}</td>
+                            <td className="px-3 py-2 text-slate-600 dark:text-slate-400 font-mono">{b.phone}</td>
+                            <td className="px-3 py-2 text-slate-600 dark:text-slate-400">{b.contactEmail}</td>
+                            <td className="px-3 py-2 text-slate-600 dark:text-slate-400">{b.address}</td>
+                            <td className="px-3 py-2">{b.country}</td>
+                            <td className="px-3 py-2 text-center">
                               <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
                                 b.status === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
                               }`}>
                                 {b.status}
                               </span>
                             </td>
-                            <td className="px-4 py-3 text-center">
-                              <div className="flex items-center justify-center gap-1">
-                                <button
-                                  onClick={() => handleOpenBuyerModal(b)}
-                                  className="p-1 text-slate-500 hover:text-teal-500 hover:bg-slate-100 rounded transition cursor-pointer"
-                                  title="Edit"
-                                >
-                                  <Pencil size={14} />
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteBuyer(b.id)}
-                                  className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition cursor-pointer"
-                                  title="Delete"
-                                >
-                                  <Trash2 size={14} />
-                                </button>
-                              </div>
-                            </td>
+                            <td className="px-3 py-2 text-right font-mono">{b.prdLeadDays}</td>
+                            <td className="px-3 py-2 text-right font-mono">{b.defPayDays}</td>
+                            <td className="px-3 py-2 text-right font-mono">{b.exfactLeadDays}</td>
                           </tr>
                         ))}
-                      </tbody>
-                    </table>
-                  </div>
+                    </tbody>
+                  </table>
                 </div>
+
+                <p className="text-[11px] text-slate-400 p-3">
+                  Showing 1 to {filteredBuyers.length} of {buyers.length} entries
+                </p>
+              </div>
+
+              {/* Floating green plus button in bottom right corner */}
+              <button
+                onClick={() => {
+                  setBuyerForm({
+                    shortCode: "",
+                    buyerName: "",
+                    fullName: "",
+                    buyingHouse: "",
+                    country: "Bangladesh",
+                    aqlStandard: "AQL 2.5",
+                    payTerms: "120 Days BBLC",
+                    currency: "USD",
+                    contactEmail: "",
+                    phone: "",
+                    address: "",
+                    prdLeadDays: 0,
+                    defPayDays: 0,
+                    exfactLeadDays: 0,
+                    status: "Active",
+                  });
+                  setProfileBuyerId(null);
+                  setProfileViewMode(true);
+                  setExpandedAccordion("basic-info");
+                }}
+                className="fixed bottom-6 right-6 size-12 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95 cursor-pointer z-40"
+              >
+                <Plus size={24} />
+              </button>
+            </div>
+          )
         ) : null}
 
 
@@ -1757,135 +4829,6 @@ function MerchandisingMasterSettingsPage() {
                 </div>
         )}
 
-        {/* MODAL 1: BUYER MODAL */}
-        {buyerModal.open && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-150">
-              <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30">
-                <h3 className="font-bold text-sm text-slate-800 dark:text-white flex items-center gap-2">
-                  <Users className="size-4 text-teal-500" />
-                  {buyerModal.item ? "Edit Buyer Configuration" : "Register New Buyer"}
-                </h3>
-                <button onClick={() => setBuyerModal({ open: false })} className="text-slate-400 hover:text-slate-600"><X size={16} /></button>
-              </div>
-
-              <div className="p-5 space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400">Buyer Short Code</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. ZARA"
-                      value={buyerForm.shortCode}
-                      onChange={(e) => setBuyerForm({ ...buyerForm, shortCode: e.target.value })}
-                      className="w-full text-xs font-bold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400">Buyer Name *</label>
-                    <input
-                      type="text"
-                      placeholder="Full Buyer Name"
-                      value={buyerForm.buyerName}
-                      onChange={(e) => setBuyerForm({ ...buyerForm, buyerName: e.target.value })}
-                      className="w-full text-xs font-bold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400">Buying House / Agent</label>
-                    <input
-                      type="text"
-                      placeholder="Agent or Direct"
-                      value={buyerForm.buyingHouse}
-                      onChange={(e) => setBuyerForm({ ...buyerForm, buyingHouse: e.target.value })}
-                      className="w-full text-xs px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400">Country</label>
-                    <input
-                      type="text"
-                      placeholder="Country of Origin"
-                      value={buyerForm.country}
-                      onChange={(e) => setBuyerForm({ ...buyerForm, country: e.target.value })}
-                      className="w-full text-xs px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-3">
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400">AQL Standard</label>
-                    <select
-                      value={buyerForm.aqlStandard}
-                      onChange={(e) => setBuyerForm({ ...buyerForm, aqlStandard: e.target.value })}
-                      className="w-full text-xs px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100"
-                    >
-                      <option value="AQL 1.5">AQL 1.5 Strict</option>
-                      <option value="AQL 2.5">AQL 2.5 Standard</option>
-                      <option value="AQL 4.0">AQL 4.0 Relaxed</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400">Pay Terms</label>
-                    <select
-                      value={buyerForm.payTerms}
-                      onChange={(e) => setBuyerForm({ ...buyerForm, payTerms: e.target.value })}
-                      className="w-full text-xs px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100"
-                    >
-                      <option value="120 Days BBLC">120 Days BBLC</option>
-                      <option value="90 Days BBLC">90 Days BBLC</option>
-                      <option value="At Sight LC">At Sight LC</option>
-                      <option value="TT Transfer">TT Transfer</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400">Currency</label>
-                    <select
-                      value={buyerForm.currency}
-                      onChange={(e) => setBuyerForm({ ...buyerForm, currency: e.target.value })}
-                      className="w-full text-xs px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100"
-                    >
-                      <option value="USD">USD ($)</option>
-                      <option value="EUR">EUR (€)</option>
-                      <option value="GBP">GBP (£)</option>
-                      <option value="BDT">BDT (৳)</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400">Contact Email</label>
-                  <input
-                    type="email"
-                    placeholder="buyer@domain.com"
-                    value={buyerForm.contactEmail}
-                    onChange={(e) => setBuyerForm({ ...buyerForm, contactEmail: e.target.value })}
-                    className="w-full text-xs px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100"
-                  />
-                </div>
-              </div>
-
-              <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex justify-end gap-2">
-                <button
-                  onClick={() => setBuyerModal({ open: false })}
-                  className="px-4 py-2 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-lg shadow-sm transition cursor-pointer"
-                >
-                  CLOSE
-                </button>
-                <button
-                  onClick={handleSaveBuyer}
-                  className="px-5 py-2 text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-600 rounded-lg shadow-sm transition cursor-pointer"
-                >
-                  SAVE BUYER
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* MODAL 2: FABRIC SPEC MODAL */}
         {fabricModal.open && (
