@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v56");
+    const saved = localStorage.getItem("system_changes_v65");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -492,6 +492,78 @@ function ChangesPage() {
           link: "/merchandising-sales-target-entry",
           descriptionEn: "Refactored the Sales Target Entry page. List view now features columns: SL, edit pencil, Year, and Buyer Name. Added a backdrop-blurred wide modal for creating/editing targets with top controls: Year, Buyer, and GET MONTH button, along with a bottom-scrollable 12-month details grid showing: SL, Month, Quantity (Pcs), Amount (USD), Minute, Margin (USD), CM, RM, Avg SMV, Avg Eff, Mgt Notes, and a blue Team ACTION button.",
           descriptionBn: "সেলস টার্গেট এন্ট্রি পেজটি রিফ্যাক্টর করা হয়েছে। লিস্ট ভিউ টেবিলে SL, এডিট পেন্সিল, বছর এবং বায়ার নামের কলাম রয়েছে। এছাড়া টার্গেট তৈরি ও এডিট করার জন্য ব্যাকড্রপ-ব্লারড মোডাল যুক্ত করা হয়েছে যেখানে বছর, বায়ার এবং GET MONTH বাটনের সাহায্যে ১২ মাসের ছক জেনারেট করা ও কলামসমূহের মোট যোগফল রিয়েল-টাইমে ক্যালকুলেট করার ব্যবস্থা রয়েছে।",
+        },
+        {
+          id: "53",
+          date: "2026-07-30T15:08",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-work-orders",
+          descriptionEn: "Added a new 'Workorder' accordion menu in the Merchandising Sidebar below Fabric Booking. Included submenus: Dyed Yarn WO, Trims WO, Wash WO, AOP WO, Print WO, Emb WO, and Sweater Service WO, pointing to /merchandising-work-orders with specific tab query parameters.",
+          descriptionBn: "মার্চেন্ডাইজিং সাইডবারে Fabric Booking এর নিচে নতুন 'Workorder' অ্যাকর্ডিয়ন মেনু যোগ করা হয়েছে। এর সাব-মেনুসমূহ হচ্ছে: Dyed Yarn WO, Trims WO, Wash WO, AOP WO, Print WO, Emb WO, এবং Sweater Service WO; যা টার্গেট কুয়েরি ট্যাব নিয়ে /merchandising-work-orders রুটে নেভিগেট করবে।",
+        },
+        {
+          id: "54",
+          date: "2026-07-30T15:11",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-reports",
+          descriptionEn: "Added a new 'Reports' accordion menu in the Merchandising Sidebar containing 24 submenu entries (Sample Report, Capacity & Booking, Order Summary, Date Wise Shipment, Yarn Booking Status, Order Pre. Vs Post Costing, etc.) pointing to /merchandising-reports with tab query configurations.",
+          descriptionBn: "মার্চেন্ডাইজিং সাইডবারে সর্বশেষে নতুন 'Reports' অ্যাকর্ডিয়ন মেনু যোগ করা হয়েছে। এর অধীনে ২৪টি রিপোর্টিং সাব-মেনু (যেমন: Sample Report, Capacity & Booking, Order Summary, Date Wise Shipment, Yarn Booking Status, Order Pre. Vs Post Costing ইত্যাদি) যুক্ত করা হয়েছে যা ট্যাব কুয়েরি নিয়ে /merchandising-reports রুটে নেভিগেট করবে।",
+        },
+        {
+          id: "55",
+          date: "2026-07-30T15:12",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Renamed the 'Merchandising Settings' accordion label to 'MM Settings' in the sidebar layout.",
+          descriptionBn: "মার্চেন্ডাইজিং সাইডবার লেআউটে 'Merchandising Settings' অ্যাকর্ডিয়ন লেবেলের নাম পরিবর্তন করে 'MM Settings' করা হয়েছে।",
+        },
+        {
+          id: "56",
+          date: "2026-07-30T15:15",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-reports",
+          descriptionEn: "Refactored the sidebar component in MerchandisingLayout.tsx to preserve and restore scroll position via sessionStorage. Updated accordion expanded states initialization to dynamically analyze the current URL pathname and search tab parameters, ensuring the active category and subitem are always expanded, selected, and scrolled into view.",
+          descriptionBn: "মার্চেন্ডাইজিং সাইডবারে স্ক্রল পজিশন ধরের রাখার জন্য sessionStorage ব্যবহার করা হয়েছে। সেই সাথে অ্যাকর্ডিয়নগুলোর এক্সপ্যান্ডেড স্টেট ডায়নামিক করা হয়েছে যাতে বর্তমান পেজ এবং ড্রপডাউন ট্যাবের উপর ভিত্তি করে সংশ্লিষ্ট ক্যাটাগরিটি স্বয়ংক্রিয়ভাবে এক্সপ্যান্ডেড, সিলেক্টেড এবং স্ক্রল ভিউতে দৃশ্যমান থাকে।",
+        },
+        {
+          id: "57",
+          date: "2026-07-30T15:17",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Moved the static menuCategories configuration array outside the MerchandisingLayout component scope to fix a ReferenceError during component state initialization.",
+          descriptionBn: "স্টেট ইনিশিয়ালাইজেশন এর সময় আসা ReferenceError দূর করার জন্য MerchandisingLayout কম্পোনেন্টের বাইরে স্ট্যাটিক menuCategories কনফিগারেশন অ্যারেটিকে সরিয়ে নেওয়া হয়েছে।",
+        },
+        {
+          id: "58",
+          date: "2026-07-30T15:23",
+          type: "Modify",
+          module: "Merchandising",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Refactored the Company Wise MERC Setting master page under MM Settings. Rendered custom company ledger table (Act hamburger dropdown, SL, Company Name, Address, and status badges). Implemented action dropdown with items (Fabric Source, Print Type, Fabric Nature, UOM, Body Part, Map DOM Key) that trigger backdrop-blurred multi-select tag modal setup editors with suggestion listings and manual custom tagging.",
+          descriptionBn: "MM Settings এর অধীনে 'Company Wise MERC Setting' পেজটি সম্পূর্ণ নতুনভাবে তৈরি করা হয়েছে। এতে প্রতিটি কোম্পানির জন্য অ্যাকশন ড্রপডাউন (Fabric Source, Print Type, Fabric Nature, UOM, Body Part, Map DOM Key) যুক্ত করা হয়েছে এবং প্রতিটি ফিচারের জন্য ইন্টারেক্টিভ ট্যাগ এডিটর মোডাল যুক্ত করা হয়েছে যেখানে প্রিসেট সাজেশন থেকে ট্যাগ সিলেক্ট করা বা কাস্টম টাইপিংয়ের মাধ্যমে ট্যাগ অ্যাড করার ব্যবস্থা রয়েছে।",
+        },
+        {
+          id: "59",
+          date: "2026-07-30T15:47",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings?tab=costing-configuration-cpm",
+          descriptionEn: "Replaced the old simple 4-field Costing Configuration panel with a proper data table showing Setup Date, Year, Month, CM Expense, No of Resource, Working Hour, Working Day, CPM (auto-calculated), Applied CPM, Currency, and Status. Added Create and Update modals with full field validation.",
+          descriptionBn: "পুরনো সাধারণ ৪-ফিল্ডের Costing Configuration প্যানেলটি একটি পূর্ণাঙ্গ ডেটা টেবিল দিয়ে প্রতিস্থাপন করা হয়েছে। এতে Setup Date, Year, Month, CM Expense, No of Resource, Working Hour, Working Day, CPM (স্বয়ংক্রিয়ভাবে গণনা করা), Applied CPM, Currency এবং Status দেখানো হচ্ছে। সম্পূর্ণ ভ্যালিডেশনসহ Create এবং Update মোডাল যুক্ত করা হয়েছে।",
+        },
+        {
+          id: "60",
+          date: "2026-07-30T15:49",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings?tab=payment-terms",
+          descriptionEn: "Built a dedicated Payment Terms tab with a clean data table (Actions, SL, Name, IsActive) pre-loaded with 10 standard terms (120/180/30/60/90 Days BBLC, At Sight, Cash, FOD, Others, TT). Added Create and Update modals with Short Name and IsActive fields.",
+          descriptionBn: "Payment Terms ট্যাবের জন্য একটি পূর্ণাঙ্গ ডেটা টেবিল (Actions, SL, Name, IsActive) তৈরি করা হয়েছে। এতে ১০টি স্ট্যান্ডার্ড টার্ম (120/180/30/60/90 Days BBLC, At Sight, Cash, FOD, Others, TT) আগে থেকেই লোড করা আছে। Short Name এবং IsActive ফিল্ডসহ Create ও Update মোডাল যুক্ত করা হয়েছে।",
         },
       ]);
     }

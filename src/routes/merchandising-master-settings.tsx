@@ -1,6 +1,52 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import MerchandisingLayout from "../components/merchandising/MerchandisingLayout";
+
+// ── Costing Configuration Types & Initial Data ──────────────────────────────
+interface CostingConfig {
+  id: string;
+  setupDate: string;
+  year: number;
+  month: string;
+  cmExpense: number;
+  noOfResource: number;
+  workingHour: number;
+  workingDay: number;
+  cpm: number;
+  appliedCpm: number;
+  currency: string;
+  status: "Active" | "Inactive";
+}
+
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+const initialCostingConfigs: CostingConfig[] = [
+  { id: "cc-1", setupDate: "03/03/2025", year: 2025, month: "October",  cmExpense: 80000000, noOfResource: 12000, workingHour: 10, workingDay: 26, cpm: 0.4274, appliedCpm: 0.0450, currency: "USD", status: "Active" },
+  { id: "cc-2", setupDate: "23/12/2025", year: 2025, month: "December", cmExpense: 80000000, noOfResource: 12000, workingHour: 10, workingDay: 25, cpm: 0.4444, appliedCpm: 0.0450, currency: "USD", status: "Active" },
+  { id: "cc-3", setupDate: "23/12/2025", year: 2025, month: "November", cmExpense: 80000000, noOfResource: 12000, workingHour: 10, workingDay: 25, cpm: 0.4444, appliedCpm: 0.0450, currency: "USD", status: "Active" },
+  { id: "cc-4", setupDate: "01/01/2026", year: 2026, month: "June",    cmExpense: 80000000, noOfResource: 12000, workingHour: 10, workingDay: 26, cpm: 0.4274, appliedCpm: 0.0450, currency: "USD", status: "Active" },
+  { id: "cc-5", setupDate: "17/02/2026", year: 2026, month: "May",     cmExpense: 86875741, noOfResource: 1684,  workingHour:  8, workingDay: 19, cpm: 5.6567, appliedCpm: 0.0389, currency: "USD", status: "Active" },
+];
+
+// ── Payment Terms Types & Initial Data ────────────────────────────────────
+interface PaymentTerm {
+  id: string;
+  shortName: string;
+  status: "Active" | "Inactive";
+}
+
+const initialPaymentTerms: PaymentTerm[] = [
+  { id: "pt-1",  shortName: "120 Days BBLC",  status: "Active" },
+  { id: "pt-2",  shortName: "180 Days BBLC",  status: "Active" },
+  { id: "pt-3",  shortName: "30 Days BBLC",   status: "Active" },
+  { id: "pt-4",  shortName: "60 Days BBLC",   status: "Active" },
+  { id: "pt-5",  shortName: "90 Days BBLC",   status: "Active" },
+  { id: "pt-6",  shortName: "At Sight",        status: "Active" },
+  { id: "pt-7",  shortName: "Cash",            status: "Active" },
+  { id: "pt-8",  shortName: "FOD",             status: "Active" },
+  { id: "pt-9",  shortName: "Others",          status: "Active" },
+  { id: "pt-10", shortName: "TT",              status: "Active" },
+];
 import {
   Settings,
   Plus,
@@ -23,13 +69,17 @@ import {
   Ruler,
   Calculator,
   Briefcase,
+  Printer,
+  Download,
+  AlignLeft,
+  Folder,
 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/merchandising-master-settings")({
   validateSearch: (search: Record<string, unknown>) => {
     return {
-      tab: (search.tab as string) || "buyers",
+      tab: (search.tab as string) || "company-wise-merc-setting",
     };
   },
   head: () => ({
@@ -319,82 +369,15 @@ const genericMockData: Record<string, { id: string; name: string; desc: string; 
 
 function MerchandisingMasterSettingsPage() {
   const search = Route.useSearch();
-  const searchTab = search?.tab || "buyers";
+  const searchTab = search?.tab || "company-wise-merc-setting";
 
-  const [activeTab, setActiveTab] = useState<"company" | "partners" | "product" | "fabric" | "yarn" | "color" | "costing" | "quality">(
-    (searchTab as any) || "company"
-  );
-
-  const [activeSubTab, setActiveSubTab] = useState<string>("company-wise-merc-setting");
   const [genericDb, setGenericDb] = useState<Record<string, { id: string; name: string; desc: string; status: "Active" | "Inactive" }[]>>(genericMockData);
 
-  useEffect(() => {
-    if (searchTab) {
-      if (searchTab === "trims") {
-        setActiveTab("costing");
-        setActiveSubTab("additional-cost-entry");
-      } else if (["company", "partners", "product", "fabric", "yarn", "color", "costing", "quality"].includes(searchTab)) {
-        setActiveTab(searchTab as any);
-        if (searchTab === "company") setActiveSubTab("company-wise-merc-setting");
-        if (searchTab === "partners") setActiveSubTab("buying-house");
-        if (searchTab === "product") setActiveSubTab("item-department");
-        if (searchTab === "fabric") setActiveSubTab("fabric-gsm");
-        if (searchTab === "yarn") setActiveSubTab("yarn-brand");
-        if (searchTab === "color") setActiveSubTab("gmt-fabric-color-name");
-        if (searchTab === "costing") setActiveSubTab("additional-cost-entry");
-        if (searchTab === "quality") setActiveSubTab("quality-label");
-      } else {
-        const tabMapping: Record<string, "company" | "partners" | "product" | "fabric" | "yarn" | "color" | "costing" | "quality"> = {
-          "company-wise-merc-setting": "company",
-          "costing-configuration-cpm": "company",
-          "payment-terms": "company",
-          "buying-house": "partners",
-          "buyer-name": "partners",
-          "buyer-wise-brand": "partners",
-          "buying-agent": "partners",
-          "supplier": "partners",
-          "item-department": "product",
-          "gmt-item-name": "product",
-          "body-part": "product",
-          "season": "product",
-          "sample-type": "product",
-          "size-group": "product",
-          "uom": "product",
-          "fabric-gsm": "fabric",
-          "fabric-nature": "fabric",
-          "fabric-construction": "fabric",
-          "fabric-yarn-composotion": "fabric",
-          "dyeing": "fabric",
-          "finishing": "fabric",
-          "shade-range": "fabric",
-          "yarn-brand": "yarn",
-          "yarn-type": "yarn",
-          "yarn-count": "yarn",
-          "yarn-po-type": "yarn",
-          "yarn-po-settings": "yarn",
-          "gmt-fabric-color-name": "color",
-          "fabric-print-color-type": "color",
-          "print-emb-wash-special-type": "color",
-          "aop-process": "color",
-          "additional-cost-entry": "costing",
-          "rmg-process-loss": "costing",
-          "quality-label": "quality",
-        };
-        const mapped = tabMapping[searchTab];
-        if (mapped) {
-          setActiveTab(mapped);
-          setActiveSubTab(searchTab);
-        }
-      }
-    }
-  }, [searchTab]);
+  // Flat label lookup from all sub-tabs
+  const allSubTabs = Object.values(subTabsForMainTab).flat();
+  const tabLabel = allSubTabs.find(s => s.id === searchTab)?.label
+    || searchTab.replace(/-/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase());
 
-  useEffect(() => {
-    const validSubs = subTabsForMainTab[activeTab].map(s => s.id);
-    if (!validSubs.includes(activeSubTab)) {
-      setActiveSubTab(validSubs[0]);
-    }
-  }, [activeTab]);
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -621,11 +604,113 @@ function MerchandisingMasterSettingsPage() {
   const [trims, setTrims] = useState<TrimsMaster[]>(initialTrims);
   const [specs, setSpecs] = useState<SpecParameter[]>(initialSpecs);
 
-  // Financial Config States
-  const [cpmRateUsd, setCpmRateUsd] = useState(0.085); // Cost per minute ($)
-  const [commercialLossPct, setCommercialLossPct] = useState(2.5); // %
-  const [bankInterestPct, setBankInterestPct] = useState(4.0); // %
-  const [targetMarginPct, setTargetMarginPct] = useState(12.0); // %
+  // Costing Configuration States
+  const [costingConfigs, setCostingConfigs] = useState<CostingConfig[]>(initialCostingConfigs);
+  const [costingModal, setCostingModal] = useState<{ open: boolean; item?: CostingConfig }>({ open: false });
+  const [costingForm, setCostingForm] = useState<Partial<CostingConfig>>({
+    setupDate: new Date().toLocaleDateString("en-GB").replace(/\//g, "/"),
+    year: new Date().getFullYear(),
+    month: "",
+    cmExpense: 0,
+    noOfResource: 0,
+    workingHour: 8,
+    workingDay: 26,
+    cpm: 0,
+    appliedCpm: 0,
+    currency: "USD",
+    status: "Active",
+  });
+
+  const calcCpm = (f: Partial<CostingConfig>) => {
+    const denom = (f.noOfResource || 0) * (f.workingHour || 0) * (f.workingDay || 0) * 60;
+    return denom > 0 ? Number(((f.cmExpense || 0) / denom).toFixed(4)) : 0;
+  };
+
+  const handleOpenCostingModal = (item?: CostingConfig) => {
+    if (item) {
+      setCostingForm(item);
+      setCostingModal({ open: true, item });
+    } else {
+      const blank: Partial<CostingConfig> = {
+        setupDate: new Date().toLocaleDateString("en-GB").replace(/\//g, "/"),
+        year: new Date().getFullYear(), month: "", cmExpense: 0,
+        noOfResource: 0, workingHour: 8, workingDay: 26,
+        cpm: 0, appliedCpm: 0, currency: "USD", status: "Active",
+      };
+      setCostingForm(blank);
+      setCostingModal({ open: true });
+    }
+  };
+
+  const handleSaveCosting = () => {
+    if (!costingForm.month) { toast.error("Month is required"); return; }
+    if (!costingForm.cmExpense) { toast.error("CM Expense is required"); return; }
+    const computed = calcCpm(costingForm);
+    if (costingModal.item) {
+      setCostingConfigs(prev => prev.map(c => c.id === costingModal.item!.id ? { ...c, ...costingForm, cpm: computed } as CostingConfig : c));
+      toast.success("Costing Configuration updated!");
+    } else {
+      const newC: CostingConfig = {
+        id: `cc-${Date.now()}`,
+        setupDate: costingForm.setupDate || new Date().toLocaleDateString("en-GB"),
+        year: costingForm.year || new Date().getFullYear(),
+        month: costingForm.month!,
+        cmExpense: costingForm.cmExpense || 0,
+        noOfResource: costingForm.noOfResource || 0,
+        workingHour: costingForm.workingHour || 8,
+        workingDay: costingForm.workingDay || 26,
+        cpm: computed,
+        appliedCpm: costingForm.appliedCpm || 0,
+        currency: costingForm.currency || "USD",
+        status: costingForm.status || "Active",
+      };
+      setCostingConfigs(prev => [newC, ...prev]);
+      toast.success("New Costing Configuration added!");
+    }
+    setCostingModal({ open: false });
+  };
+
+  const handleDeleteCosting = (id: string) => {
+    setCostingConfigs(prev => prev.filter(c => c.id !== id));
+    toast.success("Configuration removed");
+  };
+
+  // ── Payment Terms State & Handlers ──────────────────────────────────
+  const [paymentTerms, setPaymentTerms] = useState<PaymentTerm[]>(initialPaymentTerms);
+  const [paymentTermModal, setPaymentTermModal] = useState<{ open: boolean; item?: PaymentTerm }>({ open: false });
+  const [paymentTermForm, setPaymentTermForm] = useState<Partial<PaymentTerm>>({ shortName: "", status: "Active" });
+
+  const handleOpenPaymentTermModal = (item?: PaymentTerm) => {
+    if (item) {
+      setPaymentTermForm(item);
+      setPaymentTermModal({ open: true, item });
+    } else {
+      setPaymentTermForm({ shortName: "", status: "Active" });
+      setPaymentTermModal({ open: true });
+    }
+  };
+
+  const handleSavePaymentTerm = () => {
+    if (!paymentTermForm.shortName?.trim()) { toast.error("Short Name is required"); return; }
+    if (paymentTermModal.item) {
+      setPaymentTerms(prev => prev.map(p => p.id === paymentTermModal.item!.id ? { ...p, ...paymentTermForm } as PaymentTerm : p));
+      toast.success("Payment Term updated!");
+    } else {
+      const newP: PaymentTerm = { id: `pt-${Date.now()}`, shortName: paymentTermForm.shortName!, status: paymentTermForm.status || "Active" };
+      setPaymentTerms(prev => [...prev, newP]);
+      toast.success("Payment Term added!");
+    }
+    setPaymentTermModal({ open: false });
+  };
+
+  const handleDeletePaymentTerm = (id: string) => {
+    setPaymentTerms(prev => prev.filter(p => p.id !== id));
+    toast.success("Payment Term removed");
+  };
+
+  const filteredPaymentTerms = paymentTerms.filter(p =>
+    p.shortName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   // Modal States
   const [buyerModal, setBuyerModal] = useState<{ open: boolean; item?: BuyerSetting }>({ open: false });
@@ -924,7 +1009,7 @@ function MerchandisingMasterSettingsPage() {
   return (
     <MerchandisingLayout
       activePath="masterSettings"
-      breadcrumbs={[{ label: "Master Settings" }, { label: activeTab.toUpperCase() }]}
+      breadcrumbs={[{ label: "Master Settings" }, { label: tabLabel }]}
       title="RMG Master Configurations Suite"
     >
       <div className="p-4 md:p-6 lg:p-8 bg-slate-50 dark:bg-slate-950 min-h-full font-sans space-y-6">
@@ -946,46 +1031,13 @@ function MerchandisingMasterSettingsPage() {
           </div>
         </div>
 
-        {/* Tab Selection Navigation & Search Bar */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-3">
-          <div className="flex flex-wrap items-center gap-2">
-            {[
-              { id: "company", label: "Company Config", icon: Building2, count: 3 },
-              { id: "partners", label: "Business Partners", icon: Users, count: 5 },
-              { id: "product", label: "Product Masters", icon: Package, count: 7 },
-              { id: "fabric", label: "Fabric Masters", icon: Layers, count: 7 },
-              { id: "yarn", label: "Yarn Masters", icon: Ruler, count: 5 },
-              { id: "color", label: "Color & Processing", icon: Settings, count: 4 },
-              { id: "costing", label: "Costing", icon: Calculator, count: 2 },
-              { id: "quality", label: "Quality", icon: CheckCircle, count: 1 },
-            ].map((t) => {
-              const Icon = t.icon;
-              const isSel = activeTab === t.id;
-              return (
-                <button
-                  key={t.id}
-                  onClick={() => {
-                    setActiveTab(t.id as any);
-                    setSearchQuery("");
-                  }}
-                  className={`px-4 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 transition cursor-pointer ${
-                    isSel
-                      ? "bg-teal-500 text-white shadow-md shadow-teal-500/15 animate-all"
-                      : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100"
-                  }`}
-                >
-                  <Icon size={14} />
-                  <span>{t.label}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="relative w-full md:w-64">
+        {/* Search bar */}
+        <div className="flex justify-end">
+          <div className="relative w-56">
             <Search className="absolute left-3 top-2.5 size-4 text-slate-400" />
             <input
               type="text"
-              placeholder={`Search ${activeTab}...`}
+              placeholder="Search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full text-xs font-semibold pl-9 pr-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
@@ -993,132 +1045,401 @@ function MerchandisingMasterSettingsPage() {
           </div>
         </div>
 
-        {/* TAB 1: BUYER SETUP */}
-        {/* TAB 1: COMPANY CONFIGURATION */}
-        {activeTab === "company" && (
-          <div className="grid grid-cols-12 gap-6">
-            <div className="col-span-12 md:col-span-3 lg:col-span-2.5 flex flex-col gap-1 bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs h-fit">
-              <div className="px-2 pb-2 text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800/80 mb-2">
-                Sub Categories
-              </div>
-              {subTabsForMainTab.company.map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => {
-                    setActiveSubTab(s.id);
-                    setSearchQuery("");
-                  }}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all duration-155 flex items-center justify-between cursor-pointer ${
-                    activeSubTab === s.id
-                      ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 font-extrabold border border-teal-500/15"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40 hover:text-slate-900 dark:hover:text-slate-200"
-                  }`}
-                >
-                  <span>{s.label}</span>
-                </button>
-              ))}
-            </div>
-
-            <div className="col-span-12 md:col-span-9 lg:col-span-9.5">
-              {activeSubTab === "costing-configuration-cpm" ? (
-                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 shadow-xs">
-                  <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
-                    <Calculator className="size-4 text-teal-500" /> Costing Configuration (CPM & Commercial Overhead)
-                  </h3>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-1">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Cost Per Minute (CPM USD)</label>
-                      <input
-                        type="number"
-                        step="0.005"
-                        value={cpmRateUsd}
-                        onChange={(e) => setCpmRateUsd(Number(e.target.value))}
-                        className="w-full text-sm font-black px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-teal-600 dark:text-teal-400 font-mono animate-all"
-                      />
-                      <span className="text-[9px] text-slate-400">Used for factory CM pricing formula</span>
-                    </div>
-
-                    <div className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-1">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Commercial Overhead %</label>
-                      <input
-                        type="number"
-                        step="0.5"
-                        value={commercialLossPct}
-                        onChange={(e) => setCommercialLossPct(Number(e.target.value))}
-                        className="w-full text-sm font-black px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100 font-mono animate-all"
-                      />
-                      <span className="text-[9px] text-slate-400">Default BBLC & port clearance %</span>
-                    </div>
-
-                    <div className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-1">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Bank Interest & L/C %</label>
-                      <input
-                        type="number"
-                        step="0.5"
-                        value={bankInterestPct}
-                        onChange={(e) => setBankInterestPct(Number(e.target.value))}
-                        className="w-full text-sm font-black px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100 font-mono animate-all"
-                      />
-                      <span className="text-[9px] text-slate-400">LC opening charge & interest</span>
-                    </div>
-
-                    <div className="p-3 bg-teal-500/10 border border-teal-500/20 rounded-xl space-y-1">
-                      <label className="text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase">Target Net Profit Margin %</label>
-                      <input
-                        type="number"
-                        step="0.5"
-                        value={targetMarginPct}
-                        onChange={(e) => setTargetMarginPct(Number(e.target.value))}
-                        className="w-full text-sm font-black px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-teal-500/30 rounded-lg text-teal-600 dark:text-teal-400 font-mono animate-all"
-                      />
-                      <span className="text-[9px] text-teal-600/70 font-semibold">Minimum profit margin rule</span>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end">
+        {/* Content - rendered directly based on URL tab param */}
+        <div>
+              {searchTab === "costing-configuration-cpm" ? (
+                <div className="space-y-0">
+                  {/* Table Header */}
+                  <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                      <Calculator className="size-4 text-teal-500" /> Costing Configuration (CPM) — {costingConfigs.length} Record{costingConfigs.length !== 1 ? "s" : ""}
+                    </span>
                     <button
-                      onClick={() => toast.success("Financial CPM & Commercial Overhead parameters saved!")}
-                      className="px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center gap-1.5 cursor-pointer"
+                      onClick={() => handleOpenCostingModal()}
+                      className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 duration-100"
                     >
-                      <Save size={14} /> SAVE FINANCIAL PARAMETERS
+                      <Plus size={14} /> Add Configuration
                     </button>
                   </div>
+
+                  {/* Table */}
+                  <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+                    <table className="w-full text-xs text-left">
+                      <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                        <tr>
+                          <th className="px-3 py-3 text-center w-10">SL</th>
+                          <th className="px-3 py-3 text-center">Actions</th>
+                          <th className="px-3 py-3">Setup Date</th>
+                          <th className="px-3 py-3">Year</th>
+                          <th className="px-3 py-3">Month</th>
+                          <th className="px-3 py-3 text-right">CM Expense</th>
+                          <th className="px-3 py-3 text-right">No of Resource</th>
+                          <th className="px-3 py-3 text-right">Working Hour</th>
+                          <th className="px-3 py-3 text-right">Working Day</th>
+                          <th className="px-3 py-3 text-right">CPM</th>
+                          <th className="px-3 py-3 text-right">Applied CPM</th>
+                          <th className="px-3 py-3">Currency</th>
+                          <th className="px-3 py-3 text-center">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                        {costingConfigs.map((c, idx) => (
+                          <tr key={c.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                            <td className="px-3 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                            <td className="px-3 py-2.5 text-center">
+                              <div className="flex items-center justify-center gap-1">
+                                <button
+                                  onClick={() => handleOpenCostingModal(c)}
+                                  className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                                  title="Edit"
+                                >
+                                  <Pencil size={13} />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteCosting(c.id)}
+                                  className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition cursor-pointer"
+                                  title="Delete"
+                                >
+                                  <Trash2 size={13} />
+                                </button>
+                              </div>
+                            </td>
+                            <td className="px-3 py-2.5 text-slate-700 dark:text-slate-300">{c.setupDate}</td>
+                            <td className="px-3 py-2.5 text-slate-700 dark:text-slate-300">{c.year}</td>
+                            <td className="px-3 py-2.5 text-slate-700 dark:text-slate-300">{c.month}</td>
+                            <td className="px-3 py-2.5 text-right font-mono text-slate-800 dark:text-slate-200">{c.cmExpense.toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
+                            <td className="px-3 py-2.5 text-right font-mono text-slate-700 dark:text-slate-300">{c.noOfResource.toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
+                            <td className="px-3 py-2.5 text-right font-mono text-slate-700 dark:text-slate-300">{c.workingHour.toFixed(2)}</td>
+                            <td className="px-3 py-2.5 text-right font-mono text-slate-700 dark:text-slate-300">{c.workingDay.toFixed(2)}</td>
+                            <td className="px-3 py-2.5 text-right font-mono text-teal-600 dark:text-teal-400 font-bold">{c.cpm.toFixed(4)}</td>
+                            <td className="px-3 py-2.5 text-right font-mono text-teal-700 dark:text-teal-300 font-bold">{c.appliedCpm.toFixed(4)}</td>
+                            <td className="px-3 py-2.5 text-slate-700 dark:text-slate-300">{c.currency}</td>
+                            <td className="px-3 py-2.5 text-center">
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold ${
+                                c.status === "Active"
+                                  ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
+                                  : "bg-slate-500/10 text-slate-500 border border-slate-500/20"
+                              }`}>{c.status}</span>
+                            </td>
+                          </tr>
+                        ))}
+                        {costingConfigs.length === 0 && (
+                          <tr>
+                            <td colSpan={13} className="px-4 py-8 text-center text-slate-400 text-xs">
+                              No costing configurations found. Click "Add Configuration" to create one.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Showing count footer */}
+                  <p className="text-[11px] text-slate-400 pt-1">
+                    Showing 1 to {costingConfigs.length} of {costingConfigs.length} entries
+                  </p>
+
+                  {/* Costing Config Modal */}
+                  {costingModal.open && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4">
+                      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-150">
+                        <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30">
+                          <h3 className="font-bold text-sm text-slate-800 dark:text-white flex items-center gap-2">
+                            <Calculator className="size-4 text-teal-500" />
+                            {costingModal.item ? "Update Costing Configuration" : "Costing Configuration"}
+                          </h3>
+                          <button onClick={() => setCostingModal({ open: false })} className="text-slate-400 hover:text-slate-600 cursor-pointer"><X size={16} /></button>
+                        </div>
+
+                        <div className="p-5 space-y-3 max-h-[75vh] overflow-y-auto">
+                          <div className="grid grid-cols-2 gap-3">
+                            {/* Setup Date */}
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Setup Date <span className="text-rose-500">*</span></label>
+                              <input
+                                type="text"
+                                value={costingForm.setupDate || ""}
+                                onChange={(e) => setCostingForm({ ...costingForm, setupDate: e.target.value })}
+                                placeholder="DD/MM/YYYY"
+                                className="w-full text-xs px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                              />
+                            </div>
+                            {/* Year */}
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Year <span className="text-rose-500">*</span></label>
+                              <select
+                                value={costingForm.year || ""}
+                                onChange={(e) => setCostingForm({ ...costingForm, year: Number(e.target.value) })}
+                                className="w-full text-xs px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                              >
+                                <option value="">Select Year...</option>
+                                {[2023,2024,2025,2026,2027,2028].map(y => <option key={y} value={y}>{y}</option>)}
+                              </select>
+                            </div>
+                            {/* Month */}
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Month <span className="text-rose-500">*</span></label>
+                              <select
+                                value={costingForm.month || ""}
+                                onChange={(e) => setCostingForm({ ...costingForm, month: e.target.value })}
+                                className="w-full text-xs px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                              >
+                                <option value="">Select...</option>
+                                {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
+                              </select>
+                            </div>
+                            {/* CM Expense */}
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">CM Expense <span className="text-rose-500">*</span></label>
+                              <input
+                                type="number"
+                                value={costingForm.cmExpense || ""}
+                                onChange={(e) => {
+                                  const v = Number(e.target.value);
+                                  const f = { ...costingForm, cmExpense: v };
+                                  setCostingForm({ ...f, cpm: calcCpm(f) });
+                                }}
+                                className="w-full text-xs px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                              />
+                            </div>
+                            {/* No Of Resource */}
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">No Of Resource <span className="text-rose-500">*</span></label>
+                              <input
+                                type="number"
+                                value={costingForm.noOfResource || ""}
+                                onChange={(e) => {
+                                  const v = Number(e.target.value);
+                                  const f = { ...costingForm, noOfResource: v };
+                                  setCostingForm({ ...f, cpm: calcCpm(f) });
+                                }}
+                                className="w-full text-xs px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                              />
+                            </div>
+                            {/* Working Hour */}
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Working Hour <span className="text-rose-500">*</span></label>
+                              <input
+                                type="number"
+                                value={costingForm.workingHour || ""}
+                                onChange={(e) => {
+                                  const v = Number(e.target.value);
+                                  const f = { ...costingForm, workingHour: v };
+                                  setCostingForm({ ...f, cpm: calcCpm(f) });
+                                }}
+                                className="w-full text-xs px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                              />
+                            </div>
+                            {/* Working Day */}
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Working Day <span className="text-rose-500">*</span></label>
+                              <input
+                                type="number"
+                                value={costingForm.workingDay || ""}
+                                onChange={(e) => {
+                                  const v = Number(e.target.value);
+                                  const f = { ...costingForm, workingDay: v };
+                                  setCostingForm({ ...f, cpm: calcCpm(f) });
+                                }}
+                                className="w-full text-xs px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                              />
+                            </div>
+                            {/* CPM (auto-calculated) */}
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">CPM <span className="text-rose-500">*</span> <span className="text-[10px] text-teal-500 font-normal">(auto-calculated)</span></label>
+                              <input
+                                type="text"
+                                readOnly
+                                value={costingForm.cpm?.toFixed(4) || "0.0000"}
+                                className="w-full text-xs px-3 py-2 bg-teal-50 dark:bg-teal-950/30 border border-teal-200 dark:border-teal-800/50 rounded-lg text-teal-700 dark:text-teal-300 font-mono font-bold cursor-not-allowed"
+                              />
+                            </div>
+                            {/* Applied CPM */}
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Applied CPM <span className="text-rose-500">*</span></label>
+                              <input
+                                type="number"
+                                step="0.0001"
+                                value={costingForm.appliedCpm || ""}
+                                onChange={(e) => setCostingForm({ ...costingForm, appliedCpm: Number(e.target.value) })}
+                                className="w-full text-xs px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                              />
+                            </div>
+                            {/* Currency */}
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Currency <span className="text-rose-500">*</span></label>
+                              <select
+                                value={costingForm.currency || "USD"}
+                                onChange={(e) => setCostingForm({ ...costingForm, currency: e.target.value })}
+                                className="w-full text-xs px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                              >
+                                <option value=""></option>
+                                {["USD","EUR","GBP","BDT","JPY","CAD"].map(c => <option key={c} value={c}>{c}</option>)}
+                              </select>
+                            </div>
+                          </div>
+
+                          {/* Status — full width */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Status <span className="text-rose-500">*</span></label>
+                            <select
+                              value={costingForm.status || "Active"}
+                              onChange={(e) => setCostingForm({ ...costingForm, status: e.target.value as "Active" | "Inactive" })}
+                              className="w-full text-xs px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                            >
+                              <option value="Active">Active</option>
+                              <option value="Inactive">Inactive</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex justify-between items-center">
+                          <button
+                            onClick={() => setCostingModal({ open: false })}
+                            className="px-4 py-2 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-lg shadow-sm transition cursor-pointer"
+                          >
+                            CLOSE
+                          </button>
+                          <button
+                            onClick={handleSaveCosting}
+                            className="px-5 py-2 text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-600 rounded-lg shadow-sm transition cursor-pointer"
+                          >
+                            {costingModal.item ? "UPDATE" : "CREATE"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : searchTab === "company-wise-merc-setting" ? (
+                <CompanyWiseMercSettingView />
+              ) : searchTab === "payment-terms" ? (
+                <div className="space-y-0">
+                  {/* Table Header */}
+                  <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                      <DollarSign className="size-4 text-teal-500" /> Payment Terms — {filteredPaymentTerms.length} Record{filteredPaymentTerms.length !== 1 ? "s" : ""}
+                    </span>
+                    <button
+                      onClick={() => handleOpenPaymentTermModal()}
+                      className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 duration-100"
+                    >
+                      <Plus size={14} /> Add New
+                    </button>
+                  </div>
+
+                  {/* Table */}
+                  <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+                    <table className="w-full text-xs text-left">
+                      <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                        <tr>
+                          <th className="px-4 py-3 text-center w-20">Actions</th>
+                          <th className="px-4 py-3 text-center w-16">SL</th>
+                          <th className="px-4 py-3">Name</th>
+                          <th className="px-4 py-3">IsActive</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                        {filteredPaymentTerms.map((p, idx) => (
+                          <tr key={p.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                            <td className="px-4 py-2.5 text-center">
+                              <button
+                                onClick={() => handleOpenPaymentTermModal(p)}
+                                className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                                title="Edit"
+                              >
+                                <Pencil size={13} />
+                              </button>
+                            </td>
+                            <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                            <td className="px-4 py-2.5 text-slate-800 dark:text-slate-200">{p.shortName}</td>
+                            <td className="px-4 py-2.5">
+                              <span className={`text-xs font-semibold ${
+                                p.status === "Active" ? "text-emerald-600" : "text-slate-400"
+                              }`}>{p.status}</span>
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredPaymentTerms.length === 0 && (
+                          <tr>
+                            <td colSpan={4} className="px-4 py-8 text-center text-slate-400 text-xs">
+                              No payment terms found.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Footer count */}
+                  <p className="text-[11px] text-slate-400 pt-1">
+                    Showing 1 to {filteredPaymentTerms.length} of {paymentTerms.length} entries
+                  </p>
+
+                  {/* Modal */}
+                  {paymentTermModal.open && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4">
+                      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-150">
+                        <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30">
+                          <h3 className="font-bold text-sm text-slate-800 dark:text-white flex items-center gap-2">
+                            <DollarSign className="size-4 text-teal-500" />
+                            {paymentTermModal.item ? "Update PaymentTerms Information" : "Add New PaymentTerms"}
+                          </h3>
+                          <button onClick={() => setPaymentTermModal({ open: false })} className="text-slate-400 hover:text-slate-600 cursor-pointer"><X size={16} /></button>
+                        </div>
+
+                        <div className="p-5 space-y-4">
+                          {/* Short Name */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Short Name <span className="text-rose-500">*</span></label>
+                            <input
+                              type="text"
+                              value={paymentTermForm.shortName || ""}
+                              onChange={(e) => setPaymentTermForm({ ...paymentTermForm, shortName: e.target.value })}
+                              className="w-full text-xs px-3 py-2.5 bg-slate-50 dark:bg-slate-950 border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                              placeholder="e.g. 120 Days BBLC"
+                            />
+                          </div>
+
+                          {/* IsActive */}
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">IsActive <span className="text-rose-500">*</span></label>
+                            <select
+                              value={paymentTermForm.status || ""}
+                              onChange={(e) => setPaymentTermForm({ ...paymentTermForm, status: e.target.value as "Active" | "Inactive" })}
+                              className="w-full text-xs px-3 py-2.5 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
+                            >
+                              <option value=""></option>
+                              <option value="Active">Active</option>
+                              <option value="Inactive">Inactive</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="px-5 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex justify-between items-center">
+                          <button
+                            onClick={() => setPaymentTermModal({ open: false })}
+                            className="px-4 py-2 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-lg shadow-sm transition cursor-pointer"
+                          >
+                            CLOSE
+                          </button>
+                          <button
+                            onClick={handleSavePaymentTerm}
+                            className="px-5 py-2 text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-600 rounded-lg shadow-sm transition cursor-pointer"
+                          >
+                            {paymentTermModal.item ? "UPDATE" : "CREATE"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
-                renderDynamicMasterDB(activeSubTab, subTabsForMainTab.company.find(s => s.id === activeSubTab)?.label || "")
+                renderDynamicMasterDB(searchTab, tabLabel)
               )}
-            </div>
-          </div>
-        )}
+        </div>
 
-        {/* TAB 2: BUSINESS PARTNERS */}
-        {activeTab === "partners" && (
-          <div className="grid grid-cols-12 gap-6">
-            <div className="col-span-12 md:col-span-3 lg:col-span-2.5 flex flex-col gap-1 bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs h-fit">
-              <div className="px-2 pb-2 text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800/80 mb-2">
-                Sub Categories
-              </div>
-              {subTabsForMainTab.partners.map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => {
-                    setActiveSubTab(s.id);
-                    setSearchQuery("");
-                  }}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all duration-155 flex items-center justify-between cursor-pointer ${
-                    activeSubTab === s.id
-                      ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 font-extrabold border border-teal-500/15"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40 hover:text-slate-900 dark:hover:text-slate-200"
-                  }`}
-                >
-                  <span>{s.label}</span>
-                </button>
-              ))}
-            </div>
-
-            <div className="col-span-12 md:col-span-9 lg:col-span-9.5">
-              {activeSubTab === "buyer-name" ? (
+        {searchTab === "buyer-name" ? (
                 <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
                   <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                     <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">Registered RMG Buyers ({filteredBuyers.length})</span>
@@ -1185,71 +1506,11 @@ function MerchandisingMasterSettingsPage() {
                     </table>
                   </div>
                 </div>
-              ) : (
-                renderDynamicMasterDB(activeSubTab, subTabsForMainTab.partners.find(s => s.id === activeSubTab)?.label || "")
-              )}
-            </div>
-          </div>
-        )}
+        ) : null}
 
-        {/* TAB 3: PRODUCT MASTERS */}
-        {activeTab === "product" && (
-          <div className="grid grid-cols-12 gap-6">
-            <div className="col-span-12 md:col-span-3 lg:col-span-2.5 flex flex-col gap-1 bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs h-fit">
-              <div className="px-2 pb-2 text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800/80 mb-2">
-                Sub Categories
-              </div>
-              {subTabsForMainTab.product.map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => {
-                    setActiveSubTab(s.id);
-                    setSearchQuery("");
-                  }}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all duration-155 flex items-center justify-between cursor-pointer ${
-                    activeSubTab === s.id
-                      ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 font-extrabold border border-teal-500/15"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40 hover:text-slate-900 dark:hover:text-slate-200"
-                  }`}
-                >
-                  <span>{s.label}</span>
-                </button>
-              ))}
-            </div>
 
-            <div className="col-span-12 md:col-span-9 lg:col-span-9.5">
-              {renderDynamicMasterDB(activeSubTab, subTabsForMainTab.product.find(s => s.id === activeSubTab)?.label || "")}
-            </div>
-          </div>
-        )}
 
-        {/* TAB 4: FABRIC MASTERS */}
-        {activeTab === "fabric" && (
-          <div className="grid grid-cols-12 gap-6">
-            <div className="col-span-12 md:col-span-3 lg:col-span-2.5 flex flex-col gap-1 bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs h-fit">
-              <div className="px-2 pb-2 text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800/80 mb-2">
-                Sub Categories
-              </div>
-              {subTabsForMainTab.fabric.map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => {
-                    setActiveSubTab(s.id);
-                    setSearchQuery("");
-                  }}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all duration-155 flex items-center justify-between cursor-pointer ${
-                    activeSubTab === s.id
-                      ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 font-extrabold border border-teal-500/15"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40 hover:text-slate-900 dark:hover:text-slate-200"
-                  }`}
-                >
-                  <span>{s.label}</span>
-                </button>
-              ))}
-            </div>
-
-            <div className="col-span-12 md:col-span-9 lg:col-span-9.5">
-              {activeSubTab === "fabric-construction" ? (
+        {searchTab === "fabric-construction" ? (
                 <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
                   <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                     <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">Fabric & Yarn Specification Master Library ({filteredFabrics.length})</span>
@@ -1306,102 +1567,13 @@ function MerchandisingMasterSettingsPage() {
                     </table>
                   </div>
                 </div>
-              ) : (
-                renderDynamicMasterDB(activeSubTab, subTabsForMainTab.fabric.find(s => s.id === activeSubTab)?.label || "")
-              )}
-            </div>
-          </div>
-        )}
+        ) : null}
 
-        {/* TAB 5: YARN MASTERS */}
-        {activeTab === "yarn" && (
-          <div className="grid grid-cols-12 gap-6">
-            <div className="col-span-12 md:col-span-3 lg:col-span-2.5 flex flex-col gap-1 bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs h-fit">
-              <div className="px-2 pb-2 text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800/80 mb-2">
-                Sub Categories
-              </div>
-              {subTabsForMainTab.yarn.map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => {
-                    setActiveSubTab(s.id);
-                    setSearchQuery("");
-                  }}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all duration-155 flex items-center justify-between cursor-pointer ${
-                    activeSubTab === s.id
-                      ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 font-extrabold border border-teal-500/15"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40 hover:text-slate-900 dark:hover:text-slate-200"
-                  }`}
-                >
-                  <span>{s.label}</span>
-                </button>
-              ))}
-            </div>
 
-            <div className="col-span-12 md:col-span-9 lg:col-span-9.5">
-              {renderDynamicMasterDB(activeSubTab, subTabsForMainTab.yarn.find(s => s.id === activeSubTab)?.label || "")}
-            </div>
-          </div>
-        )}
 
-        {/* TAB 6: COLOR & PROCESSING */}
-        {activeTab === "color" && (
-          <div className="grid grid-cols-12 gap-6">
-            <div className="col-span-12 md:col-span-3 lg:col-span-2.5 flex flex-col gap-1 bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs h-fit">
-              <div className="px-2 pb-2 text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800/80 mb-2">
-                Sub Categories
-              </div>
-              {subTabsForMainTab.color.map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => {
-                    setActiveSubTab(s.id);
-                    setSearchQuery("");
-                  }}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all duration-155 flex items-center justify-between cursor-pointer ${
-                    activeSubTab === s.id
-                      ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 font-extrabold border border-teal-500/15"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40 hover:text-slate-900 dark:hover:text-slate-200"
-                  }`}
-                >
-                  <span>{s.label}</span>
-                </button>
-              ))}
-            </div>
 
-            <div className="col-span-12 md:col-span-9 lg:col-span-9.5">
-              {renderDynamicMasterDB(activeSubTab, subTabsForMainTab.color.find(s => s.id === activeSubTab)?.label || "")}
-            </div>
-          </div>
-        )}
 
-        {/* TAB 7: COSTING */}
-        {activeTab === "costing" && (
-          <div className="grid grid-cols-12 gap-6">
-            <div className="col-span-12 md:col-span-3 lg:col-span-2.5 flex flex-col gap-1 bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs h-fit">
-              <div className="px-2 pb-2 text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800/80 mb-2">
-                Sub Categories
-              </div>
-              {subTabsForMainTab.costing.map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => {
-                    setActiveSubTab(s.id);
-                    setSearchQuery("");
-                  }}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all duration-155 flex items-center justify-between cursor-pointer ${
-                    activeSubTab === s.id
-                      ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 font-extrabold border border-teal-500/15"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40 hover:text-slate-900 dark:hover:text-slate-200"
-                  }`}
-                >
-                  <span>{s.label}</span>
-                </button>
-              ))}
-            </div>
-
-            <div className="col-span-12 md:col-span-9 lg:col-span-9.5">
-              {activeSubTab === "additional-cost-entry" && (
+        {searchTab === "additional-cost-entry" && (
                 <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
                   <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                     <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">Trims & Accessories Master Catalog ({filteredTrims.length})</span>
@@ -1464,9 +1636,9 @@ function MerchandisingMasterSettingsPage() {
                     </table>
                   </div>
                 </div>
-              )}
+        )}
 
-              {activeSubTab === "rmg-process-loss" && (
+        {searchTab === "rmg-process-loss" && (
                 <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
                   <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                     <div>
@@ -1527,38 +1699,10 @@ function MerchandisingMasterSettingsPage() {
                     </table>
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
         )}
 
         {/* TAB 8: QUALITY */}
-        {activeTab === "quality" && (
-          <div className="grid grid-cols-12 gap-6">
-            <div className="col-span-12 md:col-span-3 lg:col-span-2.5 flex flex-col gap-1 bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs h-fit">
-              <div className="px-2 pb-2 text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800/80 mb-2">
-                Sub Categories
-              </div>
-              {subTabsForMainTab.quality.map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => {
-                    setActiveSubTab(s.id);
-                    setSearchQuery("");
-                  }}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all duration-155 flex items-center justify-between cursor-pointer ${
-                    activeSubTab === s.id
-                      ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 font-extrabold border border-teal-500/15"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40 hover:text-slate-900 dark:hover:text-slate-200"
-                  }`}
-                >
-                  <span>{s.label}</span>
-                </button>
-              ))}
-            </div>
-
-            <div className="col-span-12 md:col-span-9 lg:col-span-9.5">
-              {activeSubTab === "quality-label" && (
+        {false && (
                 <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
                   <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                     <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">Garment Specifications & Size Groups Master ({filteredSpecs.length})</span>
@@ -1611,9 +1755,6 @@ function MerchandisingMasterSettingsPage() {
                     </table>
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
         )}
 
         {/* MODAL 1: BUYER MODAL */}
@@ -2113,5 +2254,422 @@ function MerchandisingMasterSettingsPage() {
 
       </div>
     </MerchandisingLayout>
+  );
+}
+
+// ── CUSTOM COMPONENT: Company Wise MERC Setting ──────────────────────────────
+interface CompanyMercSetting {
+  id: string;
+  companyName: string;
+  address: string;
+  status: "Active" | "Inactive";
+  fabricSource: string[];
+  printType: string[];
+  fabricNature: string[];
+  uom: string[];
+  bodyPart: string[];
+  mapDomKey: string[];
+}
+
+const initialCompanySettings: CompanyMercSetting[] = [
+  {
+    id: "CWM-01",
+    companyName: "Pole Star Knit Composite Ltd.",
+    address: "Naibari, Pubail, Gazipur City Corporation, Gazipur.",
+    status: "Active",
+    fabricSource: ["Finish Purchase", "Buyer Supplied", "Stock"],
+    printType: ["Pigment Print", "Rubber Print", "Plastisol Print"],
+    fabricNature: ["Knit"],
+    uom: ["Pcs", "Dzn", "Set"],
+    bodyPart: ["Front Part", "Back Part", "Sleeve"],
+    mapDomKey: ["Company wise setup"]
+  },
+  {
+    id: "CWM-02",
+    companyName: "Pole Star Fashion Design Ltd.",
+    address: "Sharifpur, National UniversityTongi, Gazipur, Bangladesh.",
+    status: "Inactive",
+    fabricSource: ["Finish Purchase", "Stock"],
+    printType: ["Pigment Print", "Discharge Print"],
+    fabricNature: ["Knit", "Woven"],
+    uom: ["Pcs", "Kg"],
+    bodyPart: ["Front Part", "Back Part"],
+    mapDomKey: ["Default configuration"]
+  },
+  {
+    id: "CWM-03",
+    companyName: "Prime Sweater Ltd.",
+    address: "Naibari, Pubail, Gazipur City Corporation, Gazipur.",
+    status: "Active",
+    fabricSource: ["Buyer Supplied", "Stock"],
+    printType: ["Plastisol Print", "Discharge Print"],
+    fabricNature: ["Sweater"],
+    uom: ["Pcs", "Lbs"],
+    bodyPart: ["Front Part", "Back Part", "Sleeve", "Collar"],
+    mapDomKey: ["Custom key mapping"]
+  }
+];
+
+const PREDEFINED_SUGGESTIONS: Record<string, string[]> = {
+  fabricSource: ["Finish Purchase", "Buyer Supplied", "Stock", "Imported", "Local", "Sub-Contract"],
+  printType: ["Pigment Print", "Rubber Print", "Plastisol Print", "Discharge Print", "High Density Print", "AOP Print WO", "Flock Print", "Foil Print"],
+  fabricNature: ["Knit", "Woven", "Sweater", "Fleece", "Terry", "Interlock"],
+  uom: ["Pcs", "Dzn", "Set", "Pack", "Kg", "Yds", "Lbs", "Mtr", "Roll"],
+  bodyPart: ["Front Part", "Back Part", "Sleeve", "Collar", "Cuff", "Pocket", "Hood", "Bottom Rib", "Neck Rib"],
+  mapDomKey: ["Company wise setup", "Default configuration", "Custom key mapping", "TNA Milestone", "Procurement Rule"]
+};
+
+function CompanyWiseMercSettingView() {
+  const [companySettings, setCompanySettings] = useState<CompanyMercSetting[]>(initialCompanySettings);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+
+  // Modal State
+  const [activeModal, setActiveModal] = useState<{
+    companyId: string;
+    type: keyof Omit<CompanyMercSetting, "id" | "companyName" | "address" | "status">;
+    label: string;
+  } | null>(null);
+
+  // Tag Editor Temporary State
+  const [tempTags, setTempTags] = useState<string[]>([]);
+  const [newTagInput, setNewTagInput] = useState("");
+
+  // Populate temp tags when modal opens
+  useEffect(() => {
+    if (activeModal) {
+      const comp = companySettings.find(c => c.id === activeModal.companyId);
+      if (comp) {
+        setTempTags(comp[activeModal.type] as string[] || []);
+      }
+      setNewTagInput("");
+    }
+  }, [activeModal, companySettings]);
+
+  // Export handlers
+  const handleExport = (format: "EXCEL" | "PRINT" | "PDF") => {
+    toast.success(`Exporting Company Wise MERC Settings as ${format}...`);
+  };
+
+  // Filter list
+  const filtered = companySettings.filter(c => 
+    c.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.address.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Tag actions
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTempTags(prev => prev.filter(t => t !== tagToRemove));
+  };
+
+  const handleAddTag = (tagToAdd: string) => {
+    const trimmed = tagToAdd.trim();
+    if (!trimmed) return;
+    if (tempTags.includes(trimmed)) {
+      toast.error("Tag already exists");
+      return;
+    }
+    setTempTags(prev => [...prev, trimmed]);
+    setNewTagInput("");
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      handleAddTag(newTagInput);
+    }
+  };
+
+  const handleSubmitModal = () => {
+    if (!activeModal) return;
+    setCompanySettings(prev => prev.map(c => 
+      c.id === activeModal.companyId 
+        ? { ...c, [activeModal.type]: tempTags } 
+        : c
+    ));
+    toast.success(`${activeModal.label} updated successfully!`);
+    setActiveModal(null);
+  };
+
+  return (
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border-l-4 border-l-amber-500 border-y border-r border-slate-200 dark:border-slate-800 shadow-sm p-5 space-y-6 select-none relative">
+      
+      {/* Action Toolbar */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        {/* Export Buttons */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleExport("EXCEL")}
+            className="px-3.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95 duration-100"
+          >
+            <Download size={13} className="text-slate-500" /> EXCEL
+          </button>
+          <button
+            onClick={() => handleExport("PRINT")}
+            className="px-3.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95 duration-100"
+          >
+            <Printer size={13} className="text-slate-500" /> PRINT
+          </button>
+          <button
+            onClick={() => handleExport("PDF")}
+            className="px-3.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95 duration-100"
+          >
+            <Download size={13} className="text-slate-500" /> PDF
+          </button>
+        </div>
+
+        {/* Search Input */}
+        <div className="flex items-center gap-2 w-full sm:w-72">
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 shrink-0">Search:</span>
+          <div className="relative w-full">
+            <input
+              type="text"
+              placeholder="Search by Company or Address..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100 pr-8"
+            />
+            <Search size={14} className="absolute right-2.5 top-2.5 text-slate-400" />
+          </div>
+        </div>
+      </div>
+
+      {/* Settings Grid Table */}
+      <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl">
+        <table className="w-full text-xs text-left min-w-[700px]">
+          <thead className="bg-[#FDF2E9] dark:bg-slate-950 text-[#A04000] dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+            <tr>
+              <th className="px-4 py-3.5 w-16 text-center">Act</th>
+              <th className="px-4 py-3.5 w-16 text-center">Sl</th>
+              <th className="px-5 py-3.5 w-1/3">Company</th>
+              <th className="px-5 py-3.5">Address</th>
+              <th className="px-4 py-3.5 w-24 text-center">Status</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-200 dark:divide-slate-800 font-semibold text-slate-700 dark:text-slate-300">
+            {filtered.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="px-4 py-8 text-center text-slate-400 italic">
+                  No company records found matching search query.
+                </td>
+              </tr>
+            ) : (
+              filtered.map((item, idx) => (
+                <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 relative">
+                  
+                  {/* Action Hamburger Column */}
+                  <td className="px-4 py-3.5 text-center relative font-medium">
+                    <div className="flex justify-center">
+                      <button
+                        onClick={() => setOpenDropdownId(prev => prev === item.id ? null : item.id)}
+                        className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-blue-500 cursor-pointer transition active:scale-95"
+                      >
+                        <AlignLeft size={16} />
+                      </button>
+                    </div>
+
+                    {/* Action Dropdown Menu */}
+                    {openDropdownId === item.id && (
+                      <>
+                        {/* Overlay backdrop to close dropdown */}
+                        <div 
+                          className="fixed inset-0 z-40"
+                          onClick={() => setOpenDropdownId(null)}
+                        />
+                        <div className="absolute left-10 top-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl w-48 py-2 z-50 animate-scale-up text-left">
+                          <button
+                            onClick={() => {
+                              setActiveModal({ companyId: item.id, type: "fabricSource", label: "Fabric Source" });
+                              setOpenDropdownId(null);
+                            }}
+                            className="w-full px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 cursor-pointer transition"
+                          >
+                            <FileText size={14} className="text-blue-500" /> Fabric Source
+                          </button>
+                          <button
+                            onClick={() => {
+                              setActiveModal({ companyId: item.id, type: "printType", label: "Print Type" });
+                              setOpenDropdownId(null);
+                            }}
+                            className="w-full px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 cursor-pointer transition"
+                          >
+                            <FileText size={14} className="text-blue-500" /> Print Type
+                          </button>
+                          <button
+                            onClick={() => {
+                              setActiveModal({ companyId: item.id, type: "fabricNature", label: "Fabric Nature" });
+                              setOpenDropdownId(null);
+                            }}
+                            className="w-full px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 cursor-pointer transition"
+                          >
+                            <Folder size={14} className="text-amber-500" /> Fabric Nature
+                          </button>
+                          <button
+                            onClick={() => {
+                              setActiveModal({ companyId: item.id, type: "uom", label: "UOM" });
+                              setOpenDropdownId(null);
+                            }}
+                            className="w-full px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 cursor-pointer transition"
+                          >
+                            <Folder size={14} className="text-amber-500" /> UOM
+                          </button>
+                          <button
+                            onClick={() => {
+                              setActiveModal({ companyId: item.id, type: "bodyPart", label: "Body Part" });
+                              setOpenDropdownId(null);
+                            }}
+                            className="w-full px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 cursor-pointer transition"
+                          >
+                            <Folder size={14} className="text-amber-500" /> Body Part
+                          </button>
+                          <button
+                            onClick={() => {
+                              setActiveModal({ companyId: item.id, type: "mapDomKey", label: "Map DOM Key" });
+                              setOpenDropdownId(null);
+                            }}
+                            className="w-full px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 cursor-pointer transition"
+                          >
+                            <Folder size={14} className="text-amber-500" /> Map DOM Key
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </td>
+
+                  {/* Serial Column */}
+                  <td className="px-4 py-3.5 text-center text-slate-400 font-mono font-bold">{idx + 1}</td>
+
+                  {/* Company Name Column */}
+                  <td className="px-5 py-3.5 font-bold text-slate-800 dark:text-white">{item.companyName}</td>
+
+                  {/* Address Column */}
+                  <td className="px-5 py-3.5 text-slate-500 dark:text-slate-400 font-medium">{item.address}</td>
+
+                  {/* Status Badge Column */}
+                  <td className="px-4 py-3.5 text-center">
+                    <span className={`px-2.5 py-0.5 rounded text-[9px] font-extrabold uppercase inline-block ${
+                      item.status === "Active" 
+                        ? "bg-emerald-500 text-white" 
+                        : "bg-rose-500 text-white"
+                    }`}>
+                      {item.status}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination Footer */}
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-xs font-bold text-slate-500 border-t border-slate-100 dark:border-slate-800/80 pt-4">
+        <div>Showing 1 to {filtered.length} of {filtered.length} entries</div>
+        <div className="flex items-center gap-1.5">
+          <button className="px-3 py-1.5 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-slate-400 font-medium cursor-not-allowed">Previous</button>
+          <button className="px-3 py-1.5 bg-emerald-500 text-white rounded-lg">1</button>
+          <button className="px-3 py-1.5 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-slate-400 font-medium cursor-not-allowed">Next</button>
+        </div>
+      </div>
+
+      {/* MULTI-SELECT TAG MODAL EDITOR */}
+      {activeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-scale-up">
+            
+            {/* Modal Header */}
+            <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/20">
+              <h3 className="text-sm font-extrabold text-slate-800 dark:text-white uppercase tracking-wider">{activeModal.label} Setup</h3>
+              <button 
+                onClick={() => setActiveModal(null)} 
+                className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-4">
+              <label className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                {activeModal.label} <span className="text-rose-500">*</span>
+              </label>
+
+              {/* Tag Editor Box */}
+              <div className="border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 rounded-xl p-3 min-h-[100px] flex flex-wrap gap-2 items-center focus-within:ring-2 focus-within:ring-teal-500/20 focus-within:border-teal-500 transition duration-150">
+                
+                {/* Render Selected Tags */}
+                {tempTags.map((tag, idx) => (
+                  <span
+                    key={idx}
+                    className="bg-slate-200/80 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs px-2.5 py-1 rounded-md font-bold flex items-center gap-1.5 hover:bg-slate-300/80 dark:hover:bg-slate-700 transition"
+                  >
+                    {tag}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTag(tag)}
+                      className="p-0.5 hover:bg-slate-300 dark:hover:bg-slate-600 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                    >
+                      <X size={10} />
+                    </button>
+                  </span>
+                ))}
+
+                {/* Tag Input */}
+                <input
+                  type="text"
+                  placeholder={tempTags.length === 0 ? "Type and press Enter to add..." : "Add more..."}
+                  value={newTagInput}
+                  onChange={(e) => setNewTagInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="flex-1 min-w-[120px] text-xs font-semibold px-2 py-1 bg-transparent border-none focus:outline-none focus:ring-0 text-slate-800 dark:text-slate-100"
+                />
+              </div>
+
+              {/* Suggestions Panel */}
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-2">Pre-Defined Suggestions:</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {PREDEFINED_SUGGESTIONS[activeModal.type]?.map((suggestion) => {
+                    const isSelected = tempTags.includes(suggestion);
+                    return (
+                      <button
+                        key={suggestion}
+                        type="button"
+                        onClick={() => isSelected ? handleRemoveTag(suggestion) : handleAddTag(suggestion)}
+                        className={`px-2.5 py-1 rounded-md text-[10px] font-bold cursor-pointer transition active:scale-95 duration-100 ${
+                          isSelected
+                            ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/20"
+                            : "bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                        }`}
+                      >
+                        {isSelected ? `✓ ${suggestion}` : `+ ${suggestion}`}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex justify-between items-center px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/20">
+              <button
+                onClick={() => setActiveModal(null)}
+                className="text-xs font-bold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition cursor-pointer uppercase tracking-wider"
+              >
+                CLOSE
+              </button>
+              <button
+                onClick={handleSubmitModal}
+                className="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md transition cursor-pointer active:scale-95"
+              >
+                SUBMIT
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+    </div>
   );
 }
