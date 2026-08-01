@@ -10,6 +10,9 @@ import {
   FileSpreadsheet,
   Edit2,
   Trash2,
+  Save,
+  X,
+  ChevronDown,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -27,17 +30,20 @@ export const Route = createFileRoute("/merchandising-monthly-capacity")({
 interface MonthlyCapacityRecord {
   id: string;
   status: "Approved" | "Pending";
+  capacitySource: string;
   year: number;
   month: string;
-  machine: number;
+  smv: number;
+  week: string;
+  day: number;
   whour: number;
-  wmin: number; 
-  smv: number; 
-  totalLines: number;
-  capacityPct: number; 
-  oneDayCapacity: number; 
-  wday: number; 
-  totalCapacity: number; 
+  efficiency: number;
+  operator: number;
+  absenteeism: number;
+  totalAbsent: number;
+  totalOperator: number;
+  availableMinute: number;
+  capacityInMinute: number;
 }
 
 const MONTHS_LIST = [
@@ -50,78 +56,39 @@ const INITIAL_MONTHLY_CAPACITY: MonthlyCapacityRecord[] = [
   {
     id: "mc-1",
     status: "Approved",
-    year: 2024,
-    month: "October",
-    machine: 385,
+    capacitySource: "PKCL",
+    year: 2026,
+    month: "August",
+    smv: 7.5,
+    week: "1st Week",
+    day: 26,
     whour: 8,
-    wmin: 480,
-    smv: 3.5,
-    totalLines: 35,
-    capacityPct: 75,
-    oneDayCapacity: 39600,
-    wday: 26,
-    totalCapacity: 1029600
+    efficiency: 75,
+    operator: 100,
+    absenteeism: 5,
+    totalAbsent: 5,
+    totalOperator: 95,
+    availableMinute: 1185600, // 95 * 8 * 60 * 26
+    capacityInMinute: 889200
   },
   {
     id: "mc-2",
     status: "Approved",
-    year: 2024,
-    month: "November",
-    machine: 385,
-    whour: 8,
-    wmin: 480,
-    smv: 3.8,
-    totalLines: 35,
-    capacityPct: 72,
-    oneDayCapacity: 34989,
-    wday: 25,
-    totalCapacity: 874725
-  },
-  {
-    id: "mc-3",
-    status: "Pending",
-    year: 2024,
-    month: "December",
-    machine: 410,
-    whour: 8,
-    wmin: 480,
-    smv: 4.0,
-    totalLines: 38,
-    capacityPct: 70,
-    oneDayCapacity: 34440,
-    wday: 26,
-    totalCapacity: 895440
-  },
-  {
-    id: "mc-4",
-    status: "Approved",
+    capacitySource: "PKCL",
     year: 2026,
-    month: "January",
-    machine: 385,
+    month: "September",
+    smv: 7.0,
+    week: "2nd Week",
+    day: 25,
     whour: 8,
-    wmin: 480,
-    smv: 3.5,
-    totalLines: 35,
-    capacityPct: 75,
-    oneDayCapacity: 39600,
-    wday: 27,
-    totalCapacity: 1069200
-  },
-  {
-    id: "mc-5",
-    status: "Approved",
-    year: 2026,
-    month: "February",
-    machine: 385,
-    whour: 8,
-    wmin: 480,
-    smv: 3.5,
-    totalLines: 35,
-    capacityPct: 75,
-    oneDayCapacity: 39600,
-    wday: 24,
-    totalCapacity: 950400
-  },
+    efficiency: 70,
+    operator: 120,
+    absenteeism: 6,
+    totalAbsent: 7,
+    totalOperator: 113,
+    availableMinute: 1356000,
+    capacityInMinute: 949200
+  }
 ];
 
 function MonthlyCapacityPage() {
@@ -129,44 +96,51 @@ function MonthlyCapacityPage() {
   const [filterStatus, setFilterStatus] = useState<string>("All");
   const [filterYearMonthly, setFilterYearMonthly] = useState<number>(2026);
   const [filterMonthMonthly, setFilterMonthMonthly] = useState<string>("All");
-  const [searchQueryMonthly, setSearchQueryMonthly] = useState<string>("All");
+  const [searchQueryMonthly, setSearchQueryMonthly] = useState<string>("");
 
   const [isMonthlyModalOpen, setIsMonthlyModalOpen] = useState(false);
   const [editMonthlyId, setEditMonthlyId] = useState<string | null>(null);
   const [monthlyStatus, setMonthlyStatus] = useState<"Approved" | "Pending">("Approved");
-  const [monthlyYear, setMonthlyYear] = useState(2026);
-  const [monthlyMonth, setMonthlyMonth] = useState("January");
-  const [monthlyMachine, setMonthlyMachine] = useState(385);
-  const [monthlyWHour, setMonthlyWHour] = useState(8);
-  const [monthlySMV, setMonthlySMV] = useState(3.5);
-  const [monthlyTotalLines, setMonthlyTotalLines] = useState(35);
-  const [monthlyCapacityPct, setMonthlyCapacityPct] = useState(75);
-  const [monthlyWDay, setMonthlyWDay] = useState(26);
 
-  const computedMonthlyValues = useMemo(() => {
-    const wmin = monthlyWHour * 60;
-    const oneDay = monthlySMV > 0 
-      ? Math.round((monthlyMachine * wmin * (monthlyCapacityPct / 100)) / monthlySMV)
-      : 0;
-    const total = oneDay * monthlyWDay;
-    return { wmin, oneDay, total };
-  }, [monthlyMachine, monthlyWHour, monthlyCapacityPct, monthlySMV, monthlyWDay]);
+  // Monthly capacity form state parameters
+  const [monthlyCapacitySource, setMonthlyCapacitySource] = useState("PKCL");
+  const [monthlyYear, setMonthlyYear] = useState(2026);
+  const [monthlyMonth, setMonthlyMonth] = useState("August");
+  const [monthlySMV, setMonthlySMV] = useState(7.5);
+  const [monthlyWeek, setMonthlyWeek] = useState("1st Week");
+  const [monthlyDay, setMonthlyDay] = useState(26);
+  const [monthlyWHour, setMonthlyWHour] = useState(8);
+  const [monthlyEfficiency, setMonthlyEfficiency] = useState(75);
+  const [monthlyOperator, setMonthlyOperator] = useState(100);
+  const [monthlyAbsenteeism, setMonthlyAbsenteeism] = useState(5);
+
+  // Dynamic calculations based on state inputs
+  const calculatedValues = useMemo(() => {
+    const totalAbsent = Math.round((monthlyOperator * monthlyAbsenteeism) / 100);
+    const totalOperator = monthlyOperator - totalAbsent;
+    const availableMinute = totalOperator * monthlyWHour * 60 * monthlyDay;
+    const capacityInMinute = Math.round((availableMinute * monthlyEfficiency) / 100);
+    return { totalAbsent, totalOperator, availableMinute, capacityInMinute };
+  }, [monthlyOperator, monthlyAbsenteeism, monthlyWHour, monthlyDay, monthlyEfficiency]);
 
   const handleSaveMonthlyCapacity = () => {
     const payload: MonthlyCapacityRecord = {
       id: editMonthlyId || `mc-${Date.now()}`,
       status: monthlyStatus,
+      capacitySource: monthlyCapacitySource,
       year: monthlyYear,
       month: monthlyMonth,
-      machine: monthlyMachine,
-      whour: monthlyWHour,
-      wmin: computedMonthlyValues.wmin,
       smv: monthlySMV,
-      totalLines: monthlyTotalLines,
-      capacityPct: monthlyCapacityPct,
-      oneDayCapacity: computedMonthlyValues.oneDay,
-      wday: monthlyWDay,
-      totalCapacity: computedMonthlyValues.total
+      week: monthlyWeek,
+      day: monthlyDay,
+      whour: monthlyWHour,
+      efficiency: monthlyEfficiency,
+      operator: monthlyOperator,
+      absenteeism: monthlyAbsenteeism,
+      totalAbsent: calculatedValues.totalAbsent,
+      totalOperator: calculatedValues.totalOperator,
+      availableMinute: calculatedValues.availableMinute,
+      capacityInMinute: calculatedValues.capacityInMinute
     };
 
     if (editMonthlyId) {
@@ -183,14 +157,16 @@ function MonthlyCapacityPage() {
   const handleEditMonthlyCapacity = (rec: MonthlyCapacityRecord) => {
     setEditMonthlyId(rec.id);
     setMonthlyStatus(rec.status);
+    setMonthlyCapacitySource(rec.capacitySource);
     setMonthlyYear(rec.year);
     setMonthlyMonth(rec.month);
-    setMonthlyMachine(rec.machine);
-    setMonthlyWHour(rec.whour);
     setMonthlySMV(rec.smv);
-    setMonthlyTotalLines(rec.totalLines);
-    setMonthlyCapacityPct(rec.capacityPct);
-    setMonthlyWDay(rec.wday);
+    setMonthlyWeek(rec.week);
+    setMonthlyDay(rec.day);
+    setMonthlyWHour(rec.whour);
+    setMonthlyEfficiency(rec.efficiency);
+    setMonthlyOperator(rec.operator);
+    setMonthlyAbsenteeism(rec.absenteeism);
     setIsMonthlyModalOpen(true);
   };
 
@@ -207,9 +183,11 @@ function MonthlyCapacityPage() {
       const matchYear = rec.year === filterYearMonthly;
       const matchMonth = filterMonthMonthly === "All" || rec.month === filterMonthMonthly;
       const s = searchQueryMonthly.toLowerCase();
-      const matchSearch = searchQueryMonthly === "All" || searchQueryMonthly === "" ||
+      const matchSearch = searchQueryMonthly === "" ||
         rec.month.toLowerCase().includes(s) ||
-        rec.status.toLowerCase().includes(s);
+        rec.status.toLowerCase().includes(s) ||
+        rec.capacitySource.toLowerCase().includes(s) ||
+        rec.week.toLowerCase().includes(s);
       return matchStatus && matchYear && matchMonth && matchSearch;
     });
   }, [monthlyCapacities, filterStatus, filterYearMonthly, filterMonthMonthly, searchQueryMonthly]);
@@ -236,14 +214,16 @@ function MonthlyCapacityPage() {
             onClick={() => {
               setEditMonthlyId(null);
               setMonthlyStatus("Approved");
+              setMonthlyCapacitySource("PKCL");
               setMonthlyYear(2026);
-              setMonthlyMonth("January");
-              setMonthlyMachine(385);
+              setMonthlyMonth("August");
+              setMonthlySMV(7.5);
+              setMonthlyWeek("1st Week");
+              setMonthlyDay(26);
               setMonthlyWHour(8);
-              setMonthlySMV(3.5);
-              setMonthlyTotalLines(35);
-              setMonthlyCapacityPct(75);
-              setMonthlyWDay(26);
+              setMonthlyEfficiency(75);
+              setMonthlyOperator(100);
+              setMonthlyAbsenteeism(5);
               setIsMonthlyModalOpen(true);
             }}
             className="h-9.5 px-4 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 hover:opacity-95 text-white text-xs font-semibold shadow-xs flex items-center gap-1.5 cursor-pointer"
@@ -311,53 +291,59 @@ function MonthlyCapacityPage() {
             <div className="flex items-center gap-1.5">
               <button onClick={() => toast.info("Export Excel...")} className="h-8 px-3 rounded-lg border border-slate-200 bg-white dark:bg-slate-950 hover:bg-slate-55 text-xs font-bold flex items-center gap-1.5 cursor-pointer"><FileSpreadsheet className="size-3.5 text-emerald-500" /> Excel</button>
               <button onClick={() => toast.info("Printing...")} className="h-8 px-3 rounded-lg border border-slate-200 bg-white dark:bg-slate-950 hover:bg-slate-55 text-xs font-bold flex items-center gap-1.5 cursor-pointer"><Printer className="size-3.5 text-blue-500" /> Print</button>
-              <button onClick={() => toast.info("Export PDF...")} className="h-8 px-3 rounded-lg border border-slate-200 bg-white dark:bg-slate-950 hover:bg-slate-55 text-xs font-bold flex items-center gap-1.5 cursor-pointer"><Download className="size-3.5 text-rose-500" /> PDF</button>
+              <button onClick={() => toast.info("Export PDF...")} className="h-8 px-3 rounded-lg border border-slate-200 bg-white dark:bg-slate-955 hover:bg-slate-55 text-xs font-bold flex items-center gap-1.5 cursor-pointer"><Download className="size-3.5 text-rose-500" /> PDF</button>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-black uppercase text-slate-400">Search:</span>
-              <input type="text" placeholder="Filter..." value={searchQueryMonthly === "All" ? "" : searchQueryMonthly} onChange={(e) => setSearchQueryMonthly(e.target.value)} className="text-xs px-3 py-1.5 bg-white dark:bg-slate-955 border border-slate-200 rounded-lg text-slate-800 focus:outline-none animate-none" />
+              <input type="text" placeholder="Filter..." value={searchQueryMonthly} onChange={(e) => setSearchQueryMonthly(e.target.value)} className="text-xs px-3 py-1.5 bg-white dark:bg-slate-955 border border-slate-200 rounded-lg text-slate-800 focus:outline-none" />
             </div>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-100 dark:bg-slate-955 border-b border-slate-200 text-slate-500 font-extrabold text-left">
-                  <th className="px-3 py-3 w-24 text-center">Status</th>
-                  <th className="px-3 py-3 w-12 text-center">SL</th>
-                  <th className="px-3 py-3 text-center">Year</th>
-                  <th className="px-3 py-3 text-center">Month</th>
-                  <th className="px-3 py-3 text-right">Machine</th>
-                  <th className="px-3 py-3 text-center">WHour</th>
-                  <th className="px-3 py-3 text-right">WMin</th>
-                  <th className="px-3 py-3 text-right">SMV</th>
-                  <th className="px-3 py-3 text-center">Total (Lines)</th>
-                  <th className="px-3 py-3 text-right">Capacity (%)</th>
-                  <th className="px-3 py-3 text-right">OneDay Capacity</th>
-                  <th className="px-3 py-3 text-center">WDay</th>
-                  <th className="px-3 py-3 text-right">Total Capacity</th>
-                  <th className="px-3 py-3 text-center w-20">Actions</th>
+                <tr className="bg-[#bde0fe] dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-[11px] font-bold border-b border-blue-200 dark:border-slate-700">
+                  <th className="px-3 py-2.5 text-center w-20">Status</th>
+                  <th className="px-3 py-2.5 text-center w-12">SL</th>
+                  <th className="px-3 py-2.5">Source</th>
+                  <th className="px-3 py-2.5 text-center">Year</th>
+                  <th className="px-3 py-2.5 text-center">Month</th>
+                  <th className="px-3 py-2.5 text-center">Week</th>
+                  <th className="px-3 py-2.5 text-center">Day</th>
+                  <th className="px-3 py-2.5 text-center">W/HR</th>
+                  <th className="px-3 py-2.5 text-center">Efficiency</th>
+                  <th className="px-3 py-2.5 text-center">Operator</th>
+                  <th className="px-3 py-2.5 text-center">Absenteeism</th>
+                  <th className="px-3 py-2.5 text-center">Total Absent</th>
+                  <th className="px-3 py-2.5 text-center">Total Operator</th>
+                  <th className="px-3 py-2.5 text-right">Available Min</th>
+                  <th className="px-3 py-2.5 text-right">Capacity Min</th>
+                  <th className="px-3 py-2.5 text-right">AVG SMV</th>
+                  <th className="px-3 py-2.5 text-center w-20">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredMonthlyCapacities.map((rec, idx) => (
-                  <tr key={rec.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/40 text-slate-700 dark:text-slate-350 font-bold border-b border-slate-100 dark:border-slate-800">
-                    <td className="px-3 py-3 text-center">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${rec.status === "Approved" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/15" : "bg-amber-500/10 text-amber-600 border border-amber-500/15"}`}>{rec.status}</span>
+                  <tr key={rec.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/40 text-slate-700 dark:text-slate-350 font-bold border-b border-slate-100 dark:border-slate-800 text-center">
+                    <td className="px-3 py-2.5 text-center">
+                      <span className={`px-2 py-0.5 rounded text-[9px] font-extrabold uppercase ${rec.status === "Approved" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/15" : "bg-amber-500/10 text-amber-600 border border-amber-500/15"}`}>{rec.status}</span>
                     </td>
-                    <td className="px-3 py-3 text-center text-slate-400 font-normal">{idx+1}</td>
-                    <td className="px-3 py-3 text-center font-mono">{rec.year}</td>
-                    <td className="px-3 py-3 text-center text-slate-900 dark:text-white">{rec.month}</td>
-                    <td className="px-3 py-3 text-right font-mono">{rec.machine}</td>
-                    <td className="px-3 py-3 text-center font-mono">{rec.whour}</td>
-                    <td className="px-3 py-3 text-right font-mono text-slate-450">{rec.wmin}</td>
-                    <td className="px-3 py-3 text-right font-mono text-slate-500">{rec.smv.toFixed(1)}</td>
-                    <td className="px-3 py-3 text-center font-mono">{rec.totalLines}</td>
-                    <td className="px-3 py-3 text-right font-mono text-blue-500">{rec.capacityPct}%</td>
-                    <td className="px-3 py-3 text-right font-mono text-slate-900 dark:text-white">{rec.oneDayCapacity.toLocaleString()}</td>
-                    <td className="px-3 py-3 text-center font-mono text-slate-900 dark:text-white">{rec.wday}</td>
-                    <td className="px-3 py-3 text-right font-mono text-teal-600 dark:text-teal-400">{rec.totalCapacity.toLocaleString()} Pcs</td>
-                    <td className="px-3 py-3 text-center">
+                    <td className="px-3 py-2.5 text-center text-slate-400 font-normal">{idx+1}</td>
+                    <td className="px-3 py-2.5 text-left text-slate-900 dark:text-white">{rec.capacitySource}</td>
+                    <td className="px-3 py-2.5 font-mono">{rec.year}</td>
+                    <td className="px-3 py-2.5 text-slate-900 dark:text-white">{rec.month}</td>
+                    <td className="px-3 py-2.5 text-slate-900 dark:text-white">{rec.week}</td>
+                    <td className="px-3 py-2.5 font-mono">{rec.day}</td>
+                    <td className="px-3 py-2.5 font-mono">{rec.whour}</td>
+                    <td className="px-3 py-2.5 font-mono text-blue-500">{rec.efficiency}%</td>
+                    <td className="px-3 py-2.5 font-mono">{rec.operator}</td>
+                    <td className="px-3 py-2.5 font-mono text-amber-600">{rec.absenteeism}%</td>
+                    <td className="px-3 py-2.5 font-mono text-rose-500">{rec.totalAbsent}</td>
+                    <td className="px-3 py-2.5 font-mono text-emerald-600">{rec.totalOperator}</td>
+                    <td className="px-3 py-2.5 text-right font-mono text-slate-600 dark:text-slate-400">{rec.availableMinute.toLocaleString()}</td>
+                    <td className="px-3 py-2.5 text-right font-mono text-teal-600 dark:text-teal-400">{rec.capacityInMinute.toLocaleString()}</td>
+                    <td className="px-3 py-2.5 text-right font-mono text-indigo-500">{rec.smv.toFixed(1)}</td>
+                    <td className="px-3 py-2.5 text-center">
                       <div className="flex items-center justify-center gap-1">
                         <button onClick={() => handleEditMonthlyCapacity(rec)} className="size-6 rounded bg-amber-500/10 border border-amber-500/15 text-amber-600 flex items-center justify-center hover:bg-amber-55 cursor-pointer"><Edit2 size={11} /></button>
                         <button onClick={() => handleDeleteMonthlyCapacity(rec.id)} className="size-6 rounded bg-rose-500/10 border border-rose-500/15 text-rose-600 flex items-center justify-center hover:bg-rose-55 cursor-pointer"><Trash2 size={11} /></button>
@@ -372,28 +358,193 @@ function MonthlyCapacityPage() {
 
         {/* Modal Monthly Capacity */}
         {isMonthlyModalOpen && (
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg shadow-2xl overflow-hidden relative">
-              <div className="absolute top-0 inset-x-0 h-[3.5px] bg-gradient-to-r from-teal-500 to-emerald-600" />
-              <div className="p-5 border-b border-slate-100 dark:border-slate-800">
-                <h3 className="text-xs font-black uppercase text-slate-950 dark:text-white">{editMonthlyId ? "Edit Monthly Capacity Setup" : "Setup New Monthly Capacity"}</h3>
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-slate-900 w-full max-w-7xl shadow-2xl overflow-hidden rounded-2xl animate-in zoom-in duration-200 border-l-4 border-l-blue-500 flex flex-col p-6">
+              
+              {/* Modal Header */}
+              <div className="flex items-center justify-between pb-4">
+                <span className="text-sm font-black uppercase text-slate-800 dark:text-white tracking-wider">
+                  {editMonthlyId ? "Edit Monthly Capacity Setup" : "Setup New Monthly Capacity"}
+                </span>
+                <button onClick={() => setIsMonthlyModalOpen(false)} className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                  <X size={20} />
+                </button>
               </div>
-              <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5"><label className="text-[11px] font-bold text-slate-600">Status</label><select value={monthlyStatus} onChange={(e)=>setMonthlyStatus(e.target.value as any)} className="w-full text-xs font-bold px-3 py-2 bg-slate-50 dark:bg-slate-955 border border-slate-200 rounded-lg text-slate-800"><option value="Approved">Approved</option><option value="Pending">Pending</option></select></div>
-                  <div className="space-y-1.5"><label className="text-[11px] font-bold text-slate-600">Year</label><select value={monthlyYear} onChange={(e)=>setMonthlyYear(Number(e.target.value))} className="w-full text-xs font-bold px-3 py-2 bg-slate-50 dark:bg-slate-955 border border-slate-200 rounded-lg text-slate-800"><option value={2024}>2024</option><option value={2026}>2026</option></select></div>
-                  <div className="space-y-1.5"><label className="text-[11px] font-bold text-slate-600">Month</label><select value={monthlyMonth} onChange={(e)=>setMonthlyMonth(e.target.value)} className="w-full text-xs font-bold px-3 py-2 bg-slate-50 dark:bg-slate-955 border border-slate-200 rounded-lg text-slate-800">{MONTHS_LIST.map(m=>(<option key={m} value={m}>{m}</option>))}</select></div>
-                  <div className="space-y-1.5"><label className="text-[11px] font-bold text-slate-600">Total Machines</label><input type="number" value={monthlyMachine} onChange={(e)=>setMonthlyMachine(Number(e.target.value))} className="w-full text-xs font-bold px-3 py-2 bg-slate-50 dark:bg-slate-955 border border-slate-200 rounded-lg text-slate-800" /></div>
-                  <div className="space-y-1.5"><label className="text-[11px] font-bold text-slate-600">Working Hours</label><input type="number" value={monthlyWHour} onChange={(e)=>setMonthlyWHour(Number(e.target.value))} className="w-full text-xs font-bold px-3 py-2 bg-slate-50 dark:bg-slate-955 border border-slate-200 rounded-lg text-slate-800" /></div>
-                  <div className="space-y-1.5"><label className="text-[11px] font-bold text-slate-600">Average SMV</label><input type="number" step="0.1" value={monthlySMV} onChange={(e)=>setMonthlySMV(Number(e.target.value))} className="w-full text-xs font-bold px-3 py-2 bg-slate-50 dark:bg-slate-955 border border-slate-200 rounded-lg text-slate-800" /></div>
-                  <div className="space-y-1.5"><label className="text-[11px] font-bold text-slate-600">Total Lines</label><input type="number" value={monthlyTotalLines} onChange={(e)=>setMonthlyTotalLines(Number(e.target.value))} className="w-full text-xs font-bold px-3 py-2 bg-slate-50 dark:bg-slate-955 border border-slate-200 rounded-lg text-slate-800" /></div>
-                  <div className="space-y-1.5"><label className="text-[11px] font-bold text-slate-600">Target Capacity (%)</label><input type="number" value={monthlyCapacityPct} onChange={(e)=>setMonthlyCapacityPct(Number(e.target.value))} className="w-full text-xs font-bold px-3 py-2 bg-slate-50 dark:bg-slate-955 border border-slate-200 rounded-lg text-slate-800" /></div>
-                  <div className="space-y-1.5"><label className="text-[11px] font-bold text-slate-600">WDay</label><input type="number" value={monthlyWDay} onChange={(e)=>setMonthlyWDay(Number(e.target.value))} className="w-full text-xs font-bold px-3 py-2 bg-slate-50 dark:bg-slate-955 border border-slate-200 rounded-lg text-slate-800" /></div>
+
+              {/* Modal Body */}
+              <div className="space-y-6">
+                
+                {/* Row 1: Capacity Source, Year, Month, AVG SMV */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Capacity Source</label>
+                    <div className="relative">
+                      <select
+                        value={monthlyCapacitySource}
+                        onChange={(e) => setMonthlyCapacitySource(e.target.value)}
+                        className="w-full text-xs font-bold py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors appearance-none pr-8 cursor-pointer"
+                      >
+                        <option value="PKCL">PKCL</option>
+                        <option value="Factory A">Factory A</option>
+                        <option value="Factory B">Factory B</option>
+                      </select>
+                      <ChevronDown className="absolute right-1.5 top-2 size-4 text-slate-500 pointer-events-none" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Year</label>
+                    <div className="relative">
+                      <select
+                        value={monthlyYear}
+                        onChange={(e) => setMonthlyYear(Number(e.target.value))}
+                        className="w-full text-xs font-bold py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors appearance-none pr-8 cursor-pointer"
+                      >
+                        <option value={2026}>2026</option>
+                        <option value={2027}>2027</option>
+                      </select>
+                      <ChevronDown className="absolute right-1.5 top-2 size-4 text-slate-500 pointer-events-none" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Month</label>
+                    <div className="relative">
+                      <select
+                        value={monthlyMonth}
+                        onChange={(e) => setMonthlyMonth(e.target.value)}
+                        className="w-full text-xs font-bold py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors appearance-none pr-8 cursor-pointer"
+                      >
+                        {MONTHS_LIST.map((m) => (
+                          <option key={m} value={m}>{m}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-1.5 top-2 size-4 text-slate-500 pointer-events-none" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">AVG SMV <span className="text-rose-500">*</span></label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={monthlySMV}
+                      onChange={(e) => setMonthlySMV(Number(e.target.value))}
+                      className="w-full text-xs py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors font-bold"
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-2">
-                <button onClick={()=>setIsMonthlyModalOpen(false)} className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800">Close</button>
-                <button onClick={handleSaveMonthlyCapacity} className="px-5 py-2 bg-teal-500 hover:bg-teal-600 text-white font-extrabold text-xs rounded-xl shadow-xs transition duration-150 cursor-pointer">Save Configuration</button>
+
+                {/* Row 2: Week, Day, W/HR, Efficiency(%), Operator, Absenteeism(%) */}
+                <div className="grid grid-cols-1 md:grid-cols-6 gap-8">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Week</label>
+                    <div className="relative">
+                      <select
+                        value={monthlyWeek}
+                        onChange={(e) => setMonthlyWeek(e.target.value)}
+                        className="w-full text-xs font-bold py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors appearance-none pr-8 cursor-pointer"
+                      >
+                        <option value="1st Week">1st Week</option>
+                        <option value="2nd Week">2nd Week</option>
+                        <option value="3rd Week">3rd Week</option>
+                        <option value="4th Week">4th Week</option>
+                        <option value="5th Week">5th Week</option>
+                      </select>
+                      <ChevronDown className="absolute right-1.5 top-2 size-4 text-slate-500 pointer-events-none" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Day</label>
+                    <input
+                      type="number"
+                      value={monthlyDay}
+                      onChange={(e) => setMonthlyDay(Number(e.target.value))}
+                      className="w-full text-xs py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">W/HR</label>
+                    <input
+                      type="number"
+                      value={monthlyWHour}
+                      onChange={(e) => setMonthlyWHour(Number(e.target.value))}
+                      className="w-full text-xs py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Efficiency(%)</label>
+                    <input
+                      type="number"
+                      value={monthlyEfficiency}
+                      onChange={(e) => setMonthlyEfficiency(Number(e.target.value))}
+                      className="w-full text-xs py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Operator</label>
+                    <input
+                      type="number"
+                      value={monthlyOperator}
+                      onChange={(e) => setMonthlyOperator(Number(e.target.value))}
+                      className="w-full text-xs py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Absenteeism(%)</label>
+                    <input
+                      type="number"
+                      value={monthlyAbsenteeism}
+                      onChange={(e) => setMonthlyAbsenteeism(Number(e.target.value))}
+                      className="w-full text-xs py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors font-bold"
+                    />
+                  </div>
+                </div>
+
+                {/* Row 3: Total Absent, Total Operator*, Available Minute*, Capacity In Minute*, SAVE button */}
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-8 items-end">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Total Absent</label>
+                    <input
+                      type="number"
+                      readOnly
+                      value={calculatedValues.totalAbsent}
+                      className="w-full text-xs px-3 py-2 bg-[#f8f9fa] dark:bg-slate-900 border-b border-slate-300 dark:border-slate-700 text-slate-750 font-bold focus:outline-none rounded-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Total Operator <span className="text-rose-500">*</span></label>
+                    <input
+                      type="number"
+                      readOnly
+                      value={calculatedValues.totalOperator}
+                      className="w-full text-xs px-3 py-2 bg-[#f8f9fa] dark:bg-slate-900 border-b border-slate-300 dark:border-slate-700 text-slate-750 font-bold focus:outline-none rounded-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Available Minute <span className="text-rose-500">*</span></label>
+                    <input
+                      type="text"
+                      readOnly
+                      value={calculatedValues.availableMinute.toLocaleString()}
+                      className="w-full text-xs px-3 py-2 bg-[#f8f9fa] dark:bg-slate-900 border-b border-slate-300 dark:border-slate-700 text-slate-750 font-bold focus:outline-none rounded-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Capacity In Minute <span className="text-rose-500">*</span></label>
+                    <input
+                      type="text"
+                      readOnly
+                      value={calculatedValues.capacityInMinute.toLocaleString()}
+                      className="w-full text-xs px-3 py-2 bg-[#f8f9fa] dark:bg-slate-900 border-b border-slate-300 dark:border-slate-700 text-slate-750 font-bold focus:outline-none rounded-xs"
+                    />
+                  </div>
+                  <div className="flex justify-end pb-0.5">
+                    <button
+                      onClick={handleSaveMonthlyCapacity}
+                      className="h-9 px-6 bg-[#70b23b] hover:bg-[#609a32] text-white font-extrabold text-xs uppercase flex items-center justify-center gap-2 rounded-lg shadow-md transition-all cursor-pointer tracking-wider"
+                    >
+                      <Save size={14} /> SAVE
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

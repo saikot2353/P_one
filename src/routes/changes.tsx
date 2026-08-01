@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v82");
+    const saved = localStorage.getItem("system_changes_v91");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -717,6 +717,96 @@ function ChangesPage() {
           link: "/merchandising-master-settings",
           descriptionEn: "Implemented Yarn PO Settings custom configuration page, with custom dropdown fields for Company Name and Action parameter (Ceiling/Floor/Round/None), Nearest Value and CompareValue Value input controls, custom add/edit modals, and Excel/Print/PDF export functionalities.",
           descriptionBn: "Yarn PO Settings-এর জন্য কাস্টম কনফিগারেশন পেজ ইমপ্লিমেন্ট করা হয়েছে, যার মধ্যে Company Name এবং Action প্যারামিটার (Ceiling/Floor/Round/None)-এর জন্য ড্রপডাউন ফিল্ড, Nearest Value এবং CompareValue Value-এর জন্য ইনপুট কন্ট্রোল, কাস্টম মোডাল এবং এক্সপোর্ট অ্যাকশন যুক্ত করা হয়েছে।",
+        },
+        {
+          id: "78",
+          date: "2026-08-01T15:15",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Removed the top 'RMG Master Database & Parameters' header banner block from the Merchandising Master Settings workspace to streamline the interface.",
+          descriptionBn: "মার্চেন্ডাইজিং মাস্টার সেটিংস ওয়ার্কস্পেসের শীর্ষদেশ থেকে 'RMG Master Database & Parameters' হেডার ব্যানারটি অপসারন করা হয়েছে, যাতে ইন্টারফেসটি আরও পরিচ্ছন্ন ও সুন্দর দেখায়।",
+        },
+        {
+          id: "79",
+          date: "2026-08-01T15:20",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Implemented Garment & Fabric Color and Print/Color Type custom settings pages with datasets matching reference screenshots, custom add/edit dialog modals, and integrated their modals with the floating action plus button.",
+          descriptionBn: "Garment & Fabric Color এবং Print/Color Type-এর কাস্টম সেটিংস পেজসমূহ ইমপ্লিমেন্ট করা হয়েছে, যার মধ্যে কাস্টম অ্যাড/এডিট মোডাল, ফ্লোটিং প্লাস বাটন ও এক্সপোর্ট অ্যাকশন যুক্ত করা হয়েছে।",
+        },
+        {
+          id: "80",
+          date: "2026-08-01T15:25",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Implemented Print/Embroidery/Wash Type (Special Cost) configuration page, featuring main parameters, sub-modals, a floating plus action button, and a nested 'Rat Chart Information' interactive modal.",
+          descriptionBn: "Print/Embroidery/Wash Type-এর জন্য কাস্টম কনফিগারেশন পেজ এবং রেট চার্ট সাব-সিস্টেম ইমপ্লিমেন্ট করা হয়েছে, যার মধ্যে কাস্টম অ্যাড/এডিট মোডাল এবং ইন্টারেক্টিভ রেট চার্ট টেবিল যুক্ত করা হয়েছে।",
+        },
+        {
+          id: "81",
+          date: "2026-08-01T15:30",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Implemented AOP Process configuration page featuring initial dataset matching reference screenshots ('Discharge Print', 'Pigment Print'), custom Add New/Update AopProcess modal dialogs, and integrated floating action plus button.",
+          descriptionBn: "AOP Process-এর কাস্টম সেটিংস পেজ ইমপ্লিমেন্ট করা হয়েছে, যার মধ্যে রেফারেন্স স্ক্রিনশটের অনুকরণে ড্যাটা সেট, 'Add New AopProcess' মোডাল এবং ফ্লোটিং প্লাস বাটন ইন্টিগ্রেট করা হয়েছে।",
+        },
+        {
+          id: "82",
+          date: "2026-08-01T15:35",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Implemented Additional Cost Entry custom configuration page featuring pre-populated financial/commission/commercial datasets, custom edit modal dialog, and floating action button.",
+          descriptionBn: "Additional Cost Entry সেটিংস পেজ ইমপ্লিমেন্ট করা হয়েছে, যার মধ্যে ফিন্যান্সিয়াল, কমিশন ও কমার্শিয়াল ড্যাটা সেট, এডিট মোডাল এবং ফ্লোটিং প্লাস বাটন যুক্ত করা হয়েছে।",
+        },
+        {
+          id: "83",
+          date: "2026-08-01T15:38",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Implemented RMG Process Loss custom configuration page with comprehensive parameters (Garment types dropdown, Order qty ranges, Cutting/Print/EMB/Sewing/Wash/Finishing percentages), custom Add New/Update modal dialog, and light blue table styling matching reference screenshots.",
+          descriptionBn: "RMG Process Loss কাস্টম কনফিগারেশন পেজ ইমপ্লিমেন্ট করা হয়েছে, যার মধ্যে সকল প্যারামিটার সম্বলিত অ্যাড/এডিট মোডাল এবং রেফারেন্স অনুযায়ী লাইট ব্লু টেবিল ডিসপ্লে যুক্ত করা হয়েছে।",
+        },
+        {
+          id: "84",
+          date: "2026-08-01T15:42",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Implemented Quality Label custom configuration page with pre-populated 'AQL Standard' entry, custom create/edit modal labeled 'Create New Country' matching reference design, and floating action button integration.",
+          descriptionBn: "Quality Label কাস্টম পেজ ইমপ্লিমেন্ট করা হয়েছে, যার মধ্যে রেফারেন্স অনুযায়ী এডিট/ক্রিয়েট মোডাল ও ফ্লোটিং প্লাস বাটন ইন্টিগ্রেট করা হয়েছে।",
+        },
+        {
+          id: "85",
+          date: "2026-08-01T15:46",
+          type: "Modify",
+          module: "Monthly Capacity Planning",
+          link: "/merchandising-monthly-capacity",
+          descriptionEn: "Updated the Setup New Monthly Capacity modal dialog layout to match reference screenshot design exactly, including a left blue accent border card, horizontal grid alignment across three rows, real-time formula calculations for operators and minutes, and underline styled input fields.",
+          descriptionBn: "Setup New Monthly Capacity ফর্মের লেআউট ও ডিজাইন রেফারেন্স স্ক্রিনশট অনুযায়ী কাস্টমাইজ করা হয়েছে এবং রিয়েল-টাইম ফর্মুলা ক্যালকুলেশন যুক্ত করা হয়েছে।",
+        },
+        {
+          id: "86",
+          date: "2026-08-01T15:52",
+          type: "Modify",
+          module: "Company Setup",
+          link: "/company-setup",
+          descriptionEn: "Added a new 'Default Holiday Setup' tab inside Company Setup, including initial Friday/Saturday weekend history data, list ledger with calendar badges, search filtering, and CRUD operations modal featuring datepicker and MultiSelect days.",
+          descriptionBn: "Company Setup এ একটি নতুন 'Default Holiday Setup' ট্যাব যুক্ত করা হয়েছে, যার মধ্যে ইতিহাস তালিকা, ক্যালেন্ডার ব্যাজসহ ফিল্টারিং সার্চ এবং অ্যাড/এডিট মোডাল তৈরি করা হয়েছে।",
+        },
+        {
+          id: "87",
+          date: "2026-08-01T15:56",
+          type: "Modify",
+          module: "Company Setup",
+          link: "/company-setup",
+          descriptionEn: "Removed edit and delete actions from the Default Holiday Setup list to treat it strictly as a historical track of weekend configurations, and added status indicators (Active, Upcoming, Archived) for all setup records.",
+          descriptionBn: "ডিফল্ট হলিডে সেটআপ লিস্ট থেকে এডিট ও ডিলিট অ্যাকশন বাদ দেওয়া হয়েছে যাতে এটি সাপ্তাহিক ছুটির পরিবর্তনের ইতিহাস (হিস্ট্রি ট্র্যাক) হিসেবে কাজ করে এবং প্রতিটি রেকর্ডের জন্য স্ট্যাটাস ইন্ডিকেটর (Active, Upcoming, Archived) যোগ করা হয়েছে।",
         },
       ]);
     }

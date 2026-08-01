@@ -23,6 +23,7 @@ import {
   GripVertical,
   Settings,
   Coins,
+  Calendar,
 } from "lucide-react";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { MultiSelect } from "@/components/ui/multi-select";
@@ -42,10 +43,18 @@ export const Route = createFileRoute("/company-setup")({
   component: CompanySetupPage,
 });
 
-type TabType = "department" | "section" | "unit" | "line";
+type TabType = "company" | "area" | "mapping" | "department" | "section" | "unit" | "line" | "holiday";
 
 // ----------------------------------------------------
 // Interfaces
+// ----------------------------------------------------
+interface DefaultHoliday {
+  sl: number;
+  year: number;
+  effectiveDate: string;
+  days: string[];
+  remarks: string;
+}
 // ----------------------------------------------------
 interface Organization {
   sl: number;
@@ -1363,6 +1372,23 @@ const DEFAULT_COMPANY_SETTINGS: CompanyBasicSettings = {
   halfLeave: "No",
 };
 
+const DEFAULT_HOLIDAYS: DefaultHoliday[] = [
+  {
+    sl: 1,
+    year: 2024,
+    effectiveDate: "2024-07-15",
+    days: ["Friday"],
+    remarks: "Initial configuration: Friday as default weekly holiday",
+  },
+  {
+    sl: 2,
+    year: 2026,
+    effectiveDate: "2026-07-01",
+    days: ["Friday", "Saturday"],
+    remarks: "Updated weekend schedule: Friday & Saturday as default weekly holidays",
+  },
+];
+
 function CompanySetupPage() {
   const [activeTab, setActiveTab] = useState<TabType>("department");
   const [searchQuery, setSearchQuery] = useState("");
@@ -1376,6 +1402,13 @@ function CompanySetupPage() {
   const [sections, setSections] = useState<Section[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
   const [lines, setLines] = useState<Line[]>([]);
+  const [holidays, setHolidays] = useState<DefaultHoliday[]>([]);
+
+  // Form states - Holiday
+  const [holidayYear, setHolidayYear] = useState<number>(2026);
+  const [holidayEffectiveDate, setHolidayEffectiveDate] = useState("");
+  const [holidayDays, setHolidayDays] = useState<string[]>([]);
+  const [holidayRemarks, setHolidayRemarks] = useState("");
 
   // Designation assignment state
   const [deptDesignations, setDeptDesignations] = useState<Record<number, string[]>>({});
@@ -1398,7 +1431,7 @@ function CompanySetupPage() {
       const tabParam = params.get("tab") as TabType;
       if (
         tabParam &&
-        ["company", "area", "mapping", "department", "section", "unit", "line"].includes(tabParam)
+        ["company", "area", "mapping", "department", "section", "unit", "line", "holiday"].includes(tabParam)
       ) {
         setActiveTab(tabParam);
       }
@@ -1462,6 +1495,11 @@ function CompanySetupPage() {
     const linesData = assignDefaultCompany(safeParse("hris_lines", DEFAULT_LINES));
     setLines(linesData);
     localStorage.setItem("hris_lines", JSON.stringify(linesData));
+
+    // Default Holidays
+    const holidaysData = safeParse("hris_default_holidays", DEFAULT_HOLIDAYS);
+    setHolidays(holidaysData);
+    localStorage.setItem("hris_default_holidays", JSON.stringify(holidaysData));
 
     // Load Department Designations
     const deptDesignationsData = localStorage.getItem("hris_dept_designations");
@@ -1604,6 +1642,12 @@ function CompanySetupPage() {
       setLineSort(item?.sortOrder || lines.length + 1);
       setLineIsActive(item?.isActive || "Active");
       setFormSelectedCompanies(item?.companyName ? [item.companyName] : []);
+    } else if (activeTab === "holiday") {
+      const item = holidays.find((h) => h.sl === sl);
+      setHolidayYear(item?.year || 2026);
+      setHolidayEffectiveDate(item?.effectiveDate || "");
+      setHolidayDays(item?.days || []);
+      setHolidayRemarks(item?.remarks || "");
     }
     setIsFormOpen(true);
   };
@@ -1641,6 +1685,10 @@ function CompanySetupPage() {
       const updated = lines.filter((l) => l.sl !== sl).map((l, idx) => ({ ...l, sl: idx + 1 }));
       setLines(updated);
       localStorage.setItem("hris_lines", JSON.stringify(updated));
+    } else if (activeTab === "holiday") {
+      const updated = holidays.filter((h) => h.sl !== sl).map((h, idx) => ({ ...h, sl: idx + 1 }));
+      setHolidays(updated);
+      localStorage.setItem("hris_default_holidays", JSON.stringify(updated));
     }
     toast.success("Deleted successfully");
   };
@@ -1959,6 +2007,40 @@ function CompanySetupPage() {
       }
       setLines(nextList);
       localStorage.setItem("hris_lines", JSON.stringify(nextList));
+    } else if (activeTab === "holiday") {
+      if (!holidayEffectiveDate) {
+        toast.error("Effective date is required.");
+        return;
+      }
+      if (holidayDays.length === 0) {
+        toast.error("Please select at least one holiday day.");
+        return;
+      }
+      let nextList = [...holidays];
+      if (editSl !== null) {
+        nextList = holidays.map((h) =>
+          h.sl === editSl
+            ? {
+                ...h,
+                year: Number(holidayYear),
+                effectiveDate: holidayEffectiveDate,
+                days: holidayDays,
+                remarks: holidayRemarks,
+              }
+            : h
+        );
+      } else {
+        const sl = nextList.length > 0 ? Math.max(...nextList.map((h) => h.sl)) + 1 : 1;
+        nextList.push({
+          sl,
+          year: Number(holidayYear),
+          effectiveDate: holidayEffectiveDate,
+          days: holidayDays,
+          remarks: holidayRemarks,
+        });
+      }
+      setHolidays(nextList);
+      localStorage.setItem("hris_default_holidays", JSON.stringify(nextList));
     }
 
     toast.success("Saved successfully");
@@ -2042,6 +2124,7 @@ function CompanySetupPage() {
     { type: "section", label: "Section", icon: Grid },
     { type: "unit", label: "Unit", icon: Building2 },
     { type: "line", label: "Line", icon: Grid },
+    { type: "holiday", label: "Default Holiday Setup", icon: Calendar },
   ];
 
   return (
@@ -2785,6 +2868,87 @@ function CompanySetupPage() {
                   </tbody>
                 </table>
               )}
+
+              {activeTab === "holiday" && (
+                <table
+                  className="w-full text-left text-xs border-collapse whitespace-nowrap"
+                  style={{ minWidth: "900px" }}
+                >
+                  <thead className="bg-muted/30 text-muted-foreground uppercase font-semibold tracking-wider text-xs border-b border-border/40">
+                    <tr className="bg-transparent">
+                      <th className="sticky left-0 bg-transparent px-5 py-4 w-[60px] text-center border-r border-border/30 z-20">
+                        #
+                      </th>
+                      <th className="px-5 py-4 w-[110px] text-center">Status</th>
+                      <th className="px-5 py-4 w-[100px] text-center">Year</th>
+                      <th className="px-5 py-4 min-w-[200px]">Effective Date</th>
+                      <th className="px-5 py-4 min-w-[250px]">Default Holiday Days</th>
+                      <th className="px-5 py-4 min-w-[300px]">Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/30 text-foreground">
+                    {(() => {
+                      const todayStr = new Date().toISOString().slice(0, 10);
+                      const sortedHolidays = [...holidays].sort((a, b) => b.effectiveDate.localeCompare(a.effectiveDate));
+                      const activeHoliday = sortedHolidays.filter(h => h.effectiveDate <= todayStr)[0];
+
+                      return sortedHolidays
+                        .filter((h) => {
+                          const matchSearch = (h.remarks || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            (h.effectiveDate || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            String(h.year).includes(searchQuery) ||
+                            h.days.some(day => day.toLowerCase().includes(searchQuery.toLowerCase()));
+                          return matchSearch;
+                        })
+                        .map((item, idx) => {
+                          let statusLabel = "Archived";
+                          let statusStyle = "bg-slate-500/10 text-slate-500 border-slate-500/20 dark:border-slate-500/30";
+                          if (activeHoliday && item.sl === activeHoliday.sl) {
+                            statusLabel = "Active";
+                            statusStyle = "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:border-emerald-500/30";
+                          } else if (item.effectiveDate > todayStr) {
+                            statusLabel = "Upcoming";
+                            statusStyle = "bg-blue-500/10 text-blue-600 border-blue-500/20 dark:border-blue-500/30";
+                          }
+
+                          return (
+                            <tr
+                              key={item.sl}
+                              className="group hover:bg-muted/50 transition-all"
+                            >
+                              <td className="sticky left-0 bg-inherit px-5 py-3.5 text-center text-slate-500 font-normal border-r border-border/30 z-10">
+                                {idx + 1}
+                              </td>
+                              <td className="px-5 py-3.5 text-center font-normal">
+                                <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-medium border ${statusStyle}`}>
+                                  {statusLabel}
+                                </span>
+                              </td>
+                              <td className="px-5 py-3.5 text-center font-normal font-mono">
+                                {item.year}
+                              </td>
+                              <td className="px-5 py-3.5 font-normal text-foreground font-semibold">
+                                {item.effectiveDate}
+                              </td>
+                              <td className="px-5 py-3.5 font-normal">
+                                <div className="flex flex-wrap gap-1">
+                                  {item.days.map((d) => (
+                                    <span key={d} className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary border border-primary/15">
+                                      {d}
+                                    </span>
+                                  ))}
+                                </div>
+                              </td>
+                              <td className="px-5 py-3.5 font-normal text-slate-700 dark:text-slate-300 whitespace-normal max-w-sm">
+                                {item.remarks || "—"}
+                              </td>
+                            </tr>
+                          );
+                        });
+                    })()}
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
         </div>
@@ -3390,6 +3554,64 @@ function CompanySetupPage() {
                         <option value="Active">Active</option>
                         <option value="Inactive">Inactive</option>
                       </select>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === "holiday" && (
+                  <div className="space-y-4">
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Year *</label>
+                      <select
+                        value={holidayYear}
+                        onChange={(e) => setHolidayYear(Number(e.target.value))}
+                        className={insetSelectClass}
+                        required
+                      >
+                        <option value={2024}>2024</option>
+                        <option value={2025}>2025</option>
+                        <option value={2026}>2026</option>
+                        <option value={2027}>2027</option>
+                        <option value={2028}>2028</option>
+                        <option value={2029}>2029</option>
+                        <option value={2030}>2030</option>
+                      </select>
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Effective Date *</label>
+                      <input
+                        type="date"
+                        value={holidayEffectiveDate}
+                        onChange={(e) => setHolidayEffectiveDate(e.target.value)}
+                        className={insetInputClass}
+                        required
+                      />
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Default Holidays *</label>
+                      <MultiSelect
+                        options={[
+                          { value: "Saturday", label: "Saturday" },
+                          { value: "Sunday", label: "Sunday" },
+                          { value: "Monday", label: "Monday" },
+                          { value: "Tuesday", label: "Tuesday" },
+                          { value: "Wednesday", label: "Wednesday" },
+                          { value: "Thursday", label: "Thursday" },
+                          { value: "Friday", label: "Friday" },
+                        ]}
+                        selected={holidayDays}
+                        onChange={setHolidayDays}
+                        placeholder="Select holidays..."
+                      />
+                    </div>
+                    <div className={insetWrapperClass}>
+                      <label className={insetLabelClass}>Remarks</label>
+                      <textarea
+                        placeholder="Enter setup details or reasons"
+                        value={holidayRemarks}
+                        onChange={(e) => setHolidayRemarks(e.target.value)}
+                        className={`${insetInputClass} h-20 py-2 resize-none`}
+                      />
                     </div>
                   </div>
                 )}

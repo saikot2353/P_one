@@ -482,6 +482,140 @@ const initialYarnPoSettings: YarnPoSettingSpec[] = [
   { id: "yps-1", companyName: "Pole Star Knit Composite Ltd.", nearestValue: 50, compareValue: 20, action: "Ceiling", status: "Active" }
 ];
 
+interface GmtFabricColorSpec {
+  id: string;
+  name: string;
+  code: string;
+  isActive: "Active" | "Inactive";
+}
+
+const initialGmtFabricColors: GmtFabricColorSpec[] = [
+  { id: "gfc-1", name: "01 White", code: "", isActive: "Active" },
+  { id: "gfc-2", name: "02 OFF White", code: "NULL", isActive: "Active" },
+  { id: "gfc-3", name: "03 Black", code: "", isActive: "Active" },
+  { id: "gfc-4", name: "07 Charcoal Black", code: "", isActive: "Active" },
+  { id: "gfc-5", name: "13 Charcol Grey", code: "NULL", isActive: "Active" },
+  { id: "gfc-6", name: "21 Pink", code: "", isActive: "Active" },
+  { id: "gfc-7", name: "22 Red", code: "", isActive: "Active" },
+  { id: "gfc-8", name: "4252-RED Flame", code: "NULL", isActive: "Active" },
+  { id: "gfc-9", name: "4294-White CAP", code: "NULL", isActive: "Active" },
+  { id: "gfc-10", name: "4294-White CAT", code: "NULL", isActive: "Active" },
+  { id: "gfc-11", name: "4336-Signal", code: "NULL", isActive: "Active" },
+  { id: "gfc-12", name: "4456-Chili Blush", code: "NULL", isActive: "Active" },
+  { id: "gfc-13", name: "4463-Barken", code: "NULL", isActive: "Active" },
+  { id: "gfc-14", name: "4478-Hazel Bloom", code: "NULL", isActive: "Active" },
+  { id: "gfc-15", name: "4493-SISAL", code: "", isActive: "Active" },
+  { id: "gfc-16", name: "4708-JAY Blue", code: "NULL", isActive: "Active" },
+  { id: "gfc-17", name: "4818-Cotton", code: "NULL", isActive: "Active" },
+  { id: "gfc-18", name: "5323-Conifer", code: "NULL", isActive: "Active" },
+  { id: "gfc-19", name: "53-OFF White", code: "NULL", isActive: "Active" },
+  { id: "gfc-20", name: "5815-Late Night", code: "", isActive: "Active" },
+  { id: "gfc-21", name: "5817-Magenta Mose", code: "NULL", isActive: "Active" },
+  { id: "gfc-22", name: "5834-FOREST LEAF", code: "", isActive: "Active" },
+  { id: "gfc-23", name: "59 Oatmeal", code: "", isActive: "Active" },
+  { id: "gfc-24", name: "60 Grege", code: "NULL", isActive: "Active" },
+];
+
+interface FabricPrintColorTypeSpec {
+  id: string;
+  printName: string;
+  isActive: "Active" | "Inactive";
+}
+
+const initialFabricPrintColorTypes: FabricPrintColorTypeSpec[] = [
+  { id: "fpct-1", printName: "AOP", isActive: "Active" },
+  { id: "fpct-2", printName: "N/A", isActive: "Active" },
+  { id: "fpct-3", printName: "Peach Finish", isActive: "Active" },
+  { id: "fpct-4", printName: "Solid", isActive: "Active" },
+  { id: "fpct-5", printName: "YD", isActive: "Active" },
+];
+
+interface SpecialCostRateChart {
+  id: string;
+  rate: number;
+  startDate: string;
+  endDate: string;
+  status: "Active" | "Inactive";
+}
+
+interface SpecialCostSpec {
+  id: string;
+  costType: "Embroidery" | "Print" | "Wash";
+  header: string;
+  sortOrder: number;
+  description: string;
+  maxValuePerUnit: number;
+  ratePerDzn: number;
+  isActive: "Active" | "Inactive";
+  rateCharts: SpecialCostRateChart[];
+}
+
+const initialSpecialCosts: SpecialCostSpec[] = [
+  { id: "sc-1", costType: "Embroidery", header: "Plain", sortOrder: 1, description: "Plain", maxValuePerUnit: 0, ratePerDzn: 3.00, isActive: "Active", rateCharts: [] },
+  { id: "sc-2", costType: "Embroidery", header: "Floral", sortOrder: 1, description: "Floral", maxValuePerUnit: 5, ratePerDzn: 1.50, isActive: "Active", rateCharts: [] },
+  { id: "sc-3", costType: "Embroidery", header: "Tonal", sortOrder: 1, description: "Tonal", maxValuePerUnit: 5, ratePerDzn: 3.00, isActive: "Active", rateCharts: [] },
+  { id: "sc-4", costType: "Embroidery", header: "Chinile", sortOrder: 1, description: "Chinile", maxValuePerUnit: 0.1, ratePerDzn: 1.00, isActive: "Active", rateCharts: [] },
+  { id: "sc-5", costType: "Embroidery", header: "Chain Stech", sortOrder: 1, description: "Chain Stech", maxValuePerUnit: 5, ratePerDzn: 5.00, isActive: "Active", rateCharts: [] },
+  { id: "sc-6", costType: "Print", header: "Rubber Flock", sortOrder: 1, description: "Rubber Flock", maxValuePerUnit: 0.2, ratePerDzn: 1.00, isActive: "Active", rateCharts: [] },
+  { id: "sc-7", costType: "Print", header: "Rubber Foil", sortOrder: 1, description: "Rubber Foil", maxValuePerUnit: 0.2, ratePerDzn: 1.00, isActive: "Active", rateCharts: [] },
+  { id: "sc-8", costType: "Print", header: "Rubber Glitter", sortOrder: 1, description: "Rubber Glitter", maxValuePerUnit: 0, ratePerDzn: 0.00, isActive: "Active", rateCharts: [] },
+  { id: "sc-9", costType: "Print", header: "Pigment", sortOrder: 1, description: "Pigment", maxValuePerUnit: 0.416, ratePerDzn: 5.00, isActive: "Active", rateCharts: [] },
+  { id: "sc-10", costType: "Wash", header: "Garment dyed", sortOrder: 1, description: "Wash", maxValuePerUnit: 0.416, ratePerDzn: 5.00, isActive: "Active", rateCharts: [] },
+];
+
+interface AopProcessSpec {
+  id: string;
+  name: string;
+  isActive: "Active" | "Inactive";
+}
+
+const initialAopProcesses: AopProcessSpec[] = [
+  { id: "aop-1", name: "Discharge Print", isActive: "Active" },
+  { id: "aop-2", name: "Pigment Print", isActive: "Active" }
+];
+
+interface AdditionalCostSpec {
+  id: string;
+  titleName: string;
+  orderNumber: number;
+  status: "Active" | "Inactive";
+}
+
+const initialAdditionalCosts: AdditionalCostSpec[] = [
+  { id: "ac-1", titleName: "Financial Cost (%)", orderNumber: 1, status: "Active" },
+  { id: "ac-2", titleName: "Commission(%)", orderNumber: 2, status: "Active" },
+  { id: "ac-3", titleName: "Commercial (%)", orderNumber: 3, status: "Active" },
+];
+
+interface RmgProcessLossSpec {
+  id: string;
+  garmentType: string;
+  effectiveDate: string;
+  orderQtyMin: number;
+  orderQtyMax: number;
+  cuttingPercent: number;
+  printPercent: number;
+  embroideryPercent: number;
+  sewingPercent: number;
+  washPercent: number;
+  finishingPercent: number;
+  isActive: "Active" | "Inactive";
+}
+
+const initialRmgProcessLosses: RmgProcessLossSpec[] = [];
+
+interface QualityLabelSpec {
+  id: string;
+  name: string;
+  isActive: "Active" | "Inactive";
+}
+
+const initialQualityLabels: QualityLabelSpec[] = [
+  { id: "ql-1", name: "AQL Standard", isActive: "Active" }
+];
+
+
+
 
 // ── Fabric Composition, Dyeing, Finishing, Shade Range Types & Data ─────
 interface FabricCompositionSpec {
@@ -651,6 +785,7 @@ import {
   Globe,
   DollarSign,
   FileText,
+  List,
   AlertTriangle,
   Ruler,
   Calculator,
@@ -2043,6 +2178,431 @@ function MerchandisingMasterSettingsPage() {
     toast.success("Yarn PO Setting deleted successfully!");
   };
 
+  // Garment & Fabric Color States
+  const [gmtFabricColors, setGmtFabricColors] = useState<GmtFabricColorSpec[]>(initialGmtFabricColors);
+  const [gmtFabricColorModal, setGmtFabricColorModal] = useState<{ open: boolean; item?: GmtFabricColorSpec }>({ open: false });
+  const [gmtFabricColorForm, setGmtFabricColorForm] = useState<Partial<GmtFabricColorSpec>>({
+    name: "",
+    code: "",
+    isActive: "Active"
+  });
+  const [gmtFabricColorSearch, setGmtFabricColorSearch] = useState("");
+
+  const handleOpenGmtFabricColorModal = (item?: GmtFabricColorSpec) => {
+    if (item) {
+      setGmtFabricColorForm(item);
+      setGmtFabricColorModal({ open: true, item });
+    } else {
+      setGmtFabricColorForm({
+        name: "",
+        code: "",
+        isActive: "Active"
+      });
+      setGmtFabricColorModal({ open: true });
+    }
+  };
+
+  const handleSaveGmtFabricColor = () => {
+    if (!gmtFabricColorForm.name?.trim()) {
+      toast.error("Color Name is required!");
+      return;
+    }
+    if (!gmtFabricColorForm.code?.trim()) {
+      toast.error("Color Code is required!");
+      return;
+    }
+
+    if (gmtFabricColorModal.item) {
+      setGmtFabricColors(prev => prev.map(c => c.id === gmtFabricColorModal.item!.id ? { ...c, ...gmtFabricColorForm } as GmtFabricColorSpec : c));
+      toast.success("Color updated successfully!");
+    } else {
+      const newId = `gfc-${Date.now()}`;
+      setGmtFabricColors(prev => [...prev, { ...gmtFabricColorForm, id: newId } as GmtFabricColorSpec]);
+      toast.success("Color created successfully!");
+    }
+    setGmtFabricColorModal({ open: false });
+  };
+
+  const handleDeleteGmtFabricColor = (id: string) => {
+    setGmtFabricColors(prev => prev.filter(c => c.id !== id));
+    toast.success("Color deleted successfully!");
+  };
+
+  // Fabric Print Color Type States
+  const [fabricPrintColorTypes, setFabricPrintColorTypes] = useState<FabricPrintColorTypeSpec[]>(initialFabricPrintColorTypes);
+  const [fabricPrintColorTypeModal, setFabricPrintColorTypeModal] = useState<{ open: boolean; item?: FabricPrintColorTypeSpec }>({ open: false });
+  const [fabricPrintColorTypeForm, setFabricPrintColorTypeForm] = useState<Partial<FabricPrintColorTypeSpec>>({
+    printName: "",
+    isActive: "Active"
+  });
+  const [fabricPrintColorTypeSearch, setFabricPrintColorTypeSearch] = useState("");
+
+  const handleOpenFabricPrintColorTypeModal = (item?: FabricPrintColorTypeSpec) => {
+    if (item) {
+      setFabricPrintColorTypeForm(item);
+      setFabricPrintColorTypeModal({ open: true, item });
+    } else {
+      setFabricPrintColorTypeForm({
+        printName: "",
+        isActive: "Active"
+      });
+      setFabricPrintColorTypeModal({ open: true });
+    }
+  };
+
+  const handleSaveFabricPrintColorType = () => {
+    if (!fabricPrintColorTypeForm.printName?.trim()) {
+      toast.error("Print Name is required!");
+      return;
+    }
+
+    if (fabricPrintColorTypeModal.item) {
+      setFabricPrintColorTypes(prev => prev.map(p => p.id === fabricPrintColorTypeModal.item!.id ? { ...p, ...fabricPrintColorTypeForm } as FabricPrintColorTypeSpec : p));
+      toast.success("Print type updated successfully!");
+    } else {
+      const newId = `fpct-${Date.now()}`;
+      setFabricPrintColorTypes(prev => [...prev, { ...fabricPrintColorTypeForm, id: newId } as FabricPrintColorTypeSpec]);
+      toast.success("Print type created successfully!");
+    }
+    setFabricPrintColorTypeModal({ open: false });
+  };
+
+  const handleDeleteFabricPrintColorType = (id: string) => {
+    setFabricPrintColorTypes(prev => prev.filter(p => p.id !== id));
+    toast.success("Print type deleted successfully!");
+  };
+
+  // Special Costs States
+  const [specialCosts, setSpecialCosts] = useState<SpecialCostSpec[]>(initialSpecialCosts);
+  const [specialCostModal, setSpecialCostModal] = useState<{ open: boolean; item?: SpecialCostSpec }>({ open: false });
+  const [specialCostForm, setSpecialCostForm] = useState<Partial<SpecialCostSpec>>({
+    costType: "Embroidery",
+    header: "",
+    sortOrder: 1,
+    description: "",
+    maxValuePerUnit: 0,
+    ratePerDzn: 0,
+    isActive: "Active"
+  });
+  const [specialCostSearch, setSpecialCostSearch] = useState("");
+
+  // Rate Chart Details State (for a selected Special Cost item)
+  const [selectedSpecialCostId, setSelectedSpecialCostId] = useState<string | null>(null);
+  const [rateChartDetailModalOpen, setRateChartDetailModalOpen] = useState(false);
+  const [editingRateChartItem, setEditingRateChartItem] = useState<SpecialCostRateChart | null>(null);
+  const [rateChartForm, setRateChartForm] = useState<Partial<SpecialCostRateChart>>({
+    rate: 0,
+    startDate: "",
+    endDate: "",
+    status: "Active"
+  });
+  const [rateChartSearch, setRateChartSearch] = useState("");
+
+  const handleOpenSpecialCostModal = (item?: SpecialCostSpec) => {
+    if (item) {
+      setSpecialCostForm(item);
+      setSpecialCostModal({ open: true, item });
+    } else {
+      setSpecialCostForm({
+        costType: "Embroidery",
+        header: "",
+        sortOrder: 1,
+        description: "",
+        maxValuePerUnit: 0,
+        ratePerDzn: 0,
+        isActive: "Active"
+      });
+      setSpecialCostModal({ open: true });
+    }
+  };
+
+  const handleSaveSpecialCost = () => {
+    if (!specialCostForm.header?.trim()) {
+      toast.error("Header is required!");
+      return;
+    }
+    if (!specialCostForm.description?.trim()) {
+      toast.error("Description is required!");
+      return;
+    }
+    if (specialCostForm.sortOrder === undefined || isNaN(Number(specialCostForm.sortOrder))) {
+      toast.error("Sort Order is required and must be a number!");
+      return;
+    }
+    if (specialCostForm.maxValuePerUnit === undefined || isNaN(Number(specialCostForm.maxValuePerUnit))) {
+      toast.error("Max Value Per Unit is required!");
+      return;
+    }
+    if (specialCostForm.ratePerDzn === undefined || isNaN(Number(specialCostForm.ratePerDzn))) {
+      toast.error("Rate Per Dzn is required!");
+      return;
+    }
+
+    if (specialCostModal.item) {
+      setSpecialCosts(prev => prev.map(s => s.id === specialCostModal.item!.id ? { ...s, ...specialCostForm } as SpecialCostSpec : s));
+      toast.success("Special Cost updated successfully!");
+    } else {
+      const newId = `sc-${Date.now()}`;
+      setSpecialCosts(prev => [...prev, { ...specialCostForm, id: newId, rateCharts: [] } as SpecialCostSpec]);
+      toast.success("Special Cost created successfully!");
+    }
+    specialCostModal.item && setSelectedSpecialCostId(specialCostModal.item.id);
+    setSpecialCostModal({ open: false });
+  };
+
+  const handleDeleteSpecialCost = (id: string) => {
+    setSpecialCosts(prev => prev.filter(s => s.id !== id));
+    if (selectedSpecialCostId === id) {
+      setSelectedSpecialCostId(null);
+    }
+    toast.success("Special Cost deleted successfully!");
+  };
+
+  // Rate Chart Handlers
+  const handleSaveRateChart = () => {
+    if (!selectedSpecialCostId) return;
+    if (rateChartForm.rate === undefined || isNaN(Number(rateChartForm.rate))) {
+      toast.error("Rate is required and must be a number!");
+      return;
+    }
+    if (!rateChartForm.startDate?.trim()) {
+      toast.error("Start Date is required!");
+      return;
+    }
+    if (!rateChartForm.endDate?.trim()) {
+      toast.error("End Date is required!");
+      return;
+    }
+
+    setSpecialCosts(prev => prev.map(sc => {
+      if (sc.id !== selectedSpecialCostId) return sc;
+      let newCharts = [...sc.rateCharts];
+      if (editingRateChartItem) {
+        newCharts = newCharts.map(rc => rc.id === editingRateChartItem.id ? { ...rc, ...rateChartForm } as SpecialCostRateChart : rc);
+        toast.success("Rate Chart entry updated successfully!");
+      } else {
+        const newId = `rc-${Date.now()}`;
+        newCharts.push({ ...rateChartForm, id: newId } as SpecialCostRateChart);
+        toast.success("Rate Chart entry added successfully!");
+      }
+      return { ...sc, rateCharts: newCharts };
+    }));
+
+    // Reset Form
+    setRateChartForm({
+      rate: 0,
+      startDate: "",
+      endDate: "",
+      status: "Active"
+    });
+    setEditingRateChartItem(null);
+  };
+
+  const handleDeleteRateChart = (rcId: string) => {
+    if (!selectedSpecialCostId) return;
+    setSpecialCosts(prev => prev.map(sc => {
+      if (sc.id !== selectedSpecialCostId) return sc;
+      return { ...sc, rateCharts: sc.rateCharts.filter(rc => rc.id !== rcId) };
+    }));
+    toast.success("Rate Chart entry deleted successfully!");
+  };
+
+  // AOP Process States
+  const [aopProcesses, setAopProcesses] = useState<AopProcessSpec[]>(initialAopProcesses);
+  const [aopProcessModal, setAopProcessModal] = useState<{ open: boolean; item?: AopProcessSpec }>({ open: false });
+  const [aopProcessForm, setAopProcessForm] = useState<Partial<AopProcessSpec>>({
+    name: "",
+    isActive: "Active"
+  });
+  const [aopProcessSearch, setAopProcessSearch] = useState("");
+
+  const handleOpenAopProcessModal = (item?: AopProcessSpec) => {
+    if (item) {
+      setAopProcessForm(item);
+      setAopProcessModal({ open: true, item });
+    } else {
+      setAopProcessForm({
+        name: "",
+        isActive: "Active"
+      });
+      setAopProcessModal({ open: true });
+    }
+  };
+
+  const handleSaveAopProcess = () => {
+    if (!aopProcessForm.name?.trim()) {
+      toast.error("Name is required!");
+      return;
+    }
+
+    if (aopProcessModal.item) {
+      setAopProcesses(prev => prev.map(a => a.id === aopProcessModal.item!.id ? { ...a, ...aopProcessForm } as AopProcessSpec : a));
+      toast.success("AOP Process updated successfully!");
+    } else {
+      const newId = `aop-${Date.now()}`;
+      setAopProcesses(prev => [...prev, { ...aopProcessForm, id: newId } as AopProcessSpec]);
+      toast.success("AOP Process created successfully!");
+    }
+    setAopProcessModal({ open: false });
+  };
+
+  const handleDeleteAopProcess = (id: string) => {
+    setAopProcesses(prev => prev.filter(a => a.id !== id));
+    toast.success("AOP Process deleted successfully!");
+  };
+
+  // Additional Cost States
+  const [additionalCosts, setAdditionalCosts] = useState<AdditionalCostSpec[]>(initialAdditionalCosts);
+  const [additionalCostModal, setAdditionalCostModal] = useState<{ open: boolean; item?: AdditionalCostSpec }>({ open: false });
+  const [additionalCostForm, setAdditionalCostForm] = useState<Partial<AdditionalCostSpec>>({
+    titleName: "",
+    orderNumber: 1,
+    status: "Active"
+  });
+  const [additionalCostSearch, setAdditionalCostSearch] = useState("");
+
+  const handleOpenAdditionalCostModal = (item?: AdditionalCostSpec) => {
+    if (item) {
+      setAdditionalCostForm(item);
+      setAdditionalCostModal({ open: true, item });
+    } else {
+      setAdditionalCostForm({
+        titleName: "",
+        orderNumber: additionalCosts.length + 1,
+        status: "Active"
+      });
+      setAdditionalCostModal({ open: true });
+    }
+  };
+
+  const handleSaveAdditionalCost = () => {
+    if (!additionalCostForm.titleName?.trim()) {
+      toast.error("Title Name is required!");
+      return;
+    }
+
+    if (additionalCostModal.item) {
+      setAdditionalCosts(prev => prev.map(a => a.id === additionalCostModal.item!.id ? { ...a, ...additionalCostForm } as AdditionalCostSpec : a));
+      toast.success("Additional Cost updated successfully!");
+    } else {
+      const newId = `ac-${Date.now()}`;
+      setAdditionalCosts(prev => [...prev, { ...additionalCostForm, id: newId } as AdditionalCostSpec]);
+      toast.success("Additional Cost created successfully!");
+    }
+    setAdditionalCostModal({ open: false });
+  };
+
+  const handleDeleteAdditionalCost = (id: string) => {
+    setAdditionalCosts(prev => prev.filter(a => a.id !== id));
+    toast.success("Additional Cost deleted successfully!");
+  };
+
+  // RMG Process Loss States
+  const [rmgProcessLosses, setRmgProcessLosses] = useState<RmgProcessLossSpec[]>(initialRmgProcessLosses);
+  const [rmgProcessLossModal, setRmgProcessLossModal] = useState<{ open: boolean; item?: RmgProcessLossSpec }>({ open: false });
+  const [rmgProcessLossForm, setRmgProcessLossForm] = useState<Partial<RmgProcessLossSpec>>({
+    garmentType: "Solid Garments",
+    effectiveDate: "",
+    orderQtyMin: undefined,
+    orderQtyMax: undefined,
+    cuttingPercent: undefined,
+    printPercent: undefined,
+    embroideryPercent: undefined,
+    sewingPercent: undefined,
+    washPercent: undefined,
+    finishingPercent: undefined,
+    isActive: "Active"
+  });
+  const [rmgProcessLossSearch, setRmgProcessLossSearch] = useState("");
+
+  const handleOpenRmgProcessLossModal = (item?: RmgProcessLossSpec) => {
+    if (item) {
+      setRmgProcessLossForm(item);
+      setRmgProcessLossModal({ open: true, item });
+    } else {
+      setRmgProcessLossForm({
+        garmentType: "Solid Garments",
+        effectiveDate: new Date().toISOString().split("T")[0],
+        orderQtyMin: undefined,
+        orderQtyMax: undefined,
+        cuttingPercent: undefined,
+        printPercent: undefined,
+        embroideryPercent: undefined,
+        sewingPercent: undefined,
+        washPercent: undefined,
+        finishingPercent: undefined,
+        isActive: "Active"
+      });
+      setRmgProcessLossModal({ open: true });
+    }
+  };
+
+  const handleSaveRmgProcessLoss = () => {
+    if (!rmgProcessLossForm.garmentType) {
+      toast.error("Types of Garments is required!");
+      return;
+    }
+
+    if (rmgProcessLossModal.item) {
+      setRmgProcessLosses(prev => prev.map(r => r.id === rmgProcessLossModal.item!.id ? { ...r, ...rmgProcessLossForm } as RmgProcessLossSpec : r));
+      toast.success("RMG Process Loss updated successfully!");
+    } else {
+      const newId = `rmg-${Date.now()}`;
+      setRmgProcessLosses(prev => [...prev, { ...rmgProcessLossForm, id: newId } as RmgProcessLossSpec]);
+      toast.success("RMG Process Loss created successfully!");
+    }
+    setRmgProcessLossModal({ open: false });
+  };
+
+  const handleDeleteRmgProcessLoss = (id: string) => {
+    setRmgProcessLosses(prev => prev.filter(r => r.id !== id));
+    toast.success("RMG Process Loss deleted successfully!");
+  };
+
+  // Quality Label States
+  const [qualityLabels, setQualityLabels] = useState<QualityLabelSpec[]>(initialQualityLabels);
+  const [qualityLabelModal, setQualityLabelModal] = useState<{ open: boolean; item?: QualityLabelSpec }>({ open: false });
+  const [qualityLabelForm, setQualityLabelForm] = useState<Partial<QualityLabelSpec>>({
+    name: "",
+    isActive: "Active"
+  });
+  const [qualityLabelSearch, setQualityLabelSearch] = useState("");
+
+  const handleOpenQualityLabelModal = (item?: QualityLabelSpec) => {
+    if (item) {
+      setQualityLabelForm(item);
+      setQualityLabelModal({ open: true, item });
+    } else {
+      setQualityLabelForm({
+        name: "",
+        isActive: "Active"
+      });
+      setQualityLabelModal({ open: true });
+    }
+  };
+
+  const handleSaveQualityLabel = () => {
+    if (!qualityLabelForm.name?.trim()) {
+      toast.error("Name is required!");
+      return;
+    }
+
+    if (qualityLabelModal.item) {
+      setQualityLabels(prev => prev.map(q => q.id === qualityLabelModal.item!.id ? { ...q, ...qualityLabelForm } as QualityLabelSpec : q));
+      toast.success("Quality Label updated successfully!");
+    } else {
+      const newId = `ql-${Date.now()}`;
+      setQualityLabels(prev => [...prev, { ...qualityLabelForm, id: newId } as QualityLabelSpec]);
+      toast.success("Quality Label created successfully!");
+    }
+    setQualityLabelModal({ open: false });
+  };
+
+  const handleDeleteQualityLabel = (id: string) => {
+    setQualityLabels(prev => prev.filter(q => q.id !== id));
+    toast.success("Quality Label deleted successfully!");
+  };
+
 
   // Size Group States
   const [sizeGroups, setSizeGroups] = useState<SizeGroupSpec[]>(initialSizeGroups);
@@ -2988,23 +3548,6 @@ function MerchandisingMasterSettingsPage() {
       title="RMG Master Configurations Suite"
     >
       <div className="p-4 md:p-6 lg:p-8 bg-slate-50 dark:bg-slate-950 min-h-full font-sans space-y-6">
-        
-        {/* Header Banner */}
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-              <span className="p-1.5 bg-teal-500/10 text-teal-500 rounded-lg"><Settings className="size-5" /></span>
-              RMG Master Database & Parameters
-            </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Manage global configurations for Buyers, Material Specs, Measurement Parameters, Process Loss, and Financial CPM</p>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold text-teal-600 dark:text-teal-400 bg-teal-500/10 border border-teal-500/20 px-3 py-1.5 rounded-xl">
-              ✓ Merchandising Master DB Live
-            </span>
-          </div>
-        </div>
 
         {/* Search bar */}
         <div className="flex justify-end">
@@ -4183,7 +4726,7 @@ function MerchandisingMasterSettingsPage() {
                     </div>
                   )}
                 </div>
-              ) : ["buyer-name", "fabric-construction", "additional-cost-entry", "rmg-process-loss", "item-department", "gmt-item-name", "body-part", "season", "sample-type", "size-group", "uom", "fabric-gsm", "fabric-nature", "yarn-brand", "yarn-type", "yarn-count", "yarn-po-type", "yarn-po-settings"].includes(searchTab) ? null : (
+              ) : ["buyer-name", "fabric-construction", "additional-cost-entry", "rmg-process-loss", "item-department", "gmt-item-name", "body-part", "season", "sample-type", "size-group", "uom", "fabric-gsm", "fabric-nature", "yarn-brand", "yarn-type", "yarn-count", "yarn-po-type", "yarn-po-settings", "gmt-fabric-color-name", "fabric-print-color-type", "print-emb-wash-special-type", "aop-process", "quality-label"].includes(searchTab) ? null : (
                 renderDynamicMasterDB(searchTab, tabLabel)
               )}
         </div>
@@ -7739,8 +8282,1605 @@ function MerchandisingMasterSettingsPage() {
           </div>
         )}
 
-        {/* Floating Add Button matching the screenshot for Yarn tabs */}
-        {["yarn-brand", "yarn-type", "yarn-count", "yarn-po-type", "yarn-po-settings"].includes(searchTab) && (
+        {/* GARMENT & FABRIC COLOR REGISTRY */}
+        {searchTab === "gmt-fabric-color-name" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Action Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Exported to Excel")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => toast.success("Exported to PDF")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  PDF
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={gmtFabricColorSearch}
+                    onChange={(e) => setGmtFabricColorSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-48 text-slate-800 dark:text-slate-100"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+                <button
+                  onClick={() => handleOpenGmtFabricColorModal()}
+                  className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                >
+                  <Plus size={14} /> Add New
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th className="px-4 py-3 text-center w-20">Actions</th>
+                    <th className="px-4 py-3 text-center w-16">SL</th>
+                    <th className="px-4 py-3">Name</th>
+                    <th className="px-4 py-3">Code</th>
+                    <th className="px-4 py-3 text-center w-24">IsActive</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                  {gmtFabricColors
+                    .filter(c => c.name.toLowerCase().includes(gmtFabricColorSearch.toLowerCase()) || (c.code || "").toLowerCase().includes(gmtFabricColorSearch.toLowerCase()))
+                    .map((c, idx) => (
+                      <tr key={c.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-4 py-2.5 text-center flex items-center justify-center gap-1">
+                          <button
+                            onClick={() => handleOpenGmtFabricColorModal(c)}
+                            className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                            title="Edit"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm("Are you sure you want to delete this color?")) {
+                                handleDeleteGmtFabricColor(c.id);
+                              }
+                            }}
+                            className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition cursor-pointer"
+                            title="Delete"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </td>
+                        <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                        <td className="px-4 py-2.5 text-slate-800 dark:text-slate-200 font-bold">{c.name}</td>
+                        <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">{c.code || "NULL"}</td>
+                        <td className="px-4 py-2.5 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                            c.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
+                          }`}>
+                            {c.isActive}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 1 to {gmtFabricColors.length} of {gmtFabricColors.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2.5 py-1 rounded bg-teal-500 text-white shadow-sm">1</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* Modal */}
+            {gmtFabricColorModal.open && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                  <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider font-bold">
+                      {gmtFabricColorModal.item ? "Update Color Name" : "Add New Color Name"}
+                    </h3>
+                    <button onClick={() => setGmtFabricColorModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 space-y-4">
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Name <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={gmtFabricColorForm.name || ""}
+                        onChange={(e) => setGmtFabricColorForm({ ...gmtFabricColorForm, name: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. 01 White"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Code <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={gmtFabricColorForm.code || ""}
+                        onChange={(e) => setGmtFabricColorForm({ ...gmtFabricColorForm, code: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. #FFFFFF or NULL"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">IsActive <span className="text-rose-500">*</span></label>
+                      <select
+                        value={gmtFabricColorForm.isActive || "Active"}
+                        onChange={(e) => setGmtFabricColorForm({ ...gmtFabricColorForm, isActive: e.target.value as "Active" | "Inactive" })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <button
+                        type="button"
+                        onClick={() => setGmtFabricColorModal({ open: false })}
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        onClick={handleSaveGmtFabricColor}
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        {gmtFabricColorModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* PRINT/COLOR TYPE REGISTRY */}
+        {searchTab === "fabric-print-color-type" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Action Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Exported to Excel")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => toast.success("Exported to PDF")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  PDF
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={fabricPrintColorTypeSearch}
+                    onChange={(e) => setFabricPrintColorTypeSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-48 text-slate-800 dark:text-slate-100"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+                <button
+                  onClick={() => handleOpenFabricPrintColorTypeModal()}
+                  className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                >
+                  <Plus size={14} /> Add New
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th className="px-4 py-3 text-center w-20">Actions</th>
+                    <th className="px-4 py-3 text-center w-16">SL</th>
+                    <th className="px-4 py-3">Print Name</th>
+                    <th className="px-4 py-3 text-center w-24">IsActive</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                  {fabricPrintColorTypes
+                    .filter(p => p.printName.toLowerCase().includes(fabricPrintColorTypeSearch.toLowerCase()))
+                    .map((p, idx) => (
+                      <tr key={p.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-4 py-2.5 text-center flex items-center justify-center gap-1">
+                          <button
+                            onClick={() => handleOpenFabricPrintColorTypeModal(p)}
+                            className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                            title="Edit"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm("Are you sure you want to delete this print type?")) {
+                                handleDeleteFabricPrintColorType(p.id);
+                              }
+                            }}
+                            className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition cursor-pointer"
+                            title="Delete"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </td>
+                        <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                        <td className="px-4 py-2.5 text-slate-800 dark:text-slate-200 font-bold">{p.printName}</td>
+                        <td className="px-4 py-2.5 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                            p.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
+                          }`}>
+                            {p.isActive}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 1 to {fabricPrintColorTypes.length} of {fabricPrintColorTypes.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2.5 py-1 rounded bg-teal-500 text-white shadow-sm">1</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* Modal */}
+            {fabricPrintColorTypeModal.open && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                  <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider font-bold">
+                      {fabricPrintColorTypeModal.item ? "Update Printtype" : "Add New Printtype"}
+                    </h3>
+                    <button onClick={() => setFabricPrintColorTypeModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 space-y-4">
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Print Name <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={fabricPrintColorTypeForm.printName || ""}
+                        onChange={(e) => setFabricPrintColorTypeForm({ ...fabricPrintColorTypeForm, printName: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. AOP"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">IsActive <span className="text-rose-500">*</span></label>
+                      <select
+                        value={fabricPrintColorTypeForm.isActive || "Active"}
+                        onChange={(e) => setFabricPrintColorTypeForm({ ...fabricPrintColorTypeForm, isActive: e.target.value as "Active" | "Inactive" })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <button
+                        type="button"
+                        onClick={() => setFabricPrintColorTypeModal({ open: false })}
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        onClick={handleSaveFabricPrintColorType}
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        {fabricPrintColorTypeModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* PRINT/EMBROIDERY/WASH TYPE REGISTRY */}
+        {searchTab === "print-emb-wash-special-type" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Action Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Exported to Excel")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => toast.success("Exported to PDF")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  PDF
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={specialCostSearch}
+                    onChange={(e) => setSpecialCostSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-48 text-slate-800 dark:text-slate-100"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+                <button
+                  onClick={() => handleOpenSpecialCostModal()}
+                  className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                >
+                  <Plus size={14} /> Add New
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-[#bde0fe] dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-[11px] font-bold border-b border-blue-200 dark:border-slate-700">
+                  <tr>
+                    <th className="px-4 py-2.5 text-center w-24">Actions</th>
+                    <th className="px-4 py-2.5 text-center w-16">SL</th>
+                    <th className="px-4 py-2.5">Type</th>
+                    <th className="px-4 py-2.5">Header</th>
+                    <th className="px-4 py-2.5 text-center w-24">Sort Order</th>
+                    <th className="px-4 py-2.5">Description</th>
+                    <th className="px-4 py-2.5 text-center w-32">Max Value Per Unite</th>
+                    <th className="px-4 py-2.5 text-center w-28">Rate Per Dzn</th>
+                    <th className="px-4 py-2.5 text-center w-24">IsActive</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                  {specialCosts
+                    .filter(s => s.header.toLowerCase().includes(specialCostSearch.toLowerCase()) || s.costType.toLowerCase().includes(specialCostSearch.toLowerCase()) || s.description.toLowerCase().includes(specialCostSearch.toLowerCase()))
+                    .map((s, idx) => (
+                      <tr
+                        key={s.id}
+                        className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
+                      >
+                        <td className="px-4 py-2.5 text-center flex items-center justify-center gap-1.5">
+                          <button
+                            onClick={() => handleOpenSpecialCostModal(s)}
+                            className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                            title="Edit Special Cost"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSelectedSpecialCostId(s.id);
+                              setRateChartDetailModalOpen(true);
+                              setEditingRateChartItem(null);
+                              setRateChartForm({
+                                rate: 0,
+                                startDate: "",
+                                endDate: "",
+                                status: "Active"
+                              });
+                            }}
+                            className="p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-500/10 rounded transition cursor-pointer"
+                            title="Rat Chart Information"
+                          >
+                            <List size={13} />
+                          </button>
+                        </td>
+                        <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                        <td className="px-4 py-2.5 font-bold text-slate-800 dark:text-slate-200">{s.costType}</td>
+                        <td className="px-4 py-2.5 font-bold text-slate-800 dark:text-slate-200">{s.header}</td>
+                        <td className="px-4 py-2.5 text-center text-slate-500">{s.sortOrder}</td>
+                        <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{s.description}</td>
+                        <td className="px-4 py-2.5 text-center text-slate-700 dark:text-slate-350">{s.maxValuePerUnit}</td>
+                        <td className="px-4 py-2.5 text-center text-slate-700 dark:text-slate-350">{Number(s.ratePerDzn).toFixed(2)}</td>
+                        <td className="px-4 py-2.5 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                            s.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
+                          }`}>
+                            {s.isActive}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 1 to {specialCosts.length} of {specialCosts.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2.5 py-1 rounded bg-teal-500 text-white shadow-sm">1</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* Special Cost Modal */}
+            {specialCostModal.open && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                  <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider font-bold">
+                      {specialCostModal.item ? "Update Special Cost" : "Special Cost"}
+                    </h3>
+                    <button onClick={() => setSpecialCostModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 space-y-4">
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Cost Type <span className="text-rose-500">*</span></label>
+                      <select
+                        value={specialCostForm.costType || "Embroidery"}
+                        onChange={(e) => setSpecialCostForm({ ...specialCostForm, costType: e.target.value as any })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="Embroidery">Embroidery</option>
+                        <option value="Print">Print</option>
+                        <option value="Wash">Wash</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Header <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={specialCostForm.header || ""}
+                        onChange={(e) => setSpecialCostForm({ ...specialCostForm, header: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. Plain"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Sort Order <span className="text-rose-500">*</span></label>
+                      <input
+                        type="number"
+                        value={specialCostForm.sortOrder !== undefined ? specialCostForm.sortOrder : ""}
+                        onChange={(e) => setSpecialCostForm({ ...specialCostForm, sortOrder: e.target.value === "" ? undefined : Number(e.target.value) })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="1"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Description <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={specialCostForm.description || ""}
+                        onChange={(e) => setSpecialCostForm({ ...specialCostForm, description: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="Description text"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Max Value Per Unite <span className="text-rose-500">*</span></label>
+                      <input
+                        type="number"
+                        step="0.001"
+                        value={specialCostForm.maxValuePerUnit !== undefined ? specialCostForm.maxValuePerUnit : ""}
+                        onChange={(e) => setSpecialCostForm({ ...specialCostForm, maxValuePerUnit: e.target.value === "" ? undefined : Number(e.target.value) })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. 5"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Rate Per Dzn <span className="text-rose-500">*</span></label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={specialCostForm.ratePerDzn !== undefined ? specialCostForm.ratePerDzn : ""}
+                        onChange={(e) => setSpecialCostForm({ ...specialCostForm, ratePerDzn: e.target.value === "" ? undefined : Number(e.target.value) })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. 3.00"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">IsActive <span className="text-rose-500">*</span></label>
+                      <select
+                        value={specialCostForm.isActive || "Active"}
+                        onChange={(e) => setSpecialCostForm({ ...specialCostForm, isActive: e.target.value as "Active" | "Inactive" })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <button
+                        type="button"
+                        onClick={() => setSpecialCostModal({ open: false })}
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        onClick={handleSaveSpecialCost}
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        {specialCostModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Rat Chart Information Modal (exactly matching screenshot) */}
+            {rateChartDetailModalOpen && (
+              <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden animate-in zoom-in duration-200 max-h-[90vh] flex flex-col">
+                  {/* Header */}
+                  <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
+                    <h3 className="text-base font-medium text-slate-700 dark:text-slate-200 font-sans">
+                      Rat Chart Information
+                    </h3>
+                    <button
+                      onClick={() => setRateChartDetailModalOpen(false)}
+                      className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer"
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 overflow-y-auto space-y-6 flex-1">
+                    {/* Top Form Section (Exactly like reference screenshot) */}
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                        <div>
+                          <label className="block text-xs text-slate-500 mb-1">
+                            Rate <span className="text-rose-500">*</span>
+                          </label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={rateChartForm.rate !== undefined ? rateChartForm.rate : ""}
+                            onChange={(e) => setRateChartForm({ ...rateChartForm, rate: e.target.value === "" ? undefined : Number(e.target.value) })}
+                            className="w-full text-xs px-3 py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500 transition-colors"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs text-slate-500 mb-1">
+                            Start Date <span className="text-rose-500">*</span>
+                          </label>
+                          <input
+                            type="date"
+                            value={rateChartForm.startDate || ""}
+                            onChange={(e) => setRateChartForm({ ...rateChartForm, startDate: e.target.value })}
+                            className="w-full text-xs px-3 py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500 transition-colors"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs text-slate-500 mb-1">
+                            End Date <span className="text-rose-500">*</span>
+                          </label>
+                          <input
+                            type="date"
+                            value={rateChartForm.endDate || ""}
+                            onChange={(e) => setRateChartForm({ ...rateChartForm, endDate: e.target.value })}
+                            className="w-full text-xs px-3 py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500 transition-colors"
+                          />
+                        </div>
+
+                        <div className="flex flex-col justify-end">
+                          <select
+                            value={rateChartForm.status || "Active"}
+                            onChange={(e) => setRateChartForm({ ...rateChartForm, status: e.target.value as "Active" | "Inactive" })}
+                            className="w-full text-xs px-3 py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500 transition-colors"
+                          >
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex items-center justify-between pt-4">
+                        <button
+                          type="button"
+                          onClick={() => setRateChartDetailModalOpen(false)}
+                          className="px-5 py-2 bg-[#ff9800] hover:bg-[#f57c00] text-white font-bold text-xs rounded transition shadow-xs cursor-pointer uppercase tracking-wider"
+                        >
+                          CLOSE
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleSaveRateChart}
+                          className="px-5 py-2 bg-[#70b23b] hover:bg-[#609d31] text-white font-bold text-xs rounded transition shadow-xs cursor-pointer uppercase tracking-wider"
+                        >
+                          {editingRateChartItem ? "UPDATE" : "CREATE"}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Bottom Table Section */}
+                    <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
+                      {/* Sub-table Action bar */}
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => toast.success("Exported to Excel")}
+                            className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded text-xs font-medium transition flex items-center gap-1 cursor-pointer"
+                          >
+                            <FileText size={12} /> EXCEL
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => window.print()}
+                            className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded text-xs font-medium transition flex items-center gap-1 cursor-pointer"
+                          >
+                            <Printer size={12} /> PRINT
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => toast.success("Exported to PDF")}
+                            className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded text-xs font-medium transition flex items-center gap-1 cursor-pointer"
+                          >
+                            <Download size={12} /> PDF
+                          </button>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-slate-500">Search:</span>
+                          <input
+                            type="text"
+                            value={rateChartSearch}
+                            onChange={(e) => setRateChartSearch(e.target.value)}
+                            className="px-2 py-1 border-b border-slate-300 dark:border-slate-700 text-xs bg-transparent focus:outline-none focus:border-teal-500"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Sub Table */}
+                      <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-lg">
+                        <table className="w-full text-xs text-left">
+                          <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-800">
+                            <tr>
+                              <th className="px-3 py-2 w-16">Act</th>
+                              <th className="px-3 py-2 w-12 text-center">Sl</th>
+                              <th className="px-3 py-2">Rate</th>
+                              <th className="px-3 py-2">Start Date</th>
+                              <th className="px-3 py-2">End Date</th>
+                              <th className="px-3 py-2">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium text-slate-700 dark:text-slate-300">
+                            {(() => {
+                              const activeItem = specialCosts.find(sc => sc.id === selectedSpecialCostId);
+                              const charts = (activeItem?.rateCharts || []).filter(rc => 
+                                String(rc.rate).includes(rateChartSearch) ||
+                                rc.startDate.includes(rateChartSearch) ||
+                                rc.endDate.includes(rateChartSearch)
+                              );
+
+                              if (charts.length === 0) {
+                                return (
+                                  <tr>
+                                    <td colSpan={6} className="px-4 py-8 text-center text-slate-400 font-medium">
+                                      No data available in table
+                                    </td>
+                                  </tr>
+                                );
+                              }
+
+                              return charts.map((rc, idx) => (
+                                <tr key={rc.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                                  <td className="px-3 py-2 flex items-center gap-1">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setEditingRateChartItem(rc);
+                                        setRateChartForm(rc);
+                                      }}
+                                      className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                                      title="Edit Rate"
+                                    >
+                                      <Pencil size={12} />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteRateChart(rc.id)}
+                                      className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition cursor-pointer"
+                                      title="Delete Rate"
+                                    >
+                                      <Trash2 size={12} />
+                                    </button>
+                                  </td>
+                                  <td className="px-3 py-2 text-center text-slate-400">{idx + 1}</td>
+                                  <td className="px-3 py-2 font-bold text-slate-800 dark:text-slate-100">{Number(rc.rate).toFixed(2)}</td>
+                                  <td className="px-3 py-2">{rc.startDate}</td>
+                                  <td className="px-3 py-2">{rc.endDate}</td>
+                                  <td className="px-3 py-2">{rc.status}</td>
+                                </tr>
+                              ));
+                            })()}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Sub-table Footer */}
+                      <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
+                        {(() => {
+                          const activeItem = specialCosts.find(sc => sc.id === selectedSpecialCostId);
+                          const count = activeItem?.rateCharts?.length || 0;
+                          return (
+                            <>
+                              <span>Showing 0 to {count} of {count} entries</span>
+                              <div className="flex items-center gap-2">
+                                <button className="text-slate-400 hover:text-slate-600 disabled:opacity-50" disabled>Previous</button>
+                                <button className="text-slate-400 hover:text-slate-600 disabled:opacity-50" disabled>Next</button>
+                              </div>
+                            </>
+                          );
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* AOP PROCESS REGISTRY */}
+        {searchTab === "aop-process" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Action Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Exported to Excel")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => toast.success("Exported to PDF")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  PDF
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={aopProcessSearch}
+                    onChange={(e) => setAopProcessSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-48 text-slate-800 dark:text-slate-100"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+                <button
+                  onClick={() => handleOpenAopProcessModal()}
+                  className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                >
+                  <Plus size={14} /> Add New
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-[#bde0fe] dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-[11px] font-bold border-b border-blue-200 dark:border-slate-700">
+                  <tr>
+                    <th className="px-4 py-2.5 text-center w-24">Actions</th>
+                    <th className="px-4 py-2.5 text-center w-16">SL</th>
+                    <th className="px-4 py-2.5">Name</th>
+                    <th className="px-4 py-2.5 text-center w-28">IsActive</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                  {aopProcesses
+                    .filter(a => a.name.toLowerCase().includes(aopProcessSearch.toLowerCase()))
+                    .map((a, idx) => (
+                      <tr
+                        key={a.id}
+                        className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
+                      >
+                        <td className="px-4 py-2.5 text-center flex items-center justify-center gap-1.5">
+                          <button
+                            onClick={() => handleOpenAopProcessModal(a)}
+                            className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                            title="Edit"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                        </td>
+                        <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                        <td className="px-4 py-2.5 font-bold text-slate-800 dark:text-slate-200">{a.name}</td>
+                        <td className="px-4 py-2.5 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                            a.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
+                          }`}>
+                            {a.isActive}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 1 to {aopProcesses.length} of {aopProcesses.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2.5 py-1 rounded bg-teal-500 text-white shadow-sm">1</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* Add / Edit Modal */}
+            {aopProcessModal.open && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                  <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider font-bold">
+                      {aopProcessModal.item ? "Update AopProcess" : "Add New AopProcess"}
+                    </h3>
+                    <button onClick={() => setAopProcessModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 space-y-4">
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Name <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={aopProcessForm.name || ""}
+                        onChange={(e) => setAopProcessForm({ ...aopProcessForm, name: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. Discharge Print"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">IsActive <span className="text-rose-500">*</span></label>
+                      <select
+                        value={aopProcessForm.isActive || "Active"}
+                        onChange={(e) => setAopProcessForm({ ...aopProcessForm, isActive: e.target.value as "Active" | "Inactive" })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <button
+                        type="button"
+                        onClick={() => setAopProcessModal({ open: false })}
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        onClick={handleSaveAopProcess}
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        {aopProcessModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* QUALITY LABEL REGISTRY */}
+        {searchTab === "quality-label" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Action Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Exported to Excel")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => toast.success("Exported to PDF")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  PDF
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-slate-500">Search:</span>
+                  <input
+                    type="text"
+                    value={qualityLabelSearch}
+                    onChange={(e) => setQualityLabelSearch(e.target.value)}
+                    className="px-2 py-1 border-b border-slate-300 dark:border-slate-700 text-xs bg-transparent focus:outline-none focus:border-teal-500 w-48 text-slate-800 dark:text-slate-100"
+                  />
+                </div>
+                <button
+                  onClick={() => handleOpenQualityLabelModal()}
+                  className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                >
+                  <Plus size={14} /> Add New
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-[#dbe1e6] dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-[11px] font-bold border-b border-slate-300 dark:border-slate-700">
+                  <tr>
+                    <th className="px-4 py-2.5 text-left w-24">Actions</th>
+                    <th className="px-4 py-2.5 text-center w-16">SL</th>
+                    <th className="px-4 py-2.5">Name</th>
+                    <th className="px-4 py-2.5 text-center w-28">IsActive</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold text-slate-700 dark:text-slate-300">
+                  {qualityLabels
+                    .filter(q => q.name.toLowerCase().includes(qualityLabelSearch.toLowerCase()))
+                    .map((q, idx) => (
+                      <tr key={q.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-4 py-2.5 text-left">
+                          <button
+                            onClick={() => handleOpenQualityLabelModal(q)}
+                            className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                            title="Edit"
+                          >
+                            <Pencil size={14} />
+                          </button>
+                        </td>
+                        <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                        <td className="px-4 py-2.5 text-slate-800 dark:text-slate-200">{q.name}</td>
+                        <td className="px-4 py-2.5 text-center">
+                          <span className={`px-2 py-0.5 rounded-xs text-[10px] font-bold uppercase text-white bg-[#70b23b]`}>
+                            {q.isActive}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 1 to {qualityLabels.length} of {qualityLabels.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2.5 py-1 rounded bg-teal-500 text-white shadow-sm">1</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* Modal */}
+            {qualityLabelModal.open && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                  <div className="px-6 py-4 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <h3 className="text-base font-normal text-slate-800 dark:text-white font-sans">
+                      Create New Country
+                    </h3>
+                    <button onClick={() => setQualityLabelModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={18} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 space-y-6">
+                    <div>
+                      <label className="block text-xs text-slate-400 mb-1">Name (Eng) <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={qualityLabelForm.name || ""}
+                        onChange={(e) => setQualityLabelForm({ ...qualityLabelForm, name: e.target.value })}
+                        className="w-full text-xs px-3 py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs text-slate-400 mb-1">IsActiver <span className="text-rose-500">*</span></label>
+                      <select
+                        value={qualityLabelForm.isActive || "Active"}
+                        onChange={(e) => setQualityLabelForm({ ...qualityLabelForm, isActive: e.target.value as "Active" | "Inactive" })}
+                        className="w-full text-xs px-3 py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-4">
+                      <button
+                        type="button"
+                        onClick={() => setQualityLabelModal({ open: false })}
+                        className="px-6 py-2 bg-[#ff9800] hover:bg-orange-600 text-white font-bold text-xs uppercase transition cursor-pointer rounded-xs"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        onClick={handleSaveQualityLabel}
+                        className="px-6 py-2 bg-[#70b23b] hover:bg-green-600 text-white font-bold text-xs uppercase transition cursor-pointer rounded-xs"
+                      >
+                        {qualityLabelModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ADDITIONAL COST ENTRY REGISTRY */}
+        {searchTab === "additional-cost-entry" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Action Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Exported to Excel")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => toast.success("Exported to PDF")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  PDF
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={additionalCostSearch}
+                    onChange={(e) => setAdditionalCostSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-48 text-slate-800 dark:text-slate-100"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+                <button
+                  onClick={() => handleOpenAdditionalCostModal()}
+                  className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                >
+                  <Plus size={14} /> Add New
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-[#bde0fe] dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-[11px] font-bold border-b border-blue-200 dark:border-slate-700">
+                  <tr>
+                    <th className="px-4 py-2.5 text-center w-24">Act</th>
+                    <th className="px-4 py-2.5 text-center w-16">Sl</th>
+                    <th className="px-4 py-2.5">Title Name</th>
+                    <th className="px-4 py-2.5 text-center w-28">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold text-slate-700 dark:text-slate-300">
+                  {additionalCosts
+                    .filter(a => a.titleName.toLowerCase().includes(additionalCostSearch.toLowerCase()))
+                    .map((a, idx) => (
+                      <tr key={a.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-4 py-2.5 text-center flex items-center justify-center gap-1.5">
+                          <button
+                            onClick={() => handleOpenAdditionalCostModal(a)}
+                            className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                            title="Edit"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                        </td>
+                        <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                        <td className="px-4 py-2.5 font-bold text-slate-800 dark:text-slate-200">{a.titleName}</td>
+                        <td className="px-4 py-2.5 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                            a.status === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
+                          }`}>
+                            {a.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 1 to {additionalCosts.length} of {additionalCosts.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2.5 py-1 rounded bg-teal-500 text-white shadow-sm">1</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* Additional Cost Modal */}
+            {additionalCostModal.open && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                  <div className="px-6 py-4 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <h3 className="text-base font-medium text-slate-800 dark:text-white font-sans">
+                      Additional Cost
+                    </h3>
+                    <button onClick={() => setAdditionalCostModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={18} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 space-y-6">
+                    <div>
+                      <label className="block text-xs text-slate-500 mb-1">Title Name <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={additionalCostForm.titleName || ""}
+                        onChange={(e) => setAdditionalCostForm({ ...additionalCostForm, titleName: e.target.value })}
+                        className="w-full text-xs px-3 py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs text-slate-500 mb-1">Order Number <span className="text-rose-500">*</span></label>
+                      <input
+                        type="number"
+                        value={additionalCostForm.orderNumber !== undefined ? additionalCostForm.orderNumber : ""}
+                        onChange={(e) => setAdditionalCostForm({ ...additionalCostForm, orderNumber: e.target.value === "" ? undefined : Number(e.target.value) })}
+                        className="w-full text-xs px-3 py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs text-slate-500 mb-1">Status</label>
+                      <select
+                        value={additionalCostForm.status || "Active"}
+                        onChange={(e) => setAdditionalCostForm({ ...additionalCostForm, status: e.target.value as "Active" | "Inactive" })}
+                        className="w-full text-xs px-3 py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-4">
+                      <button
+                        type="button"
+                        onClick={() => setAdditionalCostModal({ open: false })}
+                        className="px-4 py-2 bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs rounded transition cursor-pointer uppercase tracking-wider"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        onClick={handleSaveAdditionalCost}
+                        className="px-6 py-2.5 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-bold text-xs rounded shadow-xs transition cursor-pointer uppercase tracking-wider"
+                      >
+                        {additionalCostModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* RMG PROCESS LOSS REGISTRY */}
+        {searchTab === "rmg-process-loss" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Action Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Exported to Excel")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => toast.success("Exported to PDF")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  PDF
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={rmgProcessLossSearch}
+                    onChange={(e) => setRmgProcessLossSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-48 text-slate-800 dark:text-slate-100"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+                <button
+                  onClick={() => handleOpenRmgProcessLossModal()}
+                  className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                >
+                  <Plus size={14} /> Add New
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-[#bde0fe] dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-[11px] font-bold border-b border-blue-200 dark:border-slate-700">
+                  <tr>
+                    <th className="px-3 py-2.5 text-center w-24">Actions</th>
+                    <th className="px-3 py-2.5 text-center w-12">SL</th>
+                    <th className="px-3 py-2.5">Types of Garments</th>
+                    <th className="px-3 py-2.5">Effective Date</th>
+                    <th className="px-3 py-2.5">Order Qty Range</th>
+                    <th className="px-3 py-2.5 text-center">CuttingPercent</th>
+                    <th className="px-3 py-2.5 text-center">PrintPercent</th>
+                    <th className="px-3 py-2.5 text-center">EmbroideryPercent</th>
+                    <th className="px-3 py-2.5 text-center">SewingPercent</th>
+                    <th className="px-3 py-2.5 text-center">WashPercent</th>
+                    <th className="px-3 py-2.5 text-center">FinishingPercent</th>
+                    <th className="px-3 py-2.5 text-center w-20">IsActive</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold text-slate-700 dark:text-slate-300">
+                  {(() => {
+                    const filtered = rmgProcessLosses.filter(r => r.garmentType.toLowerCase().includes(rmgProcessLossSearch.toLowerCase()));
+
+                    if (filtered.length === 0) {
+                      return (
+                        <tr>
+                          <td colSpan={12} className="px-4 py-8 text-center text-slate-400 font-medium">
+                            No data available in table
+                          </td>
+                        </tr>
+                      );
+                    }
+
+                    return filtered.map((r, idx) => (
+                      <tr key={r.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-3 py-2.5 text-center flex items-center justify-center gap-1.5">
+                          <button
+                            onClick={() => handleOpenRmgProcessLossModal(r)}
+                            className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                            title="Edit"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                        </td>
+                        <td className="px-3 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                        <td className="px-3 py-2.5 font-bold text-slate-800 dark:text-slate-200">{r.garmentType}</td>
+                        <td className="px-3 py-2.5">{r.effectiveDate}</td>
+                        <td className="px-3 py-2.5 font-bold">{r.orderQtyMin} - {r.orderQtyMax}</td>
+                        <td className="px-3 py-2.5 text-center font-bold text-blue-600 dark:text-blue-400">{r.cuttingPercent}%</td>
+                        <td className="px-3 py-2.5 text-center font-bold text-indigo-600 dark:text-indigo-400">{r.printPercent}%</td>
+                        <td className="px-3 py-2.5 text-center font-bold text-violet-600 dark:text-violet-400">{r.embroideryPercent}%</td>
+                        <td className="px-3 py-2.5 text-center font-bold text-purple-600 dark:text-purple-400">{r.sewingPercent}%</td>
+                        <td className="px-3 py-2.5 text-center font-bold text-pink-600 dark:text-pink-400">{r.washPercent}%</td>
+                        <td className="px-3 py-2.5 text-center font-bold text-rose-600 dark:text-rose-400">{r.finishingPercent}%</td>
+                        <td className="px-3 py-2.5 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                            r.isActive === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
+                          }`}>
+                            {r.isActive}
+                          </span>
+                        </td>
+                      </tr>
+                    ));
+                  })()}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 0 to {rmgProcessLosses.length} of {rmgProcessLosses.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* RMG Process Loss Modal */}
+            {rmgProcessLossModal.open && (
+              <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in duration-200 max-h-[90vh] flex flex-col">
+                  {/* Header */}
+                  <div className="px-6 py-4 bg-white dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
+                    <h3 className="text-base font-medium text-slate-800 dark:text-white font-sans">
+                      {rmgProcessLossModal.item ? "Update RMG Process Loss" : "Add New RMG Process Loss"}
+                    </h3>
+                    <button onClick={() => setRmgProcessLossModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={18} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 overflow-y-auto space-y-6 flex-1">
+                    {/* Types of Garments */}
+                    <div>
+                      <label className="block text-xs text-slate-500 mb-1">
+                        Types of Garments <span className="text-rose-500">*</span>
+                      </label>
+                      <select
+                        value={rmgProcessLossForm.garmentType || "Solid Garments"}
+                        onChange={(e) => setRmgProcessLossForm({ ...rmgProcessLossForm, garmentType: e.target.value })}
+                        className="w-full text-xs px-3 py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors"
+                      >
+                        <option value="Select...">Select...</option>
+                        <option value="Solid Garments">Solid Garments</option>
+                        <option value="Print/Emb Garments">Print/Emb Garments</option>
+                        <option value="Print + EMB / Print + Stone / Print + Print">Print + EMB / Print + Stone / Print + Print</option>
+                        <option value="Solid Garments Wash">Solid Garments Wash</option>
+                        <option value="Print Wash Garments">Print Wash Garments</option>
+                      </select>
+                    </div>
+
+                    {/* Effective Date */}
+                    <div>
+                      <label className="block text-xs text-slate-500 mb-1">
+                        Effective Date <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        value={rmgProcessLossForm.effectiveDate || ""}
+                        onChange={(e) => setRmgProcessLossForm({ ...rmgProcessLossForm, effectiveDate: e.target.value })}
+                        className="w-full text-xs px-3 py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors"
+                      />
+                    </div>
+
+                    {/* Order Qty Range Min & Max */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                      <div>
+                        <label className="block text-xs text-slate-500 mb-1">
+                          Order Qty Range Min <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          value={rmgProcessLossForm.orderQtyMin !== undefined ? rmgProcessLossForm.orderQtyMin : ""}
+                          onChange={(e) => setRmgProcessLossForm({ ...rmgProcessLossForm, orderQtyMin: e.target.value === "" ? undefined : Number(e.target.value) })}
+                          className="w-full text-xs px-3 py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-slate-500 mb-1">
+                          Order Qty Range Max <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          value={rmgProcessLossForm.orderQtyMax !== undefined ? rmgProcessLossForm.orderQtyMax : ""}
+                          onChange={(e) => setRmgProcessLossForm({ ...rmgProcessLossForm, orderQtyMax: e.target.value === "" ? undefined : Number(e.target.value) })}
+                          className="w-full text-xs px-3 py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Cutting & Print Percentage */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                      <div>
+                        <label className="block text-xs text-slate-500 mb-1">
+                          Cutting Percentage <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={rmgProcessLossForm.cuttingPercent !== undefined ? rmgProcessLossForm.cuttingPercent : ""}
+                          onChange={(e) => setRmgProcessLossForm({ ...rmgProcessLossForm, cuttingPercent: e.target.value === "" ? undefined : Number(e.target.value) })}
+                          className="w-full text-xs px-3 py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-slate-500 mb-1">
+                          Print Percentage <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={rmgProcessLossForm.printPercent !== undefined ? rmgProcessLossForm.printPercent : ""}
+                          onChange={(e) => setRmgProcessLossForm({ ...rmgProcessLossForm, printPercent: e.target.value === "" ? undefined : Number(e.target.value) })}
+                          className="w-full text-xs px-3 py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Embroidery & Sewing Percent */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                      <div>
+                        <label className="block text-xs text-slate-500 mb-1">
+                          Embroidery Percent <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={rmgProcessLossForm.embroideryPercent !== undefined ? rmgProcessLossForm.embroideryPercent : ""}
+                          onChange={(e) => setRmgProcessLossForm({ ...rmgProcessLossForm, embroideryPercent: e.target.value === "" ? undefined : Number(e.target.value) })}
+                          className="w-full text-xs px-3 py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-slate-500 mb-1">
+                          Sewing Percent <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={rmgProcessLossForm.sewingPercent !== undefined ? rmgProcessLossForm.sewingPercent : ""}
+                          onChange={(e) => setRmgProcessLossForm({ ...rmgProcessLossForm, sewingPercent: e.target.value === "" ? undefined : Number(e.target.value) })}
+                          className="w-full text-xs px-3 py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Wash & Finishing Percent */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                      <div>
+                        <label className="block text-xs text-slate-500 mb-1">
+                          Wash Percent <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={rmgProcessLossForm.washPercent !== undefined ? rmgProcessLossForm.washPercent : ""}
+                          onChange={(e) => setRmgProcessLossForm({ ...rmgProcessLossForm, washPercent: e.target.value === "" ? undefined : Number(e.target.value) })}
+                          className="w-full text-xs px-3 py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-slate-500 mb-1">
+                          Finishing Percent <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={rmgProcessLossForm.finishingPercent !== undefined ? rmgProcessLossForm.finishingPercent : ""}
+                          onChange={(e) => setRmgProcessLossForm({ ...rmgProcessLossForm, finishingPercent: e.target.value === "" ? undefined : Number(e.target.value) })}
+                          className="w-full text-xs px-3 py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    {/* IsActive */}
+                    <div>
+                      <label className="block text-xs text-slate-500 mb-1">
+                        IsActive <span className="text-rose-500">*</span>
+                      </label>
+                      <select
+                        value={rmgProcessLossForm.isActive || "Active"}
+                        onChange={(e) => setRmgProcessLossForm({ ...rmgProcessLossForm, isActive: e.target.value as "Active" | "Inactive" })}
+                        className="w-full text-xs px-3 py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-colors"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center justify-between pt-4">
+                      <button
+                        type="button"
+                        onClick={() => setRmgProcessLossModal({ open: false })}
+                        className="px-5 py-2 bg-[#ff9800] hover:bg-[#f57c00] text-white font-bold text-xs rounded transition shadow-xs cursor-pointer uppercase tracking-wider"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        onClick={handleSaveRmgProcessLoss}
+                        className="px-5 py-2 bg-[#70b23b] hover:bg-[#609d31] text-white font-bold text-xs rounded transition shadow-xs cursor-pointer uppercase tracking-wider"
+                      >
+                        {rmgProcessLossModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Floating Add Button matching the screenshot for Yarn, Color, Print, Special Cost, AOP Process, Additional Cost, RMG Process Loss, and Quality Label tabs */}
+        {["yarn-brand", "yarn-type", "yarn-count", "yarn-po-type", "yarn-po-settings", "gmt-fabric-color-name", "fabric-print-color-type", "print-emb-wash-special-type", "aop-process", "additional-cost-entry", "rmg-process-loss", "quality-label"].includes(searchTab) && (
           <button
             onClick={() => {
               if (searchTab === "yarn-brand") handleOpenYarnBrandModal();
@@ -7748,6 +9888,13 @@ function MerchandisingMasterSettingsPage() {
               else if (searchTab === "yarn-count") handleOpenYarnCountModal();
               else if (searchTab === "yarn-po-type") handleOpenYarnPoTypeModal();
               else if (searchTab === "yarn-po-settings") handleOpenYarnPoSettingModal();
+              else if (searchTab === "gmt-fabric-color-name") handleOpenGmtFabricColorModal();
+              else if (searchTab === "fabric-print-color-type") handleOpenFabricPrintColorTypeModal();
+              else if (searchTab === "print-emb-wash-special-type") handleOpenSpecialCostModal();
+              else if (searchTab === "aop-process") handleOpenAopProcessModal();
+              else if (searchTab === "additional-cost-entry") handleOpenAdditionalCostModal();
+              else if (searchTab === "rmg-process-loss") handleOpenRmgProcessLossModal();
+              else if (searchTab === "quality-label") handleOpenQualityLabelModal();
             }}
             className="fixed bottom-6 right-6 size-12 bg-[#70b23b] hover:bg-[#609d31] text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95 cursor-pointer z-40"
             title="Add New Entry"
@@ -8246,133 +10393,7 @@ function MerchandisingMasterSettingsPage() {
 
 
 
-        {searchTab === "additional-cost-entry" && (
-                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
-                  <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">Trims & Accessories Master Catalog ({filteredTrims.length})</span>
-                    <button
-                      onClick={() => handleOpenTrimsModal()}
-                      className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 cursor-pointer shadow-sm"
-                    >
-                      <Plus size={14} /> Add Trims Item
-                    </button>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-xs text-left">
-                      <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
-                        <tr>
-                          <th className="px-4 py-3">Code</th>
-                          <th className="px-4 py-3">Item Description</th>
-                          <th className="px-4 py-3">Category</th>
-                          <th className="px-4 py-3">UOM</th>
-                          <th className="px-4 py-3 text-right">Unit Price (USD)</th>
-                          <th className="px-4 py-3">Nominated Supplier</th>
-                          <th className="px-4 py-3 text-center">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-200 dark:divide-slate-800 font-semibold">
-                        {filteredTrims.map((t) => (
-                          <tr key={t.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                            <td className="px-4 py-3 font-mono font-bold text-slate-400">{t.itemCode}</td>
-                            <td className="px-4 py-3 font-bold text-slate-900 dark:text-white">{t.itemName}</td>
-                            <td className="px-4 py-3">
-                              <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold border ${
-                                t.category === "Sewing Trims"
-                                  ? "bg-blue-500/10 text-blue-600 border-blue-500/20"
-                                  : "bg-purple-500/10 text-purple-600 border-purple-500/20"
-                              }`}>
-                                {t.category}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 font-mono">{t.uom}</td>
-                            <td className="px-4 py-3 text-right font-mono font-bold text-teal-600 dark:text-teal-400">${t.unitPriceUsd.toFixed(3)}</td>
-                            <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t.nominatedSupplier}</td>
-                            <td className="px-4 py-3 text-center">
-                              <div className="flex items-center justify-center gap-1">
-                                <button
-                                  onClick={() => handleOpenTrimsModal(t)}
-                                  className="p-1 text-slate-500 hover:text-teal-500 hover:bg-slate-100 rounded transition cursor-pointer"
-                                >
-                                  <Pencil size={14} />
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteTrims(t.id)}
-                                  className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition cursor-pointer"
-                                >
-                                  <Trash2 size={14} />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-        )}
 
-        {searchTab === "rmg-process-loss" && (
-                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
-                  <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                    <div>
-                      <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">Garment Process Loss Matrix %</span>
-                      <span className="text-[10px] text-slate-400">Default wastage margins for material requirement calculations</span>
-                    </div>
-                    <button
-                      onClick={() => handleOpenLossModal()}
-                      className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 cursor-pointer shadow-sm"
-                    >
-                      <Plus size={14} /> Add Garment Loss Rule
-                    </button>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-xs text-left">
-                      <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
-                        <tr>
-                          <th className="px-4 py-3">Garment Category</th>
-                          <th className="px-4 py-3 text-right">Knitting Loss %</th>
-                          <th className="px-4 py-3 text-right">Dyeing Loss %</th>
-                          <th className="px-4 py-3 text-right">Cutting Loss %</th>
-                          <th className="px-4 py-3 text-right">Print/Wash Loss %</th>
-                          <th className="px-4 py-3 text-right">Total Est. Loss %</th>
-                          <th className="px-4 py-3 text-center">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-200 dark:divide-slate-800 font-semibold">
-                        {filteredLosses.map((pl) => {
-                          const totalLoss = pl.knittingLossPct + pl.dyeingLossPct + pl.cuttingLossPct + pl.printWashLossPct;
-                          return (
-                            <tr key={pl.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                              <td className="px-4 py-3 font-bold text-slate-900 dark:text-white">{pl.garmentType}</td>
-                              <td className="px-4 py-3 text-right font-mono">{pl.knittingLossPct}%</td>
-                              <td className="px-4 py-3 text-right font-mono">{pl.dyeingLossPct}%</td>
-                              <td className="px-4 py-3 text-right font-mono">{pl.cuttingLossPct}%</td>
-                              <td className="px-4 py-3 text-right font-mono">{pl.printWashLossPct}%</td>
-                              <td className="px-4 py-3 text-right font-mono font-black text-rose-500">{totalLoss.toFixed(1)}%</td>
-                              <td className="px-4 py-3 text-center">
-                                <div className="flex items-center justify-center gap-1">
-                                  <button
-                                    onClick={() => handleOpenLossModal(pl)}
-                                    className="p-1 text-slate-500 hover:text-teal-500 hover:bg-slate-100 rounded transition cursor-pointer"
-                                  >
-                                    <Pencil size={14} />
-                                  </button>
-                                  <button
-                                    onClick={() => handleDeleteLoss(pl.id)}
-                                    className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition cursor-pointer"
-                                  >
-                                    <Trash2 size={14} />
-                                  </button>
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-        )}
 
         {/* TAB 8: QUALITY */}
         {false && (
