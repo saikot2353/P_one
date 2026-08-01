@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
@@ -115,6 +115,77 @@ function CreateRosterPage() {
     return initial;
   });
 
+  // Pre-fill roster matrix with default holidays when month or year changes
+  useEffect(() => {
+    const monthIndex = monthsList.indexOf(selectedMonth);
+    const yearNum = parseInt(selectedYear);
+    const daysInMonth = new Date(yearNum, monthIndex + 1, 0).getDate();
+
+    let holidaysList = [
+      {
+        sl: 1,
+        year: 2024,
+        effectiveDate: "2024-07-15",
+        days: ["Friday"],
+        remarks: "Initial configuration: Friday as default weekly holiday",
+      },
+      {
+        sl: 2,
+        year: 2026,
+        effectiveDate: "2026-07-01",
+        days: ["Friday", "Saturday"],
+        remarks: "Updated weekend schedule: Friday & Saturday as default weekly holidays",
+      },
+    ];
+    try {
+      const saved = localStorage.getItem("hris_default_holidays");
+      if (saved) {
+        holidaysList = JSON.parse(saved);
+      }
+    } catch (e) {
+      console.error("Error parsing default holidays:", e);
+    }
+
+    const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const holidayIndices: number[] = [];
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dt = new Date(yearNum, monthIndex, d);
+      const yyyy = dt.getFullYear();
+      const mm = String(dt.getMonth() + 1).padStart(2, "0");
+      const dd = String(dt.getDate()).padStart(2, "0");
+      const dateStr = `${yyyy}-${mm}-${dd}`;
+
+      // Find the applicable holiday configuration (effectiveDate <= dateStr)
+      const applicableConfig = [...holidaysList]
+        .filter((h: any) => h.effectiveDate <= dateStr)
+        .sort((a: any, b: any) => b.effectiveDate.localeCompare(a.effectiveDate))[0];
+
+      if (applicableConfig) {
+        const dayName = dayNames[dt.getDay()];
+        if (applicableConfig.days.includes(dayName)) {
+          holidayIndices.push(d - 1);
+        }
+      } else {
+        if (dt.getDay() === 5) {
+          holidayIndices.push(d - 1);
+        }
+      }
+    }
+
+    const nextMatrix: Record<string, string[]> = {};
+    rosterEmployees.forEach((emp) => {
+      const empSchedule = Array(31).fill("W");
+      for (let idx = 0; idx < 31; idx++) {
+        if (idx < daysInMonth) {
+          empSchedule[idx] = holidayIndices.includes(idx) ? "H" : "W";
+        }
+      }
+      nextMatrix[emp.id] = empSchedule;
+    });
+    setRosterMatrix(nextMatrix);
+  }, [selectedMonth, selectedYear]);
+
   // Calculate parsed list of comma-separated active IDs
   const activeIds = useMemo(() => {
     return empIdsInput
@@ -225,17 +296,60 @@ function CreateRosterPage() {
 
   // Action: DEFAULT HOLIDAY
   const handleDefaultHoliday = () => {
-    // Automatically flag Fridays as H
     const monthIndex = monthsList.indexOf(selectedMonth);
     const yearNum = parseInt(selectedYear);
     const daysInMonth = new Date(yearNum, monthIndex + 1, 0).getDate();
-    const fridayIndices: number[] = [];
+
+    let holidaysList = [
+      {
+        sl: 1,
+        year: 2024,
+        effectiveDate: "2024-07-15",
+        days: ["Friday"],
+        remarks: "Initial configuration: Friday as default weekly holiday",
+      },
+      {
+        sl: 2,
+        year: 2026,
+        effectiveDate: "2026-07-01",
+        days: ["Friday", "Saturday"],
+        remarks: "Updated weekend schedule: Friday & Saturday as default weekly holidays",
+      },
+    ];
+    try {
+      const saved = localStorage.getItem("hris_default_holidays");
+      if (saved) {
+        holidaysList = JSON.parse(saved);
+      }
+    } catch (e) {
+      console.error("Error parsing default holidays:", e);
+    }
+
+    const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const holidayIndices: number[] = [];
 
     for (let d = 1; d <= daysInMonth; d++) {
       const dt = new Date(yearNum, monthIndex, d);
-      if (dt.getDay() === 5) {
-        // Friday
-        fridayIndices.push(d - 1);
+      const yyyy = dt.getFullYear();
+      const mm = String(dt.getMonth() + 1).padStart(2, "0");
+      const dd = String(dt.getDate()).padStart(2, "0");
+      const dateStr = `${yyyy}-${mm}-${dd}`;
+
+      // Find the applicable holiday configuration (effectiveDate <= dateStr)
+      const applicableConfig = [...holidaysList]
+        .filter((h: any) => h.effectiveDate <= dateStr)
+        .sort((a: any, b: any) => b.effectiveDate.localeCompare(a.effectiveDate))[0];
+
+      if (applicableConfig) {
+        const dayName = dayNames[dt.getDay()];
+        if (applicableConfig.days.includes(dayName)) {
+          holidayIndices.push(d - 1);
+        }
+      } else {
+        // Fallback to Friday if no configuration applies yet
+        if (dt.getDay() === 5) {
+          holidayIndices.push(d - 1);
+        }
       }
     }
 
@@ -243,14 +357,23 @@ function CreateRosterPage() {
       const next = { ...prev };
       filteredEmployees.forEach((emp) => {
         const empSchedule = [...(next[emp.id] || Array(31).fill("W"))];
-        fridayIndices.forEach((idx) => {
-          empSchedule[idx] = "H";
-        });
+        // Reset all days to Work first, then apply default holidays
+        for (let idx = 0; idx < 31; idx++) {
+          if (idx < daysInMonth) {
+            // Keep existing Govt Holiday (GH), only reset H/W
+            if (empSchedule[idx] !== "GH") {
+              empSchedule[idx] = holidayIndices.includes(idx) ? "H" : "W";
+            }
+          }
+        }
         next[emp.id] = empSchedule;
       });
       return next;
     });
-    alert("Applied default weekend (Friday) as Holiday (H)!");
+
+    alert(
+      `Applied default holiday configurations (${holidayIndices.length} days) from setup for ${selectedMonth} ${selectedYear}!`,
+    );
   };
 
   // Bottom action: UPDATE ROSTER
@@ -529,22 +652,6 @@ function CreateRosterPage() {
                     <ChevronDown className="size-3 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   </div>
                 </div>
-              </div>
-
-              {/* Roster Actions bottom left inside first card */}
-              <div className="flex items-center gap-2 pt-2">
-                <button
-                  onClick={handleRosterHoliday}
-                  className="h-8 px-4 bg-[#1e88e5] hover:bg-[#1565c0] text-white font-extrabold text-[10px] rounded-lg tracking-wider uppercase shadow-xs transition"
-                >
-                  ROSTER HOLIDAY
-                </button>
-                <button
-                  onClick={handleDefaultHoliday}
-                  className="h-8 px-4 bg-[#72b043] hover:bg-[#629c36] text-white font-extrabold text-[10px] rounded-lg tracking-wider uppercase shadow-xs transition"
-                >
-                  DEFAULT HOLIDAY
-                </button>
               </div>
             </div>
 

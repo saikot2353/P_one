@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v91");
+    const saved = localStorage.getItem("system_changes_v93");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -807,6 +807,24 @@ function ChangesPage() {
           link: "/company-setup",
           descriptionEn: "Removed edit and delete actions from the Default Holiday Setup list to treat it strictly as a historical track of weekend configurations, and added status indicators (Active, Upcoming, Archived) for all setup records.",
           descriptionBn: "ডিফল্ট হলিডে সেটআপ লিস্ট থেকে এডিট ও ডিলিট অ্যাকশন বাদ দেওয়া হয়েছে যাতে এটি সাপ্তাহিক ছুটির পরিবর্তনের ইতিহাস (হিস্ট্রি ট্র্যাক) হিসেবে কাজ করে এবং প্রতিটি রেকর্ডের জন্য স্ট্যাটাস ইন্ডিকেটর (Active, Upcoming, Archived) যোগ করা হয়েছে।",
+        },
+        {
+          id: "88",
+          date: "2026-08-01T16:08",
+          type: "Modify",
+          module: "Employee Roster",
+          link: "/create-roster",
+          descriptionEn: "Updated the DEFAULT HOLIDAY generator in the employee roster matrix to dynamically query and apply the weekly holidays configured in the Default Holiday Setup track based on the target month and year.",
+          descriptionBn: "এমপ্লয়ি রস্টার ম্যাট্রিক্সের DEFAULT HOLIDAY জেনারেটর আপডেট করা হয়েছে যাতে এটি টার্গেট মাস ও বছর অনুযায়ী ডিফল্ট হলিডে সেটআপ ট্র্যাকে কনফিগার করা সাপ্তাহিক ছুটিগুলো ডাইনামিকালি লোড এবং প্রয়োগ করে।",
+        },
+        {
+          id: "89",
+          date: "2026-08-01T16:13",
+          type: "Modify",
+          module: "Employee Roster",
+          link: "/create-roster",
+          descriptionEn: "Redesigned the Employee Roster page to automatically pre-populate the roster matrix with active default weekly holidays upon loading or switching months/years, and removed the redundant ROSTER HOLIDAY and DEFAULT HOLIDAY action buttons.",
+          descriptionBn: "এমপ্লয়ি রস্টার পেজ রিডিজাইন করা হয়েছে যাতে পেজ লোড হওয়া বা মাস/বছর পরিবর্তনের সময় রস্টার ম্যাট্রিক্স স্বয়ংক্রিয়ভাবে সক্রিয় সাপ্তাহিক ডিফল্ট ছুটির দিনগুলো দিয়ে পূরণ হয়, এবং অপ্রয়োজনীয় ROSTER HOLIDAY ও DEFAULT HOLIDAY বাটন দুটি বাদ দেওয়া হয়েছে।",
         },
       ]);
     }
