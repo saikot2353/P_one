@@ -56,6 +56,7 @@ import { Route as MerchandisingTnaCalendarRouteImport } from './routes/merchandi
 import { Route as MerchandisingSampleTrackerRouteImport } from './routes/merchandising-sample-tracker'
 import { Route as MerchandisingSalesTargetEntryRouteImport } from './routes/merchandising-sales-target-entry'
 import { Route as MerchandisingReportsRouteImport } from './routes/merchandising-reports'
+import { Route as MerchandisingPreCostingRouteImport } from './routes/merchandising-pre-costing'
 import { Route as MerchandisingOrderProfileRouteImport } from './routes/merchandising-order-profile'
 import { Route as MerchandisingOrderListRouteImport } from './routes/merchandising-order-list'
 import { Route as MerchandisingMonthlyCapacityRouteImport } from './routes/merchandising-monthly-capacity'
@@ -376,6 +377,11 @@ const MerchandisingSalesTargetEntryRoute =
 const MerchandisingReportsRoute = MerchandisingReportsRouteImport.update({
   id: '/merchandising-reports',
   path: '/merchandising-reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MerchandisingPreCostingRoute = MerchandisingPreCostingRouteImport.update({
+  id: '/merchandising-pre-costing',
+  path: '/merchandising-pre-costing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MerchandisingOrderProfileRoute =
@@ -847,6 +853,7 @@ export interface FileRoutesByFullPath {
   '/merchandising-monthly-capacity': typeof MerchandisingMonthlyCapacityRoute
   '/merchandising-order-list': typeof MerchandisingOrderListRoute
   '/merchandising-order-profile': typeof MerchandisingOrderProfileRoute
+  '/merchandising-pre-costing': typeof MerchandisingPreCostingRoute
   '/merchandising-reports': typeof MerchandisingReportsRoute
   '/merchandising-sales-target-entry': typeof MerchandisingSalesTargetEntryRoute
   '/merchandising-sample-tracker': typeof MerchandisingSampleTrackerRoute
@@ -973,6 +980,7 @@ export interface FileRoutesByTo {
   '/merchandising-monthly-capacity': typeof MerchandisingMonthlyCapacityRoute
   '/merchandising-order-list': typeof MerchandisingOrderListRoute
   '/merchandising-order-profile': typeof MerchandisingOrderProfileRoute
+  '/merchandising-pre-costing': typeof MerchandisingPreCostingRoute
   '/merchandising-reports': typeof MerchandisingReportsRoute
   '/merchandising-sales-target-entry': typeof MerchandisingSalesTargetEntryRoute
   '/merchandising-sample-tracker': typeof MerchandisingSampleTrackerRoute
@@ -1100,6 +1108,7 @@ export interface FileRoutesById {
   '/merchandising-monthly-capacity': typeof MerchandisingMonthlyCapacityRoute
   '/merchandising-order-list': typeof MerchandisingOrderListRoute
   '/merchandising-order-profile': typeof MerchandisingOrderProfileRoute
+  '/merchandising-pre-costing': typeof MerchandisingPreCostingRoute
   '/merchandising-reports': typeof MerchandisingReportsRoute
   '/merchandising-sales-target-entry': typeof MerchandisingSalesTargetEntryRoute
   '/merchandising-sample-tracker': typeof MerchandisingSampleTrackerRoute
@@ -1228,6 +1237,7 @@ export interface FileRouteTypes {
     | '/merchandising-monthly-capacity'
     | '/merchandising-order-list'
     | '/merchandising-order-profile'
+    | '/merchandising-pre-costing'
     | '/merchandising-reports'
     | '/merchandising-sales-target-entry'
     | '/merchandising-sample-tracker'
@@ -1354,6 +1364,7 @@ export interface FileRouteTypes {
     | '/merchandising-monthly-capacity'
     | '/merchandising-order-list'
     | '/merchandising-order-profile'
+    | '/merchandising-pre-costing'
     | '/merchandising-reports'
     | '/merchandising-sales-target-entry'
     | '/merchandising-sample-tracker'
@@ -1480,6 +1491,7 @@ export interface FileRouteTypes {
     | '/merchandising-monthly-capacity'
     | '/merchandising-order-list'
     | '/merchandising-order-profile'
+    | '/merchandising-pre-costing'
     | '/merchandising-reports'
     | '/merchandising-sales-target-entry'
     | '/merchandising-sample-tracker'
@@ -1607,6 +1619,7 @@ export interface RootRouteChildren {
   MerchandisingMonthlyCapacityRoute: typeof MerchandisingMonthlyCapacityRoute
   MerchandisingOrderListRoute: typeof MerchandisingOrderListRoute
   MerchandisingOrderProfileRoute: typeof MerchandisingOrderProfileRoute
+  MerchandisingPreCostingRoute: typeof MerchandisingPreCostingRoute
   MerchandisingReportsRoute: typeof MerchandisingReportsRoute
   MerchandisingSalesTargetEntryRoute: typeof MerchandisingSalesTargetEntryRoute
   MerchandisingSampleTrackerRoute: typeof MerchandisingSampleTrackerRoute
@@ -1989,6 +2002,13 @@ declare module '@tanstack/react-router' {
       path: '/merchandising-reports'
       fullPath: '/merchandising-reports'
       preLoaderRoute: typeof MerchandisingReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/merchandising-pre-costing': {
+      id: '/merchandising-pre-costing'
+      path: '/merchandising-pre-costing'
+      fullPath: '/merchandising-pre-costing'
+      preLoaderRoute: typeof MerchandisingPreCostingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/merchandising-order-profile': {
@@ -2608,6 +2628,7 @@ const rootRouteChildren: RootRouteChildren = {
   MerchandisingMonthlyCapacityRoute: MerchandisingMonthlyCapacityRoute,
   MerchandisingOrderListRoute: MerchandisingOrderListRoute,
   MerchandisingOrderProfileRoute: MerchandisingOrderProfileRoute,
+  MerchandisingPreCostingRoute: MerchandisingPreCostingRoute,
   MerchandisingReportsRoute: MerchandisingReportsRoute,
   MerchandisingSalesTargetEntryRoute: MerchandisingSalesTargetEntryRoute,
   MerchandisingSampleTrackerRoute: MerchandisingSampleTrackerRoute,

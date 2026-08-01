@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v93");
+    const saved = localStorage.getItem("system_changes_v94");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -825,6 +825,15 @@ function ChangesPage() {
           link: "/create-roster",
           descriptionEn: "Redesigned the Employee Roster page to automatically pre-populate the roster matrix with active default weekly holidays upon loading or switching months/years, and removed the redundant ROSTER HOLIDAY and DEFAULT HOLIDAY action buttons.",
           descriptionBn: "এমপ্লয়ি রস্টার পেজ রিডিজাইন করা হয়েছে যাতে পেজ লোড হওয়া বা মাস/বছর পরিবর্তনের সময় রস্টার ম্যাট্রিক্স স্বয়ংক্রিয়ভাবে সক্রিয় সাপ্তাহিক ডিফল্ট ছুটির দিনগুলো দিয়ে পূরণ হয়, এবং অপ্রয়োজনীয় ROSTER HOLIDAY ও DEFAULT HOLIDAY বাটন দুটি বাদ দেওয়া হয়েছে।",
+        },
+        {
+          id: "90",
+          date: "2026-08-01T16:48",
+          type: "New Addition",
+          module: "Merchandising",
+          link: "/merchandising-pre-costing",
+          descriptionEn: "Created a brand-new dedicated Prepare Pre-Cost page containing an initial pre-cost list view and a detailed, tab-free workspace featuring complete Order Basic Information, RMG Operation Process Loss %, dynamic style details entry with size breakdown tables, and checkable Additional Costing formulas matching the design system.",
+          descriptionBn: "মার্চেন্ডাইজিং মডিউলে একটি নতুন 'Prepare Pre-Cost' পেজ তৈরি করা হয়েছে, যার মধ্যে একটি কস্টিং তালিকা এবং '+ Prepare Pre-Cost' বাটনে ক্লিক করলে অর্ডার বেসিক ইনফরমেশন, আরএমজি প্রসেস লস %, ডাইনামিক স্টাইল ব্রেকডাউন টেবিল এবং অ্যাডিশনাল কস্টিং ফর্মুলা সম্বলিত চমৎকার ওয়ার্কস্পেস ওপেন হবে।",
         },
       ]);
     }

@@ -190,8 +190,7 @@ const menuCategories: MenuCategory[] = [
     key: "pre-costing",
     label: "Pre Costing",
     icon: TrendingUp,
-    to: "/merchandising-inquiry",
-    search: { tab: "costing" },
+    to: "/merchandising-pre-costing",
   },
   {
     key: "order-management",
