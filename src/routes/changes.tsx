@@ -20,7 +20,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v76");
+    const saved = localStorage.getItem("system_changes_v82");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -663,6 +663,60 @@ function ChangesPage() {
           link: "/merchandising-master-settings",
           descriptionEn: "Implemented custom registry layouts, actions, live searches, export mock actions, and dialog modals for 'Fabric GSM', 'Fabric Nature' (Fabric Type), and 'Fabric Construction' tabs matching screen layouts.",
           descriptionBn: "'Fabric GSM', 'Fabric Nature' (Fabric Type) এবং 'Fabric Construction' ট্যাবগুলোর জন্য লেআউট ডিজাইন অনুযায়ী কাস্টম রেজিস্ট্রি টেবিল, অ্যাকশন, সার্চ এবং অ্যাড/এডিট মোডাল ভিউ যুক্ত করা হয়েছে।",
+        },
+        {
+          id: "72",
+          date: "2026-08-01T10:47",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Added a searchable 'Supplier Category' multi-select dropdown as the first field in the Add/Update Supplier modal (options: Yarn, Fabric, Trims, etc.), displayed selected categories as pill badges in the Supplier table, and made Designation, E-mail, and Cell fields optional (removed validation constraints).",
+          descriptionBn: "সাপ্লায়ার অ্যাড/আপডেট মোডালে প্রথম ফিল্ড হিসেবে কাস্টম সার্চেবল মাল্টি-সিলেক্ট ড্রপডাউন 'Supplier Category' যুক্ত করা হয়েছে, সাপ্লায়ার টেবিলে সিলেক্ট করা ক্যাটাগরিগুলো পিল ব্যাজ হিসেবে প্রদর্শন করা হয়েছে এবং ডেজিগনেশন, ইমেইল ও সেল ফিল্ডগুলোকে ঐচ্ছিক (optional) করা হয়েছে (বাধ্যতামূলক ভ্যালিডেশন তুলে নেওয়া হয়েছে)।",
+        },
+        {
+          id: "73",
+          date: "2026-08-01T10:51",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Upgraded the UOM (Measurement Head) modal and registry table matching specifications, including advanced properties: Unit Name, Short Name, Unit Group, Sort Order, Relative Factor, and a checkbox for Is Base Unit status.",
+          descriptionBn: "UOM (পরিমাপক একক) মোডাল এবং রেজিস্ট্রি টেবিল উন্নত করা হয়েছে, যার মধ্যে নতুন বৈশিষ্ট্যসমূহ যুক্ত করা হয়েছে: Unit Name, Short Name, Unit Group, Sort Order, Relative Factor এবং Is Base Unit স্ট্যাটাসের জন্য চেকবক্স।",
+        },
+        {
+          id: "74",
+          date: "2026-08-01T10:54",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Added generic Manage Rates ($) buttons and details modals for Dyeing and Finishing tabs under RMG Master Settings, supporting dynamic date validation and export actions matching design layouts.",
+          descriptionBn: "RMG Master Settings-এর অধীনে Dyeing এবং Finishing ট্যাবগুলোর জন্য জেনেরিক Manage Rates ($) বাটন এবং ডিটেইলস মোডাল যুক্ত করা হয়েছে, যা লেআউট অনুযায়ী ডাইনামিক ডেট ভ্যালিডেশন এবং এক্সপোর্ট অ্যাকশন সমর্থন করে।",
+        },
+        {
+          id: "75",
+          date: "2026-08-01T14:35",
+          type: "New Addition",
+          module: "Global System",
+          link: "/module-selection",
+          descriptionEn: "Added a compact, Google-style corporate modules launcher (3x3 grid / waffle button) to both the global dashboard Topbar and the Merchandising layout header, enabling instant, dynamic switching between HRIS, Merchandising, and all other modules from anywhere in the application.",
+          descriptionBn: "গ্লোবাল ড্যাশবোর্ড টপবার এবং মার্চেন্ডাইজিং লেআউট হেডার উভয় স্থানেই একটি কম্প্যাক্ট, গুগল-স্টাইল কর্পোরেট মডিউল লঞ্চার (৩x৩ গ্রিড / ওয়াফেল বাটন) যুক্ত করা হয়েছে, যা অ্যাপ্লিকেশনের যেকোনো স্থান থেকে সরাসরি HRIS, মার্চেন্ডাইজিং এবং অন্যান্য সমস্ত মডিউলে ডাইনামিকালি সুইচ করতে সাহায্য করবে।",
+        },
+        {
+          id: "76",
+          date: "2026-08-01T15:00",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Implemented Yarn Brand, Yarn Type, Yarn Count, and Yarn PO Type custom settings pages with specifications matching the screenshots, custom add/edit modals, export actions, live search, and an olive green floating plus action button.",
+          descriptionBn: "ইউজার স্ক্রিনশট অনুযায়ী Yarn Brand, Yarn Type, Yarn Count এবং Yarn PO Type-এর জন্য কাস্টম সেটিংস পেজসমূহ ইমপ্লিমেন্ট করা হয়েছে, যার মধ্যে কাস্টম অ্যাড/এডিট মোডাল, লাইভ সার্চ, এক্সপোর্ট অ্যাকশন এবং একটি সুন্দর জলপাই সবুজ রঙের ফ্লোটিং প্লাস বাটন যুক্ত করা হয়েছে।",
+        },
+        {
+          id: "77",
+          date: "2026-08-01T15:10",
+          type: "Modify",
+          module: "Merchandising Master Settings",
+          link: "/merchandising-master-settings",
+          descriptionEn: "Implemented Yarn PO Settings custom configuration page, with custom dropdown fields for Company Name and Action parameter (Ceiling/Floor/Round/None), Nearest Value and CompareValue Value input controls, custom add/edit modals, and Excel/Print/PDF export functionalities.",
+          descriptionBn: "Yarn PO Settings-এর জন্য কাস্টম কনফিগারেশন পেজ ইমপ্লিমেন্ট করা হয়েছে, যার মধ্যে Company Name এবং Action প্যারামিটার (Ceiling/Floor/Round/None)-এর জন্য ড্রপডাউন ফিল্ড, Nearest Value এবং CompareValue Value-এর জন্য ইনপুট কন্ট্রোল, কাস্টম মোডাল এবং এক্সপোর্ট অ্যাকশন যুক্ত করা হয়েছে।",
         },
       ]);
     }

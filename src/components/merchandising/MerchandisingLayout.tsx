@@ -21,6 +21,7 @@ import {
   FileCheck,
   BarChart3,
 } from "lucide-react";
+import { ModuleLauncher } from "../dashboard/ModuleLauncher";
 
 interface BreadcrumbItem {
   label: string;
@@ -681,6 +682,7 @@ export default function MerchandisingLayout({
           </div>
 
           <div className="flex items-center gap-4">
+            <ModuleLauncher />
             <button
               onClick={toggleTheme}
               className="p-2 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:scale-105 transition-all shadow-xs cursor-pointer active:scale-95"

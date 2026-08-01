@@ -268,17 +268,22 @@ const initialSizeGroups: SizeGroupSpec[] = [
 
 interface UomSpec {
   id: string;
-  unitGroupName: string;
+  unitName: string;
+  shortName: string;
+  unitGroup: string;
+  sortOrder: number;
+  relativeFactor: number;
+  isBaseUnit: boolean;
   status: "Active" | "Inactive";
 }
 
 const initialUoms: UomSpec[] = [
-  { id: "uom-1", unitGroupName: "GG", status: "Active" },
-  { id: "uom-2", unitGroupName: "KG", status: "Active" },
-  { id: "uom-3", unitGroupName: "METER", status: "Active" },
-  { id: "uom-4", unitGroupName: "PCS", status: "Active" },
-  { id: "uom-5", unitGroupName: "YARD", status: "Inactive" },
-  { id: "uom-6", unitGroupName: "YRDS", status: "Active" },
+  { id: "uom-1", unitName: "GG", shortName: "GG", unitGroup: "Weight", sortOrder: 1, relativeFactor: 1.00, isBaseUnit: true, status: "Active" },
+  { id: "uom-2", unitName: "KG", shortName: "KG", unitGroup: "Weight", sortOrder: 2, relativeFactor: 1.00, isBaseUnit: true, status: "Active" },
+  { id: "uom-3", unitName: "Meters", shortName: "MTR", unitGroup: "Linear", sortOrder: 3, relativeFactor: 1.00, isBaseUnit: true, status: "Active" },
+  { id: "uom-4", unitName: "PCS", shortName: "PCS", unitGroup: "Quantity", sortOrder: 4, relativeFactor: 1.00, isBaseUnit: true, status: "Active" },
+  { id: "uom-5", unitName: "Yards", shortName: "Yards", unitGroup: "Linear", sortOrder: 9, relativeFactor: 1.00, isBaseUnit: true, status: "Inactive" },
+  { id: "uom-6", unitName: "Yrds", shortName: "Yrds", unitGroup: "Linear", sortOrder: 10, relativeFactor: 0.9144, isBaseUnit: false, status: "Active" },
 ];
 
 
@@ -362,6 +367,236 @@ const initialFabricConstructions: FabricConstructionSpec[] = [
   { id: "con-22", name: "Polyester 100%", rate: 0.00, createdDate: "20/10/2025" },
 ];
 
+interface YarnBrandSpec {
+  id: string;
+  brandName: string;
+  status: "Active" | "Inactive";
+}
+
+const initialYarnBrands: YarnBrandSpec[] = [
+  { id: "yb-1", brandName: "Anif Knitspin", status: "Active" },
+  { id: "yb-2", brandName: "Armada", status: "Active" },
+  { id: "yb-3", brandName: "Far Chemical", status: "Active" },
+  { id: "yb-4", brandName: "HUAFON", status: "Active" },
+  { id: "yb-5", brandName: "ISRAQ", status: "Active" },
+  { id: "yb-6", brandName: "Kamal", status: "Active" },
+  { id: "yb-7", brandName: "Mosharaf", status: "Active" },
+  { id: "yb-8", brandName: "Pahartoli", status: "Active" },
+  { id: "yb-9", brandName: "Shirin", status: "Active" },
+  { id: "yb-10", brandName: "SHOHAGPUR", status: "Active" },
+  { id: "yb-11", brandName: "SURAIYA", status: "Active" },
+  { id: "yb-12", brandName: "Tamijuddin", status: "Active" },
+  { id: "yb-13", brandName: "Test Brand", status: "Active" },
+  { id: "yb-14", brandName: "TONG KUN", status: "Active" },
+  { id: "yb-15", brandName: "Viyellatex", status: "Active" },
+];
+
+interface YarnTypeSpec {
+  id: string;
+  yarnType: string;
+  createDate: string;
+  status: "Active" | "Inactive";
+}
+
+const initialYarnTypes: YarnTypeSpec[] = [
+  { id: "yt-1", yarnType: "BCI CARD", createDate: "20/11/2025", status: "Active" },
+  { id: "yt-2", yarnType: "BCI COTTON", createDate: "", status: "Active" },
+  { id: "yt-3", yarnType: "BCI Melange", createDate: "20/10/2025", status: "Active" },
+  { id: "yt-4", yarnType: "BCI PC", createDate: "20/10/2025", status: "Active" },
+  { id: "yt-5", yarnType: "CARD", createDate: "01/10/2024", status: "Active" },
+  { id: "yt-6", yarnType: "CARD SLUB", createDate: "01/10/2024", status: "Active" },
+  { id: "yt-7", yarnType: "Carded", createDate: "03/05/2026", status: "Active" },
+  { id: "yt-8", yarnType: "CARDED SLUB", createDate: "01/10/2024", status: "Active" },
+  { id: "yt-9", yarnType: "COMBED COTTON", createDate: "21/08/2025", status: "Active" },
+  { id: "yt-10", yarnType: "Cotton", createDate: "03/09/2025", status: "Active" },
+  { id: "yt-11", yarnType: "CVC", createDate: "01/10/2024", status: "Active" },
+  { id: "yt-12", yarnType: "CVC VOTEX", createDate: "04/01/2026", status: "Active" },
+  { id: "yt-13", yarnType: "ELASTANCE", createDate: "08/07/2025", status: "Active" },
+  { id: "yt-14", yarnType: "FILAMENT", createDate: "09/02/2026", status: "Active" },
+  { id: "yt-15", yarnType: "GREY MELANCE", createDate: "04/01/2026", status: "Active" },
+  { id: "yt-16", yarnType: "Lycra", createDate: "25/10/2025", status: "Active" },
+  { id: "yt-17", yarnType: "Melange", createDate: "07/02/2026", status: "Active" },
+  { id: "yt-18", yarnType: "ORG COTTON", createDate: "01/10/2024", status: "Active" },
+  { id: "yt-19", yarnType: "Organic CVC", createDate: "15/02/2026", status: "Active" },
+  { id: "yt-20", yarnType: "PC", createDate: "26/10/2025", status: "Active" },
+  { id: "yt-21", yarnType: "Polyester", createDate: "08/10/2025", status: "Active" },
+  { id: "yt-22", yarnType: "RECY COTTON", createDate: "01/10/2024", status: "Active" },
+  { id: "yt-23", yarnType: "SPANDEX", createDate: "", status: "Active" },
+  { id: "yt-24", yarnType: "STRIPE", createDate: "22/10/2025", status: "Active" },
+];
+
+interface YarnCountSpec {
+  id: string;
+  name: string;
+  createdDate: string;
+  status: "Active" | "Inactive";
+}
+
+const initialYarnCounts: YarnCountSpec[] = [
+  { id: "yc-1", name: "10/1", createdDate: "", status: "Active" },
+  { id: "yc-2", name: "12/1", createdDate: "", status: "Active" },
+  { id: "yc-3", name: "150D/144F", createdDate: "", status: "Active" },
+  { id: "yc-4", name: "16/1", createdDate: "", status: "Active" },
+  { id: "yc-5", name: "20/1", createdDate: "", status: "Active" },
+  { id: "yc-6", name: "24/1", createdDate: "", status: "Active" },
+  { id: "yc-7", name: "26/1", createdDate: "", status: "Active" },
+  { id: "yc-8", name: "28/1", createdDate: "", status: "Active" },
+  { id: "yc-9", name: "30/1", createdDate: "", status: "Active" },
+  { id: "yc-10", name: "32/1", createdDate: "", status: "Active" },
+  { id: "yc-11", name: "34/1", createdDate: "", status: "Active" },
+  { id: "yc-12", name: "36/1", createdDate: "", status: "Active" },
+  { id: "yc-13", name: "40/1", createdDate: "", status: "Active" },
+  { id: "yc-14", name: "75D", createdDate: "", status: "Active" },
+  { id: "yc-15", name: "75D/36F", createdDate: "04/03/2026", status: "Active" },
+  { id: "yc-16", name: "20D", createdDate: "", status: "Active" },
+  { id: "yc-17", name: "40D", createdDate: "", status: "Active" },
+  { id: "yc-18", name: "70D", createdDate: "", status: "Active" },
+];
+
+interface YarnPoTypeSpec {
+  id: string;
+  poTypeName: string;
+  isPrRequired: "Yes" | "No";
+  status: "Active" | "Inactive";
+}
+
+const initialYarnPoTypes: YarnPoTypeSpec[] = [
+  { id: "yp-1", poTypeName: "Block against Buyer", isPrRequired: "No", status: "Active" },
+  { id: "yp-2", poTypeName: "Sample", isPrRequired: "Yes", status: "Active" },
+  { id: "yp-3", poTypeName: "Block Purchase", isPrRequired: "Yes", status: "Active" },
+  { id: "yp-4", poTypeName: "Additional Booking", isPrRequired: "Yes", status: "Active" },
+  { id: "yp-5", poTypeName: "Bulk against Job", isPrRequired: "No", status: "Active" },
+  { id: "yp-6", poTypeName: "Sample against Job", isPrRequired: "No", status: "Active" },
+];
+
+interface YarnPoSettingSpec {
+  id: string;
+  companyName: string;
+  nearestValue: number;
+  compareValue: number;
+  action: "Ceiling" | "Floor" | "Round" | "None";
+  status: "Active" | "Inactive";
+}
+
+const initialYarnPoSettings: YarnPoSettingSpec[] = [
+  { id: "yps-1", companyName: "Pole Star Knit Composite Ltd.", nearestValue: 50, compareValue: 20, action: "Ceiling", status: "Active" }
+];
+
+
+// ── Fabric Composition, Dyeing, Finishing, Shade Range Types & Data ─────
+interface FabricCompositionSpec {
+  id: string;
+  name: string;
+  createdDate: string;
+}
+
+const initialFabricCompositions: FabricCompositionSpec[] = [
+  { id: "comp-1", name: "100% BCI Carded", createdDate: "" },
+  { id: "comp-2", name: "100% BCI Combed", createdDate: "" },
+  { id: "comp-3", name: "100% BCI Slub", createdDate: "" },
+  { id: "comp-4", name: "100% Carded", createdDate: "03/09/2025" },
+  { id: "comp-5", name: "100% Cotton", createdDate: "31/12/2024" },
+  { id: "comp-6", name: "100% Cotton Card", createdDate: "" },
+  { id: "comp-7", name: "100% Cotton Combed", createdDate: "" },
+  { id: "comp-8", name: "100% Elastane", createdDate: "" },
+  { id: "comp-9", name: "100% Organic Cotton", createdDate: "" },
+  { id: "comp-10", name: "100% Polyester", createdDate: "" },
+  { id: "comp-11", name: "100% Recycle Polyester", createdDate: "26/01/2028" },
+  { id: "comp-12", name: "1X1 Rib", createdDate: "" },
+  { id: "comp-13", name: "20% Spandex", createdDate: "12/05/2025" },
+  { id: "comp-14", name: "20D", createdDate: "22/02/2026" },
+  { id: "comp-15", name: "40% Cotton 12% Filament 48% CVC (80% CTN 20% POLY)", createdDate: "" },
+  { id: "comp-16", name: "50% Cotton 50% Modal", createdDate: "03/05/2026" },
+  { id: "comp-17", name: "60% Cotton - 40% REC Polyester", createdDate: "27/10/2025" },
+  { id: "comp-18", name: "60% Cotton 40% Cotton", createdDate: "20/12/2025" },
+  { id: "comp-19", name: "60% Organic Cotton 40% Recycle Polyester", createdDate: "" },
+  { id: "comp-20", name: "65% Polyester 35% Cotton", createdDate: "" },
+  { id: "comp-21", name: "70% Cotton 30% Recycle Cotton", createdDate: "" },
+  { id: "comp-22", name: "80% cotton 18% polyester 2%Spandex", createdDate: "05/05/2028" },
+];
+
+interface DyeingSpec {
+  id: string;
+  dyeingName: string;
+  rate: number;
+  status: "Active" | "Inactive";
+}
+
+const initialDyeings: DyeingSpec[] = [
+  { id: "dy-1", dyeingName: "Average", rate: 1, status: "Active" },
+  { id: "dy-2", dyeingName: "Black", rate: 1, status: "Active" },
+  { id: "dy-3", dyeingName: "Cotton Dyeing", rate: 0, status: "Active" },
+  { id: "dy-4", dyeingName: "Dark", rate: 2, status: "Active" },
+  { id: "dy-5", dyeingName: "Double Part Dyeing", rate: 0, status: "Active" },
+  { id: "dy-6", dyeingName: "Extra Dark", rate: 15, status: "Active" },
+  { id: "dy-7", dyeingName: "Fluorescent", rate: 0, status: "Active" },
+  { id: "dy-8", dyeingName: "Garments Wash", rate: 0, status: "Active" },
+  { id: "dy-9", dyeingName: "Light", rate: 1, status: "Active" },
+  { id: "dy-10", dyeingName: "Medium", rate: 2, status: "Active" },
+  { id: "dy-11", dyeingName: "N/A", rate: 0, status: "Active" },
+  { id: "dy-12", dyeingName: "Pigment (AOP)", rate: 0, status: "Active" },
+  { id: "dy-13", dyeingName: "RFD", rate: 0, status: "Active" },
+  { id: "dy-14", dyeingName: "Royal", rate: 0, status: "Active" },
+  { id: "dy-15", dyeingName: "Wash", rate: 0, status: "Active" },
+  { id: "dy-16", dyeingName: "White", rate: 0, status: "Active" },
+  { id: "dy-17", dyeingName: "Yarn Dyeing", rate: 0, status: "Active" },
+  { id: "dy-18", dyeingName: "YD Wash", rate: 0, status: "Active" },
+];
+
+interface FinishingSpec {
+  id: string;
+  finishingName: string;
+  rate: number;
+  status: "Active" | "Inactive";
+}
+
+const initialFinishings: FinishingSpec[] = [
+  { id: "fin-1", finishingName: "Brushing", rate: 0, status: "Active" },
+  { id: "fin-2", finishingName: "Compacting", rate: 2.0200, status: "Active" },
+  { id: "fin-3", finishingName: "Dryer", rate: 0, status: "Active" },
+  { id: "fin-4", finishingName: "Heat Set", rate: 0, status: "Active" },
+  { id: "fin-5", finishingName: "Hydrophilic Softner", rate: 0, status: "Active" },
+  { id: "fin-6", finishingName: "Peach Finishing", rate: 0, status: "Active" },
+  { id: "fin-7", finishingName: "Shearing", rate: 0, status: "Active" },
+  { id: "fin-8", finishingName: "Sinzing", rate: 0, status: "Active" },
+  { id: "fin-9", finishingName: "Stenter", rate: 0, status: "Active" },
+  { id: "fin-10", finishingName: "Sueding", rate: 0, status: "Active" },
+  { id: "fin-11", finishingName: "Teflone Finish", rate: 0, status: "Active" },
+];
+
+interface ShadeRangeSpec {
+  id: string;
+  shadeRangeName: string;
+  shadePercentage: number;
+  status: "Active" | "Inactive";
+}
+
+const initialShadeRanges: ShadeRangeSpec[] = [
+  { id: "shd-1", shadeRangeName: "Dark", shadePercentage: 65.00, status: "Active" },
+  { id: "shd-2", shadeRangeName: "Extra Dark", shadePercentage: 70.00, status: "Active" },
+  { id: "shd-3", shadeRangeName: "RFD", shadePercentage: 85.00, status: "Active" },
+  { id: "shd-4", shadeRangeName: "Medium", shadePercentage: 55.00, status: "Active" },
+  { id: "shd-5", shadeRangeName: "Light", shadePercentage: 40.00, status: "Active" },
+  { id: "shd-6", shadeRangeName: "White", shadePercentage: 0.00, status: "Active" },
+  { id: "shd-7", shadeRangeName: "N/A", shadePercentage: 0, status: "Active" },
+];
+
+
+interface MasterRate {
+  id: string;
+  parentId: string; // references Dyeing entry ID or Finishing entry ID
+  type: "dyeing" | "finishing";
+  rate: number;
+  startDate: string;
+  endDate: string;
+  status: "Active" | "Inactive";
+}
+
+const initialMasterRates: MasterRate[] = [
+  { id: "mr-1", parentId: "DYE-01", type: "dyeing", rate: 1.00, startDate: "2025-10-01", endDate: "", status: "Active" },
+  { id: "mr-2", parentId: "DYE-02", type: "dyeing", rate: 1.20, startDate: "2025-10-01", endDate: "", status: "Active" },
+];
+
 // ── Supplier Types & Initial Data ──────────────────────────────────────
 interface Supplier {
   id: string;
@@ -372,19 +607,31 @@ interface Supplier {
   email: string;
   cell: string;
   status: "Active" | "Inactive";
+  category?: string[];
 }
 
+const SUPPLIER_CATEGORIES = [
+  "Yarn",
+  "Fabric",
+  "Trims",
+  "Dyes & Chemical",
+  "General Stationary",
+  "Machinery",
+  "ICT",
+  "Civil"
+];
+
 const initialSuppliers: Supplier[] = [
-  { id: "sup-1",  companyName: "A. Rashid Sikder Ind. Limited.", contactName: "Md. Shahidul Haque", designation: "xyz",     address: "210,212,Deshipara,Gazipursadar,Gazipur,Bangladesh.", email: "s.haque1967@yahoo.com",     cell: "01600000001", status: "Active" },
-  { id: "sup-2",  companyName: "A.B.M Knitwear",                 contactName: "Mr. Sabuj",           designation: "Manager", address: "Mosharaf Trade Center, Rajabari,Konabari",          email: "abmknitwear2022@gmail.com", cell: "01775-707184",  status: "Active" },
-  { id: "sup-3",  companyName: "ABIR ABDULLAH KNIT FABRICS",     contactName: "Mr",                  designation: "Manager", address: "BSCIC, Industrial Area, Konabari,Gazipur",          email: "@",                         cell: "0123456789",    status: "Active" },
-  { id: "sup-4",  companyName: "ANISA'S APPARELS LTD.",          contactName: "N/A",                 designation: "N/A",     address: "Hatimara, Kashimpur,Gazipur",                       email: "N/A",                       cell: "01897865479",   status: "Active" },
-  { id: "sup-5",  companyName: "Arif Knitspin Limited",          contactName: "Arif Knitspin Limited", designation: "Xyz",   address: "Jamirdia, Masterbari, Valuka, Mymensingh",          email: "@gmail.com",                cell: "098765",        status: "Active" },
-  { id: "sup-6",  companyName: "Armada Spinning Mills Limited",  contactName: "Tareq",               designation: "AGM",     address: "Sreepur,Gazipur 1740, Dhaka, Bangladesh",           email: "abc",                       cell: "01634846",      status: "Active" },
-  { id: "sup-7",  companyName: "ARS KNIT FABRICE",               contactName: "Mr",                  designation: "Manager", address: "Bsicc Konabari, Gazipur",                           email: "",                          cell: "",              status: "Active" },
-  { id: "sup-8",  companyName: "B.B Fashion",                    contactName: "xyz",                 designation: "Manager", address: "Molla Market,(2nd Floor)Board Bazar,Gazipur",       email: "@",                         cell: "01725642370",   status: "Active" },
-  { id: "sup-9",  companyName: "Changzhou Shenghongjing Textile",contactName: "Jeery",               designation: "chains",  address: "chaina",                                            email: "chaina",                    cell: "0987654",       status: "Active" },
-  { id: "sup-10", companyName: "DULALI KNIT WEAR",               contactName: "N/A",                 designation: "N/A",     address: "Konabari Gazipur",                                  email: "N/A",                       cell: "N/A",           status: "Active" },
+  { id: "sup-1",  companyName: "A. Rashid Sikder Ind. Limited.", contactName: "Md. Shahidul Haque", designation: "xyz",     address: "210,212,Deshipara,Gazipursadar,Gazipur,Bangladesh.", email: "s.haque1967@yahoo.com",     cell: "01600000001", status: "Active", category: ["Yarn", "Fabric"] },
+  { id: "sup-2",  companyName: "A.B.M Knitwear",                 contactName: "Mr. Sabuj",           designation: "Manager", address: "Mosharaf Trade Center, Rajabari,Konabari",          email: "abmknitwear2022@gmail.com", cell: "01775-707184",  status: "Active", category: ["Fabric"] },
+  { id: "sup-3",  companyName: "ABIR ABDULLAH KNIT FABRICS",     contactName: "Mr",                  designation: "Manager", address: "BSCIC, Industrial Area, Konabari,Gazipur",          email: "@",                         cell: "0123456789",    status: "Active", category: ["Trims"] },
+  { id: "sup-4",  companyName: "ANISA'S APPARELS LTD.",          contactName: "N/A",                 designation: "N/A",     address: "Hatimara, Kashimpur,Gazipur",                       email: "N/A",                       cell: "01897865479",   status: "Active", category: ["Dyes & Chemical"] },
+  { id: "sup-5",  companyName: "Arif Knitspin Limited",          contactName: "Arif Knitspin Limited", designation: "Xyz",   address: "Jamirdia, Masterbari, Valuka, Mymensingh",          email: "@gmail.com",                cell: "098765",        status: "Active", category: ["General Stationary"] },
+  { id: "sup-6",  companyName: "Armada Spinning Mills Limited",  contactName: "Tareq",               designation: "AGM",     address: "Sreepur,Gazipur 1740, Dhaka, Bangladesh",           email: "abc",                       cell: "01634846",      status: "Active", category: ["Machinery"] },
+  { id: "sup-7",  companyName: "ARS KNIT FABRICE",               contactName: "Mr",                  designation: "Manager", address: "Bsicc Konabari, Gazipur",                           email: "",                          cell: "",              status: "Active", category: ["ICT"] },
+  { id: "sup-8",  companyName: "B.B Fashion",                    contactName: "xyz",                 designation: "Manager", address: "Molla Market,(2nd Floor)Board Bazar,Gazipur",       email: "@",                         cell: "01725642370",   status: "Active", category: ["Civil"] },
+  { id: "sup-9",  companyName: "Changzhou Shenghongjing Textile",contactName: "Jeery",               designation: "chains",  address: "chaina",                                            email: "chaina",                    cell: "0987654",       status: "Active", category: ["Yarn"] },
+  { id: "sup-10", companyName: "DULALI KNIT WEAR",               contactName: "N/A",                 designation: "N/A",     address: "Konabari Gazipur",                                  email: "N/A",                       cell: "N/A",           status: "Active", category: ["Fabric"] },
 ];
 import {
   Settings,
@@ -745,11 +992,97 @@ const DynamicMasterDBManager = ({
   searchQuery: string;
 }) => {
   const data = genericDb[subTabId] || [];
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return "";
+    const parts = dateStr.split("-");
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return dateStr;
+  };
   const [modalOpen, setModalOpen] = useState(false);
   const [editItem, setEditItem] = useState<GenericDbItem | null>(null);
   const [formName, setFormName] = useState("");
   const [formDesc, setFormDesc] = useState("");
   const [formStatus, setFormStatus] = useState<"Active" | "Inactive">("Active");
+
+  // Master Rates State
+  const [masterRates, setMasterRates] = useState<MasterRate[]>(initialMasterRates);
+  const [selectedParentItem, setSelectedParentItem] = useState<GenericDbItem | null>(null);
+  const [ratesModalOpen, setRatesModalOpen] = useState(false);
+  const [rateForm, setRateForm] = useState<Partial<MasterRate>>({
+    rate: 1.00,
+    startDate: "",
+    endDate: "",
+    status: "Active",
+  });
+  const [editingRateId, setEditingRateId] = useState<string | null>(null);
+  const [ratesSearch, setRatesSearch] = useState("");
+
+  const handleOpenRatesModal = (item: GenericDbItem) => {
+    setSelectedParentItem(item);
+    setRatesSearch("");
+    setEditingRateId(null);
+    setRateForm({
+      rate: 1.00,
+      startDate: "",
+      endDate: "",
+      status: "Active",
+    });
+    setRatesModalOpen(true);
+  };
+
+  const handleEditRate = (r: MasterRate) => {
+    setEditingRateId(r.id);
+    setRateForm({
+      rate: r.rate,
+      startDate: r.startDate,
+      endDate: r.endDate,
+      status: r.status,
+    });
+  };
+
+  const handleSaveRate = () => {
+    if (rateForm.rate === undefined || rateForm.rate === null || isNaN(rateForm.rate)) {
+      toast.error("Rate is required!");
+      return;
+    }
+    // Validation: Start Date is required only for dyeing, optional for finishing
+    if (subTabId === "dyeing" && !rateForm.startDate) {
+      toast.error("Start Date is required!");
+      return;
+    }
+
+    if (editingRateId) {
+      setMasterRates(prev => prev.map(r => r.id === editingRateId ? { ...r, ...rateForm } as MasterRate : r));
+      toast.success(`${label} rate updated!`);
+      setEditingRateId(null);
+    } else {
+      const newRate: MasterRate = {
+        id: `mr-${Date.now()}`,
+        parentId: selectedParentItem!.id,
+        type: subTabId as "dyeing" | "finishing",
+        rate: rateForm.rate,
+        startDate: rateForm.startDate || "",
+        endDate: rateForm.endDate || "",
+        status: rateForm.status || "Active",
+      };
+      setMasterRates(prev => [...prev, newRate]);
+      toast.success(`${label} rate added!`);
+    }
+
+    setRateForm({
+      rate: 1.00,
+      startDate: "",
+      endDate: "",
+      status: "Active",
+    });
+  };
+
+  const handleDeleteRate = (id: string) => {
+    setMasterRates(prev => prev.filter(r => r.id !== id));
+    toast.success(`${label} rate deleted!`);
+  };
 
   const handleOpenModal = (item?: GenericDbItem | null) => {
     if (item) {
@@ -855,6 +1188,15 @@ const DynamicMasterDBManager = ({
                   </td>
                   <td className="px-4 py-3 text-center">
                     <div className="flex items-center justify-center gap-1">
+                      {(subTabId === "dyeing" || subTabId === "finishing") && (
+                        <button
+                          onClick={() => handleOpenRatesModal(item)}
+                          className="p-1 text-teal-600 hover:text-teal-700 hover:bg-teal-50 dark:hover:bg-slate-800 rounded transition cursor-pointer"
+                          title={`Manage ${label} Rates`}
+                        >
+                          <DollarSign size={14} />
+                        </button>
+                      )}
                       <button
                         onClick={() => handleOpenModal(item)}
                         className="p-1 text-slate-500 hover:text-teal-500 hover:bg-slate-100 rounded transition cursor-pointer"
@@ -949,6 +1291,223 @@ const DynamicMasterDBManager = ({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Rates Modal */}
+      {ratesModalOpen && selectedParentItem && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+            {/* Modal Header */}
+            <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-800 flex items-center justify-between">
+              <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                {subTabId === "dyeing"
+                  ? (editingRateId ? "Update Dyeing Rate" : "Add Dyeing Rate")
+                  : (editingRateId ? "Update Finishing Rate" : "Finishing Rate Details")
+                }
+              </h3>
+              <button
+                onClick={() => setRatesModalOpen(false)}
+                className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+              {/* Form Grid */}
+              <div className="grid grid-cols-2 gap-4">
+                {/* Rate */}
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">
+                    Rate <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    required
+                    value={rateForm.rate ?? ""}
+                    onChange={(e) => setRateForm({ ...rateForm, rate: parseFloat(e.target.value) || 0 })}
+                    className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                    placeholder="e.g. 1.00"
+                  />
+                </div>
+
+                {/* Start Date */}
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">
+                    Start Date {subTabId === "dyeing" && <span className="text-rose-500">*</span>}
+                  </label>
+                  <input
+                    type="date"
+                    required={subTabId === "dyeing"}
+                    value={rateForm.startDate || ""}
+                    onChange={(e) => setRateForm({ ...rateForm, startDate: e.target.value })}
+                    className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                  />
+                </div>
+
+                {/* End Date */}
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">
+                    End Date {subTabId === "dyeing" && <span className="text-rose-500">*</span>}
+                  </label>
+                  <input
+                    type="date"
+                    required={subTabId === "dyeing"}
+                    value={rateForm.endDate || ""}
+                    onChange={(e) => setRateForm({ ...rateForm, endDate: e.target.value })}
+                    className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                  />
+                </div>
+
+                {/* Status */}
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">
+                    Status <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    value={rateForm.status || "Active"}
+                    onChange={(e) => setRateForm({ ...rateForm, status: e.target.value as "Active" | "Inactive" })}
+                    className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Form Buttons */}
+              <div className="flex items-center justify-between pt-2">
+                <button
+                  type="button"
+                  onClick={() => setRatesModalOpen(false)}
+                  className="px-6 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl uppercase tracking-wider transition active:scale-95 duration-100 cursor-pointer shadow-sm"
+                >
+                  CLOSE
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveRate}
+                  className="px-6 py-2 bg-[#82b440] hover:bg-[#72a035] text-white font-bold text-xs rounded-xl uppercase tracking-wider transition active:scale-95 duration-100 cursor-pointer shadow-sm"
+                >
+                  {editingRateId ? "UPDATE" : "CREATE"}
+                </button>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-slate-200 dark:border-slate-800/80 my-4" />
+
+              {/* List Actions & Search */}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => toast.success("Exported to Excel")}
+                    className="px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition shadow-2xs cursor-pointer uppercase flex items-center gap-1"
+                  >
+                    <Download size={13} className="text-emerald-600" /> Excel
+                  </button>
+                  <button
+                    onClick={() => window.print()}
+                    className="px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition shadow-2xs cursor-pointer uppercase flex items-center gap-1"
+                  >
+                    <Printer size={13} className="text-slate-500" /> Print
+                  </button>
+                  <button
+                    onClick={() => toast.success("Exported to PDF")}
+                    className="px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition shadow-2xs cursor-pointer uppercase flex items-center gap-1"
+                  >
+                    <FileText size={13} className="text-red-500" /> PDF
+                  </button>
+                </div>
+
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={ratesSearch}
+                    onChange={(e) => setRatesSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-44 text-slate-800 dark:text-slate-100"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+              </div>
+
+              {/* Table */}
+              <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-x-auto">
+                <table className="w-full text-xs text-left">
+                  <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                    <tr>
+                      <th className="px-4 py-2.5 text-center w-16">∇</th>
+                      <th className="px-4 py-2.5">Rate</th>
+                      <th className="px-4 py-2.5">StartDate</th>
+                      <th className="px-4 py-2.5">EndDate</th>
+                      <th className="px-4 py-2.5 text-center">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                    {masterRates
+                      .filter(r => r.parentId === selectedParentItem.id && r.type === subTabId)
+                      .filter(r =>
+                        r.rate.toString().includes(ratesSearch) ||
+                        r.startDate.includes(ratesSearch) ||
+                        r.endDate.includes(ratesSearch) ||
+                        r.status.toLowerCase().includes(ratesSearch.toLowerCase())
+                      )
+                      .map((r, idx) => (
+                        <tr key={r.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                          <td className="px-4 py-2 text-center text-slate-500 flex items-center justify-center gap-1.5">
+                            <span>{idx + 1}</span>
+                            <button
+                              onClick={() => handleEditRate(r)}
+                              className="text-amber-500 hover:text-amber-600 transition"
+                              title="Edit Rate"
+                            >
+                              <Pencil size={11} className="inline" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteRate(r.id)}
+                              className="text-rose-500 hover:text-rose-600 transition"
+                              title="Delete Rate"
+                            >
+                              <Trash2 size={11} className="inline" />
+                            </button>
+                          </td>
+                          <td className="px-4 py-2 text-slate-800 dark:text-slate-200 font-bold">{r.rate.toFixed(2)}</td>
+                          <td className="px-4 py-2 text-slate-600 dark:text-slate-400">{r.startDate ? formatDate(r.startDate) : ""}</td>
+                          <td className="px-4 py-2 text-slate-600 dark:text-slate-400">{r.endDate ? formatDate(r.endDate) : ""}</td>
+                          <td className="px-4 py-2 text-center">
+                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                              r.status === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
+                            }`}>
+                              {r.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    {masterRates.filter(r => r.parentId === selectedParentItem.id && r.type === subTabId).length === 0 && (
+                      <tr>
+                        <td colSpan={5} className="px-4 py-6 text-center text-slate-400 dark:text-slate-500 italic">
+                          No data available in table
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination footer */}
+              <div className="flex items-center justify-between text-[10px] text-slate-400 px-1 pt-1">
+                <span>Showing 1 to {masterRates.filter(r => r.parentId === selectedParentItem.id && r.type === subTabId).length} entries</span>
+                <div className="flex items-center gap-1 font-bold">
+                  <button className="px-2 py-0.5 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 disabled:opacity-50" disabled>Previous</button>
+                  <button className="px-2 py-0.5 rounded bg-[#82b440] text-white shadow-sm">1</button>
+                  <button className="px-2 py-0.5 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 disabled:opacity-50" disabled>Next</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -1236,6 +1795,255 @@ function MerchandisingMasterSettingsPage() {
   };
 
 
+  // Yarn Brand States
+  const [yarnBrands, setYarnBrands] = useState<YarnBrandSpec[]>(initialYarnBrands);
+  const [yarnBrandModal, setYarnBrandModal] = useState<{ open: boolean; item?: YarnBrandSpec }>({ open: false });
+  const [yarnBrandForm, setYarnBrandForm] = useState<Partial<YarnBrandSpec>>({
+    brandName: "",
+    status: "Active"
+  });
+  const [yarnBrandSearch, setYarnBrandSearch] = useState("");
+
+  const handleOpenYarnBrandModal = (item?: YarnBrandSpec) => {
+    if (item) {
+      setYarnBrandForm(item);
+      setYarnBrandModal({ open: true, item });
+    } else {
+      setYarnBrandForm({
+        brandName: "",
+        status: "Active"
+      });
+      setYarnBrandModal({ open: true });
+    }
+  };
+
+  const handleSaveYarnBrand = () => {
+    if (!yarnBrandForm.brandName?.trim()) {
+      toast.error("Brand Name is required!");
+      return;
+    }
+
+    if (yarnBrandModal.item) {
+      setYarnBrands(prev => prev.map(y => y.id === yarnBrandModal.item!.id ? { ...y, ...yarnBrandForm } as YarnBrandSpec : y));
+      toast.success("Yarn Brand updated successfully!");
+    } else {
+      const newId = `yb-${Date.now()}`;
+      setYarnBrands(prev => [...prev, { ...yarnBrandForm, id: newId } as YarnBrandSpec]);
+      toast.success("Yarn Brand created successfully!");
+    }
+    setYarnBrandModal({ open: false });
+  };
+
+  const handleDeleteYarnBrand = (id: string) => {
+    setYarnBrands(prev => prev.filter(y => y.id !== id));
+    toast.success("Yarn Brand deleted successfully!");
+  };
+
+  // Yarn Type States
+  const [yarnTypes, setYarnTypes] = useState<YarnTypeSpec[]>(initialYarnTypes);
+  const [yarnTypeModal, setYarnTypeModal] = useState<{ open: boolean; item?: YarnTypeSpec }>({ open: false });
+  const [yarnTypeForm, setYarnTypeForm] = useState<Partial<YarnTypeSpec>>({
+    yarnType: "",
+    createDate: "",
+    status: "Active"
+  });
+  const [yarnTypeSearch, setYarnTypeSearch] = useState("");
+
+  const handleOpenYarnTypeModal = (item?: YarnTypeSpec) => {
+    if (item) {
+      setYarnTypeForm(item);
+      setYarnTypeModal({ open: true, item });
+    } else {
+      const today = new Date();
+      const dd = String(today.getDate()).padStart(2, '0');
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const yyyy = today.getFullYear();
+      setYarnTypeForm({
+        yarnType: "",
+        createDate: `${dd}/${mm}/${yyyy}`,
+        status: "Active"
+      });
+      setYarnTypeModal({ open: true });
+    }
+  };
+
+  const handleSaveYarnType = () => {
+    if (!yarnTypeForm.yarnType?.trim()) {
+      toast.error("Yarn Type is required!");
+      return;
+    }
+
+    if (yarnTypeModal.item) {
+      setYarnTypes(prev => prev.map(y => y.id === yarnTypeModal.item!.id ? { ...y, ...yarnTypeForm } as YarnTypeSpec : y));
+      toast.success("Yarn Type updated successfully!");
+    } else {
+      const newId = `yt-${Date.now()}`;
+      setYarnTypes(prev => [...prev, { ...yarnTypeForm, id: newId } as YarnTypeSpec]);
+      toast.success("Yarn Type created successfully!");
+    }
+    setYarnTypeModal({ open: false });
+  };
+
+  const handleDeleteYarnType = (id: string) => {
+    setYarnTypes(prev => prev.filter(y => y.id !== id));
+    toast.success("Yarn Type deleted successfully!");
+  };
+
+  // Yarn Count States
+  const [yarnCounts, setYarnCounts] = useState<YarnCountSpec[]>(initialYarnCounts);
+  const [yarnCountModal, setYarnCountModal] = useState<{ open: boolean; item?: YarnCountSpec }>({ open: false });
+  const [yarnCountForm, setYarnCountForm] = useState<Partial<YarnCountSpec>>({
+    name: "",
+    createdDate: "",
+    status: "Active"
+  });
+  const [yarnCountSearch, setYarnCountSearch] = useState("");
+
+  const handleOpenYarnCountModal = (item?: YarnCountSpec) => {
+    if (item) {
+      setYarnCountForm(item);
+      setYarnCountModal({ open: true, item });
+    } else {
+      const today = new Date();
+      const dd = String(today.getDate()).padStart(2, '0');
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const yyyy = today.getFullYear();
+      setYarnCountForm({
+        name: "",
+        createdDate: `${dd}/${mm}/${yyyy}`,
+        status: "Active"
+      });
+      setYarnCountModal({ open: true });
+    }
+  };
+
+  const handleSaveYarnCount = () => {
+    if (!yarnCountForm.name?.trim()) {
+      toast.error("Yarn Count Name is required!");
+      return;
+    }
+
+    if (yarnCountModal.item) {
+      setYarnCounts(prev => prev.map(y => y.id === yarnCountModal.item!.id ? { ...y, ...yarnCountForm } as YarnCountSpec : y));
+      toast.success("Yarn Count updated successfully!");
+    } else {
+      const newId = `yc-${Date.now()}`;
+      setYarnCounts(prev => [...prev, { ...yarnCountForm, id: newId } as YarnCountSpec]);
+      toast.success("Yarn Count created successfully!");
+    }
+    setYarnCountModal({ open: false });
+  };
+
+  const handleDeleteYarnCount = (id: string) => {
+    setYarnCounts(prev => prev.filter(y => y.id !== id));
+    toast.success("Yarn Count deleted successfully!");
+  };
+
+  // Yarn PO Type States
+  const [yarnPoTypes, setYarnPoTypes] = useState<YarnPoTypeSpec[]>(initialYarnPoTypes);
+  const [yarnPoTypeModal, setYarnPoTypeModal] = useState<{ open: boolean; item?: YarnPoTypeSpec }>({ open: false });
+  const [yarnPoTypeForm, setYarnPoTypeForm] = useState<Partial<YarnPoTypeSpec>>({
+    poTypeName: "",
+    isPrRequired: "No",
+    status: "Active"
+  });
+  const [yarnPoTypeSearch, setYarnPoTypeSearch] = useState("");
+
+  const handleOpenYarnPoTypeModal = (item?: YarnPoTypeSpec) => {
+    if (item) {
+      setYarnPoTypeForm(item);
+      setYarnPoTypeModal({ open: true, item });
+    } else {
+      setYarnPoTypeForm({
+        poTypeName: "",
+        isPrRequired: "No",
+        status: "Active"
+      });
+      setYarnPoTypeModal({ open: true });
+    }
+  };
+
+  const handleSaveYarnPoType = () => {
+    if (!yarnPoTypeForm.poTypeName?.trim()) {
+      toast.error("PO Type Name is required!");
+      return;
+    }
+
+    if (yarnPoTypeModal.item) {
+      setYarnPoTypes(prev => prev.map(y => y.id === yarnPoTypeModal.item!.id ? { ...y, ...yarnPoTypeForm } as YarnPoTypeSpec : y));
+      toast.success("Yarn PO Type updated successfully!");
+    } else {
+      const newId = `yp-${Date.now()}`;
+      setYarnPoTypes(prev => [...prev, { ...yarnPoTypeForm, id: newId } as YarnPoTypeSpec]);
+      toast.success("Yarn PO Type created successfully!");
+    }
+    setYarnPoTypeModal({ open: false });
+  };
+
+  const handleDeleteYarnPoType = (id: string) => {
+    setYarnPoTypes(prev => prev.filter(y => y.id !== id));
+    toast.success("Yarn PO Type deleted successfully!");
+  };
+
+  // Yarn PO Settings States
+  const [yarnPoSettings, setYarnPoSettings] = useState<YarnPoSettingSpec[]>(initialYarnPoSettings);
+  const [yarnPoSettingModal, setYarnPoSettingModal] = useState<{ open: boolean; item?: YarnPoSettingSpec }>({ open: false });
+  const [yarnPoSettingForm, setYarnPoSettingForm] = useState<Partial<YarnPoSettingSpec>>({
+    companyName: "",
+    nearestValue: 50,
+    compareValue: 20,
+    action: "Ceiling",
+    status: "Active"
+  });
+  const [yarnPoSettingSearch, setYarnPoSettingSearch] = useState("");
+
+  const handleOpenYarnPoSettingModal = (item?: YarnPoSettingSpec) => {
+    if (item) {
+      setYarnPoSettingForm(item);
+      setYarnPoSettingModal({ open: true, item });
+    } else {
+      setYarnPoSettingForm({
+        companyName: "Pole Star Knit Composite Ltd.",
+        nearestValue: 50,
+        compareValue: 20,
+        action: "Ceiling",
+        status: "Active"
+      });
+      setYarnPoSettingModal({ open: true });
+    }
+  };
+
+  const handleSaveYarnPoSetting = () => {
+    if (!yarnPoSettingForm.companyName?.trim()) {
+      toast.error("Company Name is required!");
+      return;
+    }
+    if (yarnPoSettingForm.nearestValue === undefined || isNaN(Number(yarnPoSettingForm.nearestValue))) {
+      toast.error("Nearest Value is required and must be a number!");
+      return;
+    }
+    if (yarnPoSettingForm.compareValue === undefined || isNaN(Number(yarnPoSettingForm.compareValue))) {
+      toast.error("CompareValue Value is required and must be a number!");
+      return;
+    }
+
+    if (yarnPoSettingModal.item) {
+      setYarnPoSettings(prev => prev.map(y => y.id === yarnPoSettingModal.item!.id ? { ...y, ...yarnPoSettingForm } as YarnPoSettingSpec : y));
+      toast.success("Yarn PO Setting updated successfully!");
+    } else {
+      const newId = `yps-${Date.now()}`;
+      setYarnPoSettings(prev => [...prev, { ...yarnPoSettingForm, id: newId } as YarnPoSettingSpec]);
+      toast.success("Yarn PO Setting created successfully!");
+    }
+    setYarnPoSettingModal({ open: false });
+  };
+
+  const handleDeleteYarnPoSetting = (id: string) => {
+    setYarnPoSettings(prev => prev.filter(y => y.id !== id));
+    toast.success("Yarn PO Setting deleted successfully!");
+  };
+
+
   // Size Group States
   const [sizeGroups, setSizeGroups] = useState<SizeGroupSpec[]>(initialSizeGroups);
   const [sizeGroupModal, setSizeGroupModal] = useState<{ open: boolean; item?: SizeGroupSpec }>({ open: false });
@@ -1287,7 +2095,12 @@ function MerchandisingMasterSettingsPage() {
   const [uoms, setUoms] = useState<UomSpec[]>(initialUoms);
   const [uomModal, setUomModal] = useState<{ open: boolean; item?: UomSpec }>({ open: false });
   const [uomForm, setUomForm] = useState<Partial<UomSpec>>({
-    unitGroupName: "",
+    unitName: "",
+    shortName: "",
+    unitGroup: "Linear",
+    sortOrder: 0,
+    relativeFactor: 1.00,
+    isBaseUnit: false,
     status: "Active"
   });
   const [uomSearch, setUomSearch] = useState("");
@@ -1298,7 +2111,12 @@ function MerchandisingMasterSettingsPage() {
       setUomModal({ open: true, item });
     } else {
       setUomForm({
-        unitGroupName: "",
+        unitName: "",
+        shortName: "",
+        unitGroup: "Linear",
+        sortOrder: uoms.length + 1,
+        relativeFactor: 1.00,
+        isBaseUnit: false,
         status: "Active"
       });
       setUomModal({ open: true });
@@ -1306,8 +2124,20 @@ function MerchandisingMasterSettingsPage() {
   };
 
   const handleSaveUom = () => {
-    if (!uomForm.unitGroupName?.trim()) {
-      toast.error("Unit Group Name is required!");
+    if (!uomForm.unitName?.trim()) {
+      toast.error("Unit Name is required!");
+      return;
+    }
+    if (!uomForm.shortName?.trim()) {
+      toast.error("Short Name is required!");
+      return;
+    }
+    if (uomForm.sortOrder === undefined || uomForm.sortOrder === null) {
+      toast.error("Sort Order is required!");
+      return;
+    }
+    if (uomForm.relativeFactor === undefined || uomForm.relativeFactor === null) {
+      toast.error("Relative Factor is required!");
       return;
     }
 
@@ -1713,25 +2543,51 @@ function MerchandisingMasterSettingsPage() {
   const [supplierModal, setSupplierModal] = useState<{ open: boolean; item?: Supplier }>({ open: false });
   const [supplierForm, setSupplierForm] = useState<Partial<Supplier>>({
     companyName: "", contactName: "", designation: "", address: "", email: "", cell: "", status: "Active",
+    category: []
   });
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
+  const [categorySearchQuery, setCategorySearchQuery] = useState("");
+
+  const toggleCategory = (cat: string) => {
+    const current = supplierForm.category || [];
+    let updated: string[];
+    if (current.includes(cat)) {
+      updated = current.filter(c => c !== cat);
+    } else {
+      updated = [...current, cat];
+    }
+    setSupplierForm(prev => ({ ...prev, category: updated }));
+  };
+
+  useEffect(() => {
+    if (!categoryDropdownOpen) return;
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".category-dropdown-container")) {
+        setCategoryDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, [categoryDropdownOpen]);
 
   const handleOpenSupplierModal = (item?: Supplier) => {
+    setCategoryDropdownOpen(false);
+    setCategorySearchQuery("");
     if (item) {
-      setSupplierForm(item);
+      setSupplierForm({ ...item, category: item.category || [] });
       setSupplierModal({ open: true, item });
     } else {
-      setSupplierForm({ companyName: "", contactName: "", designation: "", address: "", email: "", cell: "", status: "Active" });
+      setSupplierForm({ companyName: "", contactName: "", designation: "", address: "", email: "", cell: "", status: "Active", category: [] });
       setSupplierModal({ open: true });
     }
   };
 
   const handleSaveSupplier = () => {
+    if (!supplierForm.category || supplierForm.category.length === 0) { toast.error("Supplier Category is required"); return; }
     if (!supplierForm.companyName?.trim()) { toast.error("Company Name is required"); return; }
     if (!supplierForm.contactName?.trim()) { toast.error("Contact Name is required"); return; }
-    if (!supplierForm.designation?.trim()) { toast.error("Designation is required"); return; }
     if (!supplierForm.address?.trim()) { toast.error("Address is required"); return; }
-    if (!supplierForm.email?.trim()) { toast.error("E-mail is required"); return; }
-    if (!supplierForm.cell?.trim()) { toast.error("Cell is required"); return; }
 
     if (supplierModal.item) {
       setSuppliers(prev => prev.map(s => s.id === supplierModal.item!.id ? { ...s, ...supplierForm } as Supplier : s));
@@ -1741,11 +2597,12 @@ function MerchandisingMasterSettingsPage() {
         id: `sup-${Date.now()}`,
         companyName: supplierForm.companyName!,
         contactName: supplierForm.contactName!,
-        designation: supplierForm.designation!,
+        designation: supplierForm.designation || "",
         address: supplierForm.address!,
-        email: supplierForm.email!,
-        cell: supplierForm.cell!,
+        email: supplierForm.email || "",
+        cell: supplierForm.cell || "",
         status: supplierForm.status || "Active",
+        category: supplierForm.category || [],
       };
       setSuppliers(prev => [newS, ...prev]);
       toast.success("Supplier registered!");
@@ -3069,6 +3926,7 @@ function MerchandisingMasterSettingsPage() {
                         <tr>
                           <th className="px-4 py-3 text-center w-20">Actions</th>
                           <th className="px-4 py-3 text-center w-16">SL</th>
+                          <th className="px-4 py-3">Supplier Category</th>
                           <th className="px-4 py-3">Company Name</th>
                           <th className="px-4 py-3">Name</th>
                           <th className="px-4 py-3">Designation</th>
@@ -3091,6 +3949,19 @@ function MerchandisingMasterSettingsPage() {
                               </button>
                             </td>
                             <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                            <td className="px-4 py-2.5">
+                              <div className="flex flex-wrap gap-1 max-w-[200px]">
+                                {s.category && s.category.length > 0 ? (
+                                  s.category.map(cat => (
+                                    <span key={cat} className="px-1.5 py-0.5 bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 text-[10px] font-extrabold rounded border border-teal-100 dark:border-teal-900/60 whitespace-nowrap">
+                                      {cat}
+                                    </span>
+                                  ))
+                                ) : (
+                                  <span className="text-slate-400">—</span>
+                                )}
+                              </div>
+                            </td>
                             <td className="px-4 py-2.5 text-slate-800 dark:text-slate-200 font-bold">{s.companyName}</td>
                             <td className="px-4 py-2.5 text-slate-700 dark:text-slate-300">{s.contactName}</td>
                             <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{s.designation}</td>
@@ -3106,7 +3977,7 @@ function MerchandisingMasterSettingsPage() {
                         ))}
                         {filteredSuppliersList.length === 0 && (
                           <tr>
-                            <td colSpan={9} className="px-4 py-8 text-center text-slate-400 text-xs">No suppliers found.</td>
+                            <td colSpan={10} className="px-4 py-8 text-center text-slate-400 text-xs">No suppliers found.</td>
                           </tr>
                         )}
                       </tbody>
@@ -3130,6 +4001,87 @@ function MerchandisingMasterSettingsPage() {
                         </div>
 
                         <div className="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
+                          {/* Supplier Category */}
+                          <div className="relative category-dropdown-container">
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Supplier Category <span className="text-rose-500">*</span></label>
+                            
+                            <button
+                              type="button"
+                              onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
+                              className="w-full text-left text-xs px-3 py-2 bg-transparent border-b border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500 flex items-center justify-between cursor-pointer min-h-[38px]"
+                            >
+                              <div className="flex flex-wrap gap-1 max-w-[90%]">
+                                {supplierForm.category && supplierForm.category.length > 0 ? (
+                                  supplierForm.category.map(cat => (
+                                    <span
+                                      key={cat}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleCategory(cat);
+                                      }}
+                                      className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 text-[10px] px-2 py-0.5 rounded font-bold flex items-center gap-1 transition"
+                                    >
+                                      {cat}
+                                      <span className="text-slate-400 hover:text-slate-600 font-extrabold text-[9px]">×</span>
+                                    </span>
+                                  ))
+                                ) : (
+                                  <span className="text-slate-400">Select Categories...</span>
+                                )}
+                              </div>
+                              <span className="text-slate-400 text-[10px]">
+                                {categoryDropdownOpen ? "▲" : "▼"}
+                              </span>
+                            </button>
+
+                            {categoryDropdownOpen && (
+                              <div className="absolute z-50 left-0 right-0 mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl max-h-64 overflow-y-auto p-1.5 space-y-0.5 animate-in fade-in slide-in-from-top-1 duration-150">
+                                {/* Search Input */}
+                                <div className="px-2 py-1 sticky top-0 bg-white dark:bg-slate-900 z-10 pb-1 border-b border-slate-100 dark:border-slate-800">
+                                  <input
+                                    type="text"
+                                    placeholder="Search categories..."
+                                    value={categorySearchQuery}
+                                    onChange={(e) => setCategorySearchQuery(e.target.value)}
+                                    onClick={(e) => e.stopPropagation()} // Keep dropdown open when searching
+                                    className="w-full text-xs px-2.5 py-1.5 bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-850 rounded-lg text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500 font-semibold"
+                                  />
+                                </div>
+                                <div className="max-h-40 overflow-y-auto pt-1 space-y-0.5">
+                                  {SUPPLIER_CATEGORIES.filter(cat => 
+                                    cat.toLowerCase().includes(categorySearchQuery.toLowerCase())
+                                  ).map(cat => {
+                                    const isSelected = supplierForm.category?.includes(cat) || false;
+                                    return (
+                                      <div
+                                        key={cat}
+                                        onClick={() => toggleCategory(cat)}
+                                        className="flex items-center gap-2.5 px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800/60 rounded-lg cursor-pointer transition select-none"
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          checked={isSelected}
+                                          onChange={() => {}} // handled by parent div onClick
+                                          className="rounded border-slate-300 dark:border-slate-700 text-teal-500 focus:ring-teal-500 focus:ring-offset-0 size-3.5"
+                                        />
+                                        <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">
+                                          {cat}
+                                        </span>
+                                      </div>
+                                    );
+                                  })}
+                                  {SUPPLIER_CATEGORIES.filter(cat => 
+                                    cat.toLowerCase().includes(categorySearchQuery.toLowerCase())
+                                  ).length === 0 && (
+                                    <div className="text-slate-400 text-center py-4 text-xs font-semibold">
+                                      No categories found.
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
                           {/* Company Name */}
                           <div>
                             <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Company Name <span className="text-rose-500">*</span></label>
@@ -3156,7 +4108,7 @@ function MerchandisingMasterSettingsPage() {
 
                           {/* Designation */}
                           <div>
-                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Designation <span className="text-rose-500">*</span></label>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Designation</label>
                             <input
                               type="text"
                               value={supplierForm.designation || ""}
@@ -3179,7 +4131,7 @@ function MerchandisingMasterSettingsPage() {
 
                           {/* E-mail */}
                           <div>
-                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">E-mail <span className="text-rose-500">*</span></label>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">E-mail</label>
                             <input
                               type="text"
                               value={supplierForm.email || ""}
@@ -3190,7 +4142,7 @@ function MerchandisingMasterSettingsPage() {
 
                           {/* Cell */}
                           <div>
-                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Cell <span className="text-rose-500">*</span></label>
+                            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">Cell</label>
                             <input
                               type="text"
                               value={supplierForm.cell || ""}
@@ -3231,7 +4183,7 @@ function MerchandisingMasterSettingsPage() {
                     </div>
                   )}
                 </div>
-              ) : ["buyer-name", "fabric-construction", "additional-cost-entry", "rmg-process-loss", "item-department", "gmt-item-name", "body-part", "season", "sample-type", "size-group", "uom", "fabric-gsm", "fabric-nature"].includes(searchTab) ? null : (
+              ) : ["buyer-name", "fabric-construction", "additional-cost-entry", "rmg-process-loss", "item-department", "gmt-item-name", "body-part", "season", "sample-type", "size-group", "uom", "fabric-gsm", "fabric-nature", "yarn-brand", "yarn-type", "yarn-count", "yarn-po-type", "yarn-po-settings"].includes(searchTab) ? null : (
                 renderDynamicMasterDB(searchTab, tabLabel)
               )}
         </div>
@@ -4517,14 +5469,21 @@ function MerchandisingMasterSettingsPage() {
                   <tr>
                     <th className="px-4 py-3 text-center w-20">Actions</th>
                     <th className="px-4 py-3 text-center w-16">SL</th>
-                    <th className="px-4 py-3">Unit Group Name</th>
+                    <th className="px-4 py-3">Unit Name</th>
+                    <th className="px-4 py-3">Short Name</th>
+                    <th className="px-4 py-3">Unit Group</th>
+                    <th className="px-4 py-3 text-center">Sort Order</th>
+                    <th className="px-4 py-3 text-center">Relative Factor</th>
+                    <th className="px-4 py-3 text-center">Is Base Unit?</th>
                     <th className="px-4 py-3 text-center w-24">IsActive</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
                   {uoms
                     .filter(u => 
-                      u.unitGroupName.toLowerCase().includes(uomSearch.toLowerCase())
+                      u.unitName.toLowerCase().includes(uomSearch.toLowerCase()) ||
+                      u.shortName.toLowerCase().includes(uomSearch.toLowerCase()) ||
+                      u.unitGroup.toLowerCase().includes(uomSearch.toLowerCase())
                     )
                     .map((u, idx) => (
                       <tr key={u.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
@@ -4538,7 +5497,18 @@ function MerchandisingMasterSettingsPage() {
                           </button>
                         </td>
                         <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
-                        <td className="px-4 py-2.5 text-slate-800 dark:text-slate-200 font-bold">{u.unitGroupName}</td>
+                        <td className="px-4 py-2.5 text-slate-800 dark:text-slate-200 font-bold">{u.unitName}</td>
+                        <td className="px-4 py-2.5 text-slate-700 dark:text-slate-300">{u.shortName}</td>
+                        <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{u.unitGroup}</td>
+                        <td className="px-4 py-2.5 text-center text-slate-600 dark:text-slate-400">{u.sortOrder}</td>
+                        <td className="px-4 py-2.5 text-center text-slate-600 dark:text-slate-400">{u.relativeFactor.toFixed(4).replace(/\.?0+$/, "")}</td>
+                        <td className="px-4 py-2.5 text-center">
+                          {u.isBaseUnit ? (
+                            <span className="text-emerald-500 font-extrabold text-sm">✓</span>
+                          ) : (
+                            <span className="text-slate-300">—</span>
+                          )}
+                        </td>
                         <td className="px-4 py-2.5 text-center">
                           <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
                             u.status === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
@@ -4568,24 +5538,93 @@ function MerchandisingMasterSettingsPage() {
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
                   <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
                     <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                      Add New Mesaurment Head
+                      {uomModal.item ? "Update Unit" : "Add New Measurement Head"}
                     </h3>
                     <button onClick={() => setUomModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
                       <X size={16} />
                     </button>
                   </div>
 
-                  <div className="p-6 space-y-4">
-                    {/* Unit Group Name */}
+                  <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+                    {/* Unit Name */}
                     <div>
-                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Unit Group Name <span className="text-rose-500">*</span></label>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">Unit Name <span className="text-rose-500">*</span></label>
                       <input
                         type="text"
-                        value={uomForm.unitGroupName || ""}
-                        onChange={(e) => setUomForm({ ...uomForm, unitGroupName: e.target.value })}
+                        value={uomForm.unitName || ""}
+                        onChange={(e) => setUomForm({ ...uomForm, unitName: e.target.value })}
                         className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
-                        placeholder="e.g. PCS"
+                        placeholder="e.g. Yards"
                       />
+                    </div>
+
+                    {/* Short Name */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">Short Name <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={uomForm.shortName || ""}
+                        onChange={(e) => setUomForm({ ...uomForm, shortName: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. Yrds"
+                      />
+                    </div>
+
+                    {/* Unit Group */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Unit Group</label>
+                      <select
+                        value={uomForm.unitGroup || "Linear"}
+                        onChange={(e) => setUomForm({ ...uomForm, unitGroup: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30 appearance-none"
+                        style={{ backgroundImage: `url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E")`, backgroundPosition: 'right 0.5rem center', backgroundSize: '1.25rem', backgroundRepeat: 'no-repeat' }}
+                      >
+                        <option value="Linear">Linear</option>
+                        <option value="Weight">Weight</option>
+                        <option value="Volume">Volume</option>
+                        <option value="Area">Area</option>
+                        <option value="Quantity">Quantity</option>
+                        <option value="Time">Time</option>
+                      </select>
+                    </div>
+
+                    {/* Sort Order */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">Sort Order <span className="text-rose-500">*</span></label>
+                      <input
+                        type="number"
+                        value={uomForm.sortOrder ?? ""}
+                        onChange={(e) => setUomForm({ ...uomForm, sortOrder: parseInt(e.target.value) || 0 })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. 9"
+                      />
+                    </div>
+
+                    {/* Relative Factor */}
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5">Relative Factor <span className="text-rose-500">*</span></label>
+                      <input
+                        type="number"
+                        step="0.0001"
+                        value={uomForm.relativeFactor ?? ""}
+                        onChange={(e) => setUomForm({ ...uomForm, relativeFactor: parseFloat(e.target.value) || 0 })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. 1.00"
+                      />
+                    </div>
+
+                    {/* Is Base Unit checkbox */}
+                    <div className="flex items-center gap-2 py-1.5">
+                      <input
+                        type="checkbox"
+                        id="isBaseUnitCheckbox"
+                        checked={uomForm.isBaseUnit || false}
+                        onChange={(e) => setUomForm({ ...uomForm, isBaseUnit: e.target.checked })}
+                        className="rounded border-slate-300 dark:border-slate-700 text-teal-500 focus:ring-teal-500 focus:ring-offset-0 size-4 cursor-pointer"
+                      />
+                      <label htmlFor="isBaseUnitCheckbox" className="text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+                        Is Base Unit?
+                      </label>
                     </div>
 
                     {/* IsActive */}
@@ -4601,17 +5640,17 @@ function MerchandisingMasterSettingsPage() {
                       </select>
                     </div>
 
-                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                    <div className="flex justify-end gap-2 pt-4 border-t border-slate-100 dark:border-slate-800/80">
                       <button
                         type="button"
                         onClick={() => setUomModal({ open: false })}
-                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer shadow-sm active:scale-95 duration-100"
                       >
                         CLOSE
                       </button>
                       <button
                         onClick={handleSaveUom}
-                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer shadow-sm active:scale-95 duration-100"
                       >
                         {uomModal.item ? "UPDATE" : "CREATE"}
                       </button>
@@ -5775,7 +6814,947 @@ function MerchandisingMasterSettingsPage() {
           )
         ) : null}
 
+        {/* YARN BRAND REGISTRY */}
+        {searchTab === "yarn-brand" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Action Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Exported to Excel")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => toast.success("Exported to PDF")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  PDF
+                </button>
+              </div>
 
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={yarnBrandSearch}
+                    onChange={(e) => setYarnBrandSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-48 text-slate-800 dark:text-slate-100"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+                <button
+                  onClick={() => handleOpenYarnBrandModal()}
+                  className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                >
+                  <Plus size={14} /> Add New
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th className="px-4 py-3 text-center w-20">Actions</th>
+                    <th className="px-4 py-3 text-center w-16">SL</th>
+                    <th className="px-4 py-3">Brand Name</th>
+                    <th className="px-4 py-3 text-center w-24">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                  {yarnBrands
+                    .filter(s => s.brandName.toLowerCase().includes(yarnBrandSearch.toLowerCase()))
+                    .map((s, idx) => (
+                      <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-4 py-2.5 text-center flex items-center justify-center gap-1">
+                          <button
+                            onClick={() => handleOpenYarnBrandModal(s)}
+                            className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                            title="Edit"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm("Are you sure you want to delete this brand?")) {
+                                handleDeleteYarnBrand(s.id);
+                              }
+                            }}
+                            className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition cursor-pointer"
+                            title="Delete"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </td>
+                        <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                        <td className="px-4 py-2.5 text-slate-855 dark:text-slate-200 font-bold">{s.brandName}</td>
+                        <td className="px-4 py-2.5 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                            s.status === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
+                          }`}>
+                            {s.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 1 to {yarnBrands.length} of {yarnBrands.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2.5 py-1 rounded bg-teal-500 text-white shadow-sm">1</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* Modal */}
+            {yarnBrandModal.open && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                  <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                      {yarnBrandModal.item ? "Update Yarn Brand" : "Add New Yarn Brand"}
+                    </h3>
+                    <button onClick={() => setYarnBrandModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 space-y-4">
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Brand Name <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={yarnBrandForm.brandName || ""}
+                        onChange={(e) => setYarnBrandForm({ ...yarnBrandForm, brandName: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. Viyellatex"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Status <span className="text-rose-500">*</span></label>
+                      <select
+                        value={yarnBrandForm.status || "Active"}
+                        onChange={(e) => setYarnBrandForm({ ...yarnBrandForm, status: e.target.value as "Active" | "Inactive" })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <button
+                        type="button"
+                        onClick={() => setYarnBrandModal({ open: false })}
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        onClick={handleSaveYarnBrand}
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        {yarnBrandModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* YARN TYPE REGISTRY */}
+        {searchTab === "yarn-type" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Action Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Exported to Excel")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => toast.success("Exported to PDF")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  PDF
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={yarnTypeSearch}
+                    onChange={(e) => setYarnTypeSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-48 text-slate-800 dark:text-slate-100"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+                <button
+                  onClick={() => handleOpenYarnTypeModal()}
+                  className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                >
+                  <Plus size={14} /> Add New
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th className="px-4 py-3 text-center w-20">Actions</th>
+                    <th className="px-4 py-3 text-center w-16">SL</th>
+                    <th className="px-4 py-3">Yarn Type</th>
+                    <th className="px-4 py-3">Create Date</th>
+                    <th className="px-4 py-3 text-center w-24">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                  {yarnTypes
+                    .filter(s => s.yarnType.toLowerCase().includes(yarnTypeSearch.toLowerCase()))
+                    .map((s, idx) => (
+                      <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-4 py-2.5 text-center flex items-center justify-center gap-1">
+                          <button
+                            onClick={() => handleOpenYarnTypeModal(s)}
+                            className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                            title="Edit"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm("Are you sure you want to delete this yarn type?")) {
+                                handleDeleteYarnType(s.id);
+                              }
+                            }}
+                            className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition cursor-pointer"
+                            title="Delete"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </td>
+                        <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                        <td className="px-4 py-2.5 text-slate-855 dark:text-slate-200 font-bold">{s.yarnType}</td>
+                        <td className="px-4 py-2.5 text-slate-700 dark:text-slate-350">{s.createDate || <span className="text-slate-300">—</span>}</td>
+                        <td className="px-4 py-2.5 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                            s.status === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
+                          }`}>
+                            {s.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 1 to {yarnTypes.length} of {yarnTypes.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2.5 py-1 rounded bg-teal-500 text-white shadow-sm">1</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* Modal */}
+            {yarnTypeModal.open && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                  <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                      {yarnTypeModal.item ? "Update Yarn Type" : "Add New Yarn Type"}
+                    </h3>
+                    <button onClick={() => setYarnTypeModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 space-y-4">
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Yarn Type <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={yarnTypeForm.yarnType || ""}
+                        onChange={(e) => setYarnTypeForm({ ...yarnTypeForm, yarnType: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. COMBED COTTON"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-555 mb-1.5">Create Date</label>
+                      <input
+                        type="text"
+                        value={yarnTypeForm.createDate || ""}
+                        onChange={(e) => setYarnTypeForm({ ...yarnTypeForm, createDate: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. DD/MM/YYYY"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-555 mb-1.5">Status <span className="text-rose-500">*</span></label>
+                      <select
+                        value={yarnTypeForm.status || "Active"}
+                        onChange={(e) => setYarnTypeForm({ ...yarnTypeForm, status: e.target.value as "Active" | "Inactive" })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <button
+                        type="button"
+                        onClick={() => setYarnTypeModal({ open: false })}
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        onClick={handleSaveYarnType}
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        {yarnTypeModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* YARN COUNT REGISTRY */}
+        {searchTab === "yarn-count" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Action Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Exported to Excel")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => toast.success("Exported to PDF")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  PDF
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={yarnCountSearch}
+                    onChange={(e) => setYarnCountSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-48 text-slate-800 dark:text-slate-100"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+                <button
+                  onClick={() => handleOpenYarnCountModal()}
+                  className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                >
+                  <Plus size={14} /> Add New
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th className="px-4 py-3 text-center w-20">Actions</th>
+                    <th className="px-4 py-3 text-center w-16">Serial</th>
+                    <th className="px-4 py-3">Name</th>
+                    <th className="px-4 py-3">Created Date</th>
+                    <th className="px-4 py-3 text-center w-24">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                  {yarnCounts
+                    .filter(s => s.name.toLowerCase().includes(yarnCountSearch.toLowerCase()))
+                    .map((s, idx) => (
+                      <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-4 py-2.5 text-center flex items-center justify-center gap-1">
+                          <button
+                            onClick={() => handleOpenYarnCountModal(s)}
+                            className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                            title="Edit"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm("Are you sure you want to delete this yarn count?")) {
+                                handleDeleteYarnCount(s.id);
+                              }
+                            }}
+                            className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition cursor-pointer"
+                            title="Delete"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </td>
+                        <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                        <td className="px-4 py-2.5 text-slate-855 dark:text-slate-200 font-bold">{s.name}</td>
+                        <td className="px-4 py-2.5 text-slate-700 dark:text-slate-350">{s.createdDate || <span className="text-slate-300">—</span>}</td>
+                        <td className="px-4 py-2.5 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                            s.status === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
+                          }`}>
+                            {s.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 1 to {yarnCounts.length} of {yarnCounts.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2.5 py-1 rounded bg-teal-500 text-white shadow-sm">1</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* Modal */}
+            {yarnCountModal.open && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                  <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                      {yarnCountModal.item ? "Update Yarn Count" : "Add New Yarn Count"}
+                    </h3>
+                    <button onClick={() => setYarnCountModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 space-y-4">
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Count Name <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={yarnCountForm.name || ""}
+                        onChange={(e) => setYarnCountForm({ ...yarnCountForm, name: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. 30/1"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Created Date</label>
+                      <input
+                        type="text"
+                        value={yarnCountForm.createdDate || ""}
+                        onChange={(e) => setYarnCountForm({ ...yarnCountForm, createdDate: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. DD/MM/YYYY"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Status <span className="text-rose-500">*</span></label>
+                      <select
+                        value={yarnCountForm.status || "Active"}
+                        onChange={(e) => setYarnCountForm({ ...yarnCountForm, status: e.target.value as "Active" | "Inactive" })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <button
+                        type="button"
+                        onClick={() => setYarnCountModal({ open: false })}
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        onClick={handleSaveYarnCount}
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        {yarnCountModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* YARN PO TYPE REGISTRY */}
+        {searchTab === "yarn-po-type" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Action Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Exported to Excel")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => toast.success("Exported to PDF")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  PDF
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={yarnPoTypeSearch}
+                    onChange={(e) => setYarnPoTypeSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-48 text-slate-800 dark:text-slate-100"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+                <button
+                  onClick={() => handleOpenYarnPoTypeModal()}
+                  className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                >
+                  <Plus size={14} /> Add New
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th className="px-4 py-3 text-center w-20">Actions</th>
+                    <th className="px-4 py-3 text-center w-16">Serial</th>
+                    <th className="px-4 py-3">PO Type Name</th>
+                    <th className="px-4 py-3 text-center w-36">Is PR Required</th>
+                    <th className="px-4 py-3 text-center w-24">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                  {yarnPoTypes
+                    .filter(s => s.poTypeName.toLowerCase().includes(yarnPoTypeSearch.toLowerCase()))
+                    .map((s, idx) => (
+                      <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-4 py-2.5 text-center flex items-center justify-center gap-1">
+                          <button
+                            onClick={() => handleOpenYarnPoTypeModal(s)}
+                            className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                            title="Edit"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm("Are you sure you want to delete this PO type?")) {
+                                handleDeleteYarnPoType(s.id);
+                              }
+                            }}
+                            className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition cursor-pointer"
+                            title="Delete"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </td>
+                        <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                        <td className="px-4 py-2.5 text-slate-855 dark:text-slate-200 font-bold">{s.poTypeName}</td>
+                        <td className="px-4 py-2.5 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                            s.isPrRequired === "Yes" ? "bg-amber-500/10 text-amber-600 border border-amber-500/20" : "bg-slate-105 text-slate-500 dark:bg-slate-800 dark:text-slate-400 border border-slate-200/40 dark:border-slate-700/40"
+                          }`}>
+                            {s.isPrRequired}
+                          </span>
+                        </td>
+                        <td className="px-4 py-2.5 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                            s.status === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
+                          }`}>
+                            {s.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 1 to {yarnPoTypes.length} of {yarnPoTypes.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2.5 py-1 rounded bg-teal-500 text-white shadow-sm">1</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* Modal */}
+            {yarnPoTypeModal.open && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                  <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                      {yarnPoTypeModal.item ? "Update Yarn PO Type" : "Add New Yarn PO Type"}
+                    </h3>
+                    <button onClick={() => setYarnPoTypeModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 space-y-4">
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">PO Type Name <span className="text-rose-500">*</span></label>
+                      <input
+                        type="text"
+                        value={yarnPoTypeForm.poTypeName || ""}
+                        onChange={(e) => setYarnPoTypeForm({ ...yarnPoTypeForm, poTypeName: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. Bulk against Job"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Is PR Required <span className="text-rose-500">*</span></label>
+                      <select
+                        value={yarnPoTypeForm.isPrRequired || "No"}
+                        onChange={(e) => setYarnPoTypeForm({ ...yarnPoTypeForm, isPrRequired: e.target.value as "Yes" | "No" })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Status <span className="text-rose-500">*</span></label>
+                      <select
+                        value={yarnPoTypeForm.status || "Active"}
+                        onChange={(e) => setYarnPoTypeForm({ ...yarnPoTypeForm, status: e.target.value as "Active" | "Inactive" })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <button
+                        type="button"
+                        onClick={() => setYarnPoTypeModal({ open: false })}
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        onClick={handleSaveYarnPoType}
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        {yarnPoTypeModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* YARN PO SETTINGS REGISTRY */}
+        {searchTab === "yarn-po-settings" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* Action Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-t-2xl border border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Exported to Excel")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => toast.success("Exported to PDF")}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer uppercase tracking-wider"
+                >
+                  PDF
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={yarnPoSettingSearch}
+                    onChange={(e) => setYarnPoSettingSearch(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/20 w-48 text-slate-800 dark:text-slate-100"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+                <button
+                  onClick={() => handleOpenYarnPoSettingModal()}
+                  className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm active:scale-95 duration-100 cursor-pointer"
+                >
+                  <Plus size={14} /> Add New
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-b-2xl border border-t-0 border-slate-200 dark:border-slate-800 overflow-x-auto shadow-xs">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th className="px-4 py-3 text-center w-20">Actions</th>
+                    <th className="px-4 py-3 text-center w-16">Serial</th>
+                    <th className="px-4 py-3">Company Name</th>
+                    <th className="px-4 py-3 text-center w-32">Nearest Value</th>
+                    <th className="px-4 py-3 text-center w-36">CompareValue Value</th>
+                    <th className="px-4 py-3 text-center w-24">Action</th>
+                    <th className="px-4 py-3 text-center w-24">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold">
+                  {yarnPoSettings
+                    .filter(s => s.companyName.toLowerCase().includes(yarnPoSettingSearch.toLowerCase()))
+                    .map((s, idx) => (
+                      <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-4 py-2.5 text-center flex items-center justify-center gap-1">
+                          <button
+                            onClick={() => handleOpenYarnPoSettingModal(s)}
+                            className="p-1 text-amber-500 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                            title="Edit"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm("Are you sure you want to delete this PO setting?")) {
+                                handleDeleteYarnPoSetting(s.id);
+                              }
+                            }}
+                            className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition cursor-pointer"
+                            title="Delete"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </td>
+                        <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                        <td className="px-4 py-2.5 text-slate-855 dark:text-slate-200 font-bold">{s.companyName}</td>
+                        <td className="px-4 py-2.5 text-center text-slate-700 dark:text-slate-350">{s.nearestValue}</td>
+                        <td className="px-4 py-2.5 text-center text-slate-700 dark:text-slate-350">{s.compareValue}</td>
+                        <td className="px-4 py-2.5 text-center">
+                          <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-sky-500/10 text-sky-600 border border-sky-500/20">
+                            {s.action}
+                          </span>
+                        </td>
+                        <td className="px-4 py-2.5 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                            s.status === "Active" ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-slate-500/10 text-slate-500"
+                          }`}>
+                            {s.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span>Showing 1 to {yarnPoSettings.length} of {yarnPoSettings.length} entries</span>
+              <div className="flex items-center gap-1.5 font-bold">
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Previous</button>
+                <button className="px-2.5 py-1 rounded bg-teal-500 text-white shadow-sm">1</button>
+                <button className="px-2 py-1 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 cursor-pointer disabled:opacity-50" disabled>Next</button>
+              </div>
+            </div>
+
+            {/* Modal */}
+            {yarnPoSettingModal.open && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                  <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-150 dark:border-slate-850 flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                      {yarnPoSettingModal.item ? "Update PO Setting" : "Add New PO Setting"}
+                    </h3>
+                    <button onClick={() => setYarnPoSettingModal({ open: false })} className="p-1 rounded-lg hover:bg-slate-250 dark:hover:bg-slate-800 text-slate-400 transition cursor-pointer">
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 space-y-4">
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Company Name <span className="text-rose-500">*</span></label>
+                      <select
+                        value={yarnPoSettingForm.companyName || ""}
+                        onChange={(e) => setYarnPoSettingForm({ ...yarnPoSettingForm, companyName: e.target.value })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="">--Select--</option>
+                        <option value="Pole Star Knit Composite Ltd.">Pole Star Knit Composite Ltd.</option>
+                        <option value="Pole Star Fashion Design Ltd.">Pole Star Fashion Design Ltd.</option>
+                        <option value="Prime Sweater Ltd.">Prime Sweater Ltd.</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Nearest Value <span className="text-rose-500">*</span></label>
+                      <input
+                        type="number"
+                        value={yarnPoSettingForm.nearestValue !== undefined ? yarnPoSettingForm.nearestValue : ""}
+                        onChange={(e) => setYarnPoSettingForm({ ...yarnPoSettingForm, nearestValue: e.target.value === "" ? undefined : Number(e.target.value) })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. 50"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">CompareValue Value <span className="text-rose-500">*</span></label>
+                      <input
+                        type="number"
+                        value={yarnPoSettingForm.compareValue !== undefined ? yarnPoSettingForm.compareValue : ""}
+                        onChange={(e) => setYarnPoSettingForm({ ...yarnPoSettingForm, compareValue: e.target.value === "" ? undefined : Number(e.target.value) })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                        placeholder="e.g. 20"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Action <span className="text-rose-500">*</span></label>
+                      <select
+                        value={yarnPoSettingForm.action || "Ceiling"}
+                        onChange={(e) => setYarnPoSettingForm({ ...yarnPoSettingForm, action: e.target.value as any })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="Ceiling">Ceiling</option>
+                        <option value="Floor">Floor</option>
+                        <option value="Round">Round</option>
+                        <option value="None">None</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-550 mb-1.5">Status <span className="text-rose-500">*</span></label>
+                      <select
+                        value={yarnPoSettingForm.status || "Active"}
+                        onChange={(e) => setYarnPoSettingForm({ ...yarnPoSettingForm, status: e.target.value as "Active" | "Inactive" })}
+                        className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <button
+                        type="button"
+                        onClick={() => setYarnPoSettingModal({ open: false })}
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        CLOSE
+                      </button>
+                      <button
+                        onClick={handleSaveYarnPoSetting}
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                      >
+                        {yarnPoSettingModal.item ? "UPDATE" : "CREATE"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Floating Add Button matching the screenshot for Yarn tabs */}
+        {["yarn-brand", "yarn-type", "yarn-count", "yarn-po-type", "yarn-po-settings"].includes(searchTab) && (
+          <button
+            onClick={() => {
+              if (searchTab === "yarn-brand") handleOpenYarnBrandModal();
+              else if (searchTab === "yarn-type") handleOpenYarnTypeModal();
+              else if (searchTab === "yarn-count") handleOpenYarnCountModal();
+              else if (searchTab === "yarn-po-type") handleOpenYarnPoTypeModal();
+              else if (searchTab === "yarn-po-settings") handleOpenYarnPoSettingModal();
+            }}
+            className="fixed bottom-6 right-6 size-12 bg-[#70b23b] hover:bg-[#609d31] text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95 cursor-pointer z-40"
+            title="Add New Entry"
+          >
+            <Plus size={24} />
+          </button>
+        )}
 
         {/* FABRIC GSM REGISTRY */}
         {searchTab === "fabric-gsm" && (

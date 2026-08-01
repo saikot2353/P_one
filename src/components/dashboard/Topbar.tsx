@@ -30,6 +30,7 @@ import {
   Briefcase,
   Blocks,
 } from "lucide-react";
+import { ModuleLauncher } from "./ModuleLauncher";
 
 interface SearchMenuLink {
   label: string;
@@ -856,6 +857,7 @@ export function Topbar() {
             </div>
           )}
         </div>
+        <ModuleLauncher />
         <button
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           className="relative size-9 grid place-items-center rounded-lg hover:bg-muted text-foreground/80 hover:text-foreground transition-colors duration-200"
