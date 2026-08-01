@@ -799,19 +799,14 @@ function PreCostingPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setViewMode("list")}
-                  className="h-10 px-5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs hover:bg-slate-200 transition cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSaveSheet}
-                  className="h-10 px-6 rounded-xl bg-[#f08060] text-white font-black text-xs shadow-sm hover:bg-[#e07050] flex items-center gap-2 transition cursor-pointer"
-                >
-                  <Save className="size-4" /> Save Sheet
-                </button>
+              <div className="flex items-center gap-2.5">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest hidden sm:block">Query:</span>
+                <span className="text-xs font-black text-[#1e88e5] bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900 px-3 py-1 rounded-lg">{queryNo || "—"}</span>
+                {addedStyles.length > 0 && (
+                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900 px-3 py-1 rounded-lg">
+                    {addedStyles.length} style{addedStyles.length > 1 ? "s" : ""} added
+                  </span>
+                )}
               </div>
             </div>
 
@@ -1657,37 +1652,45 @@ function PreCostingPage() {
               </div>
             </div>
 
-            {/* Quoted FOB Info Box & Peach Save Button Row */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
-              <div className="flex items-center gap-4">
-                <div className="bg-indigo-50 dark:bg-indigo-950/40 px-5 py-2.5 rounded-xl border border-indigo-100 dark:border-indigo-900">
-                  <span className="text-[9px] font-extrabold uppercase tracking-widest text-indigo-500 block leading-none">
-                    Calculated Quoted FOB (Average)
-                  </span>
-                  <span className="text-xl font-black text-indigo-600 dark:text-indigo-400 mt-1 block font-mono">
-                    $ {averageFOB.toFixed(2)}
-                  </span>
+            {/* Summary Footer Bar */}
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white dark:bg-slate-900 px-6 py-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+              {/* Left — Key Metrics */}
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="bg-indigo-50 dark:bg-indigo-950/40 px-4 py-2 rounded-xl border border-indigo-100 dark:border-indigo-900 text-center min-w-[110px]">
+                  <span className="text-[8px] font-extrabold uppercase tracking-widest text-indigo-400 block leading-none">Avg Quoted FOB</span>
+                  <span className="text-lg font-black text-indigo-600 dark:text-indigo-400 mt-0.5 block font-mono">$ {averageFOB.toFixed(2)}</span>
                 </div>
-                <div className="text-xs">
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Roster Sum Qty</span>
-                  <span className="font-bold text-slate-700 dark:text-slate-350">{totalOrderQty.toLocaleString()} Pcs</span>
+                <div className="bg-slate-50 dark:bg-slate-800/50 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 text-center min-w-[100px]">
+                  <span className="text-[8px] font-extrabold uppercase tracking-widest text-slate-400 block leading-none">Total Qty</span>
+                  <span className="text-base font-black text-slate-800 dark:text-slate-200 mt-0.5 block font-mono">{totalOrderQty.toLocaleString()}<span className="text-[10px] font-bold text-slate-400 ml-1">pcs</span></span>
                 </div>
+                <div className="bg-slate-50 dark:bg-slate-800/50 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 text-center min-w-[90px]">
+                  <span className="text-[8px] font-extrabold uppercase tracking-widest text-slate-400 block leading-none">Styles</span>
+                  <span className="text-base font-black text-slate-800 dark:text-slate-200 mt-0.5 block">{addedStyles.length}</span>
+                </div>
+                {hasAdditionalCosting && (
+                  <div className="bg-emerald-50 dark:bg-emerald-950/40 px-4 py-2 rounded-xl border border-emerald-100 dark:border-emerald-900">
+                    <span className="text-[8px] font-extrabold uppercase tracking-widest text-emerald-500 block leading-none">Commission Total</span>
+                    <span className="text-base font-black text-emerald-600 dark:text-emerald-400 mt-0.5 block font-mono">$ {totalCommissionAmt.toFixed(2)}</span>
+                  </div>
+                )}
               </div>
 
-              <div className="flex items-center gap-3 ml-auto">
+              {/* Right — Actions */}
+              <div className="flex items-center gap-2.5 shrink-0">
                 <button
                   type="button"
                   onClick={() => setViewMode("list")}
-                  className="h-9 px-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-[11px] uppercase tracking-wider transition"
+                  className="h-9 px-5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold text-xs transition cursor-pointer"
                 >
-                  Cancel
+                  Discard
                 </button>
                 <button
                   type="button"
                   onClick={handleSaveSheet}
-                  className="h-10 px-9 bg-[#f08060] hover:bg-[#e07050] text-white font-extrabold text-xs uppercase tracking-widest rounded-md transition shadow-md"
+                  className="h-9 px-7 bg-[#f08060] hover:bg-[#e07050] active:scale-95 text-white font-extrabold text-xs uppercase tracking-widest rounded-xl transition shadow-sm flex items-center gap-2 cursor-pointer"
                 >
-                  SAVE
+                  <Save className="size-3.5" /> Save Sheet
                 </button>
               </div>
             </div>
