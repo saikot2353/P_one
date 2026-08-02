@@ -174,12 +174,6 @@ const menuCategories: MenuCategory[] = [
     search: { tab: "register" },
   },
   {
-    key: "pre-costing",
-    label: "Pre Costing",
-    icon: TrendingUp,
-    to: "/merchandising-pre-costing",
-  },
-  {
     key: "quotation",
     label: "Quotation",
     icon: FileText,
@@ -192,15 +186,29 @@ const menuCategories: MenuCategory[] = [
     to: "/merchandising-po",
   },
   {
+    key: "pre-costing",
+    label: "Pre Costing",
+    icon: TrendingUp,
+    to: "/merchandising-pre-costing",
+  },
+  {
     key: "order-management",
     label: "Order Management",
     icon: Layers,
     subitems: [
       { label: "Order List", to: "/merchandising-order-list", subActiveKey: "order-list" },
-      { label: "Cad Consumption Update", to: "/merchandising-order-profile", subActiveKey: "order-profile", search: { tab: "cad" } },
+      { label: "Cad Consumption Update", to: "/merchandising-cad", subActiveKey: "cad" },
       { label: "Order Profile", to: "/merchandising-order-profile", subActiveKey: "order-profile" },
       { label: "Edit Order All Part", to: "/merchandising-order-profile", subActiveKey: "order-profile", search: { action: "edit" } },
       { label: "PO Ship Date Update", to: "/merchandising-order-profile", subActiveKey: "order-profile", search: { tab: "ship" } },
+    ],
+  },
+  {
+    key: "bill-of-materials",
+    label: "Bill Of Materials",
+    icon: FileText,
+    subitems: [
+      { label: "BOM List", to: "/merchandising-bom", subActiveKey: "bom-list" },
     ],
   },
   {

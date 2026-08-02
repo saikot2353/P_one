@@ -2226,7 +2226,7 @@ function CompensationSetupPage() {
         {isFormOpen && (
           <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
             <div
-              className={`bg-card border border-border/80 w-full rounded-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 ${activeTab === "tiffin" ? "max-w-4xl" : "max-w-2xl"}`}
+              className={`bg-card border border-border/80 w-full rounded-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 ${activeTab === "allowance" ? "max-w-6xl" : activeTab === "tiffin" ? "max-w-4xl" : "max-w-2xl"}`}
             >
               {/* Modal Header */}
               <div className="px-6 py-4.5 border-b border-border/50 bg-transparent flex items-center justify-between">
@@ -2252,218 +2252,311 @@ function CompensationSetupPage() {
               {/* Modal Form Body */}
               <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
                 {activeTab === "allowance" && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Company *</label>
-                      <input
-                        type="text"
-                        value={company}
-                        onChange={(e) => setCompany(e.target.value)}
-                        className={insetInputClass}
-                        required
-                      />
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Column 1: Scope & Target */}
+                    <div className="space-y-4 bg-muted/5 p-4 rounded-xl border border-border/30">
+                      <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground border-b border-border/50 pb-2 mb-3">
+                        Scope & Target
+                      </h3>
+
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Company *</label>
+                        <select
+                          value={company}
+                          onChange={(e) => setCompany(e.target.value)}
+                          className={insetSelectClass}
+                          required
+                        >
+                          <option value="ALL">ALL</option>
+                          <option value="Pakiza Knit Composite Ltd">Pakiza Knit Composite Ltd</option>
+                          <option value="Aleya Apparels Ltd.">Aleya Apparels Ltd.</option>
+                        </select>
+                      </div>
+
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Area *</label>
+                        <select
+                          value={area}
+                          onChange={(e) => setArea(e.target.value)}
+                          className={insetSelectClass}
+                          required
+                        >
+                          <option value="ALL">ALL</option>
+                          <option value="Factory">Factory</option>
+                          <option value="Aleya-Factory">Aleya-Factory</option>
+                        </select>
+                      </div>
+
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Employee Type *</label>
+                        <select
+                          value={employeeType}
+                          onChange={(e) => setEmployeeType(e.target.value)}
+                          className={insetSelectClass}
+                          required
+                        >
+                          <option value="ALL">ALL</option>
+                          <option value="Worker">Worker</option>
+                          <option value="Operator">Operator</option>
+                          <option value="Supervisor">Supervisor</option>
+                          <option value="Helper">Helper</option>
+                          <option value="Admin staff">Admin staff</option>
+                          <option value="Permanent Worker">Permanent Worker</option>
+                          <option value="Casual Worker">Casual Worker</option>
+                        </select>
+                      </div>
+
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Department</label>
+                        <select
+                          value={department}
+                          onChange={(e) => setDepartment(e.target.value)}
+                          className={insetSelectClass}
+                        >
+                          <option value="All Departments">All Departments</option>
+                          <option value="HR, Admin and Compliance">HR, Admin and Compliance</option>
+                          <option value="Production Dept">Production Dept</option>
+                          <option value="HR & Admin">HR & Admin</option>
+                          <option value="Quality Assurance">Quality Assurance</option>
+                          <option value="Maintenance">Maintenance</option>
+                        </select>
+                      </div>
+
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Section</label>
+                        <select
+                          value={subDepartment}
+                          onChange={(e) => setSubDepartment(e.target.value)}
+                          className={insetSelectClass}
+                        >
+                          <option value="ALL">ALL</option>
+                          <option value="Admin">Admin</option>
+                          <option value="Sewing Section">Sewing Section</option>
+                          <option value="Finishing Section">Finishing Section</option>
+                          <option value="Cutting Section">Cutting Section</option>
+                          <option value="Inspection">Inspection</option>
+                        </select>
+                      </div>
+
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Designation</label>
+                        <select
+                          value={designation}
+                          onChange={(e) => setDesignation(e.target.value)}
+                          className={insetSelectClass}
+                        >
+                          <option value="ALL">ALL</option>
+                          <option value="Driver">Driver</option>
+                          <option value="Operator">Operator</option>
+                          <option value="Supervisor">Supervisor</option>
+                          <option value="Helper">Helper</option>
+                          <option value="QC Inspector">QC Inspector</option>
+                          <option value="Executive">Executive</option>
+                        </select>
+                      </div>
+
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>IsActive *</label>
+                        <select
+                          value={allowanceIsActive}
+                          onChange={(e) => setAllowanceIsActive(e.target.value as any)}
+                          className={insetSelectClass}
+                        >
+                          <option value="Active">Active</option>
+                          <option value="Inactive">Inactive</option>
+                        </select>
+                      </div>
                     </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Area *</label>
-                      <input
-                        type="text"
-                        value={area}
-                        onChange={(e) => setArea(e.target.value)}
-                        className={insetInputClass}
-                        required
-                      />
+
+                    {/* Column 2: Date, Salary & Working Hours */}
+                    <div className="space-y-4 bg-muted/5 p-4 rounded-xl border border-border/30">
+                      <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground border-b border-border/50 pb-2 mb-3">
+                        Timing & Salary Ranges
+                      </h3>
+
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Applicable From *</label>
+                        <input
+                          type="date"
+                          value={applicableFrom}
+                          onChange={(e) => setApplicableFrom(e.target.value)}
+                          className={insetInputClass}
+                          required
+                        />
+                      </div>
+
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Applicable To *</label>
+                        <input
+                          type="date"
+                          value={applicableTo}
+                          onChange={(e) => setApplicableTo(e.target.value)}
+                          className={insetInputClass}
+                          required
+                        />
+                      </div>
+
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Working Hour From</label>
+                        <input
+                          type="text"
+                          value={workingHourFrom}
+                          onChange={(e) => setWorkingHourFrom(e.target.value)}
+                          className={insetInputClass}
+                          placeholder="00:00"
+                        />
+                      </div>
+
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Working Hour To</label>
+                        <input
+                          type="text"
+                          value={workingHourTo}
+                          onChange={(e) => setWorkingHourTo(e.target.value)}
+                          className={insetInputClass}
+                          placeholder="00:00"
+                        />
+                      </div>
+
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Salary From</label>
+                        <input
+                          type="number"
+                          value={salaryFrom}
+                          onChange={(e) => setSalaryFrom(Number(e.target.value))}
+                          className={insetInputClass}
+                          placeholder="0"
+                        />
+                      </div>
+
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Salary To</label>
+                        <input
+                          type="number"
+                          value={salaryTo}
+                          onChange={(e) => setSalaryTo(Number(e.target.value))}
+                          className={insetInputClass}
+                          placeholder="0"
+                        />
+                      </div>
                     </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Applicable From *</label>
-                      <input
-                        type="date"
-                        value={applicableFrom}
-                        onChange={(e) => setApplicableFrom(e.target.value)}
-                        className={insetInputClass}
-                        required
-                      />
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Applicable To *</label>
-                      <input
-                        type="date"
-                        value={applicableTo}
-                        onChange={(e) => setApplicableTo(e.target.value)}
-                        className={insetInputClass}
-                        required
-                      />
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Employee Type *</label>
-                      <input
-                        type="text"
-                        value={employeeType}
-                        onChange={(e) => setEmployeeType(e.target.value)}
-                        className={insetInputClass}
-                        required
-                      />
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Department</label>
-                      <input
-                        type="text"
-                        value={department}
-                        onChange={(e) => setDepartment(e.target.value)}
-                        className={insetInputClass}
-                      />
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Section</label>
-                      <input
-                        type="text"
-                        value={subDepartment}
-                        onChange={(e) => setSubDepartment(e.target.value)}
-                        className={insetInputClass}
-                      />
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Designation</label>
-                      <input
-                        type="text"
-                        value={designation}
-                        onChange={(e) => setDesignation(e.target.value)}
-                        className={insetInputClass}
-                      />
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Working Hour From</label>
-                      <input
-                        type="text"
-                        value={workingHourFrom}
-                        onChange={(e) => setWorkingHourFrom(e.target.value)}
-                        className={insetInputClass}
-                      />
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Working Hour To</label>
-                      <input
-                        type="text"
-                        value={workingHourTo}
-                        onChange={(e) => setWorkingHourTo(e.target.value)}
-                        className={insetInputClass}
-                      />
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Salary From</label>
-                      <input
-                        type="number"
-                        value={salaryFrom}
-                        onChange={(e) => setSalaryFrom(Number(e.target.value))}
-                        className={insetInputClass}
-                      />
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Salary To</label>
-                      <input
-                        type="number"
-                        value={salaryTo}
-                        onChange={(e) => setSalaryTo(Number(e.target.value))}
-                        className={insetInputClass}
-                      />
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Rate For</label>
-                      <input
-                        type="text"
-                        value={rateFor}
-                        onChange={(e) => setRateFor(e.target.value)}
-                        className={insetInputClass}
-                      />
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Based On</label>
-                      <select
-                        value={basedOn}
-                        onChange={(e) => setBasedOn(e.target.value)}
-                        className={insetSelectClass}
-                      >
-                        <option value="--Select--">--Select--</option>
-                        <option value="Basic">Basic</option>
-                        <option value="Gross">Gross</option>
-                        <option value="Fixed">Fixed</option>
-                      </select>
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Rate</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={rate}
-                        onChange={(e) => setRate(Number(e.target.value))}
-                        className={insetInputClass}
-                      />
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Div By Hour</label>
-                      <input
-                        type="text"
-                        value={divByHour}
-                        onChange={(e) => setDivByHour(e.target.value)}
-                        className={insetInputClass}
-                      />
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Get After Reguler</label>
-                      <select
-                        value={getAfterReq}
-                        onChange={(e) => setGetAfterReq(e.target.value)}
-                        className={insetSelectClass}
-                      >
-                        <option value="No">No</option>
-                        <option value="Yes">Yes</option>
-                      </select>
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Rate</label>
-                      <input
-                        type="number"
-                        value={getAfterReqRate}
-                        onChange={(e) => setGetAfterReqRate(Number(e.target.value))}
-                        className={insetInputClass}
-                      />
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>EOT After</label>
-                      <input
-                        type="number"
-                        value={eotAfter}
-                        onChange={(e) => setEotAfter(Number(e.target.value))}
-                        className={insetInputClass}
-                      />
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Lunch Break</label>
-                      <input
-                        type="number"
-                        value={lunch}
-                        onChange={(e) => setLunch(Number(e.target.value))}
-                        className={insetInputClass}
-                      />
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Dinner Break</label>
-                      <input
-                        type="number"
-                        value={dinner}
-                        onChange={(e) => setDinner(Number(e.target.value))}
-                        className={insetInputClass}
-                      />
-                    </div>
-                    <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>IsActive *</label>
-                      <select
-                        value={allowanceIsActive}
-                        onChange={(e) => setAllowanceIsActive(e.target.value as any)}
-                        className={insetSelectClass}
-                      >
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                      </select>
+
+                    {/* Column 3: Rate, Breaks & Special Rules */}
+                    <div className="space-y-4 bg-muted/5 p-4 rounded-xl border border-border/30">
+                      <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground border-b border-border/50 pb-2 mb-3">
+                        Rates, Breaks & Special Rules
+                      </h3>
+
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Rate For</label>
+                        <select
+                          value={rateFor}
+                          onChange={(e) => setRateFor(e.target.value)}
+                          className={insetSelectClass}
+                        >
+                          <option value="ALL">ALL</option>
+                          <option value="Holiday">Holiday</option>
+                          <option value="Overtime">Overtime</option>
+                          <option value="Friday">Friday</option>
+                          <option value="Night">Night</option>
+                        </select>
+                      </div>
+
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Based On</label>
+                        <select
+                          value={basedOn}
+                          onChange={(e) => setBasedOn(e.target.value)}
+                          className={insetSelectClass}
+                        >
+                          <option value="--Select--">--Select--</option>
+                          <option value="Basic">Basic</option>
+                          <option value="Gross">Gross</option>
+                          <option value="Fixed">Fixed</option>
+                        </select>
+                      </div>
+
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Rate</label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={rate}
+                          onChange={(e) => setRate(Number(e.target.value))}
+                          className={insetInputClass}
+                          placeholder="0.00"
+                        />
+                      </div>
+
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Div By Hour</label>
+                        <select
+                          value={divByHour}
+                          onChange={(e) => setDivByHour(e.target.value)}
+                          className={insetSelectClass}
+                        >
+                          <option value="No">No</option>
+                          <option value="Yes">Yes</option>
+                        </select>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className={insetWrapperClass}>
+                          <label className={insetLabelClass}>Get After Regular</label>
+                          <select
+                            value={getAfterReq}
+                            onChange={(e) => setGetAfterReq(e.target.value)}
+                            className={insetSelectClass}
+                          >
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                          </select>
+                        </div>
+                        <div className={insetWrapperClass}>
+                          <label className={insetLabelClass}>Rate</label>
+                          <input
+                            type="number"
+                            value={getAfterReqRate}
+                            onChange={(e) => setGetAfterReqRate(Number(e.target.value))}
+                            className={insetInputClass}
+                            placeholder="0"
+                          />
+                        </div>
+                      </div>
+
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>EOT After</label>
+                        <input
+                          type="number"
+                          value={eotAfter}
+                          onChange={(e) => setEotAfter(Number(e.target.value))}
+                          className={insetInputClass}
+                          placeholder="0"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className={insetWrapperClass}>
+                          <label className={insetLabelClass}>Lunch Break</label>
+                          <input
+                            type="number"
+                            value={lunch}
+                            onChange={(e) => setLunch(Number(e.target.value))}
+                            className={insetInputClass}
+                            placeholder="0"
+                          />
+                        </div>
+                        <div className={insetWrapperClass}>
+                          <label className={insetLabelClass}>Dinner Break</label>
+                          <input
+                            type="number"
+                            value={dinner}
+                            onChange={(e) => setDinner(Number(e.target.value))}
+                            className={insetInputClass}
+                            placeholder="0"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}

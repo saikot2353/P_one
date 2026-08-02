@@ -68,6 +68,8 @@ import { Route as MerchandisingInquiryRouteImport } from './routes/merchandising
 import { Route as MerchandisingDashboardRouteImport } from './routes/merchandising-dashboard'
 import { Route as MerchandisingCapacityDistributionRouteImport } from './routes/merchandising-capacity-distribution'
 import { Route as MerchandisingCapacityAllocationRouteImport } from './routes/merchandising-capacity-allocation'
+import { Route as MerchandisingCadRouteImport } from './routes/merchandising-cad'
+import { Route as MerchandisingBomRouteImport } from './routes/merchandising-bom'
 import { Route as ManualAttendanceRouteImport } from './routes/manual-attendance'
 import { Route as ManageOvertimeRouteImport } from './routes/manage-overtime'
 import { Route as LoginRouteImport } from './routes/login'
@@ -447,6 +449,16 @@ const MerchandisingCapacityAllocationRoute =
     path: '/merchandising-capacity-allocation',
     getParentRoute: () => rootRouteImport,
   } as any)
+const MerchandisingCadRoute = MerchandisingCadRouteImport.update({
+  id: '/merchandising-cad',
+  path: '/merchandising-cad',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MerchandisingBomRoute = MerchandisingBomRouteImport.update({
+  id: '/merchandising-bom',
+  path: '/merchandising-bom',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ManualAttendanceRoute = ManualAttendanceRouteImport.update({
   id: '/manual-attendance',
   path: '/manual-attendance',
@@ -856,6 +868,8 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
+  '/merchandising-bom': typeof MerchandisingBomRoute
+  '/merchandising-cad': typeof MerchandisingCadRoute
   '/merchandising-capacity-allocation': typeof MerchandisingCapacityAllocationRoute
   '/merchandising-capacity-distribution': typeof MerchandisingCapacityDistributionRoute
   '/merchandising-dashboard': typeof MerchandisingDashboardRoute
@@ -985,6 +999,8 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
+  '/merchandising-bom': typeof MerchandisingBomRoute
+  '/merchandising-cad': typeof MerchandisingCadRoute
   '/merchandising-capacity-allocation': typeof MerchandisingCapacityAllocationRoute
   '/merchandising-capacity-distribution': typeof MerchandisingCapacityDistributionRoute
   '/merchandising-dashboard': typeof MerchandisingDashboardRoute
@@ -1115,6 +1131,8 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
+  '/merchandising-bom': typeof MerchandisingBomRoute
+  '/merchandising-cad': typeof MerchandisingCadRoute
   '/merchandising-capacity-allocation': typeof MerchandisingCapacityAllocationRoute
   '/merchandising-capacity-distribution': typeof MerchandisingCapacityDistributionRoute
   '/merchandising-dashboard': typeof MerchandisingDashboardRoute
@@ -1246,6 +1264,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
+    | '/merchandising-bom'
+    | '/merchandising-cad'
     | '/merchandising-capacity-allocation'
     | '/merchandising-capacity-distribution'
     | '/merchandising-dashboard'
@@ -1375,6 +1395,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
+    | '/merchandising-bom'
+    | '/merchandising-cad'
     | '/merchandising-capacity-allocation'
     | '/merchandising-capacity-distribution'
     | '/merchandising-dashboard'
@@ -1504,6 +1526,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
+    | '/merchandising-bom'
+    | '/merchandising-cad'
     | '/merchandising-capacity-allocation'
     | '/merchandising-capacity-distribution'
     | '/merchandising-dashboard'
@@ -1634,6 +1658,8 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ManageOvertimeRoute: typeof ManageOvertimeRoute
   ManualAttendanceRoute: typeof ManualAttendanceRoute
+  MerchandisingBomRoute: typeof MerchandisingBomRoute
+  MerchandisingCadRoute: typeof MerchandisingCadRoute
   MerchandisingCapacityAllocationRoute: typeof MerchandisingCapacityAllocationRoute
   MerchandisingCapacityDistributionRoute: typeof MerchandisingCapacityDistributionRoute
   MerchandisingDashboardRoute: typeof MerchandisingDashboardRoute
@@ -2112,6 +2138,20 @@ declare module '@tanstack/react-router' {
       path: '/merchandising-capacity-allocation'
       fullPath: '/merchandising-capacity-allocation'
       preLoaderRoute: typeof MerchandisingCapacityAllocationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/merchandising-cad': {
+      id: '/merchandising-cad'
+      path: '/merchandising-cad'
+      fullPath: '/merchandising-cad'
+      preLoaderRoute: typeof MerchandisingCadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/merchandising-bom': {
+      id: '/merchandising-bom'
+      path: '/merchandising-bom'
+      fullPath: '/merchandising-bom'
+      preLoaderRoute: typeof MerchandisingBomRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/manual-attendance': {
@@ -2658,6 +2698,8 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ManageOvertimeRoute: ManageOvertimeRoute,
   ManualAttendanceRoute: ManualAttendanceRoute,
+  MerchandisingBomRoute: MerchandisingBomRoute,
+  MerchandisingCadRoute: MerchandisingCadRoute,
   MerchandisingCapacityAllocationRoute: MerchandisingCapacityAllocationRoute,
   MerchandisingCapacityDistributionRoute:
     MerchandisingCapacityDistributionRoute,

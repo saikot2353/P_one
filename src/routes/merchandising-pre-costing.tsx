@@ -4,7 +4,7 @@ import MerchandisingLayout from "../components/merchandising/MerchandisingLayout
 import {
   Plus, Search, Pencil, FileText, ArrowLeft, Save, Printer,
   Eye, X, ChevronDown, ChevronUp, CheckCircle, Clock,
-  AlertCircle, Download, FileSpreadsheet,
+  AlertCircle, Download, FileSpreadsheet, List, Image as ImageIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -15,8 +15,24 @@ export const Route = createFileRoute("/merchandising-pre-costing")({
 
 // ── Types ───────────────────────────────────────────────────────
 interface StyleFOBRow {
-  id: number; styleNo: string; colour: string; itemName: string;
-  orderQty: number; unitPrice: number; deliveryDate: string;
+  id: number;
+  styleNo: string;
+  colour: string;
+  itemName: string; // also itemType
+  orderQty: number;
+  unitPrice: number;
+  deliveryDate: string;
+  sizeGroup: string;
+  sizes: string;
+  sizesQty: number;
+  print: boolean;
+  embroidery: boolean;
+  wash: boolean;
+  special: boolean;
+  commissionPct: number;
+  commissionAmt: number;
+  planCutQty: number;
+  buyerCosting: string;
 }
 interface FabricRow {
   id: number; styleRef: string; fabNature: string; fabricInfo: string;
@@ -54,20 +70,47 @@ interface SpecialCostRow { id: number; styleRef: string; colour: string; costHea
 interface OtherCostRow  { id: number; particulars: string; percentage: number; }
 
 interface PreCostRecord {
-  id: string; preCostNo: string; queryNo: string; queryType: string;
-  styleName: string; deliveryDate: string; buyerName: string;
-  orderNo: string; country: string; buyerHouse: string; brand: string;
-  preCostDate: string; orderQtyPcs: number; unitPrice: number;
-  planCutQty: number; setRatio: number; cmPct: number;
-  qualityLevel: string; inspectionType: string; season: string; merchandiser: string;
-  exchangeRate: number; shippingMode: string; payTerm: string; tenor: string;
-  specialInstructions: string; penaltyClause: string;
+  id: string;
+  preCostNo: string;
+  queryNo: string;
+  queryType: string;
+  styleName: string;
+  deliveryDate: string;
+  buyerName: string;
+  orderNo: string;
+  country: string;
+  buyerHouse: string;
+  brand: string;
+  preCostDate: string;
+  orderQtyPcs: number;
+  unitPrice: number;
+  planCutQty: number;
+  setRatio: number;
+  cmPct: number;
+  qualityLevel: string;
+  inspectionType: string;
+  season: string;
+  merchandiser: string;
+  exchangeRate: number;
+  shippingMode: string;
+  payTerm: string;
+  tenor: string;
+  specialInstructions: string;
+  penaltyClause: string;
+  refNo: string;
+  queryDate: string;
+  customerBuyingHouse: string;
+  orderType: string;
+  buyerAgent: string;
+  buyerBrand: string;
+  department: string;
+  zipFile: string;
   // Key Info
   epm: number; cpm: number; noOfColors: number; extraCuttingPct: number;
   fabricProcessLossPct: number;
   // Key Info by GMT item
   gmtItems: { id: number; name: string; smv: number; mcPerLine: number; efficiencyPct: number; }[];
-  // Process Loss
+  // Process Loss (RMG)
   cuttingPct: number; printPct: number; embroideryPct: number; sewingPct: number;
   washDyePct: number; finishingPct: number; extraPct: number;
   // FOB rows
@@ -85,29 +128,45 @@ interface PreCostRecord {
   specialCostRows: SpecialCostRow[];
   otherCostRows: OtherCostRow[];
   // I Sample
-  sampleFabricQty: number; sampleFabricRate: number;
-  sampleQty: number; sampleRate: number;
+  sampleFabricQty: number;
+  sampleFabricRate: number;
+  sampleQty: number;
+  sampleRate: number;
   styleImage: string;
   status: "Saved" | "Pending" | "Approved";
+  // Additional costing flags/numbers
+  additionalCommercialCostPct: number;
+  additionalFinanceCostPct: number;
+  additionalBuyingCommissionPct: number;
+  additionalCommercialPct: number;
 }
 
 // ── Sample Data ─────────────────────────────────────────────────
 const SAMPLE: PreCostRecord[] = [{
-  id: "PC-001", preCostNo: "26918", queryNo: "26918/0", queryType: "Regular",
+  id: "PC-001", preCostNo: "26918", queryNo: "Q-26918", queryType: "Regular",
   styleName: "SS27PB093-SL", deliveryDate: "2026-09-26",
   buyerName: "PEPCO", orderNo: "ORD01833307/08/09/10/11/12_01", country: "Poland",
   buyerHouse: "PGS", brand: "", preCostDate: "2026-08-02",
   orderQtyPcs: 39024, unitPrice: 3.15,
   planCutQty: 39414, setRatio: 1.00, cmPct: 23.81,
-  qualityLevel: "", inspectionType: "", season: "SS27", merchandiser: "Md. Al Amin",
+  qualityLevel: "A-Level", inspectionType: "Final Inspection", season: "SS27", merchandiser: "Md. Al Amin",
   exchangeRate: 120, shippingMode: "Sea", payTerm: "At Sight", tenor: "",
   specialInstructions: "", penaltyClause: "",
+  refNo: "REF-99238", queryDate: "2026-08-02", customerBuyingHouse: "PGS House",
+  orderType: "Regular", buyerAgent: "PGS Agent", buyerBrand: "Pepco Kids",
+  department: "Merchandising Dept", zipFile: "",
   epm: -0.01, cpm: 0.07, noOfColors: 1, extraCuttingPct: 1.00,
   fabricProcessLossPct: 9.85,
   gmtItems: [{ id:1, name:"Sweat Shirt", smv:4.62, mcPerLine:0, efficiencyPct:40 }],
   cuttingPct: 0, printPct: 0, embroideryPct: 0, sewingPct: 0, washDyePct: 0, finishingPct: 0, extraPct: 0,
   styleFOBRows: [
-    { id:1, styleNo:"SS27PB093-SL", colour:"Verdant Green", itemName:"Sweat Shirt", orderQty:39024, unitPrice:3.15, deliveryDate:"2026-09-26" },
+    {
+      id: 1, styleNo: "SS27PB093-SL", colour: "Verdant Green", itemName: "Sweat Shirt",
+      orderQty: 39024, unitPrice: 3.15, deliveryDate: "2026-09-26",
+      sizeGroup: "Boys 8-14", sizes: "S, M, L, XL", sizesQty: 39024,
+      print: true, embroidery: false, wash: true, special: false,
+      commissionPct: 0, commissionAmt: 0, planCutQty: 39414, buyerCosting: "Pepco Target Costing"
+    },
   ],
   buyerSupMaterialCost: 0,
   fabricRows: [
@@ -153,6 +212,10 @@ const SAMPLE: PreCostRecord[] = [{
   sampleFabricQty:15, sampleFabricRate:4, sampleQty:0, sampleRate:0,
   styleImage: "/src/components/0330c3d6-5cae-49e0-b777-d34891afcc09.jpg",
   status: "Approved",
+  additionalCommercialCostPct: 0.00,
+  additionalFinanceCostPct: 0.00,
+  additionalBuyingCommissionPct: 0.00,
+  additionalCommercialPct: 0.00,
 }];
 
 let _id = 500;
@@ -215,33 +278,121 @@ export default function PreCostingPage() {
     qualityLevel:"", inspectionType:"", season:"", merchandiser:"",
     exchangeRate:120, shippingMode:"Sea", payTerm:"At Sight", tenor:"",
     specialInstructions:"", penaltyClause:"",
+    refNo: "", queryDate: new Date().toISOString().split("T")[0], customerBuyingHouse: "",
+    orderType: "Regular", buyerAgent: "", buyerBrand: "", department: "", zipFile: "",
     epm:0, cpm:0.065, noOfColors:1, extraCuttingPct:1, fabricProcessLossPct:0,
     gmtItems:[{id:nid(),name:"",smv:0,mcPerLine:0,efficiencyPct:65}],
     cuttingPct:0, printPct:0, embroideryPct:0, sewingPct:0, washDyePct:0, finishingPct:0, extraPct:0,
-    styleFOBRows:[{id:nid(),styleNo:"",colour:"",itemName:"",orderQty:0,unitPrice:0,deliveryDate:""}],
+    styleFOBRows:[],
     buyerSupMaterialCost:0,
-    fabricRows:[{id:nid(),styleRef:"",fabNature:"Knit",fabricInfo:"",gsm:160,colour:"",source:"Finish Purchase",orderQtyDzn:0,consDzn:0,uom:"Kg",rate:0}],
-    yarnRows:[{id:nid(),composition:"",count:"",yarnType:"",colour:"Average",yarnQty:0,rate:0}],
+    fabricRows:[],
+    yarnRows:[],
     dyedYarnRows:[],
     conversionRows:[],
-    accessoryRows:[{id:nid(),itemName:"",gmtItem:"",sensitivityType:"No Sensitivity",orderQtyDzn:0,consDzn:0,processLossPct:2,uom:"Dzn",rate:0}],
+    accessoryRows:[],
     embellishmentRows:[],
-    cmCostRows:[{id:nid(),style:"",gmtItem:"",gmtDzn:0,cpm:0.065,smv:0,efficiencyPct:65}],
-    commissionRows:[{id:nid(),style:"",colour:"",commissionPct:0}],
-    specialCostRows:[{id:nid(),styleRef:"",colour:"",costHead:"Test Cost",orderQtyDzn:0,ratePerDzn:0.01}],
+    cmCostRows:[],
+    commissionRows:[],
+    specialCostRows:[],
     otherCostRows:[
-      {id:nid(),particulars:"Commercial Cost (%)",percentage:4.5},
+      {id:nid(),particulars:"Commercial Cost (%)",percentage:0},
       {id:nid(),particulars:"Finance Cost (%)",percentage:0},
       {id:nid(),particulars:"Buying Commission (%)",percentage:0},
     ],
     sampleFabricQty:0, sampleFabricRate:0, sampleQty:0, sampleRate:0,
     styleImage:"", status:"Saved",
+    additionalCommercialCostPct: 0.00,
+    additionalFinanceCostPct: 0.00,
+    additionalBuyingCommissionPct: 0.00,
+    additionalCommercialPct: 0.00,
   });
 
   const [form, setForm] = useState<PreCostRecord>(mkBlank());
   const sf = (p: Partial<PreCostRecord>) => setForm(prev=>({...prev,...p}));
   const B  = useMemo(()=>calcBudget(form),[form]);
   const BR = activeRec ? calcBudget(activeRec) : null;
+
+  // Local state variables for "Order Style Information" entry block
+  const [styleNo, setStyleNo] = useState("");
+  const [colour, setColour] = useState("");
+  const [styleOrderQty, setStyleOrderQty] = useState(0);
+  const [itemType, setItemType] = useState("Pcs");
+  const [sizeGroup, setSizeGroup] = useState("");
+  const [buyerCosting, setBuyerCosting] = useState("");
+  const [styleUnitPrice, setStyleUnitPrice] = useState(0);
+  const [styleDeliveryDate, setStyleDeliveryDate] = useState("");
+  const [planCutQty, setPlanCutQty] = useState(0);
+  const [commissionPct, setCommissionPct] = useState(0);
+
+  const [hasPrint, setHasPrint] = useState(false);
+  const [hasEmbroidery, setHasEmbroidery] = useState(false);
+  const [hasWash, setHasWash] = useState(false);
+  const [hasSpecial, setHasSpecial] = useState(false);
+
+  const calculatedCommissionAmt = styleOrderQty * styleUnitPrice * (commissionPct / 100);
+
+  const addStyleToList = () => {
+    if (!styleNo.trim()) { toast.error("Style No is required."); return; }
+    if (!colour.trim()) { toast.error("Colour is required."); return; }
+    if (styleOrderQty <= 0) { toast.error("Order Quantity must be greater than 0."); return; }
+    if (styleUnitPrice <= 0) { toast.error("Unit price must be greater than 0."); return; }
+
+    const newRow: StyleFOBRow = {
+      id: nid(),
+      styleNo,
+      colour,
+      itemName: styleNo + " Item",
+      orderQty: styleOrderQty,
+      unitPrice: styleUnitPrice,
+      deliveryDate: styleDeliveryDate || form.deliveryDate || new Date().toISOString().split("T")[0],
+      sizeGroup,
+      sizes: "Standard",
+      sizesQty: styleOrderQty,
+      print: hasPrint,
+      embroidery: hasEmbroidery,
+      wash: hasWash,
+      special: hasSpecial,
+      commissionPct,
+      commissionAmt: calculatedCommissionAmt,
+      planCutQty,
+      buyerCosting,
+    };
+
+    sf({
+      styleFOBRows: [...form.styleFOBRows, newRow],
+      orderQtyPcs: form.orderQtyPcs + styleOrderQty,
+      unitPrice: styleUnitPrice, // sets last style's unit price as base
+      planCutQty: form.planCutQty + planCutQty
+    });
+
+    // Reset local state fields
+    setStyleNo("");
+    setColour("");
+    setStyleOrderQty(0);
+    setSizeGroup("");
+    setBuyerCosting("");
+    setStyleUnitPrice(0);
+    setStyleDeliveryDate("");
+    setPlanCutQty(0);
+    setCommissionPct(0);
+    setHasPrint(false);
+    setHasEmbroidery(false);
+    setHasWash(false);
+    setHasSpecial(false);
+
+    toast.success("Style added to table.");
+  };
+
+  const removeStyleFromList = (rowId: number) => {
+    const row = form.styleFOBRows.find(x => x.id === rowId);
+    if (!row) return;
+    sf({
+      styleFOBRows: form.styleFOBRows.filter(x => x.id !== rowId),
+      orderQtyPcs: Math.max(0, form.orderQtyPcs - row.orderQty),
+      planCutQty: Math.max(0, form.planCutQty - row.planCutQty)
+    });
+    toast.info("Style removed.");
+  };
 
   const filtered = records.filter(r=>{
     const s=search.toLowerCase();
@@ -251,13 +402,13 @@ export default function PreCostingPage() {
   });
 
   const handleSave = () => {
-    if(!form.styleName.trim()){ toast.error("Style Name is required."); return; }
+    if(!form.buyerName.trim()){ toast.error("Buyer Name is required."); return; }
     if(form.id){
       setRecords(prev=>prev.map(r=>r.id===form.id?{...form}:r));
       toast.success("Pre-Costing updated!");
     }else{
       const no=`PC-${String(records.length+26859).padStart(5,"0")}`;
-      setRecords(prev=>[{...form,id:`PC-${Date.now()}`,preCostNo:no,queryNo:`${no}/0`},...prev]);
+      setRecords(prev=>[{...form,id:`PC-${Date.now()}`,preCostNo:no,queryNo:`Q-${no}`},...prev]);
       toast.success(`Pre-Cost ${no} saved!`);
     }
     setView("list");
@@ -269,36 +420,24 @@ export default function PreCostingPage() {
   // ── Input atoms ───────────────────────────────────────────────
   const TI = ({val,onChange,ph="",cls=""}:{val:string;onChange:(v:string)=>void;ph?:string;cls?:string}) => (
     <input type="text" value={val} onChange={e=>onChange(e.target.value)} placeholder={ph}
-      className={`w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-300/50 focus:border-indigo-400 bg-white placeholder-slate-350 transition-all ${cls}`}/>
+      className={`w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-slate-350 focus:outline-none focus:ring-2 focus:ring-indigo-300/30 focus:border-indigo-400 bg-white placeholder-slate-350 transition-all ${cls}`}/>
   );
   const NI = ({val,onChange,cls=""}:{val:number;onChange:(v:number)=>void;cls?:string}) => (
     <input type="number" step="any" value={val||""} onChange={e=>onChange(Number(e.target.value))}
-      className={`w-full text-right font-mono text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-300/50 focus:border-indigo-400 bg-white transition-all ${cls}`}/>
+      className={`w-full text-right font-mono text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-slate-355 focus:outline-none focus:ring-2 focus:ring-indigo-300/50 focus:border-indigo-400 bg-white transition-all ${cls}`}/>
   );
   const DI = ({val,onChange}:{val:string;onChange:(v:string)=>void}) => (
     <input type="date" value={val} onChange={e=>onChange(e.target.value)}
-      className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-300/50 focus:border-indigo-400 bg-white transition-all"/>
+      className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-slate-350 focus:outline-none focus:ring-2 focus:ring-indigo-300/50 focus:border-indigo-400 bg-white transition-all"/>
   );
-  const Label = ({children}:{children:React.ReactNode}) => (
-    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-tight mb-1">{children}</label>
+  const Label = ({children, req=false}:{children:React.ReactNode; req?:boolean}) => (
+    <label className="block text-[10px] font-bold text-slate-600 uppercase tracking-tight mb-1">
+      {children} {req && <span className="text-rose-500">*</span>}
+    </label>
   );
   const Lbl = ({children}:{children:React.ReactNode}) => (
     <p className="text-[10px] font-black text-slate-500 uppercase tracking-tight">{children}</p>
   );
-  const SH = ({id,title,badge,children}:{id:string;title:string;badge?:string;children:React.ReactNode}) => {
-    const open=!collapsed[id];
-    return (
-      <div className="rounded-xl border border-slate-200 bg-white shadow-xs overflow-hidden">
-        <button onClick={()=>tog(id)} className="flex items-center gap-2.5 px-4 py-3 w-full text-left hover:bg-slate-50 transition border-b border-slate-100 cursor-pointer">
-          <span className="w-1 h-4 rounded-full bg-indigo-500 shrink-0"/>
-          <span className="text-[11px] font-black uppercase tracking-wider text-slate-700 flex-1">{title}</span>
-          {badge&&<span className="text-[10px] font-mono font-black text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-md">{badge}</span>}
-          {open?<ChevronUp className="size-3.5 text-slate-400 shrink-0"/>:<ChevronDown className="size-3.5 text-slate-400 shrink-0"/>}
-        </button>
-        {open&&<div className="p-4">{children}</div>}
-      </div>
-    );
-  };
 
   // ────────────────────────────────────────────────────────────────
   return (
@@ -339,7 +478,7 @@ export default function PreCostingPage() {
               </div>
               <div className="flex gap-2 pt-2 border-t border-slate-100">
                 <button className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg border border-emerald-200 cursor-pointer transition"><FileSpreadsheet className="size-3.5"/> Excel</button>
-                <button className="flex items-center gap-1 text-xs font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 cursor-pointer transition"><Printer className="size-3.5"/> Print</button>
+                <button className="flex items-center gap-1 text-xs font-bold text-slate-650 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 cursor-pointer transition"><Printer className="size-3.5"/> Print</button>
                 <button className="flex items-center gap-1 text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg border border-rose-200 cursor-pointer transition"><Download className="size-3.5"/> PDF</button>
               </div>
             </div>
@@ -356,7 +495,7 @@ export default function PreCostingPage() {
                       <tr key={r.id} className="hover:bg-indigo-50/30 transition-colors group">
                         <td className="px-4 py-3 text-slate-400 font-bold">{i+1}</td>
                         <td className="px-4 py-3 font-black text-indigo-600">{r.preCostNo}</td>
-                        <td className="px-4 py-3 text-slate-600">{r.queryType}</td>
+                        <td className="px-4 py-3 text-slate-605">{r.queryType}</td>
                         <td className="px-4 py-3 text-slate-500">{r.preCostDate}</td>
                         <td className="px-4 py-3 font-semibold text-slate-800">{r.buyerName}</td>
                         <td className="px-4 py-3 font-mono text-slate-700 max-w-[160px] truncate" title={r.styleName}>{r.styleName}</td>
@@ -387,10 +526,10 @@ export default function PreCostingPage() {
         {/* ══════════ FORM VIEW ══════════ */}
         {view==="form"&&(
           <div className="pb-24">
-            <div className="h-12 bg-white border-b border-slate-200 flex items-center justify-between px-5 sticky top-0 z-30 shadow-xs">
+            <div className="h-12 bg-white border-b border-slate-200 flex items-center justify-between px-5 sticky top-0 z-35 shadow-xs">
               <div className="flex items-center gap-3">
                 <button onClick={()=>setView("list")} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 cursor-pointer transition"><ArrowLeft size={16}/></button>
-                <span className="text-sm font-black text-slate-900 uppercase tracking-tight">Prepare Pre-Costing</span>
+                <span className="text-sm font-black text-slate-900 uppercase tracking-tight">Prepare Pre-Cost</span>
               </div>
               <div className="flex gap-2">
                 <button onClick={handleSave} className="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold cursor-pointer flex items-center gap-1.5 transition shadow-sm">
@@ -398,73 +537,421 @@ export default function PreCostingPage() {
                 </button>
               </div>
             </div>
-            <div className="p-4 md:p-5 max-w-7xl mx-auto space-y-4">
-              <SH id="basic" title="Order Basic Information">
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                  <div><Label>Pre-Cost No</Label><div className="text-xs font-mono font-black text-indigo-600 bg-indigo-50 border border-indigo-100 rounded-lg px-2.5 py-1.5">{form.preCostNo||"(Auto)"}</div></div>
-                  <div><Label>Query Type</Label><select value={form.queryType} onChange={e=>sf({queryType:e.target.value})} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer"><option>Regular</option><option>Sample</option></select></div>
-                  <div><Label>Style Name *</Label><TI val={form.styleName} onChange={v=>sf({styleName:v})} ph="e.g. SS27PB093-SL"/></div>
-                  <div><Label>Delivery Date *</Label><DI val={form.deliveryDate} onChange={v=>sf({deliveryDate:v})}/></div>
-                  <div><Label>Pre-Cost Date</Label><DI val={form.preCostDate} onChange={v=>sf({preCostDate:v})}/></div>
-                  <div><Label>Buyer Name *</Label><TI val={form.buyerName} onChange={v=>sf({buyerName:v})} ph="e.g. PEPCO"/></div>
-                  <div><Label>Order No / Job No</Label><TI val={form.orderNo} onChange={v=>sf({orderNo:v})}/></div>
-                  <div><Label>Country</Label><TI val={form.country} onChange={v=>sf({country:v})}/></div>
-                  <div><Label>Buyer House</Label><TI val={form.buyerHouse} onChange={v=>sf({buyerHouse:v})}/></div>
-                  <div><Label>Brand</Label><TI val={form.brand} onChange={v=>sf({brand:v})}/></div>
-                  <div><Label>Order Qty (Pcs)</Label><NI val={form.orderQtyPcs} onChange={v=>sf({orderQtyPcs:v})}/></div>
-                  <div><Label>Unit Price ($)</Label><NI val={form.unitPrice} onChange={v=>sf({unitPrice:v})}/></div>
-                  <div><Label>Total Value [Auto]</Label><div className="text-right font-mono font-black text-xs text-teal-700 bg-teal-50 border border-teal-200 rounded-lg px-2.5 py-1.5">$ {fmt(form.orderQtyPcs*form.unitPrice)}</div></div>
-                  <div><Label>Plan Cut Qty</Label><NI val={form.planCutQty} onChange={v=>sf({planCutQty:v})}/></div>
-                  <div><Label>Set Ratio</Label><NI val={form.setRatio} onChange={v=>sf({setRatio:v})}/></div>
-                  <div><Label>CM %</Label><NI val={form.cmPct} onChange={v=>sf({cmPct:v})}/></div>
-                  <div><Label>Season</Label><TI val={form.season} onChange={v=>sf({season:v})} ph="e.g. SS27"/></div>
-                  <div><Label>Merchandiser</Label><TI val={form.merchandiser} onChange={v=>sf({merchandiser:v})}/></div>
-                  <div><Label>No of Colors</Label><NI val={form.noOfColors} onChange={v=>sf({noOfColors:v})}/></div>
-                  <div><Label>Extra Cutting %</Label><NI val={form.extraCuttingPct} onChange={v=>sf({extraCuttingPct:v})}/></div>
-                  <div><Label>Fabric Process Loss %</Label><NI val={form.fabricProcessLossPct} onChange={v=>sf({fabricProcessLossPct:v})}/></div>
-                  <div><Label>Exchange Rate</Label><NI val={form.exchangeRate} onChange={v=>sf({exchangeRate:v})}/></div>
-                  <div><Label>Shipping Mode</Label><select value={form.shippingMode} onChange={e=>sf({shippingMode:e.target.value})} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer"><option>Sea</option><option>Air</option></select></div>
-                  <div><Label>Pay Term</Label><select value={form.payTerm} onChange={e=>sf({payTerm:e.target.value})} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer"><option>At Sight</option><option>90 Days</option><option>60 Days</option></select></div>
-                  <div className="col-span-2"><Label>Special Instructions</Label><TI val={form.specialInstructions} onChange={v=>sf({specialInstructions:v})}/></div>
-                  <div className="col-span-2"><Label>Penalty Clauses</Label><TI val={form.penaltyClause} onChange={v=>sf({penaltyClause:v})}/></div>
-                </div>
-              </SH>
 
-              <SH id="fob" title="Style and FOB Details">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-xs">
-                    <thead><tr className="bg-slate-50 border-b border-slate-200">{["Style No","Color","Item Name","Order Qty","Unit Price ($)","Total Price ($)","Delivery Date",""].map(h=><th key={h} className="px-3 py-2 text-[10px] font-black text-slate-500 uppercase text-left">{h}</th>)}</tr></thead>
+            <div className="p-4 md:p-6 max-w-8xl mx-auto space-y-6">
+
+              {/* Section 1: Order Basic Information */}
+              <div className="bg-white rounded-xl border border-slate-200 shadow-xs relative overflow-hidden flex flex-col md:flex-row gap-6 p-5">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500" />
+                
+                {/* Form fields grid */}
+                <div className="flex-1 space-y-4">
+                  <h3 className="text-xs font-black uppercase text-blue-600 tracking-wider">Order Basic Information</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                      <Label>Query No</Label>
+                      <TI val={form.queryNo} onChange={v => sf({queryNo:v})} ph="Enter Query No"/>
+                    </div>
+                    <div>
+                      <Label>Order Quantity</Label>
+                      <NI val={form.orderQtyPcs} onChange={v => sf({orderQtyPcs:v})} />
+                    </div>
+                    <div>
+                      <Label req>Query Type</Label>
+                      <select value={form.queryType} onChange={e=>sf({queryType:e.target.value})} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer font-medium">
+                        <option>Regular</option>
+                        <option>Sample</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Label>Ref No</Label>
+                      <TI val={form.refNo} onChange={v => sf({refNo:v})} ph="Enter Ref No"/>
+                    </div>
+
+                    <div>
+                      <Label req>Query Date</Label>
+                      <DI val={form.queryDate} onChange={v => sf({queryDate:v})}/>
+                    </div>
+                    <div>
+                      <Label>Delivery Date</Label>
+                      <DI val={form.deliveryDate} onChange={v => sf({deliveryDate:v})}/>
+                    </div>
+                    <div>
+                      <Label>Customer/Buying House</Label>
+                      <select value={form.customerBuyingHouse} onChange={e=>sf({customerBuyingHouse:e.target.value})} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer font-medium">
+                        <option value="">Select...</option>
+                        <option>NITEX</option>
+                        <option>PGS House</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Label req>Buyer Name</Label>
+                      <select value={form.buyerName} onChange={e=>sf({buyerName:e.target.value})} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer font-medium">
+                        <option value="">select...</option>
+                        <option>THE SET</option>
+                        <option>PEPCO</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <Label req>Department</Label>
+                      <select value={form.department} onChange={e=>sf({department:e.target.value})} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer font-medium">
+                        <option value="">Select...</option>
+                        <option>Merchandising Dept</option>
+                        <option>Sourcing Dept</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Label>Order Type</Label>
+                      <select value={form.orderType} onChange={e=>sf({orderType:e.target.value})} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer font-medium">
+                        <option>Regular</option>
+                        <option>Sample</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Label>Buyer Agent</Label>
+                      <select value={form.buyerAgent} onChange={e=>sf({buyerAgent:e.target.value})} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer font-medium">
+                        <option value="">Select...</option>
+                        <option>PGS Agent</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Label>Buyer Brand</Label>
+                      <select value={form.buyerBrand} onChange={e=>sf({buyerBrand:e.target.value})} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer font-medium">
+                        <option value="">Select...</option>
+                        <option>Pepco Kids</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <Label req>Quality Level</Label>
+                      <select value={form.qualityLevel} onChange={e=>sf({qualityLevel:e.target.value})} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer font-medium">
+                        <option value="">Select...</option>
+                        <option>A-Level</option>
+                        <option>B-Level</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Label req>Inspection Type</Label>
+                      <select value={form.inspectionType} onChange={e=>sf({inspectionType:e.target.value})} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer font-medium">
+                        <option value="">Select...</option>
+                        <option>Final Inspection</option>
+                        <option>Mid Inspection</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Label req>Season</Label>
+                      <select value={form.season} onChange={e=>sf({season:e.target.value})} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer font-medium">
+                        <option value="">Select...</option>
+                        <option>SS27</option>
+                        <option>FW27</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Label>Currency</Label>
+                      <select value="USD" disabled className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 cursor-not-allowed font-medium">
+                        <option>USD</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <Label>Exchange Rate</Label>
+                      <NI val={form.exchangeRate} onChange={v => sf({exchangeRate:v})} />
+                    </div>
+                    <div>
+                      <Label>Shipping Mode</Label>
+                      <select value={form.shippingMode} onChange={e=>sf({shippingMode:e.target.value})} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer font-medium">
+                        <option>Sea</option>
+                        <option>Air</option>
+                        <option>Road</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Label>Pay Term</Label>
+                      <select value={form.payTerm} onChange={e=>sf({payTerm:e.target.value})} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer font-medium">
+                        <option>At Sight</option>
+                        <option>90 Days</option>
+                        <option>60 Days</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Label>Tenor</Label>
+                      <TI val={form.tenor} onChange={v => sf({tenor:v})} ph="Enter Tenor"/>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Special Instructions</Label>
+                      <TI val={form.specialInstructions} onChange={v => sf({specialInstructions:v})} />
+                    </div>
+                    <div>
+                      <Label>Penalty Clauses</Label>
+                      <TI val={form.penaltyClause} onChange={v => sf({penaltyClause:v})} />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label>Zip file Upload</Label>
+                    <input type="file" className="block w-full text-xs text-slate-500 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 cursor-pointer" />
+                  </div>
+                </div>
+
+                {/* Right Mockup image uploader */}
+                <div className="w-full md:w-56 shrink-0 flex flex-col items-center justify-center border border-slate-200 rounded-xl bg-slate-50 p-4">
+                  {form.styleImage ? (
+                    <img src={form.styleImage} alt="Preview" className="max-h-36 object-contain rounded-lg mb-3" />
+                  ) : (
+                    <div className="w-full h-36 rounded-lg border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-350 text-center mb-3">
+                      <ImageIcon className="size-10 stroke-1 mb-1" />
+                      <span className="text-[10px] font-black uppercase tracking-wider">NO IMAGE AVAILABLE</span>
+                    </div>
+                  )}
+                  <input type="file" onChange={e => sf({styleImage: "/src/components/0330c3d6-5cae-49e0-b777-d34891afcc09.jpg"})} className="block w-full text-[10px] text-slate-450 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-[9.5px] file:font-black file:bg-indigo-50 file:text-indigo-650 hover:file:bg-indigo-100 cursor-pointer" />
+                </div>
+              </div>
+
+              {/* Section 2: Operation Process Loss (RMG) */}
+              <div className="bg-white rounded-xl border border-slate-200 shadow-xs relative overflow-hidden p-5">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500" />
+                <h3 className="text-xs font-black uppercase text-blue-600 tracking-wider mb-4">Operation Process Loss (RMG)</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
+                  <div>
+                    <Label>Cutting (%)</Label>
+                    <NI val={form.cuttingPct} onChange={v => sf({cuttingPct:v})} />
+                  </div>
+                  <div>
+                    <Label>Print (%)</Label>
+                    <NI val={form.printPct} onChange={v => sf({printPct:v})} />
+                  </div>
+                  <div>
+                    <Label>Embroidery (%)</Label>
+                    <NI val={form.embroideryPct} onChange={v => sf({embroideryPct:v})} />
+                  </div>
+                  <div>
+                    <Label>Sewing (%)</Label>
+                    <NI val={form.sewingPct} onChange={v => sf({sewingPct:v})} />
+                  </div>
+                  <div>
+                    <Label>Garment Wash/Dye (%)</Label>
+                    <NI val={form.washDyePct} onChange={v => sf({washDyePct:v})} />
+                  </div>
+                  <div>
+                    <Label>Finishing (%)</Label>
+                    <NI val={form.finishingPct} onChange={v => sf({finishingPct:v})} />
+                  </div>
+                  <div>
+                    <Label>Extra (%)</Label>
+                    <NI val={form.extraPct} onChange={v => sf({extraPct:v})} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: Order Style Information */}
+              <div className="bg-white rounded-xl border border-slate-200 shadow-xs relative overflow-hidden p-5">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500" />
+                <h3 className="text-xs font-black uppercase text-blue-600 tracking-wider mb-4">Order Style Information</h3>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                  <div>
+                    <Label req>Style No</Label>
+                    <TI val={styleNo} onChange={setStyleNo} ph="Enter Style No"/>
+                  </div>
+                  
+                  <div>
+                    <Label req>Colour</Label>
+                    <div className="flex gap-2">
+                      <select value={colour} onChange={e=>setColour(e.target.value)} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer font-medium">
+                        <option value="">Select...</option>
+                        <option>Verdant Green</option>
+                        <option>Lilas AOP</option>
+                        <option>Vintage Indigo</option>
+                      </select>
+                      <button className="px-2 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg text-slate-650 cursor-pointer font-black text-xs transition flex items-center justify-center">+</button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label req>Style Order Qty</Label>
+                    <NI val={styleOrderQty} onChange={setStyleOrderQty} />
+                  </div>
+
+                  <div>
+                    <Label req>Item Type</Label>
+                    <div className="flex gap-2">
+                      <select value={itemType} onChange={e=>setItemType(e.target.value)} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer font-medium">
+                        <option>Pcs</option>
+                        <option>Dzn</option>
+                      </select>
+                      <button className="px-2 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg text-slate-650 cursor-pointer font-black text-xs transition flex items-center justify-center"><List size={14} /></button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label req>Size Group</Label>
+                    <div className="flex gap-2 items-end">
+                      <select value={sizeGroup} onChange={e=>setSizeGroup(e.target.value)} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer font-medium">
+                        <option value="">Select...</option>
+                        <option>Boys 8-14</option>
+                        <option>Girls Dress</option>
+                        <option>Sweat Shirt</option>
+                      </select>
+                      <button className="px-2.5 py-1 bg-indigo-50 border border-indigo-150 hover:bg-indigo-100 rounded-lg text-[9.5px] font-bold text-indigo-650 cursor-pointer transition uppercase">Size</button>
+                      <button className="px-2.5 py-1 bg-slate-50 border border-slate-200 hover:bg-slate-100 rounded-lg text-[9.5px] font-bold text-slate-500 cursor-pointer transition uppercase">Reset</button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label>Buyer Costing</Label>
+                    <select value={buyerCosting} onChange={e=>setBuyerCosting(e.target.value)} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer font-medium">
+                      <option value="">Select...</option>
+                      <option>Pepco Target Costing</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <Label req>Style Unit Price ($)</Label>
+                    <NI val={styleUnitPrice} onChange={setStyleUnitPrice} />
+                  </div>
+
+                  <div>
+                    <Label req>Style Delivery Date</Label>
+                    <DI val={styleDeliveryDate} onChange={setStyleDeliveryDate} />
+                  </div>
+
+                  <div>
+                    <Label>Plan Cut Qty</Label>
+                    <NI val={planCutQty} onChange={setPlanCutQty} />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Label req>Comm(%)</Label>
+                      <NI val={commissionPct} onChange={setCommissionPct} />
+                    </div>
+                    <div>
+                      <Label>Comm Amt</Label>
+                      <div className="text-right font-mono font-bold text-xs bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5">$ {fmt(calculatedCommissionAmt)}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Print, Embroidery, Wash, Special switches + Add button */}
+                <div className="mt-5 flex flex-wrap items-center justify-between gap-4 border-t border-slate-100 pt-4">
+                  <div className="flex gap-2">
+                    {[
+                      { l: "Print", active: hasPrint, fn: setHasPrint },
+                      { l: "Embroidery", active: hasEmbroidery, fn: setHasEmbroidery },
+                      { l: "Wash", active: hasWash, fn: setHasWash },
+                      { l: "Special", active: hasSpecial, fn: setHasSpecial },
+                    ].map(btn => (
+                      <button
+                        key={btn.l}
+                        onClick={() => btn.fn(!btn.active)}
+                        className={`px-4 py-1.5 rounded-lg text-xs font-bold border transition cursor-pointer ${
+                          btn.active
+                            ? "bg-rose-500 text-white border-rose-600 shadow-sm"
+                            : "bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100"
+                        }`}
+                      >
+                        {btn.l}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  <button
+                    onClick={addStyleToList}
+                    className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg cursor-pointer transition flex items-center gap-1.5 shadow-sm"
+                  >
+                    <Plus className="size-3.5"/> ADD TO LIST
+                  </button>
+                </div>
+              </div>
+
+              {/* Section 4: Basic Information Grid (Added styles list) */}
+              <div className="bg-white rounded-xl border border-slate-200 shadow-xs relative overflow-hidden p-5">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500" />
+                <h3 className="text-xs font-black uppercase text-blue-600 tracking-wider mb-4">Order Basic Information</h3>
+                
+                <div className="overflow-x-auto rounded-lg border border-slate-200 shadow-xs">
+                  <table className="w-full text-xs text-slate-700">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-250">
+                        {["#","Style No","Colour","Item Name","OrderQty","Size Group","Sizes","SizesQty","Print","Embroidery","Wash","Special","UnitPrice","DeliveryDate","∇"].map((h,i)=>(
+                          <th key={i} className="px-3 py-2 text-left font-black text-slate-500 uppercase tracking-wider text-[8.5px]">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
                     <tbody className="divide-y divide-slate-100">
-                      {form.styleFOBRows.map(r=>(
-                        <tr key={r.id} className="group hover:bg-slate-50">
-                          <td className="px-2 py-1.5"><TI val={r.styleNo} onChange={v=>sf({styleFOBRows:form.styleFOBRows.map(x=>x.id===r.id?{...x,styleNo:v}:x)})}/></td>
-                          <td className="px-2 py-1.5"><TI val={r.colour} onChange={v=>sf({styleFOBRows:form.styleFOBRows.map(x=>x.id===r.id?{...x,colour:v}:x)})}/></td>
-                          <td className="px-2 py-1.5"><TI val={r.itemName} onChange={v=>sf({styleFOBRows:form.styleFOBRows.map(x=>x.id===r.id?{...x,itemName:v}:x)})}/></td>
-                          <td className="px-2 py-1.5 w-24"><NI val={r.orderQty} onChange={v=>sf({styleFOBRows:form.styleFOBRows.map(x=>x.id===r.id?{...x,orderQty:v}:x)})}/></td>
-                          <td className="px-2 py-1.5 w-24"><NI val={r.unitPrice} onChange={v=>sf({styleFOBRows:form.styleFOBRows.map(x=>x.id===r.id?{...x,unitPrice:v}:x)})}/></td>
-                          <td className="px-2 py-1.5 text-right font-mono font-black text-slate-800">{fmt(r.orderQty*r.unitPrice)}</td>
-                          <td className="px-2 py-1.5 w-36"><DI val={r.deliveryDate} onChange={v=>sf({styleFOBRows:form.styleFOBRows.map(x=>x.id===r.id?{...x,deliveryDate:v}:x)})}/></td>
-                          <td className="px-2 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity"><button onClick={()=>sf({styleFOBRows:form.styleFOBRows.filter(x=>x.id!==r.id)})} className="p-1 rounded hover:bg-rose-50 hover:text-rose-500 text-slate-300 cursor-pointer transition"><X className="size-3.5"/></button></td>
-                        </tr>
-                      ))}
+                      {form.styleFOBRows.length === 0 ? (
+                        <tr><td colSpan={15} className="px-4 py-6 text-center text-slate-400 font-medium">No styles added. Add styles above.</td></tr>
+                      ) : (
+                        form.styleFOBRows.map((r,i)=>(
+                          <tr key={r.id} className="hover:bg-slate-50/50 transition-colors">
+                            <td className="px-3 py-2 text-slate-400 font-bold">{i+1}</td>
+                            <td className="px-3 py-2 font-bold text-slate-900">{r.styleNo}</td>
+                            <td className="px-3 py-2 font-semibold text-slate-650">{r.colour}</td>
+                            <td className="px-3 py-2">{r.itemName}</td>
+                            <td className="px-3 py-2 font-mono text-right font-semibold">{r.orderQty.toLocaleString()}</td>
+                            <td className="px-3 py-2">{r.sizeGroup}</td>
+                            <td className="px-3 py-2 text-slate-500">{r.sizes}</td>
+                            <td className="px-3 py-2 font-mono text-right">{r.sizesQty.toLocaleString()}</td>
+                            <td className="px-3 py-2 font-bold">{r.print ? "Yes" : "No"}</td>
+                            <td className="px-3 py-2 font-bold">{r.embroidery ? "Yes" : "No"}</td>
+                            <td className="px-3 py-2 font-bold">{r.wash ? "Yes" : "No"}</td>
+                            <td className="px-3 py-2 font-bold">{r.special ? "Yes" : "No"}</td>
+                            <td className="px-3 py-2 font-mono text-right font-bold text-slate-800">$ {r.unitPrice.toFixed(2)}</td>
+                            <td className="px-3 py-2 font-mono">{r.deliveryDate}</td>
+                            <td className="px-3 py-2">
+                              <button onClick={() => removeStyleFromList(r.id)} className="p-1 rounded hover:bg-rose-50 hover:text-rose-500 text-slate-300 transition cursor-pointer" title="Remove"><X className="size-3.5"/></button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
-                <button onClick={()=>sf({styleFOBRows:[...form.styleFOBRows,{id:nid(),styleNo:"",colour:"",itemName:"",orderQty:0,unitPrice:0,deliveryDate:""}]})} className="mt-3 flex items-center gap-1.5 w-full text-xs font-bold text-indigo-600 border border-dashed border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50 rounded-lg px-3 py-1.5 transition cursor-pointer"><Plus className="size-3.5"/> Add Style Row</button>
-              </SH>
+              </div>
 
-              <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-                <div className="flex items-center gap-2.5 px-4 py-3 border-b border-slate-100 bg-indigo-600">
-                  <span className="text-[11px] font-black uppercase tracking-wider text-white">Live Budget Summary</span>
-                  <span className="ml-auto text-[10px] text-indigo-200 font-semibold">Auto-calculated</span>
+              {/* Section 5: Additional Costing Checkbox block */}
+              <div className="bg-white rounded-xl border border-slate-200 shadow-xs relative overflow-hidden p-5">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500" />
+                <div className="flex items-center gap-2 mb-4">
+                  <input type="checkbox" defaultChecked id="add-cost" className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 size-3.5 cursor-pointer" />
+                  <label htmlFor="add-cost" className="text-xs font-black uppercase text-blue-600 tracking-wider cursor-pointer">Additional Costing</label>
                 </div>
-                <div className="p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-                  {[["Order Value",B.orderValue,"slate"],["Total Variable",B.totalVariable,"rose"],["Contribution",B.contribution,"indigo"],["CM Cost",B.cmCost,"amber"],["Net Profit",B.netProfit,B.netProfit>=0?"teal":"rose"]].map(([l,v,c])=>{
-                    const colors:Record<string,string>={slate:"bg-slate-50 text-slate-700 border-slate-200",rose:"bg-rose-50 text-rose-700 border-rose-200",indigo:"bg-indigo-50 text-indigo-700 border-indigo-200",amber:"bg-amber-50 text-amber-700 border-amber-200",teal:"bg-teal-50 text-teal-700 border-teal-200"};
-                    return <div key={l as string} className={`rounded-xl border p-3 ${colors[c as string]}`}><p className="text-[9px] font-black uppercase tracking-wide opacity-70">{l as string}</p><p className="text-lg font-black font-mono mt-0.5">$ {fmt(v as number)}</p></div>;
-                  })}
+
+                <div className="overflow-x-auto rounded-lg border border-slate-200">
+                  <table className="w-full text-xs text-slate-700">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200">
+                        {["#","Commercial Cost (%)","Finance Cost (%)","Buying Commission (%)","Sample Fabric Qty","Sample Fabric Rate","Commercial(%)"].map((h,i)=>(
+                          <th key={i} className="px-3 py-2.5 text-left font-black text-slate-500 uppercase tracking-wider text-[8.5px]">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-150">
+                      <tr className="bg-white">
+                        <td className="px-3 py-2 text-slate-400 font-bold">1</td>
+                        <td className="px-2 py-1.5"><input type="number" step="any" value={form.additionalCommercialCostPct} onChange={e=>sf({additionalCommercialCostPct:Number(e.target.value)})} className="w-full font-mono text-xs px-2.5 py-1 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white" /></td>
+                        <td className="px-2 py-1.5"><input type="number" step="any" value={form.additionalFinanceCostPct} onChange={e=>sf({additionalFinanceCostPct:Number(e.target.value)})} className="w-full font-mono text-xs px-2.5 py-1 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white" /></td>
+                        <td className="px-2 py-1.5"><input type="number" step="any" value={form.additionalBuyingCommissionPct} onChange={e=>sf({additionalBuyingCommissionPct:Number(e.target.value)})} className="w-full font-mono text-xs px-2.5 py-1 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white" /></td>
+                        <td className="px-2 py-1.5"><input type="number" step="any" value={form.sampleFabricQty} onChange={e=>sf({sampleFabricQty:Number(e.target.value)})} className="w-full font-mono text-xs px-2.5 py-1 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white" /></td>
+                        <td className="px-2 py-1.5"><input type="number" step="any" value={form.sampleFabricRate} onChange={e=>sf({sampleFabricRate:Number(e.target.value)})} className="w-full font-mono text-xs px-2.5 py-1 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white" /></td>
+                        <td className="px-2 py-1.5"><input type="number" step="any" value={form.additionalCommercialPct} onChange={e=>sf({additionalCommercialPct:Number(e.target.value)})} className="w-full font-mono text-xs px-2.5 py-1 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white" /></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Final save button in the bottom right */}
+                <div className="mt-6 flex justify-end">
+                  <button onClick={handleSave} className="px-6 py-2.5 bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold rounded-lg cursor-pointer transition shadow-sm uppercase tracking-wider">
+                    Save
+                  </button>
                 </div>
               </div>
+
             </div>
           </div>
         )}
@@ -604,17 +1091,31 @@ export default function PreCostingPage() {
                         <tbody className="divide-y divide-slate-100 text-[10px]">
                           <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">EPM</td><td/><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{activeRec.epm.toFixed(2)}</td></tr>
                           <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">CPM</td><td/><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{activeRec.cpm.toFixed(2)}</td></tr>
-                          {activeRec.gmtItems.map(g => (
-                            <React.Fragment key={g.id}>
-                              <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">SMV</td><td className="px-3 py-1.5 text-slate-600 font-semibold">{g.name}</td><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{g.smv.toFixed(2)}</td></tr>
-                              <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">Efficiency %</td><td className="px-3 py-1.5 text-slate-600 font-semibold">{g.name}</td><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{g.efficiencyPct.toFixed(2)}%</td></tr>
-                            </React.Fragment>
-                          ))}
+                          {activeRec.gmtItems.map(g => {
+                            const smvVal = g.smv;
+                            const mcPerLineVal = g.mcPerLine;
+                            const effPct = g.efficiencyPct;
+                            const prodPerHour = mcPerLineVal > 0 ? (mcPerLineVal * 60 / smvVal) * (effPct / 100) : 0;
+                            return (
+                              <React.Fragment key={g.id}>
+                                <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">SMV</td><td className="px-3 py-1.5 text-slate-650 font-semibold">{g.name}</td><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{smvVal.toFixed(2)}</td></tr>
+                                <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">M/c Per Line</td><td className="px-3 py-1.5 text-slate-650 font-semibold">{g.name}</td><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{mcPerLineVal.toFixed(2)}</td></tr>
+                                <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">Efficiency %</td><td className="px-3 py-1.5 text-slate-650 font-semibold">{g.name}</td><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{effPct.toFixed(2)}%</td></tr>
+                                <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">Production per Hour</td><td className="px-3 py-1.5 text-slate-650 font-semibold">{g.name}</td><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{prodPerHour.toFixed(2)}</td></tr>
+                              </React.Fragment>
+                            );
+                          })}
+                          <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">Assortment</td><td/><td className="px-3 py-1.5 text-right font-mono text-slate-450 font-semibold">—</td></tr>
                           <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">No of Color</td><td/><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{activeRec.noOfColors}</td></tr>
                           <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">Avg Wgt Per Color</td><td/><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{fmt(activeRec.fabricRows.reduce((s,x)=>s+(x.orderQtyDzn*x.consDzn),0)/Math.max(activeRec.noOfColors,1))} Kg</td></tr>
                           <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">Extra Cutting %</td><td/><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{activeRec.extraCuttingPct.toFixed(2)}%</td></tr>
                           <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">Extra Cut Qty (Pcs)</td><td/><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{Math.round(activeRec.orderQtyPcs*activeRec.extraCuttingPct/100).toLocaleString()}</td></tr>
                           <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">Fabric Process Loss %</td><td/><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{activeRec.fabricProcessLossPct.toFixed(2)}%</td></tr>
+                          <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">Fabric Loss Qty (Kg)</td><td/><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{fmt(activeRec.fabricRows.reduce((s,x)=>s+(x.orderQtyDzn*x.consDzn),0) * (activeRec.fabricProcessLossPct / 100))} Kg</td></tr>
+                          <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">Lead Time</td><td/><td className="px-3 py-1.5 text-right font-mono text-slate-450 font-semibold">—</td></tr>
+                          <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">Penalty Clause</td><td colSpan={2} className="px-3 py-1.5 text-slate-800 font-medium">{activeRec.penaltyClause || "None"}</td></tr>
+                          <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">Special Instructions</td><td colSpan={2} className="px-3 py-1.5 text-slate-800 font-medium">{activeRec.specialInstructions || "None"}</td></tr>
+                          <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">Sample</td><td/><td className="px-3 py-1.5 text-right font-mono text-slate-450 font-semibold">—</td></tr>
                         </tbody>
                       </table>
                     </div>
@@ -1071,7 +1572,7 @@ export default function PreCostingPage() {
                           {activeRec.specialCostRows.map(r=>(
                             <tr key={r.id} className="hover:bg-slate-50/30 transition-colors">
                               <td className="px-2 py-1.5 font-bold text-slate-900 max-w-[80px] truncate">{r.styleRef}</td>
-                              <td className="px-2 py-1.5 text-slate-600">{r.colour}</td>
+                              <td className="px-2 py-1.5 text-slate-650">{r.colour}</td>
                               <td className="px-2 py-1.5 text-slate-600">{r.costHead}</td>
                               <td className="px-2 py-1.5 text-right font-mono">{fmt(r.orderQtyDzn)}</td>
                               <td className="px-2 py-1.5 text-right font-mono font-semibold text-slate-800">$ {r.ratePerDzn.toFixed(2)}</td>
@@ -1145,7 +1646,7 @@ export default function PreCostingPage() {
                         <tbody>
                           <tr className="hover:bg-slate-50/30 transition-colors">
                             <td className="px-3 py-3 font-mono font-semibold text-slate-700">{activeRec.sampleFabricQty}</td>
-                            <td className="px-3 py-3 font-mono font-bold text-slate-800">$ {activeRec.sampleFabricRate.toFixed(2)}</td>
+                            <td className="px-3 py-3 font-mono font-bold text-slate-850">$ {activeRec.sampleFabricRate.toFixed(2)}</td>
                             <td className="px-3 py-3 font-mono font-bold text-indigo-600">$ {fmt(activeRec.sampleFabricQty*activeRec.sampleFabricRate)}</td>
                           </tr>
                         </tbody>

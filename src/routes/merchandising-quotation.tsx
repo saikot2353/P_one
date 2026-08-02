@@ -7,6 +7,7 @@ import {
   ChevronDown, ChevronUp, Info,
 } from "lucide-react";
 import { toast } from "sonner";
+import defaultDressSketch from "../components/0330c3d6-5cae-49e0-b777-d34891afcc09.jpg";
 
 export const Route = createFileRoute("/merchandising-quotation")({
   head: () => ({ meta: [{ title: "Buyer Costing — Pakiza Knit" }] }),
@@ -92,7 +93,7 @@ const SAMPLE: Q[] = [{
   fabrication1:"100% Cotton SJ-160 GSM", fabrication2:"",
   actualFabricConsCad:1.890, consWithCuttingWastagePct:3.00,
   color1:"White", garmentQuantity:50000, buyerTargetFob:2.00,
-  status:"Buyer Approved", image:"",
+  status:"Buyer Approved", image:defaultDressSketch,
   fabricRows:DEF_FABRIC.map(r=>({...r})), accessoryRows:DEF_ACC.map(r=>({...r})),
   embRows:DEF_EMB.map(r=>({...r})), washRows:DEF_WASH.map(r=>({...r})),
   otherCostRows:DEF_OTHER.map(r=>({...r})),
@@ -148,7 +149,7 @@ export default function MerchandisingQuotationPage() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"All"|Status>("All");
   const [editId, setEditId] = useState<string|null>(null);
-  const [img, setImg]     = useState<string|null>(null);
+  const [img, setImg]     = useState<string|null>(defaultDressSketch);
   const [collapsed, setCollapsed] = useState<Record<string,boolean>>({});
 
   const blank = (): Q => ({
@@ -156,7 +157,7 @@ export default function MerchandisingQuotationPage() {
     buyerName:"", department:"", season:"", styleName:"", styleDescription:"",
     shipmentDate:"", sizeRange:"", fabrication1:"", fabrication2:"",
     actualFabricConsCad:1.890, consWithCuttingWastagePct:3.00,
-    color1:"", garmentQuantity:0, buyerTargetFob:0, status:"Draft", image:"",
+    color1:"", garmentQuantity:0, buyerTargetFob:0, status:"Draft", image:defaultDressSketch,
     fabricRows: DEF_FABRIC.map(r=>({...r})), accessoryRows: DEF_ACC.map(r=>({...r})),
     embRows: DEF_EMB.map(r=>({...r})), washRows: DEF_WASH.map(r=>({...r})),
     otherCostRows: DEF_OTHER.map(r=>({...r})),
@@ -183,20 +184,21 @@ export default function MerchandisingQuotationPage() {
 
   const save = () => {
     if (!form.styleName.trim()) { toast.error("Style Name is required."); return; }
+    const updatedForm = { ...form, image: img || "" };
     if (editId) {
-      setData(prev => prev.map(q=>q.id===editId?{...form,id:editId}:q));
+      setData(prev => prev.map(q=>q.id===editId?{...updatedForm,id:editId}:q));
       toast.success("Costing updated!");
     } else {
       const cNo = `PKCL-Costing-${String(data.length+37).padStart(2,"0")}/0`;
-      setData(prev => [{...form,id:`QT-${Date.now()}`,costingNo:cNo},...prev]);
+      setData(prev => [{...updatedForm,id:`QT-${Date.now()}`,costingNo:cNo},...prev]);
       toast.success(`${cNo} created!`);
     }
     setView("list");
   };
 
-  const openNew   = () => { setForm(blank()); setEditId(null); setImg(null); setView("form"); };
-  const openEdit  = (q: Q) => { setForm({...q}); setEditId(q.id); setImg(q.image||null); setView("form"); };
-  const openSheet = (q: Q) => { setForm({...q}); setView("sheet"); };
+  const openNew   = () => { setForm(blank()); setEditId(null); setImg(defaultDressSketch); setView("form"); };
+  const openEdit  = (q: Q) => { setForm({...q}); setEditId(q.id); setImg(q.image||defaultDressSketch); setView("form"); };
+  const openSheet = (q: Q) => { setForm({...q}); setImg(q.image||defaultDressSketch); setView("sheet"); };
 
   const rows = data.filter(q => {
     const s = search.toLowerCase();
@@ -747,87 +749,429 @@ export default function MerchandisingQuotationPage() {
 
         {/* ── PRINT SHEET ── */}
         {view==="sheet" && (
-          <div className="p-6 md:p-10 max-w-5xl mx-auto pb-24 space-y-4">
-            <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 print:hidden">
-              <button onClick={()=>setView("form")} className="flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer transition"><ArrowLeft className="size-4" /> Edit</button>
+          <div className="p-4 md:p-8 max-w-[1500px] mx-auto pb-24 space-y-4 print:p-0">
+            <div className="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-200 print:hidden shadow-xs">
+              <button onClick={()=>setView("list")} className="flex items-center gap-1.5 text-xs font-bold text-slate-655 hover:text-slate-900 cursor-pointer transition">
+                <ArrowLeft className="size-4" /> Back to List
+              </button>
               <div className="flex gap-2">
-                <button onClick={()=>window.print()} className="bg-indigo-600 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-1.5 cursor-pointer hover:bg-indigo-700 transition"><Printer className="size-3.5" /> Print</button>
-                <button onClick={()=>setView("list")} className="bg-slate-100 text-slate-700 text-xs font-bold px-4 py-2 rounded-lg cursor-pointer hover:bg-slate-200 transition">Close</button>
+                <button onClick={()=>window.print()} className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-1.5 cursor-pointer transition shadow-xs">
+                  <Printer className="size-3.5" /> Print Costing
+                </button>
+                <button onClick={()=>setView("form")} className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-4 py-2 rounded-lg cursor-pointer transition">
+                  Edit Costing
+                </button>
               </div>
             </div>
 
-            <div className="bg-white p-8 border border-slate-300 shadow-sm print:border-none space-y-6">
-              <div className="text-center border-b-2 border-slate-900 pb-4">
-                <h1 className="text-xl font-black tracking-wide">PAKIZA KNIT COMPOSITE LTD</h1>
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">Buyer Costing Sheet</p>
-              </div>
-
-              <div className="grid grid-cols-12 gap-4 text-[11px]">
-                <div className="col-span-8 border border-slate-200 rounded-xl p-4 grid grid-cols-2 gap-x-8 gap-y-2">
-                  {[["Costing No",form.costingNo||"PC-Temp"],["Date",form.date],["Buyer",form.buyerName],["Department",form.department],["Season",form.season],["Style",form.styleName]].map(([l,v])=>(
-                    <div key={l}><span className="text-slate-400 font-bold">{l}: </span><span className="font-semibold text-slate-800">{v}</span></div>
-                  ))}
-                  <div className="col-span-2"><span className="text-slate-400 font-bold">Fabrication: </span><span className="text-slate-700">{form.fabrication1}</span></div>
-                  <div><span className="text-slate-400 font-bold">CAD Cons: </span><span className="font-mono font-bold">{form.actualFabricConsCad} KG</span></div>
-                  <div><span className="text-slate-400 font-bold">w/ Wastage: </span><span className="font-mono font-bold">{C.cww.toFixed(3)} KG</span></div>
-                </div>
-                <div className="col-span-4 border border-slate-200 rounded-xl p-3 flex flex-col gap-2">
-                  <div className="flex-1 bg-slate-50 border rounded-lg flex items-center justify-center min-h-20 overflow-hidden">
-                    {img ? <img src={img} className="h-full object-contain" /> : <span className="text-[10px] text-slate-400 font-bold">No Image</span>}
-                  </div>
-                  <div className="text-[11px] space-y-1 border-t pt-1.5">
-                    <div><span className="text-slate-400 font-bold">Color: </span><span className="font-bold">{form.color1}</span></div>
-                    <div><span className="text-slate-400 font-bold">Qty: </span><span className="font-bold">{form.garmentQuantity.toLocaleString()} Pcs</span></div>
-                    <div><span className="text-slate-400 font-bold">Target FOB: </span><span className="font-mono font-black">$ {form.buyerTargetFob.toFixed(2)}</span></div>
-                  </div>
+            {/* Buyer Costing Sheet Document Container */}
+            <div className="bg-white border border-slate-350 shadow-md p-6 md:p-8 space-y-6 text-[10px] text-slate-800 leading-relaxed max-w-full mx-auto print:border-none print:shadow-none print:p-0">
+              
+              {/* Header Title Block */}
+              <div className="border border-slate-300 rounded-lg overflow-hidden">
+                <div className="bg-[#8b2525] text-white py-2.5 text-center select-none">
+                  <h1 className="text-sm font-black uppercase tracking-widest leading-none">PAKIZA KNIT COMPOSITE LTD</h1>
+                  <p className="text-[10px] font-bold tracking-widest uppercase mt-1 opacity-90">Buyer Costing Sheet</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-6 text-[11px]">
-                <div>
-                  <p className="text-[10px] font-black uppercase mb-2 text-slate-400">Garment Cost Breakdown</p>
-                  <table className="w-full border border-slate-200 rounded-xl overflow-hidden">
-                    <thead><tr className="bg-slate-50 font-bold text-slate-700 border-b border-slate-200"><th className="px-3 py-1.5 text-left">Cost Item</th><th className="px-3 py-1.5 text-right">$/Dzn</th></tr></thead>
-                    <tbody className="divide-y divide-slate-100 text-slate-700">
-                      <tr><td className="px-3 py-1.5">Main Fabric</td><td className="px-3 py-1.5 text-right font-mono">{C.fab.toFixed(3)}</td></tr>
-                      {C.acc>0&&<tr><td className="px-3 py-1.5">Accessories</td><td className="px-3 py-1.5 text-right font-mono">{C.acc.toFixed(3)}</td></tr>}
-                      {C.emb>0&&<tr><td className="px-3 py-1.5">Embellishments</td><td className="px-3 py-1.5 text-right font-mono">{C.emb.toFixed(3)}</td></tr>}
-                      {C.wash>0&&<tr><td className="px-3 py-1.5">Washing & Dye</td><td className="px-3 py-1.5 text-right font-mono">{C.wash.toFixed(3)}</td></tr>}
-                      {C.oth>0&&<tr><td className="px-3 py-1.5">Other Costs</td><td className="px-3 py-1.5 text-right font-mono">{C.oth.toFixed(3)}</td></tr>}
-                      <tr><td className="px-3 py-1.5 font-bold text-indigo-600">CM Per Dozen</td><td className="px-3 py-1.5 text-right font-mono font-bold">{form.cmPerDozen.toFixed(3)}</td></tr>
-                      <tr className="bg-slate-100 font-black text-slate-900"><td className="px-3 py-2">Total Cost / Dozen</td><td className="px-3 py-2 text-right font-mono">{C.total.toFixed(3)}</td></tr>
-                      <tr><td className="px-3 py-1.5">Bank Deferred ({form.bankDeferredPct}%)</td><td className="px-3 py-1.5 text-right font-mono">{C.bank.toFixed(3)}</td></tr>
-                      <tr><td className="px-3 py-1.5">Commercial ({form.commercialCostPct}%)</td><td className="px-3 py-1.5 text-right font-mono">{C.com.toFixed(3)}</td></tr>
-                      <tr className="bg-indigo-50 text-indigo-800 font-black"><td className="px-3 py-2">QUOTED FOB / Pcs</td><td className="px-3 py-2 text-right font-mono">$ {C.fob.toFixed(3)}</td></tr>
-                      {form.buyerTargetFob>0&&<tr className={`font-black ${C.gap>=0?"bg-emerald-50 text-emerald-700":"bg-rose-50 text-rose-700"}`}><td className="px-3 py-1.5">GAP vs Target</td><td className="px-3 py-1.5 text-right font-mono">{C.gap>=0?"+":""}{C.gap.toFixed(3)}</td></tr>}
+              {/* Basic Information Layout (Side-by-side Table) */}
+              <div className="grid grid-cols-12 gap-5 items-stretch">
+                
+                {/* Left Side Table */}
+                <div className="col-span-12 md:col-span-8">
+                  <table className="w-full border-collapse border border-slate-300 text-[10px] text-slate-700">
+                    <tbody>
+                      <tr className="border-b border-slate-300">
+                        <td className="w-40 bg-slate-50 px-2 py-1.5 font-bold border-r border-slate-300 text-slate-500 uppercase text-[8.5px]">Costing No</td>
+                        <td colSpan={3} className="px-2 py-1.5 font-black text-slate-900 border-r border-slate-300">{form.costingNo || "PKCL-Costing-36/0"}</td>
+                      </tr>
+                      <tr className="border-b border-slate-300">
+                        <td className="bg-slate-50 px-2 py-1.5 font-bold border-r border-slate-300 text-slate-500 uppercase text-[8.5px]">DATE *</td>
+                        <td className="px-2 py-1.5 font-semibold border-r border-slate-300">{form.date}</td>
+                        <td className="w-40 bg-slate-50 px-2 py-1.5 font-bold border-r border-slate-300 text-slate-500 uppercase text-[8.5px]">BUYER *</td>
+                        <td className="px-2 py-1.5 font-black text-slate-950">{form.buyerName}</td>
+                      </tr>
+                      <tr className="border-b border-slate-300">
+                        <td className="bg-slate-50 px-2 py-1.5 font-bold border-r border-slate-300 text-slate-500 uppercase text-[8.5px]">DEPARTMENT *</td>
+                        <td className="px-2 py-1.5 font-semibold border-r border-slate-300">{form.department}</td>
+                        <td className="bg-slate-50 px-2 py-1.5 font-bold border-r border-slate-300 text-slate-500 uppercase text-[8.5px]">SEASON *</td>
+                        <td className="px-2 py-1.5 font-semibold">{form.season}</td>
+                      </tr>
+                      <tr className="border-b border-slate-300">
+                        <td className="bg-slate-50 px-2 py-1.5 font-bold border-r border-slate-300 text-slate-500 uppercase text-[8.5px]">STYLE NAME *</td>
+                        <td className="px-2 py-1.5 font-black text-indigo-900 border-r border-slate-300">{form.styleName}</td>
+                        <td className="bg-slate-50 px-2 py-1.5 font-bold border-r border-slate-300 text-slate-500 uppercase text-[8.5px]">STYLE DESCRIPTION</td>
+                        <td className="px-2 py-1.5 text-slate-600">{form.styleDescription || "—"}</td>
+                      </tr>
+                      <tr className="border-b border-slate-300">
+                        <td className="bg-slate-50 px-2 py-1.5 font-bold border-r border-slate-300 text-slate-500 uppercase text-[8.5px]">SHIPMENT DATE *</td>
+                        <td className="px-2 py-1.5 font-semibold border-r border-slate-300">{form.shipmentDate}</td>
+                        <td className="bg-slate-50 px-2 py-1.5 font-bold border-r border-slate-300 text-slate-500 uppercase text-[8.5px]">SIZE RANGE</td>
+                        <td className="px-2 py-1.5 font-medium">{form.sizeRange || "—"}</td>
+                      </tr>
+                      <tr className="border-b border-slate-300">
+                        <td className="bg-slate-50 px-2 py-1.5 font-bold border-r border-slate-300 text-slate-500 uppercase text-[8.5px]">FABRICATION 1</td>
+                        <td colSpan={3} className="px-2 py-1.5 font-medium border-r border-slate-300">{form.fabrication1}</td>
+                      </tr>
+                      <tr className="border-b border-slate-300">
+                        <td className="bg-slate-50 px-2 py-1.5 font-bold border-r border-slate-300 text-slate-500 uppercase text-[8.5px]">FABRICATION 2</td>
+                        <td colSpan={3} className="px-2 py-1.5 font-medium border-r border-slate-300">{form.fabrication2 || "—"}</td>
+                      </tr>
+                      <tr className="border-b border-slate-300">
+                        <td className="bg-slate-50 px-2 py-1.5 font-bold border-r border-slate-300 text-slate-500 uppercase text-[8.5px]">ACTUAL FABRIC CONSUMPTION FROM CAD</td>
+                        <td className="px-2 py-1.5 font-mono font-bold border-r border-slate-300">{form.actualFabricConsCad.toFixed(3)}</td>
+                        <td colSpan={2} className="px-2 py-1 font-bold text-slate-500">KG</td>
+                      </tr>
+                      <tr>
+                        <td className="bg-slate-50 px-2 py-1.5 font-bold border-r border-slate-300 text-slate-500 uppercase text-[8.5px]">CONSUMPTION WITH CUTTING WASTAGE</td>
+                        <td className="px-2 py-1.5 font-mono font-bold border-r border-slate-300">{form.consWithCuttingWastagePct.toFixed(3)}</td>
+                        <td className="px-2 py-1.5 font-mono font-bold border-r border-slate-300 text-indigo-750">{C.cww.toFixed(3)}</td>
+                        <td className="px-2 py-1.5 font-bold text-slate-500 flex items-center justify-between">
+                          <span>KG</span>
+                          <input type="checkbox" checked readOnly className="rounded border-slate-350 text-indigo-650 focus:ring-indigo-500 size-3 mr-1" />
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
-                <div>
-                  <p className="text-[10px] font-black uppercase mb-2 text-slate-400">Fabric Price Calculation</p>
-                  <table className="w-full border border-slate-200 rounded-xl overflow-hidden">
-                    <thead><tr className="bg-slate-50 font-bold text-slate-700 border-b border-slate-200"><th className="px-3 py-1.5 text-left">Item</th><th className="px-3 py-1.5 text-right">$/KG</th></tr></thead>
-                    <tbody className="divide-y divide-slate-100 text-slate-700">
-                      {form.yarnRows.filter(y=>y.rate>0).map(y=><tr key={y.id}><td className="px-3 py-1.5">{y.yarnType} ({y.pct}%)</td><td className="px-3 py-1.5 text-right font-mono">{(y.rate*y.pct/100).toFixed(3)}</td></tr>)}
-                      {form.knittingRows.filter(r=>r.rate>0).map(r=><tr key={r.id}><td className="px-3 py-1.5">Knitting: {r.name}</td><td className="px-3 py-1.5 text-right font-mono">{r.rate.toFixed(3)}</td></tr>)}
-                      {form.dyeingRows.filter(r=>r.rate>0).map(r=><tr key={r.id}><td className="px-3 py-1.5">Dyeing: {r.name}</td><td className="px-3 py-1.5 text-right font-mono">{r.rate.toFixed(3)}</td></tr>)}
-                      <tr className="bg-slate-100 font-bold text-slate-900"><td className="px-3 py-1.5">Sub-Total</td><td className="px-3 py-1.5 text-right font-mono">{C.sub.toFixed(3)}</td></tr>
-                      <tr><td className="px-3 py-1.5">Process Loss ({form.fabricProcessLossPct}%)</td><td className="px-3 py-1.5 text-right font-mono">{C.loss.toFixed(3)}</td></tr>
-                      <tr className="bg-teal-50 text-teal-800 font-black"><td className="px-3 py-2">Fabric Price / KG</td><td className="px-3 py-2 text-right font-mono">$ {C.fkgBase.toFixed(3)}</td></tr>
+
+                {/* Right Side Table with Dress Sketch image */}
+                <div className="col-span-12 md:col-span-4 flex flex-col justify-between">
+                  <div className="border border-slate-300 rounded-lg p-2 flex items-center justify-center bg-slate-50/50 flex-1 min-h-[140px] mb-3 relative overflow-hidden group">
+                    <div className="absolute top-1 left-2 text-[8px] font-black uppercase tracking-widest text-slate-400">Sketch Image</div>
+                    {img ? (
+                      <img src={img} alt="Quotation Sketch" className="max-h-[120px] object-contain rounded" />
+                    ) : (
+                      <div className="text-center text-slate-450 pointer-events-none">
+                        <ImageIcon className="size-8 mx-auto text-slate-300 mb-1" />
+                        <span className="text-[8px] uppercase tracking-wider font-bold">No Image Mockup Available</span>
+                      </div>
+                    )}
+                  </div>
+                  <table className="w-full border-collapse border border-slate-300 text-[10px] text-slate-700">
+                    <tbody>
+                      <tr className="border-b border-slate-300">
+                        <td className="w-40 bg-slate-50 px-2 py-1.5 font-bold border-r border-slate-300 text-slate-500 uppercase text-[8.5px]">COLOR 1</td>
+                        <td className="px-2 py-1.5 font-semibold text-slate-800">{form.color1}</td>
+                      </tr>
+                      <tr className="border-b border-slate-300">
+                        <td className="bg-slate-50 px-2 py-1.5 font-bold border-r border-slate-300 text-slate-500 uppercase text-[8.5px]">GARMENT QUANTITY (Pcs)</td>
+                        <td className="px-2 py-1.5 font-mono font-bold text-slate-900">{form.garmentQuantity.toLocaleString()}</td>
+                      </tr>
+                      <tr>
+                        <td className="bg-slate-50 px-2 py-1.5 font-bold border-r border-slate-300 text-slate-500 uppercase text-[8.5px]">BUYER'S TARGET/FOB</td>
+                        <td className="px-2 py-1.5 font-mono font-black text-indigo-700">$ {form.buyerTargetFob.toFixed(3)}</td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
+
               </div>
 
-              <div className="pt-16 grid grid-cols-3 gap-8 text-[11px] text-center text-slate-500">
-                {[["Prepared By","Md. Ashikujjaman","Sr. Merchandiser"],["Checked By Team Leader","Md. Sadekur Rahman","DGM — Merchandising"],["Approved By HOD","Md. Sadekur Rahman","DGM — Merchandising"]].map(([role,name,title])=>(
-                  <div key={role} className="space-y-0.5">
-                    <div className="border-t border-slate-400 pt-1.5 font-bold">{role}</div>
-                    <div>{name}</div>
-                    <div className="text-[9px]">{title}</div>
+              {/* ── Cost Breakdown Grid Side-By-Side ── */}
+              <div className="grid grid-cols-12 gap-5 items-stretch">
+                
+                {/* ── Left Column: GARMENT COST BREAKDOWN (7 cols) ── */}
+                <div className="col-span-12 lg:col-span-7 flex flex-col justify-between space-y-4">
+                  <div className="border border-slate-300 rounded-lg overflow-hidden">
+                    <div className="bg-[#e2d8eb] text-[#3c1d56] px-3 py-1.5 text-center font-black uppercase tracking-wider text-[9.5px]">
+                      Garment Cost Breakdown
+                    </div>
+                    <table className="w-full border-collapse border-t border-slate-300 text-[9.5px] text-slate-800">
+                      <thead>
+                        <tr className="bg-slate-50 border-b border-slate-300 text-slate-500 font-bold uppercase text-[8px] tracking-wider">
+                          <th colSpan={2} className="px-2 py-1 text-left border-r border-slate-300">Fabric</th>
+                          <th className="px-2 py-1 text-left border-r border-slate-300">Used In</th>
+                          <th className="px-2 py-1 text-right border-r border-slate-300">Cons.</th>
+                          <th className="px-2 py-1 text-left border-r border-slate-300">Unit</th>
+                          <th className="px-2 py-1 text-right border-r border-slate-300">Rate</th>
+                          <th className="px-2 py-1 text-right">Cost (USD)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="border-b border-slate-300">
+                          <td colSpan={2} className="px-2 py-1.5 font-black text-slate-900 border-r border-slate-300">MAIN FABRIC</td>
+                          <td className="px-2 py-1.5 text-slate-600 border-r border-slate-300">Body</td>
+                          <td className="px-2 py-1.5 text-right font-mono border-r border-slate-300">{C.cww.toFixed(3)}</td>
+                          <td className="px-2 py-1.5 font-bold border-r border-slate-300">KG</td>
+                          <td className="px-2 py-1.5 text-right font-mono border-r border-slate-300">{C.fkg.toFixed(3)}</td>
+                          <td className="px-2 py-1.5 text-right font-mono font-bold text-slate-900">{C.fab.toFixed(3)}</td>
+                        </tr>
+                        
+                        {/* Accessories Section */}
+                        <tr className="bg-slate-50 font-black border-y border-slate-300 text-[8.5px] text-slate-650 tracking-wider">
+                          <td colSpan={7} className="px-2 py-1 uppercase">Accessories</td>
+                        </tr>
+                        {form.accessoryRows.map(row => (
+                          <tr key={row.id} className="border-b border-slate-300 hover:bg-slate-50/30 transition-colors">
+                            <td colSpan={3} className="px-2 py-1 text-slate-700 border-r border-slate-300">{row.name}</td>
+                            <td className="px-2 py-1 text-right font-mono border-r border-slate-300">—</td>
+                            <td className="px-2 py-1 font-bold border-r border-slate-300">{row.unit}</td>
+                            <td className="px-2 py-1 text-right font-mono border-r border-slate-300">{(row.rate / 12).toFixed(3)}</td>
+                            <td className="px-2 py-1 text-right font-mono font-bold text-slate-800">{row.rate.toFixed(3)}</td>
+                          </tr>
+                        ))}
+
+                        {/* Embellishment Section */}
+                        <tr className="bg-slate-50 font-black border-y border-slate-300 text-[8.5px] text-slate-650 tracking-wider">
+                          <td colSpan={7} className="px-2 py-1 uppercase">Embellishment</td>
+                        </tr>
+                        {form.embRows.map(row => (
+                          <tr key={row.id} className="border-b border-slate-300 hover:bg-slate-50/30 transition-colors">
+                            <td colSpan={3} className="px-2 py-1 text-slate-700 border-r border-slate-300">{row.name}</td>
+                            <td className="px-2 py-1 text-right font-mono border-r border-slate-300">—</td>
+                            <td className="px-2 py-1 font-bold border-r border-slate-300">{row.unit}</td>
+                            <td className="px-2 py-1 text-right font-mono border-r border-slate-300">{(row.rate / 12).toFixed(3)}</td>
+                            <td className="px-2 py-1 text-right font-mono font-bold text-slate-800">{row.rate.toFixed(3)}</td>
+                          </tr>
+                        ))}
+
+                        {/* Washing & Garment Dye Section */}
+                        <tr className="bg-slate-50 font-black border-y border-slate-300 text-[8.5px] text-slate-650 tracking-wider">
+                          <td colSpan={7} className="px-2 py-1 uppercase">Washing & Garment Dye</td>
+                        </tr>
+                        {form.washRows.length === 0 ? (
+                          <tr className="border-b border-slate-300"><td colSpan={7} className="px-2 py-1.5 text-center text-slate-450 font-semibold">— No Washing/Dye items —</td></tr>
+                        ) : (
+                          form.washRows.map(row => (
+                            <tr key={row.id} className="border-b border-slate-300 hover:bg-slate-50/30 transition-colors">
+                              <td colSpan={3} className="px-2 py-1 text-slate-700 border-r border-slate-300">{row.name}</td>
+                              <td className="px-2 py-1 text-right font-mono border-r border-slate-300">—</td>
+                              <td className="px-2 py-1 font-bold border-r border-slate-300">{row.unit}</td>
+                              <td className="px-2 py-1 text-right font-mono border-r border-slate-300">{(row.rate / 12).toFixed(3)}</td>
+                              <td className="px-2 py-1 text-right font-mono font-bold text-slate-850">{row.rate.toFixed(3)}</td>
+                            </tr>
+                          ))
+                        )}
+
+                        {/* Other Costs Section */}
+                        <tr className="bg-slate-50 font-black border-y border-slate-300 text-[8.5px] text-slate-650 tracking-wider">
+                          <td colSpan={7} className="px-2 py-1 uppercase">Other Costs</td>
+                        </tr>
+                        {form.otherCostRows.map(row => (
+                          <tr key={row.id} className="border-b border-slate-300 hover:bg-slate-50/30 transition-colors">
+                            <td colSpan={3} className="px-2 py-1 text-slate-700 border-r border-slate-300">{row.name}</td>
+                            <td className="px-2 py-1 text-right font-mono border-r border-slate-300">—</td>
+                            <td className="px-2 py-1 font-bold border-r border-slate-300">{row.unit}</td>
+                            <td className="px-2 py-1 text-right font-mono border-r border-slate-300">{(row.rate / 12).toFixed(3)}</td>
+                            <td className="px-2 py-1 text-right font-mono font-bold text-slate-800">{row.rate.toFixed(3)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
-                ))}
+
+                  {/* Garment Cost Calculations Summary */}
+                  <div className="border border-slate-300 rounded-lg overflow-hidden bg-white text-[9.5px]">
+                    <table className="w-full border-collapse">
+                      <tbody>
+                        <tr className="border-b border-slate-300">
+                          <td colSpan={5} className="px-3 py-1 font-bold text-slate-600">CM PER DOZEN</td>
+                          <td className="px-3 py-1 text-right font-mono font-black text-slate-900 w-36">$ {form.cmPerDozen.toFixed(3)}</td>
+                        </tr>
+                        <tr className="border-b border-slate-300 bg-slate-50 font-black text-slate-900">
+                          <td colSpan={5} className="px-3 py-1.5">TOTAL COST PER DOZEN</td>
+                          <td className="px-3 py-1.5 text-right font-mono text-slate-900">$ {C.total.toFixed(3)}</td>
+                        </tr>
+                        <tr className="border-b border-slate-300">
+                          <td className="px-3 py-1 font-bold text-slate-600 w-44">ADDING GMT. WASTAGE FOR PRINT/WASH</td>
+                          <td className="px-2 py-1 font-mono font-bold text-slate-800 w-16">{form.gmtWastagePct.toFixed(3)}</td>
+                          <td className="px-2 py-1 font-bold text-slate-500 w-10">%</td>
+                          <td colSpan={2}/>
+                          <td className="px-3 py-1 text-right font-mono font-bold text-slate-800">$ {C.gmt.toFixed(3)}</td>
+                        </tr>
+                        <tr className="border-b border-slate-300 bg-slate-50 font-bold text-slate-800">
+                          <td colSpan={5} className="px-3 py-1.5">SUB TOTAL COST / DOZEN</td>
+                          <td className="px-3 py-1.5 text-right font-mono">$ {C.sub2.toFixed(3)}</td>
+                        </tr>
+                        <tr className="border-b border-slate-300">
+                          <td className="px-3 py-1 font-bold text-slate-600">BANK DEFERRED COST</td>
+                          <td className="px-2 py-1 font-mono font-bold text-slate-800">{form.bankDeferredPct.toFixed(3)}</td>
+                          <td className="px-2 py-1 font-bold text-slate-500">%</td>
+                          <td colSpan={2}/>
+                          <td className="px-3 py-1 text-right font-mono font-bold text-slate-800">$ {C.bank.toFixed(3)}</td>
+                        </tr>
+                        <tr className="border-b border-slate-300">
+                          <td className="px-3 py-1 font-bold text-slate-600">COMMERCIAL COST</td>
+                          <td className="px-2 py-1 font-mono font-bold text-slate-800">{form.commercialCostPct.toFixed(3)}</td>
+                          <td className="px-2 py-1 font-bold text-slate-500">%</td>
+                          <td colSpan={2}/>
+                          <td className="px-3 py-1 text-right font-mono font-bold text-slate-800">$ {C.com.toFixed(3)}</td>
+                        </tr>
+                        <tr className="border-b border-slate-300 bg-slate-50 font-black text-indigo-700">
+                          <td colSpan={5} className="px-3 py-1.5">Garment Price / Pcs</td>
+                          <td className="px-3 py-1.5 text-right font-mono">$ {C.ppc.toFixed(3)}</td>
+                        </tr>
+                        <tr className="border-b border-slate-300">
+                          <td className="px-3 py-1 font-bold text-slate-600">Price Per Pcs</td>
+                          <td className="px-2 py-1 font-mono font-bold text-slate-850">1.000</td>
+                          <td className="px-2 py-1 font-bold text-slate-500">Pcs</td>
+                          <td colSpan={2}/>
+                          <td className="px-3 py-1 text-right font-mono font-bold text-slate-850">$ {C.ppc.toFixed(3)}</td>
+                        </tr>
+                        <tr className="border-b border-slate-300">
+                          <td className="px-3 py-1 font-bold text-slate-600">Profit *</td>
+                          <td className="px-2 py-1 font-mono font-bold text-slate-800">{form.profitPct.toFixed(3)}</td>
+                          <td className="px-2 py-1 font-bold text-slate-500">%</td>
+                          <td colSpan={2}/>
+                          <td className="px-3 py-1 text-right font-mono font-bold text-indigo-650">$ {C.fob.toFixed(3)}</td>
+                        </tr>
+                        <tr className="border-b border-slate-300">
+                          <td colSpan={5} className="px-3 py-1 font-bold text-slate-600">Target Per Pcs</td>
+                          <td className="px-3 py-1 text-right font-mono font-black text-slate-900">$ {form.buyerTargetFob.toFixed(3)}</td>
+                        </tr>
+                        <tr className={`font-black ${C.gap >= 0 ? "bg-emerald-50 text-emerald-800" : "bg-rose-50 text-rose-800"}`}>
+                          <td colSpan={5} className="px-3 py-1.5 uppercase tracking-wider">Price GAP</td>
+                          <td className="px-3 py-1.5 text-right font-mono text-lg">{C.gap.toFixed(3)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* ── Right Column: FABRIC PRICE CALCULATION (5 cols) ── */}
+                <div className="col-span-12 lg:col-span-5 flex flex-col justify-between space-y-4">
+                  <div className="border border-slate-300 rounded-lg overflow-hidden flex-1">
+                    <div className="bg-[#e2d8eb] text-[#3c1d56] px-3 py-1.5 text-center font-black uppercase tracking-wider text-[9.5px]">
+                      Fabric Price Calculation
+                    </div>
+                    <table className="w-full border-collapse border-t border-slate-300 text-[9.5px] text-slate-800">
+                      <thead>
+                        <tr className="bg-slate-50 border-b border-slate-300 text-slate-500 font-bold uppercase text-[8px] tracking-wider">
+                          <th className="px-2 py-1 text-left border-r border-slate-300">Particulars</th>
+                          <th className="px-2 py-1 text-left border-r border-slate-300">Yarn</th>
+                          <th className="px-2 py-1 text-right border-r border-slate-300">Rate</th>
+                          <th className="px-2 py-1 text-right border-r border-slate-300">% *</th>
+                          <th className="px-2 py-1 text-right">Cost (USD)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {form.yarnRows.map(row => (
+                          <tr key={row.id} className="border-b border-slate-300 hover:bg-slate-50/30 transition-colors">
+                            <td className="px-2 py-1.5 font-bold border-r border-slate-300">YARN</td>
+                            <td className="px-2 py-1.5 text-slate-700 border-r border-slate-300">{row.yarnType}</td>
+                            <td className="px-2 py-1.5 text-right font-mono border-r border-slate-300">{row.rate.toFixed(3)}</td>
+                            <td className="px-2 py-1.5 text-right font-mono border-r border-slate-300">{row.pct.toFixed(3)}</td>
+                            <td className="px-2 py-1.5 text-right font-mono font-bold text-slate-900">{(row.rate * row.pct / 100).toFixed(3)}</td>
+                          </tr>
+                        ))}
+
+                        {/* Knitting Section */}
+                        <tr className="bg-slate-50 font-black border-y border-slate-300 text-[8.5px] text-slate-650 tracking-wider">
+                          <td colSpan={5} className="px-2 py-1 uppercase">Knitting Charge</td>
+                        </tr>
+                        {form.knittingRows.map(row => (
+                          <tr key={row.id} className="border-b border-slate-300 hover:bg-slate-50/30 transition-colors">
+                            <td colSpan={2} className="px-2 py-1 text-slate-700 border-r border-slate-300">{row.name || "SINGLE JERSEY"}</td>
+                            <td colSpan={2} className="px-2 py-1 text-right font-mono border-r border-slate-300">—</td>
+                            <td className="px-2 py-1 text-right font-mono font-bold text-slate-900">{row.rate.toFixed(3)}</td>
+                          </tr>
+                        ))}
+
+                        {/* Dyeing Section */}
+                        <tr className="bg-slate-50 font-black border-y border-slate-300 text-[8.5px] text-slate-650 tracking-wider">
+                          <td colSpan={5} className="px-2 py-1 uppercase">Dyeing & Finishing Charge</td>
+                        </tr>
+                        {form.dyeingRows.filter(d=>d.rate>0).length === 0 ? (
+                          <tr className="border-b border-slate-300"><td colSpan={5} className="px-2 py-1.5 text-center text-slate-450 font-semibold">— No Dyeing Charge —</td></tr>
+                        ) : (
+                          form.dyeingRows.filter(d=>d.rate>0).map(row => (
+                            <tr key={row.id} className="border-b border-slate-300 hover:bg-slate-50/30 transition-colors">
+                              <td colSpan={2} className="px-2 py-1 text-slate-700 border-r border-slate-300">{row.name}</td>
+                              <td colSpan={2} className="px-2 py-1 text-right font-mono border-r border-slate-300">—</td>
+                              <td className="px-2 py-1 text-right font-mono font-bold text-slate-900">{row.rate.toFixed(3)}</td>
+                            </tr>
+                          ))
+                        )}
+                        
+                        {/* Sub-Total / Process Loss */}
+                        <tr className="bg-slate-50 border-t border-slate-300 font-bold text-slate-800 border-b border-slate-300">
+                          <td colSpan={4} className="px-2 py-1.5">SUB-TOTAL</td>
+                          <td className="px-2 py-1.5 text-right font-mono font-black text-slate-900">$ {C.sub.toFixed(3)}</td>
+                        </tr>
+                        <tr className="border-b border-slate-300">
+                          <td className="px-2 py-1 font-bold text-slate-600">FABRIC PROCESS LOSS</td>
+                          <td className="px-2 py-1 font-mono font-bold text-slate-800 text-center">{form.fabricProcessLossPct.toFixed(3)}</td>
+                          <td className="px-2 py-1 font-bold text-slate-500">%</td>
+                          <td className="border-r border-slate-300"/>
+                          <td className="px-2 py-1 text-right font-mono font-bold text-slate-800">$ {C.loss.toFixed(3)}</td>
+                        </tr>
+                        <tr className="bg-slate-50/70 font-black text-teal-850 border-b border-slate-300">
+                          <td colSpan={4} className="px-2 py-1.5">FABRIC PRICE PER KG</td>
+                          <td className="px-2 py-1.5 text-right font-mono">$ {C.fkgBase.toFixed(3)}</td>
+                        </tr>
+
+                        {/* AOP (If Applicable) */}
+                        <tr className="bg-slate-50 font-black border-y border-slate-300 text-[8.5px] text-slate-650 tracking-wider">
+                          <td colSpan={5} className="px-2 py-1 uppercase">AOP Cost (If Applicable)</td>
+                        </tr>
+                        <tr className="border-b border-slate-300">
+                          <td className="px-2 py-1 font-bold text-slate-600">AOP PROCESS LOSS</td>
+                          <td className="px-2 py-1 font-mono font-bold text-slate-800 text-center">{form.aopProcessLossPct.toFixed(3)}</td>
+                          <td className="px-2 py-1 font-bold text-slate-500">%</td>
+                          <td className="border-r border-slate-300"/>
+                          <td className="px-2 py-1 text-right font-mono font-bold text-slate-800">$ {(form.aopCostRate * form.aopProcessLossPct / 100).toFixed(3)}</td>
+                        </tr>
+                        <tr className="bg-slate-50/70 font-black text-teal-850 border-b border-slate-350">
+                          <td colSpan={4} className="px-2 py-1.5">FINAL FABRIC PRICE PER KG</td>
+                          <td className="px-2 py-1.5 text-right font-mono">$ {C.fkg.toFixed(3)}</td>
+                        </tr>
+
+                        {/* Machine Income Calculation */}
+                        <tr className="bg-slate-50 font-black border-b border-slate-300 text-[8.5px] text-slate-650 tracking-wider">
+                          <td colSpan={5} className="px-2 py-1 uppercase">Machine Income Calculation</td>
+                        </tr>
+                        <tr className="border-b border-slate-300">
+                          <td colSpan={4} className="px-2 py-1 text-slate-650 border-r border-slate-300">CM PER DOZEN</td>
+                          <td className="px-2 py-1 text-right font-mono text-slate-800">0.000</td>
+                        </tr>
+                        <tr className="border-b border-slate-300">
+                          <td colSpan={4} className="px-2 py-1 text-slate-650 border-r border-slate-300">PRODUCTIVITY PER DAY</td>
+                          <td className="px-2 py-1 text-right font-mono text-slate-800">0.000</td>
+                        </tr>
+                        <tr className="border-b border-slate-300">
+                          <td colSpan={4} className="px-2 py-1 text-slate-650 border-r border-slate-300">NO. OF MACHINE REQUIRED</td>
+                          <td className="px-2 py-1 text-right font-mono text-slate-800">0.000</td>
+                        </tr>
+                        <tr>
+                          <td colSpan={4} className="px-2 py-1 text-slate-650 border-r border-slate-300">MACHINE INCOME</td>
+                          <td className="px-2 py-1 text-right font-mono text-slate-800 font-bold">0.000</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Highlights banner quotation cost */}
+                  <div className="bg-[#f8d7da] text-[#721c24] border border-[#f5c6cb] rounded-lg py-2.5 text-center font-black tracking-wide text-xs select-none">
+                    THIS QUOTATION &nbsp; &nbsp; &nbsp; &nbsp; $ {C.fob.toFixed(3)}
+                  </div>
+                </div>
+
               </div>
+
+              {/* Bottom Signature Blocks (3 Column Grid) */}
+              <div className="pt-10 grid grid-cols-1 md:grid-cols-3 gap-6 text-[10px] text-slate-500">
+                <div className="border border-slate-200 rounded-xl p-3 bg-slate-50/30 text-center flex flex-col justify-between min-h-[90px]">
+                  <div className="text-[8.5px] font-black uppercase text-slate-400 tracking-wider border-b pb-1 mb-1">Prepared By</div>
+                  <div className="font-bold text-slate-800">Md. Ashikujjaman</div>
+                  <div className="text-[8.5px] text-slate-500 font-semibold">Sr. Merchandiser</div>
+                  <div className="text-[8px] font-mono mt-1 text-slate-400">19/11/2025 16:07:25</div>
+                </div>
+                <div className="border border-slate-200 rounded-xl p-3 bg-slate-50/30 text-center flex flex-col justify-between min-h-[90px]">
+                  <div className="text-[8.5px] font-black uppercase text-slate-400 tracking-wider border-b pb-1 mb-1">Checked By Team Leader: Approved</div>
+                  <div className="font-bold text-slate-800">Md. Sadekur Rahman</div>
+                  <div className="text-[8.5px] text-slate-500 font-semibold">DGM</div>
+                  <div className="text-[8px] font-mono mt-1 text-slate-400">02/12/2025 11:52:38</div>
+                </div>
+                <div className="border border-slate-200 rounded-xl p-3 bg-slate-50/30 text-center flex flex-col justify-between min-h-[90px]">
+                  <div className="text-[8.5px] font-black uppercase text-slate-400 tracking-wider border-b pb-1 mb-1">Approved By HOD: Approved</div>
+                  <div className="font-bold text-slate-800">Md. Sadekur Rahman</div>
+                  <div className="text-[8.5px] text-slate-500 font-semibold">DGM</div>
+                  <div className="text-[8px] font-mono mt-1 text-slate-400">06/12/2025 18:16:59</div>
+                </div>
+              </div>
+
             </div>
           </div>
         )}

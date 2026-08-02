@@ -21,7 +21,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v107");
+    const saved = localStorage.getItem("system_changes_v113");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
@@ -29,6 +29,32 @@ function ChangesPage() {
     }
   }, []);
 
+  const handleExport = () => {
+    const headers = ["SL", "Date & Time", "Type", "Module/Area", "Description (English)", "Description (Bangla)"];
+    
+    const rows = records.map((r, index) => [
+      (index + 1).toString(),
+      r.date,
+      r.type,
+      r.module,
+      r.descriptionEn,
+      r.descriptionBn
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(e => e.map(val => `"${val.replace(/"/g, '""')}"`).join(","))
+    ].join("\n");
+
+    const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `system_changes_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className="min-h-screen bg-white font-sans text-slate-800 flex flex-col">
@@ -44,6 +70,13 @@ function ChangesPage() {
           </div>
         </div>
 
+        <button
+          onClick={handleExport}
+          className="flex items-center gap-2 px-3.5 py-1.5 rounded bg-[#107c41] hover:bg-[#0d6535] text-white text-xs font-bold transition-all shadow-sm hover:shadow"
+        >
+          <FileSpreadsheet size={15} />
+          Export to Excel
+        </button>
       </div>
 
       {/* Excel Formula Bar Fake */}

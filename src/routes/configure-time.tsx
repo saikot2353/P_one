@@ -39,8 +39,20 @@ type TabType = "shift" | "ot" | "abnormal" | "bonus";
 // ----------------------------------------------------
 // Interfaces
 // ----------------------------------------------------
+interface ShiftHistoryRecord {
+  sl: number;
+  startDate: string;
+  endDate: string;
+  shiftName: string;
+  inTime: string;
+  outTime: string;
+}
+
 interface Shift {
   sl: number;
+  startDate?: string;
+  endDate?: string;
+  history?: ShiftHistoryRecord[];
   nameEng: string;
   nameBng: string;
   startTime: string;
@@ -85,6 +97,8 @@ interface OtConfig {
   time4Min?: number;
   time4MaxOt?: number;
   otAfterWH?: "Yes" | "No";
+  workingHour?: number;
+  fixedOtHour?: number;
   generalDeductHour?: number;
   holidayDeductHour?: number;
   deductAfter?: number;
@@ -549,14 +563,44 @@ const DEFAULT_SHIFTS: Shift[] = [
 const DEFAULT_OT_CONFIGS: OtConfig[] = [
   {
     sl: 1,
-    employeeType: "ALL",
-    department: "All Departments",
-    section: "ALL",
-    designation: "ALL",
+    employeeType: "Worker",
+    department: "HR, Admin and Compliance",
+    section: "Admin",
+    designation: "Driver",
     unit: "ALL",
-    otCalculationType: "Fixed Hour",
+    otCalculationType: "General",
     bufferMinutes: 15,
     isActive: "Active",
+    startDate: "",
+    endDate: "",
+    shift: "General",
+    startTime: "04:00:00",
+    endTime: "14:00:00",
+    shiftStartTime: "08:00:00",
+    otStartTime: "20:00:00",
+    otToleranceUpTo: "",
+    time2Min: 110,
+    time2MaxOt: 2,
+    time3Min: 110,
+    time3MaxOt: 2,
+    time4Min: 0,
+    time4MaxOt: 0,
+    otAfterWH: "Yes",
+    workingHour: 12,
+    generalDeductHour: 0,
+    holidayDeductHour: 0,
+    deductAfter: 0,
+    otRound: "Yes",
+    roundSlots: "0-44,0#45-59,1",
+    minOt: 0,
+    maxOt: 16,
+    prayerBreak: "No",
+    dinnerBreak: "No",
+    deductionFor: "Holiday",
+    timeFrom: "14:00:00",
+    timeTo: "14:30:00",
+    deductMin: 30,
+    otStartFromShift: "Yes",
   },
   {
     sl: 2,
@@ -930,6 +974,11 @@ function TimeSetupPage() {
   const [oiDeductMin, setOiDeductMin] = useState<number>(30);
   const [oiIsActive, setOiIsActive] = useState<"Active" | "Inactive">("Active");
   const [oiOtStartFromShift, setOiOtStartFromShift] = useState<"Yes" | "No">("Yes");
+  const [oiWorkingHour, setOiWorkingHour] = useState<number>(12);
+  const [oiFixedOtHour, setOiFixedOtHour] = useState<number>(0);
+  const [siHistory, setSiHistory] = useState<ShiftHistoryRecord[]>([]);
+  const [siHistorySearch, setSiHistorySearch] = useState("");
+  const [editingHistorySl, setEditingHistorySl] = useState<number | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -1093,6 +1142,8 @@ function TimeSetupPage() {
       setOiTime4Min(item?.time4Min !== undefined ? item.time4Min : 0);
       setOiTime4MaxOt(item?.time4MaxOt !== undefined ? item.time4MaxOt : 0);
       setOiOtAfterWH(item?.otAfterWH || "No");
+      setOiWorkingHour(item?.workingHour !== undefined ? item.workingHour : 12);
+      setOiFixedOtHour(item?.fixedOtHour !== undefined ? item.fixedOtHour : 0);
       setOiGeneralDeductHour(item?.generalDeductHour !== undefined ? item.generalDeductHour : 0);
       setOiHolidayDeductHour(item?.holidayDeductHour !== undefined ? item.holidayDeductHour : 1);
       setOiDeductAfter(item?.deductAfter !== undefined ? item.deductAfter : 0);
@@ -1514,8 +1565,8 @@ function TimeSetupPage() {
                               <button
                                 onClick={() => {
                                   setShiftInfoItem(item);
-                                  setSiStartDate("");
-                                  setSiEndDate("");
+                                  setSiStartDate(item.startDate || "");
+                                  setSiEndDate(item.endDate || "");
                                   setSiNameEng(item.nameEng);
                                   setSiNameBng(item.nameBng);
                                   setSiStartTime(item.startTime);
@@ -1532,6 +1583,9 @@ function TimeSetupPage() {
                                   setSiIsLateDeduction(item.isLateDeduction);
                                   setSiStartTimeFrom(item.startTimeFrom);
                                   setSiEndTimeTo(item.endTimeTo);
+                                  setSiHistory(item.history || []);
+                                  setSiHistorySearch("");
+                                  setEditingHistorySl(null);
                                   setIsShiftInfoOpen(true);
                                 }}
                                 className="text-purple-500 hover:text-purple-600 transition-colors"
@@ -1656,6 +1710,8 @@ function TimeSetupPage() {
                                     item.time4MaxOt !== undefined ? item.time4MaxOt : 0,
                                   );
                                   setOiOtAfterWH(item.otAfterWH || "No");
+                                  setOiWorkingHour(item.workingHour !== undefined ? item.workingHour : 12);
+                                  setOiFixedOtHour(item.fixedOtHour !== undefined ? item.fixedOtHour : 0);
                                   setOiGeneralDeductHour(
                                     item.generalDeductHour !== undefined
                                       ? item.generalDeductHour
@@ -2694,25 +2750,25 @@ function TimeSetupPage() {
                     </select>
                   </div>
 
-                  {/* Lunch Break From */}
+                  {/* Start Time From */}
                   <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Lunch Break From *</label>
+                    <label className={insetLabelClass}>Start Time From *</label>
                     <input
                       type="text"
-                      value={siLunchFrom}
-                      onChange={(e) => setSiLunchFrom(e.target.value)}
+                      value={siStartTimeFrom}
+                      onChange={(e) => setSiStartTimeFrom(e.target.value)}
                       className={insetInputClass}
                       placeholder="HH:MM:SS"
                     />
                   </div>
 
-                  {/* Lunch Break To */}
+                  {/* End Time To */}
                   <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Lunch Break To *</label>
+                    <label className={insetLabelClass}>End Time To *</label>
                     <input
                       type="text"
-                      value={siLunchTo}
-                      onChange={(e) => setSiLunchTo(e.target.value)}
+                      value={siEndTimeTo}
+                      onChange={(e) => setSiEndTimeTo(e.target.value)}
                       className={insetInputClass}
                       placeholder="HH:MM:SS"
                     />
@@ -2798,73 +2854,203 @@ function TimeSetupPage() {
                       <option value="Yes">Yes</option>
                     </select>
                   </div>
+                </div>
 
-                  {/* Start Time From */}
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>Start Time From *</label>
-                    <input
-                      type="text"
-                      value={siStartTimeFrom}
-                      onChange={(e) => setSiStartTimeFrom(e.target.value)}
-                      className={insetInputClass}
-                      placeholder="HH:MM:SS"
-                    />
+                {/* Actions line */}
+                <div className="flex items-center justify-between gap-3 mt-6 pb-6 border-b border-border/50">
+                  <button
+                    type="button"
+                    onClick={() => setIsShiftInfoOpen(false)}
+                    className="h-10 px-6 rounded-lg bg-[#f39c12] hover:bg-[#e67e22] text-white font-black text-xs transition-all uppercase tracking-wider shadow-sm hover:shadow"
+                  >
+                    CLOSE
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!siStartDate || !siEndDate) {
+                        toast.error("Start Date and End Date are required.");
+                        return;
+                      }
+                      const newRec: ShiftHistoryRecord = {
+                        sl: editingHistorySl !== null
+                          ? editingHistorySl
+                          : siHistory.length > 0
+                            ? Math.max(...siHistory.map(h => h.sl)) + 1
+                            : 1,
+                        startDate: siStartDate,
+                        endDate: siEndDate,
+                        shiftName: siNameEng,
+                        inTime: siStartTime,
+                        outTime: siEndTime,
+                      };
+
+                      let nextHistory = [...siHistory];
+                      if (editingHistorySl !== null) {
+                        nextHistory = siHistory.map(h => h.sl === editingHistorySl ? newRec : h);
+                      } else {
+                        nextHistory.push(newRec);
+                      }
+                      setSiHistory(nextHistory);
+
+                      const updated = shifts.map((s) =>
+                        s.sl === shiftInfoItem.sl
+                          ? {
+                            ...s,
+                            startDate: siStartDate,
+                            endDate: siEndDate,
+                            nameEng: siNameEng,
+                            nameBng: siNameBng,
+                            startTime: siStartTime,
+                            endTime: siEndTime,
+                            lateTime: siLateTime,
+                            lateCount: siLateCount,
+                            startTimeFrom: siStartTimeFrom,
+                            endTimeTo: siEndTimeTo,
+                            sortOrder: siSortOrder,
+                            isActive: siIsActive,
+                            isRotate: siIsRotate,
+                            rotationCriteria: siRotationCriteria,
+                            shiftChangeDay: siShiftChangeDay === "Select.." ? "" : siShiftChangeDay,
+                            isLateDeduction: siIsLateDeduction,
+                            history: nextHistory,
+                          }
+                          : s,
+                      );
+                      setShifts(updated);
+                      localStorage.setItem("hris_shifts", JSON.stringify(updated));
+                      toast.success(editingHistorySl !== null ? "Shift period updated successfully!" : "Shift period created successfully!");
+                      setEditingHistorySl(null);
+                    }}
+                    className="h-10 px-8 rounded-lg bg-[#27ae60] hover:bg-[#219a52] text-white font-black text-xs shadow-md hover:shadow-lg transition-all uppercase tracking-wider"
+                  >
+                    {editingHistorySl !== null ? "UPDATE" : "CREATE"}
+                  </button>
+                </div>
+
+                {/* History Table Container */}
+                <div className="mt-6 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xs font-bold uppercase text-foreground">Shift History</h3>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">Search:</label>
+                      <input
+                        type="text"
+                        value={siHistorySearch}
+                        onChange={(e) => setSiHistorySearch(e.target.value)}
+                        placeholder="Search records..."
+                        className="px-2.5 py-1 border border-border/60 rounded bg-muted/10 text-xs focus:outline-none focus:border-primary text-foreground"
+                      />
+                    </div>
                   </div>
 
-                  {/* End Time To */}
-                  <div className={insetWrapperClass}>
-                    <label className={insetLabelClass}>End Time To *</label>
-                    <input
-                      type="text"
-                      value={siEndTimeTo}
-                      onChange={(e) => setSiEndTimeTo(e.target.value)}
-                      className={insetInputClass}
-                      placeholder="HH:MM:SS"
-                    />
+                  <div className="border border-border/80 rounded-lg overflow-hidden bg-card">
+                    <table className="w-full text-left text-xs border-collapse whitespace-nowrap">
+                      <thead className="bg-muted/30 text-muted-foreground uppercase font-semibold text-[10px] tracking-wider border-b border-border/40">
+                        <tr>
+                          <th className="px-4 py-3 w-[80px] text-center border-r border-border/30">Actions</th>
+                          <th className="px-4 py-3 w-[60px] text-center border-r border-border/30">SL</th>
+                          <th className="px-4 py-3 border-r border-border/30">Start Date</th>
+                          <th className="px-4 py-3 border-r border-border/30">End Date</th>
+                          <th className="px-4 py-3 border-r border-border/30">Shift</th>
+                          <th className="px-4 py-3 border-r border-border/30">InTime</th>
+                          <th className="px-4 py-3">OutTime</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/30 text-foreground">
+                        {siHistory.filter(h => 
+                          (h.startDate || "").includes(siHistorySearch) ||
+                          (h.endDate || "").includes(siHistorySearch) ||
+                          (h.shiftName || "").toLowerCase().includes(siHistorySearch.toLowerCase())
+                        ).length === 0 ? (
+                          <tr>
+                            <td colSpan={7} className="px-4 py-6 text-center text-muted-foreground italic">
+                              No data available in table
+                            </td>
+                          </tr>
+                        ) : (
+                          siHistory.filter(h => 
+                            (h.startDate || "").includes(siHistorySearch) ||
+                            (h.endDate || "").includes(siHistorySearch) ||
+                            (h.shiftName || "").toLowerCase().includes(siHistorySearch.toLowerCase())
+                          ).map((rec, index) => (
+                            <tr key={rec.sl} className="hover:bg-muted/50 transition">
+                              <td className="px-4 py-2.5 text-center border-r border-border/30">
+                                <div className="flex items-center justify-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setEditingHistorySl(rec.sl);
+                                      setSiStartDate(rec.startDate);
+                                      setSiEndDate(rec.endDate);
+                                      setSiStartTime(rec.inTime);
+                                      setSiEndTime(rec.outTime);
+                                    }}
+                                    className="text-orange-500 hover:text-orange-600 transition"
+                                    title="Edit Period"
+                                  >
+                                    <Pencil className="size-3.5" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const nextHistory = siHistory.filter(h => h.sl !== rec.sl);
+                                      setSiHistory(nextHistory);
+                                      const updated = shifts.map((s) =>
+                                        s.sl === shiftInfoItem.sl
+                                          ? { ...s, history: nextHistory }
+                                          : s
+                                      );
+                                      setShifts(updated);
+                                      localStorage.setItem("hris_shifts", JSON.stringify(updated));
+                                      toast.success("Period deleted successfully");
+                                      if (editingHistorySl === rec.sl) {
+                                        setEditingHistorySl(null);
+                                      }
+                                    }}
+                                    className="text-red-500 hover:text-red-650 transition"
+                                    title="Delete Period"
+                                  >
+                                    <Trash2 className="size-3.5" />
+                                  </button>
+                                </div>
+                              </td>
+                              <td className="px-4 py-2.5 text-center text-slate-500 border-r border-border/30">{index + 1}</td>
+                              <td className="px-4 py-2.5 border-r border-border/30">{rec.startDate}</td>
+                              <td className="px-4 py-2.5 border-r border-border/30">{rec.endDate}</td>
+                              <td className="px-4 py-2.5 border-r border-border/30">{rec.shiftName}</td>
+                              <td className="px-4 py-2.5 border-r border-border/30">{rec.inTime}</td>
+                              <td className="px-4 py-2.5">{rec.outTime}</td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Pagination Text & Buttons */}
+                  <div className="flex items-center justify-between text-[11px] text-muted-foreground font-semibold pt-1">
+                    <span>
+                      Showing {siHistory.length > 0 ? 1 : 0} to {siHistory.length} of {siHistory.length} entries
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        className="px-2 py-1 rounded border border-border/50 hover:bg-muted text-[10px] uppercase font-bold"
+                        disabled
+                      >
+                        Previous
+                      </button>
+                      <button
+                        type="button"
+                        className="px-2 py-1 rounded border border-border/50 hover:bg-muted text-[10px] uppercase font-bold"
+                        disabled
+                      >
+                        Next
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Footer */}
-              <div className="border-t border-border/50 flex items-center justify-between gap-3 bg-transparent px-6 py-4">
-                <button
-                  type="button"
-                  onClick={() => setIsShiftInfoOpen(false)}
-                  className="h-10 px-6 rounded-lg bg-[#f39c12] hover:bg-[#e67e22] text-white font-black text-xs transition-all uppercase tracking-wider shadow-sm hover:shadow"
-                >
-                  CLOSE
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const updated = shifts.map((s) =>
-                      s.sl === shiftInfoItem.sl
-                        ? {
-                          ...s,
-                          nameEng: siNameEng,
-                          nameBng: siNameBng,
-                          startTime: siStartTime,
-                          endTime: siEndTime,
-                          lateTime: siLateTime,
-                          lateCount: siLateCount,
-                          startTimeFrom: siStartTimeFrom,
-                          endTimeTo: siEndTimeTo,
-                          sortOrder: siSortOrder,
-                          isActive: siIsActive,
-                          isRotate: siIsRotate,
-                          rotationCriteria: siRotationCriteria,
-                          shiftChangeDay: siShiftChangeDay === "Select.." ? "" : siShiftChangeDay,
-                          isLateDeduction: siIsLateDeduction,
-                        }
-                        : s,
-                    );
-                    setShifts(updated);
-                    localStorage.setItem("hris_shifts", JSON.stringify(updated));
-                    toast.success("Shift information updated successfully!");
-                    setIsShiftInfoOpen(false);
-                  }}
-                  className="h-10 px-8 rounded-lg bg-[#27ae60] hover:bg-[#219a52] text-white font-black text-xs shadow-md hover:shadow-lg transition-all uppercase tracking-wider"
-                >Create</button>
               </div>
             </div>
           </div>
@@ -2916,6 +3102,7 @@ function TimeSetupPage() {
                           className={insetSelectClass}
                         >
                           <option value="ALL">ALL</option>
+                          <option value="Worker">Worker</option>
                           <option value="Operator">Operator</option>
                           <option value="Supervisor">Supervisor</option>
                           <option value="Helper">Helper</option>
@@ -2932,6 +3119,7 @@ function TimeSetupPage() {
                           className={insetSelectClass}
                         >
                           <option value="All Departments">All Departments</option>
+                          <option value="HR, Admin and Compliance">HR, Admin and Compliance</option>
                           <option value="Production Dept">Production Dept</option>
                           <option value="HR & Admin">HR & Admin</option>
                           <option value="Quality Assurance">Quality Assurance</option>
@@ -2946,6 +3134,7 @@ function TimeSetupPage() {
                           className={insetSelectClass}
                         >
                           <option value="ALL">ALL</option>
+                          <option value="Admin">Admin</option>
                           <option value="Sewing Section">Sewing Section</option>
                           <option value="Finishing Section">Finishing Section</option>
                           <option value="Cutting Section">Cutting Section</option>
@@ -2960,6 +3149,7 @@ function TimeSetupPage() {
                           className={insetSelectClass}
                         >
                           <option value="ALL">ALL</option>
+                          <option value="Driver">Driver</option>
                           <option value="Operator">Operator</option>
                           <option value="Supervisor">Supervisor</option>
                           <option value="Helper">Helper</option>
@@ -3259,12 +3449,32 @@ function TimeSetupPage() {
                           <option value="Gross Ratio">Gross Ratio</option>
                         </select>
                       </div>
+                      {oiOtType === "Fixed Hour" && (
+                        <div className={insetWrapperClass}>
+                          <label className={insetLabelClass}>Fixed OT Hour *</label>
+                          <input
+                            type="number"
+                            value={oiFixedOtHour}
+                            onChange={(e) => setOiFixedOtHour(Number(e.target.value))}
+                            className={insetInputClass}
+                          />
+                        </div>
+                      )}
                     </div>
                     <div className="bg-muted/10 p-4 rounded-xl border border-border/60">
                       <h4 className="text-xs font-black uppercase text-foreground mb-3">
                         OT Deductions
                       </h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className={insetWrapperClass}>
+                          <label className={insetLabelClass}>Working Hour *</label>
+                          <input
+                            type="number"
+                            value={oiWorkingHour}
+                            onChange={(e) => setOiWorkingHour(Number(e.target.value))}
+                            className={insetInputClass}
+                          />
+                        </div>
                         <div className={insetWrapperClass}>
                           <label className={insetLabelClass}>General Deduct Hour *</label>
                           <input
@@ -3425,6 +3635,8 @@ function TimeSetupPage() {
                         time4Min: oiTime4Min,
                         time4MaxOt: oiTime4MaxOt,
                         otAfterWH: oiOtAfterWH,
+                        workingHour: oiWorkingHour,
+                        fixedOtHour: oiFixedOtHour,
                         generalDeductHour: oiGeneralDeductHour,
                         holidayDeductHour: oiHolidayDeductHour,
                         deductAfter: oiDeductAfter,
