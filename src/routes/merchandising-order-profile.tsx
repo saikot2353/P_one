@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
 import MerchandisingLayout from "../components/merchandising/MerchandisingLayout";
 import { List, Plus, X, UploadCloud, Save, ArrowRight, LayoutGrid, Layers } from "lucide-react";
@@ -32,6 +32,63 @@ interface OrderStyle {
   embroidery: string; wash: string; special: string; unitPrice: number; deliveryDate: string;
 }
 
+const MOCK_REGISTERED_POS = [
+  {
+    poNumber: "PO-HM-9801",
+    quotationNo: "QT-2026-001",
+    buyerName: "H&M Group (SE)",
+    styleRef: "HM-SS26-KNT-001",
+    productType: "Knit" as const,
+    quantity: 50000,
+    unitFOB: 3.82,
+    totalValue: 191000,
+    receiveDate: "2026-08-01",
+    shipDate: "2026-10-15",
+    shipmentMode: "Sea",
+    paymentTerms: "90 Days BBLC",
+    portOfLoading: "Chittagong, BD",
+    portOfDischarge: "Gothenburg, SE",
+    buyingHouse: "Li & Fung",
+    department: "Boys",
+    season: "ANS-SS27",
+    itemDescription: "Men's Basic Round Neck T-Shirt",
+    lcNumber: "LC-HM-2026-4412",
+    lcValue: 191000,
+    lcAdvisingBank: "Standard Chartered BD",
+    lcIssueDate: "2026-08-01",
+    nominatedYarnSupplier: "Simco Spinning Ltd",
+    nominatedFabricSupplier: "Pakiza Knit Composite",
+    nominatedTrimsSupplier: "Coats Bangladesh"
+  },
+  {
+    poNumber: "PO-ZR-4521",
+    quotationNo: "QT-2026-002",
+    buyerName: "ZARA (Inditex)",
+    styleRef: "ZR-AW26-WVN-045",
+    productType: "Woven" as const,
+    quantity: 25000,
+    unitFOB: 7.42,
+    totalValue: 185500,
+    receiveDate: "2026-08-02",
+    shipDate: "2026-11-30",
+    shipmentMode: "Sea",
+    paymentTerms: "At Sight LC",
+    portOfLoading: "Chittagong, BD",
+    portOfDischarge: "Valencia, ES",
+    buyingHouse: "Synergy",
+    department: "Women",
+    season: "FW27",
+    itemDescription: "Ladies Casual Shirt",
+    lcNumber: "LC-ZR-2026-0091",
+    lcValue: 185500,
+    lcAdvisingBank: "HSBC Bangladesh",
+    lcIssueDate: "2026-08-02",
+    nominatedYarnSupplier: "Apex Spinning Ltd",
+    nominatedFabricSupplier: "Hamid Fabrics Ltd",
+    nominatedTrimsSupplier: "YKK Bangladesh"
+  }
+];
+
 function MerchandisingOrderProfilePage() {
   const navigate = useNavigate();
   const search = Route.useSearch();
@@ -56,6 +113,14 @@ function MerchandisingOrderProfilePage() {
     gauge: "12GG",
     yarnPly: "2/32 Nm",
     knittingPattern: "Jacquard",
+    // LC & nominations fields
+    lcNumber: "",
+    lcValue: 0,
+    lcAdvisingBank: "",
+    lcIssueDate: "",
+    nominatedYarnSupplier: "",
+    nominatedFabricSupplier: "",
+    nominatedTrimsSupplier: "",
   });
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -89,6 +154,72 @@ function MerchandisingOrderProfilePage() {
       unitPrice: 5, deliveryDate: "31/07/2026"
     }
   ]);
+
+  useEffect(() => {
+    if (search.editId) {
+      const matched = MOCK_REGISTERED_POS.find(p => p.poNumber === search.editId);
+      if (matched) {
+        setBasicInfo(prev => ({
+          ...prev,
+          refNo: matched.poNumber,
+          queryNo: matched.quotationNo,
+          buyerName: matched.buyerName,
+          styleNo: matched.styleRef,
+          orderQty: matched.quantity,
+          shipDate: matched.shipDate,
+          shippingMode: matched.shipmentMode,
+          payTerm: matched.paymentTerms,
+          buyingHouse: matched.buyingHouse,
+          department: matched.department,
+          season: matched.season,
+          orderType: matched.productType,
+          lcNumber: matched.lcNumber || "",
+          lcValue: matched.lcValue || 0,
+          lcAdvisingBank: matched.lcAdvisingBank || "",
+          lcIssueDate: matched.lcIssueDate || "",
+          nominatedYarnSupplier: matched.nominatedYarnSupplier || "",
+          nominatedFabricSupplier: matched.nominatedFabricSupplier || "",
+          nominatedTrimsSupplier: matched.nominatedTrimsSupplier || "",
+        }));
+        
+        setStyleForm(prev => ({
+          ...prev,
+          styleNo: matched.styleRef,
+          styleOrderQty: String(matched.quantity),
+          unitPrice: matched.unitFOB,
+          deliveryDate: matched.shipDate,
+        }));
+        
+        setStylesList([
+          {
+            id: "style-1",
+            styleNo: matched.styleRef,
+            color: "Navy Blue",
+            itemName: matched.itemDescription,
+            qty: matched.quantity,
+            sizeGroup: "XS-3XL",
+            sizes: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
+            sizesQty: [
+              Math.round(matched.quantity * 0.15),
+              Math.round(matched.quantity * 0.15),
+              Math.round(matched.quantity * 0.15),
+              Math.round(matched.quantity * 0.15),
+              Math.round(matched.quantity * 0.15),
+              Math.round(matched.quantity * 0.10),
+              Math.round(matched.quantity * 0.15),
+            ],
+            print: "Chest Print",
+            embroidery: "None",
+            wash: "Normal Wash",
+            special: "None",
+            unitPrice: matched.unitFOB,
+            deliveryDate: matched.shipDate,
+          }
+        ]);
+        toast.success(`Successfully loaded contract details for PO: ${matched.poNumber}`);
+      }
+    }
+  }, [search.editId]);
 
   // Costing
   const [additionalCosting, setAdditionalCosting] = useState(false);
@@ -205,6 +336,81 @@ function MerchandisingOrderProfilePage() {
           <div className="flex flex-col xl:flex-row gap-8">
             <div className="flex-1 space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-4">
+                <div className="flex flex-col gap-1.5 w-full">
+                  <label className="text-[11px] font-bold text-slate-600 dark:text-slate-455 uppercase tracking-tight">
+                    Link Registered PO
+                  </label>
+                  <select
+                    value={basicInfo.refNo}
+                    onChange={e => {
+                      const matched = MOCK_REGISTERED_POS.find(p => p.poNumber === e.target.value);
+                      if (matched) {
+                        setBasicInfo(prev => ({
+                          ...prev,
+                          refNo: matched.poNumber,
+                          queryNo: matched.quotationNo,
+                          buyerName: matched.buyerName,
+                          styleNo: matched.styleRef,
+                          orderQty: matched.quantity,
+                          shipDate: matched.shipDate,
+                          shippingMode: matched.shipmentMode,
+                          payTerm: matched.paymentTerms,
+                          buyingHouse: matched.buyingHouse,
+                          department: matched.department,
+                          season: matched.season,
+                          orderType: matched.productType,
+                          lcNumber: matched.lcNumber || "",
+                          lcValue: matched.lcValue || 0,
+                          lcAdvisingBank: matched.lcAdvisingBank || "",
+                          lcIssueDate: matched.lcIssueDate || "",
+                          nominatedYarnSupplier: matched.nominatedYarnSupplier || "",
+                          nominatedFabricSupplier: matched.nominatedFabricSupplier || "",
+                          nominatedTrimsSupplier: matched.nominatedTrimsSupplier || "",
+                        }));
+                        setStyleForm(prev => ({
+                          ...prev,
+                          styleNo: matched.styleRef,
+                          styleOrderQty: String(matched.quantity),
+                          unitPrice: matched.unitFOB,
+                          deliveryDate: matched.shipDate,
+                        }));
+                        setStylesList([
+                          {
+                            id: "style-1",
+                            styleNo: matched.styleRef,
+                            color: "Navy Blue",
+                            itemName: matched.itemDescription,
+                            qty: matched.quantity,
+                            sizeGroup: "XS-3XL",
+                            sizes: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
+                            sizesQty: [
+                              Math.round(matched.quantity * 0.15),
+                              Math.round(matched.quantity * 0.15),
+                              Math.round(matched.quantity * 0.15),
+                              Math.round(matched.quantity * 0.15),
+                              Math.round(matched.quantity * 0.15),
+                              Math.round(matched.quantity * 0.10),
+                              Math.round(matched.quantity * 0.15),
+                            ],
+                            print: "Chest Print",
+                            embroidery: "None",
+                            wash: "Normal Wash",
+                            special: "None",
+                            unitPrice: matched.unitFOB,
+                            deliveryDate: matched.shipDate,
+                          }
+                        ]);
+                        toast.success(`Loaded PO ${matched.poNumber} specs!`);
+                      }
+                    }}
+                    className="w-full text-xs px-3 py-2 bg-white dark:bg-slate-900 border border-slate-205 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 transition-all text-slate-800 dark:text-slate-100 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[position:right_0.75rem_center] cursor-pointer shadow-2xs"
+                  >
+                    <option value="">-- Choose registered PO --</option>
+                    {MOCK_REGISTERED_POS.map(p => (
+                      <option key={p.poNumber} value={p.poNumber}>{p.poNumber} ({p.buyerName} — {p.styleRef})</option>
+                    ))}
+                  </select>
+                </div>
                 <InputField label="Job No" value={basicInfo.jobNo} onChange={(e: any) => setBasicInfo({...basicInfo, jobNo: e.target.value})} />
                 <InputField label="Query No" value={basicInfo.queryNo} onChange={(e: any) => setBasicInfo({...basicInfo, queryNo: e.target.value})} />
                 <InputField label="Order Quantity" type="number" value={basicInfo.orderQty} onChange={(e: any) => setBasicInfo({...basicInfo, orderQty: e.target.value})} />
@@ -212,8 +418,8 @@ function MerchandisingOrderProfilePage() {
 
                 <InputField label="Ref No" value={basicInfo.refNo} onChange={(e: any) => setBasicInfo({...basicInfo, refNo: e.target.value})} />
                 <InputField label="Query Date" required type="date" value={basicInfo.queryDate} onChange={(e: any) => setBasicInfo({...basicInfo, queryDate: e.target.value})} />
-                <SelectField label="Buying House" value={basicInfo.buyingHouse} onChange={(e: any) => setBasicInfo({...basicInfo, buyingHouse: e.target.value})} options={["ITPS"]} />
-                <SelectField label="Buyer Name" required value={basicInfo.buyerName} onChange={(e: any) => setBasicInfo({...basicInfo, buyerName: e.target.value})} options={["ITPS"]} />
+                <SelectField label="Buying House" value={basicInfo.buyingHouse} onChange={(e: any) => setBasicInfo({...basicInfo, buyingHouse: e.target.value})} options={["ITPS", "Li & Fung", "Synergy", "Apex Group", "Pearl Global"]} />
+                <SelectField label="Buyer Name" required value={basicInfo.buyerName} onChange={(e: any) => setBasicInfo({...basicInfo, buyerName: e.target.value})} options={["ITPS", "H&M Group (SE)", "ZARA (Inditex)", "Primark Ltd (UK)", "Walmart", "Target", "Gap"]} />
 
                 <SelectField label="Department" required value={basicInfo.department} onChange={(e: any) => setBasicInfo({...basicInfo, department: e.target.value})} options={["Boys", "Girls", "Men", "Women"]} />
                 <InputField label="OPD" required type="date" value={basicInfo.opd} onChange={(e: any) => setBasicInfo({...basicInfo, opd: e.target.value})} />
@@ -335,6 +541,52 @@ function MerchandisingOrderProfilePage() {
                 <InputField label="Special Instructions" placeholder="Any specific requirements..." value={basicInfo.specialInstructions} onChange={(e: any) => setBasicInfo({...basicInfo, specialInstructions: e.target.value})} />
                 <InputField label="Penalty Clauses" placeholder="e.g. 5% off for 1 week delay" value={basicInfo.penaltyClauses} onChange={(e: any) => setBasicInfo({...basicInfo, penaltyClauses: e.target.value})} />
               </div>
+
+              {/* Linked PO L/C details & nominated suppliers */}
+              {basicInfo.refNo && (
+                <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 mt-4 space-y-4">
+                  <div className="flex items-center gap-1.5 border-b border-slate-200 dark:border-slate-850 pb-2">
+                    <div className="w-1 h-3.5 bg-teal-500 rounded-full" />
+                    <span className="text-[10px] font-black uppercase tracking-wider text-teal-650 dark:text-teal-400">
+                      Linked PO Master L/C & Nominated Suppliers (Read Only)
+                    </span>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                    <div>
+                      <span className="text-[9px] text-slate-400 block uppercase font-bold">L/C Number</span>
+                      <span className="font-mono font-bold text-slate-700 dark:text-slate-300">{basicInfo.lcNumber || "N/A"}</span>
+                    </div>
+                    <div>
+                      <span className="text-[9px] text-slate-400 block uppercase font-bold">L/C Advising Bank</span>
+                      <span className="font-bold text-slate-700 dark:text-slate-300">{basicInfo.lcAdvisingBank || "N/A"}</span>
+                    </div>
+                    <div>
+                      <span className="text-[9px] text-slate-400 block uppercase font-bold">L/C Net Value</span>
+                      <span className="font-mono font-bold text-slate-700 dark:text-slate-300">{basicInfo.lcValue ? `$ ${basicInfo.lcValue.toLocaleString()}` : "N/A"}</span>
+                    </div>
+                    <div>
+                      <span className="text-[9px] text-slate-400 block uppercase font-bold">L/C Issue Date</span>
+                      <span className="font-bold text-slate-700 dark:text-slate-300">{basicInfo.lcIssueDate || "N/A"}</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs pt-2 border-t border-slate-100 dark:border-slate-850">
+                    <div>
+                      <span className="text-[9px] text-slate-400 block uppercase font-bold">Nominated Yarn Spinner</span>
+                      <span className="font-bold text-slate-700 dark:text-slate-300">{basicInfo.nominatedYarnSupplier || "Buyer Nominated"}</span>
+                    </div>
+                    <div>
+                      <span className="text-[9px] text-slate-400 block uppercase font-bold">Nominated Fabric Weaver</span>
+                      <span className="font-bold text-slate-700 dark:text-slate-300">{basicInfo.nominatedFabricSupplier || "Buyer Nominated"}</span>
+                    </div>
+                    <div>
+                      <span className="text-[9px] text-slate-400 block uppercase font-bold">Nominated Trims & Thread</span>
+                      <span className="font-bold text-slate-700 dark:text-slate-300">{basicInfo.nominatedTrimsSupplier || "Buyer Nominated"}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Image Uploader */}

@@ -174,23 +174,22 @@ const menuCategories: MenuCategory[] = [
     search: { tab: "register" },
   },
   {
+    key: "pre-costing",
+    label: "Pre Costing",
+    icon: TrendingUp,
+    to: "/merchandising-pre-costing",
+  },
+  {
     key: "quotation",
     label: "Quotation",
     icon: FileText,
-    to: "/merchandising-inquiry",
-    search: { tab: "status" },
+    to: "/merchandising-quotation",
   },
   {
     key: "po-management",
     label: "PO Management",
     icon: Briefcase,
-    to: "/merchandising-order-profile",
-  },
-  {
-    key: "pre-costing",
-    label: "Pre Costing",
-    icon: TrendingUp,
-    to: "/merchandising-pre-costing",
+    to: "/merchandising-po",
   },
   {
     key: "order-management",

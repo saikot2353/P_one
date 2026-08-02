@@ -1,1698 +1,1179 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import MerchandisingLayout from "../components/merchandising/MerchandisingLayout";
 import {
-  TrendingUp,
-  Plus,
-  Search,
-  Download,
-  Printer,
-  FileSpreadsheet,
-  Edit2,
-  Trash2,
-  Save,
-  ChevronDown,
-  ArrowLeft,
-  Calculator,
-  Image as ImageIcon,
-  Check,
-  PlusCircle,
-  List,
-  Loader2,
+  Plus, Search, Pencil, FileText, ArrowLeft, Save, Printer,
+  Eye, X, ChevronDown, ChevronUp, CheckCircle, Clock,
+  AlertCircle, Download, FileSpreadsheet,
 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/merchandising-pre-costing")({
-  head: () => ({
-    meta: [
-      { title: "Prepare Pre-Costing — RMG Merchandising" },
-      { name: "description", content: "Garments Pre-Costing Sheets, FOB calculations, process loss, and style costing registry." },
-    ],
-  }),
+  head: () => ({ meta: [{ title: "Pre-Costing — Pakiza Knit Composite" }] }),
   component: PreCostingPage,
 });
 
-// Types & Interfaces
-interface PreCostingStyleItem {
-  id: string;
-  styleNo: string;
-  colour: string;
-  itemName: string;
-  orderQty: number;
-  sizeGroup: string;
-  sizes: string;
-  sizesQty: number;
-  print: boolean;
-  embroidery: boolean;
-  wash: boolean;
-  special: boolean;
-  unitPrice: number;
-  deliveryDate: string;
-  commissionPct: number;
-  commissionAmt: number;
+// ── Types ───────────────────────────────────────────────────────
+interface StyleFOBRow {
+  id: number; styleNo: string; colour: string; itemName: string;
+  orderQty: number; unitPrice: number; deliveryDate: string;
 }
-
-interface PreCostingRecord {
-  id: string;
-  queryNo: string;
-  queryType: string;
-  refNo: string;
-  queryDate: string;
-  deliveryDate: string;
-  customerBuyingHouse: string;
-  buyerName: string;
-  department: string;
-  orderType: string;
-  buyerAgent: string;
-  buyerBrand: string;
-  qualityLevel: string;
-  inspectionType: string;
-  season: string;
-  currency: string;
-  exchangeRate: number;
-  shippingMode: string;
-  payTerm: string;
-  tenor: string;
-  specialInstructions: string;
-  penaltyClauses: string;
-  status: "Draft" | "Approved" | "Pending";
-  styles: PreCostingStyleItem[];
-  processLoss: {
-    cutting: number;
-    print: number;
-    embroidery: number;
-    sewing: number;
-    wash: number;
-    finishing: number;
-    extra: number;
-  };
-  hasAdditionalCosting: boolean;
-  additionalCosting: {
-    commercialCostPct: number;
-    financeCostPct: number;
-    buyingCommissionPct: number;
-    sampleFabricQty: number;
-    sampleFabricRate: number;
-  };
-  totalOrderQty: number;
-  quotedFOB: number;
+interface FabricRow {
+  id: number; styleRef: string; fabNature: string; fabricInfo: string;
+  gsm: number; colour: string; source: string; orderQtyDzn: number;
+  consDzn: number; uom: string; rate: number;
 }
+interface YarnRow {
+  id: number; composition: string; count: string; yarnType: string;
+  colour: string; yarnQty: number; rate: number;
+}
+interface DyedYarnRow {
+  id: number; style: string; yarnInfo: string; colour: string;
+  shade: string; quantity: number; uom: string; rate: number;
+}
+interface ConversionRow {
+  id: number; processType: "Knitting" | "Dyeing"; styleRef: string;
+  fabNature: string; fabricInfo: string; gsm: number; colType: string;
+  colour: string; shade: string; prQty: number; uom: string; rate: number;
+}
+interface AccessoryRow {
+  id: number; itemName: string; gmtItem: string; sensitivityType: string;
+  orderQtyDzn: number; consDzn: number; processLossPct: number;
+  uom: string; rate: number;
+}
+interface EmbellishmentRow {
+  id: number; style: string; gmtItem: string; embName: string;
+  embDesc: string; qtyDzn: number; ratePerDzn: number;
+}
+interface CMCostRow {
+  id: number; style: string; gmtItem: string; gmtDzn: number;
+  cpm: number; smv: number; efficiencyPct: number;
+}
+interface CommissionRow { id: number; style: string; colour: string; commissionPct: number; }
+interface SpecialCostRow { id: number; styleRef: string; colour: string; costHead: string; orderQtyDzn: number; ratePerDzn: number; }
+interface OtherCostRow  { id: number; particulars: string; percentage: number; }
 
-// Initial mockup data
-const INITIAL_PRE_COSTINGS: PreCostingRecord[] = [
-  {
-    id: "PC-2026-001",
-    queryNo: "Q-9812",
-    queryType: "Regular",
-    refNo: "REF-HM-901",
-    queryDate: "2026-08-01",
-    deliveryDate: "2026-11-20",
-    buyerName: "H&M",
-    customerBuyingHouse: "Li & Fung",
-    department: "Men's Knit",
-    orderType: "Regular",
-    buyerAgent: "L&F Agent",
-    buyerBrand: "H&M Basic",
-    qualityLevel: "AQL 2.5",
-    inspectionType: "Final Inspection",
-    season: "Winter 2026",
-    currency: "USD",
-    exchangeRate: 120,
-    shippingMode: "Sea",
-    payTerm: "At Sight",
-    tenor: "90 Days",
-    specialInstructions: "Use certified organic cotton only.",
-    penaltyClauses: "Standard late shipment charge 1.5% weekly.",
-    status: "Approved",
-    processLoss: { cutting: 2, print: 1, embroidery: 0, sewing: 3, wash: 2, finishing: 1, extra: 0.5 },
-    hasAdditionalCosting: true,
-    additionalCosting: {
-      commercialCostPct: 1.5,
-      financeCostPct: 2.0,
-      buyingCommissionPct: 3.0,
-      sampleFabricQty: 50,
-      sampleFabricRate: 4.5
-    },
-    totalOrderQty: 12000,
-    quotedFOB: 4.85,
-    styles: [
-      {
-        id: "style-1",
-        styleNo: "ST-8810",
-        colour: "Navy Blue",
-        itemName: "Men's Basic Tee",
-        orderQty: 12000,
-        sizeGroup: "S-XXL",
-        sizes: "M, L, XL",
-        sizesQty: 12000,
-        print: true,
-        embroidery: false,
-        wash: false,
-        special: false,
-        unitPrice: 4.85,
-        deliveryDate: "2026-11-20",
-        commissionPct: 3.0,
-        commissionAmt: 1746
-      }
-    ]
-  },
-  {
-    id: "PC-2026-002",
-    queryNo: "Q-9815",
-    queryType: "Regular",
-    refNo: "REF-ZR-502",
-    queryDate: "2026-07-28",
-    deliveryDate: "2026-12-15",
-    buyerName: "Zara",
-    customerBuyingHouse: "Synergy",
-    department: "Ladies Woven",
-    orderType: "Regular",
-    buyerAgent: "Synergy Agent",
-    buyerBrand: "Zara Trafaluc",
-    qualityLevel: "AQL 1.5",
-    inspectionType: "Inline & Final",
-    season: "Winter 2026",
-    currency: "USD",
-    exchangeRate: 120,
-    shippingMode: "Sea",
-    payTerm: "LC",
-    tenor: "60 Days",
-    specialInstructions: "Confirm shade matching under D65 light source.",
-    penaltyClauses: "",
-    status: "Pending",
-    processLoss: { cutting: 3, print: 0, embroidery: 2, sewing: 4, wash: 3, finishing: 2, extra: 1 },
-    hasAdditionalCosting: false,
-    additionalCosting: {
-      commercialCostPct: 0,
-      financeCostPct: 0,
-      buyingCommissionPct: 0,
-      sampleFabricQty: 0,
-      sampleFabricRate: 0
-    },
-    totalOrderQty: 8500,
-    quotedFOB: 7.20,
-    styles: [
-      {
-        id: "style-2",
-        styleNo: "ST-4402",
-        colour: "Jet Black",
-        itemName: "Ladies Blouse",
-        orderQty: 8500,
-        sizeGroup: "XS-XL",
-        sizes: "S, M, L",
-        sizesQty: 8500,
-        print: false,
-        embroidery: true,
-        wash: true,
-        special: false,
-        unitPrice: 7.20,
-        deliveryDate: "2026-12-15",
-        commissionPct: 0,
-        commissionAmt: 0
-      }
-    ]
-  }
-];
-
-function PreCostingPage() {
-  const [preCostings, setPreCostings] = useState<PreCostingRecord[]>(INITIAL_PRE_COSTINGS);
-  const [viewMode, setViewMode] = useState<"list" | "prepare">("list");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterBuyer, setFilterBuyer] = useState("All");
-  const [filterStatus, setFilterStatus] = useState("All");
-
-  // State for active pre-costing edit/create
-  const [activeRecordId, setActiveRecordId] = useState<string | null>(null);
-
-  // Form State parameters - Basic
-  const [queryNo, setQueryNo] = useState("");
-  const [queryType, setQueryType] = useState("Regular");
-  const [refNo, setRefNo] = useState("");
-  const [queryDate, setQueryDate] = useState("2026-08-01");
-  const [deliveryDate, setDeliveryDate] = useState("");
-  const [customerBuyingHouse, setCustomerBuyingHouse] = useState("");
-  const [buyerName, setBuyerName] = useState("");
-  const [department, setDepartment] = useState("");
-  const [orderType, setOrderType] = useState("Regular");
-  const [buyerAgent, setBuyerAgent] = useState("");
-  const [buyerBrand, setBuyerBrand] = useState("");
-  const [qualityLevel, setQualityLevel] = useState("");
-  const [inspectionType, setInspectionType] = useState("");
-  const [season, setSeason] = useState("");
-  const [currency, setCurrency] = useState("USD");
-  const [exchangeRate, setExchangeRate] = useState(120);
-  const [shippingMode, setShippingMode] = useState("Sea");
-  const [payTerm, setPayTerm] = useState("At Sight");
-  const [tenor, setTenor] = useState("");
-  const [specialInstructions, setSpecialInstructions] = useState("");
-  const [penaltyClauses, setPenaltyClauses] = useState("");
-  const [imageFile, setImageFile] = useState<string | null>(null);
-  const [imageLoading, setImageLoading] = useState(false);
-  const [zipFileName, setZipFileName] = useState("");
-  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
-
+interface PreCostRecord {
+  id: string; preCostNo: string; queryNo: string; queryType: string;
+  styleName: string; deliveryDate: string; buyerName: string;
+  orderNo: string; country: string; buyerHouse: string; brand: string;
+  preCostDate: string; orderQtyPcs: number; unitPrice: number;
+  planCutQty: number; setRatio: number; cmPct: number;
+  qualityLevel: string; inspectionType: string; season: string; merchandiser: string;
+  exchangeRate: number; shippingMode: string; payTerm: string; tenor: string;
+  specialInstructions: string; penaltyClause: string;
+  // Key Info
+  epm: number; cpm: number; noOfColors: number; extraCuttingPct: number;
+  fabricProcessLossPct: number;
+  // Key Info by GMT item
+  gmtItems: { id: number; name: string; smv: number; mcPerLine: number; efficiencyPct: number; }[];
   // Process Loss
-  const [cuttingLoss, setCuttingLoss] = useState(0);
-  const [printLoss, setPrintLoss] = useState(0);
-  const [embroideryLoss, setEmbroideryLoss] = useState(0);
-  const [sewingLoss, setSewingLoss] = useState(0);
-  const [washLoss, setWashLoss] = useState(0);
-  const [finishingLoss, setFinishingLoss] = useState(0);
-  const [extraLoss, setExtraLoss] = useState(0);
+  cuttingPct: number; printPct: number; embroideryPct: number; sewingPct: number;
+  washDyePct: number; finishingPct: number; extraPct: number;
+  // FOB rows
+  styleFOBRows: StyleFOBRow[];
+  buyerSupMaterialCost: number;
+  // Costing rows
+  fabricRows: FabricRow[];
+  yarnRows: YarnRow[];
+  dyedYarnRows: DyedYarnRow[];
+  conversionRows: ConversionRow[];
+  accessoryRows: AccessoryRow[];
+  embellishmentRows: EmbellishmentRow[];
+  cmCostRows: CMCostRow[];
+  commissionRows: CommissionRow[];
+  specialCostRows: SpecialCostRow[];
+  otherCostRows: OtherCostRow[];
+  // I Sample
+  sampleFabricQty: number; sampleFabricRate: number;
+  sampleQty: number; sampleRate: number;
+  styleImage: string;
+  status: "Saved" | "Pending" | "Approved";
+}
 
-  // Style input form parameters
-  const [styleNo, setStyleNo] = useState("");
-  const [styleColour, setStyleColour] = useState("");
-  const [styleOrderQty, setStyleOrderQty] = useState<number>(0);
-  const [styleItemType, setStyleItemType] = useState("Pcs");
-  const [styleSizeGroup, setStyleSizeGroup] = useState("");
-  const [styleSizes, setStyleSizes] = useState("");
-  const [styleSizesQty, setStyleSizesQty] = useState<number>(0);
-  const [styleUnitPrice, setStyleUnitPrice] = useState<number>(0);
-  const [styleDeliveryDate, setStyleDeliveryDate] = useState("");
-  const [styleCommissionPct, setStyleCommissionPct] = useState<number>(0);
-  const [styleBuyerCosting, setStyleBuyerCosting] = useState("");
-  const [styleHasPrint, setStyleHasPrint] = useState(false);
-  const [styleHasEmbroidery, setStyleHasEmbroidery] = useState(false);
-  const [styleHasWash, setStyleHasWash] = useState(false);
-  const [styleHasSpecial, setStyleHasSpecial] = useState(false);
+// ── Sample Data ─────────────────────────────────────────────────
+const SAMPLE: PreCostRecord[] = [{
+  id: "PC-001", preCostNo: "26918", queryNo: "26918/0", queryType: "Regular",
+  styleName: "SS27PB093-SL", deliveryDate: "2026-09-26",
+  buyerName: "PEPCO", orderNo: "ORD01833307/08/09/10/11/12_01", country: "Poland",
+  buyerHouse: "PGS", brand: "", preCostDate: "2026-08-02",
+  orderQtyPcs: 39024, unitPrice: 3.15,
+  planCutQty: 39414, setRatio: 1.00, cmPct: 23.81,
+  qualityLevel: "", inspectionType: "", season: "SS27", merchandiser: "Md. Al Amin",
+  exchangeRate: 120, shippingMode: "Sea", payTerm: "At Sight", tenor: "",
+  specialInstructions: "", penaltyClause: "",
+  epm: -0.01, cpm: 0.07, noOfColors: 1, extraCuttingPct: 1.00,
+  fabricProcessLossPct: 9.85,
+  gmtItems: [{ id:1, name:"Sweat Shirt", smv:4.62, mcPerLine:0, efficiencyPct:40 }],
+  cuttingPct: 0, printPct: 0, embroideryPct: 0, sewingPct: 0, washDyePct: 0, finishingPct: 0, extraPct: 0,
+  styleFOBRows: [
+    { id:1, styleNo:"SS27PB093-SL", colour:"Verdant Green", itemName:"Sweat Shirt", orderQty:39024, unitPrice:3.15, deliveryDate:"2026-09-26" },
+  ],
+  buyerSupMaterialCost: 0,
+  fabricRows: [
+    { id:1, styleRef:"SS27PB093-SL::Verdant Green", fabNature:"Knit", fabricInfo:"FLAT BACK RIB:73% Polyester 27% Cotton", gsm:340, colour:"Verdant Green", source:"Production", orderQtyDzn:3252, consDzn:4.61, uom:"Kg", rate:0 },
+    { id:2, styleRef:"SS27PB093-SL::Verdant Green", fabNature:"Knit", fabricInfo:"S/J:73% Polyester 27% Cotton",          gsm:160, colour:"Verdant Green", source:"Production", orderQtyDzn:3252, consDzn:0.24, uom:"Kg", rate:0 },
+  ],
+  yarnRows: [
+    { id:1, composition:"65% Polyester 35% Cotton", count:"24/1", yarnType:"PC",       colour:"Average", yarnQty:11502.08, rate:2.75 },
+    { id:2, composition:"100% Polyester",           count:"200D/96F", yarnType:"Filament", colour:"Average", yarnQty:3818.71,  rate:2.20 },
+    { id:3, composition:"65% Polyester 35% Cotton", count:"28/1", yarnType:"PC",       colour:"Average", yarnQty:590.50,   rate:3.00 },
+  ],
+  dyedYarnRows: [],
+  conversionRows: [
+    { id:1, processType:"Knitting", styleRef:"SS27PB093-SL::Verdant Green", fabNature:"Knit", fabricInfo:"FLAT BACK RIB:73% Polyester 27% Cotton", gsm:340, colType:"Solid", colour:"Verdant Green", shade:"Dark (3.00% - 5.00%)", prQty:15134.25, uom:"Kg", rate:0.70 },
+    { id:2, processType:"Knitting", styleRef:"SS27PB093-SL::Verdant Green", fabNature:"Knit", fabricInfo:"S/J:73% Polyester 27% Cotton",          gsm:160, colType:"Solid", colour:"Verdant Green", shade:"Dark (3.00% - 5.00%)", prQty:776.98,   uom:"Kg", rate:0.16 },
+    { id:3, processType:"Dyeing",   styleRef:"SS27PB093-SL::Verdant Green", fabNature:"Knit", fabricInfo:"FLAT BACK RIB:73% Polyester 27% Cotton", gsm:340, colType:"Solid", colour:"Verdant Green", shade:"Dark (3.00% - 5.00%)", prQty:15134.25, uom:"Kg", rate:1.55 },
+    { id:4, processType:"Dyeing",   styleRef:"SS27PB093-SL::Verdant Green", fabNature:"Knit", fabricInfo:"S/J:73% Polyester 27% Cotton",          gsm:160, colType:"Solid", colour:"Verdant Green", shade:"Dark (3.00% - 5.00%)", prQty:776.98,   uom:"Kg", rate:1.40 },
+  ],
+  accessoryRows: [
+    { id:1,  itemName:"Additional Hangtag", gmtItem:"Sweat Shirt", sensitivityType:"No Sensitivity", orderQtyDzn:3252, consDzn:12.00, processLossPct:2, uom:"PCS",  rate:0.005 },
+    { id:2,  itemName:"Blister Poly",       gmtItem:"Sweat Shirt", sensitivityType:"No Sensitivity", orderQtyDzn:3252, consDzn:0.17,  processLossPct:2, uom:"Dzn",  rate:0.75  },
+    { id:3,  itemName:"Care Label",         gmtItem:"Sweat Shirt", sensitivityType:"No Sensitivity", orderQtyDzn:3252, consDzn:12.00, processLossPct:2, uom:"PCS",  rate:0.03  },
+    { id:4,  itemName:"Carton",             gmtItem:"Sweat Shirt", sensitivityType:"",               orderQtyDzn:3252, consDzn:0.40,  processLossPct:2, uom:"PCS",  rate:0.90  },
+    { id:5,  itemName:"Elastic",            gmtItem:"Sweat Shirt", sensitivityType:"No Sensitivity", orderQtyDzn:3252, consDzn:9.60,  processLossPct:2, uom:"Yards",rate:0.07  },
+    { id:6,  itemName:"Sewing Thread",      gmtItem:"Sweat Shirt", sensitivityType:"No Sensitivity", orderQtyDzn:3252, consDzn:0.98,  processLossPct:2, uom:"CONE", rate:0.45  },
+    { id:7,  itemName:"Zipper",             gmtItem:"Sweat Shirt", sensitivityType:"No Sensitivity", orderQtyDzn:3252, consDzn:1.00,  processLossPct:2, uom:"PCS",  rate:2.20  },
+  ],
+  embellishmentRows: [],
+  cmCostRows: [
+    { id:1, style:"SS27PB093-SL", gmtItem:"Sweat Shirt", gmtDzn:3252, cpm:0.065, smv:4.62, efficiencyPct:40 },
+  ],
+  commissionRows: [
+    { id:1, style:"SS27PB093-SL", colour:"Verdant Green", commissionPct:0 },
+  ],
+  specialCostRows: [
+    { id:1, styleRef:"SS27PB093-SL::Verdant Green", colour:"Verdant Green", costHead:"Test Cost", orderQtyDzn:3252, ratePerDzn:0.03 },
+  ],
+  otherCostRows: [
+    { id:1, particulars:"Commercial Cost (%)", percentage:1.10 },
+    { id:2, particulars:"Finance Cost (%)",    percentage:2.40 },
+    { id:3, particulars:"Buying Commission (%)",percentage:0   },
+  ],
+  sampleFabricQty:15, sampleFabricRate:4, sampleQty:0, sampleRate:0,
+  styleImage: "/src/components/0330c3d6-5cae-49e0-b777-d34891afcc09.jpg",
+  status: "Approved",
+}];
 
-  // Array of style items added to the current sheet
-  const [addedStyles, setAddedStyles] = useState<PreCostingStyleItem[]>([]);
+let _id = 500;
+const nid = () => ++_id;
 
-  // Additional Costing
-  const [hasAdditionalCosting, setHasAdditionalCosting] = useState(false);
-  const [commercialCostPct, setCommercialCostPct] = useState(0.0000);
-  const [financeCostPct, setFinanceCostPct] = useState(0.0000);
-  const [buyingCommissionPct, setBuyingCommissionPct] = useState(0.0000);
-  const [sampleFabricQty, setSampleFabricQty] = useState(0.0000);
-  const [sampleFabricRate, setSampleFabricRate] = useState(0.0000);
+// ── Calc ─────────────────────────────────────────────────────────
+function calcBudget(r: PreCostRecord) {
+  const orderValue     = r.orderQtyPcs * r.unitPrice;
+  const netOrderValue  = orderValue - r.buyerSupMaterialCost;
+  const fabricCost     = r.fabricRows.reduce((s,x)=>s+(x.orderQtyDzn*x.consDzn*x.rate),0);
+  const yarnCost       = r.yarnRows.reduce((s,x)=>s+(x.yarnQty*x.rate),0);
+  const dyedYarnCost   = r.dyedYarnRows.reduce((s,x)=>s+(x.quantity*x.rate),0);
+  const convCost       = r.conversionRows.reduce((s,x)=>s+(x.prQty*x.rate),0);
+  const accCost        = r.accessoryRows.reduce((s,x)=>s+(x.orderQtyDzn*x.consDzn*(1+x.processLossPct/100)*x.rate),0);
+  const embCost        = r.embellishmentRows.reduce((s,x)=>s+(x.qtyDzn*x.ratePerDzn),0);
+  const totalVariable  = fabricCost + yarnCost + dyedYarnCost + convCost + accCost + embCost;
+  const contribution   = netOrderValue - totalVariable;
+  const cmCost         = r.cmCostRows.reduce((s,x)=>{
+    const cmPcs = x.efficiencyPct>0 ? (x.cpm*x.smv)/x.efficiencyPct*100 : 0;
+    return s+(cmPcs*12*x.gmtDzn);
+  },0);
+  const opProfit       = contribution - cmCost;
+  const commission     = r.commissionRows.reduce((s,x)=>s+(netOrderValue*x.commissionPct/100),0);
+  const specialCost    = r.specialCostRows.reduce((s,x)=>s+(x.orderQtyDzn*x.ratePerDzn),0);
+  const otherCost      = r.otherCostRows.reduce((s,x)=>s+(netOrderValue*x.percentage/100),0);
+  const sampleCost     = r.sampleFabricQty*r.sampleFabricRate + r.sampleQty*r.sampleRate;
+  const totalCost      = totalVariable + cmCost + commission + specialCost + otherCost + sampleCost + r.buyerSupMaterialCost;
+  const netProfit      = orderValue - totalCost;
+  return { orderValue, netOrderValue, fabricCost, yarnCost, dyedYarnCost, convCost,
+    accCost, embCost, totalVariable, contribution, cmCost, opProfit,
+    commission, specialCost, otherCost, sampleCost, totalCost, netProfit };
+}
 
-  // Dynamic calculations
-  const totalOrderQty = useMemo(() => {
-    return addedStyles.reduce((sum, item) => sum + item.orderQty, 0);
-  }, [addedStyles]);
+const fmt = (v: number, d=2) => v.toLocaleString("en",{minimumFractionDigits:d,maximumFractionDigits:d});
+const pct = (v: number, base: number) => base>0 ? ((v/base)*100).toFixed(2) : "0.00";
 
-  const totalSizesQty = useMemo(() => {
-    return addedStyles.reduce((sum, item) => sum + item.sizesQty, 0);
-  }, [addedStyles]);
+const StatusBadge = ({ s }: { s: PreCostRecord["status"] }) => {
+  const c = { Approved:"bg-emerald-50 text-emerald-700 border-emerald-200", Pending:"bg-amber-50 text-amber-700 border-amber-200", Saved:"bg-slate-100 text-slate-600 border-slate-200" }[s];
+  const ic = { Approved:<CheckCircle className="size-3"/>, Pending:<Clock className="size-3"/>, Saved:<AlertCircle className="size-3"/> }[s];
+  return <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border ${c}`}>{ic}{s}</span>;
+};
 
-  const totalCommissionAmt = useMemo(() => {
-    return addedStyles.reduce((sum, item) => sum + item.commissionAmt, 0);
-  }, [addedStyles]);
+// ── Page ─────────────────────────────────────────────────────────
+export default function PreCostingPage() {
+  const [view, setView] = useState<"list"|"form"|"detail">("list");
+  const [records, setRecords] = useState<PreCostRecord[]>(SAMPLE);
+  const [search, setSearch]   = useState("");
+  const [filterStatus, setFilterStatus] = useState<"ALL"|PreCostRecord["status"]>("ALL");
+  const [filterBuyer, setFilterBuyer]   = useState("");
+  const [fromDate, setFromDate] = useState("2026-01-08");
+  const [toDate,   setToDate]   = useState("2026-09-02");
+  const [activeRec, setActiveRec] = useState<PreCostRecord | null>(null);
+  const [collapsed, setCollapsed] = useState<Record<string,boolean>>({});
+  const tog = (k: string) => setCollapsed(p=>({...p,[k]:!p[k]}));
 
-  const averageFOB = useMemo(() => {
-    if (addedStyles.length === 0) return 0;
-    const totalAmount = addedStyles.reduce((sum, item) => sum + (item.orderQty * item.unitPrice), 0);
-    return totalAmount / totalOrderQty;
-  }, [addedStyles, totalOrderQty]);
+  const mkBlank = (): PreCostRecord => ({
+    id:"", preCostNo:"", queryNo:"", queryType:"Regular", styleName:"", deliveryDate:"",
+    buyerName:"", orderNo:"", country:"", buyerHouse:"", brand:"", preCostDate:new Date().toISOString().split("T")[0],
+    orderQtyPcs:0, unitPrice:0, planCutQty:0, setRatio:1, cmPct:0,
+    qualityLevel:"", inspectionType:"", season:"", merchandiser:"",
+    exchangeRate:120, shippingMode:"Sea", payTerm:"At Sight", tenor:"",
+    specialInstructions:"", penaltyClause:"",
+    epm:0, cpm:0.065, noOfColors:1, extraCuttingPct:1, fabricProcessLossPct:0,
+    gmtItems:[{id:nid(),name:"",smv:0,mcPerLine:0,efficiencyPct:65}],
+    cuttingPct:0, printPct:0, embroideryPct:0, sewingPct:0, washDyePct:0, finishingPct:0, extraPct:0,
+    styleFOBRows:[{id:nid(),styleNo:"",colour:"",itemName:"",orderQty:0,unitPrice:0,deliveryDate:""}],
+    buyerSupMaterialCost:0,
+    fabricRows:[{id:nid(),styleRef:"",fabNature:"Knit",fabricInfo:"",gsm:160,colour:"",source:"Finish Purchase",orderQtyDzn:0,consDzn:0,uom:"Kg",rate:0}],
+    yarnRows:[{id:nid(),composition:"",count:"",yarnType:"",colour:"Average",yarnQty:0,rate:0}],
+    dyedYarnRows:[],
+    conversionRows:[],
+    accessoryRows:[{id:nid(),itemName:"",gmtItem:"",sensitivityType:"No Sensitivity",orderQtyDzn:0,consDzn:0,processLossPct:2,uom:"Dzn",rate:0}],
+    embellishmentRows:[],
+    cmCostRows:[{id:nid(),style:"",gmtItem:"",gmtDzn:0,cpm:0.065,smv:0,efficiencyPct:65}],
+    commissionRows:[{id:nid(),style:"",colour:"",commissionPct:0}],
+    specialCostRows:[{id:nid(),styleRef:"",colour:"",costHead:"Test Cost",orderQtyDzn:0,ratePerDzn:0.01}],
+    otherCostRows:[
+      {id:nid(),particulars:"Commercial Cost (%)",percentage:4.5},
+      {id:nid(),particulars:"Finance Cost (%)",percentage:0},
+      {id:nid(),particulars:"Buying Commission (%)",percentage:0},
+    ],
+    sampleFabricQty:0, sampleFabricRate:0, sampleQty:0, sampleRate:0,
+    styleImage:"", status:"Saved",
+  });
 
-  // Plan Cut Quantity calculator
-  const calculatedPlanCutQty = useMemo(() => {
-    return Math.round(styleOrderQty * (1 + cuttingLoss / 100));
-  }, [styleOrderQty, cuttingLoss]);
+  const [form, setForm] = useState<PreCostRecord>(mkBlank());
+  const sf = (p: Partial<PreCostRecord>) => setForm(prev=>({...prev,...p}));
+  const B  = useMemo(()=>calcBudget(form),[form]);
+  const BR = activeRec ? calcBudget(activeRec) : null;
 
-  // Commission Amount calculator
-  const calculatedCommissionAmt = useMemo(() => {
-    return (styleOrderQty * styleUnitPrice * styleCommissionPct) / 100;
-  }, [styleOrderQty, styleUnitPrice, styleCommissionPct]);
+  const filtered = records.filter(r=>{
+    const s=search.toLowerCase();
+    return (r.preCostNo.includes(s)||r.buyerName.toLowerCase().includes(s)||r.queryNo.includes(s))
+      &&(filterStatus==="ALL"||r.status===filterStatus)
+      &&(!filterBuyer||r.buyerName.toLowerCase().includes(filterBuyer.toLowerCase()));
+  });
 
-  // Quick Mock Buyers/Buying Houses for select inputs
-  const BUYERS = ["H&M", "Zara", "Walmart", "Target", "Levi's", "Gap", "Mango"];
-  const BUYING_HOUSES = ["Li & Fung", "Synergy", "Apex Group", "Pearl Global", "Intertek", "Windsor"];
-  const SEASONS = ["Summer 2026", "Winter 2026", "Spring 2027", "Autumn 2027"];
-  const SIZE_GROUPS = ["S-XXL", "XS-XL", "Kids (2-8Y)", "Numeric (28-36)", "Standard Free"];
-  const COLORS = ["Navy Blue", "Jet Black", "Off White", "Melange Gray", "Crimson Red", "Forest Green"];
-  const DEPTS = ["Men's Knit", "Ladies Woven", "Kids Playwear", "Denim Department", "Activewear"];
-
-  // Methods
-  const handleAddNewPreCost = () => {
-    setActiveRecordId(null);
-    setQueryNo(`Q-${Math.floor(1000 + Math.random() * 9000)}`);
-    setQueryType("Regular");
-    setRefNo("");
-    setQueryDate("2026-08-01");
-    setDeliveryDate("");
-    setCustomerBuyingHouse(BUYING_HOUSES[0]);
-    setBuyerName(BUYERS[0]);
-    setDepartment(DEPTS[0]);
-    setOrderType("Regular");
-    setBuyerAgent("L&F Agent");
-    setBuyerBrand("H&M Basic");
-    setQualityLevel("AQL 2.5");
-    setInspectionType("Final Inspection");
-    setSeason(SEASONS[1]);
-    setCurrency("USD");
-    setExchangeRate(120);
-    setShippingMode("Sea");
-    setPayTerm("At Sight");
-    setTenor("");
-    setSpecialInstructions("");
-    setPenaltyClauses("");
-    setImageFile(null);
-    setZipFileName("");
-    setUploadProgress(null);
-
-    setCuttingLoss(0);
-    setPrintLoss(0);
-    setEmbroideryLoss(0);
-    setSewingLoss(0);
-    setWashLoss(0);
-    setFinishingLoss(0);
-    setExtraLoss(0);
-
-    setStyleNo("");
-    setStyleColour(COLORS[0]);
-    setStyleOrderQty(0);
-    setStyleItemType("Pcs");
-    setStyleSizeGroup(SIZE_GROUPS[0]);
-    setStyleSizes("");
-    setStyleSizesQty(0);
-    setStyleUnitPrice(0);
-    setStyleDeliveryDate("");
-    setStyleCommissionPct(0);
-    setStyleBuyerCosting("");
-    setStyleHasPrint(false);
-    setStyleHasEmbroidery(false);
-    setStyleHasWash(false);
-    setStyleHasSpecial(false);
-    setAddedStyles([]);
-
-    setHasAdditionalCosting(false);
-    setCommercialCostPct(0.0000);
-    setFinanceCostPct(0.0000);
-    setBuyingCommissionPct(0.0000);
-    setSampleFabricQty(0.0000);
-    setSampleFabricRate(0.0000);
-
-    setViewMode("prepare");
+  const handleSave = () => {
+    if(!form.styleName.trim()){ toast.error("Style Name is required."); return; }
+    if(form.id){
+      setRecords(prev=>prev.map(r=>r.id===form.id?{...form}:r));
+      toast.success("Pre-Costing updated!");
+    }else{
+      const no=`PC-${String(records.length+26859).padStart(5,"0")}`;
+      setRecords(prev=>[{...form,id:`PC-${Date.now()}`,preCostNo:no,queryNo:`${no}/0`},...prev]);
+      toast.success(`Pre-Cost ${no} saved!`);
+    }
+    setView("list");
   };
 
-  const handleEditPreCost = (rec: PreCostingRecord) => {
-    setActiveRecordId(rec.id);
-    setQueryNo(rec.queryNo);
-    setQueryType(rec.queryType);
-    setRefNo(rec.refNo);
-    setQueryDate(rec.queryDate);
-    setDeliveryDate(rec.deliveryDate);
-    setCustomerBuyingHouse(rec.customerBuyingHouse);
-    setBuyerName(rec.buyerName);
-    setDepartment(rec.department);
-    setOrderType(rec.orderType);
-    setBuyerAgent(rec.buyerAgent);
-    setBuyerBrand(rec.buyerBrand);
-    setQualityLevel(rec.qualityLevel);
-    setInspectionType(rec.inspectionType);
-    setSeason(rec.season);
-    setCurrency(rec.currency);
-    setExchangeRate(rec.exchangeRate);
-    setShippingMode(rec.shippingMode);
-    setPayTerm(rec.payTerm);
-    setTenor(rec.tenor);
-    setSpecialInstructions(rec.specialInstructions);
-    setPenaltyClauses(rec.penaltyClauses);
-    setAddedStyles(rec.styles);
+  const openEdit   = (r: PreCostRecord) => { setForm({...r}); setView("form"); };
+  const openDetail = (r: PreCostRecord) => { setActiveRec(r); setView("detail"); };
 
-    setCuttingLoss(rec.processLoss.cutting);
-    setPrintLoss(rec.processLoss.print);
-    setEmbroideryLoss(rec.processLoss.embroidery);
-    setSewingLoss(rec.processLoss.sewing);
-    setWashLoss(rec.processLoss.wash);
-    setFinishingLoss(rec.processLoss.finishing);
-    setExtraLoss(rec.processLoss.extra);
-
-    setHasAdditionalCosting(rec.hasAdditionalCosting);
-    if (rec.additionalCosting) {
-      setCommercialCostPct(rec.additionalCosting.commercialCostPct);
-      setFinanceCostPct(rec.additionalCosting.financeCostPct);
-      setBuyingCommissionPct(rec.additionalCosting.buyingCommissionPct);
-      setSampleFabricQty(rec.additionalCosting.sampleFabricQty);
-      setSampleFabricRate(rec.additionalCosting.sampleFabricRate);
-    }
-
-    setViewMode("prepare");
+  // ── Input atoms ───────────────────────────────────────────────
+  const TI = ({val,onChange,ph="",cls=""}:{val:string;onChange:(v:string)=>void;ph?:string;cls?:string}) => (
+    <input type="text" value={val} onChange={e=>onChange(e.target.value)} placeholder={ph}
+      className={`w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-300/50 focus:border-indigo-400 bg-white placeholder-slate-350 transition-all ${cls}`}/>
+  );
+  const NI = ({val,onChange,cls=""}:{val:number;onChange:(v:number)=>void;cls?:string}) => (
+    <input type="number" step="any" value={val||""} onChange={e=>onChange(Number(e.target.value))}
+      className={`w-full text-right font-mono text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-300/50 focus:border-indigo-400 bg-white transition-all ${cls}`}/>
+  );
+  const DI = ({val,onChange}:{val:string;onChange:(v:string)=>void}) => (
+    <input type="date" value={val} onChange={e=>onChange(e.target.value)}
+      className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-300/50 focus:border-indigo-400 bg-white transition-all"/>
+  );
+  const Label = ({children}:{children:React.ReactNode}) => (
+    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-tight mb-1">{children}</label>
+  );
+  const Lbl = ({children}:{children:React.ReactNode}) => (
+    <p className="text-[10px] font-black text-slate-500 uppercase tracking-tight">{children}</p>
+  );
+  const SH = ({id,title,badge,children}:{id:string;title:string;badge?:string;children:React.ReactNode}) => {
+    const open=!collapsed[id];
+    return (
+      <div className="rounded-xl border border-slate-200 bg-white shadow-xs overflow-hidden">
+        <button onClick={()=>tog(id)} className="flex items-center gap-2.5 px-4 py-3 w-full text-left hover:bg-slate-50 transition border-b border-slate-100 cursor-pointer">
+          <span className="w-1 h-4 rounded-full bg-indigo-500 shrink-0"/>
+          <span className="text-[11px] font-black uppercase tracking-wider text-slate-700 flex-1">{title}</span>
+          {badge&&<span className="text-[10px] font-mono font-black text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-md">{badge}</span>}
+          {open?<ChevronUp className="size-3.5 text-slate-400 shrink-0"/>:<ChevronDown className="size-3.5 text-slate-400 shrink-0"/>}
+        </button>
+        {open&&<div className="p-4">{children}</div>}
+      </div>
+    );
   };
 
-  const handleDeleteRecord = (id: string) => {
-    if (confirm("Are you sure you want to delete this pre-costing sheet?")) {
-      setPreCostings(prev => prev.filter(p => p.id !== id));
-      toast.success("Pre-Costing Sheet deleted successfully.");
-    }
-  };
-
-  const handleBuyerChange = (buyer: string) => {
-    setBuyerName(buyer);
-    if (buyer === "H&M") {
-      setBuyerAgent("L&F Agent");
-      setBuyerBrand("H&M Basic");
-      setCustomerBuyingHouse("Li & Fung");
-    } else if (buyer === "Zara") {
-      setBuyerAgent("Synergy Agent");
-      setBuyerBrand("Zara Trafaluc");
-      setCustomerBuyingHouse("Synergy");
-    } else if (buyer === "Walmart") {
-      setBuyerAgent("Apex Agent");
-      setBuyerBrand("George");
-      setCustomerBuyingHouse("Apex Group");
-    } else if (buyer === "Target") {
-      setBuyerAgent("Pearl Agent");
-      setBuyerBrand("Target Denim");
-      setCustomerBuyingHouse("Pearl Global");
-    }
-  };
-
-  const handleStyleOrderQtyChange = (qty: number) => {
-    setStyleOrderQty(qty);
-    if (styleSizesQty === 0 || styleSizesQty === qty) {
-      setStyleSizesQty(qty);
-    }
-  };
-
-  const handleAddStyleToList = () => {
-    if (!styleNo) {
-      toast.error("Please enter a Style Number.");
-      return;
-    }
-    if (styleOrderQty <= 0) {
-      toast.error("Please enter a valid Style Order Quantity.");
-      return;
-    }
-    if (styleUnitPrice <= 0) {
-      toast.error("Please enter a valid Style Unit Price.");
-      return;
-    }
-
-    const newItem: PreCostingStyleItem = {
-      id: `style-${Date.now()}`,
-      styleNo,
-      colour: styleColour,
-      itemName: styleBuyerCosting || "Garments Item",
-      orderQty: styleOrderQty,
-      sizeGroup: styleSizeGroup,
-      sizes: styleSizes,
-      sizesQty: styleSizesQty || styleOrderQty,
-      print: styleHasPrint,
-      embroidery: styleHasEmbroidery,
-      wash: styleHasWash,
-      special: styleHasSpecial,
-      unitPrice: styleUnitPrice,
-      deliveryDate: styleDeliveryDate || deliveryDate || "2026-08-01",
-      commissionPct: styleCommissionPct,
-      commissionAmt: calculatedCommissionAmt
-    };
-
-    setAddedStyles(prev => [...prev, newItem]);
-    toast.success(`Style ${styleNo} added to cost breakdown!`);
-
-    // Reset style fields
-    setStyleNo("");
-    setStyleBuyerCosting("");
-    setStyleOrderQty(0);
-    setStyleUnitPrice(0);
-    setStyleSizes("");
-    setStyleSizesQty(0);
-    setStyleCommissionPct(0);
-    setStyleHasPrint(false);
-    setStyleHasEmbroidery(false);
-    setStyleHasWash(false);
-    setStyleHasSpecial(false);
-  };
-
-  const handleRemoveStyle = (styleId: string) => {
-    setAddedStyles(prev => prev.filter(s => s.id !== styleId));
-    toast.success("Style removed from break-down list.");
-  };
-
-  const handleSaveSheet = () => {
-    if (addedStyles.length === 0) {
-      toast.error("Please add at least one style item in the cost breakdown.");
-      return;
-    }
-
-    const payload: PreCostingRecord = {
-      id: activeRecordId || `PC-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`,
-      queryNo,
-      queryType,
-      refNo,
-      queryDate,
-      deliveryDate: deliveryDate || addedStyles[0]?.deliveryDate || "2026-08-01",
-      customerBuyingHouse,
-      buyerName,
-      department,
-      orderType,
-      buyerAgent,
-      buyerBrand,
-      qualityLevel,
-      inspectionType,
-      season,
-      currency,
-      exchangeRate,
-      shippingMode,
-      payTerm,
-      tenor,
-      specialInstructions,
-      penaltyClauses,
-      status: activeRecordId ? (preCostings.find(p => p.id === activeRecordId)?.status || "Draft") : "Draft",
-      styles: addedStyles,
-      processLoss: {
-        cutting: cuttingLoss,
-        print: printLoss,
-        embroidery: embroideryLoss,
-        sewing: sewingLoss,
-        wash: washLoss,
-        finishing: finishingLoss,
-        extra: extraLoss
-      },
-      hasAdditionalCosting,
-      additionalCosting: {
-        commercialCostPct,
-        financeCostPct,
-        buyingCommissionPct,
-        sampleFabricQty,
-        sampleFabricRate
-      },
-      totalOrderQty,
-      quotedFOB: Number(averageFOB.toFixed(2))
-    };
-
-    if (activeRecordId) {
-      setPreCostings(prev => prev.map(p => p.id === activeRecordId ? payload : p));
-      toast.success("Pre-Costing Sheet updated successfully!");
-    } else {
-      setPreCostings(prev => [payload, ...prev]);
-      toast.success("New Pre-Costing Sheet saved to database!");
-    }
-
-    setViewMode("list");
-  };
-
-  const filteredPreCostings = useMemo(() => {
-    return preCostings.filter(p => {
-      const matchBuyer = filterBuyer === "All" || p.buyerName === filterBuyer;
-      const matchStatus = filterStatus === "All" || p.status === filterStatus;
-      const s = searchQuery.toLowerCase();
-      const matchSearch = searchQuery === "" ||
-        p.queryNo.toLowerCase().includes(s) ||
-        p.refNo.toLowerCase().includes(s) ||
-        p.buyerName.toLowerCase().includes(s) ||
-        p.department.toLowerCase().includes(s);
-      return matchBuyer && matchStatus && matchSearch;
-    });
-  }, [preCostings, filterBuyer, filterStatus, searchQuery]);
-
-  // CSS Styling matching standard Pakiza/Cripton portal looks
-  const sectionContainerClass = "border-l-4 border-[#1e88e5] bg-white dark:bg-slate-900 rounded-r-xl border-y border-r border-slate-200/85 dark:border-slate-800 p-5 shadow-xs space-y-4 transition-all duration-200";
-  const sectionTitleClass = "text-sm font-extrabold text-[#1e88e5] dark:text-[#42a5f5] pb-1 tracking-wide flex items-center gap-2";
-  const labelClass = "block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1";
-  const inputClass = "w-full h-8 px-2 text-xs border border-slate-200 dark:border-slate-700 rounded-sm bg-white dark:bg-slate-850 focus:outline-none focus:border-[#1e88e5] font-semibold text-slate-800 dark:text-slate-200 shadow-2xs";
-  const selectClass = "w-full h-8 px-2 text-xs border border-slate-200 dark:border-slate-700 rounded-sm bg-white dark:bg-slate-850 focus:outline-none focus:border-[#1e88e5] font-semibold text-slate-800 dark:text-slate-200 cursor-pointer shadow-2xs appearance-none pr-7";
-
+  // ────────────────────────────────────────────────────────────────
   return (
-    <MerchandisingLayout
-      activePath="pre-costing"
-      breadcrumbs={[{ label: "Pre Costing" }, { label: "Prepare Pre-Cost" }]}
-      title={viewMode === "list" ? "Pre-Costing Registry" : "Prepare Pre-Cost"}
-    >
-      <div className="p-4 md:p-6 bg-[#f4f6f9] dark:bg-slate-950 min-h-full font-sans space-y-6 transition-colors duration-200">
-        
-        {/* ── LIST MODE VIEW ── */}
-        {viewMode === "list" && (
-          <div className="space-y-6 animate-in fade-in duration-200">
-            {/* Header Toolbar */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
-              <div>
-                <h2 className="text-lg font-black tracking-tight text-slate-950 dark:text-white flex items-center gap-2">
-                  <span className="p-1.5 bg-[#1e88e5]/10 text-[#1e88e5] rounded-lg">
-                    <TrendingUp className="size-4.5" />
-                  </span>
-                  Pre-Costing Registry
-                </h2>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                  Manage and prepare pre-costing FOB sheets for buyer style inquiries
-                </p>
-              </div>
+    <MerchandisingLayout activePath="pre-costing" breadcrumbs={[{label:"Pre-Costing"}]} title="Pre-Costing">
+      <div className="bg-slate-50 dark:bg-slate-950 min-h-full">
 
-              <button
-                onClick={handleAddNewPreCost}
-                className="h-10 px-5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-2 cursor-pointer"
-              >
-                <Plus className="size-4.5" /> Prepare Pre-Cost
+        {/* ══════════ LIST VIEW ══════════ */}
+        {view==="list"&&(
+          <div className="p-4 md:p-6 space-y-4">
+            <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+              <div>
+                <h1 className="text-sm font-black text-slate-900 flex items-center gap-2">
+                  <span className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg"><FileText className="size-4"/></span>
+                  Pre-Costing Register
+                </h1>
+                <p className="text-xs text-slate-500 mt-0.5">Manage all style pre-costings, budget summaries, and FOB calculations.</p>
+              </div>
+              <button onClick={()=>{setForm(mkBlank());setView("form");}} className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-bold text-xs shadow-sm cursor-pointer transition">
+                <Plus className="size-3.5"/> New Pre-Costing
               </button>
             </div>
-
-            {/* Filters Toolbar */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 shadow-xs flex flex-col md:flex-row gap-3 items-center justify-between">
-              <div className="relative w-full md:w-80">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Search by Query No, Ref, Buyer..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-10 pl-9 pr-4 text-xs rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800/80 focus:outline-none focus:border-primary focus:bg-white dark:focus:bg-slate-900/60 transition-all font-medium text-slate-800 dark:text-slate-200"
-                />
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-3">
+                <div><Lbl>From Date</Lbl><DI val={fromDate} onChange={setFromDate}/></div>
+                <div><Lbl>To Date</Lbl><DI val={toDate} onChange={setToDate}/></div>
+                <div><Lbl>Buyer Name</Lbl><TI val={filterBuyer} onChange={setFilterBuyer} ph="Filter buyer…"/></div>
+                <div><Lbl>Status</Lbl>
+                  <select value={filterStatus} onChange={e=>setFilterStatus(e.target.value as any)} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer font-semibold">
+                    <option value="ALL">ALL</option><option>Saved</option><option>Pending</option><option>Approved</option>
+                  </select>
+                </div>
+                <div><Lbl>Pre-Cost No</Lbl><TI val={search} onChange={setSearch} ph="Search…"/></div>
+                <div className="flex flex-col justify-end">
+                  <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-1.5 rounded-lg cursor-pointer transition flex items-center justify-center gap-1.5">
+                    <Search className="size-3.5"/> Search
+                  </button>
+                </div>
               </div>
-
-              <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-end">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-extrabold text-slate-400 uppercase">Buyer:</span>
-                  <div className="relative">
-                    <select
-                      value={filterBuyer}
-                      onChange={(e) => setFilterBuyer(e.target.value)}
-                      className="h-9 px-3 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-800 font-semibold text-slate-700 dark:text-slate-200 appearance-none pr-8 cursor-pointer"
-                    >
-                      <option value="All">All Buyers</option>
-                      {BUYERS.map((b) => (
-                        <option key={b} value={b}>{b}</option>
-                      ))}
-                    </select>
-                    <ChevronDown className="size-3 text-slate-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-extrabold text-slate-400 uppercase">Status:</span>
-                  <div className="relative">
-                    <select
-                      value={filterStatus}
-                      onChange={(e) => setFilterStatus(e.target.value)}
-                      className="h-9 px-3 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-800 font-semibold text-slate-700 dark:text-slate-200 appearance-none pr-8 cursor-pointer"
-                    >
-                      <option value="All">All Status</option>
-                      <option value="Draft">Draft</option>
-                      <option value="Pending">Pending</option>
-                      <option value="Approved">Approved</option>
-                    </select>
-                    <ChevronDown className="size-3 text-slate-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  </div>
-                </div>
-
-                <div className="h-9 w-px bg-slate-200 dark:bg-slate-800 mx-1 hidden sm:block"></div>
-
-                <div className="flex items-center gap-1.5">
-                  <button className="h-9 px-3 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center gap-1.5 transition">
-                    <FileSpreadsheet className="size-4 text-emerald-600" /> Excel
-                  </button>
-                  <button className="h-9 px-3 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center gap-1.5 transition">
-                    <Printer className="size-4 text-sky-600" /> Print
-                  </button>
-                </div>
+              <div className="flex gap-2 pt-2 border-t border-slate-100">
+                <button className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg border border-emerald-200 cursor-pointer transition"><FileSpreadsheet className="size-3.5"/> Excel</button>
+                <button className="flex items-center gap-1 text-xs font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 cursor-pointer transition"><Printer className="size-3.5"/> Print</button>
+                <button className="flex items-center gap-1 text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg border border-rose-200 cursor-pointer transition"><Download className="size-3.5"/> PDF</button>
               </div>
             </div>
-
-            {/* List Table */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+            <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs border-collapse whitespace-nowrap">
-                  <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 font-bold uppercase tracking-wider text-[10px] border-b border-slate-200/60 dark:border-slate-800/80">
-                    <tr>
-                      <th className="px-5 py-4 w-12 text-center">#</th>
-                      <th className="px-5 py-4">Query No</th>
-                      <th className="px-5 py-4">Ref No</th>
-                      <th className="px-5 py-4">Buyer</th>
-                      <th className="px-5 py-4">Department</th>
-                      <th className="px-5 py-4 text-right">Total Quantity</th>
-                      <th className="px-5 py-4 text-right">Avg Quoted FOB ($)</th>
-                      <th className="px-5 py-4">Delivery Date</th>
-                      <th className="px-5 py-4 text-center">Status</th>
-                      <th className="px-5 py-4 text-center w-24">Actions</th>
-                    </tr>
+                <table className="w-full text-xs whitespace-nowrap">
+                  <thead className="bg-slate-50 border-b border-slate-200">
+                    <tr>{["#","Pre-Cost No","Query Type","Date","Buyer","Style","Order Qty","Unit Price","Delivery","Merchandiser","Status",""].map((h,i)=>(
+                      <th key={i} className="px-4 py-2.5 text-[10px] font-black uppercase text-slate-400 text-left">{h}</th>
+                    ))}</tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-800 dark:text-slate-200">
-                    {filteredPreCostings.map((rec, idx) => (
-                      <tr key={rec.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                        <td className="px-5 py-3.5 text-center font-semibold text-slate-400">{idx + 1}</td>
-                        <td className="px-5 py-3.5 font-bold text-[#1e88e5]">{rec.queryNo}</td>
-                        <td className="px-5 py-3.5 font-semibold">{rec.refNo || "—"}</td>
-                        <td className="px-5 py-3.5 font-semibold text-slate-950 dark:text-white">{rec.buyerName}</td>
-                        <td className="px-5 py-3.5 text-slate-500 dark:text-slate-400">{rec.department}</td>
-                        <td className="px-5 py-3.5 text-right font-mono font-bold">{rec.totalOrderQty.toLocaleString()} pcs</td>
-                        <td className="px-5 py-3.5 text-right font-mono font-extrabold text-indigo-600 dark:text-indigo-400">$ {rec.quotedFOB.toFixed(2)}</td>
-                        <td className="px-5 py-3.5 font-semibold text-slate-600 dark:text-slate-400">{rec.deliveryDate}</td>
-                        <td className="px-5 py-3.5 text-center">
-                          <span
-                            className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
-                              rec.status === "Approved"
-                                ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
-                                : rec.status === "Pending"
-                                ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
-                                : "bg-slate-500/10 text-slate-600 border-slate-500/20"
-                            }`}
-                          >
-                            {rec.status}
-                          </span>
-                        </td>
-                        <td className="px-5 py-3.5 text-center">
-                          <div className="flex items-center justify-center gap-2.5">
-                            <button
-                              onClick={() => handleEditPreCost(rec)}
-                              className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 text-amber-500 hover:text-amber-600 rounded-md transition cursor-pointer"
-                              title="Edit Pre-Cost Sheet"
-                            >
-                              <Edit2 className="size-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteRecord(rec.id)}
-                              className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 text-red-500 hover:text-red-650 rounded-md transition cursor-pointer"
-                              title="Delete sheet"
-                            >
-                              <Trash2 className="size-4" />
-                            </button>
+                  <tbody className="divide-y divide-slate-50">
+                    {filtered.map((r,i)=>(
+                      <tr key={r.id} className="hover:bg-indigo-50/30 transition-colors group">
+                        <td className="px-4 py-3 text-slate-400 font-bold">{i+1}</td>
+                        <td className="px-4 py-3 font-black text-indigo-600">{r.preCostNo}</td>
+                        <td className="px-4 py-3 text-slate-600">{r.queryType}</td>
+                        <td className="px-4 py-3 text-slate-500">{r.preCostDate}</td>
+                        <td className="px-4 py-3 font-semibold text-slate-800">{r.buyerName}</td>
+                        <td className="px-4 py-3 font-mono text-slate-700 max-w-[160px] truncate" title={r.styleName}>{r.styleName}</td>
+                        <td className="px-4 py-3 font-mono font-semibold">{r.orderQtyPcs.toLocaleString()}</td>
+                        <td className="px-4 py-3 font-mono">$ {r.unitPrice.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-slate-500">{r.deliveryDate}</td>
+                        <td className="px-4 py-3 text-slate-600">{r.merchandiser}</td>
+                        <td className="px-4 py-3"><StatusBadge s={r.status}/></td>
+                        <td className="px-4 py-3">
+                          <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onClick={()=>openDetail(r)} className="p-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-600 cursor-pointer border border-indigo-100 transition" title="View"><Eye className="size-3.5"/></button>
+                            <button onClick={()=>openEdit(r)} className="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-600 cursor-pointer border border-amber-100 transition" title="Edit"><Pencil className="size-3.5"/></button>
+                            <button onClick={()=>openDetail(r)} className="p-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-600 cursor-pointer border border-teal-100 transition" title="Print"><Printer className="size-3.5"/></button>
                           </div>
                         </td>
                       </tr>
                     ))}
-                    {filteredPreCostings.length === 0 && (
-                      <tr>
-                        <td colSpan={10} className="px-5 py-12 text-center text-slate-400 font-semibold">
-                          No pre-costing configurations found. Click "+ Prepare Pre-Cost" to create one.
-                        </td>
-                      </tr>
-                    )}
                   </tbody>
                 </table>
+              </div>
+              <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50">
+                <span className="text-[11px] text-slate-500 font-semibold">Showing {filtered.length} of {records.length} records</span>
               </div>
             </div>
           </div>
         )}
 
-        {/* ── PREPARE PRE-COST FORM WORKSPACE ── */}
-        {viewMode === "prepare" && (
-          <div className="space-y-6 animate-in slide-in-from-right-5 duration-200">
-            {/* Form Header Toolbar */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+        {/* ══════════ FORM VIEW ══════════ */}
+        {view==="form"&&(
+          <div className="pb-24">
+            <div className="h-12 bg-white border-b border-slate-200 flex items-center justify-between px-5 sticky top-0 z-30 shadow-xs">
               <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setViewMode("list")}
-                  className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl transition cursor-pointer"
-                >
-                  <ArrowLeft className="size-5" />
+                <button onClick={()=>setView("list")} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 cursor-pointer transition"><ArrowLeft size={16}/></button>
+                <span className="text-sm font-black text-slate-900 uppercase tracking-tight">Prepare Pre-Costing</span>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={handleSave} className="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold cursor-pointer flex items-center gap-1.5 transition shadow-sm">
+                  <Save className="size-3.5"/> Save Pre-Cost
                 </button>
-                <div>
-                  <h2 className="text-lg font-black tracking-tight text-slate-950 dark:text-white flex items-center gap-2">
-                    Prepare Pre-Cost
-                  </h2>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                    Query No: <span className="font-bold text-[#1e88e5]">{queryNo}</span>
-                  </p>
+              </div>
+            </div>
+            <div className="p-4 md:p-5 max-w-7xl mx-auto space-y-4">
+              <SH id="basic" title="Order Basic Information">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                  <div><Label>Pre-Cost No</Label><div className="text-xs font-mono font-black text-indigo-600 bg-indigo-50 border border-indigo-100 rounded-lg px-2.5 py-1.5">{form.preCostNo||"(Auto)"}</div></div>
+                  <div><Label>Query Type</Label><select value={form.queryType} onChange={e=>sf({queryType:e.target.value})} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer"><option>Regular</option><option>Sample</option></select></div>
+                  <div><Label>Style Name *</Label><TI val={form.styleName} onChange={v=>sf({styleName:v})} ph="e.g. SS27PB093-SL"/></div>
+                  <div><Label>Delivery Date *</Label><DI val={form.deliveryDate} onChange={v=>sf({deliveryDate:v})}/></div>
+                  <div><Label>Pre-Cost Date</Label><DI val={form.preCostDate} onChange={v=>sf({preCostDate:v})}/></div>
+                  <div><Label>Buyer Name *</Label><TI val={form.buyerName} onChange={v=>sf({buyerName:v})} ph="e.g. PEPCO"/></div>
+                  <div><Label>Order No / Job No</Label><TI val={form.orderNo} onChange={v=>sf({orderNo:v})}/></div>
+                  <div><Label>Country</Label><TI val={form.country} onChange={v=>sf({country:v})}/></div>
+                  <div><Label>Buyer House</Label><TI val={form.buyerHouse} onChange={v=>sf({buyerHouse:v})}/></div>
+                  <div><Label>Brand</Label><TI val={form.brand} onChange={v=>sf({brand:v})}/></div>
+                  <div><Label>Order Qty (Pcs)</Label><NI val={form.orderQtyPcs} onChange={v=>sf({orderQtyPcs:v})}/></div>
+                  <div><Label>Unit Price ($)</Label><NI val={form.unitPrice} onChange={v=>sf({unitPrice:v})}/></div>
+                  <div><Label>Total Value [Auto]</Label><div className="text-right font-mono font-black text-xs text-teal-700 bg-teal-50 border border-teal-200 rounded-lg px-2.5 py-1.5">$ {fmt(form.orderQtyPcs*form.unitPrice)}</div></div>
+                  <div><Label>Plan Cut Qty</Label><NI val={form.planCutQty} onChange={v=>sf({planCutQty:v})}/></div>
+                  <div><Label>Set Ratio</Label><NI val={form.setRatio} onChange={v=>sf({setRatio:v})}/></div>
+                  <div><Label>CM %</Label><NI val={form.cmPct} onChange={v=>sf({cmPct:v})}/></div>
+                  <div><Label>Season</Label><TI val={form.season} onChange={v=>sf({season:v})} ph="e.g. SS27"/></div>
+                  <div><Label>Merchandiser</Label><TI val={form.merchandiser} onChange={v=>sf({merchandiser:v})}/></div>
+                  <div><Label>No of Colors</Label><NI val={form.noOfColors} onChange={v=>sf({noOfColors:v})}/></div>
+                  <div><Label>Extra Cutting %</Label><NI val={form.extraCuttingPct} onChange={v=>sf({extraCuttingPct:v})}/></div>
+                  <div><Label>Fabric Process Loss %</Label><NI val={form.fabricProcessLossPct} onChange={v=>sf({fabricProcessLossPct:v})}/></div>
+                  <div><Label>Exchange Rate</Label><NI val={form.exchangeRate} onChange={v=>sf({exchangeRate:v})}/></div>
+                  <div><Label>Shipping Mode</Label><select value={form.shippingMode} onChange={e=>sf({shippingMode:e.target.value})} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer"><option>Sea</option><option>Air</option></select></div>
+                  <div><Label>Pay Term</Label><select value={form.payTerm} onChange={e=>sf({payTerm:e.target.value})} className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-400 bg-white cursor-pointer"><option>At Sight</option><option>90 Days</option><option>60 Days</option></select></div>
+                  <div className="col-span-2"><Label>Special Instructions</Label><TI val={form.specialInstructions} onChange={v=>sf({specialInstructions:v})}/></div>
+                  <div className="col-span-2"><Label>Penalty Clauses</Label><TI val={form.penaltyClause} onChange={v=>sf({penaltyClause:v})}/></div>
+                </div>
+              </SH>
+
+              <SH id="fob" title="Style and FOB Details">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead><tr className="bg-slate-50 border-b border-slate-200">{["Style No","Color","Item Name","Order Qty","Unit Price ($)","Total Price ($)","Delivery Date",""].map(h=><th key={h} className="px-3 py-2 text-[10px] font-black text-slate-500 uppercase text-left">{h}</th>)}</tr></thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {form.styleFOBRows.map(r=>(
+                        <tr key={r.id} className="group hover:bg-slate-50">
+                          <td className="px-2 py-1.5"><TI val={r.styleNo} onChange={v=>sf({styleFOBRows:form.styleFOBRows.map(x=>x.id===r.id?{...x,styleNo:v}:x)})}/></td>
+                          <td className="px-2 py-1.5"><TI val={r.colour} onChange={v=>sf({styleFOBRows:form.styleFOBRows.map(x=>x.id===r.id?{...x,colour:v}:x)})}/></td>
+                          <td className="px-2 py-1.5"><TI val={r.itemName} onChange={v=>sf({styleFOBRows:form.styleFOBRows.map(x=>x.id===r.id?{...x,itemName:v}:x)})}/></td>
+                          <td className="px-2 py-1.5 w-24"><NI val={r.orderQty} onChange={v=>sf({styleFOBRows:form.styleFOBRows.map(x=>x.id===r.id?{...x,orderQty:v}:x)})}/></td>
+                          <td className="px-2 py-1.5 w-24"><NI val={r.unitPrice} onChange={v=>sf({styleFOBRows:form.styleFOBRows.map(x=>x.id===r.id?{...x,unitPrice:v}:x)})}/></td>
+                          <td className="px-2 py-1.5 text-right font-mono font-black text-slate-800">{fmt(r.orderQty*r.unitPrice)}</td>
+                          <td className="px-2 py-1.5 w-36"><DI val={r.deliveryDate} onChange={v=>sf({styleFOBRows:form.styleFOBRows.map(x=>x.id===r.id?{...x,deliveryDate:v}:x)})}/></td>
+                          <td className="px-2 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity"><button onClick={()=>sf({styleFOBRows:form.styleFOBRows.filter(x=>x.id!==r.id)})} className="p-1 rounded hover:bg-rose-50 hover:text-rose-500 text-slate-300 cursor-pointer transition"><X className="size-3.5"/></button></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <button onClick={()=>sf({styleFOBRows:[...form.styleFOBRows,{id:nid(),styleNo:"",colour:"",itemName:"",orderQty:0,unitPrice:0,deliveryDate:""}]})} className="mt-3 flex items-center gap-1.5 w-full text-xs font-bold text-indigo-600 border border-dashed border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50 rounded-lg px-3 py-1.5 transition cursor-pointer"><Plus className="size-3.5"/> Add Style Row</button>
+              </SH>
+
+              <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+                <div className="flex items-center gap-2.5 px-4 py-3 border-b border-slate-100 bg-indigo-600">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-white">Live Budget Summary</span>
+                  <span className="ml-auto text-[10px] text-indigo-200 font-semibold">Auto-calculated</span>
+                </div>
+                <div className="p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                  {[["Order Value",B.orderValue,"slate"],["Total Variable",B.totalVariable,"rose"],["Contribution",B.contribution,"indigo"],["CM Cost",B.cmCost,"amber"],["Net Profit",B.netProfit,B.netProfit>=0?"teal":"rose"]].map(([l,v,c])=>{
+                    const colors:Record<string,string>={slate:"bg-slate-50 text-slate-700 border-slate-200",rose:"bg-rose-50 text-rose-700 border-rose-200",indigo:"bg-indigo-50 text-indigo-700 border-indigo-200",amber:"bg-amber-50 text-amber-700 border-amber-200",teal:"bg-teal-50 text-teal-700 border-teal-200"};
+                    return <div key={l as string} className={`rounded-xl border p-3 ${colors[c as string]}`}><p className="text-[9px] font-black uppercase tracking-wide opacity-70">{l as string}</p><p className="text-lg font-black font-mono mt-0.5">$ {fmt(v as number)}</p></div>;
+                  })}
                 </div>
               </div>
+            </div>
+          </div>
+        )}
 
-              <div className="flex items-center gap-2.5">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest hidden sm:block">Query:</span>
-                <span className="text-xs font-black text-[#1e88e5] bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900 px-3 py-1 rounded-lg">{queryNo || "—"}</span>
-                {addedStyles.length > 0 && (
-                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900 px-3 py-1 rounded-lg">
-                    {addedStyles.length} style{addedStyles.length > 1 ? "s" : ""} added
-                  </span>
-                )}
+        {/* ══════════ DETAIL / PRINT VIEW ══════════ */}
+        {view==="detail"&&activeRec&&BR&&(
+          <div className="p-3 md:p-6 max-w-[1500px] mx-auto pb-24">
+            {/* Toolbar */}
+            <div className="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-200 mb-4 print:hidden">
+              <button onClick={()=>setView("list")} className="flex items-center gap-1.5 text-xs font-bold text-slate-650 hover:text-slate-900 cursor-pointer transition"><ArrowLeft className="size-4"/> Back to List</button>
+              <div className="flex gap-2">
+                <button onClick={()=>openEdit(activeRec)} className="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-1.5 cursor-pointer transition"><Pencil className="size-3.5"/> Edit</button>
+                <button onClick={()=>window.print()} className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-1.5 cursor-pointer transition"><Printer className="size-3.5"/> Print</button>
               </div>
             </div>
 
-            {/* Main Form Split Grid */}
-            <div className="space-y-6">
-              
-              {/* 1. Order Basic Information Card */}
-              <div className={sectionContainerClass}>
-                <div className="border-b border-slate-100 dark:border-slate-800/60 pb-2 mb-2">
-                  <h3 className={sectionTitleClass}>Order Basic Information</h3>
-                </div>
+            {/* ── PRINTABLE DOCUMENT ── */}
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-md p-6 md:p-8 space-y-6 text-[11px] text-slate-800 leading-relaxed max-w-full mx-auto print:border-none print:shadow-none print:p-0">
 
-                <div className="flex flex-col lg:flex-row gap-6">
-                  {/* Left Form Fields Grid */}
-                  <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <div>
-                      <label className={labelClass}>Query No</label>
-                      <input
-                        type="text"
-                        value={queryNo}
-                        onChange={(e) => setQueryNo(e.target.value)}
-                        className={inputClass}
-                        placeholder="e.g. Q-9012"
-                      />
-                    </div>
-                    <div>
-                      <label className={labelClass}>Order Quantity</label>
-                      <input
-                        type="number"
-                        value={totalOrderQty || ""}
-                        readOnly
-                        className={`${inputClass} bg-slate-50 dark:bg-slate-800 cursor-not-allowed text-[#1e88e5] font-bold`}
-                        placeholder="0"
-                      />
-                    </div>
-                    <div>
-                      <label className={`${labelClass} text-rose-500`}>Query Type *</label>
-                      <div className="relative">
-                        <select
-                          value={queryType}
-                          onChange={(e) => setQueryType(e.target.value)}
-                          className={selectClass}
-                        >
-                          <option value="Regular">Regular</option>
-                          <option value="Urgent">Urgent</option>
-                          <option value="Promo">Promo</option>
-                        </select>
-                        <ChevronDown className="size-3 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className={labelClass}>Ref No</label>
-                      <input
-                        type="text"
-                        value={refNo}
-                        onChange={(e) => setRefNo(e.target.value)}
-                        className={inputClass}
-                      />
-                    </div>
-                    <div>
-                      <label className={`${labelClass} text-rose-500`}>Query Date *</label>
-                      <input
-                        type="date"
-                        value={queryDate}
-                        onChange={(e) => setQueryDate(e.target.value)}
-                        className={inputClass}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className={labelClass}>Delivery Date</label>
-                      <input
-                        type="date"
-                        value={deliveryDate}
-                        onChange={(e) => setDeliveryDate(e.target.value)}
-                        className={inputClass}
-                      />
-                    </div>
-                    <div>
-                      <label className={labelClass}>Customer/Buying House</label>
-                      <div className="relative">
-                        <select
-                          value={customerBuyingHouse}
-                          onChange={(e) => setCustomerBuyingHouse(e.target.value)}
-                          className={selectClass}
-                        >
-                          <option value="">Select...</option>
-                          {BUYING_HOUSES.map((h) => (
-                            <option key={h} value={h}>{h}</option>
-                          ))}
-                        </select>
-                        <ChevronDown className="size-3 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className={`${labelClass} text-rose-500`}>Buyer Name *</label>
-                      <div className="relative">
-                        <select
-                          value={buyerName}
-                          onChange={(e) => handleBuyerChange(e.target.value)}
-                          className={selectClass}
-                          required
-                        >
-                          <option value="">select...</option>
-                          {BUYERS.map((b) => (
-                            <option key={b} value={b}>{b}</option>
-                          ))}
-                        </select>
-                        <ChevronDown className="size-3 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className={`${labelClass} text-rose-500`}>Department *</label>
-                      <div className="relative">
-                        <select
-                          value={department}
-                          onChange={(e) => setDepartment(e.target.value)}
-                          className={selectClass}
-                          required
-                        >
-                          <option value="">Select...</option>
-                          {DEPTS.map((d) => (
-                            <option key={d} value={d}>{d}</option>
-                          ))}
-                        </select>
-                        <ChevronDown className="size-3 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className={labelClass}>Order Type</label>
-                      <div className="relative">
-                        <select
-                          value={orderType}
-                          onChange={(e) => setOrderType(e.target.value)}
-                          className={selectClass}
-                        >
-                          <option value="Regular">Regular</option>
-                          <option value="Promo">Promo</option>
-                        </select>
-                        <ChevronDown className="size-3 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className={labelClass}>Buyer Agent</label>
-                      <input
-                        type="text"
-                        value={buyerAgent}
-                        onChange={(e) => setBuyerAgent(e.target.value)}
-                        className={inputClass}
-                        placeholder="Agent Name"
-                      />
-                    </div>
-                    <div>
-                      <label className={labelClass}>Buyer Brand</label>
-                      <input
-                        type="text"
-                        value={buyerBrand}
-                        onChange={(e) => setBuyerBrand(e.target.value)}
-                        className={inputClass}
-                        placeholder="Brand Name"
-                      />
-                    </div>
-                    <div>
-                      <label className={`${labelClass} text-rose-500`}>Quality Level *</label>
-                      <div className="relative">
-                        <select
-                          value={qualityLevel}
-                          onChange={(e) => setQualityLevel(e.target.value)}
-                          className={selectClass}
-                        >
-                          <option value="">Select...</option>
-                          <option value="AQL 1.5">AQL 1.5</option>
-                          <option value="AQL 2.5">AQL 2.5</option>
-                          <option value="AQL 4.0">AQL 4.0</option>
-                        </select>
-                        <ChevronDown className="size-3 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className={`${labelClass} text-rose-500`}>Inspection Type *</label>
-                      <div className="relative">
-                        <select
-                          value={inspectionType}
-                          onChange={(e) => setInspectionType(e.target.value)}
-                          className={selectClass}
-                        >
-                          <option value="">Select...</option>
-                          <option value="Final Inspection">Final Inspection</option>
-                          <option value="Inline & Final">Inline & Final</option>
-                        </select>
-                        <ChevronDown className="size-3 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className={`${labelClass} text-rose-500`}>Season *</label>
-                      <div className="relative">
-                        <select
-                          value={season}
-                          onChange={(e) => setSeason(e.target.value)}
-                          className={selectClass}
-                          required
-                        >
-                          <option value="">Select...</option>
-                          {SEASONS.map((s) => (
-                            <option key={s} value={s}>{s}</option>
-                          ))}
-                        </select>
-                        <ChevronDown className="size-3 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className={labelClass}>Currency</label>
-                      <div className="relative">
-                        <select
-                          value={currency}
-                          onChange={(e) => setCurrency(e.target.value)}
-                          className={selectClass}
-                        >
-                          <option value="USD">USD</option>
-                          <option value="EUR">EUR</option>
-                          <option value="BDT">BDT</option>
-                        </select>
-                        <ChevronDown className="size-3 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className={labelClass}>Exchange Rate</label>
-                      <input
-                        type="number"
-                        value={exchangeRate}
-                        onChange={(e) => setExchangeRate(Number(e.target.value))}
-                        className={inputClass}
-                      />
-                    </div>
-                    <div>
-                      <label className={labelClass}>Shipping Mode</label>
-                      <div className="relative">
-                        <select
-                          value={shippingMode}
-                          onChange={(e) => setShippingMode(e.target.value)}
-                          className={selectClass}
-                        >
-                          <option value="Sea">Sea</option>
-                          <option value="Air">Air</option>
-                        </select>
-                        <ChevronDown className="size-3 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className={labelClass}>Pay Term</label>
-                      <div className="relative">
-                        <select
-                          value={payTerm}
-                          onChange={(e) => setPayTerm(e.target.value)}
-                          className={selectClass}
-                        >
-                          <option value="At Sight">At Sight</option>
-                          <option value="LC">LC</option>
-                          <option value="TT">TT</option>
-                        </select>
-                        <ChevronDown className="size-3 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className={labelClass}>Tenor</label>
-                      <input
-                        type="text"
-                        value={tenor}
-                        onChange={(e) => setTenor(e.target.value)}
-                        className={inputClass}
-                      />
-                    </div>
-                    <div>
-                      <label className={labelClass}>Special Instructions</label>
-                      <input
-                        type="text"
-                        value={specialInstructions}
-                        onChange={(e) => setSpecialInstructions(e.target.value)}
-                        className={inputClass}
-                      />
-                    </div>
-                    <div>
-                      <label className={labelClass}>Penalty Clauses</label>
-                      <input
-                        type="text"
-                        value={penaltyClauses}
-                        onChange={(e) => setPenaltyClauses(e.target.value)}
-                        className={inputClass}
-                      />
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label className={labelClass}>Zip File Upload</label>
-                      <div className="flex flex-col gap-1.5">
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="file"
-                            onChange={(e) => {
-                              const name = e.target.files?.[0]?.name || "";
-                              setZipFileName(name);
-                              setUploadProgress(10);
-                              const interval = setInterval(() => {
-                                setUploadProgress((prev) => {
-                                  if (prev === null) return null;
-                                  if (prev >= 100) {
-                                    clearInterval(interval);
-                                    toast.success("Design pack uploaded successfully!");
-                                    return 100;
-                                  }
-                                  return prev + 30;
-                                });
-                              }, 150);
-                            }}
-                            className="hidden"
-                            id="zip-upload"
-                          />
-                          <label
-                            htmlFor="zip-upload"
-                            className="h-8 px-4 rounded-sm bg-slate-100 hover:bg-slate-200 border border-slate-350 flex items-center justify-center text-xs font-bold text-slate-700 dark:text-slate-350 cursor-pointer shadow-2xs"
-                          >
-                            Choose File
-                          </label>
-                          <span className="text-xs text-slate-500 font-medium truncate max-w-xs">
-                            {zipFileName || "No file chosen"}
-                          </span>
-                        </div>
-                        {uploadProgress !== null && (
-                          <div className="w-full max-w-xs flex items-center gap-2">
-                            <div className="flex-1 bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                              <div className="bg-emerald-500 h-full transition-all duration-300" style={{ width: `${uploadProgress}%` }}></div>
-                            </div>
-                            <span className="text-[9px] font-bold text-slate-500">{uploadProgress}%</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+              {/* ── Company Header (Premium Letterhead style) ── */}
+              <div className="flex flex-col sm:flex-row items-center justify-between border-b border-slate-200 pb-5 gap-4">
+                <div className="flex items-center gap-4 text-center sm:text-left">
+                  <div className="w-16 h-12 rounded-xl bg-indigo-600 flex flex-col items-center justify-center text-white font-black text-[12px] shadow-sm select-none">
+                    <span className="tracking-widest">PK</span>
+                    <span className="text-[7px] text-indigo-200 uppercase font-bold tracking-tight">Knit</span>
                   </div>
-
-                  {/* Photo Frame on the right */}
-                  <div className="w-full lg:w-44 flex flex-col items-center justify-center shrink-0 border border-slate-200 p-3 rounded-lg bg-slate-50/50">
-                    <div className="w-full h-32 bg-[#e9ecef] border border-slate-350/40 flex items-center justify-center text-slate-400 overflow-hidden shadow-2xs relative">
-                      {imageLoading ? (
-                        <div className="flex flex-col items-center justify-center gap-1.5">
-                          <Loader2 className="size-6 text-[#1e88e5] animate-spin" />
-                          <span className="text-[8px] font-bold text-slate-500">UPLOADING...</span>
-                        </div>
-                      ) : imageFile ? (
-                        <img src={imageFile} alt="Preview" className="size-full object-cover" />
-                      ) : (
-                        <div className="text-center p-2 flex flex-col items-center justify-center h-full">
-                          <ImageIcon className="size-8 text-slate-400 mb-1" />
-                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">NO IMAGE</span>
-                          <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none mt-0.5">AVAILABLE</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="mt-2.5 w-full">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            setImageLoading(true);
-                            setTimeout(() => {
-                              setImageFile(URL.createObjectURL(file));
-                              setImageLoading(false);
-                              toast.success("Image preview loaded!");
-                            }, 600);
-                          }
-                        }}
-                        className="hidden"
-                        id="style-img-upload"
-                      />
-                      <label
-                        htmlFor="style-img-upload"
-                        className="h-7 w-full rounded-sm bg-white border border-slate-200 flex items-center justify-center text-[9px] font-bold text-slate-600 hover:bg-slate-100 cursor-pointer"
-                      >
-                        Choose File
-                      </label>
-                      <span className="text-[9px] text-slate-400 text-center block mt-1">No file chosen</span>
-                    </div>
+                  <div>
+                    <h1 className="text-lg font-black text-slate-900 tracking-wide uppercase">Pakiza Knit Composite Ltd</h1>
+                    <p className="text-[10px] text-slate-500 font-bold tracking-widest uppercase mt-0.5">Composite Textile | Gazipur, Bangladesh</p>
+                  </div>
+                </div>
+                <div className="text-center sm:text-right">
+                  <p className="text-sm font-black text-slate-400 uppercase tracking-widest">Pre-Costing Sheet</p>
+                  <div className="mt-1.5 flex items-center justify-center sm:justify-end gap-2">
+                    <StatusBadge s={activeRec.status}/>
                   </div>
                 </div>
               </div>
 
-              {/* 2. Operation Process Loss (RMG) */}
-              <div className={sectionContainerClass}>
-                <div className="border-b border-slate-100 dark:border-slate-800/60 pb-2 mb-2">
-                  <h3 className={sectionTitleClass}>Operation Process Loss (RMG)</h3>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {/* ── Style Information Grid ── */}
+              <div>
+                <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest mb-2 flex items-center gap-2">
+                  <span className="w-1.5 h-3 bg-indigo-500 rounded-xs inline-block"></span>
+                  Style Information
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-6 border border-slate-200 rounded-xl overflow-hidden text-[10px] shadow-xs">
                   {[
-                    { label: "Cutting (%)", val: cuttingLoss, set: setCuttingLoss },
-                    { label: "Print (%)", val: printLoss, set: setPrintLoss },
-                    { label: "Embroidery (%)", val: embroideryLoss, set: setEmbroideryLoss },
-                    { label: "Sewing (%)", val: sewingLoss, set: setSewingLoss },
-                    { label: "Garment Wash/Dye (%)", val: washLoss, set: setWashLoss },
-                    { label: "Finishing (%)", val: finishingLoss, set: setFinishingLoss },
-                    { label: "Extra (%)", val: extraLoss, set: setExtraLoss },
-                  ].map((itm) => (
-                    <div key={itm.label}>
-                      <label className={labelClass}>{itm.label}</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={itm.val}
-                        onChange={(e) => itm.set(Number(e.target.value))}
-                        className={inputClass}
-                      />
+                    ["Pre-Cost No", activeRec.preCostNo],
+                    ["Style Name",  activeRec.styleName],
+                    ["Delivery Date", activeRec.deliveryDate],
+                    ["Buyer Name",  activeRec.buyerName],
+                    ["Order No",    activeRec.orderNo],
+                    ["Country",     activeRec.country],
+                    ["Buyer House", activeRec.buyerHouse],
+                    ["Brand",       activeRec.brand || "-"],
+                    ["Pre-Cost Date", activeRec.preCostDate],
+                    ["Order Qty (Pcs)", activeRec.orderQtyPcs.toLocaleString()],
+                    ["Unit Price",  `$ ${activeRec.unitPrice.toFixed(2)}`],
+                    ["Total Value", `$ ${fmt(BR.orderValue)}`],
+                    ["Plan Cut Qty", activeRec.planCutQty.toLocaleString()],
+                    ["Set Ratio",   activeRec.setRatio.toFixed(2)],
+                    ["CM %",        `${activeRec.cmPct.toFixed(2)}%`],
+                    ["Cost per Dzn", `$ ${fmt((BR.totalCost/activeRec.orderQtyPcs)*12,4)}`],
+                    ["Quality Level", activeRec.qualityLevel || "-"],
+                    ["Inspection Type", activeRec.inspectionType || "-"],
+                    ["Season",      activeRec.season],
+                    ["Merchandiser", activeRec.merchandiser],
+                  ].map(([label, val], idx) => (
+                    <div key={idx} className="flex border-b border-r border-slate-150 last:border-r-0 col-span-2">
+                      <span className="w-28 shrink-0 text-[8.5px] font-black text-slate-500 uppercase px-2.5 py-2 bg-slate-50/50 border-r border-slate-100 flex items-center tracking-wider">{label}</span>
+                      <span className="flex-1 px-3 py-2 font-bold text-slate-700 truncate" title={val as string}>{val as string}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* 3. Order Style Information */}
-              <div className={sectionContainerClass}>
-                <div className="border-b border-slate-100 dark:border-slate-800/60 pb-2 mb-2">
-                  <h3 className={sectionTitleClass}>Order Style Information</h3>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 items-end">
-                  <div>
-                    <label className={`${labelClass} text-rose-500`}>Style No *</label>
-                    <input
-                      type="text"
-                      value={styleNo}
-                      onChange={(e) => setStyleNo(e.target.value)}
-                      className={inputClass}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className={labelClass}>Colour *</label>
-                    <div className="flex items-center gap-1.5">
-                      <div className="relative flex-1">
-                        <select
-                          value={styleColour}
-                          onChange={(e) => setStyleColour(e.target.value)}
-                          className={selectClass}
-                        >
-                          <option value="">Select...</option>
-                          {COLORS.map((c) => (
-                            <option key={c} value={c}>{c}</option>
-                          ))}
-                        </select>
-                        <ChevronDown className="size-3 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const val = prompt("Enter new colour name:");
-                          if (val) {
-                            setStyleColour(val);
-                            toast.success(`Colour "${val}" selected!`);
-                          }
-                        }}
-                        className="h-8 w-8 rounded-sm border border-slate-200 bg-white flex items-center justify-center text-orange-500 hover:bg-slate-50 transition shadow-2xs"
-                        title="Add Custom Colour"
-                      >
-                        <PlusCircle className="size-4" />
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    <label className={`${labelClass} text-rose-500`}>Style Order Qty *</label>
-                    <input
-                      type="number"
-                      value={styleOrderQty || ""}
-                      onChange={(e) => handleStyleOrderQtyChange(Number(e.target.value))}
-                      className={inputClass}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className={`${labelClass} text-rose-500`}>Item Type *</label>
-                    <div className="flex items-center gap-1.5">
-                      <div className="relative flex-1">
-                        <select
-                          value={styleItemType}
-                          onChange={(e) => setStyleItemType(e.target.value)}
-                          className={selectClass}
-                          required
-                        >
-                          <option value="Pcs">Pcs</option>
-                          <option value="Set">Set</option>
-                          <option value="Dozen">Dozen</option>
-                        </select>
-                        <ChevronDown className="size-3 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      </div>
-                      <button
-                        type="button"
-                        className="h-8 w-8 rounded-sm border border-slate-200 bg-white flex items-center justify-center text-[#1e88e5] hover:bg-slate-50 transition shadow-2xs"
-                        title="Item Type List"
-                      >
-                        <List className="size-4" />
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    <label className={`${labelClass} text-rose-500`}>Size Group *</label>
-                    <div className="flex items-center gap-1.5">
-                      <div className="relative flex-1">
-                        <select
-                          value={styleSizeGroup}
-                          onChange={(e) => setStyleSizeGroup(e.target.value)}
-                          className={selectClass}
-                          required
-                        >
-                          <option value="">Select...</option>
-                          {SIZE_GROUPS.map((s) => (
-                            <option key={s} value={s}>{s}</option>
-                          ))}
-                        </select>
-                        <ChevronDown className="size-3 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      </div>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const val = prompt("Enter size details (e.g. S, M, L):");
-                            if (val) setStyleSizes(val);
-                          }}
-                          className="h-8 px-2 rounded-sm bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-[10px] tracking-wide uppercase transition shadow-2xs"
-                        >
-                          SIZE
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setStyleSizeGroup("");
-                            setStyleSizes("");
-                          }}
-                          className="h-8 px-2 rounded-sm bg-[#5c6bc0] hover:bg-[#3f51b5] text-white font-extrabold text-[10px] tracking-wide uppercase transition shadow-2xs"
-                        >
-                          RESET
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <label className={labelClass}>Sizes</label>
-                    <input
-                      type="text"
-                      value={styleSizes}
-                      onChange={(e) => setStyleSizes(e.target.value)}
-                      className={inputClass}
-                      placeholder="e.g. S, M, L"
-                    />
-                  </div>
-                  <div>
-                    <label className={labelClass}>Sizes Qty</label>
-                    <input
-                      type="number"
-                      value={styleSizesQty || ""}
-                      onChange={(e) => setStyleSizesQty(Number(e.target.value))}
-                      className={inputClass}
-                      placeholder="Default matches Order Qty"
-                    />
-                  </div>
-                  <div>
-                    <label className={labelClass}>Buyer Costing</label>
-                    <div className="flex items-center gap-1.5">
-                      <input
-                        type="text"
-                        value={styleBuyerCosting}
-                        onChange={(e) => setStyleBuyerCosting(e.target.value)}
-                        className={inputClass}
-                        placeholder="Select..."
-                      />
-                      <button
-                        type="button"
-                        className="h-8 w-8 rounded-sm border border-slate-200 bg-white flex items-center justify-center text-[#1e88e5] hover:bg-slate-55 transition shadow-2xs"
-                      >
-                        <Search className="size-4" />
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    <label className={`${labelClass} text-rose-500`}>Style Unit Price *</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={styleUnitPrice || ""}
-                      onChange={(e) => setStyleUnitPrice(Number(e.target.value))}
-                      className={inputClass}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className={`${labelClass} text-rose-500`}>Style Delivery Date *</label>
-                    <input
-                      type="date"
-                      value={styleDeliveryDate}
-                      onChange={(e) => setStyleDeliveryDate(e.target.value)}
-                      className={inputClass}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className={labelClass}>Plan Cut Qty</label>
-                    <input
-                      type="number"
-                      value={calculatedPlanCutQty}
-                      readOnly
-                      className={`${inputClass} bg-slate-50 dark:bg-slate-800 cursor-not-allowed text-slate-500`}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className={labelClass}>Comm. (%)</label>
-                      <input
-                        type="number"
-                        value={styleCommissionPct || ""}
-                        onChange={(e) => setStyleCommissionPct(Number(e.target.value))}
-                        className={inputClass}
-                      />
-                    </div>
-                    <div>
-                      <label className={labelClass}>Comm. AMT</label>
-                      <input
-                        type="number"
-                        value={calculatedCommissionAmt}
-                        readOnly
-                        className={`${inputClass} bg-slate-50 dark:bg-slate-800 cursor-not-allowed text-slate-500`}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Print/Embroidery/Wash buttons + ADD TO LIST */}
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800/60 mt-1">
-                  <div className="flex items-center gap-1 bg-[#ffcdd2]/20 p-1.5 rounded-md border border-[#ff8a80]/30">
-                    {[
-                      { label: "PRINT", val: styleHasPrint, set: setStyleHasPrint },
-                      { label: "EMBROIDERY", val: styleHasEmbroidery, set: setStyleHasEmbroidery },
-                      { label: "WASH", val: styleHasWash, set: setStyleHasWash },
-                      { label: "SPECIAL", val: styleHasSpecial, set: setStyleHasSpecial },
-                    ].map((item) => (
-                      <button
-                        key={item.label}
-                        type="button"
-                        onClick={() => item.set(!item.val)}
-                        className={`h-7 px-3.5 text-[9px] font-black tracking-wider rounded-md border transition-all ${
-                          item.val
-                            ? "bg-[#d32f2f] text-white border-[#d32f2f] shadow-xs"
-                            : "bg-[#ffebee] hover:bg-[#ffcdd2] text-[#c62828] border-[#ffcdd2]/50"
-                        }`}
-                      >
-                        {item.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={handleAddStyleToList}
-                    className="h-8.5 px-6 bg-[#2196f3] hover:bg-[#1976d2] text-white font-extrabold text-xs rounded-sm transition tracking-wider uppercase shrink-0 flex items-center gap-1.5 cursor-pointer shadow-xs"
-                  >
-                    ADD TO LIST
-                  </button>
-                </div>
-              </div>
-
-              {/* 4. Styles breakdown table (Order Basic Information list) */}
-              <div className={sectionContainerClass}>
-                <div className="border-b border-slate-100 dark:border-slate-800/60 pb-2 mb-2 flex justify-between items-center">
-                  <h3 className={sectionTitleClass}>Order Basic Information</h3>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">
-                    Breakdown Ledger
-                  </span>
-                </div>
-
-                <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-sm">
-                  <table className="w-full text-left text-xs border-collapse whitespace-nowrap">
-                    <thead className="bg-[#cbd5e1] text-slate-700 font-bold uppercase tracking-wider text-[9px] border-b border-slate-350">
-                      <tr>
-                        <th className="border-r border-b border-slate-300 px-3 py-2 text-center w-10">#</th>
-                        <th className="border-r border-b border-slate-300 px-3 py-2">Style No</th>
-                        <th className="border-r border-b border-slate-300 px-3 py-2">Colour</th>
-                        <th className="border-r border-b border-slate-300 px-3 py-2">Item Name</th>
-                        <th className="border-r border-b border-slate-300 px-3 py-2 text-right">OrderQty</th>
-                        <th className="border-r border-b border-slate-300 px-3 py-2">Size Group</th>
-                        <th className="border-r border-b border-slate-300 px-3 py-2">Sizes</th>
-                        <th className="border-r border-b border-slate-300 px-3 py-2 text-right">SizesQty</th>
-                        <th className="border-r border-b border-slate-300 px-3 py-2 text-center">Print</th>
-                        <th className="border-r border-b border-slate-300 px-3 py-2 text-center">Embroidery</th>
-                        <th className="border-r border-b border-slate-300 px-3 py-2 text-center">Wash</th>
-                        <th className="border-r border-b border-slate-300 px-3 py-2 text-center">Special</th>
-                        <th className="border-r border-b border-slate-300 px-3 py-2 text-right">UnitPrice</th>
-                        <th className="border-r border-b border-slate-300 px-3 py-2">DeliveryDate</th>
-                        <th className="border-b border-slate-300 px-3 py-2 text-center w-10">🗑</th>
+              {/* ── Style & FOB table ── */}
+              <div>
+                <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest mb-2 flex items-center gap-2">
+                  <span className="w-1.5 h-3 bg-indigo-500 rounded-xs inline-block"></span>
+                  Style and FOB Details
+                </p>
+                <div className="border border-slate-250 rounded-xl overflow-hidden shadow-xs">
+                  <table className="w-full text-[10px] text-slate-750">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200">
+                        {["Style No","Color","Item Name","Order Qty","Unit Price","Total Price","Delivery Date"].map(h => (
+                          <th key={h} className="px-4 py-2.5 text-left font-black text-slate-500 uppercase tracking-wider text-[8.5px]">{h}</th>
+                        ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-200 text-slate-800 dark:text-slate-250 bg-white">
-                      {addedStyles.map((item, idx) => (
-                        <tr key={item.id} className="hover:bg-slate-50 transition-colors">
-                          <td className="border-r border-slate-200 px-3 py-2 text-center font-bold text-slate-400">{idx + 1}</td>
-                          <td className="border-r border-slate-200 px-3 py-2 font-bold text-slate-800">{item.styleNo}</td>
-                          <td className="border-r border-slate-200 px-3 py-2 font-semibold">{item.colour}</td>
-                          <td className="border-r border-slate-200 px-3 py-2">{item.itemName}</td>
-                          <td className="border-r border-slate-200 px-3 py-2 text-right font-mono font-bold">{item.orderQty.toLocaleString()}</td>
-                          <td className="border-r border-slate-200 px-3 py-2">{item.sizeGroup}</td>
-                          <td className="border-r border-slate-200 px-3 py-2 truncate max-w-[120px]">{item.sizes || "—"}</td>
-                          <td className="border-r border-slate-200 px-3 py-2 text-right font-mono">{item.sizesQty.toLocaleString()}</td>
-                          <td className="border-r border-slate-200 px-3 py-2 text-center">
-                            {item.print ? <span className="inline-block px-1 bg-rose-50 text-rose-600 rounded-xs text-[8px] font-bold">Yes</span> : "—"}
-                          </td>
-                          <td className="border-r border-slate-200 px-3 py-2 text-center">
-                            {item.embroidery ? <span className="inline-block px-1 bg-rose-50 text-rose-600 rounded-xs text-[8px] font-bold">Yes</span> : "—"}
-                          </td>
-                          <td className="border-r border-slate-200 px-3 py-2 text-center">
-                            {item.wash ? <span className="inline-block px-1 bg-rose-50 text-rose-600 rounded-xs text-[8px] font-bold">Yes</span> : "—"}
-                          </td>
-                          <td className="border-r border-slate-200 px-3 py-2 text-center">
-                            {item.special ? <span className="inline-block px-1 bg-rose-50 text-rose-600 rounded-xs text-[8px] font-bold">Yes</span> : "—"}
-                          </td>
-                          <td className="border-r border-slate-200 px-3 py-2 text-right font-mono font-bold">$ {item.unitPrice.toFixed(2)}</td>
-                          <td className="border-r border-slate-200 px-3 py-2 text-slate-500">{item.deliveryDate}</td>
-                          <td className="px-3 py-2 text-center">
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveStyle(item.id)}
-                              className="text-red-500 hover:text-red-750 transition cursor-pointer"
-                              title="Delete row"
-                            >
-                              ✕
-                            </button>
-                          </td>
+                    <tbody className="divide-y divide-slate-100">
+                      {activeRec.styleFOBRows.map(r => (
+                        <tr key={r.id} className="hover:bg-slate-50/30 transition-colors">
+                          <td className="px-4 py-2 font-bold text-slate-900">{r.styleNo}</td>
+                          <td className="px-4 py-2">{r.colour}</td>
+                          <td className="px-4 py-2">{r.itemName}</td>
+                          <td className="px-4 py-2 text-right font-mono font-semibold">{r.orderQty.toLocaleString()}</td>
+                          <td className="px-4 py-2 text-right font-mono font-semibold">$ {r.unitPrice.toFixed(4)}</td>
+                          <td className="px-4 py-2 text-right font-mono font-bold text-indigo-600">$ {fmt(r.orderQty*r.unitPrice)}</td>
+                          <td className="px-4 py-2">{r.deliveryDate}</td>
                         </tr>
                       ))}
-                      {addedStyles.length === 0 && (
-                        <tr>
-                          <td colSpan={15} className="px-3 py-8 text-center text-slate-400 font-semibold bg-slate-50/50">
-                            No style items added yet. Click "ADD TO LIST" above.
-                          </td>
-                        </tr>
-                      )}
                     </tbody>
-                    {addedStyles.length > 0 && (
-                      <tfoot className="bg-[#f8fafc] dark:bg-slate-800 font-bold border-t border-slate-300 text-slate-850 dark:text-slate-200 text-xs">
-                        <tr>
-                          <td colSpan={4} className="border-r border-slate-200 px-3 py-2 text-right uppercase tracking-wider text-[9px] font-extrabold text-slate-500">Total</td>
-                          <td className="border-r border-slate-200 px-3 py-2 text-right font-mono text-[#1e88e5] font-black">{totalOrderQty.toLocaleString()}</td>
-                          <td colSpan={2} className="border-r border-slate-200 px-3 py-2"></td>
-                          <td className="border-r border-slate-200 px-3 py-2 text-right font-mono font-bold text-slate-700">{totalSizesQty.toLocaleString()}</td>
-                          <td colSpan={4} className="border-r border-slate-200 px-3 py-2"></td>
-                          <td className="border-r border-slate-200 px-3 py-2 text-right font-mono text-indigo-600 font-black">$ {averageFOB.toFixed(2)}</td>
-                          <td colSpan={2} className="px-3 py-2"></td>
-                        </tr>
-                      </tfoot>
-                    )}
+                    <tfoot>
+                      <tr className="bg-slate-50 font-black border-t border-slate-250 text-[10px] text-slate-800">
+                        <td colSpan={3} className="px-4 py-2">Total:</td>
+                        <td className="px-4 py-2 text-right font-mono">{activeRec.styleFOBRows.reduce((s,x)=>s+x.orderQty,0).toLocaleString()}</td>
+                        <td/>
+                        <td className="px-4 py-2 text-right font-mono text-indigo-600">$ {fmt(activeRec.styleFOBRows.reduce((s,x)=>s+x.orderQty*x.unitPrice,0))}</td>
+                        <td/>
+                      </tr>
+                    </tfoot>
                   </table>
                 </div>
               </div>
 
-              {/* 5. Additional Costing */}
-              <div className={sectionContainerClass}>
-                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/60 pb-2 mb-2">
-                  <div className="text-xs font-extrabold uppercase tracking-widest text-[#1e88e5] flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="enable-additional-costing"
-                      checked={hasAdditionalCosting}
-                      onChange={(e) => setHasAdditionalCosting(e.target.checked)}
-                      className="size-4 text-primary border-slate-350 rounded-sm focus:ring-[#1e88e5] cursor-pointer accent-[#1e88e5]"
-                    />
-                    <label htmlFor="enable-additional-costing" className="cursor-pointer font-bold">
-                      Additional Costing
-                    </label>
+              {/* ── Key Info + Style Image + Budget Summary (Extremely Aligned Grid) ── */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch">
+
+                {/* Key Information Table */}
+                <div className="col-span-12 md:col-span-4 flex flex-col justify-between">
+                  <div>
+                    <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest mb-2 flex items-center gap-2">
+                      <span className="w-1.5 h-3 bg-indigo-500 rounded-xs inline-block"></span>
+                      Key Information
+                    </p>
+                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs bg-white">
+                      <table className="w-full text-[10px] text-slate-700">
+                        <thead>
+                          <tr className="bg-slate-50 border-b border-slate-200">
+                            <th className="px-3 py-2 text-left font-black text-slate-500 uppercase text-[8.5px] tracking-wider">Particulars</th>
+                            <th className="px-3 py-2 text-left font-black text-slate-500 uppercase text-[8.5px] tracking-wider">GMT Item</th>
+                            <th className="px-3 py-2 text-right font-black text-slate-500 uppercase text-[8.5px] tracking-wider">Info</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 text-[10px]">
+                          <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">EPM</td><td/><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{activeRec.epm.toFixed(2)}</td></tr>
+                          <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">CPM</td><td/><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{activeRec.cpm.toFixed(2)}</td></tr>
+                          {activeRec.gmtItems.map(g => (
+                            <React.Fragment key={g.id}>
+                              <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">SMV</td><td className="px-3 py-1.5 text-slate-600 font-semibold">{g.name}</td><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{g.smv.toFixed(2)}</td></tr>
+                              <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">Efficiency %</td><td className="px-3 py-1.5 text-slate-600 font-semibold">{g.name}</td><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{g.efficiencyPct.toFixed(2)}%</td></tr>
+                            </React.Fragment>
+                          ))}
+                          <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">No of Color</td><td/><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{activeRec.noOfColors}</td></tr>
+                          <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">Avg Wgt Per Color</td><td/><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{fmt(activeRec.fabricRows.reduce((s,x)=>s+(x.orderQtyDzn*x.consDzn),0)/Math.max(activeRec.noOfColors,1))} Kg</td></tr>
+                          <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">Extra Cutting %</td><td/><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{activeRec.extraCuttingPct.toFixed(2)}%</td></tr>
+                          <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">Extra Cut Qty (Pcs)</td><td/><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{Math.round(activeRec.orderQtyPcs*activeRec.extraCuttingPct/100).toLocaleString()}</td></tr>
+                          <tr className="hover:bg-slate-50/50"><td className="px-3 py-1.5 text-slate-500 font-bold">Fabric Process Loss %</td><td/><td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{activeRec.fabricProcessLossPct.toFixed(2)}%</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
 
-                {hasAdditionalCosting ? (
-                  <div className="overflow-x-auto border border-slate-250 rounded-sm animate-in fade-in duration-200">
-                    <table className="w-full text-left text-xs border-collapse whitespace-nowrap">
-                      <thead className="bg-[#cbd5e1] text-slate-700 font-bold uppercase tracking-wider text-[9px] border-b border-slate-300">
-                        <tr>
-                          <th className="border-r border-slate-300 px-3 py-2 text-center w-10">#</th>
-                          <th className="border-r border-slate-300 px-3 py-2 text-center">Commercial Cost (%)</th>
-                          <th className="border-r border-slate-300 px-3 py-2 text-center">Finance Cost (%)</th>
-                          <th className="border-r border-slate-300 px-3 py-2 text-center">Buying Commission (%)</th>
-                          <th className="border-r border-slate-300 px-3 py-2 text-center">Sample Fabric Qty</th>
-                          <th className="px-3 py-2 text-center">Sample Fabric Rate</th>
+                {/* Style Image center */}
+                <div className="col-span-12 md:col-span-4 flex flex-col items-center justify-center p-3 rounded-2xl border border-slate-200 bg-slate-50/35 relative overflow-hidden group min-h-[300px]">
+                  {activeRec.styleImage ? (
+                    <img
+                      src={activeRec.styleImage}
+                      alt="Style Mockup"
+                      className="max-h-[320px] w-full object-contain rounded-xl transition duration-500 transform group-hover:scale-102"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center text-slate-400">
+                      <FileText className="size-10 mb-3 stroke-1 text-slate-300" />
+                      <span className="text-[10px] font-bold tracking-wider uppercase">No Sketch Uploaded</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Budget Summary right */}
+                <div className="col-span-12 md:col-span-4">
+                  <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest mb-2 flex items-center gap-2">
+                    <span className="w-1.5 h-3 bg-indigo-500 rounded-xs inline-block"></span>
+                    Budget Summary
+                  </p>
+                  <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs bg-white">
+                    <table className="w-full text-[10px] text-slate-700">
+                      <thead>
+                        <tr className="bg-slate-50 border-b border-slate-200">
+                          <th className="px-2 py-2 text-[8.5px] font-black text-slate-500 uppercase w-7 text-center">Ref</th>
+                          <th className="px-2 py-2 text-[8.5px] font-black text-slate-500 uppercase text-left tracking-wider">Particulars</th>
+                          <th className="px-2 py-2 text-[8.5px] font-black text-slate-500 uppercase text-right tracking-wider">Amount</th>
+                          <th className="px-2 py-2 text-[8.5px] font-black text-slate-500 uppercase text-right w-10">%</th>
                         </tr>
                       </thead>
-                      <tbody className="bg-white">
-                        <tr>
-                          <td className="border-r border-slate-200 px-3 py-2 text-center font-bold text-slate-400">1</td>
-                          <td className="border-r border-slate-200 px-2 py-1.5 text-center">
-                            <input
-                              type="number"
-                              step="0.0001"
-                              value={commercialCostPct}
-                              onChange={(e) => setCommercialCostPct(Number(e.target.value))}
-                              className="w-full max-w-[140px] mx-auto h-7 px-2 border border-slate-200 rounded-sm text-center text-xs focus:outline-none focus:border-[#1e88e5]"
-                            />
-                          </td>
-                          <td className="border-r border-slate-200 px-2 py-1.5 text-center">
-                            <input
-                              type="number"
-                              step="0.0001"
-                              value={financeCostPct}
-                              onChange={(e) => setFinanceCostPct(Number(e.target.value))}
-                              className="w-full max-w-[140px] mx-auto h-7 px-2 border border-slate-200 rounded-sm text-center text-xs focus:outline-none focus:border-[#1e88e5]"
-                            />
-                          </td>
-                          <td className="border-r border-slate-200 px-2 py-1.5 text-center">
-                            <input
-                              type="number"
-                              step="0.0001"
-                              value={buyingCommissionPct}
-                              onChange={(e) => setBuyingCommissionPct(Number(e.target.value))}
-                              className="w-full max-w-[140px] mx-auto h-7 px-2 border border-slate-200 rounded-sm text-center text-xs focus:outline-none focus:border-[#1e88e5]"
-                            />
-                          </td>
-                          <td className="border-r border-slate-200 px-2 py-1.5 text-center">
-                            <input
-                              type="number"
-                              step="0.0001"
-                              value={sampleFabricQty}
-                              onChange={(e) => setSampleFabricQty(Number(e.target.value))}
-                              className="w-full max-w-[140px] mx-auto h-7 px-2 border border-slate-200 rounded-sm text-center text-xs focus:outline-none focus:border-[#1e88e5]"
-                            />
-                          </td>
-                          <td className="px-2 py-1.5 text-center">
-                            <input
-                              type="number"
-                              step="0.0001"
-                              value={sampleFabricRate}
-                              onChange={(e) => setSampleFabricRate(Number(e.target.value))}
-                              className="w-full max-w-[140px] mx-auto h-7 px-2 border border-slate-200 rounded-sm text-center text-xs focus:outline-none focus:border-[#1e88e5]"
-                            />
-                          </td>
-                        </tr>
+                      <tbody>
+                        {([
+                          ["A",   "Order Value",          BR.orderValue,          "",    "font-bold text-slate-900"],
+                          ["A.1", "Less Buyer Sup. Mat.", activeRec.buyerSupMaterialCost,"",""],
+                          ["A.2", "Net Order Value",      BR.netOrderValue,       "100", "font-semibold text-slate-800 bg-slate-50/50"],
+                          [null,  "Variable Cost",        null,                   "",    "bg-slate-50/30 font-bold text-slate-500"],
+                          ["B.1", "Fabric Purchase Cost", BR.fabricCost,          pct(BR.fabricCost,BR.orderValue),""],
+                          ["B.2", "Yarn Cost",            BR.yarnCost,            pct(BR.yarnCost,BR.orderValue),""],
+                          ["B.3", "Dyed Yarn",            BR.dyedYarnCost,        pct(BR.dyedYarnCost,BR.orderValue),""],
+                          ["B.4", "Fabric Conv. Cost",    BR.convCost,            pct(BR.convCost,BR.orderValue),""],
+                          ["B.5", "Accessories",          BR.accCost,             pct(BR.accCost,BR.orderValue),""],
+                          ["B.6", "Embellishment Cost",   BR.embCost,             pct(BR.embCost,BR.orderValue),""],
+                          [null,  "Total Variable Cost",  BR.totalVariable,       pct(BR.totalVariable,BR.orderValue),"font-black bg-rose-50/60 text-rose-800 border-y border-rose-100"],
+                          ["C",   "Contribution Margin",  BR.contribution,        pct(BR.contribution,BR.orderValue),"font-black bg-blue-50 text-blue-700 border-y border-blue-100/70"],
+                          ["D",   "CM Cost",              BR.cmCost,              pct(BR.cmCost,BR.orderValue),"font-bold text-slate-800"],
+                          ["E",   "Operating Profit",     BR.opProfit,            pct(BR.opProfit,BR.orderValue),"font-semibold text-slate-800"],
+                          ["F",   "Commission Cost",      BR.commission,          pct(BR.commission,BR.orderValue),""],
+                          ["G",   "Special Cost",         BR.specialCost,         pct(BR.specialCost,BR.orderValue),""],
+                          ["H",   "Others Cost",          BR.otherCost,           pct(BR.otherCost,BR.orderValue),""],
+                          ["I",   "Sample Cost",          BR.sampleCost,          pct(BR.sampleCost,BR.orderValue),""],
+                          ["J",   "Total Cost",           BR.totalCost,           pct(BR.totalCost,BR.orderValue),"font-black bg-slate-100 border-y border-slate-200"],
+                          ["K",   "Net Profit",           BR.netProfit,           pct(BR.netProfit,BR.orderValue), BR.netProfit>=0?"font-black bg-emerald-50 text-emerald-700 border-y border-emerald-100":"font-black bg-rose-50 text-rose-700 border-y border-rose-100"],
+                        ] as const).map(([ref,label,val,pctVal,cls],i)=>(
+                          <tr key={i} className={`border-b border-slate-100 last:border-b-0 hover:bg-slate-50/30 transition-colors ${cls as string}`}>
+                            <td className="px-2 py-1 text-slate-400 font-bold text-[8.5px] text-center">{ref as string}</td>
+                            <td className="px-2 py-1 text-[10px]">{label as string}</td>
+                            <td className="px-2 py-1 text-right font-mono font-semibold text-[10px]">{val!==null?`$ ${fmt(val as number)}`:""}</td>
+                            <td className="px-2 py-1 text-right font-mono text-[9px] text-slate-450 font-bold">{pctVal as string}</td>
+                          </tr>
+                        ))}
                       </tbody>
                     </table>
                   </div>
-                ) : (
-                  <p className="text-[11px] text-slate-400 font-semibold text-center py-4 bg-slate-50 dark:bg-slate-900/35 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
-                    Check the box to define Additional Costing parameters inside the spreadsheet cells.
-                  </p>
-                )}
+                </div>
               </div>
-            </div>
 
-            {/* Summary Footer Bar */}
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white dark:bg-slate-900 px-6 py-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
-              {/* Left — Key Metrics */}
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="bg-indigo-50 dark:bg-indigo-950/40 px-4 py-2 rounded-xl border border-indigo-100 dark:border-indigo-900 text-center min-w-[110px]">
-                  <span className="text-[8px] font-extrabold uppercase tracking-widest text-indigo-400 block leading-none">Avg Quoted FOB</span>
-                  <span className="text-lg font-black text-indigo-600 dark:text-indigo-400 mt-0.5 block font-mono">$ {averageFOB.toFixed(2)}</span>
+              {/* ── B.1 Fabric ── */}
+              <div>
+                <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest mb-2 flex items-center gap-2">
+                  <span className="w-1.5 h-3 bg-indigo-500 rounded-xs inline-block"></span>
+                  B.1 :: Fabric Consumption & Costing
+                </p>
+                <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+                  <table className="w-full text-[10px] text-slate-700 whitespace-nowrap">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200">
+                        {["Style","Fab.Nature","Fabric Info","GSM","Color","Source","Order Qty (Dzn)","Cons/Dzn","Fabric Qty","UOM","Rate","Cost"].map(h=>(
+                          <th key={h} className="px-3 py-2.5 text-left font-black text-slate-500 uppercase tracking-wider text-[8.5px]">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {activeRec.fabricRows.map(r=>{
+                        const fq=r.orderQtyDzn*r.consDzn;
+                        const cost=fq*r.rate;
+                        return (
+                          <tr key={r.id} className="hover:bg-slate-50/30 transition-colors">
+                            <td className="px-3 py-2 font-bold text-slate-900 max-w-[140px] truncate">{r.styleRef}</td>
+                            <td className="px-3 py-2">{r.fabNature}</td>
+                            <td className="px-3 py-2 max-w-[180px] truncate">{r.fabricInfo}</td>
+                            <td className="px-3 py-2 text-right font-mono font-semibold">{r.gsm}</td>
+                            <td className="px-3 py-2">{r.colour}</td>
+                            <td className="px-3 py-2">{r.source}</td>
+                            <td className="px-3 py-2 text-right font-mono font-semibold">{fmt(r.orderQtyDzn)}</td>
+                            <td className="px-3 py-2 text-right font-mono font-semibold">{r.consDzn.toFixed(2)}</td>
+                            <td className="px-3 py-2 text-right font-mono font-semibold text-slate-650">{fmt(fq)}</td>
+                            <td className="px-3 py-2">{r.uom}</td>
+                            <td className="px-3 py-2 text-right font-mono font-bold text-slate-800">{r.rate>0?`$ ${r.rate.toFixed(2)}`:""}</td>
+                            <td className="px-3 py-2 text-right font-mono font-bold text-indigo-600">{cost>0?`$ ${fmt(cost)}`:""}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                    <tfoot>
+                      <tr className="bg-slate-50 font-black border-t border-slate-200 text-[10px] text-slate-800">
+                        <td colSpan={8} className="px-3 py-2">Total :</td>
+                        <td className="px-3 py-2 text-right font-mono">{fmt(activeRec.fabricRows.reduce((s,x)=>s+(x.orderQtyDzn*x.consDzn),0))}</td>
+                        <td colSpan={2}/>
+                        <td className="px-3 py-2 text-right font-mono text-indigo-600">$ {fmt(BR.fabricCost)}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
                 </div>
-                <div className="bg-slate-50 dark:bg-slate-800/50 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 text-center min-w-[100px]">
-                  <span className="text-[8px] font-extrabold uppercase tracking-widest text-slate-400 block leading-none">Total Qty</span>
-                  <span className="text-base font-black text-slate-800 dark:text-slate-200 mt-0.5 block font-mono">{totalOrderQty.toLocaleString()}<span className="text-[10px] font-bold text-slate-400 ml-1">pcs</span></span>
+              </div>
+
+              {/* ── B.2 Yarn Cost ── */}
+              <div>
+                <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest mb-2 flex items-center gap-2">
+                  <span className="w-1.5 h-3 bg-indigo-500 rounded-xs inline-block"></span>
+                  B.2 :: Yarn Cost (Grey Yarn)
+                </p>
+                <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+                  <table className="w-full text-[10px] text-slate-700">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200">
+                        {["Composition","Count","Yarn Type","Color","Yarn Qty (Kg)","Rate ($/Kg)","Cost"].map(h=>(
+                          <th key={h} className="px-3 py-2.5 text-left font-black text-slate-500 uppercase tracking-wider text-[8.5px]">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {activeRec.yarnRows.length===0 ? (
+                        <tr key="empty-yarn"><td colSpan={7} className="px-3 py-3 text-center text-slate-450 font-medium bg-slate-50/20">No yarn entries found</td></tr>
+                      ) : (
+                        activeRec.yarnRows.map(r=>(
+                          <tr key={r.id} className="hover:bg-slate-50/30 transition-colors">
+                            <td className="px-3 py-2 font-bold text-slate-900">{r.composition}</td>
+                            <td className="px-3 py-2 font-mono font-bold text-slate-650">{r.count}</td>
+                            <td className="px-3 py-2">{r.yarnType}</td>
+                            <td className="px-3 py-2">{r.colour}</td>
+                            <td className="px-3 py-2 text-right font-mono font-semibold">{fmt(r.yarnQty)}</td>
+                            <td className="px-3 py-2 text-right font-mono font-bold text-slate-800">$ {r.rate.toFixed(2)}</td>
+                            <td className="px-3 py-2 text-right font-mono font-bold text-indigo-600">$ {fmt(r.yarnQty*r.rate)}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                    <tfoot>
+                      <tr className="bg-slate-50 font-black border-t border-slate-200 text-[10px] text-slate-800">
+                        <td colSpan={4} className="px-3 py-2">Total :</td>
+                        <td className="px-3 py-2 text-right font-mono">{fmt(activeRec.yarnRows.reduce((s,x)=>s+x.yarnQty,0))}</td>
+                        <td/>
+                        <td className="px-3 py-2 text-right font-mono text-indigo-600">$ {fmt(BR.yarnCost)}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
                 </div>
-                <div className="bg-slate-50 dark:bg-slate-800/50 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 text-center min-w-[90px]">
-                  <span className="text-[8px] font-extrabold uppercase tracking-widest text-slate-400 block leading-none">Styles</span>
-                  <span className="text-base font-black text-slate-800 dark:text-slate-200 mt-0.5 block">{addedStyles.length}</span>
+              </div>
+
+              {/* ── B.3 Dyed Yarn ── */}
+              <div>
+                <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest mb-2 flex items-center gap-2">
+                  <span className="w-1.5 h-3 bg-indigo-500 rounded-xs inline-block"></span>
+                  B.3 :: Dyed Yarn
+                </p>
+                <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+                  <table className="w-full text-[10px] text-slate-700">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200">
+                        {["Style","Yarn Info","Color","Shade","Quantity","UOM","Rate","Cost"].map(h=>(
+                          <th key={h} className="px-3 py-2.5 text-left font-black text-slate-500 uppercase tracking-wider text-[8.5px]">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {activeRec.dyedYarnRows.length===0 ? (
+                        <tr key="empty-dyedyarn"><td colSpan={8} className="px-3 py-3 text-center text-slate-400 font-medium bg-slate-50/20">No dyed yarn records entered</td></tr>
+                      ) : (
+                        activeRec.dyedYarnRows.map(r=>(
+                          <tr key={r.id} className="hover:bg-slate-50/30 transition-colors">
+                            <td className="px-3 py-2 font-bold text-slate-900">{r.style}</td>
+                            <td className="px-3 py-2">{r.yarnInfo}</td>
+                            <td className="px-3 py-2">{r.colour}</td>
+                            <td className="px-3 py-2">{r.shade}</td>
+                            <td className="px-3 py-2 text-right font-mono font-semibold">{fmt(r.quantity)}</td>
+                            <td className="px-3 py-2">{r.uom}</td>
+                            <td className="px-3 py-2 text-right font-mono font-bold text-slate-800">$ {r.rate.toFixed(2)}</td>
+                            <td className="px-3 py-2 text-right font-mono font-bold text-indigo-600">$ {fmt(r.quantity*r.rate)}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                    <tfoot>
+                      <tr className="bg-slate-50 font-black border-t border-slate-200 text-[10px] text-slate-800">
+                        <td colSpan={7} className="px-3 py-2">Total :</td>
+                        <td className="px-3 py-2 text-right font-mono text-indigo-600">$ {fmt(BR.dyedYarnCost)}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
                 </div>
-                {hasAdditionalCosting && (
-                  <div className="bg-emerald-50 dark:bg-emerald-950/40 px-4 py-2 rounded-xl border border-emerald-100 dark:border-emerald-900">
-                    <span className="text-[8px] font-extrabold uppercase tracking-widest text-emerald-500 block leading-none">Commission Total</span>
-                    <span className="text-base font-black text-emerald-600 dark:text-emerald-400 mt-0.5 block font-mono">$ {totalCommissionAmt.toFixed(2)}</span>
+              </div>
+
+              {/* ── B.4 Fabric Conversion (grouped by Knitting/Dyeing) ── */}
+              <div>
+                <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest mb-2 flex items-center gap-2">
+                  <span className="w-1.5 h-3 bg-indigo-500 rounded-xs inline-block"></span>
+                  B.4 :: Fabric Conversion Cost
+                </p>
+                <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+                  <table className="w-full text-[10px] text-slate-700 whitespace-nowrap">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200">
+                        {["Style Info","Fab.Nature","Fabric Info","GSM","Col.Type","Color","Shade","Pr.Name","Pr.Qty (Kg)","UOM","Rate ($/Kg)","Cost"].map(h=>(
+                          <th key={h} className="px-3 py-2.5 text-left font-black text-slate-500 uppercase tracking-wider text-[8.5px]">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(["Knitting","Dyeing"] as const)
+                        .filter(pt => activeRec.conversionRows.some(r => r.processType === pt))
+                        .map(pt=>{
+                        const rows=activeRec.conversionRows.filter(r=>r.processType===pt);
+                        const subtotal=rows.reduce((s,r)=>s+(r.prQty*r.rate),0);
+                        const totalQty=rows.reduce((s,r)=>s+r.prQty,0);
+                        return (
+                          <React.Fragment key={pt}>
+                            <tr className="bg-indigo-50/50 border-y border-indigo-100">
+                              <td colSpan={12} className="px-3 py-1.5 text-[9px] font-black text-indigo-700 uppercase tracking-widest">{pt} Processing</td>
+                            </tr>
+                            {rows.map(r=>(
+                              <tr key={r.id} className="border-b border-slate-100 hover:bg-slate-50/30 transition-colors">
+                                <td className="px-3 py-2 font-bold text-slate-900 max-w-[130px] truncate">{r.styleRef}</td>
+                                <td className="px-3 py-2">{r.fabNature}</td>
+                                <td className="px-3 py-2 max-w-[160px] truncate">{r.fabricInfo}</td>
+                                <td className="px-3 py-2 text-right font-mono font-semibold">{r.gsm}</td>
+                                <td className="px-3 py-2">{r.colType}</td>
+                                <td className="px-3 py-2">{r.colour}</td>
+                                <td className="px-3 py-2">{r.shade}</td>
+                                <td className="px-3 py-2 font-bold text-indigo-650">{pt}</td>
+                                <td className="px-3 py-2 text-right font-mono font-semibold">{fmt(r.prQty)}</td>
+                                <td className="px-3 py-2">{r.uom}</td>
+                                <td className="px-3 py-2 text-right font-mono font-bold text-slate-800">$ {r.rate.toFixed(2)}</td>
+                                <td className="px-3 py-2 text-right font-mono font-bold text-indigo-600">$ {fmt(r.prQty*r.rate)}</td>
+                              </tr>
+                            ))}
+                            <tr className="bg-slate-50 font-black border-b border-slate-200 text-[10px] text-slate-800">
+                              <td colSpan={8} className="px-3 py-2">Total {pt} Cost</td>
+                              <td className="px-3 py-2 text-right font-mono">{fmt(totalQty)}</td>
+                              <td colSpan={2}/>
+                              <td className="px-3 py-2 text-right font-mono text-indigo-600">$ {fmt(subtotal)}</td>
+                            </tr>
+                          </React.Fragment>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* ── B.5 Accessories ── */}
+              <div>
+                <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest mb-2 flex items-center gap-2">
+                  <span className="w-1.5 h-3 bg-indigo-500 rounded-xs inline-block"></span>
+                  B.5 :: Accessories Details
+                </p>
+                <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+                  <table className="w-full text-[10px] text-slate-700 whitespace-nowrap">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200">
+                        {["Item Name","Gmt Item","Sensitivity Type","Order Qty (Dzn)","Cons/Dzn","Prs.Loss %","Quantity","UOM","Rate","Cost"].map(h=>(
+                          <th key={h} className="px-3 py-2.5 text-left font-black text-slate-500 uppercase tracking-wider text-[8.5px]">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {activeRec.accessoryRows.map(r=>{
+                        const qty=r.orderQtyDzn*r.consDzn*(1+r.processLossPct/100);
+                        const cost=qty*r.rate;
+                        return (
+                          <tr key={r.id} className="hover:bg-slate-50/30 transition-colors">
+                            <td className="px-3 py-2 font-bold text-slate-900">{r.itemName}</td>
+                            <td className="px-3 py-2">{r.gmtItem}</td>
+                            <td className="px-3 py-2 text-slate-500">{r.sensitivityType || "No Sensitivity"}</td>
+                            <td className="px-3 py-2 text-right font-mono font-semibold">{fmt(r.orderQtyDzn)}</td>
+                            <td className="px-3 py-2 text-right font-mono font-semibold">{r.consDzn.toFixed(2)}</td>
+                            <td className="px-3 py-2 text-right font-mono font-semibold">{r.processLossPct.toFixed(2)}%</td>
+                            <td className="px-3 py-2 text-right font-mono font-semibold text-slate-650">{fmt(qty)}</td>
+                            <td className="px-3 py-2">{r.uom}</td>
+                            <td className="px-3 py-2 text-right font-mono font-bold text-slate-800">$ {r.rate.toFixed(4)}</td>
+                            <td className="px-3 py-2 text-right font-mono font-bold text-indigo-600">$ {fmt(cost)}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                    <tfoot>
+                      <tr className="bg-slate-50 font-black border-t border-slate-200 text-[10px] text-slate-800">
+                        <td colSpan={9} className="px-3 py-2">Total :</td>
+                        <td className="px-3 py-2 text-right font-mono text-indigo-600">$ {fmt(BR.accCost)}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+
+              {/* ── B.6 Embellishment ── */}
+              <div>
+                <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest mb-2 flex items-center gap-2">
+                  <span className="w-1.5 h-3 bg-indigo-500 rounded-xs inline-block"></span>
+                  B.6 :: Embellishment Cost
+                </p>
+                <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+                  <table className="w-full text-[10px] text-slate-700">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200">
+                        {["Style","Gmt Item","Embellishment Name","Emb.Description","Quantity (Dzn)","Rate per Dzn","Cost"].map(h=>(
+                          <th key={h} className="px-3 py-2.5 text-left font-black text-slate-500 uppercase tracking-wider text-[8.5px]">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {activeRec.embellishmentRows.length===0 ? (
+                        <tr key="empty-emb"><td colSpan={7} className="px-3 py-3 text-center text-slate-400 font-medium bg-slate-50/20">No embroidery or printing embellishment costs</td></tr>
+                      ) : (
+                        activeRec.embellishmentRows.map(r=>(
+                          <tr key={r.id} className="hover:bg-slate-50/30 transition-colors">
+                            <td className="px-3 py-2 font-bold text-slate-900">{r.style}</td>
+                            <td className="px-3 py-2">{r.gmtItem}</td>
+                            <td className="px-3 py-2">{r.embName}</td>
+                            <td className="px-3 py-2">{r.embDesc}</td>
+                            <td className="px-3 py-2 text-right font-mono font-semibold">{fmt(r.qtyDzn)}</td>
+                            <td className="px-3 py-2 text-right font-mono font-bold text-slate-800">$ {r.ratePerDzn.toFixed(2)}</td>
+                            <td className="px-3 py-2 text-right font-mono font-bold text-indigo-600">$ {fmt(r.qtyDzn*r.ratePerDzn)}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                    <tfoot>
+                      <tr className="bg-slate-50 font-black border-t border-slate-200 text-[10px] text-slate-800">
+                        <td colSpan={6} className="px-3 py-2">Total :</td>
+                        <td className="px-3 py-2 text-right font-mono text-indigo-600">$ {fmt(BR.embCost)}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+
+              {/* ── D CM Cost ── */}
+              <div>
+                <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest mb-2 flex items-center gap-2">
+                  <span className="w-1.5 h-3 bg-indigo-500 rounded-xs inline-block"></span>
+                  D :: CM Cost
+                </p>
+                <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+                  <table className="w-full text-[10px] text-slate-700">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200">
+                        {["Style","GMT Item","GMT/Dzn","CPM ($)","SMV","Efficiency %","CM / Pcs","CM / Dzn","CM Cost"].map(h=>(
+                          <th key={h} className="px-3 py-2.5 text-left font-black text-slate-500 uppercase tracking-wider text-[8.5px]">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {activeRec.cmCostRows.map(r=>{
+                        const cmPcs=r.efficiencyPct>0?(r.cpm*r.smv)/r.efficiencyPct*100:0;
+                        const cmDzn=cmPcs*12;
+                        const cmCost=cmDzn*r.gmtDzn;
+                        return (
+                          <tr key={r.id} className="hover:bg-slate-50/30 transition-colors">
+                            <td className="px-3 py-2 font-bold text-slate-900">{r.style}</td>
+                            <td className="px-3 py-2">{r.gmtItem}</td>
+                            <td className="px-3 py-2 text-right font-mono font-semibold">{fmt(r.gmtDzn)}</td>
+                            <td className="px-3 py-2 text-right font-mono font-semibold">{r.cpm.toFixed(4)}</td>
+                            <td className="px-3 py-2 text-right font-mono font-semibold">{r.smv.toFixed(2)}</td>
+                            <td className="px-3 py-2 text-right font-mono font-semibold text-slate-500">{r.efficiencyPct.toFixed(2)}%</td>
+                            <td className="px-3 py-2 text-right font-mono font-semibold text-slate-800">$ {cmPcs.toFixed(4)}</td>
+                            <td className="px-3 py-2 text-right font-mono font-bold text-indigo-600">$ {cmDzn.toFixed(4)}</td>
+                            <td className="px-3 py-2 text-right font-mono font-bold text-slate-900">$ {fmt(cmCost)}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                    <tfoot>
+                      <tr className="bg-slate-50 font-black border-t border-slate-200 text-[10px] text-slate-800">
+                        <td colSpan={8} className="px-3 py-2">Total :</td>
+                        <td className="px-3 py-2 text-right font-mono text-indigo-600">$ {fmt(BR.cmCost)}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+
+              {/* ── F Commission ── */}
+              <div>
+                <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest mb-2 flex items-center gap-2">
+                  <span className="w-1.5 h-3 bg-indigo-500 rounded-xs inline-block"></span>
+                  F :: Commission Cost
+                </p>
+                <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+                  <table className="w-full text-[10px] text-slate-700">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200">
+                        {["Style","Color","Commission (%)","Commission Value"].map(h=>(
+                          <th key={h} className="px-3 py-2.5 text-left font-black text-slate-500 uppercase tracking-wider text-[8.5px]">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {activeRec.commissionRows.map(r=>(
+                        <tr key={r.id} className="hover:bg-slate-50/30 transition-colors">
+                          <td className="px-3 py-2 font-bold text-slate-900">{r.style}</td>
+                          <td className="px-3 py-2">{r.colour}</td>
+                          <td className="px-3 py-2 text-right font-mono font-semibold">{r.commissionPct.toFixed(4)}%</td>
+                          <td className="px-3 py-2 text-right font-mono font-bold text-indigo-600">$ {fmt(BR.netOrderValue*r.commissionPct/100)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr className="bg-slate-50 font-black border-t border-slate-200 text-[10px] text-slate-800">
+                        <td colSpan={3} className="px-3 py-2">Total :</td>
+                        <td className="px-3 py-2 text-right font-mono text-indigo-600">$ {fmt(BR.commission)}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+
+              {/* ── G Special + H Others + I Sample side-by-side ── */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch">
+                {/* G Special */}
+                <div className="col-span-12 md:col-span-4 flex flex-col justify-between">
+                  <div>
+                    <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest mb-2 flex items-center gap-2">
+                      <span className="w-1.5 h-3 bg-indigo-500 rounded-xs inline-block"></span>
+                      G :: Special Cost
+                    </p>
+                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs bg-white">
+                      <table className="w-full text-[10px] text-slate-700">
+                        <thead>
+                          <tr className="bg-slate-50 border-b border-slate-200">
+                            {["Style","Color","Cost Head","Qty (Dzn)","Rate/Dzn","Cost"].map(h=>(
+                              <th key={h} className="px-2 py-2 text-left font-black text-slate-500 uppercase tracking-wider text-[8px]">{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          {activeRec.specialCostRows.map(r=>(
+                            <tr key={r.id} className="hover:bg-slate-50/30 transition-colors">
+                              <td className="px-2 py-1.5 font-bold text-slate-900 max-w-[80px] truncate">{r.styleRef}</td>
+                              <td className="px-2 py-1.5 text-slate-600">{r.colour}</td>
+                              <td className="px-2 py-1.5 text-slate-600">{r.costHead}</td>
+                              <td className="px-2 py-1.5 text-right font-mono">{fmt(r.orderQtyDzn)}</td>
+                              <td className="px-2 py-1.5 text-right font-mono font-semibold text-slate-800">$ {r.ratePerDzn.toFixed(2)}</td>
+                              <td className="px-2 py-1.5 text-right font-mono font-bold text-indigo-600">$ {fmt(r.orderQtyDzn*r.ratePerDzn)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                        <tfoot>
+                          <tr className="bg-slate-50 font-black border-t border-slate-200 text-[10px] text-slate-800">
+                            <td colSpan={5} className="px-2 py-1.5">Total :</td>
+                            <td className="px-2 py-1.5 text-right font-mono text-indigo-600">$ {fmt(BR.specialCost)}</td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
                   </div>
-                )}
+                </div>
+
+                {/* H Others */}
+                <div className="col-span-12 md:col-span-4 flex flex-col justify-between">
+                  <div>
+                    <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest mb-2 flex items-center gap-2">
+                      <span className="w-1.5 h-3 bg-indigo-500 rounded-xs inline-block"></span>
+                      H :: Others Cost
+                    </p>
+                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs bg-white">
+                      <table className="w-full text-[10px] text-slate-700">
+                        <thead>
+                          <tr className="bg-slate-50 border-b border-slate-200">
+                            {["Particulars","Percentage (%)","Cost"].map(h=>(
+                              <th key={h} className="px-2 py-2 text-left font-black text-slate-500 uppercase tracking-wider text-[8px]">{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          {activeRec.otherCostRows.map(r=>(
+                            <tr key={r.id} className="hover:bg-slate-50/30 transition-colors">
+                              <td className="px-2 py-1.5 font-bold text-slate-900">{r.particulars}</td>
+                              <td className="px-2 py-1.5 text-right font-mono font-semibold">{r.percentage.toFixed(2)}%</td>
+                              <td className="px-2 py-1.5 text-right font-mono font-bold text-indigo-600">$ {fmt(BR.netOrderValue*r.percentage/100)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                        <tfoot>
+                          <tr className="bg-slate-50 font-black border-t border-slate-200 text-[10px] text-slate-800">
+                            <td colSpan={2} className="px-2 py-1.5">Total :</td>
+                            <td className="px-2 py-1.5 text-right font-mono text-indigo-600">$ {fmt(BR.otherCost)}</td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                {/* I Sample Cost */}
+                <div className="col-span-12 md:col-span-4 flex flex-col justify-between">
+                  <div>
+                    <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest mb-2 flex items-center gap-2">
+                      <span className="w-1.5 h-3 bg-indigo-500 rounded-xs inline-block"></span>
+                      I :: Sample Cost
+                    </p>
+                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs bg-white">
+                      <table className="w-full text-[10px] text-slate-700">
+                        <thead>
+                          <tr className="bg-slate-50 border-b border-slate-200">
+                            {["Sample Fabric Qty (Kg)","Sample Fabric Rate","Cost"].map(h=>(
+                              <th key={h} className="px-3 py-2 text-left font-black text-slate-500 uppercase tracking-wider text-[8px]">{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="hover:bg-slate-50/30 transition-colors">
+                            <td className="px-3 py-3 font-mono font-semibold text-slate-700">{activeRec.sampleFabricQty}</td>
+                            <td className="px-3 py-3 font-mono font-bold text-slate-800">$ {activeRec.sampleFabricRate.toFixed(2)}</td>
+                            <td className="px-3 py-3 font-mono font-bold text-indigo-600">$ {fmt(activeRec.sampleFabricQty*activeRec.sampleFabricRate)}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {/* Right — Actions */}
-              <div className="flex items-center gap-2.5 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setViewMode("list")}
-                  className="h-9 px-5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold text-xs transition cursor-pointer"
-                >
-                  Discard
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveSheet}
-                  className="h-9 px-7 bg-[#f08060] hover:bg-[#e07050] active:scale-95 text-white font-extrabold text-xs uppercase tracking-widest rounded-xl transition shadow-sm flex items-center gap-2 cursor-pointer"
-                >
-                  <Save className="size-3.5" /> Save Sheet
-                </button>
+              {/* ── Approval Signatures (Premium layout) ── */}
+              <div className="pt-12 grid grid-cols-2 md:grid-cols-5 gap-6 text-[10px] text-center border-t border-slate-200">
+                {[
+                  { role:"Prepared By",                status:"",        name:activeRec.merchandiser, title:"Merchandiser", date:activeRec.preCostDate },
+                  { role:"Checked By :: Approved",      status:"Approved",name:"Monoranjan Kha",       title:"Manager",      date:"02/08/2026 11:52:45" },
+                  { role:"Verified By :: Approved",     status:"Approved",name:"Md. Sadekur Rahman",   title:"DGM",          date:"02/08/2026 11:54:03" },
+                  { role:"Verified By Sr. GM :: Pending",status:"Pending",name:"Md. Jamshed Alam",    title:"GM Operation", date:"—" },
+                  { role:"Approved By CEO :: Pending",  status:"Pending", name:"Muhammad Azeem",       title:"CEO",          date:"—" },
+                ].map(({role,status,name,title,date})=>(
+                  <div key={role} className="border-t border-slate-300 pt-3 space-y-1">
+                    <p className={`font-black text-[9px] uppercase tracking-wider ${status==="Approved"?"text-emerald-700":status==="Pending"?"text-amber-600":"text-slate-500"}`}>{role}</p>
+                    <p className="font-black text-slate-800 text-[11px]">{name}</p>
+                    <p className="text-slate-500 font-semibold">{title}</p>
+                    {date&&<p className="text-[9px] text-slate-400 font-mono">{date}</p>}
+                    {status&&<div className="mt-1"><span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8.5px] font-black border ${status==="Approved"?"bg-emerald-50 text-emerald-700 border-emerald-100":"bg-amber-50 text-amber-700 border-amber-100"}`}>{status==="Approved"?<CheckCircle className="size-2.5"/>:<Clock className="size-2.5"/>}{status}</span></div>}
+                  </div>
+                ))}
               </div>
+
             </div>
           </div>
         )}
