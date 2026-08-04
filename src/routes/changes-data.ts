@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
         {
+          id: "124",
+          date: "2026-08-04T15:53",
+          type: "Modify",
+          module: "Personnel List",
+          link: "/personnel-list",
+          descriptionEn: "Removed the 'OT After(H)' field from the Assign OT And Allowance modal and updated the modal to automatically prefill and display the employee's existing OT Option and OT Rate if already assigned.",
+          descriptionBn: "Assign OT And Allowance মোডাল থেকে 'OT After(H)' ফিল্ডটি সরাতে দেওয়া হয়েছে এবং কর্মচারীর পূর্বে নির্ধারিত OT অপশন ও OT Rate ডেটা থাকলে মোডাল খোলার সাথে সাথে তা স্বয়ংক্রিয়ভাবে দেখানোর ব্যবস্থা করা হয়েছে।",
+        },
+        {
           id: "123",
           date: "2026-08-04T15:33",
           type: "New Addition",
