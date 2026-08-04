@@ -2,13 +2,22 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
         {
-          id: "122",
-          date: "2026-08-04T15:28",
+          id: "123",
+          date: "2026-08-04T15:33",
           type: "New Addition",
           module: "Personnel List",
           link: "/personnel-list",
-          descriptionEn: "Added the 'Assign OT And Allowance' modal to Personnel List when clicking 'OT Status Update' for selected employees, complete with OT options (N/A, OverTime, Fixed OverTime, etc.), OT After(H), OT Rate, and Close/Delete/Submit action buttons.",
-          descriptionBn: "পার্সোনেল লিস্টে নির্বাচিত কর্মচারীদের জন্য 'OT Status Update' ক্লিক করলে 'Assign OT And Allowance' পপআপ মোডাল যুক্ত করা হয়েছে, যেখানে OT অপশন (N/A, OverTime, Fixed OverTime ইত্যাদি), OT After(H), OT Rate এবং Close/Delete/Submit বাটন সুবিধা রয়েছে।",
+          descriptionEn: "Implemented all operational modals for Personnel List: 'Shift Update' (Shift Rotation), 'Employee Status Change', 'Shift Update - Default Holiday', 'ID Card Issue Date', and 'Revenue Mapping' with interactive fields and submit actions.",
+          descriptionBn: "পার্সোনেল লিস্টের জন্য সমস্ত অপারেশন মোডাল বাস্তবায়ন করা হয়েছে: 'Shift Update' (Shift Rotation), 'Employee Status Change', 'Shift Update - Default Holiday', 'ID Card Issue Date', এবং 'Revenue Mapping'।",
+        },
+        {
+          id: "122",
+          date: "2026-08-04T15:30",
+          type: "New Addition",
+          module: "Personnel List",
+          link: "/personnel-list",
+          descriptionEn: "Added the 'Assign OT And Allowance' modal to Personnel List when clicking 'OT Status Update' for selected employees (with N/A, OverTime, Fixed OverTime options, OT Rate, Close/Delete/Submit buttons), and increased the Personnel Operations sidebar width for better readability.",
+          descriptionBn: "পার্সোনেল লিস্টে নির্বাচিত কর্মচারীদের জন্য 'OT Status Update' ক্লিক করলে 'Assign OT And Allowance' পপআপ মোডাল যুক্ত করা হয়েছে এবং সুবিধাজনকভাবে দেখার জন্য অপারেশন সাইডবারটির প্রাস্থ (Width) বাড়িয়ে চওড়া করা হয়েছে।",
         },
         {
           id: "1",

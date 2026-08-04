@@ -847,9 +847,54 @@ function PersonnelListPage() {
   const [otAfterHours, setOtAfterHours] = useState("");
   const [otRate, setOtRate] = useState("");
 
+  // Shift Rotation Modal State
+  const [isShiftModalOpen, setIsShiftModalOpen] = useState(false);
+  const [newShiftVal, setNewShiftVal] = useState("General Shift");
+  const [shiftStartDate, setShiftStartDate] = useState("");
+
+  // Status Update Modal State
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [statusVal, setStatusVal] = useState("Working");
+  const [statusDate, setStatusDate] = useState("");
+  const [statusRemarks, setStatusRemarks] = useState("");
+
+  // Set Holiday Modal State
+  const [isHolidayModalOpen, setIsHolidayModalOpen] = useState(false);
+  const [defaultHoliday, setDefaultHoliday] = useState("N/A");
+
+  // ID Card Issue Date Modal State
+  const [isIdCardModalOpen, setIsIdCardModalOpen] = useState(false);
+  const [idIssueDate, setIdIssueDate] = useState("04/08/2026");
+
+  // Revenue Mapping Modal State
+  const [isRevenueModalOpen, setIsRevenueModalOpen] = useState(false);
+  const [revenueCenter, setRevenueCenter] = useState("Cripton ERP");
+  const [salaryInventory, setSalaryInventory] = useState("0");
+  const [salaryExpense, setSalaryExpense] = useState("0");
+
   const triggerBulkAction = (actionName: string) => {
     if (actionName === "OT Status Update") {
       setIsOtModalOpen(true);
+      return;
+    }
+    if (actionName === "Shift Rotation") {
+      setIsShiftModalOpen(true);
+      return;
+    }
+    if (actionName === "Status Update") {
+      setIsStatusModalOpen(true);
+      return;
+    }
+    if (actionName === "Set Holiday") {
+      setIsHolidayModalOpen(true);
+      return;
+    }
+    if (actionName === "ID Card IssueDate") {
+      setIsIdCardModalOpen(true);
+      return;
+    }
+    if (actionName === "Revenue Mapping") {
+      setIsRevenueModalOpen(true);
       return;
     }
 
@@ -904,6 +949,77 @@ function PersonnelListPage() {
     );
     setTimeout(() => setBulkActionMessage(null), 4500);
     setIsOtModalOpen(false);
+  };
+
+  const handleShiftSubmit = () => {
+    setEmployees((prev) =>
+      prev.map((emp) =>
+        selectedEmpIds.includes(emp.id)
+          ? {
+              ...emp,
+              shift: newShiftVal,
+              shiftStart: shiftStartDate || emp.shiftStart,
+            }
+          : emp,
+      ),
+    );
+    setBulkActionMessage(
+      `Shift updated to [${newShiftVal}] for ${selectedEmpIds.length} selected employee(s).`,
+    );
+    setTimeout(() => setBulkActionMessage(null), 4500);
+    setIsShiftModalOpen(false);
+  };
+
+  const handleStatusSubmit = () => {
+    setEmployees((prev) =>
+      prev.map((emp) =>
+        selectedEmpIds.includes(emp.id)
+          ? {
+              ...emp,
+              status: statusVal,
+            }
+          : emp,
+      ),
+    );
+    setBulkActionMessage(
+      `Status updated to [${statusVal}] for ${selectedEmpIds.length} selected employee(s).`,
+    );
+    setTimeout(() => setBulkActionMessage(null), 4500);
+    setIsStatusModalOpen(false);
+  };
+
+  const handleHolidaySubmit = () => {
+    setEmployees((prev) =>
+      prev.map((emp) =>
+        selectedEmpIds.includes(emp.id)
+          ? {
+              ...emp,
+              holiday: defaultHoliday,
+            }
+          : emp,
+      ),
+    );
+    setBulkActionMessage(
+      `Default Holiday updated to [${defaultHoliday}] for ${selectedEmpIds.length} selected employee(s).`,
+    );
+    setTimeout(() => setBulkActionMessage(null), 4500);
+    setIsHolidayModalOpen(false);
+  };
+
+  const handleIdCardSubmit = () => {
+    setBulkActionMessage(
+      `ID Card Issue Date updated to [${idIssueDate}] for ${selectedEmpIds.length} selected employee(s).`,
+    );
+    setTimeout(() => setBulkActionMessage(null), 4500);
+    setIsIdCardModalOpen(false);
+  };
+
+  const handleRevenueSubmit = () => {
+    setBulkActionMessage(
+      `Revenue Mapping updated [${revenueCenter}] for ${selectedEmpIds.length} selected employee(s).`,
+    );
+    setTimeout(() => setBulkActionMessage(null), 4500);
+    setIsRevenueModalOpen(false);
   };
 
   useEffect(() => {
@@ -1199,7 +1315,7 @@ function PersonnelListPage() {
           {/* SPLIT LAYOUT WRAPPER */}
           <div className="flex flex-col xl:flex-row gap-4 items-start w-full">
             {/* Left side (Filters and Table) */}
-            <div className={`flex-1 min-w-0 flex flex-col gap-4 transition-all duration-300 ${selectedEmpIds.length > 0 ? "w-full xl:w-[75%]" : "w-full"}`}>
+            <div className={`flex-1 min-w-0 flex flex-col gap-4 transition-all duration-300 ${selectedEmpIds.length > 0 ? "w-full xl:w-[65%]" : "w-full"}`}>
           {/* Collapsible Advanced Filters Section */}
           <div className="bg-card rounded-lg border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300">
             <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-primary/10 via-primary/45 to-primary/10" />
@@ -1722,7 +1838,7 @@ function PersonnelListPage() {
 
             {/* Right Column (Sidebar) */}
             {selectedEmpIds.length > 0 && (
-              <div className="w-full xl:w-[25%] shrink-0 sticky top-4 animate-in slide-in-from-right-4 duration-300 space-y-4 max-h-[calc(100vh-2rem)] overflow-y-auto pb-4">
+              <div className="w-full xl:w-[35%] shrink-0 sticky top-4 animate-in slide-in-from-right-4 duration-300 space-y-4 max-h-[calc(100vh-2rem)] overflow-y-auto pb-4">
                           {/* Personnel Operations & Document Hub */}
           <div className="bg-card rounded-lg border border-border/80 shadow-xs relative overflow-hidden transition-all duration-300">
             <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-emerald-500 via-primary to-indigo-500" />
@@ -2590,6 +2706,341 @@ function PersonnelListPage() {
                     SUBMIT
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Shift Update (Shift Rotation) Modal */}
+        {isShiftModalOpen && (
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-200"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setIsShiftModalOpen(false);
+            }}
+          >
+            <div className="bg-card w-full max-w-2xl rounded-xl border border-border/60 shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6 text-foreground animate-in zoom-in-95 duration-200">
+              <h2 className="text-xl sm:text-2xl font-medium tracking-tight text-foreground/90">
+                Shift Update
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start pt-2">
+                {/* New Shift */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground/90 flex items-center gap-0.5">
+                    New Shift <span className="text-rose-500 font-bold">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={newShiftVal}
+                      onChange={(e) => setNewShiftVal(e.target.value)}
+                      className="w-full h-10 appearance-none bg-transparent border-b border-border/50 text-sm font-semibold text-foreground focus:outline-none pr-8 cursor-pointer"
+                    >
+                      <option value="General Shift">General Shift</option>
+                      <option value="Night Shift">Night Shift</option>
+                      <option value="Morning Shift">Morning Shift</option>
+                      <option value="Evening Shift">Evening Shift</option>
+                      <option value="Exe-Ptvl">Exe-Ptvl</option>
+                    </select>
+                    <ChevronDown className="size-4 text-foreground/70 pointer-events-none absolute right-1 top-3" />
+                  </div>
+                </div>
+
+                {/* Shift Start Date */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground/90 flex items-center gap-0.5">
+                    Shift Start Date <span className="text-rose-500 font-bold">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={shiftStartDate}
+                    onChange={(e) => setShiftStartDate(e.target.value)}
+                    className="w-full h-10 bg-transparent border-b border-border/50 text-sm font-normal text-foreground focus:outline-none focus:border-primary transition duration-150"
+                  />
+                </div>
+              </div>
+
+              {/* Modal Buttons */}
+              <div className="flex items-center justify-between pt-6">
+                <button
+                  onClick={() => setIsShiftModalOpen(false)}
+                  className="px-6 py-2.5 rounded bg-[#f59e0b] hover:bg-[#d97706] text-white text-xs font-bold uppercase tracking-wider shadow-xs transition duration-150"
+                >
+                  CLOSE
+                </button>
+                <button
+                  onClick={handleShiftSubmit}
+                  className="px-6 py-2.5 rounded bg-[#71b340] hover:bg-[#5ea030] text-white text-xs font-bold uppercase tracking-wider shadow-xs transition duration-150"
+                >
+                  SUBMIT
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Employee Status Change Modal */}
+        {isStatusModalOpen && (
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-200"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setIsStatusModalOpen(false);
+            }}
+          >
+            <div className="bg-card w-full max-w-2xl rounded-xl border border-border/60 shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6 text-foreground animate-in zoom-in-95 duration-200">
+              <h2 className="text-xl sm:text-2xl font-medium tracking-tight text-foreground/90">
+                Employee Status Change
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-start pt-2">
+                {/* Status */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground/90 flex items-center gap-0.5">
+                    Status <span className="text-rose-500 font-bold">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={statusVal}
+                      onChange={(e) => setStatusVal(e.target.value)}
+                      className="w-full h-10 appearance-none bg-transparent border-b-2 border-primary text-sm font-semibold text-foreground focus:outline-none pr-8 cursor-pointer"
+                    >
+                      <option value="Working">Working</option>
+                      <option value="Resigned">Resigned</option>
+                      <option value="Dismissed">Dismissed</option>
+                      <option value="Terminated">Terminated</option>
+                      <option value="Retired">Retired</option>
+                      <option value="Suspended">Suspended</option>
+                    </select>
+                    <ChevronDown className="size-4 text-foreground/70 pointer-events-none absolute right-1 top-3" />
+                  </div>
+                </div>
+
+                {/* Date */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground/90 flex items-center gap-0.5">
+                    Date <span className="text-rose-500 font-bold">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={statusDate}
+                    onChange={(e) => setStatusDate(e.target.value)}
+                    className="w-full h-10 bg-transparent border-b border-border/50 text-sm font-normal text-foreground focus:outline-none focus:border-primary transition duration-150"
+                  />
+                </div>
+
+                {/* Remarks */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground/90 flex items-center gap-0.5">
+                    Remarks <span className="text-rose-500 font-bold">*</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={statusRemarks}
+                      onChange={(e) => setStatusRemarks(e.target.value)}
+                      placeholder=""
+                      className="w-full h-10 bg-transparent border-b border-border/50 text-sm font-normal text-foreground focus:outline-none focus:border-primary transition duration-150"
+                    />
+                    <ChevronDown className="size-4 text-foreground/70 pointer-events-none absolute right-1 top-3" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Buttons */}
+              <div className="flex items-center justify-between pt-6">
+                <button
+                  onClick={() => setIsStatusModalOpen(false)}
+                  className="px-6 py-2.5 rounded bg-[#f59e0b] hover:bg-[#d97706] text-white text-xs font-bold uppercase tracking-wider shadow-xs transition duration-150"
+                >
+                  CLOSE
+                </button>
+                <button
+                  onClick={handleStatusSubmit}
+                  className="px-6 py-2.5 rounded bg-[#71b340] hover:bg-[#5ea030] text-white text-xs font-bold uppercase tracking-wider shadow-xs transition duration-150"
+                >
+                  SUBMIT
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Set Holiday (Shift Update - Default Holiday) Modal */}
+        {isHolidayModalOpen && (
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-200"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setIsHolidayModalOpen(false);
+            }}
+          >
+            <div className="bg-card w-full max-w-2xl rounded-xl border border-border/60 shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6 text-foreground animate-in zoom-in-95 duration-200">
+              <h2 className="text-xl sm:text-2xl font-medium tracking-tight text-foreground/90">
+                Shift Update
+              </h2>
+
+              <div className="pt-2">
+                {/* Default Holiday */}
+                <div className="space-y-1 max-w-md">
+                  <label className="text-xs font-medium text-muted-foreground/90">
+                    Default Holiday
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={defaultHoliday}
+                      onChange={(e) => setDefaultHoliday(e.target.value)}
+                      className="w-full h-10 appearance-none bg-transparent border-b-2 border-primary text-sm font-semibold text-foreground focus:outline-none pr-8 cursor-pointer"
+                    >
+                      <option value="N/A">N/A</option>
+                      <option value="Friday">Friday</option>
+                      <option value="Saturday">Saturday</option>
+                      <option value="Sunday">Sunday</option>
+                      <option value="Friday & Saturday">Friday & Saturday</option>
+                    </select>
+                    <ChevronDown className="size-4 text-foreground/70 pointer-events-none absolute right-1 top-3" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Buttons */}
+              <div className="flex items-center justify-between pt-6">
+                <button
+                  onClick={() => setIsHolidayModalOpen(false)}
+                  className="px-6 py-2.5 rounded bg-[#f59e0b] hover:bg-[#d97706] text-white text-xs font-bold uppercase tracking-wider shadow-xs transition duration-150"
+                >
+                  CLOSE
+                </button>
+                <button
+                  onClick={handleHolidaySubmit}
+                  className="px-6 py-2.5 rounded bg-[#71b340] hover:bg-[#5ea030] text-white text-xs font-bold uppercase tracking-wider shadow-xs transition duration-150"
+                >
+                  SUBMIT
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ID Card Issue Date Modal */}
+        {isIdCardModalOpen && (
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-200"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setIsIdCardModalOpen(false);
+            }}
+          >
+            <div className="bg-card w-full max-w-xl rounded-xl border border-border/60 shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6 text-foreground animate-in zoom-in-95 duration-200">
+              <h2 className="text-xl sm:text-2xl font-medium tracking-tight text-foreground/90">
+                ID Card Issue Date
+              </h2>
+
+              <div className="pt-2">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground/90">
+                    Issue Date
+                  </label>
+                  <input
+                    type="text"
+                    value={idIssueDate}
+                    onChange={(e) => setIdIssueDate(e.target.value)}
+                    className="w-full h-10 bg-transparent border-b border-border/50 text-base font-semibold text-foreground focus:outline-none focus:border-primary transition duration-150"
+                  />
+                </div>
+              </div>
+
+              {/* Modal Buttons */}
+              <div className="flex items-center justify-between pt-6">
+                <button
+                  onClick={() => setIsIdCardModalOpen(false)}
+                  className="px-6 py-2.5 rounded bg-[#f59e0b] hover:bg-[#d97706] text-white text-xs font-bold uppercase tracking-wider shadow-xs transition duration-150"
+                >
+                  CLOSE
+                </button>
+                <button
+                  onClick={handleIdCardSubmit}
+                  className="px-6 py-2.5 rounded bg-[#71b340] hover:bg-[#5ea030] text-white text-xs font-bold uppercase tracking-wider shadow-xs transition duration-150"
+                >
+                  SUBMIT
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Revenue Mapping Modal */}
+        {isRevenueModalOpen && (
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-200"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setIsRevenueModalOpen(false);
+            }}
+          >
+            <div className="bg-card w-full max-w-2xl rounded-xl border border-border/60 shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6 text-foreground animate-in zoom-in-95 duration-200">
+              <h2 className="text-xl sm:text-2xl font-medium tracking-tight text-foreground/90">
+                Revenue Mapping
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-start pt-2">
+                {/* Revenue Center */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground/90 flex items-center gap-0.5">
+                    Revenue Center <span className="text-rose-500 font-bold">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={revenueCenter}
+                      onChange={(e) => setRevenueCenter(e.target.value)}
+                      className="w-full h-10 appearance-none bg-transparent border-b-2 border-primary text-sm font-semibold text-foreground focus:outline-none pr-8 cursor-pointer"
+                    >
+                      <option value="Cripton ERP">Cripton ERP</option>
+                      <option value="Software Division">Software Division</option>
+                      <option value="Apparel Tech">Apparel Tech</option>
+                      <option value="Corporate HR">Corporate HR</option>
+                    </select>
+                    <ChevronDown className="size-4 text-foreground/70 pointer-events-none absolute right-1 top-3" />
+                  </div>
+                </div>
+
+                {/* Salary As Inventory */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground/90">
+                    Salary As Inventory
+                  </label>
+                  <input
+                    type="text"
+                    value={salaryInventory}
+                    onChange={(e) => setSalaryInventory(e.target.value)}
+                    className="w-full h-10 bg-transparent border-b border-border/50 text-sm font-normal text-foreground focus:outline-none focus:border-primary transition duration-150"
+                  />
+                </div>
+
+                {/* Salary As Expense */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground/90">
+                    Salary As Expense
+                  </label>
+                  <input
+                    type="text"
+                    value={salaryExpense}
+                    onChange={(e) => setSalaryExpense(e.target.value)}
+                    className="w-full h-10 bg-transparent border-b border-border/50 text-sm font-normal text-foreground focus:outline-none focus:border-primary transition duration-150"
+                  />
+                </div>
+              </div>
+
+              {/* Modal Buttons */}
+              <div className="flex items-center justify-between pt-6">
+                <button
+                  onClick={() => setIsRevenueModalOpen(false)}
+                  className="px-6 py-2.5 rounded bg-[#f59e0b] hover:bg-[#d97706] text-white text-xs font-bold uppercase tracking-wider shadow-xs transition duration-150"
+                >
+                  CLOSE
+                </button>
+                <button
+                  onClick={handleRevenueSubmit}
+                  className="px-6 py-2.5 rounded bg-[#71b340] hover:bg-[#5ea030] text-white text-xs font-bold uppercase tracking-wider shadow-xs transition duration-150"
+                >
+                  SUBMIT
+                </button>
               </div>
             </div>
           </div>
