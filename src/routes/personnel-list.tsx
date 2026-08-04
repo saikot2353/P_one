@@ -874,6 +874,14 @@ function PersonnelListPage() {
 
   const triggerBulkAction = (actionName: string) => {
     if (actionName === "OT Status Update") {
+      // If employees selected, prefill modal with first selected employee's existing OT data
+      if (selectedEmpIds.length > 0) {
+        const firstEmp = employees.find((e) => e.id === selectedEmpIds[0]);
+        if (firstEmp) {
+          setOtOption(firstEmp.otStatus || "N/A");
+          setOtRate(firstEmp.otRate || "0");
+        }
+      }
       setIsOtModalOpen(true);
       return;
     }
@@ -2631,7 +2639,7 @@ function PersonnelListPage() {
                 Assign OT And Allowance
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-start pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start pt-2">
                 {/* OT Option Dropdown */}
                 <div className="space-y-1">
                   <label className="text-xs font-medium text-muted-foreground/90 flex items-center gap-0.5">
@@ -2652,20 +2660,6 @@ function PersonnelListPage() {
                     </select>
                     <ChevronDown className="size-4 text-foreground/70 pointer-events-none absolute right-1 top-3" />
                   </div>
-                </div>
-
-                {/* OT After(H) */}
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground/90">
-                    OT After(H)
-                  </label>
-                  <input
-                    type="text"
-                    value={otAfterHours}
-                    onChange={(e) => setOtAfterHours(e.target.value)}
-                    placeholder=""
-                    className="w-full h-10 bg-transparent border-b border-border/50 text-sm font-normal text-foreground focus:outline-none focus:border-primary transition duration-150"
-                  />
                 </div>
 
                 {/* OT Rate */}
