@@ -841,7 +841,18 @@ function PersonnelListPage() {
     }, 1200);
   };
 
+  // OT Status Update Modal State
+  const [isOtModalOpen, setIsOtModalOpen] = useState(false);
+  const [otOption, setOtOption] = useState("N/A");
+  const [otAfterHours, setOtAfterHours] = useState("");
+  const [otRate, setOtRate] = useState("");
+
   const triggerBulkAction = (actionName: string) => {
+    if (actionName === "OT Status Update") {
+      setIsOtModalOpen(true);
+      return;
+    }
+
     const targetNames = selectedEmpIds
       .map((id) => {
         const emp = employees.find((e) => e.id === id);
@@ -853,6 +864,46 @@ function PersonnelListPage() {
       `Bulk action [${actionName}] applied successfully to: ${targetNames.length > 55 ? targetNames.substring(0, 52) + "..." : targetNames}`,
     );
     setTimeout(() => setBulkActionMessage(null), 4500);
+  };
+
+  const handleOtSubmit = () => {
+    setEmployees((prev) =>
+      prev.map((emp) =>
+        selectedEmpIds.includes(emp.id)
+          ? {
+              ...emp,
+              otStatus: otOption,
+              otRate: otRate || emp.otRate,
+            }
+          : emp,
+      ),
+    );
+
+    setBulkActionMessage(
+      `OT & Allowance updated to [${otOption}] for ${selectedEmpIds.length} selected employee(s).`,
+    );
+    setTimeout(() => setBulkActionMessage(null), 4500);
+    setIsOtModalOpen(false);
+  };
+
+  const handleOtDelete = () => {
+    setEmployees((prev) =>
+      prev.map((emp) =>
+        selectedEmpIds.includes(emp.id)
+          ? {
+              ...emp,
+              otStatus: "N/A",
+              otRate: "0",
+            }
+          : emp,
+      ),
+    );
+
+    setBulkActionMessage(
+      `OT & Allowance reset/deleted for ${selectedEmpIds.length} selected employee(s).`,
+    );
+    setTimeout(() => setBulkActionMessage(null), 4500);
+    setIsOtModalOpen(false);
   };
 
   useEffect(() => {
@@ -2446,6 +2497,99 @@ function PersonnelListPage() {
                 >
                   Confirm Rejoin
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Assign OT And Allowance Modal */}
+        {isOtModalOpen && (
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-200"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setIsOtModalOpen(false);
+            }}
+          >
+            <div className="bg-card w-full max-w-2xl rounded-xl border border-border/60 shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6 text-foreground animate-in zoom-in-95 duration-200">
+              <h2 className="text-xl sm:text-2xl font-medium tracking-tight text-foreground/90">
+                Assign OT And Allowance
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-start pt-2">
+                {/* OT Option Dropdown */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground/90 flex items-center gap-0.5">
+                    OT Option <span className="text-rose-500 font-bold">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={otOption}
+                      onChange={(e) => setOtOption(e.target.value)}
+                      className="w-full h-10 appearance-none bg-transparent border-b-2 border-primary text-sm font-semibold text-foreground focus:outline-none pr-8 cursor-pointer"
+                    >
+                      <option value="N/A">N/A</option>
+                      <option value="OverTime">OverTime</option>
+                      <option value="Fixed OverTime">Fixed OverTime</option>
+                      <option value="OverTime + Fixed OverTime">OverTime + Fixed OverTime</option>
+                      <option value="Allowance">Allowance</option>
+                      <option value="Not Allowed">Not Allowed</option>
+                    </select>
+                    <ChevronDown className="size-4 text-foreground/70 pointer-events-none absolute right-1 top-3" />
+                  </div>
+                </div>
+
+                {/* OT After(H) */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground/90">
+                    OT After(H)
+                  </label>
+                  <input
+                    type="text"
+                    value={otAfterHours}
+                    onChange={(e) => setOtAfterHours(e.target.value)}
+                    placeholder=""
+                    className="w-full h-10 bg-transparent border-b border-border/50 text-sm font-normal text-foreground focus:outline-none focus:border-primary transition duration-150"
+                  />
+                </div>
+
+                {/* OT Rate */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground/90">
+                    OT Rate
+                  </label>
+                  <input
+                    type="text"
+                    value={otRate}
+                    onChange={(e) => setOtRate(e.target.value)}
+                    placeholder=""
+                    className="w-full h-10 bg-transparent border-b border-border/50 text-sm font-normal text-foreground focus:outline-none focus:border-primary transition duration-150"
+                  />
+                </div>
+              </div>
+
+              {/* Modal Buttons */}
+              <div className="flex items-center justify-between pt-6">
+                <button
+                  onClick={() => setIsOtModalOpen(false)}
+                  className="px-6 py-2.5 rounded bg-[#f59e0b] hover:bg-[#d97706] text-white text-xs font-bold uppercase tracking-wider shadow-xs transition duration-150"
+                >
+                  CLOSE
+                </button>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handleOtDelete}
+                    className="px-6 py-2.5 rounded bg-[#ef4444] hover:bg-[#dc2626] text-white text-xs font-bold uppercase tracking-wider shadow-xs transition duration-150"
+                  >
+                    DELETE
+                  </button>
+                  <button
+                    onClick={handleOtSubmit}
+                    className="px-6 py-2.5 rounded bg-[#71b340] hover:bg-[#5ea030] text-white text-xs font-bold uppercase tracking-wider shadow-xs transition duration-150"
+                  >
+                    SUBMIT
+                  </button>
+                </div>
               </div>
             </div>
           </div>
