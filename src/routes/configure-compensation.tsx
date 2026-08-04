@@ -56,12 +56,14 @@ interface AllowanceRate {
   basedOn: string;
   rate: number;
   divByHour: string;
+  divByDay: string;
   getAfterReq: string;
   getAfterReqRate: number;
   eotAfter: number;
   lunch: number;
   dinner: number;
   isActive: "Active" | "Inactive";
+  calculationFor: string;
 }
 
 interface TiffinRate {
@@ -136,6 +138,8 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     lunch: 0,
     dinner: 0,
     isActive: "Active",
+    divByDay: "No",
+    calculationFor: "Shift",
   },
   {
     sl: 2,
@@ -161,6 +165,8 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     lunch: 0,
     dinner: 0,
     isActive: "Active",
+    divByDay: "No",
+    calculationFor: "Shift",
   },
   {
     sl: 3,
@@ -186,6 +192,8 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     lunch: 0,
     dinner: 0,
     isActive: "Active",
+    divByDay: "No",
+    calculationFor: "Shift",
   },
   {
     sl: 4,
@@ -211,6 +219,8 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     lunch: 0,
     dinner: 0,
     isActive: "Active",
+    divByDay: "No",
+    calculationFor: "Shift",
   },
   {
     sl: 5,
@@ -236,6 +246,8 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     lunch: 0,
     dinner: 0,
     isActive: "Active",
+    divByDay: "No",
+    calculationFor: "Shift",
   },
   {
     sl: 6,
@@ -261,6 +273,8 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     lunch: 0,
     dinner: 0,
     isActive: "Active",
+    divByDay: "No",
+    calculationFor: "Shift",
   },
   {
     sl: 7,
@@ -286,6 +300,8 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     lunch: 0,
     dinner: 0,
     isActive: "Active",
+    divByDay: "No",
+    calculationFor: "Shift",
   },
   {
     sl: 8,
@@ -311,6 +327,8 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     lunch: 0,
     dinner: 0,
     isActive: "Active",
+    divByDay: "No",
+    calculationFor: "Shift",
   },
   {
     sl: 9,
@@ -336,6 +354,8 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     lunch: 0,
     dinner: 0,
     isActive: "Active",
+    divByDay: "No",
+    calculationFor: "Shift",
   },
   {
     sl: 10,
@@ -361,6 +381,8 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     lunch: 0,
     dinner: 0,
     isActive: "Active",
+    divByDay: "No",
+    calculationFor: "Shift",
   },
   {
     sl: 11,
@@ -386,6 +408,8 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     lunch: 0,
     dinner: 0,
     isActive: "Active",
+    divByDay: "No",
+    calculationFor: "Shift",
   },
   {
     sl: 12,
@@ -411,6 +435,8 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     lunch: 0,
     dinner: 0,
     isActive: "Active",
+    divByDay: "No",
+    calculationFor: "Shift",
   },
   {
     sl: 13,
@@ -436,6 +462,8 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     lunch: 0,
     dinner: 0,
     isActive: "Active",
+    divByDay: "No",
+    calculationFor: "Shift",
   },
   {
     sl: 14,
@@ -461,6 +489,8 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     lunch: 0,
     dinner: 0,
     isActive: "Active",
+    divByDay: "No",
+    calculationFor: "Shift",
   },
   {
     sl: 15,
@@ -486,6 +516,8 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     lunch: 0,
     dinner: 0,
     isActive: "Active",
+    divByDay: "No",
+    calculationFor: "Shift",
   },
   {
     sl: 16,
@@ -511,6 +543,8 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     lunch: 0,
     dinner: 0,
     isActive: "Active",
+    divByDay: "No",
+    calculationFor: "Shift",
   },
   {
     sl: 17,
@@ -536,6 +570,8 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     lunch: 0,
     dinner: 0,
     isActive: "Active",
+    divByDay: "No",
+    calculationFor: "Shift",
   },
   {
     sl: 18,
@@ -561,6 +597,8 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     lunch: 0,
     dinner: 0,
     isActive: "Active",
+    divByDay: "No",
+    calculationFor: "Shift",
   },
   {
     sl: 19,
@@ -586,6 +624,8 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     lunch: 0,
     dinner: 0,
     isActive: "Active",
+    divByDay: "No",
+    calculationFor: "Shift",
   },
   {
     sl: 20,
@@ -611,6 +651,8 @@ const DEFAULT_ALLOWANCES: AllowanceRate[] = [
     lunch: 0,
     dinner: 0,
     isActive: "Active",
+    divByDay: "No",
+    calculationFor: "Shift",
   },
 ];
 
@@ -1309,12 +1351,14 @@ function CompensationSetupPage() {
   const [basedOn, setBasedOn] = useState("--Select--");
   const [rate, setRate] = useState<number>(0);
   const [divByHour, setDivByHour] = useState("");
+  const [divByDay, setDivByDay] = useState("No");
   const [getAfterReq, setGetAfterReq] = useState("No");
   const [getAfterReqRate, setGetAfterReqRate] = useState<number>(0);
   const [eotAfter, setEotAfter] = useState<number>(0);
   const [lunch, setLunch] = useState<number>(0);
   const [dinner, setDinner] = useState<number>(0);
   const [allowanceIsActive, setAllowanceIsActive] = useState<"Active" | "Inactive">("Active");
+  const [calculationFor, setCalculationFor] = useState("Shift");
 
   // Form states - Tiffin Rate
   const [tiffinCompany, setTiffinCompany] = useState("Aleya Apparels Ltd.");
@@ -1372,12 +1416,14 @@ function CompensationSetupPage() {
       setBasedOn(item?.basedOn || "--Select--");
       setRate(item?.rate || 0);
       setDivByHour(item?.divByHour || "");
+      setDivByDay(item?.divByDay || "No");
       setGetAfterReq(item?.getAfterReq || "No");
       setGetAfterReqRate(item?.getAfterReqRate || 0);
       setEotAfter(item?.eotAfter || 0);
       setLunch(item?.lunch || 0);
       setDinner(item?.dinner || 0);
       setAllowanceIsActive(item?.isActive || "Active");
+      setCalculationFor(item?.calculationFor || "Shift");
     } else if (activeTab === "tiffin") {
       const item = tiffinRates.find((t) => t.sl === sl);
       setTiffinCompany(item?.company || "Aleya Apparels Ltd.");
@@ -1484,12 +1530,14 @@ function CompensationSetupPage() {
               basedOn,
               rate: Number(rate),
               divByHour,
+              divByDay,
               getAfterReq,
               getAfterReqRate: Number(getAfterReqRate),
               eotAfter: Number(eotAfter),
               lunch: Number(lunch),
               dinner: Number(dinner),
               isActive: allowanceIsActive,
+              calculationFor,
             }
             : a,
         );
@@ -1513,12 +1561,14 @@ function CompensationSetupPage() {
           basedOn,
           rate: Number(rate),
           divByHour,
+          divByDay,
           getAfterReq,
           getAfterReqRate: Number(getAfterReqRate),
           eotAfter: Number(eotAfter),
           lunch: Number(lunch),
           dinner: Number(dinner),
           isActive: allowanceIsActive,
+          calculationFor,
         });
       }
       setAllowances(nextList);
@@ -1772,7 +1822,7 @@ function CompensationSetupPage() {
               {activeTab === "allowance" && (
                 <table
                   className="w-full text-left text-xs border-collapse whitespace-nowrap"
-                  style={{ minWidth: "1800px" }}
+                  style={{ minWidth: "2000px" }}
                 >
                   <thead className="bg-muted/30 text-muted-foreground uppercase font-semibold tracking-wider text-xs border-b border-border/40">
                     <tr className="bg-transparent">
@@ -1796,11 +1846,13 @@ function CompensationSetupPage() {
                       <th className="px-5 py-4 w-[110px]">Based On</th>
                       <th className="px-5 py-4 w-[100px] text-center">Rate</th>
                       <th className="px-5 py-4 w-[100px] text-center">Div By Hour</th>
+                      <th className="px-5 py-4 w-[100px] text-center">Div By Day</th>
                       <th className="px-5 py-4 w-[120px] text-center">Get After Req</th>
                       <th className="px-5 py-4 w-[100px] text-center">Rate</th>
                       <th className="px-5 py-4 w-[100px] text-center">EOT After</th>
                       <th className="px-5 py-4 w-[100px] text-center">Lunch</th>
                       <th className="px-5 py-4 w-[100px] text-center">Dinner</th>
+                      <th className="px-5 py-4 w-[150px]">Calculation For</th>
                       <th className="px-5 py-4 w-[120px] text-center">IsActive</th>
                     </tr>
                   </thead>
@@ -1870,6 +1922,9 @@ function CompensationSetupPage() {
                             {item.divByHour || "—"}
                           </td>
                           <td className="px-5 py-3.5 text-center font-normal">
+                            {item.divByDay || "—"}
+                          </td>
+                          <td className="px-5 py-3.5 text-center font-normal">
                             {item.getAfterReq}
                           </td>
                           <td className="px-5 py-3.5 text-center font-normal font-mono">
@@ -1883,6 +1938,9 @@ function CompensationSetupPage() {
                           </td>
                           <td className="px-5 py-3.5 text-center font-normal font-mono">
                             {item.dinner}
+                          </td>
+                          <td className="px-5 py-3.5 font-normal">
+                            {item.calculationFor || "—"}
                           </td>
                           <td className="px-5 py-3.5 text-center">
                             <span
@@ -2471,6 +2529,7 @@ function CompensationSetupPage() {
                         >
                           <option value="--Select--">--Select--</option>
                           <option value="Basic">Basic</option>
+                          <option value="Basic Salary">Basic Salary</option>
                           <option value="Gross">Gross</option>
                           <option value="Fixed">Fixed</option>
                         </select>
@@ -2493,6 +2552,18 @@ function CompensationSetupPage() {
                         <select
                           value={divByHour}
                           onChange={(e) => setDivByHour(e.target.value)}
+                          className={insetSelectClass}
+                        >
+                          <option value="No">No</option>
+                          <option value="Yes">Yes</option>
+                        </select>
+                      </div>
+
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Div By Day</label>
+                        <select
+                          value={divByDay}
+                          onChange={(e) => setDivByDay(e.target.value)}
                           className={insetSelectClass}
                         >
                           <option value="No">No</option>
@@ -2556,6 +2627,19 @@ function CompensationSetupPage() {
                             placeholder="0"
                           />
                         </div>
+                      </div>
+
+                      <div className={insetWrapperClass}>
+                        <label className={insetLabelClass}>Calculation For *</label>
+                        <select
+                          value={calculationFor}
+                          onChange={(e) => setCalculationFor(e.target.value)}
+                          className={insetSelectClass}
+                          required
+                        >
+                          <option value="Shift">Shift</option>
+                          <option value="Shift For Allowance">Shift For Allowance</option>
+                        </select>
                       </div>
                     </div>
                   </div>

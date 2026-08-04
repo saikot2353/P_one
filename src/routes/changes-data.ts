@@ -1189,4 +1189,13 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
           descriptionEn: "Filtered the OT Configurations Overview history table in the settings modal to only display rules matching the selected Employee Type.",
           descriptionBn: "সেটিংস মোডালের ওটি কনফিগারেশন ওভারভিউ হিস্ট্রি টেবিলটি ফিল্টার করে শুধু সিলেক্টেড এমপ্লয়ী টাইপের নিয়মগুলো দেখানোর ব্যবস্থা করা হয়েছে।",
         },
+        {
+          id: "131",
+          date: "2026-08-04T11:58",
+          type: "Modify",
+          module: "Allowance Rate",
+          link: "/configure-compensation?tab=allowance",
+          descriptionEn: "Added missing fields ('Div By Day', 'Calculation For') and 'Basic Salary' option under Based On to the Allowance Rate form, states, interfaces, mock data, and table overview columns.",
+          descriptionBn: "এলাউন্স রেট ফর্মে অনুপস্থিত ফিল্ড ('Div By Day', 'Calculation For') এবং Based On অপশনে 'Basic Salary' যুক্ত করা হয়েছে, যা স্টেট, ইন্টারফেস, মক ডাটা এবং ওভারভিউ টেবিল কলামে আপডেট হয়েছে।",
+        },
 ];
