@@ -952,6 +952,7 @@ function TimeSetupPage() {
 
   // OT Config Info modal state
   const [isOtInfoOpen, setIsOtInfoOpen] = useState(false);
+  const [oiMode, setOiMode] = useState<"edit" | "settings">("edit");
   const [oiModalTab, setOiModalTab] = useState<
     "general" | "timings" | "slabs" | "rules" | "breaks"
   >("general");
@@ -1139,6 +1140,7 @@ function TimeSetupPage() {
       setShiftDeductPer(item?.deductionPer || "");
       setShiftDeductAfterDay(item?.deductionAfterDay || "");
     } else if (activeTab === "ot") {
+      setOiMode("edit");
       const item = otConfigs.find((o) => o.sl === sl);
       setOtInfoItem(
         item ||
@@ -1784,6 +1786,7 @@ function TimeSetupPage() {
                                     setOiDesignation(item.designation || "ALL");
                                     setOiUnit(item.unit || "ALL");
                                     setEditSl(item.sl);
+                                    setOiMode("settings");
                                     setIsOtInfoOpen(true);
                                   }}
                                   className="text-purple-500 hover:text-purple-600 transition-colors"
@@ -3166,10 +3169,12 @@ function TimeSetupPage() {
                     onChange={setOiUnit}
                   />
                 </div>
-                <div className="grid gap-4 md:grid-cols-2 mt-4">
-                  <TextField label="Start Date" type="date" value={oiStartDate} onChange={setOiStartDate} />
-                  <TextField label="End Date" type="date" value={oiEndDate} onChange={setOiEndDate} />
-                </div>
+                {oiMode === "settings" && (
+                  <div className="grid gap-4 md:grid-cols-2 mt-4">
+                    <TextField label="Start Date" required type="date" value={oiStartDate} onChange={setOiStartDate} />
+                    <TextField label="End Date" required type="date" value={oiEndDate} onChange={setOiEndDate} />
+                  </div>
+                )}
               </SectionCard>
 
               <SectionCard title="Shift & Timing" description="Attendance window and when OT starts counting.">
@@ -3235,6 +3240,7 @@ function TimeSetupPage() {
                   <RoundSlotBuilder
                     slabs={oiSlabs}
                     disabled={oiOtRound === "No"}
+                    required
                     onChange={setOiSlabs}
                   />
                 </div>
@@ -3273,10 +3279,14 @@ function TimeSetupPage() {
                 <hr className="my-4 border-border" />
                 <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-5">
                   <SelectField label="Dinner/Others Break" value={oiDinnerBreak} options={["Yes", "No"]} onChange={(v) => setOiDinnerBreak(v as any)} />
-                  <SelectField label="Deduction For" value={oiDeductionFor} options={["Holiday", "Weekday", "All"]} onChange={setOiDeductionFor} />
-                  <TextField label="Time From" required type="text" placeholder="HH:MM:SS" value={oiTimeFrom} onChange={setOiTimeFrom} />
-                  <TextField label="Time To" required type="text" placeholder="HH:MM:SS" value={oiTimeTo} onChange={setOiTimeTo} />
-                  <TextField label="Deduct Min" required type="number" value={oiDeductMin} onChange={(v) => setOiDeductMin(Number(v))} />
+                  {oiDinnerBreak === "Yes" && (
+                    <>
+                      <SelectField label="Deduction For" value={oiDeductionFor} options={["Holiday", "Weekday", "All", "Regular"]} onChange={setOiDeductionFor} />
+                      <TextField label="Time From" required type="text" placeholder="HH:MM:SS" value={oiTimeFrom} onChange={setOiTimeFrom} />
+                      <TextField label="Time To" required type="text" placeholder="HH:MM:SS" value={oiTimeTo} onChange={setOiTimeTo} />
+                      <TextField label="Deduct Min" required type="number" value={oiDeductMin} onChange={(v) => setOiDeductMin(Number(v))} />
+                    </>
+                  )}
                 </div>
               </SectionCard>
 
@@ -3285,6 +3295,125 @@ function TimeSetupPage() {
                   <SelectField label="IsActive" required value={oiIsActive} options={["Active", "Inactive"]} onChange={(v) => setOiIsActive(v as any)} />
                 </div>
               </SectionCard>
+
+              {oiMode === "settings" && (
+                <SectionCard title="OT Configurations Overview" description="View and select configuration to load for editing.">
+                  <div className="overflow-x-auto rounded-lg border border-border">
+                    <table className="w-full text-left text-xs border-collapse whitespace-nowrap">
+                      <thead className="bg-[#bde0fe]/60 dark:bg-sky-950/60 text-slate-800 dark:text-slate-200 font-semibold border-b border-border/40">
+                        <tr>
+                          <th className="px-4 py-3 text-center">SL</th>
+                          <th className="px-4 py-3 text-center">Action</th>
+                          <th className="px-4 py-3">Employee Type</th>
+                          <th className="px-4 py-3">Department</th>
+                          <th className="px-4 py-3">Section</th>
+                          <th className="px-4 py-3">Designation</th>
+                          <th className="px-4 py-3">Unit</th>
+                          <th className="px-4 py-3">OT Rules</th>
+                          <th className="px-4 py-3">Start Time</th>
+                          <th className="px-4 py-3">End Time</th>
+                          <th className="px-4 py-3">OT Start Time</th>
+                          <th className="px-4 py-3">Time2</th>
+                          <th className="px-4 py-3">Time3</th>
+                          <th className="px-4 py-3">Time4</th>
+                          <th className="px-4 py-3">WorkingHour</th>
+                          <th className="px-4 py-3">OTAfterWH</th>
+                          <th className="px-4 py-3 font-medium">GenDeductHour</th>
+                          <th className="px-4 py-3 font-medium">HolidayDeductHour</th>
+                          <th className="px-4 py-3">OTRound</th>
+                          <th className="px-4 py-3">RoundAfter</th>
+                          <th className="px-4 py-3">MaxOT</th>
+                          <th className="px-4 py-3">IsActive</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/30 text-foreground">
+                        {otConfigs
+                          .filter((o) => o.employeeType === otInfoItem?.employeeType)
+                          .map((item, idx) => (
+                          <tr key={item.sl} className="hover:bg-muted/50 transition-colors">
+                            <td className="px-4 py-3 text-center text-muted-foreground">{idx + 1}</td>
+                            <td className="px-4 py-3 text-center">
+                              <button
+                                onClick={() => {
+                                  setOtInfoItem(item);
+                                  setOiStartDate(item.startDate || "");
+                                  setOiEndDate(item.endDate || "");
+                                  setOiShift(item.shift || "General");
+                                  setOiStartTime(item.startTime || "06:11:00");
+                                  setOiEndTime(item.endTime || "11:59:00");
+                                  setOiShiftStartTime(item.shiftStartTime || "08:00:00");
+                                  setOiOtStartTime(item.otStartTime || "17:00:00");
+                                  setOiOtToleranceUpTo(item.otToleranceUpTo || "");
+                                  setOiTime2Min(item.time2Min !== undefined ? item.time2Min : 110);
+                                  setOiTime2MaxOt(item.time2MaxOt !== undefined ? item.time2MaxOt : 2);
+                                  setOiTime3Min(item.time3Min !== undefined ? item.time3Min : 110);
+                                  setOiTime3MaxOt(item.time3MaxOt !== undefined ? item.time3MaxOt : 2);
+                                  setOiTime4Min(item.time4Min !== undefined ? item.time4Min : 0);
+                                  setOiTime4MaxOt(item.time4MaxOt !== undefined ? item.time4MaxOt : 0);
+                                  setOiOtAfterWH(item.otAfterWH || "No");
+                                  setOiWorkingHour(item.workingHour !== undefined ? item.workingHour : 12);
+                                  setOiFixedOtHour(item.fixedOtHour !== undefined ? item.fixedOtHour : 0);
+                                  setOiGeneralDeductHour(item.generalDeductHour !== undefined ? item.generalDeductHour : 0);
+                                  setOiHolidayDeductHour(item.holidayDeductHour !== undefined ? item.holidayDeductHour : 1);
+                                  setOiDeductAfter(item.deductAfter !== undefined ? item.deductAfter : 0);
+                                  setOiOtRound(item.otRound || "Yes");
+                                  const rsStr = item.roundSlots || "0-49,0#50-59,1";
+                                  setOiRoundSlots(rsStr);
+                                  setOiSlabs(parseRoundSlots(rsStr));
+                                  setOiMinOt(item.minOt !== undefined ? item.minOt : 0);
+                                  setOiMaxOt(item.maxOt !== undefined ? item.maxOt : 14);
+                                  setOiOtType(item.otCalculationType || "General");
+                                  setOiPrayerBreak(item.prayerBreak || "No");
+                                  setOiPrayerDayName(item.prayerDayName || "Saturday");
+                                  setOiPrayerTimeFrom(item.prayerTimeFrom || "13:00:00");
+                                  setOiPrayerTimeTo(item.prayerTimeTo || "13:30:00");
+                                  setOiDinnerBreak(item.dinnerBreak || "Yes");
+                                  setOiDeductionFor(item.deductionFor || "Holiday");
+                                  setOiTimeFrom(item.timeFrom || "14:00:00");
+                                  setOiTimeTo(item.timeTo || "14:30:00");
+                                  setOiDeductMin(item.deductMin !== undefined ? item.deductMin : 30);
+                                  setOiIsActive(item.isActive);
+                                  setOiOtStartFromShift(item.otStartFromShift || "Yes");
+                                  setOiEmployeeType(item.employeeType || "ALL");
+                                  setOiDepartment(item.department || "All Departments");
+                                  setOiSection(item.section || "ALL");
+                                  setOiDesignation(item.designation || "ALL");
+                                  setOiUnit(item.unit || "ALL");
+                                  setEditSl(item.sl);
+                                }}
+                                className="text-orange-500 hover:text-orange-600 transition"
+                                title="Load into Form"
+                              >
+                                <Pencil className="size-4" />
+                              </button>
+                            </td>
+                            <td className="px-4 py-3">{item.employeeType}</td>
+                            <td className="px-4 py-3">{item.department || "—"}</td>
+                            <td className="px-4 py-3">{item.section || "—"}</td>
+                            <td className="px-4 py-3">{item.designation || "—"}</td>
+                            <td className="px-4 py-3">{item.unit || "—"}</td>
+                            <td className="px-4 py-3">Date</td>
+                            <td className="px-4 py-3 font-mono">{item.startTime || "—"}</td>
+                            <td className="px-4 py-3 font-mono">{item.endTime || "—"}</td>
+                            <td className="px-4 py-3 font-mono">{item.otStartTime || "—"}</td>
+                            <td className="px-4 py-3 font-mono">{item.time2Min !== undefined ? item.time2Min : 0}</td>
+                            <td className="px-4 py-3 font-mono">{item.time3Min !== undefined ? item.time3Min : 0}</td>
+                            <td className="px-4 py-3 font-mono">{item.time4Min !== undefined ? item.time4Min : 0}</td>
+                            <td className="px-4 py-3 font-mono">{item.workingHour !== undefined ? item.workingHour : 0}</td>
+                            <td className="px-4 py-3">{item.otAfterWH || "—"}</td>
+                            <td className="px-4 py-3 font-mono">{item.generalDeductHour !== undefined ? item.generalDeductHour : 0}</td>
+                            <td className="px-4 py-3 font-mono">{item.holidayDeductHour !== undefined ? item.holidayDeductHour : 0}</td>
+                            <td className="px-4 py-3">{item.otRound || "—"}</td>
+                            <td className="px-4 py-3 font-mono text-xs">{item.roundSlots || "—"}</td>
+                            <td className="px-4 py-3 font-mono">{item.maxOt !== undefined ? item.maxOt : 0}</td>
+                            <td className="px-4 py-3">{item.isActive || "—"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </SectionCard>
+              )}
             </div>
 
             <footer className="flex items-center justify-between gap-3 border-t border-border bg-card px-6 py-4">
@@ -3293,6 +3422,142 @@ function TimeSetupPage() {
               </Button>
               <Button
                 onClick={() => {
+                  // Validation checks
+                  if (oiMode === "settings") {
+                    if (!oiStartDate) {
+                      toast.error("Start Date is required!");
+                      return;
+                    }
+                    if (!oiEndDate) {
+                      toast.error("End Date is required!");
+                      return;
+                    }
+                  }
+                  if (!oiShift) {
+                    toast.error("Shift is required!");
+                    return;
+                  }
+                  if (!oiStartTime) {
+                    toast.error("Start Time is required!");
+                    return;
+                  }
+                  if (!oiEndTime) {
+                    toast.error("End Time is required!");
+                    return;
+                  }
+                  if (!oiShiftStartTime) {
+                    toast.error("Shift Start Time is required!");
+                    return;
+                  }
+                  if (!oiOtStartTime) {
+                    toast.error("OT Start Time is required!");
+                    return;
+                  }
+                  if (oiTime2Min === undefined || oiTime2Min === null || isNaN(oiTime2Min)) {
+                    toast.error("Time-2 (Min) is required!");
+                    return;
+                  }
+                  if (oiTime2MaxOt === undefined || oiTime2MaxOt === null || isNaN(oiTime2MaxOt)) {
+                    toast.error("Time-2 Max OT is required!");
+                    return;
+                  }
+                  if (oiTime3Min === undefined || oiTime3Min === null || isNaN(oiTime3Min)) {
+                    toast.error("Time-3 (Min) is required!");
+                    return;
+                  }
+                  if (oiTime3MaxOt === undefined || oiTime3MaxOt === null || isNaN(oiTime3MaxOt)) {
+                    toast.error("Time-3 Max OT is required!");
+                    return;
+                  }
+                  if (oiTime4Min === undefined || oiTime4Min === null || isNaN(oiTime4Min)) {
+                    toast.error("Time-4 (Min) is required!");
+                    return;
+                  }
+                  if (oiTime4MaxOt === undefined || oiTime4MaxOt === null || isNaN(oiTime4MaxOt)) {
+                    toast.error("Time-4 Max OT is required!");
+                    return;
+                  }
+                  if (!oiOtAfterWH) {
+                    toast.error("OT After WH is required!");
+                    return;
+                  }
+                  if (oiWorkingHour === undefined || oiWorkingHour === null || isNaN(oiWorkingHour)) {
+                    toast.error("Working Hour is required!");
+                    return;
+                  }
+                  if (oiGeneralDeductHour === undefined || oiGeneralDeductHour === null || isNaN(oiGeneralDeductHour)) {
+                    toast.error("General Deduct Hour is required!");
+                    return;
+                  }
+                  if (oiHolidayDeductHour === undefined || oiHolidayDeductHour === null || isNaN(oiHolidayDeductHour)) {
+                    toast.error("Holiday Deduct Hour is required!");
+                    return;
+                  }
+                  if (oiDeductAfter === undefined || oiDeductAfter === null || isNaN(oiDeductAfter)) {
+                    toast.error("Deduct After is required!");
+                    return;
+                  }
+                  if (!oiOtRound) {
+                    toast.error("OT Round is required!");
+                    return;
+                  }
+                  if (oiOtRound === "Yes" && oiSlabs.length === 0) {
+                    toast.error("At least one Round Slab is required when OT Round is Yes!");
+                    return;
+                  }
+                  if (oiMinOt === undefined || oiMinOt === null || isNaN(oiMinOt)) {
+                    toast.error("Min OT is required!");
+                    return;
+                  }
+                  if (oiMaxOt === undefined || oiMaxOt === null || isNaN(oiMaxOt)) {
+                    toast.error("Max OT is required!");
+                    return;
+                  }
+                  if (!oiOtType) {
+                    toast.error("OT Type is required!");
+                    return;
+                  }
+                  if (oiPrayerBreak === "Yes") {
+                    if (!oiPrayerDayName) {
+                      toast.error("Prayer Day Name is required!");
+                      return;
+                    }
+                    if (!oiPrayerTimeFrom) {
+                      toast.error("Prayer Time From is required!");
+                      return;
+                    }
+                    if (!oiPrayerTimeTo) {
+                      toast.error("Prayer Time To is required!");
+                      return;
+                    }
+                  }
+                  if (oiDinnerBreak === "Yes") {
+                    if (!oiDeductionFor) {
+                      toast.error("Deduction For is required!");
+                      return;
+                    }
+                    if (!oiTimeFrom) {
+                      toast.error("Time From is required!");
+                      return;
+                    }
+                    if (!oiTimeTo) {
+                      toast.error("Time To is required!");
+                      return;
+                    }
+                    if (oiDeductMin === undefined || oiDeductMin === null || isNaN(oiDeductMin)) {
+                      toast.error("Deduct Min is required!");
+                      return;
+                    }
+                  }
+                  if (!oiIsActive) {
+                    toast.error("IsActive is required!");
+                    return;
+                  }
+                  if (!oiOtStartFromShift) {
+                    toast.error("OTStartTime From Shift is required!");
+                    return;
+                  }
+
                   const isNew = !otInfoItem || !otInfoItem.sl || otInfoItem.sl === 0;
                   const sl = isNew
                     ? otConfigs.length > 0

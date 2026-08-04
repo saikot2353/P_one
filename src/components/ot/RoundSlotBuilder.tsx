@@ -15,9 +15,10 @@ type Props = {
   slabs: RoundSlab[];
   onChange: (slabs: RoundSlab[]) => void;
   disabled?: boolean;
+  required?: boolean;
 };
 
-export function RoundSlotBuilder({ slabs, onChange, disabled }: Props) {
+export function RoundSlotBuilder({ slabs, onChange, disabled, required }: Props) {
   const update = (id: string, patch: Partial<RoundSlab>) =>
     onChange(slabs.map((s) => (s.id === id ? { ...s, ...patch } : s)));
 
@@ -36,7 +37,9 @@ export function RoundSlotBuilder({ slabs, onChange, disabled }: Props) {
         <div className="flex items-center gap-2">
           <Layers className="size-4 text-primary" />
           <div>
-            <p className="text-sm font-semibold text-foreground">Round Slabs</p>
+            <p className="text-sm font-semibold text-foreground">
+              Round Slabs {required && !disabled && <span className="text-destructive"> *</span>}
+            </p>
             <p className="text-xs text-muted-foreground">
               Define a minute range, then the OT hour granted for that range.
             </p>
