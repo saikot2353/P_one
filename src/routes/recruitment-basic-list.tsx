@@ -111,18 +111,28 @@ function BasicInfoListPage() {
   const [filterFormStatus, setFilterFormStatus] = useState("All");
   const [filterWorkflowStatus, setFilterWorkflowStatus] = useState("All");
   const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(null);
+  
+  const [showOfferModal, setShowOfferModal] = useState(false);
+  const [offerCandidate, setOfferCandidate] = useState<Candidate | null>(null);
+
+  const handleOpenOffer = (c: Candidate) => {
+    setOfferCandidate(c);
+    setShowOfferModal(true);
+  };
 
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [candidateName, setCandidateName] = useState("");
   const [genDepartment, setGenDepartment] = useState("");
   const [genDesignation, setGenDesignation] = useState("");
   const [reportingBoss, setReportingBoss] = useState("");
+  const [genDoj, setGenDoj] = useState("");
+  const [genEmployeeType, setGenEmployeeType] = useState("Worker");
   const [generatedLink, setGeneratedLink] = useState("");
   const [copied, setCopied] = useState(false);
 
   const handleGenerateLink = () => {
-    if (!candidateName || !genDepartment || !genDesignation || !reportingBoss) {
-      toast.error("Please fill all fields to generate a link.");
+    if (!candidateName || !genDepartment || !genDesignation || !reportingBoss || !genDoj) {
+      toast.error("Please fill all required fields to generate a link.");
       return;
     }
 
@@ -138,9 +148,10 @@ function BasicInfoListPage() {
       department: genDepartment,
       designation: genDesignation,
       reportingBoss: reportingBoss,
+      employeeType: genEmployeeType,
+      doj: genDoj,
       formStatus: "Not Filled",
       assessStatus: "Pending",
-      doj: "",
     };
 
     parsed.push(newCandidate);
@@ -393,7 +404,7 @@ function BasicInfoListPage() {
                             </span>
                           )}
                           <button
-                            onClick={() => toast.success(`Offer Letter generated for ${c.nameEng}`)}
+                            onClick={() => handleOpenOffer(c)}
                             className="h-7 px-3 rounded bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100 flex items-center justify-center gap-1 text-[10px] font-bold transition"
                             title="Offer Letter"
                           >
@@ -454,37 +465,80 @@ function BasicInfoListPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Department</label>
-                    <input 
-                      type="text" 
+                    <select 
                       value={genDepartment}
                       onChange={(e) => setGenDepartment(e.target.value)}
                       className="w-full h-10 px-3 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                      placeholder="e.g. RMG Operation"
-                    />
+                    >
+                      <option value="">Select Department...</option>
+                      <option value="RMG Operation">RMG Operation</option>
+                      <option value="HR & Admin">HR & Admin</option>
+                      <option value="Quality">Quality</option>
+                      <option value="Cutting">Cutting</option>
+                      <option value="Finishing">Finishing</option>
+                      <option value="IT">IT</option>
+                    </select>
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Designation</label>
-                    <input 
-                      type="text" 
+                    <select 
                       value={genDesignation}
                       onChange={(e) => setGenDesignation(e.target.value)}
                       className="w-full h-10 px-3 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                      placeholder="e.g. Operator"
+                    >
+                      <option value="">Select Designation...</option>
+                      <option value="Operator">Operator</option>
+                      <option value="Cutter">Cutter</option>
+                      <option value="Quality Inspector">Quality Inspector</option>
+                      <option value="HR Officer">HR Officer</option>
+                      <option value="Line Supervisor">Line Supervisor</option>
+                      <option value="Iron Man">Iron Man</option>
+                      <option value="Helper">Helper</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Expected Joining Date</label>
+                    <input 
+                      type="date" 
+                      value={genDoj}
+                      onChange={(e) => setGenDoj(e.target.value)}
+                      className="w-full h-10 px-3 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                     />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Employee Type</label>
+                    <select 
+                      value={genEmployeeType}
+                      onChange={(e) => setGenEmployeeType(e.target.value)}
+                      className="w-full h-10 px-3 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    >
+                      <option value="Worker">Worker</option>
+                      <option value="Staff">Staff</option>
+                      <option value="Management">Management</option>
+                    </select>
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Reporting Boss</label>
-                  <input 
-                    type="text" 
-                    value={reportingBoss}
-                    onChange={(e) => setReportingBoss(e.target.value)}
-                    className="w-full h-10 px-3 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                    placeholder="e.g. Jane Smith"
-                  />
-                </div>
-                
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Reporting Boss</label>
+                    <select 
+                      value={reportingBoss}
+                      onChange={(e) => setReportingBoss(e.target.value)}
+                      className="w-full h-10 px-3 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    >
+                      <option value="">Select Boss...</option>
+                      <option value="Jane Smith">Jane Smith</option>
+                      <option value="John Doe">John Doe</option>
+                      <option value="Md. Hasan">Md. Hasan</option>
+                      <option value="Md. Rahman">Md. Rahman</option>
+                      <option value="Kamal Hossain">Kamal Hossain</option>
+                      <option value="Mst. Shirin">Mst. Shirin</option>
+                    </select>
+                  </div>
+                  
                 <div className="pt-4 border-t border-border/50 space-y-4">
                   <button 
                     onClick={handleGenerateLink}
@@ -516,6 +570,83 @@ function BasicInfoListPage() {
                       </div>
                     </div>
                   )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showOfferModal && offerCandidate && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div className="bg-card w-full max-w-2xl mx-4 rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+              <div className="flex items-center justify-between p-6 border-b border-border/50 bg-muted/20">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-blue-500/10 rounded-xl text-blue-600">
+                    <FileText className="size-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-bold">Employment Offer Letter</h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">Preview of the generated offer letter</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowOfferModal(false)}
+                  className="p-2 text-muted-foreground hover:bg-muted rounded-full transition"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+              
+              <div className="p-6 space-y-6">
+                <div className="space-y-4 border rounded-xl p-6 bg-muted/10 font-mono text-sm text-foreground/80 leading-relaxed h-80 overflow-y-auto">
+                  <div className="text-right">
+                    Date: {new Date().toLocaleDateString()}
+                  </div>
+                  <div>
+                    To,<br/>
+                    <strong>{offerCandidate.nameEng}</strong><br/>
+                    Candidate ID: {offerCandidate.empIdTemp}<br/>
+                    Contact: {offerCandidate.personalContact}
+                  </div>
+                  <div className="font-bold">Subject: Offer of Employment</div>
+                  <p>Dear {offerCandidate.nameEng},</p>
+                  <p>
+                    We are pleased to offer you the position of <strong>{offerCandidate.designation}</strong> in the <strong>{offerCandidate.department}</strong> department at our company. 
+                  </p>
+                  <p>
+                    Your skills and experience will be an ideal fit for our team. You will be reporting directly to <strong>{offerCandidate.reportingBoss || "your supervisor"}</strong>.
+                  </p>
+                  <p>
+                    Please review this summary of terms and conditions for your anticipated employment with us. If you accept this offer, your expected date of joining will be <strong>{offerCandidate.doj ? new Date(offerCandidate.doj).toLocaleDateString() : "TBD"}</strong>.
+                  </p>
+                  <p>
+                    We look forward to welcoming you to the team.
+                  </p>
+                  <div className="pt-4">
+                    Sincerely,<br/>
+                    <br/>
+                    <strong>HR Department</strong><br/>
+                    CRIPTON HRIS
+                  </div>
+                </div>
+                
+                <div className="pt-2 flex items-center justify-end gap-3">
+                  <button 
+                    onClick={() => setShowOfferModal(false)}
+                    className="h-10 px-6 rounded-xl border border-border text-sm font-bold hover:bg-muted transition-colors"
+                  >
+                    Close
+                  </button>
+                  <button 
+                    onClick={() => {
+                      toast.success("Offer Letter downloaded successfully!");
+                      setShowOfferModal(false);
+                    }}
+                    className="h-10 px-6 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-colors flex items-center gap-2"
+                  >
+                    <Copy className="size-4" />
+                    Download PDF
+                  </button>
                 </div>
               </div>
             </div>

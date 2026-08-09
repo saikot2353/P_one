@@ -1,5 +1,5 @@
 // Version key — bump this to force-refresh stale localStorage data
-const DATA_VERSION = "v7";
+const DATA_VERSION = "v8";
 
 export const initializeRecruitmentMockData = (forceReset = false) => {
   if (typeof window === "undefined") return;
@@ -2255,6 +2255,7 @@ export const initializeRecruitmentMockData = (forceReset = false) => {
         contact: "01611223358",
       },
       assessStatus: "HR Pending",
+      formStatus: "Not Filled",
       grade: "",
     },
     {
@@ -2310,6 +2311,7 @@ export const initializeRecruitmentMockData = (forceReset = false) => {
         contact: "01711223359",
       },
       assessStatus: "IE Pending",
+      formStatus: "Filled",
       grade: "",
     },
   ]);
