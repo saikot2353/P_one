@@ -200,6 +200,7 @@ export const nav: NavItem[] = [
     icon: UserPlus,
     subitems: [
       { label: "e-Recruitment Form", to: "/e-recruitment-form" },
+      { label: "Link Generator", to: "/e-recruitment-link-generator" },
       { label: "List", to: "/recruitment-basic-list" },
       { label: "Approved List", to: "/recruitment-assessment-list" },
     ],

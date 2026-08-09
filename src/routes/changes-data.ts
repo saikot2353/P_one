@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
         {
+          id: "125",
+          date: new Date().toISOString().slice(0, 16),
+          type: "New Addition",
+          module: "e-Recruitment",
+          link: "/e-recruitment-link-generator",
+          descriptionEn: "Enhanced the 'Link Generator' workflow under e-Recruitment. Added 'Form Status' column and 'Copy Link', 'Offer Letter' buttons in the Application Queue list. The 'Review' button is now automatically disabled until the candidate fills out the form. Also added 'Form Status' and 'Workflow Status' dropdown filters to easily sort candidates.",
+          descriptionBn: "e-Recruitment এর অধীনে 'Link Generator' আপডেট করা হয়েছে। অ্যাপ্লিকেশান কিউ লিস্টে 'Form Status' কলাম এবং 'Copy Link', 'Offer Letter' বাটন যোগ করা হয়েছে। ক্যান্ডিডেট ফর্ম ফিল আপ না করা পর্যন্ত 'Review' বাটনটি এখন স্বয়ংক্রিয়ভাবে নিষ্ক্রিয় থাকবে। এছাড়া সহজে ক্যান্ডিডেট খোঁজার জন্য 'Form Status' এবং 'Workflow Status' ড্রপডাউন ফিল্টার যোগ করা হয়েছে।",
+        },
+        {
           id: "124",
           date: "2026-08-04T15:53",
           type: "Modify",

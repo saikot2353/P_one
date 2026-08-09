@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
@@ -30,8 +30,25 @@ import {
   Check,
 } from "lucide-react";
 
+type ERecruitmentSearchParams = {
+  candidateName?: string;
+  designation?: string;
+  department?: string;
+  reportingBoss?: string;
+  tempId?: string;
+};
+
 export const Route = createFileRoute("/e-recruitment-form")({
   component: ERecruitmentForm,
+  validateSearch: (search: Record<string, unknown>): ERecruitmentSearchParams => {
+    return {
+      candidateName: search.candidateName as string | undefined,
+      designation: search.designation as string | undefined,
+      department: search.department as string | undefined,
+      reportingBoss: search.reportingBoss as string | undefined,
+      tempId: search.tempId as string | undefined,
+    };
+  },
 });
 
 // ─── Reusable Field Components ───────────────────────────────────────────────
@@ -189,6 +206,7 @@ const countryOptions = [{ value: "Bangladesh", label: "Bangladesh" }];
 
 function ERecruitmentForm() {
   const router = useRouter();
+  const search = Route.useSearch();
   const [copyAddress, setCopyAddress] = useState(false);
 
   // NID OCR Scanner States
@@ -638,7 +656,26 @@ function ERecruitmentForm() {
   const photoFileRef = useRef<HTMLInputElement>(null);
 
   // Basic Details States
-  const [nameEng, setNameEng] = useState("");
+  const [nameEng, setNameEng] = useState(search.candidateName || "");
+  const [department, setDepartment] = useState(search.department || "RMG Operation");
+  const [designation, setDesignation] = useState(search.designation || "Operator");
+  const [reportingBoss, setReportingBoss] = useState(search.reportingBoss || "");
+
+  useEffect(() => {
+    if (search.tempId) {
+      const saved = localStorage.getItem("recruitment_candidates");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const cand = parsed.find((c: any) => c.empIdTemp === search.tempId);
+        if (cand) {
+          if (cand.nameEng) setNameEng(cand.nameEng);
+          if (cand.department) setDepartment(cand.department);
+          if (cand.designation) setDesignation(cand.designation);
+          if (cand.reportingBoss) setReportingBoss(cand.reportingBoss);
+        }
+      }
+    }
+  }, [search.tempId]);
   const [nameBng, setNameBng] = useState("");
   const [dob, setDob] = useState("");
   const [religion, setReligion] = useState("");
@@ -776,16 +813,18 @@ function ERecruitmentForm() {
     }
 
     const saved = localStorage.getItem("recruitment_candidates");
-    const parsed = saved ? JSON.parse(saved) : [];
+    let parsed = saved ? JSON.parse(saved) : [];
     const newCandidate = {
-      empIdTemp: `PAL${String(parsed.length + 1).padStart(6, "0")}`,
+      empIdTemp: search.tempId || `PAL${String(parsed.length + 1).padStart(6, "0")}`,
       nameEng,
       nameBng,
       doj: new Date().toISOString().split("T")[0],
       personalContact,
       personalEmail,
-      department: "RMG Operation",
-      designation: "Operator",
+      department,
+      designation,
+      reportingBoss,
+      formStatus: "Filled",
       assessStatus: "IE Pending",
       dob,
       religion,
@@ -812,7 +851,18 @@ function ERecruitmentForm() {
       },
     };
 
-    localStorage.setItem("recruitment_candidates", JSON.stringify([...parsed, newCandidate]));
+    if (search.tempId) {
+      const idx = parsed.findIndex((c: any) => c.empIdTemp === search.tempId);
+      if (idx !== -1) {
+        parsed[idx] = { ...parsed[idx], ...newCandidate };
+      } else {
+        parsed.push(newCandidate);
+      }
+    } else {
+      parsed.push(newCandidate);
+    }
+
+    localStorage.setItem("recruitment_candidates", JSON.stringify(parsed));
     alert("✅ Candidate registered successfully under Public e-Recruitment Portal!");
     router.navigate({ to: "/recruitment-basic-list" });
   };
