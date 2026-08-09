@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
         {
+          id: "127",
+          date: new Date().toISOString().slice(0, 16),
+          type: "Modify",
+          module: "e-Recruitment",
+          link: "/e-recruitment-form",
+          descriptionEn: "Fixed an issue in the e-Recruitment form where the 'jobPost' property was missing from the URL search parameters type definition.",
+          descriptionBn: "e-Recruitment ফর্মে একটি সমস্যা সমাধান করা হয়েছে যেখানে URL সার্চ প্যারামিটার থেকে 'jobPost' প্রপার্টিটি মিসিং ছিল।",
+        },
+        {
           id: "126",
           date: new Date().toISOString().slice(0, 16),
           type: "Modify",
@@ -1093,7 +1102,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
         {
           id: "115",
           date: "2026-08-02T16:01",
-          type: "Create",
+          type: "New Addition",
           module: "Merchandising",
           link: "/merchandising-bom",
           descriptionEn: "Created the Bill of Materials (BOM) page: integrated 'Bill of Materials' and 'BOM List' links into the sidebar layout; designed a filterable BOM Sheet Report register with status-colored row highlighting; implemented a high-fidelity Accessories BOM Sheet details view featuring Color/Size breakdown grids, Fabric detail lists, and sewing trim items grouped by style with subtotals.",
@@ -1129,7 +1138,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
         {
           id: "119",
           date: "2026-08-02T16:40",
-          type: "Create",
+          type: "New Addition",
           module: "Merchandising",
           link: "/merchandising-cad",
           descriptionEn: "Created the CAD Consumption Update module: implemented a filterable registry list view; built a high-fidelity spreadsheet-style edit/entry form with automatic dozen-wise consumption and wastage weight calculations; and designed a printable sheet featuring style details, marker length/DIA parameters, signature approvals, and marker nest visualizers.",

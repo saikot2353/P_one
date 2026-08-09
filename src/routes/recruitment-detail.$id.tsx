@@ -40,6 +40,7 @@ interface Candidate {
   personalEmail?: string;
   department: string;
   designation: string;
+  reportingBoss?: string;
   assessStatus: string;
   dob?: string;
   religion?: string;

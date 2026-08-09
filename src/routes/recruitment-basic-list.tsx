@@ -54,6 +54,7 @@ interface Candidate {
   personalEmail?: string;
   department: string;
   designation: string;
+  reportingBoss?: string;
   assessStatus: string;
   formStatus?: string;
   dob?: string;

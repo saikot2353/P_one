@@ -33,6 +33,7 @@ type ERecruitmentSearchParams = {
   candidateName?: string;
   designation?: string;
   department?: string;
+  jobPost?: string;
   reportingBoss?: string;
   tempId?: string;
 };
@@ -44,6 +45,7 @@ export const Route = createFileRoute("/e-recruitment-form")({
       candidateName: search.candidateName as string | undefined,
       designation: search.designation as string | undefined,
       department: search.department as string | undefined,
+      jobPost: search.jobPost as string | undefined,
       reportingBoss: search.reportingBoss as string | undefined,
       tempId: search.tempId as string | undefined,
     };
@@ -135,22 +137,27 @@ function SectionHeader({
   icon,
   title,
   subtitle,
+  action,
 }: {
   icon: React.ReactNode;
   title: string;
   subtitle?: string;
+  action?: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center gap-3 px-5 py-4 border-b border-border/50 bg-muted/20">
-      <div className="p-2 rounded-xl bg-card border border-border/80 text-primary shadow-2xs">
-        {icon}
+    <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-border/50 bg-muted/20">
+      <div className="flex items-center gap-3">
+        <div className="p-2 rounded-xl bg-card border border-border/80 text-primary shadow-2xs">
+          {icon}
+        </div>
+        <div>
+          <h2 className="text-[11px] font-black text-foreground/70 uppercase tracking-widest leading-none">
+            {title}
+          </h2>
+          {subtitle && <p className="text-[10px] text-muted-foreground/75 mt-1">{subtitle}</p>}
+        </div>
       </div>
-      <div>
-        <h2 className="text-[11px] font-black text-foreground/70 uppercase tracking-widest leading-none">
-          {title}
-        </h2>
-        {subtitle && <p className="text-[10px] text-muted-foreground/75 mt-1">{subtitle}</p>}
-      </div>
+      {action && <div>{action}</div>}
     </div>
   );
 }
@@ -319,6 +326,7 @@ function ERecruitmentForm() {
   const router = useRouter();
   const search = Route.useSearch();
   const [activeSection, setActiveSection] = useState("identity");
+  const [helpLanguage, setHelpLanguage] = useState<'en' | 'bn'>('en');
   const [copyAddress, setCopyAddress] = useState(false);
 
   // NID OCR Scanner States
@@ -1904,6 +1912,22 @@ function ERecruitmentForm() {
                   icon={<Info className="size-4" />}
                   title="Help & User Manual"
                   subtitle="Detailed instructions and explanations for filling out the e-Recruitment form"
+                  action={
+                    <div className="flex items-center gap-1 bg-card border border-border/80 rounded-lg p-1">
+                      <button
+                        onClick={() => setHelpLanguage('en')}
+                        className={`px-3 py-1 rounded text-[10px] font-bold transition-colors ${helpLanguage === 'en' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted/50'}`}
+                      >
+                        English
+                      </button>
+                      <button
+                        onClick={() => setHelpLanguage('bn')}
+                        className={`px-3 py-1 rounded text-[10px] font-bold transition-colors ${helpLanguage === 'bn' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted/50'}`}
+                      >
+                        বাংলা
+                      </button>
+                    </div>
+                  }
                 />
                 <div className="p-6 space-y-8">
                   {/* Comprehensive Manual Content */}
@@ -1914,34 +1938,55 @@ function ERecruitmentForm() {
                         <h3 className="text-sm font-extrabold text-primary border-b border-border/50 pb-3 mb-4 flex items-center gap-2">
                           <User className="size-4" /> 1. Candidate Identity
                         </h3>
-                        <ul className="text-xs text-muted-foreground space-y-3">
-                          <li><strong className="text-foreground">Candidate Photo:</strong> Upload a clear, recent passport-size photograph. Supported formats are JPG/PNG (Max 2MB).</li>
-                          <li><strong className="text-foreground">Full Name (English & Bengali):</strong> Enter your legal name exactly as it appears on your official documents (NID/Passport).</li>
-                          <li><strong className="text-foreground">Date of Birth:</strong> Select your official date of birth from the calendar.</li>
-                          <li><strong className="text-foreground">Religion & Marital Status:</strong> Select the appropriate options from the dropdown menus.</li>
-                          <li><strong className="text-foreground">Identity Numbers:</strong> Provide your 10, 13, or 17-digit NID Number. Alternatively, provide your Birth Registration Number.</li>
-                        </ul>
+                        <div className="space-y-3">
+                          <p className="text-[12px] text-muted-foreground leading-relaxed">
+                            <strong className="text-foreground">Candidate Photo:</strong> {helpLanguage === 'bn' ? "আপনার একটি পাসপোর্ট সাইজ ছবি আপলোড করুন। আপনার মুখমণ্ডল যেন পরিষ্কার দেখা যায়। ছবির সাইজ ২ মেগাবাইটের (2MB) কম হতে হবে।" : "Click on the photo box to upload a recent passport-size picture of yourself. Make sure your face is clearly visible. The picture must be smaller than 2MB."}
+                          </p>
+                          <p className="text-[12px] text-muted-foreground leading-relaxed">
+                            <strong className="text-foreground">Candidate Name (English & Bengali):</strong> {helpLanguage === 'bn' ? "আপনার জাতীয় পরিচয়পত্রে (NID) যেভাবে নাম লেখা আছে, ঠিক সেভাবেই আপনার সম্পূর্ণ নাম লিখুন। এটি ইংরেজি এবং বাংলা উভয় ভাষায় লিখতে হবে।" : "Type your full name exactly as it is written on your National ID (NID). We need you to write it in both English and Bengali."}
+                          </p>
+                          <p className="text-[12px] text-muted-foreground leading-relaxed">
+                            <strong className="text-foreground">Date of Birth:</strong> {helpLanguage === 'bn' ? "বক্সে ক্লিক করে ক্যালেন্ডার থেকে আপনার সঠিক জন্মতারিখ (দিন, মাস ও বছর) নির্বাচন করুন।" : "Click the box to open a calendar and select the exact day, month, and year you were born."}
+                          </p>
+                          <p className="text-[12px] text-muted-foreground leading-relaxed">
+                            <strong className="text-foreground">Religion & Marital Status:</strong> {helpLanguage === 'bn' ? "ড্রপডাউন মেনু থেকে আপনার ধর্ম এবং বৈবাহিক অবস্থা (যেমন: ইসলাম, অবিবাহিত) নির্বাচন করুন।" : "Click the dropdown menus and choose the options that apply to you (e.g., Islam, Single)."}
+                          </p>
+                          <p className="text-[12px] text-muted-foreground leading-relaxed">
+                            <strong className="text-foreground">NID Number & Birth Registration Number:</strong> {helpLanguage === 'bn' ? "আপনার ১০, ১৩, বা ১৭-সংখ্যার জাতীয় পরিচয়পত্র (NID) নম্বর দিতে হবে। যদি NID না থাকে, তবে আপনার জন্ম নিবন্ধন নম্বর দিন।" : "You must enter your 10, 13, or 17-digit National ID (NID) number. If you don't have an NID, enter your Birth Registration Number."}
+                          </p>
+                        </div>
                       </div>
 
                       <div className="bg-muted/10 p-5 rounded-xl border border-border/50 hover:border-primary/20 hover:bg-muted/30 transition-colors">
                         <h3 className="text-sm font-extrabold text-primary border-b border-border/50 pb-3 mb-4 flex items-center gap-2">
                           <Contact2 className="size-4" /> 2. Family & Contact
                         </h3>
-                        <ul className="text-xs text-muted-foreground space-y-3">
-                          <li><strong className="text-foreground">Parents' Names:</strong> Provide the names of your Father and Mother in both English and Bengali.</li>
-                          <li><strong className="text-foreground">Personal Contact & Email:</strong> Enter your active mobile number and email address. These will be used for official communications and interview scheduling.</li>
-                          <li><strong className="text-foreground">Emergency Contact:</strong> Provide the Name, Contact Number, and Relationship of a person we can reach in case of a medical or administrative emergency.</li>
-                        </ul>
+                        <div className="space-y-3">
+                          <p className="text-[12px] text-muted-foreground leading-relaxed">
+                            <strong className="text-foreground">Parents' Names:</strong> {helpLanguage === 'bn' ? "আপনার পিতা এবং মাতার নাম লিখুন। নিজের নামের মতো এগুলোও ইংরেজি এবং বাংলা উভয় ভাষায় লিখতে হবে।" : "Type your Father's Name and Mother's Name. Like your own name, please write these in both English and Bengali."}
+                          </p>
+                          <p className="text-[12px] text-muted-foreground leading-relaxed">
+                            <strong className="text-foreground">Personal Contact No & Email Address:</strong> {helpLanguage === 'bn' ? "আপনার ব্যক্তিগত মোবাইল নম্বর এবং ইমেইল ঠিকানা দিন। এগুলো অবশ্যই চালু থাকতে হবে, কারণ আমরা আপনার সাথে যোগাযোগের জন্য এগুলো ব্যবহার করব!" : "Type your personal mobile phone number and your email address. Make sure these are active, because we will use them to contact you!"}
+                          </p>
+                          <p className="text-[12px] text-muted-foreground leading-relaxed">
+                            <strong className="text-foreground">Emergency Contact:</strong> {helpLanguage === 'bn' ? "জরুরি প্রয়োজনে আমরা কাকে কল করব? তার নাম, মোবাইল নম্বর এবং তার সাথে আপনার সম্পর্ক (যেমন: ভাই বা চাচা) লিখুন।" : "If there is an emergency, who should we call? Enter their Name, their Contact Number, and how they are related to you (for example, \"Brother\" or \"Uncle\")."}
+                          </p>
+                        </div>
                       </div>
                       
                       <div className="bg-muted/10 p-5 rounded-xl border border-border/50 hover:border-primary/20 hover:bg-muted/30 transition-colors">
                         <h3 className="text-sm font-extrabold text-primary border-b border-border/50 pb-3 mb-4 flex items-center gap-2">
                           <MapPin className="size-4" /> 3. Address Enrollment
                         </h3>
-                        <ul className="text-xs text-muted-foreground space-y-3">
-                          <li><strong className="text-foreground">Present Address:</strong> Fill in your current residential address including Division, District, Thana, Post Office, and detailed street/house information.</li>
-                          <li><strong className="text-foreground">Permanent Address:</strong> Your official permanent address. If it is exactly the same as your present address, you can use the <span className="font-bold text-foreground">"Same as Present Address"</span> toggle to automatically copy all fields.</li>
-                        </ul>
+                        <div className="space-y-3">
+                          <p className="text-[12px] text-muted-foreground leading-relaxed">
+                            <strong className="text-foreground">Present Address:</strong> {helpLanguage === 'bn' ? "বর্তমানে আপনি যেখানে বসবাস করছেন তার ঠিকানা। আপনার বিভাগ, জেলা, থানা এবং পোস্ট অফিস নির্বাচন করুন। এরপর আপনার বিস্তারিত ঠিকানা (যেমন: বাড়ির নম্বর, রাস্তা বা গ্রাম) লিখুন।" : "This is where you live right now. Fill in your Division, District, Thana, Post Office, and Country. Then, type your exact address details (like house number, road, or village)."}
+                          </p>
+                          <p className="text-[12px] text-muted-foreground leading-relaxed">
+                            <strong className="text-foreground">Permanent Address:</strong> {helpLanguage === 'bn' ? "এটি আপনার স্থায়ী ঠিকানা।" : "This is your permanent or home address."} <br/><br/>
+                            <span className="bg-primary/10 text-primary px-2 py-0.5 rounded font-semibold text-[11px] inline-flex items-center gap-1">💡 {helpLanguage === 'bn' ? "শর্টকাট" : "Shortcut"}</span> {helpLanguage === 'bn' ? "যদি আপনার স্থায়ী এবং বর্তমান ঠিকানা একই হয়, তবে শুধু \"Same as Present Address\" সুইচটিতে ক্লিক করুন! এটি স্বয়ংক্রিয়ভাবে সব তথ্য কপি করে নেবে।" : "If your Permanent Address is exactly the same as your Present Address, just click the \"Same as Present Address\" switch! It will automatically copy everything for you."}
+                          </p>
+                        </div>
                       </div>
                     </div>
 
@@ -1951,41 +1996,59 @@ function ERecruitmentForm() {
                         <h3 className="text-sm font-extrabold text-primary border-b border-border/50 pb-3 mb-4 flex items-center gap-2">
                           <GraduationCap className="size-4" /> 4. Academic Credentials
                         </h3>
-                        <ul className="text-xs text-muted-foreground space-y-3">
-                          <li><strong className="text-foreground">Education Details:</strong> Enter your Degree Title, Institution Name, Passing Year, and Result/CGPA.</li>
-                          <li><strong className="text-foreground">Document Upload:</strong> You can upload a scanned PDF or Image of your certificate/transcript for verification.</li>
-                          <li><strong className="text-foreground">Multiple Degrees:</strong> Use the <span className="font-bold text-foreground">"Add More"</span> button to list all your qualifications, starting from the highest degree.</li>
-                        </ul>
+                        <div className="space-y-3">
+                          <p className="text-[12px] text-muted-foreground leading-relaxed">
+                            <strong className="text-foreground">Education Details:</strong> {helpLanguage === 'bn' ? "আপনার শিক্ষাগত যোগ্যতার তথ্য দিন। আপনার ডিগ্রির নাম (যেমন: B.Sc বা HSC), প্রতিষ্ঠানের নাম (স্কুল বা বিশ্ববিদ্যালয়), পাসের বছর এবং ফলাফল (যেমন: GPA 4.00) লিখুন।" : "Tell us about your education. Type the name of your Degree (like B.Sc or HSC), the Institute Name (your school or university), your Passing Year, and your Result (like GPA 4.00)."}
+                          </p>
+                          <p className="text-[12px] text-muted-foreground leading-relaxed">
+                            <strong className="text-foreground">Upload Document:</strong> {helpLanguage === 'bn' ? "সার্টিফিকেট বা মার্কশিটের ছবি বা PDF আপলোড করতে বক্সে ক্লিক করুন।" : "You can click the upload box to attach a picture or PDF of your certificate or mark sheet."}
+                          </p>
+                          <p className="text-[12px] text-muted-foreground leading-relaxed">
+                            <strong className="text-foreground">Adding More Degrees:</strong> {helpLanguage === 'bn' ? <>একাধিক ডিগ্রি থাকলে, আপনার পরবর্তী ডিগ্রির তথ্য যোগ করার জন্য <span className="text-primary font-bold">"Add More"</span> বাটনে ক্লিক করুন!</> : <>Have more than one degree? Just click the <span className="text-primary font-bold">"Add More"</span> button to add another set of boxes for your next degree!</>}
+                          </p>
+                        </div>
                       </div>
 
                       <div className="bg-muted/10 p-5 rounded-xl border border-border/50 hover:border-primary/20 hover:bg-muted/30 transition-colors">
                         <h3 className="text-sm font-extrabold text-primary border-b border-border/50 pb-3 mb-4 flex items-center gap-2">
                           <Briefcase className="size-4" /> 5. Prior Experience
                         </h3>
-                        <ul className="text-xs text-muted-foreground space-y-3">
-                          <li><strong className="text-foreground">Job Details:</strong> Specify the Organization Name, your Designation, and the Reason for Leaving.</li>
-                          <li><strong className="text-foreground">Employment Period:</strong> Select the Start Date (From) and End Date (To) of your employment.</li>
-                          <li><strong className="text-foreground">Multiple Experiences:</strong> Use the <span className="font-bold text-foreground">"Add Experience"</span> button to list all relevant previous jobs.</li>
-                        </ul>
+                        <div className="space-y-3">
+                          <p className="text-[12px] text-muted-foreground leading-relaxed">
+                            <strong className="text-foreground">Job Details:</strong> {helpLanguage === 'bn' ? "যদি আপনার আগে কাজ করার অভিজ্ঞতা থাকে, তবে প্রতিষ্ঠানের নাম, আপনার পদবি এবং চাকরি ছাড়ার কারণ লিখুন।" : "If you have worked before, type the Organization Name (the company), your Designation (your job title), and the Reason for Leaving."}
+                          </p>
+                          <p className="text-[12px] text-muted-foreground leading-relaxed">
+                            <strong className="text-foreground">Employment Period:</strong> {helpLanguage === 'bn' ? "ক্যালেন্ডার ব্যবহার করে আপনি কবে চাকরি শুরু করেছিলেন (From) এবং কবে শেষ করেছিলেন (To) তা নির্বাচন করুন।" : "Use the calendars to select when you started the job (From) and when you finished (To)."}
+                          </p>
+                          <p className="text-[12px] text-muted-foreground leading-relaxed">
+                            <strong className="text-foreground">Adding More Jobs:</strong> {helpLanguage === 'bn' ? <>একাধিক জায়গায় কাজ করে থাকলে, আরও চাকরির তথ্য যোগ করতে <span className="text-primary font-bold">"Add Experience"</span> বাটনে ক্লিক করুন।</> : <>If you have worked at multiple places, click the <span className="text-primary font-bold">"Add Experience"</span> button to add more jobs to the list.</>}
+                          </p>
+                        </div>
                       </div>
 
                       <div className="bg-muted/10 p-5 rounded-xl border border-border/50 hover:border-primary/20 hover:bg-muted/30 transition-colors">
                         <h3 className="text-sm font-extrabold text-primary border-b border-border/50 pb-3 mb-4 flex items-center gap-2">
                           <ShieldCheck className="size-4" /> 6. Nominee Declaration
                         </h3>
-                        <ul className="text-xs text-muted-foreground space-y-3">
-                          <li><strong className="text-foreground">Nominee Details:</strong> Provide details for your legal nominees for official HR benefits and allocations.</li>
-                          <li><strong className="text-foreground">Required Information:</strong> Include their Full Name, Relation to you (e.g., Spouse, Mother), NID/Birth Registration number, and Contact Number.</li>
-                          <li><strong className="text-foreground">Multiple Nominees:</strong> Click the <span className="font-bold text-foreground">"Add Nominee"</span> button if you wish to distribute benefits among multiple individuals.</li>
-                        </ul>
+                        <div className="space-y-3">
+                          <p className="text-[12px] text-muted-foreground leading-relaxed">
+                            <strong className="text-foreground">What is a Nominee?:</strong> {helpLanguage === 'bn' ? "নমিনি হলেন সেই ব্যক্তি যিনি আপনার কোনো দুর্ঘটনা বা অবর্তমানে আপনার অফিশিয়াল কোম্পানির সুযোগ-সুবিধাগুলো গ্রহণ করবেন (সাধারণত স্বামী/স্ত্রী বা পিতা-মাতা)।" : "A nominee is a person who will receive your official company benefits if something happens to you (usually a husband, wife, or parent)."}
+                          </p>
+                          <p className="text-[12px] text-muted-foreground leading-relaxed">
+                            <strong className="text-foreground">Nominee Details:</strong> {helpLanguage === 'bn' ? "নমিনির সম্পূর্ণ নাম, তার সাথে আপনার সম্পর্ক, তার NID বা জন্ম নিবন্ধন নম্বর এবং মোবাইল নম্বর লিখুন।" : "Type their Full Name, their Relation to you, their NID or Birth Registration number, and their Contact Number."}
+                          </p>
+                          <p className="text-[12px] text-muted-foreground leading-relaxed">
+                            <strong className="text-foreground">Adding Multiple Nominees:</strong> {helpLanguage === 'bn' ? <>আপনি চাইলে একাধিক ব্যক্তিকে নমিনি হিসেবে রাখতে পারেন! অন্য কাউকে যোগ করতে শুধু <span className="text-primary font-bold">"Add Nominee"</span> বাটনে ক্লিক করুন।</> : <>You can choose more than one person to be your nominee! Just click the <span className="text-primary font-bold">"Add Nominee"</span> button to add another person.</>}
+                          </p>
+                        </div>
                       </div>
                       
-                      <div className="p-4 bg-primary/5 rounded-xl border border-primary/20 flex gap-3 items-start hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
-                        <CheckCircle2 className="size-5 text-primary mt-0.5 shrink-0" />
+                      <div className="p-5 bg-primary/10 rounded-xl border border-primary/30 flex gap-4 items-start shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+                        <CheckCircle2 className="size-6 text-primary mt-1 shrink-0" />
                         <div>
-                          <h4 className="text-xs font-bold text-foreground">Final Submission</h4>
-                          <p className="text-[11px] text-muted-foreground mt-1">
-                            Ensure the top progress bar reaches 100% before submission. Required fields are marked with an asterisk (<span className="text-red-500 font-bold">*</span>).
+                          <h4 className="text-sm font-bold text-foreground">{helpLanguage === 'bn' ? 'জমা দেওয়ার জন্য প্রস্তুত?' : 'Ready to Submit?'}</h4>
+                          <p className="text-[11px] text-muted-foreground mt-2 leading-relaxed">
+                            {helpLanguage === 'bn' ? <>উপরের প্রগ্রেস বারটি লক্ষ্য করুন। ফর্ম জমা দেওয়ার আগে এটি অবশ্যই <strong className="text-foreground">100%</strong> হতে হবে। লাল তারকা (<span className="text-red-500 font-bold">*</span>) চিহ্ন দেওয়া ঘরগুলো অবশ্যই পূরণ করতে হবে, কারণ এগুলো বাধ্যতামূলক!</> : <>Look at the progress bar at the top of the page. It must reach <strong className="text-foreground">100%</strong> before you can submit. Make sure you have filled out all the boxes that have a red star (<span className="text-red-500 font-bold">*</span>) next to them, because those are mandatory!</>}
                           </p>
                         </div>
                       </div>
