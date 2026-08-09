@@ -110,11 +110,11 @@ function AddEmployeePage() {
     const fileInput = document.createElement("input");
     fileInput.type = "file";
     fileInput.accept = ".pdf,.jpg,.jpeg,.png";
-    
+
     fileInput.onchange = (e: any) => {
       const file = e.target.files?.[0];
       if (!file) return;
-      
+
       // Extension validation
       const allowedExtensions = ["pdf", "jpg", "jpeg", "png"];
       const fileExtension = file.name.split(".").pop()?.toLowerCase();
@@ -122,29 +122,29 @@ function AddEmployeePage() {
         toast.error("Only PDF, JPG, JPEG, and PNG files are allowed!");
         return;
       }
-      
+
       // Size validation (5MB max)
       const maxSize = 5 * 1024 * 1024;
       if (file.size > maxSize) {
         toast.error("File size exceeds the 5MB limit!");
         return;
       }
-      
-      const fileSizeStr = file.size > 1024 * 1024 
+
+      const fileSizeStr = file.size > 1024 * 1024
         ? `${(file.size / (1024 * 1024)).toFixed(2)} MB`
         : `${(file.size / 1024).toFixed(1)} KB`;
-        
+
       let currentProgress = 0;
       setUploadingState({ listType, index, progress: 0 });
-      
+
       const interval = setInterval(() => {
         currentProgress += 10;
         setUploadingState({ listType, index, progress: currentProgress });
-        
+
         if (currentProgress >= 100) {
           clearInterval(interval);
           setUploadingState(null);
-          
+
           const generatedAttachmentId = "att_" + Math.floor(100000 + Math.random() * 900000).toString(16);
           const updatedFileName = `${file.name} (${fileSizeStr})`;
           if (listType === "education") {
@@ -160,7 +160,7 @@ function AddEmployeePage() {
         }
       }, 100);
     };
-    
+
     fileInput.click();
   };
 
@@ -1543,11 +1543,10 @@ function AddEmployeePage() {
                         setActiveTab(tab.id);
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
-                      className={`group text-left p-3.5 rounded-xl border transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[96px] cursor-pointer hover:-translate-y-0.5 ${
-                        isActive
+                      className={`group text-left p-3.5 rounded-xl border transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[96px] cursor-pointer hover:-translate-y-0.5 ${isActive
                           ? "bg-primary/8 border-primary/45 shadow-xs"
                           : "bg-card border-border/80 hover:border-primary/20 hover:bg-muted/10"
-                      }`}
+                        }`}
                     >
                       {/* Top part: Icon + step indicator */}
                       <div className="flex items-center justify-between gap-2 w-full">
@@ -1555,13 +1554,12 @@ function AddEmployeePage() {
                           Step 0{idx + 1}
                         </span>
                         <div
-                          className={`size-6 rounded-md flex items-center justify-center transition-all ${
-                            isActive
+                          className={`size-6 rounded-md flex items-center justify-center transition-all ${isActive
                               ? "bg-primary text-primary-foreground shadow-xs"
                               : completed
                                 ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
                                 : "bg-muted text-muted-foreground"
-                          }`}
+                            }`}
                         >
                           {completed && !isActive ? (
                             <Check className="size-3.5 stroke-[3]" />
@@ -1584,26 +1582,24 @@ function AddEmployeePage() {
                       <div className="mt-2.5 w-full flex items-center gap-2">
                         <div className="flex-1 h-1 bg-muted rounded-full overflow-hidden border border-border/10">
                           <div
-                            className={`h-full rounded-full transition-all duration-500 ${
-                              percentage === 100
+                            className={`h-full rounded-full transition-all duration-500 ${percentage === 100
                                 ? "bg-emerald-500"
                                 : percentage > 40
                                   ? "bg-amber-500"
                                   : "bg-rose-500"
-                            }`}
+                              }`}
                             style={{ width: `${percentage}%` }}
                           />
                         </div>
                         <span
-                          className={`text-[9px] font-black shrink-0 ${
-                            isActive
+                          className={`text-[9px] font-black shrink-0 ${isActive
                               ? "text-primary"
                               : percentage === 100
                                 ? "text-emerald-500"
                                 : percentage > 40
                                   ? "text-amber-500"
                                   : "text-rose-500"
-                          }`}
+                            }`}
                         >
                           {percentage}%
                         </span>
@@ -1671,13 +1667,12 @@ function AddEmployeePage() {
                           >
                             {/* Circle Stepper Dot/Bubble */}
                             <div
-                              className={`size-[42px] rounded-full flex items-center justify-center border-2 transition-all duration-300 relative ${
-                                isSelected
+                              className={`size-[42px] rounded-full flex items-center justify-center border-2 transition-all duration-300 relative ${isSelected
                                   ? "bg-primary text-primary-foreground border-primary shadow-[0_0_15px_var(--primary)] scale-110"
                                   : isCompleted
                                     ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.2)]"
                                     : "bg-card text-muted-foreground border-border/80 hover:border-muted-foreground/60"
-                              }`}
+                                }`}
                             >
                               {isCompleted ? (
                                 <Check className="size-[18px] stroke-[3]" />
@@ -1694,25 +1689,23 @@ function AddEmployeePage() {
                             {/* Text labels and percentages */}
                             <div className="text-center space-y-1.5 w-full min-w-[120px]">
                               <span
-                                className={`text-[10px] font-black uppercase tracking-wider block transition-colors duration-200 ${
-                                  isSelected
+                                className={`text-[10px] font-black uppercase tracking-wider block transition-colors duration-200 ${isSelected
                                     ? "text-primary"
                                     : "text-muted-foreground group-hover:text-foreground"
-                                }`}
+                                  }`}
                               >
                                 {idx + 1}. {step.label}
                               </span>
 
                               <span
-                                className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full inline-block transition-all duration-200 ${
-                                  isSelected
+                                className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full inline-block transition-all duration-200 ${isSelected
                                     ? "bg-primary/10 text-primary border border-primary/20"
                                     : isCompleted
                                       ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/10"
                                       : subPercentage > 0
                                         ? "bg-amber-500/10 text-amber-600 border border-amber-500/10"
                                         : "bg-rose-500/10 text-rose-600 border border-rose-500/10"
-                                }`}
+                                  }`}
                               >
                                 {subPercentage}%
                               </span>
@@ -1733,18 +1726,10 @@ function AddEmployeePage() {
                         </div>
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
                           <div className="space-y-1.5 max-w-xl">
-                            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-wider border border-primary/20">
-                              <Sparkles className="size-3" /> AI Smart Utility
-                            </div>
+
                             <h3 className="text-sm font-extrabold text-foreground tracking-tight">
                               Autofill with Smart Document Scan
                             </h3>
-                            <p className="text-[11px] text-muted-foreground leading-relaxed">
-                              Upload a scanned copy or picture of your National ID, Passport, Birth
-                              Certificate, or Driving License. Our smart AI extractor will instantly
-                              parse your name, parent details, date of birth, document number,
-                              gender, and addresses so you don't have to enter them manually.
-                            </p>
                           </div>
 
                           {/* Control Panel */}
@@ -1788,9 +1773,8 @@ function AddEmployeePage() {
                               type="text"
                               value={form.nameEng}
                               onChange={(e) => handleChange("nameEng", e.target.value)}
-                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full ${
-                                errors.nameEng ? "border-rose-400" : "border-border"
-                              }`}
+                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full ${errors.nameEng ? "border-rose-400" : "border-border"
+                                }`}
                               placeholder="e.g. Tahmid Afsar Shapno"
                             />
                           </div>
@@ -1818,9 +1802,8 @@ function AddEmployeePage() {
                               type="date"
                               value={form.dob}
                               onChange={(e) => handleChange("dob", e.target.value)}
-                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full ${
-                                errors.dob ? "border-rose-400" : "border-border"
-                              }`}
+                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full ${errors.dob ? "border-rose-400" : "border-border"
+                                }`}
                             />
                           </div>
 
@@ -1832,7 +1815,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.gender}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "Male", label: "Male" },
                                   { value: "Female", label: "Female" },
@@ -1850,7 +1833,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.religion}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "Islam", label: "Islam" },
                                   { value: "Hinduism", label: "Hinduism" },
@@ -1870,7 +1853,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.blood}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "A (+ve)", label: "A (+ve)" },
                                   { value: "A (-ve)", label: "A (-ve)" },
@@ -1893,7 +1876,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.maritalStatus}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "Single", label: "Single" },
                                   { value: "Married", label: "Married" },
@@ -1912,7 +1895,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.education}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   {
                                     value: "Bachelor of Science (B.Sc)",
@@ -2066,7 +2049,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.dept}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "Supply Chain", label: "Supply Chain" },
                                   {
@@ -2093,7 +2076,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.title}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "Executive", label: "Executive" },
                                   { value: "Office Executive", label: "Office Executive" },
@@ -2117,7 +2100,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.empType}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "Office Executive", label: "Office Executive" },
                                   { value: "Factory worker", label: "Factory worker" },
@@ -2135,7 +2118,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.workingArea}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "PSL-Operation", label: "PSL-Operation" },
                                   { value: "Head Office", label: "Head Office" },
@@ -2154,7 +2137,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.sect}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "ALL", label: "ALL" },
                                   { value: "Software Development", label: "Software Development" },
@@ -2174,7 +2157,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.jobNature}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "ALL", label: "ALL" },
                                   { value: "Full-Time", label: "Full-Time" },
@@ -2193,7 +2176,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.unit}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "ALL", label: "ALL" },
                                   { value: "Unit 1", label: "Unit 1" },
@@ -2212,7 +2195,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.line}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "ALL", label: "ALL" },
                                   { value: "Line A", label: "Line A" },
@@ -2231,7 +2214,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.grade}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "ALL", label: "None" },
                                   { value: "Grade A", label: "Grade A" },
@@ -2251,7 +2234,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.shift}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "General Shift", label: "General Shift" },
                                   { value: "Night Shift", label: "Night Shift" },
@@ -2269,7 +2252,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.empStatus}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "Probation", label: "Probation" },
                                   { value: "Permanent", label: "Permanent" },
@@ -2287,7 +2270,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.probationPeriod}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "N/A", label: "N/A" },
                                   { value: "3", label: "3" },
@@ -2306,7 +2289,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.holiday}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "N/A", label: "N/A" },
                                   { value: "Friday", label: "Friday" },
@@ -2325,7 +2308,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.setManager}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   {
                                     value: "Mamunoor Rashid (DGM), Head Office",
@@ -2346,7 +2329,7 @@ function AddEmployeePage() {
                             <div className="relative">
                               <SearchableSelect
                                 value={form.recruitmentType}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "New", label: "New" },
                                   { value: "Re-appointment", label: "Re-appointment" },
@@ -2400,9 +2383,8 @@ function AddEmployeePage() {
                               type="text"
                               value={form.nid}
                               onChange={(e) => handleChange("nid", e.target.value)}
-                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full font-mono ${
-                                errors.nid ? "border-rose-400" : "border-border"
-                              }`}
+                              className={`h-10 px-3.5 rounded-xl border bg-card text-xs font-semibold focus:outline-none w-full font-mono ${errors.nid ? "border-rose-400" : "border-border"
+                                }`}
                               placeholder="10 or 17 digit NID number"
                             />
                           </div>
@@ -2832,7 +2814,7 @@ function AddEmployeePage() {
                                 <div className="relative">
                                   <SearchableSelect
                                     value={form.presPostOffice}
-                                    onChange={() => {}}
+                                    onChange={() => { }}
                                     options={postOffices.map((p) => ({ value: p, label: p }))}
                                   />
                                 </div>
@@ -2897,7 +2879,7 @@ function AddEmployeePage() {
                                 <div className="relative">
                                   <SearchableSelect
                                     value={form.presCountry}
-                                    onChange={() => {}}
+                                    onChange={() => { }}
                                     options={[
                                       { value: "Bangladesh", label: "Bangladesh" },
                                       { value: "India", label: "India" },
@@ -2958,7 +2940,7 @@ function AddEmployeePage() {
                                   <div className="relative">
                                     <SearchableSelect
                                       value={form.permPostOffice}
-                                      onChange={() => {}}
+                                      onChange={() => { }}
                                       options={postOffices.map((p) => ({ value: p, label: p }))}
                                     />
                                   </div>
@@ -3028,7 +3010,7 @@ function AddEmployeePage() {
                                   <div className="relative">
                                     <SearchableSelect
                                       value={form.permCountry}
-                                      onChange={() => {}}
+                                      onChange={() => { }}
                                       options={[
                                         { value: "Bangladesh", label: "Bangladesh" },
                                         { value: "India", label: "India" },
@@ -3234,9 +3216,8 @@ function AddEmployeePage() {
                                 type="number"
                                 value={form.gross}
                                 onChange={(e) => handleChange("gross", e.target.value)}
-                                className={`h-10 pl-7.5 pr-3.5 rounded-xl border bg-primary/5 text-sm font-extrabold font-mono text-primary focus:outline-none focus:ring-1 focus:ring-primary w-full ${
-                                  errors.gross ? "border-rose-400" : "border-border/80"
-                                }`}
+                                className={`h-10 pl-7.5 pr-3.5 rounded-xl border bg-primary/5 text-sm font-extrabold font-mono text-primary focus:outline-none focus:ring-1 focus:ring-primary w-full ${errors.gross ? "border-rose-400" : "border-border/80"
+                                  }`}
                                 placeholder="e.g. 45000"
                               />
                             </div>
@@ -3521,7 +3502,7 @@ function AddEmployeePage() {
                         Allowance
                       </h3>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
                       {/* Allowance Option */}
                       <div className="space-y-1.5">
@@ -3625,7 +3606,7 @@ function AddEmployeePage() {
                           placeholder="0"
                         />
                       </div>
-                      
+
                       {/* Empty column spacer */}
                       <div className="hidden sm:block" />
                     </div>
@@ -3812,7 +3793,7 @@ function AddEmployeePage() {
                                   <td className="px-4 py-2">
                                     <SearchableSelect
                                       value={edu.degree}
-                                      onChange={() => {}}
+                                      onChange={() => { }}
                                       options={[
                                         {
                                           value: "Secondary (SSC)",
@@ -3882,8 +3863,8 @@ function AddEmployeePage() {
                                           <span>{uploadingState.progress}%</span>
                                         </div>
                                         <div className="w-full bg-muted-foreground/10 rounded-full h-1">
-                                          <div 
-                                            className="bg-primary h-1 rounded-full transition-all duration-100" 
+                                          <div
+                                            className="bg-primary h-1 rounded-full transition-all duration-100"
                                             style={{ width: `${uploadingState.progress}%` }}
                                           />
                                         </div>
@@ -4079,8 +4060,8 @@ function AddEmployeePage() {
                                           <span>{uploadingState.progress}%</span>
                                         </div>
                                         <div className="w-full bg-muted-foreground/10 rounded-full h-1">
-                                          <div 
-                                            className="bg-primary h-1 rounded-full transition-all duration-100" 
+                                          <div
+                                            className="bg-primary h-1 rounded-full transition-all duration-100"
                                             style={{ width: `${uploadingState.progress}%` }}
                                           />
                                         </div>
@@ -4598,7 +4579,7 @@ function AddEmployeePage() {
                       </label>
                       <SearchableSelect
                         value={form.emergencyRelation}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         options={[
                           { value: "Father", label: "Father" },
                           { value: "Mother", label: "Mother" },
@@ -4726,7 +4707,7 @@ function AddEmployeePage() {
                       </label>
                       <SearchableSelect
                         value={form.nomineeRelation}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         options={[
                           { value: "Mother", label: "Mother" },
                           { value: "Father", label: "Father" },
@@ -4970,7 +4951,7 @@ function AddEmployeePage() {
                             <td className="px-4 py-2">
                               <SearchableSelect
                                 value={dep.depRelation}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "Child", label: "Child (Son/Daughter)" },
                                   { value: "Spouse", label: "Spouse (Husband/Wife)" },
@@ -5174,7 +5155,7 @@ function AddEmployeePage() {
                             <td className="px-4 py-2">
                               <SearchableSelect
                                 value={doc.docType}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 options={[
                                   { value: "PDF", label: "PDF Document" },
                                   { value: "DOCX", label: "Microsoft Word (DOCX)" },
@@ -5252,7 +5233,7 @@ function AddEmployeePage() {
                       </label>
                       <SearchableSelect
                         value={form.verificationStatus}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         options={[
                           { value: "Verified", label: "Verified & Cleared" },
                           { value: "Pending", label: "Pending Audit" },
@@ -5579,11 +5560,11 @@ function AddEmployeePage() {
                 <X className="size-4" />
               </button>
             </div>
-            
+
             {/* Premium Mock File Content Viewer */}
             <div className="bg-muted/30 border border-border/40 rounded-xl p-6 h-96 flex flex-col items-center justify-center relative overflow-hidden select-none">
               <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px] dark:bg-[radial-gradient(#334155_1px,transparent_1px)] opacity-50" />
-              
+
               <div className="z-10 text-center space-y-4 max-w-sm">
                 <div className="size-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 shadow-md">
                   <FileText className="size-8 animate-bounce" />
@@ -5594,7 +5575,7 @@ function AddEmployeePage() {
                     This is a secure local sandbox visualization of the uploaded digital file. Verification checks are automatically verified.
                   </p>
                 </div>
-                
+
                 <div className="pt-2">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
                     <ShieldCheck className="size-3.5" /> Checked & Secured by SAIF
@@ -5602,7 +5583,7 @@ function AddEmployeePage() {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex justify-end gap-3 pt-2">
               <button
                 type="button"

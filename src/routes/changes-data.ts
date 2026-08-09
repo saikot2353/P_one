@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
         {
+          id: "126",
+          date: new Date().toISOString().slice(0, 16),
+          type: "Modify",
+          module: "e-Recruitment",
+          link: "/e-recruitment-form",
+          descriptionEn: "Completely redesigned the e-Recruitment form into a standalone page with a step-by-step sidebar navigation. The main app navigation has been removed from this page for a focused applicant experience.",
+          descriptionBn: "ই-রিক্রুটমেন্ট ফর্মটি সম্পূর্ণ নতুন করে ডিজাইন করা হয়েছে। এটি এখন স্টেপ-বাই-স্টেপ সাইডবার নেভিগেশন সহ একটি স্বয়ংসম্পূর্ণ পেজ। ফোকাসড অ্যাপ্লিক্যান্ট অভিজ্ঞতার জন্য মেইন অ্যাপ নেভিগেশন এই পেজ থেকে সরানো হয়েছে।",
+        },
+        {
           id: "125",
           date: new Date().toISOString().slice(0, 16),
           type: "New Addition",

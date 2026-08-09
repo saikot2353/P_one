@@ -127,11 +127,12 @@ function BasicInfoListPage() {
   const [reportingBoss, setReportingBoss] = useState("");
   const [genDoj, setGenDoj] = useState("");
   const [genEmployeeType, setGenEmployeeType] = useState("Worker");
+  const [genJobPost, setGenJobPost] = useState("");
   const [generatedLink, setGeneratedLink] = useState("");
   const [copied, setCopied] = useState(false);
 
   const handleGenerateLink = () => {
-    if (!candidateName || !genDepartment || !genDesignation || !reportingBoss || !genDoj) {
+    if (!candidateName || !genDepartment || !genDesignation || !reportingBoss || !genDoj || !genJobPost) {
       toast.error("Please fill all required fields to generate a link.");
       return;
     }
@@ -147,6 +148,7 @@ function BasicInfoListPage() {
       nameEng: candidateName,
       department: genDepartment,
       designation: genDesignation,
+      jobPost: genJobPost,
       reportingBoss: reportingBoss,
       employeeType: genEmployeeType,
       doj: genDoj,
@@ -451,15 +453,27 @@ function BasicInfoListPage() {
               </div>
               
               <div className="p-6 space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Candidate Name</label>
-                  <input 
-                    type="text" 
-                    value={candidateName}
-                    onChange={(e) => setCandidateName(e.target.value)}
-                    className="w-full h-10 px-3 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                    placeholder="e.g. John Doe"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Candidate Name</label>
+                    <input 
+                      type="text" 
+                      value={candidateName}
+                      onChange={(e) => setCandidateName(e.target.value)}
+                      className="w-full h-10 px-3 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                      placeholder="e.g. John Doe"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Job Post</label>
+                    <input 
+                      type="text" 
+                      value={genJobPost}
+                      onChange={(e) => setGenJobPost(e.target.value)}
+                      className="w-full h-10 px-3 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                      placeholder="e.g. Software QA Engineer"
+                    />
+                  </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
@@ -487,7 +501,7 @@ function BasicInfoListPage() {
                       className="w-full h-10 px-3 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                     >
                       <option value="">Select Designation...</option>
-                      <option value="Operator">Operator</option>
+                      <option value="Software Quality Assurance (QA) Engineer">Software Quality Assurance (QA) Engineer</option>
                       <option value="Cutter">Cutter</option>
                       <option value="Quality Inspector">Quality Inspector</option>
                       <option value="HR Officer">HR Officer</option>

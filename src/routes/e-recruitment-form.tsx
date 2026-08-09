@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { Sidebar } from "@/components/dashboard/Sidebar";
-import { Topbar } from "@/components/dashboard/Topbar";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import companyLogo from "@/components/Pakiza-Software-bgless-e1692258364537.webp";
 import {
   ChevronRight,
   UserPlus,
@@ -85,10 +84,9 @@ function FieldInput({
         onChange={onChange}
         placeholder={placeholder}
         className={`h-10 w-full rounded-xl border px-3 text-sm outline-none transition-all duration-200
-          ${
-            readOnly
-              ? "bg-muted/60 border-border/30 text-primary font-bold cursor-default"
-              : "bg-background border-border/80 text-foreground hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/10"
+          ${readOnly
+            ? "bg-muted/60 border-border/30 text-primary font-bold cursor-default"
+            : "bg-background border-border/80 text-foreground hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/10"
           }`}
       />
     </div>
@@ -202,11 +200,125 @@ const postOfficeOptions = ["Uttara Model Town", "Mirpur-10", "Hathazari", "Rauja
 );
 const countryOptions = [{ value: "Bangladesh", label: "Bangladesh" }];
 
+function FormSidebar({ activeSection, setActiveSection, completion, designation }: { activeSection: string, setActiveSection: (s: string) => void, completion?: Record<string, number>, designation?: string }) {
+  const sections = [
+    { id: "identity", label: "Candidate Identity", icon: <User className="size-4" /> },
+    { id: "family", label: "Family & Contact", icon: <Contact2 className="size-4" /> },
+    { id: "address", label: "Address Enrollment", icon: <MapPin className="size-4" /> },
+    { id: "academics", label: "Academic Credentials", icon: <GraduationCap className="size-4" /> },
+    { id: "experience", label: "Prior Experience", icon: <Briefcase className="size-4" /> },
+    { id: "nominee", label: "Nominee & Submit", icon: <ShieldCheck className="size-4" /> },
+  ];
+
+  return (
+    <aside className="w-64 border-r border-border/50 bg-card hidden md:flex flex-col h-screen sticky top-0 shrink-0">
+      <div className="p-6 border-b border-border/50 flex justify-center">
+        <img src={companyLogo} alt="Company Logo" className="h-14 object-contain drop-shadow-md" />
+      </div>
+      <div className="p-4 flex-1 space-y-1 overflow-y-auto">
+        {sections.map((sec) => {
+          const pct = completion ? completion[sec.id] || 0 : 0;
+          return (
+            <button
+              key={sec.id}
+              onClick={() => setActiveSection(sec.id)}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${activeSection === sec.id
+                ? "bg-primary/10 text-primary border border-primary/20"
+                : "text-muted-foreground hover:bg-muted/50 hover:text-foreground border border-transparent"
+                }`}
+            >
+              <div className="flex items-center gap-3">
+                {sec.icon}
+                {sec.label}
+              </div>
+              {completion && (
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-md ${pct === 100 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-muted text-muted-foreground'}`}>
+                  {pct}%
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+      <div className="p-4 border-t border-border/50 bg-card mt-auto">
+        <button
+          type="button"
+          onClick={() => setActiveSection("help")}
+          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
+            activeSection === "help"
+              ? "bg-primary/10 text-primary border border-primary/20"
+              : "text-muted-foreground hover:bg-muted/50 hover:text-foreground border border-transparent"
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <Info className="size-4" />
+            Help & User Manual
+          </div>
+        </button>
+      </div>
+      <div className="p-4 border-t border-border/50 bg-muted/10 text-center">
+        <p className="text-[9px] text-muted-foreground font-medium leading-relaxed">
+          Powered by <span className="font-bold text-primary">Pakiza Software Limited</span><br/>
+          For help call: 01xxxxxxxxx
+        </p>
+      </div>
+    </aside>
+  );
+}
+
+function FormBottomNav({
+  onNext,
+  onPrev,
+  isSubmit = false,
+  onSubmit,
+}: {
+  onNext?: () => void;
+  onPrev?: () => void;
+  isSubmit?: boolean;
+  onSubmit?: (e: React.FormEvent) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between pt-6 border-t border-border/50 mt-6">
+      <div>
+        {onPrev && (
+          <button
+            type="button"
+            onClick={onPrev}
+            className="h-10 px-6 rounded-xl border border-border/80 bg-card hover:bg-muted text-sm font-bold text-foreground hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 flex items-center gap-2 shadow-sm hover:shadow-md"
+          >
+            Previous
+          </button>
+        )}
+      </div>
+      <div>
+        {!isSubmit ? (
+          <button
+            type="button"
+            onClick={onNext}
+            className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-sm font-bold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-1 active:translate-y-0 transition-all duration-300 flex items-center gap-2"
+          >
+            Next Step
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={onSubmit}
+            className="h-11 px-8 rounded-xl bg-primary text-primary-foreground text-sm font-bold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-1 active:translate-y-0 transition-all duration-300 flex items-center gap-2"
+          >
+            <CheckCircle2 className="size-5" /> Submit Application
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 function ERecruitmentForm() {
   const router = useRouter();
   const search = Route.useSearch();
+  const [activeSection, setActiveSection] = useState("identity");
   const [copyAddress, setCopyAddress] = useState(false);
 
   // NID OCR Scanner States
@@ -658,7 +770,8 @@ function ERecruitmentForm() {
   // Basic Details States
   const [nameEng, setNameEng] = useState(search.candidateName || "");
   const [department, setDepartment] = useState(search.department || "RMG Operation");
-  const [designation, setDesignation] = useState(search.designation || "Operator");
+  const [designation, setDesignation] = useState(search.designation || "Software Quality Assurance (QA) Engineer");
+  const [jobPost, setJobPost] = useState(search.jobPost || "");
   const [reportingBoss, setReportingBoss] = useState(search.reportingBoss || "");
 
   useEffect(() => {
@@ -671,6 +784,7 @@ function ERecruitmentForm() {
           if (cand.nameEng) setNameEng(cand.nameEng);
           if (cand.department) setDepartment(cand.department);
           if (cand.designation) setDesignation(cand.designation);
+          if (cand.jobPost) setJobPost(cand.jobPost);
           if (cand.reportingBoss) setReportingBoss(cand.reportingBoss);
         }
       }
@@ -715,18 +829,13 @@ function ERecruitmentForm() {
   const [permCountry, setPermCountry] = useState("Bangladesh");
 
   // Dynamic Lists
-  const [academics, setAcademics] = useState<any[]>([
-    { id: "1", title: "", institution: "", year: "", result: "", file: null },
-  ]);
-  const [experiences, setExperiences] = useState<any[]>([
-    { id: "1", company: "", designation: "", from: "", to: "", reason: "", file: null },
-  ]);
+  const [academics, setAcademics] = useState<any[]>([]);
+  const [experiences, setExperiences] = useState<any[]>([]);
 
   // Nominee Dossier States
-  const [nomineeName, setNomineeName] = useState("");
-  const [nomineeRelation, setNomineeRelation] = useState("");
-  const [nomineeNidReg, setNomineeNidReg] = useState("");
-  const [nomineeContact, setNomineeContact] = useState("");
+  const [nominees, setNominees] = useState<any[]>([
+    { id: "1", name: "", relation: "", nidReg: "", contact: "" },
+  ]);
 
   // Compute Full Addresses
   const fullPresentAddress = [
@@ -760,6 +869,67 @@ function ERecruitmentForm() {
   ]
     .filter(Boolean)
     .join(", ");
+
+  const calculateCompletion = () => {
+    let identityScore = 0;
+    if (nameEng) identityScore++;
+    if (dob) identityScore++;
+    if (religion) identityScore++;
+    if (maritalStatus) identityScore++;
+    if (nidNumber) identityScore++;
+    const identity = Math.round((identityScore / 5) * 100);
+
+    let familyScore = 0;
+    if (fatherEng || fatherBng) familyScore++;
+    if (motherEng || motherBng) familyScore++;
+    if (personalContact) familyScore++;
+    if (emergencyContact) familyScore++;
+    const family = Math.round((familyScore / 4) * 100);
+
+    let addressScore = 0;
+    if (presDistrict && presVillage) addressScore++;
+    if (computedPermDistrict && computedPermVillage) addressScore++;
+    const address = Math.round((addressScore / 2) * 100);
+
+    const firstAc = academics[0];
+    let academicScore = 0;
+    if (firstAc?.title) academicScore++;
+    if (firstAc?.institution) academicScore++;
+    if (firstAc?.year) academicScore++;
+    if (firstAc?.result) academicScore++;
+    const academicsPct = academics.length > 1 ? 100 : Math.round((academicScore / 4) * 100);
+
+    const firstExp = experiences[0];
+    let experience = 0;
+    if (experiences.length > 1 || (firstExp?.company && firstExp?.designation)) {
+      experience = 100;
+    } else if (firstExp?.company || firstExp?.designation) {
+      experience = 50;
+    }
+
+    const firstNom = nominees[0];
+    let nomineeScore = 0;
+    if (firstNom) {
+      if (firstNom.name) nomineeScore++;
+      if (firstNom.relation) nomineeScore++;
+      if (firstNom.contact) nomineeScore++;
+    }
+    const nominee = Math.round((nomineeScore / 3) * 100);
+
+    return {
+      identity,
+      family,
+      address,
+      academics: academicsPct,
+      experience,
+      nominee,
+    };
+  };
+
+  const completion = calculateCompletion();
+  const totalProgress = Math.round(
+    (completion.identity + completion.family + completion.address + completion.academics + completion.experience + completion.nominee) / 6
+  );
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -806,6 +976,16 @@ function ERecruitmentForm() {
     setExperiences(experiences.map((e) => (e.id === id ? { ...e, [key]: value } : e)));
   };
 
+  const handleAddNominee = () => {
+    setNominees([...nominees, { id: crypto.randomUUID(), name: "", relation: "", nidReg: "", contact: "" }]);
+  };
+  const handleRemoveNominee = (id: string) => {
+    setNominees(nominees.filter((n) => n.id !== id));
+  };
+  const handleNomineeChange = (id: string, key: string, value: any) => {
+    setNominees(nominees.map((n) => (n.id === id ? { ...n, [key]: value } : n)));
+  };
+
   const handleSubmit = () => {
     if (!nameEng || !dob || !religion || !maritalStatus || !personalContact) {
       alert("Please fill in all required (*) fields.");
@@ -823,6 +1003,7 @@ function ERecruitmentForm() {
       personalEmail,
       department,
       designation,
+      jobPost,
       reportingBoss,
       formStatus: "Filled",
       assessStatus: "IE Pending",
@@ -843,12 +1024,7 @@ function ERecruitmentForm() {
       permanentAddress: fullPermanentAddress,
       academics,
       experiences,
-      nominee: {
-        name: nomineeName,
-        relation: nomineeRelation,
-        nidReg: nomineeNidReg,
-        contact: nomineeContact,
-      },
+      nominees,
     };
 
     if (search.tempId) {
@@ -885,55 +1061,32 @@ function ERecruitmentForm() {
     setContactPerson("");
     setRelationship("");
     setPhotoPreview(null);
-    setAcademics([{ id: "1", title: "", institution: "", year: "", result: "", file: null }]);
-    setExperiences([
-      { id: "1", company: "", designation: "", from: "", to: "", reason: "", file: null },
-    ]);
-    setNomineeName("");
-    setNomineeRelation("");
-    setNomineeNidReg("");
-    setNomineeContact("");
+    setAcademics([]);
+    setExperiences([]);
+    setNominees([{ id: "1", name: "", relation: "", nidReg: "", contact: "" }]);
     setCopyAddress(false);
   };
 
   return (
     <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
-      <Sidebar />
-      <main className="flex-1 min-w-0 flex flex-col relative">
-        <Topbar />
+      <FormSidebar activeSection={activeSection} setActiveSection={setActiveSection} completion={completion} />
+      <main className="flex-1 min-w-0 flex flex-col relative h-screen overflow-y-auto">
+        {/* Global Progress Bar */}
+        <div className="sticky top-0 left-0 right-0 z-50 h-1.5 bg-muted/40 w-full overflow-hidden">
+          <div 
+            className="h-full bg-primary transition-all duration-700 ease-out shadow-[0_0_10px_var(--primary)]"
+            style={{ width: `${totalProgress}%` }}
+          />
+        </div>
+        
+        <div className="p-4 md:p-6 lg:p-8 space-y-6 w-full max-w-[1600px] mx-auto">
 
-        <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-[1400px] mx-auto w-full">
-          {/* Breadcrumb & Header */}
-          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">
-                  Home
-                </Link>
-                <ChevronRight className="size-3" />
-                <span>Recruitment</span>
-                <ChevronRight className="size-3" />
-                <span className="text-primary font-black">e-Recruitment Form</span>
-              </div>
-              <h1 className="text-xl font-black text-foreground tracking-tight flex items-center gap-2">
-                <UserPlus className="size-5.5 text-primary" />
-                <span>e-Recruitment Application Form</span>
-              </h1>
-            </div>
-            <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/25 rounded-xl px-3 py-2 shadow-2xs">
-              <ShieldCheck className="size-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-              <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold">
-                Security Active (SSL Encrypted)
-              </span>
-            </div>
-          </div>
-
-          {/* Intro Card */}
-          <div className="bg-card rounded-lg border border-border/80 p-6 shadow-xs relative overflow-hidden">
+          {/* Topbar / Intro Card */}
+          <div className="bg-card/60 backdrop-blur-md rounded-2xl border border-border/50 shadow-xl shadow-primary/5 p-6 relative overflow-hidden group hover:border-primary/20 transition-all duration-500">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl" />
             <div className="space-y-1.5 z-10 relative">
-              <h2 className="text-xl font-extrabold text-foreground tracking-tight text-primary">
-                Employment Application Portal
+              <h2 className="text-xl font-extrabold tracking-tight text-primary">
+                Employment Application Portal - <span className="text-foreground/70">{jobPost || designation || "Software Quality Assurance (QA) Engineer"}</span>
               </h2>
               <p className="text-xs text-muted-foreground font-medium max-w-3xl leading-relaxed">
                 Please complete the application form below with your correct personal, contact,
@@ -943,701 +1096,905 @@ function ERecruitmentForm() {
             </div>
           </div>
 
-          {/* AI NID OCR Scanner Widget */}
-          <div className="bg-card border border-border/80 rounded-xl p-5 md:p-6 shadow-xs relative overflow-hidden transition-all duration-300 hover:border-primary/20 bg-gradient-to-br from-card to-primary/5">
-            <div className="absolute top-0 right-0 p-3 opacity-[0.03] text-primary pointer-events-none">
-              <Cpu className="size-24" />
-            </div>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
-              <div className="space-y-1.5 max-w-xl">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-wider border border-primary/20">
-                  <Sparkles className="size-3" /> AI Smart Utility
-                </div>
-                <h3 className="text-sm font-extrabold text-foreground tracking-tight">
-                  Autofill with Smart Document Scan
-                </h3>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Upload a scanned copy or picture of your National ID, Passport, Birth Certificate,
-                  or Driving License. Our smart AI extractor will instantly parse your name, parent
-                  details, date of birth, document number, gender, and address so you don't have to
-                  enter them manually.
-                </p>
-              </div>
+          {activeSection === 'identity' && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
-              {/* Control Panel */}
-              <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setShowNidScannerModal(true)}
-                  className="h-10 px-6 rounded-xl text-xs font-black shadow-lg bg-primary text-primary-foreground hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 group"
-                >
-                  <Scan className="size-4 group-hover:rotate-12 transition-transform" /> Open Smart
-                  Scanner
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* ── SECTION 1: CANDIDATE IDENTITY ── */}
-          <div className="bg-card rounded-lg border border-border/80 shadow-2xs overflow-hidden">
-            <SectionHeader
-              icon={<User className="size-4" />}
-              title="Candidate Profile & Identity"
-              subtitle="Primary applicant identification and document credentials"
-            />
-            <div className="p-6 flex flex-col lg:flex-row gap-8">
-              {/* Photo Upload Zone */}
-              <div className="w-full lg:w-72 shrink-0 flex flex-col items-center gap-4 bg-muted/10 border border-border/60 rounded-lg p-5">
-                <span className="text-[11px] font-black uppercase tracking-wider text-foreground/80">
-                  Candidate Photo
-                </span>
-                <div
-                  onClick={() => photoFileRef.current?.click()}
-                  className="relative w-40 h-40 rounded-lg border-2 border-dashed border-border/85 hover:border-primary/50 bg-card hover:bg-muted/10 transition-all duration-300 cursor-pointer overflow-hidden flex items-center justify-center group"
-                >
-                  {photoPreview ? (
-                    <img
-                      src={photoPreview}
-                      alt="Candidate Preview"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center gap-2 text-muted-foreground/50 group-hover:text-primary/70 text-center p-3">
-                      <Camera className="size-8 stroke-[1.5]" />
-                      <span className="text-[9px] font-bold uppercase tracking-wider">
-                        Upload Portrait
-                      </span>
-                      <span className="text-[8px] text-muted-foreground/60">Max 2MB (JPG/PNG)</span>
-                    </div>
-                  )}
-                  {photoPreview && (
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <span className="text-white text-[10px] font-bold">Replace Photo</span>
-                    </div>
-                  )}
+              {/* AI NID OCR Scanner Widget */}
+              <div className="bg-gradient-to-br from-card/80 to-primary/5 backdrop-blur-md border border-border/50 rounded-2xl p-5 md:p-6 shadow-xl shadow-primary/5 relative overflow-hidden hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 group">
+                <div className="absolute top-0 right-0 p-3 opacity-[0.03] text-primary pointer-events-none">
+                  <Cpu className="size-24" />
                 </div>
-                <div className="flex gap-2 w-full">
-                  <button
-                    type="button"
-                    onClick={() => photoFileRef.current?.click()}
-                    className="flex-1 h-8 rounded-lg bg-card border border-border/85 text-[10px] font-bold text-foreground/80 hover:text-primary hover:border-primary/30 transition-all shadow-3xs"
-                  >
-                    Select File
-                  </button>
-                  {photoPreview && (
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
+                  <div className="space-y-1.5 max-w-xl">
+
+                    <h3 className="text-sm font-extrabold text-foreground tracking-tight">
+                      Autofill with Smart Document Scan
+                    </h3>
+                  </div>
+
+                  {/* Control Panel */}
+                  <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
                     <button
                       type="button"
-                      onClick={() => setPhotoPreview(null)}
-                      className="h-8 px-3 rounded-lg bg-red-50 hover:bg-red-100 border border-red-150 text-red-600 transition-all"
+                      onClick={() => setShowNidScannerModal(true)}
+                      className="h-10 px-6 rounded-xl text-xs font-black shadow-lg bg-primary text-primary-foreground hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 group"
                     >
-                      <Trash2 className="size-3.5" />
+                      <Scan className="size-4 group-hover:rotate-12 transition-transform" /> Open Smart
+                      Scanner
                     </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── SECTION 1: CANDIDATE IDENTITY ── */}
+              <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/50 shadow-xl shadow-black/5 overflow-hidden hover:border-primary/20 transition-colors duration-500">
+                <SectionHeader
+                  icon={<User className="size-4" />}
+                  title="Candidate Profile & Identity"
+                  subtitle="Primary applicant identification and document credentials"
+                />
+                <div className="p-6 flex flex-col lg:flex-row gap-8">
+                  {/* Photo Upload Zone */}
+                  <div className="w-full lg:w-72 shrink-0 flex flex-col items-center gap-4 bg-muted/10 border border-border/60 rounded-lg p-5">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-foreground/80">
+                      Candidate Photo
+                    </span>
+                    <div
+                      onClick={() => photoFileRef.current?.click()}
+                      className="relative w-40 h-40 rounded-lg border-2 border-dashed border-border/85 hover:border-primary/50 bg-card hover:bg-muted/10 transition-all duration-300 cursor-pointer overflow-hidden flex items-center justify-center group"
+                    >
+                      {photoPreview ? (
+                        <img
+                          src={photoPreview}
+                          alt="Candidate Preview"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center gap-2 text-muted-foreground/50 group-hover:text-primary/70 text-center p-3">
+                          <Camera className="size-8 stroke-[1.5]" />
+                          <span className="text-[9px] font-bold uppercase tracking-wider">
+                            Upload Portrait
+                          </span>
+                          <span className="text-[8px] text-muted-foreground/60">Max 2MB (JPG/PNG)</span>
+                        </div>
+                      )}
+                      {photoPreview && (
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <span className="text-white text-[10px] font-bold">Replace Photo</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex gap-2 w-full">
+                      <button
+                        type="button"
+                        onClick={() => photoFileRef.current?.click()}
+                        className="flex-1 h-8 rounded-lg bg-card border border-border/85 text-[10px] font-bold text-foreground/80 hover:text-primary hover:border-primary/30 transition-all shadow-3xs"
+                      >
+                        Select File
+                      </button>
+                      {photoPreview && (
+                        <button
+                          type="button"
+                          onClick={() => setPhotoPreview(null)}
+                          className="h-8 px-3 rounded-lg bg-red-50 hover:bg-red-100 border border-red-150 text-red-600 transition-all"
+                        >
+                          <Trash2 className="size-3.5" />
+                        </button>
+                      )}
+                    </div>
+                    <input
+                      ref={photoFileRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handlePhotoUpload}
+                    />
+                  </div>
+
+                  {/* Identity Details Fields */}
+                  <div className="flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-5">
+                    <FieldInput
+                      label="Candidate Name (ENG)"
+                      required
+                      placeholder="John Doe"
+                      value={nameEng}
+                      onChange={(e) => setNameEng(e.target.value)}
+                    />
+                    <FieldInput
+                      label="Candidate Name (BNG)"
+                      placeholder="জন ডো"
+                      value={nameBng}
+                      onChange={(e) => setNameBng(e.target.value)}
+                    />
+                    <FieldInput
+                      label="Date of Birth (DOB)"
+                      required
+                      type="date"
+                      value={dob}
+                      onChange={(e) => setDob(e.target.value)}
+                    />
+
+                    <FieldSelect
+                      label="Religion"
+                      required
+                      value={religion}
+                      onChange={setReligion}
+                      options={religionOptions}
+                    />
+                    <FieldSelect
+                      label="Marital Status"
+                      required
+                      value={maritalStatus}
+                      onChange={setMaritalStatus}
+                      options={maritalStatusOptions}
+                    />
+                    <FieldInput
+                      label="NID Number"
+                      placeholder="e.g. 5534XXXXXXXX"
+                      value={nidNumber}
+                      onChange={(e) => setNidNumber(e.target.value)}
+                    />
+
+                    <FieldInput
+                      label="Birth Registration No"
+                      placeholder="e.g. 199XXXXXXXXXXXXXX"
+                      value={birthReg}
+                      onChange={(e) => setBirthReg(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+              <FormBottomNav onNext={() => setActiveSection('family')} />
+            </div>
+          )}
+
+          {activeSection === 'family' && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {/* ── SECTION 2: FAMILY & PRIMARY CONTACT ── */}
+              <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/50 shadow-xl shadow-black/5 overflow-hidden hover:border-primary/20 transition-colors duration-500">
+                <SectionHeader
+                  icon={<Contact2 className="size-4" />}
+                  title="Family Details & Contacts"
+                  subtitle="Parental information, personal contact details, and emergency references"
+                />
+                <div className="p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-5">
+                  <FieldInput
+                    label="Father Name (ENG)"
+                    placeholder="Father's English Name"
+                    value={fatherEng}
+                    onChange={(e) => setFatherEng(e.target.value)}
+                  />
+                  <FieldInput
+                    label="Father Name (BNG)"
+                    placeholder="বাবার বাংলা নাম"
+                    value={fatherBng}
+                    onChange={(e) => setFatherBng(e.target.value)}
+                  />
+                  <FieldInput
+                    label="Mother Name (ENG)"
+                    placeholder="Mother's English Name"
+                    value={motherEng}
+                    onChange={(e) => setMotherEng(e.target.value)}
+                  />
+
+                  <FieldInput
+                    label="Mother Name (BNG)"
+                    placeholder="মায়ের বাংলা নাম"
+                    value={motherBng}
+                    onChange={(e) => setMotherBng(e.target.value)}
+                  />
+                  <FieldInput
+                    label="Personal Contact No"
+                    required
+                    placeholder="e.g. 017XXXXXXXX"
+                    value={personalContact}
+                    onChange={(e) => setPersonalContact(e.target.value)}
+                  />
+                  <FieldInput
+                    label="Emergency Contact No"
+                    placeholder="Alternative contact number"
+                    value={emergencyContact}
+                    onChange={(e) => setEmergencyContact(e.target.value)}
+                  />
+
+                  <FieldInput
+                    label="Personal Email"
+                    type="email"
+                    placeholder="john.doe@example.com"
+                    value={personalEmail}
+                    onChange={(e) => setPersonalEmail(e.target.value)}
+                  />
+                  <FieldInput
+                    label="Contact Person Name"
+                    placeholder="Emergency reference name"
+                    value={contactPerson}
+                    onChange={(e) => setContactPerson(e.target.value)}
+                  />
+                  <FieldInput
+                    label="Relationship"
+                    placeholder="e.g. Brother, Wife"
+                    value={relationship}
+                    onChange={(e) => setRelationship(e.target.value)}
+                  />
+                </div>
+              </div>
+              <FormBottomNav onPrev={() => setActiveSection('identity')} onNext={() => setActiveSection('address')} />
+            </div>
+          )}
+
+          {activeSection === 'address' && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {/* ── SECTION 3: ADDRESS ENROLLMENT ── */}
+              {/* Present Address */}
+              <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/50 shadow-xl shadow-black/5 overflow-hidden hover:border-primary/20 transition-colors duration-500">
+                <SectionHeader
+                  icon={<MapPin className="size-4" />}
+                  title="Present Address"
+                  subtitle="Current residential and mailing coordinates"
+                />
+                <div className="p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-6 gap-y-5">
+                  <FieldSelect
+                    label="Division"
+                    value={presDivision}
+                    onChange={setPresDivision}
+                    options={divisionOptions}
+                  />
+                  <FieldSelect
+                    label="District"
+                    value={presDistrict}
+                    onChange={setPresDistrict}
+                    options={districtOptions}
+                  />
+                  <FieldSelect
+                    label="Thana / Upazila"
+                    value={presThana}
+                    onChange={setPresThana}
+                    options={thanaOptions}
+                  />
+                  <FieldSelect
+                    label="Post Office"
+                    value={presPostOffice}
+                    onChange={setPresPostOffice}
+                    options={postOfficeOptions}
+                  />
+
+                  <FieldInput
+                    label="Village / House"
+                    placeholder="e.g. House 35, Block D"
+                    value={presVillage}
+                    onChange={(e) => setPresVillage(e.target.value)}
+                  />
+                  <FieldInput
+                    label="Road / Block"
+                    placeholder="e.g. Road 12"
+                    value={presRoad}
+                    onChange={(e) => setPresRoad(e.target.value)}
+                  />
+                  <FieldSelect
+                    label="Country"
+                    value={presCountry}
+                    onChange={setPresCountry}
+                    options={countryOptions}
+                  />
+
+                  <div className="md:col-span-2 xl:col-span-4 flex flex-col gap-1.5">
+                    <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">
+                      Full Present Address
+                    </label>
+                    <div className="h-10 px-3 flex items-center bg-muted/40 rounded-xl border border-border/50 text-xs font-semibold text-foreground/80 overflow-hidden text-ellipsis whitespace-nowrap">
+                      {fullPresentAddress ||
+                        "Division, District, Thana, PO details auto-compiled here..."}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Permanent Address */}
+              <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/50 shadow-xl shadow-black/5 overflow-hidden hover:border-primary/20 transition-colors duration-500">
+                <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-border/50 bg-muted/20">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-card border border-border/80 text-primary shadow-2xs">
+                      <MapPin className="size-4" />
+                    </div>
+                    <div>
+                      <h2 className="text-[11px] font-black text-foreground/70 uppercase tracking-widest leading-none">
+                        Permanent Address
+                      </h2>
+                      <p className="text-[10px] text-muted-foreground/75 mt-1">
+                        Native / legal home address
+                      </p>
+                    </div>
+                  </div>
+                  <label className="flex items-center gap-2 cursor-pointer bg-card hover:bg-muted border border-border/80 rounded-xl px-3.5 py-1.5 transition-all shadow-2xs">
+                    <input
+                      type="checkbox"
+                      checked={copyAddress}
+                      onChange={(e) => setCopyAddress(e.target.checked)}
+                      className="size-3.5 accent-primary cursor-pointer rounded"
+                    />
+                    <span className="text-[10.5px] text-foreground font-bold whitespace-nowrap">
+                      Same as Present Address
+                    </span>
+                  </label>
+                </div>
+                <div
+                  className={`p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-6 gap-y-5 transition-opacity duration-300 ${copyAddress ? "opacity-45 pointer-events-none" : ""}`}
+                >
+                  <FieldSelect
+                    label="Division"
+                    value={permDivision}
+                    onChange={setPermDivision}
+                    options={divisionOptions}
+                  />
+                  <FieldSelect
+                    label="District"
+                    value={permDistrict}
+                    onChange={setPermDistrict}
+                    options={districtOptions}
+                  />
+                  <FieldSelect
+                    label="Thana / Upazila"
+                    value={permThana}
+                    onChange={setPermThana}
+                    options={thanaOptions}
+                  />
+                  <FieldSelect
+                    label="Post Office"
+                    value={permPostOffice}
+                    onChange={setPermPostOffice}
+                    options={postOfficeOptions}
+                  />
+
+                  <FieldInput
+                    label="Village / House"
+                    placeholder="e.g. Village/Para name"
+                    value={permVillage}
+                    onChange={(e) => setPermVillage(e.target.value)}
+                  />
+                  <FieldInput
+                    label="Road / Block"
+                    placeholder="e.g. Post Code/Word"
+                    value={permRoad}
+                    onChange={(e) => setPermRoad(e.target.value)}
+                  />
+                  <FieldSelect
+                    label="Country"
+                    value={permCountry}
+                    onChange={setPermCountry}
+                    options={countryOptions}
+                  />
+
+                  <div className="md:col-span-2 xl:col-span-4 flex flex-col gap-1.5">
+                    <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">
+                      Full Permanent Address
+                    </label>
+                    <div className="h-10 px-3 flex items-center bg-muted/40 rounded-xl border border-border/50 text-xs font-semibold text-foreground/80 overflow-hidden text-ellipsis whitespace-nowrap">
+                      {fullPermanentAddress ||
+                        "Division, District, Thana, PO details auto-compiled here..."}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <FormBottomNav onPrev={() => setActiveSection('family')} onNext={() => setActiveSection('academics')} />
+            </div>
+          )}
+
+          {activeSection === 'academics' && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {/* ── SECTION 4: ACADEMIC CREDENTIALS ── */}
+              <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/50 shadow-xl shadow-black/5 overflow-hidden hover:border-primary/20 transition-colors duration-500">
+                <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-border/50 bg-muted/20">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-card border border-border/80 text-primary shadow-2xs">
+                      <GraduationCap className="size-4" />
+                    </div>
+                    <div>
+                      <h2 className="text-[11px] font-black text-foreground/70 uppercase tracking-widest leading-none">
+                        Academic Credentials &amp; Qualifications
+                      </h2>
+                      <p className="text-[10px] text-muted-foreground/75 mt-1">
+                        Highest educational details, board examinations and certificates
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddAcademic}
+                    className="inline-flex items-center gap-1 bg-primary hover:opacity-95 text-primary-foreground text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-lg shadow-xs transition"
+                  >
+                    <Plus className="size-3.5" /> Add Row
+                  </button>
+                </div>
+
+                <div className="p-6 space-y-4">
+                  {academics.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 px-4 text-center border-2 border-dashed border-border/60 rounded-xl bg-muted/10">
+                      <div className="size-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4 shadow-inner">
+                        <GraduationCap className="size-8" />
+                      </div>
+                      <h3 className="text-sm font-extrabold text-foreground mb-1">No Academic Records</h3>
+                      <p className="text-xs text-muted-foreground max-w-sm mb-5">
+                        Add your highest educational degrees, diplomas, or certifications to boost your profile.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleAddAcademic}
+                        className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-primary text-primary-foreground text-xs font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                      >
+                        <Plus className="size-4" /> Add Academic Record
+                      </button>
+                    </div>
+                  ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse text-left text-xs whitespace-nowrap">
+                      <thead>
+                        <tr className="text-[9px] uppercase font-bold tracking-wider text-muted-foreground/70 border-b border-border/30 bg-muted/20">
+                          <th className="px-4 py-3">Degree / Exam Title</th>
+                          <th className="px-4 py-3">Institution Name</th>
+                          <th className="px-4 py-3 w-40">Passing Year</th>
+                          <th className="px-4 py-3 w-40">Result / GPA</th>
+                          <th className="px-4 py-3 w-64">Attachment (Optional)</th>
+                          <th className="px-4 py-3 text-center w-16">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/20">
+                        {academics.map((row) => (
+                          <tr key={row.id} className="hover:bg-muted/10 transition-colors">
+                            <td className="px-3 py-2">
+                              <input
+                                type="text"
+                                placeholder="e.g. SSC, HSC, Diploma"
+                                value={row.title}
+                                onChange={(e) => handleAcademicChange(row.id, "title", e.target.value)}
+                                className="h-9 w-full bg-background border border-border/60 rounded-lg px-3 text-xs outline-none focus:border-primary"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <input
+                                type="text"
+                                placeholder="Board or School Name"
+                                value={row.institution}
+                                onChange={(e) =>
+                                  handleAcademicChange(row.id, "institution", e.target.value)
+                                }
+                                className="h-9 w-full bg-background border border-border/60 rounded-lg px-3 text-xs outline-none focus:border-primary"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <input
+                                type="number"
+                                placeholder="YYYY"
+                                value={row.year}
+                                onChange={(e) => handleAcademicChange(row.id, "year", e.target.value)}
+                                className="h-9 w-full bg-background border border-border/60 rounded-lg px-3 text-xs outline-none focus:border-primary font-mono"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <input
+                                type="text"
+                                placeholder="e.g. 5.00 / First Div"
+                                value={row.result}
+                                onChange={(e) => handleAcademicChange(row.id, "result", e.target.value)}
+                                className="h-9 w-full bg-background border border-border/60 rounded-lg px-3 text-xs outline-none focus:border-primary font-semibold"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <div className="flex items-center gap-2">
+                                <label className="flex-1 flex items-center justify-center gap-1.5 h-9 border border-dashed border-border/80 hover:border-primary/50 bg-background hover:bg-muted/20 rounded-lg text-[10px] font-bold text-muted-foreground cursor-pointer transition">
+                                  <Upload className="size-3" />
+                                  <span className="truncate">
+                                    {row.file ? row.file.name : "Choose PDF/JPG"}
+                                  </span>
+                                  <input
+                                    type="file"
+                                    accept=".pdf,image/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      if (file) handleAcademicChange(row.id, "file", file);
+                                    }}
+                                  />
+                                </label>
+                                {row.file && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleAcademicChange(row.id, "file", null)}
+                                    className="size-9 rounded-lg border border-red-200 bg-red-50 text-red-650 flex items-center justify-center hover:bg-red-100"
+                                  >
+                                    <Trash2 className="size-4" />
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-4 py-2 text-center">
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveAcademic(row.id)}
+                                className="size-9 rounded-lg border border-border/40 hover:bg-red-50 hover:text-red-600 flex items-center justify-center text-muted-foreground transition"
+                              >
+                                <Trash2 className="size-3.5" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                   )}
                 </div>
-                <input
-                  ref={photoFileRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handlePhotoUpload}
-                />
               </div>
-
-              {/* Identity Details Fields */}
-              <div className="flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-5">
-                <FieldInput
-                  label="Candidate Name (ENG)"
-                  required
-                  placeholder="John Doe"
-                  value={nameEng}
-                  onChange={(e) => setNameEng(e.target.value)}
-                />
-                <FieldInput
-                  label="Candidate Name (BNG)"
-                  placeholder="জন ডো"
-                  value={nameBng}
-                  onChange={(e) => setNameBng(e.target.value)}
-                />
-                <FieldInput
-                  label="Date of Birth (DOB)"
-                  required
-                  type="date"
-                  value={dob}
-                  onChange={(e) => setDob(e.target.value)}
-                />
-
-                <FieldSelect
-                  label="Religion"
-                  required
-                  value={religion}
-                  onChange={setReligion}
-                  options={religionOptions}
-                />
-                <FieldSelect
-                  label="Marital Status"
-                  required
-                  value={maritalStatus}
-                  onChange={setMaritalStatus}
-                  options={maritalStatusOptions}
-                />
-                <FieldInput
-                  label="NID Number"
-                  placeholder="e.g. 5534XXXXXXXX"
-                  value={nidNumber}
-                  onChange={(e) => setNidNumber(e.target.value)}
-                />
-
-                <FieldInput
-                  label="Birth Registration No"
-                  placeholder="e.g. 199XXXXXXXXXXXXXX"
-                  value={birthReg}
-                  onChange={(e) => setBirthReg(e.target.value)}
-                />
-              </div>
+              <FormBottomNav onPrev={() => setActiveSection('address')} onNext={() => setActiveSection('experience')} />
             </div>
-          </div>
+          )}
 
-          {/* ── SECTION 2: FAMILY & PRIMARY CONTACT ── */}
-          <div className="bg-card rounded-lg border border-border/80 shadow-2xs overflow-hidden">
-            <SectionHeader
-              icon={<Contact2 className="size-4" />}
-              title="Family Details & Contacts"
-              subtitle="Parental information, personal contact details, and emergency references"
-            />
-            <div className="p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-5">
-              <FieldInput
-                label="Father Name (ENG)"
-                placeholder="Father's English Name"
-                value={fatherEng}
-                onChange={(e) => setFatherEng(e.target.value)}
-              />
-              <FieldInput
-                label="Father Name (BNG)"
-                placeholder="বাবার বাংলা নাম"
-                value={fatherBng}
-                onChange={(e) => setFatherBng(e.target.value)}
-              />
-              <FieldInput
-                label="Mother Name (ENG)"
-                placeholder="Mother's English Name"
-                value={motherEng}
-                onChange={(e) => setMotherEng(e.target.value)}
-              />
-
-              <FieldInput
-                label="Mother Name (BNG)"
-                placeholder="মায়ের বাংলা নাম"
-                value={motherBng}
-                onChange={(e) => setMotherBng(e.target.value)}
-              />
-              <FieldInput
-                label="Personal Contact No"
-                required
-                placeholder="e.g. 017XXXXXXXX"
-                value={personalContact}
-                onChange={(e) => setPersonalContact(e.target.value)}
-              />
-              <FieldInput
-                label="Emergency Contact No"
-                placeholder="Alternative contact number"
-                value={emergencyContact}
-                onChange={(e) => setEmergencyContact(e.target.value)}
-              />
-
-              <FieldInput
-                label="Personal Email"
-                type="email"
-                placeholder="john.doe@example.com"
-                value={personalEmail}
-                onChange={(e) => setPersonalEmail(e.target.value)}
-              />
-              <FieldInput
-                label="Contact Person Name"
-                placeholder="Emergency reference name"
-                value={contactPerson}
-                onChange={(e) => setContactPerson(e.target.value)}
-              />
-              <FieldInput
-                label="Relationship"
-                placeholder="e.g. Brother, Wife"
-                value={relationship}
-                onChange={(e) => setRelationship(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {/* ── SECTION 3: ADDRESS ENROLLMENT ── */}
-          {/* Present Address */}
-          <div className="bg-card rounded-lg border border-border/80 shadow-2xs overflow-hidden">
-            <SectionHeader
-              icon={<MapPin className="size-4" />}
-              title="Present Address"
-              subtitle="Current residential and mailing coordinates"
-            />
-            <div className="p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-6 gap-y-5">
-              <FieldSelect
-                label="Division"
-                value={presDivision}
-                onChange={setPresDivision}
-                options={divisionOptions}
-              />
-              <FieldSelect
-                label="District"
-                value={presDistrict}
-                onChange={setPresDistrict}
-                options={districtOptions}
-              />
-              <FieldSelect
-                label="Thana / Upazila"
-                value={presThana}
-                onChange={setPresThana}
-                options={thanaOptions}
-              />
-              <FieldSelect
-                label="Post Office"
-                value={presPostOffice}
-                onChange={setPresPostOffice}
-                options={postOfficeOptions}
-              />
-
-              <FieldInput
-                label="Village / House"
-                placeholder="e.g. House 35, Block D"
-                value={presVillage}
-                onChange={(e) => setPresVillage(e.target.value)}
-              />
-              <FieldInput
-                label="Road / Block"
-                placeholder="e.g. Road 12"
-                value={presRoad}
-                onChange={(e) => setPresRoad(e.target.value)}
-              />
-              <FieldSelect
-                label="Country"
-                value={presCountry}
-                onChange={setPresCountry}
-                options={countryOptions}
-              />
-
-              <div className="md:col-span-2 xl:col-span-4 flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">
-                  Full Present Address
-                </label>
-                <div className="h-10 px-3 flex items-center bg-muted/40 rounded-xl border border-border/50 text-xs font-semibold text-foreground/80 overflow-hidden text-ellipsis whitespace-nowrap">
-                  {fullPresentAddress ||
-                    "Division, District, Thana, PO details auto-compiled here..."}
+          {activeSection === 'experience' && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {/* ── SECTION 5: PRIOR JOB EXPERIENCE ── */}
+              <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/50 shadow-xl shadow-black/5 overflow-hidden hover:border-primary/20 transition-colors duration-500">
+                <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-border/50 bg-muted/20">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-card border border-border/80 text-primary shadow-2xs">
+                      <Briefcase className="size-4" />
+                    </div>
+                    <div>
+                      <h2 className="text-[11px] font-black text-foreground/70 uppercase tracking-widest leading-none">
+                        Prior Job Experience &amp; Career History
+                      </h2>
+                      <p className="text-[10px] text-muted-foreground/75 mt-1">
+                        Previous employment history, designations and clearances
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddExperience}
+                    className="inline-flex items-center gap-1 bg-primary hover:opacity-95 text-primary-foreground text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-lg shadow-xs transition"
+                  >
+                    <Plus className="size-3.5" /> Add Row
+                  </button>
                 </div>
-              </div>
-            </div>
-          </div>
 
-          {/* Permanent Address */}
-          <div className="bg-card rounded-lg border border-border/80 shadow-2xs overflow-hidden">
-            <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-border/50 bg-muted/20">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-card border border-border/80 text-primary shadow-2xs">
-                  <MapPin className="size-4" />
-                </div>
-                <div>
-                  <h2 className="text-[11px] font-black text-foreground/70 uppercase tracking-widest leading-none">
-                    Permanent Address
-                  </h2>
-                  <p className="text-[10px] text-muted-foreground/75 mt-1">
-                    Native / legal home address
-                  </p>
-                </div>
-              </div>
-              <label className="flex items-center gap-2 cursor-pointer bg-card hover:bg-muted border border-border/80 rounded-xl px-3.5 py-1.5 transition-all shadow-2xs">
-                <input
-                  type="checkbox"
-                  checked={copyAddress}
-                  onChange={(e) => setCopyAddress(e.target.checked)}
-                  className="size-3.5 accent-primary cursor-pointer rounded"
-                />
-                <span className="text-[10.5px] text-foreground font-bold whitespace-nowrap">
-                  Same as Present Address
-                </span>
-              </label>
-            </div>
-            <div
-              className={`p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-6 gap-y-5 transition-opacity duration-300 ${copyAddress ? "opacity-45 pointer-events-none" : ""}`}
-            >
-              <FieldSelect
-                label="Division"
-                value={permDivision}
-                onChange={setPermDivision}
-                options={divisionOptions}
-              />
-              <FieldSelect
-                label="District"
-                value={permDistrict}
-                onChange={setPermDistrict}
-                options={districtOptions}
-              />
-              <FieldSelect
-                label="Thana / Upazila"
-                value={permThana}
-                onChange={setPermThana}
-                options={thanaOptions}
-              />
-              <FieldSelect
-                label="Post Office"
-                value={permPostOffice}
-                onChange={setPermPostOffice}
-                options={postOfficeOptions}
-              />
-
-              <FieldInput
-                label="Village / House"
-                placeholder="e.g. Village/Para name"
-                value={permVillage}
-                onChange={(e) => setPermVillage(e.target.value)}
-              />
-              <FieldInput
-                label="Road / Block"
-                placeholder="e.g. Post Code/Word"
-                value={permRoad}
-                onChange={(e) => setPermRoad(e.target.value)}
-              />
-              <FieldSelect
-                label="Country"
-                value={permCountry}
-                onChange={setPermCountry}
-                options={countryOptions}
-              />
-
-              <div className="md:col-span-2 xl:col-span-4 flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">
-                  Full Permanent Address
-                </label>
-                <div className="h-10 px-3 flex items-center bg-muted/40 rounded-xl border border-border/50 text-xs font-semibold text-foreground/80 overflow-hidden text-ellipsis whitespace-nowrap">
-                  {fullPermanentAddress ||
-                    "Division, District, Thana, PO details auto-compiled here..."}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* ── SECTION 4: ACADEMIC CREDENTIALS ── */}
-          <div className="bg-card rounded-lg border border-border/80 shadow-2xs overflow-hidden">
-            <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-border/50 bg-muted/20">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-card border border-border/80 text-primary shadow-2xs">
-                  <GraduationCap className="size-4" />
-                </div>
-                <div>
-                  <h2 className="text-[11px] font-black text-foreground/70 uppercase tracking-widest leading-none">
-                    Academic Credentials &amp; Qualifications
-                  </h2>
-                  <p className="text-[10px] text-muted-foreground/75 mt-1">
-                    Highest educational details, board examinations and certificates
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={handleAddAcademic}
-                className="inline-flex items-center gap-1 bg-primary hover:opacity-95 text-primary-foreground text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-lg shadow-xs transition"
-              >
-                <Plus className="size-3.5" /> Add Row
-              </button>
-            </div>
-
-            <div className="p-6 space-y-4">
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse text-left text-xs whitespace-nowrap">
-                  <thead>
-                    <tr className="text-[9px] uppercase font-bold tracking-wider text-muted-foreground/70 border-b border-border/30 bg-muted/20">
-                      <th className="px-4 py-3">Degree / Exam Title</th>
-                      <th className="px-4 py-3">Institution Name</th>
-                      <th className="px-4 py-3 w-40">Passing Year</th>
-                      <th className="px-4 py-3 w-40">Result / GPA</th>
-                      <th className="px-4 py-3 w-64">Attachment (Optional)</th>
-                      <th className="px-4 py-3 text-center w-16">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/20">
-                    {academics.map((row) => (
-                      <tr key={row.id} className="hover:bg-muted/10 transition-colors">
-                        <td className="px-3 py-2">
-                          <input
-                            type="text"
-                            placeholder="e.g. SSC, HSC, Diploma"
-                            value={row.title}
-                            onChange={(e) => handleAcademicChange(row.id, "title", e.target.value)}
-                            className="h-9 w-full bg-background border border-border/60 rounded-lg px-3 text-xs outline-none focus:border-primary"
-                          />
-                        </td>
-                        <td className="px-3 py-2">
-                          <input
-                            type="text"
-                            placeholder="Board or School Name"
-                            value={row.institution}
-                            onChange={(e) =>
-                              handleAcademicChange(row.id, "institution", e.target.value)
-                            }
-                            className="h-9 w-full bg-background border border-border/60 rounded-lg px-3 text-xs outline-none focus:border-primary"
-                          />
-                        </td>
-                        <td className="px-3 py-2">
-                          <input
-                            type="number"
-                            placeholder="YYYY"
-                            value={row.year}
-                            onChange={(e) => handleAcademicChange(row.id, "year", e.target.value)}
-                            className="h-9 w-full bg-background border border-border/60 rounded-lg px-3 text-xs outline-none focus:border-primary font-mono"
-                          />
-                        </td>
-                        <td className="px-3 py-2">
-                          <input
-                            type="text"
-                            placeholder="e.g. 5.00 / First Div"
-                            value={row.result}
-                            onChange={(e) => handleAcademicChange(row.id, "result", e.target.value)}
-                            className="h-9 w-full bg-background border border-border/60 rounded-lg px-3 text-xs outline-none focus:border-primary font-semibold"
-                          />
-                        </td>
-                        <td className="px-3 py-2">
-                          <div className="flex items-center gap-2">
-                            <label className="flex-1 flex items-center justify-center gap-1.5 h-9 border border-dashed border-border/80 hover:border-primary/50 bg-background hover:bg-muted/20 rounded-lg text-[10px] font-bold text-muted-foreground cursor-pointer transition">
-                              <Upload className="size-3" />
-                              <span className="truncate">
-                                {row.file ? row.file.name : "Choose PDF/JPG"}
-                              </span>
+                <div className="p-6 space-y-4">
+                  {experiences.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 px-4 text-center border-2 border-dashed border-border/60 rounded-xl bg-muted/10">
+                      <div className="size-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4 shadow-inner">
+                        <Briefcase className="size-8" />
+                      </div>
+                      <h3 className="text-sm font-extrabold text-foreground mb-1">No Experience Added</h3>
+                      <p className="text-xs text-muted-foreground max-w-sm mb-5">
+                        Include any past employment, internships, or relevant work history.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleAddExperience}
+                        className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-primary text-primary-foreground text-xs font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                      >
+                        <Plus className="size-4" /> Add Experience
+                      </button>
+                    </div>
+                  ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse text-left text-xs whitespace-nowrap">
+                      <thead>
+                        <tr className="text-[9px] uppercase font-bold tracking-wider text-muted-foreground/70 border-b border-border/30 bg-muted/20">
+                          <th className="px-4 py-3">Organization / Company</th>
+                          <th className="px-4 py-3">Designation</th>
+                          <th className="px-4 py-3 w-40">From Date</th>
+                          <th className="px-4 py-3 w-40">To Date</th>
+                          <th className="px-4 py-3">Reason for Leaving</th>
+                          <th className="px-4 py-3 w-56">Attachment (Optional)</th>
+                          <th className="px-4 py-3 text-center w-16">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/20">
+                        {experiences.map((row) => (
+                          <tr key={row.id} className="hover:bg-muted/10 transition-colors">
+                            <td className="px-3 py-2">
                               <input
-                                type="file"
-                                accept=".pdf,image/*"
-                                className="hidden"
-                                onChange={(e) => {
-                                  const file = e.target.files?.[0];
-                                  if (file) handleAcademicChange(row.id, "file", file);
-                                }}
+                                type="text"
+                                placeholder="Company Name"
+                                value={row.company}
+                                onChange={(e) =>
+                                  handleExperienceChange(row.id, "company", e.target.value)
+                                }
+                                className="h-9 w-full bg-background border border-border/60 rounded-lg px-3 text-xs outline-none focus:border-primary"
                               />
-                            </label>
-                            {row.file && (
+                            </td>
+                            <td className="px-3 py-2">
+                              <input
+                                type="text"
+                                placeholder="Job Title / Role"
+                                value={row.designation}
+                                onChange={(e) =>
+                                  handleExperienceChange(row.id, "designation", e.target.value)
+                                }
+                                className="h-9 w-full bg-background border border-border/60 rounded-lg px-3 text-xs outline-none focus:border-primary"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <input
+                                type="date"
+                                value={row.from}
+                                onChange={(e) => handleExperienceChange(row.id, "from", e.target.value)}
+                                className="h-9 w-full bg-background border border-border/60 rounded-lg px-3 text-xs outline-none focus:border-primary font-mono"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <input
+                                type="date"
+                                value={row.to}
+                                onChange={(e) => handleExperienceChange(row.id, "to", e.target.value)}
+                                className="h-9 w-full bg-background border border-border/60 rounded-lg px-3 text-xs outline-none focus:border-primary font-mono"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <input
+                                type="text"
+                                placeholder="Reason for Resignation"
+                                value={row.reason}
+                                onChange={(e) =>
+                                  handleExperienceChange(row.id, "reason", e.target.value)
+                                }
+                                className="h-9 w-full bg-background border border-border/60 rounded-lg px-3 text-xs outline-none focus:border-primary"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <div className="flex items-center gap-2">
+                                <label className="flex-1 flex items-center justify-center gap-1.5 h-9 border border-dashed border-border/80 hover:border-primary/50 bg-background hover:bg-muted/20 rounded-lg text-[10px] font-bold text-muted-foreground cursor-pointer transition">
+                                  <Upload className="size-3" />
+                                  <span className="truncate">
+                                    {row.file ? row.file.name : "Experience Copy"}
+                                  </span>
+                                  <input
+                                    type="file"
+                                    accept=".pdf,image/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      if (file) handleExperienceChange(row.id, "file", file);
+                                    }}
+                                  />
+                                </label>
+                                {row.file && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleExperienceChange(row.id, "file", null)}
+                                    className="size-9 rounded-lg border border-red-200 bg-red-50 text-red-650 flex items-center justify-center hover:bg-red-100"
+                                  >
+                                    <Trash2 className="size-4" />
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-4 py-2 text-center">
                               <button
                                 type="button"
-                                onClick={() => handleAcademicChange(row.id, "file", null)}
-                                className="size-9 rounded-lg border border-red-200 bg-red-50 text-red-650 flex items-center justify-center hover:bg-red-100"
+                                onClick={() => handleRemoveExperience(row.id)}
+                                className="size-9 rounded-lg border border-border/40 hover:bg-red-50 hover:text-red-600 flex items-center justify-center text-muted-foreground transition"
                               >
-                                <Trash2 className="size-4" />
+                                <Trash2 className="size-3.5" />
                               </button>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-4 py-2 text-center">
-                          <button
-                            type="button"
-                            disabled={academics.length === 1}
-                            onClick={() => handleRemoveAcademic(row.id)}
-                            className="size-9 rounded-lg border border-border/40 hover:bg-red-50 hover:text-red-600 flex items-center justify-center text-muted-foreground disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted-foreground transition"
-                          >
-                            <Trash2 className="size-3.5" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          {/* ── SECTION 5: PRIOR JOB EXPERIENCE ── */}
-          <div className="bg-card rounded-lg border border-border/80 shadow-2xs overflow-hidden">
-            <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-border/50 bg-muted/20">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-card border border-border/80 text-primary shadow-2xs">
-                  <Briefcase className="size-4" />
-                </div>
-                <div>
-                  <h2 className="text-[11px] font-black text-foreground/70 uppercase tracking-widest leading-none">
-                    Prior Job Experience &amp; Career History
-                  </h2>
-                  <p className="text-[10px] text-muted-foreground/75 mt-1">
-                    Previous employment history, designations and clearances
-                  </p>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  )}
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={handleAddExperience}
-                className="inline-flex items-center gap-1 bg-primary hover:opacity-95 text-primary-foreground text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-lg shadow-xs transition"
-              >
-                <Plus className="size-3.5" /> Add Row
-              </button>
+              <FormBottomNav onPrev={() => setActiveSection('academics')} onNext={() => setActiveSection('nominee')} />
             </div>
+          )}
 
-            <div className="p-6 space-y-4">
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse text-left text-xs whitespace-nowrap">
-                  <thead>
-                    <tr className="text-[9px] uppercase font-bold tracking-wider text-muted-foreground/70 border-b border-border/30 bg-muted/20">
-                      <th className="px-4 py-3">Organization / Company</th>
-                      <th className="px-4 py-3">Designation</th>
-                      <th className="px-4 py-3 w-40">From Date</th>
-                      <th className="px-4 py-3 w-40">To Date</th>
-                      <th className="px-4 py-3">Reason for Leaving</th>
-                      <th className="px-4 py-3 w-56">Attachment (Optional)</th>
-                      <th className="px-4 py-3 text-center w-16">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/20">
-                    {experiences.map((row) => (
-                      <tr key={row.id} className="hover:bg-muted/10 transition-colors">
-                        <td className="px-3 py-2">
-                          <input
-                            type="text"
-                            placeholder="Company Name"
-                            value={row.company}
-                            onChange={(e) =>
-                              handleExperienceChange(row.id, "company", e.target.value)
-                            }
-                            className="h-9 w-full bg-background border border-border/60 rounded-lg px-3 text-xs outline-none focus:border-primary"
-                          />
-                        </td>
-                        <td className="px-3 py-2">
-                          <input
-                            type="text"
-                            placeholder="Job Title / Role"
-                            value={row.designation}
-                            onChange={(e) =>
-                              handleExperienceChange(row.id, "designation", e.target.value)
-                            }
-                            className="h-9 w-full bg-background border border-border/60 rounded-lg px-3 text-xs outline-none focus:border-primary"
-                          />
-                        </td>
-                        <td className="px-3 py-2">
-                          <input
-                            type="date"
-                            value={row.from}
-                            onChange={(e) => handleExperienceChange(row.id, "from", e.target.value)}
-                            className="h-9 w-full bg-background border border-border/60 rounded-lg px-3 text-xs outline-none focus:border-primary font-mono"
-                          />
-                        </td>
-                        <td className="px-3 py-2">
-                          <input
-                            type="date"
-                            value={row.to}
-                            onChange={(e) => handleExperienceChange(row.id, "to", e.target.value)}
-                            className="h-9 w-full bg-background border border-border/60 rounded-lg px-3 text-xs outline-none focus:border-primary font-mono"
-                          />
-                        </td>
-                        <td className="px-3 py-2">
-                          <input
-                            type="text"
-                            placeholder="Reason for Resignation"
-                            value={row.reason}
-                            onChange={(e) =>
-                              handleExperienceChange(row.id, "reason", e.target.value)
-                            }
-                            className="h-9 w-full bg-background border border-border/60 rounded-lg px-3 text-xs outline-none focus:border-primary"
-                          />
-                        </td>
-                        <td className="px-3 py-2">
-                          <div className="flex items-center gap-2">
-                            <label className="flex-1 flex items-center justify-center gap-1.5 h-9 border border-dashed border-border/80 hover:border-primary/50 bg-background hover:bg-muted/20 rounded-lg text-[10px] font-bold text-muted-foreground cursor-pointer transition">
-                              <Upload className="size-3" />
-                              <span className="truncate">
-                                {row.file ? row.file.name : "Experience Copy"}
-                              </span>
-                              <input
-                                type="file"
-                                accept=".pdf,image/*"
-                                className="hidden"
-                                onChange={(e) => {
-                                  const file = e.target.files?.[0];
-                                  if (file) handleExperienceChange(row.id, "file", file);
-                                }}
-                              />
-                            </label>
-                            {row.file && (
-                              <button
-                                type="button"
-                                onClick={() => handleExperienceChange(row.id, "file", null)}
-                                className="size-9 rounded-lg border border-red-200 bg-red-50 text-red-650 flex items-center justify-center hover:bg-red-100"
-                              >
-                                <Trash2 className="size-4" />
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-4 py-2 text-center">
-                          <button
-                            type="button"
-                            disabled={experiences.length === 1}
-                            onClick={() => handleRemoveExperience(row.id)}
-                            className="size-9 rounded-lg border border-border/40 hover:bg-red-50 hover:text-red-600 flex items-center justify-center text-muted-foreground disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted-foreground transition"
-                          >
-                            <Trash2 className="size-3.5" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+          {activeSection === 'nominee' && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {/* ── SECTION 6: NOMINEE DECLARATION ── */}
+              <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/50 shadow-xl shadow-black/5 overflow-hidden hover:border-primary/20 transition-colors duration-500">
+                <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-border/50 bg-muted/20">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-card border border-border/80 text-primary shadow-2xs">
+                      <Heart className="size-4" />
+                    </div>
+                    <div>
+                      <h2 className="text-[11px] font-black text-foreground/70 uppercase tracking-widest leading-none">
+                        Nominee Declaration Dossier
+                      </h2>
+                      <p className="text-[10px] text-muted-foreground/75 mt-1">
+                        Declared legal nominee details for official allocations and benefits
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddNominee}
+                    className="inline-flex items-center gap-1 bg-primary hover:opacity-95 text-primary-foreground text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-lg shadow-xs transition"
+                  >
+                    <Plus className="size-3.5" /> Add Nominee
+                  </button>
+                </div>
+                <div className="p-6 space-y-6">
+                  {nominees.map((nominee, index) => (
+                    <div key={nominee.id} className="relative p-5 border border-border/50 bg-muted/5 rounded-xl space-y-5 group transition-colors hover:border-primary/20 hover:bg-muted/10">
+                      {nominees.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveNominee(nominee.id)}
+                          className="absolute -top-3 -right-3 size-7 rounded-full bg-red-100 text-red-600 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm border border-red-200 hover:bg-red-200"
+                        >
+                          <X className="size-3.5" />
+                        </button>
+                      )}
+                      
+                      <div className="flex items-center gap-2 pb-2 border-b border-border/30">
+                        <div className="size-5 rounded-full bg-primary/10 text-primary text-[10px] font-black flex items-center justify-center">
+                          {index + 1}
+                        </div>
+                        <h4 className="text-xs font-bold text-foreground">Nominee Details</h4>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-6 gap-y-5">
+                        <FieldInput
+                          label="Nominee Full Name"
+                          placeholder="Nominee's complete name"
+                          value={nominee.name}
+                          onChange={(e) => handleNomineeChange(nominee.id, "name", e.target.value)}
+                        />
+                        <FieldInput
+                          label="Relation"
+                          placeholder="e.g. Spouse, Mother, Son"
+                          value={nominee.relation}
+                          onChange={(e) => handleNomineeChange(nominee.id, "relation", e.target.value)}
+                        />
+                        <FieldInput
+                          label="Nominee NID / Birth Reg"
+                          placeholder="Identity credentials"
+                          value={nominee.nidReg}
+                          onChange={(e) => handleNomineeChange(nominee.id, "nidReg", e.target.value)}
+                        />
+                        <FieldInput
+                          label="Nominee Contact No"
+                          placeholder="Nominee's mobile number"
+                          value={nominee.contact}
+                          onChange={(e) => handleNomineeChange(nominee.id, "contact", e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* ── SUBMIT BAR ────────────────────────── */}
+              <div className="p-5 bg-card rounded-lg border border-border/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p className="text-[11px] text-muted-foreground font-semibold">
+                  All <span className="text-red-500 font-bold">*</span> marked fields are required
+                  before application submission.
+                </p>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setActiveSection('experience')}
+                    className="h-10 px-6 rounded-xl border border-border/80 bg-card text-sm font-bold text-foreground hover:bg-muted transition-colors flex items-center gap-2"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    className="h-10 px-8 rounded-lg border border-border/60 hover:bg-muted text-muted-foreground font-bold text-xs transition-all"
+                  >
+                    Reset Form
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSubmit}
+                    className="h-10 px-10 rounded-lg bg-primary text-primary-foreground font-black text-xs shadow-md hover:opacity-95 hover:-translate-y-0.5 active:translate-y-0 transition-all"
+                  >
+                    Submit Application Form
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
-          {/* ── SECTION 6: NOMINEE DECLARATION ── */}
-          <div className="bg-card rounded-lg border border-border/80 shadow-2xs overflow-hidden">
-            <SectionHeader
-              icon={<Heart className="size-4" />}
-              title="Nominee Declaration Dossier"
-              subtitle="Declared legal nominee details for official allocations and benefits"
-            />
-            <div className="p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-6 gap-y-5">
-              <FieldInput
-                label="Nominee Full Name"
-                placeholder="Nominee's complete name"
-                value={nomineeName}
-                onChange={(e) => setNomineeName(e.target.value)}
-              />
-              <FieldInput
-                label="Relation"
-                placeholder="e.g. Spouse, Mother, Son"
-                value={nomineeRelation}
-                onChange={(e) => setNomineeRelation(e.target.value)}
-              />
-              <FieldInput
-                label="Nominee NID / Birth Reg"
-                placeholder="Identity credentials"
-                value={nomineeNidReg}
-                onChange={(e) => setNomineeNidReg(e.target.value)}
-              />
-              <FieldInput
-                label="Nominee Contact No"
-                placeholder="Nominee's mobile number"
-                value={nomineeContact}
-                onChange={(e) => setNomineeContact(e.target.value)}
-              />
-            </div>
-          </div>
+          {activeSection === 'help' && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/50 shadow-xl shadow-black/5 overflow-hidden">
+                <SectionHeader
+                  icon={<Info className="size-4" />}
+                  title="Help & User Manual"
+                  subtitle="Detailed instructions and explanations for filling out the e-Recruitment form"
+                />
+                <div className="p-6 space-y-8">
+                  {/* Comprehensive Manual Content */}
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                    {/* Identity & Family */}
+                    <div className="space-y-6">
+                      <div className="bg-muted/10 p-5 rounded-xl border border-border/50 hover:border-primary/20 hover:bg-muted/30 transition-colors">
+                        <h3 className="text-sm font-extrabold text-primary border-b border-border/50 pb-3 mb-4 flex items-center gap-2">
+                          <User className="size-4" /> 1. Candidate Identity
+                        </h3>
+                        <ul className="text-xs text-muted-foreground space-y-3">
+                          <li><strong className="text-foreground">Candidate Photo:</strong> Upload a clear, recent passport-size photograph. Supported formats are JPG/PNG (Max 2MB).</li>
+                          <li><strong className="text-foreground">Full Name (English & Bengali):</strong> Enter your legal name exactly as it appears on your official documents (NID/Passport).</li>
+                          <li><strong className="text-foreground">Date of Birth:</strong> Select your official date of birth from the calendar.</li>
+                          <li><strong className="text-foreground">Religion & Marital Status:</strong> Select the appropriate options from the dropdown menus.</li>
+                          <li><strong className="text-foreground">Identity Numbers:</strong> Provide your 10, 13, or 17-digit NID Number. Alternatively, provide your Birth Registration Number.</li>
+                        </ul>
+                      </div>
 
-          {/* ── SUBMIT BAR ────────────────────────── */}
-          <div className="p-5 bg-card rounded-lg border border-border/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-[11px] text-muted-foreground font-semibold">
-              All <span className="text-red-500 font-bold">*</span> marked fields are required
-              before application submission.
-            </p>
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={handleReset}
-                className="h-10 px-8 rounded-lg border border-border/60 hover:bg-muted text-muted-foreground font-bold text-xs transition-all"
-              >
-                Reset Form
-              </button>
-              <button
-                type="button"
-                onClick={handleSubmit}
-                className="h-10 px-10 rounded-lg bg-primary text-primary-foreground font-black text-xs shadow-md hover:opacity-95 hover:-translate-y-0.5 active:translate-y-0 transition-all"
-              >
-                Submit Application Form
-              </button>
+                      <div className="bg-muted/10 p-5 rounded-xl border border-border/50 hover:border-primary/20 hover:bg-muted/30 transition-colors">
+                        <h3 className="text-sm font-extrabold text-primary border-b border-border/50 pb-3 mb-4 flex items-center gap-2">
+                          <Contact2 className="size-4" /> 2. Family & Contact
+                        </h3>
+                        <ul className="text-xs text-muted-foreground space-y-3">
+                          <li><strong className="text-foreground">Parents' Names:</strong> Provide the names of your Father and Mother in both English and Bengali.</li>
+                          <li><strong className="text-foreground">Personal Contact & Email:</strong> Enter your active mobile number and email address. These will be used for official communications and interview scheduling.</li>
+                          <li><strong className="text-foreground">Emergency Contact:</strong> Provide the Name, Contact Number, and Relationship of a person we can reach in case of a medical or administrative emergency.</li>
+                        </ul>
+                      </div>
+                      
+                      <div className="bg-muted/10 p-5 rounded-xl border border-border/50 hover:border-primary/20 hover:bg-muted/30 transition-colors">
+                        <h3 className="text-sm font-extrabold text-primary border-b border-border/50 pb-3 mb-4 flex items-center gap-2">
+                          <MapPin className="size-4" /> 3. Address Enrollment
+                        </h3>
+                        <ul className="text-xs text-muted-foreground space-y-3">
+                          <li><strong className="text-foreground">Present Address:</strong> Fill in your current residential address including Division, District, Thana, Post Office, and detailed street/house information.</li>
+                          <li><strong className="text-foreground">Permanent Address:</strong> Your official permanent address. If it is exactly the same as your present address, you can use the <span className="font-bold text-foreground">"Same as Present Address"</span> toggle to automatically copy all fields.</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* Academics, Experience & Nominee */}
+                    <div className="space-y-6">
+                      <div className="bg-muted/10 p-5 rounded-xl border border-border/50 hover:border-primary/20 hover:bg-muted/30 transition-colors">
+                        <h3 className="text-sm font-extrabold text-primary border-b border-border/50 pb-3 mb-4 flex items-center gap-2">
+                          <GraduationCap className="size-4" /> 4. Academic Credentials
+                        </h3>
+                        <ul className="text-xs text-muted-foreground space-y-3">
+                          <li><strong className="text-foreground">Education Details:</strong> Enter your Degree Title, Institution Name, Passing Year, and Result/CGPA.</li>
+                          <li><strong className="text-foreground">Document Upload:</strong> You can upload a scanned PDF or Image of your certificate/transcript for verification.</li>
+                          <li><strong className="text-foreground">Multiple Degrees:</strong> Use the <span className="font-bold text-foreground">"Add More"</span> button to list all your qualifications, starting from the highest degree.</li>
+                        </ul>
+                      </div>
+
+                      <div className="bg-muted/10 p-5 rounded-xl border border-border/50 hover:border-primary/20 hover:bg-muted/30 transition-colors">
+                        <h3 className="text-sm font-extrabold text-primary border-b border-border/50 pb-3 mb-4 flex items-center gap-2">
+                          <Briefcase className="size-4" /> 5. Prior Experience
+                        </h3>
+                        <ul className="text-xs text-muted-foreground space-y-3">
+                          <li><strong className="text-foreground">Job Details:</strong> Specify the Organization Name, your Designation, and the Reason for Leaving.</li>
+                          <li><strong className="text-foreground">Employment Period:</strong> Select the Start Date (From) and End Date (To) of your employment.</li>
+                          <li><strong className="text-foreground">Multiple Experiences:</strong> Use the <span className="font-bold text-foreground">"Add Experience"</span> button to list all relevant previous jobs.</li>
+                        </ul>
+                      </div>
+
+                      <div className="bg-muted/10 p-5 rounded-xl border border-border/50 hover:border-primary/20 hover:bg-muted/30 transition-colors">
+                        <h3 className="text-sm font-extrabold text-primary border-b border-border/50 pb-3 mb-4 flex items-center gap-2">
+                          <ShieldCheck className="size-4" /> 6. Nominee Declaration
+                        </h3>
+                        <ul className="text-xs text-muted-foreground space-y-3">
+                          <li><strong className="text-foreground">Nominee Details:</strong> Provide details for your legal nominees for official HR benefits and allocations.</li>
+                          <li><strong className="text-foreground">Required Information:</strong> Include their Full Name, Relation to you (e.g., Spouse, Mother), NID/Birth Registration number, and Contact Number.</li>
+                          <li><strong className="text-foreground">Multiple Nominees:</strong> Click the <span className="font-bold text-foreground">"Add Nominee"</span> button if you wish to distribute benefits among multiple individuals.</li>
+                        </ul>
+                      </div>
+                      
+                      <div className="p-4 bg-primary/5 rounded-xl border border-primary/20 flex gap-3 items-start hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+                        <CheckCircle2 className="size-5 text-primary mt-0.5 shrink-0" />
+                        <div>
+                          <h4 className="text-xs font-bold text-foreground">Final Submission</h4>
+                          <p className="text-[11px] text-muted-foreground mt-1">
+                            Ensure the top progress bar reaches 100% before submission. Required fields are marked with an asterisk (<span className="text-red-500 font-bold">*</span>).
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </main>
 
@@ -2059,7 +2416,9 @@ function ERecruitmentForm() {
                 </div>
               )}
 
-              {/* Scanning Animation UI */}
+
+
+          {/* Scanning Animation UI */}
               {isNidScanning && (
                 <div className="flex flex-col items-center justify-center py-12 w-full animate-in zoom-in-95 duration-500">
                   <div className="relative w-full max-w-md mx-auto">
