@@ -26,6 +26,8 @@ import {
   Info,
   Copy,
   FileText,
+  Link2,
+  RotateCw,
 } from "lucide-react";
 import { toast } from "sonner";
 import { initializeRecruitmentMockData } from "@/lib/recruitment-mock-data";
@@ -109,6 +111,55 @@ function BasicInfoListPage() {
   const [filterFormStatus, setFilterFormStatus] = useState("All");
   const [filterWorkflowStatus, setFilterWorkflowStatus] = useState("All");
   const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(null);
+
+  const [showLinkModal, setShowLinkModal] = useState(false);
+  const [candidateName, setCandidateName] = useState("");
+  const [genDepartment, setGenDepartment] = useState("");
+  const [genDesignation, setGenDesignation] = useState("");
+  const [reportingBoss, setReportingBoss] = useState("");
+  const [generatedLink, setGeneratedLink] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const handleGenerateLink = () => {
+    if (!candidateName || !genDepartment || !genDesignation || !reportingBoss) {
+      toast.error("Please fill all fields to generate a link.");
+      return;
+    }
+
+    const saved = localStorage.getItem("recruitment_candidates");
+    const parsed = saved ? JSON.parse(saved) : [];
+    
+    // Create new temp ID
+    const newId = `PAL${String(parsed.length + 1).padStart(6, "0")}`;
+    
+    const newCandidate = {
+      empIdTemp: newId,
+      nameEng: candidateName,
+      department: genDepartment,
+      designation: genDesignation,
+      reportingBoss: reportingBoss,
+      formStatus: "Not Filled",
+      assessStatus: "Pending",
+      doj: "",
+    };
+
+    parsed.push(newCandidate);
+    localStorage.setItem("recruitment_candidates", JSON.stringify(parsed));
+    setCandidates(parsed);
+
+    const baseUrl = window.location.origin;
+    const link = `${baseUrl}/e-recruitment-form?tempId=${newId}`;
+    setGeneratedLink(link);
+    toast.success("Link generated and candidate added to queue.");
+  };
+
+  const handleCopyGeneratedLink = () => {
+    if (!generatedLink) return;
+    navigator.clipboard.writeText(generatedLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+    toast.success("Link copied to clipboard!");
+  };
 
   // Load from local storage
   const loadData = () => {
@@ -208,11 +259,18 @@ function BasicInfoListPage() {
               </span>
               <Link
                 to="/e-recruitment-form"
+                className="h-9.5 px-4 bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 font-black text-xs rounded-xl shadow-xs transition uppercase tracking-wider flex items-center justify-center gap-1.5"
+              >
+                <FileText className="size-4" />
+                <span>Application Form</span>
+              </Link>
+              <button
+                onClick={() => setShowLinkModal(true)}
                 className="h-9.5 px-4 bg-primary hover:opacity-95 text-primary-foreground font-black text-xs rounded-xl shadow-xs transition uppercase tracking-wider flex items-center justify-center gap-1.5"
               >
-                <Plus className="size-4" />
-                <span>Apply Form</span>
-              </Link>
+                <Link2 className="size-4" />
+                <span>Generate Link</span>
+              </button>
             </div>
           </div>
 
@@ -360,6 +418,109 @@ function BasicInfoListPage() {
             </div>
           </div>
         </div>
+        {showLinkModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div className="bg-card w-full max-w-2xl mx-4 rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+              <div className="flex items-center justify-between p-6 border-b border-border/50 bg-muted/20">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-primary/10 rounded-xl text-primary">
+                    <Link2 className="size-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-bold">Generate e-Recruitment Link</h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">Create a pre-filled link for the candidate</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowLinkModal(false)}
+                  className="p-2 text-muted-foreground hover:bg-muted rounded-full transition"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+              
+              <div className="p-6 space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Candidate Name</label>
+                  <input 
+                    type="text" 
+                    value={candidateName}
+                    onChange={(e) => setCandidateName(e.target.value)}
+                    className="w-full h-10 px-3 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    placeholder="e.g. John Doe"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Department</label>
+                    <input 
+                      type="text" 
+                      value={genDepartment}
+                      onChange={(e) => setGenDepartment(e.target.value)}
+                      className="w-full h-10 px-3 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                      placeholder="e.g. RMG Operation"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Designation</label>
+                    <input 
+                      type="text" 
+                      value={genDesignation}
+                      onChange={(e) => setGenDesignation(e.target.value)}
+                      className="w-full h-10 px-3 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                      placeholder="e.g. Operator"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Reporting Boss</label>
+                  <input 
+                    type="text" 
+                    value={reportingBoss}
+                    onChange={(e) => setReportingBoss(e.target.value)}
+                    className="w-full h-10 px-3 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    placeholder="e.g. Jane Smith"
+                  />
+                </div>
+                
+                <div className="pt-4 border-t border-border/50 space-y-4">
+                  <button 
+                    onClick={handleGenerateLink}
+                    className="w-full h-11 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 shadow-sm"
+                  >
+                    <RotateCw className="size-4" />
+                    Generate Link
+                  </button>
+
+                  {generatedLink && (
+                    <div className="space-y-2 animate-in fade-in slide-in-from-bottom-2">
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">Generated Link</label>
+                      <div className="flex gap-2">
+                        <div className="flex-1 relative">
+                          <input 
+                            type="text" 
+                            readOnly
+                            value={generatedLink}
+                            className="w-full h-11 px-4 rounded-xl border border-primary/20 bg-primary/5 text-primary text-sm font-medium focus:outline-none pr-12"
+                          />
+                          <button 
+                            onClick={handleCopyGeneratedLink}
+                            className="absolute right-2 top-1.5 p-2 hover:bg-primary/10 rounded-lg text-primary transition-colors"
+                            title="Copy Link"
+                          >
+                            {copied ? <CheckCircle2 className="size-4" /> : <Copy className="size-4" />}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

@@ -106,7 +106,6 @@ import { Route as EmployeeJobCardRouteImport } from './routes/employee-job-card'
 import { Route as EarnLeaveWorkflowRouteImport } from './routes/earn-leave-workflow'
 import { Route as EarnLeaveSubmitRouteImport } from './routes/earn-leave-submit'
 import { Route as EarnLeaveProcessRouteImport } from './routes/earn-leave-process'
-import { Route as ERecruitmentLinkGeneratorRouteImport } from './routes/e-recruitment-link-generator'
 import { Route as ERecruitmentFormRouteImport } from './routes/e-recruitment-form'
 import { Route as CreateRosterRouteImport } from './routes/create-roster'
 import { Route as ConfigureTimeRouteImport } from './routes/configure-time'
@@ -640,12 +639,6 @@ const EarnLeaveProcessRoute = EarnLeaveProcessRouteImport.update({
   path: '/earn-leave-process',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ERecruitmentLinkGeneratorRoute =
-  ERecruitmentLinkGeneratorRouteImport.update({
-    id: '/e-recruitment-link-generator',
-    path: '/e-recruitment-link-generator',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ERecruitmentFormRoute = ERecruitmentFormRouteImport.update({
   id: '/e-recruitment-form',
   path: '/e-recruitment-form',
@@ -839,7 +832,6 @@ export interface FileRoutesByFullPath {
   '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
   '/e-recruitment-form': typeof ERecruitmentFormRoute
-  '/e-recruitment-link-generator': typeof ERecruitmentLinkGeneratorRoute
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
@@ -971,7 +963,6 @@ export interface FileRoutesByTo {
   '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
   '/e-recruitment-form': typeof ERecruitmentFormRoute
-  '/e-recruitment-link-generator': typeof ERecruitmentLinkGeneratorRoute
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
@@ -1104,7 +1095,6 @@ export interface FileRoutesById {
   '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
   '/e-recruitment-form': typeof ERecruitmentFormRoute
-  '/e-recruitment-link-generator': typeof ERecruitmentLinkGeneratorRoute
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
@@ -1238,7 +1228,6 @@ export interface FileRouteTypes {
     | '/configure-time'
     | '/create-roster'
     | '/e-recruitment-form'
-    | '/e-recruitment-link-generator'
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
@@ -1370,7 +1359,6 @@ export interface FileRouteTypes {
     | '/configure-time'
     | '/create-roster'
     | '/e-recruitment-form'
-    | '/e-recruitment-link-generator'
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
@@ -1502,7 +1490,6 @@ export interface FileRouteTypes {
     | '/configure-time'
     | '/create-roster'
     | '/e-recruitment-form'
-    | '/e-recruitment-link-generator'
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
@@ -1635,7 +1622,6 @@ export interface RootRouteChildren {
   ConfigureTimeRoute: typeof ConfigureTimeRoute
   CreateRosterRoute: typeof CreateRosterRoute
   ERecruitmentFormRoute: typeof ERecruitmentFormRoute
-  ERecruitmentLinkGeneratorRoute: typeof ERecruitmentLinkGeneratorRoute
   EarnLeaveProcessRoute: typeof EarnLeaveProcessRoute
   EarnLeaveSubmitRoute: typeof EarnLeaveSubmitRoute
   EarnLeaveWorkflowRoute: typeof EarnLeaveWorkflowRoute
@@ -2420,13 +2406,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EarnLeaveProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/e-recruitment-link-generator': {
-      id: '/e-recruitment-link-generator'
-      path: '/e-recruitment-link-generator'
-      fullPath: '/e-recruitment-link-generator'
-      preLoaderRoute: typeof ERecruitmentLinkGeneratorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/e-recruitment-form': {
       id: '/e-recruitment-form'
       path: '/e-recruitment-form'
@@ -2683,7 +2662,6 @@ const rootRouteChildren: RootRouteChildren = {
   ConfigureTimeRoute: ConfigureTimeRoute,
   CreateRosterRoute: CreateRosterRoute,
   ERecruitmentFormRoute: ERecruitmentFormRoute,
-  ERecruitmentLinkGeneratorRoute: ERecruitmentLinkGeneratorRoute,
   EarnLeaveProcessRoute: EarnLeaveProcessRoute,
   EarnLeaveSubmitRoute: EarnLeaveSubmitRoute,
   EarnLeaveWorkflowRoute: EarnLeaveWorkflowRoute,

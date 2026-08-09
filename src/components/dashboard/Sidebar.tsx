@@ -199,9 +199,8 @@ export const nav: NavItem[] = [
     label: "e-Recruitment",
     icon: UserPlus,
     subitems: [
-      { label: "e-Recruitment Form", to: "/e-recruitment-form" },
-      { label: "Link Generator", to: "/e-recruitment-link-generator" },
-      { label: "List", to: "/recruitment-basic-list" },
+      { label: "Application Queue", to: "/recruitment-basic-list" },
+      { label: "Settings", to: "/recruitment-settings" },
       { label: "Approved List", to: "/recruitment-assessment-list" },
     ],
   },

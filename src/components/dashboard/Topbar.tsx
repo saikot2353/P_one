@@ -282,12 +282,6 @@ const searchableMenus: SearchMenuLink[] = [
     description: "Digital recruitment form",
   },
   {
-    label: "Link Generator",
-    parent: "e-Recruitment",
-    to: "/e-recruitment-link-generator",
-    description: "Generate candidate e-recruitment link",
-  },
-  {
     label: "Candidate List",
     parent: "e-Recruitment",
     to: "/recruitment-basic-list",
