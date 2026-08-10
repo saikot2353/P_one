@@ -269,9 +269,9 @@ function InvDashboardPage() {
                     <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8', fontWeight: 700 }} dy={10} />
                     <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8', fontWeight: 700 }} />
                     <Tooltip contentStyle={{ fontSize: '12px', borderRadius: '6px', fontWeight: 'bold', border: '1px solid #e2e8f0' }} />
-                    <Bar dataKey="receipts" barSize={20} fill="#0ea5e9" radius={[4, 4, 0, 0]} name="Receipts" />
-                    <Bar dataKey="issues" barSize={20} fill="#3b82f6" radius={[4, 4, 0, 0]} name="Issues" />
-                    <Line type="monotone" dataKey="value" stroke="#f43f5e" strokeWidth={3} dot={{r: 5, fill: '#f43f5e'}} name="Trend Index" />
+                    <Bar dataKey="receipts" barSize={20} fill="#cbd5e1" radius={[4, 4, 0, 0]} name="Receipts" />
+                    <Bar dataKey="issues" barSize={20} fill="#1e293b" radius={[4, 4, 0, 0]} name="Issues" />
+                    <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={3} dot={{r: 5, fill: '#3b82f6'}} name="Trend Index" />
                   </ComposedChart>
                 </ResponsiveContainer>
               </div>
