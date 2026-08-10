@@ -95,6 +95,7 @@ import { Route as InvIssueReturnRouteImport } from './routes/inv-issue-return'
 import { Route as InvIssueRegularRouteImport } from './routes/inv-issue-regular'
 import { Route as InvIssueMrrReturnRouteImport } from './routes/inv-issue-mrr-return'
 import { Route as InvIssueListRouteImport } from './routes/inv-issue-list'
+import { Route as InvDashboardRouteImport } from './routes/inv-dashboard'
 import { Route as InvConfigUomRouteImport } from './routes/inv-config-uom'
 import { Route as InvConfigStoreNameRouteImport } from './routes/inv-config-store-name'
 import { Route as InvConfigProductTypeRouteImport } from './routes/inv-config-product-type'
@@ -599,6 +600,11 @@ const InvIssueListRoute = InvIssueListRouteImport.update({
   path: '/inv-issue-list',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvDashboardRoute = InvDashboardRouteImport.update({
+  id: '/inv-dashboard',
+  path: '/inv-dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InvConfigUomRoute = InvConfigUomRouteImport.update({
   id: '/inv-config-uom',
   path: '/inv-config-uom',
@@ -948,6 +954,7 @@ export interface FileRoutesByFullPath {
   '/inv-config-product-type': typeof InvConfigProductTypeRoute
   '/inv-config-store-name': typeof InvConfigStoreNameRoute
   '/inv-config-uom': typeof InvConfigUomRoute
+  '/inv-dashboard': typeof InvDashboardRoute
   '/inv-issue-list': typeof InvIssueListRoute
   '/inv-issue-mrr-return': typeof InvIssueMrrReturnRoute
   '/inv-issue-regular': typeof InvIssueRegularRoute
@@ -1094,6 +1101,7 @@ export interface FileRoutesByTo {
   '/inv-config-product-type': typeof InvConfigProductTypeRoute
   '/inv-config-store-name': typeof InvConfigStoreNameRoute
   '/inv-config-uom': typeof InvConfigUomRoute
+  '/inv-dashboard': typeof InvDashboardRoute
   '/inv-issue-list': typeof InvIssueListRoute
   '/inv-issue-mrr-return': typeof InvIssueMrrReturnRoute
   '/inv-issue-regular': typeof InvIssueRegularRoute
@@ -1241,6 +1249,7 @@ export interface FileRoutesById {
   '/inv-config-product-type': typeof InvConfigProductTypeRoute
   '/inv-config-store-name': typeof InvConfigStoreNameRoute
   '/inv-config-uom': typeof InvConfigUomRoute
+  '/inv-dashboard': typeof InvDashboardRoute
   '/inv-issue-list': typeof InvIssueListRoute
   '/inv-issue-mrr-return': typeof InvIssueMrrReturnRoute
   '/inv-issue-regular': typeof InvIssueRegularRoute
@@ -1389,6 +1398,7 @@ export interface FileRouteTypes {
     | '/inv-config-product-type'
     | '/inv-config-store-name'
     | '/inv-config-uom'
+    | '/inv-dashboard'
     | '/inv-issue-list'
     | '/inv-issue-mrr-return'
     | '/inv-issue-regular'
@@ -1535,6 +1545,7 @@ export interface FileRouteTypes {
     | '/inv-config-product-type'
     | '/inv-config-store-name'
     | '/inv-config-uom'
+    | '/inv-dashboard'
     | '/inv-issue-list'
     | '/inv-issue-mrr-return'
     | '/inv-issue-regular'
@@ -1681,6 +1692,7 @@ export interface FileRouteTypes {
     | '/inv-config-product-type'
     | '/inv-config-store-name'
     | '/inv-config-uom'
+    | '/inv-dashboard'
     | '/inv-issue-list'
     | '/inv-issue-mrr-return'
     | '/inv-issue-regular'
@@ -1828,6 +1840,7 @@ export interface RootRouteChildren {
   InvConfigProductTypeRoute: typeof InvConfigProductTypeRoute
   InvConfigStoreNameRoute: typeof InvConfigStoreNameRoute
   InvConfigUomRoute: typeof InvConfigUomRoute
+  InvDashboardRoute: typeof InvDashboardRoute
   InvIssueListRoute: typeof InvIssueListRoute
   InvIssueMrrReturnRoute: typeof InvIssueMrrReturnRoute
   InvIssueRegularRoute: typeof InvIssueRegularRoute
@@ -2524,6 +2537,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvIssueListRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inv-dashboard': {
+      id: '/inv-dashboard'
+      path: '/inv-dashboard'
+      fullPath: '/inv-dashboard'
+      preLoaderRoute: typeof InvDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/inv-config-uom': {
       id: '/inv-config-uom'
       path: '/inv-config-uom'
@@ -2988,6 +3008,7 @@ const rootRouteChildren: RootRouteChildren = {
   InvConfigProductTypeRoute: InvConfigProductTypeRoute,
   InvConfigStoreNameRoute: InvConfigStoreNameRoute,
   InvConfigUomRoute: InvConfigUomRoute,
+  InvDashboardRoute: InvDashboardRoute,
   InvIssueListRoute: InvIssueListRoute,
   InvIssueMrrReturnRoute: InvIssueMrrReturnRoute,
   InvIssueRegularRoute: InvIssueRegularRoute,

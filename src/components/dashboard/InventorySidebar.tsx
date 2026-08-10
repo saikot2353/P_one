@@ -45,7 +45,7 @@ export interface NavItem {
 }
 
 export const nav: NavItem[] = [
-  { label: "Dashboard", to: "/inventory-dashboard", icon: LayoutDashboard },
+  { label: "Dashboard", to: "/inv-dashboard", icon: LayoutDashboard },
   {
     label: "Configuration",
     icon: Settings,
