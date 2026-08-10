@@ -89,6 +89,8 @@ import { Route as KpiCyclesRouteImport } from './routes/kpi-cycles'
 import { Route as KpiAssessmentWorkflowRouteImport } from './routes/kpi-assessment-workflow'
 import { Route as InventoryDashboardRouteImport } from './routes/inventory-dashboard'
 import { Route as InvYarnOpeningStockRouteImport } from './routes/inv-yarn-opening-stock'
+import { Route as InvReceiveListRouteImport } from './routes/inv-receive-list'
+import { Route as InvReceiveDirectRouteImport } from './routes/inv-receive-direct'
 import { Route as InvConfigUomRouteImport } from './routes/inv-config-uom'
 import { Route as InvConfigStoreNameRouteImport } from './routes/inv-config-store-name'
 import { Route as InvConfigProductTypeRouteImport } from './routes/inv-config-product-type'
@@ -563,6 +565,16 @@ const InvYarnOpeningStockRoute = InvYarnOpeningStockRouteImport.update({
   path: '/inv-yarn-opening-stock',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvReceiveListRoute = InvReceiveListRouteImport.update({
+  id: '/inv-receive-list',
+  path: '/inv-receive-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvReceiveDirectRoute = InvReceiveDirectRouteImport.update({
+  id: '/inv-receive-direct',
+  path: '/inv-receive-direct',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InvConfigUomRoute = InvConfigUomRouteImport.update({
   id: '/inv-config-uom',
   path: '/inv-config-uom',
@@ -912,6 +924,8 @@ export interface FileRoutesByFullPath {
   '/inv-config-product-type': typeof InvConfigProductTypeRoute
   '/inv-config-store-name': typeof InvConfigStoreNameRoute
   '/inv-config-uom': typeof InvConfigUomRoute
+  '/inv-receive-direct': typeof InvReceiveDirectRoute
+  '/inv-receive-list': typeof InvReceiveListRoute
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
   '/inventory-dashboard': typeof InventoryDashboardRoute
   '/kpi-assessment-workflow': typeof KpiAssessmentWorkflowRoute
@@ -1052,6 +1066,8 @@ export interface FileRoutesByTo {
   '/inv-config-product-type': typeof InvConfigProductTypeRoute
   '/inv-config-store-name': typeof InvConfigStoreNameRoute
   '/inv-config-uom': typeof InvConfigUomRoute
+  '/inv-receive-direct': typeof InvReceiveDirectRoute
+  '/inv-receive-list': typeof InvReceiveListRoute
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
   '/inventory-dashboard': typeof InventoryDashboardRoute
   '/kpi-assessment-workflow': typeof KpiAssessmentWorkflowRoute
@@ -1193,6 +1209,8 @@ export interface FileRoutesById {
   '/inv-config-product-type': typeof InvConfigProductTypeRoute
   '/inv-config-store-name': typeof InvConfigStoreNameRoute
   '/inv-config-uom': typeof InvConfigUomRoute
+  '/inv-receive-direct': typeof InvReceiveDirectRoute
+  '/inv-receive-list': typeof InvReceiveListRoute
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
   '/inventory-dashboard': typeof InventoryDashboardRoute
   '/kpi-assessment-workflow': typeof KpiAssessmentWorkflowRoute
@@ -1335,6 +1353,8 @@ export interface FileRouteTypes {
     | '/inv-config-product-type'
     | '/inv-config-store-name'
     | '/inv-config-uom'
+    | '/inv-receive-direct'
+    | '/inv-receive-list'
     | '/inv-yarn-opening-stock'
     | '/inventory-dashboard'
     | '/kpi-assessment-workflow'
@@ -1475,6 +1495,8 @@ export interface FileRouteTypes {
     | '/inv-config-product-type'
     | '/inv-config-store-name'
     | '/inv-config-uom'
+    | '/inv-receive-direct'
+    | '/inv-receive-list'
     | '/inv-yarn-opening-stock'
     | '/inventory-dashboard'
     | '/kpi-assessment-workflow'
@@ -1615,6 +1637,8 @@ export interface FileRouteTypes {
     | '/inv-config-product-type'
     | '/inv-config-store-name'
     | '/inv-config-uom'
+    | '/inv-receive-direct'
+    | '/inv-receive-list'
     | '/inv-yarn-opening-stock'
     | '/inventory-dashboard'
     | '/kpi-assessment-workflow'
@@ -1756,6 +1780,8 @@ export interface RootRouteChildren {
   InvConfigProductTypeRoute: typeof InvConfigProductTypeRoute
   InvConfigStoreNameRoute: typeof InvConfigStoreNameRoute
   InvConfigUomRoute: typeof InvConfigUomRoute
+  InvReceiveDirectRoute: typeof InvReceiveDirectRoute
+  InvReceiveListRoute: typeof InvReceiveListRoute
   InvYarnOpeningStockRoute: typeof InvYarnOpeningStockRoute
   InventoryDashboardRoute: typeof InventoryDashboardRoute
   KpiAssessmentWorkflowRoute: typeof KpiAssessmentWorkflowRoute
@@ -2404,6 +2430,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvYarnOpeningStockRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inv-receive-list': {
+      id: '/inv-receive-list'
+      path: '/inv-receive-list'
+      fullPath: '/inv-receive-list'
+      preLoaderRoute: typeof InvReceiveListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-receive-direct': {
+      id: '/inv-receive-direct'
+      path: '/inv-receive-direct'
+      fullPath: '/inv-receive-direct'
+      preLoaderRoute: typeof InvReceiveDirectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/inv-config-uom': {
       id: '/inv-config-uom'
       path: '/inv-config-uom'
@@ -2868,6 +2908,8 @@ const rootRouteChildren: RootRouteChildren = {
   InvConfigProductTypeRoute: InvConfigProductTypeRoute,
   InvConfigStoreNameRoute: InvConfigStoreNameRoute,
   InvConfigUomRoute: InvConfigUomRoute,
+  InvReceiveDirectRoute: InvReceiveDirectRoute,
+  InvReceiveListRoute: InvReceiveListRoute,
   InvYarnOpeningStockRoute: InvYarnOpeningStockRoute,
   InventoryDashboardRoute: InventoryDashboardRoute,
   KpiAssessmentWorkflowRoute: KpiAssessmentWorkflowRoute,

@@ -2,6 +2,24 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
         {
+          id: "149",
+          date: new Date().toISOString().slice(0, 16),
+          type: "Feature",
+          module: "Inventory",
+          link: "/inv-receive-list",
+          descriptionEn: "Implemented the Receive List page with detailed filtering, searchable table, and a comprehensive Print Details (MRIR) modal.",
+          descriptionBn: "বিস্তারিত ফিল্টারিং, সার্চেবল টেবিল এবং সুন্দর প্রিন্ট ডিটেইলস (MRIR) মোডাল সহ রিসিভ লিস্ট পেজ তৈরি করা হয়েছে।",
+        },
+        {
+          id: "148",
+          date: new Date().toISOString().slice(0, 16),
+          type: "Feature",
+          module: "Inventory",
+          link: "/inv-receive-direct",
+          descriptionEn: "Implemented the Direct Receive page with a complete MRR form and an interactive product entry table.",
+          descriptionBn: "সম্পূর্ণ এমআরআর (MRR) ফর্ম এবং প্রোডাক্ট এন্ট্রি টেবিল সহ ডিরেক্ট রিসিভ পেজ তৈরি করা হয়েছে।",
+        },
+        {
           id: "147",
           date: new Date().toISOString().slice(0, 16),
           type: "Feature",
