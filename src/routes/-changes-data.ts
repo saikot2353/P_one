@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
         {
+          id: "146",
+          date: new Date().toISOString().slice(0, 16),
+          type: "Feature",
+          module: "Inventory",
+          link: "/inv-config-uom",
+          descriptionEn: "Added new configuration pages for Unit of Measurement (UoM), Brand, and Model in the Inventory module.",
+          descriptionBn: "ইনভেন্টরি মডিউলে Unit of Measurement (UoM), Brand, এবং Model এর জন্য নতুন কনফিগারেশন পেজ যুক্ত করা হয়েছে।",
+        },
+        {
           id: "145",
           date: new Date().toISOString().slice(0, 16),
           type: "UI Update",

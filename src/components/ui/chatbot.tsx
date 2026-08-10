@@ -179,7 +179,7 @@ export function Chatbot() {
         <div className="relative shrink-0 overflow-hidden">
           {/* Animated Gradient Background */}
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 opacity-90"></div>
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+          <div className="absolute inset-0 bg-primary/5 opacity-20"></div>
           
           <div className="relative p-4 px-5 flex items-center justify-between text-white">
             <div className="flex items-center gap-3.5">

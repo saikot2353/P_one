@@ -89,10 +89,13 @@ import { Route as KpiCyclesRouteImport } from './routes/kpi-cycles'
 import { Route as KpiAssessmentWorkflowRouteImport } from './routes/kpi-assessment-workflow'
 import { Route as InventoryDashboardRouteImport } from './routes/inventory-dashboard'
 import { Route as InvYarnOpeningStockRouteImport } from './routes/inv-yarn-opening-stock'
+import { Route as InvConfigUomRouteImport } from './routes/inv-config-uom'
 import { Route as InvConfigStoreNameRouteImport } from './routes/inv-config-store-name'
 import { Route as InvConfigProductTypeRouteImport } from './routes/inv-config-product-type'
 import { Route as InvConfigProductNameRouteImport } from './routes/inv-config-product-name'
+import { Route as InvConfigModelRouteImport } from './routes/inv-config-model'
 import { Route as InvConfigGroupNameRouteImport } from './routes/inv-config-group-name'
+import { Route as InvConfigBrandRouteImport } from './routes/inv-config-brand'
 import { Route as IncrementSummaryRouteImport } from './routes/increment-summary'
 import { Route as IncrementReportRouteImport } from './routes/increment-report'
 import { Route as IncrementQueuelistRouteImport } from './routes/increment-queuelist'
@@ -560,6 +563,11 @@ const InvYarnOpeningStockRoute = InvYarnOpeningStockRouteImport.update({
   path: '/inv-yarn-opening-stock',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvConfigUomRoute = InvConfigUomRouteImport.update({
+  id: '/inv-config-uom',
+  path: '/inv-config-uom',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InvConfigStoreNameRoute = InvConfigStoreNameRouteImport.update({
   id: '/inv-config-store-name',
   path: '/inv-config-store-name',
@@ -575,9 +583,19 @@ const InvConfigProductNameRoute = InvConfigProductNameRouteImport.update({
   path: '/inv-config-product-name',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvConfigModelRoute = InvConfigModelRouteImport.update({
+  id: '/inv-config-model',
+  path: '/inv-config-model',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InvConfigGroupNameRoute = InvConfigGroupNameRouteImport.update({
   id: '/inv-config-group-name',
   path: '/inv-config-group-name',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvConfigBrandRoute = InvConfigBrandRouteImport.update({
+  id: '/inv-config-brand',
+  path: '/inv-config-brand',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IncrementSummaryRoute = IncrementSummaryRouteImport.update({
@@ -887,10 +905,13 @@ export interface FileRoutesByFullPath {
   '/increment-queuelist': typeof IncrementQueuelistRoute
   '/increment-report': typeof IncrementReportRoute
   '/increment-summary': typeof IncrementSummaryRoute
+  '/inv-config-brand': typeof InvConfigBrandRoute
   '/inv-config-group-name': typeof InvConfigGroupNameRoute
+  '/inv-config-model': typeof InvConfigModelRoute
   '/inv-config-product-name': typeof InvConfigProductNameRoute
   '/inv-config-product-type': typeof InvConfigProductTypeRoute
   '/inv-config-store-name': typeof InvConfigStoreNameRoute
+  '/inv-config-uom': typeof InvConfigUomRoute
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
   '/inventory-dashboard': typeof InventoryDashboardRoute
   '/kpi-assessment-workflow': typeof KpiAssessmentWorkflowRoute
@@ -1024,10 +1045,13 @@ export interface FileRoutesByTo {
   '/increment-queuelist': typeof IncrementQueuelistRoute
   '/increment-report': typeof IncrementReportRoute
   '/increment-summary': typeof IncrementSummaryRoute
+  '/inv-config-brand': typeof InvConfigBrandRoute
   '/inv-config-group-name': typeof InvConfigGroupNameRoute
+  '/inv-config-model': typeof InvConfigModelRoute
   '/inv-config-product-name': typeof InvConfigProductNameRoute
   '/inv-config-product-type': typeof InvConfigProductTypeRoute
   '/inv-config-store-name': typeof InvConfigStoreNameRoute
+  '/inv-config-uom': typeof InvConfigUomRoute
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
   '/inventory-dashboard': typeof InventoryDashboardRoute
   '/kpi-assessment-workflow': typeof KpiAssessmentWorkflowRoute
@@ -1162,10 +1186,13 @@ export interface FileRoutesById {
   '/increment-queuelist': typeof IncrementQueuelistRoute
   '/increment-report': typeof IncrementReportRoute
   '/increment-summary': typeof IncrementSummaryRoute
+  '/inv-config-brand': typeof InvConfigBrandRoute
   '/inv-config-group-name': typeof InvConfigGroupNameRoute
+  '/inv-config-model': typeof InvConfigModelRoute
   '/inv-config-product-name': typeof InvConfigProductNameRoute
   '/inv-config-product-type': typeof InvConfigProductTypeRoute
   '/inv-config-store-name': typeof InvConfigStoreNameRoute
+  '/inv-config-uom': typeof InvConfigUomRoute
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
   '/inventory-dashboard': typeof InventoryDashboardRoute
   '/kpi-assessment-workflow': typeof KpiAssessmentWorkflowRoute
@@ -1301,10 +1328,13 @@ export interface FileRouteTypes {
     | '/increment-queuelist'
     | '/increment-report'
     | '/increment-summary'
+    | '/inv-config-brand'
     | '/inv-config-group-name'
+    | '/inv-config-model'
     | '/inv-config-product-name'
     | '/inv-config-product-type'
     | '/inv-config-store-name'
+    | '/inv-config-uom'
     | '/inv-yarn-opening-stock'
     | '/inventory-dashboard'
     | '/kpi-assessment-workflow'
@@ -1438,10 +1468,13 @@ export interface FileRouteTypes {
     | '/increment-queuelist'
     | '/increment-report'
     | '/increment-summary'
+    | '/inv-config-brand'
     | '/inv-config-group-name'
+    | '/inv-config-model'
     | '/inv-config-product-name'
     | '/inv-config-product-type'
     | '/inv-config-store-name'
+    | '/inv-config-uom'
     | '/inv-yarn-opening-stock'
     | '/inventory-dashboard'
     | '/kpi-assessment-workflow'
@@ -1575,10 +1608,13 @@ export interface FileRouteTypes {
     | '/increment-queuelist'
     | '/increment-report'
     | '/increment-summary'
+    | '/inv-config-brand'
     | '/inv-config-group-name'
+    | '/inv-config-model'
     | '/inv-config-product-name'
     | '/inv-config-product-type'
     | '/inv-config-store-name'
+    | '/inv-config-uom'
     | '/inv-yarn-opening-stock'
     | '/inventory-dashboard'
     | '/kpi-assessment-workflow'
@@ -1713,10 +1749,13 @@ export interface RootRouteChildren {
   IncrementQueuelistRoute: typeof IncrementQueuelistRoute
   IncrementReportRoute: typeof IncrementReportRoute
   IncrementSummaryRoute: typeof IncrementSummaryRoute
+  InvConfigBrandRoute: typeof InvConfigBrandRoute
   InvConfigGroupNameRoute: typeof InvConfigGroupNameRoute
+  InvConfigModelRoute: typeof InvConfigModelRoute
   InvConfigProductNameRoute: typeof InvConfigProductNameRoute
   InvConfigProductTypeRoute: typeof InvConfigProductTypeRoute
   InvConfigStoreNameRoute: typeof InvConfigStoreNameRoute
+  InvConfigUomRoute: typeof InvConfigUomRoute
   InvYarnOpeningStockRoute: typeof InvYarnOpeningStockRoute
   InventoryDashboardRoute: typeof InventoryDashboardRoute
   KpiAssessmentWorkflowRoute: typeof KpiAssessmentWorkflowRoute
@@ -2365,6 +2404,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvYarnOpeningStockRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inv-config-uom': {
+      id: '/inv-config-uom'
+      path: '/inv-config-uom'
+      fullPath: '/inv-config-uom'
+      preLoaderRoute: typeof InvConfigUomRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/inv-config-store-name': {
       id: '/inv-config-store-name'
       path: '/inv-config-store-name'
@@ -2386,11 +2432,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvConfigProductNameRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inv-config-model': {
+      id: '/inv-config-model'
+      path: '/inv-config-model'
+      fullPath: '/inv-config-model'
+      preLoaderRoute: typeof InvConfigModelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/inv-config-group-name': {
       id: '/inv-config-group-name'
       path: '/inv-config-group-name'
       fullPath: '/inv-config-group-name'
       preLoaderRoute: typeof InvConfigGroupNameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-config-brand': {
+      id: '/inv-config-brand'
+      path: '/inv-config-brand'
+      fullPath: '/inv-config-brand'
+      preLoaderRoute: typeof InvConfigBrandRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/increment-summary': {
@@ -2801,10 +2861,13 @@ const rootRouteChildren: RootRouteChildren = {
   IncrementQueuelistRoute: IncrementQueuelistRoute,
   IncrementReportRoute: IncrementReportRoute,
   IncrementSummaryRoute: IncrementSummaryRoute,
+  InvConfigBrandRoute: InvConfigBrandRoute,
   InvConfigGroupNameRoute: InvConfigGroupNameRoute,
+  InvConfigModelRoute: InvConfigModelRoute,
   InvConfigProductNameRoute: InvConfigProductNameRoute,
   InvConfigProductTypeRoute: InvConfigProductTypeRoute,
   InvConfigStoreNameRoute: InvConfigStoreNameRoute,
+  InvConfigUomRoute: InvConfigUomRoute,
   InvYarnOpeningStockRoute: InvYarnOpeningStockRoute,
   InventoryDashboardRoute: InventoryDashboardRoute,
   KpiAssessmentWorkflowRoute: KpiAssessmentWorkflowRoute,
