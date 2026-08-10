@@ -19,6 +19,59 @@ type ReceiveProductData = {
   totalPrice: string;
 };
 
+
+// ─── Smart UI Components ──────────────────────────────────────────────────
+
+function SmartInput({ label, value, onChange, placeholder, type = "text", readOnly = false }: any) {
+  return (
+    <div className="flex flex-col gap-1.5 relative group">
+      <label className="text-[10.5px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-0.5">
+        {label}
+      </label>
+      <div className="relative">
+        <input 
+          type={type}
+          readOnly={readOnly}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          className={`w-full rounded-lg px-3 py-2 text-[10.5px] font-semibold text-foreground transition-all duration-200 outline-none shadow-sm shadow-black/[0.02] ${
+            readOnly 
+              ? "bg-slate-50 border border-slate-200/50 text-slate-400 cursor-not-allowed" 
+              : "bg-slate-100 border border-slate-200 hover:border-blue-400 hover:bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+          } ${type === 'date' ? '[&::-webkit-calendar-picker-indicator]:opacity-0 relative z-10' : ''}`}
+        />
+        {type === 'date' && (
+          <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-400 pointer-events-none z-0" />
+        )}
+      </div>
+    </div>
+  )
+}
+
+function SmartSelect({ label, value, onChange, options, defaultOption }: any) {
+  return (
+    <div className="flex flex-col gap-1.5 relative group">
+      <label className="text-[10.5px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-0.5">
+        {label}
+      </label>
+      <div className="relative">
+        <select 
+          value={value}
+          onChange={onChange}
+          className="w-full rounded-lg bg-slate-100 border border-slate-200 hover:border-blue-400 hover:bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 px-3 py-2 text-[10.5px] font-semibold text-foreground transition-all duration-200 outline-none appearance-none cursor-pointer shadow-sm shadow-black/[0.02]"
+        >
+          {defaultOption && <option value="">{defaultOption}</option>}
+          {options.map((opt: any) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-400 pointer-events-none" />
+      </div>
+    </div>
+  )
+}
+
 function InvReceiveDirectPage() {
   // Form State
   const [mrrType, setMrrType] = useState("Receive Regular");
@@ -109,68 +162,31 @@ function InvReceiveDirectPage() {
                 </div>
                 <div className="p-6 flex-1">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
-                    <div className="relative group sm:col-span-2">
-                      <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">Supplier Name</label>
-                      <select 
-                        className="w-full bg-background border border-border/60 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 rounded px-2.5 py-1.5 text-[10.5px] font-medium text-foreground transition-all outline-none shadow-sm appearance-none cursor-pointer"
-                        value={supplierName}
-                        onChange={(e) => setSupplierName(e.target.value)}
-                      >
-                        <option value="">Select Supplier...</option>
-                        <option value="M.B. Trade Corporation">M.B. Trade Corporation</option>
-                        <option value="Rahman Fabrics">Rahman Fabrics</option>
-                        <option value="Global Accessories Ltd">Global Accessories Ltd</option>
-                      </select>
-                      <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground/70 pointer-events-none" />
-                    </div>
-
-                    <div className="relative group">
-                      <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">MRR Type</label>
-                      <select 
-                        className="w-full bg-background border border-border/60 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 rounded px-2.5 py-1.5 text-[10.5px] font-medium text-foreground transition-all outline-none shadow-sm appearance-none cursor-pointer"
-                        value={mrrType}
-                        onChange={(e) => setMrrType(e.target.value)}
-                      >
-                        <option value="Receive Regular">Receive Regular</option>
-                        <option value="Receive Without PO">Receive Without PO</option>
-                      </select>
-                      <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground/70 pointer-events-none" />
-                    </div>
-                    
-                    <div className="relative group">
-                      <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">MRR Date</label>
-                      <div className="relative">
-                        <input 
-                          type="date" 
-                          className="w-full bg-background border border-border/60 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 rounded px-2.5 py-1.5 text-[10.5px] font-medium text-foreground transition-all outline-none shadow-sm [&::-webkit-calendar-picker-indicator]:opacity-0 relative z-10"
-                          value={mrrDate}
-                          onChange={(e) => setMrrDate(e.target.value)}
-                        />
-                        <Calendar className="absolute right-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground/70 pointer-events-none z-0" />
-                      </div>
-                    </div>
-                    
-                    <div className="relative group">
-                      <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">MRR No</label>
-                      <input 
-                        type="text" 
-                        className="w-full bg-muted/30 border border-border/40 rounded px-2.5 py-1.5 text-[10.5px] font-medium text-muted-foreground focus:outline-none cursor-not-allowed shadow-sm"
-                        value={mrrNo}
-                        readOnly
-                        placeholder="Auto Generated"
+                    <div className="sm:col-span-2">
+                      <SmartSelect 
+                        label="Supplier Name" 
+                        value={supplierName} 
+                        onChange={(e: any) => setSupplierName(e.target.value)} 
+                        defaultOption="Select Supplier..."
+                        options={[
+                          {value: "M.B. Trade Corporation", label: "M.B. Trade Corporation"},
+                          {value: "Rahman Fabrics", label: "Rahman Fabrics"},
+                          {value: "Global Accessories Ltd", label: "Global Accessories Ltd"},
+                        ]} 
                       />
                     </div>
-
-                    <div className="relative group">
-                      <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">Remarks</label>
-                      <input 
-                        type="text" 
-                        className="w-full bg-background border border-border/60 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 rounded px-2.5 py-1.5 text-[10.5px] font-medium text-foreground transition-all outline-none shadow-sm"
-                        value={remarks}
-                        onChange={(e) => setRemarks(e.target.value)}
-                        placeholder="Enter remarks..."
-                      />
-                    </div>
+                    <SmartSelect 
+                      label="MRR Type" 
+                      value={mrrType} 
+                      onChange={(e: any) => setMrrType(e.target.value)} 
+                      options={[
+                        {value: "Receive Regular", label: "Receive Regular"},
+                        {value: "Receive Without PO", label: "Receive Without PO"},
+                      ]} 
+                    />
+                    <SmartInput label="MRR Date" type="date" value={mrrDate} onChange={(e: any) => setMrrDate(e.target.value)} />
+                    <SmartInput label="MRR No" value={mrrNo} readOnly={true} placeholder="Auto Generated" />
+                    <SmartInput label="Remarks" value={remarks} onChange={(e: any) => setRemarks(e.target.value)} placeholder="Enter remarks..." />
                   </div>
                 </div>
               </div>
@@ -185,103 +201,17 @@ function InvReceiveDirectPage() {
                 </div>
                 <div className="p-6 flex-1">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+                    <SmartInput label="Challan No" value={challanNo} onChange={(e: any) => setChallanNo(e.target.value)} placeholder="Enter Challan No" />
+                    <SmartInput label="Challan Date" type="date" value={challanDate} onChange={(e: any) => setChallanDate(e.target.value)} />
                     
-                    <div className="relative group">
-                      <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">Challan No</label>
-                      <input 
-                        type="text" 
-                        className="w-full bg-background border border-border/60 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 rounded px-2.5 py-1.5 text-[10.5px] font-medium text-foreground transition-all outline-none shadow-sm"
-                        value={challanNo}
-                        onChange={(e) => setChallanNo(e.target.value)}
-                        placeholder="Enter Challan No"
-                      />
-                    </div>
-
-                    <div className="relative group">
-                      <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">Challan Date</label>
-                      <div className="relative">
-                        <input 
-                          type="date" 
-                          className="w-full bg-background border border-border/60 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 rounded px-2.5 py-1.5 text-[10.5px] font-medium text-foreground transition-all outline-none shadow-sm [&::-webkit-calendar-picker-indicator]:opacity-0 relative z-10"
-                          value={challanDate}
-                          onChange={(e) => setChallanDate(e.target.value)}
-                        />
-                        <Calendar className="absolute right-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground/70 pointer-events-none z-0" />
-                      </div>
-                    </div>
-
-                    <div className="relative group">
-                      <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">Bill No</label>
-                      <input 
-                        type="text" 
-                        className="w-full bg-background border border-border/60 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 rounded px-2.5 py-1.5 text-[10.5px] font-medium text-foreground transition-all outline-none shadow-sm"
-                        value={billNo}
-                        onChange={(e) => setBillNo(e.target.value)}
-                        placeholder="Enter Bill No"
-                      />
-                    </div>
-
-                    <div className="relative group">
-                      <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">Bill Date</label>
-                      <div className="relative">
-                        <input 
-                          type="date" 
-                          className="w-full bg-background border border-border/60 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 rounded px-2.5 py-1.5 text-[10.5px] font-medium text-foreground transition-all outline-none shadow-sm [&::-webkit-calendar-picker-indicator]:opacity-0 relative z-10"
-                          value={billDate}
-                          onChange={(e) => setBillDate(e.target.value)}
-                        />
-                        <Calendar className="absolute right-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground/70 pointer-events-none z-0" />
-                      </div>
-                    </div>
-
-                    <div className="relative group">
-                      <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">LC No</label>
-                      <input 
-                        type="text" 
-                        className="w-full bg-background border border-border/60 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 rounded px-2.5 py-1.5 text-[10.5px] font-medium text-foreground transition-all outline-none shadow-sm"
-                        value={lcNo}
-                        onChange={(e) => setLcNo(e.target.value)}
-                        placeholder="Enter LC No"
-                      />
-                    </div>
-
-                    <div className="relative group">
-                      <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">LC Date</label>
-                      <div className="relative">
-                        <input 
-                          type="date" 
-                          className="w-full bg-background border border-border/60 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 rounded px-2.5 py-1.5 text-[10.5px] font-medium text-foreground transition-all outline-none shadow-sm [&::-webkit-calendar-picker-indicator]:opacity-0 relative z-10"
-                          value={lcDate}
-                          onChange={(e) => setLcDate(e.target.value)}
-                        />
-                        <Calendar className="absolute right-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground/70 pointer-events-none z-0" />
-                      </div>
-                    </div>
-
-                    <div className="relative group">
-                      <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">PI No</label>
-                      <input 
-                        type="text" 
-                        className="w-full bg-background border border-border/60 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 rounded px-2.5 py-1.5 text-[10.5px] font-medium text-foreground transition-all outline-none shadow-sm"
-                        value={piNo}
-                        onChange={(e) => setPiNo(e.target.value)}
-                        placeholder="Enter PI No"
-                      />
-                    </div>
+                    <SmartInput label="Bill No" value={billNo} onChange={(e: any) => setBillNo(e.target.value)} placeholder="Enter Bill No" />
+                    <SmartInput label="Bill Date" type="date" value={billDate} onChange={(e: any) => setBillDate(e.target.value)} />
                     
-                    <div className="relative group">
-                      <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">PI Date</label>
-                      <div className="relative">
-                        <input 
-                          type="date" 
-                          className="w-full bg-background border border-border/60 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 rounded px-2.5 py-1.5 text-[10.5px] font-medium text-foreground transition-all outline-none shadow-sm [&::-webkit-calendar-picker-indicator]:opacity-0 relative z-10"
-                          value={piDate}
-                          onChange={(e) => setPiDate(e.target.value)}
-                        />
-                        <Calendar className="absolute right-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground/70 pointer-events-none z-0" />
-                      </div>
-                    </div>
-
+                    <SmartInput label="LC No" value={lcNo} onChange={(e: any) => setLcNo(e.target.value)} placeholder="Enter LC No" />
+                    <SmartInput label="LC Date" type="date" value={lcDate} onChange={(e: any) => setLcDate(e.target.value)} />
+                    
+                    <SmartInput label="PI No" value={piNo} onChange={(e: any) => setPiNo(e.target.value)} placeholder="Enter PI No" />
+                    <SmartInput label="PI Date" type="date" value={piDate} onChange={(e: any) => setPiDate(e.target.value)} />
                   </div>
                 </div>
               </div>
@@ -300,55 +230,20 @@ function InvReceiveDirectPage() {
                 
                 {/* Entry Form */}
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-x-6 gap-y-6 pb-6 mb-6 border-b border-border/50">
-                  <div className="md:col-span-3 relative group">
-                    <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">Product Name</label>
-                    <input 
-                      type="text"
-                      className="w-full bg-background border border-border/60 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 rounded px-2.5 py-1.5 text-[10.5px] font-medium text-foreground transition-all outline-none shadow-sm"
-                      value={newProductName}
-                      onChange={(e) => setNewProductName(e.target.value)}
-                      placeholder="Enter product..."
-                    />
+                  <div className="md:col-span-3">
+                    <SmartInput label="Product Name" value={newProductName} onChange={(e: any) => setNewProductName(e.target.value)} placeholder="Enter product..." />
                   </div>
-                  <div className="md:col-span-3 relative group">
-                    <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">Specifications</label>
-                    <input 
-                      type="text"
-                      className="w-full bg-background border border-border/60 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 rounded px-2.5 py-1.5 text-[10.5px] font-medium text-foreground transition-all outline-none shadow-sm"
-                      value={newSpecifications}
-                      onChange={(e) => setNewSpecifications(e.target.value)}
-                      placeholder="Details..."
-                    />
+                  <div className="md:col-span-3">
+                    <SmartInput label="Specifications" value={newSpecifications} onChange={(e: any) => setNewSpecifications(e.target.value)} placeholder="Details..." />
                   </div>
-                  <div className="md:col-span-2 relative group">
-                    <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">Quantity</label>
-                    <input 
-                      type="number"
-                      className="w-full bg-background border border-border/60 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 rounded px-2.5 py-1.5 text-[10.5px] font-medium text-foreground transition-all outline-none shadow-sm"
-                      value={newQuantity}
-                      onChange={(e) => setNewQuantity(e.target.value)}
-                      placeholder="0"
-                    />
+                  <div className="md:col-span-2">
+                    <SmartInput label="Quantity" type="number" value={newQuantity} onChange={(e: any) => setNewQuantity(e.target.value)} placeholder="0" />
                   </div>
-                  <div className="md:col-span-2 relative group">
-                    <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">Unit Price</label>
-                    <input 
-                      type="number"
-                      className="w-full bg-background border border-border/60 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 rounded px-2.5 py-1.5 text-[10.5px] font-medium text-foreground transition-all outline-none shadow-sm"
-                      value={newUnitPrice}
-                      onChange={(e) => setNewUnitPrice(e.target.value)}
-                      placeholder="0.00"
-                    />
+                  <div className="md:col-span-2">
+                    <SmartInput label="Unit Price" type="number" value={newUnitPrice} onChange={(e: any) => setNewUnitPrice(e.target.value)} placeholder="0.00" />
                   </div>
-                  <div className="md:col-span-2 relative group">
-                    <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">Total Price</label>
-                    <input 
-                      type="text"
-                      readOnly
-                      className="w-full bg-muted/30 border border-border/40 rounded px-2.5 py-1.5 text-[10.5px] font-bold text-muted-foreground focus:outline-none cursor-not-allowed shadow-sm"
-                      value={newTotalPrice === "0.00" ? "" : newTotalPrice}
-                      placeholder="0.00"
-                    />
+                  <div className="md:col-span-2">
+                    <SmartInput label="Total Price" value={newTotalPrice === "0.00" ? "" : newTotalPrice} readOnly={true} placeholder="0.00" />
                   </div>
                   
                   <div className="md:col-span-12 flex justify-end">

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { InventorySidebar } from "@/components/dashboard/InventorySidebar";
 import { InventoryTopbar } from "@/components/dashboard/InventoryTopbar";
-import { Printer, FileSpreadsheet, FileText, FileDown, Search, X, Filter } from "lucide-react";
+import { Printer, FileSpreadsheet, FileText, FileDown, Search, X, Filter, ChevronDown, Calendar } from "lucide-react";
 
 export const Route = createFileRoute("/inv-receive-list")({
   component: InvReceiveListPage,
@@ -31,6 +31,59 @@ const mockData: ReceiveRecord[] = [
   { id: "9", mrr: "583", mrrDate: "12/07/2026", supplier: "Noor Motors", challan: "1829", chDate: "19/05/2026", billNo: "1404", remark: "" },
 ];
 
+
+// ─── Smart UI Components ──────────────────────────────────────────────────
+
+function SmartInput({ label, value, onChange, placeholder, type = "text", readOnly = false, subLabel }: any) {
+  return (
+    <div className="flex flex-col gap-1.5 relative group">
+      <label className="text-[10.5px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-0.5">
+        {label} {subLabel && <span className="font-normal normal-case tracking-normal opacity-60 ml-1">{subLabel}</span>}
+      </label>
+      <div className="relative">
+        <input 
+          type={type}
+          readOnly={readOnly}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          className={`w-full rounded-lg px-3 py-2 text-[10.5px] font-semibold text-foreground transition-all duration-200 outline-none shadow-sm shadow-black/[0.02] ${
+            readOnly 
+              ? "bg-slate-50 border border-slate-200/50 text-slate-400 cursor-not-allowed" 
+              : "bg-slate-100 border border-slate-200 hover:border-blue-400 hover:bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+          } ${type === 'date' ? '[&::-webkit-calendar-picker-indicator]:opacity-0 relative z-10' : ''}`}
+        />
+        {type === 'date' && (
+          <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-400 pointer-events-none z-0" />
+        )}
+      </div>
+    </div>
+  )
+}
+
+function SmartSelect({ label, value, onChange, options, defaultOption }: any) {
+  return (
+    <div className="flex flex-col gap-1.5 relative group">
+      <label className="text-[10.5px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-0.5">
+        {label}
+      </label>
+      <div className="relative">
+        <select 
+          value={value}
+          onChange={onChange}
+          className="w-full rounded-lg bg-slate-100 border border-slate-200 hover:border-blue-400 hover:bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 px-3 py-2 text-[10.5px] font-semibold text-foreground transition-all duration-200 outline-none appearance-none cursor-pointer shadow-sm shadow-black/[0.02]"
+        >
+          {defaultOption && <option value="">{defaultOption}</option>}
+          {options.map((opt: any) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-400 pointer-events-none" />
+      </div>
+    </div>
+  )
+}
+
 function InvReceiveListPage() {
   const [dateFrom, setDateFrom] = useState("2026-07-10");
   const [dateTo, setDateTo] = useState("2026-08-10");
@@ -41,6 +94,7 @@ function InvReceiveListPage() {
   const [challanNumbers, setChallanNumbers] = useState("");
   const [sspReqNum, setSspReqNum] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isFiltersOpen, setIsFiltersOpen] = useState(true);
   
   const [selectedMRR, setSelectedMRR] = useState<ReceiveRecord | null>(null);
 
@@ -69,114 +123,61 @@ function InvReceiveListPage() {
           </div>
 
           {/* Filter Section */}
-          <div className="bg-card border border-border/50 rounded-lg shadow-sm">
-            <div className="h-1 w-full bg-blue-500 rounded-t-lg"></div>
+          <div className="bg-card border border-border/50 rounded-lg shadow-sm overflow-hidden">
+            <div className="h-1 w-full bg-blue-500"></div>
             
-            <div className="p-6 md:p-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-8">
+            <button 
+              onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+              className="w-full px-6 py-4 flex items-center justify-between bg-muted/10 hover:bg-muted/30 transition-colors border-b border-border/40 focus:outline-none"
+            >
+              <div className="flex items-center gap-2.5">
+                <Filter className="size-4 text-blue-500" />
+                <span className="text-[11px] font-bold text-foreground uppercase tracking-wider">Filter Options</span>
+              </div>
+              <ChevronDown className={`size-4 text-muted-foreground transition-transform duration-300 ${isFiltersOpen ? "rotate-180" : ""}`} />
+            </button>
+            
+            <div className={`transition-all duration-300 ease-in-out ${isFiltersOpen ? "opacity-100 max-h-[2000px]" : "opacity-0 max-h-0 overflow-hidden"}`}>
+              <div className="p-6 md:p-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-8">
                 
-                {/* Row 1 */}
-                <div className="relative group">
-                  <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">MRR Date From</label>
-                  <input 
-                    type="date" 
-                    className="w-full bg-transparent border-b-2 border-muted hover:border-border focus:border-blue-500 pb-1.5 text-[10.5px] font-medium text-foreground focus:outline-none transition-colors"
-                    value={dateFrom}
-                    onChange={(e) => setDateFrom(e.target.value)}
-                  />
-                </div>
+                <SmartInput label="MRR Date From" type="date" value={dateFrom} onChange={(e: any) => setDateFrom(e.target.value)} />
+                <SmartInput label="MRR Date To" type="date" value={dateTo} onChange={(e: any) => setDateTo(e.target.value)} />
                 
-                <div className="relative group">
-                  <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">MRR Date To</label>
-                  <input 
-                    type="date" 
-                    className="w-full bg-transparent border-b-2 border-muted hover:border-border focus:border-blue-500 pb-1.5 text-[10.5px] font-medium text-foreground focus:outline-none transition-colors"
-                    value={dateTo}
-                    onChange={(e) => setDateTo(e.target.value)}
-                  />
-                </div>
+                <SmartSelect 
+                  label="MRR Type" 
+                  value={mrrType} 
+                  onChange={(e: any) => setMrrType(e.target.value)} 
+                  options={[
+                    {value: "Receive Regular", label: "Receive Regular"},
+                    {value: "Direct Receive", label: "Direct Receive"},
+                  ]} 
+                />
                 
-                <div className="relative group">
-                  <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">MRR Type</label>
-                  <select 
-                    className="w-full bg-transparent border-b-2 border-muted hover:border-border focus:border-blue-500 pb-1.5 text-[10.5px] font-medium text-foreground focus:outline-none transition-colors appearance-none cursor-pointer"
-                    value={mrrType}
-                    onChange={(e) => setMrrType(e.target.value)}
-                  >
-                    <option value="Receive Regular">Receive Regular</option>
-                    <option value="Direct Receive">Direct Receive</option>
-                  </select>
-                  <div className="absolute right-0 bottom-2.5 pointer-events-none text-muted-foreground">
-                    ▼
-                  </div>
-                </div>
-                
-                <div className="relative group">
-                  <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">Supplier Name</label>
-                  <select 
-                    className="w-full bg-transparent border-b-2 border-muted hover:border-border focus:border-blue-500 pb-1.5 text-[10.5px] font-medium text-foreground focus:outline-none transition-colors appearance-none cursor-pointer"
-                    value={supplier}
-                    onChange={(e) => setSupplier(e.target.value)}
-                  >
-                    <option value="ALL SUPPLIER">ALL SUPPLIER</option>
-                    <option value="M.B. Trade Corporation">M.B. Trade Corporation</option>
-                  </select>
-                  <div className="absolute right-0 bottom-2.5 pointer-events-none text-muted-foreground">
-                    ▼
-                  </div>
-                </div>
+                <SmartSelect 
+                  label="Supplier Name" 
+                  value={supplier} 
+                  onChange={(e: any) => setSupplier(e.target.value)} 
+                  options={[
+                    {value: "ALL SUPPLIER", label: "ALL SUPPLIER"},
+                    {value: "M.B. Trade Corporation", label: "M.B. Trade Corporation"},
+                  ]} 
+                />
 
-                {/* Row 2 */}
-                <div className="relative group">
-                  <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">Product Name</label>
-                  <select 
-                    className="w-full bg-transparent border-b-2 border-muted hover:border-border focus:border-blue-500 pb-1.5 text-[10.5px] font-medium text-foreground focus:outline-none transition-colors appearance-none cursor-pointer"
-                    value={product}
-                    onChange={(e) => setProduct(e.target.value)}
-                  >
-                    <option value="All Product">All Product</option>
-                    <option value="Yarn">Yarn</option>
-                  </select>
-                  <div className="absolute right-0 bottom-2.5 pointer-events-none text-muted-foreground">
-                    ▼
-                  </div>
-                </div>
+                <SmartSelect 
+                  label="Product Name" 
+                  value={product} 
+                  onChange={(e: any) => setProduct(e.target.value)} 
+                  options={[
+                    {value: "All Product", label: "All Product"},
+                    {value: "Yarn", label: "Yarn"},
+                  ]} 
+                />
 
-                <div className="relative group">
-                  <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">
-                    MRR Numbers <span className="font-normal opacity-60">(Comma Separator)</span>
-                  </label>
-                  <input 
-                    type="text" 
-                    className="w-full bg-transparent border-b-2 border-muted hover:border-border focus:border-blue-500 pb-1.5 text-[10.5px] font-medium text-foreground focus:outline-none transition-colors"
-                    value={mrrNumbers}
-                    onChange={(e) => setMrrNumbers(e.target.value)}
-                  />
-                </div>
+                <SmartInput label="MRR Numbers" subLabel="(Comma Separator)" value={mrrNumbers} onChange={(e: any) => setMrrNumbers(e.target.value)} />
+                <SmartInput label="Challan Numbers" subLabel="(Comma Separator)" value={challanNumbers} onChange={(e: any) => setChallanNumbers(e.target.value)} />
+                <SmartInput label="SSP ReqNum" subLabel="(Comma Separator)" value={sspReqNum} onChange={(e: any) => setSspReqNum(e.target.value)} />
                 
-                <div className="relative group">
-                  <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">
-                    Challan Numbers <span className="font-normal opacity-60">(Comma Separator)</span>
-                  </label>
-                  <input 
-                    type="text" 
-                    className="w-full bg-transparent border-b-2 border-muted hover:border-border focus:border-blue-500 pb-1.5 text-[10.5px] font-medium text-foreground focus:outline-none transition-colors"
-                    value={challanNumbers}
-                    onChange={(e) => setChallanNumbers(e.target.value)}
-                  />
-                </div>
-                
-                <div className="relative group">
-                  <label className="block text-[10.5px] font-semibold text-muted-foreground/80 mb-1.5">
-                    SSP ReqNum <span className="font-normal opacity-60">(Comma Separator)</span>
-                  </label>
-                  <input 
-                    type="text" 
-                    className="w-full bg-transparent border-b-2 border-muted hover:border-border focus:border-blue-500 pb-1.5 text-[10.5px] font-medium text-foreground focus:outline-none transition-colors"
-                    value={sspReqNum}
-                    onChange={(e) => setSspReqNum(e.target.value)}
-                  />
-                </div>
               </div>
 
               {/* Show Button */}
@@ -184,6 +185,7 @@ function InvReceiveListPage() {
                 <button className="px-8 py-2.5 bg-[#1F8CF5] hover:bg-blue-600 text-white font-bold text-[10.5px] tracking-widest rounded transition-all shadow-sm hover:shadow flex items-center gap-2">
                   SHOW
                 </button>
+              </div>
               </div>
             </div>
           </div>
@@ -208,14 +210,17 @@ function InvReceiveListPage() {
                 </button>
               </div>
               
-              <div className="w-full sm:w-auto">
-                <label className="text-[10.5px] font-bold text-muted-foreground mb-1 block">Search:</label>
-                <input 
-                  type="text"
-                  className="w-full sm:w-64 bg-transparent border-b-2 border-muted hover:border-border focus:border-blue-500 pb-1 text-[10.5px] focus:outline-none transition-colors"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
+              <div className="w-full sm:w-auto relative group">
+                <div className="relative">
+                  <input 
+                    type="text"
+                    className="w-full sm:w-64 rounded-lg bg-slate-100 border border-slate-200 hover:border-blue-400 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 pl-9 pr-3 py-2 text-[10.5px] font-semibold text-foreground transition-all duration-200 outline-none shadow-sm shadow-black/[0.02]"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search records..."
+                  />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-400 pointer-events-none group-focus-within:text-blue-500 transition-colors" />
+                </div>
               </div>
             </div>
             

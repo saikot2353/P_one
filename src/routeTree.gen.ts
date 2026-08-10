@@ -91,6 +91,7 @@ import { Route as InventoryDashboardRouteImport } from './routes/inventory-dashb
 import { Route as InvYarnOpeningStockRouteImport } from './routes/inv-yarn-opening-stock'
 import { Route as InvReceiveListRouteImport } from './routes/inv-receive-list'
 import { Route as InvReceiveDirectRouteImport } from './routes/inv-receive-direct'
+import { Route as InvIssueRegularRouteImport } from './routes/inv-issue-regular'
 import { Route as InvConfigUomRouteImport } from './routes/inv-config-uom'
 import { Route as InvConfigStoreNameRouteImport } from './routes/inv-config-store-name'
 import { Route as InvConfigProductTypeRouteImport } from './routes/inv-config-product-type'
@@ -575,6 +576,11 @@ const InvReceiveDirectRoute = InvReceiveDirectRouteImport.update({
   path: '/inv-receive-direct',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvIssueRegularRoute = InvIssueRegularRouteImport.update({
+  id: '/inv-issue-regular',
+  path: '/inv-issue-regular',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InvConfigUomRoute = InvConfigUomRouteImport.update({
   id: '/inv-config-uom',
   path: '/inv-config-uom',
@@ -924,6 +930,7 @@ export interface FileRoutesByFullPath {
   '/inv-config-product-type': typeof InvConfigProductTypeRoute
   '/inv-config-store-name': typeof InvConfigStoreNameRoute
   '/inv-config-uom': typeof InvConfigUomRoute
+  '/inv-issue-regular': typeof InvIssueRegularRoute
   '/inv-receive-direct': typeof InvReceiveDirectRoute
   '/inv-receive-list': typeof InvReceiveListRoute
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
@@ -1066,6 +1073,7 @@ export interface FileRoutesByTo {
   '/inv-config-product-type': typeof InvConfigProductTypeRoute
   '/inv-config-store-name': typeof InvConfigStoreNameRoute
   '/inv-config-uom': typeof InvConfigUomRoute
+  '/inv-issue-regular': typeof InvIssueRegularRoute
   '/inv-receive-direct': typeof InvReceiveDirectRoute
   '/inv-receive-list': typeof InvReceiveListRoute
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
@@ -1209,6 +1217,7 @@ export interface FileRoutesById {
   '/inv-config-product-type': typeof InvConfigProductTypeRoute
   '/inv-config-store-name': typeof InvConfigStoreNameRoute
   '/inv-config-uom': typeof InvConfigUomRoute
+  '/inv-issue-regular': typeof InvIssueRegularRoute
   '/inv-receive-direct': typeof InvReceiveDirectRoute
   '/inv-receive-list': typeof InvReceiveListRoute
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
@@ -1353,6 +1362,7 @@ export interface FileRouteTypes {
     | '/inv-config-product-type'
     | '/inv-config-store-name'
     | '/inv-config-uom'
+    | '/inv-issue-regular'
     | '/inv-receive-direct'
     | '/inv-receive-list'
     | '/inv-yarn-opening-stock'
@@ -1495,6 +1505,7 @@ export interface FileRouteTypes {
     | '/inv-config-product-type'
     | '/inv-config-store-name'
     | '/inv-config-uom'
+    | '/inv-issue-regular'
     | '/inv-receive-direct'
     | '/inv-receive-list'
     | '/inv-yarn-opening-stock'
@@ -1637,6 +1648,7 @@ export interface FileRouteTypes {
     | '/inv-config-product-type'
     | '/inv-config-store-name'
     | '/inv-config-uom'
+    | '/inv-issue-regular'
     | '/inv-receive-direct'
     | '/inv-receive-list'
     | '/inv-yarn-opening-stock'
@@ -1780,6 +1792,7 @@ export interface RootRouteChildren {
   InvConfigProductTypeRoute: typeof InvConfigProductTypeRoute
   InvConfigStoreNameRoute: typeof InvConfigStoreNameRoute
   InvConfigUomRoute: typeof InvConfigUomRoute
+  InvIssueRegularRoute: typeof InvIssueRegularRoute
   InvReceiveDirectRoute: typeof InvReceiveDirectRoute
   InvReceiveListRoute: typeof InvReceiveListRoute
   InvYarnOpeningStockRoute: typeof InvYarnOpeningStockRoute
@@ -2444,6 +2457,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvReceiveDirectRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inv-issue-regular': {
+      id: '/inv-issue-regular'
+      path: '/inv-issue-regular'
+      fullPath: '/inv-issue-regular'
+      preLoaderRoute: typeof InvIssueRegularRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/inv-config-uom': {
       id: '/inv-config-uom'
       path: '/inv-config-uom'
@@ -2908,6 +2928,7 @@ const rootRouteChildren: RootRouteChildren = {
   InvConfigProductTypeRoute: InvConfigProductTypeRoute,
   InvConfigStoreNameRoute: InvConfigStoreNameRoute,
   InvConfigUomRoute: InvConfigUomRoute,
+  InvIssueRegularRoute: InvIssueRegularRoute,
   InvReceiveDirectRoute: InvReceiveDirectRoute,
   InvReceiveListRoute: InvReceiveListRoute,
   InvYarnOpeningStockRoute: InvYarnOpeningStockRoute,
