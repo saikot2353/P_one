@@ -96,23 +96,7 @@ function InvDashboardPage() {
         
         <div className="p-4 md:p-6 lg:p-8 space-y-6 w-full max-w-[1800px] mx-auto overflow-x-hidden">
           
-          {/* Header Row */}
-          <div className="flex justify-between items-center bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-            <div className="flex items-center gap-4">
-              <div className="size-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Activity className="size-6 text-blue-600" />
-              </div>
-              <div>
-                <h1 className="text-lg font-black tracking-tight text-slate-800 uppercase">Inventory Command Center</h1>
-                <p className="text-xs text-slate-500 font-bold tracking-widest uppercase mt-0.5">Live Metrics & Analysis</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-bold text-slate-400 bg-slate-100 px-3 py-1.5 rounded-lg uppercase tracking-wider">
-                Last Sync: Just Now
-              </span>
-            </div>
-          </div>
+
 
           {/* 6 KPI Cards Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5">
@@ -121,7 +105,7 @@ function InvDashboardPage() {
               <div className="flex justify-between items-start relative z-10">
                 <div className="flex-1 min-w-0 pr-2">
                   <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 truncate">Total Stock Items</div>
-                  <div className="text-2xl font-black text-slate-800">24,592</div>
+                  <div className="text-xl font-black text-slate-800">24,592</div>
                   <div className="text-[10px] font-bold text-emerald-500 mt-2 flex items-center gap-1 truncate"><ArrowUpRight className="size-3.5"/> +12% YoY</div>
                 </div>
                 <div className="size-10 shrink-0 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center"><Package className="size-5" /></div>
@@ -132,7 +116,7 @@ function InvDashboardPage() {
               <div className="flex justify-between items-start relative z-10">
                 <div className="flex-1 min-w-0 pr-2">
                   <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 truncate">Total Value (BDT)</div>
-                  <div className="text-2xl font-black text-slate-800">1.45M</div>
+                  <div className="text-xl font-black text-slate-800">1.45M</div>
                   <div className="text-[10px] font-bold text-red-500 mt-2 flex items-center gap-1 truncate"><ArrowDownRight className="size-3.5"/> -2.4% MoM</div>
                 </div>
                 <div className="size-10 shrink-0 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><Wallet className="size-5" /></div>
@@ -143,7 +127,7 @@ function InvDashboardPage() {
               <div className="flex justify-between items-start relative z-10">
                 <div className="flex-1 min-w-0 pr-2">
                   <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 truncate">Low Stock Alerts</div>
-                  <div className="text-2xl font-black text-slate-800">14</div>
+                  <div className="text-xl font-black text-slate-800">14</div>
                   <div className="text-[10px] font-bold text-amber-500 mt-2 flex items-center gap-1 truncate"><AlertTriangle className="size-3.5"/> 3 Critical</div>
                 </div>
                 <div className="size-10 shrink-0 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><AlertTriangle className="size-5" /></div>
@@ -154,7 +138,7 @@ function InvDashboardPage() {
               <div className="flex justify-between items-start relative z-10">
                 <div className="flex-1 min-w-0 pr-2">
                   <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 truncate">Pending MRR</div>
-                  <div className="text-2xl font-black text-slate-800">8</div>
+                  <div className="text-xl font-black text-slate-800">8</div>
                   <div className="text-[10px] font-bold text-slate-400 mt-2 flex items-center gap-1 truncate"><Clock className="size-3.5"/> Needs Approval</div>
                 </div>
                 <div className="size-10 shrink-0 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center"><ShoppingCart className="size-5" /></div>
@@ -165,7 +149,7 @@ function InvDashboardPage() {
               <div className="flex justify-between items-start relative z-10">
                 <div className="flex-1 min-w-0 pr-2">
                   <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 truncate">Active Depts</div>
-                  <div className="text-2xl font-black text-slate-800">22</div>
+                  <div className="text-xl font-black text-slate-800">22</div>
                   <div className="text-[10px] font-bold text-emerald-500 mt-2 flex items-center gap-1 truncate"><TrendingUp className="size-3.5"/> Issuing Actively</div>
                 </div>
                 <div className="size-10 shrink-0 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center"><Users className="size-5" /></div>
@@ -176,7 +160,7 @@ function InvDashboardPage() {
               <div className="flex justify-between items-start relative z-10">
                 <div className="flex-1 min-w-0 pr-2">
                   <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 truncate">Total Stores</div>
-                  <div className="text-2xl font-black text-slate-800">4</div>
+                  <div className="text-xl font-black text-slate-800">4</div>
                   <div className="text-[10px] font-bold text-slate-400 mt-2 flex items-center gap-1 truncate">Across Locations</div>
                 </div>
                 <div className="size-10 shrink-0 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center"><Store className="size-5" /></div>
@@ -192,7 +176,7 @@ function InvDashboardPage() {
             <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col h-[320px] lg:h-full">
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest">7-Day Transaction Flow</h2>
+                  <h2 className="text-xs font-black text-slate-800 uppercase tracking-widest">7-Day Transaction Flow</h2>
                 </div>
               </div>
               <div className="flex-1 w-full min-h-[200px]">
@@ -222,7 +206,7 @@ function InvDashboardPage() {
             {/* Bar Chart: Dept Consumption */}
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col h-[320px] lg:h-full">
               <div className="mb-6">
-                <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest">Top Issuing Depts</h2>
+                <h2 className="text-xs font-black text-slate-800 uppercase tracking-widest">Top Issuing Depts</h2>
               </div>
               <div className="flex-1 w-full min-h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
@@ -245,7 +229,7 @@ function InvDashboardPage() {
             {/* Pie Chart: Distribution */}
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col h-[340px] lg:h-full">
               <div className="mb-4 text-center">
-                <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest">Inventory Composition</h2>
+                <h2 className="text-xs font-black text-slate-800 uppercase tracking-widest">Inventory Composition</h2>
               </div>
               <div className="flex-1 w-full relative flex items-center justify-center min-h-[180px]">
                 <ResponsiveContainer width="100%" height="100%">
@@ -258,7 +242,7 @@ function InvDashboardPage() {
                 </ResponsiveContainer>
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                   <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Total</div>
-                  <div className="text-2xl font-black text-slate-800">100%</div>
+                  <div className="text-xl font-black text-slate-800">100%</div>
                 </div>
               </div>
               <div className="flex justify-center gap-x-4 gap-y-2 mt-4 flex-wrap">
@@ -275,7 +259,7 @@ function InvDashboardPage() {
             <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col h-[340px] lg:h-full">
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest">6-Month Macro Trends</h2>
+                  <h2 className="text-xs font-black text-slate-800 uppercase tracking-widest">6-Month Macro Trends</h2>
                 </div>
               </div>
               <div className="flex-1 w-full min-h-[200px]">
