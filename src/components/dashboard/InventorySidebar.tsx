@@ -207,7 +207,7 @@ export function InventorySidebar() {
             CRIPTON
           </div>
           <div className="text-[9px] uppercase tracking-[0.25em] font-bold text-sidebar-primary">
-            HRIS
+            Inventory
           </div>
         </div>
       </Link>

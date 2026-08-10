@@ -3,6 +3,8 @@ import { useState } from "react";
 import { InventorySidebar } from "@/components/dashboard/InventorySidebar";
 import { InventoryTopbar } from "@/components/dashboard/InventoryTopbar";
 import { Printer, FileSpreadsheet, FileText, FileDown, Search, X, Filter, ChevronDown, Calendar } from "lucide-react";
+import pakizaLogo from "@/components/Pakiza-Software-bgless-e1692258364537.webp";
+
 
 export const Route = createFileRoute("/inv-receive-list")({
   component: InvReceiveListPage,
@@ -353,12 +355,7 @@ function InvReceiveListPage() {
               {/* Header */}
               <div className="flex justify-between items-start mb-6">
                 <div>
-                  <div className="text-2xl font-black italic tracking-tighter text-blue-900 flex items-center gap-1">
-                    <div className="size-8 bg-blue-900 rounded-br-2xl mr-1"></div>
-                    PAKIZA
-                  </div>
-                  <div className="text-[10px] font-bold tracking-[0.2em] text-gray-800 ml-1">SOFTWARE</div>
-                  <div className="text-[8px] tracking-widest text-gray-500 ml-1 mb-2">Excellence | Intelligence | Automation</div>
+                  <img src={pakizaLogo} alt="Pakiza Software" className="h-10 object-contain mb-2" />
                   
                   <div className="text-[10px] text-gray-800 space-y-0.5">
                     <p>Khan ABC Tradeplex House#37, Floor#11 (B-11), Road#2, Dhaka-1205</p>

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { InventorySidebar } from "@/components/dashboard/InventorySidebar";
 import { InventoryTopbar } from "@/components/dashboard/InventoryTopbar";
-import { PackageOpen, Save, Plus, Trash2, Calendar, ChevronDown, CheckCircle2, User, Building2 } from "lucide-react";
+import { PackageOpen, Plus, Trash2, Calendar, ChevronDown, CheckCircle2, User, Building2 } from "lucide-react";
 
 export const Route = createFileRoute("/inv-issue-regular")({
   component: InvIssueRegularPage,
@@ -12,8 +12,8 @@ export const Route = createFileRoute("/inv-issue-regular")({
 
 function SmartInput({ label, value, onChange, placeholder, type = "text", readOnly = false, icon: Icon, disabled = false }: any) {
   return (
-    <div className="flex flex-col gap-1 relative group">
-      <label className="text-[10.5px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider pl-0.5">
+    <div className="flex flex-col gap-1.5 relative group">
+      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
         {label}
       </label>
       <div className="relative">
@@ -24,10 +24,10 @@ function SmartInput({ label, value, onChange, placeholder, type = "text", readOn
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`w-full rounded-lg px-3 h-8 py-1 text-[10.5px] font-semibold text-foreground transition-all duration-200 outline-none shadow-sm shadow-black/[0.02] ${
+          className={`w-full h-[36px] rounded-lg px-3 text-[11px] font-medium transition-all duration-200 outline-none ${
             readOnly || disabled
-              ? "bg-slate-50 border border-slate-200/50 text-slate-400 cursor-not-allowed" 
-              : "bg-slate-100 border border-slate-200 hover:border-blue-400 hover:bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+              ? "bg-slate-50 text-slate-400 cursor-not-allowed" 
+              : "bg-slate-100/80 hover:bg-slate-200/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border focus:border-blue-500/30 text-slate-700 placeholder:text-slate-400"
           } ${type === 'date' ? '[&::-webkit-calendar-picker-indicator]:opacity-0 relative z-10' : ''} ${Icon ? 'pl-8' : ''}`}
         />
         {type === 'date' && (
@@ -43,8 +43,8 @@ function SmartInput({ label, value, onChange, placeholder, type = "text", readOn
 
 function SmartSelect({ label, value, onChange, options, defaultOption, icon: Icon, disabled = false }: any) {
   return (
-    <div className="flex flex-col gap-1 relative group">
-      <label className="text-[10.5px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider pl-0.5">
+    <div className="flex flex-col gap-1.5 relative group">
+      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
         {label}
       </label>
       <div className="relative">
@@ -52,10 +52,10 @@ function SmartSelect({ label, value, onChange, options, defaultOption, icon: Ico
           value={value}
           onChange={onChange}
           disabled={disabled}
-          className={`w-full rounded-lg px-3 h-8 py-1 text-[10.5px] font-semibold text-foreground transition-all duration-200 outline-none appearance-none shadow-sm shadow-black/[0.02] ${
+          className={`w-full h-[36px] rounded-lg px-3 text-[11px] font-medium transition-all duration-200 outline-none appearance-none ${
             disabled
-              ? "bg-slate-50 border border-slate-200/50 text-slate-400 cursor-not-allowed" 
-              : "bg-slate-100 border border-slate-200 hover:border-blue-400 hover:bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 cursor-pointer"
+              ? "bg-slate-50 text-slate-400 cursor-not-allowed" 
+              : "bg-slate-100/80 hover:bg-slate-200/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border focus:border-blue-500/30 text-slate-700 cursor-pointer"
           } ${Icon ? 'pl-8' : ''}`}
         >
           {defaultOption && <option value="" disabled>{defaultOption}</option>}
@@ -82,23 +82,34 @@ function InvIssueRegularPage() {
   const [srnNo, setSrnNo] = useState("");
   
   const [productName, setProductName] = useState("");
-  const [quantity, setQuantity] = useState("");
+  const [quantity, setQuantity] = useState("0");
   
   const [remarks, setRemarks] = useState("");
   
-  const [issueList, setIssueList] = useState<any[]>([]);
+  const [issueList, setIssueList] = useState<any[]>([
+    {
+      id: 1,
+      itemName: "Yarn A",
+      uom: "PCS",
+      availableQuantity: "50",
+      quantity: "3",
+      damageQty: "0",
+      specifications: "N/A",
+      unitPrice: "120.00",
+      totalPrice: "360.00"
+    }
+  ]);
 
-  // Mock dependent employee list based on department
   const employeeOptions = department === "IT" 
-    ? [{value: "E001", label: "John Doe (E001)"}, {value: "E002", label: "Jane Smith (E002)"}]
+    ? [{value: "E001", label: "John Doe"}]
     : department === "HR"
-    ? [{value: "E003", label: "Alice Johnson (E003)"}]
+    ? [{value: "E003", label: "Alice Johnson"}]
     : department === "Production"
-    ? [{value: "E004", label: "Bob Brown (E004)"}, {value: "E005", label: "Charlie Davis (E005)"}]
+    ? [{value: "E004", label: "Bob Brown"}]
     : [];
 
   const handleAddProduct = () => {
-    if (!productName || !quantity) return;
+    if (!productName || !quantity || quantity === "0") return;
     
     setIssueList([...issueList, {
       id: Date.now(),
@@ -113,7 +124,7 @@ function InvIssueRegularPage() {
     }]);
     
     setProductName("");
-    setQuantity("");
+    setQuantity("0");
   };
 
   const removeProduct = (id: number) => {
@@ -121,45 +132,29 @@ function InvIssueRegularPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-background text-foreground">
+    <div className="min-h-screen flex bg-slate-50 text-foreground">
       <InventorySidebar />
       <main className="flex-1 min-w-0 flex flex-col relative pb-20">
         <InventoryTopbar />
         
-        <div className="p-4 md:p-6 lg:p-8 space-y-4 w-full max-w-[1600px] mx-auto">
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-border/40">
-            <div>
-              <h1 className="text-xl font-black tracking-tight text-foreground flex items-center gap-2.5">
-                <div className="p-2 bg-blue-500/10 rounded-lg">
-                  <PackageOpen className="size-5 text-blue-600" />
-                </div>
-                Regular Issue
-              </h1>
-              <p className="text-[11px] font-medium text-muted-foreground mt-1.5 uppercase tracking-wider">
-                Distribute products to departments and employees
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <button className="px-6 h-8 py-1.5 bg-background border border-border/60 hover:bg-muted text-foreground font-bold text-[10.5px] tracking-wider rounded-lg transition-all shadow-sm">
-                CLEAR
-              </button>
-            </div>
-          </div>
-
+        <div className="p-4 md:p-6 space-y-6 w-full max-w-[1400px] mx-auto mt-4">
+          
           {/* Type Details Card */}
-          <div className="bg-card border border-border/50 rounded-xl shadow-sm overflow-hidden relative">
-            <div className="absolute left-0 top-0 bottom-0 w-1 bg-amber-500"></div>
+          <div className="bg-white rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-slate-200/60 overflow-hidden relative">
+            <div className="absolute left-0 top-4 bottom-4 w-1 bg-amber-500 rounded-r-md"></div>
             
-            <div className="p-4 md:p-5">
-              <div className="flex justify-between items-center mb-4 pb-3 border-b border-border/30">
-                <h2 className="text-[13px] font-bold text-foreground tracking-wide flex items-center gap-2">
+            <div className="p-6 md:p-8">
+              <div className="flex justify-between items-start mb-6">
+                <h2 className="text-sm font-bold text-slate-800 flex items-center gap-2.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                   Type Details
                 </h2>
-                <div className="w-64">
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-x-6 gap-y-6">
+                <div className="md:col-span-4">
                   <SmartSelect 
-                    label="Issue Type" 
+                    label="ISSUE TYPE" 
                     value={issueType} 
                     onChange={(e: any) => setIssueType(e.target.value)} 
                     options={[
@@ -168,17 +163,14 @@ function InvIssueRegularPage() {
                     ]} 
                   />
                 </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4">
-                <div className="lg:col-span-2 grid grid-cols-2 gap-4">
+                <div className="md:col-span-4">
                   <SmartSelect 
-                    label="Select Department" 
+                    label="SELECT DEPARTMENT" 
                     icon={Building2}
                     value={department} 
                     onChange={(e: any) => {
                       setDepartment(e.target.value);
-                      setEmployee(""); // Reset employee when dept changes
+                      setEmployee("");
                     }} 
                     defaultOption="Choose Dept..."
                     options={[
@@ -187,8 +179,10 @@ function InvIssueRegularPage() {
                       {value: "Production", label: "Production Floor"},
                     ]} 
                   />
+                </div>
+                <div className="md:col-span-4">
                   <SmartSelect 
-                    label="Issue To (Employee)" 
+                    label="ISSUE TO (EMPLOYEE)" 
                     icon={User}
                     value={employee} 
                     onChange={(e: any) => setEmployee(e.target.value)} 
@@ -198,31 +192,34 @@ function InvIssueRegularPage() {
                   />
                 </div>
                 
-                <SmartInput label="Issue Date" type="date" value={issueDate} onChange={(e: any) => setIssueDate(e.target.value)} />
-                <SmartInput label="SRN No" value={srnNo} onChange={(e: any) => setSrnNo(e.target.value)} placeholder="Enter SRN Number..." />
+                <div className="md:col-span-2">
+                  <SmartInput label="ISSUE DATE" type="date" value={issueDate} onChange={(e: any) => setIssueDate(e.target.value)} />
+                </div>
+                <div className="md:col-span-2">
+                  <SmartInput label="SRN NO" value={srnNo} onChange={(e: any) => setSrnNo(e.target.value)} placeholder="Enter SRN Number..." />
+                </div>
                 
-                <div className="lg:col-span-2">
+                <div className="md:col-span-4">
                   <SmartSelect 
-                    label="Product Name" 
+                    label="PRODUCT NAME" 
                     value={productName} 
                     onChange={(e: any) => setProductName(e.target.value)} 
                     defaultOption="Select product to add..."
                     options={[
-                      {value: "Yarn A", label: "Yarn A (100% Cotton)"},
+                      {value: "Yarn A", label: "Yarn A"},
                       {value: "Spare Part B", label: "Machine Bearing 50mm"},
-                      {value: "Stationery", label: "A4 Paper Ream"},
                     ]} 
                   />
                 </div>
                 
-                <div className="flex gap-4 items-end">
+                <div className="md:col-span-4 flex gap-4 items-end">
                   <div className="flex-1">
-                    <SmartInput label="Quantity" type="number" value={quantity} onChange={(e: any) => setQuantity(e.target.value)} placeholder="0" />
+                    <SmartInput label="QUANTITY" type="number" value={quantity} onChange={(e: any) => setQuantity(e.target.value)} placeholder="0" />
                   </div>
                   <button 
                     onClick={handleAddProduct}
-                    disabled={!productName || !quantity}
-                    className="h-8 px-6 bg-amber-500 hover:bg-amber-600 disabled:bg-amber-500/50 disabled:cursor-not-allowed text-white font-bold text-[10.5px] tracking-wider rounded-lg transition-all shadow-sm shadow-amber-500/20 flex items-center gap-2"
+                    disabled={!productName || !quantity || quantity === "0"}
+                    className="h-[36px] px-8 bg-orange-400 hover:bg-orange-500 disabled:bg-orange-300 disabled:cursor-not-allowed text-white font-bold text-[11px] tracking-wider rounded-lg transition-all shadow-sm flex items-center justify-center gap-1.5"
                   >
                     <Plus className="size-3.5" strokeWidth={3} />
                     ADD
@@ -233,60 +230,56 @@ function InvIssueRegularPage() {
           </div>
 
           {/* Issue Details Card */}
-          <div className="bg-card border border-border/50 rounded-xl shadow-sm overflow-hidden relative">
-            <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
+          <div className="bg-white rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-slate-200/60 overflow-hidden relative">
+            <div className="absolute left-0 top-4 bottom-4 w-1 bg-blue-500 rounded-r-md"></div>
             
-            <div className="p-4 md:p-5 flex flex-col min-h-[400px]">
-              <h2 className="text-[13px] font-bold text-foreground tracking-wide flex items-center gap-2 mb-4">
+            <div className="p-6 md:p-8 flex flex-col min-h-[450px]">
+              <h2 className="text-sm font-bold text-slate-800 flex items-center gap-2.5 mb-6">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
                 Issue Details
               </h2>
               
               {/* Product Table */}
-              <div className="rounded-xl border border-border/60 overflow-hidden shadow-sm flex-1 mb-8">
+              <div className="rounded-xl border border-slate-100 overflow-hidden flex-1 mb-8">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-slate-100/80 border-b border-border/60 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                        <th className="py-2 px-3 w-12 text-center">SL</th>
-                        <th className="py-2 px-3">Item Name</th>
-                        <th className="py-2 px-3 w-24">Uom</th>
-                        <th className="py-2 px-3 w-32 text-right">Available Qty</th>
-                        <th className="py-2 px-3 w-24 text-right">Quantity</th>
-                        <th className="py-2 px-3 w-24 text-right">Damage Qty</th>
-                        <th className="py-2 px-3">Specifications</th>
-                        <th className="py-2 px-3 w-28 text-right">Unit Price</th>
-                        <th className="py-2 px-3 w-28 text-right">Total Price</th>
-                        <th className="py-2 px-3 w-12 text-center">Action</th>
+                      <tr className="bg-slate-100/50 text-[9.5px] font-bold text-slate-500 uppercase tracking-widest">
+                        <th className="py-3 px-4 w-12 text-center">SL</th>
+                        <th className="py-3 px-4">ITEM NAME</th>
+                        <th className="py-3 px-4 w-20">UOM</th>
+                        <th className="py-3 px-4 w-28 text-center">AVAILABLE QTY</th>
+                        <th className="py-3 px-4 w-24 text-center">QUANTITY</th>
+                        <th className="py-3 px-4 w-24 text-center">DAMAGE QTY</th>
+                        <th className="py-3 px-4">SPECIFICATIONS</th>
+                        <th className="py-3 px-4 w-24 text-right">UNIT PRICE</th>
+                        <th className="py-3 px-4 w-24 text-right">TOTAL PRICE</th>
+                        <th className="py-3 px-4 w-16 text-center">ACTION</th>
                       </tr>
                     </thead>
-                    <tbody className="text-[10.5px]">
+                    <tbody className="text-[11px]">
                       {issueList.length === 0 ? (
                         <tr>
-                          <td colSpan={10} className="py-8 text-center">
-                            <div className="flex flex-col items-center justify-center text-muted-foreground">
-                              <PackageOpen className="size-10 opacity-20 mb-3" />
-                              <span className="font-semibold text-sm">No items added yet</span>
-                              <span className="text-xs opacity-70 mt-1">Select a product and quantity above to add it to the issue list</span>
-                            </div>
+                          <td colSpan={10} className="py-12 text-center text-slate-400">
+                            No items added yet
                           </td>
                         </tr>
                       ) : (
                         issueList.map((row, idx) => (
-                          <tr key={row.id} className="border-b border-border/40 hover:bg-slate-50/50 transition-colors group">
-                            <td className="py-1.5 px-3 text-center font-medium text-slate-500">{idx + 1}</td>
-                            <td className="py-1.5 px-3 font-semibold text-foreground">{row.itemName}</td>
-                            <td className="py-1.5 px-3 text-slate-500">{row.uom}</td>
-                            <td className="py-1.5 px-3 text-right text-emerald-600 font-medium">{row.availableQuantity}</td>
-                            <td className="py-1.5 px-3 text-right font-bold text-blue-600">{row.quantity}</td>
-                            <td className="py-1.5 px-3 text-right text-slate-500">{row.damageQty}</td>
-                            <td className="py-1.5 px-3 text-slate-500">{row.specifications}</td>
-                            <td className="py-1.5 px-3 text-right font-medium text-slate-600">{row.unitPrice}</td>
-                            <td className="py-1.5 px-3 text-right font-bold text-foreground">{row.totalPrice}</td>
-                            <td className="py-1.5 px-3 text-center">
+                          <tr key={row.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                            <td className="py-3 px-4 text-center font-medium text-slate-400">{idx + 1}</td>
+                            <td className="py-3 px-4 font-bold text-slate-700">{row.itemName}</td>
+                            <td className="py-3 px-4 text-slate-500">{row.uom}</td>
+                            <td className="py-3 px-4 text-center text-emerald-500 font-medium">{row.availableQuantity}</td>
+                            <td className="py-3 px-4 text-center font-bold text-blue-600">{row.quantity}</td>
+                            <td className="py-3 px-4 text-center text-slate-400">{row.damageQty}</td>
+                            <td className="py-3 px-4 text-slate-400">{row.specifications}</td>
+                            <td className="py-3 px-4 text-right text-slate-600">{row.unitPrice}</td>
+                            <td className="py-3 px-4 text-right font-bold text-slate-800">{row.totalPrice}</td>
+                            <td className="py-3 px-4 text-center">
                               <button 
                                 onClick={() => removeProduct(row.id)}
-                                className="text-slate-400 hover:text-red-500 transition-colors p-1.5 rounded-md hover:bg-red-50"
+                                className="text-slate-400 hover:text-red-500 transition-colors p-1"
                               >
                                 <Trash2 className="size-3.5" />
                               </button>
@@ -300,10 +293,10 @@ function InvIssueRegularPage() {
               </div>
               
               {/* Remarks and Submit */}
-              <div className="mt-auto grid grid-cols-1 md:grid-cols-12 gap-8 items-end">
+              <div className="mt-auto grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
                 <div className="md:col-span-10">
                   <SmartInput 
-                    label="Remarks" 
+                    label="REMARKS" 
                     value={remarks} 
                     onChange={(e: any) => setRemarks(e.target.value)} 
                     placeholder="Enter any additional remarks or notes for this issue..." 
@@ -312,7 +305,7 @@ function InvIssueRegularPage() {
                 <div className="md:col-span-2 flex justify-end">
                   <button 
                     disabled={issueList.length === 0}
-                    className="w-full h-8 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed text-white font-bold text-[10.5px] tracking-wider rounded-lg transition-all shadow-sm shadow-blue-500/20 flex items-center justify-center gap-2"
+                    className="w-full h-[36px] bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white font-bold text-[11px] tracking-wider rounded-lg transition-all flex items-center justify-center gap-2"
                   >
                     <CheckCircle2 className="size-4" />
                     SUBMIT

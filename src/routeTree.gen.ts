@@ -91,7 +91,10 @@ import { Route as InventoryDashboardRouteImport } from './routes/inventory-dashb
 import { Route as InvYarnOpeningStockRouteImport } from './routes/inv-yarn-opening-stock'
 import { Route as InvReceiveListRouteImport } from './routes/inv-receive-list'
 import { Route as InvReceiveDirectRouteImport } from './routes/inv-receive-direct'
+import { Route as InvIssueReturnRouteImport } from './routes/inv-issue-return'
 import { Route as InvIssueRegularRouteImport } from './routes/inv-issue-regular'
+import { Route as InvIssueMrrReturnRouteImport } from './routes/inv-issue-mrr-return'
+import { Route as InvIssueListRouteImport } from './routes/inv-issue-list'
 import { Route as InvConfigUomRouteImport } from './routes/inv-config-uom'
 import { Route as InvConfigStoreNameRouteImport } from './routes/inv-config-store-name'
 import { Route as InvConfigProductTypeRouteImport } from './routes/inv-config-product-type'
@@ -576,9 +579,24 @@ const InvReceiveDirectRoute = InvReceiveDirectRouteImport.update({
   path: '/inv-receive-direct',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvIssueReturnRoute = InvIssueReturnRouteImport.update({
+  id: '/inv-issue-return',
+  path: '/inv-issue-return',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InvIssueRegularRoute = InvIssueRegularRouteImport.update({
   id: '/inv-issue-regular',
   path: '/inv-issue-regular',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvIssueMrrReturnRoute = InvIssueMrrReturnRouteImport.update({
+  id: '/inv-issue-mrr-return',
+  path: '/inv-issue-mrr-return',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvIssueListRoute = InvIssueListRouteImport.update({
+  id: '/inv-issue-list',
+  path: '/inv-issue-list',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InvConfigUomRoute = InvConfigUomRouteImport.update({
@@ -930,7 +948,10 @@ export interface FileRoutesByFullPath {
   '/inv-config-product-type': typeof InvConfigProductTypeRoute
   '/inv-config-store-name': typeof InvConfigStoreNameRoute
   '/inv-config-uom': typeof InvConfigUomRoute
+  '/inv-issue-list': typeof InvIssueListRoute
+  '/inv-issue-mrr-return': typeof InvIssueMrrReturnRoute
   '/inv-issue-regular': typeof InvIssueRegularRoute
+  '/inv-issue-return': typeof InvIssueReturnRoute
   '/inv-receive-direct': typeof InvReceiveDirectRoute
   '/inv-receive-list': typeof InvReceiveListRoute
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
@@ -1073,7 +1094,10 @@ export interface FileRoutesByTo {
   '/inv-config-product-type': typeof InvConfigProductTypeRoute
   '/inv-config-store-name': typeof InvConfigStoreNameRoute
   '/inv-config-uom': typeof InvConfigUomRoute
+  '/inv-issue-list': typeof InvIssueListRoute
+  '/inv-issue-mrr-return': typeof InvIssueMrrReturnRoute
   '/inv-issue-regular': typeof InvIssueRegularRoute
+  '/inv-issue-return': typeof InvIssueReturnRoute
   '/inv-receive-direct': typeof InvReceiveDirectRoute
   '/inv-receive-list': typeof InvReceiveListRoute
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
@@ -1217,7 +1241,10 @@ export interface FileRoutesById {
   '/inv-config-product-type': typeof InvConfigProductTypeRoute
   '/inv-config-store-name': typeof InvConfigStoreNameRoute
   '/inv-config-uom': typeof InvConfigUomRoute
+  '/inv-issue-list': typeof InvIssueListRoute
+  '/inv-issue-mrr-return': typeof InvIssueMrrReturnRoute
   '/inv-issue-regular': typeof InvIssueRegularRoute
+  '/inv-issue-return': typeof InvIssueReturnRoute
   '/inv-receive-direct': typeof InvReceiveDirectRoute
   '/inv-receive-list': typeof InvReceiveListRoute
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
@@ -1362,7 +1389,10 @@ export interface FileRouteTypes {
     | '/inv-config-product-type'
     | '/inv-config-store-name'
     | '/inv-config-uom'
+    | '/inv-issue-list'
+    | '/inv-issue-mrr-return'
     | '/inv-issue-regular'
+    | '/inv-issue-return'
     | '/inv-receive-direct'
     | '/inv-receive-list'
     | '/inv-yarn-opening-stock'
@@ -1505,7 +1535,10 @@ export interface FileRouteTypes {
     | '/inv-config-product-type'
     | '/inv-config-store-name'
     | '/inv-config-uom'
+    | '/inv-issue-list'
+    | '/inv-issue-mrr-return'
     | '/inv-issue-regular'
+    | '/inv-issue-return'
     | '/inv-receive-direct'
     | '/inv-receive-list'
     | '/inv-yarn-opening-stock'
@@ -1648,7 +1681,10 @@ export interface FileRouteTypes {
     | '/inv-config-product-type'
     | '/inv-config-store-name'
     | '/inv-config-uom'
+    | '/inv-issue-list'
+    | '/inv-issue-mrr-return'
     | '/inv-issue-regular'
+    | '/inv-issue-return'
     | '/inv-receive-direct'
     | '/inv-receive-list'
     | '/inv-yarn-opening-stock'
@@ -1792,7 +1828,10 @@ export interface RootRouteChildren {
   InvConfigProductTypeRoute: typeof InvConfigProductTypeRoute
   InvConfigStoreNameRoute: typeof InvConfigStoreNameRoute
   InvConfigUomRoute: typeof InvConfigUomRoute
+  InvIssueListRoute: typeof InvIssueListRoute
+  InvIssueMrrReturnRoute: typeof InvIssueMrrReturnRoute
   InvIssueRegularRoute: typeof InvIssueRegularRoute
+  InvIssueReturnRoute: typeof InvIssueReturnRoute
   InvReceiveDirectRoute: typeof InvReceiveDirectRoute
   InvReceiveListRoute: typeof InvReceiveListRoute
   InvYarnOpeningStockRoute: typeof InvYarnOpeningStockRoute
@@ -2457,11 +2496,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvReceiveDirectRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inv-issue-return': {
+      id: '/inv-issue-return'
+      path: '/inv-issue-return'
+      fullPath: '/inv-issue-return'
+      preLoaderRoute: typeof InvIssueReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/inv-issue-regular': {
       id: '/inv-issue-regular'
       path: '/inv-issue-regular'
       fullPath: '/inv-issue-regular'
       preLoaderRoute: typeof InvIssueRegularRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-issue-mrr-return': {
+      id: '/inv-issue-mrr-return'
+      path: '/inv-issue-mrr-return'
+      fullPath: '/inv-issue-mrr-return'
+      preLoaderRoute: typeof InvIssueMrrReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inv-issue-list': {
+      id: '/inv-issue-list'
+      path: '/inv-issue-list'
+      fullPath: '/inv-issue-list'
+      preLoaderRoute: typeof InvIssueListRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/inv-config-uom': {
@@ -2928,7 +2988,10 @@ const rootRouteChildren: RootRouteChildren = {
   InvConfigProductTypeRoute: InvConfigProductTypeRoute,
   InvConfigStoreNameRoute: InvConfigStoreNameRoute,
   InvConfigUomRoute: InvConfigUomRoute,
+  InvIssueListRoute: InvIssueListRoute,
+  InvIssueMrrReturnRoute: InvIssueMrrReturnRoute,
   InvIssueRegularRoute: InvIssueRegularRoute,
+  InvIssueReturnRoute: InvIssueReturnRoute,
   InvReceiveDirectRoute: InvReceiveDirectRoute,
   InvReceiveListRoute: InvReceiveListRoute,
   InvYarnOpeningStockRoute: InvYarnOpeningStockRoute,
