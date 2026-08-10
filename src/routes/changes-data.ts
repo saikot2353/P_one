@@ -2,6 +2,24 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
         {
+          id: "129",
+          date: new Date().toISOString().slice(0, 16),
+          type: "Modify",
+          module: "e-Recruitment",
+          link: "/e-recruitment-form",
+          descriptionEn: "Redesigned form tooltips with a professional card UI, detailed field instructions, and placed the hover icon before the label for improved user guidance.",
+          descriptionBn: "ই-রিক্রুটমেন্ট ফর্মের টুলটিপগুলো আরও প্রফেশনাল করা হয়েছে। লেবেলের আগে ইনফো আইকন দেওয়া হয়েছে এবং বিস্তারিত গাইডলাইন যুক্ত করা হয়েছে যাতে ক্যান্ডিডেটদের সুবিধা হয়।",
+        },
+        {
+          id: "128",
+          date: new Date().toISOString().slice(0, 16),
+          type: "Modify",
+          module: "e-Recruitment",
+          link: "/",
+          descriptionEn: "Hid the 'Settings' and 'Approved List' menus from the e-Recruitment section in both the sidebar and topbar navigation.",
+          descriptionBn: "সাইডবার এবং টপবার নেভিগেশন উভয় জায়গা থেকে ই-রিক্রুটমেন্ট সেকশনের 'Settings' এবং 'Approved List' মেনুগুলো হাইড করা হয়েছে।",
+        },
+        {
           id: "127",
           date: new Date().toISOString().slice(0, 16),
           type: "Modify",

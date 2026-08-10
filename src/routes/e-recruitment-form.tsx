@@ -3,6 +3,12 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import companyLogo from "@/components/Pakiza-Software-bgless-e1692258364537.webp";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   ChevronRight,
   UserPlus,
   User,
@@ -54,6 +60,39 @@ export const Route = createFileRoute("/e-recruitment-form")({
 
 // ─── Reusable Field Components ───────────────────────────────────────────────
 
+function getTooltipContent(label: string) {
+  const contentMap: Record<string, string> = {
+    "Full Name (English)": "Please enter your complete name in English exactly as it appears on your official documents (NID or Passport).",
+    "Full Name (Bengali)": "জাতীয় পরিচয়পত্র অনুযায়ী আপনার সম্পূর্ণ নাম বাংলায় লিখুন।",
+    "Date of Birth": "Select your official date of birth as registered in your National ID or Birth Certificate.",
+    "Religion": "Select your faith or religious belief from the provided list.",
+    "Marital Status": "Indicate your current marital status (e.g., Single, Married).",
+    "NID Number": "Enter your 10, 13, or 17-digit National Identity Card number. This is required for official verification.",
+    "Birth Registration No.": "If you do not have an NID, provide your official 17-digit Birth Registration Number.",
+    "Father's Name (English)": "Enter your father's full name in English as per official records.",
+    "Father's Name (Bengali)": "আপনার পিতার সম্পূর্ণ নাম বাংলায় লিখুন।",
+    "Mother's Name (English)": "Enter your mother's full name in English as per official records.",
+    "Mother's Name (Bengali)": "আপনার মাতার সম্পূর্ণ নাম বাংলায় লিখুন।",
+    "Personal Contact No.": "Provide a valid and active mobile number where you can be reached for interview and updates.",
+    "Emergency Contact No.": "Provide a reliable phone number of a family member or guardian to contact in case of an emergency.",
+    "Personal Email": "Enter a valid, professional email address for official communication.",
+    "Contact Person Name": "Enter the full name of the individual we should contact during an emergency.",
+    "Relationship": "Specify your relation to the emergency contact person (e.g., Father, Brother, Spouse).",
+    "Division": "Select the division corresponding to this address.",
+    "District": "Select the district corresponding to this address.",
+    "Thana / Upazila": "Select the specific Thana or Upazila for this address.",
+    "Post Office": "Select or type the relevant Post Office for this area.",
+    "Village / House No": "Provide the precise house number, village, or street details for accurate record keeping.",
+    "Road / Block / Sector": "Specify any additional road, block, or sector information for this address.",
+    "Country": "Select your country of residence.",
+    "Nominee Name": "Enter the full name of the person you are nominating for employment benefits.",
+    "Relation with Nominee": "Specify your exact relationship with the designated nominee.",
+    "Nominee NID / Birth Reg.": "Provide the nominee's National ID or Birth Registration Number for verification.",
+    "Nominee Contact No.": "Provide a valid mobile number for the nominee.",
+  };
+  return contentMap[label] || `Please provide accurate information for ${label}.`;
+}
+
 function FieldInput({
   label,
   required,
@@ -63,6 +102,7 @@ function FieldInput({
   placeholder,
   type = "text",
   className = "",
+  tooltip,
 }: {
   label: string;
   required?: boolean;
@@ -72,13 +112,29 @@ function FieldInput({
   placeholder?: string;
   type?: string;
   className?: string;
+  tooltip?: string;
 }) {
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
-      <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">
-        {label}
-        {required && <span className="text-red-500 ml-0.5">*</span>}
-      </label>
+      <div className="flex items-center gap-1.5">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button type="button" tabIndex={-1} className="cursor-help text-muted-foreground hover:text-primary transition-colors focus:outline-none flex items-center">
+              <Info className="size-3.5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="bg-card text-card-foreground border border-border shadow-xl p-3 max-w-[250px] rounded-xl text-left">
+            <p className="leading-relaxed text-[11.5px] text-muted-foreground font-medium">
+              <strong className="text-foreground block mb-1">{label}</strong>
+              {tooltip || getTooltipContent(label)}
+            </p>
+          </TooltipContent>
+        </Tooltip>
+        <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide flex items-center">
+          {label}
+          {required && <span className="text-red-500 ml-0.5">*</span>}
+        </label>
+      </div>
       <input
         type={type}
         readOnly={readOnly}
@@ -103,6 +159,7 @@ function FieldSelect({
   options,
   placeholder = "Select...",
   className = "",
+  tooltip,
 }: {
   label: string;
   required?: boolean;
@@ -111,14 +168,30 @@ function FieldSelect({
   options: { value: string; label: string }[];
   placeholder?: string;
   className?: string;
+  tooltip?: string;
 }) {
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
       <div className="flex items-center justify-between">
-        <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">
-          {label}
-          {required && <span className="text-red-500 ml-0.5">*</span>}
-        </label>
+        <div className="flex items-center gap-1.5">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button type="button" tabIndex={-1} className="cursor-help text-muted-foreground hover:text-primary transition-colors focus:outline-none flex items-center">
+                <Info className="size-3.5" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="bg-card text-card-foreground border border-border shadow-xl p-3 max-w-[250px] rounded-xl text-left">
+              <p className="leading-relaxed text-[11.5px] text-muted-foreground font-medium">
+                <strong className="text-foreground block mb-1">{label}</strong>
+                {tooltip || getTooltipContent(label)}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+          <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide flex items-center">
+            {label}
+            {required && <span className="text-red-500 ml-0.5">*</span>}
+          </label>
+        </div>
         <span className="inline-flex items-center gap-0.5 text-[8.5px] font-black text-primary/80 tracking-wider uppercase bg-primary/5 px-1.5 py-0.5 rounded-md border border-primary/10 select-none">
           <Search className="size-2 text-primary" /> Searchable
         </span>
@@ -1076,7 +1149,8 @@ function ERecruitmentForm() {
   };
 
   return (
-    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
+    <TooltipProvider>
+      <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
       <FormSidebar activeSection={activeSection} setActiveSection={setActiveSection} completion={completion} />
       <main className="flex-1 min-w-0 flex flex-col relative h-screen overflow-y-auto">
         {/* Global Progress Bar */}
@@ -2562,5 +2636,6 @@ function ERecruitmentForm() {
         </div>
       )}
     </div>
+    </TooltipProvider>
   );
 }

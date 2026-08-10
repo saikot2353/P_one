@@ -287,12 +287,12 @@ const searchableMenus: SearchMenuLink[] = [
     to: "/recruitment-basic-list",
     description: "List of candidates",
   },
-  {
-    label: "Approved Candidates",
-    parent: "e-Recruitment",
-    to: "/recruitment-assessment-list",
-    description: "Approved candidates list",
-  },
+  // {
+  //   label: "Approved Candidates",
+  //   parent: "e-Recruitment",
+  //   to: "/recruitment-assessment-list",
+  //   description: "Approved candidates list",
+  // },
   // SSP
   {
     label: "New Requisition",
