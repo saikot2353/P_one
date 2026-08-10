@@ -2,39 +2,20 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,
-  SlidersHorizontal,
-  UserRound,
-  Clock,
-  Coins,
-  Users,
-  RefreshCw,
+  ShoppingCart,
+  Package,
   FileText,
-  BarChart3,
-  ClipboardCheck,
-  CalendarDays,
-  CalendarX,
-  ShieldAlert,
-  Fingerprint,
-  Timer,
-  CreditCard,
-  Cpu,
-  ShieldCheck,
-  Lightbulb,
+  Blocks,
   Settings,
-  LifeBuoy,
   ChevronDown,
   ChevronRight,
-  File,
-  Briefcase,
-  UserPlus,
-  LogOut,
-  HeartHandshake,
-  Banknote,
-  CheckCircle,
-  Blocks,
   ArrowLeft,
-  MessageSquare,
-  BookUser,
+  LifeBuoy,
+  LogOut,
+  File,
+  Wrench,
+  Download,
+  Upload,
 } from "lucide-react";
 
 export interface NestedItem {
@@ -64,323 +45,52 @@ export interface NavItem {
 }
 
 export const nav: NavItem[] = [
-  { label: "Dashboard", to: "/", icon: LayoutDashboard },
-  { label: "Messenger", to: "/messenger", icon: MessageSquare },
-  { label: "Phonebook", to: "/phonebook", icon: BookUser },
+  { label: "Dashboard", to: "/inventory-dashboard", icon: LayoutDashboard },
   {
-    label: "SSP",
-    icon: Briefcase,
+    label: "Configuration",
+    icon: Settings,
     subitems: [
-      { label: "New Requisition", to: "/ssp-new-requisition" },
-      { label: "My Requisition", to: "/ssp-my-requisition" },
-      { label: "Attendance", to: "/ssp-attendance" },
-    ],
+      { label: "Product Type", to: "/inv-config-product-type" },
+      { label: "Store Name", to: "/inv-config-store-name" },
+      { label: "Group Name", to: "/inv-config-group-name" },
+      { label: "Product Name", to: "/inv-config-product-name" },
+      { label: "UoM", to: "/inv-config-uom" },
+      { label: "Brand", to: "/inv-config-brand" },
+      { label: "Model", to: "/inv-config-model" },
+    ]
   },
   {
-    label: "Configure",
-    icon: SlidersHorizontal,
+    label: "Config",
+    icon: Wrench,
     subitems: [
-      { label: "Structure Setup", to: "/configure-structure" },
-      { label: "Company Setup", to: "/company-setup" },
-      { label: "Personnel File Configure", to: "/configure-personnel" },
-      { label: "Job & Employee Setup", to: "/configure-employment" },
-      { label: "Shift & Time Rules", to: "/configure-time" },
-      { label: "Allowances & Bonuses", to: "/configure-compensation" },
-      { label: "Tax & Compliance Setup", to: "/configure-tax" },
-      { label: "Payroll Configuration", to: "/payroll-configure" },
-      { label: "Education & Training", to: "/configure-education" },
-      { label: "Leave & Policies", to: "/configure-policies" },
-      { label: "Letter Setup", to: "/configure-letter" },
-    ],
+      { label: "Opening Stock", to: "/inv-yarn-opening-stock" }
+    ]
   },
   {
-    label: "Approvals",
-    icon: CheckCircle,
-    count: 38,
+    label: "Store Receive",
+    icon: Download,
     subitems: [
-      { label: "All Approvals", to: "/all-approvals" },
-      {
-        label: "HR Approvals",
-        count: 24,
-        subitems: [
-          { label: "SSP Approval", to: "/ssp-approval", count: 5 },
-          { label: "Personnel Approval", to: "/personnel-approval", count: 2 },
-          { label: "Manual Attendance", to: "/pending-manual-attendance", count: 7 },
-          {
-            label: "JD Approvals",
-            to: "/hr-policy-jds",
-            search: { mode: "list", filterWorkflow: "HR" },
-            count: 1,
-          },
-          { label: "Increment Gadget", to: "/approve-increment-gadget", count: 3 },
-          { label: "Increment (HR)", to: "/approve-increment-hr", count: 2 },
-          { label: "Final Increment", to: "/final-approve-increment", count: 1 },
-          { label: "Budget Requisitions", to: "/budget-requisition-approvals" },
-          {
-            label: "Transfer Approvals",
-            to: "/transfer-control-center",
-            search: { tab: "approve" },
-            count: 2,
-          },
-          { label: "Overtime Requisitions", to: "/approve-overtime", count: 1 },
-        ],
-      },
-      {
-        label: "Payroll Approval",
-        count: 14,
-        subitems: [
-          { label: "Advance Requisitions", to: "/approve-advance", count: 3 },
-          { label: "Loan Applications", to: "/loan-approval", count: 5 },
-          { label: "Salary Sheets", to: "/check-approve-salary", count: 6 },
-        ],
-      },
-    ],
+      { label: "MRR Check", to: "/inv-receive-mrr-check" },
+      { label: "MRR Inspect", to: "/inv-receive-mrr-inspect" },
+      { label: "MRR Approve", to: "/inv-receive-mrr-approve" },
+      { label: "Direct Receive", to: "/inv-receive-direct" },
+      { label: "Receive List", to: "/inv-receive-list" },
+    ]
   },
   {
-    label: "Personnel Info",
-    icon: UserRound,
+    label: "Store Issue",
+    icon: Upload,
     subitems: [
-      { label: "Personnel List", to: "/personnel-list" },
-      { label: "ID Card Setup", to: "/id-card-setup" },
-    ],
-  },
-  {
-    label: "Attendance",
-    icon: Fingerprint,
-    subitems: [
-      { label: "Manual Attendance", to: "/manual-attendance" },
-      { label: "Employee Job Card", to: "/employee-job-card" },
-      { label: "Allowance Process", to: "/" },
-      { label: "Allowance Requisition", to: "/" },
-    ],
-  },
-  {
-    label: "Roster",
-    icon: CalendarDays,
-    subitems: [
-      { label: "Create Roster", to: "/create-roster" },
-      { label: "Company Holiday", to: "/company-holiday" },
-    ],
-  },
-  {
-    label: "Leave",
-    to: "/leave",
-    icon: CalendarX,
-  },
-  {
-    label: "KPI Performance",
-    icon: BarChart3,
-    subitems: [
-      { label: "Dashboard", to: "/kpi-dashboard" },
-      { label: "Cycles", to: "/kpi-cycles" },
-      { label: "Criteria Setup", to: "/kpi-task-name" },
-      { label: "Grade Bands", to: "/kpi-setting" },
-      { label: "My Self-Assessment", to: "/kpi-self-assessment" },
-      { label: "360° Peer Review", to: "/kpi-peer-review" },
-      { label: "Assessment Workflow", to: "/kpi-assessment-workflow" },
-      { label: "KPI Reports", to: "/kpi-report" },
-    ],
-  },
-  {
-    label: "Evaluation",
-    icon: ClipboardCheck,
-    to: "/evaluation-propose",
-    activeRoutes: [
-      "/evaluation-propose",
-      "/increment-gadget",
-      "/propose-increment",
-      "/increment-summary",
-      "/increment-queuelist",
-      "/increment-list",
-      "/increment-history",
-    ],
-  },
-  {
-    label: "e-Recruitment",
-    icon: UserPlus,
-    subitems: [
-      { label: "Application Queue", to: "/recruitment-basic-list" },
-      // { label: "Settings", to: "/recruitment-settings" },
-      // { label: "Approved List", to: "/recruitment-assessment-list" },
-    ],
-  },
-  {
-    label: "IE Recruitment",
-    icon: UserPlus,
-    subitems: [
-      { label: "Organization Setting", to: "/recruitment-basic-setup" },
-      { label: "Basic Entry Form", to: "/recruitment-basic-entry" },
-      { label: "Basic Info List", to: "/recruitment-basic-info-list" },
-      { label: "IE Configuration", to: "/recruitment-configuration" },
-      { label: "IE Assessment", to: "/recruitment-ie-list" },
-      { label: "HR Assessment", to: "/recruitment-hr-list" },
-      { label: "Assessment List", to: "/recruitment-assessment-list" },
-    ],
-  },
-  {
-    label: "Manage Shift",
-    icon: Clock,
-    to: "/shift-control-center",
-  },
-  {
-    label: "Manpower Budget",
-    icon: Coins,
-    subitems: [
-      { label: "Dashboard & Statement", to: "/budget-statement" },
-      { label: "Budget Planning Hub", to: "/budget-planning" },
-      { label: "My Requisitions", to: "/budget-my-requisitions" },
-      { label: "Overtime Control", to: "/budget-overtime" },
-    ],
-  },
-  {
-    label: "Transfer",
-    icon: RefreshCw,
-    subitems: [
-      { label: "Transfer History", to: "/transfer-control-center", search: { tab: "history" } },
-      { label: "Print Transfer Letter", to: "/transfer-control-center", search: { tab: "print" } },
-    ],
-  },
-  {
-    label: "HR Policy",
-    to: "/hr-policy-jds",
-    search: { mode: "list", filterWorkflow: "ALL" },
-    icon: FileText,
-  },
-  {
-    label: "User Management",
-    icon: Users,
-    subitems: [
-      { label: "User List", to: "/user-management" },
-      { label: "Permission Management", to: "/permission-management" },
-    ],
-  },
-
-  {
-    label: "Welfare & Support",
-    icon: HeartHandshake,
-    subitems: [
-      { label: "Zakat Management", to: "/zakat-management" },
-      { label: "Financial Aid", to: "/financial-aid" },
-    ],
-  },
-  {
-    label: "Disciplinary Action",
-    icon: ShieldAlert,
-    subitems: [
-      { label: "Case Files", to: "/" },
-      { label: "Warning Letters", to: "/" },
-      { label: "Show Cause Notices", to: "/" },
-    ],
-  },
-  {
-    label: "Manage Overtime",
-    icon: Timer,
-    subitems: [{ label: "OT Tracking & Submissions", to: "/manage-overtime" }],
-  },
-  {
-    label: "Manage Allowance",
-    icon: CreditCard,
-    subitems: [
-      { label: "Allowance Setup", to: "/" },
-      { label: "Employee Allowance", to: "/" },
-      { label: "Tax Exemption Rules", to: "/" },
-    ],
-  },
-  {
-    label: "Payroll",
-    icon: Banknote,
-    subitems: [
-      {
-        label: "Advance",
-        subitems: [
-          { label: "Advance Req & List", to: "/payroll-advance" },
-          { label: "Incentive Allowance", to: "/incentive-allowance" },
-        ],
-      },
-      {
-        label: "Loan",
-        subitems: [{ label: "Loan Management", to: "/loan-application" }],
-      },
-      { label: "Deductions", to: "/payroll-deductions" },
-      {
-        label: "Salary Process",
-        subitems: [
-          { label: "Monthly Salary Process", to: "/monthly-salary-process" },
-          { label: "Advance Salary Process", to: "/advance-salary-process" },
-          { label: "Yearly Bonus Process", to: "/yearly-bonus-process" },
-        ],
-      },
-      {
-        label: "Benefits",
-        subitems: [
-          { label: "Master Data", to: "/payroll-benefits-master-data" },
-          { label: "Common Benefits", to: "/payroll-benefits-common" },
-          { label: "Monthly Benefits", to: "/payroll-benefits-monthly" },
-        ],
-      },
-      {
-        label: "Final Settlement",
-        subitems: [{ label: "Execute Final Settlement", to: "/payroll-final-settlement-execute" }],
-      },
-      { label: "Payroll Configuration", to: "/payroll-configure" },
-      {
-        label: "Reports",
-        subitems: [
-          { label: "Monthly Salary Details", to: "#" },
-          { label: "Monthly Left Salary Sheet", to: "#" },
-          { label: "Employee Salary History", to: "#" },
-          { label: "Monthly Advance Salary Sheet", to: "#" },
-          { label: "Summary Salary Sheet", to: "#" },
-          { label: "Employee Tax", to: "#" },
-          { label: "Yearly Bonus Report", to: "#" },
-          { label: "Bonus Summary Report", to: "#" },
-          { label: "Bonus Summary Report(Unit Wise)", to: "#" },
-          { label: "Holiday Summary Sheet", to: "#" },
-          { label: "Earn Leave Pay Report", to: "#" },
-          { label: "Allowance Payment", to: "#" },
-          { label: "Final Settlement", to: "#" },
-        ],
-      },
-    ],
-  },
-  {
-    label: "Processes",
-    icon: Cpu,
-    subitems: [
-      { label: "Payroll Processing", to: "/" },
-      { label: "End of Month Close", to: "/" },
-      { label: "Year End Process", to: "/" },
-    ],
-  },
-  {
-    label: "Compliance",
-    icon: ShieldCheck,
-    subitems: [
-      { label: "Statutory Compliance", to: "/" },
-      { label: "Tax Reports", to: "/" },
-      { label: "Audit Logs", to: "/" },
-    ],
-  },
-  {
-    label: "Idea Share",
-    icon: Lightbulb,
-    subitems: [
-      { label: "Idea Board", to: "/" },
-      { label: "Innovation Submissions", to: "/" },
-    ],
-  },
-  {
-    label: "Event",
-    icon: CalendarDays,
-    subitems: [
-      { label: "Upcoming Events", to: "/" },
-      { label: "Holiday Celebrations", to: "/" },
-      { label: "Team Building", to: "/" },
-    ],
-  },
+      { label: "Issue Regular", to: "/inv-issue-regular" },
+      { label: "Issue List", to: "/inv-issue-list" },
+      { label: "Issue Return", to: "/inv-issue-return" },
+      { label: "Issue Return List", to: "/inv-issue-return-list" },
+      { label: "MRR Return Issue", to: "/inv-issue-mrr-return" },
+    ]
+  }
 ];
 
-export function Sidebar() {
+export function InventorySidebar() {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
   const scrollRef = useRef<HTMLElement>(null);

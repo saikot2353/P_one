@@ -620,7 +620,7 @@ function getCategoryIcon(parent: string) {
   }
 }
 
-export function Topbar() {
+export function InventoryTopbar() {
   if (typeof window !== "undefined" && window.location.search.includes("embed=true")) {
     return null;
   }

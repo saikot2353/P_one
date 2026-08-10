@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { ArrowLeft, FileSpreadsheet, ExternalLink } from "lucide-react";
-import { DEFAULT_CHANGE_RECORDS } from "./changes-data";
+import { DEFAULT_CHANGE_RECORDS } from "./-changes-data";
 
 export const Route = createFileRoute("/changes")({
   component: ChangesPage,

@@ -50,6 +50,7 @@ import {
   Scan,
   Loader2,
   AlertTriangle,
+  List,
 } from "lucide-react";
 
 export const Route = createFileRoute("/add-employee")({
@@ -74,6 +75,8 @@ const TABS = [
 function AddEmployeePage() {
   const [activeTab, setActiveTab] = useState("personal_identity");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isProfileStatusExpanded, setIsProfileStatusExpanded] = useState(true);
+  const [isStepperExpanded, setIsStepperExpanded] = useState(true);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [subSection, setSubSection] = useState("primary_placement");
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -190,6 +193,7 @@ function AddEmployeePage() {
     blood: "B (+ve)",
     presVillageEng: "",
     presVillageBng: "",
+    presHouseNo: "",
     presRoad: "",
     presDistrict: "Dhaka",
     presDivision: "Dhaka",
@@ -239,6 +243,7 @@ function AddEmployeePage() {
     presDistrict: "Dhaka",
     presUpazila: "Mirpur",
     presPostOffice: "Mirpur-12",
+    presHouseNo: "",
     presVillageEng: "Vill # Dhopapara",
     presVillageBng: "গ্রাম # ধোপাপাড়া",
     presRoad: "Road # 12",
@@ -251,6 +256,7 @@ function AddEmployeePage() {
     permDistrict: "Dhaka",
     permUpazila: "Mirpur",
     permPostOffice: "Mirpur-12",
+    permHouseNo: "",
     permVillageEng: "Vill # Dhopapara",
     permVillageBng: "গ্রাম # ধোপাপাড়া",
     permRoad: "Road # 12",
@@ -565,6 +571,7 @@ function AddEmployeePage() {
         permDistrict: prev.presDistrict,
         permUpazila: prev.presUpazila,
         permPostOffice: prev.presPostOffice,
+        permHouseNo: prev.presHouseNo,
         permVillageEng: prev.presVillageEng,
         permVillageBng: prev.presVillageBng,
         permRoad: prev.presRoad,
@@ -578,6 +585,7 @@ function AddEmployeePage() {
     form.presDistrict,
     form.presUpazila,
     form.presPostOffice,
+    form.presHouseNo,
     form.presVillageEng,
     form.presVillageBng,
     form.presRoad,
@@ -1444,9 +1452,9 @@ function AddEmployeePage() {
         <Topbar />
 
         {/* Form Body Scrollpane */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 xl:p-8 space-y-6">
+        <div className="flex-1 overflow-y-auto p-2 space-y-2">
           {/* Top Panel Breadcrumbs and Title Card */}
-          <div className="bg-card border border-border/80 rounded-lg p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="bg-card border border-border/80 rounded-lg p-2 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-2">
             <div className="space-y-1.5">
               <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">
                 <Link to="/" className="hover:text-primary transition-colors">
@@ -1458,15 +1466,15 @@ function AddEmployeePage() {
                 <span className="text-foreground">Add Employee File</span>
               </div>
               <div className="flex items-center gap-3">
-                <div className="size-2.5 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]" />
-                <h1 className="text-xl font-extrabold tracking-tight text-foreground">
+                <div className="size-2 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]" />
+                <h1 className="text-lg font-extrabold tracking-tight text-foreground">
                   Add New Employee Digital File
                 </h1>
               </div>
             </div>
             <button
               onClick={handleSave}
-              className="h-10 px-5 rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs font-bold shadow-md hover:shadow-lg hover:opacity-95 transition-all duration-300 flex items-center justify-center gap-1.5 shrink-0"
+              className="h-9 px-5 rounded-lg bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs font-bold shadow-md hover:shadow-lg hover:opacity-95 transition-all duration-300 flex items-center justify-center gap-1.5 shrink-0"
             >
               <Save className="size-4" /> Save Employee Digital File
             </button>
@@ -1475,9 +1483,12 @@ function AddEmployeePage() {
           {/* ===== FORM DIRECTORIES + FORM BODY ===== */}
           {/* ===== FORM DIRECTORIES + FORM BODY ===== */}
           {/* ===== HORIZONTAL PROFILE COMPLETION CARD ===== */}
-          <div className="bg-card border border-border/80 rounded-xl p-5 shadow-xs space-y-4">
-            {/* Top bar: Overall progress + label */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-muted/20 border border-border/30 rounded-xl p-4">
+          <div className="bg-card border border-border/80 rounded-xl p-2 shadow-xs space-y-2">
+            {/* Top bar: Overall progress + label (Toggle Accordion) */}
+            <div 
+              className="flex flex-col md:flex-row md:items-center justify-between gap-2 bg-muted/20 border border-border/30 rounded-xl p-1.5 cursor-pointer hover:bg-muted/30 transition-colors"
+              onClick={() => setIsProfileStatusExpanded(!isProfileStatusExpanded)}
+            >
               <div className="space-y-1">
                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary block">
                   Profile Completion Status
@@ -1491,29 +1502,29 @@ function AddEmployeePage() {
                 </p>
               </div>
               <div className="flex items-center gap-3 self-start md:self-auto">
-                <div className="relative size-12 flex items-center justify-center shrink-0 bg-card rounded-full border border-border/30 shadow-2xs">
+                <div className="relative size-8 flex items-center justify-center shrink-0 bg-card rounded-full border border-border/30 shadow-2xs">
                   <svg className="size-full transform -rotate-90">
                     <circle
-                      cx="24"
-                      cy="24"
-                      r="20"
+                      cx="16"
+                      cy="16"
+                      r="12"
                       className="stroke-muted/40"
-                      strokeWidth="3"
+                      strokeWidth="2"
                       fill="transparent"
                     />
                     <circle
-                      cx="24"
-                      cy="24"
-                      r="20"
+                      cx="16"
+                      cy="16"
+                      r="12"
                       className="stroke-primary transition-all duration-500"
-                      strokeWidth="3.5"
-                      strokeDasharray={125.6}
-                      strokeDashoffset={125.6 - (125.6 * overallPercentage) / 100}
+                      strokeWidth="2.5"
+                      strokeDasharray={75.4}
+                      strokeDashoffset={75.4 - (75.4 * overallPercentage) / 100}
                       strokeLinecap="round"
                       fill="transparent"
                     />
                   </svg>
-                  <span className="absolute text-xs font-black text-primary">
+                  <span className="absolute text-[9px] font-black text-primary">
                     {overallPercentage}%
                   </span>
                 </div>
@@ -1524,12 +1535,17 @@ function AddEmployeePage() {
                     sections
                   </span>
                 </div>
+                {/* Accordion Toggle Icon */}
+                <div className="ml-2 flex items-center justify-center size-6 rounded-full bg-background border border-border/50 text-muted-foreground">
+                  <ChevronRight className={`size-3.5 transition-transform duration-300 ${isProfileStatusExpanded ? "rotate-90" : "rotate-0"}`} />
+                </div>
               </div>
             </div>
 
-            {/* Horizontal scrollable tab row / Grid on large screens */}
-            <div className="overflow-x-auto scrollbar-none pb-1 md:pb-0">
-              <div className="grid grid-cols-5 gap-2.5 min-w-[760px] md:min-w-0">
+            {/* Horizontal scrollable tab row / Grid on large screens (Conditionally Rendered) */}
+            {isProfileStatusExpanded && (
+              <div className="overflow-x-auto scrollbar-none pb-1 md:pb-0 animate-in slide-in-from-top-2 fade-in duration-200">
+                <div className="grid grid-cols-5 gap-2.5 min-w-[760px] md:min-w-0">
                 {TABS.map((tab, idx) => {
                   const TabIcon = tab.icon;
                   const completed = isTabCompleted(tab.id);
@@ -1543,16 +1559,13 @@ function AddEmployeePage() {
                         setActiveTab(tab.id);
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
-                      className={`group text-left p-3.5 rounded-xl border transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[96px] cursor-pointer hover:-translate-y-0.5 ${isActive
+                      className={`group text-left p-1.5 rounded-xl border transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[50px] cursor-pointer hover:-translate-y-0.5 ${isActive
                           ? "bg-primary/8 border-primary/45 shadow-xs"
                           : "bg-card border-border/80 hover:border-primary/20 hover:bg-muted/10"
                         }`}
                     >
                       {/* Top part: Icon + step indicator */}
-                      <div className="flex items-center justify-between gap-2 w-full">
-                        <span className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest">
-                          Step 0{idx + 1}
-                        </span>
+                      <div className="flex items-center justify-between gap-1.5 w-full">
                         <div
                           className={`size-6 rounded-md flex items-center justify-center transition-all ${isActive
                               ? "bg-primary text-primary-foreground shadow-xs"
@@ -1570,7 +1583,7 @@ function AddEmployeePage() {
                       </div>
 
                       {/* Label */}
-                      <div className="mt-2.5">
+                      <div className="mt-1.5">
                         <span
                           className={`block text-[11px] font-black leading-tight truncate ${isActive ? "text-primary" : "text-foreground"}`}
                         >
@@ -1579,7 +1592,7 @@ function AddEmployeePage() {
                       </div>
 
                       {/* Section progress */}
-                      <div className="mt-2.5 w-full flex items-center gap-2">
+                      <div className="mt-1.5 w-full flex items-center gap-2">
                         <div className="flex-1 h-1 bg-muted rounded-full overflow-hidden border border-border/10">
                           <div
                             className={`h-full rounded-full transition-all duration-500 ${percentage === 100
@@ -1609,19 +1622,36 @@ function AddEmployeePage() {
                 })}
               </div>
             </div>
+            )}
           </div>
 
           <form onSubmit={handleSave} className="space-y-0">
             {/* Core Form Card Section - full width */}
-            <div className="bg-card border border-border/80 rounded-lg p-6 md:p-8 shadow-xs min-h-[600px] flex flex-col gap-6">
+            <div className="bg-card border border-border/80 rounded-lg p-3 md:p-4 shadow-xs min-h-[400px] flex flex-col gap-2.5">
               {/* TAB 1: PERSONAL & IDENTITY (CONSOLIDATED) */}
               {activeTab === "personal_identity" && (
-                <div className="space-y-6 animate-in fade-in duration-200 text-foreground">
+                <div className="space-y-3 animate-in fade-in duration-200 text-foreground">
                   {/* Premium, High-fidelity Progress Stepper Timeline */}
-                  <div className="bg-card border border-border/60 rounded-lg p-5 shadow-xs overflow-x-auto scrollbar-thin">
-                    <div className="min-w-[650px] relative flex items-center justify-between px-6 py-3">
-                      {/* Horizontal connecting track line behind the dots */}
-                      <div className="absolute top-[26px] left-[55px] right-[55px] h-[3px] bg-muted/60 border-t border-b border-border/20 z-0" />
+                  <div className="bg-card border border-border/60 rounded-lg p-2 shadow-xs">
+                    {/* Stepper Toggle Header */}
+                    <div 
+                      className="flex items-center justify-between cursor-pointer hover:bg-muted/30 p-1.5 rounded-lg transition-colors"
+                      onClick={() => setIsStepperExpanded(!isStepperExpanded)}
+                    >
+                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5">
+                        <List className="size-3" />
+                        Sub-section Progress
+                      </span>
+                      <div className="flex items-center justify-center size-5 rounded-full bg-background border border-border/50 text-muted-foreground">
+                        <ChevronRight className={`size-3 transition-transform duration-300 ${isStepperExpanded ? "rotate-90" : "rotate-0"}`} />
+                      </div>
+                    </div>
+
+                    {isStepperExpanded && (
+                    <div className="overflow-x-auto scrollbar-thin mt-1 animate-in slide-in-from-top-2 fade-in duration-200">
+                      <div className="min-w-[650px] relative flex items-center justify-between px-6 py-2">
+                        {/* Horizontal connecting track line behind the dots */}
+                        <div className="absolute top-[23px] left-[55px] right-[55px] h-[2px] bg-muted/60 border-t border-b border-border/20 z-0" />
 
                       {[
                         {
@@ -1667,22 +1697,22 @@ function AddEmployeePage() {
                           >
                             {/* Circle Stepper Dot/Bubble */}
                             <div
-                              className={`size-[42px] rounded-full flex items-center justify-center border-2 transition-all duration-300 relative ${isSelected
-                                  ? "bg-primary text-primary-foreground border-primary shadow-[0_0_15px_var(--primary)] scale-110"
+                              className={`size-6 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative ${isSelected
+                                  ? "bg-primary text-primary-foreground border-primary shadow-[0_0_10px_var(--primary)] scale-110"
                                   : isCompleted
-                                    ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.2)]"
+                                    ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.2)]"
                                     : "bg-card text-muted-foreground border-border/80 hover:border-muted-foreground/60"
                                 }`}
                             >
                               {isCompleted ? (
-                                <Check className="size-[18px] stroke-[3]" />
+                                <Check className="size-3 stroke-[3]" />
                               ) : (
-                                <StepIcon className="size-[17px]" />
+                                <StepIcon className="size-3" />
                               )}
 
                               {/* Pulsing neon highlight around active bubble */}
                               {isSelected && (
-                                <div className="absolute inset-[-4px] rounded-full border-2 border-primary/40 animate-ping opacity-60 pointer-events-none" />
+                                <div className="absolute inset-[-3px] rounded-full border-2 border-primary/40 animate-ping opacity-60 pointer-events-none" />
                               )}
                             </div>
 
@@ -1715,52 +1745,37 @@ function AddEmployeePage() {
                       })}
                     </div>
                   </div>
+                  )}
+                </div>
 
                   {/* SUBSECTION: PRIMARY & JOB PLACEMENT */}
                   {subSection === "primary_placement" && (
-                    <div className="space-y-6 animate-in fade-in duration-200">
-                      {/* AI NID OCR Scanner Widget */}
-                      <div className="bg-card border border-border/80 rounded-xl p-5 md:p-6 shadow-xs relative overflow-hidden transition-all duration-300 hover:border-primary/20 bg-gradient-to-br from-card to-primary/5">
-                        <div className="absolute top-0 right-0 p-3 opacity-[0.03] text-primary pointer-events-none">
-                          <Cpu className="size-24" />
-                        </div>
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
-                          <div className="space-y-1.5 max-w-xl">
-
-                            <h3 className="text-sm font-extrabold text-foreground tracking-tight">
-                              Autofill with Smart Document Scan
-                            </h3>
-                          </div>
-
-                          {/* Control Panel */}
-                          <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
-                            <button
-                              type="button"
-                              onClick={() => setShowNidScannerModal(true)}
-                              className="h-10 px-6 rounded-xl text-xs font-black shadow-lg bg-primary text-primary-foreground hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 group"
-                            >
-                              <Scan className="size-4 group-hover:rotate-12 transition-transform" />{" "}
-                              Open Smart Scanner
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-
+                    <div className="space-y-3 animate-in fade-in duration-200">
                       {/* Card 1: Core Specifications */}
                       <div className="bg-card border border-border/60 rounded-lg p-6 shadow-2xs relative overflow-hidden transition-all duration-300 hover:border-emerald-500/20">
                         <div className="absolute top-0 left-0 h-full w-1.5 bg-emerald-500" />
-                        <div className="flex items-center gap-3 border-b border-border/30 pb-4 mb-5">
-                          <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
-                            <User className="size-5" />
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/30 pb-4 mb-5">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
+                              <User className="size-5" />
+                            </div>
+                            <div>
+                              <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wider">
+                                Primary & Demographic Dossier
+                              </h3>
+                              <p className="text-[11px] text-muted-foreground">
+                                Core personal data, language registry, and demographics.
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wider">
-                              Primary & Demographic Dossier
-                            </h3>
-                            <p className="text-[11px] text-muted-foreground">
-                              Core personal data, language registry, and demographics.
-                            </p>
-                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setShowNidScannerModal(true)}
+                            className="h-8 px-4 rounded-lg text-[10px] uppercase tracking-wider font-black shadow-md bg-primary text-primary-foreground hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5 group shrink-0"
+                          >
+                            <Scan className="size-3 group-hover:rotate-12 transition-transform" />
+                            Smart Scanner
+                          </button>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
@@ -2819,6 +2834,19 @@ function AddEmployeePage() {
                                   />
                                 </div>
                               </div>
+                              {/* House No */}
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                                  House No
+                                </label>
+                                <input
+                                  type="text"
+                                  value={form.presHouseNo}
+                                  onChange={(e) => handleChange("presHouseNo", e.target.value)}
+                                  className="h-10 px-3 rounded-xl border border-border bg-card text-xs font-semibold focus:outline-none w-full"
+                                  placeholder="House No"
+                                />
+                              </div>
                               {/* Village/House Eng */}
                               <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-muted-foreground uppercase">
@@ -2896,8 +2924,7 @@ function AddEmployeePage() {
                                 Mailing Dispatch preview
                               </span>
                               <span className="text-xs font-bold text-foreground block truncate">
-                                {form.presVillageEng || "Dhopapara"}, Road {form.presRoad || "N/A"},{" "}
-                                {form.presUpazila}, {form.presDistrict}, {form.presCountry}
+                                {form.presHouseNo ? `${form.presHouseNo}, ` : ""}{form.presVillageEng || "Dhopapara"}, Road {form.presRoad || "N/A"}, {form.presCountry}
                               </span>
                             </div>
                           </div>
@@ -2944,6 +2971,20 @@ function AddEmployeePage() {
                                       options={postOffices.map((p) => ({ value: p, label: p }))}
                                     />
                                   </div>
+                                </div>
+
+                                {/* House No */}
+                                <div className="space-y-1">
+                                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                                    House No
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={form.permHouseNo}
+                                    onChange={(e) => handleChange("permHouseNo", e.target.value)}
+                                    className="h-10 px-3 rounded-xl border border-border bg-card text-xs font-semibold focus:outline-none w-full"
+                                    placeholder="House No"
+                                  />
                                 </div>
 
                                 {/* Village/House Eng */}
@@ -3029,8 +3070,8 @@ function AddEmployeePage() {
                               </span>
                               <span className="text-xs font-bold text-foreground block truncate">
                                 {form.sameAsPresent
-                                  ? `${form.presVillageEng || "Dhopapara"}, Road ${form.presRoad || "N/A"}, ${form.presUpazila}, ${form.presDistrict}, ${form.presCountry}`
-                                  : `${form.permVillageEng || "Khalilgonj"}, Road ${form.permRoad || "N/A"}, ${form.permUpazila}, ${form.permDistrict}, ${form.permCountry}`}
+                                  ? `${form.presHouseNo ? `${form.presHouseNo}, ` : ""}${form.presVillageEng || "Dhopapara"}, Road ${form.presRoad || "N/A"}, ${form.presCountry}`
+                                  : `${form.permHouseNo ? `${form.permHouseNo}, ` : ""}${form.permVillageEng || "Khalilgonj"}, Road ${form.permRoad || "N/A"}, ${form.permCountry}`}
                               </span>
                             </div>
                           </div>
