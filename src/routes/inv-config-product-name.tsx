@@ -160,13 +160,13 @@ function ManageProductNamePage() {
               {/* Right Side: Buttons & Search */}
               <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
                 <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 w-full sm:w-auto">
-                  <button className="h-9 px-3 bg-background border border-border hover:bg-muted text-foreground font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5 shrink-0">
+                  <button className="h-9 px-3 bg-background border border-border hover:bg-muted text-foreground font-semibold text-[11px] rounded-lg transition-colors flex items-center gap-1.5 shrink-0">
                     <FileSpreadsheet className="size-3.5 text-emerald-600" /> EXCEL
                   </button>
-                  <button className="h-9 px-3 bg-background border border-border hover:bg-muted text-foreground font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5 shrink-0">
+                  <button className="h-9 px-3 bg-background border border-border hover:bg-muted text-foreground font-semibold text-[11px] rounded-lg transition-colors flex items-center gap-1.5 shrink-0">
                     <Printer className="size-3.5 text-blue-600" /> PRINT
                   </button>
-                  <button className="h-9 px-3 bg-background border border-border hover:bg-muted text-foreground font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5 shrink-0">
+                  <button className="h-9 px-3 bg-background border border-border hover:bg-muted text-foreground font-semibold text-[11px] rounded-lg transition-colors flex items-center gap-1.5 shrink-0">
                     <FileText className="size-3.5 text-red-600" /> PDF
                   </button>
                   
@@ -174,7 +174,7 @@ function ManageProductNamePage() {
                   
                   <button 
                     onClick={openCreateModal}
-                    className="h-9 px-4 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 shrink-0"
+                    className="h-9 px-4 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-[11px] rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 shrink-0"
                   >
                     <Plus className="size-4" />
                     Add New
@@ -211,11 +211,11 @@ function ManageProductNamePage() {
                 </thead>
                 <tbody className="divide-y divide-border/20">
                   {filteredData.map((item, idx) => (
-                    <tr key={item.id} className="hover:bg-muted/40 transition duration-150">
+                    <tr key={item.id} className="hover:bg-slate-50 border-b border-slate-100 transition duration-150">
                       <td className="px-4 py-2 text-center">
                         <button
                           onClick={() => openEditModal(item)}
-                          className="size-6 rounded-md bg-transparent text-amber-600 border border-transparent hover:bg-amber-50 hover:border-amber-200 inline-flex items-center justify-center transition-colors shadow-sm"
+                          className="size-[26px] rounded-md bg-white border border-slate-200 text-amber-500 hover:bg-amber-50 inline-flex items-center justify-center transition-colors shadow-sm"
                           title="Edit"
                         >
                           <Edit3 className="size-3" />
@@ -224,19 +224,19 @@ function ManageProductNamePage() {
                       <td className="px-4 py-2 text-center font-mono text-muted-foreground font-semibold text-[11px]">
                         {idx + 1}
                       </td>
-                      <td className="px-4 py-2 font-medium text-foreground text-xs whitespace-nowrap">
+                      <td className="px-4 py-2 font-medium text-foreground text-[11px] whitespace-nowrap">
                         {item.subStoreName}
                       </td>
                       <td className="px-4 py-2 font-mono font-semibold text-muted-foreground text-[11px]">
                         {item.code}
                       </td>
-                      <td className="px-4 py-2 font-medium text-foreground text-xs">
+                      <td className="px-4 py-2 font-medium text-foreground text-[11px]">
                         {item.name}
                       </td>
-                      <td className="px-4 py-2 font-medium text-muted-foreground text-xs">
+                      <td className="px-4 py-2 font-medium text-muted-foreground text-[11px]">
                         {item.basicName}
                       </td>
-                      <td className="px-4 py-2 font-medium text-muted-foreground text-xs">
+                      <td className="px-4 py-2 font-medium text-muted-foreground text-[11px]">
                         {item.unitName}
                       </td>
                       <td className="px-4 py-2 font-mono font-semibold text-muted-foreground text-right text-[11px]">
@@ -255,7 +255,7 @@ function ManageProductNamePage() {
               </table>
             </div>
             
-            <div className="p-4 border-t border-border/50 bg-muted/10 text-xs text-muted-foreground font-semibold flex justify-between items-center">
+            <div className="p-4 border-t border-border/50 bg-muted/10 text-[11px] text-muted-foreground font-semibold flex justify-between items-center">
               <span>Showing 1 to {filteredData.length} of {products.length} entries</span>
             </div>
           </div>
@@ -283,7 +283,7 @@ function ManageProductNamePage() {
               {/* Left Column: Form Fields */}
               <div className="flex-1 space-y-5">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Sub Store Name <span className="text-red-500">*</span></label>
+                  <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Sub Store Name <span className="text-red-500">*</span></label>
                   <div className="relative">
                     <select 
                       className="w-full pl-3 pr-8 py-2.5 bg-background border border-border rounded-lg text-sm font-semibold appearance-none focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -299,7 +299,7 @@ function ManageProductNamePage() {
                 </div>
                 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Product Name <span className="text-red-500">*</span></label>
+                  <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Product Name <span className="text-red-500">*</span></label>
                   <input 
                     type="text" 
                     className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 font-bold"
@@ -309,7 +309,7 @@ function ManageProductNamePage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Product Description</label>
+                  <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Product Description</label>
                   <input 
                     type="text" 
                     className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -319,7 +319,7 @@ function ManageProductNamePage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Unit Name <span className="text-red-500">*</span></label>
+                  <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Unit Name <span className="text-red-500">*</span></label>
                   <div className="relative">
                     <select 
                       className="w-full pl-3 pr-8 py-2.5 bg-background border border-border rounded-lg text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -336,7 +336,7 @@ function ManageProductNamePage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Factor</label>
+                  <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Factor</label>
                   <input 
                     type="number" 
                     className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -349,7 +349,7 @@ function ManageProductNamePage() {
               {/* Right Column: Existing Products Context */}
               <div className="w-full md:w-80 shrink-0 flex flex-col bg-muted/10 border border-border/50 rounded-xl overflow-hidden">
                 <div className="bg-muted/40 p-3 border-b border-border/50 flex items-center justify-between">
-                  <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
                     Existing Products
                   </h3>
                   <span className="text-[10px] font-bold bg-background border border-border/50 px-2 py-0.5 rounded-full">
@@ -364,7 +364,7 @@ function ManageProductNamePage() {
                       </li>
                     ))}
                     {existingProductsInFormStore.length === 0 && (
-                      <div className="text-center text-xs text-muted-foreground py-10 font-medium">
+                      <div className="text-center text-[11px] text-muted-foreground py-10 font-medium">
                         No existing products in this store.
                       </div>
                     )}

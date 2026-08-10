@@ -179,36 +179,36 @@ function StoreNameConfigPage() {
           <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden flex flex-col">
             
             {/* Toolbar */}
-            <div className="p-4 border-b border-border/50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-muted/10">
+            <div className="p-4 border-b border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white">
               
               <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 w-full sm:w-auto">
-                <button className="h-9 px-3 bg-background border border-border hover:bg-muted text-foreground font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5 shrink-0">
+                <button className="h-[32px] px-3 bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-[10px] uppercase rounded flex items-center gap-1.5 shrink-0 transition-colors shadow-sm">
                   <FileSpreadsheet className="size-3.5 text-emerald-600" /> EXCEL
                 </button>
-                <button className="h-9 px-3 bg-background border border-border hover:bg-muted text-foreground font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5 shrink-0">
+                <button className="h-[32px] px-3 bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-[10px] uppercase rounded flex items-center gap-1.5 shrink-0 transition-colors shadow-sm">
                   <Printer className="size-3.5 text-blue-600" /> PRINT
                 </button>
-                <button className="h-9 px-3 bg-background border border-border hover:bg-muted text-foreground font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5 shrink-0">
+                <button className="h-[32px] px-3 bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-[10px] uppercase rounded flex items-center gap-1.5 shrink-0 transition-colors shadow-sm">
                   <FileText className="size-3.5 text-red-600" /> PDF
                 </button>
               </div>
 
               <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
                 <div className="relative w-full sm:w-64 shrink-0">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-400" />
                   <input
                     type="text"
-                    placeholder="Search stores..."
+                    placeholder="Search..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
+                    className="w-full pl-9 pr-4 h-[32px] bg-[#f2f4f7] border border-transparent hover:border-slate-200 focus:bg-white focus:border-blue-500 rounded-md text-[11px] font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-400"
                   />
                 </div>
                 <button 
                   onClick={openCreateModal}
-                  className="h-9 px-4 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 shrink-0 w-full sm:w-auto justify-center"
+                  className="h-[32px] px-4 bg-[#0d6efd] hover:bg-blue-700 text-white font-bold text-[11px] rounded flex items-center gap-1.5 shrink-0 shadow-sm transition-colors"
                 >
-                  <Plus className="size-4" />
+                  <Plus className="size-3.5" strokeWidth={3} />
                   Add New
                 </button>
               </div>
@@ -218,7 +218,7 @@ function StoreNameConfigPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-sm">
                 <thead>
-                  <tr className="bg-muted/40 border-b border-border/50 text-[11px] font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">
+                  <tr className="border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
                     <th className="px-4 py-2.5 font-semibold w-16 text-center">Actions</th>
                     <th className="px-4 py-2.5 font-semibold w-20 text-center">Status</th>
                     <th className="px-4 py-2.5 font-semibold w-16">Code</th>
@@ -230,11 +230,11 @@ function StoreNameConfigPage() {
                 </thead>
                 <tbody className="divide-y divide-border/20">
                   {filteredData.map((item) => (
-                    <tr key={item.id} className="hover:bg-muted/40 transition duration-150">
+                    <tr key={item.id} className="hover:bg-slate-50 border-b border-slate-100 transition duration-150">
                       <td className="px-4 py-2 text-center">
                         <button
                           onClick={() => openEditModal(item)}
-                          className="size-6 rounded-md bg-transparent text-amber-600 border border-transparent hover:bg-amber-50 hover:border-amber-200 inline-flex items-center justify-center transition-colors shadow-sm"
+                          className="size-[26px] rounded-md bg-white border border-slate-200 text-amber-500 hover:bg-amber-50 inline-flex items-center justify-center transition-colors shadow-sm"
                           title="Edit"
                         >
                           <Edit3 className="size-3" />
@@ -248,17 +248,17 @@ function StoreNameConfigPage() {
                       <td className="px-4 py-2 font-mono font-semibold text-muted-foreground text-[11px]">
                         {item.code}
                       </td>
-                      <td className="px-4 py-2 font-medium text-foreground text-xs whitespace-nowrap">
+                      <td className="px-4 py-2 font-medium text-foreground text-[11px] whitespace-nowrap">
                         {item.codeName}
                       </td>
-                      <td className="px-4 py-2 font-medium text-foreground text-xs whitespace-nowrap">
+                      <td className="px-4 py-2 font-medium text-foreground text-[11px] whitespace-nowrap">
                         {item.name}
                       </td>
-                      <td className="px-4 py-2 font-medium text-muted-foreground text-xs whitespace-nowrap">
+                      <td className="px-4 py-2 font-medium text-muted-foreground text-[11px] whitespace-nowrap">
                         {item.productType}
                       </td>
                       <td className="px-4 py-2">
-                        <p className="text-xs text-muted-foreground line-clamp-2 md:line-clamp-none max-w-xl leading-relaxed">
+                        <p className="text-[11px] text-muted-foreground line-clamp-2 md:line-clamp-none max-w-xl leading-relaxed">
                           {item.locations.join(", ")}
                         </p>
                       </td>
@@ -275,7 +275,7 @@ function StoreNameConfigPage() {
               </table>
             </div>
             
-            <div className="p-4 border-t border-border/50 bg-muted/10 text-xs text-muted-foreground font-semibold flex justify-between items-center">
+            <div className="p-4 border-t border-border/50 bg-muted/10 text-[11px] text-muted-foreground font-semibold flex justify-between items-center">
               <span>Showing 1 to {filteredData.length} of {stores.length} entries</span>
             </div>
           </div>
@@ -301,7 +301,7 @@ function StoreNameConfigPage() {
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
               
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Store Type <span className="text-red-500">*</span></label>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Store Type <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <select 
                     className="w-full pl-3 pr-8 py-2.5 bg-background border border-border rounded-lg text-sm font-semibold appearance-none focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -316,7 +316,7 @@ function StoreNameConfigPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Product Type <span className="text-red-500">*</span></label>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Product Type <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <select 
                     className="w-full pl-3 pr-8 py-2.5 bg-background border border-border rounded-lg text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -332,7 +332,7 @@ function StoreNameConfigPage() {
               </div>
               
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Store Name <span className="text-red-500">*</span></label>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Store Name <span className="text-red-500">*</span></label>
                 <input 
                   type="text" 
                   className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 font-bold"
@@ -342,7 +342,7 @@ function StoreNameConfigPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Code No</label>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Code No</label>
                 <input 
                   type="text" 
                   className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -352,7 +352,7 @@ function StoreNameConfigPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Code Name</label>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Code Name</label>
                 <input 
                   type="text" 
                   className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -362,7 +362,7 @@ function StoreNameConfigPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Status</label>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Status</label>
                 <div className="relative">
                   <select 
                     className="w-full pl-3 pr-8 py-2.5 bg-background border border-border rounded-lg text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -377,7 +377,7 @@ function StoreNameConfigPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Store Module Area <span className="text-red-500">*</span></label>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Store Module Area <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <select 
                     className="w-full pl-3 pr-8 py-2.5 bg-background border border-border rounded-lg text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -392,7 +392,7 @@ function StoreNameConfigPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Store Table Set <span className="text-red-500">*</span></label>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Store Table Set <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <select 
                     className="w-full pl-3 pr-8 py-2.5 bg-background border border-border rounded-lg text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -408,13 +408,13 @@ function StoreNameConfigPage() {
 
               {/* Custom Multi-Select for Assign Location */}
               <div className="space-y-2 pb-10">
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Assign Location <span className="text-red-500">*</span></label>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Assign Location <span className="text-red-500">*</span></label>
                 <div 
                   className="min-h-[100px] w-full p-2 bg-background border border-border rounded-lg text-sm focus-within:ring-2 focus-within:ring-primary/50 flex flex-wrap gap-2 items-start transition-all relative"
                   ref={dropdownRef}
                 >
                   {(formData.locations || []).map(loc => (
-                    <div key={loc} className="flex items-center gap-1.5 bg-muted/60 text-foreground text-xs font-semibold px-2 py-1.5 rounded border border-border/50 group">
+                    <div key={loc} className="flex items-center gap-1.5 bg-muted/60 text-foreground text-[11px] font-bold px-2 py-1.5 rounded border border-border/50 group">
                       {loc}
                       <button 
                         onClick={() => removeLocation(loc)}
@@ -427,7 +427,7 @@ function StoreNameConfigPage() {
                   
                   <button 
                     onClick={() => setIsLocationDropdownOpen(!isLocationDropdownOpen)}
-                    className="px-3 py-1.5 text-xs font-semibold text-muted-foreground bg-muted hover:bg-muted/80 rounded border border-dashed border-border/80 flex items-center gap-1 transition-colors ml-auto"
+                    className="px-3 py-1.5 text-[11px] font-bold text-muted-foreground bg-muted hover:bg-muted/80 rounded border border-dashed border-border/80 flex items-center gap-1 transition-colors ml-auto"
                   >
                     <Plus className="size-3" /> Add Location
                   </button>
@@ -441,7 +441,7 @@ function StoreNameConfigPage() {
                           <button
                             key={loc}
                             onClick={() => toggleLocation(loc)}
-                            className={`text-left px-3 py-2 text-xs font-medium rounded-lg transition-colors flex justify-between items-center ${isSelected ? 'bg-primary/10 text-primary font-semibold' : 'hover:bg-muted text-foreground'}`}
+                            className={`text-left px-3 py-2 text-[11px] font-medium rounded-lg transition-colors flex justify-between items-center ${isSelected ? 'bg-primary/10 text-primary font-semibold' : 'hover:bg-muted text-foreground'}`}
                           >
                             <span className="truncate">{loc}</span>
                             {isSelected && <X className="size-3 opacity-50 shrink-0" />}

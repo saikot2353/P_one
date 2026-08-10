@@ -150,44 +150,45 @@ function ProductTypeConfigPage() {
                 Manage your base product classifications and their configurations.
               </p>
             </div>
-            
-            <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
-              <button className="h-9 px-3 bg-background border border-border hover:bg-muted text-foreground font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5 shrink-0">
-                <FileSpreadsheet className="size-3.5 text-emerald-600" /> EXCEL
-              </button>
-              <button className="h-9 px-3 bg-background border border-border hover:bg-muted text-foreground font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5 shrink-0">
-                <Printer className="size-3.5 text-blue-600" /> PRINT
-              </button>
-              <button className="h-9 px-3 bg-background border border-border hover:bg-muted text-foreground font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5 shrink-0">
-                <FileText className="size-3.5 text-red-600" /> PDF
-              </button>
-              
-              <div className="w-px h-6 bg-border mx-1"></div>
-              
-              <button 
-                onClick={openCreateModal}
-                className="h-9 px-4 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 shrink-0"
-              >
-                <Plus className="size-4" />
-                Add New
-              </button>
-            </div>
+
           </div>
 
           {/* Data Table Area */}
           <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden flex flex-col">
             
             {/* Toolbar */}
-            <div className="p-4 border-b border-border/50 flex justify-end items-center bg-muted/10">
-              <div className="relative w-full sm:w-72">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder="Search types..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-4 py-1.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
-                />
+            <div className="p-4 border-b border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white">
+              
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 w-full sm:w-auto">
+                <button className="h-[32px] px-3 bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-[10px] uppercase rounded flex items-center gap-1.5 shrink-0 transition-colors shadow-sm">
+                  <FileSpreadsheet className="size-3.5 text-emerald-600" /> EXCEL
+                </button>
+                <button className="h-[32px] px-3 bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-[10px] uppercase rounded flex items-center gap-1.5 shrink-0 transition-colors shadow-sm">
+                  <Printer className="size-3.5 text-blue-600" /> PRINT
+                </button>
+                <button className="h-[32px] px-3 bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-[10px] uppercase rounded flex items-center gap-1.5 shrink-0 transition-colors shadow-sm">
+                  <FileText className="size-3.5 text-red-600" /> PDF
+                </button>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                <div className="relative w-full sm:w-64 shrink-0">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-4 h-[32px] bg-[#f2f4f7] border border-transparent hover:border-slate-200 focus:bg-white focus:border-blue-500 rounded-md text-[11px] font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-400"
+                  />
+                </div>
+                <button 
+                  onClick={openCreateModal}
+                  className="h-[32px] px-4 bg-[#0d6efd] hover:bg-blue-700 text-white font-bold text-[11px] rounded flex items-center gap-1.5 shrink-0 shadow-sm transition-colors"
+                >
+                  <Plus className="size-3.5" strokeWidth={3} />
+                  Add New
+                </button>
               </div>
             </div>
 
@@ -206,12 +207,12 @@ function ProductTypeConfigPage() {
                 </thead>
                 <tbody className="divide-y divide-border/20">
                   {filteredData.map((item, idx) => (
-                    <tr key={item.id} className="hover:bg-muted/40 transition duration-150">
+                    <tr key={item.id} className="hover:bg-slate-50 border-b border-slate-100 transition duration-150">
                       <td className="px-4 py-2">
                         <div className="flex items-center justify-center gap-1.5">
                           <button
                             onClick={() => openEditModal(item)}
-                            className="size-6 rounded-md bg-transparent text-amber-600 border border-transparent hover:bg-amber-50 hover:border-amber-200 inline-flex items-center justify-center transition-colors shadow-sm"
+                            className="size-[26px] rounded-md bg-white border border-slate-200 text-amber-500 hover:bg-amber-50 inline-flex items-center justify-center transition-colors shadow-sm"
                             title="Edit"
                           >
                             <Edit3 className="size-3" />
@@ -231,10 +232,10 @@ function ProductTypeConfigPage() {
                       <td className="px-4 py-2 font-mono font-semibold text-muted-foreground text-[11px]">
                         {item.code}
                       </td>
-                      <td className="px-4 py-2 font-medium text-foreground text-xs">
+                      <td className="px-4 py-2 font-medium text-foreground text-[11px]">
                         {item.name}
                       </td>
-                      <td className="px-4 py-2 font-medium text-muted-foreground text-xs">
+                      <td className="px-4 py-2 font-medium text-muted-foreground text-[11px]">
                         {item.shortName}
                       </td>
                       <td className="px-4 py-2 font-mono font-semibold text-muted-foreground text-center text-[11px]">
@@ -253,7 +254,7 @@ function ProductTypeConfigPage() {
               </table>
             </div>
             
-            <div className="p-4 border-t border-border/50 bg-muted/10 text-xs text-muted-foreground font-semibold flex justify-between items-center">
+            <div className="p-4 border-t border-border/50 bg-muted/10 text-[11px] text-muted-foreground font-semibold flex justify-between items-center">
               <span>Showing 1 to {filteredData.length} of {productTypes.length} entries</span>
             </div>
           </div>
@@ -275,7 +276,7 @@ function ProductTypeConfigPage() {
             
             <div className="p-6 space-y-5 overflow-y-auto max-h-[70vh]">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Base Type <span className="text-red-500">*</span></label>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Base Type <span className="text-red-500">*</span></label>
                 <select 
                   className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                   value={formData.baseType || ""}
@@ -287,7 +288,7 @@ function ProductTypeConfigPage() {
               </div>
               
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Code <span className="text-red-500">*</span></label>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Code <span className="text-red-500">*</span></label>
                 <input 
                   type="text" 
                   className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -297,7 +298,7 @@ function ProductTypeConfigPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Product Type Name <span className="text-red-500">*</span></label>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Product Type Name <span className="text-red-500">*</span></label>
                 <input 
                   type="text" 
                   className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -307,7 +308,7 @@ function ProductTypeConfigPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Short Name <span className="text-red-500">*</span></label>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Short Name <span className="text-red-500">*</span></label>
                 <input 
                   type="text" 
                   className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -317,7 +318,7 @@ function ProductTypeConfigPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Sort Order <span className="text-red-500">*</span></label>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Sort Order <span className="text-red-500">*</span></label>
                 <input 
                   type="number" 
                   className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -327,7 +328,7 @@ function ProductTypeConfigPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Status <span className="text-red-500">*</span></label>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Status <span className="text-red-500">*</span></label>
                 <select 
                   className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                   value={formData.status || ""}
@@ -366,7 +367,7 @@ function ProductTypeConfigPage() {
                 <h2 className="text-lg font-black text-foreground">
                   Configure Parameters
                 </h2>
-                <p className="text-xs text-muted-foreground font-semibold mt-0.5">
+                <p className="text-[11px] text-muted-foreground font-semibold mt-0.5">
                   Type: <span className="text-primary">{paramsItem.name}</span>
                 </p>
               </div>
@@ -379,7 +380,7 @@ function ProductTypeConfigPage() {
               
               {/* Left Column: Available */}
               <div className="flex-1 bg-background border border-border rounded-xl shadow-sm flex flex-col overflow-hidden">
-                <div className="bg-amber-100/50 text-amber-800 font-black text-xs tracking-wider uppercase p-3 border-b border-border">
+                <div className="bg-amber-100/50 text-amber-800 font-black text-[11px] tracking-wider uppercase p-3 border-b border-border">
                   Product Parameters
                 </div>
                 <div className="flex-1 overflow-y-auto p-3 space-y-2">
@@ -387,14 +388,14 @@ function ProductTypeConfigPage() {
                     <button 
                       key={param}
                       onClick={() => toggleParam(param)}
-                      className="w-full text-left px-4 py-2.5 bg-yellow-500/90 hover:bg-yellow-500 text-white font-bold text-xs rounded-lg shadow-sm flex items-center justify-between group transition-all"
+                      className="w-full text-left px-4 py-2.5 bg-yellow-500/90 hover:bg-yellow-500 text-white font-bold text-[11px] rounded-lg shadow-sm flex items-center justify-between group transition-all"
                     >
                       {param.toUpperCase()}
                       <ArrowRight className="size-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </button>
                   ))}
                   {ALL_PARAMETERS.filter(p => !tempParams.includes(p)).length === 0 && (
-                    <div className="text-center text-xs text-muted-foreground py-10 font-medium">
+                    <div className="text-center text-[11px] text-muted-foreground py-10 font-medium">
                       All parameters selected.
                     </div>
                   )}
@@ -426,7 +427,7 @@ function ProductTypeConfigPage() {
 
               {/* Right Column: Selected */}
               <div className="flex-1 bg-background border border-border rounded-xl shadow-sm flex flex-col overflow-hidden">
-                <div className="bg-amber-100/50 text-amber-800 font-black text-xs tracking-wider uppercase p-3 border-b border-border">
+                <div className="bg-amber-100/50 text-amber-800 font-black text-[11px] tracking-wider uppercase p-3 border-b border-border">
                   Selected Parameters
                 </div>
                 <div className="flex-1 overflow-y-auto p-4 space-y-3">
@@ -450,7 +451,7 @@ function ProductTypeConfigPage() {
                     </div>
                   ))}
                   {tempParams.length === 0 && (
-                    <div className="text-center text-xs text-muted-foreground py-10 font-medium">
+                    <div className="text-center text-[11px] text-muted-foreground py-10 font-medium">
                       No parameters selected.
                     </div>
                   )}
