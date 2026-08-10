@@ -269,9 +269,9 @@ function InvDashboardPage() {
                     <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8', fontWeight: 700 }} dy={10} />
                     <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8', fontWeight: 700 }} />
                     <Tooltip contentStyle={{ fontSize: '12px', borderRadius: '6px', fontWeight: 'bold', border: '1px solid #e2e8f0' }} />
-                    <Bar dataKey="receipts" barSize={20} fill="#94a3b8" radius={[4, 4, 0, 0]} name="Receipts" />
-                    <Bar dataKey="issues" barSize={20} fill="#334155" radius={[4, 4, 0, 0]} name="Issues" />
-                    <Line type="monotone" dataKey="value" stroke="#6366f1" strokeWidth={3} dot={{r: 5, fill: '#6366f1'}} name="Trend Index" />
+                    <Bar dataKey="receipts" barSize={20} fill="#0ea5e9" radius={[4, 4, 0, 0]} name="Receipts" />
+                    <Bar dataKey="issues" barSize={20} fill="#3b82f6" radius={[4, 4, 0, 0]} name="Issues" />
+                    <Line type="monotone" dataKey="value" stroke="#f43f5e" strokeWidth={3} dot={{r: 5, fill: '#f43f5e'}} name="Trend Index" />
                   </ComposedChart>
                 </ResponsiveContainer>
               </div>
@@ -307,7 +307,7 @@ function InvDashboardPage() {
                           <span className="bg-slate-100 px-3 py-1 rounded-md text-slate-700 font-bold">{alert.stock}</span>
                         </td>
                         <td className="py-4 px-5 text-right">
-                          <span className={`px-2.5 py-1 rounded-md text-[10px] uppercase tracking-widest font-black border ${
+                          <span className={`px-2.5 py-1 rounded-md text-[9px] uppercase tracking-widest font-bold border ${
                             alert.status === 'Critical' ? 'bg-red-50 text-red-600 border-red-100' : 'bg-amber-50 text-amber-600 border-amber-100'
                           }`}>
                             {alert.status}
@@ -378,7 +378,7 @@ function InvDashboardPage() {
                       <tr key={item.id} className="hover:bg-slate-50">
                         <td className="py-4 px-5 text-slate-800 font-bold truncate max-w-[150px]">{item.item}</td>
                         <td className="py-4 px-5 text-center">
-                          <span className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest border ${
+                          <span className={`px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-widest border ${
                             item.velocity === 'High' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
                             item.velocity === 'Med' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-slate-50 text-slate-600 border-slate-200'
                           }`}>
