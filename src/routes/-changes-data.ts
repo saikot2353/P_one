@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
         {
+          id: "147",
+          date: new Date().toISOString().slice(0, 16),
+          type: "Feature",
+          module: "Inventory",
+          link: "/inv-yarn-opening-stock",
+          descriptionEn: "Implemented the Yarn Opening Stock page with a multiple-product add form in a modal for efficient stock entry.",
+          descriptionBn: "সহজে একসাথে অনেক প্রোডাক্টের এন্ট্রি দেওয়ার জন্য একাধিক প্রোডাক্ট অ্যাড ফর্ম যুক্ত করে ইয়ার্ন ওপেনিং স্টক পেজ তৈরি করা হয়েছে।",
+        },
+        {
           id: "146",
           date: new Date().toISOString().slice(0, 16),
           type: "Feature",
