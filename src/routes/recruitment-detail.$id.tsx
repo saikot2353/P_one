@@ -307,7 +307,7 @@ function RecruitmentDetailPage() {
               <div className="bg-card rounded-xl border border-border/60 p-4 shadow-3xs">
                 <SectionHeader
                   icon={<Phone className="size-4" />}
-                  title="Contact & Reachability Channels"
+                  title="Contact Information"
                 />
                 <div className="space-y-1">
                   <DetailRow label="Personal Contact No" value={candidate.personalContact} />
@@ -323,7 +323,7 @@ function RecruitmentDetailPage() {
                 <div className="bg-card rounded-xl border border-border/60 p-4 shadow-3xs">
                   <SectionHeader
                     icon={<Heart className="size-4" />}
-                    title="Nominee Declaration Dossier"
+                    title="Nominee Information"
                   />
                   <div className="space-y-1">
                     <DetailRow label="Nominee Full Name" value={candidate.nominee.name} />
