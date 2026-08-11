@@ -347,6 +347,9 @@ function AddEmployeePage() {
     ref2Org: "",
     ref2Contact: "",
     ref2Email: "",
+    hasCompanyRef: false,
+    refCompanyRegion: "Dhaka",
+    refEmployeeId: "",
 
     // 14. Job Description
     jobDescription:
@@ -3224,6 +3227,58 @@ function AddEmployeePage() {
                         </div>
                       </div>
                     </div>
+                    </div>
+                  </div>
+
+                  {/* Company Reference */}
+                  <div className="border border-border bg-muted/10 rounded-lg p-5 space-y-4">
+                    <div className="flex items-center justify-between border-b border-border/20 pb-2">
+                      <h3 className="text-xs font-extrabold text-emerald-500 uppercase tracking-widest">
+                        Company Reference (Internal)
+                      </h3>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase">Has Relative in Company?</span>
+                        <input
+                          type="checkbox"
+                          checked={form.hasCompanyRef}
+                          onChange={(e) => handleChange("hasCompanyRef", e.target.checked)}
+                          className="w-4 h-4 rounded border-border text-emerald-500 focus:ring-emerald-500/30"
+                        />
+                      </label>
+                    </div>
+
+                    {form.hasCompanyRef && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div className="space-y-1.5">
+                          <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
+                            Company Region
+                          </label>
+                          <select
+                            value={form.refCompanyRegion}
+                            onChange={(e) => handleChange("refCompanyRegion", e.target.value)}
+                            className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none"
+                          >
+                            <option value="Dhaka">Dhaka</option>
+                            <option value="Chittagong">Chittagong</option>
+                            <option value="Sylhet">Sylhet</option>
+                            <option value="Rajshahi">Rajshahi</option>
+                            <option value="Khulna">Khulna</option>
+                          </select>
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
+                            Relative's Employee ID
+                          </label>
+                          <input
+                            type="text"
+                            value={form.refEmployeeId}
+                            onChange={(e) => handleChange("refEmployeeId", e.target.value)}
+                            className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full font-mono"
+                            placeholder="e.g. 2023046001R"
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-border/20 mt-6">
