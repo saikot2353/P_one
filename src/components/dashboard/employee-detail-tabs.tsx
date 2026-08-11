@@ -156,11 +156,10 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
                         setActiveDetailTab(tab.id);
                         setIsDetailDropdownOpen(false);
                       }}
-                      className={`w-full flex items-center justify-between px-3.5 py-2.5 hover:bg-muted/75 text-left text-xs font-semibold transition-all ${
-                        isSelected
-                          ? "text-primary bg-primary/5 font-extrabold"
-                          : "text-foreground/80"
-                      }`}
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 hover:bg-muted/75 text-left text-xs font-semibold transition-all ${isSelected
+                        ? "text-primary bg-primary/5 font-extrabold"
+                        : "text-foreground/80"
+                        }`}
                     >
                       <div className="flex items-center gap-2">
                         <TabIcon
@@ -200,11 +199,10 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
               <button
                 key={tab.id}
                 onClick={() => setActiveDetailTab(tab.id)}
-                className={`flex items-center gap-2 py-2 px-4 rounded-lg text-[11px] font-extrabold transition-all duration-300 shrink-0 ${
-                  isSelected
-                    ? "bg-primary text-primary-foreground shadow-md ring-1 ring-primary/20 scale-[1.02]"
-                    : "bg-transparent text-muted-foreground/80 hover:bg-muted hover:text-foreground"
-                }`}
+                className={`flex items-center gap-2 py-2 px-4 rounded-lg text-[11px] font-extrabold transition-all duration-300 shrink-0 ${isSelected
+                  ? "bg-primary text-primary-foreground shadow-md ring-1 ring-primary/20 scale-[1.02]"
+                  : "bg-transparent text-muted-foreground/80 hover:bg-muted hover:text-foreground"
+                  }`}
               >
                 <TabIcon className={`size-3.5 shrink-0 ${isSelected ? "animate-pulse" : ""}`} />
                 <span>{tab.label}</span>
@@ -244,13 +242,12 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
                     style={{ width: "80px" }}
                   >
                     <div
-                      className={`size-9 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative ${
-                        isSelected
-                          ? "bg-primary text-primary-foreground border-primary shadow-[0_0_12px_var(--primary)] scale-110"
-                          : isCompleted
-                            ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.2)]"
-                            : "bg-card text-muted-foreground border-border/80 hover:border-muted-foreground/60"
-                      }`}
+                      className={`size-9 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative ${isSelected
+                        ? "bg-primary text-primary-foreground border-primary shadow-[0_0_12px_var(--primary)] scale-110"
+                        : isCompleted
+                          ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.2)]"
+                          : "bg-card text-muted-foreground border-border/80 hover:border-muted-foreground/60"
+                        }`}
                     >
                       {isCompleted ? (
                         <Check className="size-4 stroke-[3]" />
@@ -263,11 +260,10 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
                     </div>
                     <div className="text-center space-y-1 w-full min-w-[100px]">
                       <span
-                        className={`text-[9px] font-black uppercase tracking-wide block transition-colors duration-200 ${
-                          isSelected
-                            ? "text-primary"
-                            : "text-muted-foreground group-hover:text-foreground"
-                        }`}
+                        className={`text-[9px] font-black uppercase tracking-wide block transition-colors duration-200 ${isSelected
+                          ? "text-primary"
+                          : "text-muted-foreground group-hover:text-foreground"
+                          }`}
                       >
                         {idx + 1}. {step.label}
                       </span>
@@ -599,10 +595,10 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
       {/* 2. QUALIFICATIONS & EXPERIENCE TAB */}
       {activeDetailTab === "qualifications_experience" && (
         <div className="p-6 overflow-y-auto space-y-6 max-h-[62vh] scrollbar-thin">
-          {/* Section A: Academic Credentials */}
+          {/* Section A: Educational Qualifications */}
           <div className="space-y-3">
             <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
-              <GraduationCap className="size-3.5" /> Academic Credentials & Qualifications
+              <GraduationCap className="size-3.5" /> Educational Qualifications & Qualifications
             </h4>
             <div className="border border-border/40 rounded-xl overflow-hidden text-xs">
               <table className="w-full border-collapse text-left">
@@ -957,7 +953,7 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
           {/* Dependents list */}
           <div className="space-y-3 pt-2">
             <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5 border-b border-border/30 pb-1.5">
-              <Baby className="size-3.5" /> Family Dependents Registry
+              <Baby className="size-3.5" /> Dependents Information
             </h4>
             <div className="border border-border/40 rounded-xl overflow-hidden text-xs">
               <table className="w-full border-collapse text-left">
@@ -1081,7 +1077,7 @@ export function EmployeeDetailTabs({ selectedEmp }: EmployeeDetailTabsProps) {
                   Verification Findings
                 </div>
                 <p className="text-xs font-semibold text-foreground/80 leading-relaxed mt-1">
-                  All academic credentials validated. National ID and background databases checked.
+                  All Educational Qualifications validated. National ID and background databases checked.
                   Corporate reference verification reports cleared successfully with no flags
                   raised.
                 </p>
