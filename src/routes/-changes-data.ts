@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "153",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Feature",
+    module: "Add Employee",
+    link: "/add-employee",
+    descriptionEn: "Added a 'Company Reference (Internal)' section under Professional & Corporate References to track if a new employee has any relatives working in the company. Captures region and relative's employee ID.",
+    descriptionBn: "অ্যাড এমপ্লয়ি ফর্মে একটি 'Company Reference (Internal)' সেকশন যোগ করা হয়েছে, যার মাধ্যমে প্রার্থীর কোনো আত্মীয় কোম্পানিতে কর্মরত থাকলে তার রিজিওন এবং এমপ্লয়ি আইডি সংরক্ষণ করা যাবে।",
+  },
+  {
     id: "152",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Update",
