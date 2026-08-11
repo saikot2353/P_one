@@ -1,7 +1,16 @@
 import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
-        {
+  {
+    id: "150",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Modify",
+    module: "IE Recruitment",
+    link: "/recruitment-basic-entry",
+    descriptionEn: "Moved the Photo & Signature Image section directly into the Mandatory Information card on top alongside all required fields, eliminating duplicate sections across the form.",
+    descriptionBn: "আইই রিক্রুটমেন্ট বেসিক এন্ট্রি ফর্মে ছবির সেকশনটি (Employee Photo & Signature) সরাসরি সবার উপরের বাধ্যতামুলক সেকশনের (Mandatory Information) মধ্যে যুক্ত করা হয়েছে এবং ডুপ্লিকেট সেকশন বাদ দেওয়া হয়েছে।",
+  },
+  {
           id: "149",
           date: new Date().toISOString().slice(0, 16),
           type: "Feature",

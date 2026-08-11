@@ -420,48 +420,104 @@ function RecruitmentBasicEntry() {
             </div>
           </div>
 
-          {/* ── CARD 1: BASIC INFO ── */}
+          {/* ── CARD 1: MANDATORY INFORMATION (TOP SECTION) ── */}
+          <div className="bg-card rounded-lg border border-red-500/30 shadow-xs overflow-hidden">
+            <SectionHeader
+              icon={<UserPlus className="size-4 text-red-500" />}
+              title="Mandatory Information"
+              subtitle="All required candidate registration fields & picture info gathered together"
+            />
+            <div className="p-6 space-y-6 bg-gradient-to-b from-red-500/[0.02] to-transparent">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-5">
+                <FieldInput label="Emp ID (Temp)" required readOnly value="PAL000016" />
+                <FieldInput label="Employee Name (Eng)" required placeholder="Enter full name" />
+                <FieldInput label="Date of Joining (DOJ)" required type="date" />
+
+                <FieldInput label="Date of Birth (DOB)" required type="date" />
+                <FieldSelect
+                  label="Religion"
+                  required
+                  value={religion}
+                  onChange={setReligion}
+                  options={religionOptions}
+                />
+                <FieldSelect
+                  label="Marital Status"
+                  required
+                  value={maritalStatus}
+                  onChange={setMaritalStatus}
+                  options={maritalStatusOptions}
+                />
+
+                <FieldInput label="Personal Contact No" required placeholder="e.g. 01XXXXXXXXX" />
+                <FieldSelect
+                  label="Employee Type"
+                  required
+                  value={employeeType}
+                  onChange={setEmployeeType}
+                  options={employeeTypeOptions}
+                />
+                <FieldSelect
+                  label="Department"
+                  required
+                  value={department}
+                  onChange={setDepartment}
+                  options={departmentOptions}
+                />
+
+                <FieldSelect
+                  label="Section"
+                  required
+                  value={section}
+                  onChange={setSection}
+                  options={sectionOptions}
+                />
+                <FieldSelect
+                  label="Designation Title"
+                  required
+                  value={designation}
+                  onChange={setDesignation}
+                  options={designationOptions}
+                />
+              </div>
+
+              {/* Photo & Signature Section inside Mandatory Information */}
+              <div className="pt-4 border-t border-border/50">
+                <div className="flex items-center gap-2 mb-3">
+                  <Camera className="size-3.5 text-primary" />
+                  <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">
+                    Employee Picture &amp; Signature
+                    <span className="text-red-500 ml-0.5">*</span>
+                  </span>
+                </div>
+                <div className="flex flex-col md:flex-row gap-6">
+                  <PhotoUploader label="Employee Photo" />
+                  <PhotoUploader label="Employee Signature" isSignature={true} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── CARD 2: BASIC & PERSONAL INFO ── */}
           <div className="bg-card rounded-lg border border-border/80 shadow-2xs overflow-hidden">
             <SectionHeader
               icon={<User className="size-4" />}
-              title="Basic Info"
-              subtitle="Personal identification details"
+              title="Basic & Personal Info (Additional)"
+              subtitle="Bangla name & identification numbers"
             />
             <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-5">
-              <FieldInput label="Emp ID (Temp)" required readOnly value="PAL000016" />
-              <FieldInput label="Employee Name (Eng)" required placeholder="Enter full name" />
               <FieldInput label="Employee Name (Bng)" placeholder="বাংলা নাম" />
-
-              <FieldInput label="Date of Joining (DOJ)" required type="date" />
-              <FieldInput label="Date of Birth (DOB)" required type="date" />
-
-              <FieldSelect
-                label="Religion"
-                required
-                value={religion}
-                onChange={setReligion}
-                options={religionOptions}
-              />
-
-              <FieldSelect
-                label="Marital Status"
-                required
-                value={maritalStatus}
-                onChange={setMaritalStatus}
-                options={maritalStatusOptions}
-              />
-
               <FieldInput label="NID Number" placeholder="National ID number" />
               <FieldInput label="Birth Registration No" placeholder="Birth certificate number" />
             </div>
           </div>
 
-          {/* ── CARD 2: DETAILS INFO ── */}
+          {/* ── CARD 3: DETAILS INFO ── */}
           <div className="bg-card rounded-lg border border-border/80 shadow-2xs overflow-hidden">
             <SectionHeader
               icon={<Contact2 className="size-4" />}
               title="Details Info"
-              subtitle="Family & contact information"
+              subtitle="Family & emergency contact information"
             />
             <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-5">
               <FieldInput label="Father Name (Eng)" placeholder="Father's name (English)" />
@@ -469,55 +525,20 @@ function RecruitmentBasicEntry() {
               <FieldInput label="Mother Name (Eng)" placeholder="Mother's name (English)" />
 
               <FieldInput label="Mother Name (Bng)" placeholder="মায়ের নাম (বাংলা)" />
-              <FieldInput label="Personal Contact No" required placeholder="e.g. 01XXXXXXXXX" />
               <FieldInput label="Emergency Contact No" placeholder="Emergency contact number" />
             </div>
           </div>
 
-          {/* ── CARD 3: COMPANY INFO ── */}
+          {/* ── CARD 4: COMPANY INFO ── */}
           <div className="bg-card rounded-lg border border-border/80 shadow-2xs overflow-hidden">
             <SectionHeader
               icon={<Building2 className="size-4" />}
-              title="Company Info"
-              subtitle="Organizational placement details"
+              title="Company Info (Additional)"
+              subtitle="Unit, line, grade, job nature & shift placement"
             />
             <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-5">
-              <FieldSelect
-                label="Employee Type"
-                required
-                value={employeeType}
-                onChange={setEmployeeType}
-                options={employeeTypeOptions}
-              />
-
-              <FieldSelect
-                label="Department"
-                required
-                value={department}
-                onChange={setDepartment}
-                options={departmentOptions}
-              />
-
-              <FieldSelect
-                label="Section"
-                required
-                value={section}
-                onChange={setSection}
-                options={sectionOptions}
-              />
-
-              <FieldSelect
-                label="Designation Title"
-                required
-                value={designation}
-                onChange={setDesignation}
-                options={designationOptions}
-              />
-
               <FieldSelect label="Unit" value={unit} onChange={setUnit} options={unitOptions} />
-
               <FieldSelect label="Line" value={line} onChange={setLine} options={lineOptions} />
-
               <FieldSelect label="Grade" value={grade} onChange={setGrade} options={gradeOptions} />
 
               <FieldSelect
@@ -526,7 +547,6 @@ function RecruitmentBasicEntry() {
                 onChange={setJobNature}
                 options={jobNatureOptions}
               />
-
               <FieldSelect label="Shift" value={shift} onChange={setShift} options={shiftOptions} />
             </div>
           </div>
@@ -657,20 +677,6 @@ function RecruitmentBasicEntry() {
             </div>
           </div>
 
-          {/* ── CARD 6: EMPLOYEE PHOTO & SIGNATURE ── */}
-          <div className="bg-card rounded-lg border border-border/80 shadow-2xs overflow-hidden">
-            <SectionHeader
-              icon={<Camera className="size-4" />}
-              title="Employee Picture Info"
-              subtitle="Upload photo & signature — JPG/PNG or Webcam"
-            />
-            <div className="p-6">
-              <div className="flex flex-col md:flex-row gap-6">
-                <PhotoUploader label="Employee Photo" />
-                <PhotoUploader label="Employee Signature" isSignature={true} />
-              </div>
-            </div>
-          </div>
 
           {/* ── SUBMIT BAR (at the very bottom) ────────────────────────── */}
           <div className="p-5 bg-card rounded-lg border border-border/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
