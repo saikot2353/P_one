@@ -348,6 +348,7 @@ function AddEmployeePage() {
     ref2Contact: "",
     ref2Email: "",
     hasCompanyRef: false,
+    refCompanyName: "Tech Solutions",
     refCompanyRegion: "Dhaka",
     refEmployeeId: "",
 
@@ -3247,7 +3248,23 @@ function AddEmployeePage() {
                     </div>
 
                     {form.hasCompanyRef && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div className="space-y-1.5">
+                          <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
+                            Company Name
+                          </label>
+                          <select
+                            value={form.refCompanyName}
+                            onChange={(e) => handleChange("refCompanyName", e.target.value)}
+                            className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none"
+                          >
+                            <option value="Tech Solutions">Tech Solutions</option>
+                            <option value="Innovate Inc">Innovate Inc</option>
+                            <option value="Global Corp">Global Corp</option>
+                            <option value="Nexus Systems">Nexus Systems</option>
+                            <option value="Other">Other</option>
+                          </select>
+                        </div>
                         <div className="space-y-1.5">
                           <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
                             Company Region
