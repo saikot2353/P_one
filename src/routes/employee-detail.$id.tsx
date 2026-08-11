@@ -215,80 +215,83 @@ function EmployeeDetailPage() {
             <span className="text-foreground">Digital File</span>
           </div>
 
-          <div className="bg-card rounded-2xl border border-border/80 shadow-sm overflow-hidden mb-6 relative">
-            {/* Banner/Cover */}
-            <div className="h-32 md:h-40 bg-gradient-to-r from-primary/20 via-primary/5 to-transparent w-full relative">
-              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+          <div className="bg-card rounded-xl border border-border/80 shadow-sm p-5 md:p-6 lg:p-8 mb-6 flex flex-col md:flex-row gap-6 md:items-center">
+            {/* Avatar - VERY FIRST as requested */}
+            <div className="size-24 md:size-28 rounded-2xl border border-border/50 bg-slate-50 flex items-center justify-center text-slate-400 shadow-sm shrink-0 relative overflow-hidden group">
+              {selectedEmp.image ? (
+                <img src={selectedEmp.image} alt={selectedEmp.name} className="w-full h-full object-cover" />
+              ) : (
+                <img 
+                  src={`https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=256&auto=format&fit=crop`} 
+                  alt="Demo Profile" 
+                  className="w-full h-full object-cover" 
+                />
+              )}
+              {/* Hover overlay for changing image (visual only) */}
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                <Camera className="size-6 text-white" />
+              </div>
             </div>
             
-            {/* Profile Info Container */}
-            <div className="px-5 sm:px-8 pb-6 md:pb-8 relative">
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 -mt-16 md:-mt-20">
-                <div className="flex flex-col md:flex-row md:items-end gap-6">
-                  {/* Avatar - VERY FIRST as requested */}
-                  <div className="size-28 md:size-32 rounded-full border-4 border-card bg-slate-50 flex items-center justify-center text-slate-400 shadow-md z-10 shrink-0 relative overflow-hidden group">
-                    {selectedEmp.image ? (
-                      <img src={selectedEmp.image} alt={selectedEmp.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <img 
-                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(selectedEmp.name)}&background=f1f5f9&color=475569&size=256&font-size=0.35&bold=true`} 
-                        alt={selectedEmp.name} 
-                        className="w-full h-full object-cover" 
-                      />
-                    )}
-                    {/* Hover overlay for changing image (visual only) */}
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                      <Camera className="size-8 text-white" />
-                    </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-5">
+                {/* Core Info */}
+                <div>
+                  <h1 className="text-xl md:text-2xl font-extrabold tracking-tight text-foreground flex items-center gap-3">
+                    {selectedEmp.name}
+                    <span
+                      className={`text-[10px] font-bold uppercase tracking-widest border px-2 py-0.5 rounded-md ${
+                        selectedEmp.acStatus === "Active"
+                          ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                          : "bg-rose-500/10 text-rose-600 border-rose-500/20"
+                      }`}
+                    >
+                      {selectedEmp.acStatus || "Active"}
+                    </span>
+                  </h1>
+                  
+                  <div className="text-sm font-medium text-muted-foreground mt-1.5 flex items-center gap-2 flex-wrap">
+                    <Briefcase className="size-4 shrink-0 text-primary/70" /> 
+                    <span className="text-foreground/90">{selectedEmp.title}</span>
+                    <span className="text-border mx-1">•</span>
+                    <MapPin className="size-4 shrink-0 text-primary/70" /> 
+                    <span className="text-foreground/90">{selectedEmp.dept}</span>
                   </div>
                   
-                  <div className="mb-1 md:mb-2 flex-1">
-                    <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-3">
-                      {selectedEmp.name}
-                      <span
-                        className={`text-[10px] font-extrabold uppercase tracking-widest border px-2.5 py-0.5 rounded-full ${
-                          selectedEmp.acStatus === "Active"
-                            ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
-                            : "bg-rose-500/10 text-rose-500 border-rose-500/20"
-                        }`}
-                      >
-                        {selectedEmp.acStatus || "Active"}
-                      </span>
-                    </h1>
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
-                      <div className="flex items-center gap-1.5 text-sm font-semibold text-muted-foreground">
-                        <Briefcase className="size-4 text-primary/70" /> 
-                        <span className="text-foreground/90">{selectedEmp.title}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 text-sm font-semibold text-muted-foreground">
-                        <MapPin className="size-4 text-primary/70" /> 
-                        <span className="text-foreground/90">{selectedEmp.dept}</span>
+                  <div className="flex flex-wrap items-center gap-x-8 gap-y-4 mt-5">
+                    <div className="space-y-1">
+                      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Employee ID</div>
+                      <div className="flex items-center gap-1.5 text-xs font-mono text-foreground font-semibold">
+                        <User className="size-3.5 text-muted-foreground/70" /> 
+                        {selectedEmp.id}
                       </div>
                     </div>
                     
-                    <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-3 pt-3 border-t border-border/40">
-                      <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                        <User className="size-3.5" /> 
-                        <span className="font-mono text-foreground/80">Emp ID: {selectedEmp.id}</span>
+                    <div className="space-y-1">
+                      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Contact Phone</div>
+                      <div className="flex items-center gap-1.5 text-xs text-foreground font-semibold">
+                        <PhoneCall className="size-3.5 text-muted-foreground/70" /> 
+                        {selectedEmp.phone || "+880 1XXX-XXXXXX"}
                       </div>
-                      <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                        <PhoneCall className="size-3.5" /> 
-                        <span className="text-foreground/80">{selectedEmp.phone || "+880 1XXX-XXXXXX"}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                        <Clock className="size-3.5" /> 
-                        <span className="text-foreground/80">Joined: {selectedEmp.joinDate}</span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Joined Date</div>
+                      <div className="flex items-center gap-1.5 text-xs text-foreground font-semibold">
+                        <Clock className="size-3.5 text-muted-foreground/70" /> 
+                        {selectedEmp.joinDate}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 flex-wrap md:pb-2 sm:self-start md:self-end mt-2 md:mt-0">
-                  <button className="h-10 px-5 rounded-xl border border-border/80 bg-background hover:bg-muted text-sm font-semibold shadow-xs transition duration-200 flex items-center gap-2">
-                    <FileDown className="size-4 text-primary" /> Download PDF
+                {/* Actions */}
+                <div className="flex items-center gap-3 shrink-0 sm:self-start">
+                  <button className="h-9 px-4 rounded-lg border border-border/80 bg-background hover:bg-muted text-xs font-semibold shadow-xs transition duration-200 flex items-center gap-2">
+                    <FileDown className="size-3.5 text-primary" /> Download PDF
                   </button>
-                  <button className="h-10 px-5 rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-sm font-semibold shadow-xs hover:shadow-sm hover:opacity-95 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2">
-                    <UserCog className="size-4" /> Edit Profile
+                  <button className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-xs font-semibold shadow-xs hover:bg-primary/90 transition-colors flex items-center gap-2">
+                    <UserCog className="size-3.5" /> Edit Profile
                   </button>
                 </div>
               </div>
