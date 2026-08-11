@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "151",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Personnel List",
+    link: "/employee-detail/2023046001R",
+    descriptionEn: "Redesigned the employee detail profile header for a more professional and user-friendly experience. The employee's avatar is now prominently displayed at the very top alongside key information organized cleanly.",
+    descriptionBn: "এমপ্লয়ি ডিটেইল প্রোফাইল হেডার নতুন করে ডিজাইন করা হয়েছে। এখন এমপ্লয়ির ছবি সবার প্রথমে বড় করে দেখা যাবে এবং গুরুত্বপূর্ণ তথ্যগুলো সুন্দরভাবে সাজানো আছে।",
+  },
+  {
     id: "150",
     date: new Date().toISOString().slice(0, 16),
     type: "Modify",

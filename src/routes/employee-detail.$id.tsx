@@ -203,54 +203,95 @@ function EmployeeDetailPage() {
         <Topbar />
 
         <div className="p-4 md:p-6 xl:p-8 space-y-6 overflow-y-auto h-full scrollbar-thin pb-24">
-          {/* Top Breadcrumb & Actions */}
-          <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
-                <Link
-                  to="/personnel-list"
-                  className="hover:text-primary transition-colors flex items-center gap-1"
-                >
-                  <ArrowLeft className="size-3" /> Personnel List
-                </Link>
-                <ChevronRight className="size-2.5" />
-                <span className="text-foreground">Digital File</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="size-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-extrabold text-xl shadow-sm">
-                  {selectedEmp.name
-                    .split(" ")
-                    .map((n: string) => n[0])
-                    .join("")
-                    .slice(0, 2)}
-                </div>
-                <div>
-                  <h1 className="text-xl font-extrabold tracking-tight text-foreground flex items-center gap-2">
-                    {selectedEmp.name}
-                    <span
-                      className={`text-[10px] font-extrabold uppercase tracking-widest border px-2 py-0.5 rounded ${
-                        selectedEmp.acStatus === "Active"
-                          ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
-                          : "bg-rose-500/10 text-rose-500 border-rose-500/20"
-                      }`}
-                    >
-                      {selectedEmp.acStatus || "Active"}
-                    </span>
-                  </h1>
-                  <p className="text-xs font-semibold text-muted-foreground">
-                    {selectedEmp.title} — {selectedEmp.dept}
-                  </p>
-                </div>
-              </div>
-            </div>
+          {/* Profile Header section with large avatar */}
+          <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-2 px-1">
+            <Link
+              to="/personnel-list"
+              className="hover:text-primary transition-colors flex items-center gap-1"
+            >
+              <ArrowLeft className="size-3" /> Personnel List
+            </Link>
+            <ChevronRight className="size-2.5" />
+            <span className="text-foreground">Digital File</span>
+          </div>
 
-            <div className="flex items-center gap-3 flex-wrap">
-              <button className="h-9.5 px-4 rounded-xl border border-border/80 bg-card hover:bg-muted text-xs font-semibold shadow-xs transition duration-200 flex items-center gap-2">
-                <FileDown className="size-3.5 text-primary" /> Download PDF
-              </button>
-              <button className="h-9.5 px-4 rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs font-semibold shadow-xs hover:shadow-sm hover:opacity-95 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2">
-                <UserCog className="size-3.5" /> Edit Profile
-              </button>
+          <div className="bg-card rounded-2xl border border-border/80 shadow-sm overflow-hidden mb-6 relative">
+            {/* Banner/Cover */}
+            <div className="h-32 md:h-40 bg-gradient-to-r from-primary/20 via-primary/5 to-transparent w-full relative">
+              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+            </div>
+            
+            {/* Profile Info Container */}
+            <div className="px-5 sm:px-8 pb-6 md:pb-8 relative">
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 -mt-16 md:-mt-20">
+                <div className="flex flex-col md:flex-row md:items-end gap-6">
+                  {/* Avatar - VERY FIRST as requested */}
+                  <div className="size-28 md:size-32 rounded-full border-4 border-card bg-slate-50 flex items-center justify-center text-slate-400 shadow-md z-10 shrink-0 relative overflow-hidden group">
+                    {selectedEmp.image ? (
+                      <img src={selectedEmp.image} alt={selectedEmp.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <img 
+                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(selectedEmp.name)}&background=f1f5f9&color=475569&size=256&font-size=0.35&bold=true`} 
+                        alt={selectedEmp.name} 
+                        className="w-full h-full object-cover" 
+                      />
+                    )}
+                    {/* Hover overlay for changing image (visual only) */}
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                      <Camera className="size-8 text-white" />
+                    </div>
+                  </div>
+                  
+                  <div className="mb-1 md:mb-2 flex-1">
+                    <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-3">
+                      {selectedEmp.name}
+                      <span
+                        className={`text-[10px] font-extrabold uppercase tracking-widest border px-2.5 py-0.5 rounded-full ${
+                          selectedEmp.acStatus === "Active"
+                            ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                            : "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                        }`}
+                      >
+                        {selectedEmp.acStatus || "Active"}
+                      </span>
+                    </h1>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
+                      <div className="flex items-center gap-1.5 text-sm font-semibold text-muted-foreground">
+                        <Briefcase className="size-4 text-primary/70" /> 
+                        <span className="text-foreground/90">{selectedEmp.title}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-sm font-semibold text-muted-foreground">
+                        <MapPin className="size-4 text-primary/70" /> 
+                        <span className="text-foreground/90">{selectedEmp.dept}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-3 pt-3 border-t border-border/40">
+                      <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                        <User className="size-3.5" /> 
+                        <span className="font-mono text-foreground/80">Emp ID: {selectedEmp.id}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                        <PhoneCall className="size-3.5" /> 
+                        <span className="text-foreground/80">{selectedEmp.phone || "+880 1XXX-XXXXXX"}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                        <Clock className="size-3.5" /> 
+                        <span className="text-foreground/80">Joined: {selectedEmp.joinDate}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 flex-wrap md:pb-2 sm:self-start md:self-end mt-2 md:mt-0">
+                  <button className="h-10 px-5 rounded-xl border border-border/80 bg-background hover:bg-muted text-sm font-semibold shadow-xs transition duration-200 flex items-center gap-2">
+                    <FileDown className="size-4 text-primary" /> Download PDF
+                  </button>
+                  <button className="h-10 px-5 rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-sm font-semibold shadow-xs hover:shadow-sm hover:opacity-95 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2">
+                    <UserCog className="size-4" /> Edit Profile
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
