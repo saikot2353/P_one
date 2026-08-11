@@ -197,106 +197,118 @@ function EmployeeDetailPage() {
   const accessCard = `RFID-${selectedEmp.id.slice(6)}`;
 
   return (
-    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
+    <div className="min-h-screen flex bg-slate-50/50 text-slate-900 transition-colors duration-300">
       <Sidebar />
       <main className="flex-1 min-w-0 flex flex-col relative overflow-hidden">
         <Topbar />
 
-        <div className="p-4 md:p-6 xl:p-8 space-y-6 overflow-y-auto h-full scrollbar-thin pb-24">
-          {/* Profile Header section with large avatar */}
-          <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-2 px-1">
-            <Link
-              to="/personnel-list"
-              className="hover:text-primary transition-colors flex items-center gap-1"
-            >
-              <ArrowLeft className="size-3" /> Personnel List
-            </Link>
-            <ChevronRight className="size-2.5" />
-            <span className="text-foreground">Digital File</span>
-          </div>
-
-          <div className="bg-card rounded-xl border border-border/80 shadow-sm p-5 md:p-6 lg:p-8 mb-6 flex flex-col md:flex-row gap-6 md:items-center">
-            {/* Avatar - VERY FIRST as requested */}
-            <div className="size-24 md:size-28 rounded-2xl border border-border/50 bg-slate-50 flex items-center justify-center text-slate-400 shadow-sm shrink-0 relative overflow-hidden group">
-              {selectedEmp.image ? (
-                <img src={selectedEmp.image} alt={selectedEmp.name} className="w-full h-full object-cover" />
-              ) : (
-                <img 
-                  src={`https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=256&auto=format&fit=crop`} 
-                  alt="Demo Profile" 
-                  className="w-full h-full object-cover" 
-                />
-              )}
-              {/* Hover overlay for changing image (visual only) */}
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                <Camera className="size-6 text-white" />
-              </div>
+        {/* FIXED HEADER ZONE - Glassmorphic */}
+        <div className="shrink-0 bg-slate-50/80 backdrop-blur-xl border-b border-slate-200/60 z-20 px-4 md:px-6 xl:px-8 pt-4 pb-4">
+          <div className="max-w-7xl mx-auto">
+            {/* Breadcrumbs */}
+            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 px-1">
+              <Link
+                to="/personnel-list"
+                className="hover:text-indigo-600 transition-colors flex items-center gap-1"
+              >
+                <ArrowLeft className="size-3" /> Personnel List
+              </Link>
+              <ChevronRight className="size-3 opacity-50" />
+              <span className="text-slate-600">Digital File</span>
             </div>
-            
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-5">
-                {/* Core Info */}
-                <div>
-                  <h1 className="text-xl md:text-2xl font-extrabold tracking-tight text-foreground flex items-center gap-3">
-                    {selectedEmp.name}
-                    <span
-                      className={`text-[10px] font-bold uppercase tracking-widest border px-2 py-0.5 rounded-md ${
-                        selectedEmp.acStatus === "Active"
-                          ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
-                          : "bg-rose-500/10 text-rose-600 border-rose-500/20"
-                      }`}
-                    >
-                      {selectedEmp.acStatus || "Active"}
-                    </span>
-                  </h1>
-                  
-                  <div className="text-sm font-medium text-muted-foreground mt-1.5 flex items-center gap-2 flex-wrap">
-                    <Briefcase className="size-4 shrink-0 text-primary/70" /> 
-                    <span className="text-foreground/90">{selectedEmp.title}</span>
-                    <span className="text-border mx-1">•</span>
-                    <MapPin className="size-4 shrink-0 text-primary/70" /> 
-                    <span className="text-foreground/90">{selectedEmp.dept}</span>
-                  </div>
-                  
-                  <div className="flex flex-wrap items-center gap-x-8 gap-y-4 mt-5">
-                    <div className="space-y-1">
-                      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Employee ID</div>
-                      <div className="flex items-center gap-1.5 text-xs font-mono text-foreground font-semibold">
-                        <User className="size-3.5 text-muted-foreground/70" /> 
-                        {selectedEmp.id}
+
+            {/* Premium Floating Profile Card */}
+            <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 p-5 md:p-6 flex flex-col md:flex-row gap-6 md:items-center transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
+              {/* Avatar */}
+              <div className="size-20 md:size-24 rounded-2xl border border-slate-100 bg-slate-50 flex items-center justify-center text-slate-400 shadow-sm shrink-0 relative overflow-hidden group">
+                {selectedEmp.image ? (
+                  <img src={selectedEmp.image} alt={selectedEmp.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                ) : (
+                  <img 
+                    src={`https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=256&auto=format&fit=crop`} 
+                    alt="Demo Profile" 
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                  />
+                )}
+                <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 cursor-pointer backdrop-blur-sm">
+                  <Camera className="size-6 text-white drop-shadow-md" />
+                </div>
+              </div>
+              
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-5">
+                  {/* Core Info */}
+                  <div className="space-y-1.5">
+                    <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-3">
+                      {selectedEmp.name}
+                      <span
+                        className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md ${
+                          selectedEmp.acStatus === "Active"
+                            ? "bg-emerald-50 text-emerald-600 ring-1 ring-inset ring-emerald-600/20"
+                            : "bg-rose-50 text-rose-600 ring-1 ring-inset ring-rose-600/20"
+                        }`}
+                      >
+                        {selectedEmp.acStatus || "Active"}
+                      </span>
+                    </h1>
+                    
+                    <div className="text-sm font-medium text-slate-500 flex items-center gap-2.5 flex-wrap">
+                      <div className="flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-md text-slate-700">
+                        <Briefcase className="size-3.5 text-indigo-500" /> 
+                        {selectedEmp.title}
+                      </div>
+                      <span className="text-slate-300">•</span>
+                      <div className="flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-md text-slate-700">
+                        <MapPin className="size-3.5 text-rose-400" /> 
+                        {selectedEmp.dept}
                       </div>
                     </div>
                     
-                    <div className="space-y-1">
-                      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Contact Phone</div>
-                      <div className="flex items-center gap-1.5 text-xs text-foreground font-semibold">
-                        <PhoneCall className="size-3.5 text-muted-foreground/70" /> 
-                        {selectedEmp.phone || "+880 1XXX-XXXXXX"}
+                    <div className="flex flex-wrap items-center gap-x-8 gap-y-4 mt-5 pt-4 border-t border-slate-100">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Employee ID</div>
+                        <div className="flex items-center gap-1.5 text-xs font-mono text-slate-700 font-semibold">
+                          <User className="size-3.5 text-slate-400" /> 
+                          {selectedEmp.id}
+                        </div>
                       </div>
-                    </div>
+                      
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Contact Phone</div>
+                        <div className="flex items-center gap-1.5 text-xs text-slate-700 font-semibold">
+                          <PhoneCall className="size-3.5 text-slate-400" /> 
+                          {selectedEmp.phone || "+880 1XXX-XXXXXX"}
+                        </div>
+                      </div>
 
-                    <div className="space-y-1">
-                      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Joined Date</div>
-                      <div className="flex items-center gap-1.5 text-xs text-foreground font-semibold">
-                        <Clock className="size-3.5 text-muted-foreground/70" /> 
-                        {selectedEmp.joinDate}
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Joined Date</div>
+                        <div className="flex items-center gap-1.5 text-xs text-slate-700 font-semibold">
+                          <Clock className="size-3.5 text-slate-400" /> 
+                          {selectedEmp.joinDate}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Actions */}
-                <div className="flex items-center gap-3 shrink-0 sm:self-start">
-                  <button className="h-9 px-4 rounded-lg border border-border/80 bg-background hover:bg-muted text-xs font-semibold shadow-xs transition duration-200 flex items-center gap-2">
-                    <FileDown className="size-3.5 text-primary" /> Download PDF
-                  </button>
-                  <button className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-xs font-semibold shadow-xs hover:bg-primary/90 transition-colors flex items-center gap-2">
-                    <UserCog className="size-3.5" /> Edit Profile
-                  </button>
+                  {/* Actions */}
+                  <div className="flex items-center gap-3 shrink-0 sm:self-start">
+                    <button className="h-9 px-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-sm transition-all flex items-center gap-2 hover:shadow-md hover:-translate-y-0.5">
+                      <FileDown className="size-3.5 text-slate-400" /> Download PDF
+                    </button>
+                    <button className="h-9 px-4 rounded-xl bg-indigo-600 text-white text-xs font-bold shadow-sm hover:bg-indigo-700 hover:shadow-[0_4px_12px_rgba(79,70,229,0.2)] transition-all flex items-center gap-2 hover:-translate-y-0.5">
+                      <UserCog className="size-3.5 text-indigo-200" /> Edit Profile
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+
+        {/* SCROLLABLE TABS CONTENT */}
+        <div className="flex-1 overflow-y-auto scrollbar-thin bg-slate-50/30">
+          <div className="max-w-7xl mx-auto p-4 md:p-6 xl:p-8 space-y-6 pb-24">
 
           {/* Rejoined Employee Banner Notification */}
           {(selectedEmp.rejoinRef || selectedEmp.rejoinedTo || careerTimeline.length > 1) && (
@@ -340,8 +352,8 @@ function EmployeeDetailPage() {
           )}
 
           {/* TABS NAVIGATION */}
-          <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
-            <div className="flex overflow-x-auto scrollbar-none border-b border-border/40 p-1.5 gap-1 bg-muted/10">
+          <div className="bg-white rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-slate-100 overflow-hidden mb-6">
+            <div className="flex overflow-x-auto scrollbar-none p-2 gap-2 bg-slate-50/50 border-b border-slate-100">
               {TABS.map((tab) => {
                 const TabIcon = tab.icon;
                 const isSelected = activeTab === tab.id;
@@ -349,13 +361,13 @@ function EmployeeDetailPage() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                    className={`flex items-center gap-2 py-2.5 px-5 rounded-xl text-xs font-bold transition-all duration-300 shrink-0 ${
                       isSelected
-                        ? "bg-primary text-primary-foreground shadow-sm scale-[1.02]"
-                        : "text-muted-foreground/80 hover:bg-muted hover:text-foreground"
+                        ? "bg-white text-indigo-600 shadow-[0_2px_10px_rgb(0,0,0,0.06)] ring-1 ring-slate-100/50"
+                        : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
                     }`}
                   >
-                    <TabIcon className={`size-4 shrink-0 ${isSelected ? "animate-pulse" : ""}`} />
+                    <TabIcon className={`size-4 shrink-0 transition-transform duration-300 ${isSelected ? "scale-110" : ""}`} />
                     <span>{tab.label}</span>
                   </button>
                 );
@@ -367,483 +379,444 @@ function EmployeeDetailPage() {
               {activeTab === "personal" && (
                 <div className="space-y-6 animate-in fade-in duration-300">
                   {/* 1. Primary & Demographic Dossier */}
-                  <div className="space-y-3">
-                    <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary border-b border-border/20 pb-1.5">
-                      Primary & Demographic Dossier
+                  <div className="bg-white rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-slate-100 p-5 md:p-6 transition-all hover:shadow-[0_4px_20px_rgb(0,0,0,0.04)]">
+                    <h4 className="text-[11px] font-bold uppercase tracking-widest text-indigo-600 mb-5 flex items-center gap-2">
+                      <User className="size-4" /> Primary & Demographic Dossier
                     </h4>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-muted/5 border border-border/40 rounded-xl p-4">
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Name (English)
                         </div>
-                        <div className="text-xs font-extrabold">{selectedEmp.name}</div>
+                        <div className="text-sm font-bold text-slate-900">{selectedEmp.name}</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Name (Bengali)
                         </div>
-                        <div className="text-xs font-bold">{nameBngVal}</div>
+                        <div className="text-sm font-bold text-slate-700">{nameBngVal}</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Date of Birth
                         </div>
-                        <div className="text-xs font-bold">{selectedEmp.dob}</div>
+                        <div className="text-sm font-bold text-slate-700">{selectedEmp.dob}</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Gender
                         </div>
-                        <div className="text-xs font-bold">{selectedEmp.gender}</div>
+                        <div className="text-sm font-bold text-slate-700">{selectedEmp.gender}</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Religion
                         </div>
-                        <div className="text-xs font-bold">Islam</div>
+                        <div className="text-sm font-bold text-slate-700">Islam</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Blood Group
                         </div>
-                        <div className="text-xs font-bold text-rose-500">{selectedEmp.blood}</div>
+                        <div className="text-sm font-extrabold text-rose-500">{selectedEmp.blood}</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Marital Status
                         </div>
-                        <div className="text-xs font-bold">Single</div>
+                        <div className="text-sm font-bold text-slate-700">Single</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Education Level
                         </div>
-                        <div className="text-xs font-bold">Bachelor of Science (B.Sc)</div>
+                        <div className="text-sm font-bold text-slate-700">Bachelor of Science (B.Sc)</div>
                       </div>
                     </div>
                   </div>
 
                   {/* 2. Corporate Placement & Mapping */}
-                  <div className="space-y-3 pt-2">
-                    <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-500 border-b border-border/20 pb-1.5">
-                      Corporate Placement & Mapping
+                  <div className="bg-white rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-slate-100 p-5 md:p-6 transition-all hover:shadow-[0_4px_20px_rgb(0,0,0,0.04)]">
+                    <h4 className="text-[11px] font-bold uppercase tracking-widest text-emerald-600 mb-5 flex items-center gap-2">
+                      <Briefcase className="size-4" /> Corporate Placement & Mapping
                     </h4>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4">
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Emp ID (System)
                         </div>
-                        <div className="text-xs font-extrabold text-foreground">
+                        <div className="text-sm font-extrabold text-slate-900">
                           {selectedEmp.id}
                         </div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Emp ID (Company)
                         </div>
-                        <div className="text-xs font-bold">{selectedEmp.offcId || "—"}</div>
+                        <div className="text-sm font-bold text-slate-700">{selectedEmp.offcId || "—"}</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Joining Date
                         </div>
-                        <div className="text-xs font-bold">{selectedEmp.joinDate}</div>
+                        <div className="text-sm font-bold text-slate-700">{selectedEmp.joinDate}</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Confirmation Date
                         </div>
-                        <div className="text-xs font-bold">{selectedEmp.confirmDate || "—"}</div>
+                        <div className="text-sm font-bold text-slate-700">{selectedEmp.confirmDate || "—"}</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Department
                         </div>
-                        <div className="text-xs font-extrabold">{selectedEmp.dept}</div>
+                        <div className="text-sm font-extrabold text-slate-900">{selectedEmp.dept}</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Designation
                         </div>
-                        <div className="text-xs font-extrabold">{selectedEmp.title}</div>
+                        <div className="text-sm font-extrabold text-slate-900">{selectedEmp.title}</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Employee Type
                         </div>
-                        <div className="text-xs font-bold">{selectedEmp.type}</div>
+                        <div className="text-sm font-bold text-slate-700">{selectedEmp.type}</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Working Area
                         </div>
-                        <div className="text-xs font-bold">PSL-Operation</div>
+                        <div className="text-sm font-bold text-slate-700">PSL-Operation</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Section
                         </div>
-                        <div className="text-xs font-bold">{selectedEmp.sect}</div>
+                        <div className="text-sm font-bold text-slate-700">{selectedEmp.sect}</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Job Nature
                         </div>
-                        <div className="text-xs font-bold">ALL</div>
+                        <div className="text-sm font-bold text-slate-700">ALL</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Unit
                         </div>
-                        <div className="text-xs font-bold">{selectedEmp.unit}</div>
+                        <div className="text-sm font-bold text-slate-700">{selectedEmp.unit}</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Line
                         </div>
-                        <div className="text-xs font-bold">{selectedEmp.line}</div>
+                        <div className="text-sm font-bold text-slate-700">{selectedEmp.line}</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Grade
                         </div>
-                        <div className="text-xs font-bold font-mono text-indigo-500">
+                        <div className="text-sm font-bold font-mono text-indigo-500">
                           {selectedEmp.grade}
                         </div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Shift
                         </div>
-                        <div className="text-xs font-bold">{selectedEmp.shift}</div>
+                        <div className="text-sm font-bold text-slate-700">{selectedEmp.shift}</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Employment Status
                         </div>
-                        <div className="text-xs font-bold text-emerald-600">
+                        <div className="text-sm font-bold text-emerald-600">
                           {selectedEmp.empStatus}
                         </div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Probation Period
                         </div>
-                        <div className="text-xs font-bold">N/A</div>
+                        <div className="text-sm font-bold text-slate-700">N/A</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Default Holiday
                         </div>
-                        <div className="text-xs font-bold">{selectedEmp.holiday}</div>
+                        <div className="text-sm font-bold text-slate-700">{selectedEmp.holiday}</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Set Manager
                         </div>
-                        <div className="text-xs font-bold truncate">Mamunoor Rashid (DGM)</div>
+                        <div className="text-sm font-bold text-slate-700 truncate">Mamunoor Rashid (DGM)</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Recruitment Type
                         </div>
-                        <div className="text-xs font-bold">New</div>
+                        <div className="text-sm font-bold text-slate-700">New</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           RC Notes
                         </div>
-                        <div className="text-xs font-bold truncate">Hired via Campus Drive</div>
+                        <div className="text-sm font-bold text-slate-700 truncate">Hired via Campus Drive</div>
                       </div>
                     </div>
                   </div>
 
                   {/* Re-employment & Career Timeline History */}
                   {careerTimeline.length > 1 && (
-                    <div className="space-y-3 pt-2">
-                      <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-500 border-b border-border/20 pb-1.5">
-                        Re-employment & Connected Career Timeline
+                    <div className="bg-white rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-slate-100 p-5 md:p-6 transition-all hover:shadow-[0_4px_20px_rgb(0,0,0,0.04)]">
+                      <h4 className="text-[11px] font-bold uppercase tracking-widest text-indigo-600 mb-5 flex items-center gap-2">
+                        <History className="size-4" /> Re-employment & Connected Career Timeline
                       </h4>
-                      <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-4">
-                        <div className="relative border-l-2 border-indigo-500/30 ml-4 pl-6 space-y-4 text-xs">
-                          {careerTimeline.map((period, idx) => (
-                            <div key={period.id} className="relative">
-                              {/* Timeline indicator circle */}
-                              <div
-                                className={`absolute -left-[31px] top-0.5 size-4.5 rounded-full border-2 flex items-center justify-center ${
-                                  period.id === selectedEmp.id
-                                    ? "bg-indigo-500 border-indigo-500 text-white animate-pulse"
-                                    : "bg-card border-indigo-500/30 text-indigo-500"
-                                }`}
-                              >
-                                <span className="text-[8px] leading-none font-medium">
-                                  {careerTimeline.length - idx}
-                                </span>
-                              </div>
-
-                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                                <div>
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-medium text-foreground">
-                                      ID: {period.id}
-                                    </span>
-                                    {period.id === selectedEmp.id && (
-                                      <span className="text-[8px] bg-indigo-500/15 text-indigo-600 border border-indigo-500/35 px-1 rounded-sm uppercase tracking-wide leading-none font-medium">
-                                        Currently Viewing
-                                      </span>
-                                    )}
-                                    <span
-                                      className={`text-[8px] px-1 rounded-sm uppercase tracking-wide leading-none font-medium ${
-                                        period.status === "Working"
-                                          ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
-                                          : "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-                                      }`}
-                                    >
-                                      {period.status}
-                                    </span>
-                                  </div>
-                                  <p className="text-[10px] text-muted-foreground mt-0.5">
-                                    {period.title} — {period.dept}
-                                  </p>
-                                </div>
-                                <div className="sm:text-right">
-                                  <div className="text-[10px] text-muted-foreground font-mono">
-                                    Joined: {period.joinDate}
-                                  </div>
-                                  <div className="text-[10px] text-muted-foreground font-mono">
-                                    Left: {period.resignDate}
-                                  </div>
-                                </div>
-                                {period.id !== selectedEmp.id && (
-                                  <Link
-                                    to="/employee-detail/$id"
-                                    params={{ id: period.id }}
-                                    className="text-[10px] text-indigo-500 hover:text-indigo-600 font-medium hover:underline transition self-start sm:self-center"
-                                  >
-                                    Switch Profile &rarr;
-                                  </Link>
-                                )}
-                              </div>
+                      <div className="relative border-l-2 border-indigo-100 ml-4 pl-6 space-y-6">
+                        {careerTimeline.map((period, idx) => (
+                          <div key={period.id} className="relative">
+                            {/* Timeline indicator circle */}
+                            <div
+                              className={`absolute -left-[33px] top-0.5 size-5 rounded-full border-2 flex items-center justify-center ${
+                                period.id === selectedEmp.id
+                                  ? "bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-500/30"
+                                  : "bg-white border-indigo-200 text-indigo-400"
+                              }`}
+                            >
+                              <span className="text-[9px] leading-none font-bold">
+                                {careerTimeline.length - idx}
+                              </span>
                             </div>
-                          ))}
-                        </div>
+
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-bold text-slate-900 text-sm">
+                                    ID: {period.id}
+                                  </span>
+                                  {period.id === selectedEmp.id && (
+                                    <span className="text-[9px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded uppercase tracking-wide font-bold">
+                                      Currently Viewing
+                                    </span>
+                                  )}
+                                  <span
+                                    className={`text-[9px] px-2 py-0.5 rounded uppercase tracking-wide font-bold ${
+                                      period.status === "Working"
+                                        ? "bg-emerald-50 text-emerald-600 ring-1 ring-inset ring-emerald-600/20"
+                                        : "bg-amber-50 text-amber-600 ring-1 ring-inset ring-amber-600/20"
+                                    }`}
+                                  >
+                                    {period.status}
+                                  </span>
+                                </div>
+                                <p className="text-xs font-medium text-slate-500 mt-1">
+                                  {period.title} <span className="text-slate-300 mx-1">•</span> {period.dept}
+                                </p>
+                              </div>
+                              <div className="sm:text-right">
+                                <div className="text-xs text-slate-500 font-medium">
+                                  Joined: <span className="text-slate-700 font-bold">{period.joinDate}</span>
+                                </div>
+                                <div className="text-xs text-slate-500 font-medium">
+                                  Left: <span className="text-slate-700 font-bold">{period.resignDate}</span>
+                                </div>
+                              </div>
+                              {period.id !== selectedEmp.id && (
+                                <Link
+                                  to="/employee-detail/$id"
+                                  params={{ id: period.id }}
+                                  className="text-xs text-indigo-600 hover:text-indigo-700 font-bold hover:underline transition self-start sm:self-center"
+                                >
+                                  Switch Profile &rarr;
+                                </Link>
+                              )}
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   )}
 
                   {/* 3. Legal Identification Credentials */}
-                  <div className="space-y-3 pt-2">
-                    <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-500 border-b border-border/20 pb-1.5">
-                      Legal Identification Credentials
+                  <div className="bg-white rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-slate-100 p-5 md:p-6 transition-all hover:shadow-[0_4px_20px_rgb(0,0,0,0.04)]">
+                    <h4 className="text-[11px] font-bold uppercase tracking-widest text-indigo-600 mb-5 flex items-center gap-2">
+                      <ShieldCheck className="size-4" /> Legal Identification Credentials
                     </h4>
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-4 font-mono">
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase font-sans">
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-6">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           National ID (NID)
                         </div>
-                        <div className="text-xs font-bold text-foreground">1928374659201</div>
+                        <div className="text-sm font-bold text-slate-900 font-mono">1928374659201</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase font-sans">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Birth Reg No
                         </div>
-                        <div className="text-xs font-bold text-foreground">Not Provided</div>
+                        <div className="text-sm font-bold text-slate-400 font-mono italic">Not Provided</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase font-sans">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Passport No
                         </div>
-                        <div className="text-xs font-bold text-foreground">Not Provided</div>
+                        <div className="text-sm font-bold text-slate-400 font-mono italic">Not Provided</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase font-sans">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Driving License No
                         </div>
-                        <div className="text-xs font-bold text-foreground">Not Provided</div>
+                        <div className="text-sm font-bold text-slate-400 font-mono italic">Not Provided</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase font-sans">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                           Prof. Membership No
                         </div>
-                        <div className="text-xs font-bold text-foreground">IEB-92812</div>
+                        <div className="text-sm font-bold text-slate-900 font-mono">IEB-92812</div>
                       </div>
                     </div>
                   </div>
 
                   {/* 4. Parental & Kinship Context */}
-                  <div className="space-y-3 pt-2">
-                    <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary border-b border-border/20 pb-1.5">
-                      Parental & Kinship Context
+                  <div className="bg-white rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-slate-100 p-5 md:p-6 transition-all hover:shadow-[0_4px_20px_rgb(0,0,0,0.04)]">
+                    <h4 className="text-[11px] font-bold uppercase tracking-widest text-indigo-600 mb-5 flex items-center gap-2">
+                      <Users className="size-4" /> Parental & Kinship Context
                     </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-muted/5 border border-border/40 rounded-xl p-4">
-                      <div className="space-y-2">
-                        <div className="space-y-0.5">
-                          <div className="text-[9px] font-bold text-muted-foreground uppercase font-sans">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                      <div className="space-y-4">
+                        <div className="space-y-1">
+                          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                             Father Name (English)
                           </div>
-                          <div className="text-xs font-bold">{fatherNameEng}</div>
+                          <div className="text-sm font-bold text-slate-900">{fatherNameEng}</div>
                         </div>
-                        <div className="space-y-0.5">
-                          <div className="text-[9px] font-bold text-muted-foreground uppercase font-sans">
+                        <div className="space-y-1">
+                          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                             Father Name (Bengali)
                           </div>
-                          <div className="text-xs font-bold">মোহাম্মদ আবদুর রহমান</div>
+                          <div className="text-sm font-bold text-slate-700">মোহাম্মদ আবদুর রহমান</div>
                         </div>
                       </div>
-                      <div className="space-y-2">
-                        <div className="space-y-0.5">
-                          <div className="text-[9px] font-bold text-muted-foreground uppercase font-sans">
+                      <div className="space-y-4">
+                        <div className="space-y-1">
+                          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                             Mother Name (English)
                           </div>
-                          <div className="text-xs font-bold">{motherNameEng}</div>
+                          <div className="text-sm font-bold text-slate-900">{motherNameEng}</div>
                         </div>
-                        <div className="space-y-0.5">
-                          <div className="text-[9px] font-bold text-muted-foreground uppercase font-sans">
+                        <div className="space-y-1">
+                          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                             Mother Name (Bengali)
                           </div>
-                          <div className="text-xs font-bold">সুলতানা বেগম</div>
+                          <div className="text-sm font-bold text-slate-700">সুলতানা বেগম</div>
                         </div>
                       </div>
-                      <div className="col-span-1 sm:col-span-2 pt-2 border-t border-border/20">
-                        <div className="text-[10px] font-semibold text-muted-foreground/80 italic">
-                          Spouse information fields are hidden because Marital Status is set to
-                          Single.
+                      <div className="col-span-1 sm:col-span-2 pt-4 border-t border-slate-100">
+                        <div className="text-xs font-semibold text-slate-400 italic">
+                          Spouse information fields are hidden because Marital Status is set to Single.
                         </div>
                       </div>
                     </div>
                   </div>
 
                   {/* 5. Residential Address Directory */}
-                  <div className="space-y-3 pt-2">
-                    <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-amber-500 border-b border-border/20 pb-1.5">
-                      Residential Address Directory
+                  <div className="bg-white rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-slate-100 p-5 md:p-6 transition-all hover:shadow-[0_4px_20px_rgb(0,0,0,0.04)]">
+                    <h4 className="text-[11px] font-bold uppercase tracking-widest text-amber-600 mb-5 flex items-center gap-2">
+                      <MapPin className="size-4" /> Residential Address Directory
                     </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       {/* Present Address */}
-                      <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4 space-y-3">
-                        <div className="text-[10px] font-extrabold uppercase text-amber-600 border-b border-amber-500/20 pb-1">
+                      <div className="space-y-4">
+                        <div className="text-[10px] font-extrabold uppercase text-amber-600 border-b border-slate-100 pb-2">
                           Present Address
                         </div>
-                        <div className="grid grid-cols-2 gap-3 text-xs">
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Division
-                            </div>
-                            <div className="font-semibold">Dhaka</div>
+                        <div className="grid grid-cols-2 gap-4 text-xs">
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase">Division</div>
+                            <div className="font-bold text-slate-900">Dhaka</div>
                           </div>
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              District
-                            </div>
-                            <div className="font-semibold">Dhaka</div>
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase">District</div>
+                            <div className="font-bold text-slate-900">Dhaka</div>
                           </div>
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Upazila
-                            </div>
-                            <div className="font-semibold">Mirpur</div>
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase">Upazila</div>
+                            <div className="font-bold text-slate-900">Mirpur</div>
                           </div>
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Post Office
-                            </div>
-                            <div className="font-semibold">Mirpur-12</div>
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase">Post Office</div>
+                            <div className="font-bold text-slate-900">Mirpur-12</div>
                           </div>
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Village/House (Eng)
-                            </div>
-                            <div className="font-semibold">Vill # Dhopapara</div>
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase">Village/House (Eng)</div>
+                            <div className="font-bold text-slate-900">Vill # Dhopapara</div>
                           </div>
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Village/House (Bng)
-                            </div>
-                            <div className="font-semibold">গ্রাম # ধোপাপাড়া</div>
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase">Village/House (Bng)</div>
+                            <div className="font-bold text-slate-700">গ্রাম # ধোপাপাড়া</div>
                           </div>
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Road
-                            </div>
-                            <div className="font-semibold">Road # 12</div>
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase">Road</div>
+                            <div className="font-bold text-slate-900">Road # 12</div>
                           </div>
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Country
-                            </div>
-                            <div className="font-semibold">Bangladesh</div>
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase">Country</div>
+                            <div className="font-bold text-slate-900">Bangladesh</div>
                           </div>
                         </div>
-                        <div className="pt-2 border-t border-amber-500/20">
-                          <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                            Mailing Dispatch Preview
-                          </div>
-                          <div className="text-xs font-medium italic mt-1 text-foreground/80">
+                        <div className="pt-3 border-t border-slate-100">
+                          <div className="text-[10px] font-bold text-slate-400 uppercase">Mailing Dispatch Preview</div>
+                          <div className="text-xs font-medium italic mt-1 text-slate-600">
                             Vill # Dhopapara, Road # 12, Mirpur, Dhaka, Bangladesh
                           </div>
                         </div>
                       </div>
 
                       {/* Permanent Address */}
-                      <div className="bg-muted/10 border border-border/30 rounded-xl p-4 space-y-3">
-                        <div className="text-[10px] font-extrabold uppercase text-foreground/80 border-b border-border/20 pb-1">
+                      <div className="space-y-4">
+                        <div className="text-[10px] font-extrabold uppercase text-slate-600 border-b border-slate-100 pb-2">
                           Permanent Address
                         </div>
-                        <div className="grid grid-cols-2 gap-3 text-xs">
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Division
-                            </div>
-                            <div className="font-semibold">Dhaka</div>
+                        <div className="grid grid-cols-2 gap-4 text-xs">
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase">Division</div>
+                            <div className="font-bold text-slate-900">Dhaka</div>
                           </div>
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              District
-                            </div>
-                            <div className="font-semibold">Dhaka</div>
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase">District</div>
+                            <div className="font-bold text-slate-900">Dhaka</div>
                           </div>
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Upazila
-                            </div>
-                            <div className="font-semibold">Mirpur</div>
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase">Upazila</div>
+                            <div className="font-bold text-slate-900">Mirpur</div>
                           </div>
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Post Office
-                            </div>
-                            <div className="font-semibold">Mirpur-12</div>
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase">Post Office</div>
+                            <div className="font-bold text-slate-900">Mirpur-12</div>
                           </div>
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Village/House (Eng)
-                            </div>
-                            <div className="font-semibold">Vill # Dhopapara</div>
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase">Village/House (Eng)</div>
+                            <div className="font-bold text-slate-900">Vill # Dhopapara</div>
                           </div>
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Village/House (Bng)
-                            </div>
-                            <div className="font-semibold">গ্রাম # ধোপাপাড়া</div>
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase">Village/House (Bng)</div>
+                            <div className="font-bold text-slate-700">গ্রাম # ধোপাপাড়া</div>
                           </div>
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Road
-                            </div>
-                            <div className="font-semibold">Road # 12</div>
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase">Road</div>
+                            <div className="font-bold text-slate-900">Road # 12</div>
                           </div>
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Country
-                            </div>
-                            <div className="font-semibold">Bangladesh</div>
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase">Country</div>
+                            <div className="font-bold text-slate-900">Bangladesh</div>
                           </div>
                         </div>
-                        <div className="pt-2 border-t border-border/20">
-                          <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                            Legal Dossier Dispatch Preview
-                          </div>
-                          <div className="text-xs font-medium italic mt-1 text-foreground/80">
+                        <div className="pt-3 border-t border-slate-100">
+                          <div className="text-[10px] font-bold text-slate-400 uppercase">Legal Dossier Dispatch Preview</div>
+                          <div className="text-xs font-medium italic mt-1 text-slate-600">
                             Vill # Dhopapara, Road # 12, Mirpur, Dhaka, Bangladesh
                           </div>
                         </div>
@@ -852,220 +825,164 @@ function EmployeeDetailPage() {
                   </div>
 
                   {/* 6. Contact & Reachability Channels */}
-                  <div className="space-y-3 pt-2">
-                    <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary border-b border-border/20 pb-1.5">
-                      Contact & Reachability Channels
+                  <div className="bg-white rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-slate-100 p-5 md:p-6 transition-all hover:shadow-[0_4px_20px_rgb(0,0,0,0.04)]">
+                    <h4 className="text-[11px] font-bold uppercase tracking-widest text-indigo-600 mb-5 flex items-center gap-2">
+                      <PhoneCall className="size-4" /> Contact & Reachability Channels
                     </h4>
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 bg-muted/5 border border-border/40 rounded-xl p-4">
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                          Office Email
-                        </div>
-                        <div className="text-xs font-bold text-primary truncate">
-                          {selectedEmp.email || "employee@pakizasoftware.com"}
-                        </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-6">
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Office Email</div>
+                        <div className="text-sm font-bold text-indigo-600 truncate">{selectedEmp.email || "employee@pakizasoftware.com"}</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                          Office Mobile
-                        </div>
-                        <div className="text-xs font-bold font-mono">
-                          {selectedEmp.officeMob || "017500XXXXX"}
-                        </div>
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Office Mobile</div>
+                        <div className="text-sm font-bold text-slate-900 font-mono">{selectedEmp.officeMob || "017500XXXXX"}</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                          Office Extension
-                        </div>
-                        <div className="text-xs font-bold font-mono">102</div>
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Office Extension</div>
+                        <div className="text-sm font-bold text-slate-900 font-mono">102</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                          Personal Email
-                        </div>
-                        <div className="text-xs font-bold text-primary truncate">
-                          personal@gmail.com
-                        </div>
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Personal Email</div>
+                        <div className="text-sm font-bold text-slate-600 truncate">personal@gmail.com</div>
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                          Personal Contact No
-                        </div>
-                        <div className="text-xs font-bold font-mono">
-                          {selectedEmp.phone !== "—"
-                            ? selectedEmp.phone
-                            : selectedEmp.personalContact || "017130XXXXX"}
-                        </div>
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Personal Contact No</div>
+                        <div className="text-sm font-bold text-slate-900 font-mono">{selectedEmp.phone !== "—" ? selectedEmp.phone : selectedEmp.personalContact || "017130XXXXX"}</div>
                       </div>
                     </div>
                   </div>
 
                   {/* 7. Document & Image Upload Center */}
-                  <div className="space-y-3 pt-2">
-                    <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-primary border-b border-border/20 pb-1.5">
-                      Document & Image Upload Center
+                  <div className="bg-white rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-slate-100 p-5 md:p-6 transition-all hover:shadow-[0_4px_20px_rgb(0,0,0,0.04)]">
+                    <h4 className="text-[11px] font-bold uppercase tracking-widest text-indigo-600 mb-5 flex items-center gap-2">
+                      <FileDown className="size-4" /> Document & Image Upload Center
                     </h4>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="border border-border/50 bg-card rounded-xl p-4 flex flex-col items-center text-center gap-3 shadow-xs">
-                        <div className="size-12 rounded-full bg-primary/10 text-primary border border-primary/20 flex items-center justify-center">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                      <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-5 flex flex-col items-center text-center gap-4 transition-transform hover:-translate-y-1 hover:shadow-md">
+                        <div className="size-14 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-sm">
                           <User className="size-6" />
                         </div>
                         <div>
-                          <div className="text-[10px] font-bold">Employee Portrait</div>
-                          <div className="text-[8px] text-muted-foreground">
-                            Premium front portrait
-                          </div>
+                          <div className="text-xs font-bold text-slate-900">Employee Portrait</div>
+                          <div className="text-[10px] text-slate-500 mt-1">Premium front portrait</div>
                         </div>
-                        <span className="text-[9px] font-black text-emerald-500 uppercase flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-black text-emerald-600 uppercase flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-full ring-1 ring-inset ring-emerald-600/20">
                           <Check className="size-3" /> Uploaded
                         </span>
                       </div>
-                      <div className="border border-border/50 bg-card rounded-xl p-4 flex flex-col items-center text-center gap-3 shadow-xs">
-                        <div className="size-12 rounded-full bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 flex items-center justify-center">
+                      <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-5 flex flex-col items-center text-center gap-4 transition-transform hover:-translate-y-1 hover:shadow-md">
+                        <div className="size-14 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-sm">
                           <FileSignature className="size-6" />
                         </div>
                         <div>
-                          <div className="text-[10px] font-bold">Authorized Signature</div>
-                          <div className="text-[8px] text-muted-foreground">Clean white sheet</div>
+                          <div className="text-xs font-bold text-slate-900">Authorized Signature</div>
+                          <div className="text-[10px] text-slate-500 mt-1">Clean white sheet</div>
                         </div>
-                        <span className="text-[9px] font-black text-emerald-500 uppercase flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-black text-emerald-600 uppercase flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-full ring-1 ring-inset ring-emerald-600/20">
                           <Check className="size-3" /> Uploaded
                         </span>
                       </div>
-                      <div className="border border-border/50 bg-card rounded-xl p-4 flex flex-col items-center text-center gap-3 shadow-xs">
-                        <div className="size-12 rounded-lg bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center">
+                      <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-5 flex flex-col items-center text-center gap-4 transition-transform hover:-translate-y-1 hover:shadow-md">
+                        <div className="size-14 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center shadow-sm">
                           <FileText className="size-6" />
                         </div>
                         <div>
-                          <div className="text-[10px] font-bold">National ID Card</div>
-                          <div className="text-[8px] text-muted-foreground">Both sides JPG/PDF</div>
+                          <div className="text-xs font-bold text-slate-900">National ID Card</div>
+                          <div className="text-[10px] text-slate-500 mt-1">Both sides JPG/PDF</div>
                         </div>
-                        <span className="text-[9px] font-black text-emerald-500 uppercase flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-black text-emerald-600 uppercase flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-full ring-1 ring-inset ring-emerald-600/20">
                           <Check className="size-3" /> Uploaded
                         </span>
                       </div>
-                      <div className="border border-border/50 bg-card rounded-xl p-4 flex flex-col items-center text-center gap-3 shadow-xs">
-                        <div className="size-12 rounded-full bg-slate-500/10 text-slate-500 border border-slate-500/20 flex items-center justify-center">
+                      <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-5 flex flex-col items-center text-center gap-4 transition-transform hover:-translate-y-1 hover:shadow-md">
+                        <div className="size-14 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center shadow-sm">
                           <GraduationCap className="size-6" />
                         </div>
                         <div>
-                          <div className="text-[10px] font-bold">Degree Certificate</div>
-                          <div className="text-[8px] text-muted-foreground">
-                            Academic graduation
-                          </div>
+                          <div className="text-xs font-bold text-slate-900">Degree Certificate</div>
+                          <div className="text-[10px] text-slate-500 mt-1">Academic graduation</div>
                         </div>
-                        <span className="text-[9px] font-black text-emerald-500 uppercase flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-black text-emerald-600 uppercase flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-full ring-1 ring-inset ring-emerald-600/20">
                           <Check className="size-3" /> Uploaded
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* 8. Emergency Contact & Reachability */}
-                    <div className="space-y-3">
-                      <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-rose-500 border-b border-border/20 pb-1.5">
-                        Emergency Contact & Reachability
+                    <div className="bg-white rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-slate-100 p-5 md:p-6 transition-all hover:shadow-[0_4px_20px_rgb(0,0,0,0.04)]">
+                      <h4 className="text-[11px] font-bold uppercase tracking-widest text-rose-500 mb-5 flex items-center gap-2">
+                        <PhoneCall className="size-4" /> Emergency Contact
                       </h4>
-                      <div className="bg-rose-500/5 border border-rose-500/20 rounded-xl p-4 space-y-3">
-                        <div className="grid grid-cols-2 gap-3 text-xs">
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Contact Person
-                            </div>
-                            <div className="font-extrabold text-foreground">
-                              Mohammad Abdur Rahman
-                            </div>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4 text-xs">
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase">Contact Person</div>
+                            <div className="font-bold text-slate-900">Mohammad Abdur Rahman</div>
                           </div>
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Relationship
-                            </div>
-                            <div className="font-bold">Father</div>
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase">Relationship</div>
+                            <div className="font-bold text-slate-700">Father</div>
                           </div>
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Primary Mobile No
-                            </div>
-                            <div className="font-bold font-mono">+880 1750-021154</div>
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase">Primary Mobile No</div>
+                            <div className="font-bold text-slate-900 font-mono">+880 1750-021154</div>
                           </div>
-                          <div className="space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Alternative Contact
-                            </div>
-                            <div className="font-bold font-mono">01911-223344</div>
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase">Alternative Contact</div>
+                            <div className="font-bold text-slate-900 font-mono">01911-223344</div>
                           </div>
-                          <div className="col-span-2 space-y-0.5">
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                              Email Address
-                            </div>
-                            <div className="font-bold text-primary">parent@gmail.com</div>
+                          <div className="col-span-2 space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase">Email Address</div>
+                            <div className="font-bold text-indigo-600">parent@gmail.com</div>
                           </div>
                         </div>
-                        <div className="pt-2 border-t border-rose-500/20">
-                          <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                            Detailed Address
-                          </div>
-                          <div className="text-xs font-medium italic mt-1 text-foreground/80">
-                            Vill # Dhopapara, Road # 12, Mirpur, Dhaka, Bangladesh
-                          </div>
+                        <div className="pt-3 border-t border-slate-100">
+                          <div className="text-[10px] font-bold text-slate-400 uppercase">Detailed Address</div>
+                          <div className="text-xs font-medium italic mt-1 text-slate-600">Vill # Dhopapara, Road # 12, Mirpur, Dhaka, Bangladesh</div>
                         </div>
                       </div>
                     </div>
 
                     {/* 9. Professional & Corporate References */}
-                    <div className="space-y-3">
-                      <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-500 border-b border-border/20 pb-1.5">
-                        Professional & Corporate References
+                    <div className="bg-white rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-slate-100 p-5 md:p-6 transition-all hover:shadow-[0_4px_20px_rgb(0,0,0,0.04)] h-full">
+                      <h4 className="text-[11px] font-bold uppercase tracking-widest text-indigo-600 mb-5 flex items-center gap-2">
+                        <Briefcase className="size-4" /> Professional References
                       </h4>
-                      <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-4 space-y-4 h-full">
-                        <div className="space-y-2">
-                          <div className="text-[10px] font-extrabold uppercase text-indigo-600 border-b border-indigo-500/20 pb-1">
-                            Primary Reference
-                          </div>
-                          <div className="grid grid-cols-2 gap-2 text-xs">
-                            <div className="space-y-0.5">
-                              <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                                Referee Name
-                              </div>
-                              <div className="font-bold">Dr. Selim Reza</div>
+                      <div className="space-y-5">
+                        <div className="space-y-3">
+                          <div className="text-[10px] font-extrabold uppercase text-indigo-600 border-b border-slate-100 pb-1.5">Primary Reference</div>
+                          <div className="grid grid-cols-2 gap-3 text-xs">
+                            <div className="space-y-1">
+                              <div className="text-[10px] font-bold text-slate-400 uppercase">Referee Name</div>
+                              <div className="font-bold text-slate-900">Dr. Selim Reza</div>
                             </div>
-                            <div className="space-y-0.5">
-                              <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                                Contact Number
-                              </div>
-                              <div className="font-bold font-mono">01711-223344</div>
+                            <div className="space-y-1">
+                              <div className="text-[10px] font-bold text-slate-400 uppercase">Contact Number</div>
+                              <div className="font-bold text-slate-900 font-mono">01711-223344</div>
                             </div>
-                            <div className="col-span-2 space-y-0.5">
-                              <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                                Designation & Org
-                              </div>
-                              <div className="font-bold">Professor, University of Dhaka</div>
+                            <div className="col-span-2 space-y-1">
+                              <div className="text-[10px] font-bold text-slate-400 uppercase">Designation & Org</div>
+                              <div className="font-bold text-slate-700">Professor, University of Dhaka</div>
                             </div>
                           </div>
                         </div>
-                        <div className="space-y-2 pt-2 border-t border-indigo-500/20">
-                          <div className="text-[10px] font-extrabold uppercase text-indigo-600 border-b border-indigo-500/20 pb-1">
-                            Secondary Reference
-                          </div>
-                          <div className="grid grid-cols-2 gap-2 text-xs">
-                            <div className="space-y-0.5">
-                              <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                                Referee Name
-                              </div>
-                              <div className="font-bold">Ahmed Kabir</div>
+                        <div className="space-y-3 pt-4 border-t border-slate-100">
+                          <div className="text-[10px] font-extrabold uppercase text-indigo-600 border-b border-slate-100 pb-1.5">Secondary Reference</div>
+                          <div className="grid grid-cols-2 gap-3 text-xs">
+                            <div className="space-y-1">
+                              <div className="text-[10px] font-bold text-slate-400 uppercase">Referee Name</div>
+                              <div className="font-bold text-slate-900">Ahmed Kabir</div>
                             </div>
-                            <div className="space-y-0.5">
-                              <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                                Contact Number
-                              </div>
-                              <div className="font-bold font-mono">01822-334455</div>
+                            <div className="space-y-1">
+                              <div className="text-[10px] font-bold text-slate-400 uppercase">Contact Number</div>
+                              <div className="font-bold text-slate-900 font-mono">01822-334455</div>
                             </div>
-                            <div className="col-span-2 space-y-0.5">
-                              <div className="text-[9px] font-bold text-muted-foreground uppercase">
-                                Designation & Org
-                              </div>
-                              <div className="font-bold">Director, Tech Ltd</div>
+                            <div className="col-span-2 space-y-1">
+                              <div className="text-[10px] font-bold text-slate-400 uppercase">Designation & Org</div>
+                              <div className="font-bold text-slate-700">Director, Tech Ltd</div>
                             </div>
                           </div>
                         </div>
@@ -2362,6 +2279,7 @@ function EmployeeDetailPage() {
               )}
             </div>
           </div>
+        </div>
         </div>
       </main>
     </div>
