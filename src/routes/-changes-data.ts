@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "152",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Add Employee",
+    link: "/add-employee",
+    descriptionEn: "Flattened the Personal & Identity tab into a single continuous scrollable form by removing sub-steps (Placement, Contact, Emergency, Reference) for a faster and unified data entry experience.",
+    descriptionBn: "পার্সোনাল এবং আইডেন্টিটি ট্যাবটিকে একটি একক স্ক্রলযোগ্য ফর্মে পরিবর্তন করা হয়েছে। সাব-স্টেপ (প্লেসমেন্ট, কন্টাক্ট, ইমার্জেন্সি, রেফারেন্স) সরিয়ে এক পাতায় সব তথ্য পূরণের সুবিধা দেওয়া হয়েছে।",
+  },
+  {
     id: "151",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Update",

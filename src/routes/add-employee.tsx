@@ -76,7 +76,7 @@ function AddEmployeePage() {
   const [activeTab, setActiveTab] = useState("personal_identity");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProfileStatusExpanded, setIsProfileStatusExpanded] = useState(true);
-  const [isStepperExpanded, setIsStepperExpanded] = useState(true);
+
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [subSection, setSubSection] = useState("primary_placement");
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -1631,125 +1631,9 @@ function AddEmployeePage() {
               {/* TAB 1: PERSONAL & IDENTITY (CONSOLIDATED) */}
               {activeTab === "personal_identity" && (
                 <div className="space-y-3 animate-in fade-in duration-200 text-foreground">
-                  {/* Premium, High-fidelity Progress Stepper Timeline */}
-                  <div className="bg-card border border-border/60 rounded-lg p-2 shadow-xs">
-                    {/* Stepper Toggle Header */}
-                    <div 
-                      className="flex items-center justify-between cursor-pointer hover:bg-muted/30 p-1.5 rounded-lg transition-colors"
-                      onClick={() => setIsStepperExpanded(!isStepperExpanded)}
-                    >
-                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary flex items-center gap-1.5">
-                        <List className="size-3" />
-                        Sub-section Progress
-                      </span>
-                      <div className="flex items-center justify-center size-5 rounded-full bg-background border border-border/50 text-muted-foreground">
-                        <ChevronRight className={`size-3 transition-transform duration-300 ${isStepperExpanded ? "rotate-90" : "rotate-0"}`} />
-                      </div>
-                    </div>
 
-                    {isStepperExpanded && (
-                    <div className="overflow-x-auto scrollbar-thin mt-1 animate-in slide-in-from-top-2 fade-in duration-200">
-                      <div className="min-w-[650px] relative flex items-center justify-between px-6 py-2">
-                        {/* Horizontal connecting track line behind the dots */}
-                        <div className="absolute top-[23px] left-[55px] right-[55px] h-[2px] bg-muted/60 border-t border-b border-border/20 z-0" />
-
-                      {[
-                        {
-                          id: "primary_placement",
-                          label: "Placement",
-                          icon: User,
-                          desc: "Personal, Job & IDs",
-                        },
-                        {
-                          id: "address_contact",
-                          label: "Contact",
-                          icon: MapPin,
-                          desc: "Reachability",
-                        },
-                        {
-                          id: "emergency_contact",
-                          label: "Emergency",
-                          icon: PhoneCall,
-                          desc: "Alternate Reach",
-                        },
-                        {
-                          id: "references",
-                          label: "References",
-                          icon: Heart,
-                          desc: "Referee details",
-                        },
-                      ].map((step, idx) => {
-                        const StepIcon = step.icon;
-                        const isSelected = subSection === step.id;
-                        const subPercentage = getSubSectionCompletionPercentage(step.id);
-                        const isCompleted = subPercentage === 100;
-
-                        return (
-                          <button
-                            key={step.id}
-                            type="button"
-                            onClick={() => {
-                              setSubSection(step.id);
-                              window.scrollTo({ top: 0, behavior: "smooth" });
-                            }}
-                            className="relative z-10 flex flex-col items-center gap-2 group transition-all duration-300 focus:outline-none shrink-0"
-                            style={{ width: "90px" }}
-                          >
-                            {/* Circle Stepper Dot/Bubble */}
-                            <div
-                              className={`size-6 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative ${isSelected
-                                  ? "bg-primary text-primary-foreground border-primary shadow-[0_0_10px_var(--primary)] scale-110"
-                                  : isCompleted
-                                    ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.2)]"
-                                    : "bg-card text-muted-foreground border-border/80 hover:border-muted-foreground/60"
-                                }`}
-                            >
-                              {isCompleted ? (
-                                <Check className="size-3 stroke-[3]" />
-                              ) : (
-                                <StepIcon className="size-3" />
-                              )}
-
-                              {/* Pulsing neon highlight around active bubble */}
-                              {isSelected && (
-                                <div className="absolute inset-[-3px] rounded-full border-2 border-primary/40 animate-ping opacity-60 pointer-events-none" />
-                              )}
-                            </div>
-
-                            {/* Text labels and percentages */}
-                            <div className="text-center space-y-1.5 w-full min-w-[120px]">
-                              <span
-                                className={`text-[10px] font-black uppercase tracking-wider block transition-colors duration-200 ${isSelected
-                                    ? "text-primary"
-                                    : "text-muted-foreground group-hover:text-foreground"
-                                  }`}
-                              >
-                                {idx + 1}. {step.label}
-                              </span>
-
-                              <span
-                                className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full inline-block transition-all duration-200 ${isSelected
-                                    ? "bg-primary/10 text-primary border border-primary/20"
-                                    : isCompleted
-                                      ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/10"
-                                      : subPercentage > 0
-                                        ? "bg-amber-500/10 text-amber-600 border border-amber-500/10"
-                                        : "bg-rose-500/10 text-rose-600 border border-rose-500/10"
-                                  }`}
-                              >
-                                {subPercentage}%
-                              </span>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  )}
-                </div>
 
                   {/* SUBSECTION: PRIMARY & JOB PLACEMENT */}
-                  {subSection === "primary_placement" && (
                     <div className="space-y-3 animate-in fade-in duration-200">
                       {/* Card 1: Core Specifications */}
                       <div className="bg-card border border-border/60 rounded-lg p-6 shadow-2xs relative overflow-hidden transition-all duration-300 hover:border-emerald-500/20">
@@ -2731,44 +2615,9 @@ function AddEmployeePage() {
                       </div>
 
                       {/* Bottom action bar */}
-                      <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-border/20 mt-6">
-                        <div className="flex items-center gap-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              toast.success("Progress saved. Exiting...");
-                              window.location.href = "/";
-                            }}
-                            className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
-                          >
-                            Save and Exit
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              toast.success("Progress saved as draft successfully!");
-                            }}
-                            className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
-                          >
-                            Save as Draft
-                          </button>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSubSection("address_contact");
-                            window.scrollTo({ top: 0, behavior: "smooth" });
-                          }}
-                          className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200"
-                        >
-                          Next Section <ArrowRight className="size-4" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                  </div>
 
                   {/* SUBSECTION: CONTACT & RESIDENCY */}
-                  {subSection === "address_contact" && (
                     <div className="space-y-6 animate-in fade-in duration-200">
                       {/* Card 5: Residential Address Directory */}
                       <div className="bg-card border border-border/60 rounded-lg p-6 shadow-2xs relative overflow-hidden transition-all duration-300 hover:border-rose-500/20">
@@ -3182,41 +3031,235 @@ function AddEmployeePage() {
                       </div>
 
                       {/* Bottom action bar */}
-                      <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-border/20 mt-6">
-                        <div className="flex items-center gap-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              toast.success("Progress saved. Exiting...");
-                              window.location.href = "/";
-                            }}
-                            className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
-                          >
-                            Save and Exit
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              toast.success("Progress saved as draft successfully!");
-                            }}
-                            className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
-                          >
-                            Save as Draft
-                          </button>
+                  </div>
+                  {/* SUBSECTION: EMERGENCY CONTACT */}
+                <div className="space-y-6 animate-in fade-in duration-200">
+                  <div className="border-b border-border/30 pb-3 flex items-center gap-2">
+                    <PhoneCall className="size-4.5 text-rose-500" />
+                    <h2 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
+                      Emergency Contact & Reachability
+                    </h2>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 bg-muted/10 border border-border/30 rounded-lg p-5">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
+                        Contact Person Name <span className="text-rose-500 font-bold">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={form.emergencyName}
+                        onChange={(e) => handleChange("emergencyName", e.target.value)}
+                        className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full"
+                        placeholder="e.g. M. A. Rahman"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                        Relationship
+                      </label>
+                      <SearchableSelect
+                        value={form.emergencyRelation}
+                        onChange={() => { }}
+                        options={[
+                          { value: "Father", label: "Father" },
+                          { value: "Mother", label: "Mother" },
+                          { value: "Spouse", label: "Spouse" },
+                          { value: "Sibling", label: "Sibling" },
+                          { value: "Guardian", label: "Guardian" },
+                        ]}
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
+                        Primary Mobile No <span className="text-rose-500 font-bold">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={form.emergencyContact}
+                        onChange={(e) => handleChange("emergencyContact", e.target.value)}
+                        className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-bold w-full font-mono"
+                        placeholder="e.g. 017XXXXXXXX"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                        Alternative Contact No
+                      </label>
+                      <input
+                        type="text"
+                        value={form.emergencyAltContact}
+                        onChange={(e) => handleChange("emergencyAltContact", e.target.value)}
+                        className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full font-mono"
+                        placeholder="Alternative number"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                        Email Address
+                      </label>
+                      <input
+                        type="email"
+                        value={form.emergencyEmail}
+                        onChange={(e) => handleChange("emergencyEmail", e.target.value)}
+                        className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full"
+                        placeholder="e.g. parent@gmail.com"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5 sm:col-span-2 md:col-span-3">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                        Detailed Address
+                      </label>
+                      <textarea
+                        value={form.emergencyAddress}
+                        onChange={(e) => handleChange("emergencyAddress", e.target.value)}
+                        className="p-3 rounded-xl border border-border bg-card text-xs font-semibold w-full h-20 resize-none"
+                        placeholder="Enter full physical residential address of emergency contact..."
+                      />
+                    </div>
+                  </div>
+
+                  </div>
+                  {/* SUBSECTION: REFERENCE */}
+                <div className="space-y-6 animate-in fade-in duration-200">
+                  <div className="border-b border-border/30 pb-3 flex items-center gap-2">
+                    <Heart className="size-4.5 text-primary" />
+                    <h2 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
+                      Professional & Corporate References
+                    </h2>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Reference 1 */}
+                    <div className="border border-border bg-muted/15 rounded-lg p-5 space-y-4">
+                      <h3 className="text-xs font-extrabold text-primary uppercase tracking-widest border-b border-border/20 pb-2">
+                        Primary Reference
+                      </h3>
+                      <div className="space-y-3">
+                        <div className="space-y-1.5">
+                          <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
+                            Referee Name
+                          </label>
+                          <input
+                            type="text"
+                            value={form.ref1Name}
+                            onChange={(e) => handleChange("ref1Name", e.target.value)}
+                            className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full"
+                            placeholder="Name"
+                          />
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSubSection("emergency_contact");
-                            window.scrollTo({ top: 0, behavior: "smooth" });
-                          }}
-                          className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200"
-                        >
-                          Next Section <ArrowRight className="size-4" />
-                        </button>
+                        <div className="space-y-1.5">
+                          <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
+                            Designation & Org
+                          </label>
+                          <input
+                            type="text"
+                            value={form.ref1Designation}
+                            onChange={(e) => handleChange("ref1Designation", e.target.value)}
+                            className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full"
+                            placeholder="e.g. Director, Tech Ltd"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
+                            Contact Number
+                          </label>
+                          <input
+                            type="text"
+                            value={form.ref1Contact}
+                            onChange={(e) => handleChange("ref1Contact", e.target.value)}
+                            className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full font-mono"
+                            placeholder="Contact number"
+                          />
+                        </div>
                       </div>
                     </div>
-                  )}
+
+                    {/* Reference 2 */}
+                    <div className="border border-border bg-muted/15 rounded-lg p-5 space-y-4">
+                      <h3 className="text-xs font-extrabold text-indigo-500 uppercase tracking-widest border-b border-border/20 pb-2">
+                        Secondary Reference
+                      </h3>
+                      <div className="space-y-3">
+                        <div className="space-y-1.5">
+                          <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
+                            Referee Name
+                          </label>
+                          <input
+                            type="text"
+                            value={form.ref2Name}
+                            onChange={(e) => handleChange("ref2Name", e.target.value)}
+                            className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full"
+                            placeholder="Name"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
+                            Designation & Org
+                          </label>
+                          <input
+                            type="text"
+                            value={form.ref2Designation}
+                            onChange={(e) => handleChange("ref2Designation", e.target.value)}
+                            className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full"
+                            placeholder="e.g. Manager, HR"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
+                            Contact Number
+                          </label>
+                          <input
+                            type="text"
+                            value={form.ref2Contact}
+                            onChange={(e) => handleChange("ref2Contact", e.target.value)}
+                            className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full font-mono"
+                            placeholder="Contact number"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-border/20 mt-6">
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toast.success("Progress saved. Exiting...");
+                          window.location.href = "/";
+                        }}
+                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
+                      >
+                        Save and Exit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toast.success("Progress saved as draft successfully!");
+                        }}
+                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
+                      >
+                        Save as Draft
+                      </button>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab("financial_employment");
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200"
+                    >
+                      Continue to Financial & Employment <ArrowRight className="size-4" />
+                    </button>
+                  </div>
+                </div>
                 </div>
               )}
               {/* TAB 2: FINANCIAL & EMPLOYMENT (CONSOLIDATED COMPENSATION & DISBURSEMENT) */}
@@ -4590,134 +4633,6 @@ function AddEmployeePage() {
                 </div>
               )}
 
-              {/* SUBSECTION: EMERGENCY CONTACT */}
-              {activeTab === "personal_identity" && subSection === "emergency_contact" && (
-                <div className="space-y-6 animate-in fade-in duration-200">
-                  <div className="border-b border-border/30 pb-3 flex items-center gap-2">
-                    <PhoneCall className="size-4.5 text-rose-500" />
-                    <h2 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
-                      Emergency Contact & Reachability
-                    </h2>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 bg-muted/10 border border-border/30 rounded-lg p-5">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
-                        Contact Person Name <span className="text-rose-500 font-bold">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={form.emergencyName}
-                        onChange={(e) => handleChange("emergencyName", e.target.value)}
-                        className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full"
-                        placeholder="e.g. M. A. Rahman"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase">
-                        Relationship
-                      </label>
-                      <SearchableSelect
-                        value={form.emergencyRelation}
-                        onChange={() => { }}
-                        options={[
-                          { value: "Father", label: "Father" },
-                          { value: "Mother", label: "Mother" },
-                          { value: "Spouse", label: "Spouse" },
-                          { value: "Sibling", label: "Sibling" },
-                          { value: "Guardian", label: "Guardian" },
-                        ]}
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
-                        Primary Mobile No <span className="text-rose-500 font-bold">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={form.emergencyContact}
-                        onChange={(e) => handleChange("emergencyContact", e.target.value)}
-                        className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-bold w-full font-mono"
-                        placeholder="e.g. 017XXXXXXXX"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase">
-                        Alternative Contact No
-                      </label>
-                      <input
-                        type="text"
-                        value={form.emergencyAltContact}
-                        onChange={(e) => handleChange("emergencyAltContact", e.target.value)}
-                        className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full font-mono"
-                        placeholder="Alternative number"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase">
-                        Email Address
-                      </label>
-                      <input
-                        type="email"
-                        value={form.emergencyEmail}
-                        onChange={(e) => handleChange("emergencyEmail", e.target.value)}
-                        className="h-10 px-3.5 rounded-xl border border-border bg-card text-xs font-semibold w-full"
-                        placeholder="e.g. parent@gmail.com"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5 sm:col-span-2 md:col-span-3">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase">
-                        Detailed Address
-                      </label>
-                      <textarea
-                        value={form.emergencyAddress}
-                        onChange={(e) => handleChange("emergencyAddress", e.target.value)}
-                        className="p-3 rounded-xl border border-border bg-card text-xs font-semibold w-full h-20 resize-none"
-                        placeholder="Enter full physical residential address of emergency contact..."
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-border/20 mt-6">
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          toast.success("Progress saved. Exiting...");
-                          window.location.href = "/";
-                        }}
-                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
-                      >
-                        Save and Exit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          toast.success("Progress saved as draft successfully!");
-                        }}
-                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
-                      >
-                        Save as Draft
-                      </button>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSubSection("references");
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
-                      className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200"
-                    >
-                      Next Section <ArrowRight className="size-4" />
-                    </button>
-                  </div>
-                </div>
-              )}
 
               {/* TAB 4: FAMILY & DEPENDENTS (CONSOLIDATED) */}
               {activeTab === "family_dependents" && (
@@ -4814,143 +4729,6 @@ function AddEmployeePage() {
                 </div>
               )}
 
-              {/* SUBSECTION: REFERENCE */}
-              {activeTab === "personal_identity" && subSection === "references" && (
-                <div className="space-y-6 animate-in fade-in duration-200">
-                  <div className="border-b border-border/30 pb-3 flex items-center gap-2">
-                    <Heart className="size-4.5 text-primary" />
-                    <h2 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
-                      Professional & Corporate References
-                    </h2>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Reference 1 */}
-                    <div className="border border-border bg-muted/15 rounded-lg p-5 space-y-4">
-                      <h3 className="text-xs font-extrabold text-primary uppercase tracking-widest border-b border-border/20 pb-2">
-                        Primary Reference
-                      </h3>
-                      <div className="space-y-3">
-                        <div className="space-y-1.5">
-                          <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
-                            Referee Name
-                          </label>
-                          <input
-                            type="text"
-                            value={form.ref1Name}
-                            onChange={(e) => handleChange("ref1Name", e.target.value)}
-                            className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full"
-                            placeholder="Name"
-                          />
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
-                            Designation & Org
-                          </label>
-                          <input
-                            type="text"
-                            value={form.ref1Designation}
-                            onChange={(e) => handleChange("ref1Designation", e.target.value)}
-                            className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full"
-                            placeholder="e.g. Director, Tech Ltd"
-                          />
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
-                            Contact Number
-                          </label>
-                          <input
-                            type="text"
-                            value={form.ref1Contact}
-                            onChange={(e) => handleChange("ref1Contact", e.target.value)}
-                            className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full font-mono"
-                            placeholder="Contact number"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Reference 2 */}
-                    <div className="border border-border bg-muted/15 rounded-lg p-5 space-y-4">
-                      <h3 className="text-xs font-extrabold text-indigo-500 uppercase tracking-widest border-b border-border/20 pb-2">
-                        Secondary Reference
-                      </h3>
-                      <div className="space-y-3">
-                        <div className="space-y-1.5">
-                          <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
-                            Referee Name
-                          </label>
-                          <input
-                            type="text"
-                            value={form.ref2Name}
-                            onChange={(e) => handleChange("ref2Name", e.target.value)}
-                            className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full"
-                            placeholder="Name"
-                          />
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
-                            Designation & Org
-                          </label>
-                          <input
-                            type="text"
-                            value={form.ref2Designation}
-                            onChange={(e) => handleChange("ref2Designation", e.target.value)}
-                            className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full"
-                            placeholder="e.g. Manager, HR"
-                          />
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
-                            Contact Number
-                          </label>
-                          <input
-                            type="text"
-                            value={form.ref2Contact}
-                            onChange={(e) => handleChange("ref2Contact", e.target.value)}
-                            className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full font-mono"
-                            placeholder="Contact number"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-border/20 mt-6">
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          toast.success("Progress saved. Exiting...");
-                          window.location.href = "/";
-                        }}
-                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
-                      >
-                        Save and Exit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          toast.success("Progress saved as draft successfully!");
-                        }}
-                        className="h-10 px-5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-muted/50 transition duration-200"
-                      >
-                        Save as Draft
-                      </button>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveTab("financial_employment");
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
-                      className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all duration-200"
-                    >
-                      Next Section <ArrowRight className="size-4" />
-                    </button>
-                  </div>
-                </div>
-              )}
 
               {/* SUBSECTION: FAMILY DEPENDENTS */}
               {activeTab === "family_dependents" && (
