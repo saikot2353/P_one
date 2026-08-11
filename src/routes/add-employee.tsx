@@ -3227,7 +3227,6 @@ function AddEmployeePage() {
                         </div>
                       </div>
                     </div>
-                    </div>
                   </div>
 
                   {/* Company Reference */}
