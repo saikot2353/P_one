@@ -479,6 +479,21 @@ function RecruitmentBasicEntry() {
                   onChange={setDesignation}
                   options={designationOptions}
                 />
+                <FieldSelect
+                  label="Unit"
+                  required
+                  value={unit}
+                  onChange={setUnit}
+                  options={unitOptions}
+                />
+
+                <FieldSelect
+                  label="Line"
+                  required
+                  value={line}
+                  onChange={setLine}
+                  options={lineOptions}
+                />
               </div>
 
               {/* Photo & Signature Section inside Mandatory Information */}
@@ -534,13 +549,10 @@ function RecruitmentBasicEntry() {
             <SectionHeader
               icon={<Building2 className="size-4" />}
               title="Company Info (Additional)"
-              subtitle="Unit, line, grade, job nature & shift placement"
+              subtitle="Grade, job nature & shift placement"
             />
             <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-5">
-              <FieldSelect label="Unit" value={unit} onChange={setUnit} options={unitOptions} />
-              <FieldSelect label="Line" value={line} onChange={setLine} options={lineOptions} />
               <FieldSelect label="Grade" value={grade} onChange={setGrade} options={gradeOptions} />
-
               <FieldSelect
                 label="Job Nature"
                 value={jobNature}

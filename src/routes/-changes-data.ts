@@ -7,8 +7,8 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     type: "Modify",
     module: "IE Recruitment",
     link: "/recruitment-basic-entry",
-    descriptionEn: "Moved the Photo & Signature Image section directly into the Mandatory Information card on top alongside all required fields, eliminating duplicate sections across the form.",
-    descriptionBn: "আইই রিক্রুটমেন্ট বেসিক এন্ট্রি ফর্মে ছবির সেকশনটি (Employee Photo & Signature) সরাসরি সবার উপরের বাধ্যতামুলক সেকশনের (Mandatory Information) মধ্যে যুক্ত করা হয়েছে এবং ডুপ্লিকেট সেকশন বাদ দেওয়া হয়েছে।",
+    descriptionEn: "Added Unit, Line, and Date of Joining (DOJ) to the Mandatory Information card on top as required fields while removing duplicate inputs from Company Info.",
+    descriptionBn: "আইই রিক্রুটমেন্ট বেসিক এন্ট্রি ফর্মে Unit, Line এবং Date of Joining (DOJ) ফিল্ডগুলোকে বাধ্যতামুলক ফিল্ড হিসেবে সবার উপরের ম্যান্ডেটরি সেকশনে স্থানান্তরিত করা হয়েছে এবং কোম্পানি ইনফো সেকশন থেকে ডুপ্লিকেট সরানো হয়েছে।",
   },
   {
           id: "149",
