@@ -1649,7 +1649,7 @@ function AddEmployeePage() {
                             </div>
                             <div>
                               <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wider">
-                                Primary & Demographic Dossier
+                                Primary Information
                               </h3>
                               <p className="text-[11px] text-muted-foreground">
                                 Core personal data, language registry, and demographics.
@@ -1882,7 +1882,7 @@ function AddEmployeePage() {
                           </div>
                           <div>
                             <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wider">
-                              Corporate Placement & Mapping
+                              Corporate Information
                             </h3>
                             <p className="text-[11px] text-muted-foreground">
                               Organizational allocation, reporting structures, and shift schedules.
@@ -2258,7 +2258,7 @@ function AddEmployeePage() {
                         </div>
                       </div>
 
-                      {/* Card 3: Legal Identification Credentials */}
+                      {/* Card 3: Legal Information */}
                       <div className="bg-card border border-border/60 rounded-lg p-6 shadow-2xs relative overflow-hidden transition-all duration-300 hover:border-violet-500/20">
                         <div className="absolute top-0 left-0 h-full w-1.5 bg-violet-500" />
                         <div className="flex items-center gap-3 border-b border-border/30 pb-4 mb-5">
@@ -2267,7 +2267,7 @@ function AddEmployeePage() {
                           </div>
                           <div>
                             <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wider">
-                              Legal Identification Credentials
+                              Legal Information
                             </h3>
                             <p className="text-[11px] text-muted-foreground">
                               Government-issued identity cards, license numbers, and professional
@@ -2623,7 +2623,7 @@ function AddEmployeePage() {
 
                   {/* SUBSECTION: CONTACT & RESIDENCY */}
                     <div className="space-y-6 animate-in fade-in duration-200">
-                      {/* Card 5: Residential Address Directory */}
+                      {/* Card 5: Residential Address */}
                       <div className="bg-card border border-border/60 rounded-lg p-6 shadow-2xs relative overflow-hidden transition-all duration-300 hover:border-rose-500/20">
                         <div className="absolute top-0 left-0 h-full w-1.5 bg-rose-500" />
                         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/30 pb-4 mb-5">
@@ -2633,7 +2633,7 @@ function AddEmployeePage() {
                             </div>
                             <div>
                               <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wider">
-                                Residential Address Directory
+                                Residential Address
                               </h3>
                               <p className="text-[11px] text-muted-foreground">
                                 Physical residence history, active mailing postage, and permanent
@@ -2940,7 +2940,7 @@ function AddEmployeePage() {
                           </div>
                           <div>
                             <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wider">
-                              Contact & Reachability Channels
+                              Contact Information
                             </h3>
                             <p className="text-[11px] text-muted-foreground">
                               Primary communication channels, corporate extensions, and personal
@@ -3341,7 +3341,7 @@ function AddEmployeePage() {
                     <div className="border-b border-border/30 pb-3 flex items-center gap-2">
                       <DollarSign className="size-4.5 text-primary" />
                       <h2 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
-                        Compensation Structure & Financials
+                        Salary Breakdown
                       </h2>
                     </div>
 
@@ -3350,7 +3350,7 @@ function AddEmployeePage() {
                       <div className="lg:col-span-7 space-y-5 bg-card border border-border/60 rounded-lg p-5 shadow-2xs">
                         <div className="border-b border-border/30 pb-2.5">
                           <h3 className="text-xs font-extrabold text-primary uppercase tracking-wider">
-                            Base Salary & Standard Splits
+                            Salary Breakdown
                           </h3>
                           <p className="text-[10px] text-muted-foreground mt-0.5">
                             Input the employee's gross monthly package. Basic and regulatory
@@ -3911,7 +3911,7 @@ function AddEmployeePage() {
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-extrabold uppercase tracking-wider text-foreground">
-                            Academic Credentials
+                            Educational Qualifications
                           </span>
                           <span className="px-1.5 py-0.5 rounded-full text-[9px] font-mono font-bold bg-muted/80 text-muted-foreground">
                             {educationList.length} Added
@@ -4711,7 +4711,7 @@ function AddEmployeePage() {
                   <div className="border-b border-border/30 pb-3 flex items-center gap-2">
                     <FileSignature className="size-4.5 text-primary" />
                     <h2 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
-                      Nominee Declaration Dossier
+                      Nominee Information
                     </h2>
                   </div>
 
@@ -4807,7 +4807,7 @@ function AddEmployeePage() {
                   <div className="border-b border-border/30 pb-3 flex items-center gap-2">
                     <Baby className="size-4.5 text-primary" />
                     <h2 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
-                      Family Dependents Registry
+                      Dependents Information
                     </h2>
                   </div>
 
@@ -4947,7 +4947,7 @@ function AddEmployeePage() {
                   <div className="border-b border-border/30 pb-3 flex items-center gap-2">
                     <FileText className="size-4.5 text-primary" />
                     <h2 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
-                      Corporate Job Description & Charter
+                      Job Description
                     </h2>
                   </div>
 
@@ -5012,7 +5012,7 @@ function AddEmployeePage() {
                   <div className="border-b border-border/30 pb-3 flex items-center gap-2">
                     <FileDown className="size-4.5 text-primary" />
                     <h2 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
-                      Supporting Documents & PDF Annexes
+                      Supporting Documents
                     </h2>
                   </div>
 
@@ -5112,7 +5112,7 @@ function AddEmployeePage() {
                   <div className="border-b border-border/30 pb-3 flex items-center gap-2">
                     <ShieldCheck className="size-4.5 text-emerald-500 animate-pulse" />
                     <h2 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
-                      Official Auditor Background Verification
+                      Identity & Background Check
                     </h2>
                   </div>
 
@@ -5206,7 +5206,7 @@ function AddEmployeePage() {
                   <div className="border-b border-border/30 pb-3 flex items-center gap-2">
                     <Laptop className="size-4.5 text-primary animate-pulse" />
                     <h2 className="text-xs font-extrabold text-foreground uppercase tracking-widest">
-                      Corporate Equipment & Asset Assignment
+                      Assigned Equipment & Assets
                     </h2>
                   </div>
 
@@ -5357,7 +5357,7 @@ function AddEmployeePage() {
                 {missingAttachments.filter(m => m.type === "education").length > 0 && (
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-1.5 text-[9px] font-extrabold uppercase tracking-wider text-indigo-500">
-                      <GraduationCap className="size-3" /> Academic Credentials
+                      <GraduationCap className="size-3" /> Educational Qualifications
                     </div>
                     <div className="space-y-1">
                       {missingAttachments.filter(m => m.type === "education").map((item, i) => (
