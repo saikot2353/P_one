@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "161",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Merchandising Order Profile",
+    link: "/merchandising-order-profile",
+    descriptionEn: "Redesigned the 'Style Master Data' table into a modern, gorgeous Card-based UI with clear hierarchical blocks for Fabric, Yarn, and Trims requirements instead of a dense, monolithic HTML table.",
+    descriptionBn: "'Style Master Data' টেবিলটিকে নতুনভাবে ডিজাইন করা হয়েছে। এখন এটি একটি সুন্দর কার্ড-ভিত্তিক লেআউটে প্রদর্শিত হবে, যেখানে Fabric, Yarn এবং Trims এর জন্য আলাদা সুন্দর ব্লক রয়েছে।",
+  },
+  {
     id: "160",
     date: new Date().toISOString().slice(0, 16),
     type: "Feature",

@@ -1016,7 +1016,7 @@ export default function MerchandisingQuotationPage() {
                           <td className="px-2 py-1 font-mono font-bold text-slate-800">{form.profitPct.toFixed(3)}</td>
                           <td className="px-2 py-1 font-bold text-slate-500">%</td>
                           <td colSpan={2}/>
-                          <td className="px-3 py-1 text-right font-mono font-bold text-indigo-650">$ {C.fob.toFixed(3)}</td>
+                          <td className="px-3 py-1 text-right font-mono font-bold text-indigo-650">$ {(C.fob - C.ppc).toFixed(3)}</td>
                         </tr>
                         <tr className="border-b border-slate-300">
                           <td colSpan={5} className="px-3 py-1 font-bold text-slate-600">Target Per Pcs</td>
