@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "158",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Budget Planning",
+    link: "/budget-planning",
+    descriptionEn: "Redesigned the Budget Planning page by combining Approved and Pending budgets into a single master list with new filtering options. Moved the Budget Strategy Form and Staged Proposals into a Create Budget modal.",
+    descriptionBn: "বাজেট প্ল্যানিং পেজটি নতুনভাবে সাজানো হয়েছে। এখন অ্যাপ্রুভড এবং পেন্ডিং বাজেটগুলো একটি পেজেই দেখা যাবে এবং নতুন ফিল্টার যুক্ত করা হয়েছে। বাজেট স্ট্র্যাটেজি ফর্ম এবং স্টেজড প্রপোজালগুলো এখন 'Create Budget' মোডালে স্থানান্তর করা হয়েছে।",
+  },
+  {
     id: "157",
     date: new Date().toISOString().slice(0, 16),
     type: "Modify",
