@@ -1232,6 +1232,7 @@ function AddEmployeePage() {
           blood: "B (+ve)",
           presVillageEng: "",
           presVillageBng: "",
+          presHouseNo: "",
           presRoad: "",
           presDistrict: "Dhaka",
           presDivision: "Dhaka",

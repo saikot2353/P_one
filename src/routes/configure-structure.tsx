@@ -1589,14 +1589,14 @@ function StructureSetupPage() {
       setMapName(item?.name || "");
       setMapMain(item?.main || "");
       setMapRelayDuty(item?.relayDuty || "");
-    } else if (activeTab === "department") {
+    } else if (activeTab === "departments") {
       const item = departments.find((d) => d.sl === sl);
       setDepCode(item?.code || "");
       setDepNameEng(item?.nameEng || "");
       setDepNameBng(item?.nameBng || "");
       setDepShortName(item?.shortName || "");
       setDepIsActive(item?.isActive || "Active");
-    } else if (activeTab === "section") {
+    } else if (activeTab === "sections") {
       const item = sections.find((s) => s.sl === sl);
       setSecDept(item?.departmentName || departments[0]?.nameEng || "");
       setSecCode(item?.code || "");
@@ -1604,13 +1604,13 @@ function StructureSetupPage() {
       setSecNameBng(item?.nameBng || "");
       setSecShortName(item?.shortName || "");
       setSecIsActive(item?.isActive || "Active");
-    } else if (activeTab === "unit") {
+    } else if (activeTab === "units") {
       const item = units.find((u) => u.sl === sl);
       setUnitNameEng(item?.nameEng || "");
       setUnitNameBng(item?.nameBng || "");
       setUnitSort(item?.sortOrder || units.length + 1);
       setUnitIsActive(item?.isActive || "Active");
-    } else if (activeTab === "line") {
+    } else if (activeTab === "lines") {
       const item = lines.find((l) => l.sl === sl);
       setLineCompany(item?.companyName || orgs[0]?.nameEng || "");
       setLineEng(item?.lineEng || "");
@@ -1640,21 +1640,21 @@ function StructureSetupPage() {
       const updated = mappings.filter((m) => m.sl !== sl).map((m, idx) => ({ ...m, sl: idx + 1 }));
       setMappings(updated);
       localStorage.setItem("hris_company_mappings", JSON.stringify(updated));
-    } else if (activeTab === "department") {
+    } else if (activeTab === "departments") {
       const updated = departments
         .filter((d) => d.sl !== sl)
         .map((d, idx) => ({ ...d, sl: idx + 1 }));
       setDepartments(updated);
       localStorage.setItem("hris_departments", JSON.stringify(updated));
-    } else if (activeTab === "section") {
+    } else if (activeTab === "sections") {
       const updated = sections.filter((s) => s.sl !== sl).map((s, idx) => ({ ...s, sl: idx + 1 }));
       setSections(updated);
       localStorage.setItem("hris_sections", JSON.stringify(updated));
-    } else if (activeTab === "unit") {
+    } else if (activeTab === "units") {
       const updated = units.filter((u) => u.sl !== sl).map((u, idx) => ({ ...u, sl: idx + 1 }));
       setUnits(updated);
       localStorage.setItem("hris_units", JSON.stringify(updated));
-    } else if (activeTab === "line") {
+    } else if (activeTab === "lines") {
       const updated = lines.filter((l) => l.sl !== sl).map((l, idx) => ({ ...l, sl: idx + 1 }));
       setLines(updated);
       localStorage.setItem("hris_lines", JSON.stringify(updated));
@@ -1795,7 +1795,7 @@ function StructureSetupPage() {
       }
       setMappings(nextList);
       localStorage.setItem("hris_company_mappings", JSON.stringify(nextList));
-    } else if (activeTab === "department") {
+    } else if (activeTab === "departments") {
       if (!depNameEng) {
         toast.error("Department name is required.");
         return;
@@ -1827,7 +1827,7 @@ function StructureSetupPage() {
       }
       setDepartments(nextList);
       localStorage.setItem("hris_departments", JSON.stringify(nextList));
-    } else if (activeTab === "section") {
+    } else if (activeTab === "sections") {
       if (!secNameEng) {
         toast.error("Section name is required.");
         return;
@@ -1861,7 +1861,7 @@ function StructureSetupPage() {
       }
       setSections(nextList);
       localStorage.setItem("hris_sections", JSON.stringify(nextList));
-    } else if (activeTab === "unit") {
+    } else if (activeTab === "units") {
       if (!unitNameEng) {
         toast.error("Unit name is required.");
         return;
@@ -1891,7 +1891,7 @@ function StructureSetupPage() {
       }
       setUnits(nextList);
       localStorage.setItem("hris_units", JSON.stringify(nextList));
-    } else if (activeTab === "line") {
+    } else if (activeTab === "lines") {
       if (!lineEng) {
         toast.error("Line name is required.");
         return;
@@ -2418,7 +2418,7 @@ function StructureSetupPage() {
                 </div>
               )}
 
-              {activeTab === "department" && (
+              {activeTab === "departments" && (
                 <table
                   className="w-full text-left text-xs border-collapse whitespace-nowrap"
                   style={{ minWidth: "800px" }}
@@ -2503,7 +2503,7 @@ function StructureSetupPage() {
                 </table>
               )}
 
-              {activeTab === "section" && (
+              {activeTab === "sections" && (
                 <table
                   className="w-full text-left text-xs border-collapse whitespace-nowrap"
                   style={{ minWidth: "1000px" }}
@@ -2577,7 +2577,7 @@ function StructureSetupPage() {
                 </table>
               )}
 
-              {activeTab === "unit" && (
+              {activeTab === "units" && (
                 <table
                   className="w-full text-left text-xs border-collapse whitespace-nowrap"
                   style={{ minWidth: "800px" }}
@@ -2647,7 +2647,7 @@ function StructureSetupPage() {
                 </table>
               )}
 
-              {activeTab === "line" && (
+              {activeTab === "lines" && (
                 <table
                   className="w-full text-left text-xs border-collapse whitespace-nowrap"
                   style={{ minWidth: "900px" }}
@@ -3016,7 +3016,7 @@ function StructureSetupPage() {
                   </div>
                 )}
 
-                {activeTab === "department" && (
+                {activeTab === "departments" && (
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Department Code *</label>
@@ -3074,7 +3074,7 @@ function StructureSetupPage() {
                   </div>
                 )}
 
-                {activeTab === "section" && (
+                {activeTab === "sections" && (
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Department *</label>
@@ -3146,7 +3146,7 @@ function StructureSetupPage() {
                   </div>
                 )}
 
-                {activeTab === "unit" && (
+                {activeTab === "units" && (
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Unit Name (Eng) *</label>
@@ -3193,7 +3193,7 @@ function StructureSetupPage() {
                   </div>
                 )}
 
-                {activeTab === "line" && (
+                {activeTab === "lines" && (
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>
                       <label className={insetLabelClass}>Company *</label>
