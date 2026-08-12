@@ -107,6 +107,8 @@ function FinancialAidPage() {
   const [viewDetailsRecord, setViewDetailsRecord] = useState<AidRecord | null>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
+  const [tempBudgetInput, setTempBudgetInput] = useState("");
   const [newEmpName, setNewEmpName] = useState("");
   const [newEmpId, setNewEmpId] = useState("");
   const [newTenure, setNewTenure] = useState("");
@@ -650,6 +652,24 @@ function FinancialAidPage() {
                         </td>
                         <td className="px-4 py-3 text-center print:hidden">
                           <div className="flex items-center justify-center gap-1.5">
+                            {row.status === "Pending" && (
+                              <>
+                                <button
+                                  onClick={(e) => handleUpdateStatus(row.id, "Approved", e)}
+                                  className="p-1 text-emerald-500 hover:bg-emerald-50 rounded transition-colors"
+                                  title="Approve"
+                                >
+                                  <CheckCircle2 className="size-3.5" />
+                                </button>
+                                <button
+                                  onClick={(e) => handleUpdateStatus(row.id, "Rejected", e)}
+                                  className="p-1 text-rose-500 hover:bg-rose-50 rounded transition-colors"
+                                  title="Reject"
+                                >
+                                  <X className="size-3.5" />
+                                </button>
+                              </>
+                            )}
                             <button
                               onClick={() => setViewDetailsRecord(row)}
                               className="p-1 text-slate-500 hover:bg-slate-100 rounded transition-colors"
@@ -658,7 +678,10 @@ function FinancialAidPage() {
                               <Eye className="size-3.5" />
                             </button>
                             <button
-                              onClick={() => handleDelete(row.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(row.id, e);
+                              }}
                               className="p-1 text-rose-500 hover:bg-rose-50 rounded transition-colors"
                               title="Delete record"
                             >
