@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "159",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Zakat Management",
+    link: "/zakat-management",
+    descriptionEn: "Implemented Budget Configuration and Zakat List sub-menus. Styled tables for a cleaner, modern look aligning with the requested minimal design.",
+    descriptionBn: "বাজেট কনফিগারেশন এবং যাকাত লিস্ট নামে দুটি সাব-মেন্যু যুক্ত করা হয়েছে। আরও সুন্দর ও মডার্ন ডিজাইনের জন্য টেবিলগুলোর ডিজাইন আপডেট করা হয়েছে।",
+  },
+  {
     id: "158",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Update",

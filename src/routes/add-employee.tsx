@@ -1100,6 +1100,7 @@ function AddEmployeePage() {
       religion: "Islam",
       presVillageEng: fullAddress || "",
       presVillageBng: fullAddress || "",
+      presHouseNo: "",
       presRoad: "",
       presDistrict: "",
       presDivision: "",

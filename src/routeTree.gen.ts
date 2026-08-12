@@ -9,7 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ZakatManagementRouteImport } from './routes/zakat-management'
+import { Route as ZakatListRouteImport } from './routes/zakat-list'
+import { Route as ZakatBudgetConfigurationRouteImport } from './routes/zakat-budget-configuration'
 import { Route as YearlyBonusProcessRouteImport } from './routes/yearly-bonus-process'
 import { Route as UserManagementRouteImport } from './routes/user-management'
 import { Route as TransferControlCenterRouteImport } from './routes/transfer-control-center'
@@ -155,11 +156,17 @@ import { Route as RecruitmentHrAssessmentIdRouteImport } from './routes/recruitm
 import { Route as RecruitmentDetailIdRouteImport } from './routes/recruitment-detail.$id'
 import { Route as EmployeeDetailIdRouteImport } from './routes/employee-detail.$id'
 
-const ZakatManagementRoute = ZakatManagementRouteImport.update({
-  id: '/zakat-management',
-  path: '/zakat-management',
+const ZakatListRoute = ZakatListRouteImport.update({
+  id: '/zakat-list',
+  path: '/zakat-list',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ZakatBudgetConfigurationRoute =
+  ZakatBudgetConfigurationRouteImport.update({
+    id: '/zakat-budget-configuration',
+    path: '/zakat-budget-configuration',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const YearlyBonusProcessRoute = YearlyBonusProcessRouteImport.update({
   id: '/yearly-bonus-process',
   path: '/yearly-bonus-process',
@@ -1040,7 +1047,8 @@ export interface FileRoutesByFullPath {
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
-  '/zakat-management': typeof ZakatManagementRoute
+  '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
+  '/zakat-list': typeof ZakatListRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
   '/recruitment-detail/$id': typeof RecruitmentDetailIdRoute
   '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
@@ -1187,7 +1195,8 @@ export interface FileRoutesByTo {
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
-  '/zakat-management': typeof ZakatManagementRoute
+  '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
+  '/zakat-list': typeof ZakatListRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
   '/recruitment-detail/$id': typeof RecruitmentDetailIdRoute
   '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
@@ -1335,7 +1344,8 @@ export interface FileRoutesById {
   '/transfer-control-center': typeof TransferControlCenterRoute
   '/user-management': typeof UserManagementRoute
   '/yearly-bonus-process': typeof YearlyBonusProcessRoute
-  '/zakat-management': typeof ZakatManagementRoute
+  '/zakat-budget-configuration': typeof ZakatBudgetConfigurationRoute
+  '/zakat-list': typeof ZakatListRoute
   '/employee-detail/$id': typeof EmployeeDetailIdRoute
   '/recruitment-detail/$id': typeof RecruitmentDetailIdRoute
   '/recruitment-hr-assessment/$id': typeof RecruitmentHrAssessmentIdRoute
@@ -1484,7 +1494,8 @@ export interface FileRouteTypes {
     | '/transfer-control-center'
     | '/user-management'
     | '/yearly-bonus-process'
-    | '/zakat-management'
+    | '/zakat-budget-configuration'
+    | '/zakat-list'
     | '/employee-detail/$id'
     | '/recruitment-detail/$id'
     | '/recruitment-hr-assessment/$id'
@@ -1631,7 +1642,8 @@ export interface FileRouteTypes {
     | '/transfer-control-center'
     | '/user-management'
     | '/yearly-bonus-process'
-    | '/zakat-management'
+    | '/zakat-budget-configuration'
+    | '/zakat-list'
     | '/employee-detail/$id'
     | '/recruitment-detail/$id'
     | '/recruitment-hr-assessment/$id'
@@ -1778,7 +1790,8 @@ export interface FileRouteTypes {
     | '/transfer-control-center'
     | '/user-management'
     | '/yearly-bonus-process'
-    | '/zakat-management'
+    | '/zakat-budget-configuration'
+    | '/zakat-list'
     | '/employee-detail/$id'
     | '/recruitment-detail/$id'
     | '/recruitment-hr-assessment/$id'
@@ -1926,7 +1939,8 @@ export interface RootRouteChildren {
   TransferControlCenterRoute: typeof TransferControlCenterRoute
   UserManagementRoute: typeof UserManagementRoute
   YearlyBonusProcessRoute: typeof YearlyBonusProcessRoute
-  ZakatManagementRoute: typeof ZakatManagementRoute
+  ZakatBudgetConfigurationRoute: typeof ZakatBudgetConfigurationRoute
+  ZakatListRoute: typeof ZakatListRoute
   EmployeeDetailIdRoute: typeof EmployeeDetailIdRoute
   RecruitmentDetailIdRoute: typeof RecruitmentDetailIdRoute
   RecruitmentHrAssessmentIdRoute: typeof RecruitmentHrAssessmentIdRoute
@@ -1935,11 +1949,18 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/zakat-management': {
-      id: '/zakat-management'
-      path: '/zakat-management'
-      fullPath: '/zakat-management'
-      preLoaderRoute: typeof ZakatManagementRouteImport
+    '/zakat-list': {
+      id: '/zakat-list'
+      path: '/zakat-list'
+      fullPath: '/zakat-list'
+      preLoaderRoute: typeof ZakatListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/zakat-budget-configuration': {
+      id: '/zakat-budget-configuration'
+      path: '/zakat-budget-configuration'
+      fullPath: '/zakat-budget-configuration'
+      preLoaderRoute: typeof ZakatBudgetConfigurationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/yearly-bonus-process': {
@@ -3095,7 +3116,8 @@ const rootRouteChildren: RootRouteChildren = {
   TransferControlCenterRoute: TransferControlCenterRoute,
   UserManagementRoute: UserManagementRoute,
   YearlyBonusProcessRoute: YearlyBonusProcessRoute,
-  ZakatManagementRoute: ZakatManagementRoute,
+  ZakatBudgetConfigurationRoute: ZakatBudgetConfigurationRoute,
+  ZakatListRoute: ZakatListRoute,
   EmployeeDetailIdRoute: EmployeeDetailIdRoute,
   RecruitmentDetailIdRoute: RecruitmentDetailIdRoute,
   RecruitmentHrAssessmentIdRoute: RecruitmentHrAssessmentIdRoute,
