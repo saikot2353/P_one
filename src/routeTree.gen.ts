@@ -115,7 +115,8 @@ import { Route as IncrementRouteImport } from './routes/increment'
 import { Route as IncentiveAllowanceRouteImport } from './routes/incentive-allowance'
 import { Route as IdCardSetupRouteImport } from './routes/id-card-setup'
 import { Route as HrPolicyJdsRouteImport } from './routes/hr-policy-jds'
-import { Route as FinancialAidRouteImport } from './routes/financial-aid'
+import { Route as FinancialAidListRouteImport } from './routes/financial-aid-list'
+import { Route as FinancialAidBudgetConfigurationRouteImport } from './routes/financial-aid-budget-configuration'
 import { Route as FinalSettlementRouteImport } from './routes/final-settlement'
 import { Route as FinalApproveIncrementRouteImport } from './routes/final-approve-increment'
 import { Route as EvaluationProposeRouteImport } from './routes/evaluation-propose'
@@ -702,11 +703,17 @@ const HrPolicyJdsRoute = HrPolicyJdsRouteImport.update({
   path: '/hr-policy-jds',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FinancialAidRoute = FinancialAidRouteImport.update({
-  id: '/financial-aid',
-  path: '/financial-aid',
+const FinancialAidListRoute = FinancialAidListRouteImport.update({
+  id: '/financial-aid-list',
+  path: '/financial-aid-list',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FinancialAidBudgetConfigurationRoute =
+  FinancialAidBudgetConfigurationRouteImport.update({
+    id: '/financial-aid-budget-configuration',
+    path: '/financial-aid-budget-configuration',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const FinalSettlementRoute = FinalSettlementRouteImport.update({
   id: '/final-settlement',
   path: '/final-settlement',
@@ -942,7 +949,8 @@ export interface FileRoutesByFullPath {
   '/evaluation-propose': typeof EvaluationProposeRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
-  '/financial-aid': typeof FinancialAidRoute
+  '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
+  '/financial-aid-list': typeof FinancialAidListRoute
   '/hr-policy-jds': typeof HrPolicyJdsRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
@@ -1090,7 +1098,8 @@ export interface FileRoutesByTo {
   '/evaluation-propose': typeof EvaluationProposeRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
-  '/financial-aid': typeof FinancialAidRoute
+  '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
+  '/financial-aid-list': typeof FinancialAidListRoute
   '/hr-policy-jds': typeof HrPolicyJdsRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
@@ -1239,7 +1248,8 @@ export interface FileRoutesById {
   '/evaluation-propose': typeof EvaluationProposeRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
-  '/financial-aid': typeof FinancialAidRoute
+  '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
+  '/financial-aid-list': typeof FinancialAidListRoute
   '/hr-policy-jds': typeof HrPolicyJdsRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
@@ -1389,7 +1399,8 @@ export interface FileRouteTypes {
     | '/evaluation-propose'
     | '/final-approve-increment'
     | '/final-settlement'
-    | '/financial-aid'
+    | '/financial-aid-budget-configuration'
+    | '/financial-aid-list'
     | '/hr-policy-jds'
     | '/id-card-setup'
     | '/incentive-allowance'
@@ -1537,7 +1548,8 @@ export interface FileRouteTypes {
     | '/evaluation-propose'
     | '/final-approve-increment'
     | '/final-settlement'
-    | '/financial-aid'
+    | '/financial-aid-budget-configuration'
+    | '/financial-aid-list'
     | '/hr-policy-jds'
     | '/id-card-setup'
     | '/incentive-allowance'
@@ -1685,7 +1697,8 @@ export interface FileRouteTypes {
     | '/evaluation-propose'
     | '/final-approve-increment'
     | '/final-settlement'
-    | '/financial-aid'
+    | '/financial-aid-budget-configuration'
+    | '/financial-aid-list'
     | '/hr-policy-jds'
     | '/id-card-setup'
     | '/incentive-allowance'
@@ -1834,7 +1847,8 @@ export interface RootRouteChildren {
   EvaluationProposeRoute: typeof EvaluationProposeRoute
   FinalApproveIncrementRoute: typeof FinalApproveIncrementRoute
   FinalSettlementRoute: typeof FinalSettlementRoute
-  FinancialAidRoute: typeof FinancialAidRoute
+  FinancialAidBudgetConfigurationRoute: typeof FinancialAidBudgetConfigurationRoute
+  FinancialAidListRoute: typeof FinancialAidListRoute
   HrPolicyJdsRoute: typeof HrPolicyJdsRoute
   IdCardSetupRoute: typeof IdCardSetupRoute
   IncentiveAllowanceRoute: typeof IncentiveAllowanceRoute
@@ -2691,11 +2705,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HrPolicyJdsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/financial-aid': {
-      id: '/financial-aid'
-      path: '/financial-aid'
-      fullPath: '/financial-aid'
-      preLoaderRoute: typeof FinancialAidRouteImport
+    '/financial-aid-list': {
+      id: '/financial-aid-list'
+      path: '/financial-aid-list'
+      fullPath: '/financial-aid-list'
+      preLoaderRoute: typeof FinancialAidListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/financial-aid-budget-configuration': {
+      id: '/financial-aid-budget-configuration'
+      path: '/financial-aid-budget-configuration'
+      fullPath: '/financial-aid-budget-configuration'
+      preLoaderRoute: typeof FinancialAidBudgetConfigurationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/final-settlement': {
@@ -3010,7 +3031,8 @@ const rootRouteChildren: RootRouteChildren = {
   EvaluationProposeRoute: EvaluationProposeRoute,
   FinalApproveIncrementRoute: FinalApproveIncrementRoute,
   FinalSettlementRoute: FinalSettlementRoute,
-  FinancialAidRoute: FinancialAidRoute,
+  FinancialAidBudgetConfigurationRoute: FinancialAidBudgetConfigurationRoute,
+  FinancialAidListRoute: FinancialAidListRoute,
   HrPolicyJdsRoute: HrPolicyJdsRoute,
   IdCardSetupRoute: IdCardSetupRoute,
   IncentiveAllowanceRoute: IncentiveAllowanceRoute,

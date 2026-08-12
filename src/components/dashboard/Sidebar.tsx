@@ -266,7 +266,13 @@ export const nav: NavItem[] = [
           { label: "Zakat List", to: "/zakat-list" },
         ]
       },
-      { label: "Financial Aid", to: "/financial-aid" },
+      {
+        label: "Financial Aid",
+        subitems: [
+          { label: "Budget Configuration", to: "/financial-aid-budget-configuration" },
+          { label: "Financial Aid List", to: "/financial-aid-list" },
+        ]
+      },
     ],
   },
   {
