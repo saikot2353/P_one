@@ -926,7 +926,7 @@ export default function PreCostingPage() {
                     <thead>
                       <tr className="bg-slate-50 border-b border-slate-200">
                         {["#","Commercial Cost (%)","Finance Cost (%)","Buying Commission (%)","Sample Fabric Qty","Sample Fabric Rate","Commercial(%)"].map((h,i)=>(
-                          <th key={i} className="px-3 py-2.5 text-left font-black text-slate-500 uppercase tracking-wider text-[8.5px]">{h}</th>
+                          <th key={i} className={`px-3 py-2.5 font-black text-slate-500 uppercase tracking-wider text-[8.5px] ${['Order Qty', 'Unit Price', 'Total Price', 'GSM', 'Order Qty (Dzn)', 'Cons/Dzn', 'Fabric Qty', 'Rate', 'Cost', 'Yarn Qty (Kg)', 'Rate ($/Kg)', 'Quantity', 'Pr.Qty (Kg)', 'Prs.Loss %', 'Quantity (Dzn)', 'Rate per Dzn', 'CM / Pcs', 'CM / Dzn', 'CM Cost', 'Commission (%)', 'Commission Value', 'Qty (Dzn)', 'Rate/Dzn', 'Percentage (%)', 'Sample Fabric Qty (Kg)', 'Sample Fabric Rate', 'CPM ($)', 'SMV', 'Efficiency %', 'GMT/PC', 'GMT/UOM', 'SAM/PC', 'CM/DOZEN'].includes(h) ? "text-right" : "text-left"}`}>{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -1039,7 +1039,7 @@ export default function PreCostingPage() {
                     <thead>
                       <tr className="bg-slate-50 border-b border-slate-200">
                         {["Style No","Color","Item Name","Order Qty","Unit Price","Total Price","Delivery Date"].map(h => (
-                          <th key={h} className="px-4 py-2.5 text-left font-black text-slate-500 uppercase tracking-wider text-[8.5px]">{h}</th>
+                          <th key={h} className={`px-4 py-2.5 font-black text-slate-500 uppercase tracking-wider text-[8.5px] ${['Order Qty', 'Unit Price', 'Total Price', 'GSM', 'Order Qty (Dzn)', 'Cons/Dzn', 'Fabric Qty', 'Rate', 'Cost', 'Yarn Qty (Kg)', 'Rate ($/Kg)', 'Quantity', 'Pr.Qty (Kg)', 'Prs.Loss %', 'Quantity (Dzn)', 'Rate per Dzn', 'CM / Pcs', 'CM / Dzn', 'CM Cost', 'Commission (%)', 'Commission Value', 'Qty (Dzn)', 'Rate/Dzn', 'Percentage (%)', 'Sample Fabric Qty (Kg)', 'Sample Fabric Rate', 'CPM ($)', 'SMV', 'Efficiency %', 'GMT/PC', 'GMT/UOM', 'SAM/PC', 'CM/DOZEN'].includes(h) ? "text-right" : "text-left"}`}>{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -1201,7 +1201,7 @@ export default function PreCostingPage() {
                     <thead>
                       <tr className="bg-slate-50 border-b border-slate-200">
                         {["Style","Fab.Nature","Fabric Info","GSM","Color","Source","Order Qty (Dzn)","Cons/Dzn","Fabric Qty","UOM","Rate","Cost"].map(h=>(
-                          <th key={h} className="px-3 py-2.5 text-left font-black text-slate-500 uppercase tracking-wider text-[8.5px]">{h}</th>
+                          <th key={h} className={`px-3 py-2.5 font-black text-slate-500 uppercase tracking-wider text-[8.5px] ${['Order Qty', 'Unit Price', 'Total Price', 'GSM', 'Order Qty (Dzn)', 'Cons/Dzn', 'Fabric Qty', 'Rate', 'Cost', 'Yarn Qty (Kg)', 'Rate ($/Kg)', 'Quantity', 'Pr.Qty (Kg)', 'Prs.Loss %', 'Quantity (Dzn)', 'Rate per Dzn', 'CM / Pcs', 'CM / Dzn', 'CM Cost', 'Commission (%)', 'Commission Value', 'Qty (Dzn)', 'Rate/Dzn', 'Percentage (%)', 'Sample Fabric Qty (Kg)', 'Sample Fabric Rate', 'CPM ($)', 'SMV', 'Efficiency %', 'GMT/PC', 'GMT/UOM', 'SAM/PC', 'CM/DOZEN'].includes(h) ? "text-right" : "text-left"}`}>{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -1250,7 +1250,7 @@ export default function PreCostingPage() {
                     <thead>
                       <tr className="bg-slate-50 border-b border-slate-200">
                         {["Composition","Count","Yarn Type","Color","Yarn Qty (Kg)","Rate ($/Kg)","Cost"].map(h=>(
-                          <th key={h} className="px-3 py-2.5 text-left font-black text-slate-500 uppercase tracking-wider text-[8.5px]">{h}</th>
+                          <th key={h} className={`px-3 py-2.5 font-black text-slate-500 uppercase tracking-wider text-[8.5px] ${['Order Qty', 'Unit Price', 'Total Price', 'GSM', 'Order Qty (Dzn)', 'Cons/Dzn', 'Fabric Qty', 'Rate', 'Cost', 'Yarn Qty (Kg)', 'Rate ($/Kg)', 'Quantity', 'Pr.Qty (Kg)', 'Prs.Loss %', 'Quantity (Dzn)', 'Rate per Dzn', 'CM / Pcs', 'CM / Dzn', 'CM Cost', 'Commission (%)', 'Commission Value', 'Qty (Dzn)', 'Rate/Dzn', 'Percentage (%)', 'Sample Fabric Qty (Kg)', 'Sample Fabric Rate', 'CPM ($)', 'SMV', 'Efficiency %', 'GMT/PC', 'GMT/UOM', 'SAM/PC', 'CM/DOZEN'].includes(h) ? "text-right" : "text-left"}`}>{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -1294,7 +1294,7 @@ export default function PreCostingPage() {
                     <thead>
                       <tr className="bg-slate-50 border-b border-slate-200">
                         {["Style","Yarn Info","Color","Shade","Quantity","UOM","Rate","Cost"].map(h=>(
-                          <th key={h} className="px-3 py-2.5 text-left font-black text-slate-500 uppercase tracking-wider text-[8.5px]">{h}</th>
+                          <th key={h} className={`px-3 py-2.5 font-black text-slate-500 uppercase tracking-wider text-[8.5px] ${['Order Qty', 'Unit Price', 'Total Price', 'GSM', 'Order Qty (Dzn)', 'Cons/Dzn', 'Fabric Qty', 'Rate', 'Cost', 'Yarn Qty (Kg)', 'Rate ($/Kg)', 'Quantity', 'Pr.Qty (Kg)', 'Prs.Loss %', 'Quantity (Dzn)', 'Rate per Dzn', 'CM / Pcs', 'CM / Dzn', 'CM Cost', 'Commission (%)', 'Commission Value', 'Qty (Dzn)', 'Rate/Dzn', 'Percentage (%)', 'Sample Fabric Qty (Kg)', 'Sample Fabric Rate', 'CPM ($)', 'SMV', 'Efficiency %', 'GMT/PC', 'GMT/UOM', 'SAM/PC', 'CM/DOZEN'].includes(h) ? "text-right" : "text-left"}`}>{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -1337,7 +1337,7 @@ export default function PreCostingPage() {
                     <thead>
                       <tr className="bg-slate-50 border-b border-slate-200">
                         {["Style Info","Fab.Nature","Fabric Info","GSM","Col.Type","Color","Shade","Pr.Name","Pr.Qty (Kg)","UOM","Rate ($/Kg)","Cost"].map(h=>(
-                          <th key={h} className="px-3 py-2.5 text-left font-black text-slate-500 uppercase tracking-wider text-[8.5px]">{h}</th>
+                          <th key={h} className={`px-3 py-2.5 font-black text-slate-500 uppercase tracking-wider text-[8.5px] ${['Order Qty', 'Unit Price', 'Total Price', 'GSM', 'Order Qty (Dzn)', 'Cons/Dzn', 'Fabric Qty', 'Rate', 'Cost', 'Yarn Qty (Kg)', 'Rate ($/Kg)', 'Quantity', 'Pr.Qty (Kg)', 'Prs.Loss %', 'Quantity (Dzn)', 'Rate per Dzn', 'CM / Pcs', 'CM / Dzn', 'CM Cost', 'Commission (%)', 'Commission Value', 'Qty (Dzn)', 'Rate/Dzn', 'Percentage (%)', 'Sample Fabric Qty (Kg)', 'Sample Fabric Rate', 'CPM ($)', 'SMV', 'Efficiency %', 'GMT/PC', 'GMT/UOM', 'SAM/PC', 'CM/DOZEN'].includes(h) ? "text-right" : "text-left"}`}>{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -1394,7 +1394,7 @@ export default function PreCostingPage() {
                     <thead>
                       <tr className="bg-slate-50 border-b border-slate-200">
                         {["Item Name","Gmt Item","Sensitivity Type","Order Qty (Dzn)","Cons/Dzn","Prs.Loss %","Quantity","UOM","Rate","Cost"].map(h=>(
-                          <th key={h} className="px-3 py-2.5 text-left font-black text-slate-500 uppercase tracking-wider text-[8.5px]">{h}</th>
+                          <th key={h} className={`px-3 py-2.5 font-black text-slate-500 uppercase tracking-wider text-[8.5px] ${['Order Qty', 'Unit Price', 'Total Price', 'GSM', 'Order Qty (Dzn)', 'Cons/Dzn', 'Fabric Qty', 'Rate', 'Cost', 'Yarn Qty (Kg)', 'Rate ($/Kg)', 'Quantity', 'Pr.Qty (Kg)', 'Prs.Loss %', 'Quantity (Dzn)', 'Rate per Dzn', 'CM / Pcs', 'CM / Dzn', 'CM Cost', 'Commission (%)', 'Commission Value', 'Qty (Dzn)', 'Rate/Dzn', 'Percentage (%)', 'Sample Fabric Qty (Kg)', 'Sample Fabric Rate', 'CPM ($)', 'SMV', 'Efficiency %', 'GMT/PC', 'GMT/UOM', 'SAM/PC', 'CM/DOZEN'].includes(h) ? "text-right" : "text-left"}`}>{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -1439,7 +1439,7 @@ export default function PreCostingPage() {
                     <thead>
                       <tr className="bg-slate-50 border-b border-slate-200">
                         {["Style","Gmt Item","Embellishment Name","Emb.Description","Quantity (Dzn)","Rate per Dzn","Cost"].map(h=>(
-                          <th key={h} className="px-3 py-2.5 text-left font-black text-slate-500 uppercase tracking-wider text-[8.5px]">{h}</th>
+                          <th key={h} className={`px-3 py-2.5 font-black text-slate-500 uppercase tracking-wider text-[8.5px] ${['Order Qty', 'Unit Price', 'Total Price', 'GSM', 'Order Qty (Dzn)', 'Cons/Dzn', 'Fabric Qty', 'Rate', 'Cost', 'Yarn Qty (Kg)', 'Rate ($/Kg)', 'Quantity', 'Pr.Qty (Kg)', 'Prs.Loss %', 'Quantity (Dzn)', 'Rate per Dzn', 'CM / Pcs', 'CM / Dzn', 'CM Cost', 'Commission (%)', 'Commission Value', 'Qty (Dzn)', 'Rate/Dzn', 'Percentage (%)', 'Sample Fabric Qty (Kg)', 'Sample Fabric Rate', 'CPM ($)', 'SMV', 'Efficiency %', 'GMT/PC', 'GMT/UOM', 'SAM/PC', 'CM/DOZEN'].includes(h) ? "text-right" : "text-left"}`}>{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -1481,7 +1481,7 @@ export default function PreCostingPage() {
                     <thead>
                       <tr className="bg-slate-50 border-b border-slate-200">
                         {["Style","GMT Item","GMT/Dzn","CPM ($)","SMV","Efficiency %","CM / Pcs","CM / Dzn","CM Cost"].map(h=>(
-                          <th key={h} className="px-3 py-2.5 text-left font-black text-slate-500 uppercase tracking-wider text-[8.5px]">{h}</th>
+                          <th key={h} className={`px-3 py-2.5 font-black text-slate-500 uppercase tracking-wider text-[8.5px] ${['Order Qty', 'Unit Price', 'Total Price', 'GSM', 'Order Qty (Dzn)', 'Cons/Dzn', 'Fabric Qty', 'Rate', 'Cost', 'Yarn Qty (Kg)', 'Rate ($/Kg)', 'Quantity', 'Pr.Qty (Kg)', 'Prs.Loss %', 'Quantity (Dzn)', 'Rate per Dzn', 'CM / Pcs', 'CM / Dzn', 'CM Cost', 'Commission (%)', 'Commission Value', 'Qty (Dzn)', 'Rate/Dzn', 'Percentage (%)', 'Sample Fabric Qty (Kg)', 'Sample Fabric Rate', 'CPM ($)', 'SMV', 'Efficiency %', 'GMT/PC', 'GMT/UOM', 'SAM/PC', 'CM/DOZEN'].includes(h) ? "text-right" : "text-left"}`}>{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -1526,7 +1526,7 @@ export default function PreCostingPage() {
                     <thead>
                       <tr className="bg-slate-50 border-b border-slate-200">
                         {["Style","Color","Commission (%)","Commission Value"].map(h=>(
-                          <th key={h} className="px-3 py-2.5 text-left font-black text-slate-500 uppercase tracking-wider text-[8.5px]">{h}</th>
+                          <th key={h} className={`px-3 py-2.5 font-black text-slate-500 uppercase tracking-wider text-[8.5px] ${['Order Qty', 'Unit Price', 'Total Price', 'GSM', 'Order Qty (Dzn)', 'Cons/Dzn', 'Fabric Qty', 'Rate', 'Cost', 'Yarn Qty (Kg)', 'Rate ($/Kg)', 'Quantity', 'Pr.Qty (Kg)', 'Prs.Loss %', 'Quantity (Dzn)', 'Rate per Dzn', 'CM / Pcs', 'CM / Dzn', 'CM Cost', 'Commission (%)', 'Commission Value', 'Qty (Dzn)', 'Rate/Dzn', 'Percentage (%)', 'Sample Fabric Qty (Kg)', 'Sample Fabric Rate', 'CPM ($)', 'SMV', 'Efficiency %', 'GMT/PC', 'GMT/UOM', 'SAM/PC', 'CM/DOZEN'].includes(h) ? "text-right" : "text-left"}`}>{h}</th>
                         ))}
                       </tr>
                     </thead>

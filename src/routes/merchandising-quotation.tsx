@@ -873,7 +873,7 @@ export default function MerchandisingQuotationPage() {
               <div className="grid grid-cols-12 gap-5 items-stretch">
                 
                 {/* ── Left Column: GARMENT COST BREAKDOWN (7 cols) ── */}
-                <div className="col-span-12 lg:col-span-7 flex flex-col justify-between space-y-4">
+                <div className="col-span-12 lg:col-span-7 flex flex-col space-y-4">
                   <div className="border border-slate-300 rounded-lg overflow-hidden">
                     <div className="bg-[#e2d8eb] text-[#3c1d56] px-3 py-1.5 text-center font-black uppercase tracking-wider text-[9.5px]">
                       Garment Cost Breakdown
@@ -1031,7 +1031,7 @@ export default function MerchandisingQuotationPage() {
                 </div>
 
                 {/* ── Right Column: FABRIC PRICE CALCULATION (5 cols) ── */}
-                <div className="col-span-12 lg:col-span-5 flex flex-col justify-between space-y-4">
+                <div className="col-span-12 lg:col-span-5 flex flex-col space-y-4">
                   <div className="border border-slate-300 rounded-lg overflow-hidden flex-1">
                     <div className="bg-[#e2d8eb] text-[#3c1d56] px-3 py-1.5 text-center font-black uppercase tracking-wider text-[9.5px]">
                       Fabric Price Calculation
