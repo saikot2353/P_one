@@ -10,7 +10,7 @@ export const Route = createFileRoute("/changes")({
 export type ChangeRecord = {
   id: string;
   date: string;
-  type: "Modify" | "New Addition" | "";
+  type: "Modify" | "New Addition" | "Feature" | "UI Update" | "New" | "";
   module: string;
   link?: string;
   descriptionEn: string;
@@ -21,7 +21,7 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v139");
+    const saved = localStorage.getItem("system_changes_v140");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {

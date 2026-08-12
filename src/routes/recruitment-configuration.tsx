@@ -904,9 +904,15 @@ function RecruitmentConfiguration() {
                           Weight Factor <span className="text-red-500">*</span>
                         </label>
                         <input
-                          type="text"
+                          type="number"
+                          step="0.01"
                           value={formData.weightFactor || ""}
                           onChange={(e) => setFormData({ ...formData, weightFactor: e.target.value })}
+                          onBlur={(e) => {
+                            if (e.target.value) {
+                              setFormData({ ...formData, weightFactor: Number(e.target.value).toFixed(2) });
+                            }
+                          }}
                           className={inp}
                           placeholder="e.g. 1.50"
                         />

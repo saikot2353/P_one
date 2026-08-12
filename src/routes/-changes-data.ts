@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "157",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Modify",
+    module: "Recruitment Configuration",
+    link: "/recruitment-configuration",
+    descriptionEn: "Refined the 'Weight Factor' field to strictly enforce numeric input and automatically format the value to 2 decimal places.",
+    descriptionBn: "অপারেশন গ্রেড (Operation Grade) এর 'Weight Factor' ফিল্ডটি রিফাইন করা হয়েছে যাতে এটি শুধুমাত্র নম্বর গ্রহণ করে এবং মানটি ২ দশমিক স্থানে স্বয়ংক্রিয়ভাবে ফরম্যাট হয়।",
+  },
+  {
     id: "156",
     date: new Date().toISOString().slice(0, 16),
     type: "Modify",
