@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "160",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Feature",
+    module: "Merchandising Quotation",
+    link: "/merchandising-quotation",
+    descriptionEn: "Added a dynamic 'Budget Summary' table showing a comprehensive breakdown of order value, variable costs, contribution margin, and net profit based on form variables.",
+    descriptionBn: "মার্চেন্ডাইজিং কোটেশন পেজে একটি নতুন ডাইনামিক 'বাজেট সামারি' টেবিল যুক্ত করা হয়েছে, যা ফর্মের ডেটা অনুযায়ী অর্ডারের ভ্যালু, ভ্যারিয়েবল কস্ট, কন্ট্রিবিউশন মার্জিন এবং নেট প্রফিটের বিস্তারিত ব্রেকডাউন দেখায়।",
+  },
+  {
     id: "159",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Update",

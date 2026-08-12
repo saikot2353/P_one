@@ -1146,9 +1146,185 @@ export default function MerchandisingQuotationPage() {
                   <div className="bg-[#f8d7da] text-[#721c24] border border-[#f5c6cb] rounded-lg py-2.5 text-center font-black tracking-wide text-xs select-none">
                     THIS QUOTATION &nbsp; &nbsp; &nbsp; &nbsp; $ {C.fob.toFixed(3)}
                   </div>
+
+                  {/* ── BUDGET SUMMARY ── */}
+                  {(() => {
+                    const qtyDozen = form.garmentQuantity / 12;
+                    const orderValue = form.garmentQuantity * C.fob;
+                    const netOrderValue = orderValue;
+
+                    const b1 = qtyDozen * (C.fab - (C.cww * C.fkg));
+                    const b2 = qtyDozen * C.cww * C.yarn;
+                    const b3 = 0;
+                    const b4 = qtyDozen * C.cww * (C.fkg - C.yarn);
+                    const b5 = qtyDozen * C.acc;
+                    const b6 = qtyDozen * (C.emb + C.wash);
+                    const totalVarCost = b1 + b2 + b3 + b4 + b5 + b6;
+
+                    const cm = netOrderValue - totalVarCost;
+                    const cmCost = qtyDozen * form.cmPerDozen;
+                    const opProfit = cm - cmCost;
+
+                    const fComm = 0;
+                    const gSpec = qtyDozen * C.gmt;
+                    const hOth = qtyDozen * (C.oth + C.bank + C.com);
+                    const iSamp = 0;
+                    const totalCost = totalVarCost + cmCost + fComm + gSpec + hOth + iSamp;
+                    const netProfit = netOrderValue - totalCost;
+
+                    const pct = (val: number) => netOrderValue > 0 ? ((val / netOrderValue) * 100).toFixed(2) : "0.00";
+                    const fAmt = (val: number) => `$ ${val.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+                    return (
+                      <div className="border border-slate-300 shadow-sm rounded-lg overflow-hidden w-full print:max-w-none print:shadow-none print:border-slate-300">
+                        <div className="bg-white border-b border-slate-300 px-3 py-2.5 flex items-center gap-2">
+                          <div className="w-1.5 h-4 bg-indigo-600 rounded-sm"></div>
+                          <h3 className="font-black text-indigo-950 tracking-widest text-[10.5px] uppercase">Budget Summary</h3>
+                        </div>
+                        <table className="w-full text-[9.5px] border-collapse text-slate-700 bg-white">
+                          <thead>
+                            <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[9px] bg-slate-50/50">
+                              <th className="px-3 py-1.5 text-left w-12">Ref</th>
+                              <th className="px-3 py-1.5 text-left">Particulars</th>
+                              <th className="px-3 py-1.5 text-right">Amount</th>
+                              <th className="px-3 py-1.5 text-right w-16">%</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr className="border-b border-slate-100 hover:bg-slate-50/80 transition-colors">
+                              <td className="px-3 py-1.5 font-bold text-slate-400">A</td>
+                              <td className="px-3 py-1.5 font-bold text-slate-800">Order Value</td>
+                              <td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{fAmt(orderValue)}</td>
+                              <td className="px-3 py-1.5"></td>
+                            </tr>
+                            <tr className="border-b border-slate-100 hover:bg-slate-50/80 transition-colors text-slate-500">
+                              <td className="px-3 py-1.5 text-slate-400">A.1</td>
+                              <td className="px-3 py-1.5">Less Buyer Sup. Mat.</td>
+                              <td className="px-3 py-1.5 text-right font-mono">{fAmt(0)}</td>
+                              <td className="px-3 py-1.5"></td>
+                            </tr>
+                            <tr className="border-b border-slate-200 bg-slate-50/80">
+                              <td className="px-3 py-1.5 font-bold text-slate-400">A.2</td>
+                              <td className="px-3 py-1.5 font-black text-slate-900">Net Order Value</td>
+                              <td className="px-3 py-1.5 text-right font-mono font-black text-slate-900">{fAmt(netOrderValue)}</td>
+                              <td className="px-3 py-1.5 text-right font-mono font-bold text-slate-900">100</td>
+                            </tr>
+                            
+                            <tr>
+                              <td colSpan={4} className="px-3 pt-2.5 pb-1 font-bold text-indigo-800/80 text-[9px] tracking-wider uppercase">Variable Cost</td>
+                            </tr>
+                            <tr className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors text-slate-600">
+                              <td className="px-3 py-1 text-slate-400">B.1</td>
+                              <td className="px-3 py-1">Fabric Purchase Cost</td>
+                              <td className="px-3 py-1 text-right font-mono">{fAmt(b1)}</td>
+                              <td className="px-3 py-1 text-right font-mono">{pct(b1)}</td>
+                            </tr>
+                            <tr className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors text-slate-600">
+                              <td className="px-3 py-1 text-slate-400">B.2</td>
+                              <td className="px-3 py-1">Yarn Cost</td>
+                              <td className="px-3 py-1 text-right font-mono font-medium text-slate-800">{fAmt(b2)}</td>
+                              <td className="px-3 py-1 text-right font-mono">{pct(b2)}</td>
+                            </tr>
+                            <tr className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors text-slate-600">
+                              <td className="px-3 py-1 text-slate-400">B.3</td>
+                              <td className="px-3 py-1">Dyed Yarn</td>
+                              <td className="px-3 py-1 text-right font-mono">{fAmt(b3)}</td>
+                              <td className="px-3 py-1 text-right font-mono">{pct(b3)}</td>
+                            </tr>
+                            <tr className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors text-slate-600">
+                              <td className="px-3 py-1 text-slate-400">B.4</td>
+                              <td className="px-3 py-1">Fabric Conv. Cost</td>
+                              <td className="px-3 py-1 text-right font-mono font-medium text-slate-800">{fAmt(b4)}</td>
+                              <td className="px-3 py-1 text-right font-mono">{pct(b4)}</td>
+                            </tr>
+                            <tr className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors text-slate-600">
+                              <td className="px-3 py-1 text-slate-400">B.5</td>
+                              <td className="px-3 py-1">Accessories</td>
+                              <td className="px-3 py-1 text-right font-mono font-medium text-slate-800">{fAmt(b5)}</td>
+                              <td className="px-3 py-1 text-right font-mono">{pct(b5)}</td>
+                            </tr>
+                            <tr className="border-b border-slate-200 hover:bg-slate-50/80 transition-colors text-slate-600">
+                              <td className="px-3 py-1 text-slate-400">B.6</td>
+                              <td className="px-3 py-1">Embellishment Cost</td>
+                              <td className="px-3 py-1 text-right font-mono">{fAmt(b6)}</td>
+                              <td className="px-3 py-1 text-right font-mono">{pct(b6)}</td>
+                            </tr>
+                            <tr className="border-b border-slate-200 bg-rose-50/30">
+                              <td className="px-3 py-1.5"></td>
+                              <td className="px-3 py-1.5 font-black text-rose-700">Total Variable Cost</td>
+                              <td className="px-3 py-1.5 text-right font-mono font-black text-rose-700">{fAmt(totalVarCost)}</td>
+                              <td className="px-3 py-1.5 text-right font-mono font-bold text-rose-700">{pct(totalVarCost)}</td>
+                            </tr>
+                            
+                            <tr className="border-b border-slate-200 bg-blue-50/30">
+                              <td className="px-3 py-1.5 font-bold text-slate-400">C</td>
+                              <td className="px-3 py-1.5 font-black text-blue-700 text-[9.5px]">Contribution Margin</td>
+                              <td className="px-3 py-1.5 text-right font-mono font-black text-blue-700 text-[9.5px]">{fAmt(cm)}</td>
+                              <td className="px-3 py-1.5 text-right font-mono font-bold text-blue-700">{pct(cm)}</td>
+                            </tr>
+                            
+                            <tr className="border-b border-slate-100 hover:bg-slate-50/80 transition-colors">
+                              <td className="px-3 py-1.5 font-bold text-slate-400">D</td>
+                              <td className="px-3 py-1.5 font-bold text-slate-800">CM Cost</td>
+                              <td className="px-3 py-1.5 text-right font-mono font-bold text-slate-800">{fAmt(cmCost)}</td>
+                              <td className="px-3 py-1.5 text-right font-mono">{pct(cmCost)}</td>
+                            </tr>
+                            
+                            <tr className="border-b border-slate-200 bg-slate-50/80">
+                              <td className="px-3 py-1.5 font-bold text-slate-400">E</td>
+                              <td className="px-3 py-1.5 font-black text-slate-900">Operating Profit</td>
+                              <td className="px-3 py-1.5 text-right font-mono font-black text-slate-900">{fAmt(opProfit)}</td>
+                              <td className="px-3 py-1.5 text-right font-mono font-bold text-slate-900">{pct(opProfit)}</td>
+                            </tr>
+                            
+                            <tr className="border-b border-slate-100 hover:bg-slate-50/80 transition-colors text-slate-600">
+                              <td className="px-3 py-1 text-slate-400">F</td>
+                              <td className="px-3 py-1">Commission Cost</td>
+                              <td className="px-3 py-1 text-right font-mono">{fAmt(fComm)}</td>
+                              <td className="px-3 py-1 text-right font-mono">{pct(fComm)}</td>
+                            </tr>
+                            <tr className="border-b border-slate-100 hover:bg-slate-50/80 transition-colors text-slate-600">
+                              <td className="px-3 py-1 text-slate-400">G</td>
+                              <td className="px-3 py-1">Special Cost</td>
+                              <td className="px-3 py-1 text-right font-mono">{fAmt(gSpec)}</td>
+                              <td className="px-3 py-1 text-right font-mono">{pct(gSpec)}</td>
+                            </tr>
+                            <tr className="border-b border-slate-100 hover:bg-slate-50/80 transition-colors text-slate-600">
+                              <td className="px-3 py-1 text-slate-400">H</td>
+                              <td className="px-3 py-1">Others Cost</td>
+                              <td className="px-3 py-1 text-right font-mono font-medium text-slate-800">{fAmt(hOth)}</td>
+                              <td className="px-3 py-1 text-right font-mono">{pct(hOth)}</td>
+                            </tr>
+                            <tr className="border-b border-slate-200 hover:bg-slate-50/80 transition-colors text-slate-600">
+                              <td className="px-3 py-1 text-slate-400">I</td>
+                              <td className="px-3 py-1">Sample Cost</td>
+                              <td className="px-3 py-1 text-right font-mono">{fAmt(iSamp)}</td>
+                              <td className="px-3 py-1 text-right font-mono">{pct(iSamp)}</td>
+                            </tr>
+                            
+                            <tr className="border-b border-slate-200 bg-slate-100/60">
+                              <td className="px-3 py-1.5 font-bold text-slate-400">J</td>
+                              <td className="px-3 py-1.5 font-black text-slate-900 text-[9.5px]">Total Cost</td>
+                              <td className="px-3 py-1.5 text-right font-mono font-black text-slate-900 text-[9.5px]">{fAmt(totalCost)}</td>
+                              <td className="px-3 py-1.5 text-right font-mono font-bold text-slate-900">{pct(totalCost)}</td>
+                            </tr>
+                            
+                            <tr className={netProfit >= 0 ? "bg-emerald-50/60" : "bg-rose-50/60"}>
+                              <td className="px-3 py-1.5 font-bold text-slate-400">K</td>
+                              <td className={`px-3 py-1.5 font-black text-[10.5px] ${netProfit >= 0 ? "text-emerald-700" : "text-rose-700"}`}>Net Profit</td>
+                              <td className={`px-3 py-1.5 text-right font-mono font-black text-[10.5px] ${netProfit >= 0 ? "text-emerald-700" : "text-rose-700"}`}>{fAmt(netProfit)}</td>
+                              <td className={`px-3 py-1.5 text-right font-mono font-bold ${netProfit >= 0 ? "text-emerald-700" : "text-rose-700"}`}>{pct(netProfit)}</td>
+                            </tr>
+                            
+                          </tbody>
+                        </table>
+                      </div>
+                    );
+                  })()}
                 </div>
 
               </div>
+
 
               {/* Bottom Signature Blocks (3 Column Grid) */}
               <div className="pt-10 grid grid-cols-1 md:grid-cols-3 gap-6 text-[10px] text-slate-500">
