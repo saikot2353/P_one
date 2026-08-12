@@ -147,7 +147,7 @@ const SAMPLE: PreCostRecord[] = [{
   styleName: "SS27PB093-SL", deliveryDate: "2026-09-26",
   buyerName: "PEPCO", orderNo: "ORD01833307/08/09/10/11/12_01", country: "Poland",
   buyerHouse: "PGS", brand: "", preCostDate: "2026-08-02",
-  orderQtyPcs: 39024, unitPrice: 3.15,
+  orderQtyPcs: 39024, unitPrice: 4.15,
   planCutQty: 39414, setRatio: 1.00, cmPct: 23.81,
   qualityLevel: "A-Level", inspectionType: "Final Inspection", season: "SS27", merchandiser: "Md. Al Amin",
   exchangeRate: 120, shippingMode: "Sea", payTerm: "At Sight", tenor: "",
@@ -162,7 +162,7 @@ const SAMPLE: PreCostRecord[] = [{
   styleFOBRows: [
     {
       id: 1, styleNo: "SS27PB093-SL", colour: "Verdant Green", itemName: "Sweat Shirt",
-      orderQty: 39024, unitPrice: 3.15, deliveryDate: "2026-09-26",
+      orderQty: 39024, unitPrice: 4.15, deliveryDate: "2026-09-26",
       sizeGroup: "Boys 8-14", sizes: "S, M, L, XL", sizesQty: 39024,
       print: true, embroidery: false, wash: true, special: false,
       commissionPct: 0, commissionAmt: 0, planCutQty: 39414, buyerCosting: "Pepco Target Costing"
@@ -178,7 +178,9 @@ const SAMPLE: PreCostRecord[] = [{
     { id:2, composition:"100% Polyester",           count:"200D/96F", yarnType:"Filament", colour:"Average", yarnQty:3818.71,  rate:2.20 },
     { id:3, composition:"65% Polyester 35% Cotton", count:"28/1", yarnType:"PC",       colour:"Average", yarnQty:590.50,   rate:3.00 },
   ],
-  dyedYarnRows: [],
+  dyedYarnRows: [
+    { id:1, style:"SS27PB093-SL", yarnInfo:"30/1 Combed", colour:"Verdant Green", shade:"Dark", quantity:1200, uom:"Kg", rate:3.50 }
+  ],
   conversionRows: [
     { id:1, processType:"Knitting", styleRef:"SS27PB093-SL::Verdant Green", fabNature:"Knit", fabricInfo:"FLAT BACK RIB:73% Polyester 27% Cotton", gsm:340, colType:"Solid", colour:"Verdant Green", shade:"Dark (3.00% - 5.00%)", prQty:15134.25, uom:"Kg", rate:0.70 },
     { id:2, processType:"Knitting", styleRef:"SS27PB093-SL::Verdant Green", fabNature:"Knit", fabricInfo:"S/J:73% Polyester 27% Cotton",          gsm:160, colType:"Solid", colour:"Verdant Green", shade:"Dark (3.00% - 5.00%)", prQty:776.98,   uom:"Kg", rate:0.16 },
@@ -199,7 +201,7 @@ const SAMPLE: PreCostRecord[] = [{
     { id:1, style:"SS27PB093-SL", gmtItem:"Sweat Shirt", gmtDzn:3252, cpm:0.065, smv:4.62, efficiencyPct:40 },
   ],
   commissionRows: [
-    { id:1, style:"SS27PB093-SL", colour:"Verdant Green", commissionPct:0 },
+    { id:1, style:"SS27PB093-SL", colour:"Verdant Green", commissionPct:1.5 },
   ],
   specialCostRows: [
     { id:1, styleRef:"SS27PB093-SL::Verdant Green", colour:"Verdant Green", costHead:"Test Cost", orderQtyDzn:3252, ratePerDzn:0.03 },

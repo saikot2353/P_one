@@ -74,6 +74,7 @@ const DEF_OTHER: CostRow[] = [
   { id:1, name:"Lab Test",          unit:"Dzn", rate:0.10 },
   { id:2, name:"Inspection Charge", unit:"Dzn", rate:0.05 },
   { id:3, name:"Commission",        unit:"Dzn", rate:0.12 },
+  { id:4, name:"Sample Cost",       unit:"Dzn", rate:0.03 },
 ];
 const DEF_YARN: YarnRow[]     = [{ id:1, yarnType:"26s Cotton", rate:2.900, pct:100 }];
 const DEF_KNIT: KnittingRow[] = [{ id:1, name:"Lycra Single Jersey", rate:0.200 }];
@@ -1165,10 +1166,12 @@ export default function MerchandisingQuotationPage() {
                     const cmCost = qtyDozen * form.cmPerDozen;
                     const opProfit = cm - cmCost;
 
-                    const fComm = 0;
+                    const fCommRate = form.otherCostRows.find(r => r.name.toLowerCase() === "commission")?.rate || 0;
+                    const fComm = qtyDozen * fCommRate;
+                    const sampleRate = form.otherCostRows.find(r => r.name.toLowerCase().includes("sample"))?.rate || 0;
+                    const iSamp = qtyDozen * sampleRate;
                     const gSpec = qtyDozen * C.gmt;
-                    const hOth = qtyDozen * (C.oth + C.bank + C.com);
-                    const iSamp = 0;
+                    const hOth = qtyDozen * (C.oth - fCommRate - sampleRate + C.bank + C.com);
                     const totalCost = totalVarCost + cmCost + fComm + gSpec + hOth + iSamp;
                     const netProfit = netOrderValue - totalCost;
 
