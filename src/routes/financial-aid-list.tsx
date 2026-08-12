@@ -87,6 +87,17 @@ function FinancialAidPage() {
     localStorage.setItem("cripton_financial_aid_budget", budgetPool.toString());
   }, [budgetPool]);
 
+
+  const [budgetPools, setBudgetPools] = useState<{ year: number; amount: number }[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("cripton_financial_aid_budgets");
+      return saved ? JSON.parse(saved) : [{ year: new Date().getFullYear(), amount: 1500000 }];
+    }
+    return [{ year: new Date().getFullYear(), amount: 1500000 }];
+  });
+
+  const [selectedBudgetYear, setSelectedBudgetYear] = useState<number>(new Date().getFullYear());
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("ALL");
   const [dateFrom, setDateFrom] = useState("");
@@ -223,28 +234,26 @@ function FinancialAidPage() {
 
 
   const stats = useMemo(() => {
+    const yearRecords = records.filter(r => r.requestDate.startsWith(selectedBudgetYear.toString()));
+    
     let totalApproved = 0;
-    records.forEach((r) => {
+    yearRecords.forEach((r) => {
       if (r.status === "Approved") {
         totalApproved += r.amount;
       }
     });
 
-    let budgetPool = 1500000;
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("cripton_financial_aid_budget");
-      if (saved) budgetPool = parseFloat(saved);
-    }
-
-    const remainingBudget = budgetPool - totalApproved;
+    const activePool = budgetPools.find(b => b.year === selectedBudgetYear);
+    const currentBudget = activePool ? activePool.amount : 0;
+    const remainingBudget = currentBudget - totalApproved;
 
     return {
-      budgetPool,
+      currentBudget,
       totalApproved,
       remainingBudget,
-      pendingApprovalCount: records.filter((r) => r.status === "Pending").length,
+      pendingApprovalCount: yearRecords.filter((r) => r.status === "Pending").length,
     };
-  }, [records]);
+  }, [records, budgetPools, selectedBudgetYear]);
 
 
   const filteredRecords = useMemo(() => {
@@ -419,7 +428,16 @@ function FinancialAidPage() {
             </p>
           </div>
 
-          <div className="flex items-center justify-end print:hidden">
+          <div className="flex items-center justify-between print:hidden">
+            <select
+              value={selectedBudgetYear}
+              onChange={(e) => setSelectedBudgetYear(parseInt(e.target.value))}
+              className="h-8 px-3 rounded-lg bg-white border border-slate-200 text-xs font-bold text-slate-700 outline-none hover:border-slate-300 focus:border-blue-500 transition-colors shadow-sm"
+            >
+              {budgetPools.map(b => (
+                <option key={b.year} value={b.year}>{b.year}</option>
+              ))}
+            </select>
             <button
               onClick={() => {
                 setNewEmpName("");
@@ -445,7 +463,7 @@ function FinancialAidPage() {
               <span className="text-[9px] font-bold tracking-widest uppercase mb-1">
                 Welfare Budget Pool
               </span>
-              <div className="text-xl font-black text-emerald-600">৳ {stats.budgetPool.toLocaleString()}</div>
+              <div className="text-xl font-black text-emerald-600">৳ {stats.currentBudget.toLocaleString()}</div>
               <div className="text-[10px] opacity-75 font-medium mt-0.5 text-emerald-600">Total corporate fund set</div>
             </div>
             <div className="p-4 rounded-xl bg-[#EFF6FF] text-blue-700 shadow-sm flex flex-col justify-center">
