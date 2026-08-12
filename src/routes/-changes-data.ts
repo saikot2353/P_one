@@ -2,6 +2,33 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "156",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Modify",
+    module: "Recruitment Configuration",
+    link: "/recruitment-configuration",
+    descriptionEn: "Added a new 'Weight Factor' field to the Operation Grade configuration matrix. It captures a numeric 2-decimal value and displays it in the data table.",
+    descriptionBn: "অপারেশন গ্রেড (Operation Grade) কনফিগারেশন ম্যাট্রিক্সে নতুন 'Weight Factor' ফিল্ড যোগ করা হয়েছে। এটি ২ দশমিক স্থান পর্যন্ত সংখ্যা ধারণ করতে পারে এবং তা ডেটা টেবিলে প্রদর্শিত হবে।",
+  },
+  {
+    id: "155",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Modify",
+    module: "Recruitment Configuration",
+    link: "/recruitment-configuration",
+    descriptionEn: "Updated the SMV Value in the SMV Bank configuration matrix to consistently format to 4 decimal places.",
+    descriptionBn: "এসএমভি ব্যাংক (SMV Bank) কনফিগারেশন ম্যাট্রিক্সে SMV Value কে ৪ ডেসিমেল প্লেস (৪ দশমিক স্থান) পর্যন্ত ফরম্যাট করা হয়েছে।",
+  },
+  {
+    id: "154",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Modify",
+    module: "Recruitment Configuration",
+    link: "/recruitment-configuration",
+    descriptionEn: "Updated the OP Grade field in the Multi/SS configuration matrix to use a multi-select component.",
+    descriptionBn: "মাল্টি/এসএস (Multi/SS) কনফিগারেশন ম্যাট্রিক্সে OP Grade ফিল্ডটিকে আপডেট করে মাল্টি-সিলেক্ট কম্পোনেন্ট ব্যবহার করা হয়েছে।",
+  },
+  {
     id: "153",
     date: new Date().toISOString().slice(0, 16),
     type: "Feature",

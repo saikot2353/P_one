@@ -23,6 +23,7 @@ import {
   CalendarClock,
 } from "lucide-react";
 import { initializeRecruitmentMockData } from "@/lib/recruitment-mock-data";
+import { MultiSelect } from "@/components/ui/multi-select";
 
 export const Route = createFileRoute("/recruitment-configuration")({
   component: RecruitmentConfiguration,
@@ -434,9 +435,14 @@ function RecruitmentConfiguration() {
                       </>
                     )}
                     {activeTab === "op_grade" && (
-                      <th className="px-4 py-3.5 min-w-[160px] border-r border-border/30">
-                        Operation Grade
-                      </th>
+                      <>
+                        <th className="px-4 py-3.5 min-w-[160px] border-r border-border/30">
+                          Operation Grade
+                        </th>
+                        <th className="px-4 py-3.5 min-w-[120px] border-r border-border/30">
+                          Weight Factor
+                        </th>
+                      </>
                     )}
                     {activeTab === "measurement" && (
                       <th className="px-4 py-3.5 min-w-[200px] border-r border-border/30">
@@ -611,11 +617,16 @@ function RecruitmentConfiguration() {
                           </>
                         )}
                         {activeTab === "op_grade" && (
-                          <td className="px-4 py-3 border-r border-border/30">
-                            <span className="bg-violet-100 text-violet-800 dark:bg-violet-950/40 dark:text-violet-400 text-[11px] font-black px-2.5 py-0.5 rounded-full">
-                              {item.grade}
-                            </span>
-                          </td>
+                          <>
+                            <td className="px-4 py-3 border-r border-border/30">
+                              <span className="bg-violet-100 text-violet-800 dark:bg-violet-950/40 dark:text-violet-400 text-[11px] font-black px-2.5 py-0.5 rounded-full">
+                                {item.grade}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 font-mono font-black text-primary border-r border-border/30">
+                              {item.weightFactor ? Number(item.weightFactor).toFixed(2) : ""}
+                            </td>
+                          </>
                         )}
                         {activeTab === "measurement" && (
                           <td className="px-4 py-3 font-mono font-semibold border-r border-border/30">
@@ -641,7 +652,7 @@ function RecruitmentConfiguration() {
                               {item.meas}
                             </td>
                             <td className="px-4 py-3 font-mono font-black text-primary border-r border-border/30">
-                              {item.smvValue}
+                              {item.smvValue ? Number(item.smvValue).toFixed(4) : ""}
                             </td>
                           </>
                         )}
@@ -705,9 +716,13 @@ function RecruitmentConfiguration() {
                               {item.point}
                             </td>
                             <td className="px-4 py-3 border-r border-border/30">
-                              <span className="bg-violet-100 text-violet-800 dark:bg-violet-950/40 dark:text-violet-400 text-[10px] font-black px-2 py-0.5 rounded-full">
-                                {item.opGrade}
-                              </span>
+                              <div className="flex flex-wrap gap-1">
+                                {(Array.isArray(item.opGrade) ? item.opGrade : item.opGrade ? [item.opGrade] : []).map((g: string) => (
+                                  <span key={g} className="bg-violet-100 text-violet-800 dark:bg-violet-950/40 dark:text-violet-400 text-[10px] font-black px-2 py-0.5 rounded-full">
+                                    {g}
+                                  </span>
+                                ))}
+                              </div>
                             </td>
                             <td className="px-4 py-3 font-mono border-r border-border/30">
                               {item.minOpCount}
@@ -871,18 +886,32 @@ function RecruitmentConfiguration() {
 
                   {/* ── Operation Grade ── */}
                   {activeTab === "op_grade" && (
-                    <div className="col-span-2">
-                      <label className={lbl}>
-                        Operation Grade <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.grade || ""}
-                        onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
-                        className={inp}
-                        placeholder="e.g. P, P1, A, B+"
-                      />
-                    </div>
+                    <>
+                      <div className="col-span-2">
+                        <label className={lbl}>
+                          Operation Grade <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.grade || ""}
+                          onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
+                          className={inp}
+                          placeholder="e.g. P, P1, A, B+"
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <label className={lbl}>
+                          Weight Factor <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.weightFactor || ""}
+                          onChange={(e) => setFormData({ ...formData, weightFactor: e.target.value })}
+                          className={inp}
+                          placeholder="e.g. 1.50"
+                        />
+                      </div>
+                    </>
                   )}
 
                   {/* ── Measurement ── */}
@@ -1196,18 +1225,12 @@ function RecruitmentConfiguration() {
                         <label className={lbl}>
                           Op. Grade <span className="text-red-500">*</span>
                         </label>
-                        <select
-                          value={formData.opGrade || ""}
-                          onChange={(e) => setFormData({ ...formData, opGrade: e.target.value })}
-                          className={sel}
-                        >
-                          <option value="">— Select Grade —</option>
-                          {opGrades.map((o) => (
-                            <option key={o.id} value={o.grade}>
-                              {o.grade}
-                            </option>
-                          ))}
-                        </select>
+                        <MultiSelect
+                          options={opGrades.map((o) => ({ value: o.grade, label: o.grade }))}
+                          selected={Array.isArray(formData.opGrade) ? formData.opGrade : formData.opGrade ? [formData.opGrade] : []}
+                          onChange={(selected) => setFormData({ ...formData, opGrade: selected })}
+                          placeholder="— Select Grade —"
+                        />
                       </div>
                       <div>
                         <label className={lbl}>
