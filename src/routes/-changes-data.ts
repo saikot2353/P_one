@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "163",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Financial Aid & Zakat",
+    link: "/financial-aid-list",
+    descriptionEn: "Upgraded the 'Employee Verified Details' card in both the Financial Aid Request and Zakat Assignment modals to display a comprehensive view including the employee's image, department, section, join date, and gross salary.",
+    descriptionBn: "ফাইন্যান্সিয়াল এইড রিকোয়েস্ট এবং যাকাত অ্যাসাইনমেন্ট মোডালগুলোর 'Employee Verified Details' কার্ডটি আরও উন্নত করা হয়েছে। এখন এমপ্লয়ি সিলেক্ট করলে তার ছবি, ডিপার্টমেন্ট, সেকশন, জয়েনিং ডেট এবং গ্রস স্যালারি বিস্তারিতভাবে দেখা যাবে।",
+  },
+  {
     id: "162",
     date: new Date().toISOString().slice(0, 16),
     type: "Modify",
