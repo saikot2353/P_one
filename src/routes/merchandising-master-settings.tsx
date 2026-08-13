@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import MerchandisingLayout from "../components/merchandising/MerchandisingLayout";
 
+export type RateConstraint = "Fixed" | "Increase Only" | "Decrease Only" | "No Restriction";
+
 // ── Costing Configuration Types & Initial Data ──────────────────────────────
 interface CostingConfig {
   id: string;
@@ -336,6 +338,7 @@ const initialFabricNatures: FabricNatureSpec[] = [
 ];
 
 interface FabricConstructionSpec {
+  rateConstraint: RateConstraint;
   id: string;
   name: string;
   rate: number;
@@ -399,30 +402,30 @@ interface YarnTypeSpec {
 }
 
 export const initialYarnTypes: YarnTypeSpec[] = [
-  { id: "yt-1", yarnType: "BCI CARD", createDate: "20/11/2025", status: "Active" },
-  { id: "yt-2", yarnType: "BCI COTTON", createDate: "", status: "Active" },
-  { id: "yt-3", yarnType: "BCI Melange", createDate: "20/10/2025", status: "Active" },
-  { id: "yt-4", yarnType: "BCI PC", createDate: "20/10/2025", status: "Active" },
-  { id: "yt-5", yarnType: "CARD", createDate: "01/10/2024", status: "Active" },
-  { id: "yt-6", yarnType: "CARD SLUB", createDate: "01/10/2024", status: "Active" },
-  { id: "yt-7", yarnType: "Carded", createDate: "03/05/2026", status: "Active" },
-  { id: "yt-8", yarnType: "CARDED SLUB", createDate: "01/10/2024", status: "Active" },
-  { id: "yt-9", yarnType: "COMBED COTTON", createDate: "21/08/2025", status: "Active" },
-  { id: "yt-10", yarnType: "Cotton", createDate: "03/09/2025", status: "Active" },
-  { id: "yt-11", yarnType: "CVC", createDate: "01/10/2024", status: "Active" },
-  { id: "yt-12", yarnType: "CVC VOTEX", createDate: "04/01/2026", status: "Active" },
-  { id: "yt-13", yarnType: "ELASTANCE", createDate: "08/07/2025", status: "Active" },
-  { id: "yt-14", yarnType: "FILAMENT", createDate: "09/02/2026", status: "Active" },
-  { id: "yt-15", yarnType: "GREY MELANCE", createDate: "04/01/2026", status: "Active" },
-  { id: "yt-16", yarnType: "Lycra", createDate: "25/10/2025", status: "Active" },
-  { id: "yt-17", yarnType: "Melange", createDate: "07/02/2026", status: "Active" },
-  { id: "yt-18", yarnType: "ORG COTTON", createDate: "01/10/2024", status: "Active" },
-  { id: "yt-19", yarnType: "Organic CVC", createDate: "15/02/2026", status: "Active" },
-  { id: "yt-20", yarnType: "PC", createDate: "26/10/2025", status: "Active" },
-  { id: "yt-21", yarnType: "Polyester", createDate: "08/10/2025", status: "Active" },
-  { id: "yt-22", yarnType: "RECY COTTON", createDate: "01/10/2024", status: "Active" },
-  { id: "yt-23", yarnType: "SPANDEX", createDate: "", status: "Active" },
-  { id: "yt-24", yarnType: "STRIPE", createDate: "22/10/2025", status: "Active" },
+  { id: "yt-1", yarnType: "BCI CARD", createDate: "20/11/2025", rate: 2.5, rateConstraint: "Increase Only" },
+  { id: "yt-2", yarnType: "BCI COTTON", createDate: "", rate: 2.5, rateConstraint: "Decrease Only" },
+  { id: "yt-3", yarnType: "BCI Melange", createDate: "20/10/2025", rate: 2.5, rateConstraint: "No Restriction" },
+  { id: "yt-4", yarnType: "BCI PC", createDate: "20/10/2025", rate: 2.5, rateConstraint: "Fixed" },
+  { id: "yt-5", yarnType: "CARD", createDate: "01/10/2024", rate: 2.5, rateConstraint: "Increase Only" },
+  { id: "yt-6", yarnType: "CARD SLUB", createDate: "01/10/2024", rate: 2.5, rateConstraint: "Decrease Only" },
+  { id: "yt-7", yarnType: "Carded", createDate: "03/05/2026", rate: 2.5, rateConstraint: "No Restriction" },
+  { id: "yt-8", yarnType: "CARDED SLUB", createDate: "01/10/2024", rate: 2.5, rateConstraint: "Fixed" },
+  { id: "yt-9", yarnType: "COMBED COTTON", createDate: "21/08/2025", rate: 2.5, rateConstraint: "Increase Only" },
+  { id: "yt-10", yarnType: "Cotton", createDate: "03/09/2025", rate: 2.5, rateConstraint: "Decrease Only" },
+  { id: "yt-11", yarnType: "CVC", createDate: "01/10/2024", rate: 2.5, rateConstraint: "No Restriction" },
+  { id: "yt-12", yarnType: "CVC VOTEX", createDate: "04/01/2026", rate: 2.5, rateConstraint: "Fixed" },
+  { id: "yt-13", yarnType: "ELASTANCE", createDate: "08/07/2025", rate: 2.5, rateConstraint: "Increase Only" },
+  { id: "yt-14", yarnType: "FILAMENT", createDate: "09/02/2026", rate: 2.5, rateConstraint: "Decrease Only" },
+  { id: "yt-15", yarnType: "GREY MELANCE", createDate: "04/01/2026", rate: 2.5, rateConstraint: "No Restriction" },
+  { id: "yt-16", yarnType: "Lycra", createDate: "25/10/2025", rate: 2.5, rateConstraint: "Fixed" },
+  { id: "yt-17", yarnType: "Melange", createDate: "07/02/2026", rate: 2.5, rateConstraint: "Increase Only" },
+  { id: "yt-18", yarnType: "ORG COTTON", createDate: "01/10/2024", rate: 2.5, rateConstraint: "Decrease Only" },
+  { id: "yt-19", yarnType: "Organic CVC", createDate: "15/02/2026", rate: 2.5, rateConstraint: "No Restriction" },
+  { id: "yt-20", yarnType: "PC", createDate: "26/10/2025", rate: 2.5, rateConstraint: "Fixed" },
+  { id: "yt-21", yarnType: "Polyester", createDate: "08/10/2025", rate: 2.5, rateConstraint: "Increase Only" },
+  { id: "yt-22", yarnType: "RECY COTTON", createDate: "01/10/2024", rate: 2.5, rateConstraint: "Decrease Only" },
+  { id: "yt-23", yarnType: "SPANDEX", createDate: "", rate: 2.5, rateConstraint: "No Restriction" },
+  { id: "yt-24", yarnType: "STRIPE", createDate: "22/10/2025", rate: 2.5, rateConstraint: "Fixed" },
 ];
 
 interface YarnCountSpec {
@@ -433,24 +436,24 @@ interface YarnCountSpec {
 }
 
 export const initialYarnCounts: YarnCountSpec[] = [
-  { id: "yc-1", name: "10/1", createdDate: "", status: "Active" },
-  { id: "yc-2", name: "12/1", createdDate: "", status: "Active" },
-  { id: "yc-3", name: "150D/144F", createdDate: "", status: "Active" },
-  { id: "yc-4", name: "16/1", createdDate: "", status: "Active" },
-  { id: "yc-5", name: "20/1", createdDate: "", status: "Active" },
-  { id: "yc-6", name: "24/1", createdDate: "", status: "Active" },
-  { id: "yc-7", name: "26/1", createdDate: "", status: "Active" },
-  { id: "yc-8", name: "28/1", createdDate: "", status: "Active" },
-  { id: "yc-9", name: "30/1", createdDate: "", status: "Active" },
-  { id: "yc-10", name: "32/1", createdDate: "", status: "Active" },
-  { id: "yc-11", name: "34/1", createdDate: "", status: "Active" },
-  { id: "yc-12", name: "36/1", createdDate: "", status: "Active" },
-  { id: "yc-13", name: "40/1", createdDate: "", status: "Active" },
-  { id: "yc-14", name: "75D", createdDate: "", status: "Active" },
-  { id: "yc-15", name: "75D/36F", createdDate: "04/03/2026", status: "Active" },
-  { id: "yc-16", name: "20D", createdDate: "", status: "Active" },
-  { id: "yc-17", name: "40D", createdDate: "", status: "Active" },
-  { id: "yc-18", name: "70D", createdDate: "", status: "Active" },
+  { id: "yc-1", name: "10/1", createdDate: "", rate: 2.8, rateConstraint: "Increase Only" },
+  { id: "yc-2", name: "12/1", createdDate: "", rate: 2.8, rateConstraint: "Decrease Only" },
+  { id: "yc-3", name: "150D/144F", createdDate: "", rate: 2.8, rateConstraint: "No Restriction" },
+  { id: "yc-4", name: "16/1", createdDate: "", rate: 2.8, rateConstraint: "Fixed" },
+  { id: "yc-5", name: "20/1", createdDate: "", rate: 2.8, rateConstraint: "Increase Only" },
+  { id: "yc-6", name: "24/1", createdDate: "", rate: 2.8, rateConstraint: "Decrease Only" },
+  { id: "yc-7", name: "26/1", createdDate: "", rate: 2.8, rateConstraint: "No Restriction" },
+  { id: "yc-8", name: "28/1", createdDate: "", rate: 2.8, rateConstraint: "Fixed" },
+  { id: "yc-9", name: "30/1", createdDate: "", rate: 2.8, rateConstraint: "Increase Only" },
+  { id: "yc-10", name: "32/1", createdDate: "", rate: 2.8, rateConstraint: "Decrease Only" },
+  { id: "yc-11", name: "34/1", createdDate: "", rate: 2.8, rateConstraint: "No Restriction" },
+  { id: "yc-12", name: "36/1", createdDate: "", rate: 2.8, rateConstraint: "Fixed" },
+  { id: "yc-13", name: "40/1", createdDate: "", rate: 2.8, rateConstraint: "Increase Only" },
+  { id: "yc-14", name: "75D", createdDate: "", rate: 2.8, rateConstraint: "Decrease Only" },
+  { id: "yc-15", name: "75D/36F", createdDate: "04/03/2026", rate: 2.8, rateConstraint: "No Restriction" },
+  { id: "yc-16", name: "20D", createdDate: "", rate: 2.8, rateConstraint: "Fixed" },
+  { id: "yc-17", name: "40D", createdDate: "", rate: 2.8, rateConstraint: "Increase Only" },
+  { id: "yc-18", name: "70D", createdDate: "", rate: 2.8, rateConstraint: "Decrease Only" },
 ];
 
 interface YarnPoTypeSpec {
@@ -551,16 +554,16 @@ interface SpecialCostSpec {
 }
 
 export const initialSpecialCosts: SpecialCostSpec[] = [
-  { id: "sc-1", costType: "Embroidery", header: "Plain", sortOrder: 1, description: "Plain", maxValuePerUnit: 0, ratePerDzn: 3.00, isActive: "Active", rateCharts: [] },
-  { id: "sc-2", costType: "Embroidery", header: "Floral", sortOrder: 1, description: "Floral", maxValuePerUnit: 5, ratePerDzn: 1.50, isActive: "Active", rateCharts: [] },
-  { id: "sc-3", costType: "Embroidery", header: "Tonal", sortOrder: 1, description: "Tonal", maxValuePerUnit: 5, ratePerDzn: 3.00, isActive: "Active", rateCharts: [] },
-  { id: "sc-4", costType: "Embroidery", header: "Chinile", sortOrder: 1, description: "Chinile", maxValuePerUnit: 0.1, ratePerDzn: 1.00, isActive: "Active", rateCharts: [] },
-  { id: "sc-5", costType: "Embroidery", header: "Chain Stech", sortOrder: 1, description: "Chain Stech", maxValuePerUnit: 5, ratePerDzn: 5.00, isActive: "Active", rateCharts: [] },
-  { id: "sc-6", costType: "Print", header: "Rubber Flock", sortOrder: 1, description: "Rubber Flock", maxValuePerUnit: 0.2, ratePerDzn: 1.00, isActive: "Active", rateCharts: [] },
-  { id: "sc-7", costType: "Print", header: "Rubber Foil", sortOrder: 1, description: "Rubber Foil", maxValuePerUnit: 0.2, ratePerDzn: 1.00, isActive: "Active", rateCharts: [] },
-  { id: "sc-8", costType: "Print", header: "Rubber Glitter", sortOrder: 1, description: "Rubber Glitter", maxValuePerUnit: 0, ratePerDzn: 0.00, isActive: "Active", rateCharts: [] },
-  { id: "sc-9", costType: "Print", header: "Pigment", sortOrder: 1, description: "Pigment", maxValuePerUnit: 0.416, ratePerDzn: 5.00, isActive: "Active", rateCharts: [] },
-  { id: "sc-10", costType: "Wash", header: "Garment dyed", sortOrder: 1, description: "Wash", maxValuePerUnit: 0.416, ratePerDzn: 5.00, isActive: "Active", rateCharts: [] },
+  { id: "sc-1", costType: "Embroidery", header: "Plain", sortOrder: 1, description: "Plain", maxValuePerUnit: 0, ratePerDzn: 3.00, isActive: "Active", rateConstraint: "Increase Only" },
+  { id: "sc-2", costType: "Embroidery", header: "Floral", sortOrder: 1, description: "Floral", maxValuePerUnit: 5, ratePerDzn: 1.50, isActive: "Active", rateConstraint: "Decrease Only" },
+  { id: "sc-3", costType: "Embroidery", header: "Tonal", sortOrder: 1, description: "Tonal", maxValuePerUnit: 5, ratePerDzn: 3.00, isActive: "Active", rateConstraint: "No Restriction" },
+  { id: "sc-4", costType: "Embroidery", header: "Chinile", sortOrder: 1, description: "Chinile", maxValuePerUnit: 0.1, ratePerDzn: 1.00, isActive: "Active", rateConstraint: "Fixed" },
+  { id: "sc-5", costType: "Embroidery", header: "Chain Stech", sortOrder: 1, description: "Chain Stech", maxValuePerUnit: 5, ratePerDzn: 5.00, isActive: "Active", rateConstraint: "Increase Only" },
+  { id: "sc-6", costType: "Print", header: "Rubber Flock", sortOrder: 1, description: "Rubber Flock", maxValuePerUnit: 0.2, ratePerDzn: 1.00, isActive: "Active", rateConstraint: "Decrease Only" },
+  { id: "sc-7", costType: "Print", header: "Rubber Foil", sortOrder: 1, description: "Rubber Foil", maxValuePerUnit: 0.2, ratePerDzn: 1.00, isActive: "Active", rateConstraint: "No Restriction" },
+  { id: "sc-8", costType: "Print", header: "Rubber Glitter", sortOrder: 1, description: "Rubber Glitter", maxValuePerUnit: 0, ratePerDzn: 0.00, isActive: "Active", rateConstraint: "Fixed" },
+  { id: "sc-9", costType: "Print", header: "Pigment", sortOrder: 1, description: "Pigment", maxValuePerUnit: 0.416, ratePerDzn: 5.00, isActive: "Active", rateConstraint: "Increase Only" },
+  { id: "sc-10", costType: "Wash", header: "Garment dyed", sortOrder: 1, description: "Wash", maxValuePerUnit: 0.416, ratePerDzn: 5.00, isActive: "Active", rateConstraint: "Decrease Only" },
 ];
 
 interface AopProcessSpec {
@@ -582,9 +585,9 @@ interface AdditionalCostSpec {
 }
 
 export const initialAdditionalCosts: AdditionalCostSpec[] = [
-  { id: "ac-1", titleName: "Financial Cost (%)", orderNumber: 1, status: "Active" },
-  { id: "ac-2", titleName: "Commission(%)", orderNumber: 2, status: "Active" },
-  { id: "ac-3", titleName: "Commercial (%)", orderNumber: 3, status: "Active" },
+  { id: "ac-1", titleName: "Financial Cost (%)", orderNumber: 1, rate: 2, rateConstraint: "Increase Only" },
+  { id: "ac-2", titleName: "Commission(%)", orderNumber: 2, rate: 2, rateConstraint: "Decrease Only" },
+  { id: "ac-3", titleName: "Commercial (%)", orderNumber: 3, rate: 2, rateConstraint: "No Restriction" },
 ];
 
 interface RmgProcessLossSpec {
@@ -653,49 +656,51 @@ interface DyeingSpec {
   id: string;
   dyeingName: string;
   rate: number;
+  rateConstraint: RateConstraint;
   status: "Active" | "Inactive";
 }
 
 export const initialDyeings: DyeingSpec[] = [
-  { id: "dy-1", dyeingName: "Average", rate: 1, status: "Active" },
-  { id: "dy-2", dyeingName: "Black", rate: 1, status: "Active" },
-  { id: "dy-3", dyeingName: "Cotton Dyeing", rate: 0, status: "Active" },
-  { id: "dy-4", dyeingName: "Dark", rate: 2, status: "Active" },
-  { id: "dy-5", dyeingName: "Double Part Dyeing", rate: 0, status: "Active" },
-  { id: "dy-6", dyeingName: "Extra Dark", rate: 15, status: "Active" },
-  { id: "dy-7", dyeingName: "Fluorescent", rate: 0, status: "Active" },
-  { id: "dy-8", dyeingName: "Garments Wash", rate: 0, status: "Active" },
-  { id: "dy-9", dyeingName: "Light", rate: 1, status: "Active" },
-  { id: "dy-10", dyeingName: "Medium", rate: 2, status: "Active" },
-  { id: "dy-11", dyeingName: "N/A", rate: 0, status: "Active" },
-  { id: "dy-12", dyeingName: "Pigment (AOP)", rate: 0, status: "Active" },
-  { id: "dy-13", dyeingName: "RFD", rate: 0, status: "Active" },
-  { id: "dy-14", dyeingName: "Royal", rate: 0, status: "Active" },
-  { id: "dy-15", dyeingName: "Wash", rate: 0, status: "Active" },
-  { id: "dy-16", dyeingName: "White", rate: 0, status: "Active" },
-  { id: "dy-17", dyeingName: "Yarn Dyeing", rate: 0, status: "Active" },
-  { id: "dy-18", dyeingName: "YD Wash", rate: 0, status: "Active" },
+  { id: "dy-1", dyeingName: "Average", rate: 1, rateConstraint: "Increase Only" },
+  { id: "dy-2", dyeingName: "Black", rate: 1, rateConstraint: "Decrease Only" },
+  { id: "dy-3", dyeingName: "Cotton Dyeing", rate: 0, rateConstraint: "No Restriction" },
+  { id: "dy-4", dyeingName: "Dark", rate: 2, rateConstraint: "Fixed" },
+  { id: "dy-5", dyeingName: "Double Part Dyeing", rate: 0, rateConstraint: "Increase Only" },
+  { id: "dy-6", dyeingName: "Extra Dark", rate: 15, rateConstraint: "Decrease Only" },
+  { id: "dy-7", dyeingName: "Fluorescent", rate: 0, rateConstraint: "No Restriction" },
+  { id: "dy-8", dyeingName: "Garments Wash", rate: 0, rateConstraint: "Fixed" },
+  { id: "dy-9", dyeingName: "Light", rate: 1, rateConstraint: "Increase Only" },
+  { id: "dy-10", dyeingName: "Medium", rate: 2, rateConstraint: "Decrease Only" },
+  { id: "dy-11", dyeingName: "N/A", rate: 0, rateConstraint: "No Restriction" },
+  { id: "dy-12", dyeingName: "Pigment (AOP)", rate: 0, rateConstraint: "Fixed" },
+  { id: "dy-13", dyeingName: "RFD", rate: 0, rateConstraint: "Increase Only" },
+  { id: "dy-14", dyeingName: "Royal", rate: 0, rateConstraint: "Decrease Only" },
+  { id: "dy-15", dyeingName: "Wash", rate: 0, rateConstraint: "No Restriction" },
+  { id: "dy-16", dyeingName: "White", rate: 0, rateConstraint: "Fixed" },
+  { id: "dy-17", dyeingName: "Yarn Dyeing", rate: 0, rateConstraint: "Increase Only" },
+  { id: "dy-18", dyeingName: "YD Wash", rate: 0, rateConstraint: "Decrease Only" },
 ];
 
 interface FinishingSpec {
   id: string;
   finishingName: string;
   rate: number;
+  rateConstraint: RateConstraint;
   status: "Active" | "Inactive";
 }
 
 export const initialFinishings: FinishingSpec[] = [
-  { id: "fin-1", finishingName: "Brushing", rate: 0, status: "Active" },
-  { id: "fin-2", finishingName: "Compacting", rate: 2.0200, status: "Active" },
-  { id: "fin-3", finishingName: "Dryer", rate: 0, status: "Active" },
-  { id: "fin-4", finishingName: "Heat Set", rate: 0, status: "Active" },
-  { id: "fin-5", finishingName: "Hydrophilic Softner", rate: 0, status: "Active" },
-  { id: "fin-6", finishingName: "Peach Finishing", rate: 0, status: "Active" },
-  { id: "fin-7", finishingName: "Shearing", rate: 0, status: "Active" },
-  { id: "fin-8", finishingName: "Sinzing", rate: 0, status: "Active" },
-  { id: "fin-9", finishingName: "Stenter", rate: 0, status: "Active" },
-  { id: "fin-10", finishingName: "Sueding", rate: 0, status: "Active" },
-  { id: "fin-11", finishingName: "Teflone Finish", rate: 0, status: "Active" },
+  { id: "fin-1", finishingName: "Brushing", rate: 0, rateConstraint: "Increase Only" },
+  { id: "fin-2", finishingName: "Compacting", rate: 2.0200, rateConstraint: "Decrease Only" },
+  { id: "fin-3", finishingName: "Dryer", rate: 0, rateConstraint: "No Restriction" },
+  { id: "fin-4", finishingName: "Heat Set", rate: 0, rateConstraint: "Fixed" },
+  { id: "fin-5", finishingName: "Hydrophilic Softner", rate: 0, rateConstraint: "Increase Only" },
+  { id: "fin-6", finishingName: "Peach Finishing", rate: 0, rateConstraint: "Decrease Only" },
+  { id: "fin-7", finishingName: "Shearing", rate: 0, rateConstraint: "No Restriction" },
+  { id: "fin-8", finishingName: "Sinzing", rate: 0, rateConstraint: "Fixed" },
+  { id: "fin-9", finishingName: "Stenter", rate: 0, rateConstraint: "Increase Only" },
+  { id: "fin-10", finishingName: "Sueding", rate: 0, rateConstraint: "Decrease Only" },
+  { id: "fin-11", finishingName: "Teflone Finish", rate: 0, rateConstraint: "No Restriction" },
 ];
 
 interface ShadeRangeSpec {
@@ -861,6 +866,7 @@ interface TrimsMaster {
   subCategory: string;
   uom: string;
   unitPriceUsd: number;
+  rateConstraint: RateConstraint;
   nominatedSupplier: string;
 }
 
@@ -905,11 +911,11 @@ const initialProcessLoss: ProcessLoss[] = [
 ];
 
 export const initialTrims: TrimsMaster[] = [
-  { id: "t-1", itemCode: "TRM-THD-01", itemName: "100% Spun Polyester Thread 40/2", category: "Sewing Trims", subCategory: "Sewing Thread", uom: "Cone (4000m)", unitPriceUsd: 1.45, nominatedSupplier: "Coats Bangladesh" },
-  { id: "t-2", itemCode: "TRM-LBL-02", itemName: "Woven Main Label (Damask HD)", category: "Sewing Trims", subCategory: "Labels", uom: "Pcs", unitPriceUsd: 0.035, nominatedSupplier: "Avery Dennison BD" },
-  { id: "t-3", itemCode: "TRM-PLY-03", itemName: "Self-Seal Polybag (12x18 inch)", category: "Packing Trims", subCategory: "Polybags", uom: "Pcs", unitPriceUsd: 0.042, nominatedSupplier: "Kazi Poly Ltd" },
-  { id: "t-4", itemCode: "TRM-CTN-04", itemName: "7-Ply Master Shipping Carton", category: "Packing Trims", subCategory: "Cartons", uom: "Pcs", unitPriceUsd: 0.85, nominatedSupplier: "Mir Carton Ltd" },
-  { id: "t-5", itemCode: "TRM-ZIP-05", itemName: "#5 Nylon Open-End Metal Zipper", category: "Sewing Trims", subCategory: "Zippers", uom: "Pcs", unitPriceUsd: 0.28, nominatedSupplier: "YKK Bangladesh Ltd" },
+  { id: "t-1", itemCode: "TRM-THD-01", itemName: "100% Spun Polyester Thread 40/2", category: "Sewing Trims", subCategory: "Sewing Thread", uom: "Cone (4000m)", unitPriceUsd: 1.45, rateConstraint: "Increase Only" },
+  { id: "t-2", itemCode: "TRM-LBL-02", itemName: "Woven Main Label (Damask HD)", category: "Sewing Trims", subCategory: "Labels", uom: "Pcs", unitPriceUsd: 0.035, rateConstraint: "Decrease Only" },
+  { id: "t-3", itemCode: "TRM-PLY-03", itemName: "Self-Seal Polybag (12x18 inch)", category: "Packing Trims", subCategory: "Polybags", uom: "Pcs", unitPriceUsd: 0.042, rateConstraint: "No Restriction" },
+  { id: "t-4", itemCode: "TRM-CTN-04", itemName: "7-Ply Master Shipping Carton", category: "Packing Trims", subCategory: "Cartons", uom: "Pcs", unitPriceUsd: 0.85, rateConstraint: "Fixed" },
+  { id: "t-5", itemCode: "TRM-ZIP-05", itemName: "#5 Nylon Open-End Metal Zipper", category: "Sewing Trims", subCategory: "Zippers", uom: "Pcs", unitPriceUsd: 0.28, rateConstraint: "Increase Only" },
 ];
 
 const initialSpecs: SpecParameter[] = [
@@ -7679,6 +7685,23 @@ function MerchandisingMasterSettingsPage() {
                         <option value="Inactive">Inactive</option>
                       </select>
                     </div>
+                  <div>
+                    <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Rate</label>
+                    <input type="number" step="0.01" value={yarnTypeForm.rate || 0} onChange={(e) => setYarnTypeForm({ ...yarnTypeForm, rate: Number(e.target.value) })} className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30" />
+                  </div>
+                  <div className="">
+                    <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Rate Constraint</label>
+                    <select
+                      value={yarnTypeForm.rateConstraint || "No Restriction"}
+                      onChange={(e) => setYarnTypeForm({ ...yarnTypeForm, rateConstraint: e.target.value as RateConstraint })}
+                      className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                    >
+                      <option value="No Restriction">No Restriction</option>
+                      <option value="Fixed">Fixed</option>
+                      <option value="Increase Only">Increase Only</option>
+                      <option value="Decrease Only">Decrease Only</option>
+                    </select>
+                  </div>
 
                     <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
                       <button
@@ -7858,6 +7881,23 @@ function MerchandisingMasterSettingsPage() {
                         <option value="Inactive">Inactive</option>
                       </select>
                     </div>
+                  <div>
+                    <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Rate</label>
+                    <input type="number" step="0.01" value={yarnCountForm.rate || 0} onChange={(e) => setYarnCountForm({ ...yarnCountForm, rate: Number(e.target.value) })} className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30" />
+                  </div>
+                  <div className="">
+                    <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Rate Constraint</label>
+                    <select
+                      value={yarnCountForm.rateConstraint || "No Restriction"}
+                      onChange={(e) => setYarnCountForm({ ...yarnCountForm, rateConstraint: e.target.value as RateConstraint })}
+                      className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                    >
+                      <option value="No Restriction">No Restriction</option>
+                      <option value="Fixed">Fixed</option>
+                      <option value="Increase Only">Increase Only</option>
+                      <option value="Decrease Only">Decrease Only</option>
+                    </select>
+                  </div>
 
                     <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
                       <button
@@ -8848,6 +8888,19 @@ function MerchandisingMasterSettingsPage() {
                         <option value="Inactive">Inactive</option>
                       </select>
                     </div>
+                  <div className="">
+                    <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Rate Constraint</label>
+                    <select
+                      value={specialCostForm.rateConstraint || "No Restriction"}
+                      onChange={(e) => setSpecialCostForm({ ...specialCostForm, rateConstraint: e.target.value as RateConstraint })}
+                      className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                    >
+                      <option value="No Restriction">No Restriction</option>
+                      <option value="Fixed">Fixed</option>
+                      <option value="Increase Only">Increase Only</option>
+                      <option value="Decrease Only">Decrease Only</option>
+                    </select>
+                  </div>
 
                     <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
                       <button
@@ -9538,6 +9591,23 @@ function MerchandisingMasterSettingsPage() {
                         <option value="Inactive">Inactive</option>
                       </select>
                     </div>
+                  <div>
+                    <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Rate</label>
+                    <input type="number" step="0.01" value={additionalCostForm.rate || 0} onChange={(e) => setAdditionalCostForm({ ...additionalCostForm, rate: Number(e.target.value) })} className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30" />
+                  </div>
+                  <div className="">
+                    <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Rate Constraint</label>
+                    <select
+                      value={additionalCostForm.rateConstraint || "No Restriction"}
+                      onChange={(e) => setAdditionalCostForm({ ...additionalCostForm, rateConstraint: e.target.value as RateConstraint })}
+                      className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                    >
+                      <option value="No Restriction">No Restriction</option>
+                      <option value="Fixed">Fixed</option>
+                      <option value="Increase Only">Increase Only</option>
+                      <option value="Decrease Only">Decrease Only</option>
+                    </select>
+                  </div>
 
                     <div className="flex items-center justify-between pt-4">
                       <button
@@ -10366,6 +10436,19 @@ function MerchandisingMasterSettingsPage() {
                         className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
                       />
                     </div>
+                  <div className="">
+                    <label className="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-505 mb-1.5">Rate Constraint</label>
+                    <select
+                      value={fabricConstructionForm.rateConstraint || "No Restriction"}
+                      onChange={(e) => setFabricConstructionForm({ ...fabricConstructionForm, rateConstraint: e.target.value as RateConstraint })}
+                      className="w-full text-xs font-semibold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                    >
+                      <option value="No Restriction">No Restriction</option>
+                      <option value="Fixed">Fixed</option>
+                      <option value="Increase Only">Increase Only</option>
+                      <option value="Decrease Only">Decrease Only</option>
+                    </select>
+                  </div>
 
                     <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
                       <button
@@ -10785,6 +10868,19 @@ function MerchandisingMasterSettingsPage() {
                       onChange={(e) => setTrimsForm({ ...trimsForm, unitPriceUsd: Number(e.target.value) })}
                       className="w-full text-xs font-bold px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100"
                     />
+                  </div>
+                  <div className="">
+                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400">Rate Constraint</label>
+                    <select
+                      value={trimsForm.rateConstraint || "No Restriction"}
+                      onChange={(e) => setTrimsForm({ ...trimsForm, rateConstraint: e.target.value as RateConstraint })}
+                      className="w-full text-xs  px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                    >
+                      <option value="No Restriction">No Restriction</option>
+                      <option value="Fixed">Fixed</option>
+                      <option value="Increase Only">Increase Only</option>
+                      <option value="Decrease Only">Decrease Only</option>
+                    </select>
                   </div>
                   <div>
                     <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400">Supplier</label>

@@ -10,7 +10,8 @@ import {
   initialYarnCounts,
   initialYarnTypes,
   initialDyeings,
-  initialFinishings
+  initialFinishings,
+  RateConstraint
 } from "./merchandising-master-settings";
 import {
   Search, Plus, Pencil, FileText, ArrowLeft, Save, Printer,
@@ -26,11 +27,11 @@ export const Route = createFileRoute("/merchandising-quotation")({
 });
 
 type Status = "Draft" | "Sent to Buyer" | "Buyer Approved" | "Converted to PO" | "Rejected";
-interface FabricRow   { id: number; name: string; usedIn: string; cons: number; unit: string; rate: number; }
-interface CostRow     { id: number; name: string; unit: string; rate: number; }
-interface YarnRow     { id: number; yarnType: string; rate: number; pct: number; }
-interface KnittingRow { id: number; name: string; rate: number; }
-interface DyeingRow   { id: number; name: string; rate: number; }
+interface FabricRow   { id: number; name: string; usedIn: string; cons: number; unit: string; rate: number; defaultRate?: number; rateConstraint?: RateConstraint; }
+interface CostRow     { id: number; name: string; unit: string; rate: number; defaultRate?: number; rateConstraint?: RateConstraint; }
+interface YarnRow     { id: number; yarnType: string; rate: number; pct: number; defaultRate?: number; rateConstraint?: RateConstraint; }
+interface KnittingRow { id: number; name: string; rate: number; defaultRate?: number; rateConstraint?: RateConstraint; }
+interface DyeingRow   { id: number; name: string; rate: number; defaultRate?: number; rateConstraint?: RateConstraint; }
 
 interface Q {
   id: string; costingNo: string; date: string;
@@ -219,20 +220,40 @@ export default function MerchandisingQuotationPage() {
   });
 
   // ── Reusable UI atoms ─────────────────────────────────────────
-  const NI = ({ val, onChange, disabled=false, cls="" }: { val:number; onChange:(v:number)=>void; disabled?:boolean; cls?:string }) => (
-    <input type="number" step="any" value={val||""} onChange={e=>onChange(Number(e.target.value))} disabled={disabled}
-      className={`w-full text-right font-mono text-xs px-2 py-1.5 rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400
-        ${disabled ? "bg-teal-50 text-teal-700 border-teal-200 font-black cursor-default" : "bg-white border-slate-200 hover:border-slate-300 text-slate-800"} ${cls}`} />
-  );
+  const NI = ({ val, onChange, disabled=false, constraint, defaultRate, cls="" }: { val:number; onChange:(v:number)=>void; disabled?:boolean; constraint?:RateConstraint; defaultRate?:number; cls?:string }) => {
+    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+      let v = Number(e.target.value);
+      if (constraint === "Increase Only" && defaultRate !== undefined && v < defaultRate) {
+        onChange(defaultRate);
+        toast.error(`Rate cannot be reduced below ${defaultRate}`);
+      } else if (constraint === "Decrease Only" && defaultRate !== undefined && v > defaultRate) {
+        onChange(defaultRate);
+        toast.error(`Rate cannot be increased above ${defaultRate}`);
+      }
+    };
+    const isFixed = constraint === "Fixed";
+    return (
+      <input type="number" step="any" value={val||""} onChange={e=>onChange(Number(e.target.value))} 
+        onBlur={handleBlur} disabled={disabled || isFixed}
+        className={`w-full text-right font-mono text-xs px-2 py-1.5 rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400
+          ${(disabled || isFixed) ? "bg-teal-50 text-teal-700 border-teal-200 font-black cursor-default" : "bg-white border-slate-200 hover:border-slate-300 text-slate-800"} ${cls}`} />
+    );
+  };
   const TI = ({ val, onChange, ph="", cls="" }: { val:string; onChange:(v:string)=>void; ph?:string; cls?:string }) => (
     <input type="text" value={val} onChange={e=>onChange(e.target.value)} placeholder={ph}
       className={`w-full text-xs px-2 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 bg-white text-slate-800 placeholder-slate-350 transition-all ${cls}`} />
   );
-  const SI = ({ val, onChange, options, ph="", cls="" }: { val:string; onChange:(v:string)=>void; options:string[]; ph?:string; cls?:string }) => (
-    <select value={val} onChange={e=>onChange(e.target.value)}
+  const SI = ({ val, onChange, options, ph="", cls="" }: { val:string; onChange:(v:string, opt?:any)=>void; options:any[]; ph?:string; cls?:string }) => (
+    <select value={val} onChange={e=>{
+      const opt = options.find(o => (typeof o === 'string' ? o : o.name) === e.target.value);
+      onChange(e.target.value, opt);
+    }}
       className={`w-full text-xs px-2 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 bg-white text-slate-800 cursor-pointer transition-all ${cls}`}>
       <option value="" disabled>{ph || "Select..."}</option>
-      {options.map(o => <option key={o} value={o}>{o}</option>)}
+      {options.map((o,i) => {
+        const v = typeof o === 'string' ? o : o.name;
+        return <option key={v+i} value={v}>{v}</option>;
+      })}
     </select>
   );
   const DI = ({ val, onChange }: { val:string; onChange:(v:string)=>void }) => (
@@ -287,7 +308,7 @@ export default function MerchandisingQuotationPage() {
     rows: CostRow[]; rowKey: keyof Q;
     onUpd:(id:number,p:Partial<CostRow>)=>void;
     onAdd:()=>void; onDel:(id:number)=>void;
-    options: string[];
+    options: any[];
   }) => (
     <div>
       <div className="grid grid-cols-12 gap-2 px-1 mb-1.5">
@@ -299,7 +320,7 @@ export default function MerchandisingQuotationPage() {
       <div className="space-y-1.5">
         {rows.map(r => (
           <div key={r.id} className={`grid grid-cols-12 gap-2 items-center group rounded-lg px-1 py-0.5 transition-colors ${r.rate > 0 ? "hover:bg-indigo-50/40" : "hover:bg-slate-50"}`}>
-            <div className="col-span-6"><SI val={r.name} onChange={v=>onUpd(r.id,{name:v})} options={options} ph="Select Description" /></div>
+            <div className="col-span-6"><SI val={r.name} onChange={(v, opt)=>onUpd(r.id,{name:v, rate: opt?.rate ?? r.rate, defaultRate: opt?.rate ?? r.defaultRate, rateConstraint: opt?.rateConstraint ?? r.rateConstraint})} options={options} ph="Select Description" /></div>
             <div className="col-span-2">
               <select value={r.unit} onChange={e=>onUpd(r.id,{unit:e.target.value})}
                 className="w-full text-[10px] text-center border border-slate-200 rounded-lg py-1.5 bg-white focus:outline-none focus:border-indigo-400 cursor-pointer">
@@ -307,7 +328,7 @@ export default function MerchandisingQuotationPage() {
               </select>
             </div>
             <div className="col-span-3">
-              <NI val={r.rate} onChange={v=>onUpd(r.id,{rate:v})} />
+              <NI val={r.rate} onChange={v=>onUpd(r.id,{rate:v})} constraint={r.rateConstraint} defaultRate={r.defaultRate} />
             </div>
             <div className="col-span-1 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity">
               <DelBtn onClick={()=>onDel(r.id)} />
@@ -468,7 +489,7 @@ export default function MerchandisingQuotationPage() {
                         const cost = cons * rate;
                         return (
                           <div key={row.id} className={`grid grid-cols-12 gap-2 items-center group rounded-lg px-1 py-1 transition-colors ${isMain?"bg-indigo-50/30 border border-indigo-100":"hover:bg-slate-50"}`}>
-                            <div className="col-span-3"><SI val={row.name} onChange={v=>updFabric(row.id,{name:v})} options={initialFabricConstructions.map(c=>c.name)} ph="Fabric Class" /></div>
+                            <div className="col-span-3"><SI val={row.name} onChange={(v, opt)=>updFabric(row.id,{name:v, rate: opt?.rate ?? row.rate, defaultRate: opt?.rate ?? row.defaultRate, rateConstraint: opt?.rateConstraint ?? row.rateConstraint})} options={initialFabricConstructions.map(c=>({ name: c.name, rate: c.rate, rateConstraint: c.rateConstraint }))} ph="Fabric Class" /></div>
                             <div className="col-span-2"><SI val={row.usedIn} onChange={v=>updFabric(row.id,{usedIn:v})} options={initialBodyParts.map(b=>b.shortName || b.name)} ph="Body..." /></div>
                             <div className="col-span-2">
                               {isMain
@@ -484,7 +505,7 @@ export default function MerchandisingQuotationPage() {
                             <div className="col-span-2">
                               {isMain
                                 ? <NI val={C.fkg} onChange={()=>{}} disabled />
-                                : <NI val={row.rate} onChange={v=>updFabric(row.id,{rate:v})} />}
+                                : <NI val={row.rate} onChange={v=>updFabric(row.id,{rate:v})} constraint={row.rateConstraint} defaultRate={row.defaultRate} />}
                             </div>
                             <div className="col-span-2 flex items-center justify-end gap-1">
                               <span className={`text-xs font-mono font-black ${cost>0?"text-slate-800":"text-slate-350"}`}>{cost.toFixed(3)}</span>
@@ -508,14 +529,14 @@ export default function MerchandisingQuotationPage() {
                         onUpd={(id,p)=>updCost("accessoryRows",id,p)}
                         onAdd={()=>addCost("accessoryRows")}
                         onDel={(id)=>delCost("accessoryRows",id)}
-                        options={initialTrims.map(t=>t.itemName)} />
+                        options={initialTrims.map(t=>({ name: t.itemName, rate: t.unitPriceUsd, rateConstraint: t.rateConstraint }))} />
                     </Section>
                     <Section id="emb" title="Embellishments" total={C.emb} color="pink">
                       <CostSection rows={form.embRows} rowKey="embRows"
                         onUpd={(id,p)=>updCost("embRows",id,p)}
                         onAdd={()=>addCost("embRows")}
                         onDel={(id)=>delCost("embRows",id)}
-                        options={initialSpecialCosts.filter(c=>c.costType==="Print"||c.costType==="Embroidery").map(c=>c.description || c.header)} />
+                        options={initialSpecialCosts.filter(c=>c.costType==="Print"||c.costType==="Embroidery").map(c=>({ name: c.description || c.header, rate: c.ratePerDzn, rateConstraint: c.rateConstraint }))} />
                     </Section>
                   </div>
 
@@ -526,14 +547,14 @@ export default function MerchandisingQuotationPage() {
                         onUpd={(id,p)=>updCost("washRows",id,p)}
                         onAdd={()=>addCost("washRows")}
                         onDel={(id)=>delCost("washRows",id)}
-                        options={initialSpecialCosts.filter(c=>c.costType==="Wash").map(c=>c.description || c.header)} />
+                        options={initialSpecialCosts.filter(c=>c.costType==="Wash").map(c=>({ name: c.description || c.header, rate: c.ratePerDzn, rateConstraint: c.rateConstraint }))} />
                     </Section>
                     <Section id="other" title="Other Costs" total={C.oth} color="teal">
                       <CostSection rows={form.otherCostRows} rowKey="otherCostRows"
                         onUpd={(id,p)=>updCost("otherCostRows",id,p)}
                         onAdd={()=>addCost("otherCostRows")}
                         onDel={(id)=>delCost("otherCostRows",id)}
-                        options={initialAdditionalCosts.map(c=>c.titleName)} />
+                        options={initialAdditionalCosts.map(c=>({ name: c.titleName, rate: c.rate, rateConstraint: c.rateConstraint }))} />
                     </Section>
                   </div>
 
@@ -664,8 +685,8 @@ export default function MerchandisingQuotationPage() {
                         </div>
                         {form.yarnRows.map(r=>(
                           <div key={r.id} className="grid grid-cols-12 gap-1.5 mb-1.5 items-center group">
-                            <div className="col-span-4"><SI val={r.yarnType} onChange={v=>sf({yarnRows:form.yarnRows.map(y=>y.id===r.id?{...y,yarnType:v}:y)})} options={[...initialYarnCounts.map(y=>y.name), ...initialYarnTypes.map(y=>y.yarnType)]} ph="Select Yarn" /></div>
-                            <div className="col-span-4"><NI val={r.rate} onChange={v=>sf({yarnRows:form.yarnRows.map(y=>y.id===r.id?{...y,rate:v}:y)})} /></div>
+                            <div className="col-span-4"><SI val={r.yarnType} onChange={(v, opt)=>sf({yarnRows:form.yarnRows.map(y=>y.id===r.id?{...y,yarnType:v, rate: opt?.rate ?? y.rate, defaultRate: opt?.rate ?? y.defaultRate, rateConstraint: opt?.rateConstraint ?? y.rateConstraint}:y)})} options={[...initialYarnCounts.map(y=>({ name: y.name, rate: y.rate, rateConstraint: y.rateConstraint })), ...initialYarnTypes.map(y=>({ name: y.yarnType, rate: y.rate, rateConstraint: y.rateConstraint }))] } ph="Select Yarn" /></div>
+                            <div className="col-span-4"><NI val={r.rate} onChange={v=>sf({yarnRows:form.yarnRows.map(y=>y.id===r.id?{...y,rate:v}:y)})} constraint={r.rateConstraint} defaultRate={r.defaultRate} /></div>
                             <div className="col-span-3"><NI val={r.pct} onChange={v=>sf({yarnRows:form.yarnRows.map(y=>y.id===r.id?{...y,pct:v}:y)})} /></div>
                             <div className="col-span-1 opacity-0 group-hover:opacity-100 transition-opacity">
                               <DelBtn onClick={()=>sf({yarnRows:form.yarnRows.filter(y=>y.id!==r.id)})} />
@@ -685,8 +706,8 @@ export default function MerchandisingQuotationPage() {
                         </div>
                         {form.knittingRows.map(r=>(
                           <div key={r.id} className="grid grid-cols-12 gap-1.5 mb-1.5 items-center group">
-                            <div className="col-span-8"><SI val={r.name} onChange={v=>sf({knittingRows:form.knittingRows.map(k=>k.id===r.id?{...k,name:v}:k)})} options={initialFabricConstructions.map(c=>c.name)} ph="Select Knitting" /></div>
-                            <div className="col-span-3"><NI val={r.rate} onChange={v=>sf({knittingRows:form.knittingRows.map(k=>k.id===r.id?{...k,rate:v}:k)})} /></div>
+                            <div className="col-span-8"><SI val={r.name} onChange={(v, opt)=>sf({knittingRows:form.knittingRows.map(k=>k.id===r.id?{...k,name:v, rate: opt?.rate ?? k.rate, defaultRate: opt?.rate ?? k.defaultRate, rateConstraint: opt?.rateConstraint ?? k.rateConstraint}:k)})} options={initialFabricConstructions.map(c=>({ name: c.name, rate: c.rate, rateConstraint: c.rateConstraint }))} ph="Select Knitting" /></div>
+                            <div className="col-span-3"><NI val={r.rate} onChange={v=>sf({knittingRows:form.knittingRows.map(k=>k.id===r.id?{...k,rate:v}:k)})} constraint={r.rateConstraint} defaultRate={r.defaultRate} /></div>
                             <div className="col-span-1 opacity-0 group-hover:opacity-100 transition-opacity">
                               <DelBtn onClick={()=>sf({knittingRows:form.knittingRows.filter(k=>k.id!==r.id)})} />
                             </div>
@@ -705,8 +726,8 @@ export default function MerchandisingQuotationPage() {
                         </div>
                         {form.dyeingRows.map(r=>(
                           <div key={r.id} className="grid grid-cols-12 gap-1.5 mb-1.5 items-center group">
-                            <div className="col-span-8"><SI val={r.name} onChange={v=>sf({dyeingRows:form.dyeingRows.map(d=>d.id===r.id?{...d,name:v}:d)})} options={[...initialDyeings.map(d=>d.dyeingName), ...initialFinishings.map(f=>f.finishingName)]} ph="Select Process" /></div>
-                            <div className="col-span-3"><NI val={r.rate} onChange={v=>sf({dyeingRows:form.dyeingRows.map(d=>d.id===r.id?{...d,rate:v}:d)})} /></div>
+                            <div className="col-span-8"><SI val={r.name} onChange={(v, opt)=>sf({dyeingRows:form.dyeingRows.map(d=>d.id===r.id?{...d,name:v, rate: opt?.rate ?? d.rate, defaultRate: opt?.rate ?? d.defaultRate, rateConstraint: opt?.rateConstraint ?? d.rateConstraint}:d)})} options={[...initialDyeings.map(d=>({ name: d.dyeingName, rate: d.rate, rateConstraint: d.rateConstraint })), ...initialFinishings.map(f=>({ name: f.finishingName, rate: f.rate, rateConstraint: f.rateConstraint }))] } ph="Select Process" /></div>
+                            <div className="col-span-3"><NI val={r.rate} onChange={v=>sf({dyeingRows:form.dyeingRows.map(d=>d.id===r.id?{...d,rate:v}:d)})} constraint={r.rateConstraint} defaultRate={r.defaultRate} /></div>
                             <div className="col-span-1 opacity-0 group-hover:opacity-100 transition-opacity">
                               <DelBtn onClick={()=>sf({dyeingRows:form.dyeingRows.filter(d=>d.id!==r.id)})} />
                             </div>

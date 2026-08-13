@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "165",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Merchandising Quotation",
+    link: "/merchandising-quotation",
+    descriptionEn: "Implemented dynamic rate constraints across the Buyer Costing form based on Master Settings. When a description is selected, the rate field is automatically populated with a default rate. Depending on the master setting, the rate field can now be 'Fixed' (cannot be changed), 'Increase Only' (can only be raised), 'Decrease Only' (can only be lowered), or 'No Restriction' (can be freely edited).",
+    descriptionBn: "বায়ার কস্টিং ফর্মে মাস্টার সেটিংসের উপর ভিত্তি করে ডায়নামিক রেট রেসট্রিকশন (Rate Constraint) যুক্ত করা হয়েছে। এখন কোনো আইটেম সিলেক্ট করলে রেট ফিল্ডে অটোমেটিক ডিফল্ট রেট চলে আসবে। মাস্টার সেটিংস এর উপর নির্ভর করে এই রেট ফিল্ডটি 'Fixed', 'Increase Only', 'Decrease Only', অথবা 'No Restriction' হতে পারে।",
+  },
+  {
     id: "164",
     date: new Date().toISOString().slice(0, 16),
     type: "Modify",
