@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "164",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Modify",
+    module: "Merchandising Quotation",
+    link: "/merchandising-quotation",
+    descriptionEn: "Replaced all free-text description fields in the Buyer Costing form with dropdown menus. The options for Fabric Class, Used In, Accessories, Embellishments, Washing, Yarn Count, Knitting, and Dyeing are now directly populated from the Master Settings.",
+    descriptionBn: "বায়ার কস্টিং ফর্মের সকল ডেসক্রিপশন ফিল্ডগুলোকে ড্রপডাউন মেনুতে পরিবর্তন করা হয়েছে। এখন Fabric Class, Used In, Accessories, Embellishments, Washing, Yarn Count, Knitting, এবং Dyeing এর অপশনগুলো সরাসরি মাস্টার সেটিংস থেকে আসবে।",
+  },
+  {
     id: "163",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Update",

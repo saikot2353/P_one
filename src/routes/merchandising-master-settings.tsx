@@ -174,7 +174,7 @@ interface BodyPartSpec {
   status: "Active" | "Inactive";
 }
 
-const initialBodyParts: BodyPartSpec[] = [
+export const initialBodyParts: BodyPartSpec[] = [
   { id: "bp-1", name: "Collar", shortName: "Collar", bodyFor: "Collar", nature: "Production", status: "Active" },
   { id: "bp-2", name: "Long Sleeves", shortName: "", bodyFor: "Others", nature: "Production", status: "Active" },
   { id: "bp-3", name: "Placket", shortName: "Placket", bodyFor: "Others", nature: "Production", status: "Active" },
@@ -342,7 +342,7 @@ interface FabricConstructionSpec {
   createdDate: string;
 }
 
-const initialFabricConstructions: FabricConstructionSpec[] = [
+export const initialFabricConstructions: FabricConstructionSpec[] = [
   { id: "con-1", name: "100% Cotton Heavy Jersey", rate: 0.00, createdDate: "31/01/2026" },
   { id: "con-2", name: "1X1 RIB", rate: 3.80, createdDate: "05/07/2025" },
   { id: "con-3", name: "2X1 Rib", rate: 0.00, createdDate: "20/11/2025" },
@@ -398,7 +398,7 @@ interface YarnTypeSpec {
   status: "Active" | "Inactive";
 }
 
-const initialYarnTypes: YarnTypeSpec[] = [
+export const initialYarnTypes: YarnTypeSpec[] = [
   { id: "yt-1", yarnType: "BCI CARD", createDate: "20/11/2025", status: "Active" },
   { id: "yt-2", yarnType: "BCI COTTON", createDate: "", status: "Active" },
   { id: "yt-3", yarnType: "BCI Melange", createDate: "20/10/2025", status: "Active" },
@@ -432,7 +432,7 @@ interface YarnCountSpec {
   status: "Active" | "Inactive";
 }
 
-const initialYarnCounts: YarnCountSpec[] = [
+export const initialYarnCounts: YarnCountSpec[] = [
   { id: "yc-1", name: "10/1", createdDate: "", status: "Active" },
   { id: "yc-2", name: "12/1", createdDate: "", status: "Active" },
   { id: "yc-3", name: "150D/144F", createdDate: "", status: "Active" },
@@ -550,7 +550,7 @@ interface SpecialCostSpec {
   rateCharts: SpecialCostRateChart[];
 }
 
-const initialSpecialCosts: SpecialCostSpec[] = [
+export const initialSpecialCosts: SpecialCostSpec[] = [
   { id: "sc-1", costType: "Embroidery", header: "Plain", sortOrder: 1, description: "Plain", maxValuePerUnit: 0, ratePerDzn: 3.00, isActive: "Active", rateCharts: [] },
   { id: "sc-2", costType: "Embroidery", header: "Floral", sortOrder: 1, description: "Floral", maxValuePerUnit: 5, ratePerDzn: 1.50, isActive: "Active", rateCharts: [] },
   { id: "sc-3", costType: "Embroidery", header: "Tonal", sortOrder: 1, description: "Tonal", maxValuePerUnit: 5, ratePerDzn: 3.00, isActive: "Active", rateCharts: [] },
@@ -581,7 +581,7 @@ interface AdditionalCostSpec {
   status: "Active" | "Inactive";
 }
 
-const initialAdditionalCosts: AdditionalCostSpec[] = [
+export const initialAdditionalCosts: AdditionalCostSpec[] = [
   { id: "ac-1", titleName: "Financial Cost (%)", orderNumber: 1, status: "Active" },
   { id: "ac-2", titleName: "Commission(%)", orderNumber: 2, status: "Active" },
   { id: "ac-3", titleName: "Commercial (%)", orderNumber: 3, status: "Active" },
@@ -656,7 +656,7 @@ interface DyeingSpec {
   status: "Active" | "Inactive";
 }
 
-const initialDyeings: DyeingSpec[] = [
+export const initialDyeings: DyeingSpec[] = [
   { id: "dy-1", dyeingName: "Average", rate: 1, status: "Active" },
   { id: "dy-2", dyeingName: "Black", rate: 1, status: "Active" },
   { id: "dy-3", dyeingName: "Cotton Dyeing", rate: 0, status: "Active" },
@@ -684,7 +684,7 @@ interface FinishingSpec {
   status: "Active" | "Inactive";
 }
 
-const initialFinishings: FinishingSpec[] = [
+export const initialFinishings: FinishingSpec[] = [
   { id: "fin-1", finishingName: "Brushing", rate: 0, status: "Active" },
   { id: "fin-2", finishingName: "Compacting", rate: 2.0200, status: "Active" },
   { id: "fin-3", finishingName: "Dryer", rate: 0, status: "Active" },
@@ -904,7 +904,7 @@ const initialProcessLoss: ProcessLoss[] = [
   { id: "pl-4", garmentType: "Hooded Sweatshirt (Heavy Knit)", knittingLossPct: 3.5, dyeingLossPct: 5.5, cuttingLossPct: 3.0, printWashLossPct: 3.0 },
 ];
 
-const initialTrims: TrimsMaster[] = [
+export const initialTrims: TrimsMaster[] = [
   { id: "t-1", itemCode: "TRM-THD-01", itemName: "100% Spun Polyester Thread 40/2", category: "Sewing Trims", subCategory: "Sewing Thread", uom: "Cone (4000m)", unitPriceUsd: 1.45, nominatedSupplier: "Coats Bangladesh" },
   { id: "t-2", itemCode: "TRM-LBL-02", itemName: "Woven Main Label (Damask HD)", category: "Sewing Trims", subCategory: "Labels", uom: "Pcs", unitPriceUsd: 0.035, nominatedSupplier: "Avery Dennison BD" },
   { id: "t-3", itemCode: "TRM-PLY-03", itemName: "Self-Seal Polybag (12x18 inch)", category: "Packing Trims", subCategory: "Polybags", uom: "Pcs", unitPriceUsd: 0.042, nominatedSupplier: "Kazi Poly Ltd" },

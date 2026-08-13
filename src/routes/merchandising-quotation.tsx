@@ -2,6 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import MerchandisingLayout from "../components/merchandising/MerchandisingLayout";
 import {
+  initialFabricConstructions,
+  initialBodyParts,
+  initialTrims,
+  initialSpecialCosts,
+  initialAdditionalCosts,
+  initialYarnCounts,
+  initialYarnTypes,
+  initialDyeings,
+  initialFinishings
+} from "./merchandising-master-settings";
+import {
   Search, Plus, Pencil, FileText, ArrowLeft, Save, Printer,
   Upload, Image as ImageIcon, X, CheckCircle, AlertCircle,
   ChevronDown, ChevronUp, Info,
@@ -217,6 +228,13 @@ export default function MerchandisingQuotationPage() {
     <input type="text" value={val} onChange={e=>onChange(e.target.value)} placeholder={ph}
       className={`w-full text-xs px-2 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 bg-white text-slate-800 placeholder-slate-350 transition-all ${cls}`} />
   );
+  const SI = ({ val, onChange, options, ph="", cls="" }: { val:string; onChange:(v:string)=>void; options:string[]; ph?:string; cls?:string }) => (
+    <select value={val} onChange={e=>onChange(e.target.value)}
+      className={`w-full text-xs px-2 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 bg-white text-slate-800 cursor-pointer transition-all ${cls}`}>
+      <option value="" disabled>{ph || "Select..."}</option>
+      {options.map(o => <option key={o} value={o}>{o}</option>)}
+    </select>
+  );
   const DI = ({ val, onChange }: { val:string; onChange:(v:string)=>void }) => (
     <input type="date" value={val} onChange={e=>onChange(e.target.value)}
       className="w-full text-xs px-2 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 bg-white text-slate-800 transition-all" />
@@ -265,10 +283,11 @@ export default function MerchandisingQuotationPage() {
   };
 
   // Universal cost-row table
-  const CostSection = ({ rows, rowKey, onUpd, onAdd, onDel }: {
+  const CostSection = ({ rows, rowKey, onUpd, onAdd, onDel, options }: {
     rows: CostRow[]; rowKey: keyof Q;
     onUpd:(id:number,p:Partial<CostRow>)=>void;
     onAdd:()=>void; onDel:(id:number)=>void;
+    options: string[];
   }) => (
     <div>
       <div className="grid grid-cols-12 gap-2 px-1 mb-1.5">
@@ -280,7 +299,7 @@ export default function MerchandisingQuotationPage() {
       <div className="space-y-1.5">
         {rows.map(r => (
           <div key={r.id} className={`grid grid-cols-12 gap-2 items-center group rounded-lg px-1 py-0.5 transition-colors ${r.rate > 0 ? "hover:bg-indigo-50/40" : "hover:bg-slate-50"}`}>
-            <div className="col-span-6"><TI val={r.name} onChange={v=>onUpd(r.id,{name:v})} /></div>
+            <div className="col-span-6"><SI val={r.name} onChange={v=>onUpd(r.id,{name:v})} options={options} ph="Select Description" /></div>
             <div className="col-span-2">
               <select value={r.unit} onChange={e=>onUpd(r.id,{unit:e.target.value})}
                 className="w-full text-[10px] text-center border border-slate-200 rounded-lg py-1.5 bg-white focus:outline-none focus:border-indigo-400 cursor-pointer">
@@ -449,8 +468,8 @@ export default function MerchandisingQuotationPage() {
                         const cost = cons * rate;
                         return (
                           <div key={row.id} className={`grid grid-cols-12 gap-2 items-center group rounded-lg px-1 py-1 transition-colors ${isMain?"bg-indigo-50/30 border border-indigo-100":"hover:bg-slate-50"}`}>
-                            <div className="col-span-3"><TI val={row.name} onChange={v=>updFabric(row.id,{name:v})} /></div>
-                            <div className="col-span-2"><TI val={row.usedIn} onChange={v=>updFabric(row.id,{usedIn:v})} ph="Body…" /></div>
+                            <div className="col-span-3"><SI val={row.name} onChange={v=>updFabric(row.id,{name:v})} options={initialFabricConstructions.map(c=>c.name)} ph="Fabric Class" /></div>
+                            <div className="col-span-2"><SI val={row.usedIn} onChange={v=>updFabric(row.id,{usedIn:v})} options={initialBodyParts.map(b=>b.shortName || b.name)} ph="Body..." /></div>
                             <div className="col-span-2">
                               {isMain
                                 ? <NI val={C.cww} onChange={()=>{}} disabled />
@@ -488,13 +507,15 @@ export default function MerchandisingQuotationPage() {
                       <CostSection rows={form.accessoryRows} rowKey="accessoryRows"
                         onUpd={(id,p)=>updCost("accessoryRows",id,p)}
                         onAdd={()=>addCost("accessoryRows")}
-                        onDel={(id)=>delCost("accessoryRows",id)} />
+                        onDel={(id)=>delCost("accessoryRows",id)}
+                        options={initialTrims.map(t=>t.itemName)} />
                     </Section>
                     <Section id="emb" title="Embellishments" total={C.emb} color="pink">
                       <CostSection rows={form.embRows} rowKey="embRows"
                         onUpd={(id,p)=>updCost("embRows",id,p)}
                         onAdd={()=>addCost("embRows")}
-                        onDel={(id)=>delCost("embRows",id)} />
+                        onDel={(id)=>delCost("embRows",id)}
+                        options={initialSpecialCosts.filter(c=>c.costType==="Print"||c.costType==="Embroidery").map(c=>c.description || c.header)} />
                     </Section>
                   </div>
 
@@ -504,13 +525,15 @@ export default function MerchandisingQuotationPage() {
                       <CostSection rows={form.washRows} rowKey="washRows"
                         onUpd={(id,p)=>updCost("washRows",id,p)}
                         onAdd={()=>addCost("washRows")}
-                        onDel={(id)=>delCost("washRows",id)} />
+                        onDel={(id)=>delCost("washRows",id)}
+                        options={initialSpecialCosts.filter(c=>c.costType==="Wash").map(c=>c.description || c.header)} />
                     </Section>
                     <Section id="other" title="Other Costs" total={C.oth} color="teal">
                       <CostSection rows={form.otherCostRows} rowKey="otherCostRows"
                         onUpd={(id,p)=>updCost("otherCostRows",id,p)}
                         onAdd={()=>addCost("otherCostRows")}
-                        onDel={(id)=>delCost("otherCostRows",id)} />
+                        onDel={(id)=>delCost("otherCostRows",id)}
+                        options={initialAdditionalCosts.map(c=>c.titleName)} />
                     </Section>
                   </div>
 
@@ -641,7 +664,7 @@ export default function MerchandisingQuotationPage() {
                         </div>
                         {form.yarnRows.map(r=>(
                           <div key={r.id} className="grid grid-cols-12 gap-1.5 mb-1.5 items-center group">
-                            <div className="col-span-4"><TI val={r.yarnType} onChange={v=>sf({yarnRows:form.yarnRows.map(y=>y.id===r.id?{...y,yarnType:v}:y)})} /></div>
+                            <div className="col-span-4"><SI val={r.yarnType} onChange={v=>sf({yarnRows:form.yarnRows.map(y=>y.id===r.id?{...y,yarnType:v}:y)})} options={[...initialYarnCounts.map(y=>y.name), ...initialYarnTypes.map(y=>y.yarnType)]} ph="Select Yarn" /></div>
                             <div className="col-span-4"><NI val={r.rate} onChange={v=>sf({yarnRows:form.yarnRows.map(y=>y.id===r.id?{...y,rate:v}:y)})} /></div>
                             <div className="col-span-3"><NI val={r.pct} onChange={v=>sf({yarnRows:form.yarnRows.map(y=>y.id===r.id?{...y,pct:v}:y)})} /></div>
                             <div className="col-span-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -662,7 +685,7 @@ export default function MerchandisingQuotationPage() {
                         </div>
                         {form.knittingRows.map(r=>(
                           <div key={r.id} className="grid grid-cols-12 gap-1.5 mb-1.5 items-center group">
-                            <div className="col-span-8"><TI val={r.name} onChange={v=>sf({knittingRows:form.knittingRows.map(k=>k.id===r.id?{...k,name:v}:k)})} /></div>
+                            <div className="col-span-8"><SI val={r.name} onChange={v=>sf({knittingRows:form.knittingRows.map(k=>k.id===r.id?{...k,name:v}:k)})} options={initialFabricConstructions.map(c=>c.name)} ph="Select Knitting" /></div>
                             <div className="col-span-3"><NI val={r.rate} onChange={v=>sf({knittingRows:form.knittingRows.map(k=>k.id===r.id?{...k,rate:v}:k)})} /></div>
                             <div className="col-span-1 opacity-0 group-hover:opacity-100 transition-opacity">
                               <DelBtn onClick={()=>sf({knittingRows:form.knittingRows.filter(k=>k.id!==r.id)})} />
@@ -682,7 +705,7 @@ export default function MerchandisingQuotationPage() {
                         </div>
                         {form.dyeingRows.map(r=>(
                           <div key={r.id} className="grid grid-cols-12 gap-1.5 mb-1.5 items-center group">
-                            <div className="col-span-8"><TI val={r.name} onChange={v=>sf({dyeingRows:form.dyeingRows.map(d=>d.id===r.id?{...d,name:v}:d)})} /></div>
+                            <div className="col-span-8"><SI val={r.name} onChange={v=>sf({dyeingRows:form.dyeingRows.map(d=>d.id===r.id?{...d,name:v}:d)})} options={[...initialDyeings.map(d=>d.dyeingName), ...initialFinishings.map(f=>f.finishingName)]} ph="Select Process" /></div>
                             <div className="col-span-3"><NI val={r.rate} onChange={v=>sf({dyeingRows:form.dyeingRows.map(d=>d.id===r.id?{...d,rate:v}:d)})} /></div>
                             <div className="col-span-1 opacity-0 group-hover:opacity-100 transition-opacity">
                               <DelBtn onClick={()=>sf({dyeingRows:form.dyeingRows.filter(d=>d.id!==r.id)})} />
