@@ -805,21 +805,49 @@ function FinancialAidPage() {
                 </div>
 
                 {newEmpId && selectedEmpDetails && (
-                  <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl space-y-2 animate-in fade-in zoom-in-95 duration-200">
-                    <div className="flex justify-between font-black text-xs uppercase tracking-wider">
-                      <span className="text-slate-700">Employee Verified Details</span>
-                      <span className="text-emerald-600 font-mono">{newEmpId}</span>
+                  <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl space-y-3 animate-in fade-in zoom-in-95 duration-200">
+                    <div className="flex justify-between font-black text-xs uppercase tracking-wider border-b border-emerald-500/10 pb-2">
+                      <span className="text-slate-700 flex items-center gap-1.5"><CheckCircle2 className="size-4 text-emerald-600" /> Employee Verified Details</span>
+                      <span className="text-emerald-700 font-mono bg-emerald-100/50 px-2 py-0.5 rounded border border-emerald-200">{newEmpId}</span>
                     </div>
-                    <div className="text-xs text-slate-500 leading-relaxed">
-                      Name: <span className="font-bold text-slate-700">{newEmpName}</span>
-                      <br />
-                      Role:{" "}
-                      <span className="font-bold text-slate-700">
-                        {selectedEmpDetails.title}
-                      </span> •{" "}
-                      <span className="font-semibold text-slate-700">{selectedEmpDetails.dept}</span>
+                    
+                    <div className="flex gap-4 items-start">
+                      <div className="size-16 rounded-xl bg-slate-100 overflow-hidden shrink-0 border border-slate-200 shadow-sm">
+                        <img 
+                           src={`https://ui-avatars.com/api/?name=${encodeURIComponent(newEmpName)}&background=random`} 
+                           alt={newEmpName}
+                           className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 grid grid-cols-2 gap-y-3 gap-x-4 text-xs">
+                        <div>
+                          <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest block mb-0.5">Full Name</span>
+                          <span className="font-bold text-slate-800">{newEmpName}</span>
+                        </div>
+                        <div>
+                          <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest block mb-0.5">Designation</span>
+                          <span className="font-semibold text-slate-700">{selectedEmpDetails.title}</span>
+                        </div>
+                        <div>
+                          <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest block mb-0.5">Department</span>
+                          <span className="font-medium text-slate-600">{selectedEmpDetails.dept}</span>
+                        </div>
+                        <div>
+                          <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest block mb-0.5">Section</span>
+                          <span className="font-medium text-slate-600">{selectedEmpDetails.sect || "N/A"}</span>
+                        </div>
+                        <div>
+                          <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest block mb-0.5">Join Date</span>
+                          <span className="font-mono text-slate-600">{selectedEmpDetails.joinDate || "N/A"}</span>
+                        </div>
+                        <div>
+                          <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest block mb-0.5">Gross Salary</span>
+                          <span className="font-bold text-slate-700">৳ {selectedEmpDetails.gross ? parseFloat(selectedEmpDetails.gross).toLocaleString() : "0"}</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-[11px] text-emerald-600 font-bold flex justify-between border-t border-emerald-500/20 pt-2 mt-2">
+
+                    <div className="text-[11px] text-emerald-700 bg-emerald-50 font-bold flex justify-between border border-emerald-500/20 px-3 py-2 rounded-lg mt-1">
                       <span>Previous Zakat: ৳{prevZakat.toLocaleString()}</span>
                       <span>Previous Aid: ৳{prevAid.toLocaleString()}</span>
                     </div>
