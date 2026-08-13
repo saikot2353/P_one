@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "162",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Modify",
+    module: "Financial Aid",
+    link: "/financial-aid-list",
+    descriptionEn: "Fixed an issue where the 'New Aid Request' financial modal was not opening on the Financial Aid page.",
+    descriptionBn: "ফাইন্যান্সিয়াল এইড পেজে 'New Aid Request' মোডালটি ওপেন না হওয়ার সমস্যাটি ঠিক করা হয়েছে।",
+  },
+  {
     id: "161",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Update",

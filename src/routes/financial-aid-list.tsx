@@ -704,6 +704,209 @@ function FinancialAidPage() {
             </div>
           </div>
         </div>
+      {/* MODAL: New Aid Request */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-2xl rounded-[20px] shadow-2xl border border-slate-200 flex flex-col overflow-visible">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200 bg-white rounded-t-[20px]">
+              <div className="flex items-center gap-3">
+                <div className="bg-[#0B1527] text-white size-9 rounded-full flex items-center justify-center">
+                  <Banknote className="size-5" />
+                </div>
+                <h3 className="text-lg font-bold text-slate-800">New Financial Aid Request</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="p-2 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 transition-colors bg-white cursor-pointer"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleRecordRequest} className="flex flex-col overflow-visible">
+              <div className="p-6 space-y-5 bg-white overflow-visible">
+                <div className="relative overflow-visible">
+                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wide flex gap-1 mb-2">
+                    Search Employee (Name or ID) <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Search className="size-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      placeholder="Type employee ID or Name to search..."
+                      value={empSearchInput}
+                      onChange={(e) => {
+                        setEmpSearchInput(e.target.value);
+                        setIsEmpDropdownOpen(true);
+                        if (!e.target.value) {
+                          setNewEmpId("");
+                          setNewEmpName("");
+                          setPrevZakat(0);
+                          setPrevAid(0);
+                        }
+                      }}
+                      onFocus={() => setIsEmpDropdownOpen(true)}
+                      className="w-full h-11 pl-10 pr-4 border border-slate-200 rounded-xl text-sm font-medium focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-slate-800"
+                    />
+                  {empSearchInput && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEmpSearchInput("");
+                        setNewEmpId("");
+                        setNewEmpName("");
+                        setPrevZakat(0);
+                        setPrevAid(0);
+                        setIsEmpDropdownOpen(false);
+                      }}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:bg-slate-100 rounded transition cursor-pointer"
+                    >
+                      <X className="size-4" />
+                    </button>
+                  )}
+                  </div>
+                  
+                  {isEmpDropdownOpen && filteredEmployeesForDropdown.length > 0 && (
+                    <div className="absolute left-0 right-0 mt-2 max-h-56 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-xl z-50 divide-y divide-slate-100">
+                      {filteredEmployeesForDropdown.map((emp) => {
+                        const totals = getPreviousHelpTotals(emp.id);
+                        return (
+                          <div
+                            key={emp.id}
+                            onClick={() => {
+                              setNewEmpId(emp.id);
+                              setNewEmpName(emp.name);
+                              setEmpSearchInput(`${emp.name} (${emp.id})`);
+                              setPrevZakat(totals.totalZakat);
+                              setPrevAid(totals.totalAid);
+                              setIsEmpDropdownOpen(false);
+                            }}
+                            className="p-3 cursor-pointer hover:bg-slate-50 transition flex items-center justify-between"
+                          >
+                            <div>
+                              <div className="font-bold text-slate-800">
+                                {emp.name} <span className="text-slate-500">({emp.id})</span>
+                              </div>
+                              <div className="text-[10px] text-slate-500">
+                                {emp.dept} &middot; {emp.title}
+                              </div>
+                            </div>
+                            {(totals.totalZakat > 0 || totals.totalAid > 0) && (
+                              <div className="text-right text-[9px] font-semibold text-amber-700 bg-amber-50 px-2 py-1 rounded-md border border-amber-200">
+                                 Zakat: ৳{totals.totalZakat.toLocaleString()} | Aid: ৳{totals.totalAid.toLocaleString()}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {newEmpId && selectedEmpDetails && (
+                  <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl space-y-2 animate-in fade-in zoom-in-95 duration-200">
+                    <div className="flex justify-between font-black text-xs uppercase tracking-wider">
+                      <span className="text-slate-700">Employee Verified Details</span>
+                      <span className="text-emerald-600 font-mono">{newEmpId}</span>
+                    </div>
+                    <div className="text-xs text-slate-500 leading-relaxed">
+                      Name: <span className="font-bold text-slate-700">{newEmpName}</span>
+                      <br />
+                      Role:{" "}
+                      <span className="font-bold text-slate-700">
+                        {selectedEmpDetails.title}
+                      </span> •{" "}
+                      <span className="font-semibold text-slate-700">{selectedEmpDetails.dept}</span>
+                    </div>
+                    <div className="text-[11px] text-emerald-600 font-bold flex justify-between border-t border-emerald-500/20 pt-2 mt-2">
+                      <span>Previous Zakat: ৳{prevZakat.toLocaleString()}</span>
+                      <span>Previous Aid: ৳{prevAid.toLocaleString()}</span>
+                    </div>
+                  </div>
+                )}
+
+                {hasExistingActiveRequest && (
+                  <div className="p-3 bg-amber-50 text-amber-700 text-xs rounded-lg border border-amber-200 flex items-start gap-2">
+                    <AlertCircle className="size-4 shrink-0 mt-0.5" />
+                    <p>
+                      This employee already has a <b>Pending</b> financial aid request.
+                      Are you sure you want to log another?
+                    </p>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wide flex gap-1 mb-2">
+                      Tenure (Months) <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      value={newTenure}
+                      onChange={(e) => setNewTenure(e.target.value)}
+                      placeholder="e.g. 12"
+                      className="w-full h-11 px-4 border border-slate-200 rounded-xl text-sm font-medium focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-slate-800"
+                    />
+                    {!isTenureEligible && newTenure !== "" && (
+                      <p className="text-[10px] text-red-500 font-semibold mt-1 flex items-center gap-1">
+                        <AlertCircle className="size-3" />
+                        Must be at least 6 months tenure.
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wide flex gap-1 mb-2">
+                      Requested Amount (৳) <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      value={newAmount}
+                      onChange={(e) => setNewAmount(e.target.value)}
+                      placeholder="e.g. 15000"
+                      className="w-full h-11 px-4 border border-slate-200 rounded-xl text-sm font-medium focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-slate-800"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wide flex gap-1 mb-2">
+                    Reason / Justification <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    required
+                    value={newReason}
+                    onChange={(e) => setNewReason(e.target.value)}
+                    placeholder="Provide a detailed explanation for the financial aid request..."
+                    className="w-full h-24 p-4 border border-slate-200 rounded-xl text-sm font-medium focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all resize-none text-slate-800"
+                  ></textarea>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 px-6 py-5 border-t border-slate-200 bg-slate-50 rounded-b-[20px]">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="h-11 px-6 rounded-xl border border-slate-200 font-bold text-sm text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                  CLOSE
+                </button>
+                <button
+                  type="submit"
+                  disabled={!isTenureEligible && newTenure !== ""}
+                  className="h-11 px-8 rounded-xl font-bold text-sm text-white bg-[#2563EB] hover:bg-blue-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  SAVE REQUEST
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* MODAL: View Request Details */}
       {viewDetailsRecord && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
