@@ -1612,4 +1612,13 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     descriptionEn: "Fully redesigned the HR Policy module to exclusively focus on Policy uploading and management, completely removing Job Description (JD) features. Added a dedicated attachment upload workflow.",
     descriptionBn: "এইচআর পলিসি মডিউলটি সম্পূর্ণরূপে রিডিজাইন করা হয়েছে যাতে শুধুমাত্র পলিসি আপলোড ও ম্যানেজমেন্টের উপর ফোকাস করা যায়, জব ডেসক্রিপশন (JD) ফিচারগুলো সম্পূর্ণ সরিয়ে দেওয়া হয়েছে। পলিসি অ্যাটাচমেন্ট আপলোড করার নতুন অপশন যোগ করা হয়েছে।",
   },
+  {
+    id: "133",
+    date: "2026-08-15T17:42",
+    type: "New",
+    module: "JD List",
+    link: "/jd-list",
+    descriptionEn: "Created a new dedicated JD List module decoupled from HR Policies. Features a high-fidelity data table and a standardized modal for creating JDs based on Department and Designation.",
+    descriptionBn: "এইচআর পলিসি থেকে আলাদা করে নতুন 'JD List' মডিউল তৈরি করা হয়েছে। এতে ডিপার্টমেন্ট এবং ডেজিগনেশনের ওপর ভিত্তি করে জেডি (JD) তৈরি করার জন্য একটি টেবিল এবং স্ট্যান্ডার্ড মোডাল যুক্ত করা হয়েছে।",
+  },
 ];

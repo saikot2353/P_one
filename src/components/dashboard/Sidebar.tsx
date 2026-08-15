@@ -243,8 +243,12 @@ export const nav: NavItem[] = [
   {
     label: "HR Policy",
     to: "/hr-policy",
-    search: { mode: "list", filterWorkflow: "ALL" },
     icon: FileText,
+  },
+  {
+    label: "JD List",
+    to: "/jd-list",
+    icon: Briefcase,
   },
   {
     label: "User Management",

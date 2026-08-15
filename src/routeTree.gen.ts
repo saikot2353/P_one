@@ -88,6 +88,7 @@ import { Route as KpiPeerReviewRouteImport } from './routes/kpi-peer-review'
 import { Route as KpiDashboardRouteImport } from './routes/kpi-dashboard'
 import { Route as KpiCyclesRouteImport } from './routes/kpi-cycles'
 import { Route as KpiAssessmentWorkflowRouteImport } from './routes/kpi-assessment-workflow'
+import { Route as JdListRouteImport } from './routes/jd-list'
 import { Route as InventoryDashboardRouteImport } from './routes/inventory-dashboard'
 import { Route as InvYarnOpeningStockRouteImport } from './routes/inv-yarn-opening-stock'
 import { Route as InvReceiveListRouteImport } from './routes/inv-receive-list'
@@ -569,6 +570,11 @@ const KpiAssessmentWorkflowRoute = KpiAssessmentWorkflowRouteImport.update({
   path: '/kpi-assessment-workflow',
   getParentRoute: () => rootRouteImport,
 } as any)
+const JdListRoute = JdListRouteImport.update({
+  id: '/jd-list',
+  path: '/jd-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InventoryDashboardRoute = InventoryDashboardRouteImport.update({
   id: '/inventory-dashboard',
   path: '/inventory-dashboard',
@@ -985,6 +991,7 @@ export interface FileRoutesByFullPath {
   '/inv-receive-list': typeof InvReceiveListRoute
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
   '/inventory-dashboard': typeof InventoryDashboardRoute
+  '/jd-list': typeof JdListRoute
   '/kpi-assessment-workflow': typeof KpiAssessmentWorkflowRoute
   '/kpi-cycles': typeof KpiCyclesRoute
   '/kpi-dashboard': typeof KpiDashboardRoute
@@ -1135,6 +1142,7 @@ export interface FileRoutesByTo {
   '/inv-receive-list': typeof InvReceiveListRoute
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
   '/inventory-dashboard': typeof InventoryDashboardRoute
+  '/jd-list': typeof JdListRoute
   '/kpi-assessment-workflow': typeof KpiAssessmentWorkflowRoute
   '/kpi-cycles': typeof KpiCyclesRoute
   '/kpi-dashboard': typeof KpiDashboardRoute
@@ -1286,6 +1294,7 @@ export interface FileRoutesById {
   '/inv-receive-list': typeof InvReceiveListRoute
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
   '/inventory-dashboard': typeof InventoryDashboardRoute
+  '/jd-list': typeof JdListRoute
   '/kpi-assessment-workflow': typeof KpiAssessmentWorkflowRoute
   '/kpi-cycles': typeof KpiCyclesRoute
   '/kpi-dashboard': typeof KpiDashboardRoute
@@ -1438,6 +1447,7 @@ export interface FileRouteTypes {
     | '/inv-receive-list'
     | '/inv-yarn-opening-stock'
     | '/inventory-dashboard'
+    | '/jd-list'
     | '/kpi-assessment-workflow'
     | '/kpi-cycles'
     | '/kpi-dashboard'
@@ -1588,6 +1598,7 @@ export interface FileRouteTypes {
     | '/inv-receive-list'
     | '/inv-yarn-opening-stock'
     | '/inventory-dashboard'
+    | '/jd-list'
     | '/kpi-assessment-workflow'
     | '/kpi-cycles'
     | '/kpi-dashboard'
@@ -1738,6 +1749,7 @@ export interface FileRouteTypes {
     | '/inv-receive-list'
     | '/inv-yarn-opening-stock'
     | '/inventory-dashboard'
+    | '/jd-list'
     | '/kpi-assessment-workflow'
     | '/kpi-cycles'
     | '/kpi-dashboard'
@@ -1889,6 +1901,7 @@ export interface RootRouteChildren {
   InvReceiveListRoute: typeof InvReceiveListRoute
   InvYarnOpeningStockRoute: typeof InvYarnOpeningStockRoute
   InventoryDashboardRoute: typeof InventoryDashboardRoute
+  JdListRoute: typeof JdListRoute
   KpiAssessmentWorkflowRoute: typeof KpiAssessmentWorkflowRoute
   KpiCyclesRoute: typeof KpiCyclesRoute
   KpiDashboardRoute: typeof KpiDashboardRoute
@@ -2529,6 +2542,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KpiAssessmentWorkflowRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/jd-list': {
+      id: '/jd-list'
+      path: '/jd-list'
+      fullPath: '/jd-list'
+      preLoaderRoute: typeof JdListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/inventory-dashboard': {
       id: '/inventory-dashboard'
       path: '/inventory-dashboard'
@@ -3081,6 +3101,7 @@ const rootRouteChildren: RootRouteChildren = {
   InvReceiveListRoute: InvReceiveListRoute,
   InvYarnOpeningStockRoute: InvYarnOpeningStockRoute,
   InventoryDashboardRoute: InventoryDashboardRoute,
+  JdListRoute: JdListRoute,
   KpiAssessmentWorkflowRoute: KpiAssessmentWorkflowRoute,
   KpiCyclesRoute: KpiCyclesRoute,
   KpiDashboardRoute: KpiDashboardRoute,
