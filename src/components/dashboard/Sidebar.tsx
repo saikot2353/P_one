@@ -108,7 +108,7 @@ export const nav: NavItem[] = [
           { label: "Manual Attendance", to: "/pending-manual-attendance", count: 7 },
           {
             label: "JD Approvals",
-            to: "/hr-policy-jds",
+            to: "/hr-policy",
             search: { mode: "list", filterWorkflow: "HR" },
             count: 1,
           },
@@ -242,7 +242,7 @@ export const nav: NavItem[] = [
   },
   {
     label: "HR Policy",
-    to: "/hr-policy-jds",
+    to: "/hr-policy",
     search: { mode: "list", filterWorkflow: "ALL" },
     icon: FileText,
   },

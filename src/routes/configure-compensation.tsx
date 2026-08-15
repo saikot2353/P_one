@@ -1707,14 +1707,10 @@ function CompensationSetupPage() {
     setIsFormOpen(false);
   };
 
-  const insetWrapperClass =
-    "group relative rounded-xl border border-border/80 focus-within:border-primary px-3.5 py-1.5 bg-muted/15 focus-within:bg-card transition-all duration-200";
-  const insetLabelClass =
-    "text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block mb-0.5";
-  const insetInputClass =
-    "w-full bg-transparent border-0 outline-none text-xs font-normal text-foreground focus:ring-0 p-0";
-  const insetSelectClass =
-    "w-full bg-transparent border-0 outline-none text-xs font-normal text-foreground focus:ring-0 p-0 cursor-pointer";
+  const insetWrapperClass = "space-y-1.5 flex flex-col relative";
+  const insetLabelClass = "text-[11px] font-bold uppercase text-slate-600 tracking-wider [&:has(>span)]:text-slate-600";
+  const insetInputClass = "w-full h-10 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 focus:outline-none focus:ring-1 focus:ring-[#2563eb] focus:border-[#2563eb] text-sm shadow-sm placeholder:text-slate-400";
+  const insetSelectClass = "w-full h-10 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 focus:outline-none focus:ring-1 focus:ring-[#2563eb] focus:border-[#2563eb] text-sm appearance-none cursor-pointer shadow-sm bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m7%2015%205%205%205-5%22%2F%3E%3Cpath%20d%3D%22m7%209%205-5%205%205%22%2F%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[position:right_12px_center]";
 
   // Tab Header Items
   const tabsList: { type: TabType; label: string; icon: any }[] = [
@@ -2284,24 +2280,25 @@ function CompensationSetupPage() {
         {isFormOpen && (
           <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
             <div
-              className={`bg-card border border-border/80 w-full rounded-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 ${activeTab === "allowance" ? "max-w-6xl" : activeTab === "tiffin" ? "max-w-4xl" : "max-w-2xl"}`}
+              className={`bg-white border-slate-200 w-full rounded-2xl shadow-xl flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200 ${activeTab === "allowance" ? "max-w-6xl" : activeTab === "tiffin" ? "max-w-4xl" : "max-w-2xl"}`}
             >
               {/* Modal Header */}
-              <div className="px-6 py-4.5 border-b border-border/50 bg-transparent flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="size-9 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
-                    <Coins className="size-5" />
+              <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center size-8 rounded-full bg-[#0f172a] text-white shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold tracking-tight text-foreground">
+                    <h2 className="text-[17px] font-bold text-slate-800">
                       {editSl ? "Update" : "Create"}{" "}
                       {tabsList.find((t) => t.type === activeTab)?.label}
                     </h2>
                   </div>
                 </div>
                 <button
+                  type="button"
                   onClick={() => setIsFormOpen(false)}
-                  className="size-8.5 rounded-xl hover:bg-muted/80 flex items-center justify-center transition-colors text-muted-foreground hover:text-foreground border border-border/20"
+                  className="rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 hover:bg-slate-50 transition-colors"
                 >
                   <X className="size-4" />
                 </button>
@@ -2318,7 +2315,7 @@ function CompensationSetupPage() {
                       </h3>
 
                       <div className={insetWrapperClass}>
-                        <label className={insetLabelClass}>Company *</label>
+                        <label className={insetLabelClass}>Company <span className="text-red-500">*</span></label>
                         <select
                           value={company}
                           onChange={(e) => setCompany(e.target.value)}
@@ -2332,7 +2329,7 @@ function CompensationSetupPage() {
                       </div>
 
                       <div className={insetWrapperClass}>
-                        <label className={insetLabelClass}>Area *</label>
+                        <label className={insetLabelClass}>Area <span className="text-red-500">*</span></label>
                         <select
                           value={area}
                           onChange={(e) => setArea(e.target.value)}
@@ -2346,7 +2343,7 @@ function CompensationSetupPage() {
                       </div>
 
                       <div className={insetWrapperClass}>
-                        <label className={insetLabelClass}>Employee Type *</label>
+                        <label className={insetLabelClass}>Employee Type <span className="text-red-500">*</span></label>
                         <select
                           value={employeeType}
                           onChange={(e) => setEmployeeType(e.target.value)}
@@ -2414,7 +2411,7 @@ function CompensationSetupPage() {
                       </div>
 
                       <div className={insetWrapperClass}>
-                        <label className={insetLabelClass}>IsActive *</label>
+                        <label className={insetLabelClass}>IsActive <span className="text-red-500">*</span></label>
                         <select
                           value={allowanceIsActive}
                           onChange={(e) => setAllowanceIsActive(e.target.value as any)}
@@ -2433,7 +2430,7 @@ function CompensationSetupPage() {
                       </h3>
 
                       <div className={insetWrapperClass}>
-                        <label className={insetLabelClass}>Applicable From *</label>
+                        <label className={insetLabelClass}>Applicable From <span className="text-red-500">*</span></label>
                         <input
                           type="date"
                           value={applicableFrom}
@@ -2444,7 +2441,7 @@ function CompensationSetupPage() {
                       </div>
 
                       <div className={insetWrapperClass}>
-                        <label className={insetLabelClass}>Applicable To *</label>
+                        <label className={insetLabelClass}>Applicable To <span className="text-red-500">*</span></label>
                         <input
                           type="date"
                           value={applicableTo}
@@ -2630,7 +2627,7 @@ function CompensationSetupPage() {
                       </div>
 
                       <div className={insetWrapperClass}>
-                        <label className={insetLabelClass}>Calculation For *</label>
+                        <label className={insetLabelClass}>Calculation For <span className="text-red-500">*</span></label>
                         <select
                           value={calculationFor}
                           onChange={(e) => setCalculationFor(e.target.value)}
@@ -2648,7 +2645,7 @@ function CompensationSetupPage() {
                 {activeTab === "tiffin" && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Company *</label>
+                      <label className={insetLabelClass}>Company <span className="text-red-500">*</span></label>
                       <select
                         value={tiffinCompany}
                         onChange={(e) => setTiffinCompany(e.target.value)}
@@ -2661,7 +2658,7 @@ function CompensationSetupPage() {
                       </select>
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Area *</label>
+                      <label className={insetLabelClass}>Area <span className="text-red-500">*</span></label>
                       <select
                         value={tiffinArea}
                         onChange={(e) => setTiffinArea(e.target.value)}
@@ -2675,7 +2672,7 @@ function CompensationSetupPage() {
                       </select>
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Applicable From *</label>
+                      <label className={insetLabelClass}>Applicable From <span className="text-red-500">*</span></label>
                       <input
                         type="date"
                         value={tiffinApplicableFrom}
@@ -2685,7 +2682,7 @@ function CompensationSetupPage() {
                       />
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Applicable To *</label>
+                      <label className={insetLabelClass}>Applicable To <span className="text-red-500">*</span></label>
                       <input
                         type="date"
                         value={tiffinApplicableTo}
@@ -2771,7 +2768,7 @@ function CompensationSetupPage() {
                       />
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>IsActive *</label>
+                      <label className={insetLabelClass}>IsActive <span className="text-red-500">*</span></label>
                       <select
                         value={tiffinIsActive}
                         onChange={(e) => setTiffinIsActive(e.target.value as any)}
@@ -2782,7 +2779,7 @@ function CompensationSetupPage() {
                       </select>
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Based On Tiffin *</label>
+                      <label className={insetLabelClass}>Based On Tiffin <span className="text-red-500">*</span></label>
                       <select
                         value={tiffinBasedOn}
                         onChange={(e) => setTiffinBasedOn(e.target.value)}
@@ -2822,7 +2819,7 @@ function CompensationSetupPage() {
                 {activeTab === "lunch" && (
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Employee Type *</label>
+                      <label className={insetLabelClass}>Employee Type <span className="text-red-500">*</span></label>
                       <input
                         type="text"
                         value={lunchEmpType}
@@ -2832,7 +2829,7 @@ function CompensationSetupPage() {
                       />
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Lunch Rate (BDT) *</label>
+                      <label className={insetLabelClass}>Lunch Rate (BDT) <span className="text-red-500">*</span></label>
                       <input
                         type="number"
                         value={lunchRateVal}
@@ -2842,7 +2839,7 @@ function CompensationSetupPage() {
                       />
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>IsActive *</label>
+                      <label className={insetLabelClass}>IsActive <span className="text-red-500">*</span></label>
                       <select
                         value={lunchIsActive}
                         onChange={(e) => setLunchIsActive(e.target.value as any)}
@@ -2858,7 +2855,7 @@ function CompensationSetupPage() {
                 {activeTab === "conveyance" && (
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Employee Type *</label>
+                      <label className={insetLabelClass}>Employee Type <span className="text-red-500">*</span></label>
                       <input
                         type="text"
                         value={convEmpType}
@@ -2868,7 +2865,7 @@ function CompensationSetupPage() {
                       />
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Conveyance Amount (BDT) *</label>
+                      <label className={insetLabelClass}>Conveyance Amount (BDT) <span className="text-red-500">*</span></label>
                       <input
                         type="number"
                         value={convAmount}
@@ -2878,7 +2875,7 @@ function CompensationSetupPage() {
                       />
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>IsActive *</label>
+                      <label className={insetLabelClass}>IsActive <span className="text-red-500">*</span></label>
                       <select
                         value={convIsActive}
                         onChange={(e) => setConvIsActive(e.target.value as any)}
@@ -2894,7 +2891,7 @@ function CompensationSetupPage() {
                 {activeTab === "bonus" && (
                   <div className="space-y-4">
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Employee Type *</label>
+                      <label className={insetLabelClass}>Employee Type <span className="text-red-500">*</span></label>
                       <select
                         value={bonusEmpType}
                         onChange={(e) => setBonusEmpType(e.target.value)}
@@ -2916,7 +2913,7 @@ function CompensationSetupPage() {
                       </select>
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Days Form *</label>
+                      <label className={insetLabelClass}>Days Form <span className="text-red-500">*</span></label>
                       <input
                         type="number"
                         value={bonusDaysFrom}
@@ -2935,7 +2932,7 @@ function CompensationSetupPage() {
                       />
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Based On *</label>
+                      <label className={insetLabelClass}>Based On <span className="text-red-500">*</span></label>
                       <select
                         value={bonusBasedOn}
                         onChange={(e) => setBonusBasedOn(e.target.value)}
@@ -2948,7 +2945,7 @@ function CompensationSetupPage() {
                       </select>
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Bonus (%) *</label>
+                      <label className={insetLabelClass}>Bonus (%) <span className="text-red-500">*</span></label>
                       <input
                         type="number"
                         value={bonusPercent}
@@ -2958,7 +2955,7 @@ function CompensationSetupPage() {
                       />
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Designation *</label>
+                      <label className={insetLabelClass}>Designation <span className="text-red-500">*</span></label>
                       <input
                         type="text"
                         value={bonusDesignation}
@@ -2968,7 +2965,7 @@ function CompensationSetupPage() {
                       />
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>Is Include Service Length *</label>
+                      <label className={insetLabelClass}>Is Include Service Length <span className="text-red-500">*</span></label>
                       <select
                         value={bonusIncludeServiceLength}
                         onChange={(e) =>
@@ -2981,7 +2978,7 @@ function CompensationSetupPage() {
                       </select>
                     </div>
                     <div className={insetWrapperClass}>
-                      <label className={insetLabelClass}>IsActive *</label>
+                      <label className={insetLabelClass}>IsActive <span className="text-red-500">*</span></label>
                       <select
                         value={bonusIsActive}
                         onChange={(e) => setBonusIsActive(e.target.value as any)}

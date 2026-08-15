@@ -114,7 +114,7 @@ import { Route as IncrementGadgetRouteImport } from './routes/increment-gadget'
 import { Route as IncrementRouteImport } from './routes/increment'
 import { Route as IncentiveAllowanceRouteImport } from './routes/incentive-allowance'
 import { Route as IdCardSetupRouteImport } from './routes/id-card-setup'
-import { Route as HrPolicyJdsRouteImport } from './routes/hr-policy-jds'
+import { Route as HrPolicyRouteImport } from './routes/hr-policy'
 import { Route as FinancialAidListRouteImport } from './routes/financial-aid-list'
 import { Route as FinancialAidBudgetConfigurationRouteImport } from './routes/financial-aid-budget-configuration'
 import { Route as FinalSettlementRouteImport } from './routes/final-settlement'
@@ -148,6 +148,7 @@ import { Route as ApproveOvertimeRouteImport } from './routes/approve-overtime'
 import { Route as ApproveIncrementHrRouteImport } from './routes/approve-increment-hr'
 import { Route as ApproveIncrementGadgetRouteImport } from './routes/approve-increment-gadget'
 import { Route as ApproveAdvanceRouteImport } from './routes/approve-advance'
+import { Route as AllowanceRateRouteImport } from './routes/allowance-rate'
 import { Route as AllApprovalsRouteImport } from './routes/all-approvals'
 import { Route as AdvanceSalaryProcessRouteImport } from './routes/advance-salary-process'
 import { Route as AddEmployeeRouteImport } from './routes/add-employee'
@@ -698,9 +699,9 @@ const IdCardSetupRoute = IdCardSetupRouteImport.update({
   path: '/id-card-setup',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HrPolicyJdsRoute = HrPolicyJdsRouteImport.update({
-  id: '/hr-policy-jds',
-  path: '/hr-policy-jds',
+const HrPolicyRoute = HrPolicyRouteImport.update({
+  id: '/hr-policy',
+  path: '/hr-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FinancialAidListRoute = FinancialAidListRouteImport.update({
@@ -870,6 +871,11 @@ const ApproveAdvanceRoute = ApproveAdvanceRouteImport.update({
   path: '/approve-advance',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AllowanceRateRoute = AllowanceRateRouteImport.update({
+  id: '/allowance-rate',
+  path: '/allowance-rate',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AllApprovalsRoute = AllApprovalsRouteImport.update({
   id: '/all-approvals',
   path: '/all-approvals',
@@ -918,6 +924,7 @@ export interface FileRoutesByFullPath {
   '/add-employee': typeof AddEmployeeRoute
   '/advance-salary-process': typeof AdvanceSalaryProcessRoute
   '/all-approvals': typeof AllApprovalsRoute
+  '/allowance-rate': typeof AllowanceRateRoute
   '/approve-advance': typeof ApproveAdvanceRoute
   '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
@@ -951,7 +958,7 @@ export interface FileRoutesByFullPath {
   '/final-settlement': typeof FinalSettlementRoute
   '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
   '/financial-aid-list': typeof FinancialAidListRoute
-  '/hr-policy-jds': typeof HrPolicyJdsRoute
+  '/hr-policy': typeof HrPolicyRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
   '/increment': typeof IncrementRoute
@@ -1067,6 +1074,7 @@ export interface FileRoutesByTo {
   '/add-employee': typeof AddEmployeeRoute
   '/advance-salary-process': typeof AdvanceSalaryProcessRoute
   '/all-approvals': typeof AllApprovalsRoute
+  '/allowance-rate': typeof AllowanceRateRoute
   '/approve-advance': typeof ApproveAdvanceRoute
   '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
@@ -1100,7 +1108,7 @@ export interface FileRoutesByTo {
   '/final-settlement': typeof FinalSettlementRoute
   '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
   '/financial-aid-list': typeof FinancialAidListRoute
-  '/hr-policy-jds': typeof HrPolicyJdsRoute
+  '/hr-policy': typeof HrPolicyRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
   '/increment': typeof IncrementRoute
@@ -1217,6 +1225,7 @@ export interface FileRoutesById {
   '/add-employee': typeof AddEmployeeRoute
   '/advance-salary-process': typeof AdvanceSalaryProcessRoute
   '/all-approvals': typeof AllApprovalsRoute
+  '/allowance-rate': typeof AllowanceRateRoute
   '/approve-advance': typeof ApproveAdvanceRoute
   '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
@@ -1250,7 +1259,7 @@ export interface FileRoutesById {
   '/final-settlement': typeof FinalSettlementRoute
   '/financial-aid-budget-configuration': typeof FinancialAidBudgetConfigurationRoute
   '/financial-aid-list': typeof FinancialAidListRoute
-  '/hr-policy-jds': typeof HrPolicyJdsRoute
+  '/hr-policy': typeof HrPolicyRoute
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
   '/increment': typeof IncrementRoute
@@ -1368,6 +1377,7 @@ export interface FileRouteTypes {
     | '/add-employee'
     | '/advance-salary-process'
     | '/all-approvals'
+    | '/allowance-rate'
     | '/approve-advance'
     | '/approve-increment-gadget'
     | '/approve-increment-hr'
@@ -1401,7 +1411,7 @@ export interface FileRouteTypes {
     | '/final-settlement'
     | '/financial-aid-budget-configuration'
     | '/financial-aid-list'
-    | '/hr-policy-jds'
+    | '/hr-policy'
     | '/id-card-setup'
     | '/incentive-allowance'
     | '/increment'
@@ -1517,6 +1527,7 @@ export interface FileRouteTypes {
     | '/add-employee'
     | '/advance-salary-process'
     | '/all-approvals'
+    | '/allowance-rate'
     | '/approve-advance'
     | '/approve-increment-gadget'
     | '/approve-increment-hr'
@@ -1550,7 +1561,7 @@ export interface FileRouteTypes {
     | '/final-settlement'
     | '/financial-aid-budget-configuration'
     | '/financial-aid-list'
-    | '/hr-policy-jds'
+    | '/hr-policy'
     | '/id-card-setup'
     | '/incentive-allowance'
     | '/increment'
@@ -1666,6 +1677,7 @@ export interface FileRouteTypes {
     | '/add-employee'
     | '/advance-salary-process'
     | '/all-approvals'
+    | '/allowance-rate'
     | '/approve-advance'
     | '/approve-increment-gadget'
     | '/approve-increment-hr'
@@ -1699,7 +1711,7 @@ export interface FileRouteTypes {
     | '/final-settlement'
     | '/financial-aid-budget-configuration'
     | '/financial-aid-list'
-    | '/hr-policy-jds'
+    | '/hr-policy'
     | '/id-card-setup'
     | '/incentive-allowance'
     | '/increment'
@@ -1816,6 +1828,7 @@ export interface RootRouteChildren {
   AddEmployeeRoute: typeof AddEmployeeRoute
   AdvanceSalaryProcessRoute: typeof AdvanceSalaryProcessRoute
   AllApprovalsRoute: typeof AllApprovalsRoute
+  AllowanceRateRoute: typeof AllowanceRateRoute
   ApproveAdvanceRoute: typeof ApproveAdvanceRoute
   ApproveIncrementGadgetRoute: typeof ApproveIncrementGadgetRoute
   ApproveIncrementHrRoute: typeof ApproveIncrementHrRoute
@@ -1849,7 +1862,7 @@ export interface RootRouteChildren {
   FinalSettlementRoute: typeof FinalSettlementRoute
   FinancialAidBudgetConfigurationRoute: typeof FinancialAidBudgetConfigurationRoute
   FinancialAidListRoute: typeof FinancialAidListRoute
-  HrPolicyJdsRoute: typeof HrPolicyJdsRoute
+  HrPolicyRoute: typeof HrPolicyRoute
   IdCardSetupRoute: typeof IdCardSetupRoute
   IncentiveAllowanceRoute: typeof IncentiveAllowanceRoute
   IncrementRoute: typeof IncrementRoute
@@ -2698,11 +2711,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IdCardSetupRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/hr-policy-jds': {
-      id: '/hr-policy-jds'
-      path: '/hr-policy-jds'
-      fullPath: '/hr-policy-jds'
-      preLoaderRoute: typeof HrPolicyJdsRouteImport
+    '/hr-policy': {
+      id: '/hr-policy'
+      path: '/hr-policy'
+      fullPath: '/hr-policy'
+      preLoaderRoute: typeof HrPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/financial-aid-list': {
@@ -2936,6 +2949,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApproveAdvanceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/allowance-rate': {
+      id: '/allowance-rate'
+      path: '/allowance-rate'
+      fullPath: '/allowance-rate'
+      preLoaderRoute: typeof AllowanceRateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/all-approvals': {
       id: '/all-approvals'
       path: '/all-approvals'
@@ -3000,6 +3020,7 @@ const rootRouteChildren: RootRouteChildren = {
   AddEmployeeRoute: AddEmployeeRoute,
   AdvanceSalaryProcessRoute: AdvanceSalaryProcessRoute,
   AllApprovalsRoute: AllApprovalsRoute,
+  AllowanceRateRoute: AllowanceRateRoute,
   ApproveAdvanceRoute: ApproveAdvanceRoute,
   ApproveIncrementGadgetRoute: ApproveIncrementGadgetRoute,
   ApproveIncrementHrRoute: ApproveIncrementHrRoute,
@@ -3033,7 +3054,7 @@ const rootRouteChildren: RootRouteChildren = {
   FinalSettlementRoute: FinalSettlementRoute,
   FinancialAidBudgetConfigurationRoute: FinancialAidBudgetConfigurationRoute,
   FinancialAidListRoute: FinancialAidListRoute,
-  HrPolicyJdsRoute: HrPolicyJdsRoute,
+  HrPolicyRoute: HrPolicyRoute,
   IdCardSetupRoute: IdCardSetupRoute,
   IncentiveAllowanceRoute: IncentiveAllowanceRoute,
   IncrementRoute: IncrementRoute,

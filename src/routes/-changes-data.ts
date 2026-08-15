@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "166",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Configuration - Allowance Rate",
+    link: "/allowance-rate",
+    descriptionEn: "Created a new 'Allowance Rate' configuration page with a centralized one-page modal design. Users can easily view, add, edit, and delete company-wide allowance rates (Percentage or Fixed amount) using a beautiful and well-organized interface.",
+    descriptionBn: "একটি নতুন 'Allowance Rate' কনফিগারেশন পেইজ তৈরি করা হয়েছে, যা একটি সুন্দর ও গোছানো এক-পেইজ মডেল ডিজাইনে তৈরি। ব্যবহারকারীরা এখন সহজেই কোম্পানির অ্যালাউন্স রেটগুলো (শতকরা বা নির্দিষ্ট পরিমাণ) দেখতে, যোগ করতে, এডিট করতে এবং ডিলিট করতে পারবেন।",
+  },
+  {
     id: "165",
     date: new Date().toISOString().slice(0, 16),
     type: "New Feature",
@@ -1593,5 +1602,14 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     link: "/configure-compensation?tab=allowance",
     descriptionEn: "Added missing fields ('Div By Day', 'Calculation For') and 'Basic Salary' option under Based On to the Allowance Rate form, states, interfaces, mock data, and table overview columns.",
     descriptionBn: "এলাউন্স রেট ফর্মে অনুপস্থিত ফিল্ড ('Div By Day', 'Calculation For') এবং Based On অপশনে 'Basic Salary' যুক্ত করা হয়েছে, যা স্টেট, ইন্টারফেস, মক ডাটা এবং ওভারভিউ টেবিল কলামে আপডেট হয়েছে।",
+  },
+  {
+    id: "132",
+    date: "2026-08-15T17:35",
+    type: "New",
+    module: "HR Policy",
+    link: "/hr-policy",
+    descriptionEn: "Fully redesigned the HR Policy module to exclusively focus on Policy uploading and management, completely removing Job Description (JD) features. Added a dedicated attachment upload workflow.",
+    descriptionBn: "এইচআর পলিসি মডিউলটি সম্পূর্ণরূপে রিডিজাইন করা হয়েছে যাতে শুধুমাত্র পলিসি আপলোড ও ম্যানেজমেন্টের উপর ফোকাস করা যায়, জব ডেসক্রিপশন (JD) ফিচারগুলো সম্পূর্ণ সরিয়ে দেওয়া হয়েছে। পলিসি অ্যাটাচমেন্ট আপলোড করার নতুন অপশন যোগ করা হয়েছে।",
   },
 ];

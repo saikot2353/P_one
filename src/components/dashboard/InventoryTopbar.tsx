@@ -199,13 +199,13 @@ const searchableMenus: SearchMenuLink[] = [
   {
     label: "JD List",
     parent: "HR Policy",
-    to: "/hr-policy-jds",
+    to: "/hr-policy",
     description: "Register, search, and view designation Job Description Sheets (JDS)",
   },
   {
     label: "JD Approvals",
     parent: "HR Policy",
-    to: "/hr-policy-jds?mode=list&filterWorkflow=HR",
+    to: "/hr-policy?mode=list&filterWorkflow=HR",
     description: "Sequential approval board workflow for pending Job Description Sheets",
   },
   // Disciplinary Action
