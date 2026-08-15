@@ -76,6 +76,7 @@ function HRPolicyPage() {
     return INITIAL_POLICIES;
   });
 
+  const [selectedPolicy, setSelectedPolicy] = useState<PolicyItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
@@ -157,129 +158,128 @@ function HRPolicyPage() {
       <main className="flex-1 min-w-0 flex flex-col relative overflow-y-auto bg-muted/20">
         <Topbar />
         
-        <div className="flex-1 flex flex-col p-4 md:p-8 max-w-[1400px] mx-auto w-full">
-          {/* Header */}
-          <div className="mb-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-wider mb-2">
-              <Link to="/" className="hover:underline">Dashboard</Link>
-              <ChevronRight className="size-3.5" />
-              <span>HR Policies</span>
+        <div className="flex-1 flex flex-col p-4 w-full mx-auto">
+          {/* Top Header - Breadcrumbs & Actions */}
+          <div className="flex items-center justify-between mb-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
+              <Link to="/" className="hover:text-[#2563eb] transition-colors">Home</Link>
+              <ChevronRight className="size-3" />
+              <Link to="/" className="hover:text-[#2563eb] transition-colors">Configure</Link>
+              <ChevronRight className="size-3" />
+              <span className="text-slate-800 font-bold">HR Policy</span>
             </div>
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-              <div>
-                <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
-                  <div className="p-2.5 bg-primary rounded-xl text-primary-foreground shadow-md">
-                    <FileText className="size-6" />
-                  </div>
-                  HR Policy Directory
-                </h1>
-                <p className="text-sm text-muted-foreground mt-2 max-w-xl">
-                  Manage all company policies, guidelines, and manuals in one central hub.
-                </p>
-              </div>
-              
-              <Button onClick={handleOpenNew} className="gap-2 h-11 px-6 rounded-xl shadow-md shrink-0 bg-[#2563eb] hover:bg-blue-700">
-                <Plus className="size-4" /> Upload New Policy
+            <div className="flex items-center gap-3">
+              <Button variant="outline" className="h-8 px-4 rounded-md border-slate-200 text-slate-700 text-[10px] font-bold tracking-wide uppercase bg-white hover:bg-slate-50 shadow-sm">
+                <svg className="size-3.5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                Copy From...
+              </Button>
+              <Button onClick={handleOpenNew} className="h-8 px-4 rounded-md bg-[#2563eb] hover:bg-blue-700 text-white text-[10px] font-bold tracking-wide uppercase shadow-sm">
+                <Plus className="size-3.5 mr-1.5" /> Add New Record
               </Button>
             </div>
           </div>
 
-          {/* Filters & Content Area */}
-          <div className="bg-card rounded-2xl border border-border/40 shadow-xl overflow-hidden flex-1 flex flex-col animate-in fade-in zoom-in-95 duration-500 delay-100">
-            <div className="p-4 border-b border-border/40 bg-muted/5 flex flex-col sm:flex-row gap-4 justify-between items-center">
-              <div className="relative w-full sm:w-96">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+          {/* Filters Bar */}
+          <div className="bg-white border border-slate-200 rounded-xl p-3 flex flex-col sm:flex-row gap-4 justify-between items-center mb-4 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 delay-75">
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                 <Input 
-                  placeholder="Search policies by title or keyword..." 
-                  className="pl-9 h-10 rounded-xl bg-background border-border/60"
+                  placeholder="Search Department..." 
+                  className="pl-9 h-9 rounded-lg bg-white border-slate-200 text-sm focus:ring-1 focus:ring-blue-500 shadow-sm"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <div className="flex gap-2 w-full sm:w-auto">
-                {["All", "Active", "Inactive"].map(status => (
-                  <button
-                    key={status}
-                    onClick={() => setFilterStatus(status)}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors flex-1 sm:flex-none ${filterStatus === status ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-background border border-border/60 text-muted-foreground hover:bg-muted'}`}
+              <div className="hidden sm:block">
+                 <select
+                    className="h-9 px-3 rounded-lg bg-white border border-slate-200 text-sm text-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-sm appearance-none min-w-[160px]"
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
                   >
-                    {status}
-                  </button>
-                ))}
+                    <option value="All">Select Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
               </div>
+              <button className="h-9 w-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 transition-colors shadow-sm shrink-0">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              </button>
             </div>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded border border-emerald-200 text-emerald-600 hover:bg-emerald-50 text-[10px] font-bold uppercase tracking-wider transition-colors bg-white">
+                <FileText className="size-3.5" /> Excel
+              </button>
+              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded border border-blue-200 text-blue-600 hover:bg-blue-50 text-[10px] font-bold uppercase tracking-wider transition-colors bg-white">
+                <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                Print
+              </button>
+              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded border border-rose-200 text-rose-600 hover:bg-rose-50 text-[10px] font-bold uppercase tracking-wider transition-colors bg-white">
+                <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M10 13v6"/><path d="M10 13c1.1 0 2 .9 2 2s-.9 2-2 2"/><path d="M10 16H8v3"/><path d="M15 13v6"/><path d="M15 13h2a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2h-2"/></svg>
+                PDF
+              </button>
+            </div>
+          </div>
 
-            <div className="flex-1 overflow-x-auto bg-card">
+          {/* Table Area */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col animate-in fade-in zoom-in-95 duration-500 delay-100">
+            <div className="flex-1 overflow-x-auto">
               {filteredPolicies.length === 0 ? (
                  <div className="flex flex-col items-center justify-center h-64 text-center">
-                   <AlertCircle className="size-12 text-muted-foreground/30 mb-4" />
-                   <h3 className="text-lg font-bold text-foreground">No Policies Found</h3>
-                   <p className="text-sm text-muted-foreground mt-1 max-w-sm">
+                   <AlertCircle className="size-12 text-slate-300 mb-4" />
+                   <h3 className="text-lg font-bold text-slate-700">No Policies Found</h3>
+                   <p className="text-sm text-slate-500 mt-1 max-w-sm">
                      {searchQuery ? "No policies matched your search criteria." : "There are currently no HR policies uploaded."}
                    </p>
                  </div>
               ) : (
                 <table className="w-full border-collapse text-left text-xs whitespace-nowrap">
                   <thead>
-                    <tr className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/60 bg-muted/40 border-b border-border/40">
-                      <th className="px-3 py-4 font-bold border-r border-border/30 w-[120px]">Actions</th>
-                      <th className="px-3 py-4 font-bold border-r border-border/30 w-[100px]">Policy ID</th>
-                      <th className="px-3 py-4 font-bold border-r border-border/30 min-w-[200px]">Title</th>
-                      <th className="px-3 py-4 font-bold border-r border-border/30 w-[120px]">Status</th>
-                      <th className="px-3 py-4 font-bold border-r border-border/30 w-[140px]">Attachment</th>
-                      <th className="px-3 py-4 font-bold">Upload Date</th>
+                    <tr className="text-[10px] uppercase font-bold tracking-wider text-slate-700 bg-white border-b border-slate-200">
+                      <th className="px-5 py-4 font-bold border-r border-slate-100 w-[60px] text-center">SL</th>
+                      <th className="px-5 py-4 font-bold border-r border-slate-100 w-[100px]">CODE</th>
+                      <th className="px-5 py-4 font-bold border-r border-slate-100 min-w-[200px]">TITLE</th>
+                      <th className="px-5 py-4 font-bold border-r border-slate-100 w-[140px]">ATTACHMENT</th>
+                      <th className="px-5 py-4 font-bold border-r border-slate-100 w-[100px] text-center">STATUS</th>
+                      <th className="px-5 py-4 font-bold text-center w-[120px]">ACTIONS</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-border/45">
-                    {filteredPolicies.map(policy => (
-                      <tr key={policy.id} className="group hover:bg-[#f8fafc] transition-all cursor-pointer">
-                        <td className="px-2 py-2 border-r border-border/30">
-                          <div className="flex items-center gap-1.5 justify-center">
-                            <button 
-                              className="size-6 rounded-lg bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 hover:bg-indigo-500 hover:text-white transition flex items-center justify-center shadow-3xs"
-                              title="View Document"
-                            >
-                              <Eye className="size-3" />
-                            </button>
-                            <button 
-                              className="size-6 rounded-lg bg-amber-500/10 text-amber-600 border border-amber-500/20 hover:bg-amber-500 hover:text-white transition flex items-center justify-center shadow-3xs"
-                              title="Edit Policy"
-                            >
-                              <Pencil className="size-3" />
-                            </button>
-                            <button 
-                              onClick={(e) => { e.stopPropagation(); handleDelete(policy.id); }}
-                              className="size-6 rounded-lg bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500 hover:text-white transition flex items-center justify-center shadow-3xs"
-                              title="Delete Policy"
-                            >
-                              <Trash2 className="size-3" />
-                            </button>
-                          </div>
+                  <tbody className="divide-y divide-slate-100">
+                    {filteredPolicies.map((policy, index) => (
+                      <tr key={policy.id} className="hover:bg-slate-50/50 transition-colors">
+                        <td className="px-5 py-4 border-r border-slate-100 text-center text-slate-500">
+                          {index + 1}
                         </td>
-                        <td className="px-3 py-2 border-r border-border/30 font-semibold text-foreground/80">
+                        <td className="px-5 py-4 border-r border-slate-100 font-medium text-slate-800">
                           {policy.id}
                         </td>
-                        <td className="px-3 py-2 border-r border-border/30">
-                          <div className="font-bold text-foreground">{policy.title}</div>
-                          <div className="text-[10px] text-muted-foreground/70 mt-0.5 truncate max-w-[300px]">{policy.body}</div>
+                        <td className="px-5 py-4 border-r border-slate-100 font-medium text-slate-800">
+                          {policy.title}
                         </td>
-                        <td className="px-3 py-2 border-r border-border/30">
-                          <Badge variant="outline" className={`shrink-0 text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 ${policy.status === 'Active' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' : 'bg-muted text-muted-foreground border-border/50'}`}>
-                            {policy.status}
-                          </Badge>
-                        </td>
-                        <td className="px-3 py-2 border-r border-border/30">
+                        <td className="px-5 py-4 border-r border-slate-100 font-medium text-slate-800">
                           {policy.fileName ? (
-                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-primary bg-primary/10 px-2 py-1 rounded border border-primary/20 w-max max-w-[150px]">
-                              <FileDown className="size-3 shrink-0" />
-                              <span className="truncate" title={policy.fileName}>{policy.fileName}</span>
-                            </div>
+                            <span className="truncate" title={policy.fileName}>{policy.fileName}</span>
                           ) : (
-                            <span className="text-[10px] text-muted-foreground/50 italic">No attachment</span>
+                            <span className="text-slate-400 italic">No attachment</span>
                           )}
                         </td>
-                        <td className="px-3 py-2 text-muted-foreground/80 text-[11px] font-semibold">
-                          {policy.uploadDate}
+                        <td className="px-5 py-4 border-r border-slate-100 text-center">
+                          <span className={`inline-flex items-center justify-center px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wide ${policy.status === 'Active' ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>
+                            {policy.status}
+                          </span>
+                        </td>
+                        <td className="px-5 py-4 text-center">
+                          <div className="flex items-center justify-center gap-3">
+                            <button className="text-amber-500 hover:text-amber-600 transition-colors" title="Edit">
+                              <Pencil className="size-3.5" />
+                            </button>
+                            <button className="text-rose-500 hover:text-rose-600 transition-colors" onClick={() => handleDelete(policy.id)} title="Delete">
+                              <Trash2 className="size-3.5" />
+                            </button>
+                            <button className="text-blue-500 hover:text-blue-600 transition-colors" onClick={() => setSelectedPolicy(policy)} title="View">
+                              <Eye className="size-3.5" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -288,8 +288,77 @@ function HRPolicyPage() {
               )}
             </div>
           </div>
+          
+          {/* Pagination */}
+          <div className="mt-4 flex items-center justify-between text-xs text-slate-500 font-medium px-1">
+            <div className="flex items-center gap-2">
+              <button className="hover:text-slate-700 transition-colors">&lt; Previous</button>
+              <button className="w-6 h-6 flex items-center justify-center bg-white border border-slate-200 rounded font-bold text-slate-700 shadow-sm">1</button>
+              <button className="hover:text-slate-700 transition-colors">Next &gt;</button>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+              <span>{filteredPolicies.length} records</span>
+            </div>
+          </div>
         </div>
       </main>
+
+      {/* View Policy Modal */}
+      <Dialog open={!!selectedPolicy} onOpenChange={(open) => !open && setSelectedPolicy(null)}>
+        <DialogContent className="max-w-2xl p-0 overflow-hidden border-0 shadow-2xl rounded-2xl">
+          {selectedPolicy && (
+            <>
+              <div className="bg-[#2563eb] p-6 text-white flex items-start justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold">{selectedPolicy.title}</h2>
+                  <div className="flex items-center gap-3 mt-2 text-blue-100 text-sm font-medium">
+                    <span>ID: {selectedPolicy.id}</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-300"></span>
+                    <span>Updated: {selectedPolicy.uploadDate}</span>
+                  </div>
+                </div>
+                <div className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${selectedPolicy.status === 'Active' ? 'bg-emerald-400/20 text-emerald-50 border border-emerald-400/30' : 'bg-white/10 text-white/80 border border-white/20'}`}>
+                  {selectedPolicy.status}
+                </div>
+              </div>
+              <div className="p-6 md:p-8 bg-slate-50 max-h-[60vh] overflow-y-auto">
+                <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm min-h-[200px]">
+                  <h3 className="text-xs font-bold uppercase text-slate-400 tracking-wider mb-4 border-b border-slate-100 pb-2">Policy Description</h3>
+                  <div className="text-slate-700 text-sm leading-relaxed whitespace-pre-wrap">
+                    {selectedPolicy.body}
+                  </div>
+                </div>
+
+                {selectedPolicy.fileName && (
+                  <div className="mt-6">
+                    <h3 className="text-xs font-bold uppercase text-slate-400 tracking-wider mb-3">Attachment</h3>
+                    <div className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2.5 bg-blue-50 text-blue-600 rounded-lg">
+                          <FileText className="size-5" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-slate-700">{selectedPolicy.fileName}</p>
+                          <p className="text-[10px] font-medium text-slate-400 mt-0.5">PDF Document</p>
+                        </div>
+                      </div>
+                      <Button variant="outline" className="gap-2 h-9 border-slate-200 text-blue-600 hover:bg-blue-50 hover:text-blue-700">
+                        <FileDown className="size-4" /> Download
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="p-4 border-t border-slate-100 bg-white flex justify-end">
+                <Button variant="outline" onClick={() => setSelectedPolicy(null)} className="h-9 px-6 rounded-lg font-semibold text-slate-600 border-slate-200 hover:bg-slate-50">
+                  Close
+                </Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Upload/Create Modal - Matching Personnel Config Modals */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
