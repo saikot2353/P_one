@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "182",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "KPI Cycles",
+    link: "/kpi-cycles",
+    descriptionEn: "Upgraded the KPI Cycles creation modal with a smart, searchable combobox (MultiSelect) for both Applicable Departments and Applicable Employees, replacing the previous bulky scrollable lists for a much more professional and clean UX.",
+    descriptionBn: "KPI Cycles তৈরির মোডালটি আরও স্মার্ট ও প্রফেশনাল করা হয়েছে। Applicable Departments এবং Applicable Employees নির্বাচনের জন্য আগের বড় স্ক্রলযোগ্য তালিকার পরিবর্তে সার্চ-সুবিধাযুক্ত আধুনিক মাল্টি-সিলেক্ট কম্বোবক্স যোগ করা হয়েছে।",
+  },
+  {
     id: "181",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Update",

@@ -18,6 +18,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { type KpiCycle, loadKpiCycles, saveKpiCycles, DEPARTMENT_LIST } from "@/lib/kpi-data";
+import { MultiSelect } from "@/components/ui/multi-select";
 
 export const Route = createFileRoute("/kpi-cycles")({
   head: () => ({
@@ -477,64 +478,42 @@ function KpiCyclesPage() {
                 <label className="text-[10px] font-bold text-muted-foreground uppercase">
                   Applicable Departments *
                 </label>
-                <div className="w-full h-32 overflow-y-auto p-2 rounded-lg bg-muted/40 border border-border/40 space-y-1">
-                  {DEPARTMENT_LIST.map((d) => (
-                    <label key={d} className="flex items-center gap-2 p-1.5 hover:bg-muted rounded cursor-pointer transition-colors">
-                      <input
-                        type="checkbox"
-                        checked={form.departments.includes(d)}
-                        onChange={(e) => {
-                          let newValues = [...form.departments];
-                          if (e.target.checked) {
-                            if (d === "All Departments") newValues = ["All Departments"];
-                            else {
-                              newValues = newValues.filter((v) => v !== "All Departments");
-                              newValues.push(d);
-                            }
-                          } else {
-                            newValues = newValues.filter((v) => v !== d);
-                            if (newValues.length === 0) newValues = ["All Departments"];
-                          }
-                          setForm((p) => ({ ...p, departments: newValues }));
-                        }}
-                        className="size-4 rounded border-border/50 text-primary focus:ring-primary/20"
-                      />
-                      <span className="text-xs font-semibold">{d}</span>
-                    </label>
-                  ))}
-                </div>
+                <MultiSelect
+                  options={DEPARTMENT_LIST.map(d => ({ value: d, label: d }))}
+                  selected={form.departments}
+                  onChange={(selected) => {
+                    if (selected.length === 0) setForm(p => ({ ...p, departments: ["All Departments"] }));
+                    else if (selected[selected.length - 1] === "All Departments" && !form.departments.includes("All Departments")) {
+                      setForm(p => ({ ...p, departments: ["All Departments"] }));
+                    } else if (selected.includes("All Departments") && selected.length > 1) {
+                      setForm(p => ({ ...p, departments: selected.filter(v => v !== "All Departments") }));
+                    } else {
+                      setForm(p => ({ ...p, departments: selected }));
+                    }
+                  }}
+                  placeholder="Select Departments..."
+                />
               </div>
 
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-muted-foreground uppercase">
                   Applicable Employees *
                 </label>
-                <div className="w-full h-32 overflow-y-auto p-2 rounded-lg bg-muted/40 border border-border/40 space-y-1">
-                  {EMPLOYEE_LIST.map((emp) => (
-                    <label key={emp} className="flex items-center gap-2 p-1.5 hover:bg-muted rounded cursor-pointer transition-colors">
-                      <input
-                        type="checkbox"
-                        checked={form.employees.includes(emp)}
-                        onChange={(e) => {
-                          let newValues = [...form.employees];
-                          if (e.target.checked) {
-                            if (emp === "All Employees") newValues = ["All Employees"];
-                            else {
-                              newValues = newValues.filter((v) => v !== "All Employees");
-                              newValues.push(emp);
-                            }
-                          } else {
-                            newValues = newValues.filter((v) => v !== emp);
-                            if (newValues.length === 0) newValues = ["All Employees"];
-                          }
-                          setForm((p) => ({ ...p, employees: newValues }));
-                        }}
-                        className="size-4 rounded border-border/50 text-primary focus:ring-primary/20"
-                      />
-                      <span className="text-xs font-semibold">{emp}</span>
-                    </label>
-                  ))}
-                </div>
+                <MultiSelect
+                  options={EMPLOYEE_LIST.map(emp => ({ value: emp, label: emp }))}
+                  selected={form.employees}
+                  onChange={(selected) => {
+                    if (selected.length === 0) setForm(p => ({ ...p, employees: ["All Employees"] }));
+                    else if (selected[selected.length - 1] === "All Employees" && !form.employees.includes("All Employees")) {
+                      setForm(p => ({ ...p, employees: ["All Employees"] }));
+                    } else if (selected.includes("All Employees") && selected.length > 1) {
+                      setForm(p => ({ ...p, employees: selected.filter(v => v !== "All Employees") }));
+                    } else {
+                      setForm(p => ({ ...p, employees: selected }));
+                    }
+                  }}
+                  placeholder="Select Employees..."
+                />
               </div>
 
               {form.status === "Active" && (
