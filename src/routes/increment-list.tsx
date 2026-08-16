@@ -670,7 +670,13 @@ function IncrementListPage() {
                 <label className="text-[10px] font-bold text-muted-foreground uppercase">Select Employee *</label>
                 <select
                   value={evalEmployee}
-                  onChange={(e) => setEvalEmployee(e.target.value)}
+                  onChange={(e) => {
+                    const emp = e.target.value;
+                    setEvalEmployee(emp);
+                    if (evalPullFromKPI) {
+                      setEvalIncAmount(emp ? "5000" : "");
+                    }
+                  }}
                   className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs text-foreground font-semibold"
                   required
                 >
@@ -681,6 +687,31 @@ function IncrementListPage() {
                   <option value="2024052333 - Mohammad Rahatul Islam">2024052333 - Mohammad Rahatul Islam</option>
                   <option value="2026000001 - New Employee">2026000001 - New Employee</option>
                 </select>
+              </div>
+
+              <div className="pt-2 pb-2 border-b border-border/40 mb-2">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="pull-kpi-chk"
+                    checked={evalPullFromKPI}
+                    disabled={!evalEmployee}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setEvalPullFromKPI(checked);
+                      if (checked && evalEmployee) {
+                        setEvalIncAmount("5000"); // Mock KPI auto-filled amount
+                      } else {
+                        setEvalIncAmount("");
+                      }
+                    }}
+                    className="size-4 rounded border-border/50 text-emerald-600 focus:ring-emerald-500/20 bg-muted transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                  <label htmlFor="pull-kpi-chk" className={`text-xs font-bold ${!evalEmployee ? 'text-muted-foreground opacity-50 cursor-not-allowed' : 'text-emerald-600 cursor-pointer'} select-none flex items-center gap-1.5`}>
+                    Pull Increment Data from KPI
+                    <span className="px-1.5 py-0.5 rounded text-[8px] uppercase font-black bg-emerald-500/15 text-emerald-600">Auto-fill</span>
+                  </label>
+                </div>
               </div>
 
               <div className="flex items-center gap-2 pt-1 pb-1">
@@ -719,30 +750,6 @@ function IncrementListPage() {
                   </select>
                 </div>
               )}
-
-              <div className="pt-2 pb-1 border-t border-border/40">
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="pull-kpi-chk"
-                    checked={evalPullFromKPI}
-                    onChange={(e) => {
-                      const checked = e.target.checked;
-                      setEvalPullFromKPI(checked);
-                      if (checked) {
-                        setEvalIncAmount("5000"); // Mock KPI auto-filled amount
-                      } else {
-                        setEvalIncAmount("");
-                      }
-                    }}
-                    className="size-4 rounded border-border/50 text-emerald-600 focus:ring-emerald-500/20 bg-muted transition cursor-pointer"
-                  />
-                  <label htmlFor="pull-kpi-chk" className="text-xs font-bold text-emerald-600 cursor-pointer select-none flex items-center gap-1.5">
-                    Pull Increment Data from KPI
-                    <span className="px-1.5 py-0.5 rounded text-[8px] uppercase font-black bg-emerald-500/15 text-emerald-600">Auto-fill</span>
-                  </label>
-                </div>
-              </div>
 
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-muted-foreground uppercase">Increment Amount (৳) *</label>

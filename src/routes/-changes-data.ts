@@ -2,6 +2,33 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "180",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Employee Increment",
+    link: "/increment-list",
+    descriptionEn: "Reordered fields in the Employee Evaluation modal to place the KPI option before the promotion checkbox, as per the new logical flow.",
+    descriptionBn: "এমপ্লয়ি ইভ্যালুয়েশন মোডালে ফিল্ডের ক্রম পরিবর্তন করা হয়েছে; নতুন ফ্লো অনুযায়ী KPI অপশনটি প্রমোশন চেকবক্সের আগে রাখা হয়েছে।",
+  },
+  {
+    id: "179",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Employee Increment",
+    link: "/increment-list",
+    descriptionEn: "Updated the Employee Evaluation modal flow to enforce a logical order: the 'Pull Increment Data from KPI' option is now disabled until an employee is selected, and checking the KPI option auto-fills data specifically for the selected employee.",
+    descriptionBn: "এমপ্লয়ি ইভ্যালুয়েশন মোডালে একটি লজিক্যাল ফ্লো এনফোর্স করা হয়েছে: কোনো এমপ্লয়ি সিলেক্ট করার আগে 'Pull Increment Data from KPI' অপশনটি ডিজেবল থাকবে, এবং KPI অপশনে চেক করলে শুধুমাত্র সিলেক্টেড এমপ্লয়ির জন্য অটোমেটিক ডেটা ফিল হবে।",
+  },
+  {
+    id: "178",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Modify",
+    module: "Merchandising Master Settings",
+    link: "/merchandising-master-settings",
+    descriptionEn: "Fixed a TypeScript error where the initialDyeings and initialFinishings arrays were missing the status property.",
+    descriptionBn: "মার্চেন্ডাইজিং মাস্টার সেটিংসে একটি টাইপস্ক্রিপ্ট এরর সমাধান করা হয়েছে যেখানে initialDyeings এবং initialFinishings অ্যারেগুলোতে status প্রপার্টিটি মিসিং ছিল।",
+  },
+  {
     id: "177",
     date: new Date().toISOString().slice(0, 16),
     type: "Modify",

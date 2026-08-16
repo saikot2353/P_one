@@ -664,24 +664,24 @@ interface DyeingSpec {
 }
 
 export const initialDyeings: DyeingSpec[] = [
-  { id: "dy-1", dyeingName: "Average", rate: 1, rateConstraint: "Increase Only" },
-  { id: "dy-2", dyeingName: "Black", rate: 1, rateConstraint: "Decrease Only" },
-  { id: "dy-3", dyeingName: "Cotton Dyeing", rate: 0, rateConstraint: "No Restriction" },
-  { id: "dy-4", dyeingName: "Dark", rate: 2, rateConstraint: "Fixed" },
-  { id: "dy-5", dyeingName: "Double Part Dyeing", rate: 0, rateConstraint: "Increase Only" },
-  { id: "dy-6", dyeingName: "Extra Dark", rate: 15, rateConstraint: "Decrease Only" },
-  { id: "dy-7", dyeingName: "Fluorescent", rate: 0, rateConstraint: "No Restriction" },
-  { id: "dy-8", dyeingName: "Garments Wash", rate: 0, rateConstraint: "Fixed" },
-  { id: "dy-9", dyeingName: "Light", rate: 1, rateConstraint: "Increase Only" },
-  { id: "dy-10", dyeingName: "Medium", rate: 2, rateConstraint: "Decrease Only" },
-  { id: "dy-11", dyeingName: "N/A", rate: 0, rateConstraint: "No Restriction" },
-  { id: "dy-12", dyeingName: "Pigment (AOP)", rate: 0, rateConstraint: "Fixed" },
-  { id: "dy-13", dyeingName: "RFD", rate: 0, rateConstraint: "Increase Only" },
-  { id: "dy-14", dyeingName: "Royal", rate: 0, rateConstraint: "Decrease Only" },
-  { id: "dy-15", dyeingName: "Wash", rate: 0, rateConstraint: "No Restriction" },
-  { id: "dy-16", dyeingName: "White", rate: 0, rateConstraint: "Fixed" },
-  { id: "dy-17", dyeingName: "Yarn Dyeing", rate: 0, rateConstraint: "Increase Only" },
-  { id: "dy-18", dyeingName: "YD Wash", rate: 0, rateConstraint: "Decrease Only" },
+  { id: "dy-1", dyeingName: "Average", rate: 1, rateConstraint: "Increase Only", status: "Active" },
+  { id: "dy-2", dyeingName: "Black", rate: 1, rateConstraint: "Decrease Only", status: "Active" },
+  { id: "dy-3", dyeingName: "Cotton Dyeing", rate: 0, rateConstraint: "No Restriction", status: "Active" },
+  { id: "dy-4", dyeingName: "Dark", rate: 2, rateConstraint: "Fixed", status: "Active" },
+  { id: "dy-5", dyeingName: "Double Part Dyeing", rate: 0, rateConstraint: "Increase Only", status: "Active" },
+  { id: "dy-6", dyeingName: "Extra Dark", rate: 15, rateConstraint: "Decrease Only", status: "Active" },
+  { id: "dy-7", dyeingName: "Fluorescent", rate: 0, rateConstraint: "No Restriction", status: "Active" },
+  { id: "dy-8", dyeingName: "Garments Wash", rate: 0, rateConstraint: "Fixed", status: "Active" },
+  { id: "dy-9", dyeingName: "Light", rate: 1, rateConstraint: "Increase Only", status: "Active" },
+  { id: "dy-10", dyeingName: "Medium", rate: 2, rateConstraint: "Decrease Only", status: "Active" },
+  { id: "dy-11", dyeingName: "N/A", rate: 0, rateConstraint: "No Restriction", status: "Active" },
+  { id: "dy-12", dyeingName: "Pigment (AOP)", rate: 0, rateConstraint: "Fixed", status: "Active" },
+  { id: "dy-13", dyeingName: "RFD", rate: 0, rateConstraint: "Increase Only", status: "Active" },
+  { id: "dy-14", dyeingName: "Royal", rate: 0, rateConstraint: "Decrease Only", status: "Active" },
+  { id: "dy-15", dyeingName: "Wash", rate: 0, rateConstraint: "No Restriction", status: "Active" },
+  { id: "dy-16", dyeingName: "White", rate: 0, rateConstraint: "Fixed", status: "Active" },
+  { id: "dy-17", dyeingName: "Yarn Dyeing", rate: 0, rateConstraint: "Increase Only", status: "Active" },
+  { id: "dy-18", dyeingName: "YD Wash", rate: 0, rateConstraint: "Decrease Only", status: "Active" },
 ];
 
 interface FinishingSpec {
@@ -693,17 +693,17 @@ interface FinishingSpec {
 }
 
 export const initialFinishings: FinishingSpec[] = [
-  { id: "fin-1", finishingName: "Brushing", rate: 0, rateConstraint: "Increase Only" },
-  { id: "fin-2", finishingName: "Compacting", rate: 2.0200, rateConstraint: "Decrease Only" },
-  { id: "fin-3", finishingName: "Dryer", rate: 0, rateConstraint: "No Restriction" },
-  { id: "fin-4", finishingName: "Heat Set", rate: 0, rateConstraint: "Fixed" },
-  { id: "fin-5", finishingName: "Hydrophilic Softner", rate: 0, rateConstraint: "Increase Only" },
-  { id: "fin-6", finishingName: "Peach Finishing", rate: 0, rateConstraint: "Decrease Only" },
-  { id: "fin-7", finishingName: "Shearing", rate: 0, rateConstraint: "No Restriction" },
-  { id: "fin-8", finishingName: "Sinzing", rate: 0, rateConstraint: "Fixed" },
-  { id: "fin-9", finishingName: "Stenter", rate: 0, rateConstraint: "Increase Only" },
-  { id: "fin-10", finishingName: "Sueding", rate: 0, rateConstraint: "Decrease Only" },
-  { id: "fin-11", finishingName: "Teflone Finish", rate: 0, rateConstraint: "No Restriction" },
+  { id: "fin-1", finishingName: "Brushing", rate: 0, rateConstraint: "Increase Only", status: "Active" },
+  { id: "fin-2", finishingName: "Compacting", rate: 2.0200, rateConstraint: "Decrease Only", status: "Active" },
+  { id: "fin-3", finishingName: "Dryer", rate: 0, rateConstraint: "No Restriction", status: "Active" },
+  { id: "fin-4", finishingName: "Heat Set", rate: 0, rateConstraint: "Fixed", status: "Active" },
+  { id: "fin-5", finishingName: "Hydrophilic Softner", rate: 0, rateConstraint: "Increase Only", status: "Active" },
+  { id: "fin-6", finishingName: "Peach Finishing", rate: 0, rateConstraint: "Decrease Only", status: "Active" },
+  { id: "fin-7", finishingName: "Shearing", rate: 0, rateConstraint: "No Restriction", status: "Active" },
+  { id: "fin-8", finishingName: "Sinzing", rate: 0, rateConstraint: "Fixed", status: "Active" },
+  { id: "fin-9", finishingName: "Stenter", rate: 0, rateConstraint: "Increase Only", status: "Active" },
+  { id: "fin-10", finishingName: "Sueding", rate: 0, rateConstraint: "Decrease Only", status: "Active" },
+  { id: "fin-11", finishingName: "Teflone Finish", rate: 0, rateConstraint: "No Restriction", status: "Active" },
 ];
 
 interface ShadeRangeSpec {
