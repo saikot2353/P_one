@@ -2,6 +2,24 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "185",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UX Optimization",
+    module: "KPI Cycles",
+    link: "/kpi-cycles",
+    descriptionEn: "Replaced the standard popover for 'Applicable Employees' with a dedicated advanced selection modal. This provides a much better experience by showing employee details (ID, Name, and Department) in a spacious grid view.",
+    descriptionBn: "'Applicable Employees' নির্বাচনের জন্য সাধারণ পপওভারের পরিবর্তে একটি আধুনিক ডেডিকেটেড সিলেকশন মোডাল যোগ করা হয়েছে। এর ফলে বড় স্ক্রিনে এমপ্লয়িদের বিস্তারিত (ID, নাম এবং ডিপার্টমেন্ট) তথ্যসহ সহজেই সিলেক্ট করা যাবে, যা ব্যবহারকারীদের দারুণ অভিজ্ঞতা দেবে।",
+  },
+  {
+    id: "184",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Core UI",
+    link: "/kpi-cycles",
+    descriptionEn: "Upgraded the MultiSelect component to display selected items as visible chips inside the input box (showing up to 3 items and a '+ X more' badge) instead of a generic text like '6 items selected'. This provides immediate visibility into what is selected without needing to open the dropdown.",
+    descriptionBn: "MultiSelect কম্পোনেন্টটি আপডেট করা হয়েছে। এখন শুধুমাত্র '6 items selected' এরকম লেখার পরিবর্তে, নির্বাচিত আইটেমগুলো ইনপুট বক্সের ভেতরে চিপস (Chips) আকারে দেখা যাবে (সর্বোচ্চ ৩টি আইটেম এবং একটি '+ X more' ব্যাজ সহ)। এর ফলে ড্রপডাউন না খুলেই কী কী সিলেক্ট করা হয়েছে তা সহজে বোঝা যাবে।",
+  },
+  {
     id: "183",
     date: new Date().toISOString().slice(0, 16),
     type: "UX Optimization",

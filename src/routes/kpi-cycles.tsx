@@ -49,6 +49,7 @@ function KpiCyclesPage() {
   const [cycles, setCycles] = useState<KpiCycle[]>(() => loadKpiCycles());
   const [searchQuery, setSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [showEmployeeModal, setShowEmployeeModal] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
@@ -519,24 +520,35 @@ function KpiCyclesPage() {
                   <label className="text-[10px] font-bold text-muted-foreground uppercase">
                     Applicable Employees *
                   </label>
-                  <MultiSelect
-                    options={applicableEmployees.map(emp => {
-                      const val = emp.id === "All Employees" ? "All Employees" : `${emp.id} - ${emp.name}`;
-                      return { value: val, label: val };
-                    })}
-                    selected={form.employees}
-                    onChange={(selected) => {
-                      if (selected.length === 0) setForm(p => ({ ...p, employees: ["All Employees"] }));
-                      else if (selected[selected.length - 1] === "All Employees" && !form.employees.includes("All Employees")) {
-                        setForm(p => ({ ...p, employees: ["All Employees"] }));
-                      } else if (selected.includes("All Employees") && selected.length > 1) {
-                        setForm(p => ({ ...p, employees: selected.filter(v => v !== "All Employees") }));
-                      } else {
-                        setForm(p => ({ ...p, employees: selected }));
-                      }
-                    }}
-                    placeholder="Select Employees..."
-                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowEmployeeModal(true)}
+                    className="flex w-full items-center justify-between min-h-10 py-1.5 px-3 rounded-xl bg-background border border-border/80 hover:border-primary/50 outline-none text-sm text-left transition-all"
+                  >
+                    <div className="flex flex-wrap items-center gap-1.5 flex-1 pr-2">
+                      {form.employees.length === 0 ? (
+                        <span className="text-muted-foreground">Select Employees...</span>
+                      ) : (
+                        <>
+                          {form.employees.slice(0, 3).map((emp) => (
+                            <span
+                              key={emp}
+                              className="inline-flex items-center gap-1 bg-primary/10 text-primary px-2 py-0.5 rounded-md text-[11px] font-medium leading-tight max-w-[140px]"
+                              title={emp}
+                            >
+                              <span className="truncate">{emp}</span>
+                            </span>
+                          ))}
+                          {form.employees.length > 3 && (
+                            <span className="inline-flex items-center bg-muted text-muted-foreground px-2 py-0.5 rounded-md text-[11px] font-medium leading-tight shrink-0">
+                              +{form.employees.length - 3} more
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </div>
+                    <ChevronRight className="h-4 w-4 shrink-0 opacity-50 text-muted-foreground mt-0.5" />
+                  </button>
                   {!form.departments.includes("All Departments") && (
                     <p className="text-[9px] text-muted-foreground mt-1 px-1">
                       Showing employees from selected departments.
@@ -600,6 +612,97 @@ function KpiCyclesPage() {
                 className="h-8 px-4 bg-red-500 hover:bg-red-600 text-white font-extrabold text-xs rounded-lg shadow-sm transition uppercase"
               >
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* EMPLOYEE SELECTION MODAL */}
+      {showEmployeeModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
+          <div className="bg-card w-full max-w-3xl flex flex-col h-[80vh] rounded-xl border border-border/80 shadow-2xl relative animate-in zoom-in-95 duration-200 overflow-hidden">
+            {/* Header */}
+            <div className="p-4 border-b border-border/30 flex items-center justify-between bg-muted/20">
+              <h3 className="text-sm font-black text-foreground flex items-center gap-2">
+                <Users className="size-5 text-primary" />
+                Select Applicable Employees
+              </h3>
+              <button
+                onClick={() => setShowEmployeeModal(false)}
+                className="p-1.5 text-muted-foreground/60 hover:text-foreground hover:bg-muted rounded-lg transition"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <label className="flex items-start gap-3 p-3 border border-border/50 rounded-lg hover:bg-muted/30 cursor-pointer transition">
+                  <input
+                    type="checkbox"
+                    checked={form.employees.includes("All Employees")}
+                    onChange={(e) => {
+                      if (e.target.checked) setForm((p) => ({ ...p, employees: ["All Employees"] }));
+                      else setForm((p) => ({ ...p, employees: [] }));
+                    }}
+                    className="size-4 mt-0.5 rounded border-border/50 text-primary focus:ring-primary/20"
+                  />
+                  <div>
+                    <div className="text-xs font-bold text-foreground">All Employees</div>
+                    <div className="text-[10px] font-semibold text-muted-foreground mt-0.5">
+                      Select everyone in applicable departments
+                    </div>
+                  </div>
+                </label>
+
+                {applicableEmployees
+                  .filter((e) => e.id !== "All Employees")
+                  .map((emp) => {
+                    const val = `${emp.id} - ${emp.name}`;
+                    return (
+                      <label
+                        key={emp.id}
+                        className="flex items-start gap-3 p-3 border border-border/50 rounded-lg hover:bg-muted/30 cursor-pointer transition"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={form.employees.includes(val)}
+                          onChange={(e) => {
+                            let newValues = [...form.employees];
+                            if (e.target.checked) {
+                              newValues = newValues.filter((v) => v !== "All Employees");
+                              newValues.push(val);
+                            } else {
+                              newValues = newValues.filter((v) => v !== val);
+                            }
+                            setForm((p) => ({ ...p, employees: newValues }));
+                          }}
+                          className="size-4 mt-0.5 rounded border-border/50 text-primary focus:ring-primary/20"
+                        />
+                        <div>
+                          <div className="text-xs font-bold text-foreground">{emp.name}</div>
+                          <div className="text-[10px] font-semibold text-muted-foreground mt-0.5">
+                            {emp.id} • {emp.department}
+                          </div>
+                        </div>
+                      </label>
+                    );
+                  })}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 border-t border-border/30 bg-muted/10 flex justify-between items-center">
+              <div className="text-xs font-bold text-muted-foreground">
+                {form.employees.length} items selected
+              </div>
+              <button
+                onClick={() => setShowEmployeeModal(false)}
+                type="button"
+                className="h-9 px-5 bg-primary text-primary-foreground text-xs font-black rounded-lg hover:bg-primary/90 transition"
+              >
+                Done
               </button>
             </div>
           </div>

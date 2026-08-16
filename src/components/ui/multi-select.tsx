@@ -58,20 +58,36 @@ export function MultiSelect({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "flex w-full items-center justify-between h-10 px-3 rounded-xl bg-background border border-border/80 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-sm transition-all text-foreground cursor-pointer hover:border-primary/50 text-left",
+            "flex w-full items-center justify-between min-h-10 py-1.5 px-3 rounded-xl bg-background border border-border/80 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-sm transition-all text-foreground cursor-pointer hover:border-primary/50 text-left",
             className,
           )}
         >
-          <span className="flex items-center gap-2 truncate">
-            <span>
-              {selected.length === 0
-                ? placeholder
-                : selected.length === 1
-                  ? options.find((o) => o.value === selected[0])?.label
-                  : `${selected.length} items selected`}
-            </span>
-          </span>
-          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50 text-muted-foreground" />
+          <div className="flex flex-wrap items-center gap-1.5 flex-1 pr-2">
+            {selected.length === 0 ? (
+              <span className="text-muted-foreground">{placeholder}</span>
+            ) : (
+              <>
+                {selected.slice(0, 3).map((val) => {
+                  const label = options.find((o) => o.value === val)?.label || val;
+                  return (
+                    <span
+                      key={val}
+                      className="inline-flex items-center gap-1 bg-primary/10 text-primary px-2 py-0.5 rounded-md text-[11px] font-medium leading-tight max-w-[140px]"
+                      title={label}
+                    >
+                      <span className="truncate">{label}</span>
+                    </span>
+                  );
+                })}
+                {selected.length > 3 && (
+                  <span className="inline-flex items-center bg-muted text-muted-foreground px-2 py-0.5 rounded-md text-[11px] font-medium leading-tight shrink-0">
+                    +{selected.length - 3} more
+                  </span>
+                )}
+              </>
+            )}
+          </div>
+          <ChevronDown className="h-4 w-4 shrink-0 opacity-50 text-muted-foreground mt-0.5" />
         </button>
       </PopoverTrigger>
       <PopoverContent
