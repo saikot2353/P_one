@@ -346,28 +346,28 @@ interface FabricConstructionSpec {
 }
 
 export const initialFabricConstructions: FabricConstructionSpec[] = [
-  { id: "con-1", name: "100% Cotton Heavy Jersey", rate: 0.00, createdDate: "31/01/2026" },
-  { id: "con-2", name: "1X1 RIB", rate: 3.80, createdDate: "05/07/2025" },
-  { id: "con-3", name: "2X1 Rib", rate: 0.00, createdDate: "20/11/2025" },
-  { id: "con-4", name: "2X2 Lycra Rib", rate: 0.00, createdDate: "03/11/2025" },
-  { id: "con-5", name: "4X1 RIB", rate: 0.00, createdDate: "08/05/2025" },
-  { id: "con-6", name: "70E X 16L-70D(80%poly,20%CTN)/74X51", rate: 0.00, createdDate: "05/05/2026" },
-  { id: "con-7", name: "BCI Melange", rate: 0.00, createdDate: "20/10/2025" },
-  { id: "con-8", name: "BCI PC", rate: 0.00, createdDate: "20/10/2025" },
-  { id: "con-9", name: "Flannel", rate: 0.00, createdDate: "21/01/2026" },
-  { id: "con-10", name: "Flat knit", rate: 0.00, createdDate: "20/10/2025" },
-  { id: "con-11", name: "Fleece", rate: 0.00, createdDate: "08/10/2025" },
-  { id: "con-12", name: "Fleece Brush", rate: 0.00, createdDate: "21/01/2026" },
-  { id: "con-13", name: "Fleece Melange", rate: 0.00, createdDate: "06/01/2026" },
-  { id: "con-14", name: "Interlock", rate: 0.00, createdDate: "04/01/2026" },
-  { id: "con-15", name: "Lycra Rib 1X1", rate: 0.00, createdDate: "28/10/2025" },
-  { id: "con-16", name: "Lycra S/J", rate: 0.00, createdDate: "28/10/2025" },
-  { id: "con-17", name: "Melange", rate: 3.30, createdDate: "05/07/2025" },
-  { id: "con-18", name: "Micro Fleece", rate: 1.40, createdDate: "12/11/2024" },
-  { id: "con-19", name: "Mono Fleece", rate: 1.23, createdDate: "14/11/2024" },
-  { id: "con-20", name: "Ottoman", rate: 0.00, createdDate: "01/11/2025" },
-  { id: "con-21", name: "PIQUE", rate: 1.00, createdDate: "03/07/2025" },
-  { id: "con-22", name: "Polyester 100%", rate: 0.00, createdDate: "20/10/2025" },
+  { id: "con-1", name: "100% Cotton Heavy Jersey", rate: 0.00, rateConstraint: "No Restriction", createdDate: "31/01/2026" },
+  { id: "con-2", name: "1X1 RIB", rate: 3.80, rateConstraint: "No Restriction", createdDate: "05/07/2025" },
+  { id: "con-3", name: "2X1 Rib", rate: 0.00, rateConstraint: "No Restriction", createdDate: "20/11/2025" },
+  { id: "con-4", name: "2X2 Lycra Rib", rate: 0.00, rateConstraint: "No Restriction", createdDate: "03/11/2025" },
+  { id: "con-5", name: "4X1 RIB", rate: 0.00, rateConstraint: "No Restriction", createdDate: "08/05/2025" },
+  { id: "con-6", name: "70E X 16L-70D(80%poly,20%CTN)/74X51", rate: 0.00, rateConstraint: "No Restriction", createdDate: "05/05/2026" },
+  { id: "con-7", name: "BCI Melange", rate: 0.00, rateConstraint: "No Restriction", createdDate: "20/10/2025" },
+  { id: "con-8", name: "BCI PC", rate: 0.00, rateConstraint: "No Restriction", createdDate: "20/10/2025" },
+  { id: "con-9", name: "Flannel", rate: 0.00, rateConstraint: "No Restriction", createdDate: "21/01/2026" },
+  { id: "con-10", name: "Flat knit", rate: 0.00, rateConstraint: "No Restriction", createdDate: "20/10/2025" },
+  { id: "con-11", name: "Fleece", rate: 0.00, rateConstraint: "No Restriction", createdDate: "08/10/2025" },
+  { id: "con-12", name: "Fleece Brush", rate: 0.00, rateConstraint: "No Restriction", createdDate: "21/01/2026" },
+  { id: "con-13", name: "Fleece Melange", rate: 0.00, rateConstraint: "No Restriction", createdDate: "06/01/2026" },
+  { id: "con-14", name: "Interlock", rate: 0.00, rateConstraint: "No Restriction", createdDate: "04/01/2026" },
+  { id: "con-15", name: "Lycra Rib 1X1", rate: 0.00, rateConstraint: "No Restriction", createdDate: "28/10/2025" },
+  { id: "con-16", name: "Lycra S/J", rate: 0.00, rateConstraint: "No Restriction", createdDate: "28/10/2025" },
+  { id: "con-17", name: "Melange", rate: 3.30, rateConstraint: "No Restriction", createdDate: "05/07/2025" },
+  { id: "con-18", name: "Micro Fleece", rate: 1.40, rateConstraint: "No Restriction", createdDate: "12/11/2024" },
+  { id: "con-19", name: "Mono Fleece", rate: 1.23, rateConstraint: "No Restriction", createdDate: "14/11/2024" },
+  { id: "con-20", name: "Ottoman", rate: 0.00, rateConstraint: "No Restriction", createdDate: "01/11/2025" },
+  { id: "con-21", name: "PIQUE", rate: 1.00, rateConstraint: "No Restriction", createdDate: "03/07/2025" },
+  { id: "con-22", name: "Polyester 100%", rate: 0.00, rateConstraint: "No Restriction", createdDate: "20/10/2025" },
 ];
 
 interface YarnBrandSpec {
@@ -436,24 +436,24 @@ interface YarnCountSpec {
 }
 
 export const initialYarnCounts: YarnCountSpec[] = [
-  { id: "yc-1", name: "10/1", createdDate: "", rate: 2.8, rateConstraint: "Increase Only" },
-  { id: "yc-2", name: "12/1", createdDate: "", rate: 2.8, rateConstraint: "Decrease Only" },
-  { id: "yc-3", name: "150D/144F", createdDate: "", rate: 2.8, rateConstraint: "No Restriction" },
-  { id: "yc-4", name: "16/1", createdDate: "", rate: 2.8, rateConstraint: "Fixed" },
-  { id: "yc-5", name: "20/1", createdDate: "", rate: 2.8, rateConstraint: "Increase Only" },
-  { id: "yc-6", name: "24/1", createdDate: "", rate: 2.8, rateConstraint: "Decrease Only" },
-  { id: "yc-7", name: "26/1", createdDate: "", rate: 2.8, rateConstraint: "No Restriction" },
-  { id: "yc-8", name: "28/1", createdDate: "", rate: 2.8, rateConstraint: "Fixed" },
-  { id: "yc-9", name: "30/1", createdDate: "", rate: 2.8, rateConstraint: "Increase Only" },
-  { id: "yc-10", name: "32/1", createdDate: "", rate: 2.8, rateConstraint: "Decrease Only" },
-  { id: "yc-11", name: "34/1", createdDate: "", rate: 2.8, rateConstraint: "No Restriction" },
-  { id: "yc-12", name: "36/1", createdDate: "", rate: 2.8, rateConstraint: "Fixed" },
-  { id: "yc-13", name: "40/1", createdDate: "", rate: 2.8, rateConstraint: "Increase Only" },
-  { id: "yc-14", name: "75D", createdDate: "", rate: 2.8, rateConstraint: "Decrease Only" },
-  { id: "yc-15", name: "75D/36F", createdDate: "04/03/2026", rate: 2.8, rateConstraint: "No Restriction" },
-  { id: "yc-16", name: "20D", createdDate: "", rate: 2.8, rateConstraint: "Fixed" },
-  { id: "yc-17", name: "40D", createdDate: "", rate: 2.8, rateConstraint: "Increase Only" },
-  { id: "yc-18", name: "70D", createdDate: "", rate: 2.8, rateConstraint: "Decrease Only" },
+  { id: "yc-1", name: "10/1", createdDate: "", status: "Active" },
+  { id: "yc-2", name: "12/1", createdDate: "", status: "Active" },
+  { id: "yc-3", name: "150D/144F", createdDate: "", status: "Active" },
+  { id: "yc-4", name: "16/1", createdDate: "", status: "Active" },
+  { id: "yc-5", name: "20/1", createdDate: "", status: "Active" },
+  { id: "yc-6", name: "24/1", createdDate: "", status: "Active" },
+  { id: "yc-7", name: "26/1", createdDate: "", status: "Active" },
+  { id: "yc-8", name: "28/1", createdDate: "", status: "Active" },
+  { id: "yc-9", name: "30/1", createdDate: "", status: "Active" },
+  { id: "yc-10", name: "32/1", createdDate: "", status: "Active" },
+  { id: "yc-11", name: "34/1", createdDate: "", status: "Active" },
+  { id: "yc-12", name: "36/1", createdDate: "", status: "Active" },
+  { id: "yc-13", name: "40/1", createdDate: "", status: "Active" },
+  { id: "yc-14", name: "75D", createdDate: "", status: "Active" },
+  { id: "yc-15", name: "75D/36F", createdDate: "04/03/2026", status: "Active" },
+  { id: "yc-16", name: "20D", createdDate: "", status: "Active" },
+  { id: "yc-17", name: "40D", createdDate: "", status: "Active" },
+  { id: "yc-18", name: "70D", createdDate: "", status: "Active" },
 ];
 
 interface YarnPoTypeSpec {
@@ -549,6 +549,7 @@ interface SpecialCostSpec {
   description: string;
   maxValuePerUnit: number;
   ratePerDzn: number;
+  rateConstraint: RateConstraint;
   isActive: "Active" | "Inactive";
   rateCharts: SpecialCostRateChart[];
 }
@@ -581,13 +582,15 @@ interface AdditionalCostSpec {
   id: string;
   titleName: string;
   orderNumber: number;
+  rate: number;
+  rateConstraint: RateConstraint;
   status: "Active" | "Inactive";
 }
 
 export const initialAdditionalCosts: AdditionalCostSpec[] = [
-  { id: "ac-1", titleName: "Financial Cost (%)", orderNumber: 1, rate: 2, rateConstraint: "Increase Only" },
-  { id: "ac-2", titleName: "Commission(%)", orderNumber: 2, rate: 2, rateConstraint: "Decrease Only" },
-  { id: "ac-3", titleName: "Commercial (%)", orderNumber: 3, rate: 2, rateConstraint: "No Restriction" },
+  { id: "ac-1", titleName: "Financial Cost (%)", orderNumber: 1, rate: 2, rateConstraint: "Increase Only", status: "Active" },
+  { id: "ac-2", titleName: "Commission(%)", orderNumber: 2, rate: 2, rateConstraint: "Decrease Only", status: "Active" },
+  { id: "ac-3", titleName: "Commercial (%)", orderNumber: 3, rate: 2, rateConstraint: "No Restriction", status: "Active" },
 ];
 
 interface RmgProcessLossSpec {

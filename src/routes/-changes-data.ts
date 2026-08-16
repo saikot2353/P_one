@@ -2,6 +2,24 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "177",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Modify",
+    module: "Merchandising Master Settings",
+    link: "/merchandising-master-settings",
+    descriptionEn: "Fixed a TypeScript error where the FabricConstructionSpec data was missing the rateConstraint property.",
+    descriptionBn: "মার্চেন্ডাইজিং মাস্টার সেটিংসে একটি টাইপস্ক্রিপ্ট এরর সমাধান করা হয়েছে যেখানে FabricConstructionSpec ডেটাতে rateConstraint প্রপার্টিটি মিসিং ছিল।",
+  },
+  {
+    id: "176",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Modify",
+    module: "Merchandising Master Settings",
+    link: "/merchandising-master-settings",
+    descriptionEn: "Fixed a TypeScript error where SpecialCostSpec and AdditionalCostSpec were missing rate and rateConstraint properties.",
+    descriptionBn: "মার্চেন্ডাইজিং মাস্টার সেটিংসে একটি টাইপস্ক্রিপ্ট এরর সমাধান করা হয়েছে যেখানে SpecialCostSpec এবং AdditionalCostSpec-এ rate এবং rateConstraint প্রপার্টিগুলো মিসিং ছিল।",
+  },
+  {
     id: "175",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Update",
@@ -1701,5 +1719,14 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     link: "/jd-list",
     descriptionEn: "Created a new dedicated JD List module decoupled from HR Policies. Features a high-fidelity data table and a standardized modal for creating JDs based on Department and Designation.",
     descriptionBn: "এইচআর পলিসি থেকে আলাদা করে নতুন 'JD List' মডিউল তৈরি করা হয়েছে। এতে ডিপার্টমেন্ট এবং ডেজিগনেশনের ওপর ভিত্তি করে জেডি (JD) তৈরি করার জন্য একটি টেবিল এবং স্ট্যান্ডার্ড মোডাল যুক্ত করা হয়েছে।",
+  },
+  {
+    id: "134",
+    date: "2026-08-16T15:09",
+    type: "Modify",
+    module: "Merchandising Master Settings",
+    link: "/merchandising-master-settings",
+    descriptionEn: "Fixed a TypeScript error in the YarnCountSpec initial data configuration by correcting object properties.",
+    descriptionBn: "ইয়ার্ন কাউন্ট স্পেক (YarnCountSpec)-এর ইনিশিয়াল ডেটা কনফিগারেশনে ভুল অবজেক্ট প্রপার্টিগুলোর কারণে তৈরি হওয়া একটি টাইপস্ক্রিপ্ট এরর সমাধান করা হয়েছে।",
   },
 ];
