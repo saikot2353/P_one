@@ -30,6 +30,8 @@ import {
   Lock,
   Building2,
   MapPin,
+  Sparkles,
+  Compass,
 } from "lucide-react";
 import { toast } from "sonner";
 import { employeesData } from "@/routes/personnel-list";
@@ -278,6 +280,43 @@ const SEED_USERS: UserItem[] = [
     isActive: "Active",
     password: "admin",
     companyAccess: ["All"],
+  },
+];
+
+const SYSTEM_COMPANIES = [
+  {
+    value: "Pakiza Software Limited",
+    label: "Pakiza Software Ltd",
+    shortName: "PSL",
+    desc: "Software Operations & Setup Modules",
+    theme: "blue" as const,
+    areas: [
+      { value: "PSL-Operation", label: "PSL Operation" },
+      { value: "PSL-Head Office", label: "PSL Head Office" },
+    ],
+  },
+  {
+    value: "Pakiza Knit Composite Ltd",
+    label: "Pakiza Knit Composite Ltd",
+    shortName: "PKCL",
+    desc: "Manufacturing Systems & Plant Operations",
+    theme: "emerald" as const,
+    areas: [
+      { value: "PKC-Dyeing", label: "PKC Dyeing" },
+      { value: "PKC-Sewing", label: "PKC Sewing" },
+      { value: "PKC-Cutting", label: "PKC Cutting" },
+    ],
+  },
+  {
+    value: "Pakiza Group",
+    label: "Pakiza Group",
+    shortName: "PG",
+    desc: "Corporate Centralized Systems & Sales",
+    theme: "indigo" as const,
+    areas: [
+      { value: "PG-Corporate", label: "PG Corporate" },
+      { value: "PG-Textile Sales", label: "PG Textile Sales" },
+    ],
   },
 ];
 
@@ -1014,6 +1053,59 @@ function UserManagementPage() {
   const [roleName, setRoleName] = useState("");
   const [roleIsActive, setRoleIsActive] = useState<"Active" | "Inactive">("Active");
 
+  // User Access Overview Modal state
+  const [isOverviewModalOpen, setIsOverviewModalOpen] = useState(false);
+  const [overviewUser, setOverviewUser] = useState<UserItem | null>(null);
+
+  const openAccessOverview = (user: UserItem) => {
+    setOverviewUser(user);
+    setIsOverviewModalOpen(true);
+  };
+
+  const userAccessSummary = useMemo(() => {
+    if (!overviewUser) return [];
+    const isAllCompanies =
+      !overviewUser.companyAccess ||
+      overviewUser.companyAccess.length === 0 ||
+      overviewUser.companyAccess.includes("All");
+    const isAllSections =
+      !overviewUser.sectionAccess ||
+      overviewUser.sectionAccess.length === 0 ||
+      overviewUser.sectionAccess.includes("All");
+
+    const assignedCompanies = SYSTEM_COMPANIES.filter((c) => {
+      if (isAllCompanies) return true;
+      return overviewUser.companyAccess?.some(
+        (ca) =>
+          ca.toLowerCase() === c.value.toLowerCase() ||
+          ca.toLowerCase() === c.label.toLowerCase() ||
+          ca.toLowerCase() === c.shortName.toLowerCase(),
+      );
+    });
+
+    return assignedCompanies.map((c) => {
+      let accessibleAreas = c.areas;
+      if (!isAllSections) {
+        const filtered = c.areas.filter((a) =>
+          overviewUser.sectionAccess?.some(
+            (sa) =>
+              sa.toLowerCase() === a.value.toLowerCase() ||
+              sa.toLowerCase() === a.label.toLowerCase() ||
+              a.value.toLowerCase().includes(sa.toLowerCase()),
+          ),
+        );
+        if (filtered.length > 0) {
+          accessibleAreas = filtered;
+        }
+      }
+      return {
+        ...c,
+        accessibleAreas,
+        hasFullAccess: accessibleAreas.length === c.areas.length,
+      };
+    });
+  }, [overviewUser]);
+
   // User modal open trigger
   const openUserForm = (sl: number | null) => {
     setEditingUserSl(sl);
@@ -1525,7 +1617,7 @@ function UserManagementPage() {
                       <th className="px-5 py-4 min-w-[200px]">Department</th>
                       <th className="px-5 py-4 w-[130px] text-center">Last Login</th>
                       <th className="px-5 py-4 w-[100px] text-center">Status</th>
-                      <th className="px-5 py-4 w-[100px] text-center">Actions</th>
+                      <th className="px-5 py-4 w-[120px] text-center">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/30 text-foreground">
@@ -1650,11 +1742,19 @@ function UserManagementPage() {
                             </span>
                           </td>
                           <td className="px-5 py-3.5">
-                            <div className="flex items-center justify-center gap-3">
+                            <div className="flex items-center justify-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => openAccessOverview(item)}
+                                className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition p-1 hover:bg-blue-50 dark:hover:bg-blue-950/50 rounded-lg"
+                                title="User Access Overview"
+                              >
+                                <Eye className="size-4" />
+                              </button>
                               <button
                                 type="button"
                                 onClick={() => openUserForm(item.sl)}
-                                className="text-orange-500 hover:text-orange-600 transition"
+                                className="text-orange-500 hover:text-orange-600 transition p-1 hover:bg-orange-50 dark:hover:bg-orange-950/50 rounded-lg"
                                 title="Edit User Info"
                               >
                                 <Pencil className="size-4" />
@@ -1662,7 +1762,7 @@ function UserManagementPage() {
                               <button
                                 type="button"
                                 onClick={() => handleDeleteUser(item.sl)}
-                                className="text-rose-500 hover:text-rose-600 transition"
+                                className="text-rose-500 hover:text-rose-600 transition p-1 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-lg"
                                 title="De-register User"
                               >
                                 <Trash2 className="size-4" />
@@ -2448,6 +2548,194 @@ function UserManagementPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 3: USER ACCESS OVERVIEW */}
+      {isOverviewModalOpen && overviewUser && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+          <div className="bg-card border border-border/80 w-full max-w-3xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="px-6 py-4.5 border-b border-border/60 bg-[#f8fafc] dark:bg-[#0f172a] flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="size-10 rounded-full bg-slate-900 text-white dark:bg-primary dark:text-white flex items-center justify-center shadow-xs shrink-0">
+                  <Sparkles className="size-5" />
+                </div>
+                <div>
+                  <h2 className="text-base md:text-lg font-bold tracking-tight text-foreground">
+                    User Access Overview
+                  </h2>
+                  <p className="text-[11.5px] text-muted-foreground/85 font-normal">
+                    Detailed overview of organizational and company access permissions
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsOverviewModalOpen(false)}
+                className="size-8.5 rounded-xl hover:bg-muted flex items-center justify-center transition-colors text-muted-foreground hover:text-foreground border border-border/30"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              {/* Top User Profile Card (Matches Reference Image) */}
+              <div className="p-4 md:p-5 rounded-2xl bg-white dark:bg-slate-900/80 border border-border/80 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-3xs">
+                <div className="flex items-center gap-3.5 min-w-0">
+                  {overviewUser.avatar ? (
+                    <img
+                      src={overviewUser.avatar}
+                      alt={overviewUser.name}
+                      className="size-12 rounded-full object-cover border-2 border-primary/20 shadow-xs shrink-0"
+                    />
+                  ) : (
+                    <div className="size-12 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center justify-center font-bold text-sm tracking-wider uppercase shadow-xs shrink-0">
+                      {overviewUser.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .slice(0, 2)}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <div className="text-sm md:text-[15px] font-bold text-foreground uppercase tracking-tight truncate">
+                      {overviewUser.name}
+                    </div>
+                    <div className="text-xs text-muted-foreground font-medium flex items-center gap-2 mt-0.5 truncate">
+                      <span className="font-mono">{overviewUser.empId || overviewUser.userId}</span>
+                      <span className="text-muted-foreground/40">•</span>
+                      <span className="truncate">{overviewUser.email || "No email"}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Badges */}
+                <div className="flex items-center gap-2 flex-wrap shrink-0">
+                  <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
+                    {overviewUser.role}
+                  </span>
+                  {overviewUser.department && (
+                    <span className="px-3 py-1 rounded-full text-[10.5px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                      {overviewUser.department}
+                    </span>
+                  )}
+                  <span
+                    className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                      overviewUser.isActive === "Active"
+                        ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                        : "bg-rose-500/10 text-rose-600 border-rose-500/20"
+                    }`}
+                  >
+                    {overviewUser.isActive}
+                  </span>
+                </div>
+              </div>
+
+              {/* Assigned Company & Area Access Section (Enhanced Modern Design) */}
+              <div className="space-y-3.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="size-6 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center justify-center">
+                      <Shield className="size-3.5" />
+                    </div>
+                    <h3 className="text-xs md:text-sm font-bold text-foreground uppercase tracking-wide">
+                      Assigned Company & Area Access
+                    </h3>
+                  </div>
+                  <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                    {userAccessSummary.length} {userAccessSummary.length === 1 ? "Company" : "Companies"} Active
+                  </span>
+                </div>
+
+                {userAccessSummary.length === 0 ? (
+                  <div className="p-8 rounded-2xl border border-dashed border-border text-center space-y-2 bg-muted/10">
+                    <Building2 className="size-8 mx-auto text-muted-foreground/50" />
+                    <p className="text-xs font-semibold text-muted-foreground">
+                      No company access assigned to this user profile.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="border border-border/80 dark:border-border/60 rounded-2xl overflow-hidden bg-white dark:bg-slate-900/40 shadow-3xs">
+                    {/* Header Row */}
+                    <div className="grid grid-cols-12 bg-slate-50 dark:bg-slate-900 px-5 py-3 border-b border-border/80 text-[10px] uppercase font-bold tracking-wider text-muted-foreground">
+                      <div className="col-span-5 flex items-center gap-2">
+                        <Building2 className="size-3.5" /> Company Profile
+                      </div>
+                      <div className="col-span-7 flex items-center gap-2">
+                        <MapPin className="size-3.5 text-primary" /> Accessible Areas / Sections
+                      </div>
+                    </div>
+                    {/* Data Rows */}
+                    <div className="divide-y divide-border/60">
+                      {userAccessSummary.map((comp) => (
+                        <div
+                          key={comp.value}
+                          className="grid grid-cols-12 px-5 py-4 hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors items-center gap-4"
+                        >
+                          {/* Company Identity Info */}
+                          <div className="col-span-5 min-w-0">
+                            <div className="flex items-center gap-2.5">
+                              <h4 className="text-[12.5px] font-bold text-foreground truncate uppercase">
+                                {comp.value}
+                              </h4>
+                            </div>
+                            <span className="text-[10px] text-muted-foreground font-medium mt-1 block truncate">
+                              {comp.desc}
+                            </span>
+                          </div>
+
+                          {/* Accessible Areas List */}
+                          <div className="col-span-7">
+                            {comp.accessibleAreas.length === 0 ? (
+                              <span className="text-xs text-muted-foreground italic font-medium">
+                                No operational sections assigned
+                              </span>
+                            ) : (
+                              <div className="flex flex-wrap gap-1.5">
+                                {comp.accessibleAreas.map((area) => (
+                                  <span
+                                    key={area.value}
+                                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[10px] font-bold bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 shadow-3xs"
+                                  >
+                                    <CheckCircle2 className="size-3 text-emerald-500 shrink-0" />
+                                    {area.label.toUpperCase()}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Bottom Metadata Ribbon Removed */}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 border-t border-border/60 bg-[#f8fafc] dark:bg-[#0f172a] flex items-center justify-between shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsOverviewModalOpen(false)}
+                className="h-9 px-5 rounded-xl bg-secondary text-secondary-foreground hover:bg-secondary/80 font-semibold text-xs transition uppercase tracking-wider border border-border/60"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOverviewModalOpen(false);
+                  openUserForm(overviewUser.sl);
+                }}
+                className="h-9 px-5 rounded-xl bg-primary hover:bg-primary/95 text-white font-semibold text-xs shadow-xs transition uppercase tracking-wider flex items-center gap-1.5"
+              >
+                <Pencil className="size-3.5" /> Edit Profile & Access
+              </button>
+            </div>
           </div>
         </div>
       )}

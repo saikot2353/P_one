@@ -2,6 +2,33 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "175",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "User Management",
+    link: "/user-management",
+    descriptionEn: "Restored the avatar/image holder circle next to the employee name in the User Access Overview modal, removed the bottom metadata ribbon (Landing Route, Phone, Last Login) to reduce clutter, and removed the short company code (e.g. PSL, PKCL) chips beside the company names in the access list.",
+    descriptionBn: "ইউজার অ্যাক্সেস ওভারভিউ মোডালে এমপ্লয়ির নামের পাশে অ্যাভাটার/ছবি আবার যুক্ত করা হয়েছে। নিচের মেটাডেটা রিবন (ল্যান্ডিং রাউট, ফোন, লাস্ট লগইন) সরিয়ে দেওয়া হয়েছে। এছাড়াও কোম্পানি অ্যাক্সেস লিস্টের কোম্পানির নামের পাশ থেকে শর্ট কোড (যেমন- PSL, PKCL) চিপগুলো মুছে দেওয়া হয়েছে।",
+  },
+  {
+    id: "174",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "User Management",
+    link: "/user-management",
+    descriptionEn: "Removed the user avatar/image section from the User Access Overview modal to create a cleaner layout.",
+    descriptionBn: "মোডালটিকে আরও পরিষ্কার এবং ছিমছাম করার জন্য ইউজার অ্যাক্সেস ওভারভিউ মোডাল থেকে ইউজারের ছবি/অ্যাভাটার সেকশনটি সরিয়ে ফেলা হয়েছে।",
+  },
+  {
+    id: "173",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "User Management",
+    link: "/user-management",
+    descriptionEn: "Added a dedicated 'User Access Overview' action button and modal in the User Management table. It provides a visual snapshot of user credentials, system role, department, status, and an enhanced card-based matrix of assigned companies and accessible operational areas.",
+    descriptionBn: "ইউজার ম্যানেজমেন্ট টেবিলে একটি নতুন 'User Access Overview' অ্যাকশন বাটন এবং মোডাল যুক্ত করা হয়েছে। এর মাধ্যমে যেকোনো ব্যবহারকারীর প্রোফাইল তথ্য, সিস্টেম রোল, ডিপার্টমেন্ট, স্ট্যাটাস এবং অ্যাসাইন করা কোম্পানি ও অনুমোদিত এরিয়াগুলো সুন্দর কার্ড ডিজাইনে একনজরে দেখা যাবে।",
+  },
+  {
     id: "172",
     date: new Date().toISOString().slice(0, 16),
     type: "Feature",
