@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
@@ -33,16 +33,16 @@ export const Route = createFileRoute("/kpi-cycles")({
   component: KpiCyclesPage,
 });
 
-export const EMPLOYEE_LIST = [
-  "All Employees",
-  "2022035599 - Dipon Saha",
-  "2023044017 - Md. Rejaul Karim",
-  "2021028542 - Zakir Hossain",
-  "2024052333 - Mohammad Rahatul Islam",
-  "2026000001 - New Employee",
-  "2023043910 - Tahmid Afsar Shapno",
-  "2024049326 - Hanif Uddin",
-  "2023045044 - Sultan Ahmed"
+export const EMPLOYEES_DATA = [
+  { id: "All Employees", name: "All Employees", department: "All Departments" },
+  { id: "2022035599", name: "Dipon Saha", department: "Business Innovation" },
+  { id: "2023044017", name: "Md. Rejaul Karim", department: "Business Innovation" },
+  { id: "2021028542", name: "Zakir Hossain", department: "Business Automation" },
+  { id: "2024052333", name: "Mohammad Rahatul Islam", department: "HR, Admin and Compliance" },
+  { id: "2026000001", name: "New Employee", department: "Operations & HR" },
+  { id: "2023043910", name: "Tahmid Afsar Shapno", department: "Business Innovation" },
+  { id: "2024049326", name: "Hanif Uddin", department: "Business Innovation" },
+  { id: "2023045044", name: "Sultan Ahmed", department: "Implementation & Business Analysis" }
 ];
 
 function KpiCyclesPage() {
@@ -71,6 +71,25 @@ function KpiCyclesPage() {
     departments: ["All Departments"],
     employees: ["All Employees"],
   });
+
+  const applicableEmployees = useMemo(() => {
+    if (form.departments.includes("All Departments")) {
+      return EMPLOYEES_DATA;
+    }
+    return EMPLOYEES_DATA.filter(
+      (emp) => emp.id === "All Employees" || form.departments.includes(emp.department)
+    );
+  }, [form.departments]);
+
+  useEffect(() => {
+    if (!form.departments.includes("All Departments")) {
+      const validEmpIds = new Set(applicableEmployees.map(e => e.id === "All Employees" ? "All Employees" : `${e.id} - ${e.name}`));
+      const newEmployees = form.employees.filter(emp => validEmpIds.has(emp));
+      if (newEmployees.length !== form.employees.length) {
+        setForm(p => ({ ...p, employees: newEmployees.length > 0 ? newEmployees : ["All Employees"] }));
+      }
+    }
+  }, [form.departments, applicableEmployees]);
 
   const filteredCycles = useMemo(() => {
     let list = cycles;
@@ -474,46 +493,56 @@ function KpiCyclesPage() {
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">
-                  Applicable Departments *
-                </label>
-                <MultiSelect
-                  options={DEPARTMENT_LIST.map(d => ({ value: d, label: d }))}
-                  selected={form.departments}
-                  onChange={(selected) => {
-                    if (selected.length === 0) setForm(p => ({ ...p, departments: ["All Departments"] }));
-                    else if (selected[selected.length - 1] === "All Departments" && !form.departments.includes("All Departments")) {
-                      setForm(p => ({ ...p, departments: ["All Departments"] }));
-                    } else if (selected.includes("All Departments") && selected.length > 1) {
-                      setForm(p => ({ ...p, departments: selected.filter(v => v !== "All Departments") }));
-                    } else {
-                      setForm(p => ({ ...p, departments: selected }));
-                    }
-                  }}
-                  placeholder="Select Departments..."
-                />
-              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Applicable Departments *
+                  </label>
+                  <MultiSelect
+                    options={DEPARTMENT_LIST.map(d => ({ value: d, label: d }))}
+                    selected={form.departments}
+                    onChange={(selected) => {
+                      if (selected.length === 0) setForm(p => ({ ...p, departments: ["All Departments"] }));
+                      else if (selected[selected.length - 1] === "All Departments" && !form.departments.includes("All Departments")) {
+                        setForm(p => ({ ...p, departments: ["All Departments"] }));
+                      } else if (selected.includes("All Departments") && selected.length > 1) {
+                        setForm(p => ({ ...p, departments: selected.filter(v => v !== "All Departments") }));
+                      } else {
+                        setForm(p => ({ ...p, departments: selected }));
+                      }
+                    }}
+                    placeholder="Select Departments..."
+                  />
+                </div>
 
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">
-                  Applicable Employees *
-                </label>
-                <MultiSelect
-                  options={EMPLOYEE_LIST.map(emp => ({ value: emp, label: emp }))}
-                  selected={form.employees}
-                  onChange={(selected) => {
-                    if (selected.length === 0) setForm(p => ({ ...p, employees: ["All Employees"] }));
-                    else if (selected[selected.length - 1] === "All Employees" && !form.employees.includes("All Employees")) {
-                      setForm(p => ({ ...p, employees: ["All Employees"] }));
-                    } else if (selected.includes("All Employees") && selected.length > 1) {
-                      setForm(p => ({ ...p, employees: selected.filter(v => v !== "All Employees") }));
-                    } else {
-                      setForm(p => ({ ...p, employees: selected }));
-                    }
-                  }}
-                  placeholder="Select Employees..."
-                />
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Applicable Employees *
+                  </label>
+                  <MultiSelect
+                    options={applicableEmployees.map(emp => {
+                      const val = emp.id === "All Employees" ? "All Employees" : `${emp.id} - ${emp.name}`;
+                      return { value: val, label: val };
+                    })}
+                    selected={form.employees}
+                    onChange={(selected) => {
+                      if (selected.length === 0) setForm(p => ({ ...p, employees: ["All Employees"] }));
+                      else if (selected[selected.length - 1] === "All Employees" && !form.employees.includes("All Employees")) {
+                        setForm(p => ({ ...p, employees: ["All Employees"] }));
+                      } else if (selected.includes("All Employees") && selected.length > 1) {
+                        setForm(p => ({ ...p, employees: selected.filter(v => v !== "All Employees") }));
+                      } else {
+                        setForm(p => ({ ...p, employees: selected }));
+                      }
+                    }}
+                    placeholder="Select Employees..."
+                  />
+                  {!form.departments.includes("All Departments") && (
+                    <p className="text-[9px] text-muted-foreground mt-1 px-1">
+                      Showing employees from selected departments.
+                    </p>
+                  )}
+                </div>
               </div>
 
               {form.status === "Active" && (

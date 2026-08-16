@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "183",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UX Optimization",
+    module: "KPI Cycles",
+    link: "/kpi-cycles",
+    descriptionEn: "Deep UX optimization for KPI Cycles modal. The Applicable Departments and Applicable Employees inputs are now neatly aligned side-by-side using a grid layout to save vertical space. Furthermore, the Employees list is now smartly filtered dynamically based on the selected Departments.",
+    descriptionBn: "KPI Cycles মোডালের UX-এ বড় ধরণের উন্নয়ন করা হয়েছে। Applicable Departments এবং Applicable Employees ইনপুট দুটি এখন পাশাপাশি সুন্দরভাবে গ্রিড লেআউটে সাজানো হয়েছে। এছাড়া, এখন শুধুমাত্র নির্বাচিত ডিপার্টমেন্টের ওপর ভিত্তি করে Employees-এর তালিকা ডাইনামিকালি ফিল্টার হয়ে প্রদর্শিত হবে।",
+  },
+  {
     id: "182",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Update",
