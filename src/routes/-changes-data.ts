@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "186",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UX Optimization",
+    module: "KPI Cycles",
+    link: "/kpi-cycles",
+    descriptionEn: "Added a real-time search bar to the Employee Selection modal, allowing users to instantly filter by Name, ID, or Department. Also introduced profile picture avatars (with fallback initials) to each employee card for quick visual identification.",
+    descriptionBn: "এমপ্লয়ী সিলেকশন মোডালে একটি রিয়েল-টাইম সার্চ বার যোগ করা হয়েছে, যার সাহায্যে নাম, আইডি বা ডিপার্টমেন্ট দিয়ে দ্রুত এমপ্লয়ি খুঁজে বের করা যাবে। পাশাপাশি, প্রত্যেক এমপ্লয়ি কার্ডে প্রোফাইল পিকচার অ্যাভাটার (অথবা নামের আদ্যক্ষর) যুক্ত করা হয়েছে যাতে তাদের সহজেই চেনা যায়।",
+  },
+  {
     id: "185",
     date: new Date().toISOString().slice(0, 16),
     type: "UX Optimization",

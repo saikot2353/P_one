@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { type KpiCycle, loadKpiCycles, saveKpiCycles, DEPARTMENT_LIST } from "@/lib/kpi-data";
 import { MultiSelect } from "@/components/ui/multi-select";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export const Route = createFileRoute("/kpi-cycles")({
   head: () => ({
@@ -50,6 +51,7 @@ function KpiCyclesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [showEmployeeModal, setShowEmployeeModal] = useState(false);
+  const [employeeSearch, setEmployeeSearch] = useState("");
   const [editId, setEditId] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
@@ -636,34 +638,58 @@ function KpiCyclesPage() {
             </div>
 
             {/* Body */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <label className="flex items-start gap-3 p-3 border border-border/50 rounded-lg hover:bg-muted/30 cursor-pointer transition">
-                  <input
-                    type="checkbox"
-                    checked={form.employees.includes("All Employees")}
-                    onChange={(e) => {
-                      if (e.target.checked) setForm((p) => ({ ...p, employees: ["All Employees"] }));
-                      else setForm((p) => ({ ...p, employees: [] }));
-                    }}
-                    className="size-4 mt-0.5 rounded border-border/50 text-primary focus:ring-primary/20"
-                  />
-                  <div>
-                    <div className="text-xs font-bold text-foreground">All Employees</div>
-                    <div className="text-[10px] font-semibold text-muted-foreground mt-0.5">
-                      Select everyone in applicable departments
+            <div className="flex-1 overflow-hidden flex flex-col p-4 space-y-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search by name, ID, or department..."
+                  value={employeeSearch}
+                  onChange={(e) => setEmployeeSearch(e.target.value)}
+                  className="w-full h-10 pl-9 pr-4 rounded-xl bg-muted/40 border border-border/50 text-xs font-semibold outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
+                />
+              </div>
+
+              <div className="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-3 pb-4 content-start">
+                {"All Employees".toLowerCase().includes(employeeSearch.toLowerCase()) && (
+                  <label className="flex items-center gap-3 p-3 border border-border/50 rounded-lg hover:bg-muted/30 cursor-pointer transition">
+                    <input
+                      type="checkbox"
+                      checked={form.employees.includes("All Employees")}
+                      onChange={(e) => {
+                        if (e.target.checked) setForm((p) => ({ ...p, employees: ["All Employees"] }));
+                        else setForm((p) => ({ ...p, employees: [] }));
+                      }}
+                      className="size-4 rounded border-border/50 text-primary focus:ring-primary/20"
+                    />
+                    <Avatar className="size-9 rounded-lg shrink-0">
+                      <AvatarFallback className="rounded-lg bg-primary/10 text-primary text-xs">
+                        <Users className="size-4" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="text-xs font-bold text-foreground">All Employees</div>
+                      <div className="text-[10px] font-semibold text-muted-foreground mt-0.5">
+                        Select everyone in applicable departments
+                      </div>
                     </div>
-                  </div>
-                </label>
+                  </label>
+                )}
 
                 {applicableEmployees
                   .filter((e) => e.id !== "All Employees")
+                  .filter((e) => 
+                    e.name.toLowerCase().includes(employeeSearch.toLowerCase()) || 
+                    e.id.includes(employeeSearch) || 
+                    e.department.toLowerCase().includes(employeeSearch.toLowerCase())
+                  )
                   .map((emp) => {
                     const val = `${emp.id} - ${emp.name}`;
+                    const initials = emp.name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
                     return (
                       <label
                         key={emp.id}
-                        className="flex items-start gap-3 p-3 border border-border/50 rounded-lg hover:bg-muted/30 cursor-pointer transition"
+                        className="flex items-center gap-3 p-3 border border-border/50 rounded-lg hover:bg-muted/30 cursor-pointer transition"
                       >
                         <input
                           type="checkbox"
@@ -678,9 +704,15 @@ function KpiCyclesPage() {
                             }
                             setForm((p) => ({ ...p, employees: newValues }));
                           }}
-                          className="size-4 mt-0.5 rounded border-border/50 text-primary focus:ring-primary/20"
+                          className="size-4 rounded border-border/50 text-primary focus:ring-primary/20"
                         />
-                        <div>
+                        <Avatar className="size-9 rounded-lg shrink-0">
+                          <AvatarImage src={`https://i.pravatar.cc/150?u=${emp.id}`} />
+                          <AvatarFallback className="rounded-lg bg-muted text-xs">
+                            {initials}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
                           <div className="text-xs font-bold text-foreground">{emp.name}</div>
                           <div className="text-[10px] font-semibold text-muted-foreground mt-0.5">
                             {emp.id} • {emp.department}
