@@ -32,6 +32,18 @@ export const Route = createFileRoute("/kpi-cycles")({
   component: KpiCyclesPage,
 });
 
+export const EMPLOYEE_LIST = [
+  "All Employees",
+  "2022035599 - Dipon Saha",
+  "2023044017 - Md. Rejaul Karim",
+  "2021028542 - Zakir Hossain",
+  "2024052333 - Mohammad Rahatul Islam",
+  "2026000001 - New Employee",
+  "2023043910 - Tahmid Afsar Shapno",
+  "2024049326 - Hanif Uddin",
+  "2023045044 - Sultan Ahmed"
+];
+
 function KpiCyclesPage() {
   const [cycles, setCycles] = useState<KpiCycle[]>(() => loadKpiCycles());
   const [searchQuery, setSearchQuery] = useState("");
@@ -46,6 +58,7 @@ function KpiCyclesPage() {
     endDate: string;
     status: KpiCycle["status"];
     departments: string[];
+    employees: string[];
   }>({
     name: "",
     type: "Annual",
@@ -55,6 +68,7 @@ function KpiCyclesPage() {
       .split("T")[0],
     status: "Draft",
     departments: ["All Departments"],
+    employees: ["All Employees"],
   });
 
   const filteredCycles = useMemo(() => {
@@ -81,6 +95,7 @@ function KpiCyclesPage() {
         .split("T")[0],
       status: "Draft",
       departments: ["All Departments"],
+      employees: ["All Employees"],
     });
     setShowModal(true);
   };
@@ -94,6 +109,7 @@ function KpiCyclesPage() {
       endDate: item.endDate,
       status: item.status,
       departments: [...item.departments],
+      employees: item.employees ? [...item.employees] : ["All Employees"],
     });
     setShowModal(true);
   };
@@ -461,28 +477,64 @@ function KpiCyclesPage() {
                 <label className="text-[10px] font-bold text-muted-foreground uppercase">
                   Applicable Departments *
                 </label>
-                <select
-                  multiple
-                  value={form.departments}
-                  onChange={(e) => {
-                    const values = Array.from(e.target.selectedOptions, (option) => option.value);
-                    if (values.includes("All Departments")) {
-                      setForm((p) => ({ ...p, departments: ["All Departments"] }));
-                    } else {
-                      setForm((p) => ({ ...p, departments: values }));
-                    }
-                  }}
-                  className="w-full h-24 p-2 rounded-lg bg-muted/40 border border-border/40 text-xs font-semibold outline-none focus:border-[#1e88e5] resize-y"
-                >
+                <div className="w-full h-32 overflow-y-auto p-2 rounded-lg bg-muted/40 border border-border/40 space-y-1">
                   {DEPARTMENT_LIST.map((d) => (
-                    <option key={d} value={d} className="p-1">
-                      {d}
-                    </option>
+                    <label key={d} className="flex items-center gap-2 p-1.5 hover:bg-muted rounded cursor-pointer transition-colors">
+                      <input
+                        type="checkbox"
+                        checked={form.departments.includes(d)}
+                        onChange={(e) => {
+                          let newValues = [...form.departments];
+                          if (e.target.checked) {
+                            if (d === "All Departments") newValues = ["All Departments"];
+                            else {
+                              newValues = newValues.filter((v) => v !== "All Departments");
+                              newValues.push(d);
+                            }
+                          } else {
+                            newValues = newValues.filter((v) => v !== d);
+                            if (newValues.length === 0) newValues = ["All Departments"];
+                          }
+                          setForm((p) => ({ ...p, departments: newValues }));
+                        }}
+                        className="size-4 rounded border-border/50 text-primary focus:ring-primary/20"
+                      />
+                      <span className="text-xs font-semibold">{d}</span>
+                    </label>
                   ))}
-                </select>
-                <span className="text-[9px] text-muted-foreground">
-                  Hold Ctrl/Cmd to select multiple. Select "All Departments" to override.
-                </span>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase">
+                  Applicable Employees *
+                </label>
+                <div className="w-full h-32 overflow-y-auto p-2 rounded-lg bg-muted/40 border border-border/40 space-y-1">
+                  {EMPLOYEE_LIST.map((emp) => (
+                    <label key={emp} className="flex items-center gap-2 p-1.5 hover:bg-muted rounded cursor-pointer transition-colors">
+                      <input
+                        type="checkbox"
+                        checked={form.employees.includes(emp)}
+                        onChange={(e) => {
+                          let newValues = [...form.employees];
+                          if (e.target.checked) {
+                            if (emp === "All Employees") newValues = ["All Employees"];
+                            else {
+                              newValues = newValues.filter((v) => v !== "All Employees");
+                              newValues.push(emp);
+                            }
+                          } else {
+                            newValues = newValues.filter((v) => v !== emp);
+                            if (newValues.length === 0) newValues = ["All Employees"];
+                          }
+                          setForm((p) => ({ ...p, employees: newValues }));
+                        }}
+                        className="size-4 rounded border-border/50 text-primary focus:ring-primary/20"
+                      />
+                      <span className="text-xs font-semibold">{emp}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
 
               {form.status === "Active" && (

@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "181",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "KPI Cycles",
+    link: "/kpi-cycles",
+    descriptionEn: "Upgraded the 'Create/Edit Cycle' modal to be more user-friendly. Replaced the native multi-select box with scrollable checkbox lists for both Applicable Departments and Applicable Employees.",
+    descriptionBn: "'Create/Edit Cycle' মোডালটিকে আরও ইউজার-ফ্রেন্ডলি করা হয়েছে। আগের ডিফল্ট মাল্টি-সিলেক্ট বক্সের বদলে Applicable Departments এবং Applicable Employees-এর জন্য স্ক্রল করা যায় এমন চেকবক্স লিস্ট যোগ করা হয়েছে।",
+  },
+  {
     id: "180",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Update",

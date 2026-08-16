@@ -46,6 +46,7 @@ export interface KpiCycle {
   endDate: string;
   status: "Draft" | "Active" | "Closed" | "Archived";
   departments: string[];
+  employees?: string[];
   totalEmployees: number;
   completedCount: number;
   createdAt: string;
