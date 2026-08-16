@@ -184,15 +184,10 @@ export const nav: NavItem[] = [
   {
     label: "Evaluation",
     icon: ClipboardCheck,
-    to: "/evaluation-propose",
-    activeRoutes: [
-      "/evaluation-propose",
-      "/increment-gadget",
-      "/propose-increment",
-      "/increment-summary",
-      "/increment-queuelist",
-      "/increment-list",
-      "/increment-history",
+    subitems: [
+      { label: "Increment List", to: "/increment-list" },
+      { label: "Summary", to: "/increment-summary" },
+      { label: "History", to: "/increment-history" },
     ],
   },
   {

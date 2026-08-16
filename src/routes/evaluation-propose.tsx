@@ -514,15 +514,14 @@ function EvaluationProposePage() {
     }
   };
 
-  // Submit Handler: Saves selected IDs to localStorage and moves to the configurator
+  // Submit Handler
   const handleSubmitAppraisal = () => {
     if (selectedIds.length === 0) {
-      alert("Please select at least one employee row to initiate the increment configuration.");
+      alert("Please select at least one employee row to submit proposals.");
       return;
     }
-    // Save to localStorage so Increment Gadget can parse and display these specifically
-    localStorage.setItem("gadget_preselected_empids", JSON.stringify(selectedIds));
-    router.navigate({ to: "/increment-gadget" });
+    alert("Increment/Promotion proposals successfully submitted for approval!");
+    // router.navigate({ to: "/increment-list" }); // Navigate to list if needed
   };
 
   return (
@@ -749,6 +748,8 @@ function EvaluationProposePage() {
                     <th className="px-4 py-3 text-right">Last Inc Amount</th>
                     <th className="px-3 py-3 text-center">Last Prom Date</th>
                     <th className="px-4 py-3">Last Prom. Designation</th>
+                    <th className="px-4 py-3 text-right text-primary">Propose Increment (৳)</th>
+                    <th className="px-4 py-3 text-primary">Propose Promotion</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/20">
@@ -828,6 +829,22 @@ function EvaluationProposePage() {
                         </td>
                         <td className="px-4 py-3 text-muted-foreground/75 font-semibold">
                           {row.lastPromDesignation || "—"}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <input
+                            type="number"
+                            placeholder="Amt (৳)"
+                            className="w-24 h-8 px-2 rounded bg-background border border-border/50 text-xs font-semibold text-foreground outline-none focus:border-primary/50"
+                            disabled={!isChecked}
+                          />
+                        </td>
+                        <td className="px-4 py-3">
+                          <input
+                            type="text"
+                            placeholder="Designation..."
+                            className="w-32 h-8 px-2 rounded bg-background border border-border/50 text-xs font-semibold text-foreground outline-none focus:border-primary/50"
+                            disabled={!isChecked}
+                          />
                         </td>
                       </tr>
                     );

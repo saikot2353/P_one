@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
-import { EvaluationTabNav } from "@/components/evaluation/EvaluationTabNav";
 import {
   ChevronRight,
   Sparkles,
@@ -12,6 +11,8 @@ import {
   FileDown,
   Eye,
   CheckCircle2,
+  Plus,
+  X,
 } from "lucide-react";
 
 export const Route = createFileRoute("/increment-list")({
@@ -185,6 +186,68 @@ function IncrementListPage() {
   const [records, setRecords] = useState<ListRecord[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Modal State
+  const [evalModalOpen, setEvalModalOpen] = useState(false);
+  const [evalYear, setEvalYear] = useState("2026");
+  const [evalMonth, setEvalMonth] = useState("Jan");
+  const [evalEmployee, setEvalEmployee] = useState("");
+  const [evalIsPromoted, setEvalIsPromoted] = useState(false);
+  const [evalPullFromKPI, setEvalPullFromKPI] = useState(false);
+  const [evalDesignation, setEvalDesignation] = useState("");
+  const [evalIncAmount, setEvalIncAmount] = useState("");
+
+  const handleEvaluateSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!evalEmployee || !evalIncAmount) {
+      alert("Please fill required fields (Employee and Increment Amount).");
+      return;
+    }
+    if (evalIsPromoted && !evalDesignation) {
+      alert("Please select a new designation for the promotion.");
+      return;
+    }
+    const [empIdSelected, empNameSelected] = evalEmployee.split(" - ");
+    
+    const newRecord: ListRecord = {
+      id: empIdSelected,
+      name: empNameSelected || "Unknown",
+      department: "Core Development",
+      section: "General ERP",
+      descBefore: "Current Designation", // In real app, fetch this from DB
+      descAfter: evalIsPromoted ? evalDesignation : "Current Designation",
+      prevGross: 40000,
+      currentGross: 40000 + Number(evalIncAmount),
+      incAmount: Number(evalIncAmount),
+      month: `${evalMonth},${evalYear}`,
+      arrear: "No",
+    };
+
+    const saved = localStorage.getItem("custom_increment_queue_records");
+    const parsed = saved ? JSON.parse(saved) : [];
+    
+    const toStore = {
+      empId: newRecord.id,
+      empName: newRecord.name,
+      department: newRecord.department,
+      section: newRecord.section,
+      designation: newRecord.descAfter,
+      prevGross: newRecord.prevGross,
+      grossAfterInc: newRecord.currentGross,
+      incMonth: newRecord.month,
+    };
+    parsed.push(toStore);
+    localStorage.setItem("custom_increment_queue_records", JSON.stringify(parsed));
+    
+    setRecords((prev) => [newRecord, ...prev]);
+
+    setEvalModalOpen(false);
+    setEvalEmployee("");
+    setEvalIsPromoted(false);
+    setEvalPullFromKPI(false);
+    setEvalDesignation("");
+    setEvalIncAmount("");
+  };
+
   // Load custom submissions from localStorage, falling back to defaults if empty
   useEffect(() => {
     const saved = localStorage.getItem("custom_increment_queue_records");
@@ -268,10 +331,15 @@ function IncrementListPage() {
               </h1>
               <p className="text-xs text-muted-foreground mt-1">Finalized increment records sorted by month and department</p>
             </div>
+            
+            <button
+              onClick={() => setEvalModalOpen(true)}
+              className="px-5 py-2.5 bg-primary text-primary-foreground font-bold text-xs rounded-xl shadow-sm hover:opacity-90 transition flex items-center gap-2"
+            >
+              <Plus className="size-4" />
+              New Evaluation
+            </button>
           </div>
-
-          {/* Evaluation Module Tab Nav */}
-          <EvaluationTabNav />
 
           {/* PARAMETRIC FILTERS ROW */}
           <div className="bg-card rounded-lg border border-border/80 p-5 shadow-xs space-y-4">
@@ -553,6 +621,166 @@ function IncrementListPage() {
           </div>
         </div>
       </main>
+
+      {/* Evaluation Modal */}
+      {evalModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-card w-full max-w-md rounded-2xl shadow-xl overflow-hidden border border-border/60">
+            <div className="flex items-center justify-between p-4 border-b border-border/50 bg-muted/30">
+              <h3 className="font-bold text-foreground flex items-center gap-2">
+                <Sparkles className="size-4 text-primary" />
+                Evaluate Employee
+              </h3>
+              <button
+                onClick={() => setEvalModalOpen(false)}
+                className="p-1 hover:bg-muted rounded-md text-muted-foreground transition"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleEvaluateSubmit} className="p-5 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Year</label>
+                  <select
+                    value={evalYear}
+                    onChange={(e) => setEvalYear(e.target.value)}
+                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs text-foreground font-semibold"
+                  >
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Month</label>
+                  <select
+                    value={evalMonth}
+                    onChange={(e) => setEvalMonth(e.target.value)}
+                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs text-foreground font-semibold"
+                  >
+                    <option value="Jan">Jan</option>
+                    <option value="Feb">Feb</option>
+                    <option value="Mar">Mar</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase">Select Employee *</label>
+                <select
+                  value={evalEmployee}
+                  onChange={(e) => setEvalEmployee(e.target.value)}
+                  className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs text-foreground font-semibold"
+                  required
+                >
+                  <option value="">-- Choose --</option>
+                  <option value="2022035599 - Dipon Saha">2022035599 - Dipon Saha</option>
+                  <option value="2023044017 - Md. Rejaul Karim">2023044017 - Md. Rejaul Karim</option>
+                  <option value="2021028542 - Zakir Hossain">2021028542 - Zakir Hossain</option>
+                  <option value="2024052333 - Mohammad Rahatul Islam">2024052333 - Mohammad Rahatul Islam</option>
+                  <option value="2026000001 - New Employee">2026000001 - New Employee</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2 pt-1 pb-1">
+                <input
+                  type="checkbox"
+                  id="is-promoted-chk"
+                  checked={evalIsPromoted}
+                  onChange={(e) => {
+                    setEvalIsPromoted(e.target.checked);
+                    if (!e.target.checked) setEvalDesignation("");
+                  }}
+                  className="size-4 rounded border-border/50 text-primary focus:ring-primary/20 bg-muted transition cursor-pointer"
+                />
+                <label htmlFor="is-promoted-chk" className="text-xs font-bold text-foreground cursor-pointer select-none">
+                  Is Promoted?
+                </label>
+              </div>
+
+              {evalIsPromoted && (
+                <div className="space-y-1.5 animate-in fade-in slide-in-from-top-1">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">New Designation *</label>
+                  <select
+                    value={evalDesignation}
+                    onChange={(e) => setEvalDesignation(e.target.value)}
+                    className="w-full h-9 px-3 rounded-lg bg-muted border border-border/40 text-xs text-foreground font-semibold"
+                    required={evalIsPromoted}
+                  >
+                    <option value="">-- Select Designation --</option>
+                    <option value="Senior Manager">Senior Manager</option>
+                    <option value="Manager">Manager</option>
+                    <option value="Deputy Manager">Deputy Manager</option>
+                    <option value="Assistant Manager">Assistant Manager</option>
+                    <option value="Senior Executive">Senior Executive</option>
+                    <option value="Executive">Executive</option>
+                    <option value="Junior Executive">Junior Executive</option>
+                  </select>
+                </div>
+              )}
+
+              <div className="pt-2 pb-1 border-t border-border/40">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="pull-kpi-chk"
+                    checked={evalPullFromKPI}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setEvalPullFromKPI(checked);
+                      if (checked) {
+                        setEvalIncAmount("5000"); // Mock KPI auto-filled amount
+                      } else {
+                        setEvalIncAmount("");
+                      }
+                    }}
+                    className="size-4 rounded border-border/50 text-emerald-600 focus:ring-emerald-500/20 bg-muted transition cursor-pointer"
+                  />
+                  <label htmlFor="pull-kpi-chk" className="text-xs font-bold text-emerald-600 cursor-pointer select-none flex items-center gap-1.5">
+                    Pull Increment Data from KPI
+                    <span className="px-1.5 py-0.5 rounded text-[8px] uppercase font-black bg-emerald-500/15 text-emerald-600">Auto-fill</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase">Increment Amount (৳) *</label>
+                <input
+                  type="number"
+                  value={evalIncAmount}
+                  onChange={(e) => setEvalIncAmount(e.target.value)}
+                  placeholder="e.g. 5000"
+                  className={`w-full h-9 px-3 rounded-lg border text-xs font-semibold outline-none transition ${
+                    evalPullFromKPI
+                      ? "bg-emerald-500/5 border-emerald-500/30 text-emerald-700"
+                      : "bg-muted border-border/40 text-foreground focus:border-primary/50"
+                  }`}
+                  readOnly={evalPullFromKPI}
+                  required
+                />
+              </div>
+
+              <div className="pt-2 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setEvalModalOpen(false)}
+                  className="px-4 py-2 text-xs font-bold text-muted-foreground hover:bg-muted rounded-lg transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 text-xs font-bold bg-primary text-primary-foreground rounded-lg shadow-sm hover:opacity-90 transition flex items-center gap-1.5"
+                >
+                  <CheckCircle2 className="size-3.5" />
+                  Save Evaluation
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
