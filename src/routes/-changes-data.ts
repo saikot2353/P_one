@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "195",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Company Setup",
+    link: "/company-setup?tab=payslip",
+    descriptionEn: "Implemented a fully dynamic Payslip Configuration tab within the Company Setup page. Users can edit English and Bengali names/labels for all working status, earning, and deduction fields, customize visibility toggles per company, and view real-time pay slip mockups in both English and Bengali with a mathematically consistent preview totaling 165,000 Net Payment.",
+    descriptionBn: "কোম্পানি সেটআপ পেজের ভেতরে একটি সম্পূর্ণ ডাইনামিক পেসলিপ কনফিগারেশন ট্যাব যুক্ত করা হয়েছে। এর মাধ্যমে প্রতিটি কোম্পানির কাজের অবস্থা, আয় এবং কর্তনের সকল ফিল্ডের ইংরেজি ও বাংলা নাম কাস্টমাইজ এবং অন/অফ করা যাবে এবং লাইভ পেসলিপ প্রিভিউ দেখা যাবে। প্রিভিউ ভিউতে নেট পেমেন্ট ১৬৫,০০০ এবং অন্যান্য সমীকরণগুলো সামঞ্জস্যপূর্ণ করা হয়েছে।",
+  },
+  {
     id: "194",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Update",

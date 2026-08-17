@@ -29,7 +29,16 @@ import { SearchableSelect } from "@/components/ui/searchable-select";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { toast } from "sonner";
 
+interface CompanySetupSearch {
+  tab?: TabType;
+}
+
 export const Route = createFileRoute("/company-setup")({
+  validateSearch: (search: Record<string, unknown>): CompanySetupSearch => {
+    return {
+      tab: (search.tab as TabType) || "department",
+    };
+  },
   head: () => ({
     meta: [
       { title: "Company Setup — CRIPTON HRIS" },
@@ -43,11 +52,58 @@ export const Route = createFileRoute("/company-setup")({
   component: CompanySetupPage,
 });
 
-type TabType = "company" | "area" | "mapping" | "department" | "section" | "unit" | "line" | "holiday";
+type TabType = "company" | "area" | "mapping" | "department" | "section" | "unit" | "line" | "holiday" | "payslip";
 
-// ----------------------------------------------------
-// Interfaces
-// ----------------------------------------------------
+interface PayslipField {
+  key: string;
+  category: "status" | "payment" | "deduction";
+  defaultLabelEng: string;
+  defaultLabelBng: string;
+  customLabelEng: string;
+  customLabelBng: string;
+  isVisible: boolean;
+}
+
+const DEFAULT_PAYSLIP_FIELDS: PayslipField[] = [
+  // Working Status
+  { key: "working_day", category: "status", defaultLabelEng: "Working Day", defaultLabelBng: "কার্য দিবস", customLabelEng: "Working Day", customLabelBng: "কার্য দিবস", isVisible: true },
+  { key: "holiday", category: "status", defaultLabelEng: "Holiday", defaultLabelBng: "সাপ্তাহিক ছুটি", customLabelEng: "Holiday", customLabelBng: "সাপ্তাহিক ছুটি", isVisible: true },
+  { key: "present", category: "status", defaultLabelEng: "Present", defaultLabelBng: "উপস্থিত দিন", customLabelEng: "Present", customLabelBng: "উপস্থিত দিন", isVisible: true },
+  { key: "cl", category: "status", defaultLabelEng: "CL", defaultLabelBng: "নৈমিত্তিক ছুটি", customLabelEng: "CL", customLabelBng: "নৈমিত্তিক ছুটি", isVisible: true },
+  { key: "sl", category: "status", defaultLabelEng: "SL", defaultLabelBng: "অসুস্থতাজনিত ছুটি", customLabelEng: "SL", customLabelBng: "অসুস্থতাজনিত ছুটি", isVisible: true },
+  { key: "el", category: "status", defaultLabelEng: "EL", defaultLabelBng: "অর্জিত ছুটি", customLabelEng: "EL", customLabelBng: "অর্জিত ছুটি", isVisible: true },
+  { key: "ml", category: "status", defaultLabelEng: "ML", defaultLabelBng: "মাতৃত্ব জনিত ছুটি", customLabelEng: "ML", customLabelBng: "মাতৃত্ব জনিত ছুটি", isVisible: true },
+  { key: "spl", category: "status", defaultLabelEng: "SPL", defaultLabelBng: "বিশেষ ছুটি", customLabelEng: "SPL", customLabelBng: "বিশেষ ছুটি", isVisible: true },
+  { key: "absent", category: "status", defaultLabelEng: "Absent", defaultLabelBng: "অনুপস্থিত দিন", customLabelEng: "Absent", customLabelBng: "অনুপস্থিত দিন", isVisible: true },
+  { key: "ot_rate", category: "status", defaultLabelEng: "OT Rate", defaultLabelBng: "ওভার টাইমের হার", customLabelEng: "OT Rate", customLabelBng: "ওভার টাইমের হার", isVisible: true },
+  { key: "ot_hour", category: "status", defaultLabelEng: "OT Hour", defaultLabelBng: "ওভার টাইম ঘন্টা", customLabelEng: "OT Hour", customLabelBng: "ওভার টাইম ঘন্টা", isVisible: true },
+
+  // Payments and Deductions / Earnings
+  { key: "basic_pay", category: "payment", defaultLabelEng: "Basic Pay", defaultLabelBng: "মূল বেতন", customLabelEng: "Basic Pay", customLabelBng: "মূল বেতন", isVisible: true },
+  { key: "house_rent", category: "payment", defaultLabelEng: "House Rent", defaultLabelBng: "বাড়ী ভাড়া", customLabelEng: "House Rent", customLabelBng: "বাড়ী ভাড়া", isVisible: true },
+  { key: "medical", category: "payment", defaultLabelEng: "Medical", defaultLabelBng: "চিকিৎসা ভাতা", customLabelEng: "Medical", customLabelBng: "চিকিৎসা ভাতা", isVisible: true },
+  { key: "food", category: "payment", defaultLabelEng: "Food", defaultLabelBng: "খাদ্য ভাতা", customLabelEng: "Food", customLabelBng: "খাদ্য ভাতা", isVisible: true },
+  { key: "conveyance", category: "payment", defaultLabelEng: "Conveyance", defaultLabelBng: "যাতায়াত ভাতা", customLabelEng: "Conveyance", customLabelBng: "যাতায়াত ভাতা", isVisible: true },
+  { key: "gross_salary", category: "payment", defaultLabelEng: "Gross Salary", defaultLabelBng: "মোট বেতন", customLabelEng: "Gross Salary", customLabelBng: "মোট বেতন", isVisible: true },
+  { key: "ot_payment", category: "payment", defaultLabelEng: "OT Payment", defaultLabelBng: "ওভার টাইম", customLabelEng: "OT Payment", customLabelBng: "ওভার টাইম", isVisible: true },
+  { key: "tiffin", category: "payment", defaultLabelEng: "Tiffin", defaultLabelBng: "টিফিন ভাতা", customLabelEng: "Tiffin", customLabelBng: "টিফিন ভাতা", isVisible: true },
+  { key: "night_allowance", category: "payment", defaultLabelEng: "Night Allowance", defaultLabelBng: "নাইট বিল", customLabelEng: "Night Allowance", customLabelBng: "নাইট বিল", isVisible: true },
+  { key: "attendance_bonus", category: "payment", defaultLabelEng: "Attendance Bonus", defaultLabelBng: "হাজিরা বোনাস", customLabelEng: "Attendance Bonus", customLabelBng: "হাজিরা বোনাস", isVisible: true },
+  { key: "allowance", category: "payment", defaultLabelEng: "Allowance", defaultLabelBng: "আচরণ বোনাস", customLabelEng: "Allowance", customLabelBng: "আচরণ বোনাস", isVisible: true },
+  { key: "arrear", category: "payment", defaultLabelEng: "Arrear", defaultLabelBng: "বকেয়া", customLabelEng: "Arrear", customLabelBng: "বকেয়া", isVisible: true },
+  { key: "total_payment", category: "payment", defaultLabelEng: "Total Payment", defaultLabelBng: "মোট প্রদান", customLabelEng: "Total Payment", customLabelBng: "মোট প্রদান", isVisible: true },
+
+  // Deductions
+  { key: "absent_deduction", category: "deduction", defaultLabelEng: "Absent Deduction", defaultLabelBng: "অনুপস্থিতজনিত কর্তন", customLabelEng: "Absent Deduction", customLabelBng: "অনুপস্থিতজনিত কর্তন", isVisible: true },
+  { key: "lunch_deduction", category: "deduction", defaultLabelEng: "Lunch Deduction", defaultLabelBng: "লাঞ্চ কর্তন", customLabelEng: "Lunch Deduction", customLabelBng: "লাঞ্চ কর্তন", isVisible: true },
+  { key: "advance", category: "deduction", defaultLabelEng: "Advance", defaultLabelBng: "অগ্রিম", customLabelEng: "Advance", customLabelBng: "অগ্রিম", isVisible: true },
+  { key: "wagely_advance", category: "deduction", defaultLabelEng: "Wagely Advance", defaultLabelBng: "অগ্রিম (wagely)", customLabelEng: "Wagely Advance", customLabelBng: "অগ্রিম (wagely)", isVisible: true },
+  { key: "adjust", category: "deduction", defaultLabelEng: "Adjust", defaultLabelBng: "সমন্বয়", customLabelEng: "Adjust", customLabelBng: "সমন্বয়", isVisible: true },
+  { key: "income_tax", category: "deduction", defaultLabelEng: "Income Tax", defaultLabelBng: "আয়কর", customLabelEng: "Income Tax", customLabelBng: "আয়কর", isVisible: true },
+  { key: "revenue_stamp", category: "deduction", defaultLabelEng: "Revenue Stamp", defaultLabelBng: "স্ট্যাম্প বাবদ কর্তন", customLabelEng: "Revenue Stamp", customLabelBng: "স্ট্যাম্প বাবদ কর্তন", isVisible: true },
+  { key: "total_deduction", category: "deduction", defaultLabelEng: "Total Deduction", defaultLabelBng: "মোট কর্তন", customLabelEng: "Total Deduction", customLabelBng: "মোট কর্তন", isVisible: true },
+];
+
 interface DefaultHoliday {
   sl: number;
   year: number;
@@ -1390,9 +1446,50 @@ const DEFAULT_HOLIDAYS: DefaultHoliday[] = [
 ];
 
 function CompanySetupPage() {
-  const [activeTab, setActiveTab] = useState<TabType>("department");
+  const search = Route.useSearch();
+  const [activeTab, setActiveTab] = useState<TabType>(search.tab || "department");
+
+  useEffect(() => {
+    if (search.tab) {
+      setActiveTab(search.tab);
+    }
+  }, [search.tab]);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [companyFilter, setCompanyFilter] = useState("all");
+
+  // Payslip fields state
+  const [payslipFields, setPayslipFields] = useState<PayslipField[]>(DEFAULT_PAYSLIP_FIELDS);
+  const [previewLang, setPreviewLang] = useState<"en" | "bn">("en");
+
+  // Load configuration from local storage for the selected company
+  useEffect(() => {
+    const companyKey = `payslip_config_${companyFilter || "all"}`;
+    const saved = localStorage.getItem(companyKey);
+    if (saved) {
+      try {
+        setPayslipFields(JSON.parse(saved));
+      } catch (e) {
+        setPayslipFields(DEFAULT_PAYSLIP_FIELDS);
+      }
+    } else {
+      setPayslipFields(DEFAULT_PAYSLIP_FIELDS);
+    }
+  }, [companyFilter]);
+
+  const savePayslipConfig = (updatedFields?: PayslipField[]) => {
+    const fieldsToSave = updatedFields || payslipFields;
+    const companyKey = `payslip_config_${companyFilter || "all"}`;
+    localStorage.setItem(companyKey, JSON.stringify(fieldsToSave));
+    toast.success("Payslip configuration saved successfully!");
+  };
+
+  const handleFieldChange = (key: string, updates: Partial<PayslipField>) => {
+    const updated = payslipFields.map(field => 
+      field.key === key ? { ...field, ...updates } : field
+    );
+    setPayslipFields(updated);
+  };
 
   // Lists State
   const [orgs, setOrgs] = useState<Organization[]>([]);
@@ -2125,6 +2222,7 @@ function CompanySetupPage() {
     { type: "unit", label: "Unit", icon: Building2 },
     { type: "line", label: "Line", icon: Grid },
     { type: "holiday", label: "Default Holiday Setup", icon: Calendar },
+    { type: "payslip", label: "Payslip Configuration", icon: Settings },
   ];
 
   return (
@@ -2197,55 +2295,416 @@ function CompanySetupPage() {
           </div>
 
           {/* Search bar & Actions toolbar */}
-          <div className="bg-card rounded-2xl border border-border/50 p-4 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
-            <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-              <div className="w-full sm:w-64 md:w-80 h-10 px-3.5 rounded-lg border border-border/60 bg-muted/10 hover:bg-muted/20 focus-within:bg-background focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 transition-all flex items-center gap-2.5 shadow-sm">
-                <Search className="size-4.5 text-muted-foreground/70" />
-                <input
-                  type="text"
-                  placeholder={`Search ${tabsList.find((t) => t.type === activeTab)?.label}...`}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-transparent border-0 outline-none text-sm w-full text-foreground placeholder:text-muted-foreground/50 font-medium"
-                />
+          {activeTab !== "payslip" && (
+            <div className="bg-card rounded-2xl border border-border/50 p-4 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
+              <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                <div className="w-full sm:w-64 md:w-80 h-10 px-3.5 rounded-lg border border-border/60 bg-muted/10 hover:bg-muted/20 focus-within:bg-background focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 transition-all flex items-center gap-2.5 shadow-sm">
+                  <Search className="size-4.5 text-muted-foreground/70" />
+                  <input
+                    type="text"
+                    placeholder={`Search ${tabsList.find((t) => t.type === activeTab)?.label}...`}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="bg-transparent border-0 outline-none text-sm w-full text-foreground placeholder:text-muted-foreground/50 font-medium"
+                  />
+                </div>
+                <div className="w-full sm:w-64 md:w-72">
+                  <SearchableSelect
+                    value={companyFilter}
+                    onChange={(val) => setCompanyFilter(val)}
+                    options={[
+                      { value: "all", label: "Select Company" },
+                      ...orgs.map((org) => ({ value: org.nameEng, label: org.nameEng }))
+                    ]}
+                    placeholder="Select Company"
+                  />
+                </div>
               </div>
-              <div className="w-full sm:w-64 md:w-72">
-                <SearchableSelect
-                  value={companyFilter}
-                  onChange={(val) => setCompanyFilter(val)}
-                  options={[
-                    { value: "all", label: "Select Company" },
-                    ...orgs.map((org) => ({ value: org.nameEng, label: org.nameEng }))
-                  ]}
-                  placeholder="Select Company"
-                />
-              </div>
-            </div>
 
-            <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
-              <button
-                onClick={() => toast.success("Exporting to Excel...")}
-                className="h-10 px-4 rounded-xl border border-border/40 hover:bg-muted font-semibold text-xs text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors shadow-sm"
-              >
-                <FileSpreadsheet className="size-4.5 text-emerald-600" /> Excel
-              </button>
-              <button
-                onClick={() => window.print()}
-                className="h-10 px-4 rounded-xl border border-border/40 hover:bg-muted font-semibold text-xs text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors shadow-sm"
-              >
-                <Printer className="size-4.5 text-blue-600" /> Print
-              </button>
-              <button
-                onClick={() => toast.success("Generating PDF...")}
-                className="h-10 px-4 rounded-xl border border-border/40 hover:bg-muted font-semibold text-xs text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors shadow-sm"
-              >
-                <FileText className="size-4.5 text-red-600" /> PDF
-              </button>
+              <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
+                <button
+                  onClick={() => toast.success("Exporting to Excel...")}
+                  className="h-10 px-4 rounded-xl border border-border/40 hover:bg-muted font-semibold text-xs text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors shadow-sm"
+                >
+                  <FileSpreadsheet className="size-4.5 text-emerald-600" /> Excel
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="h-10 px-4 rounded-xl border border-border/40 hover:bg-muted font-semibold text-xs text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors shadow-sm"
+                >
+                  <Printer className="size-4.5 text-blue-600" /> Print
+                </button>
+                <button
+                  onClick={() => toast.success("Generating PDF...")}
+                  className="h-10 px-4 rounded-xl border border-border/40 hover:bg-muted font-semibold text-xs text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors shadow-sm"
+                >
+                  <FileText className="size-4.5 text-red-600" /> PDF
+                </button>
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Payslip Configuration View */}
+          {activeTab === "payslip" && (
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+              {/* Left Column: Form Settings */}
+              <div className="xl:col-span-7 space-y-6">
+                <div className="bg-card rounded-2xl border border-border/50 p-5 shadow-sm space-y-4">
+                  {/* Top Bar inside Card */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/40">
+                    <div>
+                      <h2 className="text-base font-bold text-foreground">Configure Payslip Fields</h2>
+                      <p className="text-xs text-muted-foreground mt-0.5">Customize English & Bengali labels and toggle field visibility.</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          if (window.confirm("Are you sure you want to reset all fields for this company to defaults?")) {
+                            setPayslipFields(DEFAULT_PAYSLIP_FIELDS);
+                            savePayslipConfig(DEFAULT_PAYSLIP_FIELDS);
+                          }
+                        }}
+                        className="h-9 px-3 rounded-xl border border-border/40 text-xs font-semibold text-muted-foreground hover:text-foreground transition-all hover:bg-muted"
+                      >
+                        Reset Defaults
+                      </button>
+                      <button
+                        onClick={() => savePayslipConfig()}
+                        className="h-9 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-semibold transition-all hover:bg-primary/90 shadow-sm"
+                      >
+                        Save Configuration
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Company Select */}
+                  <div className="space-y-1.5 max-w-sm">
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">Target Company</label>
+                    <SearchableSelect
+                      value={companyFilter}
+                      onChange={(val) => setCompanyFilter(val)}
+                      options={[
+                        { value: "all", label: "Global Default Layout" },
+                        ...orgs.map((org) => ({ value: org.nameEng, label: org.nameEng }))
+                      ]}
+                      placeholder="Select Company"
+                    />
+                  </div>
+
+                  {/* Sections */}
+                  {/* Status Fields */}
+                  <div className="space-y-3 pt-2">
+                    <h3 className="text-xs font-bold text-primary uppercase tracking-widest border-b border-primary/20 pb-1.5">Working Status Section</h3>
+                    <div className="divide-y divide-border/20 max-h-[30vh] overflow-y-auto pr-1">
+                      {payslipFields.filter(f => f.category === "status").map(field => (
+                        <div key={field.key} className="grid grid-cols-12 gap-3 items-center py-2 text-xs">
+                          <div className="col-span-3">
+                            <span className="font-bold text-foreground block">{field.defaultLabelEng}</span>
+                            <span className="text-[10px] text-muted-foreground">{field.defaultLabelBng}</span>
+                          </div>
+                          <div className="col-span-4">
+                            <input
+                              type="text"
+                              value={field.customLabelEng}
+                              onChange={(e) => handleFieldChange(field.key, { customLabelEng: e.target.value })}
+                              placeholder={field.defaultLabelEng}
+                              className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
+                            />
+                          </div>
+                          <div className="col-span-4">
+                            <input
+                              type="text"
+                              value={field.customLabelBng}
+                              onChange={(e) => handleFieldChange(field.key, { customLabelBng: e.target.value })}
+                              placeholder={field.defaultLabelBng}
+                              className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
+                            />
+                          </div>
+                          <div className="col-span-1 flex justify-end">
+                            <label className="relative inline-flex items-center cursor-pointer select-none">
+                              <input
+                                type="checkbox"
+                                checked={field.isVisible}
+                                onChange={(e) => handleFieldChange(field.key, { isVisible: e.target.checked })}
+                                className="sr-only peer"
+                              />
+                              <div className="w-8 h-4.5 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-350 dark:after:border-slate-655 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Payment Fields */}
+                  <div className="space-y-3 pt-2">
+                    <h3 className="text-xs font-bold text-primary uppercase tracking-widest border-b border-primary/20 pb-1.5">Payments & Earnings Section</h3>
+                    <div className="divide-y divide-border/20 max-h-[30vh] overflow-y-auto pr-1">
+                      {payslipFields.filter(f => f.category === "payment").map(field => (
+                        <div key={field.key} className="grid grid-cols-12 gap-3 items-center py-2 text-xs">
+                          <div className="col-span-3">
+                            <span className="font-bold text-foreground block">{field.defaultLabelEng}</span>
+                            <span className="text-[10px] text-muted-foreground">{field.defaultLabelBng}</span>
+                          </div>
+                          <div className="col-span-4">
+                            <input
+                              type="text"
+                              value={field.customLabelEng}
+                              onChange={(e) => handleFieldChange(field.key, { customLabelEng: e.target.value })}
+                              placeholder={field.defaultLabelEng}
+                              className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
+                            />
+                          </div>
+                          <div className="col-span-4">
+                            <input
+                              type="text"
+                              value={field.customLabelBng}
+                              onChange={(e) => handleFieldChange(field.key, { customLabelBng: e.target.value })}
+                              placeholder={field.defaultLabelBng}
+                              className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
+                            />
+                          </div>
+                          <div className="col-span-1 flex justify-end">
+                            <label className="relative inline-flex items-center cursor-pointer select-none">
+                              <input
+                                type="checkbox"
+                                checked={field.isVisible}
+                                onChange={(e) => handleFieldChange(field.key, { isVisible: e.target.checked })}
+                                className="sr-only peer"
+                              />
+                              <div className="w-8 h-4.5 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-355 dark:after:border-slate-655 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Deduction Fields */}
+                  <div className="space-y-3 pt-2">
+                    <h3 className="text-xs font-bold text-primary uppercase tracking-widest border-b border-primary/20 pb-1.5">Deductions Section</h3>
+                    <div className="divide-y divide-border/20 max-h-[30vh] overflow-y-auto pr-1">
+                      {payslipFields.filter(f => f.category === "deduction").map(field => (
+                        <div key={field.key} className="grid grid-cols-12 gap-3 items-center py-2 text-xs">
+                          <div className="col-span-3">
+                            <span className="font-bold text-foreground block">{field.defaultLabelEng}</span>
+                            <span className="text-[10px] text-muted-foreground">{field.defaultLabelBng}</span>
+                          </div>
+                          <div className="col-span-4">
+                            <input
+                              type="text"
+                              value={field.customLabelEng}
+                              onChange={(e) => handleFieldChange(field.key, { customLabelEng: e.target.value })}
+                              placeholder={field.defaultLabelEng}
+                              className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
+                            />
+                          </div>
+                          <div className="col-span-4">
+                            <input
+                              type="text"
+                              value={field.customLabelBng}
+                              onChange={(e) => handleFieldChange(field.key, { customLabelBng: e.target.value })}
+                              placeholder={field.defaultLabelBng}
+                              className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
+                            />
+                          </div>
+                          <div className="col-span-1 flex justify-end">
+                            <label className="relative inline-flex items-center cursor-pointer select-none">
+                              <input
+                                type="checkbox"
+                                checked={field.isVisible}
+                                onChange={(e) => handleFieldChange(field.key, { isVisible: e.target.checked })}
+                                className="sr-only peer"
+                              />
+                              <div className="w-8 h-4.5 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-355 dark:after:border-slate-655 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Live Interactive Mockup */}
+              <div className="xl:col-span-5 space-y-4 xl:sticky xl:top-[90px]">
+                <div className="bg-card rounded-2xl border border-border/50 p-5 shadow-sm space-y-4">
+                  <div className="flex items-center justify-between border-b border-border/40 pb-3">
+                    <h3 className="text-sm font-bold text-foreground">Interactive Payslip Preview</h3>
+                    <div className="flex items-center bg-muted rounded-lg p-0.5 border border-border/30">
+                      <button
+                        onClick={() => setPreviewLang("en")}
+                        className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${previewLang === "en" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                      >
+                        EN
+                      </button>
+                      <button
+                        onClick={() => setPreviewLang("bn")}
+                        className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${previewLang === "bn" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                      >
+                        BN
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Preview Container */}
+                  <div className="bg-white text-black p-5 rounded-xl border border-slate-300 shadow-sm font-sans relative overflow-hidden select-none leading-normal">
+                    {/* Decorative Sideline */}
+                    <div className="absolute top-0 right-3 w-[2px] h-full border-r border-dotted border-black/30" />
+
+                    {/* Company Header */}
+                    <div className="text-center font-bold text-[14px] uppercase tracking-tight">
+                      {companyFilter === "all" ? "Pakiza Software Limited" : companyFilter}
+                    </div>
+                    <div className="text-center text-[10.5px] font-bold border-b border-black pb-1 mb-2 tracking-tight">
+                      {previewLang === "en" ? "Pay Slip For the month of -Jul, 2026" : "পে স্লিপ - জুলাই, ২০২৬"}
+                    </div>
+
+                    {/* Emp Info */}
+                    <div className="grid grid-cols-2 text-[10px] leading-relaxed mb-2.5">
+                      <div>
+                        <span className="font-bold">{previewLang === "en" ? "ID" : "আইডি"}:</span> 2023043910
+                      </div>
+                      <div>
+                        <span className="font-bold">{previewLang === "en" ? "JD" : "যোগদানের তারিখ"}:</span> 01/08/2023
+                      </div>
+                      <div className="col-span-2">
+                        <span className="font-bold">{previewLang === "en" ? "Name" : "নাম"}:</span> Tahmid Afsar
+                      </div>
+                      <div className="col-span-2">
+                        <span className="font-bold">{previewLang === "en" ? "Department" : "বিভাগ"}:</span> Project Resource & Strategy
+                      </div>
+                      <div className="col-span-2">
+                        <span className="font-bold">{previewLang === "en" ? "Designation" : "পদবী"}:</span> Deputy Manager
+                      </div>
+                      <div className="col-span-2 flex justify-between">
+                        <span><span className="font-bold">{previewLang === "en" ? "Grade" : "গ্রেড"}:</span> —</span>
+                        <span><span className="font-bold">{previewLang === "en" ? "Unit" : "ইউনিট"}:</span> PSL</span>
+                        <span><span className="font-bold">{previewLang === "en" ? "Line" : "লাইন"}:</span> N/A</span>
+                      </div>
+                    </div>
+
+                    {/* Working Status */}
+                    <div className="border-t border-b border-black py-1 mb-1.5 flex justify-between text-[11px] font-extrabold uppercase tracking-wide">
+                      <span>{previewLang === "en" ? "Working Status" : "কার্য অবস্থা"}</span>
+                      <span>{previewLang === "en" ? "Unit" : "ইউনিট"}</span>
+                    </div>
+                    <div className="space-y-1 text-[10.5px] mb-3">
+                      {payslipFields.filter(f => f.category === "status" && f.isVisible).map(f => {
+                        const mockValues: Record<string, string> = {
+                          working_day: "25",
+                          holiday: "6",
+                          present: "24",
+                          cl: "1",
+                          sl: "0",
+                          el: "0",
+                          ml: "0",
+                          spl: "0",
+                          absent: "0",
+                          ot_rate: "120.00",
+                          ot_hour: "0.00",
+                        };
+                        const label = previewLang === "en" ? f.customLabelEng || f.defaultLabelEng : f.customLabelBng || f.defaultLabelBng;
+                        return (
+                          <div key={f.key} className="flex justify-between pl-4 font-bold text-slate-800">
+                            <span>{label}</span>
+                            <span className="font-mono text-black font-extrabold">{mockValues[f.key] || "0"}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Payments and Deductions */}
+                    <div className="border-t border-b border-black py-1 mb-1.5 flex justify-between text-[11px] font-extrabold uppercase tracking-wide">
+                      <span>{previewLang === "en" ? "Payments and Deductions" : "প্রদান এবং কর্তনসমূহ"}</span>
+                      <span>{previewLang === "en" ? "Amount (TK.)" : "টাকা (TK.)"}</span>
+                    </div>
+                    <div className="space-y-1 text-[10.5px] mb-2">
+                      {payslipFields.filter(f => f.category === "payment" && f.isVisible && f.key !== "total_payment").map(f => {
+                        const mockValues: Record<string, string> = {
+                          basic_pay: "100000",
+                          house_rent: "50000",
+                          medical: "10000",
+                          food: "0",
+                          conveyance: "5000",
+                          gross_salary: "165000",
+                          ot_payment: "0",
+                          tiffin: "0",
+                          night_allowance: "0",
+                          attendance_bonus: "0",
+                          allowance: "10000",
+                          arrear: "0.00",
+                        };
+                        const label = previewLang === "en" ? f.customLabelEng || f.defaultLabelEng : f.customLabelBng || f.defaultLabelBng;
+                        const isGross = f.key === "gross_salary";
+                        return (
+                          <div key={f.key} className={`flex justify-between pl-4 font-bold text-slate-800 ${isGross ? "font-black text-black border-t border-dashed border-black/40 pt-1 mt-1 text-[11px]" : ""}`}>
+                            <span>{label}</span>
+                            <span className="font-mono text-black font-extrabold">{mockValues[f.key] || "0"}</span>
+                          </div>
+                        );
+                      })}
+                      {(() => {
+                        const f = payslipFields.find(field => field.key === "total_payment");
+                        if (!f || !f.isVisible) return null;
+                        const label = previewLang === "en" ? f.customLabelEng || f.defaultLabelEng : f.customLabelBng || f.defaultLabelBng;
+                        return (
+                          <div className="flex justify-between font-black border-t-2 border-black pt-1.5 mt-2 text-[11px] uppercase">
+                            <span>{label}</span>
+                            <span className="font-mono">175000</span>
+                          </div>
+                        );
+                      })()}
+                    </div>
+
+                    {/* Deductions */}
+                    <div className="space-y-1 text-[10.5px] mb-3">
+                      {payslipFields.filter(f => f.category === "deduction" && f.isVisible && f.key !== "total_deduction").map(f => {
+                        const mockValues: Record<string, string> = {
+                          absent_deduction: "0",
+                          lunch_deduction: "2500",
+                          advance: "5000",
+                          wagely_advance: "0",
+                          adjust: "0",
+                          income_tax: "2500",
+                          revenue_stamp: "0",
+                        };
+                        const label = previewLang === "en" ? f.customLabelEng || f.defaultLabelEng : f.customLabelBng || f.defaultLabelBng;
+                        return (
+                          <div key={f.key} className="flex justify-between pl-4 font-bold text-slate-800">
+                            <span>{label}</span>
+                            <span className="font-mono text-black font-extrabold">{mockValues[f.key] || "0"}</span>
+                          </div>
+                        );
+                      })}
+                      {(() => {
+                        const f = payslipFields.find(field => field.key === "total_deduction");
+                        if (!f || !f.isVisible) return null;
+                        const label = previewLang === "en" ? f.customLabelEng || f.defaultLabelEng : f.customLabelBng || f.defaultLabelBng;
+                        return (
+                          <div className="flex justify-between font-black border-t-2 border-black pt-1.5 mt-2 text-[11px] uppercase">
+                            <span>{label}</span>
+                            <span className="font-mono">10000</span>
+                          </div>
+                        );
+                      })()}
+                    </div>
+
+                    {/* Net Payment */}
+                    <div className="flex justify-between font-black border-t border-b-2 border-black py-1.5 mt-2 text-[11.5px] uppercase">
+                      <span>{previewLang === "en" ? "Net Payment" : "নেট পেমেন্ট"}</span>
+                      <span className="font-mono">165000</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Master Table Router */}
-          <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
+          {activeTab !== "payslip" && (
+            <div className="bg-card rounded-lg border border-border/80 shadow-xs overflow-hidden">
+
             <div className="overflow-x-auto">
               {activeTab === "company" && (
                 <table
@@ -2951,6 +3410,7 @@ function CompanySetupPage() {
               )}
             </div>
           </div>
+          )}
         </div>
 
       {/* Copy From Modal */}
