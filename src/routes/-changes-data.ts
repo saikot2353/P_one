@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "196",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Company Setup",
+    link: "/company-setup?tab=payslip",
+    descriptionEn: "Upgraded the Payslip Configuration system to be template-based. Users can now view a list of templates, create new templates targeting specific companies and employee types, configure custom field names/visibilities for each template individually, and manage them via an interactive list and configure workflow.",
+    descriptionBn: "পে স্লিপ কনফিগারেশন সিস্টেমকে টেমপ্লেট ভিত্তিক করা হয়েছে। ব্যবহারকারীরা এখন নির্দিষ্ট কোম্পানি এবং এমপ্লয়ি টাইপের জন্য নতুন টেমপ্লেট তৈরি করতে পারবেন, প্রতিটি টেমপ্লেটের ফিল্ডের নাম ও ভিজিবিলিটি আলাদাভাবে কাস্টমাইজ করতে পারবেন এবং লিস্ট ভিউ থেকে এগুলো পরিচালনা করতে পারবেন।",
+  },
+  {
     id: "195",
     date: new Date().toISOString().slice(0, 16),
     type: "New Feature",

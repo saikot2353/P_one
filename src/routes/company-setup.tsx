@@ -104,6 +104,39 @@ const DEFAULT_PAYSLIP_FIELDS: PayslipField[] = [
   { key: "total_deduction", category: "deduction", defaultLabelEng: "Total Deduction", defaultLabelBng: "মোট কর্তন", customLabelEng: "Total Deduction", customLabelBng: "মোট কর্তন", isVisible: true },
 ];
 
+interface PayslipTemplate {
+  id: string;
+  title: string;
+  companyName: string;
+  employeeType: string;
+  isActive: boolean;
+  fields: PayslipField[];
+}
+
+const DEFAULT_TEMPLATES: PayslipTemplate[] = [
+  {
+    id: "tpl-1",
+    title: "Standard Staff Layout",
+    companyName: "Pakiza Software Limited",
+    employeeType: "Permanent",
+    isActive: true,
+    fields: DEFAULT_PAYSLIP_FIELDS
+  },
+  {
+    id: "tpl-2",
+    title: "Hourly Worker Template",
+    companyName: "Pakiza Knit Composite Ltd",
+    employeeType: "Casual",
+    isActive: true,
+    fields: DEFAULT_PAYSLIP_FIELDS.map(f => {
+      if (f.key === "conveyance" || f.key === "food") {
+        return { ...f, isVisible: false };
+      }
+      return f;
+    })
+  }
+];
+
 interface DefaultHoliday {
   sl: number;
   year: number;
@@ -1458,37 +1491,99 @@ function CompanySetupPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [companyFilter, setCompanyFilter] = useState("all");
 
-  // Payslip fields state
-  const [payslipFields, setPayslipFields] = useState<PayslipField[]>(DEFAULT_PAYSLIP_FIELDS);
+  // Payslip Templates States
+  const [payslipTemplates, setPayslipTemplates] = useState<PayslipTemplate[]>([]);
+  const [editingTemplate, setEditingTemplate] = useState<PayslipTemplate | null>(null);
+  const [isConfiguringTemplate, setIsConfiguringTemplate] = useState(false);
   const [previewLang, setPreviewLang] = useState<"en" | "bn">("en");
 
-  // Load configuration from local storage for the selected company
+  // Create Template Modal States
+  const [isCreateTplOpen, setIsCreateTplOpen] = useState(false);
+  const [tplTitle, setTplTitle] = useState("");
+  const [tplCompany, setTplCompany] = useState("");
+  const [tplEmpType, setTplEmpType] = useState("Permanent");
+
+  // Load templates from local storage
   useEffect(() => {
-    const companyKey = `payslip_config_${companyFilter || "all"}`;
-    const saved = localStorage.getItem(companyKey);
+    const saved = localStorage.getItem("payslip_templates_data");
     if (saved) {
       try {
-        setPayslipFields(JSON.parse(saved));
+        setPayslipTemplates(JSON.parse(saved));
       } catch (e) {
-        setPayslipFields(DEFAULT_PAYSLIP_FIELDS);
+        setPayslipTemplates(DEFAULT_TEMPLATES);
       }
     } else {
-      setPayslipFields(DEFAULT_PAYSLIP_FIELDS);
+      setPayslipTemplates(DEFAULT_TEMPLATES);
+      localStorage.setItem("payslip_templates_data", JSON.stringify(DEFAULT_TEMPLATES));
     }
-  }, [companyFilter]);
+  }, []);
 
-  const savePayslipConfig = (updatedFields?: PayslipField[]) => {
-    const fieldsToSave = updatedFields || payslipFields;
-    const companyKey = `payslip_config_${companyFilter || "all"}`;
-    localStorage.setItem(companyKey, JSON.stringify(fieldsToSave));
-    toast.success("Payslip configuration saved successfully!");
+  const saveTemplatesToStorage = (updatedList: PayslipTemplate[]) => {
+    setPayslipTemplates(updatedList);
+    localStorage.setItem("payslip_templates_data", JSON.stringify(updatedList));
+  };
+
+  const handleCreateTemplate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!tplTitle.trim()) {
+      toast.error("Template title is required!");
+      return;
+    }
+    const newTpl: PayslipTemplate = {
+      id: `tpl-${Date.now()}`,
+      title: tplTitle,
+      companyName: tplCompany || (orgs[0]?.nameEng || "Pakiza Software Limited"),
+      employeeType: tplEmpType,
+      isActive: true,
+      fields: JSON.parse(JSON.stringify(DEFAULT_PAYSLIP_FIELDS))
+    };
+
+    const updated = [...payslipTemplates, newTpl];
+    saveTemplatesToStorage(updated);
+    
+    setIsCreateTplOpen(false);
+    setTplTitle("");
+    setEditingTemplate(newTpl);
+    setIsConfiguringTemplate(true);
+    toast.success("Template created successfully! Now configure its fields.");
   };
 
   const handleFieldChange = (key: string, updates: Partial<PayslipField>) => {
-    const updated = payslipFields.map(field => 
+    if (!editingTemplate) return;
+    const updatedFields = editingTemplate.fields.map(field => 
       field.key === key ? { ...field, ...updates } : field
     );
-    setPayslipFields(updated);
+    setEditingTemplate({
+      ...editingTemplate,
+      fields: updatedFields
+    });
+  };
+
+  const handleSaveTemplateConfig = () => {
+    if (!editingTemplate) return;
+    const updated = payslipTemplates.map(tpl => 
+      tpl.id === editingTemplate.id ? editingTemplate : tpl
+    );
+    saveTemplatesToStorage(updated);
+    setIsConfiguringTemplate(false);
+    setEditingTemplate(null);
+    toast.success("Template configuration saved successfully!");
+  };
+
+  const handleDeleteTemplate = (id: string) => {
+    if (window.confirm("Are you sure you want to delete this template?")) {
+      const updated = payslipTemplates.filter(t => t.id !== id);
+      saveTemplatesToStorage(updated);
+      toast.success("Template deleted.");
+    }
+  };
+
+  const handleToggleTemplateStatus = (id: string) => {
+    const updated = payslipTemplates.map(t => 
+      t.id === id ? { ...t, isActive: !t.isActive } : t
+    );
+    saveTemplatesToStorage(updated);
+    toast.success("Template status updated.");
   };
 
   // Lists State
@@ -2344,361 +2439,450 @@ function CompanySetupPage() {
             </div>
           )}
 
-          {/* Payslip Configuration View */}
+          {/* Payslip Configuration Tab Content */}
           {activeTab === "payslip" && (
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-              {/* Left Column: Form Settings */}
-              <div className="xl:col-span-7 space-y-6">
-                <div className="bg-card rounded-2xl border border-border/50 p-5 shadow-sm space-y-4">
-                  {/* Top Bar inside Card */}
+            <>
+              {!isConfiguringTemplate ? (
+                /* List View of Templates */
+                <div className="bg-card rounded-2xl border border-border/50 p-6 shadow-sm space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/40">
                     <div>
-                      <h2 className="text-base font-bold text-foreground">Configure Payslip Fields</h2>
-                      <p className="text-xs text-muted-foreground mt-0.5">Customize English & Bengali labels and toggle field visibility.</p>
+                      <h2 className="text-base font-bold text-foreground">Payslip Templates Setup</h2>
+                      <p className="text-xs text-muted-foreground mt-0.5">Manage and customize payslip columns and translations based on employee types.</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => {
-                          if (window.confirm("Are you sure you want to reset all fields for this company to defaults?")) {
-                            setPayslipFields(DEFAULT_PAYSLIP_FIELDS);
-                            savePayslipConfig(DEFAULT_PAYSLIP_FIELDS);
-                          }
-                        }}
-                        className="h-9 px-3 rounded-xl border border-border/40 text-xs font-semibold text-muted-foreground hover:text-foreground transition-all hover:bg-muted"
-                      >
-                        Reset Defaults
-                      </button>
-                      <button
-                        onClick={() => savePayslipConfig()}
-                        className="h-9 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-semibold transition-all hover:bg-primary/90 shadow-sm"
-                      >
-                        Save Configuration
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => {
+                        setTplTitle("");
+                        setTplCompany(orgs[0]?.nameEng || "Pakiza Software Limited");
+                        setTplEmpType("Permanent");
+                        setIsCreateTplOpen(true);
+                      }}
+                      className="h-10 px-5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
+                    >
+                      <Plus className="size-4.5" /> Create New Template
+                    </button>
                   </div>
 
-                  {/* Company Select */}
-                  <div className="space-y-1.5 max-w-sm">
-                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">Target Company</label>
-                    <SearchableSelect
-                      value={companyFilter}
-                      onChange={(val) => setCompanyFilter(val)}
-                      options={[
-                        { value: "all", label: "Global Default Layout" },
-                        ...orgs.map((org) => ({ value: org.nameEng, label: org.nameEng }))
-                      ]}
-                      placeholder="Select Company"
-                    />
-                  </div>
-
-                  {/* Sections */}
-                  {/* Status Fields */}
-                  <div className="space-y-3 pt-2">
-                    <h3 className="text-xs font-bold text-primary uppercase tracking-widest border-b border-primary/20 pb-1.5">Working Status Section</h3>
-                    <div className="divide-y divide-border/20 max-h-[30vh] overflow-y-auto pr-1">
-                      {payslipFields.filter(f => f.category === "status").map(field => (
-                        <div key={field.key} className="grid grid-cols-12 gap-3 items-center py-2 text-xs">
-                          <div className="col-span-3">
-                            <span className="font-bold text-foreground block">{field.defaultLabelEng}</span>
-                            <span className="text-[10px] text-muted-foreground">{field.defaultLabelBng}</span>
-                          </div>
-                          <div className="col-span-4">
-                            <input
-                              type="text"
-                              value={field.customLabelEng}
-                              onChange={(e) => handleFieldChange(field.key, { customLabelEng: e.target.value })}
-                              placeholder={field.defaultLabelEng}
-                              className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
-                            />
-                          </div>
-                          <div className="col-span-4">
-                            <input
-                              type="text"
-                              value={field.customLabelBng}
-                              onChange={(e) => handleFieldChange(field.key, { customLabelBng: e.target.value })}
-                              placeholder={field.defaultLabelBng}
-                              className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
-                            />
-                          </div>
-                          <div className="col-span-1 flex justify-end">
-                            <label className="relative inline-flex items-center cursor-pointer select-none">
-                              <input
-                                type="checkbox"
-                                checked={field.isVisible}
-                                onChange={(e) => handleFieldChange(field.key, { isVisible: e.target.checked })}
-                                className="sr-only peer"
-                              />
-                              <div className="w-8 h-4.5 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-350 dark:after:border-slate-655 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-primary"></div>
-                            </label>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Payment Fields */}
-                  <div className="space-y-3 pt-2">
-                    <h3 className="text-xs font-bold text-primary uppercase tracking-widest border-b border-primary/20 pb-1.5">Payments & Earnings Section</h3>
-                    <div className="divide-y divide-border/20 max-h-[30vh] overflow-y-auto pr-1">
-                      {payslipFields.filter(f => f.category === "payment").map(field => (
-                        <div key={field.key} className="grid grid-cols-12 gap-3 items-center py-2 text-xs">
-                          <div className="col-span-3">
-                            <span className="font-bold text-foreground block">{field.defaultLabelEng}</span>
-                            <span className="text-[10px] text-muted-foreground">{field.defaultLabelBng}</span>
-                          </div>
-                          <div className="col-span-4">
-                            <input
-                              type="text"
-                              value={field.customLabelEng}
-                              onChange={(e) => handleFieldChange(field.key, { customLabelEng: e.target.value })}
-                              placeholder={field.defaultLabelEng}
-                              className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
-                            />
-                          </div>
-                          <div className="col-span-4">
-                            <input
-                              type="text"
-                              value={field.customLabelBng}
-                              onChange={(e) => handleFieldChange(field.key, { customLabelBng: e.target.value })}
-                              placeholder={field.defaultLabelBng}
-                              className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
-                            />
-                          </div>
-                          <div className="col-span-1 flex justify-end">
-                            <label className="relative inline-flex items-center cursor-pointer select-none">
-                              <input
-                                type="checkbox"
-                                checked={field.isVisible}
-                                onChange={(e) => handleFieldChange(field.key, { isVisible: e.target.checked })}
-                                className="sr-only peer"
-                              />
-                              <div className="w-8 h-4.5 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-355 dark:after:border-slate-655 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-primary"></div>
-                            </label>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Deduction Fields */}
-                  <div className="space-y-3 pt-2">
-                    <h3 className="text-xs font-bold text-primary uppercase tracking-widest border-b border-primary/20 pb-1.5">Deductions Section</h3>
-                    <div className="divide-y divide-border/20 max-h-[30vh] overflow-y-auto pr-1">
-                      {payslipFields.filter(f => f.category === "deduction").map(field => (
-                        <div key={field.key} className="grid grid-cols-12 gap-3 items-center py-2 text-xs">
-                          <div className="col-span-3">
-                            <span className="font-bold text-foreground block">{field.defaultLabelEng}</span>
-                            <span className="text-[10px] text-muted-foreground">{field.defaultLabelBng}</span>
-                          </div>
-                          <div className="col-span-4">
-                            <input
-                              type="text"
-                              value={field.customLabelEng}
-                              onChange={(e) => handleFieldChange(field.key, { customLabelEng: e.target.value })}
-                              placeholder={field.defaultLabelEng}
-                              className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
-                            />
-                          </div>
-                          <div className="col-span-4">
-                            <input
-                              type="text"
-                              value={field.customLabelBng}
-                              onChange={(e) => handleFieldChange(field.key, { customLabelBng: e.target.value })}
-                              placeholder={field.defaultLabelBng}
-                              className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
-                            />
-                          </div>
-                          <div className="col-span-1 flex justify-end">
-                            <label className="relative inline-flex items-center cursor-pointer select-none">
-                              <input
-                                type="checkbox"
-                                checked={field.isVisible}
-                                onChange={(e) => handleFieldChange(field.key, { isVisible: e.target.checked })}
-                                className="sr-only peer"
-                              />
-                              <div className="w-8 h-4.5 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-355 dark:after:border-slate-655 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-primary"></div>
-                            </label>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                  <div className="overflow-x-auto border border-border/40 rounded-xl">
+                    <table className="w-full text-left text-xs border-collapse whitespace-nowrap">
+                      <thead className="bg-muted/30 text-muted-foreground uppercase font-bold tracking-wider text-xs border-b border-border/40">
+                        <tr>
+                          <th className="px-5 py-4 w-[60px] text-center border-r border-border/30">#</th>
+                          <th className="px-5 py-4">Template Title</th>
+                          <th className="px-5 py-4">Target Company</th>
+                          <th className="px-5 py-4">Employee Type</th>
+                          <th className="px-5 py-4 text-center w-[120px]">Status</th>
+                          <th className="px-5 py-4 text-center w-[150px]">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/30 text-foreground">
+                        {payslipTemplates.length === 0 ? (
+                          <tr>
+                            <td colSpan={6} className="px-5 py-8 text-center text-sm text-muted-foreground">
+                              No payslip templates configured. Click "Create New Template" to get started.
+                            </td>
+                          </tr>
+                        ) : (
+                          payslipTemplates.map((tpl, idx) => (
+                            <tr key={tpl.id} className="group hover:bg-muted/40 transition-colors">
+                              <td className="px-5 py-4 text-center text-slate-500 font-normal border-r border-border/30">{idx + 1}</td>
+                              <td className="px-5 py-4 font-bold text-foreground">{tpl.title}</td>
+                              <td className="px-5 py-4 text-slate-700 dark:text-slate-300">{tpl.companyName}</td>
+                              <td className="px-5 py-4">
+                                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/15">
+                                  {tpl.employeeType}
+                                </span>
+                              </td>
+                              <td className="px-5 py-4 text-center">
+                                <button
+                                  onClick={() => handleToggleTemplateStatus(tpl.id)}
+                                  className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${
+                                    tpl.isActive
+                                      ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                                      : "bg-slate-500/10 text-slate-650 border-slate-500/20"
+                                  }`}
+                                >
+                                  {tpl.isActive ? "Active" : "Inactive"}
+                                </button>
+                              </td>
+                              <td className="px-5 py-4 text-center">
+                                <div className="flex items-center justify-center gap-3">
+                                  <button
+                                    onClick={() => {
+                                      setEditingTemplate(JSON.parse(JSON.stringify(tpl)));
+                                      setIsConfiguringTemplate(true);
+                                    }}
+                                    className="h-8 px-3 rounded-lg border border-primary/20 hover:bg-primary/5 text-primary text-xs font-bold transition-all flex items-center gap-1"
+                                    title="Configure Fields"
+                                  >
+                                    <Settings className="size-3.5" /> Configure
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteTemplate(tpl.id)}
+                                    className="text-red-500 hover:text-red-650 transition-colors p-1"
+                                    title="Delete Template"
+                                  >
+                                    <Trash2 className="size-4" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
-              </div>
+              ) : (
+                /* Editor View of Templates */
+                editingTemplate && (
+                  <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+                    {/* Left Column: Form Settings */}
+                    <div className="xl:col-span-7 space-y-6">
+                      <div className="bg-card rounded-2xl border border-border/50 p-5 shadow-sm space-y-4">
+                        {/* Top Bar inside Card */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/40">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/15 uppercase tracking-wide">
+                                {editingTemplate.employeeType}
+                              </span>
+                              <span className="text-[10px] text-muted-foreground font-semibold">
+                                {editingTemplate.companyName}
+                              </span>
+                            </div>
+                            <h2 className="text-base font-bold text-foreground mt-1">Configure: {editingTemplate.title}</h2>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => {
+                                setIsConfiguringTemplate(false);
+                                setEditingTemplate(null);
+                              }}
+                              className="h-9 px-4 rounded-xl border border-border/40 text-xs font-semibold text-muted-foreground hover:text-foreground transition-all hover:bg-muted"
+                            >
+                              Back to List
+                            </button>
+                            <button
+                              onClick={handleSaveTemplateConfig}
+                              className="h-9 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-semibold transition-all hover:bg-primary/90 shadow-sm"
+                            >
+                              Save Template
+                            </button>
+                          </div>
+                        </div>
 
-              {/* Right Column: Live Interactive Mockup */}
-              <div className="xl:col-span-5 space-y-4 xl:sticky xl:top-[90px]">
-                <div className="bg-card rounded-2xl border border-border/50 p-5 shadow-sm space-y-4">
-                  <div className="flex items-center justify-between border-b border-border/40 pb-3">
-                    <h3 className="text-sm font-bold text-foreground">Interactive Payslip Preview</h3>
-                    <div className="flex items-center bg-muted rounded-lg p-0.5 border border-border/30">
-                      <button
-                        onClick={() => setPreviewLang("en")}
-                        className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${previewLang === "en" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
-                      >
-                        EN
-                      </button>
-                      <button
-                        onClick={() => setPreviewLang("bn")}
-                        className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${previewLang === "bn" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
-                      >
-                        BN
-                      </button>
+                        {/* Sections */}
+                        {/* Status Fields */}
+                        <div className="space-y-3 pt-2">
+                          <h3 className="text-xs font-bold text-primary uppercase tracking-widest border-b border-primary/20 pb-1.5">Working Status Section</h3>
+                          <div className="divide-y divide-border/20 max-h-[30vh] overflow-y-auto pr-1">
+                            {editingTemplate.fields.filter(f => f.category === "status").map(field => (
+                              <div key={field.key} className="grid grid-cols-12 gap-3 items-center py-2 text-xs">
+                                <div className="col-span-3">
+                                  <span className="font-bold text-foreground block">{field.defaultLabelEng}</span>
+                                  <span className="text-[10px] text-muted-foreground">{field.defaultLabelBng}</span>
+                                </div>
+                                <div className="col-span-4">
+                                  <input
+                                    type="text"
+                                    value={field.customLabelEng}
+                                    onChange={(e) => handleFieldChange(field.key, { customLabelEng: e.target.value })}
+                                    placeholder={field.defaultLabelEng}
+                                    className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
+                                  />
+                                </div>
+                                <div className="col-span-4">
+                                  <input
+                                    type="text"
+                                    value={field.customLabelBng}
+                                    onChange={(e) => handleFieldChange(field.key, { customLabelBng: e.target.value })}
+                                    placeholder={field.defaultLabelBng}
+                                    className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
+                                  />
+                                </div>
+                                <div className="col-span-1 flex justify-end">
+                                  <label className="relative inline-flex items-center cursor-pointer select-none">
+                                    <input
+                                      type="checkbox"
+                                      checked={field.isVisible}
+                                      onChange={(e) => handleFieldChange(field.key, { isVisible: e.target.checked })}
+                                      className="sr-only peer"
+                                    />
+                                    <div className="w-8 h-4.5 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-350 dark:after:border-slate-655 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-primary"></div>
+                                  </label>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Payment Fields */}
+                        <div className="space-y-3 pt-2">
+                          <h3 className="text-xs font-bold text-primary uppercase tracking-widest border-b border-primary/20 pb-1.5">Payments & Earnings Section</h3>
+                          <div className="divide-y divide-border/20 max-h-[30vh] overflow-y-auto pr-1">
+                            {editingTemplate.fields.filter(f => f.category === "payment").map(field => (
+                              <div key={field.key} className="grid grid-cols-12 gap-3 items-center py-2 text-xs">
+                                <div className="col-span-3">
+                                  <span className="font-bold text-foreground block">{field.defaultLabelEng}</span>
+                                  <span className="text-[10px] text-muted-foreground">{field.defaultLabelBng}</span>
+                                </div>
+                                <div className="col-span-4">
+                                  <input
+                                    type="text"
+                                    value={field.customLabelEng}
+                                    onChange={(e) => handleFieldChange(field.key, { customLabelEng: e.target.value })}
+                                    placeholder={field.defaultLabelEng}
+                                    className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
+                                  />
+                                </div>
+                                <div className="col-span-4">
+                                  <input
+                                    type="text"
+                                    value={field.customLabelBng}
+                                    onChange={(e) => handleFieldChange(field.key, { customLabelBng: e.target.value })}
+                                    placeholder={field.defaultLabelBng}
+                                    className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
+                                  />
+                                </div>
+                                <div className="col-span-1 flex justify-end">
+                                  <label className="relative inline-flex items-center cursor-pointer select-none">
+                                    <input
+                                      type="checkbox"
+                                      checked={field.isVisible}
+                                      onChange={(e) => handleFieldChange(field.key, { isVisible: e.target.checked })}
+                                      className="sr-only peer"
+                                    />
+                                    <div className="w-8 h-4.5 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-355 dark:after:border-slate-655 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-primary"></div>
+                                  </label>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Deduction Fields */}
+                        <div className="space-y-3 pt-2">
+                          <h3 className="text-xs font-bold text-primary uppercase tracking-widest border-b border-primary/20 pb-1.5">Deductions Section</h3>
+                          <div className="divide-y divide-border/20 max-h-[30vh] overflow-y-auto pr-1">
+                            {editingTemplate.fields.filter(f => f.category === "deduction").map(field => (
+                              <div key={field.key} className="grid grid-cols-12 gap-3 items-center py-2 text-xs">
+                                <div className="col-span-3">
+                                  <span className="font-bold text-foreground block">{field.defaultLabelEng}</span>
+                                  <span className="text-[10px] text-muted-foreground">{field.defaultLabelBng}</span>
+                                </div>
+                                <div className="col-span-4">
+                                  <input
+                                    type="text"
+                                    value={field.customLabelEng}
+                                    onChange={(e) => handleFieldChange(field.key, { customLabelEng: e.target.value })}
+                                    placeholder={field.defaultLabelEng}
+                                    className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
+                                  />
+                                </div>
+                                <div className="col-span-4">
+                                  <input
+                                    type="text"
+                                    value={field.customLabelBng}
+                                    onChange={(e) => handleFieldChange(field.key, { customLabelBng: e.target.value })}
+                                    placeholder={field.defaultLabelBng}
+                                    className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
+                                  />
+                                </div>
+                                <div className="col-span-1 flex justify-end">
+                                  <label className="relative inline-flex items-center cursor-pointer select-none">
+                                    <input
+                                      type="checkbox"
+                                      checked={field.isVisible}
+                                      onChange={(e) => handleFieldChange(field.key, { isVisible: e.target.checked })}
+                                      className="sr-only peer"
+                                    />
+                                    <div className="w-8 h-4.5 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-355 dark:after:border-slate-655 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-primary"></div>
+                                  </label>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Column: Live Interactive Mockup */}
+                    <div className="xl:col-span-5 space-y-4 xl:sticky xl:top-[90px]">
+                      <div className="bg-card rounded-2xl border border-border/50 p-5 shadow-sm space-y-4">
+                        <div className="flex items-center justify-between border-b border-border/40 pb-3">
+                          <h3 className="text-sm font-bold text-foreground">Interactive Payslip Preview</h3>
+                          <div className="flex items-center bg-muted rounded-lg p-0.5 border border-border/30">
+                            <button
+                              onClick={() => setPreviewLang("en")}
+                              className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${previewLang === "en" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                            >
+                              EN
+                            </button>
+                            <button
+                              onClick={() => setPreviewLang("bn")}
+                              className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${previewLang === "bn" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                            >
+                              BN
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Preview Container */}
+                        <div className="bg-white text-black p-5 rounded-xl border border-slate-300 shadow-sm font-sans relative overflow-hidden select-none leading-normal">
+                          {/* Decorative Sideline */}
+                          <div className="absolute top-0 right-3 w-[2px] h-full border-r border-dotted border-black/30" />
+
+                          {/* Company Header */}
+                          <div className="text-center font-bold text-[14px] uppercase tracking-tight">
+                            {editingTemplate.companyName}
+                          </div>
+                          <div className="text-center text-[10.5px] font-bold border-b border-black pb-1 mb-2 tracking-tight">
+                            {previewLang === "en" ? "Pay Slip For the month of -Jul, 2026" : "পে স্লিপ - জুলাই, ২০২৬"}
+                          </div>
+
+                          {/* Emp Info */}
+                          <div className="grid grid-cols-2 text-[10px] leading-relaxed mb-2.5">
+                            <div>
+                              <span className="font-bold">{previewLang === "en" ? "ID" : "আইডি"}:</span> 2023043910
+                            </div>
+                            <div>
+                              <span className="font-bold">{previewLang === "en" ? "JD" : "যোগদানের তারিখ"}:</span> 01/08/2023
+                            </div>
+                            <div className="col-span-2">
+                              <span className="font-bold">{previewLang === "en" ? "Name" : "নাম"}:</span> Tahmid Afsar
+                            </div>
+                            <div className="col-span-2">
+                              <span className="font-bold">{previewLang === "en" ? "Department" : "বিভাগ"}:</span> Project Resource & Strategy
+                            </div>
+                            <div className="col-span-2">
+                              <span className="font-bold">{previewLang === "en" ? "Designation" : "পদবী"}:</span> Deputy Manager
+                            </div>
+                            <div className="col-span-2 flex justify-between">
+                              <span><span className="font-bold">{previewLang === "en" ? "Grade" : "গ্রেড"}:</span> —</span>
+                              <span><span className="font-bold">{previewLang === "en" ? "Unit" : "ইউনিট"}:</span> PSL</span>
+                              <span><span className="font-bold">{previewLang === "en" ? "Line" : "লাইন"}:</span> N/A</span>
+                            </div>
+                          </div>
+
+                          {/* Working Status */}
+                          <div className="border-t border-b border-black py-1 mb-1.5 flex justify-between text-[11px] font-extrabold uppercase tracking-wide">
+                            <span>{previewLang === "en" ? "Working Status" : "কার্য অবস্থা"}</span>
+                            <span>{previewLang === "en" ? "Unit" : "ইউনিট"}</span>
+                          </div>
+                          <div className="space-y-1 text-[10.5px] mb-3">
+                            {editingTemplate.fields.filter(f => f.category === "status" && f.isVisible).map(f => {
+                              const mockValues: Record<string, string> = {
+                                working_day: "25",
+                                holiday: "6",
+                                present: "24",
+                                cl: "1",
+                                sl: "0",
+                                el: "0",
+                                ml: "0",
+                                spl: "0",
+                                absent: "0",
+                                ot_rate: "120.00",
+                                ot_hour: "0.00",
+                              };
+                              const label = previewLang === "en" ? f.customLabelEng || f.defaultLabelEng : f.customLabelBng || f.defaultLabelBng;
+                              return (
+                                <div key={f.key} className="flex justify-between pl-4 font-bold text-slate-800">
+                                  <span>{label}</span>
+                                  <span className="font-mono text-black font-extrabold">{mockValues[f.key] || "0"}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Payments and Deductions */}
+                          <div className="border-t border-b border-black py-1 mb-1.5 flex justify-between text-[11px] font-extrabold uppercase tracking-wide">
+                            <span>{previewLang === "en" ? "Payments and Deductions" : "প্রদান এবং কর্তনসমূহ"}</span>
+                            <span>{previewLang === "en" ? "Amount (TK.)" : "টাকা (TK.)"}</span>
+                          </div>
+                          <div className="space-y-1 text-[10.5px] mb-2">
+                            {editingTemplate.fields.filter(f => f.category === "payment" && f.isVisible && f.key !== "total_payment").map(f => {
+                              const mockValues: Record<string, string> = {
+                                basic_pay: "100000",
+                                house_rent: "50000",
+                                medical: "10000",
+                                food: "0",
+                                conveyance: "5000",
+                                gross_salary: "165000",
+                                ot_payment: "0",
+                                tiffin: "0",
+                                night_allowance: "0",
+                                attendance_bonus: "0",
+                                allowance: "10000",
+                                arrear: "0.00",
+                              };
+                              const label = previewLang === "en" ? f.customLabelEng || f.defaultLabelEng : f.customLabelBng || f.defaultLabelBng;
+                              const isGross = f.key === "gross_salary";
+                              return (
+                                <div key={f.key} className={`flex justify-between pl-4 font-bold text-slate-800 ${isGross ? "font-black text-black border-t border-dashed border-black/40 pt-1 mt-1 text-[11px]" : ""}`}>
+                                  <span>{label}</span>
+                                  <span className="font-mono text-black font-extrabold">{mockValues[f.key] || "0"}</span>
+                                </div>
+                              );
+                            })}
+                            {(() => {
+                              const f = editingTemplate.fields.find(field => field.key === "total_payment");
+                              if (!f || !f.isVisible) return null;
+                              const label = previewLang === "en" ? f.customLabelEng || f.defaultLabelEng : f.customLabelBng || f.defaultLabelBng;
+                              return (
+                                <div className="flex justify-between font-black border-t-2 border-black pt-1.5 mt-2 text-[11px] uppercase">
+                                  <span>{label}</span>
+                                  <span className="font-mono">175000</span>
+                                </div>
+                              );
+                            })()}
+                          </div>
+
+                          {/* Deductions */}
+                          <div className="space-y-1 text-[10.5px] mb-3">
+                            {editingTemplate.fields.filter(f => f.category === "deduction" && f.isVisible && f.key !== "total_deduction").map(f => {
+                              const mockValues: Record<string, string> = {
+                                absent_deduction: "0",
+                                lunch_deduction: "2500",
+                                advance: "5000",
+                                wagely_advance: "0",
+                                adjust: "0",
+                                income_tax: "2500",
+                                revenue_stamp: "0",
+                              };
+                              const label = previewLang === "en" ? f.customLabelEng || f.defaultLabelEng : f.customLabelBng || f.defaultLabelBng;
+                              return (
+                                <div key={f.key} className="flex justify-between pl-4 font-bold text-slate-800">
+                                  <span>{label}</span>
+                                  <span className="font-mono text-black font-extrabold">{mockValues[f.key] || "0"}</span>
+                                </div>
+                              );
+                            })}
+                            {(() => {
+                              const f = editingTemplate.fields.find(field => field.key === "total_deduction");
+                              if (!f || !f.isVisible) return null;
+                              const label = previewLang === "en" ? f.customLabelEng || f.defaultLabelEng : f.customLabelBng || f.defaultLabelBng;
+                              return (
+                                <div className="flex justify-between font-black border-t-2 border-black pt-1.5 mt-2 text-[11px] uppercase">
+                                  <span>{label}</span>
+                                  <span className="font-mono">10000</span>
+                                </div>
+                              );
+                            })()}
+                          </div>
+
+                          {/* Net Payment */}
+                          <div className="flex justify-between font-black border-t border-b-2 border-black py-1.5 mt-2 text-[11.5px] uppercase">
+                            <span>{previewLang === "en" ? "Net Payment" : "নেট পেমেন্ট"}</span>
+                            <span className="font-mono">165000</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-
-                  {/* Preview Container */}
-                  <div className="bg-white text-black p-5 rounded-xl border border-slate-300 shadow-sm font-sans relative overflow-hidden select-none leading-normal">
-                    {/* Decorative Sideline */}
-                    <div className="absolute top-0 right-3 w-[2px] h-full border-r border-dotted border-black/30" />
-
-                    {/* Company Header */}
-                    <div className="text-center font-bold text-[14px] uppercase tracking-tight">
-                      {companyFilter === "all" ? "Pakiza Software Limited" : companyFilter}
-                    </div>
-                    <div className="text-center text-[10.5px] font-bold border-b border-black pb-1 mb-2 tracking-tight">
-                      {previewLang === "en" ? "Pay Slip For the month of -Jul, 2026" : "পে স্লিপ - জুলাই, ২০২৬"}
-                    </div>
-
-                    {/* Emp Info */}
-                    <div className="grid grid-cols-2 text-[10px] leading-relaxed mb-2.5">
-                      <div>
-                        <span className="font-bold">{previewLang === "en" ? "ID" : "আইডি"}:</span> 2023043910
-                      </div>
-                      <div>
-                        <span className="font-bold">{previewLang === "en" ? "JD" : "যোগদানের তারিখ"}:</span> 01/08/2023
-                      </div>
-                      <div className="col-span-2">
-                        <span className="font-bold">{previewLang === "en" ? "Name" : "নাম"}:</span> Tahmid Afsar
-                      </div>
-                      <div className="col-span-2">
-                        <span className="font-bold">{previewLang === "en" ? "Department" : "বিভাগ"}:</span> Project Resource & Strategy
-                      </div>
-                      <div className="col-span-2">
-                        <span className="font-bold">{previewLang === "en" ? "Designation" : "পদবী"}:</span> Deputy Manager
-                      </div>
-                      <div className="col-span-2 flex justify-between">
-                        <span><span className="font-bold">{previewLang === "en" ? "Grade" : "গ্রেড"}:</span> —</span>
-                        <span><span className="font-bold">{previewLang === "en" ? "Unit" : "ইউনিট"}:</span> PSL</span>
-                        <span><span className="font-bold">{previewLang === "en" ? "Line" : "লাইন"}:</span> N/A</span>
-                      </div>
-                    </div>
-
-                    {/* Working Status */}
-                    <div className="border-t border-b border-black py-1 mb-1.5 flex justify-between text-[11px] font-extrabold uppercase tracking-wide">
-                      <span>{previewLang === "en" ? "Working Status" : "কার্য অবস্থা"}</span>
-                      <span>{previewLang === "en" ? "Unit" : "ইউনিট"}</span>
-                    </div>
-                    <div className="space-y-1 text-[10.5px] mb-3">
-                      {payslipFields.filter(f => f.category === "status" && f.isVisible).map(f => {
-                        const mockValues: Record<string, string> = {
-                          working_day: "25",
-                          holiday: "6",
-                          present: "24",
-                          cl: "1",
-                          sl: "0",
-                          el: "0",
-                          ml: "0",
-                          spl: "0",
-                          absent: "0",
-                          ot_rate: "120.00",
-                          ot_hour: "0.00",
-                        };
-                        const label = previewLang === "en" ? f.customLabelEng || f.defaultLabelEng : f.customLabelBng || f.defaultLabelBng;
-                        return (
-                          <div key={f.key} className="flex justify-between pl-4 font-bold text-slate-800">
-                            <span>{label}</span>
-                            <span className="font-mono text-black font-extrabold">{mockValues[f.key] || "0"}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    {/* Payments and Deductions */}
-                    <div className="border-t border-b border-black py-1 mb-1.5 flex justify-between text-[11px] font-extrabold uppercase tracking-wide">
-                      <span>{previewLang === "en" ? "Payments and Deductions" : "প্রদান এবং কর্তনসমূহ"}</span>
-                      <span>{previewLang === "en" ? "Amount (TK.)" : "টাকা (TK.)"}</span>
-                    </div>
-                    <div className="space-y-1 text-[10.5px] mb-2">
-                      {payslipFields.filter(f => f.category === "payment" && f.isVisible && f.key !== "total_payment").map(f => {
-                        const mockValues: Record<string, string> = {
-                          basic_pay: "100000",
-                          house_rent: "50000",
-                          medical: "10000",
-                          food: "0",
-                          conveyance: "5000",
-                          gross_salary: "165000",
-                          ot_payment: "0",
-                          tiffin: "0",
-                          night_allowance: "0",
-                          attendance_bonus: "0",
-                          allowance: "10000",
-                          arrear: "0.00",
-                        };
-                        const label = previewLang === "en" ? f.customLabelEng || f.defaultLabelEng : f.customLabelBng || f.defaultLabelBng;
-                        const isGross = f.key === "gross_salary";
-                        return (
-                          <div key={f.key} className={`flex justify-between pl-4 font-bold text-slate-800 ${isGross ? "font-black text-black border-t border-dashed border-black/40 pt-1 mt-1 text-[11px]" : ""}`}>
-                            <span>{label}</span>
-                            <span className="font-mono text-black font-extrabold">{mockValues[f.key] || "0"}</span>
-                          </div>
-                        );
-                      })}
-                      {(() => {
-                        const f = payslipFields.find(field => field.key === "total_payment");
-                        if (!f || !f.isVisible) return null;
-                        const label = previewLang === "en" ? f.customLabelEng || f.defaultLabelEng : f.customLabelBng || f.defaultLabelBng;
-                        return (
-                          <div className="flex justify-between font-black border-t-2 border-black pt-1.5 mt-2 text-[11px] uppercase">
-                            <span>{label}</span>
-                            <span className="font-mono">175000</span>
-                          </div>
-                        );
-                      })()}
-                    </div>
-
-                    {/* Deductions */}
-                    <div className="space-y-1 text-[10.5px] mb-3">
-                      {payslipFields.filter(f => f.category === "deduction" && f.isVisible && f.key !== "total_deduction").map(f => {
-                        const mockValues: Record<string, string> = {
-                          absent_deduction: "0",
-                          lunch_deduction: "2500",
-                          advance: "5000",
-                          wagely_advance: "0",
-                          adjust: "0",
-                          income_tax: "2500",
-                          revenue_stamp: "0",
-                        };
-                        const label = previewLang === "en" ? f.customLabelEng || f.defaultLabelEng : f.customLabelBng || f.defaultLabelBng;
-                        return (
-                          <div key={f.key} className="flex justify-between pl-4 font-bold text-slate-800">
-                            <span>{label}</span>
-                            <span className="font-mono text-black font-extrabold">{mockValues[f.key] || "0"}</span>
-                          </div>
-                        );
-                      })}
-                      {(() => {
-                        const f = payslipFields.find(field => field.key === "total_deduction");
-                        if (!f || !f.isVisible) return null;
-                        const label = previewLang === "en" ? f.customLabelEng || f.defaultLabelEng : f.customLabelBng || f.defaultLabelBng;
-                        return (
-                          <div className="flex justify-between font-black border-t-2 border-black pt-1.5 mt-2 text-[11px] uppercase">
-                            <span>{label}</span>
-                            <span className="font-mono">10000</span>
-                          </div>
-                        );
-                      })()}
-                    </div>
-
-                    {/* Net Payment */}
-                    <div className="flex justify-between font-black border-t border-b-2 border-black py-1.5 mt-2 text-[11.5px] uppercase">
-                      <span>{previewLang === "en" ? "Net Payment" : "নেট পেমেন্ট"}</span>
-                      <span className="font-mono">165000</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+                )
+              )}
+            </>
           )}
 
           {/* Master Table Router */}
@@ -3520,6 +3704,87 @@ function CompanySetupPage() {
                 <Layers className="size-4.5" /> Import
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Payslip Template Modal */}
+      {isCreateTplOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-card w-full max-w-md rounded-2xl shadow-2xl border border-border/60 flex flex-col animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border/50">
+              <h2 className="text-lg font-bold flex items-center gap-2">
+                <Plus className="size-5 text-primary" />
+                Create Payslip Template
+              </h2>
+              <button
+                onClick={() => setIsCreateTplOpen(false)}
+                className="p-2 rounded-full hover:bg-muted text-muted-foreground transition-colors"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleCreateTemplate}>
+              <div className="p-6 space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground/80 block">Template Title *</label>
+                  <input
+                    type="text"
+                    required
+                    value={tplTitle}
+                    onChange={(e) => setTplTitle(e.target.value)}
+                    placeholder="e.g. Standard Staff, Casual Wages"
+                    className="w-full h-10 px-3.5 rounded-lg border border-border/60 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-sm outline-none font-medium"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground/80 block">Target Company *</label>
+                  <SearchableSelect
+                    value={tplCompany}
+                    onChange={(val) => setTplCompany(val)}
+                    options={orgs.map((org) => ({ value: org.nameEng, label: org.nameEng }))}
+                    placeholder="Select Company"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground/80 block">Employee Type *</label>
+                  <SearchableSelect
+                    value={tplEmpType}
+                    onChange={(val) => setTplEmpType(val)}
+                    options={[
+                      { value: "Permanent", label: "Permanent" },
+                      { value: "Contractual", label: "Contractual" },
+                      { value: "Provision", label: "Provision" },
+                      { value: "Casual", label: "Casual" },
+                      { value: "Apprentice", label: "Apprentice" }
+                    ]}
+                    placeholder="Select Employee Type"
+                  />
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="p-4 border-t border-border/50 bg-muted/10 flex items-center justify-end gap-3 rounded-b-2xl">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateTplOpen(false)}
+                  className="px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-muted transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/95 transition-all"
+                >
+                  Create & Configure
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
