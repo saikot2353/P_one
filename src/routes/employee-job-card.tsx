@@ -125,11 +125,10 @@ function SearchableSelect({
                       onChange(option.value);
                       setIsOpen(false);
                     }}
-                    className={`w-full px-3 py-2 text-left rounded-lg transition duration-100 flex items-center justify-between font-bold ${
-                      isSelected
+                    className={`w-full px-3 py-2 text-left rounded-lg transition duration-100 flex items-center justify-between font-bold ${isSelected
                         ? "bg-[#1e88e5]/10 text-[#1e88e5]"
                         : "text-foreground/80 hover:bg-muted/80 hover:text-foreground"
-                    }`}
+                      }`}
                   >
                     <span className="truncate">{option.label}</span>
                     {isSelected && <Check className="size-3 text-[#1e88e5]" />}
@@ -194,8 +193,8 @@ const employeeDb: Record<
   },
 };
 
-// Generates daily attendance log for an employee for a given month/year
-const generateAttendanceData = (empId: string, month: string, year: number) => {
+// Generates daily attendance log for an employee for a given date range
+const generateAttendanceData = (empId: string, startDateStr: string, endDateStr: string) => {
   const emp = employeeDb[empId] || {
     name: "Unknown Employee",
     type: "N/A",
@@ -207,27 +206,21 @@ const generateAttendanceData = (empId: string, month: string, year: number) => {
     defaultHoliday: "Friday",
   };
 
-  const monthIndex = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ].indexOf(month);
-  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+  const start = new Date(startDateStr);
+  const end = new Date(endDateStr);
   const logs = [];
 
-  for (let day = 1; day <= daysInMonth; day++) {
-    const dateStr = `${String(day).padStart(2, "0")}/${String(monthIndex + 1).padStart(2, "0")}/${year}`;
-    const dateObj = new Date(year, monthIndex, day);
-    const isHoliday = dateObj.getDay() === 5; // Friday (Friday = 5)
+  if (isNaN(start.getTime()) || isNaN(end.getTime()) || start > end) return [];
+
+  let current = new Date(start);
+  let index = 1;
+
+  while (current <= end) {
+    const year = current.getFullYear();
+    const month = String(current.getMonth() + 1).padStart(2, "0");
+    const day = String(current.getDate()).padStart(2, "0");
+    const dateStr = `${day}/${month}/${year}`;
+    const isHoliday = current.getDay() === 5; // Friday (Friday = 5)
 
     if (isHoliday) {
       logs.push({
@@ -241,7 +234,7 @@ const generateAttendanceData = (empId: string, month: string, year: number) => {
         shift: emp.shift,
         status: "Holiday",
       });
-    } else if (day === 21 || day === 22) {
+    } else if (index % 12 === 0) {
       // Casual Leave preset
       logs.push({
         empId,
@@ -257,18 +250,18 @@ const generateAttendanceData = (empId: string, month: string, year: number) => {
     } else {
       // Regular Present days
       // Generate realistic dynamic punch times
-      const inHr = 8 + (day % 3 === 0 ? 2 : 0) + (day % 5 === 0 ? 1 : 0);
-      const inMin = Math.floor(20 + ((day * 7) % 39));
-      const inSec = Math.floor(10 + ((day * 13) % 49));
+      const inHr = 8 + (index % 3 === 0 ? 2 : 0) + (index % 5 === 0 ? 1 : 0);
+      const inMin = Math.floor(20 + ((index * 7) % 39));
+      const inSec = Math.floor(10 + ((index * 13) % 49));
       const inTimeStr = `${String(inHr).padStart(2, "0")}:${String(inMin).padStart(2, "0")}:${String(inSec).padStart(2, "0")}`;
 
       // Simulate early leaves on days divisible by 7
-      const isEarlyDay = day % 7 === 0;
-      const outHr = isEarlyDay ? 17 : 18 + (day % 4 === 0 ? 1 : 0) + (day % 6 === 0 ? 2 : 0);
+      const isEarlyDay = index % 7 === 0;
+      const outHr = isEarlyDay ? 17 : 18 + (index % 4 === 0 ? 1 : 0) + (index % 6 === 0 ? 2 : 0);
       const outMin = isEarlyDay
-        ? Math.floor(10 + ((day * 9) % 30))
-        : Math.floor(10 + ((day * 9) % 45));
-      const outSec = Math.floor(10 + ((day * 17) % 49));
+        ? Math.floor(10 + ((index * 9) % 30))
+        : Math.floor(10 + ((index * 9) % 45));
+      const outSec = Math.floor(10 + ((index * 17) % 49));
       const outTimeStr = `${String(outHr).padStart(2, "0")}:${String(outMin).padStart(2, "0")}:${String(outSec).padStart(2, "0")}`;
 
       // Overtime calculation: if out time past 18:00
@@ -289,20 +282,30 @@ const generateAttendanceData = (empId: string, month: string, year: number) => {
         status: "Present",
       });
     }
+
+    current.setDate(current.getDate() + 1);
+    index++;
   }
 
   return logs;
 };
 
 function EmployeeJobCardPage() {
-  const [selectedMonths, setSelectedMonths] = useState<string[]>(["Jan"]);
-  const [selectedYear, setSelectedYear] = useState<number>(2026);
+  const today = new Date();
+  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split("T")[0];
+  const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split("T")[0];
+
+  const [startDate, setStartDate] = useState(firstDay);
+  const [endDate, setEndDate] = useState(lastDay);
+
   const [selectedCompany, setSelectedCompany] = useState("Pakiza Software Limited");
-  const [selectedArea, setSelectedArea] = useState("PSL-Head Office");
+  const [selectedArea, setSelectedArea] = useState("PSL-Operation");
   const [selectedType, setSelectedType] = useState("Actual");
 
-  // Multi-employee ID input (allows selecting multiple comma-separated IDs)
+  // Primary active employee (drives the metadata card)
   const [activeEmpId, setActiveEmpId] = useState("2023043910");
+
+  // Multi-employee ID input (allows selecting multiple IDs for the fetch)
   const [multiEmpIds, setMultiEmpIds] = useState<string[]>(["2023043910"]);
 
   // Runtime Calculation States
@@ -316,15 +319,6 @@ function EmployeeJobCardPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 31;
 
-  const yearOptions = useMemo(
-    () => [
-      { value: "2026", label: "2026" },
-      { value: "2025", label: "2025" },
-      { value: "2024", label: "2024" },
-    ],
-    [],
-  );
-
   const companyOptions = useMemo(
     () => [
       { value: "Pakiza Software Limited", label: "Pakiza Software Limited" },
@@ -335,8 +329,9 @@ function EmployeeJobCardPage() {
 
   const areaOptions = useMemo(
     () => [
+      { value: "PSL-Operation", label: "PSL-Operation" },
       { value: "PSL-Head Office", label: "PSL-Head Office" },
-      { value: "PSL-Factory Operations", label: "PSL-Factory Operations" },
+      { value: "PSL-Factory", label: "PSL-Factory" },
     ],
     [],
   );
@@ -382,21 +377,6 @@ function EmployeeJobCardPage() {
     );
   };
 
-  // Auto-fill metadata for display based on active primary ID
-  const activeEmpMetadata = useMemo(() => {
-    return (
-      employeeDb[activeEmpId] || {
-        name: "N/A",
-        type: "N/A",
-        subDept: "N/A",
-        jobTitle: "N/A",
-        unit: "N/A",
-        shift: "N/A",
-        shiftStartDate: "N/A",
-        defaultHoliday: "N/A",
-      }
-    );
-  }, [activeEmpId]);
 
   // Retrieve initial logs on mount
   useEffect(() => {
@@ -404,12 +384,9 @@ function EmployeeJobCardPage() {
   }, []);
 
   const handleGetLogs = () => {
-    // Generate full list by combining all selected employees and months
     const allLogs: any[] = [];
     multiEmpIds.forEach((empId) => {
-      selectedMonths.forEach((m) => {
-        allLogs.push(...generateAttendanceData(empId, m, selectedYear));
-      });
+      allLogs.push(...generateAttendanceData(empId, startDate, endDate));
     });
     setRenderedLogs(allLogs);
     setCurrentPage(1);
@@ -436,18 +413,6 @@ function EmployeeJobCardPage() {
     }
   };
 
-  // Checkbox toggle for multiple months
-  const toggleMonth = (m: string) => {
-    setSelectedMonths((prev) => {
-      if (prev.includes(m)) {
-        if (prev.length === 1) return prev; // keep at least one
-        return prev.filter((item) => item !== m);
-      } else {
-        return [...prev, m];
-      }
-    });
-  };
-
   // Filtered rows matching query
   const filteredRows = useMemo(() => {
     return renderedLogs.filter((row) => {
@@ -462,58 +427,6 @@ function EmployeeJobCardPage() {
     });
   }, [renderedLogs, searchQuery]);
 
-  // Statistics calculation for high-fidelity summary meters
-  const stats = useMemo(() => {
-    let present = 0;
-    let holidays = 0;
-    let leaves = 0;
-    let totalOt = 0;
-    let lateCount = 0;
-    let earlyLeaveCount = 0;
-
-    filteredRows.forEach((r) => {
-      // Calculate active status under runtime calculation rules
-      let activeStatus = r.status;
-      if (isRuntimeCal && r.status === "Present") {
-        const thresholdIn = shiftInThreshold + ":00";
-        const thresholdOut = shiftOutThreshold + ":00";
-        const inTime = r.inTime;
-        const outTime = r.outTime;
-
-        if (inTime && outTime && inTime !== "N/A" && outTime !== "N/A") {
-          const isLate = inTime > thresholdIn;
-          const isEarly = outTime < thresholdOut;
-          if (isLate && isEarly) {
-            activeStatus = "Late & Early";
-          } else if (isLate) {
-            activeStatus = "Late";
-          } else if (isEarly) {
-            activeStatus = "Early Leave";
-          }
-        }
-      }
-
-      if (activeStatus === "Present") present++;
-      if (activeStatus === "Holiday") holidays++;
-      if (activeStatus === "CL") leaves++;
-      if (activeStatus === "Late") {
-        lateCount++;
-        present++;
-      }
-      if (activeStatus === "Early Leave") {
-        earlyLeaveCount++;
-        present++;
-      }
-      if (activeStatus === "Late & Early") {
-        lateCount++;
-        earlyLeaveCount++;
-        present++;
-      }
-      totalOt += parseFloat(r.overtime || "0");
-    });
-
-    return { present, holidays, leaves, totalOt: totalOt.toFixed(2), lateCount, earlyLeaveCount };
-  }, [filteredRows, isRuntimeCal, shiftInThreshold, shiftOutThreshold]);
 
   // Paginated Rows
   const paginatedRows = useMemo(() => {
@@ -556,376 +469,195 @@ function EmployeeJobCardPage() {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-[10.5px] font-black text-primary bg-primary/10 px-3 py-1.5 rounded-xl border border-primary/20 shadow-xs">
-                Active Selection: {multiEmpIds.length} Emps / {selectedMonths.length} Months
+                Active Selection: {multiEmpIds.length} Emps / {startDate} to {endDate}
               </span>
             </div>
           </div>
 
           {/* Top Panel: Criteria Selection */}
-          <div className="bg-card rounded-2xl border border-border/85 p-5 shadow-sm space-y-4 print:hidden">
-            <div className="flex items-center justify-between border-b border-border/40 pb-2.5">
-              <span className="text-[10px] font-black uppercase tracking-wider text-primary">
-                Job Card Configuration & Filtering
-              </span>
-              <span className="text-[9px] font-bold text-muted-foreground/40">
-                Parametric Filters
+          <div className="bg-card rounded-2xl border border-border/85 p-5 shadow-sm space-y-5 print:hidden">
+            <div className="flex items-center justify-between border-b border-border/40 pb-3">
+              <span className="text-[11px] font-black uppercase tracking-wider text-primary flex items-center gap-2">
+                <Search className="size-3.5" /> Scope & Parameters
               </span>
             </div>
 
-            {/* Grid Container for Layout Balance */}
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-              {/* Left Wing: Scope & Active Employees (col-span-3) */}
-              <div className="lg:col-span-3 space-y-4">
-                {/* 1. Period Selection */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block">
-                    Select Months (Multi-Select)
-                  </label>
-                  <div className="flex flex-wrap gap-1 p-1 bg-muted/30 dark:bg-slate-900/20 rounded-xl border border-border/40">
-                    {[
-                      "Jan",
-                      "Feb",
-                      "Mar",
-                      "Apr",
-                      "May",
-                      "Jun",
-                      "Jul",
-                      "Aug",
-                      "Sep",
-                      "Oct",
-                      "Nov",
-                      "Dec",
-                    ].map((m) => {
-                      const isSelected = selectedMonths.includes(m);
-                      return (
-                        <button
-                          key={m}
-                          onClick={() => toggleMonth(m)}
-                          className={`px-2.5 py-1 rounded-lg text-[9.5px] font-black uppercase transition-all duration-150 ${
-                            isSelected
-                              ? "bg-primary text-white shadow-xs"
-                              : "hover:bg-card text-muted-foreground hover:text-foreground"
-                          }`}
-                        >
-                          {m}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+              {/* Row 1: Period & Organization */}
+              <div className="md:col-span-3 space-y-1.5">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block">
+                  Company
+                </label>
+                <SearchableSelect
+                  options={companyOptions}
+                  value={selectedCompany}
+                  onChange={setSelectedCompany}
+                />
+              </div>
 
-                {/* 2. Unified Company & Region Settings */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {/* Year */}
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">
-                      Year
-                    </label>
-                    <SearchableSelect
-                      options={yearOptions}
-                      value={selectedYear.toString()}
-                      onChange={(val) => setSelectedYear(parseInt(val))}
-                    />
-                  </div>
+              <div className="md:col-span-3 space-y-1.5">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block">
+                  Area Name
+                </label>
+                <SearchableSelect
+                  options={areaOptions}
+                  value={selectedArea}
+                  onChange={setSelectedArea}
+                />
+              </div>
 
-                  {/* Company */}
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">
-                      Company
-                    </label>
-                    <SearchableSelect
-                      options={companyOptions}
-                      value={selectedCompany}
-                      onChange={setSelectedCompany}
-                    />
-                  </div>
+              <div className="md:col-span-3 space-y-1.5">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block">
+                  Start Date
+                </label>
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-full h-10 px-3.5 rounded-xl bg-muted border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5] text-foreground hover:bg-muted/80 transition duration-150 cursor-pointer"
+                />
+              </div>
 
-                  {/* Area Name */}
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">
-                      Area Name
-                    </label>
-                    <SearchableSelect
-                      options={areaOptions}
-                      value={selectedArea}
-                      onChange={setSelectedArea}
-                    />
-                  </div>
-                </div>
+              <div className="md:col-span-3 space-y-1.5">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block">
+                  End Date
+                </label>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="w-full h-10 px-3.5 rounded-xl bg-muted border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5] text-foreground hover:bg-muted/80 transition duration-150 cursor-pointer"
+                />
+              </div>
 
-                {/* 3. Active Multi Selected Employees tags display */}
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">
-                    Active Selection Registry (Multi)
-                  </label>
-                  <div className="min-h-10 p-1.5 bg-muted/20 dark:bg-slate-900/10 rounded-xl border border-border/40 flex flex-wrap gap-1.5 items-center">
-                    {multiEmpIds.map((id) => (
-                      <span
-                        key={id}
-                        className="inline-flex items-center gap-1 bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 rounded-lg text-[10.5px] font-extrabold transition-all duration-150 hover:bg-primary/15"
-                      >
-                        <span>
-                          {id} ({employeeDb[id]?.name || "N/A"})
-                        </span>
-                        <button
-                          onClick={() => handleRemoveEmployee(id)}
-                          className="hover:text-rose-500 font-bold ml-0.5 transition"
-                        >
-                          <X className="size-3" />
-                        </button>
+              {/* Row 2: Employee Selection & Action */}
+              <div className="md:col-span-3 space-y-1.5">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block">
+                  Single Employee
+                </label>
+                <SearchableSelect
+                  options={employeeOptions}
+                  value={activeEmpId}
+                  onChange={(val) => {
+                    setActiveEmpId(val);
+                    handleAddEmployee(val); // Auto-add to multi-select
+                  }}
+                  placeholder="Search by ID or Name"
+                />
+              </div>
+
+              <div className="md:col-span-9 space-y-1.5">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block flex items-center gap-2">
+                  Employee Id (Multi)
+                  <span className="bg-primary/10 text-primary text-[8.5px] px-1.5 py-0.5 rounded-sm">Combines fetch results</span>
+                </label>
+                <div className="min-h-10 p-1.5 bg-muted/20 dark:bg-slate-900/10 rounded-xl border border-border/40 flex flex-wrap gap-1.5 items-center">
+                  {multiEmpIds.map((id) => (
+                    <span
+                      key={id}
+                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10.5px] font-extrabold transition-all duration-150 ${id === activeEmpId ? 'bg-primary text-white shadow-sm' : 'bg-primary/10 text-primary border border-primary/20 hover:bg-primary/15'}`}
+                    >
+                      <span>
+                        {id} ({employeeDb[id]?.name || "N/A"})
                       </span>
-                    ))}
-                    <div className="relative inline-block w-40">
-                      <SearchableSelect
-                        options={addEmployeeOptions}
-                        value=""
-                        onChange={(val) => {
-                          if (val) handleAddEmployee(val);
-                        }}
-                        placeholder="+ Add Employee"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Wing: Primary Selection & Runtime Engine (col-span-2) */}
-              <div className="lg:col-span-2 flex flex-col justify-between gap-4">
-                {/* 1. Core Selection block */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {/* Type dropdown */}
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">
-                      Type
-                    </label>
+                      <button
+                        onClick={() => handleRemoveEmployee(id)}
+                        className={`font-bold ml-0.5 transition cursor-pointer ${id === activeEmpId ? 'hover:text-white/70' : 'hover:text-rose-500'}`}
+                      >
+                        <X className="size-3" />
+                      </button>
+                    </span>
+                  ))}
+                  <div className="relative inline-block w-40">
                     <SearchableSelect
-                      options={typeOptions}
-                      value={selectedType}
-                      onChange={setSelectedType}
-                    />
-                  </div>
-
-                  {/* Primary Employee ID Selection */}
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">
-                      Primary Employee
-                    </label>
-                    <SearchableSelect
-                      options={employeeOptions}
-                      value={activeEmpId}
+                      options={addEmployeeOptions}
+                      value=""
                       onChange={(val) => {
-                        setActiveEmpId(val);
-                        handleAddEmployee(val);
+                        if (val) handleAddEmployee(val);
                       }}
+                      placeholder="+ Add Employee"
+                      className="!h-7 text-[10px]"
                     />
                   </div>
                 </div>
+              </div>
 
-                {/* 2. Runtime Calculation Subcard */}
-                <div className="p-3 bg-primary/[0.02] dark:bg-primary/[0.01] border border-primary/20 rounded-xl flex-1 flex flex-col justify-center space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-[11px] font-extrabold text-primary tracking-wide">
-                        Runtime Evaluation
-                      </h4>
-                      <p className="text-[9px] text-muted-foreground">
-                        Dynamically evaluate punch logs
-                      </p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer select-none">
+              <div className="md:col-span-3 space-y-1.5">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">
+                  Type
+                </label>
+                <SearchableSelect
+                  options={typeOptions}
+                  value={selectedType}
+                  onChange={setSelectedType}
+                />
+              </div>
+
+              <div className="md:col-span-7 p-3 bg-primary/[0.02] dark:bg-primary/[0.01] border border-primary/20 rounded-xl flex flex-col md:flex-row md:items-center gap-4">
+                <div className="flex-1 flex items-center justify-between">
+                  <div>
+                    <h4 className="text-[11px] font-extrabold text-primary tracking-wide">
+                      Runtime Evaluation
+                    </h4>
+                    <p className="text-[9px] text-muted-foreground">
+                      Dynamically evaluate punch logs
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer select-none ml-4">
+                    <input
+                      type="checkbox"
+                      checked={isRuntimeCal}
+                      onChange={(e) => setIsRuntimeCal(e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 dark:after:border-slate-600 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                  </label>
+                </div>
+
+                {isRuntimeCal && (
+                  <div className="flex-1 flex gap-2 border-l border-primary/10 pl-4">
+                    <div className="space-y-0.5 w-1/2">
+                      <span className="text-[9px] font-black text-muted-foreground uppercase">
+                        Shift In
+                      </span>
                       <input
-                        type="checkbox"
-                        checked={isRuntimeCal}
-                        onChange={(e) => setIsRuntimeCal(e.target.checked)}
-                        className="sr-only peer"
+                        type="text"
+                        value={shiftInThreshold}
+                        onChange={(e) => setShiftInThreshold(e.target.value)}
+                        placeholder="09:00"
+                        className="w-full h-8 px-2 rounded-lg bg-card border border-border/40 text-xs font-bold outline-none focus:border-primary text-primary font-mono"
                       />
-                      <div className="w-9 h-5 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 dark:after:border-slate-600 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
-                    </label>
-                  </div>
-
-                  {isRuntimeCal && (
-                    <div className="grid grid-cols-2 gap-2 pt-1.5 border-t border-primary/10">
-                      {/* Shift In Threshold */}
-                      <div className="space-y-0.5">
-                        <span className="text-[9px] font-black text-muted-foreground uppercase">
-                          Shift In Time
-                        </span>
-                        <input
-                          type="text"
-                          value={shiftInThreshold}
-                          onChange={(e) => setShiftInThreshold(e.target.value)}
-                          placeholder="e.g. 09:00"
-                          className="w-full h-8 px-2 rounded-lg bg-card border border-border/40 text-xs font-bold outline-none focus:border-primary text-primary font-mono"
-                        />
-                      </div>
-
-                      {/* Shift Out Threshold */}
-                      <div className="space-y-0.5">
-                        <span className="text-[9px] font-black text-muted-foreground uppercase">
-                          Shift Out Time
-                        </span>
-                        <input
-                          type="text"
-                          value={shiftOutThreshold}
-                          onChange={(e) => setShiftOutThreshold(e.target.value)}
-                          placeholder="e.g. 18:00"
-                          className="w-full h-8 px-2 rounded-lg bg-card border border-border/40 text-xs font-bold outline-none focus:border-primary text-primary font-mono"
-                        />
-                      </div>
                     </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Dynamic Metadata Summary Card based on primary ID */}
-            <div className="p-4 bg-gradient-to-r from-primary/[0.04] via-transparent to-transparent border border-border/60 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-[3px] h-full bg-primary" />
-
-              <div className="flex items-center gap-3">
-                <div className="size-11 rounded-xl bg-gradient-to-tr from-primary to-primary-glow text-white flex items-center justify-center font-black text-sm shadow-md shadow-primary/25">
-                  {activeEmpMetadata.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
-                </div>
-                <div>
-                  <h3 className="text-sm font-black text-foreground">{activeEmpMetadata.name}</h3>
-                  <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
-                    <span className="text-[9.5px] font-extrabold uppercase bg-primary/10 text-primary border border-primary/25 px-1.5 py-0.5 rounded-md">
-                      {activeEmpMetadata.type}
-                    </span>
-                    <span className="text-[9.5px] font-bold text-muted-foreground">
-                      {activeEmpMetadata.jobTitle} &bull; {activeEmpMetadata.subDept}
-                    </span>
+                    <div className="space-y-0.5 w-1/2">
+                      <span className="text-[9px] font-black text-muted-foreground uppercase">
+                        Shift Out
+                      </span>
+                      <input
+                        type="text"
+                        value={shiftOutThreshold}
+                        onChange={(e) => setShiftOutThreshold(e.target.value)}
+                        placeholder="18:00"
+                        className="w-full h-8 px-2 rounded-lg bg-card border border-border/40 text-xs font-bold outline-none focus:border-primary text-primary font-mono"
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-2 text-xs w-full md:w-auto border-t md:border-t-0 md:border-l border-border/40 pt-3 md:pt-0 md:pl-6">
-                <div>
-                  <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block">
-                    Unit
-                  </span>
-                  <span className="text-foreground font-black">{activeEmpMetadata.unit}</span>
-                </div>
-                <div>
-                  <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block">
-                    Shift
-                  </span>
-                  <span className="text-foreground font-semibold">{activeEmpMetadata.shift}</span>
-                </div>
-                <div>
-                  <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block">
-                    Shift Start
-                  </span>
-                  <span className="text-foreground font-semibold font-mono">
-                    {activeEmpMetadata.shiftStartDate}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider block">
-                    Weekly Holiday
-                  </span>
-                  <span className="text-rose-500 font-extrabold">
-                    {activeEmpMetadata.defaultHoliday}
-                  </span>
-                </div>
+              <div className="md:col-span-2 flex items-end justify-end">
+                <button
+                  onClick={handleGetLogs}
+                  className="w-full h-10 bg-primary hover:bg-primary-glow text-white font-black text-xs rounded-xl shadow-md shadow-primary/10 hover:shadow-primary/20 transition duration-150 uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Fingerprint className="size-4" />
+                  <span>Fetch</span>
+                </button>
               </div>
             </div>
 
-            {/* Action Bar */}
-            <div className="flex justify-end pt-2 border-t border-border/30">
-              <button
-                onClick={handleGetLogs}
-                className="h-10 px-8 bg-primary hover:bg-primary-glow text-white font-black text-xs rounded-xl shadow-md shadow-primary/10 hover:shadow-primary/20 transition duration-150 uppercase tracking-widest flex items-center gap-2 cursor-pointer"
-              >
-                <Fingerprint className="size-4" />
-                <span>Fetch Attendance</span>
-              </button>
-            </div>
+
           </div>
 
-          {/* Summary Stats Cards Ribbon */}
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2 print:hidden">
-            <div className="bg-card rounded-xl border border-border/80 p-3 shadow-xs flex items-center gap-3">
-              <div className="size-8.5 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-black text-xs">
-                P
-              </div>
-              <div>
-                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">
-                  Present Days
-                </span>
-                <span className="text-sm font-black text-foreground">{stats.present}</span>
-              </div>
-            </div>
-
-            <div className="bg-card rounded-xl border border-border/80 p-3 shadow-xs flex items-center gap-3">
-              <div className="size-8.5 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center font-black text-xs">
-                L
-              </div>
-              <div>
-                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">
-                  Leaves Taken
-                </span>
-                <span className="text-sm font-black text-foreground">{stats.leaves}</span>
-              </div>
-            </div>
-
-            <div className="bg-card rounded-xl border border-border/80 p-3 shadow-xs flex items-center gap-3">
-              <div className="size-8.5 rounded-lg bg-slate-500/10 text-slate-500 flex items-center justify-center font-black text-xs">
-                H
-              </div>
-              <div>
-                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">
-                  Weekly Holidays
-                </span>
-                <span className="text-sm font-black text-foreground">{stats.holidays}</span>
-              </div>
-            </div>
-
-            <div className="bg-card rounded-xl border border-border/80 p-3 shadow-xs flex items-center gap-3">
-              <div className="size-8.5 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-black text-xs">
-                OT
-              </div>
-              <div>
-                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">
-                  Overtime Hours
-                </span>
-                <span className="text-sm font-black text-foreground">{stats.totalOt} hrs</span>
-              </div>
-            </div>
-
-            {/* Late Entries Count */}
-            <div className="bg-card rounded-xl border border-border/80 p-3 shadow-xs flex items-center gap-3">
-              <div className="size-8.5 rounded-lg bg-rose-500/10 text-rose-500 flex items-center justify-center font-black text-xs">
-                LT
-              </div>
-              <div>
-                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">
-                  Late Entries
-                </span>
-                <span className="text-sm font-black text-foreground font-mono">
-                  {isRuntimeCal ? stats.lateCount : "—"}
-                </span>
-              </div>
-            </div>
-
-            {/* Early Leaves Count */}
-            <div className="bg-card rounded-xl border border-border/80 p-3 shadow-xs flex items-center gap-3">
-              <div className="size-8.5 rounded-lg bg-purple-500/10 text-purple-500 flex items-center justify-center font-black text-xs">
-                EL
-              </div>
-              <div>
-                <span className="text-[9.5px] font-bold text-muted-foreground uppercase block">
-                  Early Leaves
-                </span>
-                <span className="text-sm font-black text-foreground font-mono">
-                  {isRuntimeCal ? stats.earlyLeaveCount : "—"}
-                </span>
-              </div>
-            </div>
-          </div>
 
           {/* Spreadsheet Datagrid Card */}
           <div className="bg-card rounded-2xl border border-border/80 p-4 shadow-xs space-y-3">
