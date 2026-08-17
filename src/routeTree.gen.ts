@@ -126,6 +126,9 @@ import { Route as EarnLeaveWorkflowRouteImport } from './routes/earn-leave-workf
 import { Route as EarnLeaveSubmitRouteImport } from './routes/earn-leave-submit'
 import { Route as EarnLeaveProcessRouteImport } from './routes/earn-leave-process'
 import { Route as ERecruitmentFormRouteImport } from './routes/e-recruitment-form'
+import { Route as DisciplinaryWarningLettersRouteImport } from './routes/disciplinary-warning-letters'
+import { Route as DisciplinaryShowcauseNoticesRouteImport } from './routes/disciplinary-showcause-notices'
+import { Route as DisciplinaryCaseFilesRouteImport } from './routes/disciplinary-case-files'
 import { Route as CreateRosterRouteImport } from './routes/create-roster'
 import { Route as ConfigureTimeRouteImport } from './routes/configure-time'
 import { Route as ConfigureTaxRouteImport } from './routes/configure-tax'
@@ -761,6 +764,23 @@ const ERecruitmentFormRoute = ERecruitmentFormRouteImport.update({
   path: '/e-recruitment-form',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DisciplinaryWarningLettersRoute =
+  DisciplinaryWarningLettersRouteImport.update({
+    id: '/disciplinary-warning-letters',
+    path: '/disciplinary-warning-letters',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DisciplinaryShowcauseNoticesRoute =
+  DisciplinaryShowcauseNoticesRouteImport.update({
+    id: '/disciplinary-showcause-notices',
+    path: '/disciplinary-showcause-notices',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DisciplinaryCaseFilesRoute = DisciplinaryCaseFilesRouteImport.update({
+  id: '/disciplinary-case-files',
+  path: '/disciplinary-case-files',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CreateRosterRoute = CreateRosterRouteImport.update({
   id: '/create-roster',
   path: '/create-roster',
@@ -954,6 +974,9 @@ export interface FileRoutesByFullPath {
   '/configure-tax': typeof ConfigureTaxRoute
   '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
+  '/disciplinary-case-files': typeof DisciplinaryCaseFilesRoute
+  '/disciplinary-showcause-notices': typeof DisciplinaryShowcauseNoticesRoute
+  '/disciplinary-warning-letters': typeof DisciplinaryWarningLettersRoute
   '/e-recruitment-form': typeof ERecruitmentFormRoute
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
@@ -1105,6 +1128,9 @@ export interface FileRoutesByTo {
   '/configure-tax': typeof ConfigureTaxRoute
   '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
+  '/disciplinary-case-files': typeof DisciplinaryCaseFilesRoute
+  '/disciplinary-showcause-notices': typeof DisciplinaryShowcauseNoticesRoute
+  '/disciplinary-warning-letters': typeof DisciplinaryWarningLettersRoute
   '/e-recruitment-form': typeof ERecruitmentFormRoute
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
@@ -1257,6 +1283,9 @@ export interface FileRoutesById {
   '/configure-tax': typeof ConfigureTaxRoute
   '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
+  '/disciplinary-case-files': typeof DisciplinaryCaseFilesRoute
+  '/disciplinary-showcause-notices': typeof DisciplinaryShowcauseNoticesRoute
+  '/disciplinary-warning-letters': typeof DisciplinaryWarningLettersRoute
   '/e-recruitment-form': typeof ERecruitmentFormRoute
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
@@ -1410,6 +1439,9 @@ export interface FileRouteTypes {
     | '/configure-tax'
     | '/configure-time'
     | '/create-roster'
+    | '/disciplinary-case-files'
+    | '/disciplinary-showcause-notices'
+    | '/disciplinary-warning-letters'
     | '/e-recruitment-form'
     | '/earn-leave-process'
     | '/earn-leave-submit'
@@ -1561,6 +1593,9 @@ export interface FileRouteTypes {
     | '/configure-tax'
     | '/configure-time'
     | '/create-roster'
+    | '/disciplinary-case-files'
+    | '/disciplinary-showcause-notices'
+    | '/disciplinary-warning-letters'
     | '/e-recruitment-form'
     | '/earn-leave-process'
     | '/earn-leave-submit'
@@ -1712,6 +1747,9 @@ export interface FileRouteTypes {
     | '/configure-tax'
     | '/configure-time'
     | '/create-roster'
+    | '/disciplinary-case-files'
+    | '/disciplinary-showcause-notices'
+    | '/disciplinary-warning-letters'
     | '/e-recruitment-form'
     | '/earn-leave-process'
     | '/earn-leave-submit'
@@ -1864,6 +1902,9 @@ export interface RootRouteChildren {
   ConfigureTaxRoute: typeof ConfigureTaxRoute
   ConfigureTimeRoute: typeof ConfigureTimeRoute
   CreateRosterRoute: typeof CreateRosterRoute
+  DisciplinaryCaseFilesRoute: typeof DisciplinaryCaseFilesRoute
+  DisciplinaryShowcauseNoticesRoute: typeof DisciplinaryShowcauseNoticesRoute
+  DisciplinaryWarningLettersRoute: typeof DisciplinaryWarningLettersRoute
   ERecruitmentFormRoute: typeof ERecruitmentFormRoute
   EarnLeaveProcessRoute: typeof EarnLeaveProcessRoute
   EarnLeaveSubmitRoute: typeof EarnLeaveSubmitRoute
@@ -2808,6 +2849,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ERecruitmentFormRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/disciplinary-warning-letters': {
+      id: '/disciplinary-warning-letters'
+      path: '/disciplinary-warning-letters'
+      fullPath: '/disciplinary-warning-letters'
+      preLoaderRoute: typeof DisciplinaryWarningLettersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/disciplinary-showcause-notices': {
+      id: '/disciplinary-showcause-notices'
+      path: '/disciplinary-showcause-notices'
+      fullPath: '/disciplinary-showcause-notices'
+      preLoaderRoute: typeof DisciplinaryShowcauseNoticesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/disciplinary-case-files': {
+      id: '/disciplinary-case-files'
+      path: '/disciplinary-case-files'
+      fullPath: '/disciplinary-case-files'
+      preLoaderRoute: typeof DisciplinaryCaseFilesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/create-roster': {
       id: '/create-roster'
       path: '/create-roster'
@@ -3064,6 +3126,9 @@ const rootRouteChildren: RootRouteChildren = {
   ConfigureTaxRoute: ConfigureTaxRoute,
   ConfigureTimeRoute: ConfigureTimeRoute,
   CreateRosterRoute: CreateRosterRoute,
+  DisciplinaryCaseFilesRoute: DisciplinaryCaseFilesRoute,
+  DisciplinaryShowcauseNoticesRoute: DisciplinaryShowcauseNoticesRoute,
+  DisciplinaryWarningLettersRoute: DisciplinaryWarningLettersRoute,
   ERecruitmentFormRoute: ERecruitmentFormRoute,
   EarnLeaveProcessRoute: EarnLeaveProcessRoute,
   EarnLeaveSubmitRoute: EarnLeaveSubmitRoute,

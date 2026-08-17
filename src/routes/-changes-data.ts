@@ -2,6 +2,33 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "189",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Disciplinary Action",
+    link: "/disciplinary-showcause-notices",
+    descriptionEn: "Added Disciplinary Show Cause Notices page to manage and track notices with complete lifecycle tracking and a modern modal interface.",
+    descriptionBn: "ডিসিপ্লিনারি শো-কজ নোটিশ পেজ যুক্ত করা হয়েছে, যেখানে নোটিশ প্রদান এবং সম্পূর্ণ লাইফসাইকেল ট্র্যাকিং এর জন্য আধুনিক মোডাল এবং ফিল্টারিং সুবিধা রয়েছে।",
+  },
+  {
+    id: "188",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Disciplinary Action",
+    link: "/disciplinary-warning-letters",
+    descriptionEn: "Added Disciplinary Warning Letters page with comprehensive record tracking, filtering, and a modern modal for issuing letters.",
+    descriptionBn: "ডিসিপ্লিনারি ওয়ার্নিং লেটারস (সতর্কতামূলক চিঠি) পেজ যুক্ত করা হয়েছে, যেখানে চিঠি প্রদান ও রেকর্ড ট্র্যাকিং এর জন্য আধুনিক মোডাল এবং ফিল্টারিং সুবিধা রয়েছে।",
+  },
+  {
+    id: "187",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Disciplinary Action",
+    link: "/disciplinary-case-files",
+    descriptionEn: "Added Disciplinary Action module with a comprehensive Case Files management page including advanced filtering and status tracking.",
+    descriptionBn: "ডিসিপ্লিনারি অ্যাকশন মডিউল যুক্ত করা হয়েছে, যেখানে কেস ফাইল পরিচালনার জন্য উন্নত ফিল্টারিং এবং স্ট্যাটাস ট্র্যাকিং সুবিধা রয়েছে।",
+  },
+  {
     id: "186",
     date: new Date().toISOString().slice(0, 16),
     type: "UX Optimization",

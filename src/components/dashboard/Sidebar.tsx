@@ -278,9 +278,9 @@ export const nav: NavItem[] = [
     label: "Disciplinary Action",
     icon: ShieldAlert,
     subitems: [
-      { label: "Case Files", to: "/" },
-      { label: "Warning Letters", to: "/" },
-      { label: "Show Cause Notices", to: "/" },
+      { label: "Case Files", to: "/disciplinary-case-files" },
+      { label: "Warning Letters", to: "/disciplinary-warning-letters" },
+      { label: "Show Cause Notices", to: "/disciplinary-showcause-notices" },
     ],
   },
   {
