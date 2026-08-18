@@ -1506,7 +1506,8 @@ function CompanySetupPage() {
   const [isCreateTplOpen, setIsCreateTplOpen] = useState(false);
   const [tplTitle, setTplTitle] = useState("");
   const [tplCompany, setTplCompany] = useState("");
-  const [tplEmpType, setTplEmpType] = useState("Permanent");
+  const [tplEmpType, setTplEmpType] = useState("Worker");
+  const [tplOtType, setTplOtType] = useState("2hrs OT");
 
   // Load templates from local storage
   useEffect(() => {
