@@ -112,6 +112,7 @@ interface PayslipTemplate {
   title: string;
   companyName: string;
   employeeType: string;
+  otType?: string;
   isActive: boolean;
   fields: PayslipField[];
 }
@@ -121,7 +122,8 @@ const DEFAULT_TEMPLATES: PayslipTemplate[] = [
     id: "tpl-1",
     title: "Standard Staff Layout",
     companyName: "Pakiza Software Limited",
-    employeeType: "Permanent",
+    employeeType: "Worker",
+    otType: "2hrs OT",
     isActive: true,
     fields: DEFAULT_PAYSLIP_FIELDS
   },
@@ -1537,6 +1539,7 @@ function CompanySetupPage() {
       title: tplTitle,
       companyName: tplCompany || (orgs[0]?.nameEng || "Pakiza Software Limited"),
       employeeType: tplEmpType,
+      otType: tplEmpType === "Worker" ? tplOtType : undefined,
       isActive: true,
       fields: JSON.parse(JSON.stringify(DEFAULT_PAYSLIP_FIELDS))
     };
@@ -2366,7 +2369,8 @@ function CompanySetupPage() {
                     if (activeTab === "payslip") {
                       setTplTitle("");
                       setTplCompany(orgs[0]?.nameEng || "Pakiza Software Limited");
-                      setTplEmpType("Permanent");
+                      setTplEmpType("Worker");
+                      setTplOtType("2hrs OT");
                       setIsCreateTplOpen(true);
                     } else {
                       openForm(null);
@@ -2495,7 +2499,8 @@ function CompanySetupPage() {
                                   onClick={() => {
                                     setTplTitle("");
                                     setTplCompany(orgs[0]?.nameEng || "Pakiza Software Limited");
-                                    setTplEmpType("Permanent");
+                                    setTplEmpType("Worker");
+                                    setTplOtType("2hrs OT");
                                     setIsCreateTplOpen(true);
                                   }}
                                   className="h-9 px-4 mt-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-sm hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
@@ -2512,9 +2517,16 @@ function CompanySetupPage() {
                               <td className="px-5 py-4 font-bold text-foreground">{tpl.title}</td>
                               <td className="px-5 py-4 text-slate-700 dark:text-slate-300">{tpl.companyName}</td>
                               <td className="px-5 py-4">
-                                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/15">
-                                  {tpl.employeeType}
-                                </span>
+                                <div className="flex flex-col gap-1 items-start">
+                                  <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/15">
+                                    {tpl.employeeType}
+                                  </span>
+                                  {tpl.otType && (
+                                    <span className="inline-block px-2 py-0.5 rounded-full text-[9px] font-semibold bg-amber-500/10 text-amber-600 border border-amber-500/15">
+                                      {tpl.otType}
+                                    </span>
+                                  )}
+                                </div>
                               </td>
                               <td className="px-5 py-4 text-center">
                                 <button
@@ -2566,10 +2578,15 @@ function CompanySetupPage() {
                         {/* Top Bar inside Card */}
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/40">
                           <div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex flex-wrap items-center gap-2">
                               <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/15 uppercase tracking-wide">
                                 {editingTemplate.employeeType}
                               </span>
+                              {editingTemplate.otType && (
+                                <span className="inline-block px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-500/10 text-amber-600 border border-amber-500/15 uppercase tracking-wide">
+                                  {editingTemplate.otType}
+                                </span>
+                              )}
                               <span className="text-[10px] text-muted-foreground font-semibold">
                                 {editingTemplate.companyName}
                               </span>
@@ -3780,14 +3797,29 @@ function CompanySetupPage() {
                     value={tplEmpType}
                     onChange={(val) => setTplEmpType(val)}
                     options={[
-                      { value: "Permanent", label: "Permanent" },
-                      { value: "Contractual", label: "Contractual" },
-                      { value: "Provision", label: "Provision" },
-                      { value: "Casual", label: "Casual" },
-                      { value: "Apprentice", label: "Apprentice" }
+                      { value: "Worker", label: "Worker" },
+                      { value: "Office Executive", label: "Office Executive" },
+                      { value: "Staff", label: "Staff" }
                     ]}
                     placeholder="Select Employee Type"
                   />
+                </div>
+
+                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${tplEmpType === "Worker" ? "max-h-24 opacity-100" : "max-h-0 opacity-0"}`}>
+                  <div className="space-y-1.5 pt-1">
+                    <label className="text-xs font-semibold text-foreground/80 block">OT Type *</label>
+                    <SearchableSelect
+                      value={tplOtType}
+                      onChange={(val) => setTplOtType(val)}
+                      options={[
+                        { value: "2hrs OT", label: "2hrs OT" },
+                        { value: "3hrs OT", label: "3hrs OT" },
+                        { value: "4hrs OT", label: "4hrs OT" },
+                        { value: "No OT", label: "No OT" }
+                      ]}
+                      placeholder="Select OT Type"
+                    />
+                  </div>
                 </div>
               </div>
 
