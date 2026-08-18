@@ -2,7 +2,6 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
-<<<<<<< HEAD
     id: "206",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Update",
@@ -46,6 +45,24 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     link: "/all-approvals",
     descriptionEn: "Redesigned the Loan Terms & Details section inside the details modal to a clean, flat, borderless design. Replaced blocky card panels with a horizontal metrics bar separated by clean vertical dividers, and flat inline text indicators to reduce card fatigue.",
     descriptionBn: "লোন ডিটেইলস মোডালের লোন টার্মস অ্যান্ড ডিটেইলস সেকশনটি সম্পূর্ণ কার্ড-মুক্ত এবং ফ্ল্যাট ডিজাইনে রূপান্তর করা হয়েছে। ব্লক ব্যাকগ্রাউন্ড ও বক্স বর্ডারের পরিবর্তে এতে মিনিমালিস্টিক ডট/লাইন বিভাজকযুক্ত হরাইজন্টাল মেট্রিক্স বার ব্যবহার করা হয়েছে যা দেখতে আরও আধুনিক ও পরিচ্ছন্ন।",
+  },
+  {
+    id: "201",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Central Approvals",
+    link: "/all-approvals",
+    descriptionEn: "Redesigned the Loan Terms & Details section inside the Loan details modal into a split-layout comparative dashboard. Features a visual loan amount allocation panel with a dynamic progress bar on the left, and a high-contrast dark-slate repayment overview sidebar card on the right.",
+    descriptionBn: "লোন ডিটেইলস মোডালের লোন টার্মস অ্যান্ড ডিটেইলস সেকশনটি স্প্লিট-লেআউট ড্যাশবোর্ডে রূপান্তর করা হয়েছে। বাম পাশে ডাইনামিক প্রোগ্রেস বারসহ লোন অ্যালোকেশন প্যানেল এবং ডান পাশে হাই-কনট্রাস্ট ডার্ক-স্লেট রিপেমেন্ট সামারি কার্ড যুক্ত করা হয়েছে।",
+  },
+  {
+    id: "198-company-setup",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Company Setup",
+    link: "/company-setup?tab=payslip",
+    descriptionEn: "Updated the Employee Type dropdown in the Payslip Template configuration to standard categories (Worker, Office Executive, Staff). Added a smart conditional OT Type selection (e.g. 2hrs OT, 3hrs OT) that elegantly animates in whenever 'Worker' is selected, making template designation highly specific and professional.",
+    descriptionBn: "পেসলিপ টেমপ্লেট তৈরির সময় এমপ্লয়ি টাইপ অপশনগুলো পরিবর্তন করে (Worker, Office Executive, Staff) করা হয়েছে। এছাড়াও যখন 'Worker' সিলেক্ট করা হবে, তখন স্বয়ংক্রিয়ভাবে একটি স্মার্ট OT Type অপশন (যেমন- 2hrs OT, 3hrs OT) অ্যানিমেশন সহ প্রদর্শিত হবে, যা টেমপ্লেটগুলোকে আরও স্পেসিফিক এবং প্রফেশনাল করবে।",�পূর্ণ কার্ড-মুক্ত এবং ফ্ল্যাট ডিজাইনে রূপান্তর করা হয়েছে। ব্লক ব্যাকগ্রাউন্ড ও বক্স বর্ডারের পরিবর্তে এতে মিনিমালিস্টিক ডট/লাইন বিভাজকযুক্ত হরাইজন্টাল মেট্রিক্স বার ব্যবহার করা হয়েছে যা দেখতে আরও আধুনিক ও পরিচ্ছন্ন।",
   },
   {
     id: "201",
