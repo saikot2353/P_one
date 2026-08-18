@@ -221,47 +221,47 @@ export function LoanApprovalViewModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
-      <div className="bg-[#F8FAFC] dark:bg-[#0B1120] w-full max-w-5xl rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col my-auto max-h-[94vh]">
+      <div className="bg-[#F8FAFC] dark:bg-[#0B1120] w-full max-w-5xl rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col my-auto max-h-[94vh]">
         
         {/* TOP MODAL HEADER */}
-        <div className="bg-white dark:bg-slate-900 px-6 py-4 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-4 shrink-0">
-          <div className="flex items-center gap-3.5">
-            <div className="size-11 rounded-2xl bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 text-[#2563eb] flex items-center justify-center shrink-0">
-              <Banknote className="size-5" />
+        <div className="bg-white dark:bg-slate-900 px-5 py-3.5 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-4 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="size-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 text-[#2563eb] flex items-center justify-center shrink-0">
+              <Banknote className="size-4" />
             </div>
             <div>
-              <div className="flex items-center gap-2.5">
-                <h2 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
+              <div className="flex items-center gap-2">
+                <h2 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
                   {loan.moduleName} details — ID: {loan.id}
                 </h2>
                 {loan.status === "Pending" && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-50 text-amber-600 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20">
-                    <span className="size-1.5 rounded-full bg-amber-500 animate-pulse" /> PENDING
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-amber-50 text-amber-600 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20">
+                    <span className="size-1 rounded-full bg-amber-500 animate-pulse" /> PENDING
                   </span>
                 )}
                 {loan.status === "Approved" && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
-                    <CheckCircle2 className="size-3" /> APPROVED
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
+                    <CheckCircle2 className="size-2.5" /> APPROVED
                   </span>
                 )}
                 {loan.status === "Rejected" && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20">
-                    <XCircle className="size-3" /> REJECTED
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20">
+                    <XCircle className="size-2.5" /> REJECTED
                   </span>
                 )}
               </div>
-              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">
                 Verify employee information, approval flow timelines, and repayment projections.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex flex-col items-end border-r border-slate-200 dark:border-slate-800 pr-4">
-              <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex flex-col items-end border-r border-slate-200 dark:border-slate-800 pr-3.5">
+              <span className="text-[9px] font-semibold uppercase tracking-wider text-slate-400">
                 APPLICATION DATE
               </span>
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+              <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
                 {loan.applicationDate}
               </span>
               <span className="text-[10px] font-medium text-slate-500 flex items-center gap-1">
@@ -271,7 +271,7 @@ export function LoanApprovalViewModal({
 
             <button
               onClick={onClose}
-              className="size-9 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+              className="size-8 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
             >
               <X className="size-4" />
             </button>
@@ -281,76 +281,76 @@ export function LoanApprovalViewModal({
         {/* MODAL MAIN CONTENT SCROLL AREA */}
         <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5">
           
-          {/* CARD 1: EMPLOYEE HERO BOX (Style from Image 3) */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
-            <div className="flex items-center gap-4 min-w-[240px]">
-              <div className="size-13 rounded-2xl bg-blue-600 text-white font-black text-base flex items-center justify-center shadow-lg shadow-blue-600/25 shrink-0">
+          {/* CARD 1: EMPLOYEE HERO BOX (Flat & Compact Style) */}
+          <div className="bg-slate-50/80 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/60 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5 min-w-[240px]">
+              <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-[#2563eb] dark:text-blue-400 font-bold text-sm flex items-center justify-center shrink-0">
                 {getInitials(loan.employee.name)}
               </div>
               <div>
-                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                <div className="text-[9px] font-semibold uppercase tracking-wider text-slate-400">
                   REQUEST FOR
                 </div>
-                <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
                   {loan.employee.name}
                 </h3>
-                <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
+                <div className="text-xs font-medium text-slate-400 mt-0.5">
                   Employee ID · <span className="font-mono">{loan.employee.id}</span>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3 flex-1 border-t md:border-t-0 md:border-l border-slate-100 dark:border-slate-800 pt-4 md:pt-0 md:pl-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-5 gap-y-2.5 flex-1 border-t md:border-t-0 md:border-l border-slate-200/60 dark:border-slate-800 pt-3 md:pt-0 md:pl-5">
               <div>
-                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1">
+                <div className="text-[9px] font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1">
                   <Briefcase className="size-3 text-slate-400" /> DESIGNATION
                 </div>
-                <div className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-0.5">
+                <div className="text-xs font-semibold text-slate-700 dark:text-slate-300 mt-0.5">
                   {loan.employee.designation}
                 </div>
               </div>
 
               <div>
-                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1">
+                <div className="text-[9px] font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1">
                   <Building2 className="size-3 text-slate-400" /> DEPARTMENT
                 </div>
-                <div className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-0.5">
+                <div className="text-xs font-semibold text-slate-700 dark:text-slate-300 mt-0.5">
                   {loan.employee.department}
                 </div>
               </div>
 
               <div>
-                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1">
+                <div className="text-[9px] font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1">
                   <Layers className="size-3 text-slate-400" /> SECTION
                 </div>
-                <div className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-0.5">
+                <div className="text-xs font-semibold text-slate-700 dark:text-slate-300 mt-0.5">
                   {loan.employee.section || "N/A"}
                 </div>
               </div>
 
               <div>
-                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1">
+                <div className="text-[9px] font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1">
                   <Calendar className="size-3 text-slate-400" /> JOINING DATE
                 </div>
-                <div className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-0.5 font-mono">
+                <div className="text-xs font-semibold text-slate-700 dark:text-slate-300 mt-0.5 font-mono">
                   {loan.employee.joiningDate}
                 </div>
               </div>
 
               <div>
-                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1">
+                <div className="text-[9px] font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1">
                   <MapPin className="size-3 text-slate-400" /> OPERATIONAL DIVISION
                 </div>
-                <div className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-0.5">
+                <div className="text-xs font-semibold text-slate-700 dark:text-slate-300 mt-0.5">
                   {loan.employee.division || loan.employee.location || "Placeholder Unit"}
                 </div>
               </div>
 
               <div>
-                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1">
+                <div className="text-[9px] font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1">
                   <Banknote className="size-3 text-slate-400" /> BASIC / GROSS SALARY
                 </div>
-                <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 font-mono">
+                <div className="text-xs font-semibold text-slate-700 dark:text-slate-300 mt-0.5 font-mono">
                   ৳{loan.employee.basicSalary.toLocaleString()} / ৳{loan.employee.grossSalary.toLocaleString()}
                 </div>
               </div>
@@ -358,27 +358,27 @@ export function LoanApprovalViewModal({
           </div>
 
           {/* TAB SWITCHER BUTTONS (Image 1 & 2 Tabs) - Filled Container style */}
-          <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-2xl w-full border border-slate-200/60 dark:border-slate-850">
+          <div className="flex bg-slate-100 dark:bg-slate-950 p-0.5 rounded-xl w-full border border-slate-200/60 dark:border-slate-850">
             <button
               onClick={() => setActiveTab("summary")}
-              className={`flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
+              className={`flex-1 py-1.5 rounded-lg text-xs font-semibold tracking-normal transition-all flex items-center justify-center gap-2 ${
                 activeTab === "summary"
-                  ? "bg-white dark:bg-slate-900 text-[#2563eb] shadow-md shadow-slate-200/50 dark:shadow-none"
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  ? "bg-white dark:bg-slate-900 text-[#2563eb] shadow-sm"
+                  : "text-slate-555 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
-              <User className="size-4" /> 1. {loan.moduleName?.toUpperCase() || "LOAN"} SUMMARY & FLOW
+              <User className="size-3.5" /> 1. {loan.moduleName?.toUpperCase() || "LOAN"} SUMMARY & FLOW
             </button>
             {loan.moduleName === "Loan" && (
               <button
                 onClick={() => setActiveTab("amortization")}
-                className={`flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
+                className={`flex-1 py-1.5 rounded-lg text-xs font-semibold tracking-normal transition-all flex items-center justify-center gap-2 ${
                   activeTab === "amortization"
-                    ? "bg-white dark:bg-slate-900 text-[#2563eb] shadow-md shadow-slate-200/50 dark:shadow-none"
-                    : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                    ? "bg-white dark:bg-slate-900 text-[#2563eb] shadow-sm"
+                    : "text-slate-555 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
-                <Calendar className="size-4" /> 2. AMORTIZATION SCHEDULE
+                <Calendar className="size-3.5" /> 2. AMORTIZATION SCHEDULE
               </button>
             )}
           </div>
@@ -387,15 +387,11 @@ export function LoanApprovalViewModal({
           {activeTab === "summary" && (
             <div className="space-y-5 animate-in fade-in duration-200">
               
-              {/* SECTION: LOAN TERMS & REPAYMENTS (Redesigned with Edit Mode) */}
-              <div className={`bg-white dark:bg-slate-900 rounded-2xl p-6 border transition-all duration-300 shadow-sm space-y-5 ${
-                isEditing 
-                  ? "border-[#2563eb] ring-2 ring-blue-500/10 dark:ring-blue-500/20" 
-                  : "border-slate-200/80 dark:border-slate-800"
-              }`}>
-                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-                  <div className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                    <FileText className="size-4 text-[#2563eb]" /> {loan.moduleName?.toUpperCase() || "LOAN"} TERMS & DETAILS
+              {/* SECTION: LOAN TERMS & DETAILS */}
+              <div className="bg-slate-50/80 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/60 rounded-2xl p-4 space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800 pb-2.5">
+                  <div className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                    <FileText className="size-3.5 text-[#2563eb]" /> {loan.moduleName?.toUpperCase() || "LOAN"} TERMS & DETAILS
                   </div>
                   {loan.moduleName === "Loan" && (
                     <div className="flex items-center gap-2">
@@ -403,13 +399,13 @@ export function LoanApprovalViewModal({
                         <>
                           <button
                             onClick={handleCancelEdit}
-                            className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 transition-colors"
+                            className="px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-[10px] font-semibold text-slate-500 dark:text-slate-400 transition-colors"
                           >
                             Cancel
                           </button>
                           <button
                             onClick={handleSaveEdit}
-                            className="px-3 py-1.5 rounded-lg bg-[#2563eb] hover:bg-blue-700 text-white text-[10px] font-black uppercase tracking-wider transition-colors shadow-sm shadow-blue-500/15"
+                            className="px-2.5 py-1 rounded-md bg-[#2563eb] hover:bg-blue-700 text-white text-[10px] font-bold transition-colors shadow-sm"
                           >
                             Save
                           </button>
@@ -417,9 +413,9 @@ export function LoanApprovalViewModal({
                       ) : (
                         <button
                           onClick={handleStartEdit}
-                          className="px-3 py-1.5 rounded-lg bg-[#2563eb]/10 hover:bg-[#2563eb]/20 text-[#2563eb] dark:bg-blue-500/10 dark:hover:bg-blue-500/20 dark:text-blue-400 text-[10px] font-black uppercase tracking-wider transition-colors flex items-center gap-1.5"
+                          className="px-2.5 py-1 rounded-md bg-[#2563eb]/10 hover:bg-[#2563eb]/20 text-[#2563eb] dark:bg-blue-500/10 dark:hover:bg-blue-500/20 dark:text-blue-400 text-[10px] font-bold transition-colors flex items-center gap-1"
                         >
-                          <Pencil className="size-3" />
+                          <Pencil className="size-2.5" />
                           Edit Terms
                         </button>
                       )}
@@ -427,101 +423,81 @@ export function LoanApprovalViewModal({
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {/* Card 1: Requested Amount */}
-                  <div className="bg-slate-50/50 dark:bg-slate-950/40 p-4.5 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 transition-all hover:bg-slate-50 dark:hover:bg-slate-950/60">
-                    <div className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-                      REQUESTED AMOUNT
-                    </div>
-                    <div className="text-2xl font-black text-slate-900 dark:text-white mt-1.5 font-mono">
-                      ৳{loan.terms.requestedAmount.toLocaleString()}
-                    </div>
+                {/* Table Layout for terms */}
+                <div className="border border-slate-200/80 dark:border-slate-800 rounded-xl overflow-hidden mt-3">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse whitespace-nowrap">
+                      <thead>
+                        <tr className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                          <th className="px-5 py-3">REQUESTED AMOUNT</th>
+                          <th className="px-5 py-3">APPROVED AMOUNT</th>
+                          <th className="px-5 py-3">INSTALLMENT TERM</th>
+                          <th className="px-5 py-3">MONTHLY RATE</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-xs font-semibold text-slate-700 dark:text-slate-350">
+                        <tr className="hover:bg-slate-50/40 dark:hover:bg-slate-800/20 transition-colors">
+                          <td className="px-5 py-4 font-mono">
+                            ৳{loan.terms.requestedAmount.toLocaleString()}
+                          </td>
+                          <td className="px-5 py-4">
+                            {isEditing ? (
+                              <div className="relative max-w-[140px]">
+                                <span className="absolute left-0 top-1/2 -translate-y-1/2 text-xs font-bold text-[#2563eb]">৳</span>
+                                <input
+                                  type="number"
+                                  value={tempApprovedAmount}
+                                  onChange={(e) => setTempApprovedAmount(Number(e.target.value))}
+                                  className="w-full bg-transparent border-b border-[#2563eb] py-0.5 pl-3.5 text-xs font-semibold font-mono focus:outline-none focus:border-blue-600 text-slate-900 dark:text-white"
+                                />
+                              </div>
+                            ) : (
+                              <span className="font-mono">৳{approvedAmount.toLocaleString()}</span>
+                            )}
+                          </td>
+                          <td className="px-5 py-4">
+                            {isEditing ? (
+                              <div className="relative max-w-[110px]">
+                                <input
+                                  type="number"
+                                  value={tempInstallmentTerm}
+                                  onChange={(e) => setTempInstallmentTerm(Number(e.target.value))}
+                                  className="w-full bg-transparent border-b border-slate-350 dark:border-slate-700 py-0.5 pr-8 text-xs font-semibold focus:outline-none focus:border-blue-500 text-slate-900 dark:text-white"
+                                  min="1"
+                                  max="60"
+                                />
+                                <span className="absolute right-0 top-1/2 -translate-y-1/2 text-[9px] font-semibold text-slate-400">Months</span>
+                              </div>
+                            ) : (
+                              <span>{installmentTerm} Months</span>
+                            )}
+                          </td>
+                          <td className="px-5 py-4 font-mono">
+                            ৳{monthlyRate.toLocaleString()}<span className="text-[10px] font-medium text-slate-550 ml-0.5">/mo</span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
-
-                  {/* Card 2: Approved Amount (Editable) */}
-                  <div className={`p-4.5 rounded-2xl border transition-all ${
-                    isEditing 
-                      ? "bg-blue-50/20 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800" 
-                      : "bg-blue-50/50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-800/30"
-                  }`}>
-                    <div className="text-[10px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                      APPROVED AMOUNT
-                    </div>
-                    {isEditing ? (
-                      <div className="relative mt-2">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-blue-500">৳</span>
-                        <input
-                          type="number"
-                          value={tempApprovedAmount}
-                          onChange={(e) => setTempApprovedAmount(Number(e.target.value))}
-                          className="w-full bg-white dark:bg-slate-900 border border-blue-300 dark:border-blue-700 rounded-xl py-1.5 pl-7 pr-3 text-sm font-bold font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-900 dark:text-white"
-                        />
-                      </div>
-                    ) : (
-                      <div className="text-2xl font-black text-[#2563eb] dark:text-blue-400 mt-1.5 font-mono">
-                        ৳{approvedAmount.toLocaleString()}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Card 3: Installment Term (Editable) */}
-                  {loan.moduleName === "Loan" && (
-                    <div className={`p-4.5 rounded-2xl border transition-all ${
-                      isEditing 
-                        ? "bg-slate-50 dark:bg-slate-950 border-blue-200 dark:border-blue-800" 
-                        : "bg-slate-50 dark:bg-slate-950/60 border-slate-200/70 dark:border-slate-800/80"
-                    }`}>
-                      <div className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-                        INSTALLMENT TERM
-                      </div>
-                      {isEditing ? (
-                        <div className="relative mt-2">
-                          <input
-                            type="number"
-                            value={tempInstallmentTerm}
-                            onChange={(e) => setTempInstallmentTerm(Number(e.target.value))}
-                            className="w-full bg-white dark:bg-slate-900 border border-blue-300 dark:border-blue-700 rounded-xl py-1.5 px-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-900 dark:text-white"
-                            min="1"
-                            max="60"
-                          />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">Months</span>
-                        </div>
-                      ) : (
-                        <div className="text-2xl font-black text-slate-900 dark:text-white mt-1.5">
-                          {installmentTerm} Months
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Card 4: Monthly Rate */}
-                  {loan.moduleName === "Loan" && (
-                    <div className="bg-purple-50/50 dark:bg-purple-900/10 p-4.5 rounded-2xl border border-purple-100 dark:border-purple-800/30 transition-all hover:bg-purple-50 dark:hover:bg-purple-900/15">
-                      <div className="text-[10px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400">
-                        MONTHLY RATE
-                      </div>
-                      <div className="text-2xl font-black text-purple-600 dark:text-purple-400 mt-1.5 font-mono flex items-baseline">
-                        ৳{monthlyRate.toLocaleString()}
-                        <span className="text-[10px] font-bold text-slate-500 ml-1">/mo</span>
-                      </div>
-                    </div>
-                  )}
                 </div>
 
-                <div className="space-y-1.5 pt-2">
-                  <div className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-                    {loan.moduleName?.toUpperCase() || "LOAN"} REASON / DETAILS
-                  </div>
-                  <div className="bg-slate-50 dark:bg-slate-950/70 p-3.5 rounded-2xl border border-slate-200/60 dark:border-slate-800 text-xs font-medium italic text-slate-700 dark:text-slate-300">
+                {/* Reason detail line, cleanly integrated underneath */}
+                <div className="border-t border-slate-100 dark:border-slate-800/80 pt-3 flex flex-col gap-0.5">
+                  <span className="text-[9px] font-semibold uppercase tracking-wider text-slate-400">
+                    Reason / Remarks
+                  </span>
+                  <p className="text-xs font-medium text-slate-600 dark:text-slate-300 italic">
                     "{loan.terms.reason}"
-                  </div>
+                  </p>
                 </div>
               </div>
 
-              {/* SECTION: APPROVAL FLOW TIMELINE (Image 1 & Image 3 Style) */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
-                <div className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
-                  <ShieldCheck className="size-4 text-[#2563eb]" /> APPROVAL FLOW TIMELINE
+              <div className="h-px bg-slate-200/50 dark:bg-slate-800/60 my-5" />
+
+              {/* SECTION: APPROVAL FLOW TIMELINE */}
+              <div className="py-1 space-y-4">
+                <div className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5 border-b border-slate-200/50 dark:border-slate-800/80 pb-2.5">
+                  <ShieldCheck className="size-3.5 text-[#2563eb]" /> APPROVAL FLOW TIMELINE
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -574,51 +550,51 @@ export function LoanApprovalViewModal({
             <div className="space-y-5 animate-in fade-in duration-200">
               
               {/* SECTION: REPAYMENT PROJECTIONS */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="py-1 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-250/60 dark:border-slate-800 pb-2.5">
                   <div>
-                    <h4 className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                      <Calendar className="size-4 text-[#2563eb]" /> REPAYMENT PROJECTIONS
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-450 dark:text-slate-400 flex items-center gap-1.5">
+                      <Calendar className="size-3.5 text-[#2563eb]" /> REPAYMENT PROJECTIONS
                     </h4>
-                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">
+                    <p className="text-[11px] font-medium text-slate-500 dark:text-slate-450 mt-0.5">
                       Estimates of monthly deductions from employee base salary starting from application period.
                     </p>
                   </div>
                 </div>
 
                 {/* INFO ALERT BOX (From Image 2) */}
-                <div className="bg-blue-50/70 dark:bg-blue-900/10 border border-blue-200/80 dark:border-blue-800/40 rounded-xl p-3.5 flex items-start gap-3 text-xs font-semibold text-blue-700 dark:text-blue-300">
-                  <Info className="size-4.5 text-[#2563eb] shrink-0 mt-0.5" />
+                <div className="bg-blue-50/40 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-lg p-3 flex items-start gap-2.5 text-xs font-medium text-blue-700 dark:text-blue-300">
+                  <Info className="size-4 text-[#2563eb] shrink-0 mt-0.5" />
                   <div>
                     Calculations assume zero percent company interest. Installments are deducted automatically during monthly process execution.
                   </div>
                 </div>
 
                 {/* AMORTIZATION TABLE */}
-                <div className="border border-slate-200/80 dark:border-slate-800 rounded-xl overflow-hidden">
+                <div className="border border-slate-200/60 dark:border-slate-800 rounded-lg overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse whitespace-nowrap">
                       <thead>
-                        <tr className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-[10px] font-black uppercase tracking-wider text-slate-500">
-                          <th className="px-5 py-3 text-center w-24">INSTALLMENT</th>
-                          <th className="px-5 py-3">SCHEDULED PERIOD</th>
-                          <th className="px-5 py-3 text-right">REPAYMENT AMOUNT</th>
-                          <th className="px-5 py-3 text-right">REMAINING BALANCE</th>
+                        <tr className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-[10px] font-semibold uppercase tracking-wider text-slate-450">
+                          <th className="px-5 py-2.5 text-center w-24">INSTALLMENT</th>
+                          <th className="px-5 py-2.5">SCHEDULED PERIOD</th>
+                          <th className="px-5 py-2.5 text-right">REPAYMENT AMOUNT</th>
+                          <th className="px-5 py-2.5 text-right">REMAINING BALANCE</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs font-bold text-slate-700 dark:text-slate-300">
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs font-semibold text-slate-700 dark:text-slate-350">
                         {amortizationSchedule?.map((row) => (
                           <tr key={row.installmentNo} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
-                            <td className="px-5 py-3 text-center font-mono font-extrabold text-slate-500">
+                            <td className="px-5 py-2.5 text-center font-mono font-bold text-slate-400">
                               {row.installmentNo}
                             </td>
-                            <td className="px-5 py-3 font-semibold text-slate-800 dark:text-slate-200">
+                            <td className="px-5 py-2.5 font-medium text-slate-800 dark:text-slate-200">
                               {row.scheduledPeriod}
                             </td>
-                            <td className="px-5 py-3 text-right font-mono text-slate-900 dark:text-white">
+                            <td className="px-5 py-2.5 text-right font-mono text-slate-800 dark:text-white">
                               ৳{row.repaymentAmount.toLocaleString()}
                             </td>
-                            <td className="px-5 py-3 text-right font-mono text-slate-900 dark:text-white">
+                            <td className="px-5 py-2.5 text-right font-mono text-slate-800 dark:text-white">
                               ৳{row.remainingBalance.toLocaleString()}
                             </td>
                           </tr>
@@ -629,10 +605,12 @@ export function LoanApprovalViewModal({
                 </div>
               </div>
 
-              {/* SECTION: COMMENTS & APPROVAL NOTES (Image 2 & 3 Style) */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
-                <div className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
-                  <FileText className="size-4 text-[#2563eb]" /> Comments & Approval Notes
+              <div className="h-px bg-slate-200/50 dark:bg-slate-800/60 my-5" />
+
+              {/* SECTION: COMMENTS & APPROVAL NOTES */}
+              <div className="py-1 space-y-4">
+                <div className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5 border-b border-slate-200/50 dark:border-slate-800/80 pb-2.5">
+                  <FileText className="size-3.5 text-[#2563eb]" /> Comments & Approval Notes
                 </div>
 
                 {currentComments.length > 0 ? (
@@ -694,7 +672,7 @@ export function LoanApprovalViewModal({
         </div>
 
         {/* MODAL FOOTER */}
-        <div className="bg-white dark:bg-slate-900 px-6 py-4 border-t border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+        <div className="bg-white dark:bg-slate-900 px-5 py-3 border-t border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
           <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">
             Request Ref: <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{loan.reqNo}</span>
           </div>
@@ -702,7 +680,7 @@ export function LoanApprovalViewModal({
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <button
               onClick={onClose}
-              className="flex-1 sm:flex-none h-10 px-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider transition-colors"
+              className="flex-1 sm:flex-none h-9 px-4 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-300 transition-colors"
             >
               Close
             </button>
@@ -715,9 +693,9 @@ export function LoanApprovalViewModal({
                     else toast.success(`Loan request ${loan.id} rejected.`);
                     onClose();
                   }}
-                  className="flex-1 sm:flex-none h-10 px-5 rounded-xl border border-rose-200 dark:border-rose-900/40 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-500/20 text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5"
+                  className="flex-1 sm:flex-none h-9 px-4 rounded-lg border border-rose-200 dark:border-rose-900/40 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-500/20 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
                 >
-                  <XCircle className="size-4" /> Reject
+                  <XCircle className="size-3.5" /> Reject
                 </button>
 
                 <button
@@ -726,9 +704,9 @@ export function LoanApprovalViewModal({
                     else toast.success(`Loan request ${loan.id} approved successfully with amount ৳${approvedAmount.toLocaleString()} over ${installmentTerm} months!`);
                     onClose();
                   }}
-                  className="flex-1 sm:flex-none h-10 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md shadow-emerald-600/20"
+                  className="flex-1 sm:flex-none h-9 px-5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm"
                 >
-                  <CheckCircle2 className="size-4" /> Approve Loan
+                  <CheckCircle2 className="size-3.5" /> Approve Loan
                 </button>
               </>
             )}
