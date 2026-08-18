@@ -11,6 +11,8 @@ import {
   FileText,
   ChevronRight,
   Eye,
+  ChevronDown,
+  LayoutGrid,
 } from "lucide-react";
 
 export const Route = createFileRoute("/monthly-salary-details")({
@@ -654,11 +656,17 @@ function MonthlySalaryDetailsPage() {
   const [outputMode, setOutputMode] = useState("System");
   
   const [searchQuery, setSearchQuery] = useState("");
+  const [isActionsOpen, setIsActionsOpen] = useState(false);
 
   const filteredData = mockData.filter(d => 
     d.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
     d.empId.includes(searchQuery)
   );
+
+  const handleOpenPayslip = (lang: "en" | "bn") => {
+    localStorage.setItem("print_payslip_data", JSON.stringify(filteredData));
+    window.open(`/payslip-print?lang=${lang}`, "_blank");
+  };
 
   return (
     <div className="min-h-screen flex bg-background text-foreground">
@@ -829,6 +837,72 @@ function MonthlySalaryDetailsPage() {
             </div>
           </div>
 
+          {/* Action Button Grid Accordion */}
+          <div className="bg-card rounded-2xl border border-border/60 shadow-sm overflow-hidden transition-all duration-300">
+            <button 
+              onClick={() => setIsActionsOpen(!isActionsOpen)}
+              className="w-full p-4 flex items-center justify-between bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-primary/10 rounded-md text-primary">
+                  <LayoutGrid className="size-4" />
+                </div>
+                <h2 className="text-sm font-bold text-foreground">Advanced Report Actions</h2>
+              </div>
+              <ChevronDown className={`size-4 text-muted-foreground transition-transform duration-300 ${isActionsOpen ? "rotate-180" : ""}`} />
+            </button>
+            
+            {isActionsOpen && (
+              <div className="p-5 border-t border-border/60 bg-card space-y-5 animate-in slide-in-from-top-2 fade-in duration-200">
+                {/* Row 1 */}
+                <div className="flex flex-wrap gap-2">
+                  <ReportBtn onClick={() => handleOpenPayslip("en")}>Pay Slip-English</ReportBtn>
+                  <ReportBtn onClick={() => handleOpenPayslip("bn")}>Pay Slip-Bangla</ReportBtn>
+                  <ReportBtn>Salary Sheet</ReportBtn>
+                  <ReportBtn>Dept.Wise Salary Sheet</ReportBtn>
+                  <ReportBtn>Salary Sheet(Exec)</ReportBtn>
+                  <ReportBtn>Bank Sheet(Exec)</ReportBtn>
+                  <ReportBtn>Export Bank Sheet(Exec)</ReportBtn>
+                </div>
+                
+                {/* Row 2 */}
+                <div className="flex flex-wrap gap-2">
+                  <ReportBtn onClick={() => handleOpenPayslip("en")}>Pay Slip-English</ReportBtn>
+                  <ReportBtn onClick={() => handleOpenPayslip("bn")}>Pay Slip-Bangla</ReportBtn>
+                  <ReportBtn onClick={() => handleOpenPayslip("bn")}>Pay Slip-Bangla(WH)</ReportBtn>
+                  <ReportBtn>Salary Sheet Full(Without Holiday)</ReportBtn>
+                  <ReportBtn>Salary Sheet Full(WH)</ReportBtn>
+                  <ReportBtn>OT Sheet(Holiday)</ReportBtn>
+                  <ReportBtn>Cash Sheet(Exec)</ReportBtn>
+                  <ReportBtn>Export Cash Sheet(Exec)</ReportBtn>
+                </div>
+
+                {/* Row 3 */}
+                <div className="flex flex-wrap gap-2">
+                  <ReportBtn onClick={() => handleOpenPayslip("bn")}>Pay Slip-Bangla(2Hr)</ReportBtn>
+                  <ReportBtn onClick={() => handleOpenPayslip("bn")}>Pay Slip-Bangla(3Hr)</ReportBtn>
+                  <ReportBtn>Salary Sheet(2Hr)</ReportBtn>
+                  <ReportBtn>Salary Sheet(3Hr)</ReportBtn>
+                  <ReportBtn>Salary Sheet(4HR)</ReportBtn>
+                </div>
+
+                {/* Row 4 */}
+                <div className="flex flex-wrap gap-2">
+                  <ReportBtn onClick={() => handleOpenPayslip("en")}>Pay Slip(NT)</ReportBtn>
+                  <ReportBtn>Salary Sheet(NT)</ReportBtn>
+                </div>
+
+                {/* Row 5 */}
+                <div className="flex flex-wrap gap-2">
+                  <ReportBtn>Bank Forwarding(A)</ReportBtn>
+                  <ReportBtn>Bank Forwarding(2)</ReportBtn>
+                  <ReportBtn>Bank Forwarding(3)</ReportBtn>
+                  <ReportBtn>Bank Forwarding(NT)</ReportBtn>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Action Toolbar & Search */}
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2">
@@ -856,9 +930,9 @@ function MonthlySalaryDetailsPage() {
 
           {/* Data Table */}
           <div className="bg-card rounded-2xl border border-border/60 shadow-sm overflow-hidden flex flex-col">
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto overflow-y-auto max-h-[700px] relative">
               <table className="w-full text-left text-xs whitespace-nowrap">
-                <thead className="bg-muted/40 text-muted-foreground uppercase font-bold text-[10px] tracking-wider border-b border-border/60">
+                <thead className="bg-muted/95 backdrop-blur-sm text-muted-foreground uppercase font-bold text-[10px] tracking-wider sticky top-0 z-10 shadow-sm">
                   <tr>
                     <th className="px-4 py-3 border-r border-border/30 w-12 text-center">SL</th>
                     <th className="px-3 py-3 w-10"></th>
@@ -912,67 +986,16 @@ function MonthlySalaryDetailsPage() {
               </table>
             </div>
           </div>
-
-          {/* Action Button Grid */}
-          <div className="bg-card rounded-2xl border border-border/60 p-5 shadow-sm space-y-4">
-            <h2 className="text-sm font-bold text-foreground mb-4">Report Actions</h2>
-            
-            {/* Row 1 */}
-            <div className="flex flex-wrap gap-2">
-              <ReportBtn>Pay Slip-English</ReportBtn>
-              <ReportBtn>Pay Slip-Bangla</ReportBtn>
-              <ReportBtn>Salary Sheet</ReportBtn>
-              <ReportBtn>Dept.Wise Salary Sheet</ReportBtn>
-              <ReportBtn>Salary Sheet(Exec)</ReportBtn>
-              <ReportBtn>Bank Sheet(Exec)</ReportBtn>
-              <ReportBtn>Export Bank Sheet(Exec)</ReportBtn>
-            </div>
-            
-            {/* Row 2 */}
-            <div className="flex flex-wrap gap-2">
-              <ReportBtn>Pay Slip-English</ReportBtn>
-              <ReportBtn>Pay Slip-Bangla</ReportBtn>
-              <ReportBtn>Pay Slip-Bangla(WH)</ReportBtn>
-              <ReportBtn>Salary Sheet Full(Without Holiday)</ReportBtn>
-              <ReportBtn>Salary Sheet Full(WH)</ReportBtn>
-              <ReportBtn>OT Sheet(Holiday)</ReportBtn>
-              <ReportBtn>Cash Sheet(Exec)</ReportBtn>
-              <ReportBtn>Export Cash Sheet(Exec)</ReportBtn>
-            </div>
-
-            {/* Row 3 */}
-            <div className="flex flex-wrap gap-2">
-              <ReportBtn>Pay Slip-Bangla(2Hr)</ReportBtn>
-              <ReportBtn>Pay Slip-Bangla(3Hr)</ReportBtn>
-              <ReportBtn>Salary Sheet(2Hr)</ReportBtn>
-              <ReportBtn>Salary Sheet(3Hr)</ReportBtn>
-              <ReportBtn>Salary Sheet(4HR)</ReportBtn>
-            </div>
-
-            {/* Row 4 */}
-            <div className="flex flex-wrap gap-2">
-              <ReportBtn>Pay Slip(NT)</ReportBtn>
-              <ReportBtn>Salary Sheet(NT)</ReportBtn>
-            </div>
-
-            {/* Row 5 */}
-            <div className="flex flex-wrap gap-2">
-              <ReportBtn>Bank Forwarding(A)</ReportBtn>
-              <ReportBtn>Bank Forwarding(2)</ReportBtn>
-              <ReportBtn>Bank Forwarding(3)</ReportBtn>
-              <ReportBtn>Bank Forwarding(NT)</ReportBtn>
-            </div>
-          </div>
-
         </div>
       </main>
     </div>
   );
 }
 
-function ReportBtn({ children }: { children: React.ReactNode }) {
+function ReportBtn({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) {
   return (
-    <button className="h-8 px-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary text-xs font-semibold transition-colors whitespace-nowrap">
+    <button onClick={onClick} className="h-9 px-4 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary hover:text-primary-foreground hover:-translate-y-0.5 hover:shadow-md text-primary text-xs font-bold transition-all duration-300 whitespace-nowrap flex items-center gap-2 group">
+      <FileText className="size-3.5 opacity-70 group-hover:opacity-100 transition-opacity" />
       {children}
     </button>
   );

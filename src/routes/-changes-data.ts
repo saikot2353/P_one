@@ -2026,4 +2026,13 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     descriptionEn: "Fixed a TypeScript error in the YarnCountSpec initial data configuration by correcting object properties.",
     descriptionBn: "à¦‡à§Ÿà¦¾à¦°à§�à¦¨ à¦•à¦¾à¦‰à¦¨à§�à¦Ÿ à¦¸à§�à¦ªà§‡à¦• (YarnCountSpec)-à¦�à¦° à¦‡à¦¨à¦¿à¦¶à¦¿à§Ÿà¦¾à¦² à¦¡à§‡à¦Ÿà¦¾ à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨à§‡ à¦­à§�à¦² à¦…à¦¬à¦œà§‡à¦•à§�à¦Ÿ à¦ªà§�à¦°à¦ªà¦¾à¦°à§�à¦Ÿà¦¿à¦—à§�à¦²à§‹à¦° à¦•à¦¾à¦°à¦£à§‡ à¦¤à§ˆà¦°à¦¿ à¦¹à¦“à§Ÿà¦¾ à¦�à¦•à¦Ÿà¦¿ à¦Ÿà¦¾à¦‡à¦ªà¦¸à§�à¦•à§�à¦°à¦¿à¦ªà§�à¦Ÿ à¦�à¦°à¦° à¦¸à¦®à¦¾à¦§à¦¾à¦¨ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
+  {
+    id: "190",
+    date: "2026-08-18T08:42",
+    type: "New",
+    module: "Monthly Salary Process",
+    link: "/monthly-salary-process",
+    descriptionEn: "Added the Advanced Report Actions accordion to the Monthly Salary Process page, enabling dynamic smart printing for processed salary records directly in Pay Slip templates (English & Bangla) precisely matching single-column A4 format.",
+    descriptionBn: "Monthly Salary Process পেজে Advanced Report Actions অপশন যোগ করা হয়েছে, যার মাধ্যমে প্রসেস করা স্যালারি রেকর্ডগুলো থেকে সরাসরি Pay Slip (ইংরেজি ও বাংলা) প্রিন্ট করা যাবে, যা সিঙ্গেল-কলাম A4 ফরম্যাটে সাজানো হয়েছে।",
+  },
 ];

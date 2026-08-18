@@ -39,6 +39,7 @@ import { Route as PersonnelListRouteImport } from './routes/personnel-list'
 import { Route as PersonnelApprovalRouteImport } from './routes/personnel-approval'
 import { Route as PermissionManagementRouteImport } from './routes/permission-management'
 import { Route as PendingManualAttendanceRouteImport } from './routes/pending-manual-attendance'
+import { Route as PayslipPrintRouteImport } from './routes/payslip-print'
 import { Route as PayrollReportsRouteImport } from './routes/payroll-reports'
 import { Route as PayrollLoanRouteImport } from './routes/payroll-loan'
 import { Route as PayrollDeductionsRouteImport } from './routes/payroll-deductions'
@@ -317,6 +318,11 @@ const PermissionManagementRoute = PermissionManagementRouteImport.update({
 const PendingManualAttendanceRoute = PendingManualAttendanceRouteImport.update({
   id: '/pending-manual-attendance',
   path: '/pending-manual-attendance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayslipPrintRoute = PayslipPrintRouteImport.update({
+  id: '/payslip-print',
+  path: '/payslip-print',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PayrollReportsRoute = PayrollReportsRouteImport.update({
@@ -1071,6 +1077,7 @@ export interface FileRoutesByFullPath {
   '/payroll-deductions': typeof PayrollDeductionsRoute
   '/payroll-loan': typeof PayrollLoanRoute
   '/payroll-reports': typeof PayrollReportsRoute
+  '/payslip-print': typeof PayslipPrintRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
   '/permission-management': typeof PermissionManagementRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
@@ -1226,6 +1233,7 @@ export interface FileRoutesByTo {
   '/payroll-deductions': typeof PayrollDeductionsRoute
   '/payroll-loan': typeof PayrollLoanRoute
   '/payroll-reports': typeof PayrollReportsRoute
+  '/payslip-print': typeof PayslipPrintRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
   '/permission-management': typeof PermissionManagementRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
@@ -1382,6 +1390,7 @@ export interface FileRoutesById {
   '/payroll-deductions': typeof PayrollDeductionsRoute
   '/payroll-loan': typeof PayrollLoanRoute
   '/payroll-reports': typeof PayrollReportsRoute
+  '/payslip-print': typeof PayslipPrintRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
   '/permission-management': typeof PermissionManagementRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
@@ -1539,6 +1548,7 @@ export interface FileRouteTypes {
     | '/payroll-deductions'
     | '/payroll-loan'
     | '/payroll-reports'
+    | '/payslip-print'
     | '/pending-manual-attendance'
     | '/permission-management'
     | '/personnel-approval'
@@ -1694,6 +1704,7 @@ export interface FileRouteTypes {
     | '/payroll-deductions'
     | '/payroll-loan'
     | '/payroll-reports'
+    | '/payslip-print'
     | '/pending-manual-attendance'
     | '/permission-management'
     | '/personnel-approval'
@@ -1849,6 +1860,7 @@ export interface FileRouteTypes {
     | '/payroll-deductions'
     | '/payroll-loan'
     | '/payroll-reports'
+    | '/payslip-print'
     | '/pending-manual-attendance'
     | '/permission-management'
     | '/personnel-approval'
@@ -2005,6 +2017,7 @@ export interface RootRouteChildren {
   PayrollDeductionsRoute: typeof PayrollDeductionsRoute
   PayrollLoanRoute: typeof PayrollLoanRoute
   PayrollReportsRoute: typeof PayrollReportsRoute
+  PayslipPrintRoute: typeof PayslipPrintRoute
   PendingManualAttendanceRoute: typeof PendingManualAttendanceRoute
   PermissionManagementRoute: typeof PermissionManagementRoute
   PersonnelApprovalRoute: typeof PersonnelApprovalRoute
@@ -2251,6 +2264,13 @@ declare module '@tanstack/react-router' {
       path: '/pending-manual-attendance'
       fullPath: '/pending-manual-attendance'
       preLoaderRoute: typeof PendingManualAttendanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payslip-print': {
+      id: '/payslip-print'
+      path: '/payslip-print'
+      fullPath: '/payslip-print'
+      preLoaderRoute: typeof PayslipPrintRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/payroll-reports': {
@@ -3238,6 +3258,7 @@ const rootRouteChildren: RootRouteChildren = {
   PayrollDeductionsRoute: PayrollDeductionsRoute,
   PayrollLoanRoute: PayrollLoanRoute,
   PayrollReportsRoute: PayrollReportsRoute,
+  PayslipPrintRoute: PayslipPrintRoute,
   PendingManualAttendanceRoute: PendingManualAttendanceRoute,
   PermissionManagementRoute: PermissionManagementRoute,
   PersonnelApprovalRoute: PersonnelApprovalRoute,

@@ -3,20 +3,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { 
-  Search, 
-  FileText, 
-  Printer, 
-  FileDown, 
-  Play, 
-  ChevronRight, 
-  AlertCircle, 
+  Search,
+  FileText,
+  Printer,
+  FileDown,
+  Play,
+  ChevronRight,
+  AlertCircle,
   Database,
   Building,
   MapPin,
@@ -45,7 +40,7 @@ import {
   Trash2,
   ChevronDown,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
 } from "lucide-react";
 
 // Deduction Template and Ramadan Month configurations definitions (aligned with payroll-deductions page)
@@ -78,7 +73,7 @@ const checkDeductionStatus = (
   year: number,
   monthStr: string,
   designatedRamadanMonth?: string,
-  empId?: string
+  empId?: string,
 ): { isSkipped: boolean; reason?: string } => {
   if (template.status === "Inactive") {
     return { isSkipped: true, reason: "Inactive Template" };
@@ -86,7 +81,7 @@ const checkDeductionStatus = (
 
   // Employee exclusions
   if (empId && template.employeeExclusions) {
-    const empExcl = template.employeeExclusions.find(x => x.empId === empId);
+    const empExcl = template.employeeExclusions.find((x) => x.empId === empId);
     if (empExcl) {
       const monthNum = String(MONTHS.indexOf(monthStr) + 1).padStart(2, "0");
       const periodStr = `${year}-${monthNum}`;
@@ -126,7 +121,12 @@ const checkDeductionStatus = (
   return { isSkipped: false };
 };
 
-const getEvaluatedAmount = (amount: string, amountType: "flat" | "percent-basic" | "percent-gross", basic: number, gross: number) => {
+const getEvaluatedAmount = (
+  amount: string,
+  amountType: "flat" | "percent-basic" | "percent-gross",
+  basic: number,
+  gross: number,
+) => {
   const numericVal = Number(amount) || 0;
   if (amountType === "percent-basic") {
     return Math.round((numericVal / 100) * basic);
@@ -197,7 +197,7 @@ const ROSTER_EMPLOYEES = [
     bankPay: 36750,
     cashPay: 12000,
     bankName: "Dutch-Bangla Bank Ltd.",
-    accountNo: "171.103.0271433"
+    accountNo: "171.103.0271433",
   },
   {
     id: 2,
@@ -256,7 +256,7 @@ const ROSTER_EMPLOYEES = [
     bankPay: 30000,
     cashPay: 8750,
     bankName: "Dutch-Bangla Bank Ltd.",
-    accountNo: "171.103.0756558"
+    accountNo: "171.103.0756558",
   },
   {
     id: 3,
@@ -315,7 +315,7 @@ const ROSTER_EMPLOYEES = [
     bankPay: 40000,
     cashPay: 8750,
     bankName: "",
-    accountNo: ""
+    accountNo: "",
   },
   {
     id: 4,
@@ -374,7 +374,7 @@ const ROSTER_EMPLOYEES = [
     bankPay: 31500,
     cashPay: 5289,
     bankName: "Dutch-Bangla Bank Ltd.",
-    accountNo: "171.103.0256059"
+    accountNo: "171.103.0256059",
   },
   {
     id: 5,
@@ -433,7 +433,7 @@ const ROSTER_EMPLOYEES = [
     bankPay: 25000,
     cashPay: 6750,
     bankName: "Dutch-Bangla Bank Ltd.",
-    accountNo: "163.105.0055997"
+    accountNo: "163.105.0055997",
   },
   {
     id: 6,
@@ -492,7 +492,7 @@ const ROSTER_EMPLOYEES = [
     bankPay: 31500,
     cashPay: 10250,
     bankName: "Dutch-Bangla Bank Ltd.",
-    accountNo: "171.103.0271342"
+    accountNo: "171.103.0271342",
   },
   {
     id: 7,
@@ -551,7 +551,7 @@ const ROSTER_EMPLOYEES = [
     bankPay: 15750,
     cashPay: 10000,
     bankName: "Dutch-Bangla Bank Ltd.",
-    accountNo: "171.103.0274893"
+    accountNo: "171.103.0274893",
   },
   {
     id: 8,
@@ -610,7 +610,7 @@ const ROSTER_EMPLOYEES = [
     bankPay: 38588,
     cashPay: 29162,
     bankName: "Dutch-Bangla Bank Ltd.",
-    accountNo: "171.103.0258700"
+    accountNo: "171.103.0258700",
   },
   {
     id: 9,
@@ -669,7 +669,7 @@ const ROSTER_EMPLOYEES = [
     bankPay: 35000,
     cashPay: 9750,
     bankName: "Dutch-Bangla Bank Ltd.",
-    accountNo: "171.103.0347140"
+    accountNo: "171.103.0347140",
   },
   {
     id: 10,
@@ -728,7 +728,7 @@ const ROSTER_EMPLOYEES = [
     bankPay: 15000,
     cashPay: 8750,
     bankName: "Dutch-Bangla Bank Ltd.",
-    accountNo: "238.105.0019971"
+    accountNo: "238.105.0019971",
   },
   {
     id: 11,
@@ -787,7 +787,7 @@ const ROSTER_EMPLOYEES = [
     bankPay: 15000,
     cashPay: 8750,
     bankName: "Dutch-Bangla Bank Ltd.",
-    accountNo: "171.103.0457353"
+    accountNo: "171.103.0457353",
   },
   {
     id: 12,
@@ -846,7 +846,7 @@ const ROSTER_EMPLOYEES = [
     bankPay: 28750,
     cashPay: 0,
     bankName: "Dutch-Bangla Bank Ltd.",
-    accountNo: "171.103.0793441"
+    accountNo: "171.103.0793441",
   },
   {
     id: 13,
@@ -905,7 +905,7 @@ const ROSTER_EMPLOYEES = [
     bankPay: 23750,
     cashPay: 0,
     bankName: "Dutch-Bangla Bank Ltd.",
-    accountNo: "171.103.0793452"
+    accountNo: "171.103.0793452",
   },
   {
     id: 14,
@@ -964,15 +964,18 @@ const ROSTER_EMPLOYEES = [
     bankPay: 25000,
     cashPay: 1750,
     bankName: "Dutch-Bangla Bank Ltd.",
-    accountNo: "125.105.52631"
-  }
+    accountNo: "125.105.52631",
+  },
 ];
 
 export const Route = createFileRoute("/monthly-salary-process")({
   head: () => ({
     meta: [
       { title: "Monthly Salary Process — CRIPTON" },
-      { name: "description", content: "Process and preview monthly staff salaries with diagnostic logs." },
+      {
+        name: "description",
+        content: "Process and preview monthly staff salaries with diagnostic logs.",
+      },
     ],
   }),
   component: MonthlySalaryProcessPage,
@@ -1114,7 +1117,7 @@ const DEFAULT_COLUMNS = {
   bankPay: true,
   cashPay: true,
   bankName: true,
-  accountNo: true
+  accountNo: true,
 };
 
 type ColumnKey = keyof typeof DEFAULT_COLUMNS;
@@ -1175,7 +1178,7 @@ const COLUMN_LABELS: Record<ColumnKey, string> = {
   bankPay: "Bank Pay",
   cashPay: "Cash Pay",
   bankName: "Bank Name",
-  accountNo: "Account No"
+  accountNo: "Account No",
 };
 
 type ColumnTemplate = {
@@ -1210,6 +1213,28 @@ const normalizeColumnVisibility = (columns?: Partial<Record<ColumnKey, boolean>>
   ...(columns || {}),
 });
 
+const ReportBtn = ({
+  label,
+  onClick,
+  highlight,
+}: {
+  label: string;
+  onClick?: () => void;
+  highlight?: boolean;
+}) => (
+  <button
+    onClick={onClick}
+    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-[11px] font-bold transition-all shadow-xs ${
+      highlight
+        ? "border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 hover:border-blue-300"
+        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300"
+    }`}
+  >
+    <FileText className="size-3.5" />
+    {label}
+  </button>
+);
+
 function MonthlySalaryProcessPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [processedRecords, setProcessedRecords] = useState<ProcessedSalaryRecord[]>([]);
@@ -1221,10 +1246,11 @@ function MonthlySalaryProcessPage() {
 
   // Selection filters for search
   const [searchQuery, setSearchQuery] = useState("");
+  const [isActionsOpen, setIsActionsOpen] = useState(false);
 
   // Edit Overlay Modal States
   const [editingRecord, setEditingRecord] = useState<ProcessedSalaryRecord | null>(null);
-  
+
   // Editable form fields states
   const [editWd, setEditWd] = useState(0);
   const [editPresent, setEditPresent] = useState(0);
@@ -1250,11 +1276,17 @@ function MonthlySalaryProcessPage() {
   const [editAdjust, setEditAdjust] = useState(0);
 
   // Column rearrangement & show/hide configurations
-  const [visibleCols, setVisibleCols] = useState<Record<ColumnKey, boolean>>({ ...DEFAULT_COLUMNS });
+  const [visibleCols, setVisibleCols] = useState<Record<ColumnKey, boolean>>({
+    ...DEFAULT_COLUMNS,
+  });
   const [columnOrder, setColumnOrder] = useState<ColumnKey[]>([...defaultColumnOrder]);
-  const [draftVisibleCols, setDraftVisibleCols] = useState<Record<ColumnKey, boolean>>({ ...DEFAULT_COLUMNS });
+  const [draftVisibleCols, setDraftVisibleCols] = useState<Record<ColumnKey, boolean>>({
+    ...DEFAULT_COLUMNS,
+  });
   const [draftColumnOrder, setDraftColumnOrder] = useState<ColumnKey[]>([...defaultColumnOrder]);
-  const [columnTemplates, setColumnTemplates] = useState<ColumnTemplate[]>([createDefaultColumnTemplate()]);
+  const [columnTemplates, setColumnTemplates] = useState<ColumnTemplate[]>([
+    createDefaultColumnTemplate(),
+  ]);
   const [templateName, setTemplateName] = useState("");
   const [isColSelectorOpen, setIsColSelectorOpen] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -1275,7 +1307,10 @@ function MonthlySalaryProcessPage() {
               columns: normalizeColumnVisibility(t.columns),
               order: normalizeColumnOrder(t.order),
             }));
-            const activeTemplate = normalizedTemplates.find((t: any) => t.isActive) || normalizedTemplates[0] || fallback[0];
+            const activeTemplate =
+              normalizedTemplates.find((t: any) => t.isActive) ||
+              normalizedTemplates[0] ||
+              fallback[0];
             setColumnTemplates(normalizedTemplates);
             setVisibleCols(normalizeColumnVisibility(activeTemplate.columns));
             setColumnOrder(normalizeColumnOrder(activeTemplate.order));
@@ -1429,7 +1464,9 @@ function MonthlySalaryProcessPage() {
       order: [...draftColumnOrder],
     };
 
-    const updatedTemplates = columnTemplates.map((t) => ({ ...t, isActive: false })).concat(newTemplate);
+    const updatedTemplates = columnTemplates
+      .map((t) => ({ ...t, isActive: false }))
+      .concat(newTemplate);
     setColumnTemplates(updatedTemplates);
     setTemplateName("");
     applyColumnConfig(updatedTemplates);
@@ -1473,7 +1510,9 @@ function MonthlySalaryProcessPage() {
         console.error("Failed to parse processed data", e);
       }
     }
-    alert(`No processed data exists for ${processMonth} ${processYear} yet. Please click the PROCESS button to calculate salary rates first.`);
+    alert(
+      `No processed data exists for ${processMonth} ${processYear} yet. Please click the PROCESS button to calculate salary rates first.`,
+    );
     setProcessedRecords([]);
     setIsDataLoaded(false);
   };
@@ -1483,7 +1522,7 @@ function MonthlySalaryProcessPage() {
     const generated: ProcessedSalaryRecord[] = ROSTER_EMPLOYEES.map((emp) => {
       return {
         ...emp,
-        netSalary: emp.totalPay
+        netSalary: emp.totalPay,
       };
     });
 
@@ -1491,7 +1530,9 @@ function MonthlySalaryProcessPage() {
     localStorage.setItem(activeStorageKey, JSON.stringify(generated));
     setProcessedRecords(generated);
     setIsDataLoaded(true);
-    alert(`Success: Payroll processed and saved for ${processMonth} ${processYear}! (${generated.length} employees calculated).`);
+    alert(
+      `Success: Payroll processed and saved for ${processMonth} ${processYear}! (${generated.length} employees calculated).`,
+    );
   };
 
   // Trigger row edits
@@ -1537,10 +1578,27 @@ function MonthlySalaryProcessPage() {
     const advance = Number(editAdvance) || 0;
     const loan = Number(editLoan) || 0;
 
-    return (gross + ot + bonus + allowance + adjust) - (lunch + transport + pf + tax + absent + advance + loan);
+    return (
+      gross +
+      ot +
+      bonus +
+      allowance +
+      adjust -
+      (lunch + transport + pf + tax + absent + advance + loan)
+    );
   }, [
-    editGross, editOtPay, editAttBonus, editAllowance, editAdjust,
-    editLunchDeduct, editTransportDeduct, editPf, editTax, editAbsentDeduct, editAdvance, editLoan
+    editGross,
+    editOtPay,
+    editAttBonus,
+    editAllowance,
+    editAdjust,
+    editLunchDeduct,
+    editTransportDeduct,
+    editPf,
+    editTax,
+    editAbsentDeduct,
+    editAdvance,
+    editLoan,
   ]);
 
   // Save manual overrides
@@ -1571,7 +1629,7 @@ function MonthlySalaryProcessPage() {
           adjust: editAdjust,
           wagelyAdv: editWagelyAdv,
           loan: editLoan,
-          netSalary: liveNetSalary
+          netSalary: liveNetSalary,
         };
       }
       return r;
@@ -1582,10 +1640,28 @@ function MonthlySalaryProcessPage() {
     setEditingRecord(null);
   };
 
-  const filteredRecords = processedRecords.filter((r) =>
-    r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    r.empId.includes(searchQuery)
+  const filteredRecords = processedRecords.filter(
+    (r) =>
+      r.name.toLowerCase().includes(searchQuery.toLowerCase()) || r.empId.includes(searchQuery),
   );
+
+  const handleOpenPayslip = (lang: "en" | "bn") => {
+    const printData = filteredRecords.map((r) => ({
+      sl: r.id.toString(),
+      statusType: r.employeeType,
+      empId: r.empId,
+      empIdOff: "",
+      name: r.name,
+      joinDate: r.joinDate,
+      empType: r.employeeType,
+      department: r.department,
+      section: r.section,
+      designation: r.designation,
+      totalPay: r.gross?.toString() || r.netPay?.toString() || "0",
+    }));
+    localStorage.setItem("print_payslip_data", JSON.stringify(printData));
+    window.open(`/payslip-print?lang=${lang}`, "_blank");
+  };
 
   return (
     <div className="min-h-screen flex bg-slate-50/70 text-slate-800 font-sans">
@@ -1611,40 +1687,55 @@ function MonthlySalaryProcessPage() {
                 Monthly Salary Process & Adjustments
               </h1>
               <p className="text-sm text-slate-500 max-w-4xl leading-relaxed">
-                Run dynamic payroll batches by loading rule mappings from deduction templates. View generated records per processing month, and manually adjust individual employee variables if necessary.
+                Run dynamic payroll batches by loading rule mappings from deduction templates. View
+                generated records per processing month, and manually adjust individual employee
+                variables if necessary.
               </p>
             </div>
           </div>
 
           {/* Dynamic Configuration Controls Form */}
           <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-6">
-            
             {/* Form row 1 */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
               <div className="col-span-2">
-                <label className="text-[10px] text-slate-400 font-bold uppercase block mb-1.5 tracking-wider">Year</label>
-                <select 
+                <label className="text-[10px] text-slate-400 font-bold uppercase block mb-1.5 tracking-wider">
+                  Year
+                </label>
+                <select
                   value={processYear}
                   onChange={(e) => setProcessYear(e.target.value)}
                   className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 focus:outline-none transition-all cursor-pointer font-sans"
                 >
-                  {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                  {YEARS.map((y) => (
+                    <option key={y} value={y}>
+                      {y}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div className="col-span-2">
-                <label className="text-[10px] text-slate-400 font-bold uppercase block mb-1.5 tracking-wider">Month</label>
-                <select 
+                <label className="text-[10px] text-slate-400 font-bold uppercase block mb-1.5 tracking-wider">
+                  Month
+                </label>
+                <select
                   value={processMonth}
                   onChange={(e) => setProcessMonth(e.target.value)}
                   className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 focus:outline-none transition-all cursor-pointer font-sans"
                 >
-                  {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
+                  {MONTHS.map((m) => (
+                    <option key={m} value={m}>
+                      {m}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div className="col-span-3">
-                <label className="text-[10px] text-slate-400 font-bold uppercase block mb-1.5 tracking-wider">Process Type</label>
+                <label className="text-[10px] text-slate-400 font-bold uppercase block mb-1.5 tracking-wider">
+                  Process Type
+                </label>
                 <select className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 focus:outline-none transition-all cursor-pointer font-sans">
                   <option>Final</option>
                   <option>Advance</option>
@@ -1653,7 +1744,9 @@ function MonthlySalaryProcessPage() {
               </div>
 
               <div className="col-span-3">
-                <label className="text-[10px] text-slate-400 font-bold uppercase block mb-1.5 tracking-wider">Salary Type</label>
+                <label className="text-[10px] text-slate-400 font-bold uppercase block mb-1.5 tracking-wider">
+                  Salary Type
+                </label>
                 <select className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 focus:outline-none transition-all cursor-pointer font-sans">
                   <option>ALL</option>
                   <option>Regular</option>
@@ -1662,7 +1755,7 @@ function MonthlySalaryProcessPage() {
               </div>
 
               <div className="col-span-2 flex justify-start">
-                <Button 
+                <Button
                   onClick={handleProcessSalaries}
                   className="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold h-10 rounded-xl transition-all shadow-md shadow-rose-500/10 flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
                 >
@@ -1725,7 +1818,9 @@ function MonthlySalaryProcessPage() {
               </div>
 
               <div className="col-span-3">
-                <label className="text-[10px] text-slate-400 font-bold uppercase block mb-1.5 tracking-wider">Employee Id</label>
+                <label className="text-[10px] text-slate-400 font-bold uppercase block mb-1.5 tracking-wider">
+                  Employee Id
+                </label>
                 <input
                   type="text"
                   placeholder="Use comma as separator"
@@ -1734,7 +1829,7 @@ function MonthlySalaryProcessPage() {
               </div>
 
               <div className="col-span-4 flex justify-start">
-                <Button 
+                <Button
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-10 rounded-xl transition-all shadow-md shadow-blue-500/10 flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
                   onClick={handleFetchData}
                 >
@@ -1745,23 +1840,117 @@ function MonthlySalaryProcessPage() {
             </div>
           </div>
 
+          {/* Advanced Report Actions Accordion */}
+          <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+            <button
+              onClick={() => setIsActionsOpen(!isActionsOpen)}
+              className="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100/50 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-blue-100 text-blue-600 rounded-md">
+                  <LayoutGrid className="size-4" />
+                </div>
+                <span className="text-sm font-bold text-slate-800 tracking-tight">
+                  Advanced Report Actions
+                </span>
+              </div>
+              {isActionsOpen ? (
+                <ChevronDown className="size-4 text-slate-500" />
+              ) : (
+                <ChevronRight className="size-4 text-slate-500" />
+              )}
+            </button>
+
+            {isActionsOpen && (
+              <div className="p-5 border-t border-slate-100 bg-white space-y-4">
+                <div className="flex flex-wrap gap-2">
+                  <ReportBtn
+                    label="Pay Slip-English"
+                    highlight
+                    onClick={() => handleOpenPayslip("en")}
+                  />
+                  <ReportBtn
+                    label="Pay Slip-Bangla"
+                    highlight
+                    onClick={() => handleOpenPayslip("bn")}
+                  />
+                  <ReportBtn label="Salary Sheet" highlight />
+                  <ReportBtn label="Dept.Wise Salary Sheet" highlight />
+                  <ReportBtn label="Salary Sheet(Exec)" highlight />
+                  <ReportBtn label="Bank Sheet(Exec)" highlight />
+                  <ReportBtn label="Export Bank Sheet(Exec)" highlight />
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <ReportBtn
+                    label="Pay Slip-English"
+                    highlight
+                    onClick={() => handleOpenPayslip("en")}
+                  />
+                  <ReportBtn
+                    label="Pay Slip-Bangla"
+                    highlight
+                    onClick={() => handleOpenPayslip("bn")}
+                  />
+                  <ReportBtn label="Pay Slip-Bangla(WH)" highlight />
+                  <ReportBtn label="Salary Sheet Full(Without Holiday)" highlight />
+                  <ReportBtn label="Salary Sheet Full(WH)" highlight />
+                  <ReportBtn label="OT Sheet(Holiday)" highlight />
+                  <ReportBtn label="Cash Sheet(Exec)" highlight />
+                  <ReportBtn label="Export Cash Sheet(Exec)" highlight />
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <ReportBtn label="Pay Slip-Bangla(2Hr)" highlight />
+                  <ReportBtn label="Pay Slip-Bangla(3Hr)" highlight />
+                  <ReportBtn label="Salary Sheet(2Hr)" highlight />
+                  <ReportBtn label="Salary Sheet(3Hr)" highlight />
+                  <ReportBtn label="Salary Sheet(4Hr)" highlight />
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <ReportBtn label="Pay Slip(NT)" highlight />
+                  <ReportBtn label="Salary Sheet(NT)" highlight />
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <ReportBtn label="Bank Forwarding(A)" highlight />
+                  <ReportBtn label="Bank Forwarding(2)" highlight />
+                  <ReportBtn label="Bank Forwarding(3)" highlight />
+                  <ReportBtn label="Bank Forwarding(NT)" highlight />
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Table Container */}
           <div className="bg-white border border-slate-200/80 rounded-2xl shadow-sm flex flex-col min-h-[500px] overflow-hidden">
-            
             {/* Top Action Bar */}
             <div className="p-5 border-b border-slate-100 bg-slate-50/40 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
               <div className="flex bg-slate-100/80 border border-slate-200/50 rounded-xl p-1 w-fit shadow-xs">
-                <Button variant="ghost" size="sm" className="h-8 px-4 text-xs font-bold text-slate-600 hover:bg-white hover:text-slate-800 rounded-lg transition-all flex items-center gap-1.5">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-4 text-xs font-bold text-slate-600 hover:bg-white hover:text-slate-800 rounded-lg transition-all flex items-center gap-1.5"
+                >
                   <FileDown className="size-4 text-emerald-600" />
                   EXCEL
                 </Button>
                 <div className="w-px bg-slate-200 my-1.5" />
-                <Button variant="ghost" size="sm" className="h-8 px-4 text-xs font-bold text-slate-600 hover:bg-white hover:text-slate-800 rounded-lg transition-all flex items-center gap-1.5">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-4 text-xs font-bold text-slate-600 hover:bg-white hover:text-slate-800 rounded-lg transition-all flex items-center gap-1.5"
+                >
                   <Printer className="size-4 text-blue-600" />
                   PRINT
                 </Button>
                 <div className="w-px bg-slate-200 my-1.5" />
-                <Button variant="ghost" size="sm" className="h-8 px-4 text-xs font-bold text-slate-600 hover:bg-white hover:text-slate-800 rounded-lg transition-all flex items-center gap-1.5">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-4 text-xs font-bold text-slate-600 hover:bg-white hover:text-slate-800 rounded-lg transition-all flex items-center gap-1.5"
+                >
                   <FileText className="size-4 text-rose-600" />
                   PDF
                 </Button>
@@ -1800,29 +1989,66 @@ function MonthlySalaryProcessPage() {
                     <th className="px-2 py-2 text-center w-16 bg-slate-50">Edit</th>
                     {columnOrder.map((key) => {
                       if (!visibleCols[key]) return null;
-                      
+
                       let extraClass = "";
                       if (key === "paySalary") extraClass = "font-extrabold bg-[#f1f5f9]";
-                      else if (key === "totalPay") extraClass = "font-extrabold bg-[#eff6ff] text-blue-600";
+                      else if (key === "totalPay")
+                        extraClass = "font-extrabold bg-[#eff6ff] text-blue-600";
                       else if (key === "absentDeduct") extraClass = "text-rose-600";
                       else if (key === "lateDeduct") extraClass = "text-rose-500";
-                      
+
                       let alignClass = "text-left";
                       const rightAligned = [
-                        "basic", "hRent", "med", "conv", "food", "gross", "otPay2", "otPay3", "eotPay", 
-                        "totalOtPay", "attBonus", "behaviorBonus", "holidayAllowance", "generalAllowance", 
-                        "conveyanceAllowance", "incentiveAllowance", "nightAllowance", "tiffin", "otherAllowance", 
-                        "totalAllowance", "arrearAdjust", "tax", "absentDeduct", "advance", "adjust", 
-                        "wagelyAdv", "loan", "lunchDeduct", "lateDeduct", "paySalary", "revStamp", "totalPay", 
-                        "bankPay", "cashPay"
+                        "basic",
+                        "hRent",
+                        "med",
+                        "conv",
+                        "food",
+                        "gross",
+                        "otPay2",
+                        "otPay3",
+                        "eotPay",
+                        "totalOtPay",
+                        "attBonus",
+                        "behaviorBonus",
+                        "holidayAllowance",
+                        "generalAllowance",
+                        "conveyanceAllowance",
+                        "incentiveAllowance",
+                        "nightAllowance",
+                        "tiffin",
+                        "otherAllowance",
+                        "totalAllowance",
+                        "arrearAdjust",
+                        "tax",
+                        "absentDeduct",
+                        "advance",
+                        "adjust",
+                        "wagelyAdv",
+                        "loan",
+                        "lunchDeduct",
+                        "lateDeduct",
+                        "paySalary",
+                        "revStamp",
+                        "totalPay",
+                        "bankPay",
+                        "cashPay",
                       ];
                       const centerAligned = [
-                        "wd", "present", "absent", "leave", "holiday", "ot2", "ot3", "eot", "totalOt"
+                        "wd",
+                        "present",
+                        "absent",
+                        "leave",
+                        "holiday",
+                        "ot2",
+                        "ot3",
+                        "eot",
+                        "totalOt",
                       ];
-                      
+
                       if (rightAligned.includes(key)) alignClass = "text-right";
                       else if (centerAligned.includes(key)) alignClass = "text-center";
-                      
+
                       return (
                         <th key={key} className={`px-2 py-2 ${alignClass} ${extraClass}`}>
                           {COLUMN_LABELS[key]}
@@ -1834,27 +2060,41 @@ function MonthlySalaryProcessPage() {
                 <tbody className="divide-y divide-slate-150 bg-white text-slate-700 font-sans">
                   {!isDataLoaded ? (
                     <tr>
-                      <td colSpan={columnOrder.filter(k => visibleCols[k]).length + 2} className="px-6 py-20 text-center text-slate-400 font-medium">
+                      <td
+                        colSpan={columnOrder.filter((k) => visibleCols[k]).length + 2}
+                        className="px-6 py-20 text-center text-slate-400 font-medium"
+                      >
                         <div className="flex flex-col items-center justify-center gap-2">
                           <AlertCircle className="size-6 text-slate-300" />
-                          <span>No data retrieved. Select Month/Year and click "GET PROCESSED DATA" or run "PROCESS" calculations.</span>
+                          <span>
+                            No data retrieved. Select Month/Year and click "GET PROCESSED DATA" or
+                            run "PROCESS" calculations.
+                          </span>
                         </div>
                       </td>
                     </tr>
                   ) : filteredRecords.length === 0 ? (
                     <tr>
-                      <td colSpan={columnOrder.filter(k => visibleCols[k]).length + 2} className="px-6 py-20 text-center text-slate-400 font-medium">
+                      <td
+                        colSpan={columnOrder.filter((k) => visibleCols[k]).length + 2}
+                        className="px-6 py-20 text-center text-slate-400 font-medium"
+                      >
                         No processed records match selected filters.
                       </td>
                     </tr>
                   ) : (
                     filteredRecords.map((row, idx) => (
-                      <tr key={row.id} className="hover:bg-slate-50/50 divide-x divide-slate-150 transition-colors group">
-                        <td className="px-2 py-1.5 font-semibold text-slate-400 text-center">{idx + 1}</td>
+                      <tr
+                        key={row.id}
+                        className="hover:bg-slate-50/50 divide-x divide-slate-150 transition-colors group"
+                      >
+                        <td className="px-2 py-1.5 font-semibold text-slate-400 text-center">
+                          {idx + 1}
+                        </td>
                         <td className="px-2 py-1.5 text-center">
-                          <button 
+                          <button
                             onClick={() => handleEditRecord(row)}
-                            className="bg-blue-50 text-blue-600 p-1 rounded hover:bg-blue-100 transition-colors cursor-pointer shadow-xs border border-blue-100" 
+                            className="bg-blue-50 text-blue-600 p-1 rounded hover:bg-blue-100 transition-colors cursor-pointer shadow-xs border border-blue-100"
                             title="Adjust Record values"
                           >
                             <Edit className="size-3" />
@@ -1862,36 +2102,77 @@ function MonthlySalaryProcessPage() {
                         </td>
                         {columnOrder.map((key) => {
                           if (!visibleCols[key]) return null;
-                          
+
                           const val = row[key as keyof ProcessedSalaryRecord];
                           let cellClass = "text-slate-650";
                           let formatVal = val;
-                          
+
                           if (key === "type") cellClass = "font-semibold text-slate-500";
                           else if (key === "empId") cellClass = "font-semibold text-slate-800";
-                          else if (key === "name") cellClass = "font-bold text-slate-900 group-hover:text-blue-600 transition-colors min-w-[150px]";
+                          else if (key === "name")
+                            cellClass =
+                              "font-bold text-slate-900 group-hover:text-blue-600 transition-colors min-w-[150px]";
                           else if (key === "joinDate") cellClass = "font-medium text-slate-550";
-                          else if (key === "bankName") cellClass = "font-semibold text-slate-600 text-xs";
+                          else if (key === "bankName")
+                            cellClass = "font-semibold text-slate-600 text-xs";
                           else if (key === "accountNo") cellClass = "font-mono text-slate-500";
-                          
+
                           const currencyKeys = [
-                            "basic", "hRent", "med", "conv", "food", "gross", "otPay2", "otPay3", "eotPay", 
-                            "totalOtPay", "attBonus", "behaviorBonus", "holidayAllowance", "generalAllowance", 
-                            "conveyanceAllowance", "incentiveAllowance", "nightAllowance", "tiffin", "otherAllowance", 
-                            "totalAllowance", "arrearAdjust", "tax", "absentDeduct", "advance", "adjust", 
-                            "wagelyAdv", "loan", "lunchDeduct", "lateDeduct", "paySalary", "revStamp", "totalPay", 
-                            "bankPay", "cashPay"
+                            "basic",
+                            "hRent",
+                            "med",
+                            "conv",
+                            "food",
+                            "gross",
+                            "otPay2",
+                            "otPay3",
+                            "eotPay",
+                            "totalOtPay",
+                            "attBonus",
+                            "behaviorBonus",
+                            "holidayAllowance",
+                            "generalAllowance",
+                            "conveyanceAllowance",
+                            "incentiveAllowance",
+                            "nightAllowance",
+                            "tiffin",
+                            "otherAllowance",
+                            "totalAllowance",
+                            "arrearAdjust",
+                            "tax",
+                            "absentDeduct",
+                            "advance",
+                            "adjust",
+                            "wagelyAdv",
+                            "loan",
+                            "lunchDeduct",
+                            "lateDeduct",
+                            "paySalary",
+                            "revStamp",
+                            "totalPay",
+                            "bankPay",
+                            "cashPay",
                           ];
                           const centerAligned = [
-                            "wd", "present", "absent", "leave", "holiday", "ot2", "ot3", "eot", "totalOt"
+                            "wd",
+                            "present",
+                            "absent",
+                            "leave",
+                            "holiday",
+                            "ot2",
+                            "ot3",
+                            "eot",
+                            "totalOt",
                           ];
-                          
+
                           let alignClass = "text-left";
                           if (currencyKeys.includes(key)) {
                             alignClass = "text-right font-mono";
                             formatVal = typeof val === "number" ? val.toLocaleString() : val;
-                            if (key === "paySalary") cellClass = "font-bold bg-slate-50 text-slate-800";
-                            else if (key === "totalPay") cellClass = "font-extrabold bg-blue-50/30 text-blue-600";
+                            if (key === "paySalary")
+                              cellClass = "font-bold bg-slate-50 text-slate-800";
+                            else if (key === "totalPay")
+                              cellClass = "font-extrabold bg-blue-50/30 text-blue-600";
                             else if (key === "absentDeduct") cellClass = "text-rose-600";
                             else if (key === "lateDeduct") cellClass = "text-rose-500";
                           } else if (centerAligned.includes(key)) {
@@ -1901,7 +2182,7 @@ function MonthlySalaryProcessPage() {
                             else if (key === "leave") cellClass = "font-medium text-amber-600";
                             else if (key === "holiday") cellClass = "font-medium text-blue-600";
                           }
-                          
+
                           return (
                             <td key={key} className={`px-2 py-1.5 ${alignClass} ${cellClass}`}>
                               {formatVal}
@@ -1923,19 +2204,23 @@ function MonthlySalaryProcessPage() {
                 </div>
                 <div className="flex gap-2 items-center">
                   <span className="cursor-not-allowed opacity-50 mr-2">Previous</span>
-                  <button className="h-7 w-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-extrabold shadow-sm shadow-blue-500/10">1</button>
+                  <button className="h-7 w-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-extrabold shadow-sm shadow-blue-500/10">
+                    1
+                  </button>
                   <span className="cursor-not-allowed opacity-50 ml-2">Next</span>
                 </div>
               </div>
             )}
           </div>
-
         </div>
 
         {/* ADJUSTMENT OVERLAYS EDIT MODAL */}
-        <Dialog open={editingRecord !== null} onOpenChange={(open) => {
-          if (!open) setEditingRecord(null);
-        }}>
+        <Dialog
+          open={editingRecord !== null}
+          onOpenChange={(open) => {
+            if (!open) setEditingRecord(null);
+          }}
+        >
           {editingRecord && (
             <DialogContent className="sm:max-w-4xl p-0 bg-white border-0 shadow-2xl overflow-hidden rounded-2xl">
               {/* Header */}
@@ -1948,32 +2233,39 @@ function MonthlySalaryProcessPage() {
                     <DialogTitle className="text-lg font-extrabold text-slate-800">
                       Payroll Adjustments — {editingRecord.name}
                     </DialogTitle>
-                    <p className="text-xs text-slate-400 mt-0.5 font-medium">Emp ID: {editingRecord.empId} • Editing {processMonth} {processYear} salary record</p>
+                    <p className="text-xs text-slate-400 mt-0.5 font-medium">
+                      Emp ID: {editingRecord.empId} • Editing {processMonth} {processYear} salary
+                      record
+                    </p>
                   </div>
                 </div>
               </div>
 
               {/* Scrollable form details */}
               <div className="px-6 py-5 max-h-[60vh] overflow-y-auto bg-slate-50/40 space-y-6">
-                
                 {/* Section: Deductions & Exceptions */}
                 <div className="bg-white p-6 rounded-2xl border border-slate-200/70 shadow-xs space-y-5">
                   <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
                     <TrendingDown className="size-4.5 text-rose-500" />
-                    <span className="text-xs font-extrabold uppercase tracking-wider text-slate-550 block">Monthly Deductions & Exceptions (৳)</span>
+                    <span className="text-xs font-extrabold uppercase tracking-wider text-slate-550 block">
+                      Monthly Deductions & Exceptions (৳)
+                    </span>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-                    
                     {/* Lunch Deduct */}
                     <div className="flex items-center gap-3.5 p-3.5 rounded-xl border border-slate-150 bg-slate-50/30">
                       <div className="size-9 rounded-lg flex items-center justify-center bg-orange-50 border border-orange-100 text-orange-500 shrink-0">
                         <Utensils className="size-4.5" />
                       </div>
                       <div className="flex-1 space-y-1">
-                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Lunch Deduct</label>
+                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+                          Lunch Deduct
+                        </label>
                         <div className="relative">
-                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">৳</span>
+                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">
+                            ৳
+                          </span>
                           <input
                             type="number"
                             value={editLunchDeduct}
@@ -1990,9 +2282,13 @@ function MonthlySalaryProcessPage() {
                         <Car className="size-4.5" />
                       </div>
                       <div className="flex-1 space-y-1">
-                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Transport Deduct</label>
+                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+                          Transport Deduct
+                        </label>
                         <div className="relative">
-                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">৳</span>
+                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">
+                            ৳
+                          </span>
                           <input
                             type="number"
                             value={editTransportDeduct}
@@ -2009,9 +2305,13 @@ function MonthlySalaryProcessPage() {
                         <Wallet className="size-4.5" />
                       </div>
                       <div className="flex-1 space-y-1">
-                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">PF Deduct</label>
+                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+                          PF Deduct
+                        </label>
                         <div className="relative">
-                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">৳</span>
+                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">
+                            ৳
+                          </span>
                           <input
                             type="number"
                             value={editPf}
@@ -2028,9 +2328,13 @@ function MonthlySalaryProcessPage() {
                         <Percent className="size-4.5" />
                       </div>
                       <div className="flex-1 space-y-1">
-                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Tax Deduct</label>
+                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+                          Tax Deduct
+                        </label>
                         <div className="relative">
-                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">৳</span>
+                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">
+                            ৳
+                          </span>
                           <input
                             type="number"
                             value={editTax}
@@ -2047,9 +2351,13 @@ function MonthlySalaryProcessPage() {
                         <AlertTriangle className="size-4.5" />
                       </div>
                       <div className="flex-1 space-y-1">
-                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block text-rose-600">Absent Penalty</label>
+                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block text-rose-600">
+                          Absent Penalty
+                        </label>
                         <div className="relative">
-                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">৳</span>
+                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">
+                            ৳
+                          </span>
                           <input
                             type="number"
                             value={editAbsentDeduct}
@@ -2066,9 +2374,13 @@ function MonthlySalaryProcessPage() {
                         <ArrowUpRight className="size-4.5" />
                       </div>
                       <div className="flex-1 space-y-1">
-                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Salary Adv.</label>
+                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+                          Salary Adv.
+                        </label>
                         <div className="relative">
-                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">৳</span>
+                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">
+                            ৳
+                          </span>
                           <input
                             type="number"
                             value={editAdvance}
@@ -2085,9 +2397,13 @@ function MonthlySalaryProcessPage() {
                         <Coins className="size-4.5" />
                       </div>
                       <div className="flex-1 space-y-1">
-                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Loan Repay</label>
+                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+                          Loan Repay
+                        </label>
                         <div className="relative">
-                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">৳</span>
+                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">
+                            ৳
+                          </span>
                           <input
                             type="number"
                             value={editLoan}
@@ -2104,9 +2420,13 @@ function MonthlySalaryProcessPage() {
                         <Sliders className="size-4.5" />
                       </div>
                       <div className="flex-1 space-y-1">
-                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Adjustments</label>
+                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+                          Adjustments
+                        </label>
                         <div className="relative">
-                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">৳</span>
+                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">
+                            ৳
+                          </span>
                           <input
                             type="number"
                             value={editAdjust}
@@ -2116,17 +2436,20 @@ function MonthlySalaryProcessPage() {
                         </div>
                       </div>
                     </div>
-
                   </div>
                 </div>
 
                 {/* Section D: Live calculated net pay auditor banner */}
                 <div className="bg-blue-600 text-white rounded-2xl p-5 flex flex-row items-center justify-between shadow-md shadow-blue-500/10">
                   <div className="space-y-0.5">
-                    <span className="text-[10px] uppercase font-bold tracking-wider opacity-85 block">Live Net Pay Audit</span>
-                    <span className="text-xs opacity-75 block font-medium">Matches recalculations based on configured adjustments.</span>
+                    <span className="text-[10px] uppercase font-bold tracking-wider opacity-85 block">
+                      Live Net Pay Audit
+                    </span>
+                    <span className="text-xs opacity-75 block font-medium">
+                      Matches recalculations based on configured adjustments.
+                    </span>
                   </div>
-                  
+
                   <div className="text-right">
                     <span className="text-2xl font-extrabold tracking-tight font-mono">
                       ৳ {liveNetSalary.toLocaleString()}
@@ -2169,7 +2492,9 @@ function MonthlySalaryProcessPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <LayoutGrid className="size-4.5 text-blue-600" />
-                    <h3 className="text-sm font-bold text-slate-800">Column Arrangement & Visibility</h3>
+                    <h3 className="text-sm font-bold text-slate-800">
+                      Column Arrangement & Visibility
+                    </h3>
                   </div>
                   <p className="text-[11px] text-slate-455 mt-1 font-medium">
                     Show/hide columns, drag columns to reorder, and save reusable custom templates.
@@ -2216,7 +2541,8 @@ function MonthlySalaryProcessPage() {
                                   </span>
                                 </div>
                                 <div className="text-[10px] text-slate-400 mt-1 font-semibold">
-                                  {visibleCount} visible • {defaultColumnOrder.length - visibleCount} hidden
+                                  {visibleCount} visible •{" "}
+                                  {defaultColumnOrder.length - visibleCount} hidden
                                 </div>
                               </div>
                               <span
@@ -2303,12 +2629,16 @@ function MonthlySalaryProcessPage() {
                           className={`flex items-center gap-4 py-2 bg-white transition-all cursor-grab active:cursor-grabbing group ${isOver ? "bg-blue-50/50 scale-[0.99] border-y border-blue-100" : ""}`}
                         >
                           <div className="w-8 text-[11px] font-bold text-slate-300 font-mono flex items-center gap-1.5">
-                            <span className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-300">⋮⋮</span>
+                            <span className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-300">
+                              ⋮⋮
+                            </span>
                             <span>{index + 1}</span>
                           </div>
-                          
+
                           <div className="flex-1 min-w-0">
-                            <span className="text-xs font-bold text-slate-700 block">{COLUMN_LABELS[key]}</span>
+                            <span className="text-xs font-bold text-slate-700 block">
+                              {COLUMN_LABELS[key]}
+                            </span>
                           </div>
 
                           <div className="w-24 flex items-center justify-end gap-2.5">
