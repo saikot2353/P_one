@@ -2348,25 +2348,36 @@ function CompanySetupPage() {
                 Company Setup
               </h1>
             </div>
-            <div className="flex flex-col sm:flex-row items-center gap-2">
-              <button
-                onClick={() => {
-                  setCopySourceCompany("");
-                  setCopyTargetCompany(companyFilter === "all" ? "" : companyFilter);
-                  setSelectedCopyItems([]);
-                  setIsCopyModalOpen(true);
-                }}
-                className="h-10 px-4 rounded-xl bg-muted text-foreground border border-border/60 font-semibold text-sm shadow-sm hover:bg-muted/80 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
-              >
-                <Layers className="size-4.5 text-blue-500" /> Copy From...
-              </button>
-              <button
-                onClick={() => openForm(null)}
-                className="h-10 px-5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
-              >
-                <Plus className="size-4.5" /> Add New Record
-              </button>
-            </div>
+            {!(activeTab === "payslip" && isConfiguringTemplate) && (
+              <div className="flex flex-col sm:flex-row items-center gap-2">
+                <button
+                  onClick={() => {
+                    setCopySourceCompany("");
+                    setCopyTargetCompany(companyFilter === "all" ? "" : companyFilter);
+                    setSelectedCopyItems([]);
+                    setIsCopyModalOpen(true);
+                  }}
+                  className="h-10 px-4 rounded-xl bg-muted text-foreground border border-border/60 font-semibold text-sm shadow-sm hover:bg-muted/80 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
+                >
+                  <Layers className="size-4.5 text-blue-500" /> Copy From...
+                </button>
+                <button
+                  onClick={() => {
+                    if (activeTab === "payslip") {
+                      setTplTitle("");
+                      setTplCompany(orgs[0]?.nameEng || "Pakiza Software Limited");
+                      setTplEmpType("Permanent");
+                      setIsCreateTplOpen(true);
+                    } else {
+                      openForm(null);
+                    }
+                  }}
+                  className="h-10 px-5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
+                >
+                  <Plus className="size-4.5" /> Add New Record
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Horizontal Master Tabs */}
@@ -2454,17 +2465,6 @@ function CompanySetupPage() {
                       <h2 className="text-base font-bold text-foreground">Payslip Templates Setup</h2>
                       <p className="text-xs text-muted-foreground mt-0.5">Manage and customize payslip columns and translations based on employee types.</p>
                     </div>
-                    <button
-                      onClick={() => {
-                        setTplTitle("");
-                        setTplCompany(orgs[0]?.nameEng || "Pakiza Software Limited");
-                        setTplEmpType("Permanent");
-                        setIsCreateTplOpen(true);
-                      }}
-                      className="h-10 px-5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
-                    >
-                      <Plus className="size-4.5" /> Create New Template
-                    </button>
                   </div>
 
                   <div className="overflow-x-auto border border-border/40 rounded-xl">
@@ -2500,7 +2500,7 @@ function CompanySetupPage() {
                                   }}
                                   className="h-9 px-4 mt-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-sm hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
                                 >
-                                  <Plus className="size-4" /> Create First Template
+                                  <Plus className="size-4" /> Add New Record
                                 </button>
                               </div>
                             </td>
