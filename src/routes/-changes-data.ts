@@ -2,6 +2,33 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "200",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Central Approvals",
+    link: "/all-approvals",
+    descriptionEn: "Added inline editing for Approved Amount and Installment Terms inside the Loan details modal. Editing dynamically updates the calculations, monthly rate, and amortization projections in real time. Redesigned the tab switcher for full width container aesthetics and enhanced the details card formatting.",
+    descriptionBn: "লোন ডিটেইলস মোডালে অনুমোদিত পরিমাণ (Approved Amount) এবং কিস্তির মেয়াদ (Installment Terms) সরাসরি এডিট করার সুবিধা যুক্ত করা হয়েছে। এডিট করার সাথে সাথে হিসাবকৃত মাসিক চার্জ ও অ্যামোরটাইজেশন টেবিল স্বয়ংক্রিয়ভাবে আপডেট হবে। এছাড়া ট্যাব সুইচারকে ফুল-উইডথ করা হয়েছে এবং ডিটেইলস কার্ডের ডিজাইন আরও আকর্ষণীয় করা হয়েছে।",
+  },
+  {
+    id: "199",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Central Approvals",
+    link: "/all-approvals",
+    descriptionEn: "Upgraded the All Approvals page by adding a prominent 'View' button for all approval requests and making the new Modal design accessible across all module types (Leave, Advance, Increment, etc.), instead of just Loan requests.",
+    descriptionBn: "সকল অ্যাপ্রুভাল পেজে একটি স্পষ্ট 'View' বাটন যোগ করা হয়েছে এবং নতুন মোডাল ডিজাইনটি শুধুমাত্র লোনের পরিবর্তে এখন সব ধরনের মডিউলের (লিভ, অ্যাডভান্স, ইনক্রিমেন্ট ইত্যাদি) রিকুয়েস্ট দেখার জন্য ব্যবহার করা যাবে।",
+  },
+  {
+    id: "198",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Central Approvals",
+    link: "/all-approvals",
+    descriptionEn: "Designed and integrated an interactive Loan Approval View Modal in the All Approvals page. It presents comprehensive loan summary data, terms, repayment metrics, zero-interest amortization projections table, approval flow timeline cards, and comments/notes history using a modern card-based modal interface.",
+    descriptionBn: "অল অ্যাপ্রুভালস পেজে একটি আকর্ষণীয় লোন অ্যাপ্রুভাল ভিউ মোডাল ডিজাইন ও যুক্ত করা হয়েছে। এর মাধ্যমে লোনের সংক্ষিপ্ত বিবরণ, শর্তাবলী, ৪-১০ মাসের রি-পেমেন্ট মেট্রিক্স, জিরো-ইন্টারেস্ট অ্যামোরটাইজেশন সিডিউল টেবিল, স্টেপ-বাই-স্টেপ অ্যাপ্রুভাল ফ্লো টাইমলাইন এবং কমেন্ট/নোটস হিস্ট্রি একনজরে দেখা যাবে।",
+  },
+  {
     id: "197",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Update",

@@ -24,6 +24,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { LoanApprovalViewModal, LoanApprovalModalData } from "@/components/modals/LoanApprovalViewModal";
+
 
 export const Route = createFileRoute("/all-approvals")({
   component: AllApprovalsPage,
@@ -233,6 +235,21 @@ const mockApprovals: ApprovalRequest[] = [
     status: "Pending",
   },
   {
+    id: "9",
+    module: "Loan",
+    reqNo: "2026079299",
+    employee: {
+      name: "Mr X",
+      id: "2026079299",
+      designation: "Placeholder Designation",
+      department: "12312",
+    },
+    details: "ddddddddddvc cxv xsxvs",
+    amount: 1000,
+    date: "2026-07-25",
+    status: "Pending",
+  },
+  {
     id: "8",
     module: "Attendance",
     reqNo: "AT-2026-088",
@@ -296,6 +313,66 @@ function AllApprovalsPage() {
   const [selectedModule, setSelectedModule] = useState<ModuleType | "All">("All");
   const [selectedStatus, setSelectedStatus] = useState<StatusType | "All">("All");
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+
+  const [isLoanModalOpen, setIsLoanModalOpen] = useState(false);
+  const [selectedLoanData, setSelectedLoanData] = useState<LoanApprovalModalData | null>(null);
+
+  const handleOpenDetailsModal = (item: ApprovalRequest) => {
+    setSelectedLoanData({
+      id: item.reqNo || item.id,
+      moduleName: item.module,
+      reqNo: item.reqNo || item.id,
+      applicationDate: format(new Date(item.date), "dd MMM yyyy"),
+      submittedTime: "09:18 AM",
+      status: item.status,
+      employee: {
+        name: item.employee.name,
+        id: item.employee.id,
+        designation: item.employee.designation,
+        department: item.employee.department,
+        section: "Project Resource & Strategy",
+        division: "Placeholder Unit",
+        location: "PSL-Operation",
+        joiningDate: "2026-07-25T00:00:00Z",
+        basicSalary: 0,
+        grossSalary: 0,
+      },
+      terms: {
+        requestedAmount: item.amount || 1000,
+        approvedAmount: item.status === "Approved" ? (item.amount || 1000) : 0,
+        installmentTermMonths: 4,
+        monthlyRate: Math.round((item.amount || 1000) / 4),
+        reason: item.details,
+      },
+      timeline: [
+        {
+          stage: "STAGE 1: HR, ADMIN AND COMPLIANCE",
+          roleLabel: "STAGE 1",
+          approverName: "Rajebul Hasan Rajon",
+          approverDesignation: "HR, Admin and Compliance",
+          status: "pending",
+          date: "2026-08-12T06:58:49.285855+00:00",
+        },
+        {
+          stage: "STAGE 2: 12312",
+          roleLabel: "STAGE 2",
+          approverName: item.employee.name,
+          approverDesignation: "Department Head",
+          status: "approved",
+          date: "2026-08-18T03:57:57.3663+00:00",
+        },
+        {
+          stage: "STAGE 3: ABC",
+          roleLabel: "STAGE 3",
+          approverName: "Md. Sadmanur Islam Shishir",
+          approverDesignation: "Approval Authority",
+          status: "pending",
+          date: "2026-08-12T06:58:49.285855+00:00",
+        },
+      ],
+    });
+    setIsLoanModalOpen(true);
+  };
 
   const filteredData = useMemo(() => {
     return mockApprovals.filter((item) => {
@@ -573,11 +650,11 @@ function AllApprovalsPage() {
                                 <XCircle className="size-4" />
                               </button>
                               <button
-                                onClick={() => toast.info("Viewing details for " + item.reqNo)}
-                                className="size-8 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 dark:border-slate-700 dark:hover:bg-slate-800 dark:text-slate-300 flex items-center justify-center transition-colors"
+                                onClick={() => handleOpenDetailsModal(item)}
+                                className="h-8 px-3 rounded-lg bg-[#2563eb]/10 hover:bg-[#2563eb]/20 text-[#2563eb] dark:bg-blue-500/10 dark:hover:bg-blue-500/20 dark:text-blue-400 font-bold text-[10px] uppercase tracking-wider flex items-center justify-center transition-colors"
                                 title="View Details"
                               >
-                                <ArrowRight className="size-4" />
+                                View
                               </button>
                             </div>
                           </td>
@@ -621,6 +698,13 @@ function AllApprovalsPage() {
           </div>
         </div>
       </main>
+
+      {/* Loan Approval View Modal */}
+      <LoanApprovalViewModal
+        isOpen={isLoanModalOpen}
+        onClose={() => setIsLoanModalOpen(false)}
+        data={selectedLoanData}
+      />
     </div>
   );
 }

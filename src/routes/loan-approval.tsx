@@ -17,6 +17,8 @@ import {
   Activity,
   Banknote,
 } from "lucide-react";
+import { LoanApprovalViewModal, LoanApprovalModalData } from "@/components/modals/LoanApprovalViewModal";
+
 
 export const Route = createFileRoute("/loan-approval")({
   component: LoanApprovalPage,
@@ -80,6 +82,38 @@ function LoanApprovalPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedArea, setSelectedArea] = useState("ALL");
   const [selectedStatus, setSelectedStatus] = useState("Pending");
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedLoan, setSelectedLoan] = useState<LoanApprovalModalData | null>(null);
+
+  const handleViewLoanDetails = (row: LoanRequest) => {
+    setSelectedLoan({
+      id: row.id.replace("LN-", "") || "2026079299",
+      reqNo: row.id,
+      applicationDate: "14 Jul 2026",
+      submittedTime: "09:18 AM",
+      status: row.status,
+      employee: {
+        name: row.empName,
+        id: row.empId,
+        designation: "Placeholder Designation",
+        department: "12312",
+        division: row.areaName,
+        location: row.areaName,
+        joiningDate: row.joinDate,
+        basicSalary: 0,
+        grossSalary: 0,
+      },
+      terms: {
+        requestedAmount: row.expLoanAmount,
+        approvedAmount: row.status === "Approved" ? row.expLoanAmount : 0,
+        installmentTermMonths: 4,
+        monthlyRate: Math.round(row.expLoanAmount / 4),
+        reason: "Emergency loan request",
+      },
+    });
+    setIsModalOpen(true);
+  };
 
   const filteredRecords = useMemo(() => {
     return records.filter((r) => {
@@ -500,7 +534,7 @@ function LoanApprovalPage() {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                alert(`Viewing details for ${row.empName}`);
+                                handleViewLoanDetails(row);
                               }}
                               className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-[#2563eb] rounded transition"
                               title="View Details"
@@ -564,6 +598,20 @@ function LoanApprovalPage() {
           </div>
         </div>
       </main>
+
+      <LoanApprovalViewModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        data={selectedLoan}
+        onApprove={(id) => {
+          handleUpdateStatus(id, "Approved");
+          setIsModalOpen(false);
+        }}
+        onReject={(id) => {
+          handleUpdateStatus(id, "Rejected");
+          setIsModalOpen(false);
+        }}
+      />
     </div>
   );
 }
