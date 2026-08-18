@@ -34,7 +34,7 @@ function PayrollReportsPage() {
           title: "Monthly Salary Details",
           icon: FileText,
           desc: "Detailed breakdown of monthly salaries.",
-          to: "#",
+          to: "/monthly-salary-details",
         },
         {
           title: "Monthly Left Salary Sheet",
@@ -189,7 +189,7 @@ function PayrollReportsPage() {
                     {section.items.map((category) => (
                       <Link
                         key={category.title}
-                        to={category.to}
+                        to={category.to as any}
                         className="group flex items-start gap-3 p-3 bg-muted/20 border border-border/50 hover:bg-muted/40 hover:border-border/80 rounded-lg transition-all shadow-sm hover:shadow"
                       >
                         <div className="p-2 bg-primary/5 text-primary rounded-md border border-primary/10 group-hover:bg-primary/10 transition-colors shrink-0">

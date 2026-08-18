@@ -50,6 +50,7 @@ import { Route as PayrollBenefitsRouteImport } from './routes/payroll-benefits'
 import { Route as PayrollAdvanceRouteImport } from './routes/payroll-advance'
 import { Route as MyDashboardRouteImport } from './routes/my-dashboard'
 import { Route as MonthlySalaryProcessRouteImport } from './routes/monthly-salary-process'
+import { Route as MonthlySalaryDetailsRouteImport } from './routes/monthly-salary-details'
 import { Route as ModuleSelectionRouteImport } from './routes/module-selection'
 import { Route as MessengerRouteImport } from './routes/messenger'
 import { Route as MerchandisingWorkOrdersRouteImport } from './routes/merchandising-work-orders'
@@ -372,6 +373,11 @@ const MyDashboardRoute = MyDashboardRouteImport.update({
 const MonthlySalaryProcessRoute = MonthlySalaryProcessRouteImport.update({
   id: '/monthly-salary-process',
   path: '/monthly-salary-process',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MonthlySalaryDetailsRoute = MonthlySalaryDetailsRouteImport.update({
+  id: '/monthly-salary-details',
+  path: '/monthly-salary-details',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ModuleSelectionRoute = ModuleSelectionRouteImport.update({
@@ -1053,6 +1059,7 @@ export interface FileRoutesByFullPath {
   '/merchandising-work-orders': typeof MerchandisingWorkOrdersRoute
   '/messenger': typeof MessengerRoute
   '/module-selection': typeof ModuleSelectionRoute
+  '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
@@ -1207,6 +1214,7 @@ export interface FileRoutesByTo {
   '/merchandising-work-orders': typeof MerchandisingWorkOrdersRoute
   '/messenger': typeof MessengerRoute
   '/module-selection': typeof ModuleSelectionRoute
+  '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
@@ -1362,6 +1370,7 @@ export interface FileRoutesById {
   '/merchandising-work-orders': typeof MerchandisingWorkOrdersRoute
   '/messenger': typeof MessengerRoute
   '/module-selection': typeof ModuleSelectionRoute
+  '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
@@ -1518,6 +1527,7 @@ export interface FileRouteTypes {
     | '/merchandising-work-orders'
     | '/messenger'
     | '/module-selection'
+    | '/monthly-salary-details'
     | '/monthly-salary-process'
     | '/my-dashboard'
     | '/payroll-advance'
@@ -1672,6 +1682,7 @@ export interface FileRouteTypes {
     | '/merchandising-work-orders'
     | '/messenger'
     | '/module-selection'
+    | '/monthly-salary-details'
     | '/monthly-salary-process'
     | '/my-dashboard'
     | '/payroll-advance'
@@ -1826,6 +1837,7 @@ export interface FileRouteTypes {
     | '/merchandising-work-orders'
     | '/messenger'
     | '/module-selection'
+    | '/monthly-salary-details'
     | '/monthly-salary-process'
     | '/my-dashboard'
     | '/payroll-advance'
@@ -1981,6 +1993,7 @@ export interface RootRouteChildren {
   MerchandisingWorkOrdersRoute: typeof MerchandisingWorkOrdersRoute
   MessengerRoute: typeof MessengerRoute
   ModuleSelectionRoute: typeof ModuleSelectionRoute
+  MonthlySalaryDetailsRoute: typeof MonthlySalaryDetailsRoute
   MonthlySalaryProcessRoute: typeof MonthlySalaryProcessRoute
   MyDashboardRoute: typeof MyDashboardRoute
   PayrollAdvanceRoute: typeof PayrollAdvanceRoute
@@ -2315,6 +2328,13 @@ declare module '@tanstack/react-router' {
       path: '/monthly-salary-process'
       fullPath: '/monthly-salary-process'
       preLoaderRoute: typeof MonthlySalaryProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/monthly-salary-details': {
+      id: '/monthly-salary-details'
+      path: '/monthly-salary-details'
+      fullPath: '/monthly-salary-details'
+      preLoaderRoute: typeof MonthlySalaryDetailsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/module-selection': {
@@ -3206,6 +3226,7 @@ const rootRouteChildren: RootRouteChildren = {
   MerchandisingWorkOrdersRoute: MerchandisingWorkOrdersRoute,
   MessengerRoute: MessengerRoute,
   ModuleSelectionRoute: ModuleSelectionRoute,
+  MonthlySalaryDetailsRoute: MonthlySalaryDetailsRoute,
   MonthlySalaryProcessRoute: MonthlySalaryProcessRoute,
   MyDashboardRoute: MyDashboardRoute,
   PayrollAdvanceRoute: PayrollAdvanceRoute,

@@ -2,13 +2,22 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "199",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Payroll Reports",
+    link: "/monthly-salary-details",
+    descriptionEn: "Created the new 'Monthly Salary Details' report page. Added advanced filter options (Year, Month, Department, etc.), populated the datatable with real-time employee salary structures, and integrated a comprehensive suite of report generation action buttons at the bottom.",
+    descriptionBn: "নতুন 'Monthly Salary Details' রিপোর্ট পেইজ তৈরি করা হয়েছে। এখানে অ্যাডভান্সড ফিল্টার অপশন (Year, Month, Department, ইত্যাদি) যোগ করা হয়েছে, এমপ্লয়ি স্যালারি স্ট্রাকচার দিয়ে ডাটাটেবিল আপডেট করা হয়েছে, এবং পেইজের নিচে রিপোর্ট জেনারেট করার জন্য প্রয়োজনীয় সব অ্যাকশন বাটন যুক্ত করা হয়েছে।",
+  },
+  {
     id: "206",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Update",
     module: "Central Approvals",
     link: "/all-approvals",
     descriptionEn: "Implemented a structured table layout for the Loan Terms & Details section inside the details modal. Utilizes a light-gray table header and borderless table row design matching the styling of the other master data tables.",
-    descriptionBn: "লোন ডিটেইলস মোডালের লোন টার্মস অ্যান্ড ডিটেইলস সেকশনটি টেবিল ফরম্যাটে রূপান্তর করা হয়েছে। এটিতে লাইট-গ্রে টেবিল হেডার এবং বর্ডারহীন টেবিল রো ডিজাইন ব্যবহার করা হয়েছে যা সিস্টেমের অন্য মাস্টার ডেটা টেবিলগুলোর সাথে সামঞ্জস্যপূর্ণ।",
+    descriptionBn: "à¦²à§‹à¦¨ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸ à¦®à§‹à¦¡à¦¾à¦²à§‡à¦° à¦²à§‹à¦¨ à¦Ÿà¦¾à¦°à§�à¦®à¦¸ à¦…à§�à¦¯à¦¾à¦¨à§�à¦¡ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸ à¦¸à§‡à¦•à¦¶à¦¨à¦Ÿà¦¿ à¦Ÿà§‡à¦¬à¦¿à¦² à¦«à¦°à¦®à§�à¦¯à¦¾à¦Ÿà§‡ à¦°à§‚à¦ªà¦¾à¦¨à§�à¦¤à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦Ÿà¦¿à¦¤à§‡ à¦²à¦¾à¦‡à¦Ÿ-à¦—à§�à¦°à§‡ à¦Ÿà§‡à¦¬à¦¿à¦² à¦¹à§‡à¦¡à¦¾à¦° à¦�à¦¬à¦‚ à¦¬à¦°à§�à¦¡à¦¾à¦°à¦¹à§€à¦¨ à¦Ÿà§‡à¦¬à¦¿à¦² à¦°à§‹ à¦¡à¦¿à¦œà¦¾à¦‡à¦¨ à¦¬à§�à¦¯à¦¬à¦¹à¦¾à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¯à¦¾ à¦¸à¦¿à¦¸à§�à¦Ÿà§‡à¦®à§‡à¦° à¦…à¦¨à§�à¦¯ à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦¡à§‡à¦Ÿà¦¾ à¦Ÿà§‡à¦¬à¦¿à¦²à¦—à§�à¦²à§‹à¦° à¦¸à¦¾à¦¥à§‡ à¦¸à¦¾à¦®à¦žà§�à¦œà¦¸à§�à¦¯à¦ªà§‚à¦°à§�à¦£à¥¤",
   },
   {
     id: "205",
@@ -17,7 +26,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Central Approvals",
     link: "/all-approvals",
     descriptionEn: "Refined the Loan Terms details grid layout for a cleaner and more professional presentation. Replaced spreadsheet-like vertical divider lines with an aligned borderless grid system, and standardized all value colors and font sizes to prevent a clashing layout.",
-    descriptionBn: "লোন টার্মস ডিটেইলসের লেআউটটি আরও প্রফেশনাল ও পরিচ্ছন্ন করতে রিফাইন করা হয়েছে। স্প্রেডশিটের মতো অনমনীয় খাঁড়া বিভাজক রেখা সরিয়ে একটি সাবলীল বর্ডারহীন গ্রিড সিস্টেম প্রবর্তন করা হয়েছে এবং সব মানগুলোর ফন্ট সাইজ ও রঙ একই করা হয়েছে যাতে কালার ক্ল্যাশ না হয়।",
+    descriptionBn: "à¦²à§‹à¦¨ à¦Ÿà¦¾à¦°à§�à¦®à¦¸ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸à§‡à¦° à¦²à§‡à¦†à¦‰à¦Ÿà¦Ÿà¦¿ à¦†à¦°à¦“ à¦ªà§�à¦°à¦«à§‡à¦¶à¦¨à¦¾à¦² à¦“ à¦ªà¦°à¦¿à¦šà§�à¦›à¦¨à§�à¦¨ à¦•à¦°à¦¤à§‡ à¦°à¦¿à¦«à¦¾à¦‡à¦¨ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦¸à§�à¦ªà§�à¦°à§‡à¦¡à¦¶à¦¿à¦Ÿà§‡à¦° à¦®à¦¤à§‹ à¦…à¦¨à¦®à¦¨à§€à§Ÿ à¦–à¦¾à¦�à§œà¦¾ à¦¬à¦¿à¦­à¦¾à¦œà¦• à¦°à§‡à¦–à¦¾ à¦¸à¦°à¦¿à§Ÿà§‡ à¦�à¦•à¦Ÿà¦¿ à¦¸à¦¾à¦¬à¦²à§€à¦² à¦¬à¦°à§�à¦¡à¦¾à¦°à¦¹à§€à¦¨ à¦—à§�à¦°à¦¿à¦¡ à¦¸à¦¿à¦¸à§�à¦Ÿà§‡à¦® à¦ªà§�à¦°à¦¬à¦°à§�à¦¤à¦¨ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦¸à¦¬ à¦®à¦¾à¦¨à¦—à§�à¦²à§‹à¦° à¦«à¦¨à§�à¦Ÿ à¦¸à¦¾à¦‡à¦œ à¦“ à¦°à¦™ à¦�à¦•à¦‡ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¯à¦¾à¦¤à§‡ à¦•à¦¾à¦²à¦¾à¦° à¦•à§�à¦²à§�à¦¯à¦¾à¦¶ à¦¨à¦¾ à¦¹à§Ÿà¥¤",
   },
   {
     id: "204",
@@ -26,7 +35,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Central Approvals",
     link: "/all-approvals",
     descriptionEn: "Separated main tabs content sections in the details modal using clean horizontal dividers. Replaced blocky nested white cards in the timeline, projections, and comments sections with borderless flat areas divided by thin solid separator lines for a more professional, cohesive layout.",
-    descriptionBn: "ডিটেইলস মোডালের মূল সেকশনগুলোকে পরিচ্ছন্ন হরাইজন্টাল ডিভাইডার দিয়ে আলাদা করা হয়েছে। টাইমলাইন, প্রোজেকশন ও কমেন্টস সেকশনের চারপাশের ব্যাকগ্রাউন্ড কার্ড ও বর্ডার সরিয়ে পাতলা সোজা বিভাজক রেখা ব্যবহার করা হয়েছে যা দেখতে আরও প্রফেশনাল ও গোছানো।",
+    descriptionBn: "à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸ à¦®à§‹à¦¡à¦¾à¦²à§‡à¦° à¦®à§‚à¦² à¦¸à§‡à¦•à¦¶à¦¨à¦—à§�à¦²à§‹à¦•à§‡ à¦ªà¦°à¦¿à¦šà§�à¦›à¦¨à§�à¦¨ à¦¹à¦°à¦¾à¦‡à¦œà¦¨à§�à¦Ÿà¦¾à¦² à¦¡à¦¿à¦­à¦¾à¦‡à¦¡à¦¾à¦° à¦¦à¦¿à§Ÿà§‡ à¦†à¦²à¦¾à¦¦à¦¾ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦Ÿà¦¾à¦‡à¦®à¦²à¦¾à¦‡à¦¨, à¦ªà§�à¦°à§‹à¦œà§‡à¦•à¦¶à¦¨ à¦“ à¦•à¦®à§‡à¦¨à§�à¦Ÿà¦¸ à¦¸à§‡à¦•à¦¶à¦¨à§‡à¦° à¦šà¦¾à¦°à¦ªà¦¾à¦¶à§‡à¦° à¦¬à§�à¦¯à¦¾à¦•à¦—à§�à¦°à¦¾à¦‰à¦¨à§�à¦¡ à¦•à¦¾à¦°à§�à¦¡ à¦“ à¦¬à¦°à§�à¦¡à¦¾à¦° à¦¸à¦°à¦¿à§Ÿà§‡ à¦ªà¦¾à¦¤à¦²à¦¾ à¦¸à§‹à¦œà¦¾ à¦¬à¦¿à¦­à¦¾à¦œà¦• à¦°à§‡à¦–à¦¾ à¦¬à§�à¦¯à¦¬à¦¹à¦¾à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¯à¦¾ à¦¦à§‡à¦–à¦¤à§‡ à¦†à¦°à¦“ à¦ªà§�à¦°à¦«à§‡à¦¶à¦¨à¦¾à¦² à¦“ à¦—à§‹à¦›à¦¾à¦¨à§‹à¥¤",
   },
   {
     id: "203",
@@ -35,7 +44,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Central Approvals",
     link: "/all-approvals",
     descriptionEn: "Polished the details modal styling for a cleaner and less bulky aesthetic. Reduced typography weights (replaced heavy font-black with font-bold or font-semibold), consolidated font sizes (made details metrics flat text-base), and compacted modal frames, headers, switcher containers, and footer buttons.",
-    descriptionBn: "ডিটেইলস মোডালের ইউজার ইন্টারফেস আরও পরিচ্ছন্ন ও হালকা করা হয়েছে। ফন্টের ওভার-বোল্ডনেস কমানো হয়েছে (ভারী ফন্ট-ব্ল্যাক সরিয়ে ফন্ট-বোল্ড বা সেমিবোল্ড ব্যবহার করা হয়েছে), ফন্ট সাইজ সামঞ্জস্যপূর্ণ করা হয়েছে (মেট্রিক্স টেক্সট-বেস করা হয়েছে), এবং মোডাল হেডার, ট্যাব সুইচ এবং ফুটার বাটনগুলোকে আরও কমপ্যাক্ট করা হয়েছে।",
+    descriptionBn: "à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸ à¦®à§‹à¦¡à¦¾à¦²à§‡à¦° à¦‡à¦‰à¦œà¦¾à¦° à¦‡à¦¨à§�à¦Ÿà¦¾à¦°à¦«à§‡à¦¸ à¦†à¦°à¦“ à¦ªà¦°à¦¿à¦šà§�à¦›à¦¨à§�à¦¨ à¦“ à¦¹à¦¾à¦²à¦•à¦¾ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦«à¦¨à§�à¦Ÿà§‡à¦° à¦“à¦­à¦¾à¦°-à¦¬à§‹à¦²à§�à¦¡à¦¨à§‡à¦¸ à¦•à¦®à¦¾à¦¨à§‹ à¦¹à§Ÿà§‡à¦›à§‡ (à¦­à¦¾à¦°à§€ à¦«à¦¨à§�à¦Ÿ-à¦¬à§�à¦²à§�à¦¯à¦¾à¦• à¦¸à¦°à¦¿à§Ÿà§‡ à¦«à¦¨à§�à¦Ÿ-à¦¬à§‹à¦²à§�à¦¡ à¦¬à¦¾ à¦¸à§‡à¦®à¦¿à¦¬à§‹à¦²à§�à¦¡ à¦¬à§�à¦¯à¦¬à¦¹à¦¾à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡), à¦«à¦¨à§�à¦Ÿ à¦¸à¦¾à¦‡à¦œ à¦¸à¦¾à¦®à¦žà§�à¦œà¦¸à§�à¦¯à¦ªà§‚à¦°à§�à¦£ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ (à¦®à§‡à¦Ÿà§�à¦°à¦¿à¦•à§�à¦¸ à¦Ÿà§‡à¦•à§�à¦¸à¦Ÿ-à¦¬à§‡à¦¸ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡), à¦�à¦¬à¦‚ à¦®à§‹à¦¡à¦¾à¦² à¦¹à§‡à¦¡à¦¾à¦°, à¦Ÿà§�à¦¯à¦¾à¦¬ à¦¸à§�à¦‡à¦š à¦�à¦¬à¦‚ à¦«à§�à¦Ÿà¦¾à¦° à¦¬à¦¾à¦Ÿà¦¨à¦—à§�à¦²à§‹à¦•à§‡ à¦†à¦°à¦“ à¦•à¦®à¦ªà§�à¦¯à¦¾à¦•à§�à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "202",
@@ -44,7 +53,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Central Approvals",
     link: "/all-approvals",
     descriptionEn: "Redesigned the Loan Terms & Details section inside the details modal to a clean, flat, borderless design. Replaced blocky card panels with a horizontal metrics bar separated by clean vertical dividers, and flat inline text indicators to reduce card fatigue.",
-    descriptionBn: "লোন ডিটেইলস মোডালের লোন টার্মস অ্যান্ড ডিটেইলস সেকশনটি সম্পূর্ণ কার্ড-মুক্ত এবং ফ্ল্যাট ডিজাইনে রূপান্তর করা হয়েছে। ব্লক ব্যাকগ্রাউন্ড ও বক্স বর্ডারের পরিবর্তে এতে মিনিমালিস্টিক ডট/লাইন বিভাজকযুক্ত হরাইজন্টাল মেট্রিক্স বার ব্যবহার করা হয়েছে যা দেখতে আরও আধুনিক ও পরিচ্ছন্ন।",
+    descriptionBn: "à¦²à§‹à¦¨ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸ à¦®à§‹à¦¡à¦¾à¦²à§‡à¦° à¦²à§‹à¦¨ à¦Ÿà¦¾à¦°à§�à¦®à¦¸ à¦…à§�à¦¯à¦¾à¦¨à§�à¦¡ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸ à¦¸à§‡à¦•à¦¶à¦¨à¦Ÿà¦¿ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦•à¦¾à¦°à§�à¦¡-à¦®à§�à¦•à§�à¦¤ à¦�à¦¬à¦‚ à¦«à§�à¦²à§�à¦¯à¦¾à¦Ÿ à¦¡à¦¿à¦œà¦¾à¦‡à¦¨à§‡ à¦°à§‚à¦ªà¦¾à¦¨à§�à¦¤à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦¬à§�à¦²à¦• à¦¬à§�à¦¯à¦¾à¦•à¦—à§�à¦°à¦¾à¦‰à¦¨à§�à¦¡ à¦“ à¦¬à¦•à§�à¦¸ à¦¬à¦°à§�à¦¡à¦¾à¦°à§‡à¦° à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à§‡ à¦�à¦¤à§‡ à¦®à¦¿à¦¨à¦¿à¦®à¦¾à¦²à¦¿à¦¸à§�à¦Ÿà¦¿à¦• à¦¡à¦Ÿ/à¦²à¦¾à¦‡à¦¨ à¦¬à¦¿à¦­à¦¾à¦œà¦•à¦¯à§�à¦•à§�à¦¤ à¦¹à¦°à¦¾à¦‡à¦œà¦¨à§�à¦Ÿà¦¾à¦² à¦®à§‡à¦Ÿà§�à¦°à¦¿à¦•à§�à¦¸ à¦¬à¦¾à¦° à¦¬à§�à¦¯à¦¬à¦¹à¦¾à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¯à¦¾ à¦¦à§‡à¦–à¦¤à§‡ à¦†à¦°à¦“ à¦†à¦§à§�à¦¨à¦¿à¦• à¦“ à¦ªà¦°à¦¿à¦šà§�à¦›à¦¨à§�à¦¨à¥¤",
   },
   {
     id: "201",
@@ -53,7 +62,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Central Approvals",
     link: "/all-approvals",
     descriptionEn: "Redesigned the Loan Terms & Details section inside the Loan details modal into a split-layout comparative dashboard. Features a visual loan amount allocation panel with a dynamic progress bar on the left, and a high-contrast dark-slate repayment overview sidebar card on the right.",
-    descriptionBn: "লোন ডিটেইলস মোডালের লোন টার্মস অ্যান্ড ডিটেইলস সেকশনটি স্প্লিট-লেআউট ড্যাশবোর্ডে রূপান্তর করা হয়েছে। বাম পাশে ডাইনামিক প্রোগ্রেস বারসহ লোন অ্যালোকেশন প্যানেল এবং ডান পাশে হাই-কনট্রাস্ট ডার্ক-স্লেট রিপেমেন্ট সামারি কার্ড যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦²à§‹à¦¨ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸ à¦®à§‹à¦¡à¦¾à¦²à§‡à¦° à¦²à§‹à¦¨ à¦Ÿà¦¾à¦°à§�à¦®à¦¸ à¦…à§�à¦¯à¦¾à¦¨à§�à¦¡ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸ à¦¸à§‡à¦•à¦¶à¦¨à¦Ÿà¦¿ à¦¸à§�à¦ªà§�à¦²à¦¿à¦Ÿ-à¦²à§‡à¦†à¦‰à¦Ÿ à¦¡à§�à¦¯à¦¾à¦¶à¦¬à§‹à¦°à§�à¦¡à§‡ à¦°à§‚à¦ªà¦¾à¦¨à§�à¦¤à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦¬à¦¾à¦® à¦ªà¦¾à¦¶à§‡ à¦¡à¦¾à¦‡à¦¨à¦¾à¦®à¦¿à¦• à¦ªà§�à¦°à§‹à¦—à§�à¦°à§‡à¦¸ à¦¬à¦¾à¦°à¦¸à¦¹ à¦²à§‹à¦¨ à¦…à§�à¦¯à¦¾à¦²à§‹à¦•à§‡à¦¶à¦¨ à¦ªà§�à¦¯à¦¾à¦¨à§‡à¦² à¦�à¦¬à¦‚ à¦¡à¦¾à¦¨ à¦ªà¦¾à¦¶à§‡ à¦¹à¦¾à¦‡-à¦•à¦¨à¦Ÿà§�à¦°à¦¾à¦¸à§�à¦Ÿ à¦¡à¦¾à¦°à§�à¦•-à¦¸à§�à¦²à§‡à¦Ÿ à¦°à¦¿à¦ªà§‡à¦®à§‡à¦¨à§�à¦Ÿ à¦¸à¦¾à¦®à¦¾à¦°à¦¿ à¦•à¦¾à¦°à§�à¦¡ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "198-company-setup",
@@ -62,7 +71,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Company Setup",
     link: "/company-setup?tab=payslip",
     descriptionEn: "Updated the Employee Type dropdown in the Payslip Template configuration to standard categories (Worker, Office Executive, Staff). Added a smart conditional OT Type selection (e.g. 2hrs OT, 3hrs OT) that elegantly animates in whenever 'Worker' is selected, making template designation highly specific and professional.",
-    descriptionBn: "পেসলিপ টেমপ্লেট তৈরির সময় এমপ্লয়ি টাইপ অপশনগুলো পরিবর্তন করে (Worker, Office Executive, Staff) করা হয়েছে। এছাড়াও যখন 'Worker' সিলেক্ট করা হবে, তখন স্বয়ংক্রিয়ভাবে একটি স্মার্ট OT Type অপশন (যেমন- 2hrs OT, 3hrs OT) অ্যানিমেশন সহ প্রদর্শিত হবে, যা টেমপ্লেটগুলোকে আরও স্পেসিফিক এবং প্রফেশনাল করবে।",�পূর্ণ কার্ড-মুক্ত এবং ফ্ল্যাট ডিজাইনে রূপান্তর করা হয়েছে। ব্লক ব্যাকগ্রাউন্ড ও বক্স বর্ডারের পরিবর্তে এতে মিনিমালিস্টিক ডট/লাইন বিভাজকযুক্ত হরাইজন্টাল মেট্রিক্স বার ব্যবহার করা হয়েছে যা দেখতে আরও আধুনিক ও পরিচ্ছন্ন।",
+    descriptionBn: "à¦ªà§‡à¦¸à¦²à¦¿à¦ª à¦Ÿà§‡à¦®à¦ªà§�à¦²à§‡à¦Ÿ à¦¤à§ˆà¦°à¦¿à¦° à¦¸à¦®à§Ÿ à¦�à¦®à¦ªà§�à¦²à§Ÿà¦¿ à¦Ÿà¦¾à¦‡à¦ª à¦…à¦ªà¦¶à¦¨à¦—à§�à¦²à§‹ à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦•à¦°à§‡ (Worker, Office Executive, Staff) à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦›à¦¾à§œà¦¾à¦“ à¦¯à¦–à¦¨ 'Worker' à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦°à¦¾ à¦¹à¦¬à§‡, à¦¤à¦–à¦¨ à¦¸à§�à¦¬à§Ÿà¦‚à¦•à§�à¦°à¦¿à§Ÿà¦­à¦¾à¦¬à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¸à§�à¦®à¦¾à¦°à§�à¦Ÿ OT Type à¦…à¦ªà¦¶à¦¨ (à¦¯à§‡à¦®à¦¨- 2hrs OT, 3hrs OT) à¦…à§�à¦¯à¦¾à¦¨à¦¿à¦®à§‡à¦¶à¦¨ à¦¸à¦¹ à¦ªà§�à¦°à¦¦à¦°à§�à¦¶à¦¿à¦¤ à¦¹à¦¬à§‡, à¦¯à¦¾ à¦Ÿà§‡à¦®à¦ªà§�à¦²à§‡à¦Ÿà¦—à§�à¦²à§‹à¦•à§‡ à¦†à¦°à¦“ à¦¸à§�à¦ªà§‡à¦¸à¦¿à¦«à¦¿à¦• à¦�à¦¬à¦‚ à¦ªà§�à¦°à¦«à§‡à¦¶à¦¨à¦¾à¦² à¦•à¦°à¦¬à§‡à¥¤",�à¦ªà§‚à¦°à§�à¦£ à¦•à¦¾à¦°à§�à¦¡-à¦®à§�à¦•à§�à¦¤ à¦�à¦¬à¦‚ à¦«à§�à¦²à§�à¦¯à¦¾à¦Ÿ à¦¡à¦¿à¦œà¦¾à¦‡à¦¨à§‡ à¦°à§‚à¦ªà¦¾à¦¨à§�à¦¤à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦¬à§�à¦²à¦• à¦¬à§�à¦¯à¦¾à¦•à¦—à§�à¦°à¦¾à¦‰à¦¨à§�à¦¡ à¦“ à¦¬à¦•à§�à¦¸ à¦¬à¦°à§�à¦¡à¦¾à¦°à§‡à¦° à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à§‡ à¦�à¦¤à§‡ à¦®à¦¿à¦¨à¦¿à¦®à¦¾à¦²à¦¿à¦¸à§�à¦Ÿà¦¿à¦• à¦¡à¦Ÿ/à¦²à¦¾à¦‡à¦¨ à¦¬à¦¿à¦­à¦¾à¦œà¦•à¦¯à§�à¦•à§�à¦¤ à¦¹à¦°à¦¾à¦‡à¦œà¦¨à§�à¦Ÿà¦¾à¦² à¦®à§‡à¦Ÿà§�à¦°à¦¿à¦•à§�à¦¸ à¦¬à¦¾à¦° à¦¬à§�à¦¯à¦¬à¦¹à¦¾à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¯à¦¾ à¦¦à§‡à¦–à¦¤à§‡ à¦†à¦°à¦“ à¦†à¦§à§�à¦¨à¦¿à¦• à¦“ à¦ªà¦°à¦¿à¦šà§�à¦›à¦¨à§�à¦¨à¥¤",
   },
   {
     id: "201",
@@ -71,7 +80,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Central Approvals",
     link: "/all-approvals",
     descriptionEn: "Redesigned the Loan Terms & Details section inside the Loan details modal into a split-layout comparative dashboard. Features a visual loan amount allocation panel with a dynamic progress bar on the left, and a high-contrast dark-slate repayment overview sidebar card on the right.",
-    descriptionBn: "লোন ডিটেইলস মোডালের লোন টার্মস অ্যান্ড ডিটেইলস সেকশনটি স্প্লিট-লেআউট ড্যাশবোর্ডে রূপান্তর করা হয়েছে। বাম পাশে ডাইনামিক প্রোগ্রেস বারসহ লোন অ্যালোকেশন প্যানেল এবং ডান পাশে হাই-কনট্রাস্ট ডার্ক-স্লেট রিপেমেন্ট সামারি কার্ড যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦²à§‹à¦¨ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸ à¦®à§‹à¦¡à¦¾à¦²à§‡à¦° à¦²à§‹à¦¨ à¦Ÿà¦¾à¦°à§�à¦®à¦¸ à¦…à§�à¦¯à¦¾à¦¨à§�à¦¡ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸ à¦¸à§‡à¦•à¦¶à¦¨à¦Ÿà¦¿ à¦¸à§�à¦ªà§�à¦²à¦¿à¦Ÿ-à¦²à§‡à¦†à¦‰à¦Ÿ à¦¡à§�à¦¯à¦¾à¦¶à¦¬à§‹à¦°à§�à¦¡à§‡ à¦°à§‚à¦ªà¦¾à¦¨à§�à¦¤à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦¬à¦¾à¦® à¦ªà¦¾à¦¶à§‡ à¦¡à¦¾à¦‡à¦¨à¦¾à¦®à¦¿à¦• à¦ªà§�à¦°à§‹à¦—à§�à¦°à§‡à¦¸ à¦¬à¦¾à¦°à¦¸à¦¹ à¦²à§‹à¦¨ à¦…à§�à¦¯à¦¾à¦²à§‹à¦•à§‡à¦¶à¦¨ à¦ªà§�à¦¯à¦¾à¦¨à§‡à¦² à¦�à¦¬à¦‚ à¦¡à¦¾à¦¨ à¦ªà¦¾à¦¶à§‡ à¦¹à¦¾à¦‡-à¦•à¦¨à¦Ÿà§�à¦°à¦¾à¦¸à§�à¦Ÿ à¦¡à¦¾à¦°à§�à¦•-à¦¸à§�à¦²à§‡à¦Ÿ à¦°à¦¿à¦ªà§‡à¦®à§‡à¦¨à§�à¦Ÿ à¦¸à¦¾à¦®à¦¾à¦°à¦¿ à¦•à¦¾à¦°à§�à¦¡ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
 =======
     id: "198",
     date: new Date().toISOString().slice(0, 16),
@@ -79,7 +88,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Company Setup",
     link: "/company-setup?tab=payslip",
     descriptionEn: "Updated the Employee Type dropdown in the Payslip Template configuration to standard categories (Worker, Office Executive, Staff). Added a smart conditional OT Type selection (e.g. 2hrs OT, 3hrs OT) that elegantly animates in whenever 'Worker' is selected, making template designation highly specific and professional.",
-    descriptionBn: "পেসলিপ টেমপ্লেট তৈরির সময় এমপ্লয়ি টাইপ অপশনগুলো পরিবর্তন করে (Worker, Office Executive, Staff) করা হয়েছে। এছাড়াও যখন 'Worker' সিলেক্ট করা হবে, তখন স্বয়ংক্রিয়ভাবে একটি স্মার্ট OT Type অপশন (যেমন- 2hrs OT, 3hrs OT) অ্যানিমেশন সহ প্রদর্শিত হবে, যা টেমপ্লেটগুলোকে আরও স্পেসিফিক এবং প্রফেশনাল করবে।",
+    descriptionBn: "à¦ªà§‡à¦¸à¦²à¦¿à¦ª à¦Ÿà§‡à¦®à¦ªà§�à¦²à§‡à¦Ÿ à¦¤à§ˆà¦°à¦¿à¦° à¦¸à¦®à§Ÿ à¦�à¦®à¦ªà§�à¦²à§Ÿà¦¿ à¦Ÿà¦¾à¦‡à¦ª à¦…à¦ªà¦¶à¦¨à¦—à§�à¦²à§‹ à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦•à¦°à§‡ (Worker, Office Executive, Staff) à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦›à¦¾à§œà¦¾à¦“ à¦¯à¦–à¦¨ 'Worker' à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦°à¦¾ à¦¹à¦¬à§‡, à¦¤à¦–à¦¨ à¦¸à§�à¦¬à§Ÿà¦‚à¦•à§�à¦°à¦¿à§Ÿà¦­à¦¾à¦¬à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¸à§�à¦®à¦¾à¦°à§�à¦Ÿ OT Type à¦…à¦ªà¦¶à¦¨ (à¦¯à§‡à¦®à¦¨- 2hrs OT, 3hrs OT) à¦…à§�à¦¯à¦¾à¦¨à¦¿à¦®à§‡à¦¶à¦¨ à¦¸à¦¹ à¦ªà§�à¦°à¦¦à¦°à§�à¦¶à¦¿à¦¤ à¦¹à¦¬à§‡, à¦¯à¦¾ à¦Ÿà§‡à¦®à¦ªà§�à¦²à§‡à¦Ÿà¦—à§�à¦²à§‹à¦•à§‡ à¦†à¦°à¦“ à¦¸à§�à¦ªà§‡à¦¸à¦¿à¦«à¦¿à¦• à¦�à¦¬à¦‚ à¦ªà§�à¦°à¦«à§‡à¦¶à¦¨à¦¾à¦² à¦•à¦°à¦¬à§‡à¥¤",
 >>>>>>> fd601150219556141c5cb1fd81583ff91e8dd7e5
   },
   {
@@ -89,7 +98,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Central Approvals",
     link: "/all-approvals",
     descriptionEn: "Added inline editing for Approved Amount and Installment Terms inside the Loan details modal. Editing dynamically updates the calculations, monthly rate, and amortization projections in real time. Redesigned the tab switcher for full width container aesthetics and enhanced the details card formatting.",
-    descriptionBn: "লোন ডিটেইলস মোডালে অনুমোদিত পরিমাণ (Approved Amount) এবং কিস্তির মেয়াদ (Installment Terms) সরাসরি এডিট করার সুবিধা যুক্ত করা হয়েছে। এডিট করার সাথে সাথে হিসাবকৃত মাসিক চার্জ ও অ্যামোরটাইজেশন টেবিল স্বয়ংক্রিয়ভাবে আপডেট হবে। এছাড়া ট্যাব সুইচারকে ফুল-উইডথ করা হয়েছে এবং ডিটেইলস কার্ডের ডিজাইন আরও আকর্ষণীয় করা হয়েছে।",
+    descriptionBn: "à¦²à§‹à¦¨ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸ à¦®à§‹à¦¡à¦¾à¦²à§‡ à¦…à¦¨à§�à¦®à§‹à¦¦à¦¿à¦¤ à¦ªà¦°à¦¿à¦®à¦¾à¦£ (Approved Amount) à¦�à¦¬à¦‚ à¦•à¦¿à¦¸à§�à¦¤à¦¿à¦° à¦®à§‡à§Ÿà¦¾à¦¦ (Installment Terms) à¦¸à¦°à¦¾à¦¸à¦°à¦¿ à¦�à¦¡à¦¿à¦Ÿ à¦•à¦°à¦¾à¦° à¦¸à§�à¦¬à¦¿à¦§à¦¾ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦¡à¦¿à¦Ÿ à¦•à¦°à¦¾à¦° à¦¸à¦¾à¦¥à§‡ à¦¸à¦¾à¦¥à§‡ à¦¹à¦¿à¦¸à¦¾à¦¬à¦•à§ƒà¦¤ à¦®à¦¾à¦¸à¦¿à¦• à¦šà¦¾à¦°à§�à¦œ à¦“ à¦…à§�à¦¯à¦¾à¦®à§‹à¦°à¦Ÿà¦¾à¦‡à¦œà§‡à¦¶à¦¨ à¦Ÿà§‡à¦¬à¦¿à¦² à¦¸à§�à¦¬à§Ÿà¦‚à¦•à§�à¦°à¦¿à§Ÿà¦­à¦¾à¦¬à§‡ à¦†à¦ªà¦¡à§‡à¦Ÿ à¦¹à¦¬à§‡à¥¤ à¦�à¦›à¦¾à§œà¦¾ à¦Ÿà§�à¦¯à¦¾à¦¬ à¦¸à§�à¦‡à¦šà¦¾à¦°à¦•à§‡ à¦«à§�à¦²-à¦‰à¦‡à¦¡à¦¥ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸ à¦•à¦¾à¦°à§�à¦¡à§‡à¦° à¦¡à¦¿à¦œà¦¾à¦‡à¦¨ à¦†à¦°à¦“ à¦†à¦•à¦°à§�à¦·à¦£à§€à§Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "199",
@@ -98,7 +107,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Central Approvals",
     link: "/all-approvals",
     descriptionEn: "Upgraded the All Approvals page by adding a prominent 'View' button for all approval requests and making the new Modal design accessible across all module types (Leave, Advance, Increment, etc.), instead of just Loan requests.",
-    descriptionBn: "সকল অ্যাপ্রুভাল পেজে একটি স্পষ্ট 'View' বাটন যোগ করা হয়েছে এবং নতুন মোডাল ডিজাইনটি শুধুমাত্র লোনের পরিবর্তে এখন সব ধরনের মডিউলের (লিভ, অ্যাডভান্স, ইনক্রিমেন্ট ইত্যাদি) রিকুয়েস্ট দেখার জন্য ব্যবহার করা যাবে।",
+    descriptionBn: "à¦¸à¦•à¦² à¦…à§�à¦¯à¦¾à¦ªà§�à¦°à§�à¦­à¦¾à¦² à¦ªà§‡à¦œà§‡ à¦�à¦•à¦Ÿà¦¿ à¦¸à§�à¦ªà¦·à§�à¦Ÿ 'View' à¦¬à¦¾à¦Ÿà¦¨ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦¨à¦¤à§�à¦¨ à¦®à§‹à¦¡à¦¾à¦² à¦¡à¦¿à¦œà¦¾à¦‡à¦¨à¦Ÿà¦¿ à¦¶à§�à¦§à§�à¦®à¦¾à¦¤à§�à¦° à¦²à§‹à¦¨à§‡à¦° à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à§‡ à¦�à¦–à¦¨ à¦¸à¦¬ à¦§à¦°à¦¨à§‡à¦° à¦®à¦¡à¦¿à¦‰à¦²à§‡à¦° (à¦²à¦¿à¦­, à¦…à§�à¦¯à¦¾à¦¡à¦­à¦¾à¦¨à§�à¦¸, à¦‡à¦¨à¦•à§�à¦°à¦¿à¦®à§‡à¦¨à§�à¦Ÿ à¦‡à¦¤à§�à¦¯à¦¾à¦¦à¦¿) à¦°à¦¿à¦•à§�à§Ÿà§‡à¦¸à§�à¦Ÿ à¦¦à§‡à¦–à¦¾à¦° à¦œà¦¨à§�à¦¯ à¦¬à§�à¦¯à¦¬à¦¹à¦¾à¦° à¦•à¦°à¦¾ à¦¯à¦¾à¦¬à§‡à¥¤",
   },
   {
     id: "198",
@@ -107,7 +116,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Central Approvals",
     link: "/all-approvals",
     descriptionEn: "Designed and integrated an interactive Loan Approval View Modal in the All Approvals page. It presents comprehensive loan summary data, terms, repayment metrics, zero-interest amortization projections table, approval flow timeline cards, and comments/notes history using a modern card-based modal interface.",
-    descriptionBn: "অল অ্যাপ্রুভালস পেজে একটি আকর্ষণীয় লোন অ্যাপ্রুভাল ভিউ মোডাল ডিজাইন ও যুক্ত করা হয়েছে। এর মাধ্যমে লোনের সংক্ষিপ্ত বিবরণ, শর্তাবলী, ৪-১০ মাসের রি-পেমেন্ট মেট্রিক্স, জিরো-ইন্টারেস্ট অ্যামোরটাইজেশন সিডিউল টেবিল, স্টেপ-বাই-স্টেপ অ্যাপ্রুভাল ফ্লো টাইমলাইন এবং কমেন্ট/নোটস হিস্ট্রি একনজরে দেখা যাবে।",
+    descriptionBn: "à¦…à¦² à¦…à§�à¦¯à¦¾à¦ªà§�à¦°à§�à¦­à¦¾à¦²à¦¸ à¦ªà§‡à¦œà§‡ à¦�à¦•à¦Ÿà¦¿ à¦†à¦•à¦°à§�à¦·à¦£à§€à§Ÿ à¦²à§‹à¦¨ à¦…à§�à¦¯à¦¾à¦ªà§�à¦°à§�à¦­à¦¾à¦² à¦­à¦¿à¦‰ à¦®à§‹à¦¡à¦¾à¦² à¦¡à¦¿à¦œà¦¾à¦‡à¦¨ à¦“ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦° à¦®à¦¾à¦§à§�à¦¯à¦®à§‡ à¦²à§‹à¦¨à§‡à¦° à¦¸à¦‚à¦•à§�à¦·à¦¿à¦ªà§�à¦¤ à¦¬à¦¿à¦¬à¦°à¦£, à¦¶à¦°à§�à¦¤à¦¾à¦¬à¦²à§€, à§ª-à§§à§¦ à¦®à¦¾à¦¸à§‡à¦° à¦°à¦¿-à¦ªà§‡à¦®à§‡à¦¨à§�à¦Ÿ à¦®à§‡à¦Ÿà§�à¦°à¦¿à¦•à§�à¦¸, à¦œà¦¿à¦°à§‹-à¦‡à¦¨à§�à¦Ÿà¦¾à¦°à§‡à¦¸à§�à¦Ÿ à¦…à§�à¦¯à¦¾à¦®à§‹à¦°à¦Ÿà¦¾à¦‡à¦œà§‡à¦¶à¦¨ à¦¸à¦¿à¦¡à¦¿à¦‰à¦² à¦Ÿà§‡à¦¬à¦¿à¦², à¦¸à§�à¦Ÿà§‡à¦ª-à¦¬à¦¾à¦‡-à¦¸à§�à¦Ÿà§‡à¦ª à¦…à§�à¦¯à¦¾à¦ªà§�à¦°à§�à¦­à¦¾à¦² à¦«à§�à¦²à§‹ à¦Ÿà¦¾à¦‡à¦®à¦²à¦¾à¦‡à¦¨ à¦�à¦¬à¦‚ à¦•à¦®à§‡à¦¨à§�à¦Ÿ/à¦¨à§‹à¦Ÿà¦¸ à¦¹à¦¿à¦¸à§�à¦Ÿà§�à¦°à¦¿ à¦�à¦•à¦¨à¦œà¦°à§‡ à¦¦à§‡à¦–à¦¾ à¦¯à¦¾à¦¬à§‡à¥¤",
   },
   {
     id: "197",
@@ -116,7 +125,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Company Setup",
     link: "/company-setup?tab=payslip",
     descriptionEn: "Polished the Payslip Templates Setup page for better UI/UX. Improved the empty state with a dedicated icon, added modern focus rings to all form inputs, redesigned the English/Bangla toggle switch, added clear action icons to all buttons, and included a success notification when a new template is created.",
-    descriptionBn: "পে স্লিপ টেমপ্লেট সেটআপ পেজের ইউজার ইন্টারফেস আরও আকর্ষণীয় করা হয়েছে। নতুন টেমপ্লেট না থাকলে সেখানে সুন্দর আইকন সম্বলিত এম্পটি স্টেট দেখানো হচ্ছে। ফর্মের সব ইনপুটে মডার্ন ফোকাস রিং এবং সব বাটনে নতুন আইকন যোগ করা হয়েছে। এছাড়া নতুন টেমপ্লেট তৈরির সময় সাকসেস মেসেজ দেখানোর ব্যবস্থা করা হয়েছে।",
+    descriptionBn: "à¦ªà§‡ à¦¸à§�à¦²à¦¿à¦ª à¦Ÿà§‡à¦®à¦ªà§�à¦²à§‡à¦Ÿ à¦¸à§‡à¦Ÿà¦†à¦ª à¦ªà§‡à¦œà§‡à¦° à¦‡à¦‰à¦œà¦¾à¦° à¦‡à¦¨à§�à¦Ÿà¦¾à¦°à¦«à§‡à¦¸ à¦†à¦°à¦“ à¦†à¦•à¦°à§�à¦·à¦£à§€à§Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦¨à¦¤à§�à¦¨ à¦Ÿà§‡à¦®à¦ªà§�à¦²à§‡à¦Ÿ à¦¨à¦¾ à¦¥à¦¾à¦•à¦²à§‡ à¦¸à§‡à¦–à¦¾à¦¨à§‡ à¦¸à§�à¦¨à§�à¦¦à¦° à¦†à¦‡à¦•à¦¨ à¦¸à¦®à§�à¦¬à¦²à¦¿à¦¤ à¦�à¦®à§�à¦ªà¦Ÿà¦¿ à¦¸à§�à¦Ÿà§‡à¦Ÿ à¦¦à§‡à¦–à¦¾à¦¨à§‹ à¦¹à¦šà§�à¦›à§‡à¥¤ à¦«à¦°à§�à¦®à§‡à¦° à¦¸à¦¬ à¦‡à¦¨à¦ªà§�à¦Ÿà§‡ à¦®à¦¡à¦¾à¦°à§�à¦¨ à¦«à§‹à¦•à¦¾à¦¸ à¦°à¦¿à¦‚ à¦�à¦¬à¦‚ à¦¸à¦¬ à¦¬à¦¾à¦Ÿà¦¨à§‡ à¦¨à¦¤à§�à¦¨ à¦†à¦‡à¦•à¦¨ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦›à¦¾à§œà¦¾ à¦¨à¦¤à§�à¦¨ à¦Ÿà§‡à¦®à¦ªà§�à¦²à§‡à¦Ÿ à¦¤à§ˆà¦°à¦¿à¦° à¦¸à¦®à§Ÿ à¦¸à¦¾à¦•à¦¸à§‡à¦¸ à¦®à§‡à¦¸à§‡à¦œ à¦¦à§‡à¦–à¦¾à¦¨à§‹à¦° à¦¬à§�à¦¯à¦¬à¦¸à§�à¦¥à¦¾ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "196",
@@ -125,7 +134,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Company Setup",
     link: "/company-setup?tab=payslip",
     descriptionEn: "Upgraded the Payslip Configuration system to be template-based. Users can now view a list of templates, create new templates targeting specific companies and employee types, configure custom field names/visibilities for each template individually, and manage them via an interactive list and configure workflow.",
-    descriptionBn: "পে স্লিপ কনফিগারেশন সিস্টেমকে টেমপ্লেট ভিত্তিক করা হয়েছে। ব্যবহারকারীরা এখন নির্দিষ্ট কোম্পানি এবং এমপ্লয়ি টাইপের জন্য নতুন টেমপ্লেট তৈরি করতে পারবেন, প্রতিটি টেমপ্লেটের ফিল্ডের নাম ও ভিজিবিলিটি আলাদাভাবে কাস্টমাইজ করতে পারবেন এবং লিস্ট ভিউ থেকে এগুলো পরিচালনা করতে পারবেন।",
+    descriptionBn: "à¦ªà§‡ à¦¸à§�à¦²à¦¿à¦ª à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦¸à¦¿à¦¸à§�à¦Ÿà§‡à¦®à¦•à§‡ à¦Ÿà§‡à¦®à¦ªà§�à¦²à§‡à¦Ÿ à¦­à¦¿à¦¤à§�à¦¤à¦¿à¦• à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦¬à§�à¦¯à¦¬à¦¹à¦¾à¦°à¦•à¦¾à¦°à§€à¦°à¦¾ à¦�à¦–à¦¨ à¦¨à¦¿à¦°à§�à¦¦à¦¿à¦·à§�à¦Ÿ à¦•à§‹à¦®à§�à¦ªà¦¾à¦¨à¦¿ à¦�à¦¬à¦‚ à¦�à¦®à¦ªà§�à¦²à§Ÿà¦¿ à¦Ÿà¦¾à¦‡à¦ªà§‡à¦° à¦œà¦¨à§�à¦¯ à¦¨à¦¤à§�à¦¨ à¦Ÿà§‡à¦®à¦ªà§�à¦²à§‡à¦Ÿ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¤à§‡ à¦ªà¦¾à¦°à¦¬à§‡à¦¨, à¦ªà§�à¦°à¦¤à¦¿à¦Ÿà¦¿ à¦Ÿà§‡à¦®à¦ªà§�à¦²à§‡à¦Ÿà§‡à¦° à¦«à¦¿à¦²à§�à¦¡à§‡à¦° à¦¨à¦¾à¦® à¦“ à¦­à¦¿à¦œà¦¿à¦¬à¦¿à¦²à¦¿à¦Ÿà¦¿ à¦†à¦²à¦¾à¦¦à¦¾à¦­à¦¾à¦¬à§‡ à¦•à¦¾à¦¸à§�à¦Ÿà¦®à¦¾à¦‡à¦œ à¦•à¦°à¦¤à§‡ à¦ªà¦¾à¦°à¦¬à§‡à¦¨ à¦�à¦¬à¦‚ à¦²à¦¿à¦¸à§�à¦Ÿ à¦­à¦¿à¦‰ à¦¥à§‡à¦•à§‡ à¦�à¦—à§�à¦²à§‹ à¦ªà¦°à¦¿à¦šà¦¾à¦²à¦¨à¦¾ à¦•à¦°à¦¤à§‡ à¦ªà¦¾à¦°à¦¬à§‡à¦¨à¥¤",
   },
   {
     id: "195",
@@ -134,7 +143,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Company Setup",
     link: "/company-setup?tab=payslip",
     descriptionEn: "Implemented a fully dynamic Payslip Configuration tab within the Company Setup page. Users can edit English and Bengali names/labels for all working status, earning, and deduction fields, customize visibility toggles per company, and view real-time pay slip mockups in both English and Bengali with a mathematically consistent preview totaling 165,000 Net Payment.",
-    descriptionBn: "কোম্পানি সেটআপ পেজের ভেতরে একটি সম্পূর্ণ ডাইনামিক পেসলিপ কনফিগারেশন ট্যাব যুক্ত করা হয়েছে। এর মাধ্যমে প্রতিটি কোম্পানির কাজের অবস্থা, আয় এবং কর্তনের সকল ফিল্ডের ইংরেজি ও বাংলা নাম কাস্টমাইজ এবং অন/অফ করা যাবে এবং লাইভ পেসলিপ প্রিভিউ দেখা যাবে। প্রিভিউ ভিউতে নেট পেমেন্ট ১৬৫,০০০ এবং অন্যান্য সমীকরণগুলো সামঞ্জস্যপূর্ণ করা হয়েছে।",
+    descriptionBn: "à¦•à§‹à¦®à§�à¦ªà¦¾à¦¨à¦¿ à¦¸à§‡à¦Ÿà¦†à¦ª à¦ªà§‡à¦œà§‡à¦° à¦­à§‡à¦¤à¦°à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦¡à¦¾à¦‡à¦¨à¦¾à¦®à¦¿à¦• à¦ªà§‡à¦¸à¦²à¦¿à¦ª à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦Ÿà§�à¦¯à¦¾à¦¬ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦° à¦®à¦¾à¦§à§�à¦¯à¦®à§‡ à¦ªà§�à¦°à¦¤à¦¿à¦Ÿà¦¿ à¦•à§‹à¦®à§�à¦ªà¦¾à¦¨à¦¿à¦° à¦•à¦¾à¦œà§‡à¦° à¦…à¦¬à¦¸à§�à¦¥à¦¾, à¦†à§Ÿ à¦�à¦¬à¦‚ à¦•à¦°à§�à¦¤à¦¨à§‡à¦° à¦¸à¦•à¦² à¦«à¦¿à¦²à§�à¦¡à§‡à¦° à¦‡à¦‚à¦°à§‡à¦œà¦¿ à¦“ à¦¬à¦¾à¦‚à¦²à¦¾ à¦¨à¦¾à¦® à¦•à¦¾à¦¸à§�à¦Ÿà¦®à¦¾à¦‡à¦œ à¦�à¦¬à¦‚ à¦…à¦¨/à¦…à¦« à¦•à¦°à¦¾ à¦¯à¦¾à¦¬à§‡ à¦�à¦¬à¦‚ à¦²à¦¾à¦‡à¦­ à¦ªà§‡à¦¸à¦²à¦¿à¦ª à¦ªà§�à¦°à¦¿à¦­à¦¿à¦‰ à¦¦à§‡à¦–à¦¾ à¦¯à¦¾à¦¬à§‡à¥¤ à¦ªà§�à¦°à¦¿à¦­à¦¿à¦‰ à¦­à¦¿à¦‰à¦¤à§‡ à¦¨à§‡à¦Ÿ à¦ªà§‡à¦®à§‡à¦¨à§�à¦Ÿ à§§à§¬à§«,à§¦à§¦à§¦ à¦�à¦¬à¦‚ à¦…à¦¨à§�à¦¯à¦¾à¦¨à§�à¦¯ à¦¸à¦®à§€à¦•à¦°à¦£à¦—à§�à¦²à§‹ à¦¸à¦¾à¦®à¦žà§�à¦œà¦¸à§�à¦¯à¦ªà§‚à¦°à§�à¦£ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "194",
@@ -143,7 +152,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Employee Job Card",
     link: "/employee-job-card",
     descriptionEn: "Removed the summary stats cards ribbon (Present, Leaves, Holidays, Overtime, Late Entries, and Early Leaves) to make the registry interface cleaner and more streamlined.",
-    descriptionBn: "জব কার্ড পেজ থেকে স্ট্যাটস রিবন (Present, Leaves, Holidays ইত্যাদি সংবলিত কার্ডগুলো) সরিয়ে ফেলা হয়েছে যাতে ইন্টারফেসটি আরও পরিচ্ছন্ন দেখায়।",
+    descriptionBn: "à¦œà¦¬ à¦•à¦¾à¦°à§�à¦¡ à¦ªà§‡à¦œ à¦¥à§‡à¦•à§‡ à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦Ÿà¦¸ à¦°à¦¿à¦¬à¦¨ (Present, Leaves, Holidays à¦‡à¦¤à§�à¦¯à¦¾à¦¦à¦¿ à¦¸à¦‚à¦¬à¦²à¦¿à¦¤ à¦•à¦¾à¦°à§�à¦¡à¦—à§�à¦²à§‹) à¦¸à¦°à¦¿à§Ÿà§‡ à¦«à§‡à¦²à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¯à¦¾à¦¤à§‡ à¦‡à¦¨à§�à¦Ÿà¦¾à¦°à¦«à§‡à¦¸à¦Ÿà¦¿ à¦†à¦°à¦“ à¦ªà¦°à¦¿à¦šà§�à¦›à¦¨à§�à¦¨ à¦¦à§‡à¦–à¦¾à§Ÿà¥¤",
   },
   {
     id: "193",
@@ -152,7 +161,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Employee Job Card",
     link: "/employee-job-card",
     descriptionEn: "Removed the dynamic employee metadata summary card to make the view strictly focus on filtering logs and presenting the core table data, removing unnecessary clutter.",
-    descriptionBn: "জব কার্ড পেজ থেকে এমপ্লয়ি মেটাডেটা সামারি কার্ডটি সরিয়ে ফেলা হয়েছে যাতে শুধু ফিল্টারিং এবং প্রয়োজনীয় ডেটাগুলো ফোকাসে থাকে।",
+    descriptionBn: "à¦œà¦¬ à¦•à¦¾à¦°à§�à¦¡ à¦ªà§‡à¦œ à¦¥à§‡à¦•à§‡ à¦�à¦®à¦ªà§�à¦²à§Ÿà¦¿ à¦®à§‡à¦Ÿà¦¾à¦¡à§‡à¦Ÿà¦¾ à¦¸à¦¾à¦®à¦¾à¦°à¦¿ à¦•à¦¾à¦°à§�à¦¡à¦Ÿà¦¿ à¦¸à¦°à¦¿à§Ÿà§‡ à¦«à§‡à¦²à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¯à¦¾à¦¤à§‡ à¦¶à§�à¦§à§� à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦°à¦¿à¦‚ à¦�à¦¬à¦‚ à¦ªà§�à¦°à§Ÿà§‹à¦œà¦¨à§€à§Ÿ à¦¡à§‡à¦Ÿà¦¾à¦—à§�à¦²à§‹ à¦«à§‹à¦•à¦¾à¦¸à§‡ à¦¥à¦¾à¦•à§‡à¥¤",
   },
   {
     id: "192",
@@ -161,7 +170,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Employee Job Card",
     link: "/employee-job-card",
     descriptionEn: "Replaced the Month and Year dropdowns with a comprehensive Date Range selector (Start Date and End Date). This allows for much more flexible and precise log fetching across multiple periods.",
-    descriptionBn: "জব কার্ড পেজে Month এবং Year ফিল্টারের বদলে এখন একটি Date Range সিলেক্টর (Start Date এবং End Date) যোগ করা হয়েছে। এর মাধ্যমে খুব সহজেই পছন্দমতো নির্দিষ্ট তারিখের লগ বের করা যাবে।",
+    descriptionBn: "à¦œà¦¬ à¦•à¦¾à¦°à§�à¦¡ à¦ªà§‡à¦œà§‡ Month à¦�à¦¬à¦‚ Year à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦°à§‡à¦° à¦¬à¦¦à¦²à§‡ à¦�à¦–à¦¨ à¦�à¦•à¦Ÿà¦¿ Date Range à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿà¦° (Start Date à¦�à¦¬à¦‚ End Date) à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦° à¦®à¦¾à¦§à§�à¦¯à¦®à§‡ à¦–à§�à¦¬ à¦¸à¦¹à¦œà§‡à¦‡ à¦ªà¦›à¦¨à§�à¦¦à¦®à¦¤à§‹ à¦¨à¦¿à¦°à§�à¦¦à¦¿à¦·à§�à¦Ÿ à¦¤à¦¾à¦°à¦¿à¦–à§‡à¦° à¦²à¦— à¦¬à§‡à¦° à¦•à¦°à¦¾ à¦¯à¦¾à¦¬à§‡à¥¤",
   },
   {
     id: "191",
@@ -170,7 +179,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Employee Job Card",
     link: "/employee-job-card",
     descriptionEn: "Perfected the alignment of all filter fields into a single, unified grid layout. Removed the 'Show Advanced' toggle to keep all fields permanently visible and easily accessible.",
-    descriptionBn: "এমপ্লয়ি জব কার্ডের ফিল্টার ফিল্ডগুলোর অ্যালাইনমেন্ট (Alignment) ঠিক করে একটি সুন্দর, সিঙ্গল গ্রিড লেআউটে সাজানো হয়েছে। 'Show Advanced' টগলটি সরিয়ে দেওয়া হয়েছে, ফলে এখন সব ফিল্ড সবসময় একসাথে দেখা যাবে।",
+    descriptionBn: "à¦�à¦®à¦ªà§�à¦²à§Ÿà¦¿ à¦œà¦¬ à¦•à¦¾à¦°à§�à¦¡à§‡à¦° à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦° à¦«à¦¿à¦²à§�à¦¡à¦—à§�à¦²à§‹à¦° à¦…à§�à¦¯à¦¾à¦²à¦¾à¦‡à¦¨à¦®à§‡à¦¨à§�à¦Ÿ (Alignment) à¦ à¦¿à¦• à¦•à¦°à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¸à§�à¦¨à§�à¦¦à¦°, à¦¸à¦¿à¦™à§�à¦—à¦² à¦—à§�à¦°à¦¿à¦¡ à¦²à§‡à¦†à¦‰à¦Ÿà§‡ à¦¸à¦¾à¦œà¦¾à¦¨à§‹ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ 'Show Advanced' à¦Ÿà¦—à¦²à¦Ÿà¦¿ à¦¸à¦°à¦¿à§Ÿà§‡ à¦¦à§‡à¦“à§Ÿà¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦«à¦²à§‡ à¦�à¦–à¦¨ à¦¸à¦¬ à¦«à¦¿à¦²à§�à¦¡ à¦¸à¦¬à¦¸à¦®à§Ÿ à¦�à¦•à¦¸à¦¾à¦¥à§‡ à¦¦à§‡à¦–à¦¾ à¦¯à¦¾à¦¬à§‡à¥¤",
   },
   {
     id: "190",
@@ -179,7 +188,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Employee Job Card",
     link: "/employee-job-card",
     descriptionEn: "Simplified the Job Card UI by removing confusing multi-employee selections and reorganizing filters into a cleaner, single-row design. Moved the 'Runtime Evaluation' into an 'Advanced' toggle.",
-    descriptionBn: "জব কার্ডের ইউজার ইন্টারফেস আরও সহজ করা হয়েছে। একসাথে অনেক এমপ্লয়ি সিলেক্ট করার অপশনটি সরিয়ে একটি সুন্দর সিঙ্গল-রো ডিজাইন তৈরি করা হয়েছে এবং 'Runtime Evaluation' অপশনটিকে একটি 'Advanced' টগলের ভেতরে রাখা হয়েছে।",
+    descriptionBn: "à¦œà¦¬ à¦•à¦¾à¦°à§�à¦¡à§‡à¦° à¦‡à¦‰à¦œà¦¾à¦° à¦‡à¦¨à§�à¦Ÿà¦¾à¦°à¦«à§‡à¦¸ à¦†à¦°à¦“ à¦¸à¦¹à¦œ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦•à¦¸à¦¾à¦¥à§‡ à¦…à¦¨à§‡à¦• à¦�à¦®à¦ªà§�à¦²à§Ÿà¦¿ à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦°à¦¾à¦° à¦…à¦ªà¦¶à¦¨à¦Ÿà¦¿ à¦¸à¦°à¦¿à§Ÿà§‡ à¦�à¦•à¦Ÿà¦¿ à¦¸à§�à¦¨à§�à¦¦à¦° à¦¸à¦¿à¦™à§�à¦—à¦²-à¦°à§‹ à¦¡à¦¿à¦œà¦¾à¦‡à¦¨ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ 'Runtime Evaluation' à¦…à¦ªà¦¶à¦¨à¦Ÿà¦¿à¦•à§‡ à¦�à¦•à¦Ÿà¦¿ 'Advanced' à¦Ÿà¦—à¦²à§‡à¦° à¦­à§‡à¦¤à¦°à§‡ à¦°à¦¾à¦–à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "189",
@@ -188,7 +197,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Disciplinary Action",
     link: "/disciplinary-showcause-notices",
     descriptionEn: "Added Disciplinary Show Cause Notices page to manage and track notices with complete lifecycle tracking and a modern modal interface.",
-    descriptionBn: "ডিসিপ্লিনারি শো-কজ নোটিশ পেজ যুক্ত করা হয়েছে, যেখানে নোটিশ প্রদান এবং সম্পূর্ণ লাইফসাইকেল ট্র্যাকিং এর জন্য আধুনিক মোডাল এবং ফিল্টারিং সুবিধা রয়েছে।",
+    descriptionBn: "à¦¡à¦¿à¦¸à¦¿à¦ªà§�à¦²à¦¿à¦¨à¦¾à¦°à¦¿ à¦¶à§‹-à¦•à¦œ à¦¨à§‹à¦Ÿà¦¿à¦¶ à¦ªà§‡à¦œ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡, à¦¯à§‡à¦–à¦¾à¦¨à§‡ à¦¨à§‹à¦Ÿà¦¿à¦¶ à¦ªà§�à¦°à¦¦à¦¾à¦¨ à¦�à¦¬à¦‚ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦²à¦¾à¦‡à¦«à¦¸à¦¾à¦‡à¦•à§‡à¦² à¦Ÿà§�à¦°à§�à¦¯à¦¾à¦•à¦¿à¦‚ à¦�à¦° à¦œà¦¨à§�à¦¯ à¦†à¦§à§�à¦¨à¦¿à¦• à¦®à§‹à¦¡à¦¾à¦² à¦�à¦¬à¦‚ à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦°à¦¿à¦‚ à¦¸à§�à¦¬à¦¿à¦§à¦¾ à¦°à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "188",
@@ -197,7 +206,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Disciplinary Action",
     link: "/disciplinary-warning-letters",
     descriptionEn: "Added Disciplinary Warning Letters page with comprehensive record tracking, filtering, and a modern modal for issuing letters.",
-    descriptionBn: "ডিসিপ্লিনারি ওয়ার্নিং লেটারস (সতর্কতামূলক চিঠি) পেজ যুক্ত করা হয়েছে, যেখানে চিঠি প্রদান ও রেকর্ড ট্র্যাকিং এর জন্য আধুনিক মোডাল এবং ফিল্টারিং সুবিধা রয়েছে।",
+    descriptionBn: "à¦¡à¦¿à¦¸à¦¿à¦ªà§�à¦²à¦¿à¦¨à¦¾à¦°à¦¿ à¦“à§Ÿà¦¾à¦°à§�à¦¨à¦¿à¦‚ à¦²à§‡à¦Ÿà¦¾à¦°à¦¸ (à¦¸à¦¤à¦°à§�à¦•à¦¤à¦¾à¦®à§‚à¦²à¦• à¦šà¦¿à¦ à¦¿) à¦ªà§‡à¦œ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡, à¦¯à§‡à¦–à¦¾à¦¨à§‡ à¦šà¦¿à¦ à¦¿ à¦ªà§�à¦°à¦¦à¦¾à¦¨ à¦“ à¦°à§‡à¦•à¦°à§�à¦¡ à¦Ÿà§�à¦°à§�à¦¯à¦¾à¦•à¦¿à¦‚ à¦�à¦° à¦œà¦¨à§�à¦¯ à¦†à¦§à§�à¦¨à¦¿à¦• à¦®à§‹à¦¡à¦¾à¦² à¦�à¦¬à¦‚ à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦°à¦¿à¦‚ à¦¸à§�à¦¬à¦¿à¦§à¦¾ à¦°à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "187",
@@ -206,7 +215,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Disciplinary Action",
     link: "/disciplinary-case-files",
     descriptionEn: "Added Disciplinary Action module with a comprehensive Case Files management page including advanced filtering and status tracking.",
-    descriptionBn: "ডিসিপ্লিনারি অ্যাকশন মডিউল যুক্ত করা হয়েছে, যেখানে কেস ফাইল পরিচালনার জন্য উন্নত ফিল্টারিং এবং স্ট্যাটাস ট্র্যাকিং সুবিধা রয়েছে।",
+    descriptionBn: "à¦¡à¦¿à¦¸à¦¿à¦ªà§�à¦²à¦¿à¦¨à¦¾à¦°à¦¿ à¦…à§�à¦¯à¦¾à¦•à¦¶à¦¨ à¦®à¦¡à¦¿à¦‰à¦² à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡, à¦¯à§‡à¦–à¦¾à¦¨à§‡ à¦•à§‡à¦¸ à¦«à¦¾à¦‡à¦² à¦ªà¦°à¦¿à¦šà¦¾à¦²à¦¨à¦¾à¦° à¦œà¦¨à§�à¦¯ à¦‰à¦¨à§�à¦¨à¦¤ à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦°à¦¿à¦‚ à¦�à¦¬à¦‚ à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦Ÿà¦¾à¦¸ à¦Ÿà§�à¦°à§�à¦¯à¦¾à¦•à¦¿à¦‚ à¦¸à§�à¦¬à¦¿à¦§à¦¾ à¦°à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "186",
@@ -215,7 +224,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "KPI Cycles",
     link: "/kpi-cycles",
     descriptionEn: "Added a real-time search bar to the Employee Selection modal, allowing users to instantly filter by Name, ID, or Department. Also introduced profile picture avatars (with fallback initials) to each employee card for quick visual identification.",
-    descriptionBn: "এমপ্লয়ী সিলেকশন মোডালে একটি রিয়েল-টাইম সার্চ বার যোগ করা হয়েছে, যার সাহায্যে নাম, আইডি বা ডিপার্টমেন্ট দিয়ে দ্রুত এমপ্লয়ি খুঁজে বের করা যাবে। পাশাপাশি, প্রত্যেক এমপ্লয়ি কার্ডে প্রোফাইল পিকচার অ্যাভাটার (অথবা নামের আদ্যক্ষর) যুক্ত করা হয়েছে যাতে তাদের সহজেই চেনা যায়।",
+    descriptionBn: "à¦�à¦®à¦ªà§�à¦²à§Ÿà§€ à¦¸à¦¿à¦²à§‡à¦•à¦¶à¦¨ à¦®à§‹à¦¡à¦¾à¦²à§‡ à¦�à¦•à¦Ÿà¦¿ à¦°à¦¿à§Ÿà§‡à¦²-à¦Ÿà¦¾à¦‡à¦® à¦¸à¦¾à¦°à§�à¦š à¦¬à¦¾à¦° à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦¯à¦¾à¦° à¦¸à¦¾à¦¹à¦¾à¦¯à§�à¦¯à§‡ à¦¨à¦¾à¦®, à¦†à¦‡à¦¡à¦¿ à¦¬à¦¾ à¦¡à¦¿à¦ªà¦¾à¦°à§�à¦Ÿà¦®à§‡à¦¨à§�à¦Ÿ à¦¦à¦¿à§Ÿà§‡ à¦¦à§�à¦°à§�à¦¤ à¦�à¦®à¦ªà§�à¦²à§Ÿà¦¿ à¦–à§�à¦�à¦œà§‡ à¦¬à§‡à¦° à¦•à¦°à¦¾ à¦¯à¦¾à¦¬à§‡à¥¤ à¦ªà¦¾à¦¶à¦¾à¦ªà¦¾à¦¶à¦¿, à¦ªà§�à¦°à¦¤à§�à¦¯à§‡à¦• à¦�à¦®à¦ªà§�à¦²à§Ÿà¦¿ à¦•à¦¾à¦°à§�à¦¡à§‡ à¦ªà§�à¦°à§‹à¦«à¦¾à¦‡à¦² à¦ªà¦¿à¦•à¦šà¦¾à¦° à¦…à§�à¦¯à¦¾à¦­à¦¾à¦Ÿà¦¾à¦° (à¦…à¦¥à¦¬à¦¾ à¦¨à¦¾à¦®à§‡à¦° à¦†à¦¦à§�à¦¯à¦•à§�à¦·à¦°) à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¯à¦¾à¦¤à§‡ à¦¤à¦¾à¦¦à§‡à¦° à¦¸à¦¹à¦œà§‡à¦‡ à¦šà§‡à¦¨à¦¾ à¦¯à¦¾à§Ÿà¥¤",
   },
   {
     id: "185",
@@ -224,7 +233,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "KPI Cycles",
     link: "/kpi-cycles",
     descriptionEn: "Replaced the standard popover for 'Applicable Employees' with a dedicated advanced selection modal. This provides a much better experience by showing employee details (ID, Name, and Department) in a spacious grid view.",
-    descriptionBn: "'Applicable Employees' নির্বাচনের জন্য সাধারণ পপওভারের পরিবর্তে একটি আধুনিক ডেডিকেটেড সিলেকশন মোডাল যোগ করা হয়েছে। এর ফলে বড় স্ক্রিনে এমপ্লয়িদের বিস্তারিত (ID, নাম এবং ডিপার্টমেন্ট) তথ্যসহ সহজেই সিলেক্ট করা যাবে, যা ব্যবহারকারীদের দারুণ অভিজ্ঞতা দেবে।",
+    descriptionBn: "'Applicable Employees' à¦¨à¦¿à¦°à§�à¦¬à¦¾à¦šà¦¨à§‡à¦° à¦œà¦¨à§�à¦¯ à¦¸à¦¾à¦§à¦¾à¦°à¦£ à¦ªà¦ªà¦“à¦­à¦¾à¦°à§‡à¦° à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à§‡ à¦�à¦•à¦Ÿà¦¿ à¦†à¦§à§�à¦¨à¦¿à¦• à¦¡à§‡à¦¡à¦¿à¦•à§‡à¦Ÿà§‡à¦¡ à¦¸à¦¿à¦²à§‡à¦•à¦¶à¦¨ à¦®à§‹à¦¡à¦¾à¦² à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦° à¦«à¦²à§‡ à¦¬à§œ à¦¸à§�à¦•à§�à¦°à¦¿à¦¨à§‡ à¦�à¦®à¦ªà§�à¦²à§Ÿà¦¿à¦¦à§‡à¦° à¦¬à¦¿à¦¸à§�à¦¤à¦¾à¦°à¦¿à¦¤ (ID, à¦¨à¦¾à¦® à¦�à¦¬à¦‚ à¦¡à¦¿à¦ªà¦¾à¦°à§�à¦Ÿà¦®à§‡à¦¨à§�à¦Ÿ) à¦¤à¦¥à§�à¦¯à¦¸à¦¹ à¦¸à¦¹à¦œà§‡à¦‡ à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦°à¦¾ à¦¯à¦¾à¦¬à§‡, à¦¯à¦¾ à¦¬à§�à¦¯à¦¬à¦¹à¦¾à¦°à¦•à¦¾à¦°à§€à¦¦à§‡à¦° à¦¦à¦¾à¦°à§�à¦£ à¦…à¦­à¦¿à¦œà§�à¦žà¦¤à¦¾ à¦¦à§‡à¦¬à§‡à¥¤",
   },
   {
     id: "184",
@@ -233,7 +242,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Core UI",
     link: "/kpi-cycles",
     descriptionEn: "Upgraded the MultiSelect component to display selected items as visible chips inside the input box (showing up to 3 items and a '+ X more' badge) instead of a generic text like '6 items selected'. This provides immediate visibility into what is selected without needing to open the dropdown.",
-    descriptionBn: "MultiSelect কম্পোনেন্টটি আপডেট করা হয়েছে। এখন শুধুমাত্র '6 items selected' এরকম লেখার পরিবর্তে, নির্বাচিত আইটেমগুলো ইনপুট বক্সের ভেতরে চিপস (Chips) আকারে দেখা যাবে (সর্বোচ্চ ৩টি আইটেম এবং একটি '+ X more' ব্যাজ সহ)। এর ফলে ড্রপডাউন না খুলেই কী কী সিলেক্ট করা হয়েছে তা সহজে বোঝা যাবে।",
+    descriptionBn: "MultiSelect à¦•à¦®à§�à¦ªà§‹à¦¨à§‡à¦¨à§�à¦Ÿà¦Ÿà¦¿ à¦†à¦ªà¦¡à§‡à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦–à¦¨ à¦¶à§�à¦§à§�à¦®à¦¾à¦¤à§�à¦° '6 items selected' à¦�à¦°à¦•à¦® à¦²à§‡à¦–à¦¾à¦° à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à§‡, à¦¨à¦¿à¦°à§�à¦¬à¦¾à¦šà¦¿à¦¤ à¦†à¦‡à¦Ÿà§‡à¦®à¦—à§�à¦²à§‹ à¦‡à¦¨à¦ªà§�à¦Ÿ à¦¬à¦•à§�à¦¸à§‡à¦° à¦­à§‡à¦¤à¦°à§‡ à¦šà¦¿à¦ªà¦¸ (Chips) à¦†à¦•à¦¾à¦°à§‡ à¦¦à§‡à¦–à¦¾ à¦¯à¦¾à¦¬à§‡ (à¦¸à¦°à§�à¦¬à§‹à¦šà§�à¦š à§©à¦Ÿà¦¿ à¦†à¦‡à¦Ÿà§‡à¦® à¦�à¦¬à¦‚ à¦�à¦•à¦Ÿà¦¿ '+ X more' à¦¬à§�à¦¯à¦¾à¦œ à¦¸à¦¹)à¥¤ à¦�à¦° à¦«à¦²à§‡ à¦¡à§�à¦°à¦ªà¦¡à¦¾à¦‰à¦¨ à¦¨à¦¾ à¦–à§�à¦²à§‡à¦‡ à¦•à§€ à¦•à§€ à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¤à¦¾ à¦¸à¦¹à¦œà§‡ à¦¬à§‹à¦�à¦¾ à¦¯à¦¾à¦¬à§‡à¥¤",
   },
   {
     id: "183",
@@ -242,7 +251,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "KPI Cycles",
     link: "/kpi-cycles",
     descriptionEn: "Deep UX optimization for KPI Cycles modal. The Applicable Departments and Applicable Employees inputs are now neatly aligned side-by-side using a grid layout to save vertical space. Furthermore, the Employees list is now smartly filtered dynamically based on the selected Departments.",
-    descriptionBn: "KPI Cycles মোডালের UX-এ বড় ধরণের উন্নয়ন করা হয়েছে। Applicable Departments এবং Applicable Employees ইনপুট দুটি এখন পাশাপাশি সুন্দরভাবে গ্রিড লেআউটে সাজানো হয়েছে। এছাড়া, এখন শুধুমাত্র নির্বাচিত ডিপার্টমেন্টের ওপর ভিত্তি করে Employees-এর তালিকা ডাইনামিকালি ফিল্টার হয়ে প্রদর্শিত হবে।",
+    descriptionBn: "KPI Cycles à¦®à§‹à¦¡à¦¾à¦²à§‡à¦° UX-à¦� à¦¬à§œ à¦§à¦°à¦£à§‡à¦° à¦‰à¦¨à§�à¦¨à§Ÿà¦¨ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ Applicable Departments à¦�à¦¬à¦‚ Applicable Employees à¦‡à¦¨à¦ªà§�à¦Ÿ à¦¦à§�à¦Ÿà¦¿ à¦�à¦–à¦¨ à¦ªà¦¾à¦¶à¦¾à¦ªà¦¾à¦¶à¦¿ à¦¸à§�à¦¨à§�à¦¦à¦°à¦­à¦¾à¦¬à§‡ à¦—à§�à¦°à¦¿à¦¡ à¦²à§‡à¦†à¦‰à¦Ÿà§‡ à¦¸à¦¾à¦œà¦¾à¦¨à§‹ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦�à¦›à¦¾à§œà¦¾, à¦�à¦–à¦¨ à¦¶à§�à¦§à§�à¦®à¦¾à¦¤à§�à¦° à¦¨à¦¿à¦°à§�à¦¬à¦¾à¦šà¦¿à¦¤ à¦¡à¦¿à¦ªà¦¾à¦°à§�à¦Ÿà¦®à§‡à¦¨à§�à¦Ÿà§‡à¦° à¦“à¦ªà¦° à¦­à¦¿à¦¤à§�à¦¤à¦¿ à¦•à¦°à§‡ Employees-à¦�à¦° à¦¤à¦¾à¦²à¦¿à¦•à¦¾ à¦¡à¦¾à¦‡à¦¨à¦¾à¦®à¦¿à¦•à¦¾à¦²à¦¿ à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦° à¦¹à§Ÿà§‡ à¦ªà§�à¦°à¦¦à¦°à§�à¦¶à¦¿à¦¤ à¦¹à¦¬à§‡à¥¤",
   },
   {
     id: "182",
@@ -251,7 +260,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "KPI Cycles",
     link: "/kpi-cycles",
     descriptionEn: "Upgraded the KPI Cycles creation modal with a smart, searchable combobox (MultiSelect) for both Applicable Departments and Applicable Employees, replacing the previous bulky scrollable lists for a much more professional and clean UX.",
-    descriptionBn: "KPI Cycles তৈরির মোডালটি আরও স্মার্ট ও প্রফেশনাল করা হয়েছে। Applicable Departments এবং Applicable Employees নির্বাচনের জন্য আগের বড় স্ক্রলযোগ্য তালিকার পরিবর্তে সার্চ-সুবিধাযুক্ত আধুনিক মাল্টি-সিলেক্ট কম্বোবক্স যোগ করা হয়েছে।",
+    descriptionBn: "KPI Cycles à¦¤à§ˆà¦°à¦¿à¦° à¦®à§‹à¦¡à¦¾à¦²à¦Ÿà¦¿ à¦†à¦°à¦“ à¦¸à§�à¦®à¦¾à¦°à§�à¦Ÿ à¦“ à¦ªà§�à¦°à¦«à§‡à¦¶à¦¨à¦¾à¦² à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ Applicable Departments à¦�à¦¬à¦‚ Applicable Employees à¦¨à¦¿à¦°à§�à¦¬à¦¾à¦šà¦¨à§‡à¦° à¦œà¦¨à§�à¦¯ à¦†à¦—à§‡à¦° à¦¬à§œ à¦¸à§�à¦•à§�à¦°à¦²à¦¯à§‹à¦—à§�à¦¯ à¦¤à¦¾à¦²à¦¿à¦•à¦¾à¦° à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à§‡ à¦¸à¦¾à¦°à§�à¦š-à¦¸à§�à¦¬à¦¿à¦§à¦¾à¦¯à§�à¦•à§�à¦¤ à¦†à¦§à§�à¦¨à¦¿à¦• à¦®à¦¾à¦²à§�à¦Ÿà¦¿-à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦®à§�à¦¬à§‹à¦¬à¦•à§�à¦¸ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "181",
@@ -260,7 +269,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "KPI Cycles",
     link: "/kpi-cycles",
     descriptionEn: "Upgraded the 'Create/Edit Cycle' modal to be more user-friendly. Replaced the native multi-select box with scrollable checkbox lists for both Applicable Departments and Applicable Employees.",
-    descriptionBn: "'Create/Edit Cycle' মোডালটিকে আরও ইউজার-ফ্রেন্ডলি করা হয়েছে। আগের ডিফল্ট মাল্টি-সিলেক্ট বক্সের বদলে Applicable Departments এবং Applicable Employees-এর জন্য স্ক্রল করা যায় এমন চেকবক্স লিস্ট যোগ করা হয়েছে।",
+    descriptionBn: "'Create/Edit Cycle' à¦®à§‹à¦¡à¦¾à¦²à¦Ÿà¦¿à¦•à§‡ à¦†à¦°à¦“ à¦‡à¦‰à¦œà¦¾à¦°-à¦«à§�à¦°à§‡à¦¨à§�à¦¡à¦²à¦¿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦†à¦—à§‡à¦° à¦¡à¦¿à¦«à¦²à§�à¦Ÿ à¦®à¦¾à¦²à§�à¦Ÿà¦¿-à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦¬à¦•à§�à¦¸à§‡à¦° à¦¬à¦¦à¦²à§‡ Applicable Departments à¦�à¦¬à¦‚ Applicable Employees-à¦�à¦° à¦œà¦¨à§�à¦¯ à¦¸à§�à¦•à§�à¦°à¦² à¦•à¦°à¦¾ à¦¯à¦¾à§Ÿ à¦�à¦®à¦¨ à¦šà§‡à¦•à¦¬à¦•à§�à¦¸ à¦²à¦¿à¦¸à§�à¦Ÿ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "180",
@@ -269,7 +278,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Employee Increment",
     link: "/increment-list",
     descriptionEn: "Reordered fields in the Employee Evaluation modal to place the KPI option before the promotion checkbox, as per the new logical flow.",
-    descriptionBn: "এমপ্লয়ি ইভ্যালুয়েশন মোডালে ফিল্ডের ক্রম পরিবর্তন করা হয়েছে; নতুন ফ্লো অনুযায়ী KPI অপশনটি প্রমোশন চেকবক্সের আগে রাখা হয়েছে।",
+    descriptionBn: "à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦‡à¦­à§�à¦¯à¦¾à¦²à§�à§Ÿà§‡à¦¶à¦¨ à¦®à§‹à¦¡à¦¾à¦²à§‡ à¦«à¦¿à¦²à§�à¦¡à§‡à¦° à¦•à§�à¦°à¦® à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡; à¦¨à¦¤à§�à¦¨ à¦«à§�à¦²à§‹ à¦…à¦¨à§�à¦¯à¦¾à¦¯à¦¼à§€ KPI à¦…à¦ªà¦¶à¦¨à¦Ÿà¦¿ à¦ªà§�à¦°à¦®à§‹à¦¶à¦¨ à¦šà§‡à¦•à¦¬à¦•à§�à¦¸à§‡à¦° à¦†à¦—à§‡ à¦°à¦¾à¦–à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "179",
@@ -278,7 +287,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Employee Increment",
     link: "/increment-list",
     descriptionEn: "Updated the Employee Evaluation modal flow to enforce a logical order: the 'Pull Increment Data from KPI' option is now disabled until an employee is selected, and checking the KPI option auto-fills data specifically for the selected employee.",
-    descriptionBn: "এমপ্লয়ি ইভ্যালুয়েশন মোডালে একটি লজিক্যাল ফ্লো এনফোর্স করা হয়েছে: কোনো এমপ্লয়ি সিলেক্ট করার আগে 'Pull Increment Data from KPI' অপশনটি ডিজেবল থাকবে, এবং KPI অপশনে চেক করলে শুধুমাত্র সিলেক্টেড এমপ্লয়ির জন্য অটোমেটিক ডেটা ফিল হবে।",
+    descriptionBn: "à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦‡à¦­à§�à¦¯à¦¾à¦²à§�à§Ÿà§‡à¦¶à¦¨ à¦®à§‹à¦¡à¦¾à¦²à§‡ à¦�à¦•à¦Ÿà¦¿ à¦²à¦œà¦¿à¦•à§�à¦¯à¦¾à¦² à¦«à§�à¦²à§‹ à¦�à¦¨à¦«à§‹à¦°à§�à¦¸ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡: à¦•à§‹à¦¨à§‹ à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦°à¦¾à¦° à¦†à¦—à§‡ 'Pull Increment Data from KPI' à¦…à¦ªà¦¶à¦¨à¦Ÿà¦¿ à¦¡à¦¿à¦œà§‡à¦¬à¦² à¦¥à¦¾à¦•à¦¬à§‡, à¦�à¦¬à¦‚ KPI à¦…à¦ªà¦¶à¦¨à§‡ à¦šà§‡à¦• à¦•à¦°à¦²à§‡ à¦¶à§�à¦§à§�à¦®à¦¾à¦¤à§�à¦° à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿà§‡à¦¡ à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿à¦° à¦œà¦¨à§�à¦¯ à¦…à¦Ÿà§‹à¦®à§‡à¦Ÿà¦¿à¦• à¦¡à§‡à¦Ÿà¦¾ à¦«à¦¿à¦² à¦¹à¦¬à§‡à¥¤",
   },
   {
     id: "178",
@@ -287,7 +296,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Fixed a TypeScript error where the initialDyeings and initialFinishings arrays were missing the status property.",
-    descriptionBn: "মার্চেন্ডাইজিং মাস্টার সেটিংসে একটি টাইপস্ক্রিপ্ট এরর সমাধান করা হয়েছে যেখানে initialDyeings এবং initialFinishings অ্যারেগুলোতে status প্রপার্টিটি মিসিং ছিল।",
+    descriptionBn: "à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸à§‡ à¦�à¦•à¦Ÿà¦¿ à¦Ÿà¦¾à¦‡à¦ªà¦¸à§�à¦•à§�à¦°à¦¿à¦ªà§�à¦Ÿ à¦�à¦°à¦° à¦¸à¦®à¦¾à¦§à¦¾à¦¨ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ à¦¯à§‡à¦–à¦¾à¦¨à§‡ initialDyeings à¦�à¦¬à¦‚ initialFinishings à¦…à§�à¦¯à¦¾à¦°à§‡à¦—à§�à¦²à§‹à¦¤à§‡ status à¦ªà§�à¦°à¦ªà¦¾à¦°à§�à¦Ÿà¦¿à¦Ÿà¦¿ à¦®à¦¿à¦¸à¦¿à¦‚ à¦›à¦¿à¦²à¥¤",
   },
   {
     id: "177",
@@ -296,7 +305,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Fixed a TypeScript error where the FabricConstructionSpec data was missing the rateConstraint property.",
-    descriptionBn: "মার্চেন্ডাইজিং মাস্টার সেটিংসে একটি টাইপস্ক্রিপ্ট এরর সমাধান করা হয়েছে যেখানে FabricConstructionSpec ডেটাতে rateConstraint প্রপার্টিটি মিসিং ছিল।",
+    descriptionBn: "à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸à§‡ à¦�à¦•à¦Ÿà¦¿ à¦Ÿà¦¾à¦‡à¦ªà¦¸à§�à¦•à§�à¦°à¦¿à¦ªà§�à¦Ÿ à¦�à¦°à¦° à¦¸à¦®à¦¾à¦§à¦¾à¦¨ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ à¦¯à§‡à¦–à¦¾à¦¨à§‡ FabricConstructionSpec à¦¡à§‡à¦Ÿà¦¾à¦¤à§‡ rateConstraint à¦ªà§�à¦°à¦ªà¦¾à¦°à§�à¦Ÿà¦¿à¦Ÿà¦¿ à¦®à¦¿à¦¸à¦¿à¦‚ à¦›à¦¿à¦²à¥¤",
   },
   {
     id: "176",
@@ -305,7 +314,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Fixed a TypeScript error where SpecialCostSpec and AdditionalCostSpec were missing rate and rateConstraint properties.",
-    descriptionBn: "মার্চেন্ডাইজিং মাস্টার সেটিংসে একটি টাইপস্ক্রিপ্ট এরর সমাধান করা হয়েছে যেখানে SpecialCostSpec এবং AdditionalCostSpec-এ rate এবং rateConstraint প্রপার্টিগুলো মিসিং ছিল।",
+    descriptionBn: "à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸à§‡ à¦�à¦•à¦Ÿà¦¿ à¦Ÿà¦¾à¦‡à¦ªà¦¸à§�à¦•à§�à¦°à¦¿à¦ªà§�à¦Ÿ à¦�à¦°à¦° à¦¸à¦®à¦¾à¦§à¦¾à¦¨ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ à¦¯à§‡à¦–à¦¾à¦¨à§‡ SpecialCostSpec à¦�à¦¬à¦‚ AdditionalCostSpec-à¦� rate à¦�à¦¬à¦‚ rateConstraint à¦ªà§�à¦°à¦ªà¦¾à¦°à§�à¦Ÿà¦¿à¦—à§�à¦²à§‹ à¦®à¦¿à¦¸à¦¿à¦‚ à¦›à¦¿à¦²à¥¤",
   },
   {
     id: "175",
@@ -314,7 +323,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "User Management",
     link: "/user-management",
     descriptionEn: "Restored the avatar/image holder circle next to the employee name in the User Access Overview modal, removed the bottom metadata ribbon (Landing Route, Phone, Last Login) to reduce clutter, and removed the short company code (e.g. PSL, PKCL) chips beside the company names in the access list.",
-    descriptionBn: "ইউজার অ্যাক্সেস ওভারভিউ মোডালে এমপ্লয়ির নামের পাশে অ্যাভাটার/ছবি আবার যুক্ত করা হয়েছে। নিচের মেটাডেটা রিবন (ল্যান্ডিং রাউট, ফোন, লাস্ট লগইন) সরিয়ে দেওয়া হয়েছে। এছাড়াও কোম্পানি অ্যাক্সেস লিস্টের কোম্পানির নামের পাশ থেকে শর্ট কোড (যেমন- PSL, PKCL) চিপগুলো মুছে দেওয়া হয়েছে।",
+    descriptionBn: "à¦‡à¦‰à¦œà¦¾à¦° à¦…à§�à¦¯à¦¾à¦•à§�à¦¸à§‡à¦¸ à¦“à¦­à¦¾à¦°à¦­à¦¿à¦‰ à¦®à§‹à¦¡à¦¾à¦²à§‡ à¦�à¦®à¦ªà§�à¦²à§Ÿà¦¿à¦° à¦¨à¦¾à¦®à§‡à¦° à¦ªà¦¾à¦¶à§‡ à¦…à§�à¦¯à¦¾à¦­à¦¾à¦Ÿà¦¾à¦°/à¦›à¦¬à¦¿ à¦†à¦¬à¦¾à¦° à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦¨à¦¿à¦šà§‡à¦° à¦®à§‡à¦Ÿà¦¾à¦¡à§‡à¦Ÿà¦¾ à¦°à¦¿à¦¬à¦¨ (à¦²à§�à¦¯à¦¾à¦¨à§�à¦¡à¦¿à¦‚ à¦°à¦¾à¦‰à¦Ÿ, à¦«à§‹à¦¨, à¦²à¦¾à¦¸à§�à¦Ÿ à¦²à¦—à¦‡à¦¨) à¦¸à¦°à¦¿à§Ÿà§‡ à¦¦à§‡à¦“à§Ÿà¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦›à¦¾à§œà¦¾à¦“ à¦•à§‹à¦®à§�à¦ªà¦¾à¦¨à¦¿ à¦…à§�à¦¯à¦¾à¦•à§�à¦¸à§‡à¦¸ à¦²à¦¿à¦¸à§�à¦Ÿà§‡à¦° à¦•à§‹à¦®à§�à¦ªà¦¾à¦¨à¦¿à¦° à¦¨à¦¾à¦®à§‡à¦° à¦ªà¦¾à¦¶ à¦¥à§‡à¦•à§‡ à¦¶à¦°à§�à¦Ÿ à¦•à§‹à¦¡ (à¦¯à§‡à¦®à¦¨- PSL, PKCL) à¦šà¦¿à¦ªà¦—à§�à¦²à§‹ à¦®à§�à¦›à§‡ à¦¦à§‡à¦“à§Ÿà¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "174",
@@ -323,7 +332,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "User Management",
     link: "/user-management",
     descriptionEn: "Removed the user avatar/image section from the User Access Overview modal to create a cleaner layout.",
-    descriptionBn: "মোডালটিকে আরও পরিষ্কার এবং ছিমছাম করার জন্য ইউজার অ্যাক্সেস ওভারভিউ মোডাল থেকে ইউজারের ছবি/অ্যাভাটার সেকশনটি সরিয়ে ফেলা হয়েছে।",
+    descriptionBn: "à¦®à§‹à¦¡à¦¾à¦²à¦Ÿà¦¿à¦•à§‡ à¦†à¦°à¦“ à¦ªà¦°à¦¿à¦·à§�à¦•à¦¾à¦° à¦�à¦¬à¦‚ à¦›à¦¿à¦®à¦›à¦¾à¦® à¦•à¦°à¦¾à¦° à¦œà¦¨à§�à¦¯ à¦‡à¦‰à¦œà¦¾à¦° à¦…à§�à¦¯à¦¾à¦•à§�à¦¸à§‡à¦¸ à¦“à¦­à¦¾à¦°à¦­à¦¿à¦‰ à¦®à§‹à¦¡à¦¾à¦² à¦¥à§‡à¦•à§‡ à¦‡à¦‰à¦œà¦¾à¦°à§‡à¦° à¦›à¦¬à¦¿/à¦…à§�à¦¯à¦¾à¦­à¦¾à¦Ÿà¦¾à¦° à¦¸à§‡à¦•à¦¶à¦¨à¦Ÿà¦¿ à¦¸à¦°à¦¿à§Ÿà§‡ à¦«à§‡à¦²à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "173",
@@ -332,7 +341,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "User Management",
     link: "/user-management",
     descriptionEn: "Added a dedicated 'User Access Overview' action button and modal in the User Management table. It provides a visual snapshot of user credentials, system role, department, status, and an enhanced card-based matrix of assigned companies and accessible operational areas.",
-    descriptionBn: "ইউজার ম্যানেজমেন্ট টেবিলে একটি নতুন 'User Access Overview' অ্যাকশন বাটন এবং মোডাল যুক্ত করা হয়েছে। এর মাধ্যমে যেকোনো ব্যবহারকারীর প্রোফাইল তথ্য, সিস্টেম রোল, ডিপার্টমেন্ট, স্ট্যাটাস এবং অ্যাসাইন করা কোম্পানি ও অনুমোদিত এরিয়াগুলো সুন্দর কার্ড ডিজাইনে একনজরে দেখা যাবে।",
+    descriptionBn: "à¦‡à¦‰à¦œà¦¾à¦° à¦®à§�à¦¯à¦¾à¦¨à§‡à¦œà¦®à§‡à¦¨à§�à¦Ÿ à¦Ÿà§‡à¦¬à¦¿à¦²à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¨à¦¤à§�à¦¨ 'User Access Overview' à¦…à§�à¦¯à¦¾à¦•à¦¶à¦¨ à¦¬à¦¾à¦Ÿà¦¨ à¦�à¦¬à¦‚ à¦®à§‹à¦¡à¦¾à¦² à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦° à¦®à¦¾à¦§à§�à¦¯à¦®à§‡ à¦¯à§‡à¦•à§‹à¦¨à§‹ à¦¬à§�à¦¯à¦¬à¦¹à¦¾à¦°à¦•à¦¾à¦°à§€à¦° à¦ªà§�à¦°à§‹à¦«à¦¾à¦‡à¦² à¦¤à¦¥à§�à¦¯, à¦¸à¦¿à¦¸à§�à¦Ÿà§‡à¦® à¦°à§‹à¦², à¦¡à¦¿à¦ªà¦¾à¦°à§�à¦Ÿà¦®à§‡à¦¨à§�à¦Ÿ, à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦Ÿà¦¾à¦¸ à¦�à¦¬à¦‚ à¦…à§�à¦¯à¦¾à¦¸à¦¾à¦‡à¦¨ à¦•à¦°à¦¾ à¦•à§‹à¦®à§�à¦ªà¦¾à¦¨à¦¿ à¦“ à¦…à¦¨à§�à¦®à§‹à¦¦à¦¿à¦¤ à¦�à¦°à¦¿à§Ÿà¦¾à¦—à§�à¦²à§‹ à¦¸à§�à¦¨à§�à¦¦à¦° à¦•à¦¾à¦°à§�à¦¡ à¦¡à¦¿à¦œà¦¾à¦‡à¦¨à§‡ à¦�à¦•à¦¨à¦œà¦°à§‡ à¦¦à§‡à¦–à¦¾ à¦¯à¦¾à¦¬à§‡à¥¤",
   },
   {
     id: "172",
@@ -341,7 +350,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Evaluation",
     link: "/increment-list",
     descriptionEn: "Added a 'Pull from KPI' integration in the Evaluation modal. You can now check a box to automatically fetch and fill the increment amount based on an employee's KPI score. When unchecked, you can manually enter the amount. This streamlines the data entry for KPI-driven evaluations.",
-    descriptionBn: "ইভ্যালুয়েশন মোডালে 'Pull from KPI' অপশন যুক্ত করা হয়েছে। এই চেকবক্সে টিক দিলে এমপ্লয়ির KPI স্কোরের উপর ভিত্তি করে ইনক্রিমেন্টের পরিমাণ অটোমেটিক্যালি ফিল হয়ে যাবে। আর টিক না দিলে আপনি ম্যানুয়ালি অ্যামাউন্ট লিখতে পারবেন, যা কাজকে আরও সহজ ও নিখুঁত করবে।",
+    descriptionBn: "à¦‡à¦­à§�à¦¯à¦¾à¦²à§�à§Ÿà§‡à¦¶à¦¨ à¦®à§‹à¦¡à¦¾à¦²à§‡ 'Pull from KPI' à¦…à¦ªà¦¶à¦¨ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦‡ à¦šà§‡à¦•à¦¬à¦•à§�à¦¸à§‡ à¦Ÿà¦¿à¦• à¦¦à¦¿à¦²à§‡ à¦�à¦®à¦ªà§�à¦²à§Ÿà¦¿à¦° KPI à¦¸à§�à¦•à§‹à¦°à§‡à¦° à¦‰à¦ªà¦° à¦­à¦¿à¦¤à§�à¦¤à¦¿ à¦•à¦°à§‡ à¦‡à¦¨à¦•à§�à¦°à¦¿à¦®à§‡à¦¨à§�à¦Ÿà§‡à¦° à¦ªà¦°à¦¿à¦®à¦¾à¦£ à¦…à¦Ÿà§‹à¦®à§‡à¦Ÿà¦¿à¦•à§�à¦¯à¦¾à¦²à¦¿ à¦«à¦¿à¦² à¦¹à§Ÿà§‡ à¦¯à¦¾à¦¬à§‡à¥¤ à¦†à¦° à¦Ÿà¦¿à¦• à¦¨à¦¾ à¦¦à¦¿à¦²à§‡ à¦†à¦ªà¦¨à¦¿ à¦®à§�à¦¯à¦¾à¦¨à§�à§Ÿà¦¾à¦²à¦¿ à¦…à§�à¦¯à¦¾à¦®à¦¾à¦‰à¦¨à§�à¦Ÿ à¦²à¦¿à¦–à¦¤à§‡ à¦ªà¦¾à¦°à¦¬à§‡à¦¨, à¦¯à¦¾ à¦•à¦¾à¦œà¦•à§‡ à¦†à¦°à¦“ à¦¸à¦¹à¦œ à¦“ à¦¨à¦¿à¦–à§�à¦�à¦¤ à¦•à¦°à¦¬à§‡à¥¤",
   },
   {
     id: "171",
@@ -350,7 +359,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Evaluation",
     link: "/increment-list",
     descriptionEn: "Enhanced the 'New Evaluation' modal for a more professional experience. Replaced the manual designation input field with an 'Is Promoted?' checkbox. When checked, it gracefully reveals a dropdown to precisely select the new designation. This prevents typos and makes the form much cleaner.",
-    descriptionBn: "নতুন ইভ্যালুয়েশন মোডালটিকে আরও প্রফেশনাল করা হয়েছে। ডেজিগনেশন ম্যানুয়ালি লেখার পরিবর্তে এখন 'Is Promoted?' চেকবক্স দেওয়া হয়েছে। এটি টিক দিলে একটি ড্রপডাউন আসবে যেখান থেকে নতুন ডেজিগনেশন সিলেক্ট করা যাবে। এর ফলে ভুল হওয়ার সম্ভাবনা থাকবে না এবং ফর্মটি দেখতেও সুন্দর লাগবে।",
+    descriptionBn: "à¦¨à¦¤à§�à¦¨ à¦‡à¦­à§�à¦¯à¦¾à¦²à§�à§Ÿà§‡à¦¶à¦¨ à¦®à§‹à¦¡à¦¾à¦²à¦Ÿà¦¿à¦•à§‡ à¦†à¦°à¦“ à¦ªà§�à¦°à¦«à§‡à¦¶à¦¨à¦¾à¦² à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦¡à§‡à¦œà¦¿à¦—à¦¨à§‡à¦¶à¦¨ à¦®à§�à¦¯à¦¾à¦¨à§�à§Ÿà¦¾à¦²à¦¿ à¦²à§‡à¦–à¦¾à¦° à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à§‡ à¦�à¦–à¦¨ 'Is Promoted?' à¦šà§‡à¦•à¦¬à¦•à§�à¦¸ à¦¦à§‡à¦“à§Ÿà¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦Ÿà¦¿ à¦Ÿà¦¿à¦• à¦¦à¦¿à¦²à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¡à§�à¦°à¦ªà¦¡à¦¾à¦‰à¦¨ à¦†à¦¸à¦¬à§‡ à¦¯à§‡à¦–à¦¾à¦¨ à¦¥à§‡à¦•à§‡ à¦¨à¦¤à§�à¦¨ à¦¡à§‡à¦œà¦¿à¦—à¦¨à§‡à¦¶à¦¨ à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦°à¦¾ à¦¯à¦¾à¦¬à§‡à¥¤ à¦�à¦° à¦«à¦²à§‡ à¦­à§�à¦² à¦¹à¦“à§Ÿà¦¾à¦° à¦¸à¦®à§�à¦­à¦¾à¦¬à¦¨à¦¾ à¦¥à¦¾à¦•à¦¬à§‡ à¦¨à¦¾ à¦�à¦¬à¦‚ à¦«à¦°à§�à¦®à¦Ÿà¦¿ à¦¦à§‡à¦–à¦¤à§‡à¦“ à¦¸à§�à¦¨à§�à¦¦à¦° à¦²à¦¾à¦—à¦¬à§‡à¥¤",
   },
   {
     id: "170",
@@ -359,7 +368,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Evaluation",
     link: "/increment-list",
     descriptionEn: "Corrected the Evaluation sidebar menu. It is now called 'Evaluation' and contains three sub-menus: Increment List, Summary, and History. The 'Evaluate' button remains conveniently at the top of the Increment List page as requested.",
-    descriptionBn: "ইভ্যালুয়েশন সাইডবার মেনুটি ঠিক করা হয়েছে। এখন এর নাম 'Evaluation' রাখা হয়েছে এবং এর আন্ডারে ৩টি সাব-মেনু আছে: Increment List, Summary, এবং History। এছাড়া ইনক্রিমেন্ট লিস্ট পেইজের উপরে 'Evaluate' বাটনটি আগের মতোই রাখা হয়েছে।",
+    descriptionBn: "à¦‡à¦­à§�à¦¯à¦¾à¦²à§�à§Ÿà§‡à¦¶à¦¨ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦° à¦®à§‡à¦¨à§�à¦Ÿà¦¿ à¦ à¦¿à¦• à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦–à¦¨ à¦�à¦° à¦¨à¦¾à¦® 'Evaluation' à¦°à¦¾à¦–à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦�à¦° à¦†à¦¨à§�à¦¡à¦¾à¦°à§‡ à§©à¦Ÿà¦¿ à¦¸à¦¾à¦¬-à¦®à§‡à¦¨à§� à¦†à¦›à§‡: Increment List, Summary, à¦�à¦¬à¦‚ Historyà¥¤ à¦�à¦›à¦¾à§œà¦¾ à¦‡à¦¨à¦•à§�à¦°à¦¿à¦®à§‡à¦¨à§�à¦Ÿ à¦²à¦¿à¦¸à§�à¦Ÿ à¦ªà§‡à¦‡à¦œà§‡à¦° à¦‰à¦ªà¦°à§‡ 'Evaluate' à¦¬à¦¾à¦Ÿà¦¨à¦Ÿà¦¿ à¦†à¦—à§‡à¦° à¦®à¦¤à§‹à¦‡ à¦°à¦¾à¦–à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "169",
@@ -368,7 +377,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Evaluation",
     link: "/increment-list",
     descriptionEn: "Refactored the Evaluation workflow again based on feedback. The main entry point is now simply 'Increment List' in the sidebar. We removed the extra tabs and added a direct 'New Evaluation' button at the top of the list. Clicking it opens a fast, intuitive modal where you can select Year, Month, Employee, enter a Promotion Designation (if any), and input the Increment Amount, saving it instantly.",
-    descriptionBn: "ফিডব্যাকের উপর ভিত্তি করে ইভ্যালুয়েশন প্রসেসটি আবারও সহজ করা হয়েছে। এখন সাইডবারে শুধুমাত্র 'Increment List' মেনুটি রাখা হয়েছে এবং অন্যান্য ট্যাবগুলো মুছে ফেলা হয়েছে। ইনক্রিমেন্ট লিস্ট পেইজের উপরে একটি 'New Evaluation' বাটন যোগ করা হয়েছে। এই বাটনে ক্লিক করলে একটি সুন্দর মোডাল ওপেন হবে যেখান থেকে বছর, মাস এবং এমপ্লয়ি সিলেক্ট করে প্রমোশন ও ইনক্রিমেন্টের টাকা বসিয়ে খুব সহজেই সেভ করা যাবে।",
+    descriptionBn: "à¦«à¦¿à¦¡à¦¬à§�à¦¯à¦¾à¦•à§‡à¦° à¦‰à¦ªà¦° à¦­à¦¿à¦¤à§�à¦¤à¦¿ à¦•à¦°à§‡ à¦‡à¦­à§�à¦¯à¦¾à¦²à§�à§Ÿà§‡à¦¶à¦¨ à¦ªà§�à¦°à¦¸à§‡à¦¸à¦Ÿà¦¿ à¦†à¦¬à¦¾à¦°à¦“ à¦¸à¦¹à¦œ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦–à¦¨ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦°à§‡ à¦¶à§�à¦§à§�à¦®à¦¾à¦¤à§�à¦° 'Increment List' à¦®à§‡à¦¨à§�à¦Ÿà¦¿ à¦°à¦¾à¦–à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦…à¦¨à§�à¦¯à¦¾à¦¨à§�à¦¯ à¦Ÿà§�à¦¯à¦¾à¦¬à¦—à§�à¦²à§‹ à¦®à§�à¦›à§‡ à¦«à§‡à¦²à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦‡à¦¨à¦•à§�à¦°à¦¿à¦®à§‡à¦¨à§�à¦Ÿ à¦²à¦¿à¦¸à§�à¦Ÿ à¦ªà§‡à¦‡à¦œà§‡à¦° à¦‰à¦ªà¦°à§‡ à¦�à¦•à¦Ÿà¦¿ 'New Evaluation' à¦¬à¦¾à¦Ÿà¦¨ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦‡ à¦¬à¦¾à¦Ÿà¦¨à§‡ à¦•à§�à¦²à¦¿à¦• à¦•à¦°à¦²à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¸à§�à¦¨à§�à¦¦à¦° à¦®à§‹à¦¡à¦¾à¦² à¦“à¦ªà§‡à¦¨ à¦¹à¦¬à§‡ à¦¯à§‡à¦–à¦¾à¦¨ à¦¥à§‡à¦•à§‡ à¦¬à¦›à¦°, à¦®à¦¾à¦¸ à¦�à¦¬à¦‚ à¦�à¦®à¦ªà§�à¦²à§Ÿà¦¿ à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦°à§‡ à¦ªà§�à¦°à¦®à§‹à¦¶à¦¨ à¦“ à¦‡à¦¨à¦•à§�à¦°à¦¿à¦®à§‡à¦¨à§�à¦Ÿà§‡à¦° à¦Ÿà¦¾à¦•à¦¾ à¦¬à¦¸à¦¿à§Ÿà§‡ à¦–à§�à¦¬ à¦¸à¦¹à¦œà§‡à¦‡ à¦¸à§‡à¦­ à¦•à¦°à¦¾ à¦¯à¦¾à¦¬à§‡à¥¤",
   },
   {
     id: "168",
@@ -377,7 +386,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Evaluation",
     link: "/evaluation-propose",
     descriptionEn: "Completely streamlined the Evaluation workflow into 4 simple steps: Evaluate, Increment List, Summary, and History. Removed the complex configurator step. Managers can now directly input the proposed 'Increment Amount' and 'Promotion Designation' for each employee in the Evaluate datatable itself, making the process much faster and more professional.",
-    descriptionBn: "ইভ্যালুয়েশন প্রসেসটিকে ৪টি সহজ ধাপে সাজানো হয়েছে: Evaluate, Increment List, Summary এবং History। জটিল কনফিগারেশন স্টেপ বাদ দেওয়া হয়েছে। এখন ম্যানেজাররা সরাসরি Evaluate পেইজের ডেটাটেবিলে বসে প্রতিটি এমপ্লয়ির জন্য 'Increment Amount' এবং 'Promotion Designation' ইনপুট দিতে পারবেন, যা কাজটি আরও দ্রুত ও প্রফেশনাল করেছে।",
+    descriptionBn: "à¦‡à¦­à§�à¦¯à¦¾à¦²à§�à§Ÿà§‡à¦¶à¦¨ à¦ªà§�à¦°à¦¸à§‡à¦¸à¦Ÿà¦¿à¦•à§‡ à§ªà¦Ÿà¦¿ à¦¸à¦¹à¦œ à¦§à¦¾à¦ªà§‡ à¦¸à¦¾à¦œà¦¾à¦¨à§‹ à¦¹à§Ÿà§‡à¦›à§‡: Evaluate, Increment List, Summary à¦�à¦¬à¦‚ Historyà¥¤ à¦œà¦Ÿà¦¿à¦² à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦¸à§�à¦Ÿà§‡à¦ª à¦¬à¦¾à¦¦ à¦¦à§‡à¦“à§Ÿà¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦–à¦¨ à¦®à§�à¦¯à¦¾à¦¨à§‡à¦œà¦¾à¦°à¦°à¦¾ à¦¸à¦°à¦¾à¦¸à¦°à¦¿ Evaluate à¦ªà§‡à¦‡à¦œà§‡à¦° à¦¡à§‡à¦Ÿà¦¾à¦Ÿà§‡à¦¬à¦¿à¦²à§‡ à¦¬à¦¸à§‡ à¦ªà§�à¦°à¦¤à¦¿à¦Ÿà¦¿ à¦�à¦®à¦ªà§�à¦²à§Ÿà¦¿à¦° à¦œà¦¨à§�à¦¯ 'Increment Amount' à¦�à¦¬à¦‚ 'Promotion Designation' à¦‡à¦¨à¦ªà§�à¦Ÿ à¦¦à¦¿à¦¤à§‡ à¦ªà¦¾à¦°à¦¬à§‡à¦¨, à¦¯à¦¾ à¦•à¦¾à¦œà¦Ÿà¦¿ à¦†à¦°à¦“ à¦¦à§�à¦°à§�à¦¤ à¦“ à¦ªà§�à¦°à¦«à§‡à¦¶à¦¨à¦¾à¦² à¦•à¦°à§‡à¦›à§‡à¥¤",
   },
   {
     id: "167",
@@ -386,7 +395,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Evaluation",
     link: "/evaluation-propose",
     descriptionEn: "Simplified the Evaluation menu into a cleaner, modern, and professional inline tab navigation bar by removing the large block layout and complex descriptions. This makes the interface more user-friendly and standard.",
-    descriptionBn: "ইভ্যালুয়েশন মেনুটিকে আরও সহজ, আধুনিক এবং পেশাদার ডিজাইনে তৈরি করা হয়েছে। বড় ব্লক লেআউট এবং অতিরিক্ত ডেসক্রিপশন সরিয়ে এটিকে একটি সুন্দর ইনলাইন ট্যাব নেভিগেশন বারে পরিবর্তন করা হয়েছে, যা ব্যবহারকারীদের জন্য আরও বেশি ইউজার-ফ্রেন্ডলি।",
+    descriptionBn: "à¦‡à¦­à§�à¦¯à¦¾à¦²à§�à§Ÿà§‡à¦¶à¦¨ à¦®à§‡à¦¨à§�à¦Ÿà¦¿à¦•à§‡ à¦†à¦°à¦“ à¦¸à¦¹à¦œ, à¦†à¦§à§�à¦¨à¦¿à¦• à¦�à¦¬à¦‚ à¦ªà§‡à¦¶à¦¾à¦¦à¦¾à¦° à¦¡à¦¿à¦œà¦¾à¦‡à¦¨à§‡ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦¬à§œ à¦¬à§�à¦²à¦• à¦²à§‡à¦†à¦‰à¦Ÿ à¦�à¦¬à¦‚ à¦…à¦¤à¦¿à¦°à¦¿à¦•à§�à¦¤ à¦¡à§‡à¦¸à¦•à§�à¦°à¦¿à¦ªà¦¶à¦¨ à¦¸à¦°à¦¿à§Ÿà§‡ à¦�à¦Ÿà¦¿à¦•à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¸à§�à¦¨à§�à¦¦à¦° à¦‡à¦¨à¦²à¦¾à¦‡à¦¨ à¦Ÿà§�à¦¯à¦¾à¦¬ à¦¨à§‡à¦­à¦¿à¦—à§‡à¦¶à¦¨ à¦¬à¦¾à¦°à§‡ à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦¯à¦¾ à¦¬à§�à¦¯à¦¬à¦¹à¦¾à¦°à¦•à¦¾à¦°à§€à¦¦à§‡à¦° à¦œà¦¨à§�à¦¯ à¦†à¦°à¦“ à¦¬à§‡à¦¶à¦¿ à¦‡à¦‰à¦œà¦¾à¦°-à¦«à§�à¦°à§‡à¦¨à§�à¦¡à¦²à¦¿à¥¤",
   },
   {
     id: "166",
@@ -395,7 +404,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Configuration - Allowance Rate",
     link: "/allowance-rate",
     descriptionEn: "Created a new 'Allowance Rate' configuration page with a centralized one-page modal design. Users can easily view, add, edit, and delete company-wide allowance rates (Percentage or Fixed amount) using a beautiful and well-organized interface.",
-    descriptionBn: "একটি নতুন 'Allowance Rate' কনফিগারেশন পেইজ তৈরি করা হয়েছে, যা একটি সুন্দর ও গোছানো এক-পেইজ মডেল ডিজাইনে তৈরি। ব্যবহারকারীরা এখন সহজেই কোম্পানির অ্যালাউন্স রেটগুলো (শতকরা বা নির্দিষ্ট পরিমাণ) দেখতে, যোগ করতে, এডিট করতে এবং ডিলিট করতে পারবেন।",
+    descriptionBn: "à¦�à¦•à¦Ÿà¦¿ à¦¨à¦¤à§�à¦¨ 'Allowance Rate' à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦ªà§‡à¦‡à¦œ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦¯à¦¾ à¦�à¦•à¦Ÿà¦¿ à¦¸à§�à¦¨à§�à¦¦à¦° à¦“ à¦—à§‹à¦›à¦¾à¦¨à§‹ à¦�à¦•-à¦ªà§‡à¦‡à¦œ à¦®à¦¡à§‡à¦² à¦¡à¦¿à¦œà¦¾à¦‡à¦¨à§‡ à¦¤à§ˆà¦°à¦¿à¥¤ à¦¬à§�à¦¯à¦¬à¦¹à¦¾à¦°à¦•à¦¾à¦°à§€à¦°à¦¾ à¦�à¦–à¦¨ à¦¸à¦¹à¦œà§‡à¦‡ à¦•à§‹à¦®à§�à¦ªà¦¾à¦¨à¦¿à¦° à¦…à§�à¦¯à¦¾à¦²à¦¾à¦‰à¦¨à§�à¦¸ à¦°à§‡à¦Ÿà¦—à§�à¦²à§‹ (à¦¶à¦¤à¦•à¦°à¦¾ à¦¬à¦¾ à¦¨à¦¿à¦°à§�à¦¦à¦¿à¦·à§�à¦Ÿ à¦ªà¦°à¦¿à¦®à¦¾à¦£) à¦¦à§‡à¦–à¦¤à§‡, à¦¯à§‹à¦— à¦•à¦°à¦¤à§‡, à¦�à¦¡à¦¿à¦Ÿ à¦•à¦°à¦¤à§‡ à¦�à¦¬à¦‚ à¦¡à¦¿à¦²à¦¿à¦Ÿ à¦•à¦°à¦¤à§‡ à¦ªà¦¾à¦°à¦¬à§‡à¦¨à¥¤",
   },
   {
     id: "165",
@@ -404,7 +413,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Quotation",
     link: "/merchandising-quotation",
     descriptionEn: "Implemented dynamic rate constraints across the Buyer Costing form based on Master Settings. When a description is selected, the rate field is automatically populated with a default rate. Depending on the master setting, the rate field can now be 'Fixed' (cannot be changed), 'Increase Only' (can only be raised), 'Decrease Only' (can only be lowered), or 'No Restriction' (can be freely edited).",
-    descriptionBn: "বায়ার কস্টিং ফর্মে মাস্টার সেটিংসের উপর ভিত্তি করে ডায়নামিক রেট রেসট্রিকশন (Rate Constraint) যুক্ত করা হয়েছে। এখন কোনো আইটেম সিলেক্ট করলে রেট ফিল্ডে অটোমেটিক ডিফল্ট রেট চলে আসবে। মাস্টার সেটিংস এর উপর নির্ভর করে এই রেট ফিল্ডটি 'Fixed', 'Increase Only', 'Decrease Only', অথবা 'No Restriction' হতে পারে।",
+    descriptionBn: "à¦¬à¦¾à¦¯à¦¼à¦¾à¦° à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦«à¦°à§�à¦®à§‡ à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸à§‡à¦° à¦‰à¦ªà¦° à¦­à¦¿à¦¤à§�à¦¤à¦¿ à¦•à¦°à§‡ à¦¡à¦¾à§Ÿà¦¨à¦¾à¦®à¦¿à¦• à¦°à§‡à¦Ÿ à¦°à§‡à¦¸à¦Ÿà§�à¦°à¦¿à¦•à¦¶à¦¨ (Rate Constraint) à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦–à¦¨ à¦•à§‹à¦¨à§‹ à¦†à¦‡à¦Ÿà§‡à¦® à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦°à¦²à§‡ à¦°à§‡à¦Ÿ à¦«à¦¿à¦²à§�à¦¡à§‡ à¦…à¦Ÿà§‹à¦®à§‡à¦Ÿà¦¿à¦• à¦¡à¦¿à¦«à¦²à§�à¦Ÿ à¦°à§‡à¦Ÿ à¦šà¦²à§‡ à¦†à¦¸à¦¬à§‡à¥¤ à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸ à¦�à¦° à¦‰à¦ªà¦° à¦¨à¦¿à¦°à§�à¦­à¦° à¦•à¦°à§‡ à¦�à¦‡ à¦°à§‡à¦Ÿ à¦«à¦¿à¦²à§�à¦¡à¦Ÿà¦¿ 'Fixed', 'Increase Only', 'Decrease Only', à¦…à¦¥à¦¬à¦¾ 'No Restriction' à¦¹à¦¤à§‡ à¦ªà¦¾à¦°à§‡à¥¤",
   },
   {
     id: "164",
@@ -413,7 +422,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Quotation",
     link: "/merchandising-quotation",
     descriptionEn: "Replaced all free-text description fields in the Buyer Costing form with dropdown menus. The options for Fabric Class, Used In, Accessories, Embellishments, Washing, Yarn Count, Knitting, and Dyeing are now directly populated from the Master Settings.",
-    descriptionBn: "বায়ার কস্টিং ফর্মের সকল ডেসক্রিপশন ফিল্ডগুলোকে ড্রপডাউন মেনুতে পরিবর্তন করা হয়েছে। এখন Fabric Class, Used In, Accessories, Embellishments, Washing, Yarn Count, Knitting, এবং Dyeing এর অপশনগুলো সরাসরি মাস্টার সেটিংস থেকে আসবে।",
+    descriptionBn: "à¦¬à¦¾à¦¯à¦¼à¦¾à¦° à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦«à¦°à§�à¦®à§‡à¦° à¦¸à¦•à¦² à¦¡à§‡à¦¸à¦•à§�à¦°à¦¿à¦ªà¦¶à¦¨ à¦«à¦¿à¦²à§�à¦¡à¦—à§�à¦²à§‹à¦•à§‡ à¦¡à§�à¦°à¦ªà¦¡à¦¾à¦‰à¦¨ à¦®à§‡à¦¨à§�à¦¤à§‡ à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦�à¦–à¦¨ Fabric Class, Used In, Accessories, Embellishments, Washing, Yarn Count, Knitting, à¦�à¦¬à¦‚ Dyeing à¦�à¦° à¦…à¦ªà¦¶à¦¨à¦—à§�à¦²à§‹ à¦¸à¦°à¦¾à¦¸à¦°à¦¿ à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸ à¦¥à§‡à¦•à§‡ à¦†à¦¸à¦¬à§‡à¥¤",
   },
   {
     id: "163",
@@ -422,7 +431,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Financial Aid & Zakat",
     link: "/financial-aid-list",
     descriptionEn: "Upgraded the 'Employee Verified Details' card in both the Financial Aid Request and Zakat Assignment modals to display a comprehensive view including the employee's image, department, section, join date, and gross salary.",
-    descriptionBn: "ফাইন্যান্সিয়াল এইড রিকোয়েস্ট এবং যাকাত অ্যাসাইনমেন্ট মোডালগুলোর 'Employee Verified Details' কার্ডটি আরও উন্নত করা হয়েছে। এখন এমপ্লয়ি সিলেক্ট করলে তার ছবি, ডিপার্টমেন্ট, সেকশন, জয়েনিং ডেট এবং গ্রস স্যালারি বিস্তারিতভাবে দেখা যাবে।",
+    descriptionBn: "à¦«à¦¾à¦‡à¦¨à§�à¦¯à¦¾à¦¨à§�à¦¸à¦¿à§Ÿà¦¾à¦² à¦�à¦‡à¦¡ à¦°à¦¿à¦•à§‹à¦¯à¦¼à§‡à¦¸à§�à¦Ÿ à¦�à¦¬à¦‚ à¦¯à¦¾à¦•à¦¾à¦¤ à¦…à§�à¦¯à¦¾à¦¸à¦¾à¦‡à¦¨à¦®à§‡à¦¨à§�à¦Ÿ à¦®à§‹à¦¡à¦¾à¦²à¦—à§�à¦²à§‹à¦° 'Employee Verified Details' à¦•à¦¾à¦°à§�à¦¡à¦Ÿà¦¿ à¦†à¦°à¦“ à¦‰à¦¨à§�à¦¨à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦–à¦¨ à¦�à¦®à¦ªà§�à¦²à§Ÿà¦¿ à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦°à¦²à§‡ à¦¤à¦¾à¦° à¦›à¦¬à¦¿, à¦¡à¦¿à¦ªà¦¾à¦°à§�à¦Ÿà¦®à§‡à¦¨à§�à¦Ÿ, à¦¸à§‡à¦•à¦¶à¦¨, à¦œà§Ÿà§‡à¦¨à¦¿à¦‚ à¦¡à§‡à¦Ÿ à¦�à¦¬à¦‚ à¦—à§�à¦°à¦¸ à¦¸à§�à¦¯à¦¾à¦²à¦¾à¦°à¦¿ à¦¬à¦¿à¦¸à§�à¦¤à¦¾à¦°à¦¿à¦¤à¦­à¦¾à¦¬à§‡ à¦¦à§‡à¦–à¦¾ à¦¯à¦¾à¦¬à§‡à¥¤",
   },
   {
     id: "162",
@@ -431,7 +440,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Financial Aid",
     link: "/financial-aid-list",
     descriptionEn: "Fixed an issue where the 'New Aid Request' financial modal was not opening on the Financial Aid page.",
-    descriptionBn: "ফাইন্যান্সিয়াল এইড পেজে 'New Aid Request' মোডালটি ওপেন না হওয়ার সমস্যাটি ঠিক করা হয়েছে।",
+    descriptionBn: "à¦«à¦¾à¦‡à¦¨à§�à¦¯à¦¾à¦¨à§�à¦¸à¦¿à§Ÿà¦¾à¦² à¦�à¦‡à¦¡ à¦ªà§‡à¦œà§‡ 'New Aid Request' à¦®à§‹à¦¡à¦¾à¦²à¦Ÿà¦¿ à¦“à¦ªà§‡à¦¨ à¦¨à¦¾ à¦¹à¦“à§Ÿà¦¾à¦° à¦¸à¦®à¦¸à§�à¦¯à¦¾à¦Ÿà¦¿ à¦ à¦¿à¦• à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "161",
@@ -440,7 +449,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Order Profile",
     link: "/merchandising-order-profile",
     descriptionEn: "Redesigned the 'Style Master Data' table into a modern, gorgeous Card-based UI with clear hierarchical blocks for Fabric, Yarn, and Trims requirements instead of a dense, monolithic HTML table.",
-    descriptionBn: "'Style Master Data' টেবিলটিকে নতুনভাবে ডিজাইন করা হয়েছে। এখন এটি একটি সুন্দর কার্ড-ভিত্তিক লেআউটে প্রদর্শিত হবে, যেখানে Fabric, Yarn এবং Trims এর জন্য আলাদা সুন্দর ব্লক রয়েছে।",
+    descriptionBn: "'Style Master Data' à¦Ÿà§‡à¦¬à¦¿à¦²à¦Ÿà¦¿à¦•à§‡ à¦¨à¦¤à§�à¦¨à¦­à¦¾à¦¬à§‡ à¦¡à¦¿à¦œà¦¾à¦‡à¦¨ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦–à¦¨ à¦�à¦Ÿà¦¿ à¦�à¦•à¦Ÿà¦¿ à¦¸à§�à¦¨à§�à¦¦à¦° à¦•à¦¾à¦°à§�à¦¡-à¦­à¦¿à¦¤à§�à¦¤à¦¿à¦• à¦²à§‡à¦†à¦‰à¦Ÿà§‡ à¦ªà§�à¦°à¦¦à¦°à§�à¦¶à¦¿à¦¤ à¦¹à¦¬à§‡, à¦¯à§‡à¦–à¦¾à¦¨à§‡ Fabric, Yarn à¦�à¦¬à¦‚ Trims à¦�à¦° à¦œà¦¨à§�à¦¯ à¦†à¦²à¦¾à¦¦à¦¾ à¦¸à§�à¦¨à§�à¦¦à¦° à¦¬à§�à¦²à¦• à¦°à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "160",
@@ -449,7 +458,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Quotation",
     link: "/merchandising-quotation",
     descriptionEn: "Added a dynamic 'Budget Summary' table showing a comprehensive breakdown of order value, variable costs, contribution margin, and net profit based on form variables.",
-    descriptionBn: "মার্চেন্ডাইজিং কোটেশন পেজে একটি নতুন ডাইনামিক 'বাজেট সামারি' টেবিল যুক্ত করা হয়েছে, যা ফর্মের ডেটা অনুযায়ী অর্ডারের ভ্যালু, ভ্যারিয়েবল কস্ট, কন্ট্রিবিউশন মার্জিন এবং নেট প্রফিটের বিস্তারিত ব্রেকডাউন দেখায়।",
+    descriptionBn: "à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦•à§‹à¦Ÿà§‡à¦¶à¦¨ à¦ªà§‡à¦œà§‡ à¦�à¦•à¦Ÿà¦¿ à¦¨à¦¤à§�à¦¨ à¦¡à¦¾à¦‡à¦¨à¦¾à¦®à¦¿à¦• 'à¦¬à¦¾à¦œà§‡à¦Ÿ à¦¸à¦¾à¦®à¦¾à¦°à¦¿' à¦Ÿà§‡à¦¬à¦¿à¦² à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡, à¦¯à¦¾ à¦«à¦°à§�à¦®à§‡à¦° à¦¡à§‡à¦Ÿà¦¾ à¦…à¦¨à§�à¦¯à¦¾à¦¯à¦¼à§€ à¦…à¦°à§�à¦¡à¦¾à¦°à§‡à¦° à¦­à§�à¦¯à¦¾à¦²à§�, à¦­à§�à¦¯à¦¾à¦°à¦¿à¦¯à¦¼à§‡à¦¬à¦² à¦•à¦¸à§�à¦Ÿ, à¦•à¦¨à§�à¦Ÿà§�à¦°à¦¿à¦¬à¦¿à¦‰à¦¶à¦¨ à¦®à¦¾à¦°à§�à¦œà¦¿à¦¨ à¦�à¦¬à¦‚ à¦¨à§‡à¦Ÿ à¦ªà§�à¦°à¦«à¦¿à¦Ÿà§‡à¦° à¦¬à¦¿à¦¸à§�à¦¤à¦¾à¦°à¦¿à¦¤ à¦¬à§�à¦°à§‡à¦•à¦¡à¦¾à¦‰à¦¨ à¦¦à§‡à¦–à¦¾à¦¯à¦¼à¥¤",
   },
   {
     id: "159",
@@ -458,7 +467,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Zakat Management",
     link: "/zakat-management",
     descriptionEn: "Implemented Budget Configuration and Zakat List sub-menus. Styled tables for a cleaner, modern look aligning with the requested minimal design.",
-    descriptionBn: "বাজেট কনফিগারেশন এবং যাকাত লিস্ট নামে দুটি সাব-মেন্যু যুক্ত করা হয়েছে। আরও সুন্দর ও মডার্ন ডিজাইনের জন্য টেবিলগুলোর ডিজাইন আপডেট করা হয়েছে।",
+    descriptionBn: "à¦¬à¦¾à¦œà§‡à¦Ÿ à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦�à¦¬à¦‚ à¦¯à¦¾à¦•à¦¾à¦¤ à¦²à¦¿à¦¸à§�à¦Ÿ à¦¨à¦¾à¦®à§‡ à¦¦à§�à¦Ÿà¦¿ à¦¸à¦¾à¦¬-à¦®à§‡à¦¨à§�à¦¯à§� à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦†à¦°à¦“ à¦¸à§�à¦¨à§�à¦¦à¦° à¦“ à¦®à¦¡à¦¾à¦°à§�à¦¨ à¦¡à¦¿à¦œà¦¾à¦‡à¦¨à§‡à¦° à¦œà¦¨à§�à¦¯ à¦Ÿà§‡à¦¬à¦¿à¦²à¦—à§�à¦²à§‹à¦° à¦¡à¦¿à¦œà¦¾à¦‡à¦¨ à¦†à¦ªà¦¡à§‡à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "158",
@@ -467,7 +476,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Budget Planning",
     link: "/budget-planning",
     descriptionEn: "Redesigned the Budget Planning page by combining Approved and Pending budgets into a single master list with new filtering options. Moved the Budget Strategy Form and Staged Proposals into a Create Budget modal.",
-    descriptionBn: "বাজেট প্ল্যানিং পেজটি নতুনভাবে সাজানো হয়েছে। এখন অ্যাপ্রুভড এবং পেন্ডিং বাজেটগুলো একটি পেজেই দেখা যাবে এবং নতুন ফিল্টার যুক্ত করা হয়েছে। বাজেট স্ট্র্যাটেজি ফর্ম এবং স্টেজড প্রপোজালগুলো এখন 'Create Budget' মোডালে স্থানান্তর করা হয়েছে।",
+    descriptionBn: "à¦¬à¦¾à¦œà§‡à¦Ÿ à¦ªà§�à¦²à§�à¦¯à¦¾à¦¨à¦¿à¦‚ à¦ªà§‡à¦œà¦Ÿà¦¿ à¦¨à¦¤à§�à¦¨à¦­à¦¾à¦¬à§‡ à¦¸à¦¾à¦œà¦¾à¦¨à§‹ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦�à¦–à¦¨ à¦…à§�à¦¯à¦¾à¦ªà§�à¦°à§�à¦­à¦¡ à¦�à¦¬à¦‚ à¦ªà§‡à¦¨à§�à¦¡à¦¿à¦‚ à¦¬à¦¾à¦œà§‡à¦Ÿà¦—à§�à¦²à§‹ à¦�à¦•à¦Ÿà¦¿ à¦ªà§‡à¦œà§‡à¦‡ à¦¦à§‡à¦–à¦¾ à¦¯à¦¾à¦¬à§‡ à¦�à¦¬à¦‚ à¦¨à¦¤à§�à¦¨ à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦° à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦¬à¦¾à¦œà§‡à¦Ÿ à¦¸à§�à¦Ÿà§�à¦°à§�à¦¯à¦¾à¦Ÿà§‡à¦œà¦¿ à¦«à¦°à§�à¦® à¦�à¦¬à¦‚ à¦¸à§�à¦Ÿà§‡à¦œà¦¡ à¦ªà§�à¦°à¦ªà§‹à¦œà¦¾à¦²à¦—à§�à¦²à§‹ à¦�à¦–à¦¨ 'Create Budget' à¦®à§‹à¦¡à¦¾à¦²à§‡ à¦¸à§�à¦¥à¦¾à¦¨à¦¾à¦¨à§�à¦¤à¦° à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "157",
@@ -476,7 +485,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Recruitment Configuration",
     link: "/recruitment-configuration",
     descriptionEn: "Refined the 'Weight Factor' field to strictly enforce numeric input and automatically format the value to 2 decimal places.",
-    descriptionBn: "অপারেশন গ্রেড (Operation Grade) এর 'Weight Factor' ফিল্ডটি রিফাইন করা হয়েছে যাতে এটি শুধুমাত্র নম্বর গ্রহণ করে এবং মানটি ২ দশমিক স্থানে স্বয়ংক্রিয়ভাবে ফরম্যাট হয়।",
+    descriptionBn: "à¦…à¦ªà¦¾à¦°à§‡à¦¶à¦¨ à¦—à§�à¦°à§‡à¦¡ (Operation Grade) à¦�à¦° 'Weight Factor' à¦«à¦¿à¦²à§�à¦¡à¦Ÿà¦¿ à¦°à¦¿à¦«à¦¾à¦‡à¦¨ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ à¦¯à¦¾à¦¤à§‡ à¦�à¦Ÿà¦¿ à¦¶à§�à¦§à§�à¦®à¦¾à¦¤à§�à¦° à¦¨à¦®à§�à¦¬à¦° à¦—à§�à¦°à¦¹à¦£ à¦•à¦°à§‡ à¦�à¦¬à¦‚ à¦®à¦¾à¦¨à¦Ÿà¦¿ à§¨ à¦¦à¦¶à¦®à¦¿à¦• à¦¸à§�à¦¥à¦¾à¦¨à§‡ à¦¸à§�à¦¬à¦¯à¦¼à¦‚à¦•à§�à¦°à¦¿à¦¯à¦¼à¦­à¦¾à¦¬à§‡ à¦«à¦°à¦®à§�à¦¯à¦¾à¦Ÿ à¦¹à¦¯à¦¼à¥¤",
   },
   {
     id: "156",
@@ -485,7 +494,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Recruitment Configuration",
     link: "/recruitment-configuration",
     descriptionEn: "Added a new 'Weight Factor' field to the Operation Grade configuration matrix. It captures a numeric 2-decimal value and displays it in the data table.",
-    descriptionBn: "অপারেশন গ্রেড (Operation Grade) কনফিগারেশন ম্যাট্রিক্সে নতুন 'Weight Factor' ফিল্ড যোগ করা হয়েছে। এটি ২ দশমিক স্থান পর্যন্ত সংখ্যা ধারণ করতে পারে এবং তা ডেটা টেবিলে প্রদর্শিত হবে।",
+    descriptionBn: "à¦…à¦ªà¦¾à¦°à§‡à¦¶à¦¨ à¦—à§�à¦°à§‡à¦¡ (Operation Grade) à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦®à§�à¦¯à¦¾à¦Ÿà§�à¦°à¦¿à¦•à§�à¦¸à§‡ à¦¨à¦¤à§�à¦¨ 'Weight Factor' à¦«à¦¿à¦²à§�à¦¡ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦�à¦Ÿà¦¿ à§¨ à¦¦à¦¶à¦®à¦¿à¦• à¦¸à§�à¦¥à¦¾à¦¨ à¦ªà¦°à§�à¦¯à¦¨à§�à¦¤ à¦¸à¦‚à¦–à§�à¦¯à¦¾ à¦§à¦¾à¦°à¦£ à¦•à¦°à¦¤à§‡ à¦ªà¦¾à¦°à§‡ à¦�à¦¬à¦‚ à¦¤à¦¾ à¦¡à§‡à¦Ÿà¦¾ à¦Ÿà§‡à¦¬à¦¿à¦²à§‡ à¦ªà§�à¦°à¦¦à¦°à§�à¦¶à¦¿à¦¤ à¦¹à¦¬à§‡à¥¤",
   },
   {
     id: "155",
@@ -494,7 +503,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Recruitment Configuration",
     link: "/recruitment-configuration",
     descriptionEn: "Updated the SMV Value in the SMV Bank configuration matrix to consistently format to 4 decimal places.",
-    descriptionBn: "এসএমভি ব্যাংক (SMV Bank) কনফিগারেশন ম্যাট্রিক্সে SMV Value কে ৪ ডেসিমেল প্লেস (৪ দশমিক স্থান) পর্যন্ত ফরম্যাট করা হয়েছে।",
+    descriptionBn: "à¦�à¦¸à¦�à¦®à¦­à¦¿ à¦¬à§�à¦¯à¦¾à¦‚à¦• (SMV Bank) à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦®à§�à¦¯à¦¾à¦Ÿà§�à¦°à¦¿à¦•à§�à¦¸à§‡ SMV Value à¦•à§‡ à§ª à¦¡à§‡à¦¸à¦¿à¦®à§‡à¦² à¦ªà§�à¦²à§‡à¦¸ (à§ª à¦¦à¦¶à¦®à¦¿à¦• à¦¸à§�à¦¥à¦¾à¦¨) à¦ªà¦°à§�à¦¯à¦¨à§�à¦¤ à¦«à¦°à¦®à§�à¦¯à¦¾à¦Ÿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "154",
@@ -503,7 +512,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Recruitment Configuration",
     link: "/recruitment-configuration",
     descriptionEn: "Updated the OP Grade field in the Multi/SS configuration matrix to use a multi-select component.",
-    descriptionBn: "মাল্টি/এসএস (Multi/SS) কনফিগারেশন ম্যাট্রিক্সে OP Grade ফিল্ডটিকে আপডেট করে মাল্টি-সিলেক্ট কম্পোনেন্ট ব্যবহার করা হয়েছে।",
+    descriptionBn: "à¦®à¦¾à¦²à§�à¦Ÿà¦¿/à¦�à¦¸à¦�à¦¸ (Multi/SS) à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦®à§�à¦¯à¦¾à¦Ÿà§�à¦°à¦¿à¦•à§�à¦¸à§‡ OP Grade à¦«à¦¿à¦²à§�à¦¡à¦Ÿà¦¿à¦•à§‡ à¦†à¦ªà¦¡à§‡à¦Ÿ à¦•à¦°à§‡ à¦®à¦¾à¦²à§�à¦Ÿà¦¿-à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦®à§�à¦ªà§‹à¦¨à§‡à¦¨à§�à¦Ÿ à¦¬à§�à¦¯à¦¬à¦¹à¦¾à¦° à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "153",
@@ -512,7 +521,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Add Employee",
     link: "/add-employee",
     descriptionEn: "Added a 'Company Reference (Internal)' section under Professional & Corporate References to track if a new employee has any relatives working in the company. Captures region and relative's employee ID.",
-    descriptionBn: "অ্যাড এমপ্লয়ি ফর্মে একটি 'Company Reference (Internal)' সেকশন যোগ করা হয়েছে, যার মাধ্যমে প্রার্থীর কোনো আত্মীয় কোম্পানিতে কর্মরত থাকলে তার রিজিওন এবং এমপ্লয়ি আইডি সংরক্ষণ করা যাবে।",
+    descriptionBn: "à¦…à§�à¦¯à¦¾à¦¡ à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦«à¦°à§�à¦®à§‡ à¦�à¦•à¦Ÿà¦¿ 'Company Reference (Internal)' à¦¸à§‡à¦•à¦¶à¦¨ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡, à¦¯à¦¾à¦° à¦®à¦¾à¦§à§�à¦¯à¦®à§‡ à¦ªà§�à¦°à¦¾à¦°à§�à¦¥à§€à¦° à¦•à§‹à¦¨à§‹ à¦†à¦¤à§�à¦®à§€à¦¯à¦¼ à¦•à§‹à¦®à§�à¦ªà¦¾à¦¨à¦¿à¦¤à§‡ à¦•à¦°à§�à¦®à¦°à¦¤ à¦¥à¦¾à¦•à¦²à§‡ à¦¤à¦¾à¦° à¦°à¦¿à¦œà¦¿à¦“à¦¨ à¦�à¦¬à¦‚ à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦†à¦‡à¦¡à¦¿ à¦¸à¦‚à¦°à¦•à§�à¦·à¦£ à¦•à¦°à¦¾ à¦¯à¦¾à¦¬à§‡à¥¤",
   },
   {
     id: "152",
@@ -521,7 +530,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Add Employee",
     link: "/add-employee",
     descriptionEn: "Flattened the Personal & Identity tab into a single continuous scrollable form by removing sub-steps (Placement, Contact, Emergency, Reference) for a faster and unified data entry experience.",
-    descriptionBn: "পার্সোনাল এবং আইডেন্টিটি ট্যাবটিকে একটি একক স্ক্রলযোগ্য ফর্মে পরিবর্তন করা হয়েছে। সাব-স্টেপ (প্লেসমেন্ট, কন্টাক্ট, ইমার্জেন্সি, রেফারেন্স) সরিয়ে এক পাতায় সব তথ্য পূরণের সুবিধা দেওয়া হয়েছে।",
+    descriptionBn: "à¦ªà¦¾à¦°à§�à¦¸à§‹à¦¨à¦¾à¦² à¦�à¦¬à¦‚ à¦†à¦‡à¦¡à§‡à¦¨à§�à¦Ÿà¦¿à¦Ÿà¦¿ à¦Ÿà§�à¦¯à¦¾à¦¬à¦Ÿà¦¿à¦•à§‡ à¦�à¦•à¦Ÿà¦¿ à¦�à¦•à¦• à¦¸à§�à¦•à§�à¦°à¦²à¦¯à§‹à¦—à§�à¦¯ à¦«à¦°à§�à¦®à§‡ à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦¸à¦¾à¦¬-à¦¸à§�à¦Ÿà§‡à¦ª (à¦ªà§�à¦²à§‡à¦¸à¦®à§‡à¦¨à§�à¦Ÿ, à¦•à¦¨à§�à¦Ÿà¦¾à¦•à§�à¦Ÿ, à¦‡à¦®à¦¾à¦°à§�à¦œà§‡à¦¨à§�à¦¸à¦¿, à¦°à§‡à¦«à¦¾à¦°à§‡à¦¨à§�à¦¸) à¦¸à¦°à¦¿à§Ÿà§‡ à¦�à¦• à¦ªà¦¾à¦¤à¦¾à§Ÿ à¦¸à¦¬ à¦¤à¦¥à§�à¦¯ à¦ªà§‚à¦°à¦£à§‡à¦° à¦¸à§�à¦¬à¦¿à¦§à¦¾ à¦¦à§‡à¦“à§Ÿà¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "151",
@@ -530,7 +539,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Personnel List",
     link: "/employee-detail/2023046001R",
     descriptionEn: "Redesigned the employee detail profile header for a more professional and user-friendly experience. The employee's avatar is now prominently displayed at the very top alongside key information organized cleanly.",
-    descriptionBn: "এমপ্লয়ি ডিটেইল প্রোফাইল হেডার নতুন করে ডিজাইন করা হয়েছে। এখন এমপ্লয়ির ছবি সবার প্রথমে বড় করে দেখা যাবে এবং গুরুত্বপূর্ণ তথ্যগুলো সুন্দরভাবে সাজানো আছে।",
+    descriptionBn: "à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦² à¦ªà§�à¦°à§‹à¦«à¦¾à¦‡à¦² à¦¹à§‡à¦¡à¦¾à¦° à¦¨à¦¤à§�à¦¨ à¦•à¦°à§‡ à¦¡à¦¿à¦œà¦¾à¦‡à¦¨ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦�à¦–à¦¨ à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿à¦° à¦›à¦¬à¦¿ à¦¸à¦¬à¦¾à¦° à¦ªà§�à¦°à¦¥à¦®à§‡ à¦¬à§œ à¦•à¦°à§‡ à¦¦à§‡à¦–à¦¾ à¦¯à¦¾à¦¬à§‡ à¦�à¦¬à¦‚ à¦—à§�à¦°à§�à¦¤à§�à¦¬à¦ªà§‚à¦°à§�à¦£ à¦¤à¦¥à§�à¦¯à¦—à§�à¦²à§‹ à¦¸à§�à¦¨à§�à¦¦à¦°à¦­à¦¾à¦¬à§‡ à¦¸à¦¾à¦œà¦¾à¦¨à§‹ à¦†à¦›à§‡à¥¤",
   },
   {
     id: "150",
@@ -539,7 +548,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "IE Recruitment",
     link: "/recruitment-basic-entry",
     descriptionEn: "Added Unit, Line, and Date of Joining (DOJ) to the Mandatory Information card on top as required fields while removing duplicate inputs from Company Info.",
-    descriptionBn: "আইই রিক্রুটমেন্ট বেসিক এন্ট্রি ফর্মে Unit, Line এবং Date of Joining (DOJ) ফিল্ডগুলোকে বাধ্যতামুলক ফিল্ড হিসেবে সবার উপরের ম্যান্ডেটরি সেকশনে স্থানান্তরিত করা হয়েছে এবং কোম্পানি ইনফো সেকশন থেকে ডুপ্লিকেট সরানো হয়েছে।",
+    descriptionBn: "à¦†à¦‡à¦‡ à¦°à¦¿à¦•à§�à¦°à§�à¦Ÿà¦®à§‡à¦¨à§�à¦Ÿ à¦¬à§‡à¦¸à¦¿à¦• à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿ à¦«à¦°à§�à¦®à§‡ Unit, Line à¦�à¦¬à¦‚ Date of Joining (DOJ) à¦«à¦¿à¦²à§�à¦¡à¦—à§�à¦²à§‹à¦•à§‡ à¦¬à¦¾à¦§à§�à¦¯à¦¤à¦¾à¦®à§�à¦²à¦• à¦«à¦¿à¦²à§�à¦¡ à¦¹à¦¿à¦¸à§‡à¦¬à§‡ à¦¸à¦¬à¦¾à¦° à¦‰à¦ªà¦°à§‡à¦° à¦®à§�à¦¯à¦¾à¦¨à§�à¦¡à§‡à¦Ÿà¦°à¦¿ à¦¸à§‡à¦•à¦¶à¦¨à§‡ à¦¸à§�à¦¥à¦¾à¦¨à¦¾à¦¨à§�à¦¤à¦°à¦¿à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦•à§‹à¦®à§�à¦ªà¦¾à¦¨à¦¿ à¦‡à¦¨à¦«à§‹ à¦¸à§‡à¦•à¦¶à¦¨ à¦¥à§‡à¦•à§‡ à¦¡à§�à¦ªà§�à¦²à¦¿à¦•à§‡à¦Ÿ à¦¸à¦°à¦¾à¦¨à§‹ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "149",
@@ -548,7 +557,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Inventory",
     link: "/inv-receive-list",
     descriptionEn: "Implemented the Receive List page with detailed filtering, searchable table, and a comprehensive Print Details (MRIR) modal.",
-    descriptionBn: "বিস্তারিত ফিল্টারিং, সার্চেবল টেবিল এবং সুন্দর প্রিন্ট ডিটেইলস (MRIR) মোডাল সহ রিসিভ লিস্ট পেজ তৈরি করা হয়েছে।",
+    descriptionBn: "à¦¬à¦¿à¦¸à§�à¦¤à¦¾à¦°à¦¿à¦¤ à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦°à¦¿à¦‚, à¦¸à¦¾à¦°à§�à¦šà§‡à¦¬à¦² à¦Ÿà§‡à¦¬à¦¿à¦² à¦�à¦¬à¦‚ à¦¸à§�à¦¨à§�à¦¦à¦° à¦ªà§�à¦°à¦¿à¦¨à§�à¦Ÿ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸ (MRIR) à¦®à§‹à¦¡à¦¾à¦² à¦¸à¦¹ à¦°à¦¿à¦¸à¦¿à¦­ à¦²à¦¿à¦¸à§�à¦Ÿ à¦ªà§‡à¦œ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "148",
@@ -557,7 +566,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Inventory",
     link: "/inv-receive-direct",
     descriptionEn: "Implemented the Direct Receive page with a complete MRR form and an interactive product entry table.",
-    descriptionBn: "সম্পূর্ণ এমআরআর (MRR) ফর্ম এবং প্রোডাক্ট এন্ট্রি টেবিল সহ ডিরেক্ট রিসিভ পেজ তৈরি করা হয়েছে।",
+    descriptionBn: "à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦�à¦®à¦†à¦°à¦†à¦° (MRR) à¦«à¦°à§�à¦® à¦�à¦¬à¦‚ à¦ªà§�à¦°à§‹à¦¡à¦¾à¦•à§�à¦Ÿ à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿ à¦Ÿà§‡à¦¬à¦¿à¦² à¦¸à¦¹ à¦¡à¦¿à¦°à§‡à¦•à§�à¦Ÿ à¦°à¦¿à¦¸à¦¿à¦­ à¦ªà§‡à¦œ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "147",
@@ -566,7 +575,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Inventory",
     link: "/inv-yarn-opening-stock",
     descriptionEn: "Implemented the Yarn Opening Stock page with a multiple-product add form in a modal for efficient stock entry.",
-    descriptionBn: "সহজে একসাথে অনেক প্রোডাক্টের এন্ট্রি দেওয়ার জন্য একাধিক প্রোডাক্ট অ্যাড ফর্ম যুক্ত করে ইয়ার্ন ওপেনিং স্টক পেজ তৈরি করা হয়েছে।",
+    descriptionBn: "à¦¸à¦¹à¦œà§‡ à¦�à¦•à¦¸à¦¾à¦¥à§‡ à¦…à¦¨à§‡à¦• à¦ªà§�à¦°à§‹à¦¡à¦¾à¦•à§�à¦Ÿà§‡à¦° à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿ à¦¦à§‡à¦“à§Ÿà¦¾à¦° à¦œà¦¨à§�à¦¯ à¦�à¦•à¦¾à¦§à¦¿à¦• à¦ªà§�à¦°à§‹à¦¡à¦¾à¦•à§�à¦Ÿ à¦…à§�à¦¯à¦¾à¦¡ à¦«à¦°à§�à¦® à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à§‡ à¦‡à§Ÿà¦¾à¦°à§�à¦¨ à¦“à¦ªà§‡à¦¨à¦¿à¦‚ à¦¸à§�à¦Ÿà¦• à¦ªà§‡à¦œ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "146",
@@ -575,7 +584,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Inventory",
     link: "/inv-config-uom",
     descriptionEn: "Added new configuration pages for Unit of Measurement (UoM), Brand, and Model in the Inventory module.",
-    descriptionBn: "ইনভেন্টরি মডিউলে Unit of Measurement (UoM), Brand, এবং Model এর জন্য নতুন কনফিগারেশন পেজ যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦‡à¦¨à¦­à§‡à¦¨à§�à¦Ÿà¦°à¦¿ à¦®à¦¡à¦¿à¦‰à¦²à§‡ Unit of Measurement (UoM), Brand, à¦�à¦¬à¦‚ Model à¦�à¦° à¦œà¦¨à§�à¦¯ à¦¨à¦¤à§�à¦¨ à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦ªà§‡à¦œ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "145",
@@ -584,7 +593,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Human Resource",
     link: "/add-employee",
     descriptionEn: "Added a new 'House No' field in both Present and Permanent Address sections and updated the dispatch previews.",
-    descriptionBn: "বর্তমান এবং স্থায়ী ঠিকানা সেকশনে নতুন 'House No' ফিল্ড যুক্ত করা হয়েছে এবং ডিসপ্যাচ প্রিভিউ আপডেট করা হয়েছে।",
+    descriptionBn: "à¦¬à¦°à§�à¦¤à¦®à¦¾à¦¨ à¦�à¦¬à¦‚ à¦¸à§�à¦¥à¦¾à§Ÿà§€ à¦ à¦¿à¦•à¦¾à¦¨à¦¾ à¦¸à§‡à¦•à¦¶à¦¨à§‡ à¦¨à¦¤à§�à¦¨ 'House No' à¦«à¦¿à¦²à§�à¦¡ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦¡à¦¿à¦¸à¦ªà§�à¦¯à¦¾à¦š à¦ªà§�à¦°à¦¿à¦­à¦¿à¦‰ à¦†à¦ªà¦¡à§‡à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "144",
@@ -593,7 +602,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Human Resource",
     link: "/add-employee",
     descriptionEn: "Removed the separate Smart Scanner card and moved its button to the top right of the Primary Information header to save vertical space.",
-    descriptionBn: "অ্যাড এমপ্লয়ি পেজে স্মার্ট স্ক্যানার কার্ডটি সরিয়ে এর বাটনটি প্রাইমারি ও ডেমোগ্রাফিক ডসিয়ার হেডারের উপরে ডানদিকে নেওয়া হয়েছে।",
+    descriptionBn: "à¦…à§�à¦¯à¦¾à¦¡ à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦ªà§‡à¦œà§‡ à¦¸à§�à¦®à¦¾à¦°à§�à¦Ÿ à¦¸à§�à¦•à§�à¦¯à¦¾à¦¨à¦¾à¦° à¦•à¦¾à¦°à§�à¦¡à¦Ÿà¦¿ à¦¸à¦°à¦¿à¦¯à¦¼à§‡ à¦�à¦° à¦¬à¦¾à¦Ÿà¦¨à¦Ÿà¦¿ à¦ªà§�à¦°à¦¾à¦‡à¦®à¦¾à¦°à¦¿ à¦“ à¦¡à§‡à¦®à§‹à¦—à§�à¦°à¦¾à¦«à¦¿à¦• à¦¡à¦¸à¦¿à¦¯à¦¼à¦¾à¦° à¦¹à§‡à¦¡à¦¾à¦°à§‡à¦° à¦‰à¦ªà¦°à§‡ à¦¡à¦¾à¦¨à¦¦à¦¿à¦•à§‡ à¦¨à§‡à¦“à¦¯à¦¼à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "143",
@@ -602,7 +611,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Human Resource",
     link: "/add-employee",
     descriptionEn: "Added a collapsible accordion toggle to the Sub-section Progress Stepper Timeline on the Add Employee page.",
-    descriptionBn: "অ্যাড এমপ্লয়ি পেজে সাব-সেকশন প্রোগ্রেস স্টেপার টাইমলাইনে অ্যাকর্ডিয়ন টগল যোগ করা হয়েছে।",
+    descriptionBn: "à¦…à§�à¦¯à¦¾à¦¡ à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦ªà§‡à¦œà§‡ à¦¸à¦¾à¦¬-à¦¸à§‡à¦•à¦¶à¦¨ à¦ªà§�à¦°à§‹à¦—à§�à¦°à§‡à¦¸ à¦¸à§�à¦Ÿà§‡à¦ªà¦¾à¦° à¦Ÿà¦¾à¦‡à¦®à¦²à¦¾à¦‡à¦¨à§‡ à¦…à§�à¦¯à¦¾à¦•à¦°à§�à¦¡à¦¿à¦¯à¦¼à¦¨ à¦Ÿà¦—à¦² à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "142",
@@ -611,7 +620,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Human Resource",
     link: "/add-employee",
     descriptionEn: "Added a collapsible accordion toggle to the Profile Completion Status card on the Add Employee page to save screen space when not needed.",
-    descriptionBn: "অ্যাড এমপ্লয়ি পেজে প্রোফাইল কমপ্লিশন স্ট্যাটাস কার্ডটিতে অ্যাকর্ডিয়ন টগল যোগ করা হয়েছে, যাতে দরকারে এটি ছোট করে রাখা যায়।",
+    descriptionBn: "à¦…à§�à¦¯à¦¾à¦¡ à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦ªà§‡à¦œà§‡ à¦ªà§�à¦°à§‹à¦«à¦¾à¦‡à¦² à¦•à¦®à¦ªà§�à¦²à¦¿à¦¶à¦¨ à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦Ÿà¦¾à¦¸ à¦•à¦¾à¦°à§�à¦¡à¦Ÿà¦¿à¦¤à§‡ à¦…à§�à¦¯à¦¾à¦•à¦°à§�à¦¡à¦¿à¦¯à¦¼à¦¨ à¦Ÿà¦—à¦² à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡, à¦¯à¦¾à¦¤à§‡ à¦¦à¦°à¦•à¦¾à¦°à§‡ à¦�à¦Ÿà¦¿ à¦›à§‹à¦Ÿ à¦•à¦°à§‡ à¦°à¦¾à¦–à¦¾ à¦¯à¦¾à¦¯à¦¼à¥¤",
   },
   {
     id: "141",
@@ -620,7 +629,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Human Resource",
     link: "/add-employee",
     descriptionEn: "Compacted the layout of the Add Employee page by reducing padding, shrinking the progress cards, and minimizing the timeline stepper to maximize visible workspace.",
-    descriptionBn: "অ্যাড এমপ্লয়ি পেজের লেআউট আরও কমপ্যাক্ট করা হয়েছে; স্পেস বাঁচানোর জন্য কার্ড, প্যাডিং এবং প্রোগ্রেস স্টেপগুলো ছোট করা হয়েছে।",
+    descriptionBn: "à¦…à§�à¦¯à¦¾à¦¡ à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦ªà§‡à¦œà§‡à¦° à¦²à§‡à¦†à¦‰à¦Ÿ à¦†à¦°à¦“ à¦•à¦®à¦ªà§�à¦¯à¦¾à¦•à§�à¦Ÿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡; à¦¸à§�à¦ªà§‡à¦¸ à¦¬à¦¾à¦�à¦šà¦¾à¦¨à§‹à¦° à¦œà¦¨à§�à¦¯ à¦•à¦¾à¦°à§�à¦¡, à¦ªà§�à¦¯à¦¾à¦¡à¦¿à¦‚ à¦�à¦¬à¦‚ à¦ªà§�à¦°à§‹à¦—à§�à¦°à§‡à¦¸ à¦¸à§�à¦Ÿà§‡à¦ªà¦—à§�à¦²à§‹ à¦›à§‹à¦Ÿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "140",
@@ -629,7 +638,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Inventory Management",
     link: "/inv-config-product-type",
     descriptionEn: "Standardized table designs across all Inventory configuration pages (Product Type, Store Name, Group Name, Product Name) for consistent font sizes, alignments, and action buttons.",
-    descriptionBn: "ইনভেন্টরি কনফিগারেশনের সব পেজের টেবিল ডিজাইন (ফন্ট সাইজ, এলাইনমেন্ট, এবং বাটন) সুন্দর এবং সামঞ্জস্যপূর্ণ করা হয়েছে।",
+    descriptionBn: "à¦‡à¦¨à¦­à§‡à¦¨à§�à¦Ÿà¦°à¦¿ à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨à§‡à¦° à¦¸à¦¬ à¦ªà§‡à¦œà§‡à¦° à¦Ÿà§‡à¦¬à¦¿à¦² à¦¡à¦¿à¦œà¦¾à¦‡à¦¨ (à¦«à¦¨à§�à¦Ÿ à¦¸à¦¾à¦‡à¦œ, à¦�à¦²à¦¾à¦‡à¦¨à¦®à§‡à¦¨à§�à¦Ÿ, à¦�à¦¬à¦‚ à¦¬à¦¾à¦Ÿà¦¨) à¦¸à§�à¦¨à§�à¦¦à¦° à¦�à¦¬à¦‚ à¦¸à¦¾à¦®à¦žà§�à¦œà¦¸à§�à¦¯à¦ªà§‚à¦°à§�à¦£ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "139",
@@ -638,7 +647,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Inventory Management",
     link: "/inv-config-group-name",
     descriptionEn: "Created the Group Name configuration page with Product Type filtering and a clean single-column modal for group entry.",
-    descriptionBn: "গ্রুপ নেম কনফিগারেশন পেইজ তৈরি করা হয়েছে। এখানে প্রোডাক্ট টাইপ দিয়ে ফিল্টার করার অপশন এবং ডাটা এন্ট্রির জন্য একটি সুন্দর মোডাল যোগ করা হয়েছে।",
+    descriptionBn: "à¦—à§�à¦°à§�à¦ª à¦¨à§‡à¦® à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦ªà§‡à¦‡à¦œ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦�à¦–à¦¾à¦¨à§‡ à¦ªà§�à¦°à§‹à¦¡à¦¾à¦•à§�à¦Ÿ à¦Ÿà¦¾à¦‡à¦ª à¦¦à¦¿à¦¯à¦¼à§‡ à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦° à¦•à¦°à¦¾à¦° à¦…à¦ªà¦¶à¦¨ à¦�à¦¬à¦‚ à¦¡à¦¾à¦Ÿà¦¾ à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿à¦° à¦œà¦¨à§�à¦¯ à¦�à¦•à¦Ÿà¦¿ à¦¸à§�à¦¨à§�à¦¦à¦° à¦®à§‹à¦¡à¦¾à¦² à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "138",
@@ -647,7 +656,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Inventory Management",
     link: "/inv-config-store-name",
     descriptionEn: "Created the Store Name configuration page featuring an advanced locations multi-select tag input.",
-    descriptionBn: "স্টোর নেম কনফিগারেশন পেইজ তৈরি করা হয়েছে। এখানে লোকেশন সিলেক্ট করার জন্য একটি সুন্দর ট্যাগ-স্টাইলের মাল্টি-সিলেক্ট অপশন আছে।",
+    descriptionBn: "à¦¸à§�à¦Ÿà§‹à¦° à¦¨à§‡à¦® à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦ªà§‡à¦‡à¦œ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦�à¦–à¦¾à¦¨à§‡ à¦²à§‹à¦•à§‡à¦¶à¦¨ à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦°à¦¾à¦° à¦œà¦¨à§�à¦¯ à¦�à¦•à¦Ÿà¦¿ à¦¸à§�à¦¨à§�à¦¦à¦° à¦Ÿà§�à¦¯à¦¾à¦—-à¦¸à§�à¦Ÿà¦¾à¦‡à¦²à§‡à¦° à¦®à¦¾à¦²à§�à¦Ÿà¦¿-à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦…à¦ªà¦¶à¦¨ à¦†à¦›à§‡à¥¤",
   },
   {
     id: "137",
@@ -656,7 +665,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Inventory Management",
     link: "/inventory-dashboard",
     descriptionEn: "Added three new sub-menus (UoM, Brand, Model) under the Configuration main menu in the Inventory sidebar.",
-    descriptionBn: "ইনভেন্টরি সাইডবারে 'Configuration' মেনুর নিচে আরও তিনটি নতুন সাব-মেনু (UoM, Brand, Model) যোগ করা হয়েছে।",
+    descriptionBn: "à¦‡à¦¨à¦­à§‡à¦¨à§�à¦Ÿà¦°à¦¿ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦°à§‡ 'Configuration' à¦®à§‡à¦¨à§�à¦° à¦¨à¦¿à¦šà§‡ à¦†à¦°à¦“ à¦¤à¦¿à¦¨à¦Ÿà¦¿ à¦¨à¦¤à§�à¦¨ à¦¸à¦¾à¦¬-à¦®à§‡à¦¨à§� (UoM, Brand, Model) à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "136",
@@ -665,7 +674,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Inventory Management",
     link: "/inventory-dashboard",
     descriptionEn: "Refined and reorganized the Inventory sidebar menu structure. Consolidated sections into Configuration, Config, Store Receive, and Store Issue with updated sub-menus.",
-    descriptionBn: "ইনভেন্টরি সাইডবার মেনু স্ট্রাকচার রিফাইন এবং রিঅর্গানাইজ করা হয়েছে। এখন Configuration, Config, Store Receive, এবং Store Issue নামে নতুন সেকশনগুলো দেখা যাবে।",
+    descriptionBn: "à¦‡à¦¨à¦­à§‡à¦¨à§�à¦Ÿà¦°à¦¿ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦° à¦®à§‡à¦¨à§� à¦¸à§�à¦Ÿà§�à¦°à¦¾à¦•à¦šà¦¾à¦° à¦°à¦¿à¦«à¦¾à¦‡à¦¨ à¦�à¦¬à¦‚ à¦°à¦¿à¦…à¦°à§�à¦—à¦¾à¦¨à¦¾à¦‡à¦œ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦–à¦¨ Configuration, Config, Store Receive, à¦�à¦¬à¦‚ Store Issue à¦¨à¦¾à¦®à§‡ à¦¨à¦¤à§�à¦¨ à¦¸à§‡à¦•à¦¶à¦¨à¦—à§�à¦²à§‹ à¦¦à§‡à¦–à¦¾ à¦¯à¦¾à¦¬à§‡à¥¤",
   },
   {
     id: "135",
@@ -674,7 +683,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Inventory Management",
     link: "/inv-config-product-name",
     descriptionEn: "Created the Product Name configuration page with store-specific filtering and a dual-column modal design to show existing products for context during creation.",
-    descriptionBn: "Product Name কনফিগারেশন পেইজ তৈরি করা হয়েছে। এখানে স্টোর ফিল্টারিং এবং একটি স্পেশাল ডুয়াল-কলাম মোডাল আছে, যাতে নতুন প্রোডাক্ট এড করার সময় আগের প্রোডাক্টগুলো দেখা যায়।",
+    descriptionBn: "Product Name à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦ªà§‡à¦‡à¦œ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦�à¦–à¦¾à¦¨à§‡ à¦¸à§�à¦Ÿà§‹à¦° à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦°à¦¿à¦‚ à¦�à¦¬à¦‚ à¦�à¦•à¦Ÿà¦¿ à¦¸à§�à¦ªà§‡à¦¶à¦¾à¦² à¦¡à§�à¦¯à¦¼à¦¾à¦²-à¦•à¦²à¦¾à¦® à¦®à§‹à¦¡à¦¾à¦² à¦†à¦›à§‡, à¦¯à¦¾à¦¤à§‡ à¦¨à¦¤à§�à¦¨ à¦ªà§�à¦°à§‹à¦¡à¦¾à¦•à§�à¦Ÿ à¦�à¦¡ à¦•à¦°à¦¾à¦° à¦¸à¦®à¦¯à¦¼ à¦†à¦—à§‡à¦° à¦ªà§�à¦°à§‹à¦¡à¦¾à¦•à§�à¦Ÿà¦—à§�à¦²à§‹ à¦¦à§‡à¦–à¦¾ à¦¯à¦¾à¦¯à¦¼à¥¤",
   },
   {
     id: "134",
@@ -683,7 +692,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Inventory Management",
     link: "/inv-config-product-type",
     descriptionEn: "Created the Product Type Configuration page under Inventory Management. Features include a dynamic data table, Create/Update modals with standard fields, and an interactive dual-list parameter assignment modal.",
-    descriptionBn: "ইনভেন্টরি ম্যানেজমেন্টের আন্ডারে 'Product Type Configuration' পেইজ তৈরি করা হয়েছে। এতে ডাইনামিক ডেটা টেবিল, ক্রিয়েট/আপডেট মোডাল এবং প্যারামিটার অ্যাসাইন করার জন্য স্পেশাল ডুয়াল-লিস্ট মোডাল যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦‡à¦¨à¦­à§‡à¦¨à§�à¦Ÿà¦°à¦¿ à¦®à§�à¦¯à¦¾à¦¨à§‡à¦œà¦®à§‡à¦¨à§�à¦Ÿà§‡à¦° à¦†à¦¨à§�à¦¡à¦¾à¦°à§‡ 'Product Type Configuration' à¦ªà§‡à¦‡à¦œ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦�à¦¤à§‡ à¦¡à¦¾à¦‡à¦¨à¦¾à¦®à¦¿à¦• à¦¡à§‡à¦Ÿà¦¾ à¦Ÿà§‡à¦¬à¦¿à¦², à¦•à§�à¦°à¦¿à¦¯à¦¼à§‡à¦Ÿ/à¦†à¦ªà¦¡à§‡à¦Ÿ à¦®à§‹à¦¡à¦¾à¦² à¦�à¦¬à¦‚ à¦ªà§�à¦¯à¦¾à¦°à¦¾à¦®à¦¿à¦Ÿà¦¾à¦° à¦…à§�à¦¯à¦¾à¦¸à¦¾à¦‡à¦¨ à¦•à¦°à¦¾à¦° à¦œà¦¨à§�à¦¯ à¦¸à§�à¦ªà§‡à¦¶à¦¾à¦² à¦¡à§�à¦¯à¦¼à¦¾à¦²-à¦²à¦¿à¦¸à§�à¦Ÿ à¦®à§‹à¦¡à¦¾à¦² à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "133",
@@ -692,7 +701,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Inventory Management",
     link: "/inv-yarn-opening-stock",
     descriptionEn: "Added a new 'Manage Item' menu group to the Inventory Sidebar and created the 'Yarn Opening Stock' page featuring a search, filtering layout, and an 'Add New Stock' button.",
-    descriptionBn: "ইনভেন্টরি সাইডবারে 'Manage Item' নামের নতুন মেনু গ্রুপ যোগ করা হয়েছে এবং 'Yarn Opening Stock' পেইজ তৈরি করা হয়েছে, যেখানে সার্চ, ফিল্টার এবং 'Add New Stock' বাটন রয়েছে।",
+    descriptionBn: "à¦‡à¦¨à¦­à§‡à¦¨à§�à¦Ÿà¦°à¦¿ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦°à§‡ 'Manage Item' à¦¨à¦¾à¦®à§‡à¦° à¦¨à¦¤à§�à¦¨ à¦®à§‡à¦¨à§� à¦—à§�à¦°à§�à¦ª à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ 'Yarn Opening Stock' à¦ªà§‡à¦‡à¦œ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦¯à§‡à¦–à¦¾à¦¨à§‡ à¦¸à¦¾à¦°à§�à¦š, à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦° à¦�à¦¬à¦‚ 'Add New Stock' à¦¬à¦¾à¦Ÿà¦¨ à¦°à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "132",
@@ -701,7 +710,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Inventory Management",
     link: "/inventory-dashboard",
     descriptionEn: "Removed placeholder menus from the Inventory sidebar. The sidebar now only strictly displays the 'Dashboard' and 'Configuration' menus.",
-    descriptionBn: "ইনভেন্টরি সাইডবার থেকে ডেমো মেনুগুলো বাদ দেওয়া হয়েছে। এখন শুধুমাত্র 'Dashboard' এবং 'Configuration' মেনু দেখা যাবে।",
+    descriptionBn: "à¦‡à¦¨à¦­à§‡à¦¨à§�à¦Ÿà¦°à¦¿ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦° à¦¥à§‡à¦•à§‡ à¦¡à§‡à¦®à§‹ à¦®à§‡à¦¨à§�à¦—à§�à¦²à§‹ à¦¬à¦¾à¦¦ à¦¦à§‡à¦“à§Ÿà¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦–à¦¨ à¦¶à§�à¦§à§�à¦®à¦¾à¦¤à§�à¦° 'Dashboard' à¦�à¦¬à¦‚ 'Configuration' à¦®à§‡à¦¨à§� à¦¦à§‡à¦–à¦¾ à¦¯à¦¾à¦¬à§‡à¥¤",
   },
   {
     id: "131",
@@ -710,7 +719,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Inventory Management",
     link: "/inventory-dashboard",
     descriptionEn: "Redesigned the Store Selection modal to be more compact with horizontal store cards, and added a search bar to easily filter stores by name or description.",
-    descriptionBn: "স্টোর সিলেকশন মোডালটি আরও কমপ্যাক্ট ডিজাইনে আপডেট করা হয়েছে এবং স্টোর সহজে খুঁজে পেতে একটি সার্চ বার যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦¸à§�à¦Ÿà§‹à¦° à¦¸à¦¿à¦²à§‡à¦•à¦¶à¦¨ à¦®à§‹à¦¡à¦¾à¦²à¦Ÿà¦¿ à¦†à¦°à¦“ à¦•à¦®à¦ªà§�à¦¯à¦¾à¦•à§�à¦Ÿ à¦¡à¦¿à¦œà¦¾à¦‡à¦¨à§‡ à¦†à¦ªà¦¡à§‡à¦Ÿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦¸à§�à¦Ÿà§‹à¦° à¦¸à¦¹à¦œà§‡ à¦–à§�à¦�à¦œà§‡ à¦ªà§‡à¦¤à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¸à¦¾à¦°à§�à¦š à¦¬à¦¾à¦° à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "130",
@@ -719,7 +728,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Inventory Management",
     link: "/inventory-dashboard",
     descriptionEn: "Created the new Inventory Management module with a dashboard layout consistent with HRIS. Added a Store Selection Modal (e.g. General Store, ICT Store) that appears on first load to enforce store context.",
-    descriptionBn: "নতুন ইনভেন্টরি ম্যানেজমেন্ট মডিউল তৈরি করা হয়েছে যার ডিজাইন এইচআরআইএস (HRIS) এর মতো রাখা হয়েছে। মডিউলে প্রথমবার প্রবেশ করলে স্টোর (যেমন- জেনারেল স্টোর, আইসিটি স্টোর) নির্বাচন করার জন্য একটি মোডাল যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦¨à¦¤à§�à¦¨ à¦‡à¦¨à¦­à§‡à¦¨à§�à¦Ÿà¦°à¦¿ à¦®à§�à¦¯à¦¾à¦¨à§‡à¦œà¦®à§‡à¦¨à§�à¦Ÿ à¦®à¦¡à¦¿à¦‰à¦² à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¯à¦¾à¦° à¦¡à¦¿à¦œà¦¾à¦‡à¦¨ à¦�à¦‡à¦šà¦†à¦°à¦†à¦‡à¦�à¦¸ (HRIS) à¦�à¦° à¦®à¦¤à§‹ à¦°à¦¾à¦–à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦®à¦¡à¦¿à¦‰à¦²à§‡ à¦ªà§�à¦°à¦¥à¦®à¦¬à¦¾à¦° à¦ªà§�à¦°à¦¬à§‡à¦¶ à¦•à¦°à¦²à§‡ à¦¸à§�à¦Ÿà§‹à¦° (à¦¯à§‡à¦®à¦¨- à¦œà§‡à¦¨à¦¾à¦°à§‡à¦² à¦¸à§�à¦Ÿà§‹à¦°, à¦†à¦‡à¦¸à¦¿à¦Ÿà¦¿ à¦¸à§�à¦Ÿà§‹à¦°) à¦¨à¦¿à¦°à§�à¦¬à¦¾à¦šà¦¨ à¦•à¦°à¦¾à¦° à¦œà¦¨à§�à¦¯ à¦�à¦•à¦Ÿà¦¿ à¦®à§‹à¦¡à¦¾à¦² à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "129",
@@ -728,7 +737,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "e-Recruitment",
     link: "/e-recruitment-form",
     descriptionEn: "Redesigned form tooltips with a professional card UI, detailed field instructions, and placed the hover icon before the label for improved user guidance.",
-    descriptionBn: "ই-রিক্রুটমেন্ট ফর্মের টুলটিপগুলো আরও প্রফেশনাল করা হয়েছে। লেবেলের আগে ইনফো আইকন দেওয়া হয়েছে এবং বিস্তারিত গাইডলাইন যুক্ত করা হয়েছে যাতে ক্যান্ডিডেটদের সুবিধা হয়।",
+    descriptionBn: "à¦‡-à¦°à¦¿à¦•à§�à¦°à§�à¦Ÿà¦®à§‡à¦¨à§�à¦Ÿ à¦«à¦°à§�à¦®à§‡à¦° à¦Ÿà§�à¦²à¦Ÿà¦¿à¦ªà¦—à§�à¦²à§‹ à¦†à¦°à¦“ à¦ªà§�à¦°à¦«à§‡à¦¶à¦¨à¦¾à¦² à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦²à§‡à¦¬à§‡à¦²à§‡à¦° à¦†à¦—à§‡ à¦‡à¦¨à¦«à§‹ à¦†à¦‡à¦•à¦¨ à¦¦à§‡à¦“à¦¯à¦¼à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦¬à¦¿à¦¸à§�à¦¤à¦¾à¦°à¦¿à¦¤ à¦—à¦¾à¦‡à¦¡à¦²à¦¾à¦‡à¦¨ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ à¦¯à¦¾à¦¤à§‡ à¦•à§�à¦¯à¦¾à¦¨à§�à¦¡à¦¿à¦¡à§‡à¦Ÿà¦¦à§‡à¦° à¦¸à§�à¦¬à¦¿à¦§à¦¾ à¦¹à¦¯à¦¼à¥¤",
   },
   {
     id: "128",
@@ -737,7 +746,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "e-Recruitment",
     link: "/",
     descriptionEn: "Hid the 'Settings' and 'Approved List' menus from the e-Recruitment section in both the sidebar and topbar navigation.",
-    descriptionBn: "সাইডবার এবং টপবার নেভিগেশন উভয় জায়গা থেকে ই-রিক্রুটমেন্ট সেকশনের 'Settings' এবং 'Approved List' মেনুগুলো হাইড করা হয়েছে।",
+    descriptionBn: "à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦° à¦�à¦¬à¦‚ à¦Ÿà¦ªà¦¬à¦¾à¦° à¦¨à§‡à¦­à¦¿à¦—à§‡à¦¶à¦¨ à¦‰à¦­à¦¯à¦¼ à¦œà¦¾à¦¯à¦¼à¦—à¦¾ à¦¥à§‡à¦•à§‡ à¦‡-à¦°à¦¿à¦•à§�à¦°à§�à¦Ÿà¦®à§‡à¦¨à§�à¦Ÿ à¦¸à§‡à¦•à¦¶à¦¨à§‡à¦° 'Settings' à¦�à¦¬à¦‚ 'Approved List' à¦®à§‡à¦¨à§�à¦—à§�à¦²à§‹ à¦¹à¦¾à¦‡à¦¡ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "127",
@@ -746,7 +755,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "e-Recruitment",
     link: "/e-recruitment-form",
     descriptionEn: "Fixed an issue in the e-Recruitment form where the 'jobPost' property was missing from the URL search parameters type definition.",
-    descriptionBn: "e-Recruitment ফর্মে একটি সমস্যা সমাধান করা হয়েছে যেখানে URL সার্চ প্যারামিটার থেকে 'jobPost' প্রপার্টিটি মিসিং ছিল।",
+    descriptionBn: "e-Recruitment à¦«à¦°à§�à¦®à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¸à¦®à¦¸à§�à¦¯à¦¾ à¦¸à¦®à¦¾à¦§à¦¾à¦¨ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ à¦¯à§‡à¦–à¦¾à¦¨à§‡ URL à¦¸à¦¾à¦°à§�à¦š à¦ªà§�à¦¯à¦¾à¦°à¦¾à¦®à¦¿à¦Ÿà¦¾à¦° à¦¥à§‡à¦•à§‡ 'jobPost' à¦ªà§�à¦°à¦ªà¦¾à¦°à§�à¦Ÿà¦¿à¦Ÿà¦¿ à¦®à¦¿à¦¸à¦¿à¦‚ à¦›à¦¿à¦²à¥¤",
   },
   {
     id: "126",
@@ -755,7 +764,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "e-Recruitment",
     link: "/e-recruitment-form",
     descriptionEn: "Completely redesigned the e-Recruitment form into a standalone page with a step-by-step sidebar navigation. The main app navigation has been removed from this page for a focused applicant experience.",
-    descriptionBn: "ই-রিক্রুটমেন্ট ফর্মটি সম্পূর্ণ নতুন করে ডিজাইন করা হয়েছে। এটি এখন স্টেপ-বাই-স্টেপ সাইডবার নেভিগেশন সহ একটি স্বয়ংসম্পূর্ণ পেজ। ফোকাসড অ্যাপ্লিক্যান্ট অভিজ্ঞতার জন্য মেইন অ্যাপ নেভিগেশন এই পেজ থেকে সরানো হয়েছে।",
+    descriptionBn: "à¦‡-à¦°à¦¿à¦•à§�à¦°à§�à¦Ÿà¦®à§‡à¦¨à§�à¦Ÿ à¦«à¦°à§�à¦®à¦Ÿà¦¿ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦¨à¦¤à§�à¦¨ à¦•à¦°à§‡ à¦¡à¦¿à¦œà¦¾à¦‡à¦¨ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦Ÿà¦¿ à¦�à¦–à¦¨ à¦¸à§�à¦Ÿà§‡à¦ª-à¦¬à¦¾à¦‡-à¦¸à§�à¦Ÿà§‡à¦ª à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦° à¦¨à§‡à¦­à¦¿à¦—à§‡à¦¶à¦¨ à¦¸à¦¹ à¦�à¦•à¦Ÿà¦¿ à¦¸à§�à¦¬à¦¯à¦¼à¦‚à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦ªà§‡à¦œà¥¤ à¦«à§‹à¦•à¦¾à¦¸à¦¡ à¦…à§�à¦¯à¦¾à¦ªà§�à¦²à¦¿à¦•à§�à¦¯à¦¾à¦¨à§�à¦Ÿ à¦…à¦­à¦¿à¦œà§�à¦žà¦¤à¦¾à¦° à¦œà¦¨à§�à¦¯ à¦®à§‡à¦‡à¦¨ à¦…à§�à¦¯à¦¾à¦ª à¦¨à§‡à¦­à¦¿à¦—à§‡à¦¶à¦¨ à¦�à¦‡ à¦ªà§‡à¦œ à¦¥à§‡à¦•à§‡ à¦¸à¦°à¦¾à¦¨à§‹ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "125",
@@ -764,7 +773,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "e-Recruitment",
     link: "/e-recruitment-link-generator",
     descriptionEn: "Enhanced the 'Link Generator' workflow under e-Recruitment. Added 'Form Status' column and 'Copy Link', 'Offer Letter' buttons in the Application Queue list. The 'Review' button is now automatically disabled until the candidate fills out the form. Also added 'Form Status' and 'Workflow Status' dropdown filters to easily sort candidates.",
-    descriptionBn: "e-Recruitment এর অধীনে 'Link Generator' আপডেট করা হয়েছে। অ্যাপ্লিকেশান কিউ লিস্টে 'Form Status' কলাম এবং 'Copy Link', 'Offer Letter' বাটন যোগ করা হয়েছে। ক্যান্ডিডেট ফর্ম ফিল আপ না করা পর্যন্ত 'Review' বাটনটি এখন স্বয়ংক্রিয়ভাবে নিষ্ক্রিয় থাকবে। এছাড়া সহজে ক্যান্ডিডেট খোঁজার জন্য 'Form Status' এবং 'Workflow Status' ড্রপডাউন ফিল্টার যোগ করা হয়েছে।",
+    descriptionBn: "e-Recruitment à¦�à¦° à¦…à¦§à§€à¦¨à§‡ 'Link Generator' à¦†à¦ªà¦¡à§‡à¦Ÿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦…à§�à¦¯à¦¾à¦ªà§�à¦²à¦¿à¦•à§‡à¦¶à¦¾à¦¨ à¦•à¦¿à¦‰ à¦²à¦¿à¦¸à§�à¦Ÿà§‡ 'Form Status' à¦•à¦²à¦¾à¦® à¦�à¦¬à¦‚ 'Copy Link', 'Offer Letter' à¦¬à¦¾à¦Ÿà¦¨ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦•à§�à¦¯à¦¾à¦¨à§�à¦¡à¦¿à¦¡à§‡à¦Ÿ à¦«à¦°à§�à¦® à¦«à¦¿à¦² à¦†à¦ª à¦¨à¦¾ à¦•à¦°à¦¾ à¦ªà¦°à§�à¦¯à¦¨à§�à¦¤ 'Review' à¦¬à¦¾à¦Ÿà¦¨à¦Ÿà¦¿ à¦�à¦–à¦¨ à¦¸à§�à¦¬à¦¯à¦¼à¦‚à¦•à§�à¦°à¦¿à¦¯à¦¼à¦­à¦¾à¦¬à§‡ à¦¨à¦¿à¦·à§�à¦•à§�à¦°à¦¿à¦¯à¦¼ à¦¥à¦¾à¦•à¦¬à§‡à¥¤ à¦�à¦›à¦¾à§œà¦¾ à¦¸à¦¹à¦œà§‡ à¦•à§�à¦¯à¦¾à¦¨à§�à¦¡à¦¿à¦¡à§‡à¦Ÿ à¦–à§‹à¦�à¦œà¦¾à¦° à¦œà¦¨à§�à¦¯ 'Form Status' à¦�à¦¬à¦‚ 'Workflow Status' à¦¡à§�à¦°à¦ªà¦¡à¦¾à¦‰à¦¨ à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦° à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "124",
@@ -773,7 +782,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Personnel List",
     link: "/personnel-list",
     descriptionEn: "Removed the 'OT After(H)' field from the Assign OT And Allowance modal and updated the modal to automatically prefill and display the employee's existing OT Option and OT Rate if already assigned.",
-    descriptionBn: "Assign OT And Allowance মোডাল থেকে 'OT After(H)' ফিল্ডটি সরাতে দেওয়া হয়েছে এবং কর্মচারীর পূর্বে নির্ধারিত OT অপশন ও OT Rate ডেটা থাকলে মোডাল খোলার সাথে সাথে তা স্বয়ংক্রিয়ভাবে দেখানোর ব্যবস্থা করা হয়েছে।",
+    descriptionBn: "Assign OT And Allowance à¦®à§‹à¦¡à¦¾à¦² à¦¥à§‡à¦•à§‡ 'OT After(H)' à¦«à¦¿à¦²à§�à¦¡à¦Ÿà¦¿ à¦¸à¦°à¦¾à¦¤à§‡ à¦¦à§‡à¦“à§Ÿà¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦•à¦°à§�à¦®à¦šà¦¾à¦°à§€à¦° à¦ªà§‚à¦°à§�à¦¬à§‡ à¦¨à¦¿à¦°à§�à¦§à¦¾à¦°à¦¿à¦¤ OT à¦…à¦ªà¦¶à¦¨ à¦“ OT Rate à¦¡à§‡à¦Ÿà¦¾ à¦¥à¦¾à¦•à¦²à§‡ à¦®à§‹à¦¡à¦¾à¦² à¦–à§‹à¦²à¦¾à¦° à¦¸à¦¾à¦¥à§‡ à¦¸à¦¾à¦¥à§‡ à¦¤à¦¾ à¦¸à§�à¦¬à§Ÿà¦‚à¦•à§�à¦°à¦¿à§Ÿà¦­à¦¾à¦¬à§‡ à¦¦à§‡à¦–à¦¾à¦¨à§‹à¦° à¦¬à§�à¦¯à¦¬à¦¸à§�à¦¥à¦¾ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "123",
@@ -782,7 +791,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Personnel List",
     link: "/personnel-list",
     descriptionEn: "Implemented all operational modals for Personnel List: 'Shift Update' (Shift Rotation), 'Employee Status Change', 'Shift Update - Default Holiday', 'ID Card Issue Date', and 'Revenue Mapping' with interactive fields and submit actions.",
-    descriptionBn: "পার্সোনেল লিস্টের জন্য সমস্ত অপারেশন মোডাল বাস্তবায়ন করা হয়েছে: 'Shift Update' (Shift Rotation), 'Employee Status Change', 'Shift Update - Default Holiday', 'ID Card Issue Date', এবং 'Revenue Mapping'।",
+    descriptionBn: "à¦ªà¦¾à¦°à§�à¦¸à§‹à¦¨à§‡à¦² à¦²à¦¿à¦¸à§�à¦Ÿà§‡à¦° à¦œà¦¨à§�à¦¯ à¦¸à¦®à¦¸à§�à¦¤ à¦…à¦ªà¦¾à¦°à§‡à¦¶à¦¨ à¦®à§‹à¦¡à¦¾à¦² à¦¬à¦¾à¦¸à§�à¦¤à¦¬à¦¾à§Ÿà¦¨ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡: 'Shift Update' (Shift Rotation), 'Employee Status Change', 'Shift Update - Default Holiday', 'ID Card Issue Date', à¦�à¦¬à¦‚ 'Revenue Mapping'à¥¤",
   },
   {
     id: "122",
@@ -791,7 +800,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Personnel List",
     link: "/personnel-list",
     descriptionEn: "Added the 'Assign OT And Allowance' modal to Personnel List when clicking 'OT Status Update' for selected employees (with N/A, OverTime, Fixed OverTime options, OT Rate, Close/Delete/Submit buttons), and increased the Personnel Operations sidebar width for better readability.",
-    descriptionBn: "পার্সোনেল লিস্টে নির্বাচিত কর্মচারীদের জন্য 'OT Status Update' ক্লিক করলে 'Assign OT And Allowance' পপআপ মোডাল যুক্ত করা হয়েছে এবং সুবিধাজনকভাবে দেখার জন্য অপারেশন সাইডবারটির প্রাস্থ (Width) বাড়িয়ে চওড়া করা হয়েছে।",
+    descriptionBn: "à¦ªà¦¾à¦°à§�à¦¸à§‹à¦¨à§‡à¦² à¦²à¦¿à¦¸à§�à¦Ÿà§‡ à¦¨à¦¿à¦°à§�à¦¬à¦¾à¦šà¦¿à¦¤ à¦•à¦°à§�à¦®à¦šà¦¾à¦°à§€à¦¦à§‡à¦° à¦œà¦¨à§�à¦¯ 'OT Status Update' à¦•à§�à¦²à¦¿à¦• à¦•à¦°à¦²à§‡ 'Assign OT And Allowance' à¦ªà¦ªà¦†à¦ª à¦®à§‹à¦¡à¦¾à¦² à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦¸à§�à¦¬à¦¿à¦§à¦¾à¦œà¦¨à¦•à¦­à¦¾à¦¬à§‡ à¦¦à§‡à¦–à¦¾à¦° à¦œà¦¨à§�à¦¯ à¦…à¦ªà¦¾à¦°à§‡à¦¶à¦¨ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦°à¦Ÿà¦¿à¦° à¦ªà§�à¦°à¦¾à¦¸à§�à¦¥ (Width) à¦¬à¦¾à§œà¦¿à§Ÿà§‡ à¦šà¦“à§œà¦¾ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "1",
@@ -800,7 +809,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Module Selection",
     link: "/module-selection",
     descriptionEn: "Created this 'Changes!' page! It works just like Excel, so you can easily track and edit all the new updates happening in the system.",
-    descriptionBn: "নতুন 'Changes!' পেজ তৈরি করা হয়েছে! এটি এক্সেলের মতো কাজ করে, তাই আপনি সহজেই সিস্টেমের নতুন আপডেটগুলো ট্র্যাক ও এডিট করতে পারবেন।",
+    descriptionBn: "à¦¨à¦¤à§�à¦¨ 'Changes!' à¦ªà§‡à¦œ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡! à¦�à¦Ÿà¦¿ à¦�à¦•à§�à¦¸à§‡à¦²à§‡à¦° à¦®à¦¤à§‹ à¦•à¦¾à¦œ à¦•à¦°à§‡, à¦¤à¦¾à¦‡ à¦†à¦ªà¦¨à¦¿ à¦¸à¦¹à¦œà§‡à¦‡ à¦¸à¦¿à¦¸à§�à¦Ÿà§‡à¦®à§‡à¦° à¦¨à¦¤à§�à¦¨ à¦†à¦ªà¦¡à§‡à¦Ÿà¦—à§�à¦²à§‹ à¦Ÿà§�à¦°à§�à¦¯à¦¾à¦• à¦“ à¦�à¦¡à¦¿à¦Ÿ à¦•à¦°à¦¤à§‡ à¦ªà¦¾à¦°à¦¬à§‡à¦¨à¥¤",
   },
   {
     id: "2",
@@ -809,7 +818,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Order Profile",
     link: "/merchandising-order-profile",
     descriptionEn: "Made the Basic Information section much cleaner! It's now laid out in 4 neat columns, making it much easier to read and prettier to look at.",
-    descriptionBn: "বেসিক ইনফরমেশন সেকশনটি আরও সুন্দর করা হয়েছে! এটি এখন ৪টি কলামে সাজানো, ফলে পড়া সহজ এবং দেখতে আরও ভালো লাগছে।",
+    descriptionBn: "à¦¬à§‡à¦¸à¦¿à¦• à¦‡à¦¨à¦«à¦°à¦®à§‡à¦¶à¦¨ à¦¸à§‡à¦•à¦¶à¦¨à¦Ÿà¦¿ à¦†à¦°à¦“ à¦¸à§�à¦¨à§�à¦¦à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡! à¦�à¦Ÿà¦¿ à¦�à¦–à¦¨ à§ªà¦Ÿà¦¿ à¦•à¦²à¦¾à¦®à§‡ à¦¸à¦¾à¦œà¦¾à¦¨à§‹, à¦«à¦²à§‡ à¦ªà§œà¦¾ à¦¸à¦¹à¦œ à¦�à¦¬à¦‚ à¦¦à§‡à¦–à¦¤à§‡ à¦†à¦°à¦“ à¦­à¦¾à¦²à§‹ à¦²à¦¾à¦—à¦›à§‡à¥¤",
   },
   {
     id: "3",
@@ -818,7 +827,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Order Profile",
     link: "/merchandising-order-profile",
     descriptionEn: "Fixed the messy tables for Yarn, Fabric, and Trim! They are now combined into one perfectly aligned master table.",
-    descriptionBn: "Yarn, Fabric এবং Trim-এর ছড়ানো টেবিলগুলো ঠিক করা হয়েছে! এগুলোকে এখন একটি সুন্দর সাজানো মাস্টার টেবিলে একত্রিত করা হয়েছে।",
+    descriptionBn: "Yarn, Fabric à¦�à¦¬à¦‚ Trim-à¦�à¦° à¦›à§œà¦¾à¦¨à§‹ à¦Ÿà§‡à¦¬à¦¿à¦²à¦—à§�à¦²à§‹ à¦ à¦¿à¦• à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡! à¦�à¦—à§�à¦²à§‹à¦•à§‡ à¦�à¦–à¦¨ à¦�à¦•à¦Ÿà¦¿ à¦¸à§�à¦¨à§�à¦¦à¦° à¦¸à¦¾à¦œà¦¾à¦¨à§‹ à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦Ÿà§‡à¦¬à¦¿à¦²à§‡ à¦�à¦•à¦¤à§�à¦°à¦¿à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "4",
@@ -827,7 +836,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Order Profile",
     link: "/merchandising-order-profile",
     descriptionEn: "Made the tables more compact by reducing the text size and spacing. Now everything fits on the screen without having to scroll left and right!",
-    descriptionBn: "টেক্সট সাইজ এবং স্পেসিং কমিয়ে টেবিলগুলোকে আরও কম্প্যাক্ট করা হয়েছে। এখন ডানে-বামে স্ক্রল করা ছাড়াই সব এক স্ক্রিনে ফিট হয়ে যাবে!",
+    descriptionBn: "à¦Ÿà§‡à¦•à§�à¦¸à¦Ÿ à¦¸à¦¾à¦‡à¦œ à¦�à¦¬à¦‚ à¦¸à§�à¦ªà§‡à¦¸à¦¿à¦‚ à¦•à¦®à¦¿à§Ÿà§‡ à¦Ÿà§‡à¦¬à¦¿à¦²à¦—à§�à¦²à§‹à¦•à§‡ à¦†à¦°à¦“ à¦•à¦®à§�à¦ªà§�à¦¯à¦¾à¦•à§�à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦–à¦¨ à¦¡à¦¾à¦¨à§‡-à¦¬à¦¾à¦®à§‡ à¦¸à§�à¦•à§�à¦°à¦² à¦•à¦°à¦¾ à¦›à¦¾à§œà¦¾à¦‡ à¦¸à¦¬ à¦�à¦• à¦¸à§�à¦•à§�à¦°à¦¿à¦¨à§‡ à¦«à¦¿à¦Ÿ à¦¹à§Ÿà§‡ à¦¯à¦¾à¦¬à§‡!",
   },
   {
     id: "5",
@@ -836,7 +845,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Global System",
     link: "/",
     descriptionEn: "Switched the entire system to default to Light Mode! Everything will look bright and clear right from the start.",
-    descriptionBn: "সিস্টেমের ডিফল্ট থিম হিসেবে লাইট মোড সেট করা হয়েছে! এখন সবকিছু শুরু থেকেই উজ্জ্বল এবং পরিষ্কার দেখাবে।",
+    descriptionBn: "à¦¸à¦¿à¦¸à§�à¦Ÿà§‡à¦®à§‡à¦° à¦¡à¦¿à¦«à¦²à§�à¦Ÿ à¦¥à¦¿à¦® à¦¹à¦¿à¦¸à§‡à¦¬à§‡ à¦²à¦¾à¦‡à¦Ÿ à¦®à§‹à¦¡ à¦¸à§‡à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡! à¦�à¦–à¦¨ à¦¸à¦¬à¦•à¦¿à¦›à§� à¦¶à§�à¦°à§� à¦¥à§‡à¦•à§‡à¦‡ à¦‰à¦œà§�à¦œà§�à¦¬à¦² à¦�à¦¬à¦‚ à¦ªà¦°à¦¿à¦·à§�à¦•à¦¾à¦° à¦¦à§‡à¦–à¦¾à¦¬à§‡à¥¤",
   },
   {
     id: "6",
@@ -845,7 +854,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Personnel List",
     link: "/personnel-list",
     descriptionEn: "Moved the 'Operations' tools to a sidebar! Now, when you select an employee, the tools automatically pop up on the right side. You can still see the main table and continue clicking other employees to update multiple at once.",
-    descriptionBn: "অপারেশন টুলসগুলোকে সাইডবারে সরানো হয়েছে! এখন মেইন টেবিল থেকে যেকোনো এমপ্লয়ি সিলেক্ট করলেই টুলসগুলো ডানপাশে স্লাইড হয়ে খুলবে। আপনি তখনও মেইন টেবিল দেখতে পাবেন এবং একসাথে একাধিক কাজ করার জন্য অন্য এমপ্লয়ি সিলেক্ট করতে পারবেন।",
+    descriptionBn: "à¦…à¦ªà¦¾à¦°à§‡à¦¶à¦¨ à¦Ÿà§�à¦²à¦¸à¦—à§�à¦²à§‹à¦•à§‡ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦°à§‡ à¦¸à¦°à¦¾à¦¨à§‹ à¦¹à§Ÿà§‡à¦›à§‡! à¦�à¦–à¦¨ à¦®à§‡à¦‡à¦¨ à¦Ÿà§‡à¦¬à¦¿à¦² à¦¥à§‡à¦•à§‡ à¦¯à§‡à¦•à§‹à¦¨à§‹ à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦°à¦²à§‡à¦‡ à¦Ÿà§�à¦²à¦¸à¦—à§�à¦²à§‹ à¦¡à¦¾à¦¨à¦ªà¦¾à¦¶à§‡ à¦¸à§�à¦²à¦¾à¦‡à¦¡ à¦¹à§Ÿà§‡ à¦–à§�à¦²à¦¬à§‡à¥¤ à¦†à¦ªà¦¨à¦¿ à¦¤à¦–à¦¨à¦“ à¦®à§‡à¦‡à¦¨ à¦Ÿà§‡à¦¬à¦¿à¦² à¦¦à§‡à¦–à¦¤à§‡ à¦ªà¦¾à¦¬à§‡à¦¨ à¦�à¦¬à¦‚ à¦�à¦•à¦¸à¦¾à¦¥à§‡ à¦�à¦•à¦¾à¦§à¦¿à¦• à¦•à¦¾à¦œ à¦•à¦°à¦¾à¦° à¦œà¦¨à§�à¦¯ à¦…à¦¨à§�à¦¯ à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦°à¦¤à§‡ à¦ªà¦¾à¦°à¦¬à§‡à¦¨à¥¤",
   },
   {
     id: "7",
@@ -854,7 +863,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Payroll Deductions",
     link: "/payroll-deductions",
     descriptionEn: "Removed the 'Auto-Skip during Ramadan' option and the 'Single Period Exceptions' configuration from the Payroll Deductions setup panel.",
-    descriptionBn: "পেরোল ডিডাকশন প্যানেল থেকে 'রোজার মাসে অটো-স্কিপ' অপশন এবং 'সিঙ্গেল পিরিয়ড এক্সেপশন' সেটিং অপশনগুলো বাদ দেওয়া হয়েছে।",
+    descriptionBn: "à¦ªà§‡à¦°à§‹à¦² à¦¡à¦¿à¦¡à¦¾à¦•à¦¶à¦¨ à¦ªà§�à¦¯à¦¾à¦¨à§‡à¦² à¦¥à§‡à¦•à§‡ 'à¦°à§‹à¦œà¦¾à¦° à¦®à¦¾à¦¸à§‡ à¦…à¦Ÿà§‹-à¦¸à§�à¦•à¦¿à¦ª' à¦…à¦ªà¦¶à¦¨ à¦�à¦¬à¦‚ 'à¦¸à¦¿à¦™à§�à¦—à§‡à¦² à¦ªà¦¿à¦°à¦¿à§Ÿà¦¡ à¦�à¦•à§�à¦¸à§‡à¦ªà¦¶à¦¨' à¦¸à§‡à¦Ÿà¦¿à¦‚ à¦…à¦ªà¦¶à¦¨à¦—à§�à¦²à§‹ à¦¬à¦¾à¦¦ à¦¦à§‡à¦“à§Ÿà¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "8",
@@ -863,7 +872,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "User Management",
     link: "/user-management",
     descriptionEn: "Merged Company and Section access options into a nested view where Areas (renamed from Sections) show up directly under their selected Company. Renamed all 'Section' terms to 'Area'.",
-    descriptionBn: "ইউজার ম্যানেজমেন্টে কোম্পানি এবং সেকশন এক্সেস অপশনগুলোকে একত্রিত করা হয়েছে। এখন কোম্পানি সিলেক্ট করলেই তার ভেতরের এরিয়া (সেকশন এর নতুন নাম এরিয়া) অপশনগুলো নিচে দেখা যাবে। এছাড়া সব জায়গায় 'সেকশন' শব্দের নাম পরিবর্তন করে 'এরিয়া' করা হয়েছে।",
+    descriptionBn: "à¦‡à¦‰à¦œà¦¾à¦° à¦®à§�à¦¯à¦¾à¦¨à§‡à¦œà¦®à§‡à¦¨à§�à¦Ÿà§‡ à¦•à§‹à¦®à§�à¦ªà¦¾à¦¨à¦¿ à¦�à¦¬à¦‚ à¦¸à§‡à¦•à¦¶à¦¨ à¦�à¦•à§�à¦¸à§‡à¦¸ à¦…à¦ªà¦¶à¦¨à¦—à§�à¦²à§‹à¦•à§‡ à¦�à¦•à¦¤à§�à¦°à¦¿à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦–à¦¨ à¦•à§‹à¦®à§�à¦ªà¦¾à¦¨à¦¿ à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦°à¦²à§‡à¦‡ à¦¤à¦¾à¦° à¦­à§‡à¦¤à¦°à§‡à¦° à¦�à¦°à¦¿à§Ÿà¦¾ (à¦¸à§‡à¦•à¦¶à¦¨ à¦�à¦° à¦¨à¦¤à§�à¦¨ à¦¨à¦¾à¦® à¦�à¦°à¦¿à§Ÿà¦¾) à¦…à¦ªà¦¶à¦¨à¦—à§�à¦²à§‹ à¦¨à¦¿à¦šà§‡ à¦¦à§‡à¦–à¦¾ à¦¯à¦¾à¦¬à§‡à¥¤ à¦�à¦›à¦¾à§œà¦¾ à¦¸à¦¬ à¦œà¦¾à§Ÿà¦—à¦¾à§Ÿ 'à¦¸à§‡à¦•à¦¶à¦¨' à¦¶à¦¬à§�à¦¦à§‡à¦° à¦¨à¦¾à¦® à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦•à¦°à§‡ 'à¦�à¦°à¦¿à§Ÿà¦¾' à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "9",
@@ -872,7 +881,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Salary Process",
     link: "/monthly-salary-process",
     descriptionEn: "Refactored the Payroll Adjustments editing dialog in Monthly Salary Process. Removed Section 1 (Attendance Parameters) and Section 2 (Monthly Earnings) fields. Upgraded Section 3 (Monthly Deductions & Exceptions) into a premium card-based layout with customized Lucide icons and currency symbols.",
-    descriptionBn: "মান্থলি স্যালারি প্রসেসের পেরোল অ্যাডজাস্টমেন্ট এডিট ডায়ালগ রিফ্যাক্টর করা হয়েছে। সেকশন ১ (অ্যাটেনডেন্স প্যারামিটার) এবং সেকশন ২ (মান্থলি আর্নিংস) এর ইনপুটগুলো বাদ দেওয়া হয়েছে। এছাড়া সেকশন ৩ (মান্থলি ডিডাকশন অ্যান্ড এক্সেপশনস) এর ইনপুটগুলোকে আকর্ষণীয় কার্ড ডিজাইনে সাজানো হয়েছে এবং সাথে আইকন ও টাকার সাইন যোগ করা হয়েছে।",
+    descriptionBn: "à¦®à¦¾à¦¨à§�à¦¥à¦²à¦¿ à¦¸à§�à¦¯à¦¾à¦²à¦¾à¦°à¦¿ à¦ªà§�à¦°à¦¸à§‡à¦¸à§‡à¦° à¦ªà§‡à¦°à§‹à¦² à¦…à§�à¦¯à¦¾à¦¡à¦œà¦¾à¦¸à§�à¦Ÿà¦®à§‡à¦¨à§�à¦Ÿ à¦�à¦¡à¦¿à¦Ÿ à¦¡à¦¾à¦¯à¦¼à¦¾à¦²à¦— à¦°à¦¿à¦«à§�à¦¯à¦¾à¦•à§�à¦Ÿà¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦¸à§‡à¦•à¦¶à¦¨ à§§ (à¦…à§�à¦¯à¦¾à¦Ÿà§‡à¦¨à¦¡à§‡à¦¨à§�à¦¸ à¦ªà§�à¦¯à¦¾à¦°à¦¾à¦®à¦¿à¦Ÿà¦¾à¦°) à¦�à¦¬à¦‚ à¦¸à§‡à¦•à¦¶à¦¨ à§¨ (à¦®à¦¾à¦¨à§�à¦¥à¦²à¦¿ à¦†à¦°à§�à¦¨à¦¿à¦‚à¦¸) à¦�à¦° à¦‡à¦¨à¦ªà§�à¦Ÿà¦—à§�à¦²à§‹ à¦¬à¦¾à¦¦ à¦¦à§‡à¦“à§Ÿà¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦›à¦¾à§œà¦¾ à¦¸à§‡à¦•à¦¶à¦¨ à§© (à¦®à¦¾à¦¨à§�à¦¥à¦²à¦¿ à¦¡à¦¿à¦¡à¦¾à¦•à¦¶à¦¨ à¦…à§�à¦¯à¦¾à¦¨à§�à¦¡ à¦�à¦•à§�à¦¸à§‡à¦ªà¦¶à¦¨à¦¸) à¦�à¦° à¦‡à¦¨à¦ªà§�à¦Ÿà¦—à§�à¦²à§‹à¦•à§‡ à¦†à¦•à¦°à§�à¦·à¦£à§€à§Ÿ à¦•à¦¾à¦°à§�à¦¡ à¦¡à¦¿à¦œà¦¾à¦‡à¦¨à§‡ à¦¸à¦¾à¦œà¦¾à¦¨à§‹ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦¸à¦¾à¦¥à§‡ à¦†à¦‡à¦•à¦¨ à¦“ à¦Ÿà¦¾à¦•à¦¾à¦° à¦¸à¦¾à¦‡à¦¨ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "10",
@@ -881,7 +890,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Salary Process",
     link: "/monthly-salary-process",
     descriptionEn: "Upgraded the Monthly Salary Process data table to match the detailed 58-column spreadsheet layout. Loaded the full 14 employees roster matching the active bank and account details exactly.",
-    descriptionBn: "মান্থলি স্যালারি প্রসেস টেবিলটিকে ৫৮টি কলামবিশিষ্ট বিশদ স্প্রেডশিট লেআউটে উন্নীত করা হয়েছে। ব্যাংক ও অ্যাকাউন্ট নম্বরসহ ১৪ জন এমপ্লয়ির সম্পুর্ণ ডেটাবেস যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦®à¦¾à¦¨à§�à¦¥à¦²à¦¿ à¦¸à§�à¦¯à¦¾à¦²à¦¾à¦°à¦¿ à¦ªà§�à¦°à¦¸à§‡à¦¸ à¦Ÿà§‡à¦¬à¦¿à¦²à¦Ÿà¦¿à¦•à§‡ à§«à§®à¦Ÿà¦¿ à¦•à¦²à¦¾à¦®à¦¬à¦¿à¦¶à¦¿à¦·à§�à¦Ÿ à¦¬à¦¿à¦¶à¦¦ à¦¸à§�à¦ªà§�à¦°à§‡à¦¡à¦¶à¦¿à¦Ÿ à¦²à§‡à¦†à¦‰à¦Ÿà§‡ à¦‰à¦¨à§�à¦¨à§€à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦¬à§�à¦¯à¦¾à¦‚à¦• à¦“ à¦…à§�à¦¯à¦¾à¦•à¦¾à¦‰à¦¨à§�à¦Ÿ à¦¨à¦®à§�à¦¬à¦°à¦¸à¦¹ à§§à§ª à¦œà¦¨ à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿à¦° à¦¸à¦®à§�à¦ªà§�à¦°à§�à¦£ à¦¡à§‡à¦Ÿà¦¾à¦¬à§‡à¦¸ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "11",
@@ -890,7 +899,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Salary Process",
     link: "/monthly-salary-process",
     descriptionEn: "Added a custom column rearrangement and show/hide toggle panel to the Monthly Salary Process page, enabling draggable reordering, visibility control, and template saving matching the personnel list page design.",
-    descriptionBn: "মান্থলি স্যালারি প্রসেস পেজে কলামের ক্রম পরিবর্তন এবং হাইড/শো করার অপশন যুক্ত করা হয়েছে। এর মাধ্যমে ড্র্যাগ করে কলাম সাজানো যাবে, কলামের দৃশ্যমানতা নিয়ন্ত্রণ করা যাবে এবং পার্সোনেল লিস্ট পেজের মতো কাস্টম লেআউট টেমপ্লেট সেভ করা যাবে।",
+    descriptionBn: "à¦®à¦¾à¦¨à§�à¦¥à¦²à¦¿ à¦¸à§�à¦¯à¦¾à¦²à¦¾à¦°à¦¿ à¦ªà§�à¦°à¦¸à§‡à¦¸ à¦ªà§‡à¦œà§‡ à¦•à¦²à¦¾à¦®à§‡à¦° à¦•à§�à¦°à¦® à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦�à¦¬à¦‚ à¦¹à¦¾à¦‡à¦¡/à¦¶à§‹ à¦•à¦°à¦¾à¦° à¦…à¦ªà¦¶à¦¨ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦° à¦®à¦¾à¦§à§�à¦¯à¦®à§‡ à¦¡à§�à¦°à§�à¦¯à¦¾à¦— à¦•à¦°à§‡ à¦•à¦²à¦¾à¦® à¦¸à¦¾à¦œà¦¾à¦¨à§‹ à¦¯à¦¾à¦¬à§‡, à¦•à¦²à¦¾à¦®à§‡à¦° à¦¦à§ƒà¦¶à§�à¦¯à¦®à¦¾à¦¨à¦¤à¦¾ à¦¨à¦¿à§Ÿà¦¨à§�à¦¤à§�à¦°à¦£ à¦•à¦°à¦¾ à¦¯à¦¾à¦¬à§‡ à¦�à¦¬à¦‚ à¦ªà¦¾à¦°à§�à¦¸à§‹à¦¨à§‡à¦² à¦²à¦¿à¦¸à§�à¦Ÿ à¦ªà§‡à¦œà§‡à¦° à¦®à¦¤à§‹ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦²à§‡à¦†à¦‰à¦Ÿ à¦Ÿà§‡à¦®à¦ªà§�à¦²à§‡à¦Ÿ à¦¸à§‡à¦­ à¦•à¦°à¦¾ à¦¯à¦¾à¦¬à§‡à¥¤",
   },
   {
     id: "12",
@@ -898,8 +907,8 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     type: "Modify",
     module: "Salary Process",
     link: "/monthly-salary-process",
-    descriptionEn: "Updated default column visibility to show all 58 columns on load, and removed the currency Taka (৳) symbol from the table cell amounts.",
-    descriptionBn: "সবগুলো ৫৮টি কলাম লোড হওয়ার সাথে সাথে দৃশ্যমান রাখতে ডিফল্ট সেটিং আপডেট করা হয়েছে এবং টেবিল সেলের অ্যামাউন্ট থেকে টাকা (৳) চিহ্ন বাদ দেওয়া হয়েছে।",
+    descriptionEn: "Updated default column visibility to show all 58 columns on load, and removed the currency Taka (à§³) symbol from the table cell amounts.",
+    descriptionBn: "à¦¸à¦¬à¦—à§�à¦²à§‹ à§«à§®à¦Ÿà¦¿ à¦•à¦²à¦¾à¦® à¦²à§‹à¦¡ à¦¹à¦“à§Ÿà¦¾à¦° à¦¸à¦¾à¦¥à§‡ à¦¸à¦¾à¦¥à§‡ à¦¦à§ƒà¦¶à§�à¦¯à¦®à¦¾à¦¨ à¦°à¦¾à¦–à¦¤à§‡ à¦¡à¦¿à¦«à¦²à§�à¦Ÿ à¦¸à§‡à¦Ÿà¦¿à¦‚ à¦†à¦ªà¦¡à§‡à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦Ÿà§‡à¦¬à¦¿à¦² à¦¸à§‡à¦²à§‡à¦° à¦…à§�à¦¯à¦¾à¦®à¦¾à¦‰à¦¨à§�à¦Ÿ à¦¥à§‡à¦•à§‡ à¦Ÿà¦¾à¦•à¦¾ (à§³) à¦šà¦¿à¦¹à§�à¦¨ à¦¬à¦¾à¦¦ à¦¦à§‡à¦“à§Ÿà¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "13",
@@ -908,7 +917,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Evaluation",
     link: "/evaluation-propose",
     descriptionEn: "Redesigned all 7 Evaluation sub-pages to be simpler and easier to use! Added a shared horizontal tab navigation bar across all pages so you can jump between Configurator, Evaluation Propose, Propose Increment, Summary, Queue & Approvals, Increment List, and History without using the sidebar. Also cleaned up breadcrumbs, added short descriptions to each page, and renamed jargon-heavy labels (e.g. 'Increment Gadget' is now 'Configurator'). Created a documentation file explaining how the full workflow works.",
-    descriptionBn: "ইভ্যালুয়েশন মডিউলের সবগুলো ৭টি সাবপেজ আরও সহজ ও সুন্দর করা হয়েছে! এখন প্রতিটি পেজের উপরে একটি হরিজন্টাল ট্যাব বার আছে — Configurator, Evaluation Propose, Propose Increment, Summary, Queue & Approvals, Increment List, এবং History — যেটাতে দিয়ে সাইডবার ছাড়াই যেকোনো পেজে যাওয়া যাবে। ব্রেডক্রাম্ব ঠিক করা হয়েছে, প্রতিটি পেজে ছোট বিবরণ যোগ করা হয়েছে, এবং 'Increment Gadget' এর মতো কঠিন নামগুলো সহজ করা হয়েছে। এছাড়া সম্পূর্ণ ওয়ার্কফ্লো ব্যাখ্যা করে একটি ডকুমেন্টেশন ফাইলও তৈরি করা হয়েছে।",
+    descriptionBn: "à¦‡à¦­à§�à¦¯à¦¾à¦²à§�à¦¯à¦¼à§‡à¦¶à¦¨ à¦®à¦¡à¦¿à¦‰à¦²à§‡à¦° à¦¸à¦¬à¦—à§�à¦²à§‹ à§­à¦Ÿà¦¿ à¦¸à¦¾à¦¬à¦ªà§‡à¦œ à¦†à¦°à¦“ à¦¸à¦¹à¦œ à¦“ à¦¸à§�à¦¨à§�à¦¦à¦° à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡! à¦�à¦–à¦¨ à¦ªà§�à¦°à¦¤à¦¿à¦Ÿà¦¿ à¦ªà§‡à¦œà§‡à¦° à¦‰à¦ªà¦°à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¹à¦°à¦¿à¦œà¦¨à§�à¦Ÿà¦¾à¦² à¦Ÿà§�à¦¯à¦¾à¦¬ à¦¬à¦¾à¦° à¦†à¦›à§‡ â€” Configurator, Evaluation Propose, Propose Increment, Summary, Queue & Approvals, Increment List, à¦�à¦¬à¦‚ History â€” à¦¯à§‡à¦Ÿà¦¾à¦¤à§‡ à¦¦à¦¿à¦¯à¦¼à§‡ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦° à¦›à¦¾à¦¡à¦¼à¦¾à¦‡ à¦¯à§‡à¦•à§‹à¦¨à§‹ à¦ªà§‡à¦œà§‡ à¦¯à¦¾à¦“à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¬à§‡à¥¤ à¦¬à§�à¦°à§‡à¦¡à¦•à§�à¦°à¦¾à¦®à§�à¦¬ à¦ à¦¿à¦• à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡, à¦ªà§�à¦°à¦¤à¦¿à¦Ÿà¦¿ à¦ªà§‡à¦œà§‡ à¦›à§‹à¦Ÿ à¦¬à¦¿à¦¬à¦°à¦£ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡, à¦�à¦¬à¦‚ 'Increment Gadget' à¦�à¦° à¦®à¦¤à§‹ à¦•à¦ à¦¿à¦¨ à¦¨à¦¾à¦®à¦—à§�à¦²à§‹ à¦¸à¦¹à¦œ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦�à¦›à¦¾à¦¡à¦¼à¦¾ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦“à¦¯à¦¼à¦¾à¦°à§�à¦•à¦«à§�à¦²à§‹ à¦¬à§�à¦¯à¦¾à¦–à§�à¦¯à¦¾ à¦•à¦°à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¡à¦•à§�à¦®à§‡à¦¨à§�à¦Ÿà§‡à¦¶à¦¨ à¦«à¦¾à¦‡à¦²à¦“ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "14",
@@ -916,8 +925,8 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     type: "Modify",
     module: "Evaluation",
     link: "/evaluation-propose",
-    descriptionEn: "Fixed the double-navigation issue in the Evaluation module! Before, there were both sidebar sub-items AND a tab bar — which was confusing. Now the sidebar shows a single 'Evaluation' link, and the tab bar at the top of each page handles all navigation within the module. The sidebar also stays highlighted on all Evaluation pages.",
-    descriptionBn: "ইভ্যালুয়েশন মডিউলের ডাবল নেভিগেশন সমস্যা ঠিক করা হয়েছে! আগে সাইডবারে সাব-মেনু ছিল এবং পেজেও ট্যাব বার ছিল — দুটো একসাথে থাকায় বিভ্রান্তি হচ্ছিল। এখন সাইডবারে শুধু একটি 'Evaluation' লিংক আছে, আর পেজের উপরের ট্যাব বার থেকেই সব সাবপেজে যাওয়া যাবে। যেকোনো ইভ্যালুয়েশন পেজে থাকলে সাইডবারের 'Evaluation' আইটেমটি হাইলাইটেড থাকবে।",
+    descriptionEn: "Fixed the double-navigation issue in the Evaluation module! Before, there were both sidebar sub-items AND a tab bar â€” which was confusing. Now the sidebar shows a single 'Evaluation' link, and the tab bar at the top of each page handles all navigation within the module. The sidebar also stays highlighted on all Evaluation pages.",
+    descriptionBn: "à¦‡à¦­à§�à¦¯à¦¾à¦²à§�à¦¯à¦¼à§‡à¦¶à¦¨ à¦®à¦¡à¦¿à¦‰à¦²à§‡à¦° à¦¡à¦¾à¦¬à¦² à¦¨à§‡à¦­à¦¿à¦—à§‡à¦¶à¦¨ à¦¸à¦®à¦¸à§�à¦¯à¦¾ à¦ à¦¿à¦• à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡! à¦†à¦—à§‡ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦°à§‡ à¦¸à¦¾à¦¬-à¦®à§‡à¦¨à§� à¦›à¦¿à¦² à¦�à¦¬à¦‚ à¦ªà§‡à¦œà§‡à¦“ à¦Ÿà§�à¦¯à¦¾à¦¬ à¦¬à¦¾à¦° à¦›à¦¿à¦² â€” à¦¦à§�à¦Ÿà§‹ à¦�à¦•à¦¸à¦¾à¦¥à§‡ à¦¥à¦¾à¦•à¦¾à¦¯à¦¼ à¦¬à¦¿à¦­à§�à¦°à¦¾à¦¨à§�à¦¤à¦¿ à¦¹à¦šà§�à¦›à¦¿à¦²à¥¤ à¦�à¦–à¦¨ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦°à§‡ à¦¶à§�à¦§à§� à¦�à¦•à¦Ÿà¦¿ 'Evaluation' à¦²à¦¿à¦‚à¦• à¦†à¦›à§‡, à¦†à¦° à¦ªà§‡à¦œà§‡à¦° à¦‰à¦ªà¦°à§‡à¦° à¦Ÿà§�à¦¯à¦¾à¦¬ à¦¬à¦¾à¦° à¦¥à§‡à¦•à§‡à¦‡ à¦¸à¦¬ à¦¸à¦¾à¦¬à¦ªà§‡à¦œà§‡ à¦¯à¦¾à¦“à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¬à§‡à¥¤ à¦¯à§‡à¦•à§‹à¦¨à§‹ à¦‡à¦­à§�à¦¯à¦¾à¦²à§�à¦¯à¦¼à§‡à¦¶à¦¨ à¦ªà§‡à¦œà§‡ à¦¥à¦¾à¦•à¦²à§‡ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦°à§‡à¦° 'Evaluation' à¦†à¦‡à¦Ÿà§‡à¦®à¦Ÿà¦¿ à¦¹à¦¾à¦‡à¦²à¦¾à¦‡à¦Ÿà§‡à¦¡ à¦¥à¦¾à¦•à¦¬à§‡à¥¤",
   },
   {
     id: "15",
@@ -926,7 +935,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Benefits",
     link: "/payroll-benefits-common",
     descriptionEn: "Brand new Common Benefits page built! You can now filter employees by type, department, section, and benefit category, then enter individual benefit amounts in an editable table. Features include select-all checkboxes, live amount totals, search, pagination, Excel/Print/PDF export, and a Save button with a confirmation toast.",
-    descriptionBn: "নতুন Common Benefits পেজ তৈরি হয়েছে! এখন আপনি এমপ্লয়ি টাইপ, ডিপার্টমেন্ট, সেকশন এবং বেনিফিট ক্যাটাগরি দিয়ে ফিল্টার করে প্রতিটি এমপ্লয়ির জন্য বেনিফিট অ্যামাউন্ট সরাসরি টেবিলে এন্ট্রি দিতে পারবেন। সিলেক্ট-অল চেকবক্স, লাইভ অ্যামাউন্ট টোটাল, সার্চ, পেজিনেশন, Excel/Print/PDF এক্সপোর্ট এবং সেভ বাটন সহ কনফার্মেশন নোটিফিকেশনও আছে।",
+    descriptionBn: "à¦¨à¦¤à§�à¦¨ Common Benefits à¦ªà§‡à¦œ à¦¤à§ˆà¦°à¦¿ à¦¹à¦¯à¦¼à§‡à¦›à§‡! à¦�à¦–à¦¨ à¦†à¦ªà¦¨à¦¿ à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦Ÿà¦¾à¦‡à¦ª, à¦¡à¦¿à¦ªà¦¾à¦°à§�à¦Ÿà¦®à§‡à¦¨à§�à¦Ÿ, à¦¸à§‡à¦•à¦¶à¦¨ à¦�à¦¬à¦‚ à¦¬à§‡à¦¨à¦¿à¦«à¦¿à¦Ÿ à¦•à§�à¦¯à¦¾à¦Ÿà¦¾à¦—à¦°à¦¿ à¦¦à¦¿à¦¯à¦¼à§‡ à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦° à¦•à¦°à§‡ à¦ªà§�à¦°à¦¤à¦¿à¦Ÿà¦¿ à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿à¦° à¦œà¦¨à§�à¦¯ à¦¬à§‡à¦¨à¦¿à¦«à¦¿à¦Ÿ à¦…à§�à¦¯à¦¾à¦®à¦¾à¦‰à¦¨à§�à¦Ÿ à¦¸à¦°à¦¾à¦¸à¦°à¦¿ à¦Ÿà§‡à¦¬à¦¿à¦²à§‡ à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿ à¦¦à¦¿à¦¤à§‡ à¦ªà¦¾à¦°à¦¬à§‡à¦¨à¥¤ à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ-à¦…à¦² à¦šà§‡à¦•à¦¬à¦•à§�à¦¸, à¦²à¦¾à¦‡à¦­ à¦…à§�à¦¯à¦¾à¦®à¦¾à¦‰à¦¨à§�à¦Ÿ à¦Ÿà§‹à¦Ÿà¦¾à¦², à¦¸à¦¾à¦°à§�à¦š, à¦ªà§‡à¦œà¦¿à¦¨à§‡à¦¶à¦¨, Excel/Print/PDF à¦�à¦•à§�à¦¸à¦ªà§‹à¦°à§�à¦Ÿ à¦�à¦¬à¦‚ à¦¸à§‡à¦­ à¦¬à¦¾à¦Ÿà¦¨ à¦¸à¦¹ à¦•à¦¨à¦«à¦¾à¦°à§�à¦®à§‡à¦¶à¦¨ à¦¨à§‹à¦Ÿà¦¿à¦«à¦¿à¦•à§‡à¦¶à¦¨à¦“ à¦†à¦›à§‡à¥¤",
   },
   {
     id: "16",
@@ -934,8 +943,8 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     type: "New Addition",
     module: "Benefits",
     link: "/payroll-benefits-monthly",
-    descriptionEn: "New Monthly Benefits page is live! Filter by month, year, benefit type, benefit name, employee type, department, unit, or employee ID. Add new records via the '+' button or the FAB, edit or delete existing ones, and view full details in a clean modal. Modals match the rest of the system's style — orange CLOSE, green SUBMIT.",
-    descriptionBn: "নতুন Monthly Benefits পেজ তৈরি হয়েছে! মাস, বছর, বেনিফিট টাইপ, বেনিফিট নাম, এমপ্লয়ি টাইপ, ডিপার্টমেন্ট, ইউনিট বা এমপ্লয়ি আইডি দিয়ে ফিল্টার করা যাবে। '+' বাটন বা ফ্লোটিং বাটন দিয়ে নতুন রেকর্ড যোগ করা যাবে, সম্পাদনা বা মুছে ফেলা যাবে। মোডাল বাকি সিস্টেমের মতোই — অরেঞ্জ CLOSE, সবুজ SUBMIT।",
+    descriptionEn: "New Monthly Benefits page is live! Filter by month, year, benefit type, benefit name, employee type, department, unit, or employee ID. Add new records via the '+' button or the FAB, edit or delete existing ones, and view full details in a clean modal. Modals match the rest of the system's style â€” orange CLOSE, green SUBMIT.",
+    descriptionBn: "à¦¨à¦¤à§�à¦¨ Monthly Benefits à¦ªà§‡à¦œ à¦¤à§ˆà¦°à¦¿ à¦¹à¦¯à¦¼à§‡à¦›à§‡! à¦®à¦¾à¦¸, à¦¬à¦›à¦°, à¦¬à§‡à¦¨à¦¿à¦«à¦¿à¦Ÿ à¦Ÿà¦¾à¦‡à¦ª, à¦¬à§‡à¦¨à¦¿à¦«à¦¿à¦Ÿ à¦¨à¦¾à¦®, à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦Ÿà¦¾à¦‡à¦ª, à¦¡à¦¿à¦ªà¦¾à¦°à§�à¦Ÿà¦®à§‡à¦¨à§�à¦Ÿ, à¦‡à¦‰à¦¨à¦¿à¦Ÿ à¦¬à¦¾ à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦†à¦‡à¦¡à¦¿ à¦¦à¦¿à¦¯à¦¼à§‡ à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦° à¦•à¦°à¦¾ à¦¯à¦¾à¦¬à§‡à¥¤ '+' à¦¬à¦¾à¦Ÿà¦¨ à¦¬à¦¾ à¦«à§�à¦²à§‹à¦Ÿà¦¿à¦‚ à¦¬à¦¾à¦Ÿà¦¨ à¦¦à¦¿à¦¯à¦¼à§‡ à¦¨à¦¤à§�à¦¨ à¦°à§‡à¦•à¦°à§�à¦¡ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¯à¦¾à¦¬à§‡, à¦¸à¦®à§�à¦ªà¦¾à¦¦à¦¨à¦¾ à¦¬à¦¾ à¦®à§�à¦›à§‡ à¦«à§‡à¦²à¦¾ à¦¯à¦¾à¦¬à§‡à¥¤ à¦®à§‹à¦¡à¦¾à¦² à¦¬à¦¾à¦•à¦¿ à¦¸à¦¿à¦¸à§�à¦Ÿà§‡à¦®à§‡à¦° à¦®à¦¤à§‹à¦‡ â€” à¦…à¦°à§‡à¦žà§�à¦œ CLOSE, à¦¸à¦¬à§�à¦œ SUBMITà¥¤",
   },
   {
     id: "17",
@@ -944,7 +953,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-dashboard",
     descriptionEn: "Restructured the entire Merchandising module sidebar menu into 9 clean, task-oriented categories matching BD garments industry standard workflow stages. Also upgraded the Order Entry form workspace into a Unified Order & Costing Hub, adding a segmented Knit | Woven | Sweater type selector with dynamically conditional fields for Yarn counts, GSM, Weave density, or Sweater Gauges.",
-    descriptionBn: "মার্চেন্ডাইজিং মডিউলের সম্পূর্ণ সাইডবার মেনু ৯টি সহজে ব্যবহারযোগ্য ক্যাটাগরিতে পুনর্গঠন করা হয়েছে যা বাংলাদেশের গার্মেন্টস শিল্পের কাজের ধাপগুলোর সাথে সামঞ্জস্যপূর্ণ। তাছাড়া অর্ডার এন্ট্রি ফর্মটিকে একটি ইউনিফাইড অর্ডার এবং কস্টিং হাবে রূপান্তর করা হয়েছে, যেখানে নিট, ওভেন এবং সোয়েটার অর্ডারের জন্য আলাদা আলাদা কন্ডিশনাল প্যারামিটার যেমন জিএসএম, ইয়ার্ন কাউন্ট, উইভ ডেনসিটি এবং সোয়েটার গজ ফিল্ডগুলো স্বয়ংক্রিয়ভাবে চলে আসবে।",
+    descriptionBn: "à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦®à¦¡à¦¿à¦‰à¦²à§‡à¦° à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦° à¦®à§‡à¦¨à§� à§¯à¦Ÿà¦¿ à¦¸à¦¹à¦œà§‡ à¦¬à§�à¦¯à¦¬à¦¹à¦¾à¦°à¦¯à§‹à¦—à§�à¦¯ à¦•à§�à¦¯à¦¾à¦Ÿà¦¾à¦—à¦°à¦¿à¦¤à§‡ à¦ªà§�à¦¨à¦°à§�à¦—à¦ à¦¨ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ à¦¯à¦¾ à¦¬à¦¾à¦‚à¦²à¦¾à¦¦à§‡à¦¶à§‡à¦° à¦—à¦¾à¦°à§�à¦®à§‡à¦¨à§�à¦Ÿà¦¸ à¦¶à¦¿à¦²à§�à¦ªà§‡à¦° à¦•à¦¾à¦œà§‡à¦° à¦§à¦¾à¦ªà¦—à§�à¦²à§‹à¦° à¦¸à¦¾à¦¥à§‡ à¦¸à¦¾à¦®à¦žà§�à¦œà¦¸à§�à¦¯à¦ªà§‚à¦°à§�à¦£à¥¤ à¦¤à¦¾à¦›à¦¾à¦¡à¦¼à¦¾ à¦…à¦°à§�à¦¡à¦¾à¦° à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿ à¦«à¦°à§�à¦®à¦Ÿà¦¿à¦•à§‡ à¦�à¦•à¦Ÿà¦¿ à¦‡à¦‰à¦¨à¦¿à¦«à¦¾à¦‡à¦¡ à¦…à¦°à§�à¦¡à¦¾à¦° à¦�à¦¬à¦‚ à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦¹à¦¾à¦¬à§‡ à¦°à§‚à¦ªà¦¾à¦¨à§�à¦¤à¦° à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡, à¦¯à§‡à¦–à¦¾à¦¨à§‡ à¦¨à¦¿à¦Ÿ, à¦“à¦­à§‡à¦¨ à¦�à¦¬à¦‚ à¦¸à§‹à¦¯à¦¼à§‡à¦Ÿà¦¾à¦° à¦…à¦°à§�à¦¡à¦¾à¦°à§‡à¦° à¦œà¦¨à§�à¦¯ à¦†à¦²à¦¾à¦¦à¦¾ à¦†à¦²à¦¾à¦¦à¦¾ à¦•à¦¨à§�à¦¡à¦¿à¦¶à¦¨à¦¾à¦² à¦ªà§�à¦¯à¦¾à¦°à¦¾à¦®à¦¿à¦Ÿà¦¾à¦° à¦¯à§‡à¦®à¦¨ à¦œà¦¿à¦�à¦¸à¦�à¦®, à¦‡à¦¯à¦¼à¦¾à¦°à§�à¦¨ à¦•à¦¾à¦‰à¦¨à§�à¦Ÿ, à¦‰à¦‡à¦­ à¦¡à§‡à¦¨à¦¸à¦¿à¦Ÿà¦¿ à¦�à¦¬à¦‚ à¦¸à§‹à¦¯à¦¼à§‡à¦Ÿà¦¾à¦° à¦—à¦œ à¦«à¦¿à¦²à§�à¦¡à¦—à§�à¦²à§‹ à¦¸à§�à¦¬à¦¯à¦¼à¦‚à¦•à§�à¦°à¦¿à¦¯à¦¼à¦­à¦¾à¦¬à§‡ à¦šà¦²à§‡ à¦†à¦¸à¦¬à§‡à¥¤",
   },
   {
     id: "18",
@@ -953,7 +962,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-master-settings",
     descriptionEn: "Built the complete RMG Merchandising ERP Suite! Created 7 brand-new dedicated pages: Master Settings (Buyer config, Fabric/Yarn specs, Process Loss %, Trims master), Capacity Planning & Booking (SMV calculator, Monthly limits, Over-booking alerts), Sample Development Tracker (Proto/Fit/PP requisitions & Buyer feedback), Material Bookings (Auto Yarn Kg calculator, Fabric & Trims WOs), Service Work Orders (Washing, Printing, Dyeing, Embroidery sub-contracts), TNA Critical Path Calendar (11 Milestones timeline), and MM BI Reports (PO Order status, Buyer export share). All sidebar links are fully connected.",
-    descriptionBn: "সম্পূর্ণ আরএমজি মার্চেন্ডাইজিং ইআরপি স্যুট তৈরি করা হয়েছে! ৭টি নতুন পেজ যোগ করা হয়েছে: মাস্টার সেটিংস, ক্যাপাসিটি প্ল্যানিং, স্যাম্পল ট্র্যাকার, মেটেরিয়াল বুকিং, সার্ভিস ওয়ার্ক অর্ডার, টিএনএ ক্যালেন্ডার এবং এমএম বিআই রিপোর্টস। সাইডবারের সব লিংক সচল করা হয়েছে।",
+    descriptionBn: "à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦†à¦°à¦�à¦®à¦œà¦¿ à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦‡à¦†à¦°à¦ªà¦¿ à¦¸à§�à¦¯à§�à¦Ÿ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡! à§­à¦Ÿà¦¿ à¦¨à¦¤à§�à¦¨ à¦ªà§‡à¦œ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡: à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸, à¦•à§�à¦¯à¦¾à¦ªà¦¾à¦¸à¦¿à¦Ÿà¦¿ à¦ªà§�à¦²à§�à¦¯à¦¾à¦¨à¦¿à¦‚, à¦¸à§�à¦¯à¦¾à¦®à§�à¦ªà¦² à¦Ÿà§�à¦°à§�à¦¯à¦¾à¦•à¦¾à¦°, à¦®à§‡à¦Ÿà§‡à¦°à¦¿à¦¯à¦¼à¦¾à¦² à¦¬à§�à¦•à¦¿à¦‚, à¦¸à¦¾à¦°à§�à¦­à¦¿à¦¸ à¦“à¦¯à¦¼à¦¾à¦°à§�à¦• à¦…à¦°à§�à¦¡à¦¾à¦°, à¦Ÿà¦¿à¦�à¦¨à¦� à¦•à§�à¦¯à¦¾à¦²à§‡à¦¨à§�à¦¡à¦¾à¦° à¦�à¦¬à¦‚ à¦�à¦®à¦�à¦® à¦¬à¦¿à¦†à¦‡ à¦°à¦¿à¦ªà§‹à¦°à§�à¦Ÿà¦¸à¥¤ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦°à§‡à¦° à¦¸à¦¬ à¦²à¦¿à¦‚à¦• à¦¸à¦šà¦² à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "19",
@@ -962,7 +971,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-master-settings",
     descriptionEn: "Completely eliminated duplicate navigation in the Merchandising module! Replaced redundant accordion sub-menus in the sidebar with clean, direct-action top-level navigation links. Sub-view switching is now handled exclusively by the sleek horizontal top tab bar on each dedicated module page for a 100% stable, uncluttered user experience.",
-    descriptionBn: "মার্চেন্ডাইজিং মডিউলের সম্পূর্ণ ডুপ্লিকেট নেভিগেশন দূর করা হয়েছে! সাইডবারের বাড়তি সাব-মেনু একর্ডিয়নগুলো সরিয়ে সরাসরি ডিরেক্ট-লিংক মেনু করা হয়েছে। এখন থেকে সব সাব-ভিউ পরিবর্তন প্রতিটি পেজের পরিচ্ছন্ন টপ হরিজন্টাল ট্যাব বার দিয়ে পরিচালিত হবে, যা ইউজার এক্সপেরিয়েন্সকে করেছে ১০০% স্থিতিশীল ও সুন্দর।",
+    descriptionBn: "à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦®à¦¡à¦¿à¦‰à¦²à§‡à¦° à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦¡à§�à¦ªà§�à¦²à¦¿à¦•à§‡à¦Ÿ à¦¨à§‡à¦­à¦¿à¦—à§‡à¦¶à¦¨ à¦¦à§‚à¦° à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡! à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦°à§‡à¦° à¦¬à¦¾à¦¡à¦¼à¦¤à¦¿ à¦¸à¦¾à¦¬-à¦®à§‡à¦¨à§� à¦�à¦•à¦°à§�à¦¡à¦¿à¦¯à¦¼à¦¨à¦—à§�à¦²à§‹ à¦¸à¦°à¦¿à¦¯à¦¼à§‡ à¦¸à¦°à¦¾à¦¸à¦°à¦¿ à¦¡à¦¿à¦°à§‡à¦•à§�à¦Ÿ-à¦²à¦¿à¦‚à¦• à¦®à§‡à¦¨à§� à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦�à¦–à¦¨ à¦¥à§‡à¦•à§‡ à¦¸à¦¬ à¦¸à¦¾à¦¬-à¦­à¦¿à¦‰ à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦ªà§�à¦°à¦¤à¦¿à¦Ÿà¦¿ à¦ªà§‡à¦œà§‡à¦° à¦ªà¦°à¦¿à¦šà§�à¦›à¦¨à§�à¦¨ à¦Ÿà¦ª à¦¹à¦°à¦¿à¦œà¦¨à§�à¦Ÿà¦¾à¦² à¦Ÿà§�à¦¯à¦¾à¦¬ à¦¬à¦¾à¦° à¦¦à¦¿à¦¯à¦¼à§‡ à¦ªà¦°à¦¿à¦šà¦¾à¦²à¦¿à¦¤ à¦¹à¦¬à§‡, à¦¯à¦¾ à¦‡à¦‰à¦œà¦¾à¦° à¦�à¦•à§�à¦¸à¦ªà§‡à¦°à¦¿à¦¯à¦¼à§‡à¦¨à§�à¦¸à¦•à§‡ à¦•à¦°à§‡à¦›à§‡ à§§à§¦à§¦% à¦¸à§�à¦¥à¦¿à¦¤à¦¿à¦¶à§€à¦² à¦“ à¦¸à§�à¦¨à§�à¦¦à¦°à¥¤",
   },
   {
     id: "20",
@@ -971,7 +980,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-dashboard",
     descriptionEn: "Deep-researched and rebuilt the entire Merchandising sidebar navigation from scratch based on real Bangladesh RMG ERP standards (OCMS BD, PrideSys, Infocrat). New structure: 'Master Settings' accordion (5 sub-items linking directly to specific database tabs), 'Orders & Costing' accordion (Order Ledger + New Order Entry), and 6 clean flat-link items (Sample, Material Booking, Work Orders, TNA, Capacity, Reports). Active state auto-highlights the correct parent and child. Smart auto-expand: accordion opens automatically when you navigate to its page.",
-    descriptionBn: "বাংলাদেশের বাস্তব আরএমজি ইআরপি সিস্টেমের (OCMS BD, PrideSys, Infocrat) স্ট্যান্ডার্ড অনুযায়ী মার্চেন্ডাইজিং সাইডবার নেভিগেশন সম্পূর্ণ নতুনভাবে তৈরি করা হয়েছে। নতুন স্ট্রাকচার: 'মাস্টার সেটিংস' একর্ডিয়ন (৫টি সাব-আইটেম যা সরাসরি নির্দিষ্ট ট্যাব খোলে), 'অর্ডার ও কস্টিং' একর্ডিয়ন (অর্ডার লেজার + নতুন অর্ডার এন্ট্রি), এবং ৬টি সরাসরি ফ্ল্যাট লিংক (স্যাম্পল, মেটেরিয়াল বুকিং, ওয়ার্ক অর্ডার, টিএনএ, ক্যাপাসিটি, রিপোর্টস)। সক্রিয় পেজের সাথে মিলিয়ে সাইডবার আইটেম স্বয়ংক্রিয়ভাবে হাইলাইট ও একর্ডিয়ন খোলে।",
+    descriptionBn: "à¦¬à¦¾à¦‚à¦²à¦¾à¦¦à§‡à¦¶à§‡à¦° à¦¬à¦¾à¦¸à§�à¦¤à¦¬ à¦†à¦°à¦�à¦®à¦œà¦¿ à¦‡à¦†à¦°à¦ªà¦¿ à¦¸à¦¿à¦¸à§�à¦Ÿà§‡à¦®à§‡à¦° (OCMS BD, PrideSys, Infocrat) à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦¨à§�à¦¡à¦¾à¦°à§�à¦¡ à¦…à¦¨à§�à¦¯à¦¾à¦¯à¦¼à§€ à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦° à¦¨à§‡à¦­à¦¿à¦—à§‡à¦¶à¦¨ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦¨à¦¤à§�à¦¨à¦­à¦¾à¦¬à§‡ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦¨à¦¤à§�à¦¨ à¦¸à§�à¦Ÿà§�à¦°à¦¾à¦•à¦šà¦¾à¦°: 'à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸' à¦�à¦•à¦°à§�à¦¡à¦¿à¦¯à¦¼à¦¨ (à§«à¦Ÿà¦¿ à¦¸à¦¾à¦¬-à¦†à¦‡à¦Ÿà§‡à¦® à¦¯à¦¾ à¦¸à¦°à¦¾à¦¸à¦°à¦¿ à¦¨à¦¿à¦°à§�à¦¦à¦¿à¦·à§�à¦Ÿ à¦Ÿà§�à¦¯à¦¾à¦¬ à¦–à§‹à¦²à§‡), 'à¦…à¦°à§�à¦¡à¦¾à¦° à¦“ à¦•à¦¸à§�à¦Ÿà¦¿à¦‚' à¦�à¦•à¦°à§�à¦¡à¦¿à¦¯à¦¼à¦¨ (à¦…à¦°à§�à¦¡à¦¾à¦° à¦²à§‡à¦œà¦¾à¦° + à¦¨à¦¤à§�à¦¨ à¦…à¦°à§�à¦¡à¦¾à¦° à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿), à¦�à¦¬à¦‚ à§¬à¦Ÿà¦¿ à¦¸à¦°à¦¾à¦¸à¦°à¦¿ à¦«à§�à¦²à§�à¦¯à¦¾à¦Ÿ à¦²à¦¿à¦‚à¦• (à¦¸à§�à¦¯à¦¾à¦®à§�à¦ªà¦², à¦®à§‡à¦Ÿà§‡à¦°à¦¿à¦¯à¦¼à¦¾à¦² à¦¬à§�à¦•à¦¿à¦‚, à¦“à¦¯à¦¼à¦¾à¦°à§�à¦• à¦…à¦°à§�à¦¡à¦¾à¦°, à¦Ÿà¦¿à¦�à¦¨à¦�, à¦•à§�à¦¯à¦¾à¦ªà¦¾à¦¸à¦¿à¦Ÿà¦¿, à¦°à¦¿à¦ªà§‹à¦°à§�à¦Ÿà¦¸)à¥¤ à¦¸à¦•à§�à¦°à¦¿à¦¯à¦¼ à¦ªà§‡à¦œà§‡à¦° à¦¸à¦¾à¦¥à§‡ à¦®à¦¿à¦²à¦¿à¦¯à¦¼à§‡ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦° à¦†à¦‡à¦Ÿà§‡à¦® à¦¸à§�à¦¬à¦¯à¦¼à¦‚à¦•à§�à¦°à¦¿à¦¯à¦¼à¦­à¦¾à¦¬à§‡ à¦¹à¦¾à¦‡à¦²à¦¾à¦‡à¦Ÿ à¦“ à¦�à¦•à¦°à§�à¦¡à¦¿à¦¯à¦¼à¦¨ à¦–à§‹à¦²à§‡à¥¤",
   },
   {
     id: "21",
@@ -979,8 +988,8 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     type: "New Addition",
     module: "Merchandising",
     link: "/merchandising-inquiry",
-    descriptionEn: "Added the missing first stage of the garments order lifecycle: 'Buyer Inquiry & Pre-Costing Quotation' page. The Orders & Costing sidebar accordion now correctly shows all 3 workflow steps in order: Buyer Inquiry & Quotation → Purchase Order (PO) Register → Order Entry & Costing (KDS). The new inquiry page includes: Inquiry Register (log buyer style inquiries with AQL, payment terms, ship date), a live Pre-Costing Engine (auto-calculates Quoted FOB from fabric consumption, CMT, trims, overheads and profit margin), and a Quotation Status Kanban Board (Draft → Sent to Buyer → Buyer Approved → Converted to PO).",
-    descriptionBn: "গার্মেন্টস অর্ডার লাইফসাইকেলের প্রথম ধাপ যোগ করা হয়েছে: 'বায়ার ইনকোয়ারি এবং প্রি-কস্টিং কোটেশন' পেজ। এখন সাইডবারে 'অর্ডার ও কস্টিং' সেকশনে সঠিক ক্রমে তিনটি ধাপ দেখাচ্ছে: বায়ার ইনকোয়ারি → পিও রেজিস্টার → অর্ডার এন্ট্রি। নতুন পেজে আছে: ইনকোয়ারি রেজিস্টার (বায়ারের স্টাইল ইনকোয়ারি, একিউএল, পেমেন্ট টার্মস লগ), লাইভ প্রি-কস্টিং ইঞ্জিন (ফ্যাব্রিক কনসাম্পশন, সিএমটি, ট্রিমস, ওভারহেড থেকে এফওবি অটো-ক্যালকুলেট) এবং কোটেশন স্ট্যাটাস কানবান বোর্ড (ড্রাফট → বায়ারে পাঠানো → বায়ার অ্যাপ্রুভড → পিওতে রূপান্তর)।",
+    descriptionEn: "Added the missing first stage of the garments order lifecycle: 'Buyer Inquiry & Pre-Costing Quotation' page. The Orders & Costing sidebar accordion now correctly shows all 3 workflow steps in order: Buyer Inquiry & Quotation â†’ Purchase Order (PO) Register â†’ Order Entry & Costing (KDS). The new inquiry page includes: Inquiry Register (log buyer style inquiries with AQL, payment terms, ship date), a live Pre-Costing Engine (auto-calculates Quoted FOB from fabric consumption, CMT, trims, overheads and profit margin), and a Quotation Status Kanban Board (Draft â†’ Sent to Buyer â†’ Buyer Approved â†’ Converted to PO).",
+    descriptionBn: "à¦—à¦¾à¦°à§�à¦®à§‡à¦¨à§�à¦Ÿà¦¸ à¦…à¦°à§�à¦¡à¦¾à¦° à¦²à¦¾à¦‡à¦«à¦¸à¦¾à¦‡à¦•à§‡à¦²à§‡à¦° à¦ªà§�à¦°à¦¥à¦® à¦§à¦¾à¦ª à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡: 'à¦¬à¦¾à¦¯à¦¼à¦¾à¦° à¦‡à¦¨à¦•à§‹à¦¯à¦¼à¦¾à¦°à¦¿ à¦�à¦¬à¦‚ à¦ªà§�à¦°à¦¿-à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦•à§‹à¦Ÿà§‡à¦¶à¦¨' à¦ªà§‡à¦œà¥¤ à¦�à¦–à¦¨ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦°à§‡ 'à¦…à¦°à§�à¦¡à¦¾à¦° à¦“ à¦•à¦¸à§�à¦Ÿà¦¿à¦‚' à¦¸à§‡à¦•à¦¶à¦¨à§‡ à¦¸à¦ à¦¿à¦• à¦•à§�à¦°à¦®à§‡ à¦¤à¦¿à¦¨à¦Ÿà¦¿ à¦§à¦¾à¦ª à¦¦à§‡à¦–à¦¾à¦šà§�à¦›à§‡: à¦¬à¦¾à¦¯à¦¼à¦¾à¦° à¦‡à¦¨à¦•à§‹à¦¯à¦¼à¦¾à¦°à¦¿ â†’ à¦ªà¦¿à¦“ à¦°à§‡à¦œà¦¿à¦¸à§�à¦Ÿà¦¾à¦° â†’ à¦…à¦°à§�à¦¡à¦¾à¦° à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿à¥¤ à¦¨à¦¤à§�à¦¨ à¦ªà§‡à¦œà§‡ à¦†à¦›à§‡: à¦‡à¦¨à¦•à§‹à¦¯à¦¼à¦¾à¦°à¦¿ à¦°à§‡à¦œà¦¿à¦¸à§�à¦Ÿà¦¾à¦° (à¦¬à¦¾à¦¯à¦¼à¦¾à¦°à§‡à¦° à¦¸à§�à¦Ÿà¦¾à¦‡à¦² à¦‡à¦¨à¦•à§‹à¦¯à¦¼à¦¾à¦°à¦¿, à¦�à¦•à¦¿à¦‰à¦�à¦², à¦ªà§‡à¦®à§‡à¦¨à§�à¦Ÿ à¦Ÿà¦¾à¦°à§�à¦®à¦¸ à¦²à¦—), à¦²à¦¾à¦‡à¦­ à¦ªà§�à¦°à¦¿-à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦‡à¦žà§�à¦œà¦¿à¦¨ (à¦«à§�à¦¯à¦¾à¦¬à§�à¦°à¦¿à¦• à¦•à¦¨à¦¸à¦¾à¦®à§�à¦ªà¦¶à¦¨, à¦¸à¦¿à¦�à¦®à¦Ÿà¦¿, à¦Ÿà§�à¦°à¦¿à¦®à¦¸, à¦“à¦­à¦¾à¦°à¦¹à§‡à¦¡ à¦¥à§‡à¦•à§‡ à¦�à¦«à¦“à¦¬à¦¿ à¦…à¦Ÿà§‹-à¦•à§�à¦¯à¦¾à¦²à¦•à§�à¦²à§‡à¦Ÿ) à¦�à¦¬à¦‚ à¦•à§‹à¦Ÿà§‡à¦¶à¦¨ à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦Ÿà¦¾à¦¸ à¦•à¦¾à¦¨à¦¬à¦¾à¦¨ à¦¬à§‹à¦°à§�à¦¡ (à¦¡à§�à¦°à¦¾à¦«à¦Ÿ â†’ à¦¬à¦¾à¦¯à¦¼à¦¾à¦°à§‡ à¦ªà¦¾à¦ à¦¾à¦¨à§‹ â†’ à¦¬à¦¾à¦¯à¦¼à¦¾à¦° à¦…à§�à¦¯à¦¾à¦ªà§�à¦°à§�à¦­à¦¡ â†’ à¦ªà¦¿à¦“à¦¤à§‡ à¦°à§‚à¦ªà¦¾à¦¨à§�à¦¤à¦°)à¥¤",
   },
   {
     id: "22",
@@ -989,7 +998,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Company Setup",
     link: "/company-setup",
     descriptionEn: "Added all 15 missing parameters to the Company Basic Settings modal matching the enterprise standard layout! Included New Employee Approval, Authorization (L/E), Absent Deduct Based On, ML Count, ML Stamp, WithOut In Absent, Searching By, Holiday Tiffin, Holiday Night, Early Out, Early Out Based On, Salary Breakdown Round, Sandwich Holiday, Sandwich Employee Type, and Late Time Calculation.",
-    descriptionBn: "কোম্পানি বেসিক সেটিংস মোডালে এন্টারপ্রাইজ স্ট্যান্ডার্ড লেআউট অনুযায়ী ১৫টি নতুন ফিল্ড যুক্ত করা হয়েছে! যার মধ্যে রয়েছে নিউ এমপ্লয়ি অ্যাপ্রুভাল, অথরাইজেশন (এল/ই), অ্যাবসেন্ট ডিডাক্ট বেসড অন, এমএল কাউন্ট, এমএল স্ট্যাম্প, উইদাউট ইন অ্যাবসেন্ট, সার্চিং বাই, হোলিডে টিফিন, হোলিডে নাইট, আর্লি আউট, আর্লি আউট বেসড অন, স্যালারি ব্রেকডাউন রাউন্ড, স্যান্ডউইচ হোলিডে, স্যান্ডউইচ এমপ্লয়ি টাইপ এবং লেট টাইম ক্যালকুলেশন।",
+    descriptionBn: "à¦•à§‹à¦®à§�à¦ªà¦¾à¦¨à¦¿ à¦¬à§‡à¦¸à¦¿à¦• à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸ à¦®à§‹à¦¡à¦¾à¦²à§‡ à¦�à¦¨à§�à¦Ÿà¦¾à¦°à¦ªà§�à¦°à¦¾à¦‡à¦œ à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦¨à§�à¦¡à¦¾à¦°à§�à¦¡ à¦²à§‡à¦†à¦‰à¦Ÿ à¦…à¦¨à§�à¦¯à¦¾à§Ÿà§€ à§§à§«à¦Ÿà¦¿ à¦¨à¦¤à§�à¦¨ à¦«à¦¿à¦²à§�à¦¡ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡! à¦¯à¦¾à¦° à¦®à¦§à§�à¦¯à§‡ à¦°à§Ÿà§‡à¦›à§‡ à¦¨à¦¿à¦‰ à¦�à¦®à¦ªà§�à¦²à§Ÿà¦¿ à¦…à§�à¦¯à¦¾à¦ªà§�à¦°à§�à¦­à¦¾à¦², à¦…à¦¥à¦°à¦¾à¦‡à¦œà§‡à¦¶à¦¨ (à¦�à¦²/à¦‡), à¦…à§�à¦¯à¦¾à¦¬à¦¸à§‡à¦¨à§�à¦Ÿ à¦¡à¦¿à¦¡à¦¾à¦•à§�à¦Ÿ à¦¬à§‡à¦¸à¦¡ à¦…à¦¨, à¦�à¦®à¦�à¦² à¦•à¦¾à¦‰à¦¨à§�à¦Ÿ, à¦�à¦®à¦�à¦² à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦®à§�à¦ª, à¦‰à¦‡à¦¦à¦¾à¦‰à¦Ÿ à¦‡à¦¨ à¦…à§�à¦¯à¦¾à¦¬à¦¸à§‡à¦¨à§�à¦Ÿ, à¦¸à¦¾à¦°à§�à¦šà¦¿à¦‚ à¦¬à¦¾à¦‡, à¦¹à§‹à¦²à¦¿à¦¡à§‡ à¦Ÿà¦¿à¦«à¦¿à¦¨, à¦¹à§‹à¦²à¦¿à¦¡à§‡ à¦¨à¦¾à¦‡à¦Ÿ, à¦†à¦°à§�à¦²à¦¿ à¦†à¦‰à¦Ÿ, à¦†à¦°à§�à¦²à¦¿ à¦†à¦‰à¦Ÿ à¦¬à§‡à¦¸à¦¡ à¦…à¦¨, à¦¸à§�à¦¯à¦¾à¦²à¦¾à¦°à¦¿ à¦¬à§�à¦°à§‡à¦•à¦¡à¦¾à¦‰à¦¨ à¦°à¦¾à¦‰à¦¨à§�à¦¡, à¦¸à§�à¦¯à¦¾à¦¨à§�à¦¡à¦‰à¦‡à¦š à¦¹à§‹à¦²à¦¿à¦¡à§‡, à¦¸à§�à¦¯à¦¾à¦¨à§�à¦¡à¦‰à¦‡à¦š à¦�à¦®à¦ªà§�à¦²à§Ÿà¦¿ à¦Ÿà¦¾à¦‡à¦ª à¦�à¦¬à¦‚ à¦²à§‡à¦Ÿ à¦Ÿà¦¾à¦‡à¦® à¦•à§�à¦¯à¦¾à¦²à¦•à§�à¦²à§‡à¦¶à¦¨à¥¤",
   },
   {
     id: "23",
@@ -998,7 +1007,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Company Setup",
     link: "/company-setup",
     descriptionEn: "Reorganized the Company Basic Settings modal with interactive category filter tabs (All Settings, Approvals & Governance, Attendance & Work, OT & Allowances, Leave & Holidays, Salary & Validation, ID & System Setup) and 6 structured 4-column responsive grid cards with clear red asterisks for required fields.",
-    descriptionBn: "কোম্পানি বেসিক সেটিংস মোডালকে চমৎকার ইন্টারেক্টিভ ক্যাটাগরি ফিল্টার ট্যাব (অল সেটিংস, অ্যাপ্রুভালস, অ্যাটেনডেন্স, ওভারটাইম, লিভ ও হোলিডে, স্যালারি, আইডি ও সিস্টেম সেটিংস) এবং ৬টি সুন্দর ৪-কলাম রেসপন্সিভ গ্রিড কার্ডের মাধ্যমে সুবিন্যস্ত ও গোছানো হয়েছে।",
+    descriptionBn: "à¦•à§‹à¦®à§�à¦ªà¦¾à¦¨à¦¿ à¦¬à§‡à¦¸à¦¿à¦• à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸ à¦®à§‹à¦¡à¦¾à¦²à¦•à§‡ à¦šà¦®à§Žà¦•à¦¾à¦° à¦‡à¦¨à§�à¦Ÿà¦¾à¦°à§‡à¦•à§�à¦Ÿà¦¿à¦­ à¦•à§�à¦¯à¦¾à¦Ÿà¦¾à¦—à¦°à¦¿ à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦° à¦Ÿà§�à¦¯à¦¾à¦¬ (à¦…à¦² à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸, à¦…à§�à¦¯à¦¾à¦ªà§�à¦°à§�à¦­à¦¾à¦²à¦¸, à¦…à§�à¦¯à¦¾à¦Ÿà§‡à¦¨à¦¡à§‡à¦¨à§�à¦¸, à¦“à¦­à¦¾à¦°à¦Ÿà¦¾à¦‡à¦®, à¦²à¦¿à¦­ à¦“ à¦¹à§‹à¦²à¦¿à¦¡à§‡, à¦¸à§�à¦¯à¦¾à¦²à¦¾à¦°à¦¿, à¦†à¦‡à¦¡à¦¿ à¦“ à¦¸à¦¿à¦¸à§�à¦Ÿà§‡à¦® à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸) à¦�à¦¬à¦‚ à§¬à¦Ÿà¦¿ à¦¸à§�à¦¨à§�à¦¦à¦° à§ª-à¦•à¦²à¦¾à¦® à¦°à§‡à¦¸à¦ªà¦¨à§�à¦¸à¦¿à¦­ à¦—à§�à¦°à¦¿à¦¡ à¦•à¦¾à¦°à§�à¦¡à§‡à¦° à¦®à¦¾à¦§à§�à¦¯à¦®à§‡ à¦¸à§�à¦¬à¦¿à¦¨à§�à¦¯à¦¸à§�à¦¤ à¦“ à¦—à§‹à¦›à¦¾à¦¨à§‹ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "24",
@@ -1007,7 +1016,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Payroll",
     link: "/payroll-benefits-master-data",
     descriptionEn: "Built the complete Payroll Master Data (Master Information) page matching the enterprise standard screen! Features Master For category selection (Common Benefit Add/Deduct, Individual Benefit Add/Deduct, Bonus Type / Festival Master), inline entry form (Name, Comments, Status), table row editing via pencil icon, Excel/Print/PDF exports, status filters, live search, and dynamic record counters.",
-    descriptionBn: "পে রোল মাস্টার ইনফরমেশন পেজটি সম্পূর্ণরূপে তৈরি করা হয়েছে! এতে রয়েছে মাস্টার ফর ক্যাটাগরি নির্বাচন (কমোন বেনিফিট অ্যাড/ডিডাক্ট, ইন্ডিভিজুয়াল বেনিফিট, বোনাস টাইপ/ফেস্টিভ্যাল মাস্টার), ইনলাইন এন্ট্রি ফর্ম (নেম, কমেন্টস, স্ট্যাটাস), পেন্সিল আইকন দিয়ে টেবিল রো এডিটিং, এক্সেল/প্রিন্ট/পিডিএফ এক্সপোর্ট, লাইভ সার্চ এবং পারসিস্টেন্ট ডাটা স্টোরেজ।",
+    descriptionBn: "à¦ªà§‡ à¦°à§‹à¦² à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦‡à¦¨à¦«à¦°à¦®à§‡à¦¶à¦¨ à¦ªà§‡à¦œà¦Ÿà¦¿ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£à¦°à§‚à¦ªà§‡ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡! à¦�à¦¤à§‡ à¦°à¦¯à¦¼à§‡à¦›à§‡ à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦«à¦° à¦•à§�à¦¯à¦¾à¦Ÿà¦¾à¦—à¦°à¦¿ à¦¨à¦¿à¦°à§�à¦¬à¦¾à¦šà¦¨ (à¦•à¦®à§‹à¦¨ à¦¬à§‡à¦¨à¦¿à¦«à¦¿à¦Ÿ à¦…à§�à¦¯à¦¾à¦¡/à¦¡à¦¿à¦¡à¦¾à¦•à§�à¦Ÿ, à¦‡à¦¨à§�à¦¡à¦¿à¦­à¦¿à¦œà§�à¦¯à¦¼à¦¾à¦² à¦¬à§‡à¦¨à¦¿à¦«à¦¿à¦Ÿ, à¦¬à§‹à¦¨à¦¾à¦¸ à¦Ÿà¦¾à¦‡à¦ª/à¦«à§‡à¦¸à§�à¦Ÿà¦¿à¦­à§�à¦¯à¦¾à¦² à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦°), à¦‡à¦¨à¦²à¦¾à¦‡à¦¨ à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿ à¦«à¦°à§�à¦® (à¦¨à§‡à¦®, à¦•à¦®à§‡à¦¨à§�à¦Ÿà¦¸, à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦Ÿà¦¾à¦¸), à¦ªà§‡à¦¨à§�à¦¸à¦¿à¦² à¦†à¦‡à¦•à¦¨ à¦¦à¦¿à¦¯à¦¼à§‡ à¦Ÿà§‡à¦¬à¦¿à¦² à¦°à§‹ à¦�à¦¡à¦¿à¦Ÿà¦¿à¦‚, à¦�à¦•à§�à¦¸à§‡à¦²/à¦ªà§�à¦°à¦¿à¦¨à§�à¦Ÿ/à¦ªà¦¿à¦¡à¦¿à¦�à¦« à¦�à¦•à§�à¦¸à¦ªà§‹à¦°à§�à¦Ÿ, à¦²à¦¾à¦‡à¦­ à¦¸à¦¾à¦°à§�à¦š à¦�à¦¬à¦‚ à¦ªà¦¾à¦°à¦¸à¦¿à¦¸à§�à¦Ÿà§‡à¦¨à§�à¦Ÿ à¦¡à¦¾à¦Ÿà¦¾ à¦¸à§�à¦Ÿà§‹à¦°à§‡à¦œà¥¤",
   },
   {
     id: "25",
@@ -1016,7 +1025,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Payroll",
     link: "/payroll-benefits-master-data",
     descriptionEn: "Completely redesigned the Payroll Master Data page for zero-scroll list efficiency! Replaced static top form with an instant List View first design, top horizontal category pills filter, status badges, one-click table row status toggling, and a prominent '+ Add Master Item' primary button that opens a sleek backdrop modal for adding and editing master options without pushing data down.",
-    descriptionBn: "পে রোল মাস্টার ডাটা পেজটি জিরো-স্ক্রোল লিস্ট ফার্স্ট ডিজাইনে সম্পূর্ণ পুনর্গঠন করা হয়েছে! আগে ফর্মের কারণে স্ক্রোল করতে হতো, এখন পেজ লোডেই পুরো ডাটা টেবিল দৃশ্যমান। ক্যাটাগরি ফিল্টার পিলস, সরাসরি টেবিল রো থেকে এক-ক্লিকে স্ট্যাটাস পরিবর্তন এবং ডানে নতুন '+ Add Master Item' বাটন যোগ করা হয়েছে যা ক্লিকে পপআপ মোডালে এন্ট্রি ও এডিটের ব্যবস্থা রাখে।",
+    descriptionBn: "à¦ªà§‡ à¦°à§‹à¦² à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦¡à¦¾à¦Ÿà¦¾ à¦ªà§‡à¦œà¦Ÿà¦¿ à¦œà¦¿à¦°à§‹-à¦¸à§�à¦•à§�à¦°à§‹à¦² à¦²à¦¿à¦¸à§�à¦Ÿ à¦«à¦¾à¦°à§�à¦¸à§�à¦Ÿ à¦¡à¦¿à¦œà¦¾à¦‡à¦¨à§‡ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦ªà§�à¦¨à¦°à§�à¦—à¦ à¦¨ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡! à¦†à¦—à§‡ à¦«à¦°à§�à¦®à§‡à¦° à¦•à¦¾à¦°à¦£à§‡ à¦¸à§�à¦•à§�à¦°à§‹à¦² à¦•à¦°à¦¤à§‡ à¦¹à¦¤à§‹, à¦�à¦–à¦¨ à¦ªà§‡à¦œ à¦²à§‹à¦¡à§‡à¦‡ à¦ªà§�à¦°à§‹ à¦¡à¦¾à¦Ÿà¦¾ à¦Ÿà§‡à¦¬à¦¿à¦² à¦¦à§ƒà¦¶à§�à¦¯à¦®à¦¾à¦¨à¥¤ à¦•à§�à¦¯à¦¾à¦Ÿà¦¾à¦—à¦°à¦¿ à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦° à¦ªà¦¿à¦²à¦¸, à¦¸à¦°à¦¾à¦¸à¦°à¦¿ à¦Ÿà§‡à¦¬à¦¿à¦² à¦°à§‹ à¦¥à§‡à¦•à§‡ à¦�à¦•-à¦•à§�à¦²à¦¿à¦•à§‡ à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦Ÿà¦¾à¦¸ à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦�à¦¬à¦‚ à¦¡à¦¾à¦¨à§‡ à¦¨à¦¤à§�à¦¨ '+ Add Master Item' à¦¬à¦¾à¦Ÿà¦¨ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¯à¦¾ à¦•à§�à¦²à¦¿à¦•à§‡ à¦ªà¦ªà¦†à¦ª à¦®à§‹à¦¡à¦¾à¦²à§‡ à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿ à¦“ à¦�à¦¡à¦¿à¦Ÿà§‡à¦° à¦¬à§�à¦¯à¦¬à¦¸à§�à¦¥à¦¾ à¦°à¦¾à¦–à§‡à¥¤",
   },
   {
     id: "26",
@@ -1025,7 +1034,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Payroll",
     link: "/payroll-benefits-master-data",
     descriptionEn: "Cleaned and refined the Master Information page to exact original specifications! Removed redundant top navigation pills and horizontal category scroll bars, restoring the ultra-clean enterprise Master Information layout with a 4-column entry form (Master For, Name, Comments, Status), table export controls (Excel, Print, PDF), pencil edit actions, and bottom SUBMIT button.",
-    descriptionBn: "মাস্টার ইনফরমেশন পেজটি একদম নিখুঁত এবং রিয়াল-ওয়ার্ল্ড এন্টারপ্রাইজ লেআউটে রিফাইন করা হয়েছে! অপ্রয়োজনীয় নেভিগেশন পিলস এবং অতিরিক্ত ক্যাটাগরি স্ক্রোল বার বাদ দিয়ে ৪-কলাম এন্ট্রি ফর্ম (মাস্টার ফর, নেম, কমেন্টস, স্ট্যাটাস), টেবিল এক্সপোর্ট (এক্সেল, প্রিন্ট, পিডিএফ), পেন্সিল এডিট একশন এবং নিচের দিকে সাবমিট বাটন সহ পেজটি একদম ক্লিয়ার করা হয়েছে।",
+    descriptionBn: "à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦‡à¦¨à¦«à¦°à¦®à§‡à¦¶à¦¨ à¦ªà§‡à¦œà¦Ÿà¦¿ à¦�à¦•à¦¦à¦® à¦¨à¦¿à¦–à§�à¦�à¦¤ à¦�à¦¬à¦‚ à¦°à¦¿à§Ÿà¦¾à¦²-à¦“à§Ÿà¦¾à¦°à§�à¦²à§�à¦¡ à¦�à¦¨à§�à¦Ÿà¦¾à¦°à¦ªà§�à¦°à¦¾à¦‡à¦œ à¦²à§‡à¦†à¦‰à¦Ÿà§‡ à¦°à¦¿à¦«à¦¾à¦‡à¦¨ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡! à¦…à¦ªà§�à¦°à§Ÿà§‹à¦œà¦¨à§€à§Ÿ à¦¨à§‡à¦­à¦¿à¦—à§‡à¦¶à¦¨ à¦ªà¦¿à¦²à¦¸ à¦�à¦¬à¦‚ à¦…à¦¤à¦¿à¦°à¦¿à¦•à§�à¦¤ à¦•à§�à¦¯à¦¾à¦Ÿà¦¾à¦—à¦°à¦¿ à¦¸à§�à¦•à§�à¦°à§‹à¦² à¦¬à¦¾à¦° à¦¬à¦¾à¦¦ à¦¦à¦¿à§Ÿà§‡ à§ª-à¦•à¦²à¦¾à¦® à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿ à¦«à¦°à§�à¦® (à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦«à¦°, à¦¨à§‡à¦®, à¦•à¦®à§‡à¦¨à§�à¦Ÿà¦¸, à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦Ÿà¦¾à¦¸), à¦Ÿà§‡à¦¬à¦¿à¦² à¦�à¦•à§�à¦¸à¦ªà§‹à¦°à§�à¦Ÿ (à¦�à¦•à§�à¦¸à§‡à¦², à¦ªà§�à¦°à¦¿à¦¨à§�à¦Ÿ, à¦ªà¦¿à¦¡à¦¿à¦�à¦«), à¦ªà§‡à¦¨à§�à¦¸à¦¿à¦² à¦�à¦¡à¦¿à¦Ÿ à¦�à¦•à¦¶à¦¨ à¦�à¦¬à¦‚ à¦¨à¦¿à¦šà§‡à¦° à¦¦à¦¿à¦•à§‡ à¦¸à¦¾à¦¬à¦®à¦¿à¦Ÿ à¦¬à¦¾à¦Ÿà¦¨ à¦¸à¦¹ à¦ªà§‡à¦œà¦Ÿà¦¿ à¦�à¦•à¦¦à¦® à¦•à§�à¦²à¦¿à§Ÿà¦¾à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "27",
@@ -1034,7 +1043,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Payroll",
     link: "/payroll-benefits-master-data",
     descriptionEn: "Elevated the Master Information page with stunning modern aesthetics and placed all 4 form fields (Master For *, Name *, Comments, Status *) inside an interactive '+ Add Master Item' modal popup! Features an indigo-purple gradient hero banner, real-time KPI stats (Total Items, Active, Inactive), category dropdown filter, search box, export options, and one-click status toggling.",
-    descriptionBn: "পে রোল মাস্টার ইনফরমেশন পেজটি আধুনিক প্রিমিয়াম লুক ও ফিল দিয়ে সাজানো হয়েছে! ৪টি ফিল্ড (মাস্টার ফর, নেম, কমেন্টস, স্ট্যাটাস) নতুন '+ Add Master Item' পপআপ মোডালের ভেতর নিয়ে নেওয়া হয়েছে। পেজের ওপরে স্টানিং হিরো ব্যানার, রিয়েল-টাইম কেপিআই স্ট্যাটস, ক্যাটাগরি ড্রপডাউন এবং টেবিল এডিটিং যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦ªà§‡ à¦°à§‹à¦² à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦‡à¦¨à¦«à¦°à¦®à§‡à¦¶à¦¨ à¦ªà§‡à¦œà¦Ÿà¦¿ à¦†à¦§à§�à¦¨à¦¿à¦• à¦ªà§�à¦°à¦¿à¦®à¦¿à§Ÿà¦¾à¦® à¦²à§�à¦• à¦“ à¦«à¦¿à¦² à¦¦à¦¿à§Ÿà§‡ à¦¸à¦¾à¦œà¦¾à¦¨à§‹ à¦¹à§Ÿà§‡à¦›à§‡! à§ªà¦Ÿà¦¿ à¦«à¦¿à¦²à§�à¦¡ (à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦«à¦°, à¦¨à§‡à¦®, à¦•à¦®à§‡à¦¨à§�à¦Ÿà¦¸, à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦Ÿà¦¾à¦¸) à¦¨à¦¤à§�à¦¨ '+ Add Master Item' à¦ªà¦ªà¦†à¦ª à¦®à§‹à¦¡à¦¾à¦²à§‡à¦° à¦­à§‡à¦¤à¦° à¦¨à¦¿à§Ÿà§‡ à¦¨à§‡à¦“à§Ÿà¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦ªà§‡à¦œà§‡à¦° à¦“à¦ªà¦°à§‡ à¦¸à§�à¦Ÿà¦¾à¦¨à¦¿à¦‚ à¦¹à¦¿à¦°à§‹ à¦¬à§�à¦¯à¦¾à¦¨à¦¾à¦°, à¦°à¦¿à§Ÿà§‡à¦²-à¦Ÿà¦¾à¦‡à¦® à¦•à§‡à¦ªà¦¿à¦†à¦‡ à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦Ÿà¦¸, à¦•à§�à¦¯à¦¾à¦Ÿà¦¾à¦—à¦°à¦¿ à¦¡à§�à¦°à¦ªà¦¡à¦¾à¦‰à¦¨ à¦�à¦¬à¦‚ à¦Ÿà§‡à¦¬à¦¿à¦² à¦�à¦¡à¦¿à¦Ÿà¦¿à¦‚ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "28",
@@ -1043,7 +1052,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Payroll",
     link: "/payroll-benefits-master-data",
     descriptionEn: "Updated all primary action buttons on the Payroll Master Data page (including the main header button, footer button, and modal submit button) to use the project's standard primary brand color (bg-primary) for visual consistency.",
-    descriptionBn: "পে রোল মাস্টার ডাটা পেজের সকল প্রাইমারি অ্যাকশন বাটন (প্রধান হেডার বাটন, ফুটার বাটন এবং মোডাল সাবমিট বাটন) প্রোজেক্টের স্ট্যান্ডার্ড ব্র্যান্ড কালার (bg-primary) এ পরিবর্তন করা হয়েছে যাতে ডিজাইনে সামঞ্জস্য থাকে।",
+    descriptionBn: "à¦ªà§‡ à¦°à§‹à¦² à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦¡à¦¾à¦Ÿà¦¾ à¦ªà§‡à¦œà§‡à¦° à¦¸à¦•à¦² à¦ªà§�à¦°à¦¾à¦‡à¦®à¦¾à¦°à¦¿ à¦…à§�à¦¯à¦¾à¦•à¦¶à¦¨ à¦¬à¦¾à¦Ÿà¦¨ (à¦ªà§�à¦°à¦§à¦¾à¦¨ à¦¹à§‡à¦¡à¦¾à¦° à¦¬à¦¾à¦Ÿà¦¨, à¦«à§�à¦Ÿà¦¾à¦° à¦¬à¦¾à¦Ÿà¦¨ à¦�à¦¬à¦‚ à¦®à§‹à¦¡à¦¾à¦² à¦¸à¦¾à¦¬à¦®à¦¿à¦Ÿ à¦¬à¦¾à¦Ÿà¦¨) à¦ªà§�à¦°à§‹à¦œà§‡à¦•à§�à¦Ÿà§‡à¦° à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦¨à§�à¦¡à¦¾à¦°à§�à¦¡ à¦¬à§�à¦°à§�à¦¯à¦¾à¦¨à§�à¦¡ à¦•à¦¾à¦²à¦¾à¦° (bg-primary) à¦� à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¯à¦¾à¦¤à§‡ à¦¡à¦¿à¦œà¦¾à¦‡à¦¨à§‡ à¦¸à¦¾à¦®à¦žà§�à¦œà¦¸à§�à¦¯ à¦¥à¦¾à¦•à§‡à¥¤",
   },
   {
     id: "29",
@@ -1052,7 +1061,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Payroll",
     link: "/payroll-benefits",
     descriptionEn: "Removed redundant 'Loan/Advance Req.' and 'Loan Reschedule Sys.' submenus under the Benefits section in both the main sidebar navigation and the Payroll Benefits overview dashboard page.",
-    descriptionBn: "বেনিফিটস সেকশনের অধীনে থাকা অপ্রয়োজনীয় 'Loan/Advance Req.' এবং 'Loan Reschedule Sys.' সাবমেনু দুটি মেইন সাইডবার নেভিগেশন এবং পে রোল বেনিফিটস ওভারভিউ ড্যাশবোর্ড পেজ থেকে বাদ দেওয়া হয়েছে।",
+    descriptionBn: "à¦¬à§‡à¦¨à¦¿à¦«à¦¿à¦Ÿà¦¸ à¦¸à§‡à¦•à¦¶à¦¨à§‡à¦° à¦…à¦§à§€à¦¨à§‡ à¦¥à¦¾à¦•à¦¾ à¦…à¦ªà§�à¦°à§Ÿà§‹à¦œà¦¨à§€à§Ÿ 'Loan/Advance Req.' à¦�à¦¬à¦‚ 'Loan Reschedule Sys.' à¦¸à¦¾à¦¬à¦®à§‡à¦¨à§� à¦¦à§�à¦Ÿà¦¿ à¦®à§‡à¦‡à¦¨ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦° à¦¨à§‡à¦­à¦¿à¦—à§‡à¦¶à¦¨ à¦�à¦¬à¦‚ à¦ªà§‡ à¦°à§‹à¦² à¦¬à§‡à¦¨à¦¿à¦«à¦¿à¦Ÿà¦¸ à¦“à¦­à¦¾à¦°à¦­à¦¿à¦‰ à¦¡à§�à¦¯à¦¾à¦¶à¦¬à§‹à¦°à§�à¦¡ à¦ªà§‡à¦œ à¦¥à§‡à¦•à§‡ à¦¬à¦¾à¦¦ à¦¦à§‡à¦“à§Ÿà¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "30",
@@ -1061,7 +1070,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Benefits",
     link: "/payroll-benefits-common",
     descriptionEn: "Redesigned the Common Benefits page into a highly user-friendly dual-view layout. Replaced the modal with a spacious full-screen Configure Workspace, featuring dynamic employee lists, default quick-fill amounts, individual overrides, and manual employee add/remove controls.",
-    descriptionBn: "কমন বেনিফিটস পেজটিকে আরও ইউজার-ফ্রেন্ডলি করতে ডুয়াল-ভিউ লেআউটে রিডিজাইন করা হয়েছে। মোডালের পরিবর্তে ফুল-স্ক্রিন কনফিগারেশন ওয়ার্কস্পেস যুক্ত করা হয়েছে, যেখানে ডাইনামিক এমপ্লয়ি লিস্ট, ডিফল্ট কুইক-ফিল অ্যামাউন্ট, প্রতি এমপ্লয়ির জন্য কাস্টম অ্যামাউন্ট এবং ম্যানুয়ালি এমপ্লয়ি যুক্ত/বাদ দেওয়ার সুবিধা রয়েছে।",
+    descriptionBn: "à¦•à¦®à¦¨ à¦¬à§‡à¦¨à¦¿à¦«à¦¿à¦Ÿà¦¸ à¦ªà§‡à¦œà¦Ÿà¦¿à¦•à§‡ à¦†à¦°à¦“ à¦‡à¦‰à¦œà¦¾à¦°-à¦«à§�à¦°à§‡à¦¨à§�à¦¡à¦²à¦¿ à¦•à¦°à¦¤à§‡ à¦¡à§�à¦¯à¦¼à¦¾à¦²-à¦­à¦¿à¦‰ à¦²à§‡à¦†à¦‰à¦Ÿà§‡ à¦°à¦¿à¦¡à¦¿à¦œà¦¾à¦‡à¦¨ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦®à§‹à¦¡à¦¾à¦²à§‡à¦° à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à§‡ à¦«à§�à¦²-à¦¸à§�à¦•à§�à¦°à¦¿à¦¨ à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦“à§Ÿà¦¾à¦°à§�à¦•à¦¸à§�à¦ªà§‡à¦¸ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦¯à§‡à¦–à¦¾à¦¨à§‡ à¦¡à¦¾à¦‡à¦¨à¦¾à¦®à¦¿à¦• à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦²à¦¿à¦¸à§�à¦Ÿ, à¦¡à¦¿à¦«à¦²à§�à¦Ÿ à¦•à§�à¦‡à¦•-à¦«à¦¿à¦² à¦…à§�à¦¯à¦¾à¦®à¦¾à¦‰à¦¨à§�à¦Ÿ, à¦ªà§�à¦°à¦¤à¦¿ à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿à¦° à¦œà¦¨à§�à¦¯ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦…à§�à¦¯à¦¾à¦®à¦¾à¦‰à¦¨à§�à¦Ÿ à¦�à¦¬à¦‚ à¦®à§�à¦¯à¦¾à¦¨à§�à¦¯à¦¼à¦¾à¦²à¦¿ à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦¯à§�à¦•à§�à¦¤/à¦¬à¦¾à¦¦ à¦¦à§‡à¦“à§Ÿà¦¾à¦° à¦¸à§�à¦¬à¦¿à¦§à¦¾ à¦°à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "31",
@@ -1070,7 +1079,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Company Setup",
     link: "/company-setup",
     descriptionEn: "Added a new 'Half Leave' Yes/No setting dropdown to the Company Architecture & ID Setup configuration panel on the Company Setup page.",
-    descriptionBn: "কোম্পানি সেটআপ পেজের কোম্পানি আর্কিটেকচার অ্যান্ড আইডি সেটআপ প্যানেলে একটি নতুন 'Half Leave' (Yes/No) সেটিং ড্রপডাউন যুক্ত করা হয়েছে।"
+    descriptionBn: "à¦•à§‹à¦®à§�à¦ªà¦¾à¦¨à¦¿ à¦¸à§‡à¦Ÿà¦†à¦ª à¦ªà§‡à¦œà§‡à¦° à¦•à§‹à¦®à§�à¦ªà¦¾à¦¨à¦¿ à¦†à¦°à§�à¦•à¦¿à¦Ÿà§‡à¦•à¦šà¦¾à¦° à¦…à§�à¦¯à¦¾à¦¨à§�à¦¡ à¦†à¦‡à¦¡à¦¿ à¦¸à§‡à¦Ÿà¦†à¦ª à¦ªà§�à¦¯à¦¾à¦¨à§‡à¦²à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¨à¦¤à§�à¦¨ 'Half Leave' (Yes/No) à¦¸à§‡à¦Ÿà¦¿à¦‚ à¦¡à§�à¦°à¦ªà¦¡à¦¾à¦‰à¦¨ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤"
   },
   {
     id: "32",
@@ -1079,7 +1088,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-dashboard",
     descriptionEn: "Simplified the Merchandising module sidebar menu by removing all other links and keeping only the Dashboard and Order Entry & Costing workspace.",
-    descriptionBn: "মার্চেন্ডাইজিং মডিউলের সাইডবার মেনু থেকে অন্যান্য সব লিংক বাদ দিয়ে শুধুমাত্র ড্যাশবোর্ড এবং অর্ডার এন্ট্রি ও কস্টিং ওয়ার্কস্পেস রেখে একে সহজ করা হয়েছে।",
+    descriptionBn: "à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦®à¦¡à¦¿à¦‰à¦²à§‡à¦° à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦° à¦®à§‡à¦¨à§� à¦¥à§‡à¦•à§‡ à¦…à¦¨à§�à¦¯à¦¾à¦¨à§�à¦¯ à¦¸à¦¬ à¦²à¦¿à¦‚à¦• à¦¬à¦¾à¦¦ à¦¦à¦¿à§Ÿà§‡ à¦¶à§�à¦§à§�à¦®à¦¾à¦¤à§�à¦° à¦¡à§�à¦¯à¦¾à¦¶à¦¬à§‹à¦°à§�à¦¡ à¦�à¦¬à¦‚ à¦…à¦°à§�à¦¡à¦¾à¦° à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿ à¦“ à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦“à§Ÿà¦¾à¦°à§�à¦•à¦¸à§�à¦ªà§‡à¦¸ à¦°à§‡à¦–à§‡ à¦�à¦•à§‡ à¦¸à¦¹à¦œ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "33",
@@ -1088,7 +1097,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-master-settings",
     descriptionEn: "Added the new 'MERC Master Setting' accordion sidebar menu containing 34 custom submenus, correctly mapped to default RMG database tabs.",
-    descriptionBn: "৩৪টি সাব-মেনু বিশিষ্ট নতুন 'MERC Master Setting' সাইডবার একর্ডিয়ন মেনু যুক্ত করা হয়েছে এবং সেগুলোকে যথোপযুক্ত RMG ডেটাবেস ট্যাবের সাথে সংযুক্ত করা হয়েছে।",
+    descriptionBn: "à§©à§ªà¦Ÿà¦¿ à¦¸à¦¾à¦¬-à¦®à§‡à¦¨à§� à¦¬à¦¿à¦¶à¦¿à¦·à§�à¦Ÿ à¦¨à¦¤à§�à¦¨ 'MERC Master Setting' à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦° à¦�à¦•à¦°à§�à¦¡à¦¿à¦¯à¦¼à¦¨ à¦®à§‡à¦¨à§� à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦¸à§‡à¦—à§�à¦²à§‹à¦•à§‡ à¦¯à¦¥à§‹à¦ªà¦¯à§�à¦•à§�à¦¤ RMG à¦¡à§‡à¦Ÿà¦¾à¦¬à§‡à¦¸ à¦Ÿà§�à¦¯à¦¾à¦¬à§‡à¦° à¦¸à¦¾à¦¥à§‡ à¦¸à¦‚à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "34",
@@ -1097,7 +1106,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-master-settings",
     descriptionEn: "Refactored the MERC Master Settings to use a clean split layout. The sidebar menu now has a single direct link, and the settings page groups all 34 sub-settings into interactive sub-tabs nested within the 5 main database categories. Also built a fully functional generic CRUD Master DB manager.",
-    descriptionBn: "MERC মাস্টার সেটিংস পেজটিকে চমৎকার স্প্লিট লেআউটে রূপান্তর করা হয়েছে। সাইডবারে এখন একটি সরাসরি লিংক রয়েছে এবং পেজের ভেতরে ৩৪টি প্যারামিটারকে ৫টি মূল ক্যাটাগরির ভেতরে সাব-ট্যাব আকারে সাজানো হয়েছে। এছাড়া একটি ফুল-ফাংশনাল জেনেরিক CRUD মাস্টার ডাটাবেস ম্যানেজার তৈরি করা হয়েছে।",
+    descriptionBn: "MERC à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸ à¦ªà§‡à¦œà¦Ÿà¦¿à¦•à§‡ à¦šà¦®à§Žà¦•à¦¾à¦° à¦¸à§�à¦ªà§�à¦²à¦¿à¦Ÿ à¦²à§‡à¦†à¦‰à¦Ÿà§‡ à¦°à§‚à¦ªà¦¾à¦¨à§�à¦¤à¦° à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦°à§‡ à¦�à¦–à¦¨ à¦�à¦•à¦Ÿà¦¿ à¦¸à¦°à¦¾à¦¸à¦°à¦¿ à¦²à¦¿à¦‚à¦• à¦°à¦¯à¦¼à§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦ªà§‡à¦œà§‡à¦° à¦­à§‡à¦¤à¦°à§‡ à§©à§ªà¦Ÿà¦¿ à¦ªà§�à¦¯à¦¾à¦°à¦¾à¦®à¦¿à¦Ÿà¦¾à¦°à¦•à§‡ à§«à¦Ÿà¦¿ à¦®à§‚à¦² à¦•à§�à¦¯à¦¾à¦Ÿà¦¾à¦—à¦°à¦¿à¦° à¦­à§‡à¦¤à¦°à§‡ à¦¸à¦¾à¦¬-à¦Ÿà§�à¦¯à¦¾à¦¬ à¦†à¦•à¦¾à¦°à§‡ à¦¸à¦¾à¦œà¦¾à¦¨à§‹ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦�à¦›à¦¾à§œà¦¾ à¦�à¦•à¦Ÿà¦¿ à¦«à§�à¦²-à¦«à¦¾à¦‚à¦¶à¦¨à¦¾à¦² à¦œà§‡à¦¨à§‡à¦°à¦¿à¦• CRUD à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦¡à¦¾à¦Ÿà¦¾à¦¬à§‡à¦¸ à¦®à§�à¦¯à¦¾à¦¨à§‡à¦œà¦¾à¦° à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "35",
@@ -1106,7 +1115,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-master-settings",
     descriptionEn: "Reorganized the Merchandising Settings hierarchy to match the requested 8-category taxonomy (Company Configuration, Business Partners, Product Masters, Fabric Masters, Yarn Masters, Color & Processing, Costing, and Quality). Renamed the sidebar settings menu to 'Merchandising Settings'.",
-    descriptionBn: "মার্চেন্ডাইজিং সেটিংসের স্তরবিন্যাস পরিবর্তন করে অনুরোধকৃত ৮টি ক্যাটাগরিতে (কোম্পানি কনফিগারেশন, বিজনেস পার্টনার, প্রোডাক্ট মাস্টার্স, ফেব্রিক মাস্টার্স, ইয়ার্ন মাস্টার্স, কালার ও প্রসেসিং, কস্টিং, এবং কোয়ালিটি) সাজানো হয়েছে। সাইডবারের মেনুর নাম পরিবর্তন করে 'Merchandising Settings' রাখা হয়েছে।",
+    descriptionBn: "à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸à§‡à¦° à¦¸à§�à¦¤à¦°à¦¬à¦¿à¦¨à§�à¦¯à¦¾à¦¸ à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦•à¦°à§‡ à¦…à¦¨à§�à¦°à§‹à¦§à¦•à§ƒà¦¤ à§®à¦Ÿà¦¿ à¦•à§�à¦¯à¦¾à¦Ÿà¦¾à¦—à¦°à¦¿à¦¤à§‡ (à¦•à§‹à¦®à§�à¦ªà¦¾à¦¨à¦¿ à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨, à¦¬à¦¿à¦œà¦¨à§‡à¦¸ à¦ªà¦¾à¦°à§�à¦Ÿà¦¨à¦¾à¦°, à¦ªà§�à¦°à§‹à¦¡à¦¾à¦•à§�à¦Ÿ à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦°à§�à¦¸, à¦«à§‡à¦¬à§�à¦°à¦¿à¦• à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦°à§�à¦¸, à¦‡à¦¯à¦¼à¦¾à¦°à§�à¦¨ à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦°à§�à¦¸, à¦•à¦¾à¦²à¦¾à¦° à¦“ à¦ªà§�à¦°à¦¸à§‡à¦¸à¦¿à¦‚, à¦•à¦¸à§�à¦Ÿà¦¿à¦‚, à¦�à¦¬à¦‚ à¦•à§‹à¦¯à¦¼à¦¾à¦²à¦¿à¦Ÿà¦¿) à¦¸à¦¾à¦œà¦¾à¦¨à§‹ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦°à§‡à¦° à¦®à§‡à¦¨à§�à¦° à¦¨à¦¾à¦® à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦•à¦°à§‡ 'Merchandising Settings' à¦°à¦¾à¦–à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "36",
@@ -1115,7 +1124,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-master-settings",
     descriptionEn: "Implemented a fully nested three-level accordion layout in the Merchandising Settings sidebar. Clicking 'Merchandising Settings' now reveals the 8 sub-categories, and clicking each sub-category reveals its corresponding parameter configuration links.",
-    descriptionBn: "মার্চেন্ডাইজিং সেটিংসের সাইডবারে একটি সম্পূর্ণ ত্রিমাত্রিক একর্ডিয়ন লেআউট তৈরি করা হয়েছে। 'Merchandising Settings' এ ক্লিক করলে ৮টি সাব-ক্যাটাগরি দৃশ্যমান হয়, এবং প্রতিটি সাব-ক্যাটাগরিতে ক্লিক করলে তার অন্তর্ভুক্ত প্যারামিটার কনফিগারেশন লিংকগুলো দেখা যায়।",
+    descriptionBn: "à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸à§‡à¦° à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦°à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦¤à§�à¦°à¦¿à¦®à¦¾à¦¤à§�à¦°à¦¿à¦• à¦�à¦•à¦°à§�à¦¡à¦¿à¦¯à¦¼à¦¨ à¦²à§‡à¦†à¦‰à¦Ÿ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ 'Merchandising Settings' à¦� à¦•à§�à¦²à¦¿à¦• à¦•à¦°à¦²à§‡ à§®à¦Ÿà¦¿ à¦¸à¦¾à¦¬-à¦•à§�à¦¯à¦¾à¦Ÿà¦¾à¦—à¦°à¦¿ à¦¦à§ƒà¦¶à§�à¦¯à¦®à¦¾à¦¨ à¦¹à¦¯à¦¼, à¦�à¦¬à¦‚ à¦ªà§�à¦°à¦¤à¦¿à¦Ÿà¦¿ à¦¸à¦¾à¦¬-à¦•à§�à¦¯à¦¾à¦Ÿà¦¾à¦—à¦°à¦¿à¦¤à§‡ à¦•à§�à¦²à¦¿à¦• à¦•à¦°à¦²à§‡ à¦¤à¦¾à¦° à¦…à¦¨à§�à¦¤à¦°à§�à¦­à§�à¦•à§�à¦¤ à¦ªà§�à¦¯à¦¾à¦°à¦¾à¦®à¦¿à¦Ÿà¦¾à¦° à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦²à¦¿à¦‚à¦•à¦—à§�à¦²à§‹ à¦¦à§‡à¦–à¦¾ à¦¯à¦¾à¦¯à¦¼à¥¤",
   },
   {
     id: "37",
@@ -1124,7 +1133,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-master-settings",
     descriptionEn: "Fixed the sidebar scrolling behavior by removing nested max-height restrictions and duplicate scrollbars from the nested subGroup accordion containers, allowing the entire sidebar pane to scroll naturally.",
-    descriptionBn: "সাইডবার স্ক্রোলিং সমস্যা সমাধান করা হয়েছে। সাব-গ্রুপ একর্ডিয়ন কন্টেইনার থেকে অতিরিক্ত ম্যাক্স-হাইট এবং ডুপ্লিকেট স্ক্রোলবার সরিয়ে ফেলা হয়েছে, যার ফলে সম্পূর্ণ সাইডবারটি এখন স্বাচ্ছন্দ্যে স্ক্রোল করা যায়।",
+    descriptionBn: "à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦° à¦¸à§�à¦•à§�à¦°à§‹à¦²à¦¿à¦‚ à¦¸à¦®à¦¸à§�à¦¯à¦¾ à¦¸à¦®à¦¾à¦§à¦¾à¦¨ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦¸à¦¾à¦¬-à¦—à§�à¦°à§�à¦ª à¦�à¦•à¦°à§�à¦¡à¦¿à¦¯à¦¼à¦¨ à¦•à¦¨à§�à¦Ÿà§‡à¦‡à¦¨à¦¾à¦° à¦¥à§‡à¦•à§‡ à¦…à¦¤à¦¿à¦°à¦¿à¦•à§�à¦¤ à¦®à§�à¦¯à¦¾à¦•à§�à¦¸-à¦¹à¦¾à¦‡à¦Ÿ à¦�à¦¬à¦‚ à¦¡à§�à¦ªà§�à¦²à¦¿à¦•à§‡à¦Ÿ à¦¸à§�à¦•à§�à¦°à§‹à¦²à¦¬à¦¾à¦° à¦¸à¦°à¦¿à¦¯à¦¼à§‡ à¦«à§‡à¦²à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡, à¦¯à¦¾à¦° à¦«à¦²à§‡ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦°à¦Ÿà¦¿ à¦�à¦–à¦¨ à¦¸à§�à¦¬à¦¾à¦šà§�à¦›à¦¨à§�à¦¦à§�à¦¯à§‡ à¦¸à§�à¦•à§�à¦°à§‹à¦² à¦•à¦°à¦¾ à¦¯à¦¾à¦¯à¦¼à¥¤",
   },
   {
     id: "38",
@@ -1133,7 +1142,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-master-settings",
     descriptionEn: "Fixed text alignment issues on the accordion header buttons by adding the 'text-left' class, ensuring wrapped texts are properly left-aligned.",
-    descriptionBn: "একর্ডিয়ন হেডার বাটনগুলোর টেক্সট অ্যালাইনমেন্ট ফিক্স করা হয়েছে। 'text-left' ক্লাস যোগ করার মাধ্যমে নিশ্চিত করা হয়েছে যে র‍্যাপ হওয়া লেখাগুলো বাঁ দিকে সমানভাবে বিন্যস্ত থাকবে।",
+    descriptionBn: "à¦�à¦•à¦°à§�à¦¡à¦¿à¦¯à¦¼à¦¨ à¦¹à§‡à¦¡à¦¾à¦° à¦¬à¦¾à¦Ÿà¦¨à¦—à§�à¦²à§‹à¦° à¦Ÿà§‡à¦•à§�à¦¸à¦Ÿ à¦…à§�à¦¯à¦¾à¦²à¦¾à¦‡à¦¨à¦®à§‡à¦¨à§�à¦Ÿ à¦«à¦¿à¦•à§�à¦¸ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ 'text-left' à¦•à§�à¦²à¦¾à¦¸ à¦¯à§‹à¦— à¦•à¦°à¦¾à¦° à¦®à¦¾à¦§à§�à¦¯à¦®à§‡ à¦¨à¦¿à¦¶à§�à¦šà¦¿à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ à¦¯à§‡ à¦°â€�à§�à¦¯à¦¾à¦ª à¦¹à¦“à¦¯à¦¼à¦¾ à¦²à§‡à¦–à¦¾à¦—à§�à¦²à§‹ à¦¬à¦¾à¦� à¦¦à¦¿à¦•à§‡ à¦¸à¦®à¦¾à¦¨à¦­à¦¾à¦¬à§‡ à¦¬à¦¿à¦¨à§�à¦¯à¦¸à§�à¦¤ à¦¥à¦¾à¦•à¦¬à§‡à¥¤",
   },
   {
     id: "39",
@@ -1142,7 +1151,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Personnel File",
     link: "/add-employee",
     descriptionEn: "Added a new 'Allowance' card to the personnel file creation page and updated the employee detail view to show these overtime, holiday rate, behavior bonus, and transport/mobile/lunch allowances dynamically.",
-    descriptionBn: "পার্সোনেল ফাইল ক্রিয়েশন পেজে একটি নতুন 'Allowance' কার্ড যুক্ত করা হয়েছে এবং এমপ্লয়ি ডিটেইলস ভিউতে ওভারটাইম, হোলিডে রেট, বিহেভিয়ার বোনাস এবং ট্রান্সপোর্ট/মোবাইল/লাঞ্চ অ্যালাউন্সগুলো ডাইনামিকলি দেখানোর ব্যবস্থা করা হয়েছে।",
+    descriptionBn: "à¦ªà¦¾à¦°à§�à¦¸à§‹à¦¨à§‡à¦² à¦«à¦¾à¦‡à¦² à¦•à§�à¦°à¦¿à§Ÿà§‡à¦¶à¦¨ à¦ªà§‡à¦œà§‡ à¦�à¦•à¦Ÿà¦¿ à¦¨à¦¤à§�à¦¨ 'Allowance' à¦•à¦¾à¦°à§�à¦¡ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦�à¦®à¦ªà§�à¦²à§Ÿà¦¿ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸ à¦­à¦¿à¦‰à¦¤à§‡ à¦“à¦­à¦¾à¦°à¦Ÿà¦¾à¦‡à¦®, à¦¹à§‹à¦²à¦¿à¦¡à§‡ à¦°à§‡à¦Ÿ, à¦¬à¦¿à¦¹à§‡à¦­à¦¿à§Ÿà¦¾à¦° à¦¬à§‹à¦¨à¦¾à¦¸ à¦�à¦¬à¦‚ à¦Ÿà§�à¦°à¦¾à¦¨à§�à¦¸à¦ªà§‹à¦°à§�à¦Ÿ/à¦®à§‹à¦¬à¦¾à¦‡à¦²/à¦²à¦¾à¦žà§�à¦š à¦…à§�à¦¯à¦¾à¦²à¦¾à¦‰à¦¨à§�à¦¸à¦—à§�à¦²à§‹ à¦¡à¦¾à¦‡à¦¨à¦¾à¦®à¦¿à¦•à¦²à¦¿ à¦¦à§‡à¦–à¦¾à¦¨à§‹à¦° à¦¬à§�à¦¯à¦¬à¦¸à§�à¦¥à¦¾ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "40",
@@ -1151,7 +1160,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Personnel File",
     link: "/add-employee",
     descriptionEn: "Simplified the Disbursement Routing & Bank Details card to show only Bank Pay, Cash Pay, Bank Name, and Account Number in both employee creation and employee detail views.",
-    descriptionBn: "এমপ্লয়ি ক্রিয়েশন এবং এমপ্লয়ি ডিটেইলস উভয় পেজেই ব্যাংক ডিটেইলস কার্ডটি সহজ করা হয়েছে যাতে শুধুমাত্র ব্যাংক পে, ক্যাশ পে, ব্যাংকের নাম এবং অ্যাকাউন্ট নম্বর দেখা যায়।",
+    descriptionBn: "à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦•à§�à¦°à¦¿à¦¯à¦¼à§‡à¦¶à¦¨ à¦�à¦¬à¦‚ à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸ à¦‰à¦­à¦¯à¦¼ à¦ªà§‡à¦œà§‡à¦‡ à¦¬à§�à¦¯à¦¾à¦‚à¦• à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸ à¦•à¦¾à¦°à§�à¦¡à¦Ÿà¦¿ à¦¸à¦¹à¦œ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ à¦¯à¦¾à¦¤à§‡ à¦¶à§�à¦§à§�à¦®à¦¾à¦¤à§�à¦° à¦¬à§�à¦¯à¦¾à¦‚à¦• à¦ªà§‡, à¦•à§�à¦¯à¦¾à¦¶ à¦ªà§‡, à¦¬à§�à¦¯à¦¾à¦‚à¦•à§‡à¦° à¦¨à¦¾à¦® à¦�à¦¬à¦‚ à¦…à§�à¦¯à¦¾à¦•à¦¾à¦‰à¦¨à§�à¦Ÿ à¦¨à¦®à§�à¦¬à¦° à¦¦à§‡à¦–à¦¾ à¦¯à¦¾à¦¯à¦¼à¥¤",
   },
   {
     id: "41",
@@ -1160,7 +1169,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Personnel File",
     link: "/add-employee",
     descriptionEn: "Shifted Job Description and Assigned Equipment & Assets sections from Financial & Employment to Qualifications & Experience tab on both employee creation and details screens. Removed the Submit button from the custom Allowance card.",
-    descriptionBn: "এমপ্লয়ি ক্রিয়েশন এবং ডিটেইলস উভয় পেজেই করপোরেট জব ডেসক্রিপশন এবং করপোরেট ইকুইপমেন্ট সেকশন দুটিকে ফিন্যান্সিয়াল অ্যান্ড এমপ্লয়মেন্ট ট্যাব থেকে কোয়ালিফিকেশন অ্যান্ড এক্সপেরিয়েন্স ট্যাবে স্থানান্তরিত করা হয়েছে। কাস্টম অ্যালাউন্স কার্ড থেকে সাবমিট বাটনটি সরিয়ে ফেলা হয়েছে।",
+    descriptionBn: "à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦•à§�à¦°à¦¿à¦¯à¦¼à§‡à¦¶à¦¨ à¦�à¦¬à¦‚ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸ à¦‰à¦­à¦¯à¦¼ à¦ªà§‡à¦œà§‡à¦‡ à¦•à¦°à¦ªà§‹à¦°à§‡à¦Ÿ à¦œà¦¬ à¦¡à§‡à¦¸à¦•à§�à¦°à¦¿à¦ªà¦¶à¦¨ à¦�à¦¬à¦‚ à¦•à¦°à¦ªà§‹à¦°à§‡à¦Ÿ à¦‡à¦•à§�à¦‡à¦ªà¦®à§‡à¦¨à§�à¦Ÿ à¦¸à§‡à¦•à¦¶à¦¨ à¦¦à§�à¦Ÿà¦¿à¦•à§‡ à¦«à¦¿à¦¨à§�à¦¯à¦¾à¦¨à§�à¦¸à¦¿à¦¯à¦¼à¦¾à¦² à¦…à§�à¦¯à¦¾à¦¨à§�à¦¡ à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦®à§‡à¦¨à§�à¦Ÿ à¦Ÿà§�à¦¯à¦¾à¦¬ à¦¥à§‡à¦•à§‡ à¦•à§‹à¦¯à¦¼à¦¾à¦²à¦¿à¦«à¦¿à¦•à§‡à¦¶à¦¨ à¦…à§�à¦¯à¦¾à¦¨à§�à¦¡ à¦�à¦•à§�à¦¸à¦ªà§‡à¦°à¦¿à¦¯à¦¼à§‡à¦¨à§�à¦¸ à¦Ÿà§�à¦¯à¦¾à¦¬à§‡ à¦¸à§�à¦¥à¦¾à¦¨à¦¾à¦¨à§�à¦¤à¦°à¦¿à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦…à§�à¦¯à¦¾à¦²à¦¾à¦‰à¦¨à§�à¦¸ à¦•à¦¾à¦°à§�à¦¡ à¦¥à§‡à¦•à§‡ à¦¸à¦¾à¦¬à¦®à¦¿à¦Ÿ à¦¬à¦¾à¦Ÿà¦¨à¦Ÿà¦¿ à¦¸à¦°à¦¿à¦¯à¦¼à§‡ à¦«à§‡à¦²à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "42",
@@ -1169,7 +1178,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Personnel File",
     link: "/add-employee",
     descriptionEn: "Implemented robust file uploading, size validation (5MB max), extension validation (.pdf, .jpg, .jpeg, .png), upload progress indicators, and an interactive secure document preview modal for academic and experience attachments.",
-    descriptionBn: "একাডেমিক এবং অভিজ্ঞতা সনদের অ্যাটাচমেন্টের জন্য শক্তিশালী ফাইল আপলোডিং, ফাইলের সাইজ ভ্যালিডেশন (সর্বোচ্চ ৫ মেগাবাইট), ফাইল এক্সটেনশন ভ্যালিডেশন (.pdf, .jpg, .jpeg, .png), আপলোড প্রোগ্রেস বার এবং একটি ইন্টারেক্টিভ সিকিউর ডকুমেন্ট প্রিভিউ মোডাল তৈরি করা হয়েছে।",
+    descriptionBn: "à¦�à¦•à¦¾à¦¡à§‡à¦®à¦¿à¦• à¦�à¦¬à¦‚ à¦…à¦­à¦¿à¦œà§�à¦žà¦¤à¦¾ à¦¸à¦¨à¦¦à§‡à¦° à¦…à§�à¦¯à¦¾à¦Ÿà¦¾à¦šà¦®à§‡à¦¨à§�à¦Ÿà§‡à¦° à¦œà¦¨à§�à¦¯ à¦¶à¦•à§�à¦¤à¦¿à¦¶à¦¾à¦²à§€ à¦«à¦¾à¦‡à¦² à¦†à¦ªà¦²à§‹à¦¡à¦¿à¦‚, à¦«à¦¾à¦‡à¦²à§‡à¦° à¦¸à¦¾à¦‡à¦œ à¦­à§�à¦¯à¦¾à¦²à¦¿à¦¡à§‡à¦¶à¦¨ (à¦¸à¦°à§�à¦¬à§‹à¦šà§�à¦š à§« à¦®à§‡à¦—à¦¾à¦¬à¦¾à¦‡à¦Ÿ), à¦«à¦¾à¦‡à¦² à¦�à¦•à§�à¦¸à¦Ÿà§‡à¦¨à¦¶à¦¨ à¦­à§�à¦¯à¦¾à¦²à¦¿à¦¡à§‡à¦¶à¦¨ (.pdf, .jpg, .jpeg, .png), à¦†à¦ªà¦²à§‹à¦¡ à¦ªà§�à¦°à§‹à¦—à§�à¦°à§‡à¦¸ à¦¬à¦¾à¦° à¦�à¦¬à¦‚ à¦�à¦•à¦Ÿà¦¿ à¦‡à¦¨à§�à¦Ÿà¦¾à¦°à§‡à¦•à§�à¦Ÿà¦¿à¦­ à¦¸à¦¿à¦•à¦¿à¦‰à¦° à¦¡à¦•à§�à¦®à§‡à¦¨à§�à¦Ÿ à¦ªà§�à¦°à¦¿à¦­à¦¿à¦‰ à¦®à§‹à¦¡à¦¾à¦² à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "43",
@@ -1178,7 +1187,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Personnel File",
     link: "/add-employee",
     descriptionEn: "Added a smart missing attachment warning modal on form submit. It detects which academic degrees and work experience entries are filled in but missing a supporting document, lists them by name, and lets the user go back to attach files or proceed anyway.",
-    descriptionBn: "ফর্ম সাবমিটের সময় একটি স্মার্ট মিসিং অ্যাটাচমেন্ট ওয়ার্নিং মোডাল যুক্ত করা হয়েছে। এটি স্বয়ংক্রিয়ভাবে শনাক্ত করে কোন একাডেমিক ডিগ্রি বা কর্মঅভিজ্ঞতার এন্ট্রিতে ডকুমেন্ট আপলোড করা হয়নি, সেগুলোর নাম দিয়ে একটি তালিকা দেখায়, এবং ব্যবহারকারীকে ফিরে গিয়ে ডকুমেন্ট যোগ করার বা এড়িয়ে সাবমিট করার সুযোগ দেয়।",
+    descriptionBn: "à¦«à¦°à§�à¦® à¦¸à¦¾à¦¬à¦®à¦¿à¦Ÿà§‡à¦° à¦¸à¦®à¦¯à¦¼ à¦�à¦•à¦Ÿà¦¿ à¦¸à§�à¦®à¦¾à¦°à§�à¦Ÿ à¦®à¦¿à¦¸à¦¿à¦‚ à¦…à§�à¦¯à¦¾à¦Ÿà¦¾à¦šà¦®à§‡à¦¨à§�à¦Ÿ à¦“à¦¯à¦¼à¦¾à¦°à§�à¦¨à¦¿à¦‚ à¦®à§‹à¦¡à¦¾à¦² à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦�à¦Ÿà¦¿ à¦¸à§�à¦¬à¦¯à¦¼à¦‚à¦•à§�à¦°à¦¿à¦¯à¦¼à¦­à¦¾à¦¬à§‡ à¦¶à¦¨à¦¾à¦•à§�à¦¤ à¦•à¦°à§‡ à¦•à§‹à¦¨ à¦�à¦•à¦¾à¦¡à§‡à¦®à¦¿à¦• à¦¡à¦¿à¦—à§�à¦°à¦¿ à¦¬à¦¾ à¦•à¦°à§�à¦®à¦…à¦­à¦¿à¦œà§�à¦žà¦¤à¦¾à¦° à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿à¦¤à§‡ à¦¡à¦•à§�à¦®à§‡à¦¨à§�à¦Ÿ à¦†à¦ªà¦²à§‹à¦¡ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à¦¨à¦¿, à¦¸à§‡à¦—à§�à¦²à§‹à¦° à¦¨à¦¾à¦® à¦¦à¦¿à¦¯à¦¼à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¤à¦¾à¦²à¦¿à¦•à¦¾ à¦¦à§‡à¦–à¦¾à¦¯à¦¼, à¦�à¦¬à¦‚ à¦¬à§�à¦¯à¦¬à¦¹à¦¾à¦°à¦•à¦¾à¦°à§€à¦•à§‡ à¦«à¦¿à¦°à§‡ à¦—à¦¿à¦¯à¦¼à§‡ à¦¡à¦•à§�à¦®à§‡à¦¨à§�à¦Ÿ à¦¯à§‹à¦— à¦•à¦°à¦¾à¦° à¦¬à¦¾ à¦�à¦¡à¦¼à¦¿à¦¯à¦¼à§‡ à¦¸à¦¾à¦¬à¦®à¦¿à¦Ÿ à¦•à¦°à¦¾à¦° à¦¸à§�à¦¯à§‹à¦— à¦¦à§‡à¦¯à¦¼à¥¤",
   },
   {
     id: "44",
@@ -1187,7 +1196,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Personnel File",
     link: "/add-employee",
     descriptionEn: "Implemented the dynamic pre-upload attachment ID generation and saved qualification/experience details with attachment tokens in localStorage during employee creation.",
-    descriptionBn: "এমপ্লয়ি ক্রিয়েশন ফর্মে ডাইনামিক প্রি-আপলোড অ্যাটাচমেন্ট আইডি জেনারেশন ইমপ্লিমেন্ট করা হয়েছে এবং লোকাল স্টোরেজে কোয়ালিফিকেশন ও এক্সপেরিয়েন্স ডেটা অ্যাটাচমেন্ট টোকেনসহ সংরক্ষণ করার ব্যবস্থা করা হয়েছে।",
+    descriptionBn: "à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦•à§�à¦°à¦¿à¦¯à¦¼à§‡à¦¶à¦¨ à¦«à¦°à§�à¦®à§‡ à¦¡à¦¾à¦‡à¦¨à¦¾à¦®à¦¿à¦• à¦ªà§�à¦°à¦¿-à¦†à¦ªà¦²à§‹à¦¡ à¦…à§�à¦¯à¦¾à¦Ÿà¦¾à¦šà¦®à§‡à¦¨à§�à¦Ÿ à¦†à¦‡à¦¡à¦¿ à¦œà§‡à¦¨à¦¾à¦°à§‡à¦¶à¦¨ à¦‡à¦®à¦ªà§�à¦²à¦¿à¦®à§‡à¦¨à§�à¦Ÿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦²à§‹à¦•à¦¾à¦² à¦¸à§�à¦Ÿà§‹à¦°à§‡à¦œà§‡ à¦•à§‹à¦¯à¦¼à¦¾à¦²à¦¿à¦«à¦¿à¦•à§‡à¦¶à¦¨ à¦“ à¦�à¦•à§�à¦¸à¦ªà§‡à¦°à¦¿à¦¯à¦¼à§‡à¦¨à§�à¦¸ à¦¡à§‡à¦Ÿà¦¾ à¦…à§�à¦¯à¦¾à¦Ÿà¦¾à¦šà¦®à§‡à¦¨à§�à¦Ÿ à¦Ÿà§‹à¦•à§‡à¦¨à¦¸à¦¹ à¦¸à¦‚à¦°à¦•à§�à¦·à¦£ à¦•à¦°à¦¾à¦° à¦¬à§�à¦¯à¦¬à¦¸à§�à¦¥à¦¾ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "45",
@@ -1196,7 +1205,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-dashboard",
     descriptionEn: "Restructured the Merchandising module sidebar menu to align with the core RMG workflow: Inquiry, Quotation, PO Management, Pre Costing, Order Management (with sub-menus), Yarn Booking, and Fabric Booking, with the Merchandising Settings category moved to the top.",
-    descriptionBn: "মার্চেন্ডাইজিং মডিউলের সাইডবার মেনু আরএমজি ওয়ার্কফ্লো অনুযায়ী সাজানো হয়েছে (Inquiry, Quotation, PO Management, Pre Costing, Order Management sub-menus, Yarn Booking এবং Fabric Booking) এবং 'Merchandising Settings' মেনুটিকে সবার উপরে নিয়ে যাওয়া হয়েছে।",
+    descriptionBn: "à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦®à¦¡à¦¿à¦‰à¦²à§‡à¦° à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦° à¦®à§‡à¦¨à§� à¦†à¦°à¦�à¦®à¦œà¦¿ à¦“à¦¯à¦¼à¦¾à¦°à§�à¦•à¦«à§�à¦²à§‹ à¦…à¦¨à§�à¦¯à¦¾à¦¯à¦¼à§€ à¦¸à¦¾à¦œà¦¾à¦¨à§‹ à¦¹à¦¯à¦¼à§‡à¦›à§‡ (Inquiry, Quotation, PO Management, Pre Costing, Order Management sub-menus, Yarn Booking à¦�à¦¬à¦‚ Fabric Booking) à¦�à¦¬à¦‚ 'Merchandising Settings' à¦®à§‡à¦¨à§�à¦Ÿà¦¿à¦•à§‡ à¦¸à¦¬à¦¾à¦° à¦‰à¦ªà¦°à§‡ à¦¨à¦¿à¦¯à¦¼à§‡ à¦¯à¦¾à¦“à¦¯à¦¼à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "46",
@@ -1205,7 +1214,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-dashboard",
     descriptionEn: "Added 'Capacity' section with sub-menus (Monthly Capacity, Capacity Allocation, Capacity Distribution, Sales Target Entry) right after the Dashboard category in the Merchandising module sidebar.",
-    descriptionBn: "মার্চেন্ডাইজিং সাইডবারে Dashboard-এর পর নতুন 'Capacity' মেনু এবং তার সাব-মেনুসমূহ (Monthly Capacity, Capacity Allocation, Capacity Distribution, Sales Target Entry) যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦°à§‡ Dashboard-à¦�à¦° à¦ªà¦° à¦¨à¦¤à§�à¦¨ 'Capacity' à¦®à§‡à¦¨à§� à¦�à¦¬à¦‚ à¦¤à¦¾à¦° à¦¸à¦¾à¦¬-à¦®à§‡à¦¨à§�à¦¸à¦®à§‚à¦¹ (Monthly Capacity, Capacity Allocation, Capacity Distribution, Sales Target Entry) à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "47",
@@ -1214,7 +1223,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-capacity-planning",
     descriptionEn: "Implemented the fully interactive Capacity Allocation module, including a spreadsheet-style Master Ledger view with filters/searches/exports, and an inline day-by-day calculation form for month-wise line capacity allocation.",
-    descriptionBn: "মার্চেন্ডাইজিং ক্যাড ক্যাপাসিটি প্ল্যানিং মডিউলে একটি সম্পূর্ণ ইন্টারঅ্যাক্টিভ 'Capacity Allocation' ফিচার যোগ করা হয়েছে। এর মধ্যে ফিল্টার/সার্চ/এক্সপোর্ট সহ স্প্রেডশিট-স্টাইলের মাস্টার লেজার ভিউ এবং দিনভিত্তিক ক্যাপাসিটি হিসাবের জন্য ফর্ম ওয়ার্কস্পেস অন্তর্ভুক্ত রয়েছে।",
+    descriptionBn: "à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦•à§�à¦¯à¦¾à¦¡ à¦•à§�à¦¯à¦¾à¦ªà¦¾à¦¸à¦¿à¦Ÿà¦¿ à¦ªà§�à¦²à§�à¦¯à¦¾à¦¨à¦¿à¦‚ à¦®à¦¡à¦¿à¦‰à¦²à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦‡à¦¨à§�à¦Ÿà¦¾à¦°à¦…à§�à¦¯à¦¾à¦•à§�à¦Ÿà¦¿à¦­ 'Capacity Allocation' à¦«à¦¿à¦šà¦¾à¦° à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦° à¦®à¦§à§�à¦¯à§‡ à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦°/à¦¸à¦¾à¦°à§�à¦š/à¦�à¦•à§�à¦¸à¦ªà§‹à¦°à§�à¦Ÿ à¦¸à¦¹ à¦¸à§�à¦ªà§�à¦°à§‡à¦¡à¦¶à¦¿à¦Ÿ-à¦¸à§�à¦Ÿà¦¾à¦‡à¦²à§‡à¦° à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦²à§‡à¦œà¦¾à¦° à¦­à¦¿à¦‰ à¦�à¦¬à¦‚ à¦¦à¦¿à¦¨à¦­à¦¿à¦¤à§�à¦¤à¦¿à¦• à¦•à§�à¦¯à¦¾à¦ªà¦¾à¦¸à¦¿à¦Ÿà¦¿ à¦¹à¦¿à¦¸à¦¾à¦¬à§‡à¦° à¦œà¦¨à§�à¦¯ à¦«à¦°à§�à¦® à¦“à§Ÿà¦¾à¦°à§�à¦•à¦¸à§�à¦ªà§‡à¦¸ à¦…à¦¨à§�à¦¤à¦°à§�à¦­à§�à¦•à§�à¦¤ à¦°à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "48",
@@ -1223,7 +1232,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-capacity-planning",
     descriptionEn: "Implemented the 'Monthly Capacity' configuration panel inside the capacity planning module. Added Status, Year, and Month filters, spreadsheet export capabilities, and loaded realistic month-wise line machine/SMV capacity calculation entries as seed data.",
-    descriptionBn: "ক্যাপাসিটি প্ল্যানিং মডিউলের অধীনে 'Monthly Capacity' প্যানেল ইমপ্লিমেন্ট করা হয়েছে। এর মধ্যে স্ট্যাটাস, বছর, এবং মাস ফিল্টার, স্প্রেডশিট এক্সপোর্ট এবং বিভিন্ন মাসের মেশিন/এসএমভি ক্যাপাসিটি ক্যালকুলেশন সংক্রান্ত ডেমো ডেটা যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦•à§�à¦¯à¦¾à¦ªà¦¾à¦¸à¦¿à¦Ÿà¦¿ à¦ªà§�à¦²à§�à¦¯à¦¾à¦¨à¦¿à¦‚ à¦®à¦¡à¦¿à¦‰à¦²à§‡à¦° à¦…à¦§à§€à¦¨à§‡ 'Monthly Capacity' à¦ªà§�à¦¯à¦¾à¦¨à§‡à¦² à¦‡à¦®à¦ªà§�à¦²à¦¿à¦®à§‡à¦¨à§�à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦° à¦®à¦§à§�à¦¯à§‡ à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦Ÿà¦¾à¦¸, à¦¬à¦›à¦°, à¦�à¦¬à¦‚ à¦®à¦¾à¦¸ à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦°, à¦¸à§�à¦ªà§�à¦°à§‡à¦¡à¦¶à¦¿à¦Ÿ à¦�à¦•à§�à¦¸à¦ªà§‹à¦°à§�à¦Ÿ à¦�à¦¬à¦‚ à¦¬à¦¿à¦­à¦¿à¦¨à§�à¦¨ à¦®à¦¾à¦¸à§‡à¦° à¦®à§‡à¦¶à¦¿à¦¨/à¦�à¦¸à¦�à¦®à¦­à¦¿ à¦•à§�à¦¯à¦¾à¦ªà¦¾à¦¸à¦¿à¦Ÿà¦¿ à¦•à§�à¦¯à¦¾à¦²à¦•à§�à¦²à§‡à¦¶à¦¨ à¦¸à¦‚à¦•à§�à¦°à¦¾à¦¨à§�à¦¤ à¦¡à§‡à¦®à§‹ à¦¡à§‡à¦Ÿà¦¾ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "49",
@@ -1232,7 +1241,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-capacity-planning",
     descriptionEn: "Implemented the 'Capacity Distribution' workspace and list ledger in the capacity planning module. Features auto-lookup of month-wise capacities, multi-buyer selection (Zara, Mango, Fatface, etc.), allocation ratio validation, and real-time distribution summaries.",
-    descriptionBn: "ক্যাপাসিটি প্ল্যানিং মডিউলে 'Capacity Distribution' পেজ ও লেজার তৈরি করা হয়েছে। এর মাধ্যমে মাসভিত্তিক মোট ক্যাপাসিটি রিয়েল-টাইমে সার্চ করা, নির্দিষ্ট বায়ারদের (যেমন: Zara, Mango, Fatface ইত্যাদি) মধ্যে শতাংশ ভাগ করে দেওয়া এবং রিয়েল-টাইমে মোট বণ্টনের যোগফল হিসাবের ব্যবস্থা করা হয়েছে।",
+    descriptionBn: "à¦•à§�à¦¯à¦¾à¦ªà¦¾à¦¸à¦¿à¦Ÿà¦¿ à¦ªà§�à¦²à§�à¦¯à¦¾à¦¨à¦¿à¦‚ à¦®à¦¡à¦¿à¦‰à¦²à§‡ 'Capacity Distribution' à¦ªà§‡à¦œ à¦“ à¦²à§‡à¦œà¦¾à¦° à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦° à¦®à¦¾à¦§à§�à¦¯à¦®à§‡ à¦®à¦¾à¦¸à¦­à¦¿à¦¤à§�à¦¤à¦¿à¦• à¦®à§‹à¦Ÿ à¦•à§�à¦¯à¦¾à¦ªà¦¾à¦¸à¦¿à¦Ÿà¦¿ à¦°à¦¿à¦¯à¦¼à§‡à¦²-à¦Ÿà¦¾à¦‡à¦®à§‡ à¦¸à¦¾à¦°à§�à¦š à¦•à¦°à¦¾, à¦¨à¦¿à¦°à§�à¦¦à¦¿à¦·à§�à¦Ÿ à¦¬à¦¾à¦¯à¦¼à¦¾à¦°à¦¦à§‡à¦° (à¦¯à§‡à¦®à¦¨: Zara, Mango, Fatface à¦‡à¦¤à§�à¦¯à¦¾à¦¦à¦¿) à¦®à¦§à§�à¦¯à§‡ à¦¶à¦¤à¦¾à¦‚à¦¶ à¦­à¦¾à¦— à¦•à¦°à§‡ à¦¦à§‡à¦“à§Ÿà¦¾ à¦�à¦¬à¦‚ à¦°à¦¿à¦¯à¦¼à§‡à¦²-à¦Ÿà¦¾à¦‡à¦®à§‡ à¦®à§‹à¦Ÿ à¦¬à¦£à§�à¦Ÿà¦¨à§‡à¦° à¦¯à§‹à¦—à¦«à¦² à¦¹à¦¿à¦¸à¦¾à¦¬à§‡à¦° à¦¬à§�à¦¯à¦¬à¦¸à§�à¦¥à¦¾ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "50",
@@ -1241,7 +1250,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-monthly-capacity",
     descriptionEn: "Refactored the capacity planning module from a single tabbed route to four separate, independent URLs/pages: /merchandising-monthly-capacity, /merchandising-capacity-allocation, /merchandising-capacity-distribution, and /merchandising-sales-target-entry. Updated the merchandising sidebar layout and navigation routes accordingly.",
-    descriptionBn: "ক্যাপাসিটি প্ল্যানিং মডিউলকে একটি মাত্র ট্যাবড ইউআরএল থেকে পরিবর্তন করে ৪টি আলাদা ইউআরএল ও পেজে বিভক্ত করা হয়েছে: /merchandising-monthly-capacity, /merchandising-capacity-allocation, /merchandising-capacity-distribution এবং /merchandising-sales-target-entry। সেই সাথে মার্চেন্ডাইজিং সাইডবার লেআউট ও নেভিগেশন লিংকসমূহ আপডেট করা হয়েছে।",
+    descriptionBn: "à¦•à§�à¦¯à¦¾à¦ªà¦¾à¦¸à¦¿à¦Ÿà¦¿ à¦ªà§�à¦²à§�à¦¯à¦¾à¦¨à¦¿à¦‚ à¦®à¦¡à¦¿à¦‰à¦²à¦•à§‡ à¦�à¦•à¦Ÿà¦¿ à¦®à¦¾à¦¤à§�à¦° à¦Ÿà§�à¦¯à¦¾à¦¬à¦¡ à¦‡à¦‰à¦†à¦°à¦�à¦² à¦¥à§‡à¦•à§‡ à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦•à¦°à§‡ à§ªà¦Ÿà¦¿ à¦†à¦²à¦¾à¦¦à¦¾ à¦‡à¦‰à¦†à¦°à¦�à¦² à¦“ à¦ªà§‡à¦œà§‡ à¦¬à¦¿à¦­à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡: /merchandising-monthly-capacity, /merchandising-capacity-allocation, /merchandising-capacity-distribution à¦�à¦¬à¦‚ /merchandising-sales-target-entryà¥¤ à¦¸à§‡à¦‡ à¦¸à¦¾à¦¥à§‡ à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦° à¦²à§‡à¦†à¦‰à¦Ÿ à¦“ à¦¨à§‡à¦­à¦¿à¦—à§‡à¦¶à¦¨ à¦²à¦¿à¦‚à¦•à¦¸à¦®à§‚à¦¹ à¦†à¦ªà¦¡à§‡à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "51",
@@ -1250,7 +1259,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-capacity-distribution",
     descriptionEn: "Refactored the Capacity Distribution list layout and edit controls to match the user's reference columns: SL, edit pencil, Company Name, Location, Year, Month, Total Capacity (Min), and Total Capacity (Pcs). Also refactored the creation/editing view to open in a wide modal overlay with a dual-panel layout.",
-    descriptionBn: "ইউজারের দেয়া স্ক্রিনশট অনুযায়ী ক্যাপাসিটি ডিস্ট্রিবিউশন টেবিলের কলামসমূহ এবং এডিট পেন্সিল পজিশন বিন্যস্ত করা হয়েছে। এছাড়া এলোকেশন পেজের মতো ডিস্ট্রিবিউশন তৈরি ও এডিট করার ফর্মটিকেও ব্যাকড্রপ-ব্লারড মোডালে রুপান্তর করা হয়েছে।",
+    descriptionBn: "à¦‡à¦‰à¦œà¦¾à¦°à§‡à¦° à¦¦à§‡à§Ÿà¦¾ à¦¸à§�à¦•à§�à¦°à¦¿à¦¨à¦¶à¦Ÿ à¦…à¦¨à§�à¦¯à¦¾à§Ÿà§€ à¦•à§�à¦¯à¦¾à¦ªà¦¾à¦¸à¦¿à¦Ÿà¦¿ à¦¡à¦¿à¦¸à§�à¦Ÿà§�à¦°à¦¿à¦¬à¦¿à¦‰à¦¶à¦¨ à¦Ÿà§‡à¦¬à¦¿à¦²à§‡à¦° à¦•à¦²à¦¾à¦®à¦¸à¦®à§‚à¦¹ à¦�à¦¬à¦‚ à¦�à¦¡à¦¿à¦Ÿ à¦ªà§‡à¦¨à§�à¦¸à¦¿à¦² à¦ªà¦œà¦¿à¦¶à¦¨ à¦¬à¦¿à¦¨à§�à¦¯à¦¸à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦›à¦¾à§œà¦¾ à¦�à¦²à§‹à¦•à§‡à¦¶à¦¨ à¦ªà§‡à¦œà§‡à¦° à¦®à¦¤à§‹ à¦¡à¦¿à¦¸à§�à¦Ÿà§�à¦°à¦¿à¦¬à¦¿à¦‰à¦¶à¦¨ à¦¤à§ˆà¦°à¦¿ à¦“ à¦�à¦¡à¦¿à¦Ÿ à¦•à¦°à¦¾à¦° à¦«à¦°à§�à¦®à¦Ÿà¦¿à¦•à§‡à¦“ à¦¬à§�à¦¯à¦¾à¦•à¦¡à§�à¦°à¦ª-à¦¬à§�à¦²à¦¾à¦°à¦¡ à¦®à§‹à¦¡à¦¾à¦²à§‡ à¦°à§�à¦ªà¦¾à¦¨à§�à¦¤à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "52",
@@ -1259,7 +1268,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-sales-target-entry",
     descriptionEn: "Refactored the Sales Target Entry page. List view now features columns: SL, edit pencil, Year, and Buyer Name. Added a backdrop-blurred wide modal for creating/editing targets with top controls: Year, Buyer, and GET MONTH button, along with a bottom-scrollable 12-month details grid showing: SL, Month, Quantity (Pcs), Amount (USD), Minute, Margin (USD), CM, RM, Avg SMV, Avg Eff, Mgt Notes, and a blue Team ACTION button.",
-    descriptionBn: "সেলস টার্গেট এন্ট্রি পেজটি রিফ্যাক্টর করা হয়েছে। লিস্ট ভিউ টেবিলে SL, এডিট পেন্সিল, বছর এবং বায়ার নামের কলাম রয়েছে। এছাড়া টার্গেট তৈরি ও এডিট করার জন্য ব্যাকড্রপ-ব্লারড মোডাল যুক্ত করা হয়েছে যেখানে বছর, বায়ার এবং GET MONTH বাটনের সাহায্যে ১২ মাসের ছক জেনারেট করা ও কলামসমূহের মোট যোগফল রিয়েল-টাইমে ক্যালকুলেট করার ব্যবস্থা রয়েছে।",
+    descriptionBn: "à¦¸à§‡à¦²à¦¸ à¦Ÿà¦¾à¦°à§�à¦—à§‡à¦Ÿ à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿ à¦ªà§‡à¦œà¦Ÿà¦¿ à¦°à¦¿à¦«à§�à¦¯à¦¾à¦•à§�à¦Ÿà¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦²à¦¿à¦¸à§�à¦Ÿ à¦­à¦¿à¦‰ à¦Ÿà§‡à¦¬à¦¿à¦²à§‡ SL, à¦�à¦¡à¦¿à¦Ÿ à¦ªà§‡à¦¨à§�à¦¸à¦¿à¦², à¦¬à¦›à¦° à¦�à¦¬à¦‚ à¦¬à¦¾à¦¯à¦¼à¦¾à¦° à¦¨à¦¾à¦®à§‡à¦° à¦•à¦²à¦¾à¦® à¦°à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦›à¦¾à§œà¦¾ à¦Ÿà¦¾à¦°à§�à¦—à§‡à¦Ÿ à¦¤à§ˆà¦°à¦¿ à¦“ à¦�à¦¡à¦¿à¦Ÿ à¦•à¦°à¦¾à¦° à¦œà¦¨à§�à¦¯ à¦¬à§�à¦¯à¦¾à¦•à¦¡à§�à¦°à¦ª-à¦¬à§�à¦²à¦¾à¦°à¦¡ à¦®à§‹à¦¡à¦¾à¦² à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¯à§‡à¦–à¦¾à¦¨à§‡ à¦¬à¦›à¦°, à¦¬à¦¾à¦¯à¦¼à¦¾à¦° à¦�à¦¬à¦‚ GET MONTH à¦¬à¦¾à¦Ÿà¦¨à§‡à¦° à¦¸à¦¾à¦¹à¦¾à¦¯à§�à¦¯à§‡ à§§à§¨ à¦®à¦¾à¦¸à§‡à¦° à¦›à¦• à¦œà§‡à¦¨à¦¾à¦°à§‡à¦Ÿ à¦•à¦°à¦¾ à¦“ à¦•à¦²à¦¾à¦®à¦¸à¦®à§‚à¦¹à§‡à¦° à¦®à§‹à¦Ÿ à¦¯à§‹à¦—à¦«à¦² à¦°à¦¿à¦¯à¦¼à§‡à¦²-à¦Ÿà¦¾à¦‡à¦®à§‡ à¦•à§�à¦¯à¦¾à¦²à¦•à§�à¦²à§‡à¦Ÿ à¦•à¦°à¦¾à¦° à¦¬à§�à¦¯à¦¬à¦¸à§�à¦¥à¦¾ à¦°à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "53",
@@ -1268,7 +1277,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-work-orders",
     descriptionEn: "Added a new 'Workorder' accordion menu in the Merchandising Sidebar below Fabric Booking. Included submenus: Dyed Yarn WO, Trims WO, Wash WO, AOP WO, Print WO, Emb WO, and Sweater Service WO, pointing to /merchandising-work-orders with specific tab query parameters.",
-    descriptionBn: "মার্চেন্ডাইজিং সাইডবারে Fabric Booking এর নিচে নতুন 'Workorder' অ্যাকর্ডিয়ন মেনু যোগ করা হয়েছে। এর সাব-মেনুসমূহ হচ্ছে: Dyed Yarn WO, Trims WO, Wash WO, AOP WO, Print WO, Emb WO, এবং Sweater Service WO; যা টার্গেট কুয়েরি ট্যাব নিয়ে /merchandising-work-orders রুটে নেভিগেট করবে।",
+    descriptionBn: "à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦°à§‡ Fabric Booking à¦�à¦° à¦¨à¦¿à¦šà§‡ à¦¨à¦¤à§�à¦¨ 'Workorder' à¦…à§�à¦¯à¦¾à¦•à¦°à§�à¦¡à¦¿à¦¯à¦¼à¦¨ à¦®à§‡à¦¨à§� à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦° à¦¸à¦¾à¦¬-à¦®à§‡à¦¨à§�à¦¸à¦®à§‚à¦¹ à¦¹à¦šà§�à¦›à§‡: Dyed Yarn WO, Trims WO, Wash WO, AOP WO, Print WO, Emb WO, à¦�à¦¬à¦‚ Sweater Service WO; à¦¯à¦¾ à¦Ÿà¦¾à¦°à§�à¦—à§‡à¦Ÿ à¦•à§�à§Ÿà§‡à¦°à¦¿ à¦Ÿà§�à¦¯à¦¾à¦¬ à¦¨à¦¿à§Ÿà§‡ /merchandising-work-orders à¦°à§�à¦Ÿà§‡ à¦¨à§‡à¦­à¦¿à¦—à§‡à¦Ÿ à¦•à¦°à¦¬à§‡à¥¤",
   },
   {
     id: "54",
@@ -1277,7 +1286,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-reports",
     descriptionEn: "Added a new 'Reports' accordion menu in the Merchandising Sidebar containing 24 submenu entries (Sample Report, Capacity & Booking, Order Summary, Date Wise Shipment, Yarn Booking Status, Order Pre. Vs Post Costing, etc.) pointing to /merchandising-reports with tab query configurations.",
-    descriptionBn: "মার্চেন্ডাইজিং সাইডবারে সর্বশেষে নতুন 'Reports' অ্যাকর্ডিয়ন মেনু যোগ করা হয়েছে। এর অধীনে ২৪টি রিপোর্টিং সাব-মেনু (যেমন: Sample Report, Capacity & Booking, Order Summary, Date Wise Shipment, Yarn Booking Status, Order Pre. Vs Post Costing ইত্যাদি) যুক্ত করা হয়েছে যা ট্যাব কুয়েরি নিয়ে /merchandising-reports রুটে নেভিগেট করবে।",
+    descriptionBn: "à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦°à§‡ à¦¸à¦°à§�à¦¬à¦¶à§‡à¦·à§‡ à¦¨à¦¤à§�à¦¨ 'Reports' à¦…à§�à¦¯à¦¾à¦•à¦°à§�à¦¡à¦¿à¦¯à¦¼à¦¨ à¦®à§‡à¦¨à§� à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦° à¦…à¦§à§€à¦¨à§‡ à§¨à§ªà¦Ÿà¦¿ à¦°à¦¿à¦ªà§‹à¦°à§�à¦Ÿà¦¿à¦‚ à¦¸à¦¾à¦¬-à¦®à§‡à¦¨à§� (à¦¯à§‡à¦®à¦¨: Sample Report, Capacity & Booking, Order Summary, Date Wise Shipment, Yarn Booking Status, Order Pre. Vs Post Costing à¦‡à¦¤à§�à¦¯à¦¾à¦¦à¦¿) à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¯à¦¾ à¦Ÿà§�à¦¯à¦¾à¦¬ à¦•à§�à§Ÿà§‡à¦°à¦¿ à¦¨à¦¿à§Ÿà§‡ /merchandising-reports à¦°à§�à¦Ÿà§‡ à¦¨à§‡à¦­à¦¿à¦—à§‡à¦Ÿ à¦•à¦°à¦¬à§‡à¥¤",
   },
   {
     id: "55",
@@ -1286,7 +1295,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-master-settings",
     descriptionEn: "Renamed the 'Merchandising Settings' accordion label to 'MM Settings' in the sidebar layout.",
-    descriptionBn: "মার্চেন্ডাইজিং সাইডবার লেআউটে 'Merchandising Settings' অ্যাকর্ডিয়ন লেবেলের নাম পরিবর্তন করে 'MM Settings' করা হয়েছে।",
+    descriptionBn: "à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦° à¦²à§‡à¦†à¦‰à¦Ÿà§‡ 'Merchandising Settings' à¦…à§�à¦¯à¦¾à¦•à¦°à§�à¦¡à¦¿à¦¯à¦¼à¦¨ à¦²à§‡à¦¬à§‡à¦²à§‡à¦° à¦¨à¦¾à¦® à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦•à¦°à§‡ 'MM Settings' à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "56",
@@ -1295,7 +1304,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-reports",
     descriptionEn: "Refactored the sidebar component in MerchandisingLayout.tsx to preserve and restore scroll position via sessionStorage. Updated accordion expanded states initialization to dynamically analyze the current URL pathname and search tab parameters, ensuring the active category and subitem are always expanded, selected, and scrolled into view.",
-    descriptionBn: "মার্চেন্ডাইজিং সাইডবারে স্ক্রল পজিশন ধরের রাখার জন্য sessionStorage ব্যবহার করা হয়েছে। সেই সাথে অ্যাকর্ডিয়নগুলোর এক্সপ্যান্ডেড স্টেট ডায়নামিক করা হয়েছে যাতে বর্তমান পেজ এবং ড্রপডাউন ট্যাবের উপর ভিত্তি করে সংশ্লিষ্ট ক্যাটাগরিটি স্বয়ংক্রিয়ভাবে এক্সপ্যান্ডেড, সিলেক্টেড এবং স্ক্রল ভিউতে দৃশ্যমান থাকে।",
+    descriptionBn: "à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦°à§‡ à¦¸à§�à¦•à§�à¦°à¦² à¦ªà¦œà¦¿à¦¶à¦¨ à¦§à¦°à§‡à¦° à¦°à¦¾à¦–à¦¾à¦° à¦œà¦¨à§�à¦¯ sessionStorage à¦¬à§�à¦¯à¦¬à¦¹à¦¾à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦¸à§‡à¦‡ à¦¸à¦¾à¦¥à§‡ à¦…à§�à¦¯à¦¾à¦•à¦°à§�à¦¡à¦¿à¦¯à¦¼à¦¨à¦—à§�à¦²à§‹à¦° à¦�à¦•à§�à¦¸à¦ªà§�à¦¯à¦¾à¦¨à§�à¦¡à§‡à¦¡ à¦¸à§�à¦Ÿà§‡à¦Ÿ à¦¡à¦¾à¦¯à¦¼à¦¨à¦¾à¦®à¦¿à¦• à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¯à¦¾à¦¤à§‡ à¦¬à¦°à§�à¦¤à¦®à¦¾à¦¨ à¦ªà§‡à¦œ à¦�à¦¬à¦‚ à¦¡à§�à¦°à¦ªà¦¡à¦¾à¦‰à¦¨ à¦Ÿà§�à¦¯à¦¾à¦¬à§‡à¦° à¦‰à¦ªà¦° à¦­à¦¿à¦¤à§�à¦¤à¦¿ à¦•à¦°à§‡ à¦¸à¦‚à¦¶à§�à¦²à¦¿à¦·à§�à¦Ÿ à¦•à§�à¦¯à¦¾à¦Ÿà¦¾à¦—à¦°à¦¿à¦Ÿà¦¿ à¦¸à§�à¦¬à§Ÿà¦‚à¦•à§�à¦°à¦¿à§Ÿà¦­à¦¾à¦¬à§‡ à¦�à¦•à§�à¦¸à¦ªà§�à¦¯à¦¾à¦¨à§�à¦¡à§‡à¦¡, à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿà§‡à¦¡ à¦�à¦¬à¦‚ à¦¸à§�à¦•à§�à¦°à¦² à¦­à¦¿à¦‰à¦¤à§‡ à¦¦à§ƒà¦¶à§�à¦¯à¦®à¦¾à¦¨ à¦¥à¦¾à¦•à§‡à¥¤",
   },
   {
     id: "57",
@@ -1304,7 +1313,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-master-settings",
     descriptionEn: "Moved the static menuCategories configuration array outside the MerchandisingLayout component scope to fix a ReferenceError during component state initialization.",
-    descriptionBn: "স্টেট ইনিশিয়ালাইজেশন এর সময় আসা ReferenceError দূর করার জন্য MerchandisingLayout কম্পোনেন্টের বাইরে স্ট্যাটিক menuCategories কনফিগারেশন অ্যারেটিকে সরিয়ে নেওয়া হয়েছে।",
+    descriptionBn: "à¦¸à§�à¦Ÿà§‡à¦Ÿ à¦‡à¦¨à¦¿à¦¶à¦¿à§Ÿà¦¾à¦²à¦¾à¦‡à¦œà§‡à¦¶à¦¨ à¦�à¦° à¦¸à¦®à§Ÿ à¦†à¦¸à¦¾ ReferenceError à¦¦à§‚à¦° à¦•à¦°à¦¾à¦° à¦œà¦¨à§�à¦¯ MerchandisingLayout à¦•à¦®à§�à¦ªà§‹à¦¨à§‡à¦¨à§�à¦Ÿà§‡à¦° à¦¬à¦¾à¦‡à¦°à§‡ à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦Ÿà¦¿à¦• menuCategories à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦…à§�à¦¯à¦¾à¦°à§‡à¦Ÿà¦¿à¦•à§‡ à¦¸à¦°à¦¿à§Ÿà§‡ à¦¨à§‡à¦“à§Ÿà¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "58",
@@ -1313,7 +1322,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-master-settings",
     descriptionEn: "Refactored the Company Wise MERC Setting master page under MM Settings. Rendered custom company ledger table (Act hamburger dropdown, SL, Company Name, Address, and status badges). Implemented action dropdown with items (Fabric Source, Print Type, Fabric Nature, UOM, Body Part, Map DOM Key) that trigger backdrop-blurred multi-select tag modal setup editors with suggestion listings and manual custom tagging.",
-    descriptionBn: "MM Settings এর অধীনে 'Company Wise MERC Setting' পেজটি সম্পূর্ণ নতুনভাবে তৈরি করা হয়েছে। এতে প্রতিটি কোম্পানির জন্য অ্যাকশন ড্রপডাউন (Fabric Source, Print Type, Fabric Nature, UOM, Body Part, Map DOM Key) যুক্ত করা হয়েছে এবং প্রতিটি ফিচারের জন্য ইন্টারেক্টিভ ট্যাগ এডিটর মোডাল যুক্ত করা হয়েছে যেখানে প্রিসেট সাজেশন থেকে ট্যাগ সিলেক্ট করা বা কাস্টম টাইপিংয়ের মাধ্যমে ট্যাগ অ্যাড করার ব্যবস্থা রয়েছে।",
+    descriptionBn: "MM Settings à¦�à¦° à¦…à¦§à§€à¦¨à§‡ 'Company Wise MERC Setting' à¦ªà§‡à¦œà¦Ÿà¦¿ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦¨à¦¤à§�à¦¨à¦­à¦¾à¦¬à§‡ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦¤à§‡ à¦ªà§�à¦°à¦¤à¦¿à¦Ÿà¦¿ à¦•à§‹à¦®à§�à¦ªà¦¾à¦¨à¦¿à¦° à¦œà¦¨à§�à¦¯ à¦…à§�à¦¯à¦¾à¦•à¦¶à¦¨ à¦¡à§�à¦°à¦ªà¦¡à¦¾à¦‰à¦¨ (Fabric Source, Print Type, Fabric Nature, UOM, Body Part, Map DOM Key) à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦ªà§�à¦°à¦¤à¦¿à¦Ÿà¦¿ à¦«à¦¿à¦šà¦¾à¦°à§‡à¦° à¦œà¦¨à§�à¦¯ à¦‡à¦¨à§�à¦Ÿà¦¾à¦°à§‡à¦•à§�à¦Ÿà¦¿à¦­ à¦Ÿà§�à¦¯à¦¾à¦— à¦�à¦¡à¦¿à¦Ÿà¦° à¦®à§‹à¦¡à¦¾à¦² à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¯à§‡à¦–à¦¾à¦¨à§‡ à¦ªà§�à¦°à¦¿à¦¸à§‡à¦Ÿ à¦¸à¦¾à¦œà§‡à¦¶à¦¨ à¦¥à§‡à¦•à§‡ à¦Ÿà§�à¦¯à¦¾à¦— à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦°à¦¾ à¦¬à¦¾ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦Ÿà¦¾à¦‡à¦ªà¦¿à¦‚à§Ÿà§‡à¦° à¦®à¦¾à¦§à§�à¦¯à¦®à§‡ à¦Ÿà§�à¦¯à¦¾à¦— à¦…à§�à¦¯à¦¾à¦¡ à¦•à¦°à¦¾à¦° à¦¬à§�à¦¯à¦¬à¦¸à§�à¦¥à¦¾ à¦°à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "59",
@@ -1322,7 +1331,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings?tab=costing-configuration-cpm",
     descriptionEn: "Replaced the old simple 4-field Costing Configuration panel with a proper data table showing Setup Date, Year, Month, CM Expense, No of Resource, Working Hour, Working Day, CPM (auto-calculated), Applied CPM, Currency, and Status. Added Create and Update modals with full field validation.",
-    descriptionBn: "পুরনো সাধারণ ৪-ফিল্ডের Costing Configuration প্যানেলটি একটি পূর্ণাঙ্গ ডেটা টেবিল দিয়ে প্রতিস্থাপন করা হয়েছে। এতে Setup Date, Year, Month, CM Expense, No of Resource, Working Hour, Working Day, CPM (স্বয়ংক্রিয়ভাবে গণনা করা), Applied CPM, Currency এবং Status দেখানো হচ্ছে। সম্পূর্ণ ভ্যালিডেশনসহ Create এবং Update মোডাল যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦ªà§�à¦°à¦¨à§‹ à¦¸à¦¾à¦§à¦¾à¦°à¦£ à§ª-à¦«à¦¿à¦²à§�à¦¡à§‡à¦° Costing Configuration à¦ªà§�à¦¯à¦¾à¦¨à§‡à¦²à¦Ÿà¦¿ à¦�à¦•à¦Ÿà¦¿ à¦ªà§‚à¦°à§�à¦£à¦¾à¦™à§�à¦— à¦¡à§‡à¦Ÿà¦¾ à¦Ÿà§‡à¦¬à¦¿à¦² à¦¦à¦¿à¦¯à¦¼à§‡ à¦ªà§�à¦°à¦¤à¦¿à¦¸à§�à¦¥à¦¾à¦ªà¦¨ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦�à¦¤à§‡ Setup Date, Year, Month, CM Expense, No of Resource, Working Hour, Working Day, CPM (à¦¸à§�à¦¬à¦¯à¦¼à¦‚à¦•à§�à¦°à¦¿à¦¯à¦¼à¦­à¦¾à¦¬à§‡ à¦—à¦£à¦¨à¦¾ à¦•à¦°à¦¾), Applied CPM, Currency à¦�à¦¬à¦‚ Status à¦¦à§‡à¦–à¦¾à¦¨à§‹ à¦¹à¦šà§�à¦›à§‡à¥¤ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦­à§�à¦¯à¦¾à¦²à¦¿à¦¡à§‡à¦¶à¦¨à¦¸à¦¹ Create à¦�à¦¬à¦‚ Update à¦®à§‹à¦¡à¦¾à¦² à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "60",
@@ -1331,7 +1340,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings?tab=payment-terms",
     descriptionEn: "Built a dedicated Payment Terms tab with a clean data table (Actions, SL, Name, IsActive) pre-loaded with 10 standard terms (120/180/30/60/90 Days BBLC, At Sight, Cash, FOD, Others, TT). Added Create and Update modals with Short Name and IsActive fields.",
-    descriptionBn: "Payment Terms ট্যাবের জন্য একটি পূর্ণাঙ্গ ডেটা টেবিল (Actions, SL, Name, IsActive) তৈরি করা হয়েছে। এতে ১০টি স্ট্যান্ডার্ড টার্ম (120/180/30/60/90 Days BBLC, At Sight, Cash, FOD, Others, TT) আগে থেকেই লোড করা আছে। Short Name এবং IsActive ফিল্ডসহ Create ও Update মোডাল যুক্ত করা হয়েছে।",
+    descriptionBn: "Payment Terms à¦Ÿà§�à¦¯à¦¾à¦¬à§‡à¦° à¦œà¦¨à§�à¦¯ à¦�à¦•à¦Ÿà¦¿ à¦ªà§‚à¦°à§�à¦£à¦¾à¦™à§�à¦— à¦¡à§‡à¦Ÿà¦¾ à¦Ÿà§‡à¦¬à¦¿à¦² (Actions, SL, Name, IsActive) à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦�à¦¤à§‡ à§§à§¦à¦Ÿà¦¿ à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦¨à§�à¦¡à¦¾à¦°à§�à¦¡ à¦Ÿà¦¾à¦°à§�à¦® (120/180/30/60/90 Days BBLC, At Sight, Cash, FOD, Others, TT) à¦†à¦—à§‡ à¦¥à§‡à¦•à§‡à¦‡ à¦²à§‹à¦¡ à¦•à¦°à¦¾ à¦†à¦›à§‡à¥¤ Short Name à¦�à¦¬à¦‚ IsActive à¦«à¦¿à¦²à§�à¦¡à¦¸à¦¹ Create à¦“ Update à¦®à§‹à¦¡à¦¾à¦² à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "61",
@@ -1340,7 +1349,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings?tab=buying-house",
     descriptionEn: "Created a dedicated Buying House tab with a detailed data table (Actions, SL, Short Name, Full Name, Contact Person, Address, Phone, Email, Fax, IsActive) pre-populated with standard houses (ITPS, JMS Buyer, KLD, PFD). Added fully validated Create/Update modals.",
-    descriptionBn: "Buying House ট্যাবের জন্য একটি কাস্টম ডেটা টেবিল এবং সম্পূর্ণ ভ্যালিডেশনসহ Create/Update মোডাল যুক্ত করা হয়েছে। এতে পূর্বে থেকেই ITPS, JMS Buyer, KLD, PFD ইত্যাদি স্ট্যান্ডার্ড হাউসের ডেটা লোড করা আছে।",
+    descriptionBn: "Buying House à¦Ÿà§�à¦¯à¦¾à¦¬à§‡à¦° à¦œà¦¨à§�à¦¯ à¦�à¦•à¦Ÿà¦¿ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦¡à§‡à¦Ÿà¦¾ à¦Ÿà§‡à¦¬à¦¿à¦² à¦�à¦¬à¦‚ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦­à§�à¦¯à¦¾à¦²à¦¿à¦¡à§‡à¦¶à¦¨à¦¸à¦¹ Create/Update à¦®à§‹à¦¡à¦¾à¦² à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦�à¦¤à§‡ à¦ªà§‚à¦°à§�à¦¬à§‡ à¦¥à§‡à¦•à§‡à¦‡ ITPS, JMS Buyer, KLD, PFD à¦‡à¦¤à§�à¦¯à¦¾à¦¦à¦¿ à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦¨à§�à¦¡à¦¾à¦°à§�à¦¡ à¦¹à¦¾à¦‰à¦¸à§‡à¦° à¦¡à§‡à¦Ÿà¦¾ à¦²à§‹à¦¡ à¦•à¦°à¦¾ à¦†à¦›à§‡à¥¤",
   },
   {
     id: "62",
@@ -1349,7 +1358,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings?tab=buyer-wise-brand",
     descriptionEn: "Implemented a dedicated Buyer Brand tab with a custom table (Actions, SL, Buyer Name, Brand, IsActive). Integrated dynamic Buyer selection dropdown populated from registered buyers list and added Create/Update modals.",
-    descriptionBn: "Buyer Brand ট্যাবের জন্য একটি নতুন ভিউ তৈরি করা হয়েছে যেখানে প্রতি ক্রেতার জন্য ব্র্যান্ড অ্যাসাইন করার ব্যবস্থা রয়েছে। ক্রেতা সিলেক্ট করার জন্য ডায়নামিক ড্রপডাউন এবং ক্রিয়েট ও আপডেট মোডাল যুক্ত করা হয়েছে।",
+    descriptionBn: "Buyer Brand à¦Ÿà§�à¦¯à¦¾à¦¬à§‡à¦° à¦œà¦¨à§�à¦¯ à¦�à¦•à¦Ÿà¦¿ à¦¨à¦¤à§�à¦¨ à¦­à¦¿à¦‰ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ à¦¯à§‡à¦–à¦¾à¦¨à§‡ à¦ªà§�à¦°à¦¤à¦¿ à¦•à§�à¦°à§‡à¦¤à¦¾à¦° à¦œà¦¨à§�à¦¯ à¦¬à§�à¦°à§�à¦¯à¦¾à¦¨à§�à¦¡ à¦…à§�à¦¯à¦¾à¦¸à¦¾à¦‡à¦¨ à¦•à¦°à¦¾à¦° à¦¬à§�à¦¯à¦¬à¦¸à§�à¦¥à¦¾ à¦°à§Ÿà§‡à¦›à§‡à¥¤ à¦•à§�à¦°à§‡à¦¤à¦¾ à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦°à¦¾à¦° à¦œà¦¨à§�à¦¯ à¦¡à¦¾à¦¯à¦¼à¦¨à¦¾à¦®à¦¿à¦• à¦¡à§�à¦°à¦ªà¦¡à¦¾à¦‰à¦¨ à¦�à¦¬à¦‚ à¦•à§�à¦°à¦¿à§Ÿà§‡à¦Ÿ à¦“ à¦†à¦ªà¦¡à§‡à¦Ÿ à¦®à§‹à¦¡à¦¾à¦² à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "63",
@@ -1358,7 +1367,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings?tab=buying-agent",
     descriptionEn: "Added a dedicated Buying Agent tab with a detailed data table (Actions, SL, Short Name, Full Name, Address, Phone, Email, Fax, IsActive) preloaded with initial agent (JMS Buyer Agent) and added fully validated Create/Update modals.",
-    descriptionBn: "Buying Agent ট্যাবের জন্য একটি কাস্টম ডেটা টেবিল এবং সম্পূর্ণ ভ্যালিডেশনসহ Create/Update মোডাল যুক্ত করা হয়েছে। এতে পূর্বে থেকেই JMS Buyer Agent এর ডেটা লোড করা আছে।",
+    descriptionBn: "Buying Agent à¦Ÿà§�à¦¯à¦¾à¦¬à§‡à¦° à¦œà¦¨à§�à¦¯ à¦�à¦•à¦Ÿà¦¿ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦¡à§‡à¦Ÿà¦¾ à¦Ÿà§‡à¦¬à¦¿à¦² à¦�à¦¬à¦‚ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦­à§�à¦¯à¦¾à¦²à¦¿à¦¡à§‡à¦¶à¦¨à¦¸à¦¹ Create/Update à¦®à§‹à¦¡à¦¾à¦² à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦�à¦¤à§‡ à¦ªà§‚à¦°à§�à¦¬à§‡ à¦¥à§‡à¦•à§‡à¦‡ JMS Buyer Agent à¦�à¦° à¦¡à§‡à¦Ÿà¦¾ à¦²à§‹à¦¡ à¦•à¦°à¦¾ à¦†à¦›à§‡à¥¤",
   },
   {
     id: "64",
@@ -1367,7 +1376,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings?tab=supplier",
     descriptionEn: "Created a dedicated Supplier tab with a clean table (Actions, SL, Company Name, Name, Designation, Address, E-mail, Cell, IsActive) preloaded with 10 standard supplier entries, along with custom validated Create/Update modals.",
-    descriptionBn: "Supplier ট্যাবের জন্য একটি কাস্টম ডেটা টেবিল এবং সম্পূর্ণ ভ্যালিডেশনসহ Create/Update মোডাল যুক্ত করা হয়েছে। এতে পূর্বে থেকেই ১০টি স্ট্যান্ডার্ড সাপ্লায়ারের ডেটা লোড করা আছে।",
+    descriptionBn: "Supplier à¦Ÿà§�à¦¯à¦¾à¦¬à§‡à¦° à¦œà¦¨à§�à¦¯ à¦�à¦•à¦Ÿà¦¿ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦¡à§‡à¦Ÿà¦¾ à¦Ÿà§‡à¦¬à¦¿à¦² à¦�à¦¬à¦‚ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦­à§�à¦¯à¦¾à¦²à¦¿à¦¡à§‡à¦¶à¦¨à¦¸à¦¹ Create/Update à¦®à§‹à¦¡à¦¾à¦² à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦�à¦¤à§‡ à¦ªà§‚à¦°à§�à¦¬à§‡ à¦¥à§‡à¦•à§‡à¦‡ à§§à§¦à¦Ÿà¦¿ à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦¨à§�à¦¡à¦¾à¦°à§�à¦¡ à¦¸à¦¾à¦ªà§�à¦²à¦¾à¦¯à¦¼à¦¾à¦°à§‡à¦° à¦¡à§‡à¦Ÿà¦¾ à¦²à§‹à¦¡ à¦•à¦°à¦¾ à¦†à¦›à§‡à¥¤",
   },
   {
     id: "65",
@@ -1376,7 +1385,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings?tab=buyer-name",
     descriptionEn: "Replaced the simple buyer modal with a comprehensive, beautiful 14-accordion 'Buyer Profile' editor. Updated the buyer table to match screenshots with Excel/Print/Pdf options, country filters, and 15 default entries.",
-    descriptionBn: "সাধারণ বায়ার মোডাল পরিবর্তন করে একটি ১৪-অ্যাকর্ডিয়ন বিশিষ্ট চমৎকার 'Buyer Profile' এডিটর ভিউ তৈরি করা হয়েছে। বায়ার তালিকা টেবিলটিতে এক্সেল/প্রিন্ট/পিডিএফ বাটন, কান্ট্রি ফিল্টার এবং ১৫টি ডিফল্ট এন্ট্রি যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦¸à¦¾à¦§à¦¾à¦°à¦£ à¦¬à¦¾à¦¯à¦¼à¦¾à¦° à¦®à§‹à¦¡à¦¾à¦² à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦•à¦°à§‡ à¦�à¦•à¦Ÿà¦¿ à§§à§ª-à¦…à§�à¦¯à¦¾à¦•à¦°à§�à¦¡à¦¿à¦¯à¦¼à¦¨ à¦¬à¦¿à¦¶à¦¿à¦·à§�à¦Ÿ à¦šà¦®à§Žà¦•à¦¾à¦° 'Buyer Profile' à¦�à¦¡à¦¿à¦Ÿà¦° à¦­à¦¿à¦‰ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦¬à¦¾à¦¯à¦¼à¦¾à¦° à¦¤à¦¾à¦²à¦¿à¦•à¦¾ à¦Ÿà§‡à¦¬à¦¿à¦²à¦Ÿà¦¿à¦¤à§‡ à¦�à¦•à§�à¦¸à§‡à¦²/à¦ªà§�à¦°à¦¿à¦¨à§�à¦Ÿ/à¦ªà¦¿à¦¡à¦¿à¦�à¦« à¦¬à¦¾à¦Ÿà¦¨, à¦•à¦¾à¦¨à§�à¦Ÿà§�à¦°à¦¿ à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦° à¦�à¦¬à¦‚ à§§à§«à¦Ÿà¦¿ à¦¡à¦¿à¦«à¦²à§�à¦Ÿ à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "66",
@@ -1385,7 +1394,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Extracted renderDynamicMasterDB logic into a standalone React component (DynamicMasterDBManager) to avoid conditional React hooks rendering and fix the Rules of Hooks violation.",
-    descriptionBn: "Rules of Hooks লঙ্ঘন এড়াতে এবং কন্ডিশনাল হুক রেন্ডারিং সমস্যার সমাধান করতে renderDynamicMasterDB ফাংশনটিকে একটি নতুন স্ট্যান্ডঅ্যালোন রিঅ্যাক্ট কম্পোনেন্টে (DynamicMasterDBManager) রূপান্তর করা হয়েছে।",
+    descriptionBn: "Rules of Hooks à¦²à¦™à§�à¦˜à¦¨ à¦�à§œà¦¾à¦¤à§‡ à¦�à¦¬à¦‚ à¦•à¦¨à§�à¦¡à¦¿à¦¶à¦¨à¦¾à¦² à¦¹à§�à¦• à¦°à§‡à¦¨à§�à¦¡à¦¾à¦°à¦¿à¦‚ à¦¸à¦®à¦¸à§�à¦¯à¦¾à¦° à¦¸à¦®à¦¾à¦§à¦¾à¦¨ à¦•à¦°à¦¤à§‡ renderDynamicMasterDB à¦«à¦¾à¦‚à¦¶à¦¨à¦Ÿà¦¿à¦•à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¨à¦¤à§�à¦¨ à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦¨à§�à¦¡à¦…à§�à¦¯à¦¾à¦²à§‹à¦¨ à¦°à¦¿à¦…à§�à¦¯à¦¾à¦•à§�à¦Ÿ à¦•à¦®à§�à¦ªà§‹à¦¨à§‡à¦¨à§�à¦Ÿà§‡ (DynamicMasterDBManager) à¦°à§‚à¦ªà¦¾à¦¨à§�à¦¤à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "67",
@@ -1394,7 +1403,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Fixed layout overlap bug by making the main switch fallback conditional. Now, custom tabs (buyer-name, fabric-construction, additional-cost-entry, rmg-process-loss) correctly hide the generic fallback table, preventing duplicate elements from showing.",
-    descriptionBn: "লেআউট ওভারল্যাপ বাগটি দূর করার জন্য কন্ডিশনাল রেন্ডারিং ব্যবহার করা হয়েছে। এর ফলে কাস্টম ট্যাবসমূহে (buyer-name, fabric-construction, additional-cost-entry, rmg-process-loss) সাধারণ টেবিলটি আর পুনরাবৃত্তি হবে না।",
+    descriptionBn: "à¦²à§‡à¦†à¦‰à¦Ÿ à¦“à¦­à¦¾à¦°à¦²à§�à¦¯à¦¾à¦ª à¦¬à¦¾à¦—à¦Ÿà¦¿ à¦¦à§‚à¦° à¦•à¦°à¦¾à¦° à¦œà¦¨à§�à¦¯ à¦•à¦¨à§�à¦¡à¦¿à¦¶à¦¨à¦¾à¦² à¦°à§‡à¦¨à§�à¦¡à¦¾à¦°à¦¿à¦‚ à¦¬à§�à¦¯à¦¬à¦¹à¦¾à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦° à¦«à¦²à§‡ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦Ÿà§�à¦¯à¦¾à¦¬à¦¸à¦®à§‚à¦¹à§‡ (buyer-name, fabric-construction, additional-cost-entry, rmg-process-loss) à¦¸à¦¾à¦§à¦¾à¦°à¦£ à¦Ÿà§‡à¦¬à¦¿à¦²à¦Ÿà¦¿ à¦†à¦° à¦ªà§�à¦¨à¦°à¦¾à¦¬à§ƒà¦¤à§�à¦¤à¦¿ à¦¹à¦¬à§‡ à¦¨à¦¾à¥¤",
   },
   {
     id: "68",
@@ -1403,7 +1412,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Implemented beautiful, fully-functional custom layouts and modals for 'Item Department', 'Garment Item Name (GMT Item Name)', and 'Body Part' tabs based on layout screenshots. Added Excel/Print/Pdf options, search filters, default entries, and select dropdowns.",
-    descriptionBn: "'Item Department', 'Garment Item Name (GMT Item Name)' এবং 'Body Part' ট্যাবগুলোর জন্য লেআউট স্ক্রিনশট অনুযায়ী আকর্ষণীয় কাস্টম লেআউট এবং মোডাল ভিউ যুক্ত করা হয়েছে। এতে এক্সেল/প্রিন্ট/পিডিএফ রফতানি, সার্চ ফিল্টার, ডিফল্ট তথ্যসমূহ এবং সিলেক্ট ড্রপডাউন অন্তর্ভুক্ত রয়েছে।",
+    descriptionBn: "'Item Department', 'Garment Item Name (GMT Item Name)' à¦�à¦¬à¦‚ 'Body Part' à¦Ÿà§�à¦¯à¦¾à¦¬à¦—à§�à¦²à§‹à¦° à¦œà¦¨à§�à¦¯ à¦²à§‡à¦†à¦‰à¦Ÿ à¦¸à§�à¦•à§�à¦°à¦¿à¦¨à¦¶à¦Ÿ à¦…à¦¨à§�à¦¯à¦¾à§Ÿà§€ à¦†à¦•à¦°à§�à¦·à¦£à§€à§Ÿ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦²à§‡à¦†à¦‰à¦Ÿ à¦�à¦¬à¦‚ à¦®à§‹à¦¡à¦¾à¦² à¦­à¦¿à¦‰ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦¤à§‡ à¦�à¦•à§�à¦¸à§‡à¦²/à¦ªà§�à¦°à¦¿à¦¨à§�à¦Ÿ/à¦ªà¦¿à¦¡à¦¿à¦�à¦« à¦°à¦«à¦¤à¦¾à¦¨à¦¿, à¦¸à¦¾à¦°à§�à¦š à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦°, à¦¡à¦¿à¦«à¦²à§�à¦Ÿ à¦¤à¦¥à§�à¦¯à¦¸à¦®à§‚à¦¹ à¦�à¦¬à¦‚ à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦¡à§�à¦°à¦ªà¦¡à¦¾à¦‰à¦¨ à¦…à¦¨à§�à¦¤à¦°à§�à¦­à§�à¦•à§�à¦¤ à¦°à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "69",
@@ -1412,7 +1421,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Added beautiful, fully-functional custom styled registry tables, filters, and add/edit modals for both 'Season' and 'Sample Type' tabs, resolving a React state namespace collision with the pre-existing accordion seasons state.",
-    descriptionBn: "'Season' এবং 'Sample Type' ট্যাবদ্বয়ের জন্য আকর্ষণীয় কাস্টম রেজিস্ট্রি টেবিল, ফিল্টার এবং অ্যাড/এডিট মোডাল তৈরি করা হয়েছে। একই সাথে বায়ার প্রোফাইল একোর্ডিয়নের নিজস্ব 'seasons' স্ট্যাটের সাথে নেমস্পেস সংঘর্ষের সমাধান করা হয়েছে।",
+    descriptionBn: "'Season' à¦�à¦¬à¦‚ 'Sample Type' à¦Ÿà§�à¦¯à¦¾à¦¬à¦¦à§�à¦¬à§Ÿà§‡à¦° à¦œà¦¨à§�à¦¯ à¦†à¦•à¦°à§�à¦·à¦£à§€à§Ÿ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦°à§‡à¦œà¦¿à¦¸à§�à¦Ÿà§�à¦°à¦¿ à¦Ÿà§‡à¦¬à¦¿à¦², à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦° à¦�à¦¬à¦‚ à¦…à§�à¦¯à¦¾à¦¡/à¦�à¦¡à¦¿à¦Ÿ à¦®à§‹à¦¡à¦¾à¦² à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦•à¦‡ à¦¸à¦¾à¦¥à§‡ à¦¬à¦¾à§Ÿà¦¾à¦° à¦ªà§�à¦°à§‹à¦«à¦¾à¦‡à¦² à¦�à¦•à§‹à¦°à§�à¦¡à¦¿à§Ÿà¦¨à§‡à¦° à¦¨à¦¿à¦œà¦¸à§�à¦¬ 'seasons' à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦Ÿà§‡à¦° à¦¸à¦¾à¦¥à§‡ à¦¨à§‡à¦®à¦¸à§�à¦ªà§‡à¦¸ à¦¸à¦‚à¦˜à¦°à§�à¦·à§‡à¦° à¦¸à¦®à¦¾à¦§à¦¾à¦¨ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "70",
@@ -1421,7 +1430,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Implemented custom styled registry tables, pagination indicators, action sheets, search functions, and input/select modals for both 'Size Group' (Group size) and 'UoM' (Unit of Measurement) settings tabs matching design specifications.",
-    descriptionBn: "'Size Group' (গ্রুপ সাইজ) এবং 'UoM' (পরিমাপক একক) ট্যাবদ্বয়ের জন্য ডিজাইন স্পেসিফিকেশন অনুযায়ী কাস্টম রেজিস্ট্রি টেবিল, অ্যাকশন শিট, সার্চ এবং অ্যাড/এডিট মোডাল ভিউ যুক্ত করা হয়েছে।",
+    descriptionBn: "'Size Group' (à¦—à§�à¦°à§�à¦ª à¦¸à¦¾à¦‡à¦œ) à¦�à¦¬à¦‚ 'UoM' (à¦ªà¦°à¦¿à¦®à¦¾à¦ªà¦• à¦�à¦•à¦•) à¦Ÿà§�à¦¯à¦¾à¦¬à¦¦à§�à¦¬à§Ÿà§‡à¦° à¦œà¦¨à§�à¦¯ à¦¡à¦¿à¦œà¦¾à¦‡à¦¨ à¦¸à§�à¦ªà§‡à¦¸à¦¿à¦«à¦¿à¦•à§‡à¦¶à¦¨ à¦…à¦¨à§�à¦¯à¦¾à§Ÿà§€ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦°à§‡à¦œà¦¿à¦¸à§�à¦Ÿà§�à¦°à¦¿ à¦Ÿà§‡à¦¬à¦¿à¦², à¦…à§�à¦¯à¦¾à¦•à¦¶à¦¨ à¦¶à¦¿à¦Ÿ, à¦¸à¦¾à¦°à§�à¦š à¦�à¦¬à¦‚ à¦…à§�à¦¯à¦¾à¦¡/à¦�à¦¡à¦¿à¦Ÿ à¦®à§‹à¦¡à¦¾à¦² à¦­à¦¿à¦‰ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "71",
@@ -1430,7 +1439,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Implemented custom registry layouts, actions, live searches, export mock actions, and dialog modals for 'Fabric GSM', 'Fabric Nature' (Fabric Type), and 'Fabric Construction' tabs matching screen layouts.",
-    descriptionBn: "'Fabric GSM', 'Fabric Nature' (Fabric Type) এবং 'Fabric Construction' ট্যাবগুলোর জন্য লেআউট ডিজাইন অনুযায়ী কাস্টম রেজিস্ট্রি টেবিল, অ্যাকশন, সার্চ এবং অ্যাড/এডিট মোডাল ভিউ যুক্ত করা হয়েছে।",
+    descriptionBn: "'Fabric GSM', 'Fabric Nature' (Fabric Type) à¦�à¦¬à¦‚ 'Fabric Construction' à¦Ÿà§�à¦¯à¦¾à¦¬à¦—à§�à¦²à§‹à¦° à¦œà¦¨à§�à¦¯ à¦²à§‡à¦†à¦‰à¦Ÿ à¦¡à¦¿à¦œà¦¾à¦‡à¦¨ à¦…à¦¨à§�à¦¯à¦¾à§Ÿà§€ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦°à§‡à¦œà¦¿à¦¸à§�à¦Ÿà§�à¦°à¦¿ à¦Ÿà§‡à¦¬à¦¿à¦², à¦…à§�à¦¯à¦¾à¦•à¦¶à¦¨, à¦¸à¦¾à¦°à§�à¦š à¦�à¦¬à¦‚ à¦…à§�à¦¯à¦¾à¦¡/à¦�à¦¡à¦¿à¦Ÿ à¦®à§‹à¦¡à¦¾à¦² à¦­à¦¿à¦‰ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "72",
@@ -1439,7 +1448,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Added a searchable 'Supplier Category' multi-select dropdown as the first field in the Add/Update Supplier modal (options: Yarn, Fabric, Trims, etc.), displayed selected categories as pill badges in the Supplier table, and made Designation, E-mail, and Cell fields optional (removed validation constraints).",
-    descriptionBn: "সাপ্লায়ার অ্যাড/আপডেট মোডালে প্রথম ফিল্ড হিসেবে কাস্টম সার্চেবল মাল্টি-সিলেক্ট ড্রপডাউন 'Supplier Category' যুক্ত করা হয়েছে, সাপ্লায়ার টেবিলে সিলেক্ট করা ক্যাটাগরিগুলো পিল ব্যাজ হিসেবে প্রদর্শন করা হয়েছে এবং ডেজিগনেশন, ইমেইল ও সেল ফিল্ডগুলোকে ঐচ্ছিক (optional) করা হয়েছে (বাধ্যতামূলক ভ্যালিডেশন তুলে নেওয়া হয়েছে)।",
+    descriptionBn: "à¦¸à¦¾à¦ªà§�à¦²à¦¾à§Ÿà¦¾à¦° à¦…à§�à¦¯à¦¾à¦¡/à¦†à¦ªà¦¡à§‡à¦Ÿ à¦®à§‹à¦¡à¦¾à¦²à§‡ à¦ªà§�à¦°à¦¥à¦® à¦«à¦¿à¦²à§�à¦¡ à¦¹à¦¿à¦¸à§‡à¦¬à§‡ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦¸à¦¾à¦°à§�à¦šà§‡à¦¬à¦² à¦®à¦¾à¦²à§�à¦Ÿà¦¿-à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦¡à§�à¦°à¦ªà¦¡à¦¾à¦‰à¦¨ 'Supplier Category' à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦¸à¦¾à¦ªà§�à¦²à¦¾à§Ÿà¦¾à¦° à¦Ÿà§‡à¦¬à¦¿à¦²à§‡ à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦°à¦¾ à¦•à§�à¦¯à¦¾à¦Ÿà¦¾à¦—à¦°à¦¿à¦—à§�à¦²à§‹ à¦ªà¦¿à¦² à¦¬à§�à¦¯à¦¾à¦œ à¦¹à¦¿à¦¸à§‡à¦¬à§‡ à¦ªà§�à¦°à¦¦à¦°à§�à¦¶à¦¨ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦¡à§‡à¦œà¦¿à¦—à¦¨à§‡à¦¶à¦¨, à¦‡à¦®à§‡à¦‡à¦² à¦“ à¦¸à§‡à¦² à¦«à¦¿à¦²à§�à¦¡à¦—à§�à¦²à§‹à¦•à§‡ à¦�à¦šà§�à¦›à¦¿à¦• (optional) à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ (à¦¬à¦¾à¦§à§�à¦¯à¦¤à¦¾à¦®à§‚à¦²à¦• à¦­à§�à¦¯à¦¾à¦²à¦¿à¦¡à§‡à¦¶à¦¨ à¦¤à§�à¦²à§‡ à¦¨à§‡à¦“à§Ÿà¦¾ à¦¹à§Ÿà§‡à¦›à§‡)à¥¤",
   },
   {
     id: "73",
@@ -1448,7 +1457,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Upgraded the UOM (Measurement Head) modal and registry table matching specifications, including advanced properties: Unit Name, Short Name, Unit Group, Sort Order, Relative Factor, and a checkbox for Is Base Unit status.",
-    descriptionBn: "UOM (পরিমাপক একক) মোডাল এবং রেজিস্ট্রি টেবিল উন্নত করা হয়েছে, যার মধ্যে নতুন বৈশিষ্ট্যসমূহ যুক্ত করা হয়েছে: Unit Name, Short Name, Unit Group, Sort Order, Relative Factor এবং Is Base Unit স্ট্যাটাসের জন্য চেকবক্স।",
+    descriptionBn: "UOM (à¦ªà¦°à¦¿à¦®à¦¾à¦ªà¦• à¦�à¦•à¦•) à¦®à§‹à¦¡à¦¾à¦² à¦�à¦¬à¦‚ à¦°à§‡à¦œà¦¿à¦¸à§�à¦Ÿà§�à¦°à¦¿ à¦Ÿà§‡à¦¬à¦¿à¦² à¦‰à¦¨à§�à¦¨à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦¯à¦¾à¦° à¦®à¦§à§�à¦¯à§‡ à¦¨à¦¤à§�à¦¨ à¦¬à§ˆà¦¶à¦¿à¦·à§�à¦Ÿà§�à¦¯à¦¸à¦®à§‚à¦¹ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡: Unit Name, Short Name, Unit Group, Sort Order, Relative Factor à¦�à¦¬à¦‚ Is Base Unit à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦Ÿà¦¾à¦¸à§‡à¦° à¦œà¦¨à§�à¦¯ à¦šà§‡à¦•à¦¬à¦•à§�à¦¸à¥¤",
   },
   {
     id: "74",
@@ -1457,7 +1466,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Added generic Manage Rates ($) buttons and details modals for Dyeing and Finishing tabs under RMG Master Settings, supporting dynamic date validation and export actions matching design layouts.",
-    descriptionBn: "RMG Master Settings-এর অধীনে Dyeing এবং Finishing ট্যাবগুলোর জন্য জেনেরিক Manage Rates ($) বাটন এবং ডিটেইলস মোডাল যুক্ত করা হয়েছে, যা লেআউট অনুযায়ী ডাইনামিক ডেট ভ্যালিডেশন এবং এক্সপোর্ট অ্যাকশন সমর্থন করে।",
+    descriptionBn: "RMG Master Settings-à¦�à¦° à¦…à¦§à§€à¦¨à§‡ Dyeing à¦�à¦¬à¦‚ Finishing à¦Ÿà§�à¦¯à¦¾à¦¬à¦—à§�à¦²à§‹à¦° à¦œà¦¨à§�à¦¯ à¦œà§‡à¦¨à§‡à¦°à¦¿à¦• Manage Rates ($) à¦¬à¦¾à¦Ÿà¦¨ à¦�à¦¬à¦‚ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸ à¦®à§‹à¦¡à¦¾à¦² à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦¯à¦¾ à¦²à§‡à¦†à¦‰à¦Ÿ à¦…à¦¨à§�à¦¯à¦¾à§Ÿà§€ à¦¡à¦¾à¦‡à¦¨à¦¾à¦®à¦¿à¦• à¦¡à§‡à¦Ÿ à¦­à§�à¦¯à¦¾à¦²à¦¿à¦¡à§‡à¦¶à¦¨ à¦�à¦¬à¦‚ à¦�à¦•à§�à¦¸à¦ªà§‹à¦°à§�à¦Ÿ à¦…à§�à¦¯à¦¾à¦•à¦¶à¦¨ à¦¸à¦®à¦°à§�à¦¥à¦¨ à¦•à¦°à§‡à¥¤",
   },
   {
     id: "75",
@@ -1466,7 +1475,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Global System",
     link: "/module-selection",
     descriptionEn: "Added a compact, Google-style corporate modules launcher (3x3 grid / waffle button) to both the global dashboard Topbar and the Merchandising layout header, enabling instant, dynamic switching between HRIS, Merchandising, and all other modules from anywhere in the application.",
-    descriptionBn: "গ্লোবাল ড্যাশবোর্ড টপবার এবং মার্চেন্ডাইজিং লেআউট হেডার উভয় স্থানেই একটি কম্প্যাক্ট, গুগল-স্টাইল কর্পোরেট মডিউল লঞ্চার (৩x৩ গ্রিড / ওয়াফেল বাটন) যুক্ত করা হয়েছে, যা অ্যাপ্লিকেশনের যেকোনো স্থান থেকে সরাসরি HRIS, মার্চেন্ডাইজিং এবং অন্যান্য সমস্ত মডিউলে ডাইনামিকালি সুইচ করতে সাহায্য করবে।",
+    descriptionBn: "à¦—à§�à¦²à§‹à¦¬à¦¾à¦² à¦¡à§�à¦¯à¦¾à¦¶à¦¬à§‹à¦°à§�à¦¡ à¦Ÿà¦ªà¦¬à¦¾à¦° à¦�à¦¬à¦‚ à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦²à§‡à¦†à¦‰à¦Ÿ à¦¹à§‡à¦¡à¦¾à¦° à¦‰à¦­à¦¯à¦¼ à¦¸à§�à¦¥à¦¾à¦¨à§‡à¦‡ à¦�à¦•à¦Ÿà¦¿ à¦•à¦®à§�à¦ªà§�à¦¯à¦¾à¦•à§�à¦Ÿ, à¦—à§�à¦—à¦²-à¦¸à§�à¦Ÿà¦¾à¦‡à¦² à¦•à¦°à§�à¦ªà§‹à¦°à§‡à¦Ÿ à¦®à¦¡à¦¿à¦‰à¦² à¦²à¦žà§�à¦šà¦¾à¦° (à§©xà§© à¦—à§�à¦°à¦¿à¦¡ / à¦“à¦¯à¦¼à¦¾à¦«à§‡à¦² à¦¬à¦¾à¦Ÿà¦¨) à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡, à¦¯à¦¾ à¦…à§�à¦¯à¦¾à¦ªà§�à¦²à¦¿à¦•à§‡à¦¶à¦¨à§‡à¦° à¦¯à§‡à¦•à§‹à¦¨à§‹ à¦¸à§�à¦¥à¦¾à¦¨ à¦¥à§‡à¦•à§‡ à¦¸à¦°à¦¾à¦¸à¦°à¦¿ HRIS, à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦�à¦¬à¦‚ à¦…à¦¨à§�à¦¯à¦¾à¦¨à§�à¦¯ à¦¸à¦®à¦¸à§�à¦¤ à¦®à¦¡à¦¿à¦‰à¦²à§‡ à¦¡à¦¾à¦‡à¦¨à¦¾à¦®à¦¿à¦•à¦¾à¦²à¦¿ à¦¸à§�à¦‡à¦š à¦•à¦°à¦¤à§‡ à¦¸à¦¾à¦¹à¦¾à¦¯à§�à¦¯ à¦•à¦°à¦¬à§‡à¥¤",
   },
   {
     id: "76",
@@ -1475,7 +1484,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Implemented Yarn Brand, Yarn Type, Yarn Count, and Yarn PO Type custom settings pages with specifications matching the screenshots, custom add/edit modals, export actions, live search, and an olive green floating plus action button.",
-    descriptionBn: "ইউজার স্ক্রিনশট অনুযায়ী Yarn Brand, Yarn Type, Yarn Count এবং Yarn PO Type-এর জন্য কাস্টম সেটিংস পেজসমূহ ইমপ্লিমেন্ট করা হয়েছে, যার মধ্যে কাস্টম অ্যাড/এডিট মোডাল, লাইভ সার্চ, এক্সপোর্ট অ্যাকশন এবং একটি সুন্দর জলপাই সবুজ রঙের ফ্লোটিং প্লাস বাটন যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦‡à¦‰à¦œà¦¾à¦° à¦¸à§�à¦•à§�à¦°à¦¿à¦¨à¦¶à¦Ÿ à¦…à¦¨à§�à¦¯à¦¾à§Ÿà§€ Yarn Brand, Yarn Type, Yarn Count à¦�à¦¬à¦‚ Yarn PO Type-à¦�à¦° à¦œà¦¨à§�à¦¯ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸ à¦ªà§‡à¦œà¦¸à¦®à§‚à¦¹ à¦‡à¦®à¦ªà§�à¦²à¦¿à¦®à§‡à¦¨à§�à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦¯à¦¾à¦° à¦®à¦§à§�à¦¯à§‡ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦…à§�à¦¯à¦¾à¦¡/à¦�à¦¡à¦¿à¦Ÿ à¦®à§‹à¦¡à¦¾à¦², à¦²à¦¾à¦‡à¦­ à¦¸à¦¾à¦°à§�à¦š, à¦�à¦•à§�à¦¸à¦ªà§‹à¦°à§�à¦Ÿ à¦…à§�à¦¯à¦¾à¦•à¦¶à¦¨ à¦�à¦¬à¦‚ à¦�à¦•à¦Ÿà¦¿ à¦¸à§�à¦¨à§�à¦¦à¦° à¦œà¦²à¦ªà¦¾à¦‡ à¦¸à¦¬à§�à¦œ à¦°à¦™à§‡à¦° à¦«à§�à¦²à§‹à¦Ÿà¦¿à¦‚ à¦ªà§�à¦²à¦¾à¦¸ à¦¬à¦¾à¦Ÿà¦¨ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "77",
@@ -1484,7 +1493,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Implemented Yarn PO Settings custom configuration page, with custom dropdown fields for Company Name and Action parameter (Ceiling/Floor/Round/None), Nearest Value and CompareValue Value input controls, custom add/edit modals, and Excel/Print/PDF export functionalities.",
-    descriptionBn: "Yarn PO Settings-এর জন্য কাস্টম কনফিগারেশন পেজ ইমপ্লিমেন্ট করা হয়েছে, যার মধ্যে Company Name এবং Action প্যারামিটার (Ceiling/Floor/Round/None)-এর জন্য ড্রপডাউন ফিল্ড, Nearest Value এবং CompareValue Value-এর জন্য ইনপুট কন্ট্রোল, কাস্টম মোডাল এবং এক্সপোর্ট অ্যাকশন যুক্ত করা হয়েছে।",
+    descriptionBn: "Yarn PO Settings-à¦�à¦° à¦œà¦¨à§�à¦¯ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦ªà§‡à¦œ à¦‡à¦®à¦ªà§�à¦²à¦¿à¦®à§‡à¦¨à§�à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦¯à¦¾à¦° à¦®à¦§à§�à¦¯à§‡ Company Name à¦�à¦¬à¦‚ Action à¦ªà§�à¦¯à¦¾à¦°à¦¾à¦®à¦¿à¦Ÿà¦¾à¦° (Ceiling/Floor/Round/None)-à¦�à¦° à¦œà¦¨à§�à¦¯ à¦¡à§�à¦°à¦ªà¦¡à¦¾à¦‰à¦¨ à¦«à¦¿à¦²à§�à¦¡, Nearest Value à¦�à¦¬à¦‚ CompareValue Value-à¦�à¦° à¦œà¦¨à§�à¦¯ à¦‡à¦¨à¦ªà§�à¦Ÿ à¦•à¦¨à§�à¦Ÿà§�à¦°à§‹à¦², à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦®à§‹à¦¡à¦¾à¦² à¦�à¦¬à¦‚ à¦�à¦•à§�à¦¸à¦ªà§‹à¦°à§�à¦Ÿ à¦…à§�à¦¯à¦¾à¦•à¦¶à¦¨ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "78",
@@ -1493,7 +1502,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Removed the top 'RMG Master Database & Parameters' header banner block from the Merchandising Master Settings workspace to streamline the interface.",
-    descriptionBn: "মার্চেন্ডাইজিং মাস্টার সেটিংস ওয়ার্কস্পেসের শীর্ষদেশ থেকে 'RMG Master Database & Parameters' হেডার ব্যানারটি অপসারন করা হয়েছে, যাতে ইন্টারফেসটি আরও পরিচ্ছন্ন ও সুন্দর দেখায়।",
+    descriptionBn: "à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦®à¦¾à¦¸à§�à¦Ÿà¦¾à¦° à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸ à¦“à§Ÿà¦¾à¦°à§�à¦•à¦¸à§�à¦ªà§‡à¦¸à§‡à¦° à¦¶à§€à¦°à§�à¦·à¦¦à§‡à¦¶ à¦¥à§‡à¦•à§‡ 'RMG Master Database & Parameters' à¦¹à§‡à¦¡à¦¾à¦° à¦¬à§�à¦¯à¦¾à¦¨à¦¾à¦°à¦Ÿà¦¿ à¦…à¦ªà¦¸à¦¾à¦°à¦¨ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦¯à¦¾à¦¤à§‡ à¦‡à¦¨à§�à¦Ÿà¦¾à¦°à¦«à§‡à¦¸à¦Ÿà¦¿ à¦†à¦°à¦“ à¦ªà¦°à¦¿à¦šà§�à¦›à¦¨à§�à¦¨ à¦“ à¦¸à§�à¦¨à§�à¦¦à¦° à¦¦à§‡à¦–à¦¾à§Ÿà¥¤",
   },
   {
     id: "79",
@@ -1502,7 +1511,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Implemented Garment & Fabric Color and Print/Color Type custom settings pages with datasets matching reference screenshots, custom add/edit dialog modals, and integrated their modals with the floating action plus button.",
-    descriptionBn: "Garment & Fabric Color এবং Print/Color Type-এর কাস্টম সেটিংস পেজসমূহ ইমপ্লিমেন্ট করা হয়েছে, যার মধ্যে কাস্টম অ্যাড/এডিট মোডাল, ফ্লোটিং প্লাস বাটন ও এক্সপোর্ট অ্যাকশন যুক্ত করা হয়েছে।",
+    descriptionBn: "Garment & Fabric Color à¦�à¦¬à¦‚ Print/Color Type-à¦�à¦° à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸ à¦ªà§‡à¦œà¦¸à¦®à§‚à¦¹ à¦‡à¦®à¦ªà§�à¦²à¦¿à¦®à§‡à¦¨à§�à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦¯à¦¾à¦° à¦®à¦§à§�à¦¯à§‡ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦…à§�à¦¯à¦¾à¦¡/à¦�à¦¡à¦¿à¦Ÿ à¦®à§‹à¦¡à¦¾à¦², à¦«à§�à¦²à§‹à¦Ÿà¦¿à¦‚ à¦ªà§�à¦²à¦¾à¦¸ à¦¬à¦¾à¦Ÿà¦¨ à¦“ à¦�à¦•à§�à¦¸à¦ªà§‹à¦°à§�à¦Ÿ à¦…à§�à¦¯à¦¾à¦•à¦¶à¦¨ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "80",
@@ -1511,7 +1520,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Implemented Print/Embroidery/Wash Type (Special Cost) configuration page, featuring main parameters, sub-modals, a floating plus action button, and a nested 'Rat Chart Information' interactive modal.",
-    descriptionBn: "Print/Embroidery/Wash Type-এর জন্য কাস্টম কনফিগারেশন পেজ এবং রেট চার্ট সাব-সিস্টেম ইমপ্লিমেন্ট করা হয়েছে, যার মধ্যে কাস্টম অ্যাড/এডিট মোডাল এবং ইন্টারেক্টিভ রেট চার্ট টেবিল যুক্ত করা হয়েছে।",
+    descriptionBn: "Print/Embroidery/Wash Type-à¦�à¦° à¦œà¦¨à§�à¦¯ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦ªà§‡à¦œ à¦�à¦¬à¦‚ à¦°à§‡à¦Ÿ à¦šà¦¾à¦°à§�à¦Ÿ à¦¸à¦¾à¦¬-à¦¸à¦¿à¦¸à§�à¦Ÿà§‡à¦® à¦‡à¦®à¦ªà§�à¦²à¦¿à¦®à§‡à¦¨à§�à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦¯à¦¾à¦° à¦®à¦§à§�à¦¯à§‡ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦…à§�à¦¯à¦¾à¦¡/à¦�à¦¡à¦¿à¦Ÿ à¦®à§‹à¦¡à¦¾à¦² à¦�à¦¬à¦‚ à¦‡à¦¨à§�à¦Ÿà¦¾à¦°à§‡à¦•à§�à¦Ÿà¦¿à¦­ à¦°à§‡à¦Ÿ à¦šà¦¾à¦°à§�à¦Ÿ à¦Ÿà§‡à¦¬à¦¿à¦² à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "81",
@@ -1520,7 +1529,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Implemented AOP Process configuration page featuring initial dataset matching reference screenshots ('Discharge Print', 'Pigment Print'), custom Add New/Update AopProcess modal dialogs, and integrated floating action plus button.",
-    descriptionBn: "AOP Process-এর কাস্টম সেটিংস পেজ ইমপ্লিমেন্ট করা হয়েছে, যার মধ্যে রেফারেন্স স্ক্রিনশটের অনুকরণে ড্যাটা সেট, 'Add New AopProcess' মোডাল এবং ফ্লোটিং প্লাস বাটন ইন্টিগ্রেট করা হয়েছে।",
+    descriptionBn: "AOP Process-à¦�à¦° à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸ à¦ªà§‡à¦œ à¦‡à¦®à¦ªà§�à¦²à¦¿à¦®à§‡à¦¨à§�à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦¯à¦¾à¦° à¦®à¦§à§�à¦¯à§‡ à¦°à§‡à¦«à¦¾à¦°à§‡à¦¨à§�à¦¸ à¦¸à§�à¦•à§�à¦°à¦¿à¦¨à¦¶à¦Ÿà§‡à¦° à¦…à¦¨à§�à¦•à¦°à¦£à§‡ à¦¡à§�à¦¯à¦¾à¦Ÿà¦¾ à¦¸à§‡à¦Ÿ, 'Add New AopProcess' à¦®à§‹à¦¡à¦¾à¦² à¦�à¦¬à¦‚ à¦«à§�à¦²à§‹à¦Ÿà¦¿à¦‚ à¦ªà§�à¦²à¦¾à¦¸ à¦¬à¦¾à¦Ÿà¦¨ à¦‡à¦¨à§�à¦Ÿà¦¿à¦—à§�à¦°à§‡à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "117",
@@ -1529,7 +1538,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-quotation",
     descriptionEn: "Completely redesigned the Quotation detail view into a side-by-side high-fidelity Buyer Costing Sheet: built a 2-column header with buyer details/dress sketch mockups, side-by-side grids containing the garment cost breakdown (with dynamic yarn, accessories, embellishments, wash, other costs lists) and fabric price calculation, profit gap metrics banner, and signature approvals section.",
-    descriptionBn: "কোটেশন ডিটেইল ভিউকে বায়ার কস্টিং শিট অনুযায়ী ২-কলামে বিভক্ত প্রফেশনাল ডিজাইনে উন্নীত করা হয়েছে: যার বাম পাশে বায়ার বেসিক তথ্য, ফেব্রিক ও এম্বেড করা স্কেচ ইমেজ এবং নিচের গ্রিডগুলোতে পোশাকের খরচ (ইয়ার্ন, এক্সেসরিজ, এম্বেলিশমেন্ট, ওয়াশ ও অন্যান্য খরচ তালিকা) এবং ডান পাশে কাপড়ের দাম হিসাবের টেবিল, প্রফিট গ্যাপ ব্যানার ও নিচে স্বাক্ষরকারীদের তালিকা সুন্দরভাবে ফুটিয়ে তোলা হয়েছে।",
+    descriptionBn: "à¦•à§‹à¦Ÿà§‡à¦¶à¦¨ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦² à¦­à¦¿à¦‰à¦•à§‡ à¦¬à¦¾à¦¯à¦¼à¦¾à¦° à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦¶à¦¿à¦Ÿ à¦…à¦¨à§�à¦¯à¦¾à¦¯à¦¼à§€ à§¨-à¦•à¦²à¦¾à¦®à§‡ à¦¬à¦¿à¦­à¦•à§�à¦¤ à¦ªà§�à¦°à¦«à§‡à¦¶à¦¨à¦¾à¦² à¦¡à¦¿à¦œà¦¾à¦‡à¦¨à§‡ à¦‰à¦¨à§�à¦¨à§€à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡: à¦¯à¦¾à¦° à¦¬à¦¾à¦® à¦ªà¦¾à¦¶à§‡ à¦¬à¦¾à¦¯à¦¼à¦¾à¦° à¦¬à§‡à¦¸à¦¿à¦• à¦¤à¦¥à§�à¦¯, à¦«à§‡à¦¬à§�à¦°à¦¿à¦• à¦“ à¦�à¦®à§�à¦¬à§‡à¦¡ à¦•à¦°à¦¾ à¦¸à§�à¦•à§‡à¦š à¦‡à¦®à§‡à¦œ à¦�à¦¬à¦‚ à¦¨à¦¿à¦šà§‡à¦° à¦—à§�à¦°à¦¿à¦¡à¦—à§�à¦²à§‹à¦¤à§‡ à¦ªà§‹à¦¶à¦¾à¦•à§‡à¦° à¦–à¦°à¦š (à¦‡à¦¯à¦¼à¦¾à¦°à§�à¦¨, à¦�à¦•à§�à¦¸à§‡à¦¸à¦°à¦¿à¦œ, à¦�à¦®à§�à¦¬à§‡à¦²à¦¿à¦¶à¦®à§‡à¦¨à§�à¦Ÿ, à¦“à§Ÿà¦¾à¦¶ à¦“ à¦…à¦¨à§�à¦¯à¦¾à¦¨à§�à¦¯ à¦–à¦°à¦š à¦¤à¦¾à¦²à¦¿à¦•à¦¾) à¦�à¦¬à¦‚ à¦¡à¦¾à¦¨ à¦ªà¦¾à¦¶à§‡ à¦•à¦¾à¦ªà¦¡à¦¼à§‡à¦° à¦¦à¦¾à¦® à¦¹à¦¿à¦¸à¦¾à¦¬à§‡à¦° à¦Ÿà§‡à¦¬à¦¿à¦², à¦ªà§�à¦°à¦«à¦¿à¦Ÿ à¦—à§�à¦¯à¦¾à¦ª à¦¬à§�à¦¯à¦¾à¦¨à¦¾à¦° à¦“ à¦¨à¦¿à¦šà§‡ à¦¸à§�à¦¬à¦¾à¦•à§�à¦·à¦°à¦•à¦¾à¦°à§€à¦¦à§‡à¦° à¦¤à¦¾à¦²à¦¿à¦•à¦¾ à¦¸à§�à¦¨à§�à¦¦à¦°à¦­à¦¾à¦¬à§‡ à¦«à§�à¦Ÿà¦¿à§Ÿà§‡ à¦¤à§‹à¦²à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "118",
@@ -1538,7 +1547,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-quotation",
     descriptionEn: "Configured the style image slot in the Quotation detail/print view to default load the premium dress sketch illustration image and enabled dynamic file upload replacements.",
-    descriptionBn: "কোটেশন ডিটেইল/প্রিন্ট ভিউয়ের স্টাইল ইমেজ বক্সে ডিফল্টভাবে প্রিমিয়াম ড্রেস স্কেচ ইলাস্ট্রেশন ইমেজটি লোড করার ব্যবস্থা রাখা হয়েছে এবং কাস্টম ফাইল আপলোড করে পরিবর্তনের অপশনটি চালু করা হয়েছে।",
+    descriptionBn: "à¦•à§‹à¦Ÿà§‡à¦¶à¦¨ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²/à¦ªà§�à¦°à¦¿à¦¨à§�à¦Ÿ à¦­à¦¿à¦‰à¦¯à¦¼à§‡à¦° à¦¸à§�à¦Ÿà¦¾à¦‡à¦² à¦‡à¦®à§‡à¦œ à¦¬à¦•à§�à¦¸à§‡ à¦¡à¦¿à¦«à¦²à§�à¦Ÿà¦­à¦¾à¦¬à§‡ à¦ªà§�à¦°à¦¿à¦®à¦¿à§Ÿà¦¾à¦® à¦¡à§�à¦°à§‡à¦¸ à¦¸à§�à¦•à§‡à¦š à¦‡à¦²à¦¾à¦¸à§�à¦Ÿà§�à¦°à§‡à¦¶à¦¨ à¦‡à¦®à§‡à¦œà¦Ÿà¦¿ à¦²à§‹à¦¡ à¦•à¦°à¦¾à¦° à¦¬à§�à¦¯à¦¬à¦¸à§�à¦¥à¦¾ à¦°à¦¾à¦–à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦«à¦¾à¦‡à¦² à¦†à¦ªà¦²à§‹à¦¡ à¦•à¦°à§‡ à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨à§‡à¦° à¦…à¦ªà¦¶à¦¨à¦Ÿà¦¿ à¦šà¦¾à¦²à§� à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "82",
@@ -1547,7 +1556,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Implemented Additional Cost Entry custom configuration page featuring pre-populated financial/commission/commercial datasets, custom edit modal dialog, and floating action button.",
-    descriptionBn: "Additional Cost Entry সেটিংস পেজ ইমপ্লিমেন্ট করা হয়েছে, যার মধ্যে ফিন্যান্সিয়াল, কমিশন ও কমার্শিয়াল ড্যাটা সেট, এডিট মোডাল এবং ফ্লোটিং প্লাস বাটন যুক্ত করা হয়েছে।",
+    descriptionBn: "Additional Cost Entry à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸ à¦ªà§‡à¦œ à¦‡à¦®à¦ªà§�à¦²à¦¿à¦®à§‡à¦¨à§�à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦¯à¦¾à¦° à¦®à¦§à§�à¦¯à§‡ à¦«à¦¿à¦¨à§�à¦¯à¦¾à¦¨à§�à¦¸à¦¿à¦¯à¦¼à¦¾à¦², à¦•à¦®à¦¿à¦¶à¦¨ à¦“ à¦•à¦®à¦¾à¦°à§�à¦¶à¦¿à¦¯à¦¼à¦¾à¦² à¦¡à§�à¦¯à¦¾à¦Ÿà¦¾ à¦¸à§‡à¦Ÿ, à¦�à¦¡à¦¿à¦Ÿ à¦®à§‹à¦¡à¦¾à¦² à¦�à¦¬à¦‚ à¦«à§�à¦²à§‹à¦Ÿà¦¿à¦‚ à¦ªà§�à¦²à¦¾à¦¸ à¦¬à¦¾à¦Ÿà¦¨ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "83",
@@ -1556,7 +1565,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Implemented RMG Process Loss custom configuration page with comprehensive parameters (Garment types dropdown, Order qty ranges, Cutting/Print/EMB/Sewing/Wash/Finishing percentages), custom Add New/Update modal dialog, and light blue table styling matching reference screenshots.",
-    descriptionBn: "RMG Process Loss কাস্টম কনফিগারেশন পেজ ইমপ্লিমেন্ট করা হয়েছে, যার মধ্যে সকল প্যারামিটার সম্বলিত অ্যাড/এডিট মোডাল এবং রেফারেন্স অনুযায়ী লাইট ব্লু টেবিল ডিসপ্লে যুক্ত করা হয়েছে।",
+    descriptionBn: "RMG Process Loss à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦ªà§‡à¦œ à¦‡à¦®à¦ªà§�à¦²à¦¿à¦®à§‡à¦¨à§�à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦¯à¦¾à¦° à¦®à¦§à§�à¦¯à§‡ à¦¸à¦•à¦² à¦ªà§�à¦¯à¦¾à¦°à¦¾à¦®à¦¿à¦Ÿà¦¾à¦° à¦¸à¦®à§�à¦¬à¦²à¦¿à¦¤ à¦…à§�à¦¯à¦¾à¦¡/à¦�à¦¡à¦¿à¦Ÿ à¦®à§‹à¦¡à¦¾à¦² à¦�à¦¬à¦‚ à¦°à§‡à¦«à¦¾à¦°à§‡à¦¨à§�à¦¸ à¦…à¦¨à§�à¦¯à¦¾à§Ÿà§€ à¦²à¦¾à¦‡à¦Ÿ à¦¬à§�à¦²à§� à¦Ÿà§‡à¦¬à¦¿à¦² à¦¡à¦¿à¦¸à¦ªà§�à¦²à§‡ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "84",
@@ -1565,7 +1574,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Implemented Quality Label custom configuration page with pre-populated 'AQL Standard' entry, custom create/edit modal labeled 'Create New Country' matching reference design, and floating action button integration.",
-    descriptionBn: "Quality Label কাস্টম পেজ ইমপ্লিমেন্ট করা হয়েছে, যার মধ্যে রেফারেন্স অনুযায়ী এডিট/ক্রিয়েট মোডাল ও ফ্লোটিং প্লাস বাটন ইন্টিগ্রেট করা হয়েছে।",
+    descriptionBn: "Quality Label à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦ªà§‡à¦œ à¦‡à¦®à¦ªà§�à¦²à¦¿à¦®à§‡à¦¨à§�à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦¯à¦¾à¦° à¦®à¦§à§�à¦¯à§‡ à¦°à§‡à¦«à¦¾à¦°à§‡à¦¨à§�à¦¸ à¦…à¦¨à§�à¦¯à¦¾à§Ÿà§€ à¦�à¦¡à¦¿à¦Ÿ/à¦•à§�à¦°à¦¿à§Ÿà§‡à¦Ÿ à¦®à§‹à¦¡à¦¾à¦² à¦“ à¦«à§�à¦²à§‹à¦Ÿà¦¿à¦‚ à¦ªà§�à¦²à¦¾à¦¸ à¦¬à¦¾à¦Ÿà¦¨ à¦‡à¦¨à§�à¦Ÿà¦¿à¦—à§�à¦°à§‡à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "85",
@@ -1574,7 +1583,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Monthly Capacity Planning",
     link: "/merchandising-monthly-capacity",
     descriptionEn: "Updated the Setup New Monthly Capacity modal dialog layout to match reference screenshot design exactly, including a left blue accent border card, horizontal grid alignment across three rows, real-time formula calculations for operators and minutes, and underline styled input fields.",
-    descriptionBn: "Setup New Monthly Capacity ফর্মের লেআউট ও ডিজাইন রেফারেন্স স্ক্রিনশট অনুযায়ী কাস্টমাইজ করা হয়েছে এবং রিয়েল-টাইম ফর্মুলা ক্যালকুলেশন যুক্ত করা হয়েছে।",
+    descriptionBn: "Setup New Monthly Capacity à¦«à¦°à§�à¦®à§‡à¦° à¦²à§‡à¦†à¦‰à¦Ÿ à¦“ à¦¡à¦¿à¦œà¦¾à¦‡à¦¨ à¦°à§‡à¦«à¦¾à¦°à§‡à¦¨à§�à¦¸ à¦¸à§�à¦•à§�à¦°à¦¿à¦¨à¦¶à¦Ÿ à¦…à¦¨à§�à¦¯à¦¾à§Ÿà§€ à¦•à¦¾à¦¸à§�à¦Ÿà¦®à¦¾à¦‡à¦œ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦°à¦¿à¦¯à¦¼à§‡à¦²-à¦Ÿà¦¾à¦‡à¦® à¦«à¦°à§�à¦®à§�à¦²à¦¾ à¦•à§�à¦¯à¦¾à¦²à¦•à§�à¦²à§‡à¦¶à¦¨ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "86",
@@ -1583,7 +1592,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Company Setup",
     link: "/company-setup",
     descriptionEn: "Added a new 'Default Holiday Setup' tab inside Company Setup, including initial Friday/Saturday weekend history data, list ledger with calendar badges, search filtering, and CRUD operations modal featuring datepicker and MultiSelect days.",
-    descriptionBn: "Company Setup এ একটি নতুন 'Default Holiday Setup' ট্যাব যুক্ত করা হয়েছে, যার মধ্যে ইতিহাস তালিকা, ক্যালেন্ডার ব্যাজসহ ফিল্টারিং সার্চ এবং অ্যাড/এডিট মোডাল তৈরি করা হয়েছে।",
+    descriptionBn: "Company Setup à¦� à¦�à¦•à¦Ÿà¦¿ à¦¨à¦¤à§�à¦¨ 'Default Holiday Setup' à¦Ÿà§�à¦¯à¦¾à¦¬ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦¯à¦¾à¦° à¦®à¦§à§�à¦¯à§‡ à¦‡à¦¤à¦¿à¦¹à¦¾à¦¸ à¦¤à¦¾à¦²à¦¿à¦•à¦¾, à¦•à§�à¦¯à¦¾à¦²à§‡à¦¨à§�à¦¡à¦¾à¦° à¦¬à§�à¦¯à¦¾à¦œà¦¸à¦¹ à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦°à¦¿à¦‚ à¦¸à¦¾à¦°à§�à¦š à¦�à¦¬à¦‚ à¦…à§�à¦¯à¦¾à¦¡/à¦�à¦¡à¦¿à¦Ÿ à¦®à§‹à¦¡à¦¾à¦² à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "87",
@@ -1592,7 +1601,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Company Setup",
     link: "/company-setup",
     descriptionEn: "Removed edit and delete actions from the Default Holiday Setup list to treat it strictly as a historical track of weekend configurations, and added status indicators (Active, Upcoming, Archived) for all setup records.",
-    descriptionBn: "ডিফল্ট হলিডে সেটআপ লিস্ট থেকে এডিট ও ডিলিট অ্যাকশন বাদ দেওয়া হয়েছে যাতে এটি সাপ্তাহিক ছুটির পরিবর্তনের ইতিহাস (হিস্ট্রি ট্র্যাক) হিসেবে কাজ করে এবং প্রতিটি রেকর্ডের জন্য স্ট্যাটাস ইন্ডিকেটর (Active, Upcoming, Archived) যোগ করা হয়েছে।",
+    descriptionBn: "à¦¡à¦¿à¦«à¦²à§�à¦Ÿ à¦¹à¦²à¦¿à¦¡à§‡ à¦¸à§‡à¦Ÿà¦†à¦ª à¦²à¦¿à¦¸à§�à¦Ÿ à¦¥à§‡à¦•à§‡ à¦�à¦¡à¦¿à¦Ÿ à¦“ à¦¡à¦¿à¦²à¦¿à¦Ÿ à¦…à§�à¦¯à¦¾à¦•à¦¶à¦¨ à¦¬à¦¾à¦¦ à¦¦à§‡à¦“à§Ÿà¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¯à¦¾à¦¤à§‡ à¦�à¦Ÿà¦¿ à¦¸à¦¾à¦ªà§�à¦¤à¦¾à¦¹à¦¿à¦• à¦›à§�à¦Ÿà¦¿à¦° à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨à§‡à¦° à¦‡à¦¤à¦¿à¦¹à¦¾à¦¸ (à¦¹à¦¿à¦¸à§�à¦Ÿà§�à¦°à¦¿ à¦Ÿà§�à¦°à§�à¦¯à¦¾à¦•) à¦¹à¦¿à¦¸à§‡à¦¬à§‡ à¦•à¦¾à¦œ à¦•à¦°à§‡ à¦�à¦¬à¦‚ à¦ªà§�à¦°à¦¤à¦¿à¦Ÿà¦¿ à¦°à§‡à¦•à¦°à§�à¦¡à§‡à¦° à¦œà¦¨à§�à¦¯ à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦Ÿà¦¾à¦¸ à¦‡à¦¨à§�à¦¡à¦¿à¦•à§‡à¦Ÿà¦° (Active, Upcoming, Archived) à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "88",
@@ -1601,7 +1610,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Employee Roster",
     link: "/create-roster",
     descriptionEn: "Updated the DEFAULT HOLIDAY generator in the employee roster matrix to dynamically query and apply the weekly holidays configured in the Default Holiday Setup track based on the target month and year.",
-    descriptionBn: "এমপ্লয়ি রস্টার ম্যাট্রিক্সের DEFAULT HOLIDAY জেনারেটর আপডেট করা হয়েছে যাতে এটি টার্গেট মাস ও বছর অনুযায়ী ডিফল্ট হলিডে সেটআপ ট্র্যাকে কনফিগার করা সাপ্তাহিক ছুটিগুলো ডাইনামিকালি লোড এবং প্রয়োগ করে।",
+    descriptionBn: "à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦°à¦¸à§�à¦Ÿà¦¾à¦° à¦®à§�à¦¯à¦¾à¦Ÿà§�à¦°à¦¿à¦•à§�à¦¸à§‡à¦° DEFAULT HOLIDAY à¦œà§‡à¦¨à¦¾à¦°à§‡à¦Ÿà¦° à¦†à¦ªà¦¡à§‡à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¯à¦¾à¦¤à§‡ à¦�à¦Ÿà¦¿ à¦Ÿà¦¾à¦°à§�à¦—à§‡à¦Ÿ à¦®à¦¾à¦¸ à¦“ à¦¬à¦›à¦° à¦…à¦¨à§�à¦¯à¦¾à§Ÿà§€ à¦¡à¦¿à¦«à¦²à§�à¦Ÿ à¦¹à¦²à¦¿à¦¡à§‡ à¦¸à§‡à¦Ÿà¦†à¦ª à¦Ÿà§�à¦°à§�à¦¯à¦¾à¦•à§‡ à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦° à¦•à¦°à¦¾ à¦¸à¦¾à¦ªà§�à¦¤à¦¾à¦¹à¦¿à¦• à¦›à§�à¦Ÿà¦¿à¦—à§�à¦²à§‹ à¦¡à¦¾à¦‡à¦¨à¦¾à¦®à¦¿à¦•à¦¾à¦²à¦¿ à¦²à§‹à¦¡ à¦�à¦¬à¦‚ à¦ªà§�à¦°à§Ÿà§‹à¦— à¦•à¦°à§‡à¥¤",
   },
   {
     id: "89",
@@ -1610,7 +1619,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Employee Roster",
     link: "/create-roster",
     descriptionEn: "Redesigned the Employee Roster page to automatically pre-populate the roster matrix with active default weekly holidays upon loading or switching months/years, and removed the redundant ROSTER HOLIDAY and DEFAULT HOLIDAY action buttons.",
-    descriptionBn: "এমপ্লয়ি রস্টার পেজ রিডিজাইন করা হয়েছে যাতে পেজ লোড হওয়া বা মাস/বছর পরিবর্তনের সময় রস্টার ম্যাট্রিক্স স্বয়ংক্রিয়ভাবে সক্রিয় সাপ্তাহিক ডিফল্ট ছুটির দিনগুলো দিয়ে পূরণ হয়, এবং অপ্রয়োজনীয় ROSTER HOLIDAY ও DEFAULT HOLIDAY বাটন দুটি বাদ দেওয়া হয়েছে।",
+    descriptionBn: "à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à¦¿ à¦°à¦¸à§�à¦Ÿà¦¾à¦° à¦ªà§‡à¦œ à¦°à¦¿à¦¡à¦¿à¦œà¦¾à¦‡à¦¨ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¯à¦¾à¦¤à§‡ à¦ªà§‡à¦œ à¦²à§‹à¦¡ à¦¹à¦“à§Ÿà¦¾ à¦¬à¦¾ à¦®à¦¾à¦¸/à¦¬à¦›à¦° à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨à§‡à¦° à¦¸à¦®à§Ÿ à¦°à¦¸à§�à¦Ÿà¦¾à¦° à¦®à§�à¦¯à¦¾à¦Ÿà§�à¦°à¦¿à¦•à§�à¦¸ à¦¸à§�à¦¬à§Ÿà¦‚à¦•à§�à¦°à¦¿à§Ÿà¦­à¦¾à¦¬à§‡ à¦¸à¦•à§�à¦°à¦¿à§Ÿ à¦¸à¦¾à¦ªà§�à¦¤à¦¾à¦¹à¦¿à¦• à¦¡à¦¿à¦«à¦²à§�à¦Ÿ à¦›à§�à¦Ÿà¦¿à¦° à¦¦à¦¿à¦¨à¦—à§�à¦²à§‹ à¦¦à¦¿à§Ÿà§‡ à¦ªà§‚à¦°à¦£ à¦¹à§Ÿ, à¦�à¦¬à¦‚ à¦…à¦ªà§�à¦°à§Ÿà§‹à¦œà¦¨à§€à§Ÿ ROSTER HOLIDAY à¦“ DEFAULT HOLIDAY à¦¬à¦¾à¦Ÿà¦¨ à¦¦à§�à¦Ÿà¦¿ à¦¬à¦¾à¦¦ à¦¦à§‡à¦“à§Ÿà¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "90",
@@ -1619,7 +1628,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-pre-costing",
     descriptionEn: "Created a brand-new dedicated Prepare Pre-Cost page containing an initial pre-cost list view and a detailed, tab-free workspace featuring complete Order Basic Information, RMG Operation Process Loss %, dynamic style details entry with size breakdown tables, and checkable Additional Costing formulas matching the design system.",
-    descriptionBn: "মার্চেন্ডাইজিং মডিউলে একটি নতুন 'Prepare Pre-Cost' পেজ তৈরি করা হয়েছে, যার মধ্যে একটি কস্টিং তালিকা এবং '+ Prepare Pre-Cost' বাটনে ক্লিক করলে অর্ডার বেসিক ইনফরমেশন, আরএমজি প্রসেস লস %, ডাইনামিক স্টাইল ব্রেকডাউন টেবিল এবং অ্যাডিশনাল কস্টিং ফর্মুলা সম্বলিত চমৎকার ওয়ার্কস্পেস ওপেন হবে।",
+    descriptionBn: "à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦®à¦¡à¦¿à¦‰à¦²à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¨à¦¤à§�à¦¨ 'Prepare Pre-Cost' à¦ªà§‡à¦œ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦¯à¦¾à¦° à¦®à¦§à§�à¦¯à§‡ à¦�à¦•à¦Ÿà¦¿ à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦¤à¦¾à¦²à¦¿à¦•à¦¾ à¦�à¦¬à¦‚ '+ Prepare Pre-Cost' à¦¬à¦¾à¦Ÿà¦¨à§‡ à¦•à§�à¦²à¦¿à¦• à¦•à¦°à¦²à§‡ à¦…à¦°à§�à¦¡à¦¾à¦° à¦¬à§‡à¦¸à¦¿à¦• à¦‡à¦¨à¦«à¦°à¦®à§‡à¦¶à¦¨, à¦†à¦°à¦�à¦®à¦œà¦¿ à¦ªà§�à¦°à¦¸à§‡à¦¸ à¦²à¦¸ %, à¦¡à¦¾à¦‡à¦¨à¦¾à¦®à¦¿à¦• à¦¸à§�à¦Ÿà¦¾à¦‡à¦² à¦¬à§�à¦°à§‡à¦•à¦¡à¦¾à¦‰à¦¨ à¦Ÿà§‡à¦¬à¦¿à¦² à¦�à¦¬à¦‚ à¦…à§�à¦¯à¦¾à¦¡à¦¿à¦¶à¦¨à¦¾à¦² à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦«à¦°à§�à¦®à§�à¦²à¦¾ à¦¸à¦®à§�à¦¬à¦²à¦¿à¦¤ à¦šà¦®à§Žà¦•à¦¾à¦° à¦“à§Ÿà¦¾à¦°à§�à¦•à¦¸à§�à¦ªà§‡à¦¸ à¦“à¦ªà§‡à¦¨ à¦¹à¦¬à§‡à¥¤",
   },
   {
     id: "91",
@@ -1628,7 +1637,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-pre-costing",
     descriptionEn: "Polished the Pre-Cost form interface: removed the duplicate top-bar Cancel/Save buttons, replaced with a clean query number + style count indicator. Upgraded the bottom summary bar to show 3 live KPI metrics (Avg Quoted FOB, Total Qty, Styles count) and an optional Commission Total card. Actions are now a single Discard + Save Sheet pair, cleaner and more professional.",
-    descriptionBn: "Pre-Cost ফর্মের ইন্টারফেস পালিশ করা হয়েছে: ডুপ্লিকেট টপ-বার Cancel/Save বাটন সরিয়ে কোয়েরি নম্বর ও স্টাইল কাউন্ট ইন্ডিকেটর যোগ করা হয়েছে। ফুটার সামারি বারে তিনটি লাইভ কেপিআই মেট্রিক (গড় কোটেড এফওবি, মোট পরিমাণ, স্টাইল সংখ্যা) এবং ঐচ্ছিক কমিশন টোটাল কার্ড দেখানো হচ্ছে। অ্যাকশন বাটন এখন শুধু একটি Discard + Save Sheet পেয়ার, যা আগের থেকে অনেক ক্লিন ও প্রফেশনাল।",
+    descriptionBn: "Pre-Cost à¦«à¦°à§�à¦®à§‡à¦° à¦‡à¦¨à§�à¦Ÿà¦¾à¦°à¦«à§‡à¦¸ à¦ªà¦¾à¦²à¦¿à¦¶ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡: à¦¡à§�à¦ªà§�à¦²à¦¿à¦•à§‡à¦Ÿ à¦Ÿà¦ª-à¦¬à¦¾à¦° Cancel/Save à¦¬à¦¾à¦Ÿà¦¨ à¦¸à¦°à¦¿à¦¯à¦¼à§‡ à¦•à§‹à¦¯à¦¼à§‡à¦°à¦¿ à¦¨à¦®à§�à¦¬à¦° à¦“ à¦¸à§�à¦Ÿà¦¾à¦‡à¦² à¦•à¦¾à¦‰à¦¨à§�à¦Ÿ à¦‡à¦¨à§�à¦¡à¦¿à¦•à§‡à¦Ÿà¦° à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦«à§�à¦Ÿà¦¾à¦° à¦¸à¦¾à¦®à¦¾à¦°à¦¿ à¦¬à¦¾à¦°à§‡ à¦¤à¦¿à¦¨à¦Ÿà¦¿ à¦²à¦¾à¦‡à¦­ à¦•à§‡à¦ªà¦¿à¦†à¦‡ à¦®à§‡à¦Ÿà§�à¦°à¦¿à¦• (à¦—à¦¡à¦¼ à¦•à§‹à¦Ÿà§‡à¦¡ à¦�à¦«à¦“à¦¬à¦¿, à¦®à§‹à¦Ÿ à¦ªà¦°à¦¿à¦®à¦¾à¦£, à¦¸à§�à¦Ÿà¦¾à¦‡à¦² à¦¸à¦‚à¦–à§�à¦¯à¦¾) à¦�à¦¬à¦‚ à¦�à¦šà§�à¦›à¦¿à¦• à¦•à¦®à¦¿à¦¶à¦¨ à¦Ÿà§‹à¦Ÿà¦¾à¦² à¦•à¦¾à¦°à§�à¦¡ à¦¦à§‡à¦–à¦¾à¦¨à§‹ à¦¹à¦šà§�à¦›à§‡à¥¤ à¦…à§�à¦¯à¦¾à¦•à¦¶à¦¨ à¦¬à¦¾à¦Ÿà¦¨ à¦�à¦–à¦¨ à¦¶à§�à¦§à§� à¦�à¦•à¦Ÿà¦¿ Discard + Save Sheet à¦ªà§‡à¦¯à¦¼à¦¾à¦°, à¦¯à¦¾ à¦†à¦—à§‡à¦° à¦¥à§‡à¦•à§‡ à¦…à¦¨à§‡à¦• à¦•à§�à¦²à¦¿à¦¨ à¦“ à¦ªà§�à¦°à¦«à§‡à¦¶à¦¨à¦¾à¦²à¥¤",
   },
   {
     id: "92",
@@ -1637,7 +1646,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-inquiry",
     descriptionEn: "Upgraded the Buyer Inquiry page: refactored the old modal-based workflow to a premium split-view list register and dedicated Prepare Inquiry workspace. Added division-specific configuration grids for Knit/Woven/Sweater specs (e.g. GSM, weave construction, machine gauge), process toggles, sketch image upload slot, and a real-time live pre-costing FOB/CMT calculator engine.",
-    descriptionBn: "বায়ার ইনকোয়ারি পেজটি রিফ্যাক্টর করে একটি প্রিমিয়াম স্প্লিট-ভিউ লিস্ট রেজিস্টার এবং ডেডিকেটেড প্রিপ্রেইয়ার ইনকোয়ারি ওয়ার্কস্পেস তৈরি করা হয়েছে। এতে নিট/ওভেন/সোয়েটারের নির্দিষ্ট প্যারামিটার গ্রিড (যেমন জিএসএম, উইভ কনস্ট্রাকশন, গেজ), প্রসেস টগলস, স্কেচ আপলোডার এবং রিয়েল-টাইম প্রি-কস্টিং এফওবি ক্যালকুলেটর ইঞ্জিন অন্তর্ভুক্ত করা হয়েছে।",
+    descriptionBn: "à¦¬à¦¾à¦¯à¦¼à¦¾à¦° à¦‡à¦¨à¦•à§‹à¦¯à¦¼à¦¾à¦°à¦¿ à¦ªà§‡à¦œà¦Ÿà¦¿ à¦°à¦¿à¦«à§�à¦¯à¦¾à¦•à§�à¦Ÿà¦° à¦•à¦°à§‡ à¦�à¦•à¦Ÿà¦¿ à¦ªà§�à¦°à¦¿à¦®à¦¿à¦¯à¦¼à¦¾à¦® à¦¸à§�à¦ªà§�à¦²à¦¿à¦Ÿ-à¦­à¦¿à¦‰ à¦²à¦¿à¦¸à§�à¦Ÿ à¦°à§‡à¦œà¦¿à¦¸à§�à¦Ÿà¦¾à¦° à¦�à¦¬à¦‚ à¦¡à§‡à¦¡à¦¿à¦•à§‡à¦Ÿà§‡à¦¡ à¦ªà§�à¦°à¦¿à¦ªà§�à¦°à§‡à¦‡à¦¯à¦¼à¦¾à¦° à¦‡à¦¨à¦•à§‹à¦¯à¦¼à¦¾à¦°à¦¿ à¦“à¦¯à¦¼à¦¾à¦°à§�à¦•à¦¸à§�à¦ªà§‡à¦¸ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦�à¦¤à§‡ à¦¨à¦¿à¦Ÿ/à¦“à¦­à§‡à¦¨/à¦¸à§‹à¦¯à¦¼à§‡à¦Ÿà¦¾à¦°à§‡à¦° à¦¨à¦¿à¦°à§�à¦¦à¦¿à¦·à§�à¦Ÿ à¦ªà§�à¦¯à¦¾à¦°à¦¾à¦®à¦¿à¦Ÿà¦¾à¦° à¦—à§�à¦°à¦¿à¦¡ (à¦¯à§‡à¦®à¦¨ à¦œà¦¿à¦�à¦¸à¦�à¦®, à¦‰à¦‡à¦­ à¦•à¦¨à¦¸à§�à¦Ÿà§�à¦°à¦¾à¦•à¦¶à¦¨, à¦—à§‡à¦œ), à¦ªà§�à¦°à¦¸à§‡à¦¸ à¦Ÿà¦—à¦²à¦¸, à¦¸à§�à¦•à§‡à¦š à¦†à¦ªà¦²à§‹à¦¡à¦¾à¦° à¦�à¦¬à¦‚ à¦°à¦¿à¦¯à¦¼à§‡à¦²-à¦Ÿà¦¾à¦‡à¦® à¦ªà§�à¦°à¦¿-à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦�à¦«à¦“à¦¬à¦¿ à¦•à§�à¦¯à¦¾à¦²à¦•à§�à¦²à§‡à¦Ÿà¦° à¦‡à¦žà§�à¦œà¦¿à¦¨ à¦…à¦¨à§�à¦¤à¦°à§�à¦­à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "93",
@@ -1646,7 +1655,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-inquiry",
     descriptionEn: "Simplified the Buyer Inquiry creation and editing form by removing unnecessary PO-specific inputs (AQL Standard, Agent, Brand, Currency, Exchange Rate, and Shipping Mode). Retained only the core specifications required during initial buyer quotation to keep the workflow clean and focused.",
-    descriptionBn: "বায়ার ইনকোয়ারি তৈরি এবং সম্পাদনা ফর্মটি সহজ করা হয়েছে অপ্রয়োজনীয় পিও-নির্দিষ্ট ইনপুট যেমন একিউএল স্ট্যান্ডার্ড, এজেন্ট, ব্র্যান্ড, কারেন্সি, এক্সচেঞ্জ রেট এবং শিপিং মোড সরিয়ে দিয়ে। ওয়ার্কফ্লো পরিষ্কার রাখার জন্য প্রাথমিক কোটেশনের জন্য প্রয়োজনীয় মূল প্যারামিটারগুলো রাখা হয়েছে।",
+    descriptionBn: "à¦¬à¦¾à¦¯à¦¼à¦¾à¦° à¦‡à¦¨à¦•à§‹à¦¯à¦¼à¦¾à¦°à¦¿ à¦¤à§ˆà¦°à¦¿ à¦�à¦¬à¦‚ à¦¸à¦®à§�à¦ªà¦¾à¦¦à¦¨à¦¾ à¦«à¦°à§�à¦®à¦Ÿà¦¿ à¦¸à¦¹à¦œ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ à¦…à¦ªà§�à¦°à¦¯à¦¼à§‹à¦œà¦¨à§€à¦¯à¦¼ à¦ªà¦¿à¦“-à¦¨à¦¿à¦°à§�à¦¦à¦¿à¦·à§�à¦Ÿ à¦‡à¦¨à¦ªà§�à¦Ÿ à¦¯à§‡à¦®à¦¨ à¦�à¦•à¦¿à¦‰à¦�à¦² à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦¨à§�à¦¡à¦¾à¦°à§�à¦¡, à¦�à¦œà§‡à¦¨à§�à¦Ÿ, à¦¬à§�à¦°à§�à¦¯à¦¾à¦¨à§�à¦¡, à¦•à¦¾à¦°à§‡à¦¨à§�à¦¸à¦¿, à¦�à¦•à§�à¦¸à¦šà§‡à¦žà§�à¦œ à¦°à§‡à¦Ÿ à¦�à¦¬à¦‚ à¦¶à¦¿à¦ªà¦¿à¦‚ à¦®à§‹à¦¡ à¦¸à¦°à¦¿à¦¯à¦¼à§‡ à¦¦à¦¿à§Ÿà§‡à¥¤ à¦“à¦¯à¦¼à¦¾à¦°à§�à¦•à¦«à§�à¦²à§‹ à¦ªà¦°à¦¿à¦·à§�à¦•à¦¾à¦° à¦°à¦¾à¦–à¦¾à¦° à¦œà¦¨à§�à¦¯ à¦ªà§�à¦°à¦¾à¦¥à¦®à¦¿à¦• à¦•à§‹à¦Ÿà§‡à¦¶à¦¨à§‡à¦° à¦œà¦¨à§�à¦¯ à¦ªà§�à¦°à¦¯à¦¼à§‹à¦œà¦¨à§€à¦¯à¦¼ à¦®à§‚à¦² à¦ªà§�à¦¯à¦¾à¦°à¦¾à¦®à¦¿à¦Ÿà¦¾à¦°à¦—à§�à¦²à§‹ à¦°à¦¾à¦–à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "94",
@@ -1655,7 +1664,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-quotation",
     descriptionEn: "Created the new Buyer Price Quotation page, completing the standard RMG workflow sequence: Inquiry -> Quotation -> Order Entry. It features a list register of quotations, a pipeline status board, a detailed cost calculation workspace (linking active inquiries to auto-populate specifications), and a print-ready official quote sheet preview layout.",
-    descriptionBn: "নতুন বায়ার প্রাইস কোটেশন পেজ তৈরি করা হয়েছে, যা আরএমজি ওয়ার্কফ্লো সিকোয়েন্স সম্পন্ন করে: ইনকোয়ারি -> কোটেশন -> অর্ডার এন্ট্রি। এতে কোটেশন লিস্ট রেজিস্টার, পাইপলাইন স্ট্যাটাস বোর্ড, বিস্তারিত কস্টিং ওয়ার্কস্পেস (যা একটি ইনকোয়ারি লিংক করে স্পেসিফিকেশন লোড করে), এবং প্রিন্ট-রেডি অফিসিয়াল কোটেশন শিট প্রিভিউ লেআউট যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦¨à¦¤à§�à¦¨ à¦¬à¦¾à¦¯à¦¼à¦¾à¦° à¦ªà§�à¦°à¦¾à¦‡à¦¸ à¦•à§‹à¦Ÿà§‡à¦¶à¦¨ à¦ªà§‡à¦œ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡, à¦¯à¦¾ à¦†à¦°à¦�à¦®à¦œà¦¿ à¦“à¦¯à¦¼à¦¾à¦°à§�à¦•à¦«à§�à¦²à§‹ à¦¸à¦¿à¦•à§‹à¦¯à¦¼à§‡à¦¨à§�à¦¸ à¦¸à¦®à§�à¦ªà¦¨à§�à¦¨ à¦•à¦°à§‡: à¦‡à¦¨à¦•à§‹à¦¯à¦¼à¦¾à¦°à¦¿ -> à¦•à§‹à¦Ÿà§‡à¦¶à¦¨ -> à¦…à¦°à§�à¦¡à¦¾à¦° à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿à¥¤ à¦�à¦¤à§‡ à¦•à§‹à¦Ÿà§‡à¦¶à¦¨ à¦²à¦¿à¦¸à§�à¦Ÿ à¦°à§‡à¦œà¦¿à¦¸à§�à¦Ÿà¦¾à¦°, à¦ªà¦¾à¦‡à¦ªà¦²à¦¾à¦‡à¦¨ à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦Ÿà¦¾à¦¸ à¦¬à§‹à¦°à§�à¦¡, à¦¬à¦¿à¦¸à§�à¦¤à¦¾à¦°à¦¿à¦¤ à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦“à¦¯à¦¼à¦¾à¦°à§�à¦•à¦¸à§�à¦ªà§‡à¦¸ (à¦¯à¦¾ à¦�à¦•à¦Ÿà¦¿ à¦‡à¦¨à¦•à§‹à¦¯à¦¼à¦¾à¦°à¦¿ à¦²à¦¿à¦‚à¦• à¦•à¦°à§‡ à¦¸à§�à¦ªà§‡à¦¸à¦¿à¦«à¦¿à¦•à§‡à¦¶à¦¨ à¦²à§‹à¦¡ à¦•à¦°à§‡), à¦�à¦¬à¦‚ à¦ªà§�à¦°à¦¿à¦¨à§�à¦Ÿ-à¦°à§‡à¦¡à¦¿ à¦…à¦«à¦¿à¦¸à¦¿à¦¯à¦¼à¦¾à¦² à¦•à§‹à¦Ÿà§‡à¦¶à¦¨ à¦¶à¦¿à¦Ÿ à¦ªà§�à¦°à¦¿à¦­à¦¿à¦‰ à¦²à§‡à¦†à¦‰à¦Ÿ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "95",
@@ -1664,7 +1673,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-po",
     descriptionEn: "Created the new Purchase Order (PO) Register page, successfully establishing the full RMG sequence: Inquiry -> Quotation -> PO -> Order Entry. It features a list register of official buyer contracts, KPI summaries, and a workspace that links to approved quotations (auto-populating product specs and FOB price offers) and allows proceeding directly to the Order Entry details hub.",
-    descriptionBn: "নতুন পারচেজ অর্ডার (পিও) রেজিস্টার পেজ তৈরি করা হয়েছে, যা আরএমজি ওয়ার্কফ্লো সিকোয়েন্স সম্পন্ন করে: ইনকোয়ারি -> কোটেশন -> পিও -> অর্ডার এন্ট্রি। এতে বায়ার কন্টাক্ট রেজিস্টার, কেপিআই সামারি এবং একটি ওয়ার্কস্পেস রয়েছে যা অনুমোদিত কোটেশনের সাথে লিংক করে তথ্য অটো-পপুলেট করে এবং সরাসরি অর্ডার এন্ট্রি হাবে যাওয়ার লিংক প্রদান করে।",
+    descriptionBn: "à¦¨à¦¤à§�à¦¨ à¦ªà¦¾à¦°à¦šà§‡à¦œ à¦…à¦°à§�à¦¡à¦¾à¦° (à¦ªà¦¿à¦“) à¦°à§‡à¦œà¦¿à¦¸à§�à¦Ÿà¦¾à¦° à¦ªà§‡à¦œ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦¯à¦¾ à¦†à¦°à¦�à¦®à¦œà¦¿ à¦“à§Ÿà¦¾à¦°à§�à¦•à¦«à§�à¦²à§‹ à¦¸à¦¿à¦•à§‹à§Ÿà§‡à¦¨à§�à¦¸ à¦¸à¦®à§�à¦ªà¦¨à§�à¦¨ à¦•à¦°à§‡: à¦‡à¦¨à¦•à§‹à¦¯à¦¼à¦¾à¦°à¦¿ -> à¦•à§‹à¦Ÿà§‡à¦¶à¦¨ -> à¦ªà¦¿à¦“ -> à¦…à¦°à§�à¦¡à¦¾à¦° à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿à¥¤ à¦�à¦¤à§‡ à¦¬à¦¾à¦¯à¦¼à¦¾à¦° à¦•à¦¨à§�à¦Ÿà¦¾à¦•à§�à¦Ÿ à¦°à§‡à¦œà¦¿à¦¸à§�à¦Ÿà¦¾à¦°, à¦•à§‡à¦ªà¦¿à¦†à¦‡ à¦¸à¦¾à¦®à¦¾à¦°à¦¿ à¦�à¦¬à¦‚ à¦�à¦•à¦Ÿà¦¿ à¦“à¦¯à¦¼à¦¾à¦°à§�à¦•à¦¸à§�à¦ªà§‡à¦¸ à¦°à¦¯à¦¼à§‡à¦›à§‡ à¦¯à¦¾ à¦…à¦¨à§�à¦®à§‹à¦¦à¦¿à¦¤ à¦•à§‹à¦Ÿà§‡à¦¶à¦¨à§‡à¦° à¦¸à¦¾à¦¥à§‡ à¦²à¦¿à¦‚à¦• à¦•à¦°à§‡ à¦¤à¦¥à§�à¦¯ à¦…à¦Ÿà§‹-à¦ªà¦ªà§�à¦²à§‡à¦Ÿ à¦•à¦°à§‡ à¦�à¦¬à¦‚ à¦¸à¦°à¦¾à¦¸à¦°à¦¿ à¦…à¦°à§�à¦¡à¦¾à¦° à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿ à¦¹à¦¾à¦¬à§‡ à¦¯à¦¾à¦“à¦¯à¦¼à¦¾à¦° à¦²à¦¿à¦‚à¦• à¦ªà§�à¦°à¦¦à¦¾à¦¨ à¦•à¦°à§‡à¥¤",
   },
   {
     id: "96",
@@ -1673,7 +1682,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-quotation",
     descriptionEn: "Fixed a ReferenceError where 'showCostingModal' was not defined inside the Quotation page component. Declared the missing state hooks for showCostingModal and costingItem to resolve the rendering crash.",
-    descriptionBn: "কোটেশন পেজ উপাদানের ভেতরে 'showCostingModal' সংজ্ঞায়িত না থাকার কারণে আসা রেফারেন্স এররটি সংশোধন করা হয়েছে। রেন্ডারিং ক্র্যাশ এড়াতে showCostingModal এবং costingItem-এর অনুপস্থিত স্টেট হুকগুলো ডিক্লেয়ার করা হয়েছে।",
+    descriptionBn: "à¦•à§‹à¦Ÿà§‡à¦¶à¦¨ à¦ªà§‡à¦œ à¦‰à¦ªà¦¾à¦¦à¦¾à¦¨à§‡à¦° à¦­à§‡à¦¤à¦°à§‡ 'showCostingModal' à¦¸à¦‚à¦œà§�à¦žà¦¾à¦¯à¦¼à¦¿à¦¤ à¦¨à¦¾ à¦¥à¦¾à¦•à¦¾à¦° à¦•à¦¾à¦°à¦£à§‡ à¦†à¦¸à¦¾ à¦°à§‡à¦«à¦¾à¦°à§‡à¦¨à§�à¦¸ à¦�à¦°à¦°à¦Ÿà¦¿ à¦¸à¦‚à¦¶à§‹à¦§à¦¨ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦°à§‡à¦¨à§�à¦¡à¦¾à¦°à¦¿à¦‚ à¦•à§�à¦°à§�à¦¯à¦¾à¦¶ à¦�à§œà¦¾à¦¤à§‡ showCostingModal à¦�à¦¬à¦‚ costingItem-à¦�à¦° à¦…à¦¨à§�à¦ªà¦¸à§�à¦¥à¦¿à¦¤ à¦¸à§�à¦Ÿà§‡à¦Ÿ à¦¹à§�à¦•à¦—à§�à¦²à§‹ à¦¡à¦¿à¦•à§�à¦²à§‡à¦¯à¦¼à¦¾à¦° à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "97",
@@ -1682,7 +1691,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-inquiry",
     descriptionEn: "Standardized the UI/UX design of the Buyer Inquiry, Price Quotation, and Purchase Order pages to match the premium Order Entry page. Applied unified input component states, teal focus-rings, action button gradients, sidebar links, and structured section layout headers.",
-    descriptionBn: "বায়ার ইনকোয়ারি, প্রাইস কোটেশন এবং পারচেজ অর্ডার পেজের ডিজাইন ও লেআউট প্রিমিয়াম অর্ডার এন্ট্রি পেজের সাথে মিল রেখে স্ট্যান্ডার্ডাইজ করা হয়েছে। এতে অভিন্ন ইনপুট কম্পোনেন্ট, টিল কালার ফোকাস-রিং, অ্যাকশন বাটন গ্রেডিয়েন্ট এবং সেকশন লেআউট হেডার যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦¬à¦¾à¦¯à¦¼à¦¾à¦° à¦‡à¦¨à¦•à§‹à¦¯à¦¼à¦¾à¦°à¦¿, à¦ªà§�à¦°à¦¾à¦‡à¦¸ à¦•à§‹à¦Ÿà§‡à¦¶à¦¨ à¦�à¦¬à¦‚ à¦ªà¦¾à¦°à¦šà§‡à¦œ à¦…à¦°à§�à¦¡à¦¾à¦° à¦ªà§‡à¦œà§‡à¦° à¦¡à¦¿à¦œà¦¾à¦‡à¦¨ à¦“ à¦²à§‡à¦†à¦‰à¦Ÿ à¦ªà§�à¦°à¦¿à¦®à¦¿à¦¯à¦¼à¦¾à¦® à¦…à¦°à§�à¦¡à¦¾à¦° à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿ à¦ªà§‡à¦œà§‡à¦° à¦¸à¦¾à¦¥à§‡ à¦®à¦¿à¦² à¦°à§‡à¦–à§‡ à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦¨à§�à¦¡à¦¾à¦°à§�à¦¡à¦¾à¦‡à¦œ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦�à¦¤à§‡ à¦…à¦­à¦¿à¦¨à§�à¦¨ à¦‡à¦¨à¦ªà§�à¦Ÿ à¦•à¦®à§�à¦ªà§‹à¦¨à§‡à¦¨à§�à¦Ÿ, à¦Ÿà¦¿à¦² à¦•à¦¾à¦²à¦¾à¦° à¦«à§‹à¦•à¦¾à¦¸-à¦°à¦¿à¦‚, à¦…à§�à¦¯à¦¾à¦•à¦¶à¦¨ à¦¬à¦¾à¦Ÿà¦¨ à¦—à§�à¦°à§‡à¦¡à¦¿à¦¯à¦¼à§‡à¦¨à§�à¦Ÿ à¦�à¦¬à¦‚ à¦¸à§‡à¦•à¦¶à¦¨ à¦²à§‡à¦†à¦‰à¦Ÿ à¦¹à§‡à¦¡à¦¾à¦° à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "98",
@@ -1691,7 +1700,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-pre-costing",
     descriptionEn: "Standardized the UI/UX design of the Prepare Pre-Costing page to match the premium Order Entry page styling. Integrated unified input states, teal highlights, action button gradients, sidebar links, and structured section layout headers, and added the linkable inquiry dropdown.",
-    descriptionBn: "প্রিপেয়ার প্রি-কস্টিং পেজের ডিজাইন ও লেআউট প্রিমিয়াম অর্ডার এন্ট্রি পেজের সাথে মিল রেখে স্ট্যান্ডার্ডাইজ করা হয়েছে। এতে অভিন্ন ইনপুট কম্পোনেন্ট, টিল কালার ফোকাস-রিং, অ্যাকশন বাটন গ্রেডিয়েন্ট, এবং ইনকোয়ারি সিলেক্টর টগল যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦ªà§�à¦°à¦¿à¦ªà§‡à¦¯à¦¼à¦¾à¦° à¦ªà§�à¦°à¦¿-à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦ªà§‡à¦œà§‡à¦° à¦¡à¦¿à¦œà¦¾à¦‡à¦¨ à¦“ à¦²à§‡à¦†à¦‰à¦Ÿ à¦ªà§�à¦°à¦¿à¦®à¦¿à¦¯à¦¼à¦¾à¦® à¦…à¦°à§�à¦¡à¦¾à¦° à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿ à¦ªà§‡à¦œà§‡à¦° à¦¸à¦¾à¦¥à§‡ à¦®à¦¿à¦² à¦°à§‡à¦–à§‡ à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦¨à§�à¦¡à¦¾à¦°à§�à¦¡à¦¾à¦‡à¦œ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦�à¦¤à§‡ à¦…à¦­à¦¿à¦¨à§�à¦¨ à¦‡à¦¨à¦ªà§�à¦Ÿ à¦•à¦®à§�à¦ªà§‹à¦¨à§‡à¦¨à§�à¦Ÿ, à¦Ÿà¦¿à¦² à¦•à¦¾à¦²à¦¾à¦° à¦«à§‹à¦•à¦¾à¦¸-à¦°à¦¿à¦‚, à¦…à§�à¦¯à¦¾à¦•à¦¶à¦¨ à¦¬à¦¾à¦Ÿà¦¨ à¦—à§�à¦°à§‡à¦¡à¦¿à¦¯à¦¼à§‡à¦¨à§�à¦Ÿ, à¦�à¦¬à¦‚ à¦‡à¦¨à¦•à§‹à¦¯à¦¼à¦¾à¦°à¦¿ à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿà¦° à¦Ÿà¦—à¦² à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "99",
@@ -1700,7 +1709,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-order-profile",
     descriptionEn: "Completed the sequential integration of the RMG Merchandising lifecycle (Inquiry -> Pre-Costing -> Quotation -> PO -> Order Entry). Updated the Quotation page to pull costing parameters directly from Pre-costing sheets, and updated the Order Entry page to include a PO linkage dropdown, auto-populating final buyer, style reference, ship date, unit FOB, and sizing grids from the PO registry.",
-    descriptionBn: "আরএমজি মার্চেন্ডাইজিং লাইফসাইকেল (ইনকোয়ারি -> প্রি-কস্টিং -> কোটেশন -> পিও -> অর্ডার এন্ট্রি) সিকোয়েন্স সম্পূর্ণ ইন্টিগ্রেট করা হয়েছে। কোটেশন পেজে প্রি-কস্টিং শিট থেকে কস্টিং ডাটা লোড করার সুবিধা এবং অর্ডার এন্ট্রি পেজে পিও লিংকার ড্রপডাউন যুক্ত করা হয়েছে যা পিও সিলেক্ট করলে স্বয়ংক্রিয়ভাবে বায়ার, স্টাইল রেফারেন্স, শিপ ডেট, এফওবি রেট এবং সাইজ গ্রিড লোড করে।",
+    descriptionBn: "à¦†à¦°à¦�à¦®à¦œà¦¿ à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦²à¦¾à¦‡à¦«à¦¸à¦¾à¦‡à¦•à§‡à¦² (à¦‡à¦¨à¦•à§‹à¦¯à¦¼à¦¾à¦°à¦¿ -> à¦ªà§�à¦°à¦¿-à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ -> à¦•à§‹à¦Ÿà§‡à¦¶à¦¨ -> à¦ªà¦¿à¦“ -> à¦…à¦°à§�à¦¡à¦¾à¦° à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿) à¦¸à¦¿à¦•à§‹à¦¯à¦¼à§‡à¦¨à§�à¦¸ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦‡à¦¨à§�à¦Ÿà¦¿à¦—à§�à¦°à§‡à¦Ÿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦•à§‹à¦Ÿà§‡à¦¶à¦¨ à¦ªà§‡à¦œà§‡ à¦ªà§�à¦°à¦¿-à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦¶à¦¿à¦Ÿ à¦¥à§‡à¦•à§‡ à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦¡à¦¾à¦Ÿà¦¾ à¦²à§‹à¦¡ à¦•à¦°à¦¾à¦° à¦¸à§�à¦¬à¦¿à¦§à¦¾ à¦�à¦¬à¦‚ à¦…à¦°à§�à¦¡à¦¾à¦° à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿ à¦ªà§‡à¦œà§‡ à¦ªà¦¿à¦“ à¦²à¦¿à¦‚à¦•à¦¾à¦° à¦¡à§�à¦°à¦ªà¦¡à¦¾à¦‰à¦¨ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ à¦¯à¦¾ à¦ªà¦¿à¦“ à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦°à¦²à§‡ à¦¸à§�à¦¬à¦¯à¦¼à¦‚à¦•à§�à¦°à¦¿à¦¯à¦¼à¦­à¦¾à¦¬à§‡ à¦¬à¦¾à¦¯à¦¼à¦¾à¦°, à¦¸à§�à¦Ÿà¦¾à¦‡à¦² à¦°à§‡à¦«à¦¾à¦°à§‡à¦¨à§�à¦¸, à¦¶à¦¿à¦ª à¦¡à§‡à¦Ÿ, à¦�à¦«à¦“à¦¬à¦¿ à¦°à§‡à¦Ÿ à¦�à¦¬à¦‚ à¦¸à¦¾à¦‡à¦œ à¦—à§�à¦°à¦¿à¦¡ à¦²à§‹à¦¡ à¦•à¦°à§‡à¥¤",
   },
   {
     id: "100",
@@ -1709,7 +1718,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-inquiry",
     descriptionEn: "Reordered and serialized the Merchandising module sidebar menu inside MerchandisingLayout.tsx to match the logical RMG lifecycle: Inquiry -> Pre Costing -> Quotation -> PO Management -> Order Management.",
-    descriptionBn: "মার্চেন্ডাইজিং মডিউল সাইডবার মেনুটির সিকোয়েন্স MerchandisingLayout.tsx-এ সাজানো হয়েছে যা যৌক্তিক আরএমজি লাইফসাইকেলের সাথে সামঞ্জস্যপূর্ণ: ইনকোয়ারি -> প্রি কস্টিং -> কোটেশন -> পিও ম্যানেজমেন্ট -> অর্ডার ম্যানেজমেন্ট।",
+    descriptionBn: "à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦®à¦¡à¦¿à¦‰à¦² à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦° à¦®à§‡à¦¨à§�à¦Ÿà¦¿à¦° à¦¸à¦¿à¦•à§‹à¦¯à¦¼à§‡à¦¨à§�à¦¸ MerchandisingLayout.tsx-à¦� à¦¸à¦¾à¦œà¦¾à¦¨à§‹ à¦¹à¦¯à¦¼à§‡à¦›à§‡ à¦¯à¦¾ à¦¯à§Œà¦•à§�à¦¤à¦¿à¦• à¦†à¦°à¦�à¦®à¦œà¦¿ à¦²à¦¾à¦‡à¦«à¦¸à¦¾à¦‡à¦•à§‡à¦²à§‡à¦° à¦¸à¦¾à¦¥à§‡ à¦¸à¦¾à¦®à¦žà§�à¦œà¦¸à§�à¦¯à¦ªà§‚à¦°à§�à¦£: à¦‡à¦¨à¦•à§‹à¦¯à¦¼à¦¾à¦°à¦¿ -> à¦ªà§�à¦°à¦¿ à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ -> à¦•à§‹à¦Ÿà§‡à¦¶à¦¨ -> à¦ªà¦¿à¦“ à¦®à§�à¦¯à¦¾à¦¨à§‡à¦œà¦®à§‡à¦¨à§�à¦Ÿ -> à¦…à¦°à§�à¦¡à¦¾à¦° à¦®à§�à¦¯à¦¾à¦¨à§‡à¦œà¦®à§‡à¦¨à§�à¦Ÿà¥¤",
   },
   {
     id: "101",
@@ -1718,7 +1727,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-order-profile",
     descriptionEn: "Refactored the entire merchandising flow to support professional RMG parameters: added sample checklists to Inquiry, itemized trims spreadsheets to Pre-Costing, commercial terms to Quotation, and L/C Details plus Nominated Supplier assignments to PO Management and Order Entry.",
-    descriptionBn: "মার্চেন্ডাইজিং ফ্লো-টি পেশাদার আরএমজি প্যারামিটার সহ রিফ্যাক্টর করা হয়েছে: ইনকোয়ারিতে স্যাম্পল চেকলিস্ট, প্রি-কস্টিংয়ে আইটেমাইজড ট্রিমস স্প্রেডশিট, কোটেশনে কমার্শিয়াল টার্মস এবং পিও ও অর্ডার এন্ট্রিতে এল/সি বিবরণী ও নমিনেটেড সাপ্লায়ার যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦®à¦¾à¦°à§�à¦šà§‡à¦¨à§�à¦¡à¦¾à¦‡à¦œà¦¿à¦‚ à¦«à§�à¦²à§‹-à¦Ÿà¦¿ à¦ªà§‡à¦¶à¦¾à¦¦à¦¾à¦° à¦†à¦°à¦�à¦®à¦œà¦¿ à¦ªà§�à¦¯à¦¾à¦°à¦¾à¦®à¦¿à¦Ÿà¦¾à¦° à¦¸à¦¹ à¦°à¦¿à¦«à§�à¦¯à¦¾à¦•à§�à¦Ÿà¦° à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡: à¦‡à¦¨à¦•à§‹à¦¯à¦¼à¦¾à¦°à¦¿à¦¤à§‡ à¦¸à§�à¦¯à¦¾à¦®à§�à¦ªà¦² à¦šà§‡à¦•à¦²à¦¿à¦¸à§�à¦Ÿ, à¦ªà§�à¦°à¦¿-à¦•à¦¸à§�à¦Ÿà¦¿à¦‚à¦¯à¦¼à§‡ à¦†à¦‡à¦Ÿà§‡à¦®à¦¾à¦‡à¦œà¦¡ à¦Ÿà§�à¦°à¦¿à¦®à¦¸ à¦¸à§�à¦ªà§�à¦°à§‡à¦¡à¦¶à¦¿à¦Ÿ, à¦•à§‹à¦Ÿà§‡à¦¶à¦¨à§‡ à¦•à¦®à¦¾à¦°à§�à¦¶à¦¿à¦¯à¦¼à¦¾à¦² à¦Ÿà¦¾à¦°à§�à¦®à¦¸ à¦�à¦¬à¦‚ à¦ªà¦¿à¦“ à¦“ à¦…à¦°à§�à¦¡à¦¾à¦° à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿à¦¤à§‡ à¦�à¦²/à¦¸à¦¿ à¦¬à¦¿à¦¬à¦°à¦£à§€ à¦“ à¦¨à¦®à¦¿à¦¨à§‡à¦Ÿà§‡à¦¡ à¦¸à¦¾à¦ªà§�à¦²à¦¾à¦¯à¦¼à¦¾à¦° à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "102",
@@ -1727,7 +1736,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-quotation",
     descriptionEn: "Cloned the Pakiza Knit Composite Ltd high-fidelity costing/quotation sheet, integrating garment cost breakdowns (main fabric, trims, emb, washing, overheads), fabric price formulas (yarn cost blend ratios, knitting, process loss), machine productivity income calculations, and official signature rows.",
-    descriptionBn: "পাকিজা নিট কম্পোজিট লিমিটেডের হাই-ফিডেলিটি কস্টিং/কোটেশন শিট ক্লোন করা হয়েছে, যার মধ্যে রয়েছে গার্মেন্টস কস্ট ব্রেকডাউন (মেন ফেব্রিক, ট্রিমস, এমব্রয়ডারি, ওয়াশিং, ওভারহেড), ফেব্রিক প্রাইস ফর্মুলা (ইয়ার্ন কস্ট ব্লেন্ড রেশিও, নিটিং, প্রসেস লস), মেশিন প্রোডাক্টিভিটি ইনকাম হিসাব এবং অফিসিয়াল সিগনেচার রো।",
+    descriptionBn: "à¦ªà¦¾à¦•à¦¿à¦œà¦¾ à¦¨à¦¿à¦Ÿ à¦•à¦®à§�à¦ªà§‹à¦œà¦¿à¦Ÿ à¦²à¦¿à¦®à¦¿à¦Ÿà§‡à¦¡à§‡à¦° à¦¹à¦¾à¦‡-à¦«à¦¿à¦¡à§‡à¦²à¦¿à¦Ÿà¦¿ à¦•à¦¸à§�à¦Ÿà¦¿à¦‚/à¦•à§‹à¦Ÿà§‡à¦¶à¦¨ à¦¶à¦¿à¦Ÿ à¦•à§�à¦²à§‹à¦¨ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡, à¦¯à¦¾à¦° à¦®à¦§à§�à¦¯à§‡ à¦°à§Ÿà§‡à¦›à§‡ à¦—à¦¾à¦°à§�à¦®à§‡à¦¨à§�à¦Ÿà¦¸ à¦•à¦¸à§�à¦Ÿ à¦¬à§�à¦°à§‡à¦•à¦¡à¦¾à¦‰à¦¨ (à¦®à§‡à¦¨ à¦«à§‡à¦¬à§�à¦°à¦¿à¦•, à¦Ÿà§�à¦°à¦¿à¦®à¦¸, à¦�à¦®à¦¬à§�à¦°à¦¯à¦¼à¦¡à¦¾à¦°à¦¿, à¦“à¦¯à¦¼à¦¾à¦¶à¦¿à¦‚, à¦“à¦­à¦¾à¦°à¦¹à§‡à¦¡), à¦«à§‡à¦¬à§�à¦°à¦¿à¦• à¦ªà§�à¦°à¦¾à¦‡à¦¸ à¦«à¦°à§�à¦®à§�à¦²à¦¾ (à¦‡à¦¯à¦¼à¦¾à¦°à§�à¦¨ à¦•à¦¸à§�à¦Ÿ à¦¬à§�à¦²à§‡à¦¨à§�à¦¡ à¦°à§‡à¦¶à¦¿à¦“, à¦¨à¦¿à¦Ÿà¦¿à¦‚, à¦ªà§�à¦°à¦¸à§‡à¦¸ à¦²à¦¸), à¦®à§‡à¦¶à¦¿à¦¨ à¦ªà§�à¦°à§‹à¦¡à¦¾à¦•à§�à¦Ÿà¦¿à¦­à¦¿à¦Ÿà¦¿ à¦‡à¦¨à¦•à¦¾à¦® à¦¹à¦¿à¦¸à¦¾à¦¬ à¦�à¦¬à¦‚ à¦…à¦«à¦¿à¦¸à¦¿à¦¯à¦¼à¦¾à¦² à¦¸à¦¿à¦—à¦¨à§‡à¦šà¦¾à¦° à¦°à§‹à¥¤",
   },
   {
     id: "103",
@@ -1736,7 +1745,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-quotation",
     descriptionEn: "Implemented automatic costing formulas in the Quotation page: CAD consumption plus wastage auto-computes fabric consumption, Fabric Price/KG dynamically maps into main fabric rate, dozen costs sum automatically, and markups yield the live FOB price with target gap validation.",
-    descriptionBn: "কোটেশন পেজে স্বয়ংক্রিয় কস্টিং ফর্মুলা যুক্ত করা হয়েছে: ক্যাড কনসাম্পশন ও ওয়েস্টেজ যোগ করে ফেব্রিক কনসাম্পশন হিসাব, ফেব্রিক প্রাইস/কেজি স্বয়ংক্রিয়ভাবে মেইন ফেব্রিক রেটে ম্যাপিং, ডজন কস্ট হিসাব এবং মার্কআপ যোগ করে লাইভ এফওবি রেট ও টার্গেট গ্যাপ ভ্যালিডেশন করা হয়েছে।",
+    descriptionBn: "à¦•à§‹à¦Ÿà§‡à¦¶à¦¨ à¦ªà§‡à¦œà§‡ à¦¸à§�à¦¬à¦¯à¦¼à¦‚à¦•à§�à¦°à¦¿à¦¯à¦¼ à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦«à¦°à§�à¦®à§�à¦²à¦¾ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡: à¦•à§�à¦¯à¦¾à¦¡ à¦•à¦¨à¦¸à¦¾à¦®à§�à¦ªà¦¶à¦¨ à¦“ à¦“à¦¯à¦¼à§‡à¦¸à§�à¦Ÿà§‡à¦œ à¦¯à§‹à¦— à¦•à¦°à§‡ à¦«à§‡à¦¬à§�à¦°à¦¿à¦• à¦•à¦¨à¦¸à¦¾à¦®à§�à¦ªà¦¶à¦¨ à¦¹à¦¿à¦¸à¦¾à¦¬, à¦«à§‡à¦¬à§�à¦°à¦¿à¦• à¦ªà§�à¦°à¦¾à¦‡à¦¸/à¦•à§‡à¦œà¦¿ à¦¸à§�à¦¬à¦¯à¦¼à¦‚à¦•à§�à¦°à¦¿à¦¯à¦¼à¦­à¦¾à¦¬à§‡ à¦®à§‡à¦‡à¦¨ à¦«à§‡à¦¬à§�à¦°à¦¿à¦• à¦°à§‡à¦Ÿà§‡ à¦®à§�à¦¯à¦¾à¦ªà¦¿à¦‚, à¦¡à¦œà¦¨ à¦•à¦¸à§�à¦Ÿ à¦¹à¦¿à¦¸à¦¾à¦¬ à¦�à¦¬à¦‚ à¦®à¦¾à¦°à§�à¦•à¦†à¦ª à¦¯à§‹à¦— à¦•à¦°à§‡ à¦²à¦¾à¦‡à¦­ à¦�à¦«à¦“à¦¬à¦¿ à¦°à§‡à¦Ÿ à¦“ à¦Ÿà¦¾à¦°à§�à¦—à§‡à¦Ÿ à¦—à§�à¦¯à¦¾à¦ª à¦­à§�à¦¯à¦¾à¦²à¦¿à¦¡à§‡à¦¶à¦¨ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "104",
@@ -1744,8 +1753,8 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     type: "Modify",
     module: "Merchandising",
     link: "/merchandising-quotation",
-    descriptionEn: "Completely rebuilt the Quotation/Buyer Costing page as a true spreadsheet-style layout matching the Pakiza Knit ERP: dynamic + add row and × delete row buttons for every section (Fabric, Accessories, Embellishment, Washing, Other Costs, Yarn, Knitting, Dyeing), split left/right table panels, inline editable cells, and auto-calculated fabric consumption and FOB pricing.",
-    descriptionBn: "কোটেশন/বায়ার কস্টিং পেজটি পাকিজা নিট ইআরপির মতো সত্যিকারের স্প্রেডশিট লেআউটে সম্পূর্ণ পুনর্নির্মাণ করা হয়েছে: প্রতিটি সেকশনে (ফেব্রিক, অ্যাক্সেসরিজ, এমব্রয়ডারি, ওয়াশিং, অন্যান্য খরচ, ইয়ার্ন, নিটিং, ডায়িং) ডায়নামিক + রো যোগ এবং × রো মুছার বোতাম যুক্ত করা হয়েছে, বাম-ডান বিভক্ত টেবিল প্যানেল, ইনলাইন এডিটযোগ্য সেল এবং স্বয়ংক্রিয় ফেব্রিক কনসাম্পশন ও এফওবি মূল্য হিসাব করা হয়েছে।",
+    descriptionEn: "Completely rebuilt the Quotation/Buyer Costing page as a true spreadsheet-style layout matching the Pakiza Knit ERP: dynamic + add row and Ã— delete row buttons for every section (Fabric, Accessories, Embellishment, Washing, Other Costs, Yarn, Knitting, Dyeing), split left/right table panels, inline editable cells, and auto-calculated fabric consumption and FOB pricing.",
+    descriptionBn: "à¦•à§‹à¦Ÿà§‡à¦¶à¦¨/à¦¬à¦¾à¦¯à¦¼à¦¾à¦° à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦ªà§‡à¦œà¦Ÿà¦¿ à¦ªà¦¾à¦•à¦¿à¦œà¦¾ à¦¨à¦¿à¦Ÿ à¦‡à¦†à¦°à¦ªà¦¿à¦° à¦®à¦¤à§‹ à¦¸à¦¤à§�à¦¯à¦¿à¦•à¦¾à¦°à§‡à¦° à¦¸à§�à¦ªà§�à¦°à§‡à¦¡à¦¶à¦¿à¦Ÿ à¦²à§‡à¦†à¦‰à¦Ÿà§‡ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦ªà§�à¦¨à¦°à§�à¦¨à¦¿à¦°à§�à¦®à¦¾à¦£ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡: à¦ªà§�à¦°à¦¤à¦¿à¦Ÿà¦¿ à¦¸à§‡à¦•à¦¶à¦¨à§‡ (à¦«à§‡à¦¬à§�à¦°à¦¿à¦•, à¦…à§�à¦¯à¦¾à¦•à§�à¦¸à§‡à¦¸à¦°à¦¿à¦œ, à¦�à¦®à¦¬à§�à¦°à¦¯à¦¼à¦¡à¦¾à¦°à¦¿, à¦“à¦¯à¦¼à¦¾à¦¶à¦¿à¦‚, à¦…à¦¨à§�à¦¯à¦¾à¦¨à§�à¦¯ à¦–à¦°à¦š, à¦‡à¦¯à¦¼à¦¾à¦°à§�à¦¨, à¦¨à¦¿à¦Ÿà¦¿à¦‚, à¦¡à¦¾à¦¯à¦¼à¦¿à¦‚) à¦¡à¦¾à¦¯à¦¼à¦¨à¦¾à¦®à¦¿à¦• + à¦°à§‹ à¦¯à§‹à¦— à¦�à¦¬à¦‚ Ã— à¦°à§‹ à¦®à§�à¦›à¦¾à¦° à¦¬à§‹à¦¤à¦¾à¦® à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡, à¦¬à¦¾à¦®-à¦¡à¦¾à¦¨ à¦¬à¦¿à¦­à¦•à§�à¦¤ à¦Ÿà§‡à¦¬à¦¿à¦² à¦ªà§�à¦¯à¦¾à¦¨à§‡à¦², à¦‡à¦¨à¦²à¦¾à¦‡à¦¨ à¦�à¦¡à¦¿à¦Ÿà¦¯à§‹à¦—à§�à¦¯ à¦¸à§‡à¦² à¦�à¦¬à¦‚ à¦¸à§�à¦¬à¦¯à¦¼à¦‚à¦•à§�à¦°à¦¿à¦¯à¦¼ à¦«à§‡à¦¬à§�à¦°à¦¿à¦• à¦•à¦¨à¦¸à¦¾à¦®à§�à¦ªà¦¶à¦¨ à¦“ à¦�à¦«à¦“à¦¬à¦¿ à¦®à§‚à¦²à§�à¦¯ à¦¹à¦¿à¦¸à¦¾à¦¬ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "105",
@@ -1754,7 +1763,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-quotation",
     descriptionEn: "Full design overhaul of the Buyer Costing Sheet: replaced harsh purple/blue table headers with clean white card sections and a consistent indigo accent palette, added a sticky live FOB pricing panel on the right, grouped related sections side-by-side, made delete buttons hover-to-reveal, and highlighted auto-calculated fields in teal for clarity.",
-    descriptionBn: "বায়ার কস্টিং শিটের সম্পূর্ণ ডিজাইন পরিবর্তন করা হয়েছে: কড়া বেগুনি/নীল টেবিল হেডারের পরিবর্তে পরিষ্কার সাদা কার্ড সেকশন ও ইন্ডিগো রঙের প্যালেট যুক্ত করা হয়েছে, ডানে একটি স্টিকি লাইভ এফওবি মূল্য কার্ড যোগ করা হয়েছে, সম্পর্কিত সেকশনগুলো পাশাপাশি সাজানো হয়েছে, ডিলিট বোতাম হোভারে দেখা যায় এবং স্বয়ংক্রিয় ফিল্ডগুলো টিল রঙে হাইলাইট করা হয়েছে।",
+    descriptionBn: "à¦¬à¦¾à¦¯à¦¼à¦¾à¦° à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦¶à¦¿à¦Ÿà§‡à¦° à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦¡à¦¿à¦œà¦¾à¦‡à¦¨ à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡: à¦•à¦¡à¦¼à¦¾ à¦¬à§‡à¦—à§�à¦¨à¦¿/à¦¨à§€à¦² à¦Ÿà§‡à¦¬à¦¿à¦² à¦¹à§‡à¦¡à¦¾à¦°à§‡à¦° à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à§‡ à¦ªà¦°à¦¿à¦·à§�à¦•à¦¾à¦° à¦¸à¦¾à¦¦à¦¾ à¦•à¦¾à¦°à§�à¦¡ à¦¸à§‡à¦•à¦¶à¦¨ à¦“ à¦‡à¦¨à§�à¦¡à¦¿à¦—à§‹ à¦°à¦™à§‡à¦° à¦ªà§�à¦¯à¦¾à¦²à§‡à¦Ÿ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡, à¦¡à¦¾à¦¨à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¸à§�à¦Ÿà¦¿à¦•à¦¿ à¦²à¦¾à¦‡à¦­ à¦�à¦«à¦“à¦¬à¦¿ à¦®à§‚à¦²à§�à¦¯ à¦•à¦¾à¦°à§�à¦¡ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡, à¦¸à¦®à§�à¦ªà¦°à§�à¦•à¦¿à¦¤ à¦¸à§‡à¦•à¦¶à¦¨à¦—à§�à¦²à§‹ à¦ªà¦¾à¦¶à¦¾à¦ªà¦¾à¦¶à¦¿ à¦¸à¦¾à¦œà¦¾à¦¨à§‹ à¦¹à¦¯à¦¼à§‡à¦›à§‡, à¦¡à¦¿à¦²à¦¿à¦Ÿ à¦¬à§‹à¦¤à¦¾à¦® à¦¹à§‹à¦­à¦¾à¦°à§‡ à¦¦à§‡à¦–à¦¾ à¦¯à¦¾à¦¯à¦¼ à¦�à¦¬à¦‚ à¦¸à§�à¦¬à¦¯à¦¼à¦‚à¦•à§�à¦°à¦¿à¦¯à¦¼ à¦«à¦¿à¦²à§�à¦¡à¦—à§�à¦²à§‹ à¦Ÿà¦¿à¦² à¦°à¦™à§‡ à¦¹à¦¾à¦‡à¦²à¦¾à¦‡à¦Ÿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "106",
@@ -1763,7 +1772,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-quotation",
     descriptionEn: "Added major UX improvements to the Buyer Costing Sheet: collapsible sections with chevrons, section total chips showing $/dozen in headers, dashed full-width Add Row buttons, teal-styled auto-calculated fields, context-sensitive FOB card (green when target met), inline tooltip hints on complex fields, and main fabric row highlighted differently from editable rows.",
-    descriptionBn: "বায়ার কস্টিং শিটে গুরুত্বপূর্ণ ইউজার এক্সপেরিয়েন্স উন্নতি যোগ করা হয়েছে: চেভরন সহ সেকশন ভাঁজ করার সুবিধা, হেডারে $/ডজন সেকশন টোটাল চিপ, ড্যাশড বর্ডার সহ Add Row বোতাম, টিল রঙের স্বয়ংক্রিয় ফিল্ড, টার্গেট পূরণ হলে সবুজ FOB কার্ড, জটিল ফিল্ডে টুলটিপ হিন্ট এবং মেইন ফেব্রিক রো আলাদাভাবে হাইলাইট করা হয়েছে।",
+    descriptionBn: "à¦¬à¦¾à¦¯à¦¼à¦¾à¦° à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦¶à¦¿à¦Ÿà§‡ à¦—à§�à¦°à§�à¦¤à§�à¦¬à¦ªà§‚à¦°à§�à¦£ à¦‡à¦‰à¦œà¦¾à¦° à¦�à¦•à§�à¦¸à¦ªà§‡à¦°à¦¿à¦¯à¦¼à§‡à¦¨à§�à¦¸ à¦‰à¦¨à§�à¦¨à¦¤à¦¿ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡: à¦šà§‡à¦­à¦°à¦¨ à¦¸à¦¹ à¦¸à§‡à¦•à¦¶à¦¨ à¦­à¦¾à¦�à¦œ à¦•à¦°à¦¾à¦° à¦¸à§�à¦¬à¦¿à¦§à¦¾, à¦¹à§‡à¦¡à¦¾à¦°à§‡ $/à¦¡à¦œà¦¨ à¦¸à§‡à¦•à¦¶à¦¨ à¦Ÿà§‹à¦Ÿà¦¾à¦² à¦šà¦¿à¦ª, à¦¡à§�à¦¯à¦¾à¦¶à¦¡ à¦¬à¦°à§�à¦¡à¦¾à¦° à¦¸à¦¹ Add Row à¦¬à§‹à¦¤à¦¾à¦®, à¦Ÿà¦¿à¦² à¦°à¦™à§‡à¦° à¦¸à§�à¦¬à¦¯à¦¼à¦‚à¦•à§�à¦°à¦¿à¦¯à¦¼ à¦«à¦¿à¦²à§�à¦¡, à¦Ÿà¦¾à¦°à§�à¦—à§‡à¦Ÿ à¦ªà§‚à¦°à¦£ à¦¹à¦²à§‡ à¦¸à¦¬à§�à¦œ FOB à¦•à¦¾à¦°à§�à¦¡, à¦œà¦Ÿà¦¿à¦² à¦«à¦¿à¦²à§�à¦¡à§‡ à¦Ÿà§�à¦²à¦Ÿà¦¿à¦ª à¦¹à¦¿à¦¨à§�à¦Ÿ à¦�à¦¬à¦‚ à¦®à§‡à¦‡à¦¨ à¦«à§‡à¦¬à§�à¦°à¦¿à¦• à¦°à§‹ à¦†à¦²à¦¾à¦¦à¦¾à¦­à¦¾à¦¬à§‡ à¦¹à¦¾à¦‡à¦²à¦¾à¦‡à¦Ÿ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "107",
@@ -1772,7 +1781,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-pre-costing",
     descriptionEn: "Completely rebuilt the Pre-Costing page with three views: (1) List view with date/buyer/status filters, Excel/Print/PDF export buttons, and color-coded status badges; (2) Entry form with collapsible sections for Order Info, Process Loss, Style FOB details, Fabric (B.1), Accessories (B.5), CM Cost (D), Special Cost (G), Others (H), and a live budget summary card; (3) Full detail/print view matching the Pakiza Knit ERP format with budget summary A-K, all costing sections, and 5-person approval signature block.",
-    descriptionBn: "প্রি-কস্টিং পেজটি তিনটি ভিউ সহ সম্পূর্ণ পুনর্নির্মাণ করা হয়েছে: (১) তারিখ/ক্রেতা/স্ট্যাটাস ফিল্টার, এক্সেল/প্রিন্ট/পিডিএফ বোতাম ও রঙিন স্ট্যাটাস ব্যাজ সহ তালিকা ভিউ; (২) অর্ডার তথ্য, প্রসেস লস, স্টাইল FOB, ফেব্রিক (B.1), অ্যাক্সেসরিজ (B.5), সিএম কস্ট (D), বিশেষ খরচ (G), অন্যান্য (H) সেকশন ও লাইভ বাজেট সারসংক্ষেপ কার্ড সহ এন্ট্রি ফর্ম; (৩) পাকিজা নিট ইআরপির মতো পূর্ণ বিস্তারিত/প্রিন্ট ভিউ, বাজেট সারসংক্ষেপ A-K এবং ৫ জনের অনুমোদন সই ব্লক সহ।",
+    descriptionBn: "à¦ªà§�à¦°à¦¿-à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦ªà§‡à¦œà¦Ÿà¦¿ à¦¤à¦¿à¦¨à¦Ÿà¦¿ à¦­à¦¿à¦‰ à¦¸à¦¹ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦ªà§�à¦¨à¦°à§�à¦¨à¦¿à¦°à§�à¦®à¦¾à¦£ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡: (à§§) à¦¤à¦¾à¦°à¦¿à¦–/à¦•à§�à¦°à§‡à¦¤à¦¾/à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦Ÿà¦¾à¦¸ à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦°, à¦�à¦•à§�à¦¸à§‡à¦²/à¦ªà§�à¦°à¦¿à¦¨à§�à¦Ÿ/à¦ªà¦¿à¦¡à¦¿à¦�à¦« à¦¬à§‹à¦¤à¦¾à¦® à¦“ à¦°à¦™à¦¿à¦¨ à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦Ÿà¦¾à¦¸ à¦¬à§�à¦¯à¦¾à¦œ à¦¸à¦¹ à¦¤à¦¾à¦²à¦¿à¦•à¦¾ à¦­à¦¿à¦‰; (à§¨) à¦…à¦°à§�à¦¡à¦¾à¦° à¦¤à¦¥à§�à¦¯, à¦ªà§�à¦°à¦¸à§‡à¦¸ à¦²à¦¸, à¦¸à§�à¦Ÿà¦¾à¦‡à¦² FOB, à¦«à§‡à¦¬à§�à¦°à¦¿à¦• (B.1), à¦…à§�à¦¯à¦¾à¦•à§�à¦¸à§‡à¦¸à¦°à¦¿à¦œ (B.5), à¦¸à¦¿à¦�à¦® à¦•à¦¸à§�à¦Ÿ (D), à¦¬à¦¿à¦¶à§‡à¦· à¦–à¦°à¦š (G), à¦…à¦¨à§�à¦¯à¦¾à¦¨à§�à¦¯ (H) à¦¸à§‡à¦•à¦¶à¦¨ à¦“ à¦²à¦¾à¦‡à¦­ à¦¬à¦¾à¦œà§‡à¦Ÿ à¦¸à¦¾à¦°à¦¸à¦‚à¦•à§�à¦·à§‡à¦ª à¦•à¦¾à¦°à§�à¦¡ à¦¸à¦¹ à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿ à¦«à¦°à§�à¦®; (à§©) à¦ªà¦¾à¦•à¦¿à¦œà¦¾ à¦¨à¦¿à¦Ÿ à¦‡à¦†à¦°à¦ªà¦¿à¦° à¦®à¦¤à§‹ à¦ªà§‚à¦°à§�à¦£ à¦¬à¦¿à¦¸à§�à¦¤à¦¾à¦°à¦¿à¦¤/à¦ªà§�à¦°à¦¿à¦¨à§�à¦Ÿ à¦­à¦¿à¦‰, à¦¬à¦¾à¦œà§‡à¦Ÿ à¦¸à¦¾à¦°à¦¸à¦‚à¦•à§�à¦·à§‡à¦ª A-K à¦�à¦¬à¦‚ à§« à¦œà¦¨à§‡à¦° à¦…à¦¨à§�à¦®à§‹à¦¦à¦¨ à¦¸à¦‡ à¦¬à§�à¦²à¦• à¦¸à¦¹à¥¤",
   },
   {
     id: "108",
@@ -1781,7 +1790,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-pre-costing",
     descriptionEn: "Rebuilt the Pre-Costing detail/print view to match the Pakiza Knit ERP format: company header with logo, 6-column style info grid, Key Information + Style Image + Budget Summary in a 3-panel side-by-side layout, B.4 Fabric Conversion Cost grouped by Knitting/Dyeing sub-sections with sub-totals, B.2 Yarn and B.3 Dyed Yarn tables, G Special Cost + H Others Cost + I Sample Cost displayed side by side, and a 5-person approval block with Approved/Pending status per approver.",
-    descriptionBn: "প্রি-কস্টিং ডিটেইল/প্রিন্ট ভিউ পাকিজা নিট ইআরপির মতো পুনর্নির্মাণ করা হয়েছে: লোগো সহ কোম্পানি হেডার, ৬-কলাম স্টাইল তথ্য গ্রিড, ৩-প্যানেল পাশাপাশি লেআউটে কী ইনফো + স্টাইল ইমেজ + বাজেট সারসংক্ষেপ, নিটিং/ডায়িং সাব-সেকশন সহ B.4 ফেব্রিক কনভার্সন কস্ট, B.2 ইয়ার্ন ও B.3 ডায়েড ইয়ার্ন টেবিল, পাশাপাশি G বিশেষ খরচ + H অন্যান্য খরচ + I স্যাম্পল কস্ট, এবং প্রতিটি অনুমোদনকারীর অ্যাপ্রুভড/পেন্ডিং স্ট্যাটাস সহ ৫ জনের সই ব্লক।",
+    descriptionBn: "à¦ªà§�à¦°à¦¿-à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²/à¦ªà§�à¦°à¦¿à¦¨à§�à¦Ÿ à¦­à¦¿à¦‰ à¦ªà¦¾à¦•à¦¿à¦œà¦¾ à¦¨à¦¿à¦Ÿ à¦‡à¦†à¦°à¦ªà¦¿à¦° à¦®à¦¤à§‹ à¦ªà§�à¦¨à¦°à§�à¦¨à¦¿à¦°à§�à¦®à¦¾à¦£ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡: à¦²à§‹à¦—à§‹ à¦¸à¦¹ à¦•à§‹à¦®à§�à¦ªà¦¾à¦¨à¦¿ à¦¹à§‡à¦¡à¦¾à¦°, à§¬-à¦•à¦²à¦¾à¦® à¦¸à§�à¦Ÿà¦¾à¦‡à¦² à¦¤à¦¥à§�à¦¯ à¦—à§�à¦°à¦¿à¦¡, à§©-à¦ªà§�à¦¯à¦¾à¦¨à§‡à¦² à¦ªà¦¾à¦¶à¦¾à¦ªà¦¾à¦¶à¦¿ à¦²à§‡à¦†à¦‰à¦Ÿà§‡ à¦•à§€ à¦‡à¦¨à¦«à§‹ + à¦¸à§�à¦Ÿà¦¾à¦‡à¦² à¦‡à¦®à§‡à¦œ + à¦¬à¦¾à¦œà§‡à¦Ÿ à¦¸à¦¾à¦°à¦¸à¦‚à¦•à§�à¦·à§‡à¦ª, à¦¨à¦¿à¦Ÿà¦¿à¦‚/à¦¡à¦¾à¦¯à¦¼à¦¿à¦‚ à¦¸à¦¾à¦¬-à¦¸à§‡à¦•à¦¶à¦¨ à¦¸à¦¹ B.4 à¦«à§‡à¦¬à§�à¦°à¦¿à¦• à¦•à¦¨à¦­à¦¾à¦°à§�à¦¸à¦¨ à¦•à¦¸à§�à¦Ÿ, B.2 à¦‡à¦¯à¦¼à¦¾à¦°à§�à¦¨ à¦“ B.3 à¦¡à¦¾à¦¯à¦¼à§‡à¦¡ à¦‡à¦¯à¦¼à¦¾à¦°à§�à¦¨ à¦Ÿà§‡à¦¬à¦¿à¦², à¦ªà¦¾à¦¶à¦¾à¦ªà¦¾à¦¶à¦¿ G à¦¬à¦¿à¦¶à§‡à¦· à¦–à¦°à¦š + H à¦…à¦¨à§�à¦¯à¦¾à¦¨à§�à¦¯ à¦–à¦°à¦š + I à¦¸à§�à¦¯à¦¾à¦®à§�à¦ªà¦² à¦•à¦¸à§�à¦Ÿ, à¦�à¦¬à¦‚ à¦ªà§�à¦°à¦¤à¦¿à¦Ÿà¦¿ à¦…à¦¨à§�à¦®à§‹à¦¦à¦¨à¦•à¦¾à¦°à§€à¦° à¦…à§�à¦¯à¦¾à¦ªà§�à¦°à§�à¦­à¦¡/à¦ªà§‡à¦¨à§�à¦¡à¦¿à¦‚ à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦Ÿà¦¾à¦¸ à¦¸à¦¹ à§« à¦œà¦¨à§‡à¦° à¦¸à¦‡ à¦¬à§�à¦²à¦•à¥¤",
   },
   {
     id: "109",
@@ -1790,7 +1799,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-pre-costing",
     descriptionEn: "Polished the Pre-Costing Detail/Print view: added matching letterhead design elements, cleaner 6-column Style Info borders and spacing, highly-aligned 3-column mid-section (Key Info, Style image, Budget table), and custom tables formatting (perfect grid alignments, dollar symbol formatting, monospace fonts for values, and refined border-slate configurations). Added status-colored signature lines with clean spacing.",
-    descriptionBn: "প্রি-কস্টিং ডিটেইল/প্রিন্ট ভিউ মার্জিত করা হয়েছে: ম্যাচিং লেটারহেড ডিজাইন উপাদান, ৬-কলাম বিশিষ্ট স্টাইল তথ্যের পরিষ্কার বর্ডার ও স্পেসিং, ৩-কলাম বিশিষ্ট মাঝের সেকশনের নিখুঁত অ্যালাইনমেন্ট, এবং নিখুঁত গ্রিড অ্যালাইনমেন্ট, ডলার সিম্বল ফরম্যাটিং, মানগুলোর জন্য মনোস্পেস ফন্ট এবং মার্জিত বর্ডার সহ কাস্টম টেবিল ফরম্যাটিং যোগ করা হয়েছে।",
+    descriptionBn: "à¦ªà§�à¦°à¦¿-à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²/à¦ªà§�à¦°à¦¿à¦¨à§�à¦Ÿ à¦­à¦¿à¦‰ à¦®à¦¾à¦°à§�à¦œà¦¿à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡: à¦®à§�à¦¯à¦¾à¦šà¦¿à¦‚ à¦²à§‡à¦Ÿà¦¾à¦°à¦¹à§‡à¦¡ à¦¡à¦¿à¦œà¦¾à¦‡à¦¨ à¦‰à¦ªà¦¾à¦¦à¦¾à¦¨, à§¬-à¦•à¦²à¦¾à¦® à¦¬à¦¿à¦¶à¦¿à¦·à§�à¦Ÿ à¦¸à§�à¦Ÿà¦¾à¦‡à¦² à¦¤à¦¥à§�à¦¯à§‡à¦° à¦ªà¦°à¦¿à¦·à§�à¦•à¦¾à¦° à¦¬à¦°à§�à¦¡à¦¾à¦° à¦“ à¦¸à§�à¦ªà§‡à¦¸à¦¿à¦‚, à§©-à¦•à¦²à¦¾à¦® à¦¬à¦¿à¦¶à¦¿à¦·à§�à¦Ÿ à¦®à¦¾à¦�à§‡à¦° à¦¸à§‡à¦•à¦¶à¦¨à§‡à¦° à¦¨à¦¿à¦–à§�à¦�à¦¤ à¦…à§�à¦¯à¦¾à¦²à¦¾à¦‡à¦¨à¦®à§‡à¦¨à§�à¦Ÿ, à¦�à¦¬à¦‚ à¦¨à¦¿à¦–à§�à¦�à¦¤ à¦—à§�à¦°à¦¿à¦¡ à¦…à§�à¦¯à¦¾à¦²à¦¾à¦‡à¦¨à¦®à§‡à¦¨à§�à¦Ÿ, à¦¡à¦²à¦¾à¦° à¦¸à¦¿à¦®à§�à¦¬à¦² à¦«à¦°à¦®à§�à¦¯à¦¾à¦Ÿà¦¿à¦‚, à¦®à¦¾à¦¨à¦—à§�à¦²à§‹à¦° à¦œà¦¨à§�à¦¯ à¦®à¦¨à§‹à¦¸à§�à¦ªà§‡à¦¸ à¦«à¦¨à§�à¦Ÿ à¦�à¦¬à¦‚ à¦®à¦¾à¦°à§�à¦œà¦¿à¦¤ à¦¬à¦°à§�à¦¡à¦¾à¦° à¦¸à¦¹ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦Ÿà§‡à¦¬à¦¿à¦² à¦«à¦°à¦®à§�à¦¯à¦¾à¦Ÿà¦¿à¦‚ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "110",
@@ -1799,7 +1808,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-pre-costing",
     descriptionEn: "Resolved Pre-Costing page rendering issues: imported React to fix ReferenceError, added stable unique keys to fallback empty table rows in Yarn, Dyed Yarn, and Embellishment tables, and filtered process types in Fabric Conversion map to prevent returning null elements.",
-    descriptionBn: "প্রি-কস্টিং পেজ রেন্ডারিং সমস্যা সংশোধন করা হয়েছে: রেফারেন্স এরর দূর করার জন্য React ইমপোর্ট করা হয়েছে, ইয়ার্ন, ডাইড ইয়ার্ন ও এমবেলিশমেন্ট টেবিলের ফ্যালব্যাক খালি রো-তে ইউনিক কি (key) যুক্ত করা হয়েছে এবং কনভার্সন কস্ট ম্যাপের নল এলিমেন্ট ফিল্টার করা হয়েছে।",
+    descriptionBn: "à¦ªà§�à¦°à¦¿-à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦ªà§‡à¦œ à¦°à§‡à¦¨à§�à¦¡à¦¾à¦°à¦¿à¦‚ à¦¸à¦®à¦¸à§�à¦¯à¦¾ à¦¸à¦‚à¦¶à§‹à¦§à¦¨ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡: à¦°à§‡à¦«à¦¾à¦°à§‡à¦¨à§�à¦¸ à¦�à¦°à¦° à¦¦à§‚à¦° à¦•à¦°à¦¾à¦° à¦œà¦¨à§�à¦¯ React à¦‡à¦®à¦ªà§‹à¦°à§�à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦‡à§Ÿà¦¾à¦°à§�à¦¨, à¦¡à¦¾à¦‡à¦¡ à¦‡à§Ÿà¦¾à¦°à§�à¦¨ à¦“ à¦�à¦®à¦¬à§‡à¦²à¦¿à¦¶à¦®à§‡à¦¨à§�à¦Ÿ à¦Ÿà§‡à¦¬à¦¿à¦²à§‡à¦° à¦«à§�à¦¯à¦¾à¦²à¦¬à§�à¦¯à¦¾à¦• à¦–à¦¾à¦²à¦¿ à¦°à§‹-à¦¤à§‡ à¦‡à¦‰à¦¨à¦¿à¦• à¦•à¦¿ (key) à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦•à¦¨à¦­à¦¾à¦°à§�à¦¸à¦¨ à¦•à¦¸à§�à¦Ÿ à¦®à§�à¦¯à¦¾à¦ªà§‡à¦° à¦¨à¦² à¦�à¦²à¦¿à¦®à§‡à¦¨à§�à¦Ÿ à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "111",
@@ -1808,7 +1817,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-pre-costing",
     descriptionEn: "Expanded the Pre-Costing printable sheet width by increasing the outer container constraint from max-w-7xl to max-w-[1500px] and changing the card container to max-w-full, reducing empty space on the sides for wide screen displays.",
-    descriptionBn: "প্রি-কস্টিং প্রিন্টেবিল শিটের সাইড গ্যাপ কমানোর জন্য কন্টেইনার উইডথ max-w-7xl থেকে বাড়িয়ে max-w-[1500px] করা হয়েছে এবং ভেতরের কার্ডটিকে max-w-full এ রূপান্তর করা হয়েছে।",
+    descriptionBn: "à¦ªà§�à¦°à¦¿-à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦ªà§�à¦°à¦¿à¦¨à§�à¦Ÿà§‡à¦¬à¦¿à¦² à¦¶à¦¿à¦Ÿà§‡à¦° à¦¸à¦¾à¦‡à¦¡ à¦—à§�à¦¯à¦¾à¦ª à¦•à¦®à¦¾à¦¨à§‹à¦° à¦œà¦¨à§�à¦¯ à¦•à¦¨à§�à¦Ÿà§‡à¦‡à¦¨à¦¾à¦° à¦‰à¦‡à¦¡à¦¥ max-w-7xl à¦¥à§‡à¦•à§‡ à¦¬à¦¾à¦¡à¦¼à¦¿à¦¯à¦¼à§‡ max-w-[1500px] à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦­à§‡à¦¤à¦°à§‡à¦° à¦•à¦¾à¦°à§�à¦¡à¦Ÿà¦¿à¦•à§‡ max-w-full à¦� à¦°à§‚à¦ªà¦¾à¦¨à§�à¦¤à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "112",
@@ -1817,7 +1826,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-pre-costing",
     descriptionEn: "Completely rebuilt the Pre-Costing edit/new entry form view matching the user's screenshot layout and fields exactly: added all basic information inputs (Query No, Query Date, customer buying house, departments, agent/brand, etc.), RMG process loss inputs, Order Style Information row insertion controller (with items mapping itemType, sizeGroup, and checkboxes PRINT/EMB/WASH/SPECIAL), dynamic styles basic grid table rendering matching all columns from the screenshot, and Additional Costing spreadsheet-style input panel with final Save button.",
-    descriptionBn: "প্রি-কস্টিং পেজের এডিট/নতুন এন্ট্রি ফর্ম ভিউ স্ক্রিনশটের মতো করে সম্পূর্ণ পুনর্নির্মাণ করা হয়েছে: কোয়েরি নম্বর, কোয়েরি ডেট, ক্রেতার বায়িং হাউস, এজেন্ট/ব্র্যান্ড সহ সকল বেসিক তথ্য ইনপুট, আরএমজি প্রসেস লস ইনপুট, স্টাইল তথ্য ইনপুট ও লিঙ্কেজ (PRINT/EMB/WASH/SPECIAL), স্ক্রিনশটের সব কলাম সহ ডায়নামিক গ্রিড টেবিল রেন্ডারিং এবং অতিরিক্ত খরচের স্প্রেডশীট স্টাইল প্যানেল সহ সংরক্ষণ বোতাম।",
+    descriptionBn: "à¦ªà§�à¦°à¦¿-à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦ªà§‡à¦œà§‡à¦° à¦�à¦¡à¦¿à¦Ÿ/à¦¨à¦¤à§�à¦¨ à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿ à¦«à¦°à§�à¦® à¦­à¦¿à¦‰ à¦¸à§�à¦•à§�à¦°à¦¿à¦¨à¦¶à¦Ÿà§‡à¦° à¦®à¦¤à§‹ à¦•à¦°à§‡ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦ªà§�à¦¨à¦°à§�à¦¨à¦¿à¦°à§�à¦®à¦¾à¦£ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡: à¦•à§‹à¦¯à¦¼à§‡à¦°à¦¿ à¦¨à¦®à§�à¦¬à¦°, à¦•à§‹à¦¯à¦¼à§‡à¦°à¦¿ à¦¡à§‡à¦Ÿ, à¦•à§�à¦°à§‡à¦¤à¦¾à¦° à¦¬à¦¾à¦¯à¦¼à¦¿à¦‚ à¦¹à¦¾à¦‰à¦¸, à¦�à¦œà§‡à¦¨à§�à¦Ÿ/à¦¬à§�à¦°à§�à¦¯à¦¾à¦¨à§�à¦¡ à¦¸à¦¹ à¦¸à¦•à¦² à¦¬à§‡à¦¸à¦¿à¦• à¦¤à¦¥à§�à¦¯ à¦‡à¦¨à¦ªà§�à¦Ÿ, à¦†à¦°à¦�à¦®à¦œà¦¿ à¦ªà§�à¦°à¦¸à§‡à¦¸ à¦²à¦¸ à¦‡à¦¨à¦ªà§�à¦Ÿ, à¦¸à§�à¦Ÿà¦¾à¦‡à¦² à¦¤à¦¥à§�à¦¯ à¦‡à¦¨à¦ªà§�à¦Ÿ à¦“ à¦²à¦¿à¦™à§�à¦•à§‡à¦œ (PRINT/EMB/WASH/SPECIAL), à¦¸à§�à¦•à§�à¦°à¦¿à¦¨à¦¶à¦Ÿà§‡à¦° à¦¸à¦¬ à¦•à¦²à¦¾à¦® à¦¸à¦¹ à¦¡à¦¾à¦¯à¦¼à¦¨à¦¾à¦®à¦¿à¦• à¦—à§�à¦°à¦¿à¦¡ à¦Ÿà§‡à¦¬à¦¿à¦² à¦°à§‡à¦¨à§�à¦¡à¦¾à¦°à¦¿à¦‚ à¦�à¦¬à¦‚ à¦…à¦¤à¦¿à¦°à¦¿à¦•à§�à¦¤ à¦–à¦°à¦šà§‡à¦° à¦¸à§�à¦ªà§�à¦°à§‡à¦¡à¦¶à§€à¦Ÿ à¦¸à§�à¦Ÿà¦¾à¦‡à¦² à¦ªà§�à¦¯à¦¾à¦¨à§‡à¦² à¦¸à¦¹ à¦¸à¦‚à¦°à¦•à§�à¦·à¦£ à¦¬à§‹à¦¤à¦¾à¦®à¥¤",
   },
   {
     id: "113",
@@ -1826,7 +1835,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-pre-costing",
     descriptionEn: "Ensured 100% field coverage in the Pre-Costing detail/print sheet: added missing Key Information attributes including M/c Per Line, Production per Hour, Assortment, Fabric Loss Qty, Lead Time, and Sample, and linked dynamic calculation parameters.",
-    descriptionBn: "প্রি-কস্টিং ডিটেইল/প্রিন্ট শিটে শতভাগ ফিল্ড কভারেজ নিশ্চিত করা হয়েছে: কী ইনফরমেশন টেবিলে বাদ পড়া এট্রিবিউট যেমন মেশিন পার লাইন, প্রোডাকশন পার আওয়ার, অ্যাসোর্টমেন্ট, ফেব্রিক লস কোয়ান্টিটি, লিড টাইম ও স্যাম্পল যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦ªà§�à¦°à¦¿-à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²/à¦ªà§�à¦°à¦¿à¦¨à§�à¦Ÿ à¦¶à¦¿à¦Ÿà§‡ à¦¶à¦¤à¦­à¦¾à¦— à¦«à¦¿à¦²à§�à¦¡ à¦•à¦­à¦¾à¦°à§‡à¦œ à¦¨à¦¿à¦¶à§�à¦šà¦¿à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡: à¦•à§€ à¦‡à¦¨à¦«à¦°à¦®à§‡à¦¶à¦¨ à¦Ÿà§‡à¦¬à¦¿à¦²à§‡ à¦¬à¦¾à¦¦ à¦ªà§œà¦¾ à¦�à¦Ÿà§�à¦°à¦¿à¦¬à¦¿à¦‰à¦Ÿ à¦¯à§‡à¦®à¦¨ à¦®à§‡à¦¶à¦¿à¦¨ à¦ªà¦¾à¦° à¦²à¦¾à¦‡à¦¨, à¦ªà§�à¦°à§‹à¦¡à¦¾à¦•à¦¶à¦¨ à¦ªà¦¾à¦° à¦†à¦“à§Ÿà¦¾à¦°, à¦…à§�à¦¯à¦¾à¦¸à§‹à¦°à§�à¦Ÿà¦®à§‡à¦¨à§�à¦Ÿ, à¦«à§‡à¦¬à§�à¦°à¦¿à¦• à¦²à¦¸ à¦•à§‹à§Ÿà¦¾à¦¨à§�à¦Ÿà¦¿à¦Ÿà¦¿, à¦²à¦¿à¦¡ à¦Ÿà¦¾à¦‡à¦® à¦“ à¦¸à§�à¦¯à¦¾à¦®à§�à¦ªà¦² à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "114",
@@ -1835,7 +1844,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-pre-costing",
     descriptionEn: "Reordered sidebar workflow menus to follow the specified ERP pipeline sequence: Inquiry, Quotation, PO Management, and Pre Costing.",
-    descriptionBn: "বায়িং বা ইআরপি সিকোয়েন্স অনুযায়ী সাইডবার মেনুগুলো রিঅর্ডার করা হয়েছে: ইনকোয়ারি, কোটেশন, পিও ম্যানেজমেন্ট এবং প্রি-কস্টিং।",
+    descriptionBn: "à¦¬à¦¾à¦¯à¦¼à¦¿à¦‚ à¦¬à¦¾ à¦‡à¦†à¦°à¦ªà¦¿ à¦¸à¦¿à¦•à§‹à¦¯à¦¼à§‡à¦¨à§�à¦¸ à¦…à¦¨à§�à¦¯à¦¾à¦¯à¦¼à§€ à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦° à¦®à§‡à¦¨à§�à¦—à§�à¦²à§‹ à¦°à¦¿à¦…à¦°à§�à¦¡à¦¾à¦° à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡: à¦‡à¦¨à¦•à§‹à¦¯à¦¼à¦¾à¦°à¦¿, à¦•à§‹à¦Ÿà§‡à¦¶à¦¨, à¦ªà¦¿à¦“ à¦®à§�à¦¯à¦¾à¦¨à§‡à¦œà¦®à§‡à¦¨à§�à¦Ÿ à¦�à¦¬à¦‚ à¦ªà§�à¦°à¦¿-à¦•à¦¸à§�à¦Ÿà¦¿à¦‚à¥¤",
   },
   {
     id: "115",
@@ -1844,7 +1853,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-bom",
     descriptionEn: "Created the Bill of Materials (BOM) page: integrated 'Bill of Materials' and 'BOM List' links into the sidebar layout; designed a filterable BOM Sheet Report register with status-colored row highlighting; implemented a high-fidelity Accessories BOM Sheet details view featuring Color/Size breakdown grids, Fabric detail lists, and sewing trim items grouped by style with subtotals.",
-    descriptionBn: "বিল অব ম্যাটেরিয়ালস (BOM) পেজ তৈরি করা হয়েছে: সাইডবার লেআউটে লিঙ্ক যুক্ত করা হয়েছে; স্ট্যাটাস অনুযায়ী রঙিন রো বিশিষ্ট ফিল্টারযোগ্য রেজিস্টার ভিউ তৈরি করা হয়েছে; এবং এক্সেসরিজ বিওএম শিটের বিস্তারিত ভিউ তৈরি করা হয়েছে যেখানে কালার/সাইজ ব্রেকডাউন গ্রিড, ফেব্রিক ডিটেইল এবং স্টাইল অনুযায়ী গ্রুপ করা সুইং ট্রিমস আইটেমের সাবটোটাল টেবিল রয়েছে।",
+    descriptionBn: "à¦¬à¦¿à¦² à¦…à¦¬ à¦®à§�à¦¯à¦¾à¦Ÿà§‡à¦°à¦¿à¦¯à¦¼à¦¾à¦²à¦¸ (BOM) à¦ªà§‡à¦œ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡: à¦¸à¦¾à¦‡à¦¡à¦¬à¦¾à¦° à¦²à§‡à¦†à¦‰à¦Ÿà§‡ à¦²à¦¿à¦™à§�à¦• à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡; à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦Ÿà¦¾à¦¸ à¦…à¦¨à§�à¦¯à¦¾à§Ÿà§€ à¦°à¦™à¦¿à¦¨ à¦°à§‹ à¦¬à¦¿à¦¶à¦¿à¦·à§�à¦Ÿ à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦°à¦¯à§‹à¦—à§�à¦¯ à¦°à§‡à¦œà¦¿à¦¸à§�à¦Ÿà¦¾à¦° à¦­à¦¿à¦‰ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡; à¦�à¦¬à¦‚ à¦�à¦•à§�à¦¸à§‡à¦¸à¦°à¦¿à¦œ à¦¬à¦¿à¦“à¦�à¦® à¦¶à¦¿à¦Ÿà§‡à¦° à¦¬à¦¿à¦¸à§�à¦¤à¦¾à¦°à¦¿à¦¤ à¦­à¦¿à¦‰ à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¯à§‡à¦–à¦¾à¦¨à§‡ à¦•à¦¾à¦²à¦¾à¦°/à¦¸à¦¾à¦‡à¦œ à¦¬à§�à¦°à§‡à¦•à¦¡à¦¾à¦‰à¦¨ à¦—à§�à¦°à¦¿à¦¡, à¦«à§‡à¦¬à§�à¦°à¦¿à¦• à¦¡à¦¿à¦Ÿà§‡à¦‡à¦² à¦�à¦¬à¦‚ à¦¸à§�à¦Ÿà¦¾à¦‡à¦² à¦…à¦¨à§�à¦¯à¦¾à§Ÿà§€ à¦—à§�à¦°à§�à¦ª à¦•à¦°à¦¾ à¦¸à§�à¦‡à¦‚ à¦Ÿà§�à¦°à¦¿à¦®à¦¸ à¦†à¦‡à¦Ÿà§‡à¦®à§‡à¦° à¦¸à¦¾à¦¬à¦Ÿà§‹à¦Ÿà¦¾à¦² à¦Ÿà§‡à¦¬à¦¿à¦² à¦°à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "116",
@@ -1853,7 +1862,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-bom",
     descriptionEn: "Upgraded the BOM List view row highlights to soft, professional pastel tints (Approved: soft green, Pending: soft blue, Review: soft amber, Saved: soft grey) and replaced the harsh white-on-colored text with premium high-contrast dark text and stylized inline action eye buttons.",
-    descriptionBn: "বিওএম লিস্ট ভিউয়ের অতিরিক্ত উজ্জ্বল রঙ পরিবর্তন করে মৃদু ও পেশাদার রঙের ব্যবহার করা হয়েছে (এপ্রুভড: সফট গ্রিন, পেন্ডিং: সফট ব্লু, রিভিউ: সফট অ্যাম্বার, সেভড: সফট গ্রে) এবং লেখার রঙ সাদা থেকে পরিবর্তন করে পরিষ্কার গাঢ় টেক্সট ও আকর্ষণীয় আই (Eye) আইকন অ্যাকশন বাটন যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦¬à¦¿à¦“à¦�à¦® à¦²à¦¿à¦¸à§�à¦Ÿ à¦­à¦¿à¦‰à§Ÿà§‡à¦° à¦…à¦¤à¦¿à¦°à¦¿à¦•à§�à¦¤ à¦‰à¦œà§�à¦œà§�à¦¬à¦² à¦°à¦™ à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦•à¦°à§‡ à¦®à§ƒà¦¦à§� à¦“ à¦ªà§‡à¦¶à¦¾à¦¦à¦¾à¦° à¦°à¦™à§‡à¦° à¦¬à§�à¦¯à¦¬à¦¹à¦¾à¦° à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ (à¦�à¦ªà§�à¦°à§�à¦­à¦¡: à¦¸à¦«à¦Ÿ à¦—à§�à¦°à¦¿à¦¨, à¦ªà§‡à¦¨à§�à¦¡à¦¿à¦‚: à¦¸à¦«à¦Ÿ à¦¬à§�à¦²à§�, à¦°à¦¿à¦­à¦¿à¦‰: à¦¸à¦«à¦Ÿ à¦…à§�à¦¯à¦¾à¦®à§�à¦¬à¦¾à¦°, à¦¸à§‡à¦­à¦¡: à¦¸à¦«à¦Ÿ à¦—à§�à¦°à§‡) à¦�à¦¬à¦‚ à¦²à§‡à¦–à¦¾à¦° à¦°à¦™ à¦¸à¦¾à¦¦à¦¾ à¦¥à§‡à¦•à§‡ à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦•à¦°à§‡ à¦ªà¦°à¦¿à¦·à§�à¦•à¦¾à¦° à¦—à¦¾à§� à¦Ÿà§‡à¦•à§�à¦¸à¦Ÿ à¦“ à¦†à¦•à¦°à§�à¦·à¦£à§€à§Ÿ à¦†à¦‡ (Eye) à¦†à¦‡à¦•à¦¨ à¦…à§�à¦¯à¦¾à¦•à¦¶à¦¨ à¦¬à¦¾à¦Ÿà¦¨ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "117",
@@ -1862,7 +1871,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-quotation",
     descriptionEn: "Completely redesigned the Quotation detail view into a side-by-side high-fidelity Buyer Costing Sheet: built a 2-column header with buyer details/dress sketch mockups, side-by-side grids containing the garment cost breakdown (with dynamic yarn, accessories, embellishments, wash, other costs lists) and fabric price calculation, profit gap metrics banner, and signature approvals section.",
-    descriptionBn: "কোটেশন ডিটেইল ভিউকে বায়ার কস্টিং শিট অনুযায়ী ২-কলামে বিভক্ত প্রফেশনাল ডিজাইনে উন্নীত করা হয়েছে: যার বাম পাশে বায়ার বেসিক তথ্য, ফেব্রিক ও এম্বেড করা স্কেচ ইমেজ এবং নিচের গ্রিডগুলোতে পোশাকের খরচ (ইয়ার্ন, এক্সেসরিজ, এম্বেলিশমেন্ট, ওয়াশ ও অন্যান্য খরচ তালিকা) এবং ডান পাশে কাপড়ের দাম হিসাবের টেবিল, প্রফিট গ্যাপ ব্যানার ও নিচে স্বাক্ষরকারীদের তালিকা সুন্দরভাবে ফুটিয়ে তোলা হয়েছে।",
+    descriptionBn: "à¦•à§‹à¦Ÿà§‡à¦¶à¦¨ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦² à¦­à¦¿à¦‰à¦•à§‡ à¦¬à¦¾à¦¯à¦¼à¦¾à¦° à¦•à¦¸à§�à¦Ÿà¦¿à¦‚ à¦¶à¦¿à¦Ÿ à¦…à¦¨à§�à¦¯à¦¾à¦¯à¦¼à§€ à§¨-à¦•à¦²à¦¾à¦®à§‡ à¦¬à¦¿à¦­à¦•à§�à¦¤ à¦ªà§�à¦°à¦«à§‡à¦¶à¦¨à¦¾à¦² à¦¡à¦¿à¦œà¦¾à¦‡à¦¨à§‡ à¦‰à¦¨à§�à¦¨à§€à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡: à¦¯à¦¾à¦° à¦¬à¦¾à¦® à¦ªà¦¾à¦¶à§‡ à¦¬à¦¾à¦¯à¦¼à¦¾à¦° à¦¬à§‡à¦¸à¦¿à¦• à¦¤à¦¥à§�à¦¯, à¦«à§‡à¦¬à§�à¦°à¦¿à¦• à¦“ à¦�à¦®à§�à¦¬à§‡à¦¡ à¦•à¦°à¦¾ à¦¸à§�à¦•à§‡à¦š à¦‡à¦®à§‡à¦œ à¦�à¦¬à¦‚ à¦¨à¦¿à¦šà§‡à¦° à¦—à§�à¦°à¦¿à¦¡à¦—à§�à¦²à§‹à¦¤à§‡ à¦ªà§‹à¦¶à¦¾à¦•à§‡à¦° à¦–à¦°à¦š (à¦‡à¦¯à¦¼à¦¾à¦°à§�à¦¨, à¦�à¦•à§�à¦¸à§‡à¦¸à¦°à¦¿à¦œ, à¦�à¦®à§�à¦¬à§‡à¦²à¦¿à¦¶à¦®à§‡à¦¨à§�à¦Ÿ, à¦“à§Ÿà¦¾à¦¶ à¦“ à¦…à¦¨à§�à¦¯à¦¾à¦¨à§�à¦¯ à¦–à¦°à¦š à¦¤à¦¾à¦²à¦¿à¦•à¦¾) à¦�à¦¬à¦‚ à¦¡à¦¾à¦¨ à¦ªà¦¾à¦¶à§‡ à¦•à¦¾à¦ªà¦¡à¦¼à§‡à¦° à¦¦à¦¾à¦® à¦¹à¦¿à¦¸à¦¾à¦¬à§‡à¦° à¦Ÿà§‡à¦¬à¦¿à¦², à¦ªà§�à¦°à¦«à¦¿à¦Ÿ à¦—à§�à¦¯à¦¾à¦ª à¦¬à§�à¦¯à¦¾à¦¨à¦¾à¦° à¦“ à¦¨à¦¿à¦šà§‡ à¦¸à§�à¦¬à¦¾à¦•à§�à¦·à¦°à¦•à¦¾à¦°à§€à¦¦à§‡à¦° à¦¤à¦¾à¦²à¦¿à¦•à¦¾ à¦¸à§�à¦¨à§�à¦¦à¦°à¦­à¦¾à¦¬à§‡ à¦«à§�à¦Ÿà¦¿à§Ÿà§‡ à¦¤à§‹à¦²à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "118",
@@ -1871,7 +1880,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-quotation",
     descriptionEn: "Configured the style image slot in the Quotation detail/print view to default load the premium dress sketch illustration image and enabled dynamic file upload replacements.",
-    descriptionBn: "কোটেশন ডিটেইল/প্রিন্ট ভিউয়ের স্টাইল ইমেজ বক্সে ডিফল্টভাবে প্রিমিয়াম ড্রেস স্কেচ ইলাস্ট্রেশন ইমেজটি লোড করার ব্যবস্থা রাখা হয়েছে এবং কাস্টম ফাইল আপলোড করে পরিবর্তনের অপশনটি চালু করা হয়েছে।",
+    descriptionBn: "à¦•à§‹à¦Ÿà§‡à¦¶à¦¨ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²/à¦ªà§�à¦°à¦¿à¦¨à§�à¦Ÿ à¦­à¦¿à¦‰à¦¯à¦¼à§‡à¦° à¦¸à§�à¦Ÿà¦¾à¦‡à¦² à¦‡à¦®à§‡à¦œ à¦¬à¦•à§�à¦¸à§‡ à¦¡à¦¿à¦«à¦²à§�à¦Ÿà¦­à¦¾à¦¬à§‡ à¦ªà§�à¦°à¦¿à¦®à¦¿à§Ÿà¦¾à¦® à¦¡à§�à¦°à§‡à¦¸ à¦¸à§�à¦•à§‡à¦š à¦‡à¦²à¦¾à¦¸à§�à¦Ÿà§�à¦°à§‡à¦¶à¦¨ à¦‡à¦®à§‡à¦œà¦Ÿà¦¿ à¦²à§‹à¦¡ à¦•à¦°à¦¾à¦° à¦¬à§�à¦¯à¦¬à¦¸à§�à¦¥à¦¾ à¦°à¦¾à¦–à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦•à¦¾à¦¸à§�à¦Ÿà¦® à¦«à¦¾à¦‡à¦² à¦†à¦ªà¦²à§‹à¦¡ à¦•à¦°à§‡ à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨à§‡à¦° à¦…à¦ªà¦¶à¦¨à¦Ÿà¦¿ à¦šà¦¾à¦²à§� à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "119",
@@ -1880,7 +1889,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-cad",
     descriptionEn: "Created the CAD Consumption Update module: implemented a filterable registry list view; built a high-fidelity spreadsheet-style edit/entry form with automatic dozen-wise consumption and wastage weight calculations; and designed a printable sheet featuring style details, marker length/DIA parameters, signature approvals, and marker nest visualizers.",
-    descriptionBn: "ক্যাড কনজাম্পশন আপডেট মডিউল তৈরি করা হয়েছে: যেখানে ফিল্টারযোগ্য রেজিস্ট্রি লিস্ট ভিউ; ডজনপ্রতি ফেব্রিক কনজাম্পশন ও ওয়েস্টেজ ওজনের স্বয়ংক্রিয় হিসাব সম্বলিত স্প্রেডশীট স্টাইল এডিট/এন্ট্রি ফর্ম; এবং স্টাইল ডিটেইলস, মার্কার দৈর্ঘ্য/ডিআইএ প্যারামিটার, প্রয়োজনীয় স্বাক্ষর ও মার্কার লেআউটের প্রিন্ট ভিউ যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦•à§�à¦¯à¦¾à¦¡ à¦•à¦¨à¦œà¦¾à¦®à§�à¦ªà¦¶à¦¨ à¦†à¦ªà¦¡à§‡à¦Ÿ à¦®à¦¡à¦¿à¦‰à¦² à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡: à¦¯à§‡à¦–à¦¾à¦¨à§‡ à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦°à¦¯à§‹à¦—à§�à¦¯ à¦°à§‡à¦œà¦¿à¦¸à§�à¦Ÿà§�à¦°à¦¿ à¦²à¦¿à¦¸à§�à¦Ÿ à¦­à¦¿à¦‰; à¦¡à¦œà¦¨à¦ªà§�à¦°à¦¤à¦¿ à¦«à§‡à¦¬à§�à¦°à¦¿à¦• à¦•à¦¨à¦œà¦¾à¦®à§�à¦ªà¦¶à¦¨ à¦“ à¦“à§Ÿà§‡à¦¸à§�à¦Ÿà§‡à¦œ à¦“à¦œà¦¨à§‡à¦° à¦¸à§�à¦¬à§Ÿà¦‚à¦•à§�à¦°à¦¿à§Ÿ à¦¹à¦¿à¦¸à¦¾à¦¬ à¦¸à¦®à§�à¦¬à¦²à¦¿à¦¤ à¦¸à§�à¦ªà§�à¦°à§‡à¦¡à¦¶à§€à¦Ÿ à¦¸à§�à¦Ÿà¦¾à¦‡à¦² à¦�à¦¡à¦¿à¦Ÿ/à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿ à¦«à¦°à§�à¦®; à¦�à¦¬à¦‚ à¦¸à§�à¦Ÿà¦¾à¦‡à¦² à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸, à¦®à¦¾à¦°à§�à¦•à¦¾à¦° à¦¦à§ˆà¦°à§�à¦˜à§�à¦¯/à¦¡à¦¿à¦†à¦‡à¦� à¦ªà§�à¦¯à¦¾à¦°à¦¾à¦®à¦¿à¦Ÿà¦¾à¦°, à¦ªà§�à¦°à§Ÿà§‹à¦œà¦¨à§€à§Ÿ à¦¸à§�à¦¬à¦¾à¦•à§�à¦·à¦° à¦“ à¦®à¦¾à¦°à§�à¦•à¦¾à¦° à¦²à§‡à¦†à¦‰à¦Ÿà§‡à¦° à¦ªà§�à¦°à¦¿à¦¨à§�à¦Ÿ à¦­à¦¿à¦‰ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "120",
@@ -1889,7 +1898,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising",
     link: "/merchandising-cad",
     descriptionEn: "Refined the CAD entry/edit screen into a unified borderless spreadsheet grid editor visually matching the printable sheet, integrated the marker nesting and style card assets from the workspace, and added dark mode styling support.",
-    descriptionBn: "ক্যাড এন্ট্রি/এডিট স্ক্রিনকে আরও পেশাদার ও নিখুঁত করতে সরাসরি প্রিন্টেবিল শিটের অনুরূপ বর্ডারহীন স্প্রেডশীট গ্রিড এডিটরে রূপান্তর করা হয়েছে, মার্কার নেস্টিং ও স্টাইল কার্ড ইলাস্ট্রেশন যুক্ত করা হয়েছে এবং ডার্ক মোড সাপোর্ট নিশ্চিত করা হয়েছে।",
+    descriptionBn: "à¦•à§�à¦¯à¦¾à¦¡ à¦�à¦¨à§�à¦Ÿà§�à¦°à¦¿/à¦�à¦¡à¦¿à¦Ÿ à¦¸à§�à¦•à§�à¦°à¦¿à¦¨à¦•à§‡ à¦†à¦°à¦“ à¦ªà§‡à¦¶à¦¾à¦¦à¦¾à¦° à¦“ à¦¨à¦¿à¦–à§�à¦�à¦¤ à¦•à¦°à¦¤à§‡ à¦¸à¦°à¦¾à¦¸à¦°à¦¿ à¦ªà§�à¦°à¦¿à¦¨à§�à¦Ÿà§‡à¦¬à¦¿à¦² à¦¶à¦¿à¦Ÿà§‡à¦° à¦…à¦¨à§�à¦°à§‚à¦ª à¦¬à¦°à§�à¦¡à¦¾à¦°à¦¹à§€à¦¨ à¦¸à§�à¦ªà§�à¦°à§‡à¦¡à¦¶à§€à¦Ÿ à¦—à§�à¦°à¦¿à¦¡ à¦�à¦¡à¦¿à¦Ÿà¦°à§‡ à¦°à§‚à¦ªà¦¾à¦¨à§�à¦¤à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦®à¦¾à¦°à§�à¦•à¦¾à¦° à¦¨à§‡à¦¸à§�à¦Ÿà¦¿à¦‚ à¦“ à¦¸à§�à¦Ÿà¦¾à¦‡à¦² à¦•à¦¾à¦°à§�à¦¡ à¦‡à¦²à¦¾à¦¸à§�à¦Ÿà§�à¦°à§‡à¦¶à¦¨ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦¡à¦¾à¦°à§�à¦• à¦®à§‹à¦¡ à¦¸à¦¾à¦ªà§‹à¦°à§�à¦Ÿ à¦¨à¦¿à¦¶à§�à¦šà¦¿à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "121",
@@ -1898,7 +1907,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "OT Configuration",
     link: "/configure-time?tab=ot",
     descriptionEn: "Added the missing 'Working Hour' field to the OT Configuration edit modal under the OT Deductions block; added options for 'Worker', 'HR, Admin and Compliance', 'Admin', and 'Driver' to their respective dropdown selects; updated the default configurations; conditionally rendered the 'Fixed OT Hour' field when OT Type is set to 'Fixed Hour'; reorganized standard shift info settings modal to match legacy fields exactly, and changed action button to 'CREATE'.",
-    descriptionBn: "ওটি কনফিগারেশন এডিট মোডালে ওটি ডিডাকশন ব্লকের আওতায় অনুপস্থিত 'Working Hour' ফিল্ডটি যুক্ত করা হয়েছে; স্ব-স্ব ড্রপডাউন সিলেক্টে 'Worker', 'HR, Admin and Compliance', 'Admin' এবং 'Driver' অপশনগুলো যুক্ত করা হয়েছে; ডিফল্ট কনফিগারেশন আপডেট করা হয়েছে; ওটি টাইপ 'Fixed Hour' সিলেক্ট করা হলে শর্তসাপেক্ষে 'Fixed OT Hour' ইনপুট ফিল্ডটি দেখানোর ব্যবস্থা করা হয়েছে; শিফট ইনফরমেশন সেটিংস মোডালের ফিল্ডগুলোকে লিগ্যাসি বিন্যাস অনুযায়ী রিঅর্গানাইজ করা হয়েছে এবং অ্যাকশন বোতামের নাম পরিবর্তন করে 'CREATE' করা হয়েছে।",
+    descriptionBn: "à¦“à¦Ÿà¦¿ à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦�à¦¡à¦¿à¦Ÿ à¦®à§‹à¦¡à¦¾à¦²à§‡ à¦“à¦Ÿà¦¿ à¦¡à¦¿à¦¡à¦¾à¦•à¦¶à¦¨ à¦¬à§�à¦²à¦•à§‡à¦° à¦†à¦“à¦¤à¦¾à§Ÿ à¦…à¦¨à§�à¦ªà¦¸à§�à¦¥à¦¿à¦¤ 'Working Hour' à¦«à¦¿à¦²à§�à¦¡à¦Ÿà¦¿ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡; à¦¸à§�à¦¬-à¦¸à§�à¦¬ à¦¡à§�à¦°à¦ªà¦¡à¦¾à¦‰à¦¨ à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿà§‡ 'Worker', 'HR, Admin and Compliance', 'Admin' à¦�à¦¬à¦‚ 'Driver' à¦…à¦ªà¦¶à¦¨à¦—à§�à¦²à§‹ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡; à¦¡à¦¿à¦«à¦²à§�à¦Ÿ à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦†à¦ªà¦¡à§‡à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡; à¦“à¦Ÿà¦¿ à¦Ÿà¦¾à¦‡à¦ª 'Fixed Hour' à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦°à¦¾ à¦¹à¦²à§‡ à¦¶à¦°à§�à¦¤à¦¸à¦¾à¦ªà§‡à¦•à§�à¦·à§‡ 'Fixed OT Hour' à¦‡à¦¨à¦ªà§�à¦Ÿ à¦«à¦¿à¦²à§�à¦¡à¦Ÿà¦¿ à¦¦à§‡à¦–à¦¾à¦¨à§‹à¦° à¦¬à§�à¦¯à¦¬à¦¸à§�à¦¥à¦¾ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡; à¦¶à¦¿à¦«à¦Ÿ à¦‡à¦¨à¦«à¦°à¦®à§‡à¦¶à¦¨ à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸ à¦®à§‹à¦¡à¦¾à¦²à§‡à¦° à¦«à¦¿à¦²à§�à¦¡à¦—à§�à¦²à§‹à¦•à§‡ à¦²à¦¿à¦—à§�à¦¯à¦¾à¦¸à¦¿ à¦¬à¦¿à¦¨à§�à¦¯à¦¾à¦¸ à¦…à¦¨à§�à¦¯à¦¾à§Ÿà§€ à¦°à¦¿à¦…à¦°à§�à¦—à¦¾à¦¨à¦¾à¦‡à¦œ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦�à¦¬à¦‚ à¦…à§�à¦¯à¦¾à¦•à¦¶à¦¨ à¦¬à§‹à¦¤à¦¾à¦®à§‡à¦° à¦¨à¦¾à¦® à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦•à¦°à§‡ 'CREATE' à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "122",
@@ -1907,7 +1916,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Allowance Rate",
     link: "/configure-compensation?tab=allowance",
     descriptionEn: "Upgraded text inputs to dropdown select elements in the Allowance Rate (Holiday Rate) configuration modal: converted Company, Area, Employee Type, Department, Section, Designation, Rate For, and Div By Hour fields into fully configured select options to match the legacy screen's look and feel.",
-    descriptionBn: "অ্যালাউন্স রেট (হলিডে রেট) কনফিগারেশন মোডালের টেক্সট ইনপুটগুলোকে ড্রপডাউন সিলেক্ট উপাদানে রূপান্তর করা হয়েছে: এর মধ্যে কোম্পানি, এরিয়া, এমপ্লয়ী টাইপ, ডিপার্টমেন্ট, সেকশন, ডেজিগনেশন, রেট ফর এবং ডিভ বাই আওয়ার ফিল্ডগুলোকে পূর্ববর্তী বিন্যাস অনুযায়ী ড্রপডাউন অপশনে রূপান্তর করা হয়েছে।",
+    descriptionBn: "à¦…à§�à¦¯à¦¾à¦²à¦¾à¦‰à¦¨à§�à¦¸ à¦°à§‡à¦Ÿ (à¦¹à¦²à¦¿à¦¡à§‡ à¦°à§‡à¦Ÿ) à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦®à§‹à¦¡à¦¾à¦²à§‡à¦° à¦Ÿà§‡à¦•à§�à¦¸à¦Ÿ à¦‡à¦¨à¦ªà§�à¦Ÿà¦—à§�à¦²à§‹à¦•à§‡ à¦¡à§�à¦°à¦ªà¦¡à¦¾à¦‰à¦¨ à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦‰à¦ªà¦¾à¦¦à¦¾à¦¨à§‡ à¦°à§‚à¦ªà¦¾à¦¨à§�à¦¤à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡: à¦�à¦° à¦®à¦§à§�à¦¯à§‡ à¦•à§‹à¦®à§�à¦ªà¦¾à¦¨à¦¿, à¦�à¦°à¦¿à§Ÿà¦¾, à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à§€ à¦Ÿà¦¾à¦‡à¦ª, à¦¡à¦¿à¦ªà¦¾à¦°à§�à¦Ÿà¦®à§‡à¦¨à§�à¦Ÿ, à¦¸à§‡à¦•à¦¶à¦¨, à¦¡à§‡à¦œà¦¿à¦—à¦¨à§‡à¦¶à¦¨, à¦°à§‡à¦Ÿ à¦«à¦° à¦�à¦¬à¦‚ à¦¡à¦¿à¦­ à¦¬à¦¾à¦‡ à¦†à¦“à§Ÿà¦¾à¦° à¦«à¦¿à¦²à§�à¦¡à¦—à§�à¦²à§‹à¦•à§‡ à¦ªà§‚à¦°à§�à¦¬à¦¬à¦°à§�à¦¤à§€ à¦¬à¦¿à¦¨à§�à¦¯à¦¾à¦¸ à¦…à¦¨à§�à¦¯à¦¾à§Ÿà§€ à¦¡à§�à¦°à¦ªà¦¡à¦¾à¦‰à¦¨ à¦…à¦ªà¦¶à¦¨à§‡ à¦°à§‚à¦ªà¦¾à¦¨à§�à¦¤à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "123",
@@ -1916,7 +1925,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "OT Configuration",
     link: "/configure-time?tab=ot",
     descriptionEn: "Upgraded the OT configuration modal to a premium Dialog with a dynamic round slab builder, and added a detailed timings/slabs overview table layout.",
-    descriptionBn: "ওটি কনফিগারেশন মোডালটিকে একটি প্রিমিয়াম ডায়ালগে উন্নীত করা হয়েছে যেখানে একটি ডাইনামিক রাউন্ড স্ল্যাব বিল্ডার যুক্ত করা হয়েছে, এবং একটি বিস্তারিত সময় ও স্ল্যাব সম্বলিত টেবিল লেআউট প্রদান করা হয়েছে।",
+    descriptionBn: "à¦“à¦Ÿà¦¿ à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦®à§‹à¦¡à¦¾à¦²à¦Ÿà¦¿à¦•à§‡ à¦�à¦•à¦Ÿà¦¿ à¦ªà§�à¦°à¦¿à¦®à¦¿à§Ÿà¦¾à¦® à¦¡à¦¾à§Ÿà¦¾à¦²à¦—à§‡ à¦‰à¦¨à§�à¦¨à§€à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¯à§‡à¦–à¦¾à¦¨à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¡à¦¾à¦‡à¦¨à¦¾à¦®à¦¿à¦• à¦°à¦¾à¦‰à¦¨à§�à¦¡ à¦¸à§�à¦²à§�à¦¯à¦¾à¦¬ à¦¬à¦¿à¦²à§�à¦¡à¦¾à¦° à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦�à¦¬à¦‚ à¦�à¦•à¦Ÿà¦¿ à¦¬à¦¿à¦¸à§�à¦¤à¦¾à¦°à¦¿à¦¤ à¦¸à¦®à§Ÿ à¦“ à¦¸à§�à¦²à§�à¦¯à¦¾à¦¬ à¦¸à¦®à§�à¦¬à¦²à¦¿à¦¤ à¦Ÿà§‡à¦¬à¦¿à¦² à¦²à§‡à¦†à¦‰à¦Ÿ à¦ªà§�à¦°à¦¦à¦¾à¦¨ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "124",
@@ -1925,7 +1934,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "OT Configuration",
     link: "/configure-time?tab=ot",
     descriptionEn: "Added conditional fields for Day Name, Time From, and Time To under the Prayer Break option in the OT configuration dialog when set to Yes.",
-    descriptionBn: "ওটি কনফিগারেশন ডায়ালগে পেয়ার ব্রেক অপশন 'Yes' সেট করা হলে ডে নেম, টাইম ফ্রম এবং টাইম টু ফিল্ডগুলো দেখানোর জন্য কন্ডিশনাল ইনপুট যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦“à¦Ÿà¦¿ à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦¡à¦¾à¦¯à¦¼à¦¾à¦²à¦—à§‡ à¦ªà§‡à¦¯à¦¼à¦¾à¦° à¦¬à§�à¦°à§‡à¦• à¦…à¦ªà¦¶à¦¨ 'Yes' à¦¸à§‡à¦Ÿ à¦•à¦°à¦¾ à¦¹à¦²à§‡ à¦¡à§‡ à¦¨à§‡à¦®, à¦Ÿà¦¾à¦‡à¦® à¦«à§�à¦°à¦® à¦�à¦¬à¦‚ à¦Ÿà¦¾à¦‡à¦® à¦Ÿà§� à¦«à¦¿à¦²à§�à¦¡à¦—à§�à¦²à§‹ à¦¦à§‡à¦–à¦¾à¦¨à§‹à¦° à¦œà¦¨à§�à¦¯ à¦•à¦¨à§�à¦¡à¦¿à¦¶à¦¨à¦¾à¦² à¦‡à¦¨à¦ªà§�à¦Ÿ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "125",
@@ -1934,7 +1943,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "OT Configuration",
     link: "/configure-time?tab=ot",
     descriptionEn: "Increased width of the OT configuration dialog modal from 5xl to 7xl to allow more room for nested configurations.",
-    descriptionBn: "ওটি কনফিগারেশন ডায়ালগ মোডালের প্রস্থ 5xl থেকে বাড়িয়ে 7xl করা হয়েছে যাতে করে নেস্টেড সেটিংসগুলো আরো সহজে ব্যবহার করা যায়।",
+    descriptionBn: "à¦“à¦Ÿà¦¿ à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦¡à¦¾à¦¯à¦¼à¦¾à¦²à¦— à¦®à§‹à¦¡à¦¾à¦²à§‡à¦° à¦ªà§�à¦°à¦¸à§�à¦¥ 5xl à¦¥à§‡à¦•à§‡ à¦¬à¦¾à¦¡à¦¼à¦¿à¦¯à¦¼à§‡ 7xl à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ à¦¯à¦¾à¦¤à§‡ à¦•à¦°à§‡ à¦¨à§‡à¦¸à§�à¦Ÿà§‡à¦¡ à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸à¦—à§�à¦²à§‹ à¦†à¦°à§‹ à¦¸à¦¹à¦œà§‡ à¦¬à§�à¦¯à¦¬à¦¹à¦¾à¦° à¦•à¦°à¦¾ à¦¯à¦¾à¦¯à¦¼à¥¤",
   },
   {
     id: "126",
@@ -1943,7 +1952,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "OT Configuration",
     link: "/configure-time?tab=ot",
     descriptionEn: "Added conditional fields for Deduction For, Time From, Time To, and Deduct Min under the Dinner/Others Break option in the OT configuration dialog when set to Yes, and included 'Regular' in Deduction For options.",
-    descriptionBn: "ওটি কনফিগারেশন ডায়ালগে ডিনার/আদার্স ব্রেক অপশন 'Yes' সেট করা হলে ডিডাকশন ফর, টাইম ফ্রম, টাইম টু এবং ডিডাক্ট মিন ফিল্ডগুলো দেখানোর জন্য কন্ডিশনাল ইনপুট যুক্ত করা হয়েছে, এবং ডিডাকশন ফর অপশনে 'Regular' যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦“à¦Ÿà¦¿ à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦¡à¦¾à¦¯à¦¼à¦¾à¦²à¦—à§‡ à¦¡à¦¿à¦¨à¦¾à¦°/à¦†à¦¦à¦¾à¦°à§�à¦¸ à¦¬à§�à¦°à§‡à¦• à¦…à¦ªà¦¶à¦¨ 'Yes' à¦¸à§‡à¦Ÿ à¦•à¦°à¦¾ à¦¹à¦²à§‡ à¦¡à¦¿à¦¡à¦¾à¦•à¦¶à¦¨ à¦«à¦°, à¦Ÿà¦¾à¦‡à¦® à¦«à§�à¦°à¦®, à¦Ÿà¦¾à¦‡à¦® à¦Ÿà§� à¦�à¦¬à¦‚ à¦¡à¦¿à¦¡à¦¾à¦•à§�à¦Ÿ à¦®à¦¿à¦¨ à¦«à¦¿à¦²à§�à¦¡à¦—à§�à¦²à§‹ à¦¦à§‡à¦–à¦¾à¦¨à§‹à¦° à¦œà¦¨à§�à¦¯ à¦•à¦¨à§�à¦¡à¦¿à¦¶à¦¨à¦¾à¦² à¦‡à¦¨à¦ªà§�à¦Ÿ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡, à¦�à¦¬à¦‚ à¦¡à¦¿à¦¡à¦¾à¦•à¦¶à¦¨ à¦«à¦° à¦…à¦ªà¦¶à¦¨à§‡ 'Regular' à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "127",
@@ -1952,7 +1961,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "OT Configuration",
     link: "/configure-time?tab=ot",
     descriptionEn: "Implemented validation checks and marked asterisks for all required fields in the OT configuration dialog when clicking Create/Update.",
-    descriptionBn: "ওটি কনফিগারেশন ডায়ালগে ক্রিয়েট/আপডেট বাটনে ক্লিক করার সময় প্রয়োজনীয় ফিল্ডগুলোর ভ্যালিডেশন এবং লাল স্টার চিহ্ন যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦“à¦Ÿà¦¿ à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦¡à¦¾à¦¯à¦¼à¦¾à¦²à¦—à§‡ à¦•à§�à¦°à¦¿à¦¯à¦¼à§‡à¦Ÿ/à¦†à¦ªà¦¡à§‡à¦Ÿ à¦¬à¦¾à¦Ÿà¦¨à§‡ à¦•à§�à¦²à¦¿à¦• à¦•à¦°à¦¾à¦° à¦¸à¦®à¦¯à¦¼ à¦ªà§�à¦°à¦¯à¦¼à§‹à¦œà¦¨à§€à¦¯à¦¼ à¦«à¦¿à¦²à§�à¦¡à¦—à§�à¦²à§‹à¦° à¦­à§�à¦¯à¦¾à¦²à¦¿à¦¡à§‡à¦¶à¦¨ à¦�à¦¬à¦‚ à¦²à¦¾à¦² à¦¸à§�à¦Ÿà¦¾à¦° à¦šà¦¿à¦¹à§�à¦¨ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "128",
@@ -1961,7 +1970,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "OT Configuration",
     link: "/configure-time?tab=ot",
     descriptionEn: "Embedded the OT Configurations Overview table inside the settings dialog to display existing rules and easily load them into the form above via a pencil click.",
-    descriptionBn: "ওটি কনফিগারেশন ডায়ালগের ভেতরে একটি ওভারভিউ টেবিল যুক্ত করা হয়েছে যাতে বিদ্যমান নিয়মগুলো দেখা যায় এবং পেনসিল আইকন ক্লিকের মাধ্যমে সেগুলোকে ফর্মের ভেতরে এডিটের জন্য লোড করা যায়।",
+    descriptionBn: "à¦“à¦Ÿà¦¿ à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦¡à¦¾à¦¯à¦¼à¦¾à¦²à¦—à§‡à¦° à¦­à§‡à¦¤à¦°à§‡ à¦�à¦•à¦Ÿà¦¿ à¦“à¦­à¦¾à¦°à¦­à¦¿à¦‰ à¦Ÿà§‡à¦¬à¦¿à¦² à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ à¦¯à¦¾à¦¤à§‡ à¦¬à¦¿à¦¦à§�à¦¯à¦®à¦¾à¦¨ à¦¨à¦¿à§Ÿà¦®à¦—à§�à¦²à§‹ à¦¦à§‡à¦–à¦¾ à¦¯à¦¾à¦¯à¦¼ à¦�à¦¬à¦‚ à¦ªà§‡à¦¨à¦¸à¦¿à¦² à¦†à¦‡à¦•à¦¨ à¦•à§�à¦²à¦¿à¦•à§‡à¦° à¦®à¦¾à¦§à§�à¦¯à¦®à§‡ à¦¸à§‡à¦—à§�à¦²à§‹à¦•à§‡ à¦«à¦°à§�à¦®à§‡à¦° à¦­à§‡à¦¤à¦°à§‡ à¦�à¦¡à¦¿à¦Ÿà§‡à¦° à¦œà¦¨à§�à¦¯ à¦²à§‹à¦¡ à¦•à¦°à¦¾ à¦¯à¦¾à¦¯à¦¼à¥¤",
   },
   {
     id: "129",
@@ -1970,7 +1979,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "OT Configuration",
     link: "/configure-time?tab=ot",
     descriptionEn: "Configured separate layouts for Add/Edit rules and Settings modes: hid Start/End Dates and the Configurations table during Add/Edit rule operations, rendering them exclusively in Settings mode.",
-    descriptionBn: "অ্যাড/এডিট নিয়ম এবং সেটিংস মোডের জন্য আলাদা লেআউট কনফিগার করা হয়েছে: অ্যাড/এডিট নিয়ম অপারেশনের সময় স্টার্ট/এন্ড ডেট এবং কনফিগারেশন টেবিল হাইড করা হয়েছে, যা শুধুমাত্র সেটিংস মোডে প্রদর্শিত হবে।",
+    descriptionBn: "à¦…à§�à¦¯à¦¾à¦¡/à¦�à¦¡à¦¿à¦Ÿ à¦¨à¦¿à§Ÿà¦® à¦�à¦¬à¦‚ à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸ à¦®à§‹à¦¡à§‡à¦° à¦œà¦¨à§�à¦¯ à¦†à¦²à¦¾à¦¦à¦¾ à¦²à§‡à¦†à¦‰à¦Ÿ à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦° à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡: à¦…à§�à¦¯à¦¾à¦¡/à¦�à¦¡à¦¿à¦Ÿ à¦¨à¦¿à§Ÿà¦® à¦…à¦ªà¦¾à¦°à§‡à¦¶à¦¨à§‡à¦° à¦¸à¦®à§Ÿ à¦¸à§�à¦Ÿà¦¾à¦°à§�à¦Ÿ/à¦�à¦¨à§�à¦¡ à¦¡à§‡à¦Ÿ à¦�à¦¬à¦‚ à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦Ÿà§‡à¦¬à¦¿à¦² à¦¹à¦¾à¦‡à¦¡ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡, à¦¯à¦¾ à¦¶à§�à¦§à§�à¦®à¦¾à¦¤à§�à¦° à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸ à¦®à§‹à¦¡à§‡ à¦ªà§�à¦°à¦¦à¦°à§�à¦¶à¦¿à¦¤ à¦¹à¦¬à§‡à¥¤",
   },
   {
     id: "130",
@@ -1979,7 +1988,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "OT Configuration",
     link: "/configure-time?tab=ot",
     descriptionEn: "Filtered the OT Configurations Overview history table in the settings modal to only display rules matching the selected Employee Type.",
-    descriptionBn: "সেটিংস মোডালের ওটি কনফিগারেশন ওভারভিউ হিস্ট্রি টেবিলটি ফিল্টার করে শুধু সিলেক্টেড এমপ্লয়ী টাইপের নিয়মগুলো দেখানোর ব্যবস্থা করা হয়েছে।",
+    descriptionBn: "à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸ à¦®à§‹à¦¡à¦¾à¦²à§‡à¦° à¦“à¦Ÿà¦¿ à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨ à¦“à¦­à¦¾à¦°à¦­à¦¿à¦‰ à¦¹à¦¿à¦¸à§�à¦Ÿà§�à¦°à¦¿ à¦Ÿà§‡à¦¬à¦¿à¦²à¦Ÿà¦¿ à¦«à¦¿à¦²à§�à¦Ÿà¦¾à¦° à¦•à¦°à§‡ à¦¶à§�à¦§à§� à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿà§‡à¦¡ à¦�à¦®à¦ªà§�à¦²à¦¯à¦¼à§€ à¦Ÿà¦¾à¦‡à¦ªà§‡à¦° à¦¨à¦¿à¦¯à¦¼à¦®à¦—à§�à¦²à§‹ à¦¦à§‡à¦–à¦¾à¦¨à§‹à¦° à¦¬à§�à¦¯à¦¬à¦¸à§�à¦¥à¦¾ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "131",
@@ -1988,7 +1997,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Allowance Rate",
     link: "/configure-compensation?tab=allowance",
     descriptionEn: "Added missing fields ('Div By Day', 'Calculation For') and 'Basic Salary' option under Based On to the Allowance Rate form, states, interfaces, mock data, and table overview columns.",
-    descriptionBn: "এলাউন্স রেট ফর্মে অনুপস্থিত ফিল্ড ('Div By Day', 'Calculation For') এবং Based On অপশনে 'Basic Salary' যুক্ত করা হয়েছে, যা স্টেট, ইন্টারফেস, মক ডাটা এবং ওভারভিউ টেবিল কলামে আপডেট হয়েছে।",
+    descriptionBn: "à¦�à¦²à¦¾à¦‰à¦¨à§�à¦¸ à¦°à§‡à¦Ÿ à¦«à¦°à§�à¦®à§‡ à¦…à¦¨à§�à¦ªà¦¸à§�à¦¥à¦¿à¦¤ à¦«à¦¿à¦²à§�à¦¡ ('Div By Day', 'Calculation For') à¦�à¦¬à¦‚ Based On à¦…à¦ªà¦¶à¦¨à§‡ 'Basic Salary' à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡, à¦¯à¦¾ à¦¸à§�à¦Ÿà§‡à¦Ÿ, à¦‡à¦¨à§�à¦Ÿà¦¾à¦°à¦«à§‡à¦¸, à¦®à¦• à¦¡à¦¾à¦Ÿà¦¾ à¦�à¦¬à¦‚ à¦“à¦­à¦¾à¦°à¦­à¦¿à¦‰ à¦Ÿà§‡à¦¬à¦¿à¦² à¦•à¦²à¦¾à¦®à§‡ à¦†à¦ªà¦¡à§‡à¦Ÿ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "132",
@@ -1997,7 +2006,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "HR Policy",
     link: "/hr-policy",
     descriptionEn: "Fully redesigned the HR Policy module to exclusively focus on Policy uploading and management, completely removing Job Description (JD) features. Added a dedicated attachment upload workflow.",
-    descriptionBn: "এইচআর পলিসি মডিউলটি সম্পূর্ণরূপে রিডিজাইন করা হয়েছে যাতে শুধুমাত্র পলিসি আপলোড ও ম্যানেজমেন্টের উপর ফোকাস করা যায়, জব ডেসক্রিপশন (JD) ফিচারগুলো সম্পূর্ণ সরিয়ে দেওয়া হয়েছে। পলিসি অ্যাটাচমেন্ট আপলোড করার নতুন অপশন যোগ করা হয়েছে।",
+    descriptionBn: "à¦�à¦‡à¦šà¦†à¦° à¦ªà¦²à¦¿à¦¸à¦¿ à¦®à¦¡à¦¿à¦‰à¦²à¦Ÿà¦¿ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£à¦°à§‚à¦ªà§‡ à¦°à¦¿à¦¡à¦¿à¦œà¦¾à¦‡à¦¨ à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡ à¦¯à¦¾à¦¤à§‡ à¦¶à§�à¦§à§�à¦®à¦¾à¦¤à§�à¦° à¦ªà¦²à¦¿à¦¸à¦¿ à¦†à¦ªà¦²à§‹à¦¡ à¦“ à¦®à§�à¦¯à¦¾à¦¨à§‡à¦œà¦®à§‡à¦¨à§�à¦Ÿà§‡à¦° à¦‰à¦ªà¦° à¦«à§‹à¦•à¦¾à¦¸ à¦•à¦°à¦¾ à¦¯à¦¾à¦¯à¦¼, à¦œà¦¬ à¦¡à§‡à¦¸à¦•à§�à¦°à¦¿à¦ªà¦¶à¦¨ (JD) à¦«à¦¿à¦šà¦¾à¦°à¦—à§�à¦²à§‹ à¦¸à¦®à§�à¦ªà§‚à¦°à§�à¦£ à¦¸à¦°à¦¿à¦¯à¦¼à§‡ à¦¦à§‡à¦“à¦¯à¦¼à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦ªà¦²à¦¿à¦¸à¦¿ à¦…à§�à¦¯à¦¾à¦Ÿà¦¾à¦šà¦®à§‡à¦¨à§�à¦Ÿ à¦†à¦ªà¦²à§‹à¦¡ à¦•à¦°à¦¾à¦° à¦¨à¦¤à§�à¦¨ à¦…à¦ªà¦¶à¦¨ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤",
   },
   {
     id: "133",
@@ -2006,7 +2015,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "JD List",
     link: "/jd-list",
     descriptionEn: "Created a new dedicated JD List module decoupled from HR Policies. Features a high-fidelity data table and a standardized modal for creating JDs based on Department and Designation.",
-    descriptionBn: "এইচআর পলিসি থেকে আলাদা করে নতুন 'JD List' মডিউল তৈরি করা হয়েছে। এতে ডিপার্টমেন্ট এবং ডেজিগনেশনের ওপর ভিত্তি করে জেডি (JD) তৈরি করার জন্য একটি টেবিল এবং স্ট্যান্ডার্ড মোডাল যুক্ত করা হয়েছে।",
+    descriptionBn: "à¦�à¦‡à¦šà¦†à¦° à¦ªà¦²à¦¿à¦¸à¦¿ à¦¥à§‡à¦•à§‡ à¦†à¦²à¦¾à¦¦à¦¾ à¦•à¦°à§‡ à¦¨à¦¤à§�à¦¨ 'JD List' à¦®à¦¡à¦¿à¦‰à¦² à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦¤à§‡ à¦¡à¦¿à¦ªà¦¾à¦°à§�à¦Ÿà¦®à§‡à¦¨à§�à¦Ÿ à¦�à¦¬à¦‚ à¦¡à§‡à¦œà¦¿à¦—à¦¨à§‡à¦¶à¦¨à§‡à¦° à¦“à¦ªà¦° à¦­à¦¿à¦¤à§�à¦¤à¦¿ à¦•à¦°à§‡ à¦œà§‡à¦¡à¦¿ (JD) à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾à¦° à¦œà¦¨à§�à¦¯ à¦�à¦•à¦Ÿà¦¿ à¦Ÿà§‡à¦¬à¦¿à¦² à¦�à¦¬à¦‚ à¦¸à§�à¦Ÿà§�à¦¯à¦¾à¦¨à§�à¦¡à¦¾à¦°à§�à¦¡ à¦®à§‹à¦¡à¦¾à¦² à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
   {
     id: "134",
@@ -2015,6 +2024,6 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Merchandising Master Settings",
     link: "/merchandising-master-settings",
     descriptionEn: "Fixed a TypeScript error in the YarnCountSpec initial data configuration by correcting object properties.",
-    descriptionBn: "ইয়ার্ন কাউন্ট স্পেক (YarnCountSpec)-এর ইনিশিয়াল ডেটা কনফিগারেশনে ভুল অবজেক্ট প্রপার্টিগুলোর কারণে তৈরি হওয়া একটি টাইপস্ক্রিপ্ট এরর সমাধান করা হয়েছে।",
+    descriptionBn: "à¦‡à§Ÿà¦¾à¦°à§�à¦¨ à¦•à¦¾à¦‰à¦¨à§�à¦Ÿ à¦¸à§�à¦ªà§‡à¦• (YarnCountSpec)-à¦�à¦° à¦‡à¦¨à¦¿à¦¶à¦¿à§Ÿà¦¾à¦² à¦¡à§‡à¦Ÿà¦¾ à¦•à¦¨à¦«à¦¿à¦—à¦¾à¦°à§‡à¦¶à¦¨à§‡ à¦­à§�à¦² à¦…à¦¬à¦œà§‡à¦•à§�à¦Ÿ à¦ªà§�à¦°à¦ªà¦¾à¦°à§�à¦Ÿà¦¿à¦—à§�à¦²à§‹à¦° à¦•à¦¾à¦°à¦£à§‡ à¦¤à§ˆà¦°à¦¿ à¦¹à¦“à§Ÿà¦¾ à¦�à¦•à¦Ÿà¦¿ à¦Ÿà¦¾à¦‡à¦ªà¦¸à§�à¦•à§�à¦°à¦¿à¦ªà§�à¦Ÿ à¦�à¦°à¦° à¦¸à¦®à¦¾à¦§à¦¾à¦¨ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
   },
 ];
