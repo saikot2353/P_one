@@ -24,6 +24,9 @@ import {
   Settings,
   Coins,
   Calendar,
+  Save,
+  ArrowLeft,
+  LayoutTemplate,
 } from "lucide-react";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { MultiSelect } from "@/components/ui/multi-select";
@@ -1541,6 +1544,7 @@ function CompanySetupPage() {
     const updated = [...payslipTemplates, newTpl];
     saveTemplatesToStorage(updated);
     
+    toast.success("Payslip template created successfully!");
     setIsCreateTplOpen(false);
     setTplTitle("");
     setEditingTemplate(newTpl);
@@ -2478,8 +2482,27 @@ function CompanySetupPage() {
                       <tbody className="divide-y divide-border/30 text-foreground">
                         {payslipTemplates.length === 0 ? (
                           <tr>
-                            <td colSpan={6} className="px-5 py-8 text-center text-sm text-muted-foreground">
-                              No payslip templates configured. Click "Create New Template" to get started.
+                            <td colSpan={6} className="px-5 py-12 text-center">
+                              <div className="flex flex-col items-center justify-center space-y-3">
+                                <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                  <LayoutTemplate className="size-6" />
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-sm font-bold text-foreground">No Payslip Templates</p>
+                                  <p className="text-xs text-muted-foreground max-w-sm mx-auto">You haven't configured any payslip templates yet. Create one to customize how payslips appear for different employee types.</p>
+                                </div>
+                                <button
+                                  onClick={() => {
+                                    setTplTitle("");
+                                    setTplCompany(orgs[0]?.nameEng || "Pakiza Software Limited");
+                                    setTplEmpType("Permanent");
+                                    setIsCreateTplOpen(true);
+                                  }}
+                                  className="h-9 px-4 mt-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-sm hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
+                                >
+                                  <Plus className="size-4" /> Create First Template
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ) : (
@@ -2506,20 +2529,20 @@ function CompanySetupPage() {
                                 </button>
                               </td>
                               <td className="px-5 py-4 text-center">
-                                <div className="flex items-center justify-center gap-3">
+                                <div className="flex items-center justify-center gap-2">
                                   <button
                                     onClick={() => {
                                       setEditingTemplate(JSON.parse(JSON.stringify(tpl)));
                                       setIsConfiguringTemplate(true);
                                     }}
-                                    className="h-8 px-3 rounded-lg border border-primary/20 hover:bg-primary/5 text-primary text-xs font-bold transition-all flex items-center gap-1"
+                                    className="h-8 px-3 rounded-lg border border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary text-xs font-bold transition-all flex items-center gap-1.5"
                                     title="Configure Fields"
                                   >
                                     <Settings className="size-3.5" /> Configure
                                   </button>
                                   <button
                                     onClick={() => handleDeleteTemplate(tpl.id)}
-                                    className="text-red-500 hover:text-red-650 transition-colors p-1"
+                                    className="h-8 w-8 flex items-center justify-center rounded-lg border border-red-500/20 text-red-500 hover:bg-red-500/10 transition-colors"
                                     title="Delete Template"
                                   >
                                     <Trash2 className="size-4" />
@@ -2559,15 +2582,15 @@ function CompanySetupPage() {
                                 setIsConfiguringTemplate(false);
                                 setEditingTemplate(null);
                               }}
-                              className="h-9 px-4 rounded-xl border border-border/40 text-xs font-semibold text-muted-foreground hover:text-foreground transition-all hover:bg-muted"
+                              className="h-9 px-4 rounded-xl border border-border/40 text-xs font-semibold text-muted-foreground hover:text-foreground transition-all hover:bg-muted flex items-center gap-1.5"
                             >
-                              Back to List
+                              <ArrowLeft className="size-3.5" /> Back to List
                             </button>
                             <button
                               onClick={handleSaveTemplateConfig}
-                              className="h-9 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-semibold transition-all hover:bg-primary/90 shadow-sm"
+                              className="h-9 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-semibold transition-all hover:bg-primary/90 shadow-sm flex items-center gap-1.5"
                             >
-                              Save Template
+                              <Save className="size-3.5" /> Save Template
                             </button>
                           </div>
                         </div>
@@ -2589,7 +2612,7 @@ function CompanySetupPage() {
                                     value={field.customLabelEng}
                                     onChange={(e) => handleFieldChange(field.key, { customLabelEng: e.target.value })}
                                     placeholder={field.defaultLabelEng}
-                                    className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
+                                    className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary focus:ring-4 focus:ring-primary/10 text-xs outline-none transition-all"
                                   />
                                 </div>
                                 <div className="col-span-4">
@@ -2598,7 +2621,7 @@ function CompanySetupPage() {
                                     value={field.customLabelBng}
                                     onChange={(e) => handleFieldChange(field.key, { customLabelBng: e.target.value })}
                                     placeholder={field.defaultLabelBng}
-                                    className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
+                                    className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary focus:ring-4 focus:ring-primary/10 text-xs outline-none transition-all"
                                   />
                                 </div>
                                 <div className="col-span-1 flex justify-end">
@@ -2633,7 +2656,7 @@ function CompanySetupPage() {
                                     value={field.customLabelEng}
                                     onChange={(e) => handleFieldChange(field.key, { customLabelEng: e.target.value })}
                                     placeholder={field.defaultLabelEng}
-                                    className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
+                                    className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary focus:ring-4 focus:ring-primary/10 text-xs outline-none transition-all"
                                   />
                                 </div>
                                 <div className="col-span-4">
@@ -2642,7 +2665,7 @@ function CompanySetupPage() {
                                     value={field.customLabelBng}
                                     onChange={(e) => handleFieldChange(field.key, { customLabelBng: e.target.value })}
                                     placeholder={field.defaultLabelBng}
-                                    className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
+                                    className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary focus:ring-4 focus:ring-primary/10 text-xs outline-none transition-all"
                                   />
                                 </div>
                                 <div className="col-span-1 flex justify-end">
@@ -2677,7 +2700,7 @@ function CompanySetupPage() {
                                     value={field.customLabelEng}
                                     onChange={(e) => handleFieldChange(field.key, { customLabelEng: e.target.value })}
                                     placeholder={field.defaultLabelEng}
-                                    className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary text-xs outline-none"
+                                    className="w-full h-8 px-2.5 rounded-lg border border-border/40 bg-muted/10 hover:bg-muted/20 focus:bg-background focus:border-primary focus:ring-4 focus:ring-primary/10 text-xs outline-none transition-all"
                                   />
                                 </div>
                                 <div className="col-span-4">
@@ -2712,18 +2735,18 @@ function CompanySetupPage() {
                       <div className="bg-card rounded-2xl border border-border/50 p-5 shadow-sm space-y-4">
                         <div className="flex items-center justify-between border-b border-border/40 pb-3">
                           <h3 className="text-sm font-bold text-foreground">Interactive Payslip Preview</h3>
-                          <div className="flex items-center bg-muted rounded-lg p-0.5 border border-border/30">
+                          <div className="flex items-center bg-muted/50 rounded-lg p-1 border border-border/40 shadow-inner">
                             <button
                               onClick={() => setPreviewLang("en")}
-                              className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${previewLang === "en" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                              className={`px-3.5 py-1.5 rounded-md text-xs font-bold transition-all ${previewLang === "en" ? "bg-background text-foreground shadow-sm ring-1 ring-border/50" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
                             >
-                              EN
+                              English
                             </button>
                             <button
                               onClick={() => setPreviewLang("bn")}
-                              className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${previewLang === "bn" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                              className={`px-3.5 py-1.5 rounded-md text-xs font-bold transition-all ${previewLang === "bn" ? "bg-background text-foreground shadow-sm ring-1 ring-border/50" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
                             >
-                              BN
+                              বাংলা
                             </button>
                           </div>
                         </div>
@@ -3779,9 +3802,9 @@ function CompanySetupPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/95 transition-all"
+                  className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/95 transition-all flex items-center gap-2"
                 >
-                  Create & Configure
+                  <Plus className="size-4" /> Create & Configure
                 </button>
               </div>
             </form>

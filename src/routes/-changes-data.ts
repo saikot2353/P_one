@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "197",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Company Setup",
+    link: "/company-setup?tab=payslip",
+    descriptionEn: "Polished the Payslip Templates Setup page for better UI/UX. Improved the empty state with a dedicated icon, added modern focus rings to all form inputs, redesigned the English/Bangla toggle switch, added clear action icons to all buttons, and included a success notification when a new template is created.",
+    descriptionBn: "পে স্লিপ টেমপ্লেট সেটআপ পেজের ইউজার ইন্টারফেস আরও আকর্ষণীয় করা হয়েছে। নতুন টেমপ্লেট না থাকলে সেখানে সুন্দর আইকন সম্বলিত এম্পটি স্টেট দেখানো হচ্ছে। ফর্মের সব ইনপুটে মডার্ন ফোকাস রিং এবং সব বাটনে নতুন আইকন যোগ করা হয়েছে। এছাড়া নতুন টেমপ্লেট তৈরির সময় সাকসেস মেসেজ দেখানোর ব্যবস্থা করা হয়েছে।",
+  },
+  {
     id: "196",
     date: new Date().toISOString().slice(0, 16),
     type: "New Feature",
