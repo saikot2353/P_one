@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "207",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Modify",
+    module: "System Settings",
+    link: "/changes",
+    descriptionEn: "Fixed a typing issue where 'UX Optimization' was missing from the list of allowed change types.",
+    descriptionBn: "সিস্টেম আপডেটের তালিকায় 'UX Optimization' টাইপটি অপশন হিসেবে না থাকার সমস্যাটি সমাধান করা হয়েছে।",
+  },
+  {
     id: "199",
     date: new Date().toISOString().slice(0, 16),
     type: "New Feature",
@@ -71,25 +80,7 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     module: "Company Setup",
     link: "/company-setup?tab=payslip",
     descriptionEn: "Updated the Employee Type dropdown in the Payslip Template configuration to standard categories (Worker, Office Executive, Staff). Added a smart conditional OT Type selection (e.g. 2hrs OT, 3hrs OT) that elegantly animates in whenever 'Worker' is selected, making template designation highly specific and professional.",
-    descriptionBn: "à¦ªà§‡à¦¸à¦²à¦¿à¦ª à¦Ÿà§‡à¦®à¦ªà§�à¦²à§‡à¦Ÿ à¦¤à§ˆà¦°à¦¿à¦° à¦¸à¦®à§Ÿ à¦�à¦®à¦ªà§�à¦²à§Ÿà¦¿ à¦Ÿà¦¾à¦‡à¦ª à¦…à¦ªà¦¶à¦¨à¦—à§�à¦²à§‹ à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦•à¦°à§‡ (Worker, Office Executive, Staff) à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦›à¦¾à§œà¦¾à¦“ à¦¯à¦–à¦¨ 'Worker' à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦°à¦¾ à¦¹à¦¬à§‡, à¦¤à¦–à¦¨ à¦¸à§�à¦¬à§Ÿà¦‚à¦•à§�à¦°à¦¿à§Ÿà¦­à¦¾à¦¬à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¸à§�à¦®à¦¾à¦°à§�à¦Ÿ OT Type à¦…à¦ªà¦¶à¦¨ (à¦¯à§‡à¦®à¦¨- 2hrs OT, 3hrs OT) à¦…à§�à¦¯à¦¾à¦¨à¦¿à¦®à§‡à¦¶à¦¨ à¦¸à¦¹ à¦ªà§�à¦°à¦¦à¦°à§�à¦¶à¦¿à¦¤ à¦¹à¦¬à§‡, à¦¯à¦¾ à¦Ÿà§‡à¦®à¦ªà§�à¦²à§‡à¦Ÿà¦—à§�à¦²à§‹à¦•à§‡ à¦†à¦°à¦“ à¦¸à§�à¦ªà§‡à¦¸à¦¿à¦«à¦¿à¦• à¦�à¦¬à¦‚ à¦ªà§�à¦°à¦«à§‡à¦¶à¦¨à¦¾à¦² à¦•à¦°à¦¬à§‡à¥¤",�à¦ªà§‚à¦°à§�à¦£ à¦•à¦¾à¦°à§�à¦¡-à¦®à§�à¦•à§�à¦¤ à¦�à¦¬à¦‚ à¦«à§�à¦²à§�à¦¯à¦¾à¦Ÿ à¦¡à¦¿à¦œà¦¾à¦‡à¦¨à§‡ à¦°à§‚à¦ªà¦¾à¦¨à§�à¦¤à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦¬à§�à¦²à¦• à¦¬à§�à¦¯à¦¾à¦•à¦—à§�à¦°à¦¾à¦‰à¦¨à§�à¦¡ à¦“ à¦¬à¦•à§�à¦¸ à¦¬à¦°à§�à¦¡à¦¾à¦°à§‡à¦° à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à§‡ à¦�à¦¤à§‡ à¦®à¦¿à¦¨à¦¿à¦®à¦¾à¦²à¦¿à¦¸à§�à¦Ÿà¦¿à¦• à¦¡à¦Ÿ/à¦²à¦¾à¦‡à¦¨ à¦¬à¦¿à¦­à¦¾à¦œà¦•à¦¯à§�à¦•à§�à¦¤ à¦¹à¦°à¦¾à¦‡à¦œà¦¨à§�à¦Ÿà¦¾à¦² à¦®à§‡à¦Ÿà§�à¦°à¦¿à¦•à§�à¦¸ à¦¬à¦¾à¦° à¦¬à§�à¦¯à¦¬à¦¹à¦¾à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡ à¦¯à¦¾ à¦¦à§‡à¦–à¦¤à§‡ à¦†à¦°à¦“ à¦†à¦§à§�à¦¨à¦¿à¦• à¦“ à¦ªà¦°à¦¿à¦šà§�à¦›à¦¨à§�à¦¨à¥¤",
-  },
-  {
-    id: "201",
-    date: new Date().toISOString().slice(0, 16),
-    type: "UI Update",
-    module: "Central Approvals",
-    link: "/all-approvals",
-    descriptionEn: "Redesigned the Loan Terms & Details section inside the Loan details modal into a split-layout comparative dashboard. Features a visual loan amount allocation panel with a dynamic progress bar on the left, and a high-contrast dark-slate repayment overview sidebar card on the right.",
-    descriptionBn: "à¦²à§‹à¦¨ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸ à¦®à§‹à¦¡à¦¾à¦²à§‡à¦° à¦²à§‹à¦¨ à¦Ÿà¦¾à¦°à§�à¦®à¦¸ à¦…à§�à¦¯à¦¾à¦¨à§�à¦¡ à¦¡à¦¿à¦Ÿà§‡à¦‡à¦²à¦¸ à¦¸à§‡à¦•à¦¶à¦¨à¦Ÿà¦¿ à¦¸à§�à¦ªà§�à¦²à¦¿à¦Ÿ-à¦²à§‡à¦†à¦‰à¦Ÿ à¦¡à§�à¦¯à¦¾à¦¶à¦¬à§‹à¦°à§�à¦¡à§‡ à¦°à§‚à¦ªà¦¾à¦¨à§�à¦¤à¦° à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦¬à¦¾à¦® à¦ªà¦¾à¦¶à§‡ à¦¡à¦¾à¦‡à¦¨à¦¾à¦®à¦¿à¦• à¦ªà§�à¦°à§‹à¦—à§�à¦°à§‡à¦¸ à¦¬à¦¾à¦°à¦¸à¦¹ à¦²à§‹à¦¨ à¦…à§�à¦¯à¦¾à¦²à§‹à¦•à§‡à¦¶à¦¨ à¦ªà§�à¦¯à¦¾à¦¨à§‡à¦² à¦�à¦¬à¦‚ à¦¡à¦¾à¦¨ à¦ªà¦¾à¦¶à§‡ à¦¹à¦¾à¦‡-à¦•à¦¨à¦Ÿà§�à¦°à¦¾à¦¸à§�à¦Ÿ à¦¡à¦¾à¦°à§�à¦•-à¦¸à§�à¦²à§‡à¦Ÿ à¦°à¦¿à¦ªà§‡à¦®à§‡à¦¨à§�à¦Ÿ à¦¸à¦¾à¦®à¦¾à¦°à¦¿ à¦•à¦¾à¦°à§�à¦¡ à¦¯à§�à¦•à§�à¦¤ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤",
-=======
-    id: "198",
-    date: new Date().toISOString().slice(0, 16),
-    type: "New Feature",
-    module: "Company Setup",
-    link: "/company-setup?tab=payslip",
-    descriptionEn: "Updated the Employee Type dropdown in the Payslip Template configuration to standard categories (Worker, Office Executive, Staff). Added a smart conditional OT Type selection (e.g. 2hrs OT, 3hrs OT) that elegantly animates in whenever 'Worker' is selected, making template designation highly specific and professional.",
-    descriptionBn: "à¦ªà§‡à¦¸à¦²à¦¿à¦ª à¦Ÿà§‡à¦®à¦ªà§�à¦²à§‡à¦Ÿ à¦¤à§ˆà¦°à¦¿à¦° à¦¸à¦®à§Ÿ à¦�à¦®à¦ªà§�à¦²à§Ÿà¦¿ à¦Ÿà¦¾à¦‡à¦ª à¦…à¦ªà¦¶à¦¨à¦—à§�à¦²à§‹ à¦ªà¦°à¦¿à¦¬à¦°à§�à¦¤à¦¨ à¦•à¦°à§‡ (Worker, Office Executive, Staff) à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤ à¦�à¦›à¦¾à§œà¦¾à¦“ à¦¯à¦–à¦¨ 'Worker' à¦¸à¦¿à¦²à§‡à¦•à§�à¦Ÿ à¦•à¦°à¦¾ à¦¹à¦¬à§‡, à¦¤à¦–à¦¨ à¦¸à§�à¦¬à§Ÿà¦‚à¦•à§�à¦°à¦¿à§Ÿà¦­à¦¾à¦¬à§‡ à¦�à¦•à¦Ÿà¦¿ à¦¸à§�à¦®à¦¾à¦°à§�à¦Ÿ OT Type à¦…à¦ªà¦¶à¦¨ (à¦¯à§‡à¦®à¦¨- 2hrs OT, 3hrs OT) à¦…à§�à¦¯à¦¾à¦¨à¦¿à¦®à§‡à¦¶à¦¨ à¦¸à¦¹ à¦ªà§�à¦°à¦¦à¦°à§�à¦¶à¦¿à¦¤ à¦¹à¦¬à§‡, à¦¯à¦¾ à¦Ÿà§‡à¦®à¦ªà§�à¦²à§‡à¦Ÿà¦—à§�à¦²à§‹à¦•à§‡ à¦†à¦°à¦“ à¦¸à§�à¦ªà§‡à¦¸à¦¿à¦«à¦¿à¦• à¦�à¦¬à¦‚ à¦ªà§�à¦°à¦«à§‡à¦¶à¦¨à¦¾à¦² à¦•à¦°à¦¬à§‡à¥¤",
->>>>>>> fd601150219556141c5cb1fd81583ff91e8dd7e5
+    descriptionBn: "পে স্লিপ টেমপ্লেট তৈরির সময় এমপ্লয়ি টাইপ অপশনগুলো পরিবর্তন করে (Worker, Office Executive, Staff) করা হয়েছে। এছাড়াও যখন 'Worker' সিলেক্ট করা হবে, তখন স্বয়ংক্রিয়ভাবে একটি স্মার্ট OT Type অপশন (যেমন- 2hrs OT, 3hrs OT) অ্যানিমেশন সহ প্রদর্শিত হবে, যা টেমপ্লেটগুলোকে আরও স্পেসিফিক এবং প্রফেশনাল করবে।",
   },
   {
     id: "200",

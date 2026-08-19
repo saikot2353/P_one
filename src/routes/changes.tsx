@@ -10,7 +10,7 @@ export const Route = createFileRoute("/changes")({
 export type ChangeRecord = {
   id: string;
   date: string;
-  type: "Modify" | "New Addition" | "Feature" | "UI Update" | "New" | "New Feature" | "";
+  type: "Modify" | "New Addition" | "Feature" | "UI Update" | "UX Optimization" | "New" | "New Feature" | "";
   module: string;
   link?: string;
   descriptionEn: string;
@@ -21,12 +21,12 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v190");
+    const saved = localStorage.getItem("system_changes_v191");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
       setRecords(DEFAULT_CHANGE_RECORDS);
-      localStorage.setItem("system_changes_v188", JSON.stringify(DEFAULT_CHANGE_RECORDS));
+      localStorage.setItem("system_changes_v191", JSON.stringify(DEFAULT_CHANGE_RECORDS));
     }
   }, []);
 
@@ -129,6 +129,7 @@ function ChangesPage() {
                     <option value="New Feature">New Feature</option>
                     <option value="Feature">Feature</option>
                     <option value="UI Update">UI Update</option>
+                    <option value="UX Optimization">UX Optimization</option>
                     <option value="Modify">Modify</option>
                   </select>
                 </td>
