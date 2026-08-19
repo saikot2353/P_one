@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
@@ -17,6 +17,7 @@ import {
   Printer,
 } from "lucide-react";
 import { toast } from "sonner";
+import type { SettlementTypePolicy } from "./final-settlement-configuration";
 
 export const Route = createFileRoute("/final-settlement")({
   head: () => ({
@@ -72,14 +73,7 @@ const mockData: SettlementRecord[] = [
   },
 ];
 
-const settlementTypes = [
-  "Resigned",
-  "Retired",
-  "Terminated",
-  "Contract End",
-  "Death",
-  "Absconding",
-];
+// Dynamic types are loaded from configuration
 const elYears = ["2022", "2023", "2024", "2025", "2026"];
 const elMonths = [
   "Jan",
@@ -236,6 +230,16 @@ function FinalSettlementPage() {
   const [employeeId, setEmployeeId] = useState("");
   const [empLoaded, setEmpLoaded] = useState(false);
 
+  // Dynamic Policies
+  const [settlementPolicies, setSettlementPolicies] = useState<SettlementTypePolicy[]>([]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("fs_settlement_types_v3");
+    if (stored) {
+      setSettlementPolicies(JSON.parse(stored));
+    }
+  }, []);
+
   // Settlement Info
   const [settlementType, setSettlementType] = useState("");
   const [settlementDate, setSettlementDate] = useState("");
@@ -325,7 +329,7 @@ function FinalSettlementPage() {
     setMode("With Salary");
     setEmployeeId(id);
     setEmpLoaded(true);
-    setSettlementType("Resigned");
+    setSettlementType("Resignation");
     setSettlementDate("2026-06-15");
     setResignApplyDate("2026-04-28");
     setResignDate("2026-05-28");
@@ -419,9 +423,66 @@ function FinalSettlementPage() {
       toast.error("Please select Settlement Type.");
       return;
     }
-    setNetPayment("103147.00");
+    
+    // Find selected policy
+    const policy = settlementPolicies.find(p => p.name === settlementType);
+    if (!policy) {
+      toast.error("Invalid settlement type policy.");
+      return;
+    }
+
+    // DEMO LOGIC: Dynamic effect based on settlement type policy
+    let calculatedGrandTotal = 104807.00;
+    
+    // Notice — deduction from employee (resignation: didn't serve notice)
+    if (policy.noticeDeductedFromEmployee) {
+      setNoticePeriod(policy.noticePeriodDays.toString());
+      setNoticeShortage("5"); // Mock shortage days
+      setDeductions((prev) => {
+        const filtered = prev.filter(d => d.for && !d.for.toLowerCase().includes("notice"));
+        return [...filtered, { for: "Notice Period Shortage", amount: "3500.00" }, { for: "", amount: "" }];
+      });
+      calculatedGrandTotal -= 3500;
+    } else {
+      setNoticePeriod("0");
+      setNoticeShortage("0");
+      setDeductions((prev) => prev.filter(d => d.for && !d.for.toLowerCase().includes("notice")));
+    }
+
+    // Notice — paid by employer (termination/retrenchment: notice pay in lieu)
+    if (policy.noticePaidByEmployer) {
+      setCompensations((prev) => {
+        const filtered = prev.filter(c => c.for && !c.for.toLowerCase().includes("notice"));
+        return [...filtered, { for: "Notice Pay (In Lieu)", amount: "27900.00" }, { for: "", amount: "" }];
+      });
+      calculatedGrandTotal += 27900;
+    } else {
+      setCompensations((prev) => prev.filter(c => c.for && !c.for.toLowerCase().includes("notice")));
+    }
+
+    // Service Benefit / Compensation — two-tier based on service length
+    if (policy.isCompensationApplicable) {
+      // Demo: assume 3 years service, daily rate = 930 (basic 27900/30)
+      const DEMO_SERVICE_YEARS = 3;
+      const DEMO_DAILY_RATE = 930;
+      // Use correct tier
+      const compDays = DEMO_SERVICE_YEARS >= 10
+        ? policy.compensationDaysPerYear_above10yrs
+        : policy.compensationDaysPerYear_below10yrs;
+      const benefitAmt = DEMO_SERVICE_YEARS * compDays * DEMO_DAILY_RATE;
+      setPayableDaysPerYear(compDays.toString());
+      setServiceBenefitTotal(benefitAmt.toFixed(2));
+      calculatedGrandTotal += (benefitAmt - 19530); // offset initial mock
+    } else {
+      setPayableDaysPerYear("0");
+      setServiceBenefitTotal("0.00");
+      calculatedGrandTotal -= 19530;
+    }
+
+    setGrandTotal(calculatedGrandTotal.toFixed(2));
+    setNetPayment(calculatedGrandTotal.toFixed(2));
     setCalculated(true);
-    toast.success("Calculation complete.");
+    toast.success("Calculation complete for " + settlementType + ".");
   };
 
   const handleSubmit = () => {
@@ -636,9 +697,11 @@ function FinalSettlementPage() {
                         value={settlementType}
                         onChange={(e: any) => setSettlementType(e.target.value)}
                       >
-                        <option value="Working">Working</option>
-                        {settlementTypes.map((t) => (
-                          <option key={t}>{t}</option>
+                        <option value="">Select Type</option>
+                        {settlementPolicies.map((t) => (
+                          <option key={t.id} value={t.name}>
+                            {t.name}
+                          </option>
                         ))}
                       </Select>
                     </div>

@@ -331,7 +331,10 @@ export const nav: NavItem[] = [
       },
       {
         label: "Final Settlement",
-        subitems: [{ label: "Execute Final Settlement", to: "/payroll-final-settlement-execute" }],
+        subitems: [
+          { label: "Execute Final Settlement", to: "/final-settlement" },
+          { label: "Final Settlement Configuration", to: "/final-settlement-configuration" }
+        ],
       },
       { label: "Payroll Configuration", to: "/payroll-configure" },
       {
