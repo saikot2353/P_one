@@ -271,110 +271,144 @@ function SectionToggle({ label = "Include" }: { label?: string }) {
 
 const defaultSettlementPolicies: SettlementTypePolicy[] = [
   {
-    id: "1",
-    name: "Resignation",
-    legalReference: "Section 27, BLA 2006",
-    description: "Worker voluntarily resigns. Must give 60-day notice (permanent/monthly). Compensation payable only after 5 years of service.",
-    noticePeriodDays: 60,
-    noticePaidByEmployer: false,
-    noticeDeductedFromEmployee: true,
-    compensationDaysPerYear_3yrs: 0,
-    compensationDaysPerYear_5yrs: 14,
-    compensationDaysPerYear_below10yrs: 14,
-    compensationDaysPerYear_above10yrs: 30,
-    minServiceMonthsForCompensation: 60,
-    isCompensationApplicable: true,
-    earnedLeaveEncashable: true,
-    isGratuityApplicable: true,
-    minServiceMonthsForGratuity: 6,
-    isProvidentFundPayable: true,
-    isMisconductBased: false,
-    isDeathCase: false,
+    id: "1", name: "Resignation", legalReference: "Section 27, BLA 2006",
+    description: "Worker voluntarily resigns.",
+    noticePeriodDays: 60, noticePaidByEmployer: false, noticeDeductedFromEmployee: true,
+    compensationTiers: [
+      { minYear: 2, minMonth: 11, minDay: 30, daysPerYear: 7 },
+      { minYear: 3, minMonth: 0,  minDay: 0,  daysPerYear: 7 },
+      { minYear: 3, minMonth: 11, minDay: 0,  daysPerYear: 7 },
+      { minYear: 3, minMonth: 11, minDay: 30, daysPerYear: 15 },
+      { minYear: 4, minMonth: 0,  minDay: 0,  daysPerYear: 15 },
+      { minYear: 9, minMonth: 0,  minDay: 0,  daysPerYear: 15 },
+      { minYear: 9, minMonth: 11, minDay: 0,  daysPerYear: 15 },
+      { minYear: 9, minMonth: 11, minDay: 30, daysPerYear: 30 },
+      { minYear: 10, minMonth: 0, minDay: 0,  daysPerYear: 30 },
+    ],
+    minServiceMonthsForCompensation: 35, isCompensationApplicable: true,
+    earnedLeaveEncashable: true, isGratuityApplicable: true, minServiceMonthsForGratuity: 6,
+    isProvidentFundPayable: true, isMisconductBased: false, isDeathCase: false,
   },
   {
-    id: "2",
-    name: "Termination by Employer",
-    legalReference: "Section 26, BLA 2006",
-    description: "Employer terminates a permanent worker. Must give 120-day notice (monthly rated) or pay in lieu. Compensation: 30 days' wages per year.",
-    noticePeriodDays: 120,
-    noticePaidByEmployer: true,
-    noticeDeductedFromEmployee: false,
-    compensationDaysPerYear_3yrs: 30,
-    compensationDaysPerYear_5yrs: 30,
-    compensationDaysPerYear_below10yrs: 30,
-    compensationDaysPerYear_above10yrs: 45,
-    minServiceMonthsForCompensation: 12,
-    isCompensationApplicable: true,
-    earnedLeaveEncashable: true,
-    isGratuityApplicable: true,
-    minServiceMonthsForGratuity: 6,
-    isProvidentFundPayable: true,
-    isMisconductBased: false,
-    isDeathCase: false,
+    id: "2", name: "Termination by Employer", legalReference: "Section 26, BLA 2006",
+    description: "Employer terminates a permanent worker.",
+    noticePeriodDays: 120, noticePaidByEmployer: true, noticeDeductedFromEmployee: false,
+    compensationTiers: [
+      { minYear: 1, minMonth: 0, minDay: 0, daysPerYear: 30 },
+      { minYear: 10, minMonth: 0, minDay: 0, daysPerYear: 45 },
+    ],
+    minServiceMonthsForCompensation: 12, isCompensationApplicable: true,
+    earnedLeaveEncashable: true, isGratuityApplicable: true, minServiceMonthsForGratuity: 6,
+    isProvidentFundPayable: true, isMisconductBased: false, isDeathCase: false,
   },
   {
-    id: "3",
-    name: "Retrenchment",
-    legalReference: "Section 20, BLA 2006",
-    description: "Employer retrenches on grounds of redundancy. Must give 1-month notice or pay in lieu. 30 days' wages per completed year or gratuity.",
-    noticePeriodDays: 30,
-    noticePaidByEmployer: true,
-    noticeDeductedFromEmployee: false,
-    compensationDaysPerYear_3yrs: 30,
-    compensationDaysPerYear_5yrs: 30,
-    compensationDaysPerYear_below10yrs: 30,
-    compensationDaysPerYear_above10yrs: 45,
-    minServiceMonthsForCompensation: 12,
-    isCompensationApplicable: true,
-    earnedLeaveEncashable: true,
-    isGratuityApplicable: true,
-    minServiceMonthsForGratuity: 6,
-    isProvidentFundPayable: true,
-    isMisconductBased: false,
-    isDeathCase: false,
+    id: "3", name: "Retrenchment", legalReference: "Section 20, BLA 2006",
+    description: "Employer retrenches on grounds of redundancy.",
+    noticePeriodDays: 30, noticePaidByEmployer: true, noticeDeductedFromEmployee: false,
+    compensationTiers: [
+      { minYear: 1, minMonth: 0, minDay: 0, daysPerYear: 30 },
+      { minYear: 10, minMonth: 0, minDay: 0, daysPerYear: 45 },
+    ],
+    minServiceMonthsForCompensation: 12, isCompensationApplicable: true,
+    earnedLeaveEncashable: true, isGratuityApplicable: true, minServiceMonthsForGratuity: 6,
+    isProvidentFundPayable: true, isMisconductBased: false, isDeathCase: false,
   },
   {
-    id: "4",
-    name: "Discharge",
-    legalReference: "Section 22, BLA 2006",
-    description: "Worker discharged for physical/mental incapacity or continued ill-health. 30 days' wages per year or gratuity.",
-    noticePeriodDays: 0,
-    noticePaidByEmployer: false,
-    noticeDeductedFromEmployee: false,
-    compensationDaysPerYear_3yrs: 30,
-    compensationDaysPerYear_5yrs: 30,
-    compensationDaysPerYear_below10yrs: 30,
-    compensationDaysPerYear_above10yrs: 45,
-    minServiceMonthsForCompensation: 12,
-    isCompensationApplicable: true,
-    earnedLeaveEncashable: true,
-    isGratuityApplicable: true,
-    minServiceMonthsForGratuity: 6,
-    isProvidentFundPayable: true,
-    isMisconductBased: false,
-    isDeathCase: false,
+    id: "4", name: "Discharge", legalReference: "Section 22, BLA 2006",
+    description: "Worker discharged for physical/mental incapacity.",
+    noticePeriodDays: 0, noticePaidByEmployer: false, noticeDeductedFromEmployee: false,
+    compensationTiers: [
+      { minYear: 1, minMonth: 0, minDay: 0, daysPerYear: 30 },
+      { minYear: 10, minMonth: 0, minDay: 0, daysPerYear: 45 },
+    ],
+    minServiceMonthsForCompensation: 12, isCompensationApplicable: true,
+    earnedLeaveEncashable: true, isGratuityApplicable: true, minServiceMonthsForGratuity: 6,
+    isProvidentFundPayable: true, isMisconductBased: false, isDeathCase: false,
   },
   {
-    id: "5",
-    name: "Dismissal (Misconduct)",
-    legalReference: "Section 23(1)(b) & 23(3), BLA 2006",
-    description: "Worker dismissed for misconduct after proper enquiry. Compensation is 15 days/year UNLESS dismissed for theft, fraud, arson or riot.",
-    noticePeriodDays: 0,
-    noticePaidByEmployer: false,
-    noticeDeductedFromEmployee: false,
-    compensationDaysPerYear_3yrs: 15,
-    compensationDaysPerYear_5yrs: 15,
-    compensationDaysPerYear_below10yrs: 15,
-    compensationDaysPerYear_above10yrs: 15,
-    minServiceMonthsForCompensation: 12,
-    isCompensationApplicable: true,
-    earnedLeaveEncashable: true,
-    isGratuityApplicable: false,
-    minServiceMonthsForGratuity: 0,
-    isProvidentFundPayable: true,
-    isMisconductBased: true,
-    isDeathCase: false,
-  }
+    id: "5", name: "Dismissal (Misconduct)", legalReference: "Section 23(1)(b) & 23(3), BLA 2006",
+    description: "Worker dismissed for misconduct.",
+    noticePeriodDays: 0, noticePaidByEmployer: false, noticeDeductedFromEmployee: false,
+    compensationTiers: [{ minYear: 1, minMonth: 0, minDay: 0, daysPerYear: 15 }],
+    minServiceMonthsForCompensation: 12, isCompensationApplicable: true,
+    earnedLeaveEncashable: true, isGratuityApplicable: false, minServiceMonthsForGratuity: 0,
+    isProvidentFundPayable: true, isMisconductBased: true, isDeathCase: false,
+  },
+  {
+    id: "6", name: "Removal (Minor Punishment)", legalReference: "Section 23(2)(a), BLA 2006",
+    description: "Worker removed as lighter punishment for misconduct.",
+    noticePeriodDays: 0, noticePaidByEmployer: false, noticeDeductedFromEmployee: false,
+    compensationTiers: [{ minYear: 1, minMonth: 0, minDay: 0, daysPerYear: 15 }],
+    minServiceMonthsForCompensation: 12, isCompensationApplicable: true,
+    earnedLeaveEncashable: true, isGratuityApplicable: false, minServiceMonthsForGratuity: 0,
+    isProvidentFundPayable: true, isMisconductBased: true, isDeathCase: false,
+  },
+  {
+    id: "7", name: "Retirement (Age-Based)", legalReference: "Section 28, BLA 2006",
+    description: "Worker retires upon reaching 60 years.",
+    noticePeriodDays: 0, noticePaidByEmployer: false, noticeDeductedFromEmployee: false,
+    compensationTiers: [
+      { minYear: 1, minMonth: 0, minDay: 0, daysPerYear: 30 },
+      { minYear: 10, minMonth: 0, minDay: 0, daysPerYear: 45 },
+    ],
+    minServiceMonthsForCompensation: 12, isCompensationApplicable: true,
+    earnedLeaveEncashable: true, isGratuityApplicable: true, minServiceMonthsForGratuity: 6,
+    isProvidentFundPayable: true, isMisconductBased: false, isDeathCase: false,
+  },
+  {
+    id: "8", name: "Voluntary Retirement (25 Yrs Service)", legalReference: "Section 2(1), BLA 2006",
+    description: "Worker voluntarily retires after 25 years.",
+    noticePeriodDays: 0, noticePaidByEmployer: false, noticeDeductedFromEmployee: false,
+    compensationTiers: [
+      { minYear: 25, minMonth: 0, minDay: 0, daysPerYear: 30 },
+      { minYear: 35, minMonth: 0, minDay: 0, daysPerYear: 45 },
+    ],
+    minServiceMonthsForCompensation: 300, isCompensationApplicable: true,
+    earnedLeaveEncashable: true, isGratuityApplicable: true, minServiceMonthsForGratuity: 6,
+    isProvidentFundPayable: true, isMisconductBased: false, isDeathCase: false,
+  },
+  {
+    id: "9", name: "Death in Service", legalReference: "Section 19, BLA 2006 (Amended 2013)",
+    description: "Worker dies during service (2+ years required).",
+    noticePeriodDays: 0, noticePaidByEmployer: false, noticeDeductedFromEmployee: false,
+    compensationTiers: [
+      { minYear: 2, minMonth: 0, minDay: 0, daysPerYear: 30 },
+      { minYear: 10, minMonth: 0, minDay: 0, daysPerYear: 45 },
+    ],
+    minServiceMonthsForCompensation: 24, isCompensationApplicable: true,
+    earnedLeaveEncashable: true, isGratuityApplicable: true, minServiceMonthsForGratuity: 6,
+    isProvidentFundPayable: true, isMisconductBased: false, isDeathCase: true,
+  },
+  {
+    id: "10", name: "Absconding / Abandonment", legalReference: "Section 27(3A), BLA 2006 (Amended 2013)",
+    description: "Worker absent >10 days without notice.",
+    noticePeriodDays: 0, noticePaidByEmployer: false, noticeDeductedFromEmployee: false,
+    compensationTiers: [],
+    minServiceMonthsForCompensation: 0, isCompensationApplicable: false,
+    earnedLeaveEncashable: true, isGratuityApplicable: false, minServiceMonthsForGratuity: 0,
+    isProvidentFundPayable: true, isMisconductBased: false, isDeathCase: false,
+  },
+  {
+    id: "11", name: "Contract Expiry", legalReference: "Section 4(5), BLA 2006",
+    description: "Temporary worker's contract expires.",
+    noticePeriodDays: 0, noticePaidByEmployer: false, noticeDeductedFromEmployee: false,
+    compensationTiers: [],
+    minServiceMonthsForCompensation: 0, isCompensationApplicable: false,
+    earnedLeaveEncashable: true, isGratuityApplicable: false, minServiceMonthsForGratuity: 0,
+    isProvidentFundPayable: true, isMisconductBased: false, isDeathCase: false,
+  },
+  {
+    id: "12", name: "Mutual Separation", legalReference: "As per mutual agreement",
+    description: "Employment ends by mutual agreement.",
+    noticePeriodDays: 0, noticePaidByEmployer: false, noticeDeductedFromEmployee: false,
+    compensationTiers: [
+      { minYear: 1, minMonth: 0, minDay: 0, daysPerYear: 30 },
+      { minYear: 10, minMonth: 0, minDay: 0, daysPerYear: 45 },
+    ],
+    minServiceMonthsForCompensation: 12, isCompensationApplicable: true,
+    earnedLeaveEncashable: true, isGratuityApplicable: true, minServiceMonthsForGratuity: 6,
+    isProvidentFundPayable: true, isMisconductBased: false, isDeathCase: false,
+  },
 ];
 
 interface MockEmployee {
@@ -427,6 +461,8 @@ interface MockEmployee {
   pfAmount: string;
   cpfAmount: string;
   serviceBenefitYear: string;
+  serviceBenefitMonth: string;
+  serviceBenefitDay: string;
   unit: string;
   employeeType: string;
   bankAccount: string;
@@ -488,6 +524,8 @@ const MOCK_EMPLOYEES: Record<string, MockEmployee> = {
     pfAmount: "30000.00",
     cpfAmount: "30000.00",
     serviceBenefitYear: "3",
+    serviceBenefitMonth: "0",
+    serviceBenefitDay: "11",
     unit: "PSL",
     employeeType: "Office Executive",
     bankAccount: "171.103.0256059",
@@ -547,6 +585,8 @@ const MOCK_EMPLOYEES: Record<string, MockEmployee> = {
     pfAmount: "240000.00",
     cpfAmount: "240000.00",
     serviceBenefitYear: "11",
+    serviceBenefitMonth: "1",
+    serviceBenefitDay: "0",
     unit: "Corporate",
     employeeType: "HR Director",
     bankAccount: "189.201.0984121",
@@ -606,6 +646,8 @@ const MOCK_EMPLOYEES: Record<string, MockEmployee> = {
     pfAmount: "14400.00",
     cpfAmount: "14400.00",
     serviceBenefitYear: "0",
+    serviceBenefitMonth: "8",
+    serviceBenefitDay: "0",
     unit: "PSL",
     employeeType: "Core Developer",
     bankAccount: "192.168.0125439",
@@ -665,6 +707,8 @@ const MOCK_EMPLOYEES: Record<string, MockEmployee> = {
     pfAmount: "18000.00",
     cpfAmount: "18000.00",
     serviceBenefitYear: "2",
+    serviceBenefitMonth: "6",
+    serviceBenefitDay: "0",
     unit: "PSL",
     employeeType: "Office Executive",
     bankAccount: "171.103.0256088",
@@ -724,6 +768,8 @@ const MOCK_EMPLOYEES: Record<string, MockEmployee> = {
     pfAmount: "160000.00",
     cpfAmount: "160000.00",
     serviceBenefitYear: "7",
+    serviceBenefitMonth: "8",
+    serviceBenefitDay: "0",
     unit: "PSL",
     employeeType: "Technical Lead",
     bankAccount: "192.168.0125488",
@@ -783,6 +829,8 @@ const MOCK_EMPLOYEES: Record<string, MockEmployee> = {
     pfAmount: "24400.00",
     cpfAmount: "24400.00",
     serviceBenefitYear: "2",
+    serviceBenefitMonth: "3",
+    serviceBenefitDay: "18",
     unit: "PSL",
     employeeType: "Creative Executive",
     bankAccount: "192.168.0125499",
@@ -793,6 +841,31 @@ const MOCK_EMPLOYEES: Record<string, MockEmployee> = {
     photo: "https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg"
   }
 };
+
+// ─── Compensation Tier Helper ──────────────────────────────────────────────────
+// Reads compensationTiers from the active policy (configured in Final Settlement
+// Configuration) and finds the highest applicable tier for the given Y/M/D.
+// Tiers are sorted descending by Y/M/D — the first tier whose minimum is ≤
+// the employee's service period wins.
+function getCompDaysFromTiers(
+  tiers: Array<{ minYear: number; minMonth: number; minDay: number; daysPerYear: number }>,
+  y: number,
+  m: number,
+  d: number
+): number {
+  if (!tiers || tiers.length === 0) return 0;
+  const sorted = [...tiers].sort((a, b) => {
+    if (b.minYear !== a.minYear) return b.minYear - a.minYear;
+    if (b.minMonth !== a.minMonth) return b.minMonth - a.minMonth;
+    return b.minDay - a.minDay;
+  });
+  for (const tier of sorted) {
+    const empTotal  = y * 366 + m * 31 + d;
+    const tierTotal = tier.minYear * 366 + tier.minMonth * 31 + tier.minDay;
+    if (empTotal >= tierTotal) return tier.daysPerYear;
+  }
+  return 0;
+}
 
 // ─── Main Component ────────────────────────────────────────────────────────────
 
@@ -809,11 +882,11 @@ function FinalSettlementPage() {
   const [settlementPolicies, setSettlementPolicies] = useState<SettlementTypePolicy[]>(defaultSettlementPolicies);
 
   useEffect(() => {
-    const stored = localStorage.getItem("fs_settlement_types_v3");
+    const stored = localStorage.getItem("fs_settlement_types_v4");
     if (stored) {
       setSettlementPolicies(JSON.parse(stored));
     } else {
-      localStorage.setItem("fs_settlement_types_v3", JSON.stringify(defaultSettlementPolicies));
+      localStorage.setItem("fs_settlement_types_v4", JSON.stringify(defaultSettlementPolicies));
     }
   }, []);
 
@@ -867,6 +940,8 @@ function FinalSettlementPage() {
   const [clBalanceDays, setClBalanceDays] = useState("");
   const [clPayment, setClPayment] = useState("");
   const [serviceBenefitYear, setServiceBenefitYear] = useState("");
+  const [serviceBenefitMonth, setServiceBenefitMonth] = useState("");
+  const [serviceBenefitDay, setServiceBenefitDay] = useState("");
   const [payableDaysPerYear, setPayableDaysPerYear] = useState("");
   const [serviceBenefitTotal, setServiceBenefitTotal] = useState("");
   const [pfAmount, setPfAmount] = useState("");
@@ -965,9 +1040,19 @@ function FinalSettlementPage() {
     setClPayment(clPay.toFixed(2));
     
     setServiceBenefitYear(targetEmp.serviceBenefitYear);
-    setPayableDaysPerYear("15.00");
-    const completedYears = Number(targetEmp.serviceBenefitYear);
-    const sbPay = completedYears * 15 * (basic / 30);
+    setServiceBenefitMonth(targetEmp.serviceBenefitMonth);
+    setServiceBenefitDay(targetEmp.serviceBenefitDay);
+    const _sbY = Number(targetEmp.serviceBenefitYear);
+    const _sbM = Number(targetEmp.serviceBenefitMonth);
+    const _sbD = Number(targetEmp.serviceBenefitDay);
+    const _sbDailyRate = basic / 30;
+    const loadPolicy = settlementPolicies.find(p => p.name === mappedSettleType);
+    const _sbCompDays = getCompDaysFromTiers(
+      loadPolicy?.compensationTiers ?? [],
+      _sbY, _sbM, _sbD
+    );
+    setPayableDaysPerYear(_sbCompDays.toString());
+    const sbPay = _sbCompDays > 0 ? _sbY * _sbCompDays * _sbDailyRate : 0;
     setServiceBenefitTotal(sbPay.toFixed(2));
     
     setPfAmount(targetEmp.pfAmount);
@@ -1089,25 +1174,33 @@ function FinalSettlementPage() {
     }
     setDeductions(updatedDeductions);
 
-    // Service Benefit / Compensation (dynamic completed years/bracket calculation)
+    // Service Benefit / Compensation — exact tiered Y/M/D business rules:
+    // SL1: Y=2, M=11, 30≤D≤31  → 7
+    // SL2: Y=3, 0≤M<11          → 7
+    // SL3: Y=3, M=11, 0≤D<30   → 7
+    // SL4: Y=3, M=11, 30≤D≤31  → 15
+    // SL5: 4≤Y<9               → 15  (any M, any D)
+    // SL5b:Y=9, 0≤M<11         → 15
+    // SL6: Y=9, M=11, 0≤D<30   → 15
+    // SL7: Y=9, M=11, 30≤D≤31  → 30
+    // SL8: Y≥10                → 30
     let finalServiceBenefitTotal = 0;
     let compDays = 0;
     
     if (showServiceBenefitInfo && policy.isCompensationApplicable) {
-      const completedYears = Number(serviceBenefitYear) || 0;
-      const completedMonths = completedYears * 12;
+      const sbY = Number(serviceBenefitYear) || 0;
+      const sbM = Number(serviceBenefitMonth) || 0;
+      const sbD = Number(serviceBenefitDay) || 0;
+      const totalMonths = sbY * 12 + sbM;
       
-      if (completedMonths >= policy.minServiceMonthsForCompensation) {
-        if (completedYears >= 10) {
-          compDays = policy.compensationDaysPerYear_above10yrs;
-        } else if (completedYears >= 5) {
-          compDays = policy.compensationDaysPerYear_below10yrs;
-        } else if (completedYears >= 3) {
-          compDays = policy.compensationDaysPerYear_3yrs;
-        } else {
-          compDays = policy.compensationDaysPerYear_below10yrs;
+      if (totalMonths >= policy.minServiceMonthsForCompensation) {
+        compDays = getCompDaysFromTiers(
+          policy?.compensationTiers ?? [],
+          sbY, sbM, sbD
+        );
+        if (compDays > 0) {
+          finalServiceBenefitTotal = sbY * compDays * dailyRate;
         }
-        finalServiceBenefitTotal = completedYears * compDays * dailyRate;
         setPayableDaysPerYear(compDays.toString());
         setServiceBenefitTotal(finalServiceBenefitTotal.toFixed(2));
       } else {
@@ -1814,16 +1907,16 @@ function FinalSettlementPage() {
                         <div className="flex items-center justify-between p-3.5 rounded-lg bg-blue-500/5 border border-blue-500/10 shadow-sm">
                           <div className="space-y-0.5">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600">Calculated Service Period</span>
-                            <p className="text-[10.5px] text-muted-foreground font-medium">Completed service benefit years</p>
+                            <p className="text-[10.5px] text-muted-foreground font-medium">Completed service benefit years (Y / M / D)</p>
                           </div>
                           <span className="text-sm font-extrabold text-foreground font-mono bg-background border border-border/50 px-3 py-1 rounded shadow-sm">
-                            {empLoaded ? `${serviceBenefitYear} Years` : "—"}
+                            {empLoaded ? `${serviceBenefitYear}Y ${serviceBenefitMonth}M ${serviceBenefitDay}D` : "—"}
                           </span>
                         </div>
                         <div className="flex items-center justify-between p-3.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 shadow-sm">
                           <div className="space-y-0.5">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Benefit Pay Amount</span>
-                            <p className="text-[10.5px] text-muted-foreground font-medium">Formula: completed years × rate/year × daily rate</p>
+                            <p className="text-[10.5px] text-muted-foreground font-medium">Formula: completed years × days/year × daily rate</p>
                           </div>
                           <span className="text-sm font-extrabold text-emerald-600 font-mono bg-background border border-emerald-500/20 px-3 py-1 rounded shadow-sm">
                             ৳{empLoaded ? Number(serviceBenefitTotal).toLocaleString("en-BD", { minimumFractionDigits: 2 }) : "0.00"}
@@ -2294,7 +2387,7 @@ function FinalSettlementPage() {
                       <thead className="border-b border-gray-300">
                         <tr>
                           <th className="text-left pb-1 font-semibold text-gray-600">
-                            Service Benefit Year
+                            Service Period
                           </th>
                           <th className="text-right pb-1 font-semibold text-gray-600">
                             Payable Days Per Year(SB)
@@ -2306,7 +2399,7 @@ function FinalSettlementPage() {
                       </thead>
                       <tbody>
                         <tr>
-                          <td className="pt-2">{serviceBenefitYear}</td>
+                          <td className="pt-2">{serviceBenefitYear}Y {serviceBenefitMonth}M {serviceBenefitDay}D</td>
                           <td className="text-right pt-2">{payableDaysPerYear}</td>
                           <td className="text-right pt-2">{serviceBenefitTotal}</td>
                         </tr>

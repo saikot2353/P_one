@@ -2,6 +2,33 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "226",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Business Logic",
+    module: "Final Settlement Configuration",
+    link: "/final-settlement-configuration",
+    descriptionEn: "Made the Final Settlement compensation calculation fully dynamic: replaced 4 hardcoded day-bracket fields with a configurable 'Compensation Tiers' table (Year / Month / Day → Days per Year). HR can now add, edit, or remove tiers for each settlement type directly from the configuration page. The calculation engine reads from this config automatically.",
+    descriptionBn: "ফাইনাল সেটেলমেন্টের ক্ষতিপূরণ হিসাব এখন সম্পূর্ণ ডাইনামিক করা হয়েছে। আগের ৪টি হার্ডকোডেড ব্র্যাকেটের পরিবর্তে প্রতিটি সেটেলমেন্ট টাইপের জন্য 'Compensation Tiers' টেবিল তৈরি করা হয়েছে। HR নিজেই বছর/মাস/দিন অনুযায়ী যেকোনো টায়ার যোগ, সম্পাদনা বা মুছে ফেলতে পারবেন এবং হিসাব স্বয়ংক্রিয়ভাবে সেই কনফিগ অনুযায়ী হবে।",
+  },
+  {
+    id: "225",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Business Logic",
+    module: "Final Settlement",
+    link: "/final-settlement",
+    descriptionEn: "Updated Final Settlement compensation calculation to use exact Year + Month + Day business rules with 8 service tiers (SL1–SL8): e.g. 2Y 11M 30D+ → 7 days/yr, 3Y–8Y 11M → 15 days/yr, 9Y 11M 30D+ or 10Y+ → 30 days/yr. Now stores Month and Day service period fields alongside Year for precise tier matching.",
+    descriptionBn: "ফাইনাল সেটেলমেন্টের ক্ষতিপূরণ হিসাব এখন সঠিক বছর + মাস + দিনের ভিত্তিতে ৮টি সার্ভিস টায়ার (SL1–SL8) অনুযায়ী গণনা করা হবে। যেমন: ২ বছর ১১ মাস ৩০+ দিন → ৭ দিন/বছর, ৩–৮ বছর → ১৫ দিন/বছর, ৯ বছর ১১ মাস ৩০+ দিন বা ১০+ বছর → ৩০ দিন/বছর।",
+  },
+  {
+    id: "224",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Employee Doc Verification",
+    link: "/employee-doc-verification",
+    descriptionEn: "Created the Employee Doc Verification page with interactive side-by-side OCR scan review console and individual verification actions (Approve/Reject) per document. Added approvals menu item and topbar integration.",
+    descriptionBn: "কর্মচারীদের আপলোডকৃত প্রয়োজনীয় কাগজপত্র ও সার্টিফিকেট যাচাইয়ের জন্য 'Employee Doc Verification' ফিচার যুক্ত করা হয়েছে যেখানে প্রতিটি ডকুমেন্ট আলাদা আলাদাভাবে (অ্যাপ্রুভ/রিজেক্ট) যাচাই করা যাবে এবং ডাইনামিক এআই-ওসিআর স্ক্যান ভিউয়ারের মাধ্যমে তুলনা করা যাবে।",
+  },
+  {
     id: "223",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Update",

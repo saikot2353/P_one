@@ -125,6 +125,7 @@ import { Route as FinalSettlementRouteImport } from './routes/final-settlement'
 import { Route as FinalApproveIncrementRouteImport } from './routes/final-approve-increment'
 import { Route as EvaluationProposeRouteImport } from './routes/evaluation-propose'
 import { Route as EmployeeJobCardRouteImport } from './routes/employee-job-card'
+import { Route as EmployeeDocVerificationRouteImport } from './routes/employee-doc-verification'
 import { Route as EarnLeaveWorkflowRouteImport } from './routes/earn-leave-workflow'
 import { Route as EarnLeaveSubmitRouteImport } from './routes/earn-leave-submit'
 import { Route as EarnLeaveProcessRouteImport } from './routes/earn-leave-process'
@@ -763,6 +764,11 @@ const EmployeeJobCardRoute = EmployeeJobCardRouteImport.update({
   path: '/employee-job-card',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmployeeDocVerificationRoute = EmployeeDocVerificationRouteImport.update({
+  id: '/employee-doc-verification',
+  path: '/employee-doc-verification',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EarnLeaveWorkflowRoute = EarnLeaveWorkflowRouteImport.update({
   id: '/earn-leave-workflow',
   path: '/earn-leave-workflow',
@@ -1000,6 +1006,7 @@ export interface FileRoutesByFullPath {
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
+  '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
   '/evaluation-propose': typeof EvaluationProposeRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
@@ -1157,6 +1164,7 @@ export interface FileRoutesByTo {
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
+  '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
   '/evaluation-propose': typeof EvaluationProposeRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
@@ -1315,6 +1323,7 @@ export interface FileRoutesById {
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
+  '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
   '/evaluation-propose': typeof EvaluationProposeRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
@@ -1474,6 +1483,7 @@ export interface FileRouteTypes {
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
+    | '/employee-doc-verification'
     | '/employee-job-card'
     | '/evaluation-propose'
     | '/final-approve-increment'
@@ -1631,6 +1641,7 @@ export interface FileRouteTypes {
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
+    | '/employee-doc-verification'
     | '/employee-job-card'
     | '/evaluation-propose'
     | '/final-approve-increment'
@@ -1788,6 +1799,7 @@ export interface FileRouteTypes {
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
+    | '/employee-doc-verification'
     | '/employee-job-card'
     | '/evaluation-propose'
     | '/final-approve-increment'
@@ -1946,6 +1958,7 @@ export interface RootRouteChildren {
   EarnLeaveProcessRoute: typeof EarnLeaveProcessRoute
   EarnLeaveSubmitRoute: typeof EarnLeaveSubmitRoute
   EarnLeaveWorkflowRoute: typeof EarnLeaveWorkflowRoute
+  EmployeeDocVerificationRoute: typeof EmployeeDocVerificationRoute
   EmployeeJobCardRoute: typeof EmployeeJobCardRoute
   EvaluationProposeRoute: typeof EvaluationProposeRoute
   FinalApproveIncrementRoute: typeof FinalApproveIncrementRoute
@@ -2882,6 +2895,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmployeeJobCardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/employee-doc-verification': {
+      id: '/employee-doc-verification'
+      path: '/employee-doc-verification'
+      fullPath: '/employee-doc-verification'
+      preLoaderRoute: typeof EmployeeDocVerificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/earn-leave-workflow': {
       id: '/earn-leave-workflow'
       path: '/earn-leave-workflow'
@@ -3194,6 +3214,7 @@ const rootRouteChildren: RootRouteChildren = {
   EarnLeaveProcessRoute: EarnLeaveProcessRoute,
   EarnLeaveSubmitRoute: EarnLeaveSubmitRoute,
   EarnLeaveWorkflowRoute: EarnLeaveWorkflowRoute,
+  EmployeeDocVerificationRoute: EmployeeDocVerificationRoute,
   EmployeeJobCardRoute: EmployeeJobCardRoute,
   EvaluationProposeRoute: EvaluationProposeRoute,
   FinalApproveIncrementRoute: FinalApproveIncrementRoute,

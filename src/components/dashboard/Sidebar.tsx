@@ -96,15 +96,16 @@ export const nav: NavItem[] = [
   {
     label: "Approvals",
     icon: CheckCircle,
-    count: 38,
+    count: 42,
     subitems: [
       { label: "All Approvals", to: "/all-approvals" },
       {
         label: "HR Approvals",
-        count: 24,
+        count: 28,
         subitems: [
           { label: "SSP Approval", to: "/ssp-approval", count: 5 },
           { label: "Personnel Approval", to: "/personnel-approval", count: 2 },
+          { label: "Employee Doc Verification", to: "/employee-doc-verification", count: 4 },
           { label: "Manual Attendance", to: "/pending-manual-attendance", count: 7 },
           {
             label: "JD Approvals",
