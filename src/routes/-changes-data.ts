@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "227",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI / UX",
+    module: "Employee Doc Verification",
+    link: "/employee-doc-verification",
+    descriptionEn: "Completely redesigned the Employee Doc Verification page: cleaner table with live document progress bars, a polished full-screen review modal, fully functional Verify / Reject / Verify-All / Complete Verification buttons, a dedicated Reject Dialog with quick-reason presets and a custom text area, and an improved scan viewer with OCR match/mismatch highlighting.",
+    descriptionBn: "Employee Doc Verification পেজটি সম্পূর্ণ নতুন ডিজাইন করা হয়েছে। টেবিলে ডকুমেন্ট প্রগ্রেস বার যোগ হয়েছে, রিভিউ মডাল আরো পরিষ্কার ও প্রফেশনাল হয়েছে, Verify / Reject / Verify All / Complete Verification বাটন সঠিকভাবে কাজ করছে, Reject করার জন্য আলাদা ডায়ালগ বক্স এসেছে যেখানে প্রি-সেট রিজন এবং কাস্টম রিজন লেখার সুবিধা আছে, এবং স্ক্যান ভিউয়ারে OCR ম্যাচ ও মিসম্যাচ আরো স্পষ্টভাবে দেখা যায়।",
+  },
+  {
     id: "226",
     date: new Date().toISOString().slice(0, 16),
     type: "Business Logic",
