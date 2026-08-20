@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "228",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Business Logic",
+    module: "Final Settlement Configuration",
+    link: "/final-settlement-configuration",
+    descriptionEn: "Enhanced Final Settlement: added options in Settlement Type Configuration to choose between Year Basis and Day Basis for calculations, along with a toggle to count the present day. When Day Basis is selected, the configuration table dynamically updates from Year/Month/Day columns to a single Min. Service Days field, and the engine evaluates tiers accordingly.",
+    descriptionBn: "ফাইনাল সেটেলমেন্টের হিসাব আরো উন্নত করা হয়েছে: সেটেলমেন্ট পলিসি কনফিগারেশনে বছর ভিত্তিক (Year Basis) বা দিন ভিত্তিক (Day Basis) হিসাব এবং বর্তমান দিন যুক্ত করার টগল যোগ করা হয়েছে। ডে বেসিস সিলেক্ট করলে কনফিগারেশন টেবিলটি বছর/মাস/দিনের কলাম থেকে পরিবর্তিত হয়ে শুধু 'Min. Service Days' ইনপুটে রূপান্তর হয়।",
+  },
+  {
     id: "227",
     date: new Date().toISOString().slice(0, 16),
     type: "UI / UX",
