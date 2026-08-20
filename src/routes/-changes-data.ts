@@ -2197,4 +2197,13 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     descriptionEn: "Redesigned the Approval Workflow and Comments sections in the Payroll Advance details view for a cleaner, more interactive experience.",
     descriptionBn: "পে-রোল অ্যাডভান্স ডিটেইলস ভিউতে অ্যাপ্রুভাল ওয়ার্কফ্লো এবং কমেন্টস সেকশনের ডিজাইন আরও সুন্দর এবং ইন্টারঅ্যাক্টিভ করা হয়েছে।",
   },
+  {
+    id: "225",
+    date: "2026-08-20T10:53",
+    type: "Design Update",
+    module: "Advance Approval",
+    link: "/approve-advance",
+    descriptionEn: "Copied the detailed requisition view modal from Payroll Advance to the Advance Approval page for a consistent and improved approval experience.",
+    descriptionBn: "পে-রোল অ্যাডভান্স থেকে বিস্তারিত রিকুইজিশন ভিউ মোডালটি অ্যাডভান্স অ্যাপ্রুভাল পেজে কপি করা হয়েছে, যাতে অ্যাপ্রুভালের অভিজ্ঞতা আরও ভালো এবং সামঞ্জস্যপূর্ণ হয়।",
+  },
 ];
