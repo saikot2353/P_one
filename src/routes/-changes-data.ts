@@ -2179,4 +2179,22 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     descriptionEn: "Added the Advanced Report Actions accordion to the Monthly Salary Process page, enabling dynamic smart printing for processed salary records directly in Pay Slip templates (English & Bangla) precisely matching single-column A4 format.",
     descriptionBn: "Monthly Salary Process পেজে Advanced Report Actions অপশন যোগ করা হয়েছে, যার মাধ্যমে প্রসেস করা স্যালারি রেকর্ডগুলো থেকে সরাসরি Pay Slip (ইংরেজি ও বাংলা) প্রিন্ট করা যাবে, যা সিঙ্গেল-কলাম A4 ফরম্যাটে সাজানো হয়েছে।",
   },
+  {
+    id: "191",
+    date: "2026-08-20T10:23",
+    type: "Feature Update",
+    module: "Payroll Advance",
+    link: "/payroll-advance",
+    descriptionEn: "Added detailed requisition view modal mimicking the salary advance requisition layout. Allows comprehensive view of employee info, requested amount, advance history, and multi-level approval workflows.",
+    descriptionBn: "Payroll Advance-এ বিস্তারিত রিকুইজিশন ভিউ মোডাল যুক্ত করা হয়েছে, যেখানে এমপ্লয়ির তথ্য, হিস্ট্রি এবং অ্যাপ্রুভাল ওয়ার্কফ্লো দেখা যায়।",
+  },
+  {
+    id: "224",
+    date: "2026-08-20T10:35",
+    type: "Design Update",
+    module: "Payroll Advance",
+    link: "/payroll-advance",
+    descriptionEn: "Redesigned the Approval Workflow and Comments sections in the Payroll Advance details view for a cleaner, more interactive experience.",
+    descriptionBn: "পে-রোল অ্যাডভান্স ডিটেইলস ভিউতে অ্যাপ্রুভাল ওয়ার্কফ্লো এবং কমেন্টস সেকশনের ডিজাইন আরও সুন্দর এবং ইন্টারঅ্যাক্টিভ করা হয়েছে।",
+  },
 ];
