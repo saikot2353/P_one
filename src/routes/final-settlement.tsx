@@ -848,23 +848,34 @@ const MOCK_EMPLOYEES: Record<string, MockEmployee> = {
 // Tiers are sorted descending by Y/M/D — the first tier whose minimum is ≤
 // the employee's service period wins.
 function getCompDaysFromTiers(
-  tiers: Array<{ minYear: number; minMonth: number; minDay: number; daysPerYear: number }>,
+  tiers: Array<{ minYear: number; minMonth: number; minDay: number; daysPerYear: number; minServiceDays?: number }>,
   y: number,
   m: number,
-  d: number
+  d: number,
+  basis: "year" | "day" = "year"
 ): number {
   if (!tiers || tiers.length === 0) return 0;
-  const sorted = [...tiers].sort((a, b) => {
-    if (b.minYear !== a.minYear) return b.minYear - a.minYear;
-    if (b.minMonth !== a.minMonth) return b.minMonth - a.minMonth;
-    return b.minDay - a.minDay;
-  });
-  for (const tier of sorted) {
-    const empTotal  = y * 366 + m * 31 + d;
-    const tierTotal = tier.minYear * 366 + tier.minMonth * 31 + tier.minDay;
-    if (empTotal >= tierTotal) return tier.daysPerYear;
+  
+  if (basis === "day") {
+    const sorted = [...tiers].sort((a, b) => (b.minServiceDays ?? 0) - (a.minServiceDays ?? 0));
+    const empTotalDays = y * 365 + m * 30 + d;
+    for (const tier of sorted) {
+      if (empTotalDays >= (tier.minServiceDays ?? 0)) return tier.daysPerYear;
+    }
+    return 0;
+  } else {
+    const sorted = [...tiers].sort((a, b) => {
+      if (b.minYear !== a.minYear) return b.minYear - a.minYear;
+      if (b.minMonth !== a.minMonth) return b.minMonth - a.minMonth;
+      return b.minDay - a.minDay;
+    });
+    for (const tier of sorted) {
+      const empTotal  = y * 366 + m * 31 + d;
+      const tierTotal = tier.minYear * 366 + tier.minMonth * 31 + tier.minDay;
+      if (empTotal >= tierTotal) return tier.daysPerYear;
+    }
+    return 0;
   }
-  return 0;
 }
 
 // ─── Main Component ────────────────────────────────────────────────────────────
@@ -884,9 +895,20 @@ function FinalSettlementPage() {
   useEffect(() => {
     const stored = localStorage.getItem("fs_settlement_types_v4");
     if (stored) {
-      setSettlementPolicies(JSON.parse(stored));
+      const parsed = JSON.parse(stored).map((p: any) => ({
+        ...p,
+        calculationBasis: p.calculationBasis || "year",
+        countPresentDay: p.countPresentDay !== undefined ? p.countPresentDay : false,
+      }));
+      setSettlementPolicies(parsed);
     } else {
-      localStorage.setItem("fs_settlement_types_v4", JSON.stringify(defaultSettlementPolicies));
+      const initialized = defaultSettlementPolicies.map((p: any) => ({
+        ...p,
+        calculationBasis: "year",
+        countPresentDay: false,
+      }));
+      setSettlementPolicies(initialized);
+      localStorage.setItem("fs_settlement_types_v4", JSON.stringify(initialized));
     }
   }, []);
 
@@ -951,6 +973,10 @@ function FinalSettlementPage() {
   const [compensationRemarks, setCompensationRemarks] = useState("");
   const [netPayment, setNetPayment] = useState("");
   const [comments, setComments] = useState("");
+
+  const activePolicy = settlementPolicies.find(p => p.name === settlementType);
+  const calculationBasis = activePolicy?.calculationBasis ?? "year";
+  const countPresentDay = activePolicy?.countPresentDay ?? false;
 
   // Accordion states
   const [showSalaryInfo, setShowSalaryInfo] = useState(true);
@@ -1049,10 +1075,19 @@ function FinalSettlementPage() {
     const loadPolicy = settlementPolicies.find(p => p.name === mappedSettleType);
     const _sbCompDays = getCompDaysFromTiers(
       loadPolicy?.compensationTiers ?? [],
-      _sbY, _sbM, _sbD
+      _sbY, _sbM, _sbD,
+      loadPolicy?.calculationBasis ?? "year"
     );
     setPayableDaysPerYear(_sbCompDays.toString());
-    const sbPay = _sbCompDays > 0 ? _sbY * _sbCompDays * _sbDailyRate : 0;
+    let sbPay = 0;
+    if (_sbCompDays > 0) {
+      if ((loadPolicy?.calculationBasis ?? "year") === "year") {
+        sbPay = _sbY * _sbCompDays * _sbDailyRate;
+      } else {
+        const totalDays = (_sbY * 365) + (_sbM * 30) + _sbD;
+        sbPay = (totalDays / 365) * _sbCompDays * _sbDailyRate;
+      }
+    }
     setServiceBenefitTotal(sbPay.toFixed(2));
     
     setPfAmount(targetEmp.pfAmount);
@@ -1188,18 +1223,39 @@ function FinalSettlementPage() {
     let compDays = 0;
     
     if (showServiceBenefitInfo && policy.isCompensationApplicable) {
-      const sbY = Number(serviceBenefitYear) || 0;
-      const sbM = Number(serviceBenefitMonth) || 0;
-      const sbD = Number(serviceBenefitDay) || 0;
+      let sbY = Number(serviceBenefitYear) || 0;
+      let sbM = Number(serviceBenefitMonth) || 0;
+      let sbD = Number(serviceBenefitDay) || 0;
+
+      // Adjust tenure for present day if option is enabled
+      if (countPresentDay) {
+        sbD += 1;
+        if (sbD >= 30) {
+          sbD -= 30;
+          sbM += 1;
+          if (sbM >= 12) {
+            sbM -= 12;
+            sbY += 1;
+          }
+        }
+      }
+
       const totalMonths = sbY * 12 + sbM;
       
       if (totalMonths >= policy.minServiceMonthsForCompensation) {
         compDays = getCompDaysFromTiers(
           policy?.compensationTiers ?? [],
-          sbY, sbM, sbD
+          sbY, sbM, sbD,
+          calculationBasis
         );
         if (compDays > 0) {
-          finalServiceBenefitTotal = sbY * compDays * dailyRate;
+          if (calculationBasis === "year") {
+            finalServiceBenefitTotal = sbY * compDays * dailyRate;
+          } else {
+            // Day basis calculation: (totalDays / 365) * compDays * dailyRate
+            const totalDays = (sbY * 365) + (sbM * 30) + sbD;
+            finalServiceBenefitTotal = (totalDays / 365) * compDays * dailyRate;
+          }
         }
         setPayableDaysPerYear(compDays.toString());
         setServiceBenefitTotal(finalServiceBenefitTotal.toFixed(2));
@@ -1264,7 +1320,7 @@ function FinalSettlementPage() {
     if (calculated) {
       handleCalculate();
     }
-  }, [showSalaryInfo, showEarnLeaveInfo, showServiceBenefitInfo, showCompensationInfo, showDeductionInfo]);
+  }, [showSalaryInfo, showEarnLeaveInfo, showServiceBenefitInfo, showCompensationInfo, showDeductionInfo, settlementType, calculationBasis, countPresentDay]);
 
   return (
     <div className="min-h-screen flex bg-background text-foreground">
@@ -1891,14 +1947,34 @@ function FinalSettlementPage() {
 
                   {showServiceBenefitInfo && (
                     <div className="space-y-4 animate-fadeIn">
-                      <div className="flex flex-wrap items-center justify-between gap-4 mb-5 p-4 bg-muted/20 border border-border/40 rounded-lg">
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">Calculated Service Tenure</span>
-                          <div className="inline-flex items-center px-3 py-1 bg-blue-500/10 text-blue-600 rounded text-xs font-bold border border-blue-500/20 shadow-sm">
-                            {empLoaded && emp.tenure ? emp.tenure : "—"}
+                      <div className="flex flex-wrap items-end justify-between gap-4 mb-5 p-4 bg-muted/20 border border-border/40 rounded-lg">
+                        <div className="flex flex-wrap items-end gap-5">
+                          <div className="space-y-1">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">Calculated Service Tenure</span>
+                            <div className="inline-flex items-center px-3 py-1 bg-blue-500/10 text-blue-600 rounded text-xs font-bold border border-blue-500/20 shadow-sm h-8">
+                              {empLoaded && emp.tenure ? emp.tenure : "—"}
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">Calculation Basis</span>
+                            <div className="inline-flex items-center px-3 py-1 bg-muted border border-border/60 text-muted-foreground rounded text-[11px] font-semibold h-8 capitalize">
+                              {calculationBasis} Basis
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">Count Present Day</span>
+                            <div className="inline-flex items-center px-3 py-1 bg-muted border border-border/60 text-muted-foreground rounded text-[11px] font-semibold h-8">
+                              {countPresentDay ? "Yes" : "No"}
+                            </div>
                           </div>
                         </div>
-                        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-[10px] font-bold uppercase transition-all tracking-wider shadow-sm flex items-center gap-1.5 cursor-pointer">
+
+                        <button 
+                          onClick={handleCalculate}
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-[10px] font-bold uppercase transition-all tracking-wider shadow-sm flex items-center gap-1.5 cursor-pointer h-8"
+                        >
                           <RefreshCw className="size-3.5" />
                           Generate Benefit
                         </button>
@@ -1906,17 +1982,29 @@ function FinalSettlementPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                         <div className="flex items-center justify-between p-3.5 rounded-lg bg-blue-500/5 border border-blue-500/10 shadow-sm">
                           <div className="space-y-0.5">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600">Calculated Service Period</span>
-                            <p className="text-[10.5px] text-muted-foreground font-medium">Completed service benefit years (Y / M / D)</p>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600">
+                              {calculationBasis === "year" ? "Calculated Service Period" : "Calculated Service Days"}
+                            </span>
+                            <p className="text-[10.5px] text-muted-foreground font-medium">
+                              {calculationBasis === "year" ? "Completed service benefit tenure" : "Completed service benefit days"}
+                            </p>
                           </div>
                           <span className="text-sm font-extrabold text-foreground font-mono bg-background border border-border/50 px-3 py-1 rounded shadow-sm">
-                            {empLoaded ? `${serviceBenefitYear}Y ${serviceBenefitMonth}M ${serviceBenefitDay}D` : "—"}
+                            {empLoaded ? (
+                              calculationBasis === "year"
+                                ? `${serviceBenefitYear}Y ${serviceBenefitMonth}M ${serviceBenefitDay}D`
+                                : `${(Number(serviceBenefitYear) * 365 + Number(serviceBenefitMonth) * 30 + Number(serviceBenefitDay) + (countPresentDay ? 1 : 0))} Days`
+                            ) : "—"}
                           </span>
                         </div>
                         <div className="flex items-center justify-between p-3.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 shadow-sm">
                           <div className="space-y-0.5">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Benefit Pay Amount</span>
-                            <p className="text-[10.5px] text-muted-foreground font-medium">Formula: completed years × days/year × daily rate</p>
+                            <p className="text-[10.5px] text-muted-foreground font-medium">
+                              {calculationBasis === "year" 
+                                ? "Formula: completed years × days/year × daily rate" 
+                                : "Formula: total days / 365 × days/year × daily rate"}
+                            </p>
                           </div>
                           <span className="text-sm font-extrabold text-emerald-600 font-mono bg-background border border-emerald-500/20 px-3 py-1 rounded shadow-sm">
                             ৳{empLoaded ? Number(serviceBenefitTotal).toLocaleString("en-BD", { minimumFractionDigits: 2 }) : "0.00"}
@@ -2399,7 +2487,12 @@ function FinalSettlementPage() {
                       </thead>
                       <tbody>
                         <tr>
-                          <td className="pt-2">{serviceBenefitYear}Y {serviceBenefitMonth}M {serviceBenefitDay}D</td>
+                          <td className="pt-2">
+                            {calculationBasis === "year" 
+                              ? `${serviceBenefitYear}Y ${serviceBenefitMonth}M ${serviceBenefitDay}D`
+                              : `${(Number(serviceBenefitYear) * 365 + Number(serviceBenefitMonth) * 30 + Number(serviceBenefitDay) + (countPresentDay ? 1 : 0))} Days`
+                            }
+                          </td>
                           <td className="text-right pt-2">{payableDaysPerYear}</td>
                           <td className="text-right pt-2">{serviceBenefitTotal}</td>
                         </tr>

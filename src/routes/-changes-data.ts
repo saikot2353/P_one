@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "228",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Business Logic",
+    module: "Final Settlement Configuration",
+    link: "/final-settlement-configuration",
+    descriptionEn: "Enhanced Final Settlement: added options in Settlement Type Configuration to choose between Year Basis and Day Basis for service benefit/compensation calculations, along with a toggle to count/include the present day in the service period. The processing page automatically applies these configured rules based on the selected type.",
+    descriptionBn: "ফাইনাল সেটেলমেন্টের হিসাব আরো উন্নত করা হয়েছে: সেটেলমেন্ট পলিসি কনফিগারেশনে সার্ভিস বেনিফিটের জন্য বছর ভিত্তিক (Year Basis) অথবা দিন ভিত্তিক (Day Basis) হিসাব নির্ধারণ করার সুযোগ রাখা হয়েছে, এবং সার্ভিস পিরিয়ডে বর্তমান দিন অন্তর্ভুক্ত করার জন্য একটি টগল বাটন যোগ করা হয়েছে। ফাইনাল সেটেলমেন্ট পেজে টাইপ সিলেক্ট করলে এটি স্বয়ংক্রিয়ভাবে কাজ করে।",
+  },
+  {
     id: "227",
     date: new Date().toISOString().slice(0, 16),
     type: "UI / UX",
