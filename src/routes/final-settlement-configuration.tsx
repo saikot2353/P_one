@@ -35,31 +35,35 @@ const TABS = [
 // Type Definitions
 // ─────────────────────────────────────────────────────────────────────────────
 
+export type CompensationTier = {
+  minYear: number;   // completed full years  (≥)
+  minMonth: number;  // additional months after full years (≥)
+  minDay: number;    // additional days after months (≥)
+  daysPerYear: number; // payable days per year for this tier
+};
+
 export type SettlementTypePolicy = {
   id: string;
   name: string;
   legalReference: string;           // e.g. "Section 27, BLA 2006"
   description: string;              // Plain-language description
-  noticePeriodDays: number;         // Notice period in days (employer gives to worker, or worker gives)
-  noticePaidByEmployer: boolean;    // Employer pays wages in lieu of notice (Termination)
-  noticeDeductedFromEmployee: boolean; // Worker must pay wages in lieu if notice not served (Resignation)
-  // Compensation (from base wages per year of service, or gratuity - whichever is higher)
-  compensationDaysPerYear_3yrs: number;       // Days per year for 3+ years service
-  compensationDaysPerYear_5yrs: number;       // Days per year for 5+ years service
-  compensationDaysPerYear_below10yrs: number; // Days per year for <10 years service
-  compensationDaysPerYear_above10yrs: number; // Days per year for >=10 years service (gratuity also uses this)
-  minServiceMonthsForCompensation: number;    // Min months before compensation is applicable
-  isCompensationApplicable: boolean;          // Is any compensation applicable at all?
+  noticePeriodDays: number;         // Notice period in days
+  noticePaidByEmployer: boolean;
+  noticeDeductedFromEmployee: boolean;
+  // Compensation tiers: ordered lowest-to-highest (first matching tier wins)
+  compensationTiers: CompensationTier[];
+  minServiceMonthsForCompensation: number;
+  isCompensationApplicable: boolean;
   // Leave
-  earnedLeaveEncashable: boolean;             // Encash unused annual leave (Section 11)
+  earnedLeaveEncashable: boolean;
   // Gratuity
-  isGratuityApplicable: boolean;              // Gratuity eligibility (Section 2(10))
-  minServiceMonthsForGratuity: number;        // Minimum service for gratuity (6 months = 1 year under 14)
+  isGratuityApplicable: boolean;
+  minServiceMonthsForGratuity: number;
   // Provident Fund
-  isProvidentFundPayable: boolean;            // Section 29 — PF always payable regardless of reason
+  isProvidentFundPayable: boolean;
   // Special flags
-  isMisconductBased: boolean;                 // True for Dismissal, Removal (impacts eligibility)
-  isDeathCase: boolean;                       // For Death in Service special handling
+  isMisconductBased: boolean;
+  isDeathCase: boolean;
 };
 
 export type NoticePeriodPolicy = {
@@ -92,11 +96,18 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     noticePeriodDays: 60,
     noticePaidByEmployer: false,
     noticeDeductedFromEmployee: true,
-    compensationDaysPerYear_3yrs: 0,          // 3+ years: not eligible for resignation comp
-    compensationDaysPerYear_5yrs: 14,        // 5+ years: 14 days/year (Section 27(4)(a))
-    compensationDaysPerYear_below10yrs: 14,  // 5–<10 years: 14 days/year
-    compensationDaysPerYear_above10yrs: 30,  // ≥10 years: 30 days/year
-    minServiceMonthsForCompensation: 60,     // 5 years minimum (Section 27(4)(a))
+    compensationTiers: [
+      { minYear: 2, minMonth: 11, minDay: 30, daysPerYear: 7 },
+      { minYear: 3, minMonth: 0,  minDay: 0,  daysPerYear: 7 },
+      { minYear: 3, minMonth: 11, minDay: 0,  daysPerYear: 7 },
+      { minYear: 3, minMonth: 11, minDay: 30, daysPerYear: 15 },
+      { minYear: 4, minMonth: 0,  minDay: 0,  daysPerYear: 15 },
+      { minYear: 9, minMonth: 0,  minDay: 0,  daysPerYear: 15 },
+      { minYear: 9, minMonth: 11, minDay: 0,  daysPerYear: 15 },
+      { minYear: 9, minMonth: 11, minDay: 30, daysPerYear: 30 },
+      { minYear: 10, minMonth: 0, minDay: 0,  daysPerYear: 30 },
+    ],
+    minServiceMonthsForCompensation: 35, // 2Y 11M minimum
     isCompensationApplicable: true,
     earnedLeaveEncashable: true,
     isGratuityApplicable: true,
@@ -109,14 +120,14 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     id: "2",
     name: "Termination by Employer",
     legalReference: "Section 26, BLA 2006",
-    description: "Employer terminates a permanent worker. Must give 120-day notice (monthly rated) or pay in lieu. Compensation: 30 days' wages per year.",
+    description: "Employer terminates a permanent worker. Must give 120-day notice (monthly rated) or pay in lieu. Compensation: 30 days\u2019 wages per year.",
     noticePeriodDays: 120,
     noticePaidByEmployer: true,
     noticeDeductedFromEmployee: false,
-    compensationDaysPerYear_3yrs: 30,
-    compensationDaysPerYear_5yrs: 30,
-    compensationDaysPerYear_below10yrs: 30,
-    compensationDaysPerYear_above10yrs: 45,  // Gratuity rate for >10 yrs (Section 2(10))
+    compensationTiers: [
+      { minYear: 1, minMonth: 0, minDay: 0, daysPerYear: 30 },
+      { minYear: 10, minMonth: 0, minDay: 0, daysPerYear: 45 },
+    ],
     minServiceMonthsForCompensation: 12,
     isCompensationApplicable: true,
     earnedLeaveEncashable: true,
@@ -130,14 +141,14 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     id: "3",
     name: "Retrenchment",
     legalReference: "Section 20, BLA 2006",
-    description: "Employer retrenches on grounds of redundancy. Must give 1-month notice or pay in lieu. 30 days' wages per completed year or gratuity.",
+    description: "Employer retrenches on grounds of redundancy. Must give 1-month notice or pay in lieu. 30 days\u2019 wages per completed year or gratuity.",
     noticePeriodDays: 30,
     noticePaidByEmployer: true,
     noticeDeductedFromEmployee: false,
-    compensationDaysPerYear_3yrs: 30,
-    compensationDaysPerYear_5yrs: 30,
-    compensationDaysPerYear_below10yrs: 30,
-    compensationDaysPerYear_above10yrs: 45,
+    compensationTiers: [
+      { minYear: 1, minMonth: 0, minDay: 0, daysPerYear: 30 },
+      { minYear: 10, minMonth: 0, minDay: 0, daysPerYear: 45 },
+    ],
     minServiceMonthsForCompensation: 12,
     isCompensationApplicable: true,
     earnedLeaveEncashable: true,
@@ -151,14 +162,14 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     id: "4",
     name: "Discharge",
     legalReference: "Section 22, BLA 2006",
-    description: "Worker discharged for physical/mental incapacity or continued ill-health (certified by a registered medical practitioner). 30 days' wages per year or gratuity.",
+    description: "Worker discharged for physical/mental incapacity or continued ill-health. 30 days\u2019 wages per year or gratuity.",
     noticePeriodDays: 0,
     noticePaidByEmployer: false,
     noticeDeductedFromEmployee: false,
-    compensationDaysPerYear_3yrs: 30,
-    compensationDaysPerYear_5yrs: 30,
-    compensationDaysPerYear_below10yrs: 30,
-    compensationDaysPerYear_above10yrs: 45,
+    compensationTiers: [
+      { minYear: 1, minMonth: 0, minDay: 0, daysPerYear: 30 },
+      { minYear: 10, minMonth: 0, minDay: 0, daysPerYear: 45 },
+    ],
     minServiceMonthsForCompensation: 12,
     isCompensationApplicable: true,
     earnedLeaveEncashable: true,
@@ -172,20 +183,19 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     id: "5",
     name: "Dismissal (Misconduct)",
     legalReference: "Section 23(1)(b) & 23(3), BLA 2006",
-    description: "Worker dismissed for misconduct after proper enquiry. Compensation is 15 days/year UNLESS dismissed for theft, fraud, arson or riot (Section 23(4)(b) & (g)) — in which case NO compensation.",
+    description: "Worker dismissed for misconduct after proper enquiry. Compensation is 15 days/year UNLESS dismissed for theft, fraud, arson or riot.",
     noticePeriodDays: 0,
     noticePaidByEmployer: false,
     noticeDeductedFromEmployee: false,
-    compensationDaysPerYear_3yrs: 15,
-    compensationDaysPerYear_5yrs: 15,
-    compensationDaysPerYear_below10yrs: 15,  // Section 23(3) — 15 days/year
-    compensationDaysPerYear_above10yrs: 15,  // No higher tier for misconduct
+    compensationTiers: [
+      { minYear: 1, minMonth: 0, minDay: 0, daysPerYear: 15 },
+    ],
     minServiceMonthsForCompensation: 12,
-    isCompensationApplicable: true,          // HR can toggle this off for serious offences
-    earnedLeaveEncashable: true,             // Other lawful dues still paid (Section 23(3) proviso)
-    isGratuityApplicable: false,             // No gratuity for dismissed
+    isCompensationApplicable: true,
+    earnedLeaveEncashable: true,
+    isGratuityApplicable: false,
     minServiceMonthsForGratuity: 0,
-    isProvidentFundPayable: true,            // Section 29 — PF always payable
+    isProvidentFundPayable: true,
     isMisconductBased: true,
     isDeathCase: false,
   },
@@ -193,14 +203,13 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     id: "6",
     name: "Removal (Minor Punishment)",
     legalReference: "Section 23(2)(a), BLA 2006",
-    description: "Worker removed as a lighter punishment for misconduct (instead of dismissal). Compensation: 15 days/year under Section 23(3). Other dues remain payable.",
+    description: "Worker removed as a lighter punishment for misconduct. Compensation: 15 days/year under Section 23(3).",
     noticePeriodDays: 0,
     noticePaidByEmployer: false,
     noticeDeductedFromEmployee: false,
-    compensationDaysPerYear_3yrs: 15,
-    compensationDaysPerYear_5yrs: 15,
-    compensationDaysPerYear_below10yrs: 15,
-    compensationDaysPerYear_above10yrs: 15,
+    compensationTiers: [
+      { minYear: 1, minMonth: 0, minDay: 0, daysPerYear: 15 },
+    ],
     minServiceMonthsForCompensation: 12,
     isCompensationApplicable: true,
     earnedLeaveEncashable: true,
@@ -214,14 +223,14 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     id: "7",
     name: "Retirement (Age-Based)",
     legalReference: "Section 28, BLA 2006",
-    description: "Worker retires upon reaching 60 years of age (Section 28(1)). Entitled to full dues as per Section 26(4) or applicable service rules — i.e., 30 days/year (or 45 if gratuity is higher).",
+    description: "Worker retires upon reaching 60 years of age. Entitled to 30 days/year (<10 yrs) or 45 days/year (\u226510 yrs).",
     noticePeriodDays: 0,
     noticePaidByEmployer: false,
     noticeDeductedFromEmployee: false,
-    compensationDaysPerYear_3yrs: 30,
-    compensationDaysPerYear_5yrs: 30,
-    compensationDaysPerYear_below10yrs: 30,
-    compensationDaysPerYear_above10yrs: 45,
+    compensationTiers: [
+      { minYear: 1, minMonth: 0, minDay: 0, daysPerYear: 30 },
+      { minYear: 10, minMonth: 0, minDay: 0, daysPerYear: 45 },
+    ],
     minServiceMonthsForCompensation: 12,
     isCompensationApplicable: true,
     earnedLeaveEncashable: true,
@@ -235,15 +244,15 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     id: "8",
     name: "Voluntary Retirement (25 Yrs Service)",
     legalReference: "Section 2(1), BLA 2006",
-    description: "Worker voluntarily retires after completing 25 years of continuous service. Deemed 'retirement' under Section 2(1) and entitled to full retirement benefits as per Section 28(3).",
+    description: "Worker voluntarily retires after completing 25 years of continuous service.",
     noticePeriodDays: 0,
     noticePaidByEmployer: false,
     noticeDeductedFromEmployee: false,
-    compensationDaysPerYear_3yrs: 30,
-    compensationDaysPerYear_5yrs: 30,
-    compensationDaysPerYear_below10yrs: 30,
-    compensationDaysPerYear_above10yrs: 45,
-    minServiceMonthsForCompensation: 300,    // 25 years = 300 months
+    compensationTiers: [
+      { minYear: 25, minMonth: 0, minDay: 0, daysPerYear: 30 },
+      { minYear: 35, minMonth: 0, minDay: 0, daysPerYear: 45 },
+    ],
+    minServiceMonthsForCompensation: 300,
     isCompensationApplicable: true,
     earnedLeaveEncashable: true,
     isGratuityApplicable: true,
@@ -256,15 +265,15 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     id: "9",
     name: "Death in Service",
     legalReference: "Section 19, BLA 2006 (Amended 2013)",
-    description: "Worker dies during service (must have 2+ years of continuous service). Compensation: 30 days/year (or 45 days/year if death occurred at the workplace or due to a work accident). Paid to nominee or legal dependent. Plus retirement benefit that would have been due.",
+    description: "Worker dies during service (must have 2+ years). 30 days/year (off-premises) or 45 days/year (on-site/accident).",
     noticePeriodDays: 0,
     noticePaidByEmployer: false,
     noticeDeductedFromEmployee: false,
-    compensationDaysPerYear_3yrs: 30,
-    compensationDaysPerYear_5yrs: 30,
-    compensationDaysPerYear_below10yrs: 30,  // Standard: 30 days/year (Section 19)
-    compensationDaysPerYear_above10yrs: 45,  // On-site/accident death: 45 days/year (Section 19)
-    minServiceMonthsForCompensation: 24,     // 2 years minimum (Section 19)
+    compensationTiers: [
+      { minYear: 2, minMonth: 0, minDay: 0, daysPerYear: 30 },
+      { minYear: 10, minMonth: 0, minDay: 0, daysPerYear: 45 },
+    ],
+    minServiceMonthsForCompensation: 24,
     isCompensationApplicable: true,
     earnedLeaveEncashable: true,
     isGratuityApplicable: true,
@@ -277,20 +286,17 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     id: "10",
     name: "Absconding / Abandonment",
     legalReference: "Section 27(3A), BLA 2006 (Amended 2013)",
-    description: "Worker absent >10 days without notice/permission. Employer issues show-cause, gives 10+7 days to respond. If no response, worker is 'released from service' from the date of absence — treated as resignation without notice pay/compensation.",
+    description: "Worker absent >10 days without notice/permission. Treated as resignation — no notice pay/compensation.",
     noticePeriodDays: 0,
     noticePaidByEmployer: false,
     noticeDeductedFromEmployee: false,
-    compensationDaysPerYear_3yrs: 0,
-    compensationDaysPerYear_5yrs: 0,
-    compensationDaysPerYear_below10yrs: 0,   // No compensation for abandonment
-    compensationDaysPerYear_above10yrs: 0,
+    compensationTiers: [],
     minServiceMonthsForCompensation: 0,
     isCompensationApplicable: false,
-    earnedLeaveEncashable: true,             // Other lawful dues still payable
+    earnedLeaveEncashable: true,
     isGratuityApplicable: false,
     minServiceMonthsForGratuity: 0,
-    isProvidentFundPayable: true,            // PF always payable (Section 29)
+    isProvidentFundPayable: true,
     isMisconductBased: false,
     isDeathCase: false,
   },
@@ -298,14 +304,11 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     id: "11",
     name: "Contract Expiry",
     legalReference: "Section 4(5), BLA 2006",
-    description: "Temporary worker's fixed-term contract expires. If not renewed, no notice or termination compensation is required (as the work itself is temporary in nature). Earned leave and PF dues are still payable.",
+    description: "Temporary worker\u2019s fixed-term contract expires. No notice or termination compensation. EL and PF dues payable.",
     noticePeriodDays: 0,
     noticePaidByEmployer: false,
     noticeDeductedFromEmployee: false,
-    compensationDaysPerYear_3yrs: 0,
-    compensationDaysPerYear_5yrs: 0,
-    compensationDaysPerYear_below10yrs: 0,
-    compensationDaysPerYear_above10yrs: 0,
+    compensationTiers: [],
     minServiceMonthsForCompensation: 0,
     isCompensationApplicable: false,
     earnedLeaveEncashable: true,
@@ -319,14 +322,14 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     id: "12",
     name: "Mutual Separation",
     legalReference: "As per mutual agreement / Company Policy",
-    description: "Employment ends by mutual agreement between employer and worker. Terms are typically negotiated; at minimum all statutory dues (gratuity, PF, leave encashment) must be paid.",
+    description: "Employment ends by mutual agreement. At minimum all statutory dues must be paid.",
     noticePeriodDays: 0,
     noticePaidByEmployer: false,
     noticeDeductedFromEmployee: false,
-    compensationDaysPerYear_3yrs: 30,
-    compensationDaysPerYear_5yrs: 30,
-    compensationDaysPerYear_below10yrs: 30,  // At minimum as per agreement
-    compensationDaysPerYear_above10yrs: 45,
+    compensationTiers: [
+      { minYear: 1, minMonth: 0, minDay: 0, daysPerYear: 30 },
+      { minYear: 10, minMonth: 0, minDay: 0, daysPerYear: 45 },
+    ],
     minServiceMonthsForCompensation: 12,
     isCompensationApplicable: true,
     earnedLeaveEncashable: true,
@@ -382,11 +385,11 @@ function FinalSettlementConfigPage() {
   const [editingService, setEditingService] = useState<ServicePeriodPolicy | null>(null);
 
   useEffect(() => {
-    const storedTypes = localStorage.getItem("fs_settlement_types_v3");
+    const storedTypes = localStorage.getItem("fs_settlement_types_v4");
     if (storedTypes) {
       setSettlementTypes(JSON.parse(storedTypes));
     } else {
-      localStorage.setItem("fs_settlement_types_v3", JSON.stringify(defaultSettlementPolicies));
+      localStorage.setItem("fs_settlement_types_v4", JSON.stringify(defaultSettlementPolicies));
     }
 
     const storedNotice = localStorage.getItem("fs_notice_policies");
@@ -416,7 +419,7 @@ function FinalSettlementConfigPage() {
       : [...settlementTypes, { ...editingType, id: Date.now().toString() }];
     
     setSettlementTypes(updated);
-    localStorage.setItem("fs_settlement_types_v3", JSON.stringify(updated));
+    localStorage.setItem("fs_settlement_types_v4", JSON.stringify(updated));
     setIsTypeModalOpen(false);
     setEditingType(null);
   };
@@ -424,7 +427,7 @@ function FinalSettlementConfigPage() {
   const handleDeleteType = (id: string) => {
     const updated = settlementTypes.filter((t) => t.id !== id);
     setSettlementTypes(updated);
-    localStorage.setItem("fs_settlement_types_v3", JSON.stringify(updated));
+    localStorage.setItem("fs_settlement_types_v4", JSON.stringify(updated));
   };
 
   const handleSaveNoticePolicy = (e: React.FormEvent<HTMLFormElement>) => {
@@ -603,7 +606,7 @@ function FinalSettlementConfigPage() {
                   </div>
                   <Button
                     onClick={() => {
-                      setEditingType({ id: "", name: "", legalReference: "", description: "", noticePeriodDays: 0, noticePaidByEmployer: false, noticeDeductedFromEmployee: false, compensationDaysPerYear_3yrs: 30, compensationDaysPerYear_5yrs: 30, compensationDaysPerYear_below10yrs: 30, compensationDaysPerYear_above10yrs: 45, minServiceMonthsForCompensation: 12, isCompensationApplicable: true, earnedLeaveEncashable: true, isGratuityApplicable: true, minServiceMonthsForGratuity: 6, isProvidentFundPayable: true, isMisconductBased: false, isDeathCase: false });
+                      setEditingType({ id: "", name: "", legalReference: "", description: "", noticePeriodDays: 0, noticePaidByEmployer: false, noticeDeductedFromEmployee: false, compensationTiers: [{ minYear: 1, minMonth: 0, minDay: 0, daysPerYear: 30 }], minServiceMonthsForCompensation: 12, isCompensationApplicable: true, earnedLeaveEncashable: true, isGratuityApplicable: true, minServiceMonthsForGratuity: 6, isProvidentFundPayable: true, isMisconductBased: false, isDeathCase: false });
                       setIsTypeModalOpen(true);
                     }}
                     className="h-10 px-5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/95 font-semibold text-sm flex items-center gap-2 cursor-pointer transition-all"
@@ -636,12 +639,14 @@ function FinalSettlementConfigPage() {
                             {type.noticePeriodDays} Days
                           </td>
                           <td className="px-5 py-4 whitespace-nowrap">
-                            {type.isCompensationApplicable ? (
-                              <div className="flex flex-col gap-1 items-center font-semibold text-[9px]">
-                                <span className="bg-muted border border-border/60 px-2 py-0.5 rounded text-foreground block w-full text-center">3yr+: <strong>{type.compensationDaysPerYear_3yrs ?? 0}d</strong></span>
-                                <span className="bg-muted border border-border/60 px-2 py-0.5 rounded text-foreground block w-full text-center">5yr+: <strong>{type.compensationDaysPerYear_5yrs ?? 0}d</strong></span>
-                                <span className="bg-muted border border-border/60 px-2 py-0.5 rounded text-foreground block w-full text-center">&lt;10yr: <strong>{type.compensationDaysPerYear_below10yrs ?? 0}d</strong></span>
-                                <span className="bg-muted border border-border/60 px-2 py-0.5 rounded text-foreground block w-full text-center">&ge;10yr: <strong>{type.compensationDaysPerYear_above10yrs ?? 0}d</strong></span>
+                            {type.isCompensationApplicable && (type.compensationTiers ?? []).length > 0 ? (
+                              <div className="flex flex-col gap-1 font-mono text-[9px]">
+                                {(type.compensationTiers ?? []).map((tier, ti) => (
+                                  <span key={ti} className="bg-muted border border-border/60 px-2 py-0.5 rounded text-foreground flex items-center justify-between gap-2">
+                                    <span className="text-muted-foreground">{tier.minYear}Y {tier.minMonth}M {tier.minDay}D+</span>
+                                    <strong>{tier.daysPerYear}d</strong>
+                                  </span>
+                                ))}
                               </div>
                             ) : (
                               <div className="text-center">
@@ -850,49 +855,9 @@ function FinalSettlementConfigPage() {
                       <div className="size-1.5 rounded-full bg-blue-500"></div>
                       <span className="text-[11px] font-extrabold uppercase tracking-widest text-blue-600/80">Compensation &amp; Gratuity</span>
                     </div>
-                    <div className="p-5">
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-5">
-                        <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                          <label className={labelClass}>Comp. Days/Year</label>
-                          <label className="text-[10px] text-muted-foreground block -mt-1">Service 3+ years</label>
-                          <input
-                            type="number" min={0}
-                            value={editingType.compensationDaysPerYear_3yrs}
-                            onChange={(e) => setEditingType({...editingType, compensationDaysPerYear_3yrs: Number(e.target.value)})}
-                            className={inputClass}
-                          />
-                        </div>
-                        <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                          <label className={labelClass}>Comp. Days/Year</label>
-                          <label className="text-[10px] text-muted-foreground block -mt-1">Service 5+ years</label>
-                          <input
-                            type="number" min={0}
-                            value={editingType.compensationDaysPerYear_5yrs}
-                            onChange={(e) => setEditingType({...editingType, compensationDaysPerYear_5yrs: Number(e.target.value)})}
-                            className={inputClass}
-                          />
-                        </div>
-                        <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                          <label className={labelClass}>Comp. Days/Year</label>
-                          <label className="text-[10px] text-muted-foreground block -mt-1">Service &lt; 10 years</label>
-                          <input
-                            type="number" min={0}
-                            value={editingType.compensationDaysPerYear_below10yrs}
-                            onChange={(e) => setEditingType({...editingType, compensationDaysPerYear_below10yrs: Number(e.target.value)})}
-                            className={inputClass}
-                          />
-                        </div>
-                        <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                          <label className={labelClass}>Comp. Days/Year</label>
-                          <label className="text-[10px] text-muted-foreground block -mt-1">Service ≥ 10 years</label>
-                          <input
-                            type="number" min={0}
-                            value={editingType.compensationDaysPerYear_above10yrs}
-                            onChange={(e) => setEditingType({...editingType, compensationDaysPerYear_above10yrs: Number(e.target.value)})}
-                            className={inputClass}
-                          />
-                        </div>
-                        <div className="space-y-1.5 col-span-2 sm:col-span-1">
+                    <div className="p-5 space-y-4">
+                      <div className="grid grid-cols-2 md:grid-cols-2 gap-4 mb-2">
+                        <div className="space-y-1.5">
                           <label className={labelClass}>Min. Service for Comp.</label>
                           <label className="text-[10px] text-muted-foreground block -mt-1">In months</label>
                           <input
@@ -902,7 +867,7 @@ function FinalSettlementConfigPage() {
                             className={inputClass}
                           />
                         </div>
-                        <div className="space-y-1.5 col-span-2 sm:col-span-1">
+                        <div className="space-y-1.5">
                           <label className={labelClass}>Min. Service for Gratuity</label>
                           <label className="text-[10px] text-muted-foreground block -mt-1">In months</label>
                           <input
@@ -912,6 +877,92 @@ function FinalSettlementConfigPage() {
                             className={inputClass}
                           />
                         </div>
+                      </div>
+
+                      {/* Dynamic compensation tiers table */}
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[11px] font-extrabold uppercase tracking-wider text-foreground/70">Compensation Tiers (Y / M / D → Days/Year)</span>
+                          <button
+                            type="button"
+                            onClick={() => setEditingType({ ...editingType, compensationTiers: [...(editingType.compensationTiers ?? []), { minYear: 0, minMonth: 0, minDay: 0, daysPerYear: 0 }] })}
+                            className="text-[10px] font-bold text-primary hover:text-primary/80 flex items-center gap-1 cursor-pointer border border-primary/30 rounded px-2 py-1 hover:bg-primary/5 transition-all"
+                          >
+                            <Plus className="size-3" /> Add Row
+                          </button>
+                        </div>
+                        <div className="overflow-x-auto border border-border/40 rounded-lg">
+                          <table className="w-full text-xs">
+                            <thead>
+                              <tr className="bg-muted/40 border-b border-border/40 text-[9px] uppercase tracking-wider font-bold text-muted-foreground">
+                                <th className="px-3 py-2 text-left">Min. Year (Y)</th>
+                                <th className="px-3 py-2 text-left">Min. Month (M)</th>
+                                <th className="px-3 py-2 text-left">Min. Day (D)</th>
+                                <th className="px-3 py-2 text-left">Days / Year</th>
+                                <th className="px-3 py-2 text-right">Remove</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border/30 bg-card">
+                              {(editingType.compensationTiers ?? []).map((tier, ti) => (
+                                <tr key={ti} className="hover:bg-muted/10">
+                                  <td className="px-3 py-1.5">
+                                    <input type="number" min={0} value={tier.minYear}
+                                      onChange={(e) => {
+                                        const tiers = [...(editingType.compensationTiers ?? [])];
+                                        tiers[ti] = { ...tiers[ti], minYear: Number(e.target.value) };
+                                        setEditingType({ ...editingType, compensationTiers: tiers });
+                                      }}
+                                      className="w-16 px-2 py-1 rounded border border-border bg-background text-xs font-mono focus:border-primary outline-none"
+                                    />
+                                  </td>
+                                  <td className="px-3 py-1.5">
+                                    <input type="number" min={0} max={11} value={tier.minMonth}
+                                      onChange={(e) => {
+                                        const tiers = [...(editingType.compensationTiers ?? [])];
+                                        tiers[ti] = { ...tiers[ti], minMonth: Number(e.target.value) };
+                                        setEditingType({ ...editingType, compensationTiers: tiers });
+                                      }}
+                                      className="w-16 px-2 py-1 rounded border border-border bg-background text-xs font-mono focus:border-primary outline-none"
+                                    />
+                                  </td>
+                                  <td className="px-3 py-1.5">
+                                    <input type="number" min={0} max={31} value={tier.minDay}
+                                      onChange={(e) => {
+                                        const tiers = [...(editingType.compensationTiers ?? [])];
+                                        tiers[ti] = { ...tiers[ti], minDay: Number(e.target.value) };
+                                        setEditingType({ ...editingType, compensationTiers: tiers });
+                                      }}
+                                      className="w-16 px-2 py-1 rounded border border-border bg-background text-xs font-mono focus:border-primary outline-none"
+                                    />
+                                  </td>
+                                  <td className="px-3 py-1.5">
+                                    <input type="number" min={0} value={tier.daysPerYear}
+                                      onChange={(e) => {
+                                        const tiers = [...(editingType.compensationTiers ?? [])];
+                                        tiers[ti] = { ...tiers[ti], daysPerYear: Number(e.target.value) };
+                                        setEditingType({ ...editingType, compensationTiers: tiers });
+                                      }}
+                                      className="w-16 px-2 py-1 rounded border border-border bg-background text-xs font-mono focus:border-primary outline-none"
+                                    />
+                                  </td>
+                                  <td className="px-3 py-1.5 text-right">
+                                    <button type="button"
+                                      onClick={() => {
+                                        const tiers = (editingType.compensationTiers ?? []).filter((_, i) => i !== ti);
+                                        setEditingType({ ...editingType, compensationTiers: tiers });
+                                      }}
+                                      className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition-all cursor-pointer"
+                                    ><Trash2 className="size-3" /></button>
+                                  </td>
+                                </tr>
+                              ))}
+                              {(editingType.compensationTiers ?? []).length === 0 && (
+                                <tr><td colSpan={5} className="text-center py-3 text-[10px] text-muted-foreground italic">No tiers — compensation will be 0 days/year</td></tr>
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground mt-1.5">Tiers are matched from bottom to top — the highest matching row wins. Use Y=0 M=0 D=0 as a catch-all base tier.</p>
                       </div>
                     </div>
                   </div>

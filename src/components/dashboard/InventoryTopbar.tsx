@@ -191,6 +191,12 @@ const searchableMenus: SearchMenuLink[] = [
     description: "Export performance reports",
   },
   { label: "Approval", parent: "Personnel Info", to: "/personnel-approval" },
+  {
+    label: "Employee Doc Verification",
+    parent: "Personnel Info",
+    to: "/employee-doc-verification",
+    description: "Verify uploaded employee credentials and documents",
+  },
   // Compliance
   { label: "Statutory Compliance Audit", parent: "Compliance", to: "/" },
   { label: "Tax Reports", parent: "Compliance", to: "/" },
