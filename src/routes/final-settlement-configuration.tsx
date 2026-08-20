@@ -44,6 +44,8 @@ export type SettlementTypePolicy = {
   noticePaidByEmployer: boolean;    // Employer pays wages in lieu of notice (Termination)
   noticeDeductedFromEmployee: boolean; // Worker must pay wages in lieu if notice not served (Resignation)
   // Compensation (from base wages per year of service, or gratuity - whichever is higher)
+  compensationDaysPerYear_3yrs: number;       // Days per year for 3+ years service
+  compensationDaysPerYear_5yrs: number;       // Days per year for 5+ years service
   compensationDaysPerYear_below10yrs: number; // Days per year for <10 years service
   compensationDaysPerYear_above10yrs: number; // Days per year for >=10 years service (gratuity also uses this)
   minServiceMonthsForCompensation: number;    // Min months before compensation is applicable
@@ -90,6 +92,8 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     noticePeriodDays: 60,
     noticePaidByEmployer: false,
     noticeDeductedFromEmployee: true,
+    compensationDaysPerYear_3yrs: 0,          // 3+ years: not eligible for resignation comp
+    compensationDaysPerYear_5yrs: 14,        // 5+ years: 14 days/year (Section 27(4)(a))
     compensationDaysPerYear_below10yrs: 14,  // 5–<10 years: 14 days/year
     compensationDaysPerYear_above10yrs: 30,  // ≥10 years: 30 days/year
     minServiceMonthsForCompensation: 60,     // 5 years minimum (Section 27(4)(a))
@@ -109,6 +113,8 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     noticePeriodDays: 120,
     noticePaidByEmployer: true,
     noticeDeductedFromEmployee: false,
+    compensationDaysPerYear_3yrs: 30,
+    compensationDaysPerYear_5yrs: 30,
     compensationDaysPerYear_below10yrs: 30,
     compensationDaysPerYear_above10yrs: 45,  // Gratuity rate for >10 yrs (Section 2(10))
     minServiceMonthsForCompensation: 12,
@@ -128,6 +134,8 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     noticePeriodDays: 30,
     noticePaidByEmployer: true,
     noticeDeductedFromEmployee: false,
+    compensationDaysPerYear_3yrs: 30,
+    compensationDaysPerYear_5yrs: 30,
     compensationDaysPerYear_below10yrs: 30,
     compensationDaysPerYear_above10yrs: 45,
     minServiceMonthsForCompensation: 12,
@@ -147,6 +155,8 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     noticePeriodDays: 0,
     noticePaidByEmployer: false,
     noticeDeductedFromEmployee: false,
+    compensationDaysPerYear_3yrs: 30,
+    compensationDaysPerYear_5yrs: 30,
     compensationDaysPerYear_below10yrs: 30,
     compensationDaysPerYear_above10yrs: 45,
     minServiceMonthsForCompensation: 12,
@@ -166,6 +176,8 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     noticePeriodDays: 0,
     noticePaidByEmployer: false,
     noticeDeductedFromEmployee: false,
+    compensationDaysPerYear_3yrs: 15,
+    compensationDaysPerYear_5yrs: 15,
     compensationDaysPerYear_below10yrs: 15,  // Section 23(3) — 15 days/year
     compensationDaysPerYear_above10yrs: 15,  // No higher tier for misconduct
     minServiceMonthsForCompensation: 12,
@@ -185,6 +197,8 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     noticePeriodDays: 0,
     noticePaidByEmployer: false,
     noticeDeductedFromEmployee: false,
+    compensationDaysPerYear_3yrs: 15,
+    compensationDaysPerYear_5yrs: 15,
     compensationDaysPerYear_below10yrs: 15,
     compensationDaysPerYear_above10yrs: 15,
     minServiceMonthsForCompensation: 12,
@@ -204,6 +218,8 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     noticePeriodDays: 0,
     noticePaidByEmployer: false,
     noticeDeductedFromEmployee: false,
+    compensationDaysPerYear_3yrs: 30,
+    compensationDaysPerYear_5yrs: 30,
     compensationDaysPerYear_below10yrs: 30,
     compensationDaysPerYear_above10yrs: 45,
     minServiceMonthsForCompensation: 12,
@@ -223,6 +239,8 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     noticePeriodDays: 0,
     noticePaidByEmployer: false,
     noticeDeductedFromEmployee: false,
+    compensationDaysPerYear_3yrs: 30,
+    compensationDaysPerYear_5yrs: 30,
     compensationDaysPerYear_below10yrs: 30,
     compensationDaysPerYear_above10yrs: 45,
     minServiceMonthsForCompensation: 300,    // 25 years = 300 months
@@ -242,6 +260,8 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     noticePeriodDays: 0,
     noticePaidByEmployer: false,
     noticeDeductedFromEmployee: false,
+    compensationDaysPerYear_3yrs: 30,
+    compensationDaysPerYear_5yrs: 30,
     compensationDaysPerYear_below10yrs: 30,  // Standard: 30 days/year (Section 19)
     compensationDaysPerYear_above10yrs: 45,  // On-site/accident death: 45 days/year (Section 19)
     minServiceMonthsForCompensation: 24,     // 2 years minimum (Section 19)
@@ -261,6 +281,8 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     noticePeriodDays: 0,
     noticePaidByEmployer: false,
     noticeDeductedFromEmployee: false,
+    compensationDaysPerYear_3yrs: 0,
+    compensationDaysPerYear_5yrs: 0,
     compensationDaysPerYear_below10yrs: 0,   // No compensation for abandonment
     compensationDaysPerYear_above10yrs: 0,
     minServiceMonthsForCompensation: 0,
@@ -280,6 +302,8 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     noticePeriodDays: 0,
     noticePaidByEmployer: false,
     noticeDeductedFromEmployee: false,
+    compensationDaysPerYear_3yrs: 0,
+    compensationDaysPerYear_5yrs: 0,
     compensationDaysPerYear_below10yrs: 0,
     compensationDaysPerYear_above10yrs: 0,
     minServiceMonthsForCompensation: 0,
@@ -299,6 +323,8 @@ const defaultSettlementPolicies: SettlementTypePolicy[] = [
     noticePeriodDays: 0,
     noticePaidByEmployer: false,
     noticeDeductedFromEmployee: false,
+    compensationDaysPerYear_3yrs: 30,
+    compensationDaysPerYear_5yrs: 30,
     compensationDaysPerYear_below10yrs: 30,  // At minimum as per agreement
     compensationDaysPerYear_above10yrs: 45,
     minServiceMonthsForCompensation: 12,
@@ -567,7 +593,7 @@ function FinalSettlementConfigPage() {
                   </div>
                   <Button
                     onClick={() => {
-                      setEditingType({ id: "", name: "", legalReference: "", description: "", noticePeriodDays: 0, noticePaidByEmployer: false, noticeDeductedFromEmployee: false, compensationDaysPerYear_below10yrs: 30, compensationDaysPerYear_above10yrs: 45, minServiceMonthsForCompensation: 12, isCompensationApplicable: true, earnedLeaveEncashable: true, isGratuityApplicable: true, minServiceMonthsForGratuity: 6, isProvidentFundPayable: true, isMisconductBased: false, isDeathCase: false });
+                      setEditingType({ id: "", name: "", legalReference: "", description: "", noticePeriodDays: 0, noticePaidByEmployer: false, noticeDeductedFromEmployee: false, compensationDaysPerYear_3yrs: 30, compensationDaysPerYear_5yrs: 30, compensationDaysPerYear_below10yrs: 30, compensationDaysPerYear_above10yrs: 45, minServiceMonthsForCompensation: 12, isCompensationApplicable: true, earnedLeaveEncashable: true, isGratuityApplicable: true, minServiceMonthsForGratuity: 6, isProvidentFundPayable: true, isMisconductBased: false, isDeathCase: false });
                       setIsTypeModalOpen(true);
                     }}
                     className="h-10 px-5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/95 font-semibold text-sm flex items-center gap-2 cursor-pointer transition-all"
@@ -597,6 +623,8 @@ function FinalSettlementConfigPage() {
                         <div className="col-span-2 hidden md:flex flex-col items-center">
                           {type.isCompensationApplicable ? (
                             <>
+                              <span className="text-[10px] font-semibold text-foreground">3yr+: {type.compensationDaysPerYear_3yrs}d</span>
+                              <span className="text-[10px] font-semibold text-foreground">5yr+: {type.compensationDaysPerYear_5yrs}d</span>
                               <span className="text-[10px] font-semibold text-foreground">&lt;10yr: {type.compensationDaysPerYear_below10yrs}d</span>
                               <span className="text-[10px] font-semibold text-foreground">&ge;10yr: {type.compensationDaysPerYear_above10yrs}d</span>
                             </>
@@ -788,7 +816,27 @@ function FinalSettlementConfigPage() {
                       <span className="text-[11px] font-extrabold uppercase tracking-widest text-blue-600/80">Compensation &amp; Gratuity</span>
                     </div>
                     <div className="p-5">
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
+                      <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-5">
+                        <div className="space-y-1.5 col-span-2 md:col-span-1">
+                          <label className={labelClass}>Comp. Days/Year</label>
+                          <label className="text-[10px] text-muted-foreground block -mt-1">Service 3+ years</label>
+                          <input
+                            type="number" min={0}
+                            value={editingType.compensationDaysPerYear_3yrs}
+                            onChange={(e) => setEditingType({...editingType, compensationDaysPerYear_3yrs: Number(e.target.value)})}
+                            className={inputClass}
+                          />
+                        </div>
+                        <div className="space-y-1.5 col-span-2 md:col-span-1">
+                          <label className={labelClass}>Comp. Days/Year</label>
+                          <label className="text-[10px] text-muted-foreground block -mt-1">Service 5+ years</label>
+                          <input
+                            type="number" min={0}
+                            value={editingType.compensationDaysPerYear_5yrs}
+                            onChange={(e) => setEditingType({...editingType, compensationDaysPerYear_5yrs: Number(e.target.value)})}
+                            className={inputClass}
+                          />
+                        </div>
                         <div className="space-y-1.5 col-span-2 md:col-span-1">
                           <label className={labelClass}>Comp. Days/Year</label>
                           <label className="text-[10px] text-muted-foreground block -mt-1">Service &lt; 10 years</label>

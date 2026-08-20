@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "213",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Feature Update",
+    module: "Final Settlement",
+    link: "/final-settlement-configuration",
+    descriptionEn: "Compensation Days/Year now supports 4 tiers: 3+ years, 5+ years, under 10 years, and 10+ years. HR can now configure custom compensation rates for each service length bracket per settlement type.",
+    descriptionBn: "কমপেনসেশন ডেজ/ইয়ার এখন ৪টি স্তরে ভাগ করা হয়েছে: ৩+ বছর, ৫+ বছর, ১০ বছরের নিচে এবং ১০+ বছর। এইচআর এখন প্রতিটি সেটেলমেন্ট টাইপের জন্য প্রতিটি সার্ভিস দৈর্ঘ্যের জন্য আলাদা রেট সেট করতে পারবেন।",
+  },
+  {
     id: "212",
     date: new Date().toISOString().slice(0, 16),
     type: "Feature Update",

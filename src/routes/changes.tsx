@@ -10,7 +10,7 @@ export const Route = createFileRoute("/changes")({
 export type ChangeRecord = {
   id: string;
   date: string;
-  type: "Modify" | "New Addition" | "Feature" | "UI Update" | "UX Optimization" | "New" | "New Feature" | "";
+  type: "Modify" | "New Addition" | "Feature" | "Feature Update" | "UI Update" | "UX Optimization" | "New" | "New Feature" | "";
   module: string;
   link?: string;
   descriptionEn: string;
