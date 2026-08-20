@@ -49,15 +49,15 @@ interface DynamicRow {
 const mockData: SettlementRecord[] = [
   {
     id: "1",
-    empId: "2022041203",
-    name: "Khairul Bashar Masum",
-    department: "Implementation & Business Analysis",
-    designation: "Assistant Manager",
-    joinDate: "01/12/2022",
+    empId: "2023043910",
+    name: "Tahmid Afsar",
+    department: "Business Innovation",
+    designation: "Asst. Manager",
+    joinDate: "17/04/2023",
     resignDate: "28/05/2026",
     settleDate: "15/06/2026",
-    settleType: "Resigned",
-    settleAmt: 103147.0,
+    settleType: "Resignation",
+    settleAmt: 109317.0,
   },
   {
     id: "2",
@@ -67,10 +67,58 @@ const mockData: SettlementRecord[] = [
     designation: "Asst. Manager",
     joinDate: "17/09/2023",
     resignDate: "17/03/2026",
-    settleDate: "",
-    settleType: "Resigned",
+    settleDate: "20/03/2026",
+    settleType: "Resignation",
     settleAmt: -18179.0,
   },
+  {
+    id: "3",
+    empId: "2015051511",
+    name: "Anika Rahman",
+    department: "Human Resources & Admin",
+    designation: "Senior Manager",
+    joinDate: "15/05/2015",
+    resignDate: "15/06/2026",
+    settleDate: "01/07/2026",
+    settleType: "Termination",
+    settleAmt: 489500.0,
+  },
+  {
+    id: "4",
+    empId: "2018091204",
+    name: "Tariqul Islam Sunny",
+    department: "Software Engineering",
+    designation: "Lead Developer",
+    joinDate: "12/09/2018",
+    resignDate: "10/05/2026",
+    settleDate: "20/05/2026",
+    settleType: "Retirement",
+    settleAmt: 320000.0,
+  },
+  {
+    id: "5",
+    empId: "2025090122",
+    name: "Sabbir Ahmed",
+    department: "Business Innovation",
+    designation: "Software Engineer",
+    joinDate: "01/09/2025",
+    resignDate: "01/04/2026",
+    settleDate: "15/04/2026",
+    settleType: "Dismissal",
+    settleAmt: 23700.0,
+  },
+  {
+    id: "6",
+    empId: "2024021811",
+    name: "Rashedul Hasan",
+    department: "Design & UX",
+    designation: "UX Designer",
+    joinDate: "18/02/2024",
+    resignDate: "05/06/2026",
+    settleDate: "15/06/2026",
+    settleType: "Death",
+    settleAmt: 85200.0,
+  }
 ];
 
 // Dynamic types are loaded from configuration
@@ -219,6 +267,533 @@ function SectionToggle({ label = "Include" }: { label?: string }) {
   );
 }
 
+// ─── Mock Data & Configurations ───────────────────────────────────────────────
+
+const defaultSettlementPolicies: SettlementTypePolicy[] = [
+  {
+    id: "1",
+    name: "Resignation",
+    legalReference: "Section 27, BLA 2006",
+    description: "Worker voluntarily resigns. Must give 60-day notice (permanent/monthly). Compensation payable only after 5 years of service.",
+    noticePeriodDays: 60,
+    noticePaidByEmployer: false,
+    noticeDeductedFromEmployee: true,
+    compensationDaysPerYear_3yrs: 0,
+    compensationDaysPerYear_5yrs: 14,
+    compensationDaysPerYear_below10yrs: 14,
+    compensationDaysPerYear_above10yrs: 30,
+    minServiceMonthsForCompensation: 60,
+    isCompensationApplicable: true,
+    earnedLeaveEncashable: true,
+    isGratuityApplicable: true,
+    minServiceMonthsForGratuity: 6,
+    isProvidentFundPayable: true,
+    isMisconductBased: false,
+    isDeathCase: false,
+  },
+  {
+    id: "2",
+    name: "Termination by Employer",
+    legalReference: "Section 26, BLA 2006",
+    description: "Employer terminates a permanent worker. Must give 120-day notice (monthly rated) or pay in lieu. Compensation: 30 days' wages per year.",
+    noticePeriodDays: 120,
+    noticePaidByEmployer: true,
+    noticeDeductedFromEmployee: false,
+    compensationDaysPerYear_3yrs: 30,
+    compensationDaysPerYear_5yrs: 30,
+    compensationDaysPerYear_below10yrs: 30,
+    compensationDaysPerYear_above10yrs: 45,
+    minServiceMonthsForCompensation: 12,
+    isCompensationApplicable: true,
+    earnedLeaveEncashable: true,
+    isGratuityApplicable: true,
+    minServiceMonthsForGratuity: 6,
+    isProvidentFundPayable: true,
+    isMisconductBased: false,
+    isDeathCase: false,
+  },
+  {
+    id: "3",
+    name: "Retrenchment",
+    legalReference: "Section 20, BLA 2006",
+    description: "Employer retrenches on grounds of redundancy. Must give 1-month notice or pay in lieu. 30 days' wages per completed year or gratuity.",
+    noticePeriodDays: 30,
+    noticePaidByEmployer: true,
+    noticeDeductedFromEmployee: false,
+    compensationDaysPerYear_3yrs: 30,
+    compensationDaysPerYear_5yrs: 30,
+    compensationDaysPerYear_below10yrs: 30,
+    compensationDaysPerYear_above10yrs: 45,
+    minServiceMonthsForCompensation: 12,
+    isCompensationApplicable: true,
+    earnedLeaveEncashable: true,
+    isGratuityApplicable: true,
+    minServiceMonthsForGratuity: 6,
+    isProvidentFundPayable: true,
+    isMisconductBased: false,
+    isDeathCase: false,
+  },
+  {
+    id: "4",
+    name: "Discharge",
+    legalReference: "Section 22, BLA 2006",
+    description: "Worker discharged for physical/mental incapacity or continued ill-health. 30 days' wages per year or gratuity.",
+    noticePeriodDays: 0,
+    noticePaidByEmployer: false,
+    noticeDeductedFromEmployee: false,
+    compensationDaysPerYear_3yrs: 30,
+    compensationDaysPerYear_5yrs: 30,
+    compensationDaysPerYear_below10yrs: 30,
+    compensationDaysPerYear_above10yrs: 45,
+    minServiceMonthsForCompensation: 12,
+    isCompensationApplicable: true,
+    earnedLeaveEncashable: true,
+    isGratuityApplicable: true,
+    minServiceMonthsForGratuity: 6,
+    isProvidentFundPayable: true,
+    isMisconductBased: false,
+    isDeathCase: false,
+  },
+  {
+    id: "5",
+    name: "Dismissal (Misconduct)",
+    legalReference: "Section 23(1)(b) & 23(3), BLA 2006",
+    description: "Worker dismissed for misconduct after proper enquiry. Compensation is 15 days/year UNLESS dismissed for theft, fraud, arson or riot.",
+    noticePeriodDays: 0,
+    noticePaidByEmployer: false,
+    noticeDeductedFromEmployee: false,
+    compensationDaysPerYear_3yrs: 15,
+    compensationDaysPerYear_5yrs: 15,
+    compensationDaysPerYear_below10yrs: 15,
+    compensationDaysPerYear_above10yrs: 15,
+    minServiceMonthsForCompensation: 12,
+    isCompensationApplicable: true,
+    earnedLeaveEncashable: true,
+    isGratuityApplicable: false,
+    minServiceMonthsForGratuity: 0,
+    isProvidentFundPayable: true,
+    isMisconductBased: true,
+    isDeathCase: false,
+  }
+];
+
+interface MockEmployee {
+  company: string;
+  name: string;
+  joiningDate: string;
+  designation: string;
+  department: string;
+  section: string;
+  line: string;
+  grade: string;
+  grossSalary: string;
+  basicSalary: string;
+  tenure: string;
+  dayShortage: string;
+  resignApplyDate: string;
+  resignDate: string;
+  lastWorkingDate: string;
+  settlementDate: string;
+  workingDays: string;
+  present: string;
+  leave: string;
+  holiday: string;
+  absentDays: string;
+  absentDeduction: string;
+  pfDeduction: string;
+  taxDeduction: string;
+  advanceDeduction: string;
+  loanDeduction: string;
+  lunchDeduction: string;
+  othersDeduction: string;
+  revStamp: string;
+  paySalary: string;
+  otRate: string;
+  otHour: string;
+  otPayment: string;
+  behaviourAllowance: string;
+  holidayAllowance: string;
+  generalAllowance: string;
+  conveyanceAllowance: string;
+  incentiveAllowance: string;
+  otherAllowance: string;
+  arrear: string;
+  attendanceBonus: string;
+  tiffinNightBill: string;
+  elFrom: string;
+  elTo: string;
+  elBalanceDays: string;
+  clBalanceDays: string;
+  pfAmount: string;
+  cpfAmount: string;
+  serviceBenefitYear: string;
+  unit: string;
+  employeeType: string;
+  bankAccount: string;
+  houseRent: string;
+  medical: string;
+  transport: string;
+  food: string;
+  photo: string;
+}
+
+const MOCK_EMPLOYEES: Record<string, MockEmployee> = {
+  "2023043910": {
+    company: "Pakiza Software Limited (PSL-Operation)",
+    name: "Tahmid Afsar",
+    joiningDate: "17/04/2023",
+    designation: "Asst. Manager",
+    department: "Business Innovation",
+    section: "Project Resource & Strategy",
+    line: "N/A",
+    grade: "Grade-3",
+    grossSalary: "46500.00",
+    basicSalary: "27900.00",
+    tenure: "03 Year, 00 Month, 11 Day",
+    dayShortage: "5 Days",
+    resignApplyDate: "2026-04-28",
+    resignDate: "2026-05-28",
+    lastWorkingDate: "2026-05-25",
+    settlementDate: "2026-06-15",
+    workingDays: "25",
+    present: "23",
+    leave: "2",
+    holiday: "0",
+    absentDays: "2",
+    absentDeduction: "1860.00",
+    pfDeduction: "2000.00",
+    taxDeduction: "500.00",
+    advanceDeduction: "1000.00",
+    loanDeduction: "500.00",
+    lunchDeduction: "1200.00",
+    othersDeduction: "0.00",
+    revStamp: "10.00",
+    paySalary: "25000.00",
+    otRate: "150.00",
+    otHour: "10",
+    otPayment: "1500.00",
+    behaviourAllowance: "500.00",
+    holidayAllowance: "0.00",
+    generalAllowance: "1000.00",
+    conveyanceAllowance: "2000.00",
+    incentiveAllowance: "1500.00",
+    otherAllowance: "0.00",
+    arrear: "0.00",
+    attendanceBonus: "1000.00",
+    tiffinNightBill: "300.00",
+    elFrom: "2023",
+    elTo: "2026",
+    elBalanceDays: "45.50",
+    clBalanceDays: "5",
+    pfAmount: "30000.00",
+    cpfAmount: "30000.00",
+    serviceBenefitYear: "3",
+    unit: "PSL",
+    employeeType: "Office Executive",
+    bankAccount: "171.103.0256059",
+    houseRent: "13950.00",
+    medical: "2790.00",
+    transport: "1860.00",
+    food: "0.00",
+    photo: "https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg"
+  },
+  "2015051511": {
+    company: "Pakiza Software Limited (PSL-Operation)",
+    name: "Anika Rahman",
+    joiningDate: "15/05/2015",
+    designation: "Senior Manager",
+    department: "Human Resources & Admin",
+    section: "Corporate HR",
+    line: "N/A",
+    grade: "Grade-1",
+    grossSalary: "75000.00",
+    basicSalary: "45000.00",
+    tenure: "11 Year, 01 Month, 00 Day",
+    dayShortage: "0 Days",
+    resignApplyDate: "2026-05-15",
+    resignDate: "2026-06-15",
+    lastWorkingDate: "2026-06-15",
+    settlementDate: "2026-07-01",
+    workingDays: "26",
+    present: "25",
+    leave: "1",
+    holiday: "0",
+    absentDays: "0",
+    absentDeduction: "0.00",
+    pfDeduction: "4500.00",
+    taxDeduction: "2500.00",
+    advanceDeduction: "0.00",
+    loanDeduction: "0.00",
+    lunchDeduction: "1200.00",
+    othersDeduction: "0.00",
+    revStamp: "10.00",
+    paySalary: "45000.00",
+    otRate: "0.00",
+    otHour: "0",
+    otPayment: "0.00",
+    behaviourAllowance: "2000.00",
+    holidayAllowance: "0.00",
+    generalAllowance: "5000.00",
+    conveyanceAllowance: "5000.00",
+    incentiveAllowance: "0.00",
+    otherAllowance: "0.00",
+    arrear: "0.00",
+    attendanceBonus: "2000.00",
+    tiffinNightBill: "0.00",
+    elFrom: "2015",
+    elTo: "2026",
+    elBalanceDays: "120.00",
+    clBalanceDays: "10",
+    pfAmount: "240000.00",
+    cpfAmount: "240000.00",
+    serviceBenefitYear: "11",
+    unit: "Corporate",
+    employeeType: "HR Director",
+    bankAccount: "189.201.0984121",
+    houseRent: "22500.00",
+    medical: "4500.00",
+    transport: "3000.00",
+    food: "0.00",
+    photo: "https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg"
+  },
+  "2025090122": {
+    company: "Pakiza Software Limited (PSL-Operation)",
+    name: "Sabbir Ahmed",
+    joiningDate: "01/09/2025",
+    designation: "Software Engineer",
+    department: "Business Innovation",
+    section: "Core Software Engineering",
+    line: "N/A",
+    grade: "Grade-4",
+    grossSalary: "30000.00",
+    basicSalary: "18000.00",
+    tenure: "00 Year, 08 Month, 00 Day",
+    dayShortage: "0 Days",
+    resignApplyDate: "2026-04-01",
+    resignDate: "2026-05-01",
+    lastWorkingDate: "2026-05-01",
+    settlementDate: "2026-05-15",
+    workingDays: "22",
+    present: "20",
+    leave: "2",
+    holiday: "0",
+    absentDays: "0",
+    absentDeduction: "0.00",
+    pfDeduction: "1800.00",
+    taxDeduction: "0.00",
+    advanceDeduction: "2000.00",
+    loanDeduction: "0.00",
+    lunchDeduction: "1200.00",
+    othersDeduction: "0.00",
+    revStamp: "10.00",
+    paySalary: "18000.00",
+    otRate: "100.00",
+    otHour: "5",
+    otPayment: "500.00",
+    behaviourAllowance: "0.00",
+    holidayAllowance: "0.00",
+    generalAllowance: "0.00",
+    conveyanceAllowance: "1000.00",
+    incentiveAllowance: "0.00",
+    otherAllowance: "0.00",
+    arrear: "0.00",
+    attendanceBonus: "0.00",
+    tiffinNightBill: "0.00",
+    elFrom: "2025",
+    elTo: "2026",
+    elBalanceDays: "5.00",
+    clBalanceDays: "2",
+    pfAmount: "14400.00",
+    cpfAmount: "14400.00",
+    serviceBenefitYear: "0",
+    unit: "PSL",
+    employeeType: "Core Developer",
+    bankAccount: "192.168.0125439",
+    houseRent: "9000.00",
+    medical: "1800.00",
+    transport: "1200.00",
+    food: "0.00",
+    photo: "https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg"
+  },
+  "2023044865": {
+    company: "Pakiza Software Limited (PSL-Operation)",
+    name: "Md. Nizam Uddin Shamrat",
+    joiningDate: "17/09/2023",
+    designation: "Asst. Manager",
+    department: "Business Innovation",
+    section: "Project Resource & Strategy",
+    line: "N/A",
+    grade: "Grade-3",
+    grossSalary: "46500.00",
+    basicSalary: "27900.00",
+    tenure: "02 Year, 06 Month, 00 Day",
+    dayShortage: "0 Days",
+    resignApplyDate: "2026-02-15",
+    resignDate: "2026-03-17",
+    lastWorkingDate: "2026-03-17",
+    settlementDate: "2026-03-20",
+    workingDays: "26",
+    present: "24",
+    leave: "2",
+    holiday: "0",
+    absentDays: "0",
+    absentDeduction: "0.00",
+    pfDeduction: "2000.00",
+    taxDeduction: "500.00",
+    advanceDeduction: "20000.00",
+    loanDeduction: "0.00",
+    lunchDeduction: "1200.00",
+    othersDeduction: "0.00",
+    revStamp: "10.00",
+    paySalary: "25000.00",
+    otRate: "150.00",
+    otHour: "0",
+    otPayment: "0.00",
+    behaviourAllowance: "500.00",
+    holidayAllowance: "0.00",
+    generalAllowance: "1000.00",
+    conveyanceAllowance: "2000.00",
+    incentiveAllowance: "1500.00",
+    otherAllowance: "0.00",
+    arrear: "0.00",
+    attendanceBonus: "1000.00",
+    tiffinNightBill: "0.00",
+    elFrom: "2023",
+    elTo: "2026",
+    elBalanceDays: "12.00",
+    clBalanceDays: "5",
+    pfAmount: "18000.00",
+    cpfAmount: "18000.00",
+    serviceBenefitYear: "2",
+    unit: "PSL",
+    employeeType: "Office Executive",
+    bankAccount: "171.103.0256088",
+    houseRent: "13950.00",
+    medical: "2790.00",
+    transport: "1860.00",
+    food: "0.00",
+    photo: "https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg"
+  },
+  "2018091204": {
+    company: "Pakiza Software Limited (PSL-Operation)",
+    name: "Tariqul Islam Sunny",
+    joiningDate: "12/09/2018",
+    designation: "Lead Developer",
+    department: "Software Engineering",
+    section: "Core Software Engineering",
+    line: "N/A",
+    grade: "Grade-1",
+    grossSalary: "58000.00",
+    basicSalary: "34800.00",
+    tenure: "07 Year, 08 Month, 00 Day",
+    dayShortage: "0 Days",
+    resignApplyDate: "2026-04-10",
+    resignDate: "2026-05-10",
+    lastWorkingDate: "2026-05-10",
+    settlementDate: "2026-05-20",
+    workingDays: "25",
+    present: "23",
+    leave: "2",
+    holiday: "0",
+    absentDays: "0",
+    absentDeduction: "0.00",
+    pfDeduction: "3500.00",
+    taxDeduction: "1500.00",
+    advanceDeduction: "0.00",
+    loanDeduction: "0.00",
+    lunchDeduction: "1200.00",
+    othersDeduction: "0.00",
+    revStamp: "10.00",
+    paySalary: "35000.00",
+    otRate: "0.00",
+    otHour: "0",
+    otPayment: "0.00",
+    behaviourAllowance: "1000.00",
+    holidayAllowance: "0.00",
+    generalAllowance: "2000.00",
+    conveyanceAllowance: "3000.00",
+    incentiveAllowance: "2000.00",
+    otherAllowance: "0.00",
+    arrear: "0.00",
+    attendanceBonus: "1500.00",
+    tiffinNightBill: "0.00",
+    elFrom: "2018",
+    elTo: "2026",
+    elBalanceDays: "45.00",
+    clBalanceDays: "8",
+    pfAmount: "160000.00",
+    cpfAmount: "160000.00",
+    serviceBenefitYear: "7",
+    unit: "PSL",
+    employeeType: "Technical Lead",
+    bankAccount: "192.168.0125488",
+    houseRent: "17400.00",
+    medical: "3480.00",
+    transport: "2320.00",
+    food: "0.00",
+    photo: "https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg"
+  },
+  "2024021811": {
+    company: "Pakiza Software Limited (PSL-Operation)",
+    name: "Rashedul Hasan",
+    joiningDate: "18/02/2024",
+    designation: "UX Designer",
+    department: "Design & UX",
+    section: "Creative UI/UX",
+    line: "N/A",
+    grade: "Grade-3",
+    grossSalary: "30000.00",
+    basicSalary: "18000.00",
+    tenure: "02 Year, 03 Month, 18 Day",
+    dayShortage: "0 Days",
+    resignApplyDate: "2026-05-05",
+    resignDate: "2026-06-05",
+    lastWorkingDate: "2026-06-05",
+    settlementDate: "2026-06-15",
+    workingDays: "26",
+    present: "24",
+    leave: "2",
+    holiday: "0",
+    absentDays: "0",
+    absentDeduction: "0.00",
+    pfDeduction: "1800.00",
+    taxDeduction: "0.00",
+    advanceDeduction: "0.00",
+    loanDeduction: "0.00",
+    lunchDeduction: "1200.00",
+    othersDeduction: "0.00",
+    revStamp: "10.00",
+    paySalary: "18000.00",
+    otRate: "100.00",
+    otHour: "2",
+    otPayment: "200.00",
+    behaviourAllowance: "500.00",
+    holidayAllowance: "0.00",
+    generalAllowance: "1000.00",
+    conveyanceAllowance: "1000.00",
+    incentiveAllowance: "500.00",
+    otherAllowance: "0.00",
+    arrear: "0.00",
+    attendanceBonus: "1000.00",
+    tiffinNightBill: "0.00",
+    elFrom: "2024",
+    elTo: "2026",
+    elBalanceDays: "15.00",
+    clBalanceDays: "5",
+    pfAmount: "24400.00",
+    cpfAmount: "24400.00",
+    serviceBenefitYear: "2",
+    unit: "PSL",
+    employeeType: "Creative Executive",
+    bankAccount: "192.168.0125499",
+    houseRent: "9000.00",
+    medical: "1800.00",
+    transport: "1200.00",
+    food: "0.00",
+    photo: "https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg"
+  }
+};
+
 // ─── Main Component ────────────────────────────────────────────────────────────
 
 function FinalSettlementPage() {
@@ -231,12 +806,14 @@ function FinalSettlementPage() {
   const [empLoaded, setEmpLoaded] = useState(false);
 
   // Dynamic Policies
-  const [settlementPolicies, setSettlementPolicies] = useState<SettlementTypePolicy[]>([]);
+  const [settlementPolicies, setSettlementPolicies] = useState<SettlementTypePolicy[]>(defaultSettlementPolicies);
 
   useEffect(() => {
     const stored = localStorage.getItem("fs_settlement_types_v3");
     if (stored) {
       setSettlementPolicies(JSON.parse(stored));
+    } else {
+      localStorage.setItem("fs_settlement_types_v3", JSON.stringify(defaultSettlementPolicies));
     }
   }, []);
 
@@ -300,6 +877,13 @@ function FinalSettlementPage() {
   const [netPayment, setNetPayment] = useState("");
   const [comments, setComments] = useState("");
 
+  // Accordion states
+  const [showSalaryInfo, setShowSalaryInfo] = useState(true);
+  const [showEarnLeaveInfo, setShowEarnLeaveInfo] = useState(true);
+  const [showServiceBenefitInfo, setShowServiceBenefitInfo] = useState(true);
+  const [showCompensationInfo, setShowCompensationInfo] = useState(true);
+  const [showDeductionInfo, setShowDeductionInfo] = useState(true);
+
   // Dynamic rows
   const [compensations, setCompensations] = useState<DynamicRow[]>([{ for: "", amount: "" }]);
   const [deductions, setDeductions] = useState<DynamicRow[]>([{ for: "", amount: "" }]);
@@ -309,93 +893,113 @@ function FinalSettlementPage() {
   const [salaryToDate, setSalaryToDate] = useState("");
 
   // Employee info (demo - would be fetched by ID)
-  const emp = {
-    company: "Pakiza Software Limited (PSL-Operation)",
-    name: "Khairul Bashar Masum",
-    joiningDate: "01/12/2022",
-    designation: "Assistant Manager",
-    department: "Implementation & Business Analysis",
-    line: "N/A",
-    grade: "None",
-    grossSalary: "46500.00",
-    basicSalary: "27900.00",
-    tenure: "03 Year, 05 Month, 28 Day",
-    dayShortage: "0 Days",
-  };
+  const [currentEmployee, setCurrentEmployee] = useState<any>(MOCK_EMPLOYEES["2023043910"]);
+  const emp = currentEmployee;
 
   const [calculated, setCalculated] = useState(false);
 
   const loadDemoData = (id: string) => {
     setMode("With Salary");
     setEmployeeId(id);
+    
+    // Find matching employee profile, default to 2023043910 if not found
+    const targetEmp = MOCK_EMPLOYEES[id] || MOCK_EMPLOYEES["2023043910"];
+    setCurrentEmployee(targetEmp);
     setEmpLoaded(true);
-    setSettlementType("Resignation");
-    setSettlementDate("2026-06-15");
-    setResignApplyDate("2026-04-28");
-    setResignDate("2026-05-28");
-    setLastWorkingDate("2026-05-25");
+
+    const mappedSettleType = id === "2015051511" ? "Termination by Employer" : 
+                            id === "2018091204" ? "Retirement" : 
+                            id === "2024021811" ? "Death" : 
+                            id === "2025090122" ? "Dismissal" : 
+                            "Resignation";
+    setSettlementType(mappedSettleType);
+    setSettlementDate(targetEmp.settlementDate);
+    setResignApplyDate(targetEmp.resignApplyDate);
+    setResignDate(targetEmp.resignDate);
+    setLastWorkingDate(targetEmp.lastWorkingDate);
     setDeductionType("no");
     setNoticePeriod("30");
-    setNoticeShortage("5");
-    setWorkingDays("25");
-    setPresent("23");
-    setLeave("2");
-    setHoliday("0");
-    setAbsentDays("2");
-    setAbsentDeduction("1860.00");
-    setPfDeduction("2000.00");
-    setTaxDeduction("500.00");
-    setAdvanceDeduction("1000.00");
-    setLoanDeduction("500.00");
-    setLunchDeduction("1200.00");
-    setOthersDeduction("0.00");
-    setRevStamp("10.00");
-    setPaySalary("25000.00");
+    setNoticeShortage(targetEmp.dayShortage.split(" ")[0]);
+    setWorkingDays(targetEmp.workingDays);
+    setPresent(targetEmp.present);
+    setLeave(targetEmp.leave);
+    setHoliday(targetEmp.holiday);
+    setAbsentDays(targetEmp.absentDays);
+    setAbsentDeduction(targetEmp.absentDeduction);
+    setPfDeduction(targetEmp.pfDeduction);
+    setTaxDeduction(targetEmp.taxDeduction);
+    setAdvanceDeduction(targetEmp.advanceDeduction);
+    setLoanDeduction(targetEmp.loanDeduction);
+    setLunchDeduction(targetEmp.lunchDeduction);
+    setOthersDeduction(targetEmp.othersDeduction);
+    setRevStamp(targetEmp.revStamp);
+    setPaySalary(targetEmp.paySalary);
     setWagelyAdvance("0.00");
-    setOtRate("150.00");
-    setOtPayment("1500.00");
-    setOtHour("10");
-    setBehaviourAllowance("500.00");
+    setOtRate(targetEmp.otRate);
+    setOtPayment(targetEmp.otPayment);
+    setOtHour(targetEmp.otHour);
+    setBehaviourAllowance(targetEmp.behaviourAllowance);
     setHolidayAllowance("0.00");
-    setGeneralAllowance("1000.00");
-    setConveyanceAllowance("2000.00");
-    setIncentiveAllowance("1500.00");
-    setOtherAllowance("0.00");
+    setGeneralAllowance(targetEmp.generalAllowance);
+    setConveyanceAllowance(targetEmp.conveyanceAllowance);
+    setIncentiveAllowance(targetEmp.incentiveAllowance);
+    setOtherAllowance(targetEmp.otherAllowance);
     setArrear("0.00");
-    setAttendanceBonus("1000.00");
-    setNetSalary("25500.00");
-    setTiffinNightBill("300.00");
-    setElFrom("2022");
-    setElTo("2026");
-    setElBalanceDays("50.72");
-    setElPayment("78617.00");
-    setClBalanceDays("5");
-    setClPayment("5000.00");
-    setServiceBenefitYear("3");
-    setPayableDaysPerYear("7.00");
-    setServiceBenefitTotal("19530.00");
-    setPfAmount("35000.00");
-    setCpfAmount("35000.00");
-    setGrandTotal("104807.00");
-    setCompensationAmt("5000.00");
-    setCompensationRemarks("Good performance bonus");
-    setNetPayment("104807.00");
+    setAttendanceBonus(targetEmp.attendanceBonus);
+    
+    const basic = Number(targetEmp.basicSalary);
+    const allowances = Number(targetEmp.behaviourAllowance) + Number(targetEmp.generalAllowance) + Number(targetEmp.conveyanceAllowance) + Number(targetEmp.incentiveAllowance) + Number(targetEmp.otherAllowance) + Number(targetEmp.attendanceBonus);
+    const netSalaryVal = Number(targetEmp.paySalary) + allowances;
+    setNetSalary(netSalaryVal.toFixed(2));
+    
+    setTiffinNightBill(targetEmp.tiffinNightBill);
+    setElFrom(targetEmp.elFrom);
+    setElTo(targetEmp.elTo);
+    setElBalanceDays(targetEmp.elBalanceDays);
+    
+    const elPay = Number(targetEmp.elBalanceDays) * (basic / 30);
+    setElPayment(elPay.toFixed(2));
+    
+    setClBalanceDays(targetEmp.clBalanceDays);
+    const clPay = Number(targetEmp.clBalanceDays) * (basic / 30);
+    setClPayment(clPay.toFixed(2));
+    
+    setServiceBenefitYear(targetEmp.serviceBenefitYear);
+    setPayableDaysPerYear("15.00");
+    const completedYears = Number(targetEmp.serviceBenefitYear);
+    const sbPay = completedYears * 15 * (basic / 30);
+    setServiceBenefitTotal(sbPay.toFixed(2));
+    
+    setPfAmount(targetEmp.pfAmount);
+    setCpfAmount(targetEmp.cpfAmount);
+    
+    const pfAmtVal = Number(targetEmp.pfAmount);
+    const cpfAmtVal = Number(targetEmp.cpfAmount);
+    
+    // Sum of compensations
+    const compensationSum = elPay + sbPay + pfAmtVal + cpfAmtVal;
+    
+    // Sum of earnings
+    const earningsSum = netSalaryVal + Number(targetEmp.tiffinNightBill) + compensationSum;
+    
+    // Sum of deductions
+    const deductionsSum = Number(targetEmp.absentDeduction) + Number(targetEmp.pfDeduction) + Number(targetEmp.taxDeduction) + Number(targetEmp.advanceDeduction) + Number(targetEmp.loanDeduction) + Number(targetEmp.lunchDeduction) + Number(targetEmp.othersDeduction) + Number(targetEmp.revStamp);
+    
+    const calculatedGrandTotal = earningsSum - deductionsSum;
+    
+    setGrandTotal(calculatedGrandTotal.toFixed(2));
+    setCompensationAmt("0.00");
+    setCompensationRemarks("");
+    setNetPayment(calculatedGrandTotal.toFixed(2));
     setComments("Verified by HR. Cleared all assets.");
+    
     setCompensations([
-      { for: "Special Performance Bonus", amount: "5000.00" },
-      { for: "Sales Commission", amount: "1500.00" },
-      { for: "Unused Sick Leave Encashment", amount: "3250.00" },
-      { for: "Project Completion Reward", amount: "10000.00" },
-      { for: "Overtime Adjustment", amount: "850.00" },
-      { for: "", amount: "" },
+      { for: "Special Performance Bonus", amount: "0.00" },
+      { for: "", amount: "" }
     ]);
     setDeductions([
-      { for: "Unadjusted Loan", amount: "2000.00" },
-      { for: "Lost ID Card Penalty", amount: "500.00" },
-      { for: "Advance Salary Adjustment", amount: "5000.00" },
-      { for: "Notice Period Shortage", amount: "3500.00" },
-      { for: "Damaged Equipment", amount: "1200.00" },
-      { for: "", amount: "" },
+      { for: "Lost ID Card Penalty", amount: "0.00" },
+      { for: "", amount: "" }
     ]);
     setCalculated(true);
   };
@@ -431,54 +1035,123 @@ function FinalSettlementPage() {
       return;
     }
 
-    // DEMO LOGIC: Dynamic effect based on settlement type policy
-    let calculatedGrandTotal = 104807.00;
-    
-    // Notice — deduction from employee (resignation: didn't serve notice)
+    const basicSalary = Number(emp.basicSalary) || 0;
+    const dailyRate = basicSalary / 30;
+
+    // Notice calculation
+    let calculatedNoticePeriod = "0";
+    let calculatedNoticeShortage = "0";
+    let noticeDeductionAmt = 0;
+    let noticePayAmt = 0;
+
     if (policy.noticeDeductedFromEmployee) {
-      setNoticePeriod(policy.noticePeriodDays.toString());
-      setNoticeShortage("5"); // Mock shortage days
-      setDeductions((prev) => {
-        const filtered = prev.filter(d => d.for && !d.for.toLowerCase().includes("notice"));
-        return [...filtered, { for: "Notice Period Shortage", amount: "3500.00" }, { for: "", amount: "" }];
-      });
-      calculatedGrandTotal -= 3500;
+      calculatedNoticePeriod = policy.noticePeriodDays.toString();
+      if (resignApplyDate && lastWorkingDate) {
+        const apply = new Date(resignApplyDate);
+        const working = new Date(lastWorkingDate);
+        const diffTime = working.getTime() - apply.getTime();
+        const diffDays = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+        const shortage = Math.max(0, policy.noticePeriodDays - diffDays);
+        calculatedNoticeShortage = shortage.toString();
+        noticeDeductionAmt = shortage * dailyRate;
+      } else {
+        calculatedNoticeShortage = noticeShortage || "0";
+        noticeDeductionAmt = Number(calculatedNoticeShortage) * dailyRate;
+      }
+      setNoticePeriod(calculatedNoticePeriod);
+      setNoticeShortage(calculatedNoticeShortage);
     } else {
       setNoticePeriod("0");
       setNoticeShortage("0");
-      setDeductions((prev) => prev.filter(d => d.for && !d.for.toLowerCase().includes("notice")));
     }
 
-    // Notice — paid by employer (termination/retrenchment: notice pay in lieu)
     if (policy.noticePaidByEmployer) {
-      setCompensations((prev) => {
-        const filtered = prev.filter(c => c.for && !c.for.toLowerCase().includes("notice"));
-        return [...filtered, { for: "Notice Pay (In Lieu)", amount: "27900.00" }, { for: "", amount: "" }];
-      });
-      calculatedGrandTotal += 27900;
-    } else {
-      setCompensations((prev) => prev.filter(c => c.for && !c.for.toLowerCase().includes("notice")));
+      calculatedNoticePeriod = policy.noticePeriodDays.toString();
+      noticePayAmt = policy.noticePeriodDays * dailyRate;
+      setNoticePeriod(calculatedNoticePeriod);
     }
 
-    // Service Benefit / Compensation — two-tier based on service length
-    if (policy.isCompensationApplicable) {
-      // Demo: assume 3 years service, daily rate = 930 (basic 27900/30)
-      const DEMO_SERVICE_YEARS = 3;
-      const DEMO_DAILY_RATE = 930;
-      // Use correct tier
-      const compDays = DEMO_SERVICE_YEARS >= 10
-        ? policy.compensationDaysPerYear_above10yrs
-        : policy.compensationDaysPerYear_below10yrs;
-      const benefitAmt = DEMO_SERVICE_YEARS * compDays * DEMO_DAILY_RATE;
-      setPayableDaysPerYear(compDays.toString());
-      setServiceBenefitTotal(benefitAmt.toFixed(2));
-      calculatedGrandTotal += (benefitAmt - 19530); // offset initial mock
+    // Dynamic Compensations array
+    let updatedCompensations = [...compensations.filter(c => c.for && !c.for.toLowerCase().includes("notice"))];
+    if (noticePayAmt > 0) {
+      updatedCompensations = updatedCompensations.filter(c => c.for !== "");
+      updatedCompensations.push({ for: "Notice Pay (In Lieu)", amount: noticePayAmt.toFixed(2) });
+      updatedCompensations.push({ for: "", amount: "" });
+    }
+    setCompensations(updatedCompensations);
+
+    // Dynamic Deductions array
+    let updatedDeductions = [...deductions.filter(d => d.for && !d.for.toLowerCase().includes("notice"))];
+    if (noticeDeductionAmt > 0) {
+      updatedDeductions = updatedDeductions.filter(d => d.for !== "");
+      updatedDeductions.push({ for: "Notice Period Shortage", amount: noticeDeductionAmt.toFixed(2) });
+      updatedDeductions.push({ for: "", amount: "" });
+    }
+    setDeductions(updatedDeductions);
+
+    // Service Benefit / Compensation (dynamic completed years/bracket calculation)
+    let finalServiceBenefitTotal = 0;
+    let compDays = 0;
+    
+    if (showServiceBenefitInfo && policy.isCompensationApplicable) {
+      const completedYears = Number(serviceBenefitYear) || 0;
+      const completedMonths = completedYears * 12;
+      
+      if (completedMonths >= policy.minServiceMonthsForCompensation) {
+        if (completedYears >= 10) {
+          compDays = policy.compensationDaysPerYear_above10yrs;
+        } else if (completedYears >= 5) {
+          compDays = policy.compensationDaysPerYear_below10yrs;
+        } else if (completedYears >= 3) {
+          compDays = policy.compensationDaysPerYear_3yrs;
+        } else {
+          compDays = policy.compensationDaysPerYear_below10yrs;
+        }
+        finalServiceBenefitTotal = completedYears * compDays * dailyRate;
+        setPayableDaysPerYear(compDays.toString());
+        setServiceBenefitTotal(finalServiceBenefitTotal.toFixed(2));
+      } else {
+        setPayableDaysPerYear("0");
+        setServiceBenefitTotal("0.00");
+      }
     } else {
       setPayableDaysPerYear("0");
       setServiceBenefitTotal("0.00");
-      calculatedGrandTotal -= 19530;
     }
 
+    // Earned Leave dynamic encashment
+    let finalElPayment = 0;
+    if (showEarnLeaveInfo && policy.earnedLeaveEncashable) {
+      finalElPayment = (Number(elBalanceDays) || 0) * dailyRate;
+      setElPayment(finalElPayment.toFixed(2));
+    } else {
+      setElPayment("0.00");
+    }
+
+    // PF Amount dynamic logic
+    let finalPfAmount = Number(emp.pfAmount) || 0;
+    let finalCpfAmount = Number(emp.cpfAmount) || 0;
+    if (!policy.isProvidentFundPayable) {
+      finalPfAmount = 0;
+      finalCpfAmount = 0;
+    }
+    setPfAmount(finalPfAmount.toFixed(2));
+    setCpfAmount(finalCpfAmount.toFixed(2));
+
+    // Calculate Grand Total (Earnings - Deductions)
+    const basicPay = showSalaryInfo ? (Number(paySalary) || 0) : 0;
+    const allowances = showSalaryInfo ? (Number(behaviourAllowance) + Number(holidayAllowance) + Number(generalAllowance) + Number(conveyanceAllowance) + Number(incentiveAllowance) + Number(otherAllowance) + Number(arrear) + Number(attendanceBonus)) : 0;
+    const activeNetSalary = basicPay + allowances;
+    setNetSalary(activeNetSalary.toFixed(2));
+
+    const extraCompensations = showCompensationInfo ? updatedCompensations.reduce((sum, item) => sum + (Number(item.amount) || 0), 0) : 0;
+    const earningsSum = activeNetSalary + Number(tiffinNightBill) + finalElPayment + (showEarnLeaveInfo ? (Number(clPayment) || 0) : 0) + finalServiceBenefitTotal + finalPfAmount + finalCpfAmount + extraCompensations;
+
+    const activeDeductionsSum = showSalaryInfo ? (Number(absentDeduction) + Number(pfDeduction) + Number(taxDeduction) + Number(advanceDeduction) + Number(loanDeduction) + Number(lunchDeduction) + Number(othersDeduction) + Number(revStamp)) : 0;
+    const extraDeductions = showDeductionInfo ? updatedDeductions.reduce((sum, item) => sum + (Number(item.amount) || 0), 0) : 0;
+    const deductionsSum = activeDeductionsSum + extraDeductions;
+
+    const calculatedGrandTotal = earningsSum - deductionsSum;
     setGrandTotal(calculatedGrandTotal.toFixed(2));
     setNetPayment(calculatedGrandTotal.toFixed(2));
     setCalculated(true);
@@ -493,6 +1166,12 @@ function FinalSettlementPage() {
     toast.success("Final Settlement submitted for approval.");
     setView("list");
   };
+
+  useEffect(() => {
+    if (calculated) {
+      handleCalculate();
+    }
+  }, [showSalaryInfo, showEarnLeaveInfo, showServiceBenefitInfo, showCompensationInfo, showDeductionInfo]);
 
   return (
     <div className="min-h-screen flex bg-background text-foreground">
@@ -621,7 +1300,17 @@ function FinalSettlementPage() {
                           {row.settleDate || "—"}
                         </td>
                         <td className="px-3 py-2.5">
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-600 border border-amber-500/20">
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                            row.settleType.toLowerCase().includes("resign")
+                              ? "bg-blue-500/10 text-blue-600 border-blue-500/25"
+                              : row.settleType.toLowerCase().includes("terminat")
+                              ? "bg-rose-500/10 text-rose-600 border-rose-500/25"
+                              : row.settleType.toLowerCase().includes("dismiss")
+                              ? "bg-amber-500/10 text-amber-600 border-amber-500/25"
+                              : row.settleType.toLowerCase().includes("retire")
+                              ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/25"
+                              : "bg-purple-500/10 text-purple-600 border-purple-500/25"
+                          }`}>
                             {row.settleType}
                           </span>
                         </td>
@@ -730,38 +1419,60 @@ function FinalSettlementPage() {
                 </div>
 
                 {/* ── Employee Information ── */}
-                <div className="border border-border/60 rounded p-5 mb-6 bg-card shadow-sm">
+                <div className="border border-border/60 rounded-xl p-5 mb-6 bg-card shadow-sm">
                   <div className="flex items-center gap-1.5 mb-5 text-[11px] font-bold text-[#84cc16]">
                     <span className="uppercase tracking-wider border-b-2 border-[#84cc16]/30 pb-0.5">
                       Employee Information
                     </span>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-0.5 pt-1">
-                    <div className="space-y-1.5 border-r border-border/30 pr-6">
-                      <InfoRow
-                        label="Company"
-                        value={empLoaded ? "Pakiza Software Limited(PSL-Operation)" : ""}
-                      />
-                      <InfoRow label="Emp Name" value={empLoaded ? "Tahmid Afsar" : ""} />
-                      <InfoRow label="Designation" value={empLoaded ? "Asst. Manager" : ""} />
-                      <InfoRow label="Department" value={empLoaded ? "Business Innovation" : ""} />
-                      <InfoRow
-                        label="Section"
-                        value={empLoaded ? "Project Resource & Strategy" : ""}
-                      />
-                      <InfoRow label="Unit" value={empLoaded ? "PSL" : ""} />
-                      <InfoRow label="Joining Date" value={empLoaded ? "01/08/2023" : ""} />
-                      <InfoRow label="Employee Type" value={empLoaded ? "Office Executive" : ""} />
-                      <InfoRow label="Bank Account" value={empLoaded ? "171.103.0256059" : ""} />
+                  <div className="flex flex-col md:flex-row gap-6 items-start pt-1">
+                    {/* Employee Photo */}
+                    <div className="flex flex-col items-center gap-2.5 shrink-0 w-full md:w-32 bg-muted/10 p-3 rounded-xl border border-border/30 shadow-inner">
+                      <div className="w-[105px] h-[130px] rounded-lg border border-border/80 bg-white p-1 shadow-sm overflow-hidden flex items-center justify-center">
+                        {empLoaded && emp.photo ? (
+                          <img 
+                            src={emp.photo} 
+                            alt={emp.name} 
+                            className="size-full object-cover object-top rounded-md transition-all duration-300 hover:scale-105" 
+                          />
+                        ) : (
+                          <div className="size-full bg-slate-50 flex items-center justify-center border border-dashed border-slate-300 rounded-md">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center px-1">No Photo</span>
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground bg-muted border border-border/40 px-2 py-0.5 rounded shadow-sm">
+                        {empLoaded ? employeeId : "ID — — —"}
+                      </span>
                     </div>
-                    <div className="space-y-1.5 pl-6">
-                      <InfoRow label="Basic Salary" value={empLoaded ? "31200.00" : ""} />
-                      <InfoRow label="House Rent" value={empLoaded ? "15600.00" : ""} />
-                      <InfoRow label="Medical" value={empLoaded ? "3120.00" : ""} />
-                      <InfoRow label="Transport Allowance" value={empLoaded ? "2080.00" : ""} />
-                      <InfoRow label="Food Allowance" value={empLoaded ? "0.00" : ""} />
-                      <div className="pt-2 mt-2 border-t border-border/50">
-                        <InfoRow label="Gross Salary" value={empLoaded ? "52000.00" : ""} />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-0.5 flex-1 w-full">
+                      <div className="space-y-1.5 border-r border-border/30 pr-6">
+                        <InfoRow
+                          label="Company"
+                          value={empLoaded ? emp.company : ""}
+                        />
+                        <InfoRow label="Emp Name" value={empLoaded ? emp.name : ""} />
+                        <InfoRow label="Designation" value={empLoaded ? emp.designation : ""} />
+                        <InfoRow label="Department" value={empLoaded ? emp.department : ""} />
+                        <InfoRow
+                          label="Section"
+                          value={empLoaded ? emp.section : ""}
+                        />
+                        <InfoRow label="Unit" value={empLoaded ? emp.unit : ""} />
+                        <InfoRow label="Joining Date" value={empLoaded ? emp.joiningDate : ""} />
+                        <InfoRow label="Employee Type" value={empLoaded ? emp.employeeType : ""} />
+                        <InfoRow label="Bank Account" value={empLoaded ? emp.bankAccount : ""} />
+                      </div>
+                      <div className="space-y-1.5 pl-6">
+                        <InfoRow label="Basic Salary" value={empLoaded ? emp.basicSalary : ""} />
+                        <InfoRow label="House Rent" value={empLoaded ? emp.houseRent : ""} />
+                        <InfoRow label="Medical" value={empLoaded ? emp.medical : ""} />
+                        <InfoRow label="Transport Allowance" value={empLoaded ? emp.transport : ""} />
+                        <InfoRow label="Food Allowance" value={empLoaded ? emp.food : ""} />
+                        <div className="pt-2 mt-2 border-t border-border/50">
+                          <InfoRow label="Gross Salary" value={empLoaded ? emp.grossSalary : ""} />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -770,360 +1481,453 @@ function FinalSettlementPage() {
                 {/* ── Sections ── */}
 
                 {/* Salary Info */}
-                <div className="border border-border/60 rounded p-4 mb-4 bg-card shadow-sm">
-                  <div className="flex items-center gap-1.5 mb-4 text-[11px] font-bold text-[#3b82f6]">
-                    <input type="checkbox" className="accent-[#3b82f6] size-3" defaultChecked />{" "}
-                    Salary Info
-                  </div>
-                  <div className="flex gap-4 items-end mb-4">
-                    <div className="space-y-1">
-                      <label className="text-[10px] text-muted-foreground block">
-                        From Date <span className="text-rose-500">*</span>
-                      </label>
-                      <Input
-                        type="date"
-                        value={salaryFromDate}
-                        onChange={(e: any) => setSalaryFromDate(e.target.value)}
-                        className="w-32"
+                <div className="border border-border/60 rounded-xl p-5 mb-5 bg-card shadow-sm transition-all duration-300">
+                  <div 
+                    className={`flex items-center justify-between cursor-pointer select-none ${showSalaryInfo ? "mb-4" : "mb-0"}`}
+                    onClick={() => setShowSalaryInfo(!showSalaryInfo)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        checked={showSalaryInfo} 
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          setShowSalaryInfo(e.target.checked);
+                        }} 
+                        className="accent-blue-600 size-3.5 rounded border-border cursor-pointer transition-all" 
                       />
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-blue-600">Salary Information</h3>
                     </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] text-muted-foreground block">
-                        To Date <span className="text-rose-500">*</span>
-                      </label>
-                      <Input
-                        type="date"
-                        value={salaryToDate}
-                        onChange={(e: any) => setSalaryToDate(e.target.value)}
-                        className="w-32"
-                      />
+                    {showSalaryInfo ? <ChevronDown className="size-4 text-blue-600" /> : <ChevronRight className="size-4 text-blue-600" />}
+                  </div>
+
+                  {showSalaryInfo && (
+                    <div className="space-y-4 animate-fadeIn">
+                      <div className="flex flex-wrap items-end gap-4 mb-5 p-4 bg-muted/20 border border-border/40 rounded-lg">
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                            From Date <span className="text-rose-500">*</span>
+                          </label>
+                          <Input
+                            type="date"
+                            value={salaryFromDate}
+                            onChange={(e: any) => setSalaryFromDate(e.target.value)}
+                            className="w-36 font-semibold text-xs border-border/60 bg-background focus:border-blue-500 focus:ring-blue-500/20"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                            To Date <span className="text-rose-500">*</span>
+                          </label>
+                          <Input
+                            type="date"
+                            value={salaryToDate}
+                            onChange={(e: any) => setSalaryToDate(e.target.value)}
+                            className="w-36 font-semibold text-xs border-border/60 bg-background focus:border-blue-500 focus:ring-blue-500/20"
+                          />
+                        </div>
+                        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-[10px] font-bold uppercase transition-all tracking-wider shadow-sm flex items-center gap-1.5 cursor-pointer">
+                          <RefreshCw className="size-3.5" />
+                          Generate Salary
+                        </button>
+                      </div>
+                      <div className="overflow-x-auto rounded-lg border border-border/80 shadow-inner bg-card">
+                        <table className="w-full text-[10px] text-center whitespace-nowrap">
+                          <thead className="bg-muted/30 border-b border-border/70 text-muted-foreground font-semibold text-[10px] uppercase tracking-wider">
+                            <tr>
+                              <th className="p-2.5 font-semibold border-r border-border/50">#</th>
+                              <th className="p-2.5 font-semibold border-r border-border/50 text-left">Emp Id</th>
+                              <th className="p-2.5 font-semibold border-r border-border/50 text-left">Name</th>
+                              <th className="p-2.5 font-semibold border-r border-border/50">Month</th>
+                              <th className="p-2.5 font-semibold border-r border-border/50">Year</th>
+                              <th className="p-2.5 font-semibold border-r border-border/50">W/D</th>
+                              <th className="p-2.5 font-semibold border-r border-border/50">Present</th>
+                              <th className="p-2.5 font-semibold border-r border-border/50">Holiday</th>
+                              <th className="p-2.5 font-semibold border-r border-border/50">Leave</th>
+                              <th className="p-2.5 font-semibold border-r border-border/50">Absent</th>
+                              <th className="p-2.5 font-semibold border-r border-border/50">OT</th>
+                              <th className="p-2.5 font-semibold border-r border-border/50">OT Amt</th>
+                              <th className="p-2.5 font-semibold border-r border-border/50">Pay Basic</th>
+                              <th className="p-2.5 font-semibold border-r border-border/50">House Rent</th>
+                              <th className="p-2.5 font-semibold border-r border-border/50">Medical</th>
+                              <th className="p-2.5 font-semibold border-r border-border/50">Transport</th>
+                              <th className="p-2.5 font-semibold border-r border-border/50">Food</th>
+                              <th className="p-2.5 font-semibold border-r border-border/50">Adv Amount</th>
+                              <th className="p-2.5 font-semibold border-r border-border/50">Abs Amount</th>
+                              <th className="p-2.5 font-semibold border-r border-border/50">Tax Amount</th>
+                              <th className="p-2.5 font-semibold">Total Amount</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {empLoaded ? (
+                              <tr className="border-b border-border/30 hover:bg-muted/15 transition-colors">
+                                <td className="p-2.5 border-r border-border/50 font-medium text-muted-foreground">1</td>
+                                <td className="p-2.5 border-r border-border/50 text-left font-mono font-semibold">{employeeId}</td>
+                                <td className="p-2.5 border-r border-border/50 text-left font-semibold text-foreground">{emp.name}</td>
+                                <td className="p-2.5 border-r border-border/50 font-mono">06</td>
+                                <td className="p-2.5 border-r border-border/50 font-mono">2026</td>
+                                <td className="p-2.5 border-r border-border/50 font-mono">{workingDays}</td>
+                                <td className="p-2.5 border-r border-border/50 font-mono">{present}</td>
+                                <td className="p-2.5 border-r border-border/50 font-mono">{holiday}</td>
+                                <td className="p-2.5 border-r border-border/50 font-mono">{leave}</td>
+                                <td className="p-2.5 border-r border-border/50 font-mono">{absentDays}</td>
+                                <td className="p-2.5 border-r border-border/50 font-mono">{otHour}</td>
+                                <td className="p-2.5 border-r border-border/50 font-mono text-right">৳{Number(otPayment).toLocaleString("en-BD", { minimumFractionDigits: 2 })}</td>
+                                <td className="p-2.5 border-r border-border/50 font-mono text-right">৳{Number(emp.basicSalary).toLocaleString("en-BD", { minimumFractionDigits: 2 })}</td>
+                                <td className="p-2.5 border-r border-border/50 font-mono text-right">৳{Number(emp.houseRent).toLocaleString("en-BD", { minimumFractionDigits: 2 })}</td>
+                                <td className="p-2.5 border-r border-border/50 font-mono text-right">৳{Number(emp.medical).toLocaleString("en-BD", { minimumFractionDigits: 2 })}</td>
+                                <td className="p-2.5 border-r border-border/50 font-mono text-right">৳{Number(emp.transport).toLocaleString("en-BD", { minimumFractionDigits: 2 })}</td>
+                                <td className="p-2.5 border-r border-border/50 font-mono text-right">৳{Number(emp.food).toLocaleString("en-BD", { minimumFractionDigits: 2 })}</td>
+                                <td className="p-2.5 border-r border-border/50 font-mono text-right text-rose-500">৳{Number(advanceDeduction).toLocaleString("en-BD", { minimumFractionDigits: 2 })}</td>
+                                <td className="p-2.5 border-r border-border/50 font-mono text-right text-rose-500">৳{Number(absentDeduction).toLocaleString("en-BD", { minimumFractionDigits: 2 })}</td>
+                                <td className="p-2.5 border-r border-border/50 font-mono text-right text-rose-500">৳{Number(taxDeduction).toLocaleString("en-BD", { minimumFractionDigits: 2 })}</td>
+                                <td className="p-2.5 font-semibold text-right">
+                                  <span className="px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-600 font-bold border border-emerald-500/20 shadow-sm">
+                                    ৳{Number(netSalary).toLocaleString("en-BD", { minimumFractionDigits: 2 })}
+                                  </span>
+                                </td>
+                              </tr>
+                            ) : (
+                              <tr>
+                                <td colSpan={21} className="p-5 text-center text-muted-foreground italic bg-muted/5">
+                                  No salary data generated. Enter employee ID and dates to generate.
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
-                    <button className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-4 py-1.5 rounded text-[10px] font-bold uppercase transition-colors tracking-wider">
-                      Generate
-                    </button>
-                  </div>
-                  <div className="overflow-x-auto rounded border border-border/50">
-                    <table className="w-full text-[10px] text-center whitespace-nowrap">
-                      <thead className="bg-muted/20 border-b border-border/50 text-muted-foreground">
-                        <tr>
-                          <th className="p-2 font-medium border-r border-border/50">#</th>
-                          <th className="p-2 font-medium border-r border-border/50 text-left">
-                            Emp Id
-                          </th>
-                          <th className="p-2 font-medium border-r border-border/50 text-left">
-                            Name
-                          </th>
-                          <th className="p-2 font-medium border-r border-border/50">Month</th>
-                          <th className="p-2 font-medium border-r border-border/50">Year</th>
-                          <th className="p-2 font-medium border-r border-border/50">W/D</th>
-                          <th className="p-2 font-medium border-r border-border/50">Present</th>
-                          <th className="p-2 font-medium border-r border-border/50">Holiday</th>
-                          <th className="p-2 font-medium border-r border-border/50">Leave</th>
-                          <th className="p-2 font-medium border-r border-border/50">Absent</th>
-                          <th className="p-2 font-medium border-r border-border/50">OT</th>
-                          <th className="p-2 font-medium border-r border-border/50">OT Amt</th>
-                          <th className="p-2 font-medium border-r border-border/50">Pay Basic</th>
-                          <th className="p-2 font-medium border-r border-border/50">House Rent</th>
-                          <th className="p-2 font-medium border-r border-border/50">Medical</th>
-                          <th className="p-2 font-medium border-r border-border/50">Transport</th>
-                          <th className="p-2 font-medium border-r border-border/50">Food</th>
-                          <th className="p-2 font-medium border-r border-border/50">Adv Amount</th>
-                          <th className="p-2 font-medium border-r border-border/50">Abs Amount</th>
-                          <th className="p-2 font-medium border-r border-border/50">Tax Amount</th>
-                          <th className="p-2 font-medium">Total Amount</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {empLoaded ? (
-                          <tr className="border-b border-border/30 hover:bg-muted/10">
-                            <td className="p-2 border-r border-border/50">1</td>
-                            <td className="p-2 border-r border-border/50 text-left">2023043910</td>
-                            <td className="p-2 border-r border-border/50 text-left">
-                              Tahmid Afsar
-                            </td>
-                            <td className="p-2 border-r border-border/50">06</td>
-                            <td className="p-2 border-r border-border/50">2026</td>
-                            <td className="p-2 border-r border-border/50">14</td>
-                            <td className="p-2 border-r border-border/50">14</td>
-                            <td className="p-2 border-r border-border/50">8</td>
-                            <td className="p-2 border-r border-border/50">0</td>
-                            <td className="p-2 border-r border-border/50">0</td>
-                            <td className="p-2 border-r border-border/50">0.00</td>
-                            <td className="p-2 border-r border-border/50">0</td>
-                            <td className="p-2 border-r border-border/50">22880.00</td>
-                            <td className="p-2 border-r border-border/50">11440.00</td>
-                            <td className="p-2 border-r border-border/50">2288.00</td>
-                            <td className="p-2 border-r border-border/50">1525.33</td>
-                            <td className="p-2 border-r border-border/50">0.00</td>
-                            <td className="p-2 border-r border-border/50">0</td>
-                            <td className="p-2 border-r border-border/50">0</td>
-                            <td className="p-2 border-r border-border/50">0.00</td>
-                            <td className="p-2 font-semibold">52000</td>
-                          </tr>
-                        ) : (
-                          <tr>
-                            <td
-                              colSpan={21}
-                              className="p-4 text-center text-muted-foreground italic"
-                            >
-                              No data generated.
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
+                  )}
                 </div>
 
                 {/* Compensation Info */}
-                <div className="border border-border/60 rounded p-4 mb-4 bg-card shadow-sm">
-                  <div className="flex items-center gap-1.5 mb-4 text-[11px] font-bold text-[#84cc16]">
-                    <input type="checkbox" className="accent-[#84cc16] size-3" defaultChecked />{" "}
-                    Compensation Info
+                <div className="border border-border/60 rounded-xl p-5 mb-5 bg-card shadow-sm transition-all duration-300">
+                  <div 
+                    className={`flex items-center justify-between cursor-pointer select-none ${showCompensationInfo ? "mb-4" : "mb-0"}`}
+                    onClick={() => setShowCompensationInfo(!showCompensationInfo)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        checked={showCompensationInfo} 
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          setShowCompensationInfo(e.target.checked);
+                        }} 
+                        className="accent-lime-600 size-3.5 rounded border-border cursor-pointer transition-all" 
+                      />
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-lime-600">Compensation Additions</h3>
+                    </div>
+                    {showCompensationInfo ? <ChevronDown className="size-4 text-lime-600" /> : <ChevronRight className="size-4 text-lime-600" />}
                   </div>
-                  <div className="overflow-x-auto rounded border border-border/50">
-                    <table className="w-full text-[10px]">
-                      <thead className="bg-[#f2f9f2] border-b border-border/50 text-[#84cc16]">
-                        <tr>
-                          <th className="p-2 font-medium border-r border-border/50 w-12 text-center">
-                            #
-                          </th>
-                          <th className="p-2 font-medium border-r border-border/50 text-left">
-                            Compensation For
-                          </th>
-                          <th className="p-2 font-medium border-r border-border/50 text-right w-32">
-                            Amount
-                          </th>
-                          <th className="p-2 font-medium w-12 text-center text-muted-foreground/50">
-                            <Plus className="size-3.5 mx-auto" />
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {compensations.map((row, i) => (
-                          <tr
-                            key={i}
-                            className="border-b border-border/30 last:border-0 hover:bg-muted/10"
-                          >
-                            <td className="p-2 border-r border-border/50 text-center text-muted-foreground">
-                              {i + 1}
-                            </td>
-                            <td className="p-0 border-r border-border/50">
-                              <Input
-                                value={row.for}
-                                onChange={(e: any) =>
-                                  setCompensations((p) =>
-                                    p.map((r, idx) =>
-                                      idx === i ? { ...r, for: e.target.value } : r,
-                                    ),
-                                  )
-                                }
-                                placeholder="Compensation For"
-                                className="border-0 shadow-none h-8 text-[10px] rounded-none focus:ring-0"
-                              />
-                            </td>
-                            <td className="p-0 border-r border-border/50">
-                              <Input
-                                value={row.amount}
-                                onChange={(e: any) =>
-                                  setCompensations((p) =>
-                                    p.map((r, idx) =>
-                                      idx === i ? { ...r, amount: e.target.value } : r,
-                                    ),
-                                  )
-                                }
-                                placeholder="Amount"
-                                type="number"
-                                className="border-0 shadow-none h-8 text-[10px] text-right font-mono rounded-none focus:ring-0"
-                              />
-                            </td>
-                            <td className="p-1 text-center">
-                              {i === compensations.length - 1 ? (
-                                <button
-                                  onClick={() =>
-                                    setCompensations((p) => [...p, { for: "", amount: "" }])
-                                  }
-                                  className="p-1 rounded text-muted-foreground border border-border/50 hover:bg-muted/40 transition-colors mx-auto block"
-                                >
-                                  <Plus className="size-3" />
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={() =>
-                                    setCompensations((p) => p.filter((_, idx) => idx !== i))
-                                  }
-                                  className="p-1 rounded text-rose-500 border border-rose-500/20 hover:bg-rose-500/10 transition-colors mx-auto block"
-                                >
-                                  <Trash2 className="size-3" />
-                                </button>
-                              )}
-                            </td>
+
+                  {showCompensationInfo && (
+                    <div className="overflow-hidden rounded-lg border border-border/80 shadow-sm bg-card animate-fadeIn">
+                      <table className="w-full text-[11px]">
+                        <thead className="bg-lime-500/5 border-b border-border/70 text-lime-600 font-semibold text-[10px] uppercase tracking-wider">
+                          <tr>
+                            <th className="p-2.5 font-semibold border-r border-border/50 w-12 text-center">#</th>
+                            <th className="p-2.5 font-semibold border-r border-border/50 text-left">Compensation For</th>
+                            <th className="p-2.5 font-semibold border-r border-border/50 text-right w-44">Amount (৳)</th>
+                            <th className="p-2.5 font-semibold w-12 text-center text-muted-foreground/50">
+                              <Plus className="size-3.5 mx-auto" />
+                            </th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody>
+                          {compensations.map((row, i) => (
+                            <tr key={i} className="border-b border-border/30 last:border-0 hover:bg-muted/10 transition-colors">
+                              <td className="p-2.5 border-r border-border/50 text-center text-muted-foreground font-medium">{i + 1}</td>
+                              <td className="p-0 border-r border-border/50">
+                                <Input
+                                  value={row.for}
+                                  onChange={(e: any) =>
+                                    setCompensations((p) =>
+                                      p.map((r, idx) =>
+                                        idx === i ? { ...r, for: e.target.value } : r,
+                                      ),
+                                    )
+                                  }
+                                  placeholder="e.g. Special Performance Bonus"
+                                  className="border-0 shadow-none h-9 text-[11px] rounded-none focus-visible:ring-0 bg-transparent"
+                                />
+                              </td>
+                              <td className="p-0 border-r border-border/50">
+                                <Input
+                                  value={row.amount}
+                                  onChange={(e: any) =>
+                                    setCompensations((p) =>
+                                      p.map((r, idx) =>
+                                        idx === i ? { ...r, amount: e.target.value } : r,
+                                      ),
+                                    )
+                                  }
+                                  placeholder="0.00"
+                                  type="number"
+                                  className="border-0 shadow-none h-9 text-[11px] text-right font-mono font-semibold rounded-none focus-visible:ring-0 bg-transparent"
+                                />
+                              </td>
+                              <td className="p-1 text-center">
+                                {i === compensations.length - 1 ? (
+                                  <button
+                                    onClick={() =>
+                                      setCompensations((p) => [...p, { for: "", amount: "" }])
+                                    }
+                                    className="p-1 rounded text-lime-600 border border-lime-500/20 hover:bg-lime-500/10 transition-all mx-auto block cursor-pointer"
+                                  >
+                                    <Plus className="size-3" />
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() =>
+                                      setCompensations((p) => p.filter((_, idx) => idx !== i))
+                                    }
+                                    className="p-1 rounded text-rose-500 border border-rose-500/20 hover:bg-rose-500/10 transition-all mx-auto block cursor-pointer"
+                                  >
+                                    <Trash2 className="size-3" />
+                                  </button>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
 
                 {/* Earn Leave Info */}
-                <div className="border border-border/60 rounded p-4 mb-4 bg-card shadow-sm">
-                  <div className="flex items-center gap-1.5 mb-4 text-[11px] font-bold text-[#3b82f6]">
-                    <input type="checkbox" className="accent-[#3b82f6] size-3" defaultChecked />{" "}
-                    Earn Leave Info
+                <div className="border border-border/60 rounded-xl p-5 mb-5 bg-card shadow-sm transition-all duration-300">
+                  <div 
+                    className={`flex items-center justify-between cursor-pointer select-none ${showEarnLeaveInfo ? "mb-4" : "mb-0"}`}
+                    onClick={() => setShowEarnLeaveInfo(!showEarnLeaveInfo)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        checked={showEarnLeaveInfo} 
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          setShowEarnLeaveInfo(e.target.checked);
+                        }} 
+                        className="accent-blue-600 size-3.5 rounded border-border cursor-pointer transition-all" 
+                      />
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-blue-600">Earn Leave (EL) Encashment</h3>
+                    </div>
+                    {showEarnLeaveInfo ? <ChevronDown className="size-4 text-blue-600" /> : <ChevronRight className="size-4 text-blue-600" />}
                   </div>
-                  <div className="flex gap-4 items-end mb-6">
-                    <div>
-                      <label className="text-[10px] text-muted-foreground block mb-1">
-                        EL Year:
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px]">From</span>
-                        <Select className="w-20">
-                          <option>2023</option>
-                        </Select>
-                        <span className="text-[10px]">To</span>
-                        <Select className="w-20">
-                          <option>2026</option>
-                        </Select>
+
+                  {showEarnLeaveInfo && (
+                    <div className="space-y-4 animate-fadeIn">
+                      <div className="flex flex-wrap items-end gap-4 mb-5 p-4 bg-muted/20 border border-border/40 rounded-lg">
+                        <div className="space-y-1.5">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">EL Year Range</span>
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[10px] text-muted-foreground font-medium">From</span>
+                              <Select className="w-20 font-bold border-border/50 bg-background text-[11px]" value={elFrom} onChange={(e: any) => setElFrom(e.target.value)}>
+                                <option value="2022">2022</option>
+                                <option value="2023">2023</option>
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                              </Select>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[10px] text-muted-foreground font-medium">To</span>
+                              <Select className="w-20 font-bold border-border/50 bg-background text-[11px]" value={elTo} onChange={(e: any) => setElTo(e.target.value)}>
+                                <option value="2022">2022</option>
+                                <option value="2023">2023</option>
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                              </Select>
+                            </div>
+                          </div>
+                        </div>
+                        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-[10px] font-bold uppercase transition-all tracking-wider shadow-sm flex items-center gap-1.5 cursor-pointer">
+                          <RefreshCw className="size-3.5" />
+                          Generate EL
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                        <div className="flex items-center justify-between p-3.5 rounded-lg bg-blue-500/5 border border-blue-500/10 shadow-sm">
+                          <div className="space-y-0.5">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600">Annual Leave Days</span>
+                            <p className="text-[10.5px] text-muted-foreground font-medium">Remaining balance eligible for encashment</p>
+                          </div>
+                          <span className="text-sm font-extrabold text-foreground font-mono bg-background border border-border/50 px-3 py-1 rounded shadow-sm">
+                            {empLoaded ? elBalanceDays : "0.00"} Days
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between p-3.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 shadow-sm">
+                          <div className="space-y-0.5">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Encashment Pay Amount</span>
+                            <p className="text-[10.5px] text-muted-foreground font-medium">Calculated rate: basic salary daily rate</p>
+                          </div>
+                          <span className="text-sm font-extrabold text-emerald-600 font-mono bg-background border border-emerald-500/20 px-3 py-1 rounded shadow-sm">
+                            ৳{empLoaded ? Number(elPayment).toLocaleString("en-BD", { minimumFractionDigits: 2 }) : "0.00"}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <button className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-4 py-1.5 rounded text-[10px] font-bold uppercase transition-colors tracking-wider">
-                      Generate
-                    </button>
-                  </div>
-                  <div className="flex justify-between items-center border-t border-border/50 pt-3 text-[11px] font-bold">
-                    <div className="flex-1 flex justify-between pr-20">
-                      <span>Annual Leave Days</span>
-                      <span>:</span>
-                    </div>
-                    <div className="w-24 text-right">{empLoaded ? elBalanceDays : ""}</div>
-                    <div className="flex-1 flex justify-between pl-20 pr-20">
-                      <span>Pay Amount</span>
-                      <span>:</span>
-                    </div>
-                    <div className="w-24 text-right">{empLoaded ? elPayment : ""}</div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Service Benefit Info */}
-                <div className="border border-border/60 rounded p-4 mb-4 bg-card shadow-sm">
-                  <div className="flex items-center gap-1.5 mb-4 text-[11px] font-bold text-[#3b82f6]">
-                    <input type="checkbox" className="accent-[#3b82f6] size-3" defaultChecked />{" "}
-                    Service Benefit Info
+                <div className="border border-border/60 rounded-xl p-5 mb-5 bg-card shadow-sm transition-all duration-300">
+                  <div 
+                    className={`flex items-center justify-between cursor-pointer select-none ${showServiceBenefitInfo ? "mb-4" : "mb-0"}`}
+                    onClick={() => setShowServiceBenefitInfo(!showServiceBenefitInfo)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        checked={showServiceBenefitInfo} 
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          setShowServiceBenefitInfo(e.target.checked);
+                        }} 
+                        className="accent-blue-600 size-3.5 rounded border-border cursor-pointer transition-all" 
+                      />
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-blue-600">Service Benefit / Compensation</h3>
+                    </div>
+                    {showServiceBenefitInfo ? <ChevronDown className="size-4 text-blue-600" /> : <ChevronRight className="size-4 text-blue-600" />}
                   </div>
-                  <div className="flex items-center gap-16 mb-4">
-                    <div className="flex-1 flex justify-between font-bold text-[11px] pr-20">
-                      <span>Tenure of work</span>
-                      <span>: {empLoaded ? "0 Year, 0 Month, 0 Day" : ""}</span>
+
+                  {showServiceBenefitInfo && (
+                    <div className="space-y-4 animate-fadeIn">
+                      <div className="flex flex-wrap items-center justify-between gap-4 mb-5 p-4 bg-muted/20 border border-border/40 rounded-lg">
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">Calculated Service Tenure</span>
+                          <div className="inline-flex items-center px-3 py-1 bg-blue-500/10 text-blue-600 rounded text-xs font-bold border border-blue-500/20 shadow-sm">
+                            {empLoaded && emp.tenure ? emp.tenure : "—"}
+                          </div>
+                        </div>
+                        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-[10px] font-bold uppercase transition-all tracking-wider shadow-sm flex items-center gap-1.5 cursor-pointer">
+                          <RefreshCw className="size-3.5" />
+                          Generate Benefit
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                        <div className="flex items-center justify-between p-3.5 rounded-lg bg-blue-500/5 border border-blue-500/10 shadow-sm">
+                          <div className="space-y-0.5">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600">Calculated Service Period</span>
+                            <p className="text-[10.5px] text-muted-foreground font-medium">Completed service benefit years</p>
+                          </div>
+                          <span className="text-sm font-extrabold text-foreground font-mono bg-background border border-border/50 px-3 py-1 rounded shadow-sm">
+                            {empLoaded ? `${serviceBenefitYear} Years` : "—"}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between p-3.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 shadow-sm">
+                          <div className="space-y-0.5">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Benefit Pay Amount</span>
+                            <p className="text-[10.5px] text-muted-foreground font-medium">Formula: completed years × rate/year × daily rate</p>
+                          </div>
+                          <span className="text-sm font-extrabold text-emerald-600 font-mono bg-background border border-emerald-500/20 px-3 py-1 rounded shadow-sm">
+                            ৳{empLoaded ? Number(serviceBenefitTotal).toLocaleString("en-BD", { minimumFractionDigits: 2 }) : "0.00"}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <button className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-4 py-1.5 rounded text-[10px] font-bold uppercase transition-colors tracking-wider">
-                        Generate
-                      </button>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center border-t border-border/50 pt-3 text-[11px] font-bold">
-                    <div className="flex-1 flex justify-between pr-20">
-                      <span>Service Days</span>
-                      <span>:</span>
-                    </div>
-                    <div className="w-24 text-right">{empLoaded ? "1080" : ""}</div>
-                    <div className="flex-1 flex justify-between pl-20 pr-20">
-                      <span>Pay Amount</span>
-                      <span>:</span>
-                    </div>
-                    <div className="w-24 text-right">{empLoaded ? serviceBenefitTotal : ""}</div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Deduction Info */}
-                <div className="border border-border/60 rounded p-4 mb-6 bg-card shadow-sm">
-                  <div className="flex items-center gap-1.5 mb-4 text-[11px] font-bold text-rose-500">
-                    <input type="checkbox" className="accent-rose-500 size-3" defaultChecked />{" "}
-                    Deduction Info
+                <div className="border border-border/60 rounded-xl p-5 mb-6 bg-card shadow-sm transition-all duration-300">
+                  <div 
+                    className={`flex items-center justify-between cursor-pointer select-none ${showDeductionInfo ? "mb-4" : "mb-0"}`}
+                    onClick={() => setShowDeductionInfo(!showDeductionInfo)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        checked={showDeductionInfo} 
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          setShowDeductionInfo(e.target.checked);
+                        }} 
+                        className="accent-rose-600 size-3.5 rounded border-border cursor-pointer transition-all" 
+                      />
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-rose-600">Deduction Items</h3>
+                    </div>
+                    {showDeductionInfo ? <ChevronDown className="size-4 text-rose-600" /> : <ChevronRight className="size-4 text-rose-600" />}
                   </div>
-                  <div className="overflow-x-auto rounded border border-border/50">
-                    <table className="w-full text-[10px]">
-                      <thead className="bg-rose-50 border-b border-border/50 text-rose-600">
-                        <tr>
-                          <th className="p-2 font-medium border-r border-border/50 w-12 text-center">
-                            #
-                          </th>
-                          <th className="p-2 font-medium border-r border-border/50 text-left">
-                            Deduction For
-                          </th>
-                          <th className="p-2 font-medium border-r border-border/50 text-right w-32">
-                            Amount
-                          </th>
-                          <th className="p-2 font-medium w-12 text-center text-rose-600/50">
-                            <Plus className="size-3.5 mx-auto" />
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {deductions.map((row, i) => (
-                          <tr
-                            key={i}
-                            className="border-b border-border/30 last:border-0 hover:bg-muted/10"
-                          >
-                            <td className="p-2 border-r border-border/50 text-center text-muted-foreground">
-                              {i + 1}
-                            </td>
-                            <td className="p-0 border-r border-border/50">
-                              <Input
-                                value={row.for}
-                                onChange={(e: any) =>
-                                  setDeductions((p) =>
-                                    p.map((r, idx) =>
-                                      idx === i ? { ...r, for: e.target.value } : r,
-                                    ),
-                                  )
-                                }
-                                placeholder="Deduction For"
-                                className="border-0 shadow-none h-8 text-[10px] rounded-none focus:ring-0"
-                              />
-                            </td>
-                            <td className="p-0 border-r border-border/50">
-                              <Input
-                                value={row.amount}
-                                onChange={(e: any) =>
-                                  setDeductions((p) =>
-                                    p.map((r, idx) =>
-                                      idx === i ? { ...r, amount: e.target.value } : r,
-                                    ),
-                                  )
-                                }
-                                placeholder="Amount"
-                                type="number"
-                                className="border-0 shadow-none h-8 text-[10px] text-right font-mono rounded-none focus:ring-0"
-                              />
-                            </td>
-                            <td className="p-1 text-center">
-                              {i === deductions.length - 1 ? (
-                                <button
-                                  onClick={() =>
-                                    setDeductions((p) => [...p, { for: "", amount: "" }])
-                                  }
-                                  className="p-1 rounded text-muted-foreground border border-border/50 hover:bg-muted/40 transition-colors mx-auto block"
-                                >
-                                  <Plus className="size-3" />
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={() =>
-                                    setDeductions((p) => p.filter((_, idx) => idx !== i))
-                                  }
-                                  className="p-1 rounded text-rose-500 border border-rose-500/20 hover:bg-rose-500/10 transition-colors mx-auto block"
-                                >
-                                  <Trash2 className="size-3" />
-                                </button>
-                              )}
-                            </td>
+
+                  {showDeductionInfo && (
+                    <div className="overflow-hidden rounded-lg border border-border/80 shadow-sm bg-card animate-fadeIn">
+                      <table className="w-full text-[11px]">
+                        <thead className="bg-rose-500/5 border-b border-border/70 text-rose-600 font-semibold text-[10px] uppercase tracking-wider">
+                          <tr>
+                            <th className="p-2.5 font-semibold border-r border-border/50 w-12 text-center">#</th>
+                            <th className="p-2.5 font-semibold border-r border-border/50 text-left">Deduction For</th>
+                            <th className="p-2.5 font-semibold border-r border-border/50 text-right w-44">Amount (৳)</th>
+                            <th className="p-2.5 font-semibold w-12 text-center text-rose-600/50">
+                              <Plus className="size-3.5 mx-auto" />
+                            </th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody>
+                          {deductions.map((row, i) => (
+                            <tr key={i} className="border-b border-border/30 last:border-0 hover:bg-muted/10 transition-colors">
+                              <td className="p-2.5 border-r border-border/50 text-center text-muted-foreground font-medium">{i + 1}</td>
+                              <td className="p-0 border-r border-border/50">
+                                <Input
+                                  value={row.for}
+                                  onChange={(e: any) =>
+                                    setDeductions((p) =>
+                                      p.map((r, idx) =>
+                                        idx === i ? { ...r, for: e.target.value } : r,
+                                      ),
+                                    )
+                                  }
+                                  placeholder="e.g. Unadjusted Loan"
+                                  className="border-0 shadow-none h-9 text-[11px] rounded-none focus-visible:ring-0 bg-transparent"
+                                />
+                              </td>
+                              <td className="p-0 border-r border-border/50">
+                                <Input
+                                  value={row.amount}
+                                  onChange={(e: any) =>
+                                    setDeductions((p) =>
+                                      p.map((r, idx) =>
+                                        idx === i ? { ...r, amount: e.target.value } : r,
+                                      ),
+                                    )
+                                  }
+                                  placeholder="0.00"
+                                  type="number"
+                                  className="border-0 shadow-none h-9 text-[11px] text-right font-mono font-semibold rounded-none focus-visible:ring-0 bg-transparent"
+                                />
+                              </td>
+                              <td className="p-1 text-center">
+                                {i === deductions.length - 1 ? (
+                                  <button
+                                    onClick={() =>
+                                      setDeductions((p) => [...p, { for: "", amount: "" }])
+                                    }
+                                    className="p-1 rounded text-rose-600 border border-rose-500/20 hover:bg-rose-500/10 transition-all mx-auto block cursor-pointer"
+                                  >
+                                    <Plus className="size-3" />
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() =>
+                                      setDeductions((p) => p.filter((_, idx) => idx !== i))
+                                    }
+                                    className="p-1 rounded text-rose-500 border border-rose-500/20 hover:bg-rose-500/10 transition-all mx-auto block cursor-pointer"
+                                  >
+                                    <Trash2 className="size-3" />
+                                  </button>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
 
                 {/* ── Summary & Actions ── */}
@@ -1188,12 +1992,29 @@ function FinalSettlementPage() {
               </button>
 
               {/* Header */}
-              <div className="text-center mb-8">
-                <h2 className="text-xl font-bold">{emp.company.replace(" (PSL-Operation)", "")}</h2>
-                <p className="text-[11px] text-gray-600 mt-0.5">
-                  Khan ABC Tradeplex House#37, Floor#11 (B-11), Road#2, Dhaka-1205
-                </p>
-                <h3 className="text-lg font-bold text-blue-600 mt-2">Final Settlement</h3>
+              <div className="flex flex-col md:flex-row items-center justify-between border-b-2 border-gray-150 pb-6 mb-8 gap-4">
+                <div className="text-center md:text-left">
+                  <h2 className="text-xl font-extrabold text-gray-800 tracking-tight">{emp.company.replace(" (PSL-Operation)", "")}</h2>
+                  <p className="text-[11px] text-gray-500 mt-1 font-medium">
+                    Khan ABC Tradeplex House#37, Floor#11 (B-11), Road#2, Dhaka-1205
+                  </p>
+                  <h3 className="text-base font-bold text-blue-600 mt-2.5 uppercase tracking-wider">Final Settlement Sheet</h3>
+                </div>
+                
+                {/* ID-style employee portrait on details sheet */}
+                <div className="shrink-0 border-2 border-gray-300 p-0.5 bg-white shadow-sm rounded overflow-hidden w-[80px] h-[100px]">
+                  {emp.photo ? (
+                    <img 
+                      src={emp.photo} 
+                      alt={emp.name} 
+                      className="size-full object-cover object-top rounded-sm" 
+                    />
+                  ) : (
+                    <div className="size-full bg-gray-50 flex items-center justify-center border border-dashed border-gray-300 rounded-sm">
+                      <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest text-center">No Photo</span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Top Info Grid */}

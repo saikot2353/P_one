@@ -543,42 +543,52 @@ function FinalSettlementConfigPage() {
                   </Button>
                 </div>
 
-                <div className="border border-border/50 rounded-xl overflow-hidden bg-muted/5">
-                  <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-muted/30 border-b border-border/40 text-[10px] uppercase tracking-wider font-extrabold text-muted-foreground/80">
-                    <span className="col-span-4 lg:col-span-3">Employee Type</span>
-                    <span className="col-span-3 hidden sm:block">Payment Basis</span>
-                    <span className="col-span-3 text-center">Notice Required (Days)</span>
-                    <span className="col-span-5 sm:col-span-2 lg:col-span-3 text-right">Action</span>
-                  </div>
-                  <div className="divide-y divide-border/45 max-h-[500px] overflow-y-auto">
-                    {noticePolicies.map((policy) => (
-                      <div key={policy.id} className="grid grid-cols-12 gap-4 px-4 py-4 bg-card items-center group hover:bg-muted/10 transition-colors">
-                        <div className="col-span-4 lg:col-span-3">
-                          <span className="text-sm font-bold text-foreground block">{policy.employeeType}</span>
-                          <span className="text-[10px] text-primary/70 font-semibold block">{policy.legalReference}</span>
-                          <span className="text-[10px] text-muted-foreground block truncate" title={policy.description}>{policy.description}</span>
-                        </div>
-                        <span className="col-span-3 hidden sm:block text-sm font-medium">{policy.paymentBasis}</span>
-                        <span className="col-span-3 text-center text-sm font-mono">{policy.noticeDaysRequired}</span>
-                        <div className="col-span-5 sm:col-span-2 lg:col-span-3 flex justify-end gap-1">
-                          <button
-                            onClick={() => { setEditingNotice({ ...policy }); setIsNoticeModalOpen(true); }}
-                            className="p-1.5 text-blue-500 hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"
-                            title="Edit"
-                          >
-                            <Edit className="size-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteNotice(policy.id)}
-                            className="p-1.5 text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
-                            title="Delete"
-                          >
-                            <Trash2 className="size-4" />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                <div className="overflow-x-auto border border-border/50 rounded-xl bg-muted/5 shadow-inner">
+                  <table className="w-full text-xs text-left border-collapse">
+                    <thead>
+                      <tr className="bg-muted/40 border-b border-border/40 text-[10px] uppercase tracking-wider font-extrabold text-muted-foreground/80">
+                        <th className="px-5 py-3.5">Employee Type</th>
+                        <th className="px-5 py-3.5">Payment Basis</th>
+                        <th className="px-5 py-3.5 text-center">Notice Required</th>
+                        <th className="px-5 py-3.5 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/40 bg-card">
+                      {noticePolicies.map((policy) => (
+                        <tr key={policy.id} className="hover:bg-muted/10 transition-colors group">
+                          <td className="px-5 py-4">
+                            <span className="text-sm font-bold text-foreground block">{policy.employeeType}</span>
+                            {policy.legalReference && <span className="text-[10px] text-primary font-semibold mt-0.5 block">{policy.legalReference}</span>}
+                            {policy.description && <span className="text-[11px] text-muted-foreground mt-1 block max-w-md whitespace-normal leading-relaxed" title={policy.description}>{policy.description}</span>}
+                          </td>
+                          <td className="px-5 py-4 whitespace-nowrap">
+                            <span className="text-xs font-medium text-foreground bg-muted border border-border/60 px-2 py-1 rounded-md">{policy.paymentBasis}</span>
+                          </td>
+                          <td className="px-5 py-4 text-center font-mono font-semibold text-foreground text-sm whitespace-nowrap">
+                            {policy.noticeDaysRequired} Days
+                          </td>
+                          <td className="px-5 py-4 text-right">
+                            <div className="flex justify-end gap-1.5">
+                              <button
+                                onClick={() => { setEditingNotice({ ...policy }); setIsNoticeModalOpen(true); }}
+                                className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-lg transition-all cursor-pointer border border-transparent hover:border-blue-500/20"
+                                title="Edit"
+                              >
+                                <Edit className="size-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteNotice(policy.id)}
+                                className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all cursor-pointer border border-transparent hover:border-rose-500/20"
+                                title="Delete"
+                              >
+                                <Trash2 className="size-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             )}
@@ -603,63 +613,75 @@ function FinalSettlementConfigPage() {
                   </Button>
                 </div>
 
-                <div className="border border-border/50 rounded-xl overflow-hidden bg-muted/5">
-                  <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-muted/30 border-b border-border/40 text-[10px] uppercase tracking-wider font-extrabold text-muted-foreground/80">
-                    <span className="col-span-5 lg:col-span-4">Settlement Type</span>
-                    <span className="col-span-2 hidden sm:block text-center">Notice (Days)</span>
-                    <span className="col-span-2 hidden md:block text-center">Comp. Rate</span>
-                    <span className="col-span-3 lg:col-span-4 hidden sm:block">Benefits / Flags</span>
-                    <span className="col-span-7 sm:col-span-1 text-right">Action</span>
-                  </div>
-                  <div className="divide-y divide-border/45 max-h-[600px] overflow-y-auto">
-                    {settlementTypes.map((type) => (
-                      <div key={type.id} className="grid grid-cols-12 gap-4 px-4 py-4 bg-card items-center group hover:bg-muted/10 transition-colors">
-                        <div className="col-span-5 lg:col-span-4">
-                          <span className="text-sm font-bold text-foreground block">{type.name}</span>
-                          <span className="text-[10px] text-primary/70 font-semibold block">{type.legalReference}</span>
-                          <span className="text-[10px] text-muted-foreground block truncate max-w-[200px]" title={type.description}>{type.description}</span>
-                        </div>
-                        <span className="col-span-2 hidden sm:block text-center text-sm font-mono">{type.noticePeriodDays}</span>
-                        <div className="col-span-2 hidden md:flex flex-col items-center">
-                          {type.isCompensationApplicable ? (
-                            <>
-                              <span className="text-[10px] font-semibold text-foreground">3yr+: {type.compensationDaysPerYear_3yrs}d</span>
-                              <span className="text-[10px] font-semibold text-foreground">5yr+: {type.compensationDaysPerYear_5yrs}d</span>
-                              <span className="text-[10px] font-semibold text-foreground">&lt;10yr: {type.compensationDaysPerYear_below10yrs}d</span>
-                              <span className="text-[10px] font-semibold text-foreground">&ge;10yr: {type.compensationDaysPerYear_above10yrs}d</span>
-                            </>
-                          ) : (
-                            <span className="text-[10px] font-bold text-muted-foreground">N/A</span>
-                          )}
-                        </div>
-                        <div className="col-span-3 lg:col-span-4 hidden sm:flex flex-wrap gap-1 content-start">
-                          {type.noticePaidByEmployer && <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20">Notice Pay</span>}
-                          {type.noticeDeductedFromEmployee && <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/10 text-amber-600 border border-amber-500/20">Notice Ded.</span>}
-                          {type.earnedLeaveEncashable && <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">EL Encash</span>}
-                          {type.isGratuityApplicable && <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-violet-500/10 text-violet-600 border border-violet-500/20">Gratuity</span>}
-                          {type.isProvidentFundPayable && <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-cyan-500/10 text-cyan-600 border border-cyan-500/20">PF</span>}
-                          {type.isMisconductBased && <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-500/10 text-rose-600 border border-rose-500/20">Misconduct</span>}
-                          {type.isDeathCase && <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-gray-500/10 text-gray-600 border border-gray-500/20">Death</span>}
-                        </div>
-                        <div className="col-span-7 sm:col-span-1 flex justify-end gap-1">
-                          <button
-                            onClick={() => { setEditingType({ ...type }); setIsTypeModalOpen(true); }}
-                            className="p-1.5 text-blue-500 hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"
-                            title="Edit"
-                          >
-                            <Edit className="size-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteType(type.id)}
-                            className="p-1.5 text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
-                            title="Delete"
-                          >
-                            <Trash2 className="size-4" />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                <div className="overflow-x-auto border border-border/50 rounded-xl bg-muted/5 shadow-inner">
+                  <table className="w-full text-xs text-left border-collapse">
+                    <thead>
+                      <tr className="bg-muted/40 border-b border-border/40 text-[10px] uppercase tracking-wider font-extrabold text-muted-foreground/80">
+                        <th className="px-5 py-3.5">Settlement Type</th>
+                        <th className="px-5 py-3.5 text-center">Notice (Days)</th>
+                        <th className="px-5 py-3.5 text-center">Comp. Rate</th>
+                        <th className="px-5 py-3.5">Benefits / Flags</th>
+                        <th className="px-5 py-3.5 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/40 bg-card">
+                      {settlementTypes.map((type) => (
+                        <tr key={type.id} className="hover:bg-muted/10 transition-colors group">
+                          <td className="px-5 py-4">
+                            <span className="text-sm font-bold text-foreground block">{type.name}</span>
+                            <span className="text-[10px] text-primary font-semibold mt-0.5 block">{type.legalReference}</span>
+                            <span className="text-[11px] text-muted-foreground mt-1 block max-w-md whitespace-normal leading-relaxed" title={type.description}>{type.description}</span>
+                          </td>
+                          <td className="px-5 py-4 text-center font-mono font-semibold text-foreground text-sm whitespace-nowrap">
+                            {type.noticePeriodDays} Days
+                          </td>
+                          <td className="px-5 py-4 whitespace-nowrap">
+                            {type.isCompensationApplicable ? (
+                              <div className="flex flex-col gap-1 items-center font-semibold text-[9px]">
+                                <span className="bg-muted border border-border/60 px-2 py-0.5 rounded text-foreground block w-full text-center">3yr+: <strong>{type.compensationDaysPerYear_3yrs ?? 0}d</strong></span>
+                                <span className="bg-muted border border-border/60 px-2 py-0.5 rounded text-foreground block w-full text-center">5yr+: <strong>{type.compensationDaysPerYear_5yrs ?? 0}d</strong></span>
+                                <span className="bg-muted border border-border/60 px-2 py-0.5 rounded text-foreground block w-full text-center">&lt;10yr: <strong>{type.compensationDaysPerYear_below10yrs ?? 0}d</strong></span>
+                                <span className="bg-muted border border-border/60 px-2 py-0.5 rounded text-foreground block w-full text-center">&ge;10yr: <strong>{type.compensationDaysPerYear_above10yrs ?? 0}d</strong></span>
+                              </div>
+                            ) : (
+                              <div className="text-center">
+                                <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-muted text-muted-foreground border border-border/40">N/A</span>
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-5 py-4">
+                            <div className="flex flex-wrap gap-1.5 max-w-[280px]">
+                              {type.noticePaidByEmployer && <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-blue-500/10 text-blue-600 border border-blue-500/20 shadow-sm">Notice Pay</span>}
+                              {type.noticeDeductedFromEmployee && <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-amber-500/10 text-amber-600 border border-amber-500/20 shadow-sm">Notice Ded.</span>}
+                              {type.earnedLeaveEncashable && <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 shadow-sm">EL Encash</span>}
+                              {type.isGratuityApplicable && <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-violet-500/10 text-violet-600 border border-violet-500/20 shadow-sm">Gratuity</span>}
+                              {type.isProvidentFundPayable && <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-cyan-500/10 text-cyan-600 border border-cyan-500/20 shadow-sm">PF</span>}
+                              {type.isMisconductBased && <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-rose-500/10 text-rose-600 border border-rose-500/20 shadow-sm">Misconduct</span>}
+                              {type.isDeathCase && <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-slate-500/10 text-slate-600 border border-slate-500/20 shadow-sm">Death</span>}
+                            </div>
+                          </td>
+                          <td className="px-5 py-4 text-right">
+                            <div className="flex justify-end gap-1.5">
+                              <button
+                                onClick={() => { setEditingType({ ...type }); setIsTypeModalOpen(true); }}
+                                className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-lg transition-all cursor-pointer border border-transparent hover:border-blue-500/20"
+                                title="Edit"
+                              >
+                                <Edit className="size-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteType(type.id)}
+                                className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all cursor-pointer border border-transparent hover:border-rose-500/20"
+                                title="Delete"
+                              >
+                                <Trash2 className="size-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             )}
@@ -684,40 +706,53 @@ function FinalSettlementConfigPage() {
                   </Button>
                 </div>
 
-                <div className="border border-border/50 rounded-xl overflow-hidden bg-muted/5">
-                  <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-muted/30 border-b border-border/40 text-[10px] uppercase tracking-wider font-extrabold text-muted-foreground/80">
-                    <span className="col-span-5 lg:col-span-4">Benefit Type</span>
-                    <span className="col-span-4 text-center">Min. Service (Months)</span>
-                    <span className="col-span-3 lg:col-span-4 text-right">Action</span>
-                  </div>
-                  <div className="divide-y divide-border/45 max-h-[500px] overflow-y-auto">
-                    {servicePolicies.map((policy) => (
-                      <div key={policy.id} className="grid grid-cols-12 gap-4 px-4 py-4 bg-card items-center group hover:bg-muted/10 transition-colors">
-                        <div className="col-span-5 lg:col-span-4">
-                          <span className="text-sm font-bold text-foreground block">{policy.benefitType}</span>
-                          <span className="text-[10px] text-primary/70 font-semibold block">{policy.legalReference}</span>
-                          <span className="text-[10px] text-muted-foreground block truncate" title={policy.description}>{policy.description}</span>
-                        </div>
-                        <span className="col-span-4 text-center text-sm font-mono">{policy.minServiceMonthsRequired}</span>
-                        <div className="col-span-3 lg:col-span-4 flex justify-end gap-1">
-                          <button
-                            onClick={() => { setEditingService({ ...policy }); setIsServiceModalOpen(true); }}
-                            className="p-1.5 text-blue-500 hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"
-                            title="Edit"
-                          >
-                            <Edit className="size-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteService(policy.id)}
-                            className="p-1.5 text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
-                            title="Delete"
-                          >
-                            <Trash2 className="size-4" />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                <div className="overflow-x-auto border border-border/50 rounded-xl bg-muted/5 shadow-inner">
+                  <table className="w-full text-xs text-left border-collapse">
+                    <thead>
+                      <tr className="bg-muted/40 border-b border-border/40 text-[10px] uppercase tracking-wider font-extrabold text-muted-foreground/80">
+                        <th className="px-5 py-3.5">Benefit Type</th>
+                        <th className="px-5 py-3.5 text-center">Min. Service Required</th>
+                        <th className="px-5 py-3.5 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/40 bg-card">
+                      {servicePolicies.map((policy) => (
+                        <tr key={policy.id} className="hover:bg-muted/10 transition-colors group">
+                          <td className="px-5 py-4">
+                            <span className="text-sm font-bold text-foreground block">{policy.benefitType}</span>
+                            {policy.legalReference && <span className="text-[10px] text-primary font-semibold mt-0.5 block">{policy.legalReference}</span>}
+                            {policy.description && <span className="text-[11px] text-muted-foreground mt-1 block max-w-lg whitespace-normal leading-relaxed" title={policy.description}>{policy.description}</span>}
+                          </td>
+                          <td className="px-5 py-4 text-center font-mono font-semibold text-foreground text-sm whitespace-nowrap">
+                            {policy.minServiceMonthsRequired} Months 
+                            <span className="text-[10px] text-violet-600 block font-bold mt-1">
+                              ({policy.minServiceMonthsRequired >= 12
+                                ? `${(policy.minServiceMonthsRequired / 12).toFixed(1).replace(/\.0$/, "")} Year(s)`
+                                : `${policy.minServiceMonthsRequired} Month(s)`})
+                            </span>
+                          </td>
+                          <td className="px-5 py-4 text-right">
+                            <div className="flex justify-end gap-1.5">
+                              <button
+                                onClick={() => { setEditingService({ ...policy }); setIsServiceModalOpen(true); }}
+                                className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-lg transition-all cursor-pointer border border-transparent hover:border-blue-500/20"
+                                title="Edit"
+                              >
+                                <Edit className="size-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteService(policy.id)}
+                                className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all cursor-pointer border border-transparent hover:border-rose-500/20"
+                                title="Delete"
+                              >
+                                <Trash2 className="size-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             )}
