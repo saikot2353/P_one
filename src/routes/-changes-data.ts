@@ -2,6 +2,33 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "216",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Final Settlement",
+    link: "/final-settlement",
+    descriptionEn: "Redesigned the Configuration & Records section of the Final Settlement form. Reorganized all inputs (Employee ID, dates, and settings) into a single, cohesive, modern 6-column responsive grid layout with a polished header, and placed the 'Load' button inline with the Employee ID input.",
+    descriptionBn: "ফাইনাল সেটেলমেন্ট ফর্মের 'কনফিগারেশন ও রেকর্ডস' সেকশনটির ডিজাইন পরিবর্তন করা হয়েছে। সব ইনপুট ফিল্ডকে (এমপ্লয়ি আইডি, তারিখ এবং অন্যান্য সেটিংস) একটি আধুনিক ও সুন্দর ৬-কলাম রেসপন্সিভ গ্রিড লেআউটে সাজানো হয়েছে এবং 'Load' বাটনটিকে এমপ্লয়ি আইডি ইনপুটের পাশে যুক্ত করা হয়েছে।",
+  },
+  {
+    id: "215",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Final Settlement",
+    link: "/final-settlement-configuration",
+    descriptionEn: "Removed the BLA 2006 Quick Reference statutory guide sections from the Notice Period Policy and Service Period Policy creation/edit modals.",
+    descriptionBn: "নোটিশ পিরিয়ড এবং সার্ভিস পিরিয়ড পলিসি তৈরির মোডালগুলো থেকে বিএলএ ২০০৬ কুইক রেফারেন্স গাইড সেকশনগুলো বাদ দেওয়া হয়েছে।",
+  },
+  {
+    id: "214",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Final Settlement",
+    link: "/final-settlement-configuration",
+    descriptionEn: "Reorganized the Compensation and Gratuity configuration input fields from a single line into a neat two-line layout inside the modal for a cleaner and better view.",
+    descriptionBn: "মোডালের ভেতরে ক্ষতিপূরণ এবং গ্র্যাচুইটি কনফিগারেশনের ইনপুট ফিল্ডগুলোকে এক লাইনের বদলে সুন্দরভাবে দুই লাইনে সাজানো হয়েছে যেন দেখতে ও ব্যবহার করতে আরও সুবিধা হয়।",
+  },
+  {
     id: "213",
     date: new Date().toISOString().slice(0, 16),
     type: "Feature Update",

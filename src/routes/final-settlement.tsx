@@ -643,87 +643,88 @@ function FinalSettlementPage() {
             <div className="bg-card border border-border/60 shadow-sm rounded flex flex-col relative min-h-[calc(100vh-140px)] w-full overflow-hidden">
               <div className="p-6 flex-1 space-y-4">
                 {/* ── Configuration & Records ── */}
-                <div className="border border-border/60 rounded p-5 mb-4 bg-card shadow-sm">
-                  <div className="flex items-center gap-1.5 mb-5 text-[11px] font-bold text-primary">
-                    <span className="uppercase tracking-wider border-b-2 border-primary/30 pb-0.5">
-                      Configuration & Records
-                    </span>
+                <div className="rounded-xl border border-primary/20 overflow-hidden bg-card mb-5 shadow-sm">
+                  <div className="flex items-center gap-2.5 px-5 py-3.5 bg-primary/5 border-b border-primary/10">
+                    <div className="size-1.5 rounded-full bg-primary animate-pulse"></div>
+                    <span className="text-[11px] font-extrabold uppercase tracking-widest text-primary/80">Configuration &amp; Records</span>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-semibold text-muted-foreground">
-                        Payment Type <span className="text-rose-500">*</span>
-                      </label>
-                      <Select>
-                        <option>Bank</option>
-                        <option>Cash</option>
-                      </Select>
-                    </div>
-                    <div className="space-y-1">
-                      <label className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground cursor-pointer">
-                        <input type="checkbox" className="accent-primary size-3" defaultChecked />{" "}
-                        Notice Deduction
-                      </label>
-                      <Select>
-                        <option>30</option>
-                        <option>60</option>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-semibold text-[#3b82f6]">
-                        Employee ID
-                      </label>
-                      <Input
-                        value={employeeId}
-                        onChange={(e: any) => setEmployeeId(e.target.value)}
-                        placeholder="e.g. 2023043910"
-                        className="font-bold border-[#3b82f6]/30 focus:ring-[#3b82f6]/40"
-                      />
-                      <button
-                        onClick={handleLoadEmployee}
-                        className="mt-1.5 text-[9px] bg-[#3b82f6] hover:bg-[#2563eb] transition-colors text-white px-2.5 py-0.5 rounded font-bold tracking-wider uppercase shadow-sm"
-                      >
-                        Load Employee
-                      </button>
-                    </div>
-                    <div className="space-y-1 md:col-span-2">
-                      <label className="text-[10px] font-semibold text-muted-foreground">
-                        Settlement Type <span className="text-rose-500">*</span>
-                      </label>
-                      <Select
-                        value={settlementType}
-                        onChange={(e: any) => setSettlementType(e.target.value)}
-                      >
-                        <option value="">Select Type</option>
-                        {settlementPolicies.map((t) => (
-                          <option key={t.id} value={t.name}>
-                            {t.name}
-                          </option>
-                        ))}
-                      </Select>
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-semibold text-muted-foreground">
-                        Apply Date <span className="text-rose-500">*</span>
-                      </label>
-                      <Input
-                        type="date"
-                        value={resignApplyDate}
-                        onChange={(e: any) => setResignApplyDate(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-semibold text-muted-foreground">
-                        Action Date <span className="text-rose-500">*</span>
-                      </label>
-                      <Input
-                        type="date"
-                        value={settlementDate}
-                        onChange={(e: any) => setSettlementDate(e.target.value)}
-                      />
+                  <div className="p-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-blue-600 uppercase tracking-wider block">
+                          Employee ID <span className="text-rose-500">*</span>
+                        </label>
+                        <div className="flex gap-1.5">
+                          <Input
+                            value={employeeId}
+                            onChange={(e: any) => setEmployeeId(e.target.value)}
+                            placeholder="e.g. 2023043910"
+                            className="font-bold border-blue-500/30 focus:border-blue-500 focus:ring-blue-500/20 flex-1"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleLoadEmployee}
+                            className="px-3 bg-blue-600 hover:bg-blue-700 text-white rounded text-[11px] font-bold tracking-wider transition-colors shadow-sm cursor-pointer shrink-0"
+                          >
+                            Load
+                          </button>
+                        </div>
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                          Settlement Type <span className="text-rose-500">*</span>
+                        </label>
+                        <Select
+                          value={settlementType}
+                          onChange={(e: any) => setSettlementType(e.target.value)}
+                        >
+                          <option value="">Select Type</option>
+                          {settlementPolicies.map((t) => (
+                            <option key={t.id} value={t.name}>
+                              {t.name}
+                            </option>
+                          ))}
+                        </Select>
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                          Apply Date <span className="text-rose-500">*</span>
+                        </label>
+                        <Input
+                          type="date"
+                          value={resignApplyDate}
+                          onChange={(e: any) => setResignApplyDate(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                          Action Date <span className="text-rose-500">*</span>
+                        </label>
+                        <Input
+                          type="date"
+                          value={settlementDate}
+                          onChange={(e: any) => setSettlementDate(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                          Payment Type <span className="text-rose-500">*</span>
+                        </label>
+                        <Select>
+                          <option>Bank</option>
+                          <option>Cash</option>
+                        </Select>
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider cursor-pointer h-[15px] select-none">
+                          <input type="checkbox" className="accent-primary size-3 rounded border-border" defaultChecked />
+                          Notice Deduction
+                        </label>
+                        <Select>
+                          <option>30</option>
+                          <option>60</option>
+                        </Select>
+                      </div>
                     </div>
                   </div>
                 </div>

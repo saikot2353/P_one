@@ -816,8 +816,8 @@ function FinalSettlementConfigPage() {
                       <span className="text-[11px] font-extrabold uppercase tracking-widest text-blue-600/80">Compensation &amp; Gratuity</span>
                     </div>
                     <div className="p-5">
-                      <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-5">
-                        <div className="space-y-1.5 col-span-2 md:col-span-1">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-5">
+                        <div className="space-y-1.5 col-span-2 sm:col-span-1">
                           <label className={labelClass}>Comp. Days/Year</label>
                           <label className="text-[10px] text-muted-foreground block -mt-1">Service 3+ years</label>
                           <input
@@ -827,7 +827,7 @@ function FinalSettlementConfigPage() {
                             className={inputClass}
                           />
                         </div>
-                        <div className="space-y-1.5 col-span-2 md:col-span-1">
+                        <div className="space-y-1.5 col-span-2 sm:col-span-1">
                           <label className={labelClass}>Comp. Days/Year</label>
                           <label className="text-[10px] text-muted-foreground block -mt-1">Service 5+ years</label>
                           <input
@@ -837,7 +837,7 @@ function FinalSettlementConfigPage() {
                             className={inputClass}
                           />
                         </div>
-                        <div className="space-y-1.5 col-span-2 md:col-span-1">
+                        <div className="space-y-1.5 col-span-2 sm:col-span-1">
                           <label className={labelClass}>Comp. Days/Year</label>
                           <label className="text-[10px] text-muted-foreground block -mt-1">Service &lt; 10 years</label>
                           <input
@@ -847,7 +847,7 @@ function FinalSettlementConfigPage() {
                             className={inputClass}
                           />
                         </div>
-                        <div className="space-y-1.5 col-span-2 md:col-span-1">
+                        <div className="space-y-1.5 col-span-2 sm:col-span-1">
                           <label className={labelClass}>Comp. Days/Year</label>
                           <label className="text-[10px] text-muted-foreground block -mt-1">Service ≥ 10 years</label>
                           <input
@@ -857,7 +857,7 @@ function FinalSettlementConfigPage() {
                             className={inputClass}
                           />
                         </div>
-                        <div className="space-y-1.5 col-span-2 md:col-span-1">
+                        <div className="space-y-1.5 col-span-2 sm:col-span-1">
                           <label className={labelClass}>Min. Service for Comp.</label>
                           <label className="text-[10px] text-muted-foreground block -mt-1">In months</label>
                           <input
@@ -867,7 +867,7 @@ function FinalSettlementConfigPage() {
                             className={inputClass}
                           />
                         </div>
-                        <div className="space-y-1.5 col-span-2 md:col-span-1">
+                        <div className="space-y-1.5 col-span-2 sm:col-span-1">
                           <label className={labelClass}>Min. Service for Gratuity</label>
                           <label className="text-[10px] text-muted-foreground block -mt-1">In months</label>
                           <input
@@ -1021,41 +1021,6 @@ function FinalSettlementConfigPage() {
               <form onSubmit={handleSaveNoticePolicy} className="flex-1 overflow-y-auto flex flex-col">
                 <div className="p-7 space-y-6 flex-1">
 
-                  {/* BLA Quick Reference */}
-                  <div className="rounded-xl bg-amber-500/5 border border-amber-500/20 p-4">
-                    <p className="text-[11px] font-extrabold uppercase tracking-wider text-amber-600/80 mb-2.5">📋 BLA 2006 — Notice Period Quick Reference</p>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {[
-                        { label: "Permanent (Employer terminates)", days: "120 days", section: "§26(1)(a)", basis: "Monthly Rated" },
-                        { label: "Permanent (Other basis)", days: "60 days", section: "§26(1)(b)", basis: "Non-Monthly" },
-                        { label: "Temporary (Employer terminates)", days: "30 days", section: "§26(2)(a)", basis: "Monthly Rated" },
-                        { label: "Temporary (Other basis)", days: "14 days", section: "§26(2)(b)", basis: "Non-Monthly" },
-                        { label: "Permanent (Resignation)", days: "60 days", section: "§27(1)", basis: "Any" },
-                        { label: "Temporary (Resignation)", days: "30 days", section: "§27(2)(a)", basis: "Monthly Rated" },
-                        { label: "Temporary (Resignation)", days: "14 days", section: "§27(2)(b)", basis: "Non-Monthly" },
-                        { label: "Retrenchment notice", days: "30 days", section: "§20(2)(a)", basis: "Any" },
-                      ].map((ref) => (
-                        <button
-                          key={ref.section}
-                          type="button"
-                          onClick={() => setEditingNotice({
-                            ...editingNotice,
-                            noticeDaysRequired: parseInt(ref.days),
-                            legalReference: `${ref.section}, BLA 2006`,
-                          })}
-                          className="text-left p-2.5 rounded-lg border border-amber-500/20 bg-card hover:border-amber-500/50 hover:bg-amber-500/5 transition-all cursor-pointer group"
-                        >
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-[10px] font-extrabold text-amber-600">{ref.section}</span>
-                            <span className="text-[10px] font-bold text-foreground bg-amber-500/10 px-1.5 py-0.5 rounded">{ref.days}</span>
-                          </div>
-                          <p className="text-[10px] text-muted-foreground leading-tight">{ref.label}</p>
-                        </button>
-                      ))}
-                    </div>
-                    <p className="text-[10px] text-amber-600/70 mt-2">💡 Click any card above to auto-fill the notice days and legal reference.</p>
-                  </div>
-
                   {/* Main Fields */}
                   <div className="rounded-xl border border-border/60 overflow-hidden">
                     <div className="flex items-center gap-2.5 px-5 py-3.5 bg-muted/30 border-b border-border/40">
@@ -1173,44 +1138,6 @@ function FinalSettlementConfigPage() {
 
               <form onSubmit={handleSaveServicePolicy} className="flex-1 overflow-y-auto flex flex-col">
                 <div className="p-7 space-y-6 flex-1">
-
-                  {/* BLA Quick Reference for Service */}
-                  <div className="rounded-xl bg-violet-500/5 border border-violet-500/20 p-4">
-                    <p className="text-[11px] font-extrabold uppercase tracking-wider text-violet-600/80 mb-2.5">📋 BLA 2006 — Statutory Minimum Service Quick Reference</p>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      {[
-                        { label: "Gratuity Eligibility", months: 6, section: "§2(10)", desc: "6 months = 1 full year under §14" },
-                        { label: "Compensation — Termination / Retrenchment / Discharge", months: 12, section: "§20, §22, §26", desc: "1 year for basic compensation" },
-                        { label: "Compensation — Resignation (5–10 yrs tier)", months: 60, section: "§27(4)(a)", desc: "5 years for 14 days/year rate" },
-                        { label: "Compensation — Resignation (10+ yrs tier)", months: 120, section: "§27(4)(b)", desc: "10 years for 30 days/year rate" },
-                        { label: "Compensation — Dismissal / Removal (Misconduct)", months: 12, section: "§23(3)", desc: "1 year, 15 days/year rate" },
-                        { label: "Compensation — Death in Service", months: 24, section: "§19", desc: "2 years minimum required" },
-                        { label: "Provident Fund (Employer Contribution)", months: 12, section: "§29", desc: "PF always payable per §29" },
-                        { label: "Earned Leave Encashment", months: 12, section: "§11", desc: "After 1 year of service" },
-                        { label: "Lay-off Compensation", months: 12, section: "§16", desc: "½ basic+DA per lay-off day" },
-                      ].map((ref) => (
-                        <button
-                          key={ref.section + ref.label}
-                          type="button"
-                          onClick={() => setEditingService({
-                            ...editingService,
-                            benefitType: ref.label,
-                            minServiceMonthsRequired: ref.months,
-                            legalReference: `${ref.section}, BLA 2006`,
-                            description: ref.desc,
-                          })}
-                          className="text-left p-2.5 rounded-lg border border-violet-500/20 bg-card hover:border-violet-500/50 hover:bg-violet-500/5 transition-all cursor-pointer"
-                        >
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-[10px] font-extrabold text-violet-600">{ref.section}</span>
-                            <span className="text-[10px] font-bold text-foreground bg-violet-500/10 px-1.5 py-0.5 rounded">{ref.months}mo</span>
-                          </div>
-                          <p className="text-[10px] text-muted-foreground leading-tight">{ref.label}</p>
-                        </button>
-                      ))}
-                    </div>
-                    <p className="text-[10px] text-violet-600/70 mt-2">💡 Click any card above to auto-fill all fields for that benefit.</p>
-                  </div>
 
                   {/* Main Fields */}
                   <div className="rounded-xl border border-border/60 overflow-hidden">
