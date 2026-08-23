@@ -25,7 +25,10 @@ import {
   MessageCircle,
   Coffee,
   Megaphone,
-  Eye
+  Eye,
+  RotateCcw,
+  Lock,
+  Unlock
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
@@ -169,6 +172,50 @@ export default function MyDashboard() {
   const [layout, setLayout] = useState<LayoutSection[]>([]);
   const [activeUrl, setActiveUrl] = useState<string | null>('__overview__');
   const [selectedDashboardNotice, setSelectedDashboardNotice] = useState<any | null>(null);
+  const [overviewWidgets, setOverviewWidgets] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("dashboard_overview_widgets_v3");
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {}
+      }
+    }
+    return ["chart_attendance", "notice", "messages", "leave", "chart_ontime", "events"];
+  });
+  const [draggedOverviewId, setDraggedOverviewId] = useState<string | null>(null);
+  const [isDragEnabled, setIsDragEnabled] = useState(false);
+
+  const handleOverviewDragStart = (e: React.DragEvent, id: string) => {
+    if (!isDragEnabled) {
+      e.preventDefault();
+      return;
+    }
+    setDraggedOverviewId(id);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleOverviewDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleOverviewDrop = (e: React.DragEvent, targetId: string) => {
+    e.preventDefault();
+    if (!draggedOverviewId || draggedOverviewId === targetId) return;
+
+    const sourceIndex = overviewWidgets.indexOf(draggedOverviewId);
+    const targetIndex = overviewWidgets.indexOf(targetId);
+    if (sourceIndex === -1 || targetIndex === -1) return;
+
+    const updated = [...overviewWidgets];
+    updated.splice(sourceIndex, 1);
+    updated.splice(targetIndex, 0, draggedOverviewId);
+
+    setOverviewWidgets(updated);
+    localStorage.setItem("dashboard_overview_widgets_v3", JSON.stringify(updated));
+    setDraggedOverviewId(null);
+  };
+
   const [openSidebarSections, setOpenSidebarSections] = useState<Record<string, boolean>>({});
   const [openPoolGroups, setOpenPoolGroups] = useState<Record<string, boolean>>({});
 
@@ -425,389 +472,538 @@ export default function MyDashboard() {
           <div className="flex-1 overflow-y-auto p-4 md:p-6 xl:p-8 space-y-6 bg-background">
             <div className="flex items-center justify-between mb-6">
               <h1 className="text-2xl font-bold tracking-tight">Organization Overview</h1>
-              <button className="text-xs font-semibold px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition-opacity">
-                Download Report
-              </button>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => setIsDragEnabled(!isDragEnabled)}
+                  className={`text-xs font-bold px-3 py-2 rounded-lg border flex items-center gap-1.5 shadow-xs cursor-pointer select-none transition-all duration-200 ${
+                    isDragEnabled 
+                      ? "bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400 hover:bg-amber-500/15 animate-pulse" 
+                      : "bg-card border-border hover:bg-muted text-foreground"
+                  }`}
+                  title={isDragEnabled ? "Click to lock widget positions" : "Click to unlock widget positions for reordering"}
+                >
+                  {isDragEnabled ? (
+                    <>
+                      <Unlock className="size-3.5" /> Lock Layout
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="size-3.5 text-muted-foreground" /> Unlock Layout
+                    </>
+                  )}
+                </button>
+                <button 
+                  onClick={() => {
+                    const defaultWidgets = ["chart_attendance", "notice", "messages", "leave", "chart_ontime", "events"];
+                    setOverviewWidgets(defaultWidgets);
+                    localStorage.setItem("dashboard_overview_widgets_v3", JSON.stringify(defaultWidgets));
+                  }}
+                  className="text-xs font-bold px-3 py-2 rounded-lg border border-border bg-card hover:bg-muted text-foreground transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer select-none"
+                  title="Restore default widget layout order"
+                >
+                  <RotateCcw className="size-3.5 text-muted-foreground" /> Reset Layout
+                </button>
+                <button className="text-xs font-semibold px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition-opacity shadow-xs">
+                  Download Report
+                </button>
+              </div>
             </div>
 
             {/* Top Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-              <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <p className="text-sm font-medium mb-1 text-muted-foreground">Total Requisitions</p>
-                    <h4 className="text-3xl font-extrabold text-foreground">1,248</h4>
-                  </div>
-                  <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center">
-                    <FileCheck size={20} />
+              <div className="p-3.5 rounded-xl border border-border/80 bg-card shadow-xs flex items-center justify-between">
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Requisitions</p>
+                  <div className="flex items-baseline gap-2 mt-1">
+                    <span className="text-2xl font-extrabold text-foreground">1,248</span>
+                    <span className="text-emerald-500 text-[10px] font-bold flex items-center gap-0.5"><TrendingUp size={10} /> +12.5%</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 text-xs font-medium">
-                  <span className="text-emerald-500 flex items-center gap-0.5"><TrendingUp size={12} /> +12.5%</span>
-                  <span className="text-muted-foreground/70">vs last month</span>
+                <div className="w-9 h-9 rounded-lg bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0">
+                  <FileCheck size={18} />
                 </div>
               </div>
 
-              <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <p className="text-sm font-medium mb-1 text-muted-foreground">Pending Requisitions</p>
-                    <h4 className="text-3xl font-extrabold text-amber-500">42</h4>
-                  </div>
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
-                    <AlertCircle size={20} />
+              <div className="p-3.5 rounded-xl border border-border/80 bg-card shadow-xs flex items-center justify-between">
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pending Requisitions</p>
+                  <div className="flex items-baseline gap-2 mt-1">
+                    <span className="text-2xl font-extrabold text-amber-500">42</span>
+                    <span className="text-rose-500 text-[10px] font-bold flex items-center gap-0.5"><TrendingUp size={10} /> +4.2%</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 text-xs font-medium">
-                  <span className="text-rose-500 flex items-center gap-0.5"><TrendingUp size={12} /> +4.2%</span>
-                  <span className="text-muted-foreground/70">requires action</span>
+                <div className="w-9 h-9 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
+                  <AlertCircle size={18} />
                 </div>
               </div>
 
-              <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm group hover:border-primary/30 transition-colors cursor-pointer" onClick={() => window.location.href = '/messenger'}>
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <p className="text-sm font-medium mb-1 text-muted-foreground group-hover:text-primary transition-colors">Unread Messages</p>
-                    <h4 className="text-3xl font-extrabold text-foreground">5 <span className="text-sm font-semibold text-muted-foreground">New</span></h4>
-                  </div>
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center relative">
-                    <MessageCircle size={20} />
-                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 border-2 border-card rounded-full animate-pulse"></span>
+              <div className="p-3.5 rounded-xl border border-border/80 bg-card shadow-xs flex items-center justify-between group hover:border-primary/30 transition-colors cursor-pointer" onClick={() => window.location.href = '/messenger'}>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors uppercase tracking-wider">Unread Messages</p>
+                  <div className="flex items-baseline gap-2 mt-1">
+                    <span className="text-2xl font-extrabold text-foreground">5</span>
+                    <span className="text-muted-foreground text-[10px] font-bold">New</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 text-xs font-medium">
-                  <div className="flex -space-x-2">
-                    <img className="w-5 h-5 rounded-full border border-card" src="https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg" alt="avatar" />
-                    <img className="w-5 h-5 rounded-full border border-card" src="https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg" alt="avatar" />
-                  </div>
-                  <span className="text-muted-foreground/70 truncate">HR Dept & Management Group</span>
+                <div className="w-9 h-9 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center relative shrink-0">
+                  <MessageCircle size={18} />
+                  <span className="absolute -top-0.5 -right-0.5 size-2.5 bg-red-500 border border-card rounded-full animate-pulse"></span>
                 </div>
               </div>
             </div>
 
-            {/* Charts Row */}
+            {/* Drag and Drop Dashboard Overview Widgets Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-              {/* Bar Chart */}
-              <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm flex flex-col">
-                <div className="flex items-center justify-between mb-6">
-                  <h4 className="font-bold text-sm flex items-center gap-2 text-foreground"><BarChart3 size={16} className="text-indigo-500" /> Ontime vs Late</h4>
-                </div>
-                <div className="h-64 w-full mt-auto text-xs">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={ontimeVsLateData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                      <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} dy={10} />
-                      <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
-                      <RechartsTooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                      <Bar dataKey="onTime" name="On Time" fill="#10b981" radius={[4, 4, 0, 0]} barSize={12} />
-                      <Bar dataKey="late" name="Late" fill="#ef4444" radius={[4, 4, 0, 0]} barSize={12} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
+              {overviewWidgets.map((widgetId) => {
+                const isDragging = draggedOverviewId === widgetId;
 
-              {/* Pie Chart */}
-              <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm flex flex-col">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-bold text-sm flex items-center gap-2 text-foreground"><PieChartIcon size={16} className="text-purple-500" /> Attendance Summary</h4>
-                </div>
-                <div className="h-64 w-full mt-auto flex items-center justify-center relative text-xs">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={attendanceData}
-                        innerRadius={60}
-                        outerRadius={80}
-                        paddingAngle={5}
-                        dataKey="value"
-                        stroke="none"
-                      >
-                        {attendanceData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <RechartsTooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span className="text-3xl font-extrabold text-foreground">85%</span>
-                    <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mt-1">Present</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Widgets Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Notice Board Card */}
-              <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h4 className="font-bold text-sm text-foreground flex items-center gap-1.5">
-                        <Megaphone className="size-4 text-primary" /> Notice Board
-                      </h4>
-                      <p className="text-[10px] mt-0.5 text-muted-foreground">Official circulars & announcements</p>
-                    </div>
-                    <button 
-                      onClick={() => window.location.href = '/notice'} 
-                      className="text-[10px] font-bold flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
-                    >
-                      View All <ArrowRight size={12} />
-                    </button>
-                  </div>
-
-                  <div className="space-y-3">
-                    {dashboardNotices.map((ntc) => {
-                      const isHoliday = ntc.category === "HOLIDAY";
-                      const isPolicy = ntc.category === "POLICY";
-                      const isMeeting = ntc.category === "MEETING";
-                      
-                      let badgeBg = "bg-slate-500/10 text-slate-600 dark:bg-slate-400/10 dark:text-slate-400";
-                      if (isHoliday) badgeBg = "bg-rose-500/10 text-rose-600 dark:bg-rose-400/10 dark:text-rose-400";
-                      if (isPolicy) badgeBg = "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-400";
-                      if (isMeeting) badgeBg = "bg-blue-500/10 text-blue-600 dark:bg-blue-400/10 dark:text-blue-400";
-
+                const getWidgetContent = () => {
+                  switch (widgetId) {
+                    case "notice":
                       return (
-                        <div 
-                          key={ntc.id} 
-                          onClick={() => setSelectedDashboardNotice(ntc)}
-                          className="p-2.5 rounded-xl border border-border/40 hover:border-primary/30 bg-muted/10 hover:bg-primary/5 transition-all duration-200 cursor-pointer group"
-                        >
-                          <div className="flex items-center justify-between gap-2 mb-1.5">
-                            <span className={`text-[8.5px] font-black tracking-wider uppercase px-2 py-0.5 rounded-md ${badgeBg}`}>
-                              {ntc.category}
-                            </span>
-                            <span className="text-[9px] font-semibold text-muted-foreground font-mono">
-                              {ntc.date}
-                            </span>
+                        <div className="flex flex-col justify-between h-full">
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <div>
+                                <h4 className="font-bold text-sm text-foreground flex items-center gap-1.5">
+                                  <Megaphone className="size-4 text-primary" /> Notice Board
+                                </h4>
+                                <p className="text-[10px] mt-0.5 text-muted-foreground">Official circulars & announcements</p>
+                              </div>
+                              <button 
+                                onClick={() => window.location.href = '/notice'} 
+                                className="text-[10px] font-bold flex items-center gap-1 text-primary hover:text-primary/80 transition-colors mr-20"
+                              >
+                                View All <ArrowRight size={12} />
+                              </button>
+                            </div>
+
+                            <div className="space-y-1.5">
+                              {dashboardNotices.map((ntc) => {
+                                const isHoliday = ntc.category === "HOLIDAY";
+                                const isPolicy = ntc.category === "POLICY";
+                                const isMeeting = ntc.category === "MEETING";
+                                
+                                let badgeBg = "bg-slate-500/10 text-slate-600 dark:bg-slate-400/10 dark:text-slate-400";
+                                if (isHoliday) badgeBg = "bg-rose-500/10 text-rose-600 dark:bg-rose-400/10 dark:text-rose-400";
+                                if (isPolicy) badgeBg = "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-400";
+                                if (isMeeting) badgeBg = "bg-blue-500/10 text-blue-600 dark:bg-blue-400/10 dark:text-blue-400";
+
+                                return (
+                                  <div 
+                                    key={ntc.id} 
+                                    onClick={() => setSelectedDashboardNotice(ntc)}
+                                    className="py-1.5 px-2.5 rounded-xl border border-border/40 hover:border-primary/30 bg-muted/10 hover:bg-primary/5 transition-all duration-200 cursor-pointer group/item"
+                                  >
+                                    <div className="flex items-center justify-between gap-2 mb-0.5">
+                                      <span className={`text-[7.5px] font-black tracking-wider uppercase px-1.5 py-0.5 rounded ${badgeBg} shadow-[0_0_8px_rgba(0,0,0,0.02)]`}>
+                                        {ntc.category}
+                                      </span>
+                                      <span className="text-[8px] font-semibold text-muted-foreground font-mono">
+                                        {ntc.date}
+                                      </span>
+                                    </div>
+                                    <h5 className="font-bold text-[10.5px] text-foreground group-hover/item:text-primary transition-colors leading-tight line-clamp-1">
+                                      {ntc.title}
+                                    </h5>
+                                    <p className="text-[9.5px] text-muted-foreground mt-0.5 line-clamp-1 font-medium">
+                                      {ntc.summary}
+                                    </p>
+                                    <div className="flex items-center justify-between mt-1 pt-1 border-t border-border/20 text-[8px] font-bold text-muted-foreground/60">
+                                      <span>Ref: {ntc.circularNo}</span>
+                                      <span className="flex items-center gap-0.5 text-primary opacity-0 group-hover/item:opacity-100 transition-opacity">
+                                        Read <Eye size={10} />
+                                      </span>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
                           </div>
-                          <h5 className="font-bold text-[11.5px] text-foreground group-hover:text-primary transition-colors leading-tight line-clamp-1">
-                            {ntc.title}
-                          </h5>
-                          <p className="text-[10.5px] text-muted-foreground mt-1 line-clamp-1 font-medium">
-                            {ntc.summary}
-                          </p>
-                          <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-border/30 text-[9px] font-bold text-muted-foreground/60">
-                            <span>Ref: {ntc.circularNo}</span>
-                            <span className="flex items-center gap-0.5 text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                              Read <Eye size={10} />
-                            </span>
+
+                          <button 
+                            onClick={() => window.location.href = '/notice'} 
+                            className="w-full py-1 text-xs font-bold rounded-lg border border-border bg-muted/50 hover:bg-muted text-foreground transition-colors text-center shadow-xs"
+                          >
+                            Go to Notice Board
+                          </button>
+                        </div>
+                      );
+                    case "messages":
+                      return (
+                        <div className="flex flex-col justify-between h-full">
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <div>
+                                <h4 className="font-bold text-sm text-foreground">Recent Messages</h4>
+                                <p className="text-[10px] mt-0.5 text-muted-foreground">Unread and latest conversations</p>
+                              </div>
+                              <button onClick={() => window.location.href = '/messenger'} className="text-[10px] font-bold flex items-center gap-1 text-primary hover:text-primary/80 transition-colors cursor-pointer mr-20">
+                                View All <ArrowRight size={12} />
+                              </button>
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <div className="flex items-start gap-2 p-1.5 rounded-xl border border-border/40 hover:border-primary/30 bg-muted/10 hover:bg-primary/5 cursor-pointer transition-all duration-200 group/item" onClick={() => window.location.href = '/messenger'}>
+                                <div className="relative shrink-0">
+                                  <div className="w-8 h-8 rounded-full bg-blue-500/10 text-blue-600 flex items-center justify-center border-2 border-background font-bold text-[10px] shadow-sm">HR</div>
+                                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 border border-background rounded-full animate-pulse shadow-sm"></span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex justify-between items-start">
+                                    <h5 className="font-semibold text-[11px] text-foreground group-hover/item:text-primary transition-colors truncate font-bold">HR Department</h5>
+                                    <span className="text-[8px] font-bold text-primary">10:42 AM</span>
+                                  </div>
+                                  <p className="text-[10px] font-bold mt-0.5 text-foreground truncate">Sarah: Please review the updated policy document.</p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-start gap-2 p-1.5 rounded-xl border border-border/40 hover:border-primary/30 bg-muted/10 hover:bg-primary/5 cursor-pointer transition-all duration-200 group/item" onClick={() => window.location.href = '/messenger'}>
+                                <div className="relative shrink-0">
+                                  <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop" alt="user" className="w-8 h-8 rounded-full object-cover border-2 border-background shadow-sm" />
+                                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-background rounded-full shadow-sm"></span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex justify-between items-start">
+                                    <h5 className="font-semibold text-[11px] text-foreground group-hover/item:text-primary transition-colors truncate font-bold">Michael Chen</h5>
+                                    <span className="text-[8px] font-medium text-muted-foreground font-semibold">Yesterday</span>
+                                  </div>
+                                  <p className="text-[10px] font-medium mt-0.5 text-muted-foreground truncate">Are we still on for the 3PM sync?</p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-start gap-2 p-1.5 rounded-xl border border-border/40 hover:border-primary/30 bg-muted/10 hover:bg-primary/5 cursor-pointer transition-all duration-200 group/item" onClick={() => window.location.href = '/messenger'}>
+                                <div className="relative shrink-0">
+                                  <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop" alt="user" className="w-8 h-8 rounded-full object-cover border-2 border-background shadow-sm" />
+                                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-amber-500 border-2 border-background rounded-full shadow-sm"></span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex justify-between items-start">
+                                    <h5 className="font-semibold text-[11px] text-foreground group-hover/item:text-primary transition-colors truncate font-bold">Alice Smith</h5>
+                                    <span className="text-[8px] font-medium text-muted-foreground font-semibold">Mon</span>
+                                  </div>
+                                  <p className="text-[10px] font-medium mt-0.5 text-muted-foreground truncate">Thanks for sending over the assets!</p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-start gap-2 p-1.5 rounded-xl border border-border/40 hover:border-primary/30 bg-muted/10 hover:bg-primary/5 cursor-pointer transition-all duration-200 group/item" onClick={() => window.location.href = '/messenger'}>
+                                <div className="relative shrink-0">
+                                  <div className="w-8 h-8 rounded-full bg-purple-500/10 text-purple-600 flex items-center justify-center border-2 border-background font-bold text-[10px] shadow-sm">IT</div>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex justify-between items-start">
+                                    <h5 className="font-semibold text-[11px] text-foreground group-hover/item:text-primary transition-colors truncate font-bold">IT Support</h5>
+                                    <span className="text-[8px] font-medium text-muted-foreground font-semibold">Mon</span>
+                                  </div>
+                                  <p className="text-[10px] font-medium mt-0.5 text-muted-foreground truncate">Ticket #4042 has been marked resolved.</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <button onClick={() => window.location.href = '/messenger'} className="w-full py-1 text-xs font-bold rounded-lg border border-border bg-primary text-primary-foreground hover:opacity-90 shadow-sm transition-opacity cursor-pointer">
+                            Open Messenger
+                          </button>
+                        </div>
+                      );
+                    case "chart_ontime":
+                      return (
+                        <div className="flex flex-col justify-between h-full">
+                          <div className="flex items-center justify-between mb-1">
+                            <h4 className="font-bold text-sm flex items-center gap-2 text-foreground">
+                              <BarChart3 size={16} className="text-indigo-500" /> Ontime vs Late
+                            </h4>
+                          </div>
+                          <div className="h-[245px] w-full mt-auto text-xs">
+                            <ResponsiveContainer width="100%" height="100%">
+                              <BarChart data={ontimeVsLateData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} dy={10} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
+                                <RechartsTooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                                <Bar dataKey="onTime" name="On Time" fill="#10b981" radius={[4, 4, 0, 0]} barSize={12} />
+                                <Bar dataKey="late" name="Late" fill="#ef4444" radius={[4, 4, 0, 0]} barSize={12} />
+                              </BarChart>
+                            </ResponsiveContainer>
                           </div>
                         </div>
                       );
-                    })}
-                  </div>
-                </div>
+                    case "chart_attendance":
+                      return (
+                        <div className="flex flex-col justify-between h-full">
+                          <div className="flex items-center justify-between mb-1">
+                            <h4 className="font-bold text-sm flex items-center gap-2 text-foreground">
+                              <PieChartIcon size={16} className="text-purple-500" /> Attendance Summary
+                            </h4>
+                          </div>
+                          <div className="flex items-center justify-between gap-4 flex-1">
+                            <div className="w-1/2 h-[240px] flex items-center justify-center relative text-xs">
+                              <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                  <Pie
+                                    data={attendanceData}
+                                    innerRadius={50}
+                                    outerRadius={70}
+                                    paddingAngle={5}
+                                    dataKey="value"
+                                    stroke="none"
+                                  >
+                                    {attendanceData.map((entry, index) => (
+                                      <Cell key={`cell-${index}`} fill={entry.color} />
+                                    ))}
+                                  </Pie>
+                                  <RechartsTooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                                </PieChart>
+                              </ResponsiveContainer>
+                              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                <span className="text-2xl font-extrabold text-foreground">85%</span>
+                                <span className="text-[9px] uppercase tracking-wider font-bold text-muted-foreground mt-0.5">Present</span>
+                              </div>
+                            </div>
 
-                <button 
-                  onClick={() => window.location.href = '/notice'} 
-                  className="w-full mt-4 py-2 text-xs font-bold rounded-lg border border-border bg-muted/50 hover:bg-muted text-foreground transition-colors text-center"
-                >
-                  Go to Notice Board
-                </button>
-              </div>
+                            <div className="w-1/2 space-y-2 pr-1">
+                              <div className="p-1.5 rounded-xl bg-emerald-500/5 border border-emerald-500/10 flex items-center justify-between">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="size-2 rounded-full bg-[#10b981]"></span>
+                                  <span className="text-[10px] font-bold text-foreground">Present</span>
+                                </div>
+                                <span className="text-[11px] font-black text-emerald-600">85% <span className="text-[8px] text-muted-foreground font-medium">(1k+)</span></span>
+                              </div>
+                              <div className="p-1.5 rounded-xl bg-amber-500/5 border border-amber-500/10 flex items-center justify-between">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="size-2 rounded-full bg-[#f59e0b]"></span>
+                                  <span className="text-[10px] font-bold text-foreground">Late</span>
+                                </div>
+                                <span className="text-[11px] font-black text-amber-600">10% <span className="text-[8px] text-muted-foreground font-medium">(125)</span></span>
+                              </div>
+                              <div className="p-1.5 rounded-xl bg-rose-500/5 border border-rose-500/10 flex items-center justify-between">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="size-2 rounded-full bg-[#ef4444]"></span>
+                                  <span className="text-[10px] font-bold text-foreground">Absent</span>
+                                </div>
+                                <span className="text-[11px] font-black text-rose-600">5% <span className="text-[8px] text-muted-foreground font-medium">(62)</span></span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    case "events":
+                      return (
+                        <div className="flex flex-col justify-between h-full">
+                          <div>
+                            <div className="flex items-center justify-between mb-3">
+                              <div>
+                                <h4 className="font-bold text-sm text-foreground">Upcoming</h4>
+                                <p className="text-[10px] mt-0.5 text-muted-foreground">Events & milestones this week</p>
+                              </div>
+                              <button className="text-[10px] font-bold flex items-center gap-1 text-primary hover:text-primary/80 transition-colors mr-20">
+                                Calendar <ArrowRight size={12} />
+                              </button>
+                            </div>
 
-              {/* Upcoming Events */}
-              <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm flex flex-col">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h4 className="font-bold text-sm text-foreground">Upcoming</h4>
-                    <p className="text-[10px] mt-0.5 text-muted-foreground">Events & milestones this week</p>
-                  </div>
-                  <button className="text-[10px] font-bold flex items-center gap-1 text-primary hover:text-primary/80 transition-colors">
-                    Calendar <ArrowRight size={12} />
-                  </button>
-                </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="p-2 rounded-xl border border-rose-500/10 bg-rose-500/5 flex items-start gap-2 h-[72px]">
+                                <div className="mt-0.5 p-1 rounded-lg bg-rose-500/10 text-rose-500 shrink-0">
+                                  <Gift size={12} />
+                                </div>
+                                <div className="min-w-0">
+                                  <h5 className="font-bold text-[10.5px] text-foreground truncate">Anika's Birthday</h5>
+                                  <p className="text-[9px] text-muted-foreground font-bold mt-0.5">Today</p>
+                                </div>
+                              </div>
 
-                <div className="space-y-4 flex-1">
-                  <div className="flex items-start gap-3 group">
-                    <div className="mt-0.5 p-2 rounded-lg bg-rose-500/10 text-rose-500">
-                      <Gift size={16} />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <h5 className="font-semibold text-sm text-foreground group-hover:text-rose-500 transition-colors">Anika Mehta's birthday</h5>
-                        <button className="text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground">View</button>
+                              <div className="p-2 rounded-xl border border-amber-500/10 bg-amber-500/5 flex items-start gap-2 h-[72px]">
+                                <div className="mt-0.5 p-1 rounded-lg bg-amber-500/10 text-amber-500 shrink-0">
+                                  <Briefcase size={12} />
+                                </div>
+                                <div className="min-w-0">
+                                  <h5 className="font-bold text-[10.5px] text-foreground truncate">Jordan Park (5y)</h5>
+                                  <p className="text-[9px] text-muted-foreground font-bold mt-0.5">Tomorrow</p>
+                                </div>
+                              </div>
+
+                              <div className="p-2 rounded-xl border border-blue-500/10 bg-blue-500/5 flex items-start gap-2 h-[72px]">
+                                <div className="mt-0.5 p-1 rounded-lg bg-blue-500/10 text-blue-500 shrink-0">
+                                  <Users size={12} />
+                                </div>
+                                <div className="min-w-0">
+                                  <h5 className="font-bold text-[10.5px] text-foreground truncate">Interview: Sr. PM</h5>
+                                  <p className="text-[9px] text-muted-foreground font-bold mt-0.5">Jun 11, 2:00 PM</p>
+                                </div>
+                              </div>
+
+                              <div className="p-2 rounded-xl border border-purple-500/10 bg-purple-500/5 flex items-start gap-2 h-[72px]">
+                                <div className="mt-0.5 p-1 rounded-lg bg-purple-500/10 text-purple-500 shrink-0">
+                                  <Calendar size={12} />
+                                </div>
+                                <div className="min-w-0">
+                                  <h5 className="font-bold text-[10.5px] text-foreground truncate">All-hands Meeting</h5>
+                                  <p className="text-[9px] text-muted-foreground font-bold mt-0.5">Jun 14, 10:00 AM</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <button className="w-full py-1 text-xs font-bold rounded-lg border border-border bg-muted/50 hover:bg-muted text-foreground transition-colors">
+                            View Full Calendar
+                          </button>
+                        </div>
+                      );
+                    case "leave":
+                      {
+                        const leaveBalances = [
+                          { id: "casual", name: "Casual Leave", left: 7, total: 10, used: 3, percentage: 70, color: "blue" },
+                          { id: "sick", name: "Sick Leave", left: 12, total: 14, used: 2, percentage: 86, color: "emerald" },
+                          { id: "earned", name: "Earned Leave", left: 18, total: 18, used: 0, percentage: 100, color: "amber" },
+                          { id: "maternity", name: "Maternity", left: 90, total: 90, used: 0, percentage: 100, color: "purple" },
+                          { id: "compoff", name: "Comp Off", left: 2, total: 4, used: 2, percentage: 50, color: "indigo" },
+                          { id: "lwp", name: "Without Pay", left: 0, total: 0, used: 5, percentage: 0, color: "slate" },
+                        ];
+
+                        return (
+                          <div className="flex flex-col justify-start h-full">
+                            <style>{`
+                              .custom-scrollbar::-webkit-scrollbar {
+                                height: 4px;
+                              }
+                              .custom-scrollbar::-webkit-scrollbar-track {
+                                background: transparent;
+                              }
+                              .custom-scrollbar::-webkit-scrollbar-thumb {
+                                background: rgba(0, 0, 0, 0.12);
+                                border-radius: 4px;
+                              }
+                              .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+                                background: rgba(255, 255, 255, 0.12);
+                              }
+                            `}</style>
+                            <div className="flex items-center justify-between mb-3">
+                              <div>
+                                <h4 className="font-bold text-[13px] text-foreground">Leave Balance</h4>
+                                <p className="text-[10px] mt-0.5 text-muted-foreground">Scroll horizontally to view all allocations</p>
+                              </div>
+                              <span className="text-[9px] font-bold bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
+                                {leaveBalances.length} Types
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-2.5 overflow-x-auto pb-2 flex-1 custom-scrollbar">
+                              {leaveBalances.map((leave) => {
+                                let bgClass = "bg-slate-500/5 border-slate-500/10";
+                                let textColor = "text-slate-600 dark:text-slate-400";
+                                
+                                if (leave.color === "blue") {
+                                  bgClass = "bg-blue-500/5 border-blue-500/10";
+                                  textColor = "text-blue-600 dark:text-blue-400";
+                                } else if (leave.color === "emerald") {
+                                  bgClass = "bg-emerald-500/5 border-emerald-500/10";
+                                  textColor = "text-emerald-600 dark:text-emerald-400";
+                                } else if (leave.color === "amber") {
+                                  bgClass = "bg-amber-500/5 border-amber-500/10";
+                                  textColor = "text-amber-600 dark:text-amber-400";
+                                } else if (leave.color === "purple") {
+                                  bgClass = "bg-purple-500/5 border-purple-500/10";
+                                  textColor = "text-purple-600 dark:text-purple-400";
+                                } else if (leave.color === "indigo") {
+                                  bgClass = "bg-indigo-500/5 border-indigo-500/10";
+                                  textColor = "text-indigo-600 dark:text-indigo-400";
+                                }
+
+                                return (
+                                  <div 
+                                    key={leave.id} 
+                                    className={`p-2.5 rounded-xl border ${bgClass} flex flex-col justify-between items-center text-center w-[125px] min-w-[125px] h-[190px] shrink-0 transition-all duration-200 hover:scale-[1.015] hover:shadow-xs`}
+                                  >
+                                    <div className="size-14 flex items-center justify-center relative shrink-0 mt-1">
+                                      <svg className="absolute inset-0 size-full -rotate-90" viewBox="0 0 56 56">
+                                        <circle
+                                          cx="28"
+                                          cy="28"
+                                          r="22"
+                                          stroke="currentColor"
+                                          strokeWidth="3.5"
+                                          fill="transparent"
+                                          className="text-muted-foreground/10"
+                                        />
+                                        <circle
+                                          cx="28"
+                                          cy="28"
+                                          r="22"
+                                          stroke="currentColor"
+                                          strokeWidth="3.5"
+                                          fill="transparent"
+                                          strokeDasharray="138.2"
+                                          strokeDashoffset={138.2 - (leave.percentage / 100) * 138.2}
+                                          className={
+                                            leave.color === "blue" ? "text-blue-500" :
+                                            leave.color === "emerald" ? "text-emerald-500" :
+                                            leave.color === "amber" ? "text-amber-500" :
+                                            leave.color === "purple" ? "text-purple-500" :
+                                            leave.color === "indigo" ? "text-indigo-500" : "text-slate-500"
+                                          }
+                                          strokeLinecap="round"
+                                        />
+                                      </svg>
+                                      <span className={`text-[10px] font-extrabold ${textColor}`}>{leave.percentage}%</span>
+                                    </div>
+                                    <div className="mt-1 flex-1 flex flex-col justify-center">
+                                      <span className={`text-[9.5px] font-black tracking-wider uppercase block ${textColor} truncate w-full`}>
+                                        {leave.name}
+                                      </span>
+                                      <span className="text-sm font-extrabold text-foreground mt-0.5 block">
+                                        {leave.left} <span className="text-[9px] font-normal text-muted-foreground">/ {leave.total}</span>
+                                      </span>
+                                    </div>
+                                    <div className="mt-1 pt-1.5 border-t border-border/40 w-full flex justify-between text-[8px] font-bold text-muted-foreground">
+                                      <span>Left: {leave.left}</span>
+                                      <span>Used: {leave.used}</span>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      }
+                    default:
+                      return null;
+                  }
+                };
+
+                // Add card header top colored accent lines for each widget type
+                let accentColor = "bg-primary/5";
+                if (widgetId === "notice") accentColor = "border-t-2 border-t-blue-500";
+                if (widgetId === "messages") accentColor = "border-t-2 border-t-amber-500";
+                if (widgetId === "chart_ontime") accentColor = "border-t-2 border-t-indigo-500";
+                if (widgetId === "chart_attendance") accentColor = "border-t-2 border-t-purple-500";
+                if (widgetId === "events") accentColor = "border-t-2 border-t-rose-500";
+                if (widgetId === "leave") accentColor = "border-t-2 border-t-emerald-500";
+
+                return (
+                  <div
+                    key={widgetId}
+                    draggable={isDragEnabled}
+                    onDragStart={(e) => handleOverviewDragStart(e, widgetId)}
+                    onDragOver={isDragEnabled ? handleOverviewDragOver : undefined}
+                    onDrop={isDragEnabled ? (e) => handleOverviewDrop(e, widgetId) : undefined}
+                    className={`group/card relative bg-card p-4 rounded-2xl border border-border/80 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between overflow-hidden min-h-[330px] lg:h-[330px] ${accentColor} ${
+                      isDragEnabled ? "cursor-grab active:cursor-grabbing hover:scale-[1.005] active:scale-[0.995]" : ""
+                    } ${
+                      isDragging ? "opacity-30 border-dashed border-primary bg-primary/5" : ""
+                    }`}
+                  >
+                    {/* Drag Handle Indicator */}
+                    {isDragEnabled && (
+                      <div className="absolute top-3.5 right-3.5 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 pointer-events-none text-muted-foreground/50 flex items-center gap-1 bg-muted/65 px-1.5 py-0.5 rounded-md border border-border/40 backdrop-blur-xs select-none">
+                        <GripVertical className="size-3" />
+                        <span className="text-[7.5px] font-black uppercase tracking-wider">Drag to reorder</span>
                       </div>
-                      <p className="text-xs font-medium mt-0.5 text-muted-foreground">Today</p>
-                    </div>
-                  </div>
+                    )}
 
-                  <div className="flex items-start gap-3 group">
-                    <div className="mt-0.5 p-2 rounded-lg bg-amber-500/10 text-amber-500">
-                      <Briefcase size={16} />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <h5 className="font-semibold text-sm text-foreground group-hover:text-amber-500 transition-colors">5 yrs — Jordan Park</h5>
-                        <button className="text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground">View</button>
-                      </div>
-                      <p className="text-xs font-medium mt-0.5 text-muted-foreground">Tomorrow</p>
-                    </div>
+                    {getWidgetContent()}
                   </div>
-
-                  <div className="flex items-start gap-3 group">
-                    <div className="mt-0.5 p-2 rounded-lg bg-blue-500/10 text-blue-500">
-                      <Users size={16} />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <h5 className="font-semibold text-sm text-foreground group-hover:text-blue-500 transition-colors">Interview · Senior PM</h5>
-                        <button className="text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground">View</button>
-                      </div>
-                      <p className="text-xs font-medium mt-0.5 text-muted-foreground">Jun 11, 2:00 PM</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 group">
-                    <div className="mt-0.5 p-2 rounded-lg bg-purple-500/10 text-purple-500">
-                      <Calendar size={16} />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <h5 className="font-semibold text-sm text-foreground group-hover:text-purple-500 transition-colors">All-hands meeting</h5>
-                      </div>
-                      <p className="text-xs font-medium mt-0.5 text-muted-foreground">Jun 14, 10:00 AM</p>
-                    </div>
-                  </div>
-                </div>
-
-                <button className="w-full mt-4 py-2 text-xs font-bold rounded-lg border border-border bg-muted/50 hover:bg-muted text-foreground transition-colors">
-                  View Full Calendar
-                </button>
-              </div>
-
-              {/* Detailed Leave Balance */}
-              <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm flex flex-col justify-between">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-bold text-[13px] text-foreground">Leave Balance</h4>
-                </div>
-
-                {/* Casual Leave */}
-                <div className="flex flex-col gap-2">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-bold text-[11px] tracking-wider text-foreground">CASUAL LEAVE</h4>
-                    <span className="bg-blue-500/10 text-blue-600 font-bold text-[10px] px-2 py-0.5 rounded-full">7 left</span>
-                  </div>
-                  <div className="h-1.5 w-full bg-muted/70 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-500 rounded-full" style={{ width: '70%' }}></div>
-                  </div>
-                  <div className="flex justify-between items-center text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
-                    <span>Assigned: <strong className="text-foreground text-[10px] ml-0.5">10</strong></span>
-                    <span>Enjoyed: <strong className="text-foreground text-[10px] ml-0.5">3</strong></span>
-                  </div>
-                </div>
-
-                <div className="h-px w-full bg-border/50 my-2"></div>
-
-                {/* Sick Leave */}
-                <div className="flex flex-col gap-2">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-bold text-[11px] tracking-wider text-foreground">SICK LEAVE</h4>
-                    <span className="bg-emerald-500/10 text-emerald-600 font-bold text-[10px] px-2 py-0.5 rounded-full">12 left</span>
-                  </div>
-                  <div className="h-1.5 w-full bg-muted/70 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: '14%' }}></div>
-                  </div>
-                  <div className="flex justify-between items-center text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
-                    <span>Assigned: <strong className="text-foreground text-[10px] ml-0.5">14</strong></span>
-                    <span>Enjoyed: <strong className="text-foreground text-[10px] ml-0.5">2</strong></span>
-                  </div>
-                </div>
-
-                <div className="h-px w-full bg-border/50 my-2"></div>
-
-                {/* Earned Leave */}
-                <div className="flex flex-col gap-2">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-bold text-[11px] tracking-wider text-foreground">EARNED LEAVE</h4>
-                    <span className="bg-amber-500/10 text-amber-600 font-bold text-[10px] px-2 py-0.5 rounded-full">18 left</span>
-                  </div>
-                  <div className="h-1.5 w-full bg-muted/70 rounded-full overflow-hidden">
-                    <div className="h-full bg-amber-500 rounded-full" style={{ width: '0%' }}></div>
-                  </div>
-                  <div className="flex justify-between items-center text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
-                    <span>Assigned: <strong className="text-foreground text-[10px] ml-0.5">18</strong></span>
-                    <span>Enjoyed: <strong className="text-foreground text-[10px] ml-0.5">0</strong></span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Recent Messages */}
-              <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm flex flex-col">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h4 className="font-bold text-sm text-foreground">Recent Messages</h4>
-                    <p className="text-[10px] mt-0.5 text-muted-foreground">Unread and latest conversations</p>
-                  </div>
-                  <button onClick={() => window.location.href = '/messenger'} className="text-[10px] font-bold flex items-center gap-1 text-primary hover:text-primary/80 transition-colors cursor-pointer">
-                    View All <ArrowRight size={12} />
-                  </button>
-                </div>
-
-                <div className="space-y-4 flex-1">
-                  <div className="flex items-start gap-3 group cursor-pointer" onClick={() => window.location.href = '/messenger'}>
-                    <div className="relative shrink-0">
-                      <div className="w-9 h-9 rounded-full bg-blue-500/10 text-blue-600 flex items-center justify-center border-2 border-background font-bold text-sm shadow-sm">HR</div>
-                      <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 border-2 border-background rounded-full animate-pulse shadow-sm"></span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start">
-                        <h5 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors truncate">HR Department</h5>
-                        <span className="text-[10px] font-bold text-primary">10:42 AM</span>
-                      </div>
-                      <p className="text-[11px] font-bold mt-0.5 text-foreground truncate">Sarah: Please review the updated policy document.</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 group cursor-pointer" onClick={() => window.location.href = '/messenger'}>
-                    <div className="relative shrink-0">
-                      <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop" alt="user" className="w-9 h-9 rounded-full object-cover border-2 border-background shadow-sm" />
-                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-background rounded-full shadow-sm"></span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start">
-                        <h5 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors truncate">Michael Chen</h5>
-                        <span className="text-[10px] font-medium text-muted-foreground">Yesterday</span>
-                      </div>
-                      <p className="text-[11px] font-medium mt-0.5 text-muted-foreground truncate">Are we still on for the 3PM sync?</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 group cursor-pointer" onClick={() => window.location.href = '/messenger'}>
-                    <div className="relative shrink-0">
-                      <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop" alt="user" className="w-9 h-9 rounded-full object-cover border-2 border-background shadow-sm" />
-                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-amber-500 border-2 border-background rounded-full shadow-sm"></span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start">
-                        <h5 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors truncate">Alice Smith</h5>
-                        <span className="text-[10px] font-medium text-muted-foreground">Mon</span>
-                      </div>
-                      <p className="text-[11px] font-medium mt-0.5 text-muted-foreground truncate">Thanks for sending over the assets!</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3 group cursor-pointer" onClick={() => window.location.href = '/messenger'}>
-                    <div className="relative shrink-0">
-                      <div className="w-9 h-9 rounded-full bg-purple-500/10 text-purple-600 flex items-center justify-center border-2 border-background font-bold text-sm shadow-sm">IT</div>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start">
-                        <h5 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors truncate">IT Support</h5>
-                        <span className="text-[10px] font-medium text-muted-foreground">Mon</span>
-                      </div>
-                      <p className="text-[11px] font-medium mt-0.5 text-muted-foreground truncate">Ticket #4042 has been marked resolved.</p>
-                    </div>
-                  </div>
-
-                </div>
-
-                <button onClick={() => window.location.href = '/messenger'} className="w-full mt-4 py-2 text-xs font-bold rounded-lg border border-border bg-primary text-primary-foreground hover:opacity-90 shadow-sm transition-opacity cursor-pointer">
-                  Open Messenger
-                </button>
-              </div>
+                );
+              })}
             </div>
 
             {/* My Team Members Section */}
