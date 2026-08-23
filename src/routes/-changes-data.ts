@@ -2233,4 +2233,13 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     descriptionEn: "Removed all old evaluation pages and horizontal/sub-tab navigation bars. Reorganized the Evaluation module with 5 clean standalone page workspaces: Increment (Single), Increment (Multi), Proposed Increment, Increment Report, and Increment History.",
     descriptionBn: "মূল্যায়ন মডিউলের পুরাতন পেজ এবং সকল অনুভূমিক/সাব-ট্যাব বার মুছে ফেলা হয়েছে। মডিউলটিকে ৫টি পরিষ্কার ও স্বতন্ত্র পেজে পুনর্বিন্যাস করা হয়েছে: Increment (Single), Increment (Multi), Proposed Increment, Increment Report, এবং Increment History।",
   },
+  {
+    id: "192",
+    date: "2026-08-23T11:54",
+    type: "New Feature",
+    module: "Evaluation",
+    link: "/increment-multiple",
+    descriptionEn: "Fully implemented the new Increment (Multi) page workspace, including query filter consoles, search modal for employee IDs, dynamic calculations by percentage and fixed value, and interactive spreadsheet datagrid actions.",
+    descriptionBn: "নতুন Increment (Multi) পেজ ওয়ার্কস্পেসটি সম্পূর্ণ বাস্তবায়ন করা হয়েছে, যার মধ্যে কুয়েরি ফিল্টার কনসোল, এমপ্লয়ি আইডির জন্য সার্চ মডাল, পারসেন্টেজ ও ফিক্সড ভ্যালুর ডায়নামিক ক্যালকুলেশন এবং ইন্টারেক্টিভ স্প্রেডশীট ডেটাগ্রিড অন্তর্ভুক্ত রয়েছে।",
+  },
 ];
