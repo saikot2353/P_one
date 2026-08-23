@@ -60,6 +60,12 @@ const searchableMenus: SearchMenuLink[] = [
     to: "/set-hod",
     description: "Bulk assign head of departments",
   },
+  {
+    label: "Set Manager",
+    parent: "Personnel Info",
+    to: "/set-manager",
+    description: "Bulk assign reporting managers to employees",
+  },
   { label: "Manpower Basic Form", parent: "Personnel Info", to: "/" },
   { label: "Manpower Basic List", parent: "Personnel Info", to: "/" },
   { label: "Personnel QR Scanner", parent: "Personnel Info", to: "/" },

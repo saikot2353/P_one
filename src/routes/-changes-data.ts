@@ -2251,4 +2251,13 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     descriptionEn: "Added a new Set HOD configuration page and navigation links under Personnel Info. This page enables users to assign and manage Head of Department (HOD) roles bulky department-wise with active/inactive historical registry logs.",
     descriptionBn: "পার্সোনেল ইনফোর অধীনে একটি নতুন Set HOD কনফিগারেশন পেজ এবং নেভিগেশন লিংক যুক্ত করা হয়েছে। এই পেজটির মাধ্যমে ব্যবহারকারীরা সক্রিয়/নিষ্ক্রিয় হিস্টোরিক্যাল রেজিস্ট্রি লগসহ বাল্ক বা বিভাগ-ভিত্তিক হেড অফ ডিপার্টমেন্ট (HOD) রোল নির্ধারণ ও পরিচালনা করতে পারবেন।",
   },
+  {
+    id: "194",
+    date: "2026-08-23T13:28",
+    type: "New Feature",
+    module: "Personnel",
+    link: "/set-manager",
+    descriptionEn: "Added a new Set Manager page under Personnel Info to bulk assign reporting managers to employees. Features a master staff manager directory and a bulk assignment console modal with department/designation checklists.",
+    descriptionBn: "কর্মচারীদের জন্য বাল্ক বা এককালীন রিপোর্টিং ম্যানেজার নির্ধারণ করার জন্য পার্সোনেল ইনফোর অধীনে নতুন Set Manager পেজ যুক্ত করা হয়েছে। পেজটিতে একটি মাস্টার স্টাফ ম্যানেজার ডিরেক্টরি এবং ডিপার্টমেন্ট/ডেসিগনেশন ফিল্টার ফিল্টারসহ বাল্ক অ্যাসাইনমেন্ট মডাল কনসোল যুক্ত করা হয়েছে।",
+  },
 ];

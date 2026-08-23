@@ -144,6 +144,7 @@ export const nav: NavItem[] = [
       { label: "Personnel List", to: "/personnel-list" },
       { label: "ID Card Setup", to: "/id-card-setup" },
       { label: "Set HOD", to: "/set-hod" },
+      { label: "Set Manager", to: "/set-manager" },
     ],
   },
   {

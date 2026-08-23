@@ -104,11 +104,15 @@ function SetHodPage() {
   const [modalDept, setModalDept] = useState<string | null>(null);
   const [historyModalDept, setHistoryModalDept] = useState<string | null>(null);
 
+  // Filter States
+  const [filterDept, setFilterDept] = useState("ALL");
+  const [filterStatus, setFilterStatus] = useState("ALL");
+  const [searchText, setSearchText] = useState("");
+
   // Form Fields
   const [selectedEmpId, setSelectedEmpId] = useState("");
   const [assignDate, setAssignDate] = useState(new Date().toISOString().slice(0, 10));
   const [remarks, setRemarks] = useState("");
-  const [searchText, setSearchText] = useState("");
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -178,19 +182,40 @@ function SetHodPage() {
     return mockEmployeesList.filter((emp) => emp.department === modalDept);
   }, [modalDept]);
 
-  // Master departments filter search
+  // Master departments filter search & filter dropdowns logic
   const filteredDepartments = useMemo(() => {
-    if (!searchText.trim()) return allDepartments;
-    const query = searchText.toLowerCase();
-    return allDepartments.filter((deptName) => {
-      const activeHOD = resolveActiveHOD(deptName);
-      return (
-        deptName.toLowerCase().includes(query) ||
-        (activeHOD && activeHOD.empName.toLowerCase().includes(query)) ||
-        (activeHOD && activeHOD.empId.toLowerCase().includes(query))
-      );
-    });
-  }, [searchText, hodHistory]);
+    let list = allDepartments;
+
+    // Filter by department selection
+    if (filterDept !== "ALL") {
+      list = list.filter((deptName) => deptName === filterDept);
+    }
+
+    // Filter by HOD status
+    if (filterStatus !== "ALL") {
+      list = list.filter((deptName) => {
+        const activeHOD = resolveActiveHOD(deptName);
+        if (filterStatus === "Assigned") return !!activeHOD;
+        if (filterStatus === "Unassigned") return !activeHOD;
+        return true;
+      });
+    }
+
+    // Filter by text search query
+    if (searchText.trim()) {
+      const query = searchText.toLowerCase();
+      list = list.filter((deptName) => {
+        const activeHOD = resolveActiveHOD(deptName);
+        return (
+          deptName.toLowerCase().includes(query) ||
+          (activeHOD && activeHOD.empName.toLowerCase().includes(query)) ||
+          (activeHOD && activeHOD.empId.toLowerCase().includes(query))
+        );
+      });
+    }
+
+    return list;
+  }, [filterDept, filterStatus, searchText, hodHistory]);
 
   // History timeline with duration calculations for selected department
   const calculatedDeptHistory = useMemo(() => {
@@ -228,9 +253,9 @@ function SetHodPage() {
       <main className="flex-1 min-w-0 flex flex-col relative">
         <Topbar />
 
-        <div className="p-4 md:p-6 lg:p-8 space-y-6">
+        <div className="p-4 md:p-6 lg:p-8 space-y-6 font-sans">
           {/* Page Header */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 font-sans">
+          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
                 <Link to="/" className="hover:text-primary transition-colors">
@@ -273,23 +298,64 @@ function SetHodPage() {
           )}
 
           {/* MASTER DEPARTMENTS MASTER PANEL */}
-          <div className="bg-card border border-border/80 rounded-2xl p-5 shadow-xs space-y-4 font-sans">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <h3 className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-2">
-                <Building className="size-4.5 text-primary" />
-                <span>Department List & HOD Status</span>
-              </h3>
+          <div className="bg-card border border-border/80 rounded-2xl p-5 shadow-xs space-y-4">
+            <h3 className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-2">
+              <Building className="size-4.5 text-primary" />
+              <span>Department List & HOD Status</span>
+            </h3>
 
-              {/* Table search filter */}
-              <div className="w-full sm:w-64 relative">
-                <input
-                  type="text"
-                  placeholder="Search department or HOD..."
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  className="w-full h-9 pl-8.5 pr-3.5 bg-muted border border-border/30 rounded-xl text-xs font-semibold text-foreground focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none transition duration-200"
-                />
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+            {/* Filter Console Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-muted/30 border border-border/20 p-3.5 rounded-xl">
+              {/* Department Filter */}
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-extrabold text-muted-foreground uppercase block">
+                  Filter Department
+                </label>
+                <select
+                  value={filterDept}
+                  onChange={(e) => setFilterDept(e.target.value)}
+                  className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none"
+                >
+                  <option value="ALL">All Departments</option>
+                  {allDepartments.map((d) => (
+                    <option key={d} value={d}>
+                      {d}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Status Filter */}
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-extrabold text-muted-foreground uppercase block">
+                  HOD Status
+                </label>
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none"
+                >
+                  <option value="ALL">All Status</option>
+                  <option value="Assigned">Assigned</option>
+                  <option value="Unassigned">Unassigned</option>
+                </select>
+              </div>
+
+              {/* Search Bar */}
+              <div className="space-y-1.5 relative">
+                <label className="text-[9px] font-extrabold text-muted-foreground uppercase block">
+                  Search Query
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search department or HOD..."
+                    value={searchText}
+                    onChange={(e) => setSearchText(e.target.value)}
+                    className="h-9 pl-8 pr-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none"
+                  />
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                </div>
               </div>
             </div>
 
@@ -316,7 +382,7 @@ function SetHodPage() {
                         className="p-10 text-center text-muted-foreground/60 font-medium"
                       >
                         <AlertCircle className="size-8 text-muted-foreground/40 mx-auto mb-2" />
-                        No departments matched your query
+                        No departments matched your filters
                       </td>
                     </tr>
                   ) : (
@@ -392,7 +458,7 @@ function SetHodPage() {
       {/* --- LIGHTWEIGHT ASSIGN HOD MODAL OVERLAY --- */}
       {modalDept && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 animate-in fade-in duration-200">
-          <div className="bg-card border border-border/80 w-full max-w-md rounded-2xl p-6 shadow-2xl flex flex-col gap-4 animate-in zoom-in-95 duration-200 font-sans">
+          <div className="bg-card border border-border/80 w-full max-w-md rounded-2xl p-6 shadow-2xl flex flex-col gap-4 animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-border/50 pb-3">
               <div className="flex items-center gap-2">
@@ -494,10 +560,10 @@ function SetHodPage() {
         </div>
       )}
 
-      {/* --- TIMELINE HISTORY DIALOG MODAL --- */}
+      {/* --- TIMELINE HISTORY DIALOG MODAL (LARGER SCREEN: MAX-W-5XL) --- */}
       {historyModalDept && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 animate-in fade-in duration-200">
-          <div className="bg-card border border-border/80 w-full max-w-2xl rounded-2xl p-6 shadow-2xl flex flex-col gap-4 animate-in zoom-in-95 duration-200 font-sans">
+          <div className="bg-card border border-border/80 w-full max-w-5xl rounded-2xl p-6 shadow-2xl flex flex-col gap-4 animate-in zoom-in-95 duration-200 font-sans">
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-border/50 pb-3">
               <div className="flex items-center gap-2">
