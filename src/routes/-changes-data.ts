@@ -2,6 +2,24 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "244",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Bug Fix",
+    module: "System Settings",
+    link: "/changes",
+    descriptionEn: "Resolved TypeScript compilation type-checking error by adding 'Bug Fix' to the ChangeRecord allowed types and selection dropdown options.",
+    descriptionBn: "টাইপস্ক্রিপ্ট কম্পাইলেশন টাইপ-চেকিং ত্রুটি দূর করতে পরিবর্তনের প্রকারভেদে 'Bug Fix' যুক্ত করা হয়েছে এবং এর ড্রপডাউন অপশন আপডেট করা হয়েছে।",
+  },
+  {
+    id: "243",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Feature",
+    module: "My Dashboard Layout",
+    link: "/my-dashboard",
+    descriptionEn: "Added Lock/Unlock layout toggle button to dynamically toggle drag and drop permissions and show/hide reorder handle badges.",
+    descriptionBn: "ড্যাশবোর্ড লেআউট লক/আনলক করার জন্য বাটন যুক্ত করা হয়েছে, যা দিয়ে ড্র্যাগ অ্যান্ড ড্রপ সক্রিয় বা নিষ্ক্রিয় করা যাবে এবং হ্যান্ডেল ব্যাজ লুকানো যাবে।",
+  },
+  {
     id: "242",
     date: new Date().toISOString().slice(0, 16),
     type: "Feature",
