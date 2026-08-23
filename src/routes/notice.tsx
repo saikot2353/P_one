@@ -44,7 +44,7 @@ interface NoticeRecord {
   category: "POLICY" | "HOLIDAY" | "MEETING" | "GENERAL";
   author: string;
   role: string;
-  date: string;
+  date: string; // Stored formatted e.g., "Aug 22, 2026"
   status: "Published" | "Draft";
   attachmentName?: string;
   circularNo: string;
@@ -88,6 +88,23 @@ const initialNoticesList: NoticeRecord[] = [
   }
 ];
 
+// Helper to convert date string "Aug 22, 2026" or YYYY-MM-DD to YYYY-MM-DD
+function toYYYYMMDD(dateStr: string): string {
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) {
+    return new Date().toISOString().slice(0, 10);
+  }
+  return d.toISOString().slice(0, 10);
+}
+
+// Helper to format YYYY-MM-DD to "Aug 22, 2026"
+function formatDateDisplay(dateStr: string): string {
+  if (!dateStr) return "—";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
 function NoticePage() {
   const [notices, setNotices] = useState<NoticeRecord[]>(initialNoticesList);
   
@@ -101,6 +118,8 @@ function NoticePage() {
 
   // Form Field States
   const [title, setTitle] = useState("");
+  const [circularNo, setCircularNo] = useState("");
+  const [dateVal, setDateVal] = useState(""); // Stores "YYYY-MM-DD"
   const [category, setCategory] = useState<NoticeRecord["category"]>("GENERAL");
   const [status, setStatus] = useState<NoticeRecord["status"]>("Published");
   const [summary, setSummary] = useState("");
@@ -178,6 +197,8 @@ function NoticePage() {
   const handleOpenAddModal = () => {
     setEditNoticeId(null);
     setTitle("");
+    setCircularNo(`PSL/HR/2026/00${notices.length + 11}`);
+    setDateVal(new Date().toISOString().slice(0, 10));
     setCategory("GENERAL");
     setStatus("Published");
     setSummary("");
@@ -190,6 +211,8 @@ function NoticePage() {
   const handleOpenEditModal = (notice: NoticeRecord) => {
     setEditNoticeId(notice.id);
     setTitle(notice.title);
+    setCircularNo(notice.circularNo);
+    setDateVal(toYYYYMMDD(notice.date));
     setCategory(notice.category);
     setStatus(notice.status);
     setSummary(notice.summary);
@@ -214,10 +237,12 @@ function NoticePage() {
 
   // Save/Submit Notice
   const handleSaveNotice = () => {
-    if (!title.trim() || !summary.trim()) {
-      alert("Notice Title and Summary are required fields.");
+    if (!title.trim() || !summary.trim() || !circularNo.trim() || !dateVal) {
+      alert("Notice Title, Reference Number, Notice Date and Summary are required fields.");
       return;
     }
+
+    const formattedDisplayDate = formatDateDisplay(dateVal);
 
     if (editNoticeId) {
       // Edit
@@ -227,6 +252,8 @@ function NoticePage() {
             ? {
                 ...n,
                 title,
+                circularNo,
+                date: formattedDisplayDate,
                 category,
                 status,
                 summary,
@@ -247,10 +274,10 @@ function NoticePage() {
         category,
         author: "Tahmid Afsar Shapno",
         role: "HR Director",
-        date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+        date: formattedDisplayDate,
         status,
         attachmentName: attachment,
-        circularNo: `PSL/HR/2026/00${notices.length + 11}`
+        circularNo: circularNo,
       };
       setNotices([newNotice, ...notices]);
       showToast("Notice published successfully.");
@@ -542,12 +569,12 @@ function NoticePage() {
         </div>
       </main>
 
-      {/* --- ADD / EDIT NOTICE CONFIGURATION MODAL --- */}
+      {/* --- ADD / EDIT NOTICE CONFIGURATION MODAL (HEIGHT CONSTRAINED & SCROLLABLE) --- */}
       {isFormModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 animate-in fade-in duration-200 print:hidden">
-          <div className="bg-card border border-border/85 w-full max-w-5xl mx-4 rounded-2xl p-6 shadow-2xl flex flex-col gap-4 animate-in zoom-in-95 duration-200">
+          <div className="bg-card border border-border/85 w-full max-w-5xl mx-4 rounded-2xl p-6 shadow-2xl flex flex-col gap-4 animate-in zoom-in-95 duration-200 max-h-[92vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-border/50 pb-3">
+            <div className="flex items-center justify-between border-b border-border/50 pb-3 flex-shrink-0">
               <div className="flex items-center gap-2">
                 <Megaphone className="size-4.5 text-primary" />
                 <h3 className="text-sm font-extrabold text-foreground">
@@ -563,7 +590,7 @@ function NoticePage() {
             </div>
 
             {/* Modal Form Grid */}
-            <div className="space-y-4">
+            <div className="space-y-4 flex-1">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Title */}
                 <div className="space-y-1.5">
@@ -579,10 +606,39 @@ function NoticePage() {
                   />
                 </div>
 
-                {/* Category */}
+                {/* Reference Number (Required) */}
                 <div className="space-y-1.5">
                   <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
-                    Category <span className="text-rose-500">*</span>
+                    Ref No <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={circularNo}
+                    onChange={(e) => setCircularNo(e.target.value)}
+                    placeholder="e.g. PSL/HR/2026/0010"
+                    className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none"
+                  />
+                </div>
+
+                {/* Notice Publish Date (Required) */}
+                <div className="space-y-1.5">
+                  <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
+                    Notice Date <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={dateVal}
+                    onChange={(e) => setDateVal(e.target.value)}
+                    className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Category (Notice Type - dropdown) */}
+                <div className="space-y-1.5">
+                  <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
+                    Notice Type (Category) <span className="text-rose-500">*</span>
                   </label>
                   <select
                     value={category}
@@ -671,7 +727,7 @@ function NoticePage() {
             </div>
 
             {/* Modal Actions */}
-            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border/50">
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border/50 flex-shrink-0">
               <button
                 onClick={() => setIsFormModalOpen(false)}
                 className="h-9 px-5 bg-card hover:bg-muted text-foreground border border-border rounded-xl text-xs font-bold transition cursor-pointer"
@@ -689,10 +745,10 @@ function NoticePage() {
         </div>
       )}
 
-      {/* --- PREMIUM PREVIEW MODAL ("PROPER LUCRATIVE DESIGN") --- */}
+      {/* --- PREMIUM PREVIEW MODAL (HEIGHT CONSTRAINED & SCROLLABLE) --- */}
       {isViewModalOpen && selectedNotice && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 animate-in fade-in duration-200 print:hidden font-sans">
-          <div className="bg-card border border-border/80 w-full max-w-4xl mx-4 rounded-2xl p-6 shadow-2xl flex flex-col gap-6 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+          <div className="bg-card border border-border/80 w-full max-w-4xl mx-4 rounded-2xl p-6 shadow-2xl flex flex-col gap-6 animate-in zoom-in-95 duration-200 max-h-[92vh] overflow-y-auto">
             {/* Modal Actions Header */}
             <div className="flex items-center justify-between border-b border-border/40 pb-3 flex-shrink-0">
               <div className="flex items-center gap-2">
@@ -716,7 +772,7 @@ function NoticePage() {
             </div>
 
             {/* Circular Paper Sheet layout (Lucrative Professional Template) */}
-            <div className="bg-[#fcfcfc] dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl p-10 md:p-14 shadow-2xl space-y-6 relative overflow-hidden text-black dark:text-white leading-relaxed font-sans">
+            <div className="bg-[#fcfcfc] dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl p-10 md:p-14 shadow-2xl space-y-6 relative overflow-hidden text-black dark:text-white leading-relaxed font-sans flex-shrink-0">
               {/* Top Corporate Gradient Accent Bar */}
               <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-primary/10 via-primary to-primary/10" />
               
@@ -763,7 +819,7 @@ function NoticePage() {
 
               {/* Circular Title (middle aligned, big font) */}
               <div className="text-center py-4">
-                <h1 className="text-3xl font-extrabold text-slate-950 dark:text-white uppercase tracking-wide leading-tight">
+                <h1 className="text-3xl font-extrabold text-slate-950 dark:text-white uppercase tracking-wide leading-tight font-sans">
                   {selectedNotice.title}
                 </h1>
                 <div className="h-[2px] w-24 bg-primary mx-auto mt-3" />
