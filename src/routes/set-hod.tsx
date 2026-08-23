@@ -11,31 +11,22 @@ import {
   User,
   Plus,
   ChevronDown,
-  Cpu,
-  Eye,
   Settings,
   CheckCircle2,
   ListFilter,
-  DollarSign,
   AlertCircle,
-  Briefcase,
-  Calendar,
-  Save,
-  CheckCircle,
-  FileText,
-  UserCheck,
   Building,
+  Save,
+  UserCheck,
   History,
-  Trash2,
-  ToggleLeft,
-  ToggleRight
+  Clock
 } from "lucide-react";
 
 export const Route = createFileRoute("/set-hod")({
   head: () => ({
     meta: [
       { title: "Set HOD — CRIPTON" },
-      { name: "description", content: "Bulk assign Head of Department (HOD) department wise." }
+      { name: "description", content: "Assign Head of Department (HOD) department wise." }
     ],
   }),
   component: SetHodPage,
@@ -74,11 +65,33 @@ const mockEmployeesList: EmployeeRecord[] = [
 
 const allDepartments = ["Garment (Unit-2)", "Dyeing", "Knitting", "HR", "Sales", "IT", "Finance"];
 
-function SetHodPage() {
-  const [selectedDept, setSelectedDept] = useState("Garment (Unit-2)");
-  const [searchedDept, setSearchedDept] = useState("Garment (Unit-2)");
+// Helper to calculate duration in years, months, days
+function calculateDuration(startStr: string, endStr: string): string {
+  const start = new Date(startStr);
+  const end = endStr === "Present" ? new Date() : new Date(endStr);
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) return "—";
 
-  // HOD Assignment state
+  let diffMs = end.getTime() - start.getTime();
+  if (diffMs < 0) diffMs = 0;
+  
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDays === 0) return "1 Day";
+  
+  const years = Math.floor(diffDays / 365);
+  const remainingDays = diffDays % 365;
+  const months = Math.floor(remainingDays / 30);
+  const days = remainingDays % 30;
+
+  const parts: string[] = [];
+  if (years > 0) parts.push(`${years} Yr${years > 1 ? "s" : ""}`);
+  if (months > 0) parts.push(`${months} Mo${months > 1 ? "s" : ""}`);
+  if (days > 0 && years === 0) parts.push(`${days} Day${days > 1 ? "s" : ""}`);
+
+  return parts.join(" ") || "1 Day";
+}
+
+function SetHodPage() {
+  // Current active HODs map by department
   const [hodHistory, setHodHistory] = useState<HODRecord[]>([
     { id: "hod-1", department: "HR", empId: "2022035599", empName: "Tahmid Afsar Shapno", designation: "HR Director", assignedDate: "2024-01-01", status: "Active", remarks: "Initial assignment" },
     { id: "hod-2", department: "Sales", empId: "2021032646", empName: "Sadiqul Islam", designation: "Deputy Manager", assignedDate: "2023-06-15", status: "Active", remarks: "Assigned by Board" },
@@ -87,40 +100,46 @@ function SetHodPage() {
     { id: "hod-5", department: "Garment (Unit-2)", empId: "2023046001", empName: "Sohanur Rahman Sohan", designation: "Executive", assignedDate: "2026-02-01", status: "Active", remarks: "Assigned after Karim" },
   ]);
 
+  // Modal configuration states
+  const [modalDept, setModalDept] = useState<string | null>(null);
+  const [historyModalDept, setHistoryModalDept] = useState<string | null>(null);
+
   // Form Fields
   const [selectedEmpId, setSelectedEmpId] = useState("");
   const [assignDate, setAssignDate] = useState(new Date().toISOString().slice(0, 10));
-  const [assignStatus, setAssignStatus] = useState<"Active" | "Inactive">("Active");
   const [remarks, setRemarks] = useState("");
-  const [tableSearch, setTableSearch] = useState("");
+  const [searchText, setSearchText] = useState("");
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 4000);
+    setTimeout(() => setToastMessage(null), 3000);
   };
 
-  // Candidates for selected department
-  const eligibleCandidates = useMemo(() => {
-    return mockEmployeesList.filter((emp) => emp.department === searchedDept);
-  }, [searchedDept]);
-
-  // Current Active HOD of searched department
-  const currentHOD = useMemo(() => {
-    return hodHistory.find((hod) => hod.department === searchedDept && hod.status === "Active");
-  }, [hodHistory, searchedDept]);
-
-  // Trigger search department HOD status
-  const handleSearchDept = () => {
-    setSearchedDept(selectedDept);
-    setSelectedEmpId("");
-    setRemarks("");
-    showToast(`Loaded Head of Department configurations for ${selectedDept}`);
+  // Helper to resolve current Active HOD details for any department
+  const resolveActiveHOD = (deptName: string) => {
+    return hodHistory.find((hod) => hod.department === deptName && hod.status === "Active");
   };
 
-  // Submit new assignment
-  const handleAssignHOD = () => {
+  // Open modal config
+  const openSetHODModal = (dept: string) => {
+    setModalDept(dept);
+    const existing = resolveActiveHOD(dept);
+    if (existing) {
+      setSelectedEmpId(existing.empId);
+      setAssignDate(existing.assignedDate);
+      setRemarks(existing.remarks || "");
+    } else {
+      setSelectedEmpId("");
+      setAssignDate(new Date().toISOString().slice(0, 10));
+      setRemarks("");
+    }
+  };
+
+  // Save new HOD configuration
+  const handleSaveHOD = () => {
+    if (!modalDept) return;
     if (!selectedEmpId) {
       alert("Please select a candidate employee to set as HOD.");
       return;
@@ -129,109 +148,79 @@ function SetHodPage() {
     const employeeObj = mockEmployeesList.find((e) => e.id === selectedEmpId);
     if (!employeeObj) return;
 
-    // If active HOD exists and we are assigning a new HOD as Active:
-    // Deactivate previous HOD automatically to ensure single HOD per department
-    let updatedHistory = [...hodHistory];
-    if (assignStatus === "Active") {
-      updatedHistory = updatedHistory.map((hod) => {
-        if (hod.department === searchedDept && hod.status === "Active") {
-          return { ...hod, status: "Inactive" as const };
-        }
-        return hod;
-      });
-    }
+    // Deactivate previous active HOD
+    const updatedHistory = hodHistory.map((hod) => {
+      if (hod.department === modalDept && hod.status === "Active") {
+        return { ...hod, status: "Inactive" as const };
+      }
+      return hod;
+    });
 
     const newHODRecord: HODRecord = {
       id: `hod-${Date.now()}`,
-      department: searchedDept,
+      department: modalDept,
       empId: selectedEmpId,
       empName: employeeObj.name,
       designation: employeeObj.designation,
       assignedDate: assignDate,
-      status: assignStatus,
+      status: "Active",
       remarks: remarks.trim() || undefined,
     };
 
     setHodHistory([newHODRecord, ...updatedHistory]);
-    setSelectedEmpId("");
-    setRemarks("");
-    showToast(`HOD assigned successfully: ${employeeObj.name} is now HOD of ${searchedDept}`);
+    setModalDept(null);
+    showToast(`HOD updated successfully for department: ${modalDept}`);
   };
 
-  // Toggle HOD status manually
-  const toggleHODStatus = (id: string) => {
-    const record = hodHistory.find((r) => r.id === id);
-    if (!record) return;
+  // Candidates for currently active modal department
+  const eligibleCandidates = useMemo(() => {
+    if (!modalDept) return [];
+    return mockEmployeesList.filter((emp) => emp.department === modalDept);
+  }, [modalDept]);
 
-    const currentStatus = record.status;
-    const nextStatus = currentStatus === "Active" ? "Inactive" : "Active";
+  // Master departments filter search
+  const filteredDepartments = useMemo(() => {
+    if (!searchText.trim()) return allDepartments;
+    const query = searchText.toLowerCase();
+    return allDepartments.filter((deptName) => {
+      const activeHOD = resolveActiveHOD(deptName);
+      return (
+        deptName.toLowerCase().includes(query) ||
+        (activeHOD && activeHOD.empName.toLowerCase().includes(query)) ||
+        (activeHOD && activeHOD.empId.toLowerCase().includes(query))
+      );
+    });
+  }, [searchText, hodHistory]);
 
-    // If making it Active, ensure no other HOD is active in that department
-    let updated = [...hodHistory];
-    if (nextStatus === "Active") {
-      updated = updated.map((hod) => {
-        if (hod.department === record.department && hod.status === "Active") {
-          return { ...hod, status: "Inactive" as const };
-        }
-        return hod;
-      });
-    }
+  // History timeline with duration calculations for selected department
+  const calculatedDeptHistory = useMemo(() => {
+    if (!historyModalDept) return [];
 
-    setHodHistory(
-      updated.map((hod) => (hod.id === id ? { ...hod, status: nextStatus } : hod))
-    );
-    showToast(`Toggled HOD status for ${record.empName} to ${nextStatus}`);
-  };
+    // Filter and sort chronologically ascending
+    const deptHistory = hodHistory
+      .filter((h) => h.department === historyModalDept)
+      .sort((a, b) => new Date(a.assignedDate).getTime() - new Date(b.assignedDate).getTime());
 
-  // Delete registry entry
-  const handleDeleteHOD = (id: string) => {
-    if (confirm("Are you sure you want to delete this HOD assignment record?")) {
-      setHodHistory(hodHistory.filter((hod) => hod.id !== id));
-      showToast("HOD assignment record removed successfully.");
-    }
-  };
+    return deptHistory.map((record, index) => {
+      let endDateStr = "Present";
+      
+      if (index < deptHistory.length - 1) {
+        endDateStr = deptHistory[index + 1].assignedDate;
+      } else if (record.status === "Inactive") {
+        endDateStr = "Ended";
+      }
 
-  // Table filtering
-  const filteredHistory = useMemo(() => {
-    if (!tableSearch.trim()) return hodHistory;
-    const query = tableSearch.toLowerCase();
-    return hodHistory.filter(
-      (hod) =>
-        hod.empName.toLowerCase().includes(query) ||
-        hod.empId.toLowerCase().includes(query) ||
-        hod.department.toLowerCase().includes(query) ||
-        hod.designation.toLowerCase().includes(query)
-    );
-  }, [hodHistory, tableSearch]);
+      const duration = endDateStr === "Ended" 
+        ? "—" 
+        : calculateDuration(record.assignedDate, endDateStr);
 
-  const handlePdfExport = () => {
-    window.print();
-  };
-
-  const handleExcelExport = () => {
-    const headers = ["SL", "Department", "HOD Name", "Employee ID", "Designation", "Assigned Date", "Status", "Remarks"];
-    const rows = filteredHistory.map((row, index) => [
-      (index + 1).toString(),
-      row.department,
-      row.empName,
-      row.empId,
-      row.designation,
-      row.assignedDate,
-      row.status,
-      row.remarks || ""
-    ]);
-
-    const csvContent = "data:text/csv;charset=utf-8," 
-      + [headers.join(","), ...rows.map(e => e.map(val => `"${val.replace(/"/g, '""')}"`).join(","))].join("\n");
-    
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `HOD_assignment_logs_${new Date().toISOString().slice(0,10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+      return {
+        ...record,
+        endDate: endDateStr,
+        duration: duration,
+      };
+    }).reverse(); // Show latest first
+  }, [hodHistory, historyModalDept]);
 
   return (
     <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300">
@@ -259,15 +248,15 @@ function SetHodPage() {
                 </h1>
               </div>
               <p className="text-xs text-muted-foreground mt-1 ml-5 font-semibold">
-                Bulk assign and configuration management of HODs department-wise
+                Quickly assign Head of Departments and audit term durations department-wise
               </p>
             </div>
             <div className="bg-primary/10 border border-primary/20 rounded-xl px-3.5 py-1.5 shadow-2xs">
               <div className="text-[9px] font-bold uppercase tracking-wider text-primary">
-                Active Assignments
+                Total Departments
               </div>
               <div className="text-sm font-extrabold text-primary mt-0.5">
-                {hodHistory.filter((h) => h.status === "Active").length}
+                {allDepartments.length}
               </div>
             </div>
           </div>
@@ -283,308 +272,109 @@ function SetHodPage() {
             </div>
           )}
 
-          {/* 1. DEPARTMENT SELECTOR CONSOLE */}
-          <div className="bg-card border border-border/80 rounded-2xl p-5 shadow-xs relative overflow-hidden font-sans">
-            <div className="absolute top-0 inset-x-0 h-[2.5px] bg-gradient-to-r from-primary/10 via-primary/45 to-primary/10" />
-            <h3 className="text-xs font-black uppercase tracking-wider text-foreground mb-4 flex items-center gap-2">
-              <ListFilter className="size-4.5 text-primary" />
-              <span>Department Selection Console</span>
-            </h3>
-
-            <div className="flex flex-col sm:flex-row items-end gap-4 max-w-xl">
-              <div className="flex-1 space-y-1.5 w-full">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">
-                  Select Department
-                </label>
-                <select
-                  value={selectedDept}
-                  onChange={(e) => setSelectedDept(e.target.value)}
-                  className="w-full h-10 px-3.5 bg-muted border border-border/30 rounded-xl text-xs font-semibold text-foreground focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none transition duration-200 cursor-pointer"
-                >
-                  {allDepartments.map((dept) => (
-                    <option key={dept} value={dept}>
-                      {dept}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <button
-                onClick={handleSearchDept}
-                className="w-full sm:w-auto h-10 px-6 bg-primary hover:bg-primary-glow text-primary-foreground text-xs font-extrabold rounded-xl shadow-xs transition duration-200 uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
-              >
-                <Search className="size-3.5" /> Load HOD
-              </button>
-            </div>
-          </div>
-
-          {/* 2. DUAL COLUMN DETAILS & ASSIGNMENT */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start font-sans">
-            {/* Left Column: Current HOD Card */}
-            <div className="lg:col-span-5 bg-card border border-border/80 rounded-2xl p-5 shadow-xs relative overflow-hidden h-full min-h-[295px] flex flex-col justify-between">
-              <div className="absolute top-0 inset-x-0 h-[2.5px] bg-gradient-to-r from-amber-500/10 via-amber-500/45 to-amber-500/10" />
-              <div>
-                <h3 className="text-xs font-black uppercase tracking-wider text-foreground mb-4 flex items-center gap-2">
-                  <UserCheck className="size-4.5 text-amber-500" />
-                  <span>Current Head of Department</span>
-                </h3>
-
-                {currentHOD ? (
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4 p-3 bg-muted/30 border border-border/20 rounded-xl">
-                      <div className="size-12 bg-primary/15 border border-primary/20 text-primary flex items-center justify-center text-sm font-extrabold rounded-full">
-                        {currentHOD.empName.split(" ").map(n => n[0]).slice(0, 2).join("")}
-                      </div>
-                      <div>
-                        <div className="text-sm font-extrabold text-foreground">{currentHOD.empName}</div>
-                        <div className="text-[10px] text-muted-foreground font-semibold mt-0.5">
-                          ID: <span className="font-mono">{currentHOD.empId}</span> • {currentHOD.designation}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3.5 text-xs">
-                      <div className="bg-muted/15 border border-border/10 p-2.5 rounded-lg">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Department</div>
-                        <div className="font-semibold text-foreground mt-0.5">{currentHOD.department}</div>
-                      </div>
-                      <div className="bg-muted/15 border border-border/10 p-2.5 rounded-lg">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Assigned Date</div>
-                        <div className="font-semibold text-foreground mt-0.5">{currentHOD.assignedDate}</div>
-                      </div>
-                    </div>
-
-                    {currentHOD.remarks && (
-                      <div className="bg-muted/20 border border-border/10 p-3 rounded-lg text-xs">
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Remarks</div>
-                        <div className="text-foreground/80 mt-0.5 italic">"{currentHOD.remarks}"</div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center py-8 text-center text-muted-foreground/60">
-                    <AlertCircle className="size-8 text-muted-foreground/30 mb-2" />
-                    <div className="text-xs font-extrabold uppercase tracking-wide">No Active HOD assigned</div>
-                    <div className="text-[10px] mt-1 font-medium">Use the form on the right to assign a new HOD.</div>
-                  </div>
-                )}
-              </div>
-
-              {currentHOD && (
-                <div className="pt-4 border-t border-border/30 mt-4 flex justify-end">
-                  <button
-                    onClick={() => toggleHODStatus(currentHOD.id)}
-                    className="h-8.5 px-4 bg-rose-500/10 hover:bg-rose-500/15 text-rose-500 text-[10px] font-extrabold rounded-lg transition uppercase flex items-center justify-center gap-1 cursor-pointer"
-                  >
-                    Deactivate HOD
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Right Column: Assign New HOD Form */}
-            <div className="lg:col-span-7 bg-card border border-border/80 rounded-2xl p-5 shadow-xs relative overflow-hidden">
-              <div className="absolute top-0 inset-x-0 h-[2.5px] bg-gradient-to-r from-success/10 via-success/45 to-success/10" />
-              <h3 className="text-xs font-black uppercase tracking-wider text-foreground mb-4 flex items-center gap-2">
-                <Plus className="size-4.5 text-success" />
-                <span>Assign New Head of Department ({searchedDept})</span>
-              </h3>
-
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Select Employee Candidate */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">
-                      Select Candidate <span className="text-rose-500">*</span>
-                    </label>
-                    <select
-                      value={selectedEmpId}
-                      onChange={(e) => setSelectedEmpId(e.target.value)}
-                      className="w-full h-10 px-3.5 bg-muted border border-border/30 rounded-xl text-xs font-semibold text-foreground focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none transition duration-200 cursor-pointer"
-                    >
-                      <option value="">-- Choose Candidate --</option>
-                      {eligibleCandidates.map((emp) => (
-                        <option key={emp.id} value={emp.id}>
-                          {emp.name} ({emp.designation})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Assign Status */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">
-                      Status <span className="text-rose-500">*</span>
-                    </label>
-                    <select
-                      value={assignStatus}
-                      onChange={(e) => setAssignStatus(e.target.value as "Active" | "Inactive")}
-                      className="w-full h-10 px-3.5 bg-muted border border-border/30 rounded-xl text-xs font-semibold text-foreground focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none transition duration-200 cursor-pointer"
-                    >
-                      <option value="Active">Active</option>
-                      <option value="Inactive">Inactive</option>
-                    </select>
-                  </div>
-
-                  {/* Effective Assignment Date */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">
-                      Effective Date <span className="text-rose-500">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      value={assignDate}
-                      onChange={(e) => setAssignDate(e.target.value)}
-                      className="w-full h-10 px-3.5 bg-muted border border-border/30 rounded-xl text-xs font-semibold text-foreground focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none transition duration-200 cursor-pointer"
-                    />
-                  </div>
-
-                  {/* Empty Spacer */}
-                  <div className="hidden sm:block" />
-
-                  {/* Remarks Description */}
-                  <div className="sm:col-span-2 space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">
-                      Remarks / Directives
-                    </label>
-                    <textarea
-                      value={remarks}
-                      onChange={(e) => setRemarks(e.target.value)}
-                      placeholder="e.g. Set as HOD for project coordination"
-                      className="w-full min-h-[80px] p-3.5 bg-muted border border-border/30 rounded-xl text-xs font-semibold text-foreground focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none transition duration-200 resize-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-end pt-2">
-                  <button
-                    onClick={handleAssignHOD}
-                    className="w-full sm:w-auto h-10 px-8 bg-success hover:bg-success-glow text-white text-xs font-extrabold rounded-xl shadow-xs transition duration-200 uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer"
-                  >
-                    <Save className="size-3.5" /> Assign HOD
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 3. ASSIGNMENT HISTORY REGISTER LOG */}
-          <div className="bg-card border border-border/80 rounded-2xl shadow-xs p-5 space-y-4 font-sans">
-            <h3 className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-2">
-              <History className="size-4.5 text-primary" />
-              <span>HOD Assignment Registry & History Log</span>
-            </h3>
-
-            {/* Registry Toolbar */}
+          {/* MASTER DEPARTMENTS MASTER PANEL */}
+          <div className="bg-card border border-border/80 rounded-2xl p-5 shadow-xs space-y-4 font-sans">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={handlePdfExport}
-                  className="h-9 px-4 border border-border/30 rounded-xl text-xs font-bold bg-muted hover:bg-muted/70 text-foreground transition flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Printer className="size-3.5 text-muted-foreground" />
-                  <span>PDF</span>
-                </button>
-                <button
-                  onClick={handleExcelExport}
-                  className="h-9 px-4 border border-border/30 rounded-xl text-xs font-bold bg-muted hover:bg-muted/70 text-foreground transition flex items-center gap-1.5 cursor-pointer"
-                >
-                  <FileSpreadsheet className="size-3.5 text-muted-foreground" />
-                  <span>Excel</span>
-                </button>
-              </div>
+              <h3 className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-2">
+                <Building className="size-4.5 text-primary" />
+                <span>Department List & HOD Status</span>
+              </h3>
 
               {/* Table search filter */}
               <div className="w-full sm:w-64 relative">
                 <input
                   type="text"
-                  placeholder="Search log history..."
-                  value={tableSearch}
-                  onChange={(e) => setTableSearch(e.target.value)}
+                  placeholder="Search department or HOD..."
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
                   className="w-full h-9 pl-8.5 pr-3.5 bg-muted border border-border/30 rounded-xl text-xs font-semibold text-foreground focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none transition duration-200"
                 />
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
               </div>
             </div>
 
-            {/* Scroll table */}
+            {/* Grid Scroll Table */}
             <div className="overflow-x-auto border border-border/60 rounded-xl bg-card">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-muted border-b border-border/70 text-muted-foreground/90 font-bold uppercase tracking-wider text-[10px]">
                     <th className="p-3 w-12 text-center">SL</th>
-                    <th className="p-3">Department</th>
-                    <th className="p-3">HOD Name</th>
-                    <th className="p-3">Employee ID</th>
+                    <th className="p-3">Department Name</th>
+                    <th className="p-3">Current Active HOD</th>
+                    <th className="p-3">HOD Employee ID</th>
                     <th className="p-3">Designation</th>
                     <th className="p-3">Assigned Date</th>
-                    <th className="p-3">Status</th>
-                    <th className="p-3">Remarks</th>
-                    <th className="p-3 w-24 text-center font-bold">Actions</th>
+                    <th className="p-3 w-28 text-center">Status</th>
+                    <th className="p-3 w-56 text-center font-bold">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/50 text-foreground font-semibold">
-                  {filteredHistory.length === 0 ? (
+                  {filteredDepartments.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={9}
+                        colSpan={8}
                         className="p-10 text-center text-muted-foreground/60 font-medium"
                       >
                         <AlertCircle className="size-8 text-muted-foreground/40 mx-auto mb-2" />
-                        No HOD records found
+                        No departments matched your query
                       </td>
                     </tr>
                   ) : (
-                    filteredHistory.map((row, index) => {
-                      const isActive = row.status === "Active";
+                    filteredDepartments.map((deptName, index) => {
+                      const activeHOD = resolveActiveHOD(deptName);
                       return (
                         <tr
-                          key={row.id}
-                          className="hover:bg-muted/30 transition duration-150"
+                          key={deptName}
+                          className="hover:bg-muted/30 transition duration-150 cursor-pointer"
+                          onClick={() => openSetHODModal(deptName)}
                         >
                           <td className="p-3 text-center">{index + 1}</td>
-                          <td className="p-3">{row.department}</td>
-                          <td className="p-3 text-foreground">{row.empName}</td>
-                          <td className="p-3 font-mono text-[11px] font-bold text-foreground">
-                            {row.empId}
-                          </td>
-                          <td className="p-3">{row.designation}</td>
-                          <td className="p-3">{row.assignedDate}</td>
+                          <td className="p-3 font-extrabold text-foreground">{deptName}</td>
                           <td className="p-3">
+                            {activeHOD ? (
+                              <div className="flex items-center gap-2">
+                                <div className="size-7 bg-primary/10 text-primary rounded-full flex items-center justify-center text-[10px] font-extrabold">
+                                  {activeHOD.empName.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+                                </div>
+                                <span className="font-bold">{activeHOD.empName}</span>
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground/50 font-normal">Not Assigned</span>
+                            )}
+                          </td>
+                          <td className="p-3 font-mono">
+                            {activeHOD ? activeHOD.empId : "—"}
+                          </td>
+                          <td className="p-3">
+                            {activeHOD ? activeHOD.designation : "—"}
+                          </td>
+                          <td className="p-3">
+                            {activeHOD ? activeHOD.assignedDate : "—"}
+                          </td>
+                          <td className="p-3 text-center">
                             <span
                               className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${
-                                isActive
+                                activeHOD
                                   ? "bg-success/15 text-success"
-                                  : "bg-muted text-muted-foreground/70"
+                                  : "bg-amber-500/10 text-amber-500"
                               }`}
                             >
-                              {row.status}
+                              {activeHOD ? "Active" : "Unassigned"}
                             </span>
                           </td>
-                          <td className="p-3 max-w-[200px] truncate text-muted-foreground">
-                            {row.remarks || "—"}
-                          </td>
-                          <td className="p-3">
+                          <td className="p-3" onClick={(e) => e.stopPropagation()}>
                             <div className="flex items-center justify-center gap-2">
                               <button
-                                onClick={() => toggleHODStatus(row.id)}
-                                title={isActive ? "Deactivate" : "Activate"}
-                                className={`p-1 rounded hover:bg-muted transition cursor-pointer ${
-                                  isActive ? "text-success hover:text-rose-500" : "text-muted-foreground hover:text-success"
-                                }`}
+                                onClick={() => openSetHODModal(deptName)}
+                                className="h-7.5 px-3 bg-primary/10 hover:bg-primary/20 text-primary text-[10px] font-extrabold rounded-lg transition uppercase flex items-center justify-center gap-1 cursor-pointer"
                               >
-                                {isActive ? (
-                                  <ToggleRight className="size-5" />
-                                ) : (
-                                  <ToggleLeft className="size-5" />
-                                )}
+                                <Settings className="size-3.5" /> Set HOD
                               </button>
                               <button
-                                onClick={() => handleDeleteHOD(row.id)}
-                                title="Delete Record"
-                                className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-rose-500 transition cursor-pointer"
+                                onClick={() => setHistoryModalDept(deptName)}
+                                className="h-7.5 px-3 bg-muted hover:bg-muted/70 text-foreground text-[10px] font-bold rounded-lg transition uppercase flex items-center justify-center gap-1 cursor-pointer"
                               >
-                                <Trash2 className="size-4.5" />
+                                <History className="size-3.5 text-muted-foreground" /> History
                               </button>
                             </div>
                           </td>
@@ -595,14 +385,198 @@ function SetHodPage() {
                 </tbody>
               </table>
             </div>
-
-            {/* Registry summary */}
-            <div className="text-xs text-muted-foreground font-semibold pt-1">
-              Showing 1 to {filteredHistory.length} of {filteredHistory.length} HOD history logs
-            </div>
           </div>
         </div>
       </main>
+
+      {/* --- LIGHTWEIGHT ASSIGN HOD MODAL OVERLAY --- */}
+      {modalDept && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 animate-in fade-in duration-200">
+          <div className="bg-card border border-border/80 w-full max-w-md rounded-2xl p-6 shadow-2xl flex flex-col gap-4 animate-in zoom-in-95 duration-200 font-sans">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-border/50 pb-3">
+              <div className="flex items-center gap-2">
+                <UserCheck className="size-4.5 text-primary" />
+                <h3 className="text-sm font-extrabold text-foreground">Set HOD: {modalDept}</h3>
+              </div>
+              <button
+                onClick={() => setModalDept(null)}
+                className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            {/* Current Active HOD Alert Banner */}
+            {resolveActiveHOD(modalDept) ? (
+              <div className="p-3 bg-muted/40 border border-border/30 rounded-xl text-xs text-foreground flex items-center gap-3">
+                <div className="size-2.5 rounded-full bg-success animate-pulse" />
+                <div>
+                  <span className="font-extrabold text-muted-foreground">Current Active HOD: </span>
+                  <span className="font-bold text-foreground">{resolveActiveHOD(modalDept)!.empName}</span> ({resolveActiveHOD(modalDept)!.designation})
+                </div>
+              </div>
+            ) : (
+              <div className="p-3 bg-amber-500/5 border border-amber-500/25 rounded-xl text-xs text-amber-600 dark:text-amber-500 flex items-center gap-3">
+                <div className="size-2.5 rounded-full bg-amber-500 animate-pulse" />
+                <div>
+                  <span className="font-extrabold">Current Status: </span>
+                  <span>No active HOD assigned.</span>
+                </div>
+              </div>
+            )}
+
+            {/* Form Fields */}
+            <div className="space-y-4">
+              {/* Select Candidate dropdown */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">
+                  Select HOD Employee <span className="text-rose-500">*</span>
+                </label>
+                <select
+                  value={selectedEmpId}
+                  onChange={(e) => setSelectedEmpId(e.target.value)}
+                  className="w-full h-10 px-3.5 bg-muted border border-border/30 rounded-xl text-xs font-semibold text-foreground focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none transition duration-200 cursor-pointer"
+                >
+                  <option value="">-- Select Candidate --</option>
+                  {eligibleCandidates.map((emp) => (
+                    <option key={emp.id} value={emp.id}>
+                      {emp.name} ({emp.designation})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Effective Assignment Date */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">
+                  Effective Date <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  value={assignDate}
+                  onChange={(e) => setAssignDate(e.target.value)}
+                  className="w-full h-10 px-3.5 bg-muted border border-border/30 rounded-xl text-xs font-semibold text-foreground focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none transition duration-200 cursor-pointer"
+                />
+              </div>
+
+              {/* Remarks/Notes */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">
+                  Remarks / Purpose
+                </label>
+                <input
+                  type="text"
+                  value={remarks}
+                  onChange={(e) => setRemarks(e.target.value)}
+                  placeholder="e.g. Appointed during Board Meeting"
+                  className="w-full h-10 px-3.5 bg-muted border border-border/30 rounded-xl text-xs font-semibold text-foreground focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none transition duration-200"
+                />
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border/50">
+              <button
+                onClick={() => setModalDept(null)}
+                className="h-9 px-5 bg-card hover:bg-muted text-foreground border border-border rounded-xl text-xs font-bold transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveHOD}
+                className="h-9 px-5 bg-success hover:bg-success-glow text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+              >
+                <Save className="size-3.5" /> Save HOD
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- TIMELINE HISTORY DIALOG MODAL --- */}
+      {historyModalDept && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 animate-in fade-in duration-200">
+          <div className="bg-card border border-border/80 w-full max-w-2xl rounded-2xl p-6 shadow-2xl flex flex-col gap-4 animate-in zoom-in-95 duration-200 font-sans">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-border/50 pb-3">
+              <div className="flex items-center gap-2">
+                <History className="size-4.5 text-primary" />
+                <h3 className="text-sm font-extrabold text-foreground">HOD Assignment History: {historyModalDept}</h3>
+              </div>
+              <button
+                onClick={() => setHistoryModalDept(null)}
+                className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            {/* History Table */}
+            <div className="overflow-x-auto border border-border/60 rounded-xl bg-card max-h-80 overflow-y-auto">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-muted border-b border-border/70 text-muted-foreground/90 font-bold uppercase tracking-wider text-[10px]">
+                    <th className="p-3 w-12 text-center">SL</th>
+                    <th className="p-3">HOD Name</th>
+                    <th className="p-3">Employee ID</th>
+                    <th className="p-3">Designation</th>
+                    <th className="p-3">Start Date</th>
+                    <th className="p-3">End Date</th>
+                    <th className="p-3 flex items-center gap-1"><Clock className="size-3 text-muted-foreground" /> Duration</th>
+                    <th className="p-3 text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/50 text-foreground font-semibold">
+                  {calculatedDeptHistory.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="p-8 text-center text-muted-foreground/60 font-medium">
+                        No HOD history logs found for {historyModalDept}
+                      </td>
+                    </tr>
+                  ) : (
+                    calculatedDeptHistory.map((row, index) => {
+                      const isActive = row.status === "Active";
+                      return (
+                        <tr key={row.id} className="hover:bg-muted/30 transition duration-150">
+                          <td className="p-3 text-center">{index + 1}</td>
+                          <td className="p-3 text-foreground font-bold">{row.empName}</td>
+                          <td className="p-3 font-mono text-[11px] text-muted-foreground">{row.empId}</td>
+                          <td className="p-3 text-muted-foreground">{row.designation}</td>
+                          <td className="p-3 font-semibold">{row.assignedDate}</td>
+                          <td className="p-3 text-muted-foreground">{row.endDate}</td>
+                          <td className="p-3 text-primary font-black">{row.duration}</td>
+                          <td className="p-3 text-center">
+                            <span
+                              className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${
+                                isActive
+                                  ? "bg-success/15 text-success"
+                                  : "bg-muted text-muted-foreground/75"
+                              }`}
+                            >
+                              {row.status}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border/50">
+              <button
+                onClick={() => setHistoryModalDept(null)}
+                className="h-9 px-5 bg-card hover:bg-muted text-foreground border border-border rounded-xl text-xs font-bold transition cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
