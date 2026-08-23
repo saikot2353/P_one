@@ -2260,4 +2260,13 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     descriptionEn: "Added a new Set Manager page under Personnel Info to bulk assign reporting managers to employees. Features a master staff manager directory and a bulk assignment console modal with department/designation checklists.",
     descriptionBn: "কর্মচারীদের জন্য বাল্ক বা এককালীন রিপোর্টিং ম্যানেজার নির্ধারণ করার জন্য পার্সোনেল ইনফোর অধীনে নতুন Set Manager পেজ যুক্ত করা হয়েছে। পেজটিতে একটি মাস্টার স্টাফ ম্যানেজার ডিরেক্টরি এবং ডিপার্টমেন্ট/ডেসিগনেশন ফিল্টার ফিল্টারসহ বাল্ক অ্যাসাইনমেন্ট মডাল কনসোল যুক্ত করা হয়েছে।",
   },
+  {
+    id: "195",
+    date: "2026-08-23T14:22",
+    type: "New Feature",
+    module: "Personnel",
+    link: "/notice",
+    descriptionEn: "Added a new Notice Board route page and sidebar navigation links. Features a live search directory of notices, rich text circular content configurations using jodit-react, circular format exports, and a premium official letterhead document circular view overlay.",
+    descriptionBn: "একটি নতুন Notice Board পেজ এবং সাইডবার নেভিগেশন লিংক যুক্ত করা হয়েছে। পেজটিতে নোটিসের লাইভ সার্চ ডিরেক্টরি, jodit-react এর মাধ্যমে রিচ টেক্সট সার্কুলার কনফিগারেশন, বিভিন্ন সার্কুলার ফাইল এক্সপোর্ট এবং একটি আধুনিক কর্পোরেট লেটারহেড ডকুমেন্টের মাধ্যমে সার্কুলার ভিউ ওভারলে যুক্ত করা হয়েছে।",
+  },
 ];

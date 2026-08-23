@@ -134,6 +134,13 @@ const searchableMenus: SearchMenuLink[] = [
     to: "/earn-leave-workflow",
     description: "Unified Submit/Check/Approve pipeline",
   },
+  // Notice
+  {
+    label: "Notice Board",
+    parent: "Notice",
+    to: "/notice",
+    description: "Publish and view company notices and announcements",
+  },
   {
     label: "Earn Leave Process List",
     parent: "Leave",

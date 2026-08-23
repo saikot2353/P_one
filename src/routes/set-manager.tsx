@@ -128,7 +128,6 @@ function SetManagerPage() {
   const [historyModalEmpId, setHistoryModalEmpId] = useState<string | null>(null);
 
   const [filterDept, setFilterDept] = useState("Garment (Unit-2)");
-  const [filterDesig, setFilterDesig] = useState("ALL");
   const [modalSearchText, setModalSearchText] = useState("");
   const [selectedEmpIds, setSelectedEmpIds] = useState<string[]>([]);
 
@@ -171,14 +170,13 @@ function SetManagerPage() {
   const filteredCandidatesInModal = useMemo(() => {
     return employees.filter((emp) => {
       if (filterDept !== "ALL" && emp.department !== filterDept) return false;
-      if (filterDesig !== "ALL" && emp.designation !== filterDesig) return false;
       if (modalSearchText.trim()) {
         const q = modalSearchText.toLowerCase();
         return emp.name.toLowerCase().includes(q) || emp.id.toLowerCase().includes(q);
       }
       return true;
     });
-  }, [employees, filterDept, filterDesig, modalSearchText]);
+  }, [employees, filterDept, modalSearchText]);
 
   // Master employees list search filter
   const filteredMasterEmployees = useMemo(() => {
@@ -518,7 +516,7 @@ function SetManagerPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 min-h-0">
               {/* Left Column: Filter panel & Table list */}
               <div className="lg:col-span-8 flex flex-col gap-4 h-full min-h-0">
-                <div className="grid grid-cols-3 gap-4 bg-muted/30 border border-border/20 p-3.5 rounded-xl flex-shrink-0">
+                <div className="grid grid-cols-2 gap-4 bg-muted/30 border border-border/20 p-3.5 rounded-xl flex-shrink-0">
                   {/* Filter Department */}
                   <div className="space-y-1.5">
                     <label className="text-[9px] font-extrabold text-muted-foreground uppercase block">
@@ -534,28 +532,6 @@ function SetManagerPage() {
                     >
                       <option value="ALL">All Departments</option>
                       {allDepartments.map((d) => (
-                        <option key={d} value={d}>
-                          {d}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Filter Designation */}
-                  <div className="space-y-1.5">
-                    <label className="text-[9px] font-extrabold text-muted-foreground uppercase block">
-                      Filter Designation
-                    </label>
-                    <select
-                      value={filterDesig}
-                      onChange={(e) => {
-                        setFilterDesig(e.target.value);
-                        setSelectedEmpIds([]);
-                      }}
-                      className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none"
-                    >
-                      <option value="ALL">All Designations</option>
-                      {allDesignations.map((d) => (
                         <option key={d} value={d}>
                           {d}
                         </option>

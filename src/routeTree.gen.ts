@@ -51,6 +51,7 @@ import { Route as PayrollBenefitsMasterDataRouteImport } from './routes/payroll-
 import { Route as PayrollBenefitsCommonRouteImport } from './routes/payroll-benefits-common'
 import { Route as PayrollBenefitsRouteImport } from './routes/payroll-benefits'
 import { Route as PayrollAdvanceRouteImport } from './routes/payroll-advance'
+import { Route as NoticeRouteImport } from './routes/notice'
 import { Route as MyDashboardRouteImport } from './routes/my-dashboard'
 import { Route as MonthlySalaryProcessRouteImport } from './routes/monthly-salary-process'
 import { Route as MonthlySalaryDetailsRouteImport } from './routes/monthly-salary-details'
@@ -378,6 +379,11 @@ const PayrollBenefitsRoute = PayrollBenefitsRouteImport.update({
 const PayrollAdvanceRoute = PayrollAdvanceRouteImport.update({
   id: '/payroll-advance',
   path: '/payroll-advance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NoticeRoute = NoticeRouteImport.update({
+  id: '/notice',
+  path: '/notice',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MyDashboardRoute = MyDashboardRouteImport.update({
@@ -1060,6 +1066,7 @@ export interface FileRoutesByFullPath {
   '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
+  '/notice': typeof NoticeRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
   '/payroll-benefits-common': typeof PayrollBenefitsCommonRoute
@@ -1215,6 +1222,7 @@ export interface FileRoutesByTo {
   '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
+  '/notice': typeof NoticeRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
   '/payroll-benefits-common': typeof PayrollBenefitsCommonRoute
@@ -1371,6 +1379,7 @@ export interface FileRoutesById {
   '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
+  '/notice': typeof NoticeRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
   '/payroll-benefits-common': typeof PayrollBenefitsCommonRoute
@@ -1528,6 +1537,7 @@ export interface FileRouteTypes {
     | '/monthly-salary-details'
     | '/monthly-salary-process'
     | '/my-dashboard'
+    | '/notice'
     | '/payroll-advance'
     | '/payroll-benefits'
     | '/payroll-benefits-common'
@@ -1683,6 +1693,7 @@ export interface FileRouteTypes {
     | '/monthly-salary-details'
     | '/monthly-salary-process'
     | '/my-dashboard'
+    | '/notice'
     | '/payroll-advance'
     | '/payroll-benefits'
     | '/payroll-benefits-common'
@@ -1838,6 +1849,7 @@ export interface FileRouteTypes {
     | '/monthly-salary-details'
     | '/monthly-salary-process'
     | '/my-dashboard'
+    | '/notice'
     | '/payroll-advance'
     | '/payroll-benefits'
     | '/payroll-benefits-common'
@@ -1994,6 +2006,7 @@ export interface RootRouteChildren {
   MonthlySalaryDetailsRoute: typeof MonthlySalaryDetailsRoute
   MonthlySalaryProcessRoute: typeof MonthlySalaryProcessRoute
   MyDashboardRoute: typeof MyDashboardRoute
+  NoticeRoute: typeof NoticeRoute
   PayrollAdvanceRoute: typeof PayrollAdvanceRoute
   PayrollBenefitsRoute: typeof PayrollBenefitsRoute
   PayrollBenefitsCommonRoute: typeof PayrollBenefitsCommonRoute
@@ -2336,6 +2349,13 @@ declare module '@tanstack/react-router' {
       path: '/payroll-advance'
       fullPath: '/payroll-advance'
       preLoaderRoute: typeof PayrollAdvanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notice': {
+      id: '/notice'
+      path: '/notice'
+      fullPath: '/notice'
+      preLoaderRoute: typeof NoticeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/my-dashboard': {
@@ -3227,6 +3247,7 @@ const rootRouteChildren: RootRouteChildren = {
   MonthlySalaryDetailsRoute: MonthlySalaryDetailsRoute,
   MonthlySalaryProcessRoute: MonthlySalaryProcessRoute,
   MyDashboardRoute: MyDashboardRoute,
+  NoticeRoute: NoticeRoute,
   PayrollAdvanceRoute: PayrollAdvanceRoute,
   PayrollBenefitsRoute: PayrollBenefitsRoute,
   PayrollBenefitsCommonRoute: PayrollBenefitsCommonRoute,

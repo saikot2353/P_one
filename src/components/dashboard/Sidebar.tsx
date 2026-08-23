@@ -35,6 +35,7 @@ import {
   ArrowLeft,
   MessageSquare,
   BookUser,
+  Megaphone,
 } from "lucide-react";
 
 export interface NestedItem {
@@ -169,6 +170,11 @@ export const nav: NavItem[] = [
     label: "Leave",
     to: "/leave",
     icon: CalendarX,
+  },
+  {
+    label: "Notice",
+    to: "/notice",
+    icon: Megaphone,
   },
   {
     label: "KPI Performance",
