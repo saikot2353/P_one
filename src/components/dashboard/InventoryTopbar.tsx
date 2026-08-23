@@ -326,40 +326,40 @@ const searchableMenus: SearchMenuLink[] = [
   },
   // Evaluation
   {
-    label: "Increment Configurator",
+    label: "Increment (Single)",
     parent: "Evaluation",
-    to: "/increment-gadget",
-    description: "Configure salary increments",
+    to: "/increment",
+    description: "Single employee appraisal configuration and salary adjustments",
   },
   {
-    label: "Evaluation Propose",
+    label: "Increment (Multi)",
     parent: "Evaluation",
-    to: "/evaluation-propose",
-    description: "Propose evaluation scores",
+    to: "/increment-multiple",
+    description: "Bulk processing and department-wide increment adjustments",
   },
   {
-    label: "Propose Increment",
+    label: "Proposed Increment",
     parent: "Evaluation",
     to: "/propose-increment",
-    description: "Propose salary increments",
+    description: "Submit and manage performance-based salary increments",
   },
   {
-    label: "Increment Summary",
+    label: "Increment Report",
     parent: "Evaluation",
-    to: "/increment-summary",
-    description: "Summary of all increments",
+    to: "/increment-report",
+    description: "Analytical reports and dynamic performance curves",
+  },
+  {
+    label: "Increment History",
+    parent: "Evaluation",
+    to: "/increment-history",
+    description: "Historical increment records log for all employees",
   },
   {
     label: "Approve Increment Gadget",
     parent: "Evaluation",
     to: "/approve-increment-gadget",
     description: "Approval interface for increments",
-  },
-  {
-    label: "Increment Queue List",
-    parent: "Evaluation",
-    to: "/increment-queuelist",
-    description: "Pending increment queue",
   },
   {
     label: "Approve Increment (HR)",
@@ -372,18 +372,6 @@ const searchableMenus: SearchMenuLink[] = [
     parent: "Evaluation",
     to: "/final-approve-increment",
     description: "Final increment approval",
-  },
-  {
-    label: "Increment List",
-    parent: "Evaluation",
-    to: "/increment-list",
-    description: "List of all increments",
-  },
-  {
-    label: "Increment History",
-    parent: "Evaluation",
-    to: "/increment-history",
-    description: "Historical increment records",
   },
   // Configure
   {

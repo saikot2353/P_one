@@ -2224,4 +2224,13 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     descriptionEn: "Added the Advanced Report Actions accordion to the Monthly Salary Process page, enabling dynamic smart printing for processed salary records directly in Pay Slip templates (English & Bangla) precisely matching single-column A4 format.",
     descriptionBn: "Monthly Salary Process পেজে Advanced Report Actions অপশন যোগ করা হয়েছে, যার মাধ্যমে প্রসেস করা স্যালারি রেকর্ডগুলো থেকে সরাসরি Pay Slip (ইংরেজি ও বাংলা) প্রিন্ট করা যাবে, যা সিঙ্গেল-কলাম A4 ফরম্যাটে সাজানো হয়েছে।",
   },
+  {
+    id: "191",
+    date: "2026-08-23T11:26",
+    type: "Modify",
+    module: "Evaluation",
+    link: "/increment",
+    descriptionEn: "Removed all old evaluation pages and horizontal/sub-tab navigation bars. Reorganized the Evaluation module with 5 clean standalone page workspaces: Increment (Single), Increment (Multi), Proposed Increment, Increment Report, and Increment History.",
+    descriptionBn: "মূল্যায়ন মডিউলের পুরাতন পেজ এবং সকল অনুভূমিক/সাব-ট্যাব বার মুছে ফেলা হয়েছে। মডিউলটিকে ৫টি পরিষ্কার ও স্বতন্ত্র পেজে পুনর্বিন্যাস করা হয়েছে: Increment (Single), Increment (Multi), Proposed Increment, Increment Report, এবং Increment History।",
+  },
 ];

@@ -107,13 +107,9 @@ import { Route as InvConfigProductNameRouteImport } from './routes/inv-config-pr
 import { Route as InvConfigModelRouteImport } from './routes/inv-config-model'
 import { Route as InvConfigGroupNameRouteImport } from './routes/inv-config-group-name'
 import { Route as InvConfigBrandRouteImport } from './routes/inv-config-brand'
-import { Route as IncrementSummaryRouteImport } from './routes/increment-summary'
 import { Route as IncrementReportRouteImport } from './routes/increment-report'
-import { Route as IncrementQueuelistRouteImport } from './routes/increment-queuelist'
 import { Route as IncrementMultipleRouteImport } from './routes/increment-multiple'
-import { Route as IncrementListRouteImport } from './routes/increment-list'
 import { Route as IncrementHistoryRouteImport } from './routes/increment-history'
-import { Route as IncrementGadgetRouteImport } from './routes/increment-gadget'
 import { Route as IncrementRouteImport } from './routes/increment'
 import { Route as IncentiveAllowanceRouteImport } from './routes/incentive-allowance'
 import { Route as IdCardSetupRouteImport } from './routes/id-card-setup'
@@ -123,7 +119,6 @@ import { Route as FinancialAidBudgetConfigurationRouteImport } from './routes/fi
 import { Route as FinalSettlementConfigurationRouteImport } from './routes/final-settlement-configuration'
 import { Route as FinalSettlementRouteImport } from './routes/final-settlement'
 import { Route as FinalApproveIncrementRouteImport } from './routes/final-approve-increment'
-import { Route as EvaluationProposeRouteImport } from './routes/evaluation-propose'
 import { Route as EmployeeJobCardRouteImport } from './routes/employee-job-card'
 import { Route as EmployeeDocVerificationRouteImport } from './routes/employee-doc-verification'
 import { Route as EarnLeaveWorkflowRouteImport } from './routes/earn-leave-workflow'
@@ -672,19 +667,9 @@ const InvConfigBrandRoute = InvConfigBrandRouteImport.update({
   path: '/inv-config-brand',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IncrementSummaryRoute = IncrementSummaryRouteImport.update({
-  id: '/increment-summary',
-  path: '/increment-summary',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IncrementReportRoute = IncrementReportRouteImport.update({
   id: '/increment-report',
   path: '/increment-report',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IncrementQueuelistRoute = IncrementQueuelistRouteImport.update({
-  id: '/increment-queuelist',
-  path: '/increment-queuelist',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IncrementMultipleRoute = IncrementMultipleRouteImport.update({
@@ -692,19 +677,9 @@ const IncrementMultipleRoute = IncrementMultipleRouteImport.update({
   path: '/increment-multiple',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IncrementListRoute = IncrementListRouteImport.update({
-  id: '/increment-list',
-  path: '/increment-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IncrementHistoryRoute = IncrementHistoryRouteImport.update({
   id: '/increment-history',
   path: '/increment-history',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IncrementGadgetRoute = IncrementGadgetRouteImport.update({
-  id: '/increment-gadget',
-  path: '/increment-gadget',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IncrementRoute = IncrementRouteImport.update({
@@ -752,11 +727,6 @@ const FinalSettlementRoute = FinalSettlementRouteImport.update({
 const FinalApproveIncrementRoute = FinalApproveIncrementRouteImport.update({
   id: '/final-approve-increment',
   path: '/final-approve-increment',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EvaluationProposeRoute = EvaluationProposeRouteImport.update({
-  id: '/evaluation-propose',
-  path: '/evaluation-propose',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmployeeJobCardRoute = EmployeeJobCardRouteImport.update({
@@ -1008,7 +978,6 @@ export interface FileRoutesByFullPath {
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
-  '/evaluation-propose': typeof EvaluationProposeRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
   '/final-settlement-configuration': typeof FinalSettlementConfigurationRoute
@@ -1018,13 +987,9 @@ export interface FileRoutesByFullPath {
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
   '/increment': typeof IncrementRoute
-  '/increment-gadget': typeof IncrementGadgetRoute
   '/increment-history': typeof IncrementHistoryRoute
-  '/increment-list': typeof IncrementListRoute
   '/increment-multiple': typeof IncrementMultipleRoute
-  '/increment-queuelist': typeof IncrementQueuelistRoute
   '/increment-report': typeof IncrementReportRoute
-  '/increment-summary': typeof IncrementSummaryRoute
   '/inv-config-brand': typeof InvConfigBrandRoute
   '/inv-config-group-name': typeof InvConfigGroupNameRoute
   '/inv-config-model': typeof InvConfigModelRoute
@@ -1166,7 +1131,6 @@ export interface FileRoutesByTo {
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
-  '/evaluation-propose': typeof EvaluationProposeRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
   '/final-settlement-configuration': typeof FinalSettlementConfigurationRoute
@@ -1176,13 +1140,9 @@ export interface FileRoutesByTo {
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
   '/increment': typeof IncrementRoute
-  '/increment-gadget': typeof IncrementGadgetRoute
   '/increment-history': typeof IncrementHistoryRoute
-  '/increment-list': typeof IncrementListRoute
   '/increment-multiple': typeof IncrementMultipleRoute
-  '/increment-queuelist': typeof IncrementQueuelistRoute
   '/increment-report': typeof IncrementReportRoute
-  '/increment-summary': typeof IncrementSummaryRoute
   '/inv-config-brand': typeof InvConfigBrandRoute
   '/inv-config-group-name': typeof InvConfigGroupNameRoute
   '/inv-config-model': typeof InvConfigModelRoute
@@ -1325,7 +1285,6 @@ export interface FileRoutesById {
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
-  '/evaluation-propose': typeof EvaluationProposeRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
   '/final-settlement-configuration': typeof FinalSettlementConfigurationRoute
@@ -1335,13 +1294,9 @@ export interface FileRoutesById {
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
   '/increment': typeof IncrementRoute
-  '/increment-gadget': typeof IncrementGadgetRoute
   '/increment-history': typeof IncrementHistoryRoute
-  '/increment-list': typeof IncrementListRoute
   '/increment-multiple': typeof IncrementMultipleRoute
-  '/increment-queuelist': typeof IncrementQueuelistRoute
   '/increment-report': typeof IncrementReportRoute
-  '/increment-summary': typeof IncrementSummaryRoute
   '/inv-config-brand': typeof InvConfigBrandRoute
   '/inv-config-group-name': typeof InvConfigGroupNameRoute
   '/inv-config-model': typeof InvConfigModelRoute
@@ -1485,7 +1440,6 @@ export interface FileRouteTypes {
     | '/earn-leave-workflow'
     | '/employee-doc-verification'
     | '/employee-job-card'
-    | '/evaluation-propose'
     | '/final-approve-increment'
     | '/final-settlement'
     | '/final-settlement-configuration'
@@ -1495,13 +1449,9 @@ export interface FileRouteTypes {
     | '/id-card-setup'
     | '/incentive-allowance'
     | '/increment'
-    | '/increment-gadget'
     | '/increment-history'
-    | '/increment-list'
     | '/increment-multiple'
-    | '/increment-queuelist'
     | '/increment-report'
-    | '/increment-summary'
     | '/inv-config-brand'
     | '/inv-config-group-name'
     | '/inv-config-model'
@@ -1643,7 +1593,6 @@ export interface FileRouteTypes {
     | '/earn-leave-workflow'
     | '/employee-doc-verification'
     | '/employee-job-card'
-    | '/evaluation-propose'
     | '/final-approve-increment'
     | '/final-settlement'
     | '/final-settlement-configuration'
@@ -1653,13 +1602,9 @@ export interface FileRouteTypes {
     | '/id-card-setup'
     | '/incentive-allowance'
     | '/increment'
-    | '/increment-gadget'
     | '/increment-history'
-    | '/increment-list'
     | '/increment-multiple'
-    | '/increment-queuelist'
     | '/increment-report'
-    | '/increment-summary'
     | '/inv-config-brand'
     | '/inv-config-group-name'
     | '/inv-config-model'
@@ -1801,7 +1746,6 @@ export interface FileRouteTypes {
     | '/earn-leave-workflow'
     | '/employee-doc-verification'
     | '/employee-job-card'
-    | '/evaluation-propose'
     | '/final-approve-increment'
     | '/final-settlement'
     | '/final-settlement-configuration'
@@ -1811,13 +1755,9 @@ export interface FileRouteTypes {
     | '/id-card-setup'
     | '/incentive-allowance'
     | '/increment'
-    | '/increment-gadget'
     | '/increment-history'
-    | '/increment-list'
     | '/increment-multiple'
-    | '/increment-queuelist'
     | '/increment-report'
-    | '/increment-summary'
     | '/inv-config-brand'
     | '/inv-config-group-name'
     | '/inv-config-model'
@@ -1960,7 +1900,6 @@ export interface RootRouteChildren {
   EarnLeaveWorkflowRoute: typeof EarnLeaveWorkflowRoute
   EmployeeDocVerificationRoute: typeof EmployeeDocVerificationRoute
   EmployeeJobCardRoute: typeof EmployeeJobCardRoute
-  EvaluationProposeRoute: typeof EvaluationProposeRoute
   FinalApproveIncrementRoute: typeof FinalApproveIncrementRoute
   FinalSettlementRoute: typeof FinalSettlementRoute
   FinalSettlementConfigurationRoute: typeof FinalSettlementConfigurationRoute
@@ -1970,13 +1909,9 @@ export interface RootRouteChildren {
   IdCardSetupRoute: typeof IdCardSetupRoute
   IncentiveAllowanceRoute: typeof IncentiveAllowanceRoute
   IncrementRoute: typeof IncrementRoute
-  IncrementGadgetRoute: typeof IncrementGadgetRoute
   IncrementHistoryRoute: typeof IncrementHistoryRoute
-  IncrementListRoute: typeof IncrementListRoute
   IncrementMultipleRoute: typeof IncrementMultipleRoute
-  IncrementQueuelistRoute: typeof IncrementQueuelistRoute
   IncrementReportRoute: typeof IncrementReportRoute
-  IncrementSummaryRoute: typeof IncrementSummaryRoute
   InvConfigBrandRoute: typeof InvConfigBrandRoute
   InvConfigGroupNameRoute: typeof InvConfigGroupNameRoute
   InvConfigModelRoute: typeof InvConfigModelRoute
@@ -2769,25 +2704,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvConfigBrandRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/increment-summary': {
-      id: '/increment-summary'
-      path: '/increment-summary'
-      fullPath: '/increment-summary'
-      preLoaderRoute: typeof IncrementSummaryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/increment-report': {
       id: '/increment-report'
       path: '/increment-report'
       fullPath: '/increment-report'
       preLoaderRoute: typeof IncrementReportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/increment-queuelist': {
-      id: '/increment-queuelist'
-      path: '/increment-queuelist'
-      fullPath: '/increment-queuelist'
-      preLoaderRoute: typeof IncrementQueuelistRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/increment-multiple': {
@@ -2797,25 +2718,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IncrementMultipleRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/increment-list': {
-      id: '/increment-list'
-      path: '/increment-list'
-      fullPath: '/increment-list'
-      preLoaderRoute: typeof IncrementListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/increment-history': {
       id: '/increment-history'
       path: '/increment-history'
       fullPath: '/increment-history'
       preLoaderRoute: typeof IncrementHistoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/increment-gadget': {
-      id: '/increment-gadget'
-      path: '/increment-gadget'
-      fullPath: '/increment-gadget'
-      preLoaderRoute: typeof IncrementGadgetRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/increment': {
@@ -2879,13 +2786,6 @@ declare module '@tanstack/react-router' {
       path: '/final-approve-increment'
       fullPath: '/final-approve-increment'
       preLoaderRoute: typeof FinalApproveIncrementRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/evaluation-propose': {
-      id: '/evaluation-propose'
-      path: '/evaluation-propose'
-      fullPath: '/evaluation-propose'
-      preLoaderRoute: typeof EvaluationProposeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/employee-job-card': {
@@ -3216,7 +3116,6 @@ const rootRouteChildren: RootRouteChildren = {
   EarnLeaveWorkflowRoute: EarnLeaveWorkflowRoute,
   EmployeeDocVerificationRoute: EmployeeDocVerificationRoute,
   EmployeeJobCardRoute: EmployeeJobCardRoute,
-  EvaluationProposeRoute: EvaluationProposeRoute,
   FinalApproveIncrementRoute: FinalApproveIncrementRoute,
   FinalSettlementRoute: FinalSettlementRoute,
   FinalSettlementConfigurationRoute: FinalSettlementConfigurationRoute,
@@ -3226,13 +3125,9 @@ const rootRouteChildren: RootRouteChildren = {
   IdCardSetupRoute: IdCardSetupRoute,
   IncentiveAllowanceRoute: IncentiveAllowanceRoute,
   IncrementRoute: IncrementRoute,
-  IncrementGadgetRoute: IncrementGadgetRoute,
   IncrementHistoryRoute: IncrementHistoryRoute,
-  IncrementListRoute: IncrementListRoute,
   IncrementMultipleRoute: IncrementMultipleRoute,
-  IncrementQueuelistRoute: IncrementQueuelistRoute,
   IncrementReportRoute: IncrementReportRoute,
-  IncrementSummaryRoute: IncrementSummaryRoute,
   InvConfigBrandRoute: InvConfigBrandRoute,
   InvConfigGroupNameRoute: InvConfigGroupNameRoute,
   InvConfigModelRoute: InvConfigModelRoute,

@@ -3,7 +3,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { rawIncrementRecords, RawIncrementRecord } from "./-increment-history-data";
-import { EvaluationTabNav } from "@/components/evaluation/EvaluationTabNav";
 import {
   Search,
   FileSpreadsheet,
@@ -396,33 +395,7 @@ function IncrementHistoryPage() {
             </div>
           </div>
 
-          {/* Evaluation Module Tab Nav */}
-          <EvaluationTabNav />
 
-          {/* Tab Selector Hub */}
-          <div className="bg-card rounded-lg border border-border/80 p-1.5 shadow-2xs flex gap-1 print:hidden">
-            <button
-              onClick={() => setActiveReportsTab("history")}
-              className={`flex-1 sm:flex-none h-10 px-6 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${activeReportsTab === "history" ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground hover:bg-muted/75 hover:text-foreground"}`}
-            >
-              <FileClock className="size-3.5" />
-              <span>📊 History Ledger</span>
-            </button>
-            <button
-              onClick={() => setActiveReportsTab("summary")}
-              className={`flex-1 sm:flex-none h-10 px-6 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${activeReportsTab === "summary" ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground hover:bg-muted/75 hover:text-foreground"}`}
-            >
-              <TrendingUp className="size-3.5" />
-              <span>📈 Cumulative Summary</span>
-            </button>
-            <button
-              onClick={() => setActiveReportsTab("reports")}
-              className={`flex-1 sm:flex-none h-10 px-6 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${activeReportsTab === "reports" ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground hover:bg-muted/75 hover:text-foreground"}`}
-            >
-              <FileText className="size-3.5" />
-              <span>📄 Parameterized Reports</span>
-            </button>
-          </div>
 
           {activeReportsTab === "history" && (
             <>

@@ -275,7 +275,7 @@ const initialGadgetEmployees: GadgetEmployee[] = [
 
 function IncrementConfiguratorPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"single" | "batch" | "rules">("batch");
+  const [activeTab, setActiveTab] = useState<"single" | "batch" | "rules">("single");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -506,12 +506,12 @@ function IncrementConfiguratorPage() {
                 <ChevronRight className="size-2.5" />
                 <span className="hover:text-primary transition-colors">Evaluation</span>
                 <ChevronRight className="size-2.5" />
-                <span className="text-foreground">Salary Increment Configurator</span>
+                <span className="text-foreground">Increment (Single)</span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="size-2.5 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]" />
                 <h1 className="text-xl font-extrabold tracking-tight text-foreground">
-                  Increment Configurator Workspace
+                  Increment (Single) Workspace
                 </h1>
               </div>
             </div>
@@ -547,30 +547,7 @@ function IncrementConfiguratorPage() {
             </div>
           )}
 
-          {/* Tab Selection Hub */}
-          <div className="bg-card rounded-lg border border-border/80 p-1.5 shadow-2xs flex gap-1 print:hidden">
-            <button
-              onClick={() => setActiveTab("batch")}
-              className={`flex-1 sm:flex-none h-10 px-6 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${activeTab === "batch" ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground hover:bg-muted/75 hover:text-foreground"}`}
-            >
-              <Layers className="size-3.5" />
-              <span>🎛️ Increment Gadget Console</span>
-            </button>
-            <button
-              onClick={() => setActiveTab("single")}
-              className={`flex-1 sm:flex-none h-10 px-6 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${activeTab === "single" ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground hover:bg-muted/75 hover:text-foreground"}`}
-            >
-              <User className="size-3.5" />
-              <span>👤 Single Propose</span>
-            </button>
-            <button
-              onClick={() => setActiveTab("rules")}
-              className={`flex-1 sm:flex-none h-10 px-6 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${activeTab === "rules" ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground hover:bg-muted/75 hover:text-foreground"}`}
-            >
-              <Sliders className="size-3.5" />
-              <span>⚙️ Ratios Allocation Rules</span>
-            </button>
-          </div>
+
 
           <div className="grid grid-cols-1 gap-6">
             {/* TAB 1: INCREMENT GADGET BATCH PROCESSING */}

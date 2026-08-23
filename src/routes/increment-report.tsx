@@ -25,7 +25,7 @@ function PlaceholderPage({ title }: { title: string }) {
               <ChevronRight className="size-3" />
               <span>Evaluation</span>
               <ChevronRight className="size-3" />
-              <span className="text-primary font-extrabold">{title}</span>
+              <span className="text-foreground">{title}</span>
             </div>
             <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
               <Cpu className="size-5.5 text-primary animate-pulse" />
@@ -35,6 +35,7 @@ function PlaceholderPage({ title }: { title: string }) {
               Analytical reports and dynamic performance curves.
             </p>
           </div>
+
           <div className="bg-white dark:bg-[#1e293b] rounded-lg border border-slate-200/80 dark:border-slate-800 p-8 shadow-sm text-center py-24 space-y-4">
             <div className="size-16 rounded-lg bg-primary/10 text-primary grid place-items-center mx-auto animate-bounce">
               <Cpu className="size-8" />
