@@ -74,7 +74,14 @@ export const nav: NavItem[] = [
     subitems: [
       { label: "New Requisition", to: "/ssp-new-requisition" },
       { label: "My Requisition", to: "/ssp-my-requisition" },
-      { label: "Attendance", to: "/ssp-attendance" },
+      {
+        label: "Attendance",
+        subitems: [
+          { label: "My Attendance", to: "/ssp-my-attendance" },
+          { label: "Request Manual Attendance", to: "/ssp-request-manual-attendance" },
+          { label: "Approve Manual Attendance", to: "/ssp-approve-manual-attendance" },
+        ],
+      },
     ],
   },
   {
@@ -168,8 +175,15 @@ export const nav: NavItem[] = [
   },
   {
     label: "Leave",
-    to: "/leave",
     icon: CalendarX,
+    subitems: [
+      { label: "Leave Application", to: "/leave-application" },
+      { label: "Leave Approved & List", to: "/leave-list" },
+      { label: "Leave Approve", to: "/leave-approve" },
+      { label: "Earn Leave Process (Year)", to: "/earn-leave-process", search: { type: "year" } },
+      { label: "Earn Leave Process (Month)", to: "/earn-leave-process", search: { type: "month" } },
+      { label: "Earn Leave Submit & List", to: "/earn-leave-workflow" },
+    ],
   },
   {
     label: "Notice",

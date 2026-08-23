@@ -887,6 +887,132 @@ function LoginPage() {
   const [mounted, setMounted] = useState(false);
   const [theme, setTheme] = useState<Theme>("light");
   const [currentUser, setCurrentUser] = useState<UserItem | null>(null);
+  const [isFingerprintModalOpen, setIsFingerprintModalOpen] = useState(false);
+  const [fingerprintScanStatus, setFingerprintScanStatus] = useState<"idle" | "scanning" | "success" | "failed">("idle");
+
+  const handleFingerprintSuccess = useCallback(async () => {
+    setIsLoading(true);
+    let usersList = SEED_USERS;
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("cripton_user_list");
+      if (stored) {
+        try {
+          usersList = JSON.parse(stored);
+        } catch (err) {
+          console.error("Error parsing user list:", err);
+        }
+      } else {
+        localStorage.setItem("cripton_user_list", JSON.stringify(SEED_USERS));
+      }
+    }
+
+    const finalEmail = "Shapno";
+    const finalPassword = "87654321!";
+    let matchedUser = usersList.find((u) => u.userId?.toLowerCase() === finalEmail.toLowerCase());
+
+    if (!matchedUser) {
+      matchedUser = {
+        sl: Date.now(),
+        name: "Shapno",
+        email: "shapno@cripton.com",
+        empId: "ADMIN001",
+        userId: "Shapno",
+        role: "Admin",
+        department: "Administration",
+        lastLogin: "—",
+        isActive: "Active",
+        password: finalPassword,
+        companyAccess: ["All"],
+      };
+      usersList.push(matchedUser);
+    }
+
+    if (typeof window !== "undefined") {
+      const now = new Date();
+      const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
+
+      const updatedList = usersList.map((u) =>
+        u.sl === matchedUser.sl ? { ...u, lastLogin: formattedDate } : u,
+      );
+
+      localStorage.setItem("cripton_user_list", JSON.stringify(updatedList));
+      localStorage.setItem(
+        "cripton_current_user",
+        JSON.stringify({ ...matchedUser, lastLogin: formattedDate }),
+      );
+      setCurrentUser({ ...matchedUser, lastLogin: formattedDate });
+    }
+
+    toast.success("Authenticated via Fingerprint as Shapno");
+    setTransitioning(true);
+    setTimeout(() => {
+      setStep(2);
+      setTransitioning(false);
+      setIsLoading(false);
+      setIsFingerprintModalOpen(false);
+    }, 500);
+  }, []);
+
+  const startFingerprintScan = useCallback(async () => {
+    // Check browser support
+    if (typeof window === "undefined" || !window.PublicKeyCredential) {
+      toast.error("WebAuthn is not supported in this browser.");
+      return;
+    }
+
+    // Load enrolled credential IDs from localStorage (saved during enrollment)
+    const enrolled = localStorage.getItem("cripton_webauthn_enrolled");
+    const storedCredsRaw = localStorage.getItem("cripton_webauthn_creds");
+    const storedCreds: number[][] = storedCredsRaw ? JSON.parse(storedCredsRaw) : [];
+
+    if (!enrolled || storedCreds.length === 0) {
+      toast.error("No fingerprint enrolled. Go to Profile → Enroll Fingerprint first.");
+      return;
+    }
+
+    setIsFingerprintModalOpen(true);
+    setFingerprintScanStatus("scanning");
+
+    try {
+      const challenge = new Uint8Array(32);
+      crypto.getRandomValues(challenge);
+
+      // Build allowCredentials from stored IDs — this makes macOS show Touch ID directly
+      const allowCredentials: PublicKeyCredentialDescriptor[] = storedCreds.map((credIdArray) => ({
+        type: "public-key",
+        id: new Uint8Array(credIdArray),
+        transports: ["internal" as AuthenticatorTransport],
+      }));
+
+      await navigator.credentials.get({
+        publicKey: {
+          challenge,
+          timeout: 60000,
+          userVerification: "required",
+          rpId: window.location.hostname,
+          allowCredentials,
+        },
+      });
+
+      // Touch ID confirmed — proceed to login
+      setFingerprintScanStatus("success");
+      setTimeout(() => handleFingerprintSuccess(), 600);
+    } catch (err: unknown) {
+      const name = (err as DOMException)?.name ?? "";
+      setFingerprintScanStatus("idle");
+      setIsFingerprintModalOpen(false);
+      if (name === "NotAllowedError") {
+        toast.error("Touch ID was cancelled or timed out.");
+      } else {
+        toast.error("Fingerprint authentication failed. Please use your password.");
+      }
+    }
+  }, [handleFingerprintSuccess]);
+
+  const cancelFingerprintScan = useCallback(() => {
+    setIsFingerprintModalOpen(false);
+    setFingerprintScanStatus("idle");
+  }, []);
 
   useEffect(() => {
     requestAnimationFrame(() => setMounted(true));
@@ -1250,6 +1376,20 @@ function LoginPage() {
         @keyframes scaleIn {
           from { opacity: 0; transform: scale(0.88); }
           to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes scanLaser {
+          0% { top: 0%; opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { top: 100%; opacity: 0; }
+        }
+        .scan-line {
+          position: absolute;
+          left: 0; right: 0;
+          height: 3px;
+          background: linear-gradient(90deg, transparent, var(--l-accent-solid), transparent);
+          box-shadow: 0 0 12px var(--l-accent-solid);
+          animation: scanLaser 2s linear infinite;
         }
         @keyframes dropdownOpen {
           from { opacity: 0; transform: translateY(-8px) scale(0.97); }
@@ -1651,6 +1791,26 @@ function LoginPage() {
                 </button>
               </form>
 
+              <div className="flex items-center gap-3 my-4">
+                <div className="h-px flex-1" style={{ background: "var(--l-divider)" }} />
+                <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--l-muted)" }}>or</span>
+                <div className="h-px flex-1" style={{ background: "var(--l-divider)" }} />
+              </div>
+
+              <button
+                type="button"
+                onClick={startFingerprintScan}
+                className="w-full py-3.5 rounded-2xl text-sm font-bold flex items-center justify-center gap-2.5 border transition-all duration-300 hover:scale-[1.01]"
+                style={{
+                  background: "var(--l-input-bg)",
+                  borderColor: "var(--l-input-border)",
+                  color: "var(--l-text)",
+                }}
+              >
+                <Fingerprint className="w-5 h-5" style={{ color: "var(--l-accent-solid)" }} />
+                <span>Login with Fingerprint</span>
+              </button>
+
               {/* Footer badges */}
               <div className="mt-8 pt-6" style={{ borderTop: `1px solid var(--l-divider)` }}>
                 <div className="flex items-center justify-center gap-6">
@@ -1798,6 +1958,112 @@ function LoginPage() {
           </p>
         </div>
       </div>
+
+      {/* Fingerprint Scanner Modal */}
+      {isFingerprintModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md transition-all duration-300">
+          <div
+            className="w-full max-w-[340px] rounded-3xl p-8 shadow-2xl text-center relative overflow-hidden border border-white/10"
+            style={{
+              background: "var(--l-card-bg)",
+              backdropFilter: "blur(40px) saturate(1.5)",
+              WebkitBackdropFilter: "blur(40px) saturate(1.5)",
+              animation: "scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+            }}
+          >
+            {/* Pulsing glow background effects */}
+            <div
+              className="absolute -top-12 -left-12 w-32 h-32 rounded-full filter blur-2xl opacity-20 pointer-events-none"
+              style={{ background: "var(--l-accent-solid)" }}
+            />
+            <div
+              className="absolute -bottom-12 -right-12 w-32 h-32 rounded-full filter blur-2xl opacity-20 pointer-events-none"
+              style={{ background: "var(--l-accent-solid)" }}
+            />
+
+            <h3
+              className="text-lg font-black tracking-tight mb-2"
+              style={{ color: "var(--l-text-heading)" }}
+            >
+              Touch ID / Fingerprint Scan
+            </h3>
+            <p
+              className="text-xs mb-8"
+              style={{ color: "var(--l-text-subtitle)" }}
+            >
+              Scan your fingerprint to securely authenticate
+            </p>
+
+            {/* Fingerprint visual scanning box */}
+            <div className="relative w-32 h-32 mx-auto mb-8 rounded-full border border-white/10 flex items-center justify-center bg-white/3 shadow-inner group">
+              {/* Outer pulsing ring */}
+              <div
+                className={`absolute inset-0 rounded-full border border-primary/20 ${fingerprintScanStatus === "scanning" ? "animate-pulse" : ""}`}
+                style={{
+                  boxShadow: fingerprintScanStatus === "scanning" ? "0 0 20px rgba(59, 130, 246, 0.15)" : "none",
+                }}
+              />
+
+              <div className="relative p-6 rounded-full bg-white/3 border border-white/5 overflow-hidden">
+                <Fingerprint
+                  className="w-16 h-16 transition-all duration-500"
+                  style={{
+                    color:
+                      fingerprintScanStatus === "success"
+                        ? "#10b981"
+                        : "var(--l-accent-solid)",
+                    filter:
+                      fingerprintScanStatus === "success"
+                        ? "drop-shadow(0 0 10px rgba(16, 185, 129, 0.5))"
+                        : fingerprintScanStatus === "scanning"
+                          ? "drop-shadow(0 0 10px rgba(59, 130, 246, 0.4))"
+                          : "none",
+                  }}
+                />
+
+                {/* Scanning laser line */}
+                {fingerprintScanStatus === "scanning" && (
+                  <div className="scan-line" />
+                )}
+              </div>
+            </div>
+
+            {/* Status messages */}
+            <div className="h-6 mb-8 flex items-center justify-center">
+              {fingerprintScanStatus === "scanning" && (
+                <span
+                  className="text-xs font-bold animate-pulse"
+                  style={{ color: "var(--l-accent-solid)" }}
+                >
+                  Place your finger on the sensor...
+                </span>
+              )}
+              {fingerprintScanStatus === "success" && (
+                <span
+                  className="text-xs font-bold text-emerald-500 flex items-center gap-1.5"
+                >
+                  <Check className="size-4" />
+                  Access Granted! Redirecting...
+                </span>
+              )}
+            </div>
+
+            {/* Cancel Button */}
+            <button
+              type="button"
+              onClick={cancelFingerprintScan}
+              disabled={fingerprintScanStatus === "success"}
+              className="px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 border bg-transparent hover:bg-white/5 active:scale-95"
+              style={{
+                borderColor: "var(--l-input-border)",
+                color: "var(--l-text)",
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

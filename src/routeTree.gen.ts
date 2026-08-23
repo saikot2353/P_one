@@ -122,6 +122,7 @@ import { Route as FinancialAidBudgetConfigurationRouteImport } from './routes/fi
 import { Route as FinalSettlementConfigurationRouteImport } from './routes/final-settlement-configuration'
 import { Route as FinalSettlementRouteImport } from './routes/final-settlement'
 import { Route as FinalApproveIncrementRouteImport } from './routes/final-approve-increment'
+import { Route as EnrollFingerprintRouteImport } from './routes/enroll-fingerprint'
 import { Route as EmployeeJobCardRouteImport } from './routes/employee-job-card'
 import { Route as EmployeeDocVerificationRouteImport } from './routes/employee-doc-verification'
 import { Route as EarnLeaveWorkflowRouteImport } from './routes/earn-leave-workflow'
@@ -747,6 +748,11 @@ const FinalApproveIncrementRoute = FinalApproveIncrementRouteImport.update({
   path: '/final-approve-increment',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EnrollFingerprintRoute = EnrollFingerprintRouteImport.update({
+  id: '/enroll-fingerprint',
+  path: '/enroll-fingerprint',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmployeeJobCardRoute = EmployeeJobCardRouteImport.update({
   id: '/employee-job-card',
   path: '/employee-job-card',
@@ -996,6 +1002,7 @@ export interface FileRoutesByFullPath {
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
+  '/enroll-fingerprint': typeof EnrollFingerprintRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
   '/final-settlement-configuration': typeof FinalSettlementConfigurationRoute
@@ -1152,6 +1159,7 @@ export interface FileRoutesByTo {
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
+  '/enroll-fingerprint': typeof EnrollFingerprintRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
   '/final-settlement-configuration': typeof FinalSettlementConfigurationRoute
@@ -1309,6 +1317,7 @@ export interface FileRoutesById {
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
+  '/enroll-fingerprint': typeof EnrollFingerprintRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
   '/final-settlement-configuration': typeof FinalSettlementConfigurationRoute
@@ -1467,6 +1476,7 @@ export interface FileRouteTypes {
     | '/earn-leave-workflow'
     | '/employee-doc-verification'
     | '/employee-job-card'
+    | '/enroll-fingerprint'
     | '/final-approve-increment'
     | '/final-settlement'
     | '/final-settlement-configuration'
@@ -1623,6 +1633,7 @@ export interface FileRouteTypes {
     | '/earn-leave-workflow'
     | '/employee-doc-verification'
     | '/employee-job-card'
+    | '/enroll-fingerprint'
     | '/final-approve-increment'
     | '/final-settlement'
     | '/final-settlement-configuration'
@@ -1779,6 +1790,7 @@ export interface FileRouteTypes {
     | '/earn-leave-workflow'
     | '/employee-doc-verification'
     | '/employee-job-card'
+    | '/enroll-fingerprint'
     | '/final-approve-increment'
     | '/final-settlement'
     | '/final-settlement-configuration'
@@ -1936,6 +1948,7 @@ export interface RootRouteChildren {
   EarnLeaveWorkflowRoute: typeof EarnLeaveWorkflowRoute
   EmployeeDocVerificationRoute: typeof EmployeeDocVerificationRoute
   EmployeeJobCardRoute: typeof EmployeeJobCardRoute
+  EnrollFingerprintRoute: typeof EnrollFingerprintRoute
   FinalApproveIncrementRoute: typeof FinalApproveIncrementRoute
   FinalSettlementRoute: typeof FinalSettlementRoute
   FinalSettlementConfigurationRoute: typeof FinalSettlementConfigurationRoute
@@ -2848,6 +2861,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FinalApproveIncrementRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/enroll-fingerprint': {
+      id: '/enroll-fingerprint'
+      path: '/enroll-fingerprint'
+      fullPath: '/enroll-fingerprint'
+      preLoaderRoute: typeof EnrollFingerprintRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/employee-job-card': {
       id: '/employee-job-card'
       path: '/employee-job-card'
@@ -3176,6 +3196,7 @@ const rootRouteChildren: RootRouteChildren = {
   EarnLeaveWorkflowRoute: EarnLeaveWorkflowRoute,
   EmployeeDocVerificationRoute: EmployeeDocVerificationRoute,
   EmployeeJobCardRoute: EmployeeJobCardRoute,
+  EnrollFingerprintRoute: EnrollFingerprintRoute,
   FinalApproveIncrementRoute: FinalApproveIncrementRoute,
   FinalSettlementRoute: FinalSettlementRoute,
   FinalSettlementConfigurationRoute: FinalSettlementConfigurationRoute,
