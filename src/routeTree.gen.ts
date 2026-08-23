@@ -24,6 +24,7 @@ import { Route as SspAttendanceRouteImport } from './routes/ssp-attendance'
 import { Route as SspApproveManualAttendanceRouteImport } from './routes/ssp-approve-manual-attendance'
 import { Route as SspApprovalRouteImport } from './routes/ssp-approval'
 import { Route as ShiftControlCenterRouteImport } from './routes/shift-control-center'
+import { Route as SetHodRouteImport } from './routes/set-hod'
 import { Route as SalaryProcessRouteImport } from './routes/salary-process'
 import { Route as RecruitmentIeListRouteImport } from './routes/recruitment-ie-list'
 import { Route as RecruitmentHrListRouteImport } from './routes/recruitment-hr-list'
@@ -237,6 +238,11 @@ const SspApprovalRoute = SspApprovalRouteImport.update({
 const ShiftControlCenterRoute = ShiftControlCenterRouteImport.update({
   id: '/shift-control-center',
   path: '/shift-control-center',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SetHodRoute = SetHodRouteImport.update({
+  id: '/set-hod',
+  path: '/set-hod',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SalaryProcessRoute = SalaryProcessRouteImport.update({
@@ -1073,6 +1079,7 @@ export interface FileRoutesByFullPath {
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
   '/salary-process': typeof SalaryProcessRoute
+  '/set-hod': typeof SetHodRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
@@ -1226,6 +1233,7 @@ export interface FileRoutesByTo {
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
   '/salary-process': typeof SalaryProcessRoute
+  '/set-hod': typeof SetHodRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
@@ -1380,6 +1388,7 @@ export interface FileRoutesById {
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
   '/salary-process': typeof SalaryProcessRoute
+  '/set-hod': typeof SetHodRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
@@ -1535,6 +1544,7 @@ export interface FileRouteTypes {
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
     | '/salary-process'
+    | '/set-hod'
     | '/shift-control-center'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
@@ -1688,6 +1698,7 @@ export interface FileRouteTypes {
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
     | '/salary-process'
+    | '/set-hod'
     | '/shift-control-center'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
@@ -1841,6 +1852,7 @@ export interface FileRouteTypes {
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
     | '/salary-process'
+    | '/set-hod'
     | '/shift-control-center'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
@@ -1995,6 +2007,7 @@ export interface RootRouteChildren {
   RecruitmentHrListRoute: typeof RecruitmentHrListRoute
   RecruitmentIeListRoute: typeof RecruitmentIeListRoute
   SalaryProcessRoute: typeof SalaryProcessRoute
+  SetHodRoute: typeof SetHodRoute
   ShiftControlCenterRoute: typeof ShiftControlCenterRoute
   SspApprovalRoute: typeof SspApprovalRoute
   SspApproveManualAttendanceRoute: typeof SspApproveManualAttendanceRoute
@@ -2121,6 +2134,13 @@ declare module '@tanstack/react-router' {
       path: '/shift-control-center'
       fullPath: '/shift-control-center'
       preLoaderRoute: typeof ShiftControlCenterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/set-hod': {
+      id: '/set-hod'
+      path: '/set-hod'
+      fullPath: '/set-hod'
+      preLoaderRoute: typeof SetHodRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/salary-process': {
@@ -3212,6 +3232,7 @@ const rootRouteChildren: RootRouteChildren = {
   RecruitmentHrListRoute: RecruitmentHrListRoute,
   RecruitmentIeListRoute: RecruitmentIeListRoute,
   SalaryProcessRoute: SalaryProcessRoute,
+  SetHodRoute: SetHodRoute,
   ShiftControlCenterRoute: ShiftControlCenterRoute,
   SspApprovalRoute: SspApprovalRoute,
   SspApproveManualAttendanceRoute: SspApproveManualAttendanceRoute,

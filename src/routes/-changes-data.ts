@@ -2242,4 +2242,13 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     descriptionEn: "Fully implemented the new Increment (Multi) page workspace, including query filter consoles, search modal for employee IDs, dynamic calculations by percentage and fixed value, and interactive spreadsheet datagrid actions.",
     descriptionBn: "নতুন Increment (Multi) পেজ ওয়ার্কস্পেসটি সম্পূর্ণ বাস্তবায়ন করা হয়েছে, যার মধ্যে কুয়েরি ফিল্টার কনসোল, এমপ্লয়ি আইডির জন্য সার্চ মডাল, পারসেন্টেজ ও ফিক্সড ভ্যালুর ডায়নামিক ক্যালকুলেশন এবং ইন্টারেক্টিভ স্প্রেডশীট ডেটাগ্রিড অন্তর্ভুক্ত রয়েছে।",
   },
+  {
+    id: "193",
+    date: "2026-08-23T12:03",
+    type: "New Feature",
+    module: "Personnel",
+    link: "/set-hod",
+    descriptionEn: "Added a new Set HOD configuration page and navigation links under Personnel Info. This page enables users to assign and manage Head of Department (HOD) roles bulky department-wise with active/inactive historical registry logs.",
+    descriptionBn: "পার্সোনেল ইনফোর অধীনে একটি নতুন Set HOD কনফিগারেশন পেজ এবং নেভিগেশন লিংক যুক্ত করা হয়েছে। এই পেজটির মাধ্যমে ব্যবহারকারীরা সক্রিয়/নিষ্ক্রিয় হিস্টোরিক্যাল রেজিস্ট্রি লগসহ বাল্ক বা বিভাগ-ভিত্তিক হেড অফ ডিপার্টমেন্ট (HOD) রোল নির্ধারণ ও পরিচালনা করতে পারবেন।",
+  },
 ];

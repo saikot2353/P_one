@@ -54,6 +54,12 @@ const searchableMenus: SearchMenuLink[] = [
     to: "/id-card-setup",
     description: "Design and generate dynamic employee ID cards",
   },
+  {
+    label: "Set HOD",
+    parent: "Personnel Info",
+    to: "/set-hod",
+    description: "Bulk assign head of departments",
+  },
   { label: "Manpower Basic Form", parent: "Personnel Info", to: "/" },
   { label: "Manpower Basic List", parent: "Personnel Info", to: "/" },
   { label: "Personnel QR Scanner", parent: "Personnel Info", to: "/" },
