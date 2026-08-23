@@ -23,7 +23,9 @@ import {
   Mail,
   MoreHorizontal,
   MessageCircle,
-  Coffee
+  Coffee,
+  Megaphone,
+  Eye
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
@@ -118,9 +120,55 @@ nav.forEach(item => {
   }
 });
 
+const dashboardNotices = [
+  {
+    id: "ntc-2",
+    title: "Holiday Notice",
+    summary: "Pakiza Software Limited issued a holiday notice for an office closure from Wednesday, August 5, 2026, to Saturday.",
+    details: `
+      <p>Dear Employees,</p>
+      <p>Please note that Pakiza Software Limited will remain closed from <strong>Wednesday, August 5, 2026</strong> to <strong>Saturday, August 8, 2026</strong> on account of the upcoming national public holidays.</p>
+      <p>Key Instructions:</p>
+      <ul>
+        <li>All departments will resume normal operations on Sunday, August 9, 2026.</li>
+        <li>Emergency support staff in operations should coordinate shift coverages with their respective supervisors.</li>
+      </ul>
+      <p>We wish you a safe and restful holiday.</p>
+    `,
+    category: "HOLIDAY",
+    author: "Shishir",
+    role: "HR Manager",
+    date: "Aug 16, 2026",
+    circularNo: "PSL/HR/2026/0010"
+  },
+  {
+    id: "ntc-3",
+    title: "Monthly Performance Review",
+    summary: "The monthly performance review cycle for August 2026 has been initiated.",
+    details: "<p>We have initiated the performance review cycle for the month of August 2026. All team leads and supervisors are requested to submit their peer evaluations and KPI assessments in the dashboard portal by August 28, 2026.</p>",
+    category: "MEETING",
+    author: "Tahmid Afsar Shapno",
+    role: "HR Director",
+    date: "Aug 20, 2026",
+    circularNo: "PSL/HR/2026/0013"
+  },
+  {
+    id: "ntc-4",
+    title: "Dress Code Policy Update",
+    summary: "Updates regarding office dress code policy, effective from September 1, 2026.",
+    details: "<p>Starting September 1, 2026, the company will adopt a business casual dress code from Monday to Thursday. Friday remains casual dress day. Please refer to the HR Handbook for detailed wear guidelines.</p>",
+    category: "POLICY",
+    author: "Rajebul Hasan Rajon",
+    role: "HR Executive",
+    date: "Aug 18, 2026",
+    circularNo: "PSL/HR/2026/0014"
+  }
+];
+
 export default function MyDashboard() {
   const [layout, setLayout] = useState<LayoutSection[]>([]);
   const [activeUrl, setActiveUrl] = useState<string | null>('__overview__');
+  const [selectedDashboardNotice, setSelectedDashboardNotice] = useState<any | null>(null);
   const [openSidebarSections, setOpenSidebarSections] = useState<Record<string, boolean>>({});
   const [openPoolGroups, setOpenPoolGroups] = useState<Record<string, boolean>>({});
 
@@ -490,7 +538,76 @@ export default function MyDashboard() {
             </div>
 
             {/* Widgets Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Notice Board Card */}
+              <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h4 className="font-bold text-sm text-foreground flex items-center gap-1.5">
+                        <Megaphone className="size-4 text-primary" /> Notice Board
+                      </h4>
+                      <p className="text-[10px] mt-0.5 text-muted-foreground">Official circulars & announcements</p>
+                    </div>
+                    <button 
+                      onClick={() => window.location.href = '/notice'} 
+                      className="text-[10px] font-bold flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
+                    >
+                      View All <ArrowRight size={12} />
+                    </button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {dashboardNotices.map((ntc) => {
+                      const isHoliday = ntc.category === "HOLIDAY";
+                      const isPolicy = ntc.category === "POLICY";
+                      const isMeeting = ntc.category === "MEETING";
+                      
+                      let badgeBg = "bg-slate-500/10 text-slate-600 dark:bg-slate-400/10 dark:text-slate-400";
+                      if (isHoliday) badgeBg = "bg-rose-500/10 text-rose-600 dark:bg-rose-400/10 dark:text-rose-400";
+                      if (isPolicy) badgeBg = "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-400";
+                      if (isMeeting) badgeBg = "bg-blue-500/10 text-blue-600 dark:bg-blue-400/10 dark:text-blue-400";
+
+                      return (
+                        <div 
+                          key={ntc.id} 
+                          onClick={() => setSelectedDashboardNotice(ntc)}
+                          className="p-2.5 rounded-xl border border-border/40 hover:border-primary/30 bg-muted/10 hover:bg-primary/5 transition-all duration-200 cursor-pointer group"
+                        >
+                          <div className="flex items-center justify-between gap-2 mb-1.5">
+                            <span className={`text-[8.5px] font-black tracking-wider uppercase px-2 py-0.5 rounded-md ${badgeBg}`}>
+                              {ntc.category}
+                            </span>
+                            <span className="text-[9px] font-semibold text-muted-foreground font-mono">
+                              {ntc.date}
+                            </span>
+                          </div>
+                          <h5 className="font-bold text-[11.5px] text-foreground group-hover:text-primary transition-colors leading-tight line-clamp-1">
+                            {ntc.title}
+                          </h5>
+                          <p className="text-[10.5px] text-muted-foreground mt-1 line-clamp-1 font-medium">
+                            {ntc.summary}
+                          </p>
+                          <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-border/30 text-[9px] font-bold text-muted-foreground/60">
+                            <span>Ref: {ntc.circularNo}</span>
+                            <span className="flex items-center gap-0.5 text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                              Read <Eye size={10} />
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <button 
+                  onClick={() => window.location.href = '/notice'} 
+                  className="w-full mt-4 py-2 text-xs font-bold rounded-lg border border-border bg-muted/50 hover:bg-muted text-foreground transition-colors text-center"
+                >
+                  Go to Notice Board
+                </button>
+              </div>
+
               {/* Upcoming Events */}
               <div className="p-4 rounded-xl border border-border/80 bg-card shadow-sm flex flex-col">
                 <div className="flex items-center justify-between mb-6">
@@ -924,6 +1041,99 @@ export default function MyDashboard() {
               className="w-full h-full border-0 rounded-lg shadow-sm ring-1 ring-border"
               title="Module View"
             />
+          </div>
+        )}
+
+        {/* Dashboard Notice Preview Modal */}
+        {selectedDashboardNotice && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-[999] animate-in fade-in duration-200">
+            <div className="bg-card rounded-2xl border border-border shadow-2xl max-w-xl w-full max-h-[85vh] flex flex-col overflow-hidden animate-in scale-in duration-300">
+              {/* Modal Header */}
+              <div className="px-6 py-4 bg-muted/30 border-b border-border/40 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Megaphone className="size-4.5 text-primary" />
+                  <div>
+                    <h3 className="text-xs font-black uppercase text-foreground">
+                      Official Announcement Circular
+                    </h3>
+                    <p className="text-[9.5px] font-bold text-muted-foreground tracking-wider uppercase mt-0.5">
+                      Reference ID: {selectedDashboardNotice.circularNo}
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setSelectedDashboardNotice(null)}
+                  className="size-7.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition flex items-center justify-center font-bold text-xs"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="p-6 overflow-y-auto space-y-5 bg-card">
+                {/* Formal Letterhead */}
+                <div className="text-center border-b border-border/40 pb-5 space-y-1 bg-muted/10 p-4 rounded-xl">
+                  <h2 className="text-sm font-black tracking-[0.15em] text-foreground uppercase">
+                    Pakiza Software Limited
+                  </h2>
+                  <p className="text-[10px] text-muted-foreground font-semibold">
+                    Corporate Office • HR & Operations Division
+                  </p>
+                  <div className="flex justify-between items-center text-[10px] font-bold text-muted-foreground pt-4 border-t border-dashed border-border/40 mt-3">
+                    <span>Circular No: {selectedDashboardNotice.circularNo}</span>
+                    <span>Date: {selectedDashboardNotice.date}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="text-lg font-black text-foreground">
+                    Subject: {selectedDashboardNotice.title}
+                  </h3>
+
+                  {/* Notice Detail HTML Content */}
+                  <div 
+                    className="text-xs leading-relaxed text-foreground/90 space-y-3 prose dark:prose-invert prose-xs"
+                    dangerouslySetInnerHTML={{ __html: selectedDashboardNotice.details }}
+                  />
+                </div>
+
+                {/* Signatory Footer */}
+                <div className="pt-6 border-t border-border/30 flex justify-end">
+                  <div className="text-right space-y-1">
+                    <p className="text-xs font-bold text-foreground">
+                      {selectedDashboardNotice.author}
+                    </p>
+                    <p className="text-[10px] font-semibold text-muted-foreground">
+                      {selectedDashboardNotice.role}
+                    </p>
+                    <p className="text-[9px] uppercase tracking-widest text-primary font-bold">
+                      HR & Compliance
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer Actions */}
+              <div className="px-6 py-4 bg-muted/20 border-t border-border/40 flex justify-between items-center">
+                <span className="text-[10px] text-muted-foreground font-semibold">
+                  Category: <strong className="text-foreground uppercase">{selectedDashboardNotice.category}</strong>
+                </span>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => window.print()}
+                    className="h-8.5 px-4 bg-muted hover:bg-muted-foreground/10 text-foreground font-bold text-xs rounded-lg transition"
+                  >
+                    Print Notice
+                  </button>
+                  <button 
+                    onClick={() => setSelectedDashboardNotice(null)}
+                    className="h-8.5 px-4 bg-primary hover:opacity-90 text-primary-foreground font-bold text-xs rounded-lg shadow-sm transition"
+                  >
+                    Acknowledge & Close
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </main>

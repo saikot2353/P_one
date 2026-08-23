@@ -44,7 +44,7 @@ interface NoticeRecord {
   category: "POLICY" | "HOLIDAY" | "MEETING" | "GENERAL";
   author: string;
   role: string;
-  date: string; // Stored formatted e.g., "Aug 22, 2026"
+  date: string; // Formatted date e.g., "Aug 22, 2026"
   status: "Published" | "Draft";
   attachmentName?: string;
   circularNo: string;
@@ -85,10 +85,58 @@ const initialNoticesList: NoticeRecord[] = [
     status: "Published",
     attachmentName: "Holiday_Calendar_2026.pdf",
     circularNo: "PSL/HR/2026/0010"
+  },
+  {
+    id: "ntc-3",
+    title: "Monthly Performance Review",
+    summary: "The monthly performance review cycle for August 2026 has been initiated.",
+    details: "<p>We have initiated the performance review cycle for the month of August 2026. All team leads and supervisors are requested to submit their peer evaluations and KPI assessments in the dashboard portal by August 28, 2026.</p>",
+    category: "MEETING",
+    author: "Tahmid Afsar Shapno",
+    role: "HR Director",
+    date: "Aug 20, 2026",
+    status: "Published",
+    circularNo: "PSL/HR/2026/0013"
+  },
+  {
+    id: "ntc-4",
+    title: "Dress Code Policy Update",
+    summary: "Updates regarding office dress code policy, effective from September 1, 2026.",
+    details: "<p>Starting September 1, 2026, the company will adopt a business casual dress code from Monday to Thursday. Friday remains casual dress day. Please refer to the HR Handbook for detailed wear guidelines.</p>",
+    category: "POLICY",
+    author: "Rajebul Hasan Rajon",
+    role: "Placeholder Designation",
+    date: "Aug 18, 2026",
+    status: "Published",
+    circularNo: "PSL/HR/2026/0014"
+  },
+  {
+    id: "ntc-5",
+    title: "Annual General Meeting 2026",
+    summary: "Notice of the Annual General Meeting (AGM) to be held at corporate office auditorium.",
+    details: "<p>The Annual General Meeting for Pakiza Software Limited will be held on August 30, 2026, at 10:00 AM in the main corporate office auditorium. All shareholders and department heads are requested to join the discussion.</p>",
+    category: "MEETING",
+    author: "Shishir",
+    role: "Hrr",
+    date: "Aug 15, 2026",
+    status: "Draft",
+    circularNo: "PSL/HR/2026/0015"
+  },
+  {
+    id: "ntc-6",
+    title: "IT Infrastructure Maintenance",
+    summary: "Scheduled network and email server maintenance on Friday night.",
+    details: "<p>Please be advised that the main office network and email servers will undergo scheduled infrastructure maintenance from Friday 10:00 PM to Saturday 4:00 AM. Expect temporary email and intranet service interruptions.</p>",
+    category: "GENERAL",
+    author: "Kamal Uddin",
+    role: "Lead Engineer",
+    date: "Aug 12, 2026",
+    status: "Published",
+    circularNo: "PSL/HR/2026/0016"
   }
 ];
 
-// Helper to convert date string "Aug 22, 2026" or YYYY-MM-DD to YYYY-MM-DD
+// Helper to convert date string to YYYY-MM-DD
 function toYYYYMMDD(dateStr: string): string {
   const d = new Date(dateStr);
   if (isNaN(d.getTime())) {
@@ -119,7 +167,7 @@ function NoticePage() {
   // Form Field States
   const [title, setTitle] = useState("");
   const [circularNo, setCircularNo] = useState("");
-  const [dateVal, setDateVal] = useState(""); // Stores "YYYY-MM-DD"
+  const [dateVal, setDateVal] = useState(""); // YYYY-MM-DD format
   const [category, setCategory] = useState<NoticeRecord["category"]>("GENERAL");
   const [status, setStatus] = useState<NoticeRecord["status"]>("Published");
   const [summary, setSummary] = useState("");
@@ -173,7 +221,7 @@ function NoticePage() {
     askBeforePasteHTML: false,
     askBeforePasteFromWord: false,
     defaultActionOnPaste: "insert_clear_html",
-    height: 320,
+    height: 280,
     theme: "default"
   };
 
@@ -321,25 +369,14 @@ function NoticePage() {
         </div>
 
         <div className="p-4 md:p-6 lg:p-8 space-y-6 print:p-0 print:m-0">
-          {/* Page Header */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
-            <div>
-              <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1.5">
-                <Link to="/" className="hover:text-primary transition-colors">
-                  Home
-                </Link>
-                <ChevronRight className="size-2.5" />
-                <span className="text-foreground">Notice</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="size-2.5 rounded-full bg-primary shadow-[0_0_8px_var(--primary)] animate-pulse" />
-                <h1 className="text-xl font-extrabold tracking-tight text-foreground">
-                  Notice Board Circulars
-                </h1>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1 ml-5 font-semibold">
-                Publish internal notices, policy updates, and holiday circulars
-              </p>
+          {/* Page Header (Breadcrumbs left, Add Notice button right on one line) */}
+          <div className="flex items-center justify-between gap-4 print:hidden py-1">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground/60 uppercase tracking-widest animate-in fade-in">
+              <Link to="/" className="hover:text-primary transition-colors text-muted-foreground">
+                Home
+              </Link>
+              <ChevronRight className="size-2.5 text-muted-foreground/60" />
+              <span className="text-foreground">Notice</span>
             </div>
             
             <button
@@ -418,33 +455,33 @@ function NoticePage() {
               </div>
             </div>
 
-            {/* Directory Spreadsheet Grid Table */}
+            {/* Directory Grid Table - STRICT ONE ROW HEIGHT FOR ALL CELLS */}
             <div className="overflow-x-auto border border-border/60 rounded-xl bg-card">
-              <table className="w-full text-left border-collapse text-xs border border-border/60">
+              <table className="min-w-[1100px] w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="bg-muted border-b border-border/70 text-muted-foreground/90 font-bold uppercase tracking-wider text-[10px]">
-                    <th className="p-3 w-12 text-center font-bold border-r border-border/60">SL</th>
-                    <th className="p-3 w-28 text-center font-bold border-r border-border/60">Actions</th>
-                    <th className="p-3 border-r border-border/60">Notice Title & Summary</th>
-                    <th className="p-3 w-32 text-center border-r border-border/60">Category</th>
-                    <th className="p-3 border-r border-border/60">Author & Role</th>
-                    <th className="p-3 border-r border-border/60">Date</th>
-                    <th className="p-3 text-center">Status</th>
+                  <tr className="bg-muted border-b border-border/70 text-muted-foreground/90 font-bold uppercase tracking-wider text-[10px] divide-x divide-border/40">
+                    <th className="p-3.5 w-12 text-center font-bold whitespace-nowrap">SL</th>
+                    <th className="p-3.5 w-28 text-center font-bold whitespace-nowrap">Actions</th>
+                    <th className="p-3.5 whitespace-nowrap">Notice Title & Summary</th>
+                    <th className="p-3.5 w-32 text-center whitespace-nowrap">Category</th>
+                    <th className="p-3.5 whitespace-nowrap">Author & Role</th>
+                    <th className="p-3.5 whitespace-nowrap">Date</th>
+                    <th className="p-3.5 w-28 text-center whitespace-nowrap">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/50 text-foreground font-semibold">
                   {filteredNotices.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="p-12 text-center text-muted-foreground/60 font-medium">
+                      <td colSpan={7} className="p-12 text-center text-muted-foreground/60 font-medium whitespace-nowrap">
                         <AlertCircle className="size-8 text-muted-foreground/40 mx-auto mb-2" />
-                        No notices published matching query criteria
+                        No notices published matching criteria
                       </td>
                     </tr>
                   ) : (
                     filteredNotices.map((n, index) => (
-                      <tr key={n.id} className="hover:bg-muted/30 transition duration-150">
-                        <td className="p-3 text-center border-r border-border/50">{index + 1}</td>
-                        <td className="p-3 border-r border-border/50">
+                      <tr key={n.id} className="hover:bg-muted/20 transition duration-150 divide-x divide-border/30">
+                        <td className="p-3.5 text-center text-muted-foreground whitespace-nowrap">{index + 1}</td>
+                        <td className="p-3.5 whitespace-nowrap">
                           <div className="flex items-center justify-center gap-2">
                             <button
                               onClick={() => handleOpenPreviewModal(n)}
@@ -469,15 +506,15 @@ function NoticePage() {
                             </button>
                           </div>
                         </td>
-                        <td className="p-3 border-r border-border/50">
-                          <div className="font-extrabold text-foreground text-sm">{n.title}</div>
-                          <div className="text-[11px] text-muted-foreground font-medium mt-0.5 max-w-[420px] truncate">
-                            {n.summary}
-                          </div>
+                        {/* Title and Summary Inline on one line */}
+                        <td className="p-3.5 whitespace-nowrap">
+                          <span className="font-extrabold text-foreground text-sm">{n.title}</span>
+                          <span className="text-muted-foreground/50 mx-2">—</span>
+                          <span className="text-[11px] text-muted-foreground font-semibold">{n.summary}</span>
                         </td>
-                        <td className="p-3 text-center border-r border-border/50">
+                        <td className="p-3.5 text-center whitespace-nowrap">
                           <span
-                            className={`px-3 py-0.5 rounded text-[9px] font-black tracking-wider uppercase ${
+                            className={`px-3 py-0.5 rounded text-[9px] font-black tracking-wider uppercase whitespace-nowrap ${
                               n.category === "POLICY"
                                 ? "bg-sky-500/15 text-sky-600"
                                 : n.category === "HOLIDAY"
@@ -490,14 +527,15 @@ function NoticePage() {
                             {n.category}
                           </span>
                         </td>
-                        <td className="p-3 border-r border-border/50">
-                          <span className="font-extrabold block text-foreground">{n.author}</span>
-                          <span className="text-[10px] text-muted-foreground block font-medium mt-0.5">{n.role}</span>
+                        {/* Author and Role Inline on one line */}
+                        <td className="p-3.5 whitespace-nowrap">
+                          <span className="font-extrabold text-foreground">{n.author}</span>
+                          <span className="text-[10px] text-muted-foreground font-semibold ml-2">({n.role})</span>
                         </td>
-                        <td className="p-3 font-medium text-muted-foreground border-r border-border/50">{n.date}</td>
-                        <td className="p-3 text-center">
+                        <td className="p-3.5 font-medium text-muted-foreground whitespace-nowrap">{n.date}</td>
+                        <td className="p-3.5 text-center whitespace-nowrap">
                           <span
-                            className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${
+                            className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider whitespace-nowrap ${
                               n.status === "Published"
                                 ? "bg-success/15 text-success"
                                 : "bg-muted text-muted-foreground/70"
@@ -514,7 +552,7 @@ function NoticePage() {
             </div>
 
             {/* Pagination Controls */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-3">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <span>Previous</span>
                 <button className="size-7 bg-primary text-white text-[10px] font-black rounded-lg">1</button>
@@ -527,14 +565,14 @@ function NoticePage() {
             </div>
           </div>
 
-          {/* PRINT-ONLY BULLET CIRCULAR DISPLAY FOR GENERAL BROWSER PRINT TRIGGERS */}
+          {/* PRINT-ONLY BULLET CIRCULAR DISPLAY */}
           <div className="hidden print:block font-serif bg-white text-black p-8 max-w-3xl mx-auto border-2 border-double border-slate-400">
             {selectedNotice ? (
               <div className="space-y-6">
                 <div className="text-center border-b pb-4">
                   <h1 className="text-3xl font-black uppercase tracking-widest font-sans">Pakiza Software Limited</h1>
                   <p className="text-[10px] uppercase font-bold tracking-widest mt-1">Human Resources & Administration Division</p>
-                  <p className="text-xs text-slate-500 mt-0.5">Circular Circular / Announcement Circular</p>
+                  <p className="text-xs text-slate-500 mt-0.5">Circular / Announcement Circular</p>
                 </div>
 
                 <div className="flex justify-between text-xs font-bold border-b pb-2">
@@ -569,15 +607,15 @@ function NoticePage() {
         </div>
       </main>
 
-      {/* --- ADD / EDIT NOTICE CONFIGURATION MODAL (HEIGHT CONSTRAINED & SCROLLABLE) --- */}
+      {/* --- ADD / EDIT NOTICE FORM MODAL (SMART COMPACT GRID LAYOUT) --- */}
       {isFormModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 animate-in fade-in duration-200 print:hidden">
           <div className="bg-card border border-border/85 w-full max-w-5xl mx-4 rounded-2xl p-6 shadow-2xl flex flex-col gap-4 animate-in zoom-in-95 duration-200 max-h-[92vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-border/50 pb-3 flex-shrink-0">
               <div className="flex items-center gap-2">
-                <Megaphone className="size-4.5 text-primary" />
-                <h3 className="text-sm font-extrabold text-foreground">
+                <Megaphone className="size-4.5 text-primary animate-pulse" />
+                <h3 className="text-sm font-extrabold text-foreground tracking-tight">
                   {editNoticeId ? "Edit Company Notice" : "Publish New Notice"}
                 </h3>
               </div>
@@ -589,12 +627,12 @@ function NoticePage() {
               </button>
             </div>
 
-            {/* Modal Form Grid */}
+            {/* Smart Optimized Layout Form */}
             <div className="space-y-4 flex-1">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Title */}
-                <div className="space-y-1.5">
-                  <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
+              {/* Row 1: Notice Title (col-span-2) | Ref No (col-span-1) | Notice Date (col-span-1) */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="md:col-span-2 space-y-1.5">
+                  <label className="text-[9px] font-extrabold text-muted-foreground uppercase block">
                     Notice Title <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -602,13 +640,12 @@ function NoticePage() {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Enter clear, descriptive title..."
-                    className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none"
+                    className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none focus:ring-1 focus:ring-primary/20"
                   />
                 </div>
 
-                {/* Reference Number (Required) */}
                 <div className="space-y-1.5">
-                  <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
+                  <label className="text-[9px] font-extrabold text-muted-foreground uppercase block">
                     Ref No <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -616,34 +653,33 @@ function NoticePage() {
                     value={circularNo}
                     onChange={(e) => setCircularNo(e.target.value)}
                     placeholder="e.g. PSL/HR/2026/0010"
-                    className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none"
+                    className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none focus:ring-1 focus:ring-primary/20"
                   />
                 </div>
 
-                {/* Notice Publish Date (Required) */}
                 <div className="space-y-1.5">
-                  <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
+                  <label className="text-[9px] font-extrabold text-muted-foreground uppercase block">
                     Notice Date <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="date"
                     value={dateVal}
                     onChange={(e) => setDateVal(e.target.value)}
-                    className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none cursor-pointer"
+                    className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none cursor-pointer focus:ring-1 focus:ring-primary/20"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Category (Notice Type - dropdown) */}
+              {/* Row 2: Notice Type (Category) | Status | Attachment */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
+                  <label className="text-[9px] font-extrabold text-muted-foreground uppercase block">
                     Notice Type (Category) <span className="text-rose-500">*</span>
                   </label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value as NoticeRecord["category"])}
-                    className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none cursor-pointer"
+                    className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none cursor-pointer focus:ring-1 focus:ring-primary/20"
                   >
                     <option value="GENERAL">General Announcement</option>
                     <option value="POLICY">Policy Guideline</option>
@@ -652,42 +688,62 @@ function NoticePage() {
                   </select>
                 </div>
 
-                {/* Status */}
                 <div className="space-y-1.5">
-                  <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
+                  <label className="text-[9px] font-extrabold text-muted-foreground uppercase block">
                     Status <span className="text-rose-500">*</span>
                   </label>
                   <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value as NoticeRecord["status"])}
-                    className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none cursor-pointer"
+                    className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none cursor-pointer focus:ring-1 focus:ring-primary/20"
                   >
                     <option value="Published">Published</option>
                     <option value="Draft">Draft</option>
                   </select>
                 </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[9px] font-extrabold text-muted-foreground uppercase block">
+                    Attachment (Optional)
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="No file attached"
+                      value={attachment || ""}
+                      readOnly
+                      className="h-9 px-3 rounded-lg border border-border bg-card text-[11px] font-medium flex-1 outline-none text-muted-foreground"
+                    />
+                    <button
+                      onClick={() => setAttachment("Official_Memo_Directive_2026.pdf")}
+                      className="h-9 px-3 bg-muted border border-border/40 hover:bg-muted/75 text-foreground text-xs font-bold rounded-lg transition flex items-center justify-center gap-1 cursor-pointer"
+                    >
+                      <Paperclip className="size-3.5" /> Choose
+                    </button>
+                  </div>
+                </div>
               </div>
 
-              {/* Short Summary */}
+              {/* Row 3: Short Summary */}
               <div className="space-y-1.5">
-                <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
+                <label className="text-[9px] font-extrabold text-muted-foreground uppercase block">
                   Short Summary <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={summary}
                   onChange={(e) => setSummary(e.target.value)}
-                  placeholder="Brief high-level summary of the notice circular..."
-                  className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none"
+                  placeholder="Brief high-level summary of the announcement..."
+                  className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none focus:ring-1 focus:ring-primary/20"
                 />
               </div>
 
-              {/* Rich Text Editor */}
+              {/* Row 4: Notice Details (Jodit Editor) */}
               <div className="space-y-1.5">
-                <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
+                <label className="text-[9px] font-extrabold text-muted-foreground uppercase block">
                   Notice Details <span className="text-rose-500">*</span>
                 </label>
-                <div className="border border-border/80 rounded-xl overflow-hidden min-h-[320px] bg-card">
+                <div className="border border-border/80 rounded-xl overflow-hidden min-h-[280px] bg-card">
                   {JoditEditorComponent ? (
                     <JoditEditorComponent
                       ref={editorRef}
@@ -696,32 +752,10 @@ function NoticePage() {
                       onBlur={(newContent: string) => setDetailsHtml(newContent)}
                     />
                   ) : (
-                    <div className="h-72 flex items-center justify-center text-xs text-muted-foreground animate-pulse">
+                    <div className="h-64 flex items-center justify-center text-xs text-muted-foreground animate-pulse bg-muted/10">
                       Loading Rich Editor Component...
                     </div>
                   )}
-                </div>
-              </div>
-
-              {/* Attachment selector */}
-              <div className="space-y-1.5">
-                <label className="text-[9px] font-extrabold text-muted-foreground uppercase">
-                  Attachment Reference (Optional)
-                </label>
-                <div className="flex items-center gap-3">
-                  <input
-                    type="text"
-                    placeholder="None selected"
-                    value={attachment || ""}
-                    readOnly
-                    className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold flex-1 outline-none text-muted-foreground"
-                  />
-                  <button
-                    onClick={() => setAttachment("Official_Memo_Directive_2026.pdf")}
-                    className="h-9 px-4 border border-border/40 rounded-lg text-xs font-bold hover:bg-muted transition flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <Paperclip className="size-3.5 text-muted-foreground" /> Choose file
-                  </button>
                 </div>
               </div>
             </div>
@@ -745,15 +779,15 @@ function NoticePage() {
         </div>
       )}
 
-      {/* --- PREMIUM PREVIEW MODAL (HEIGHT CONSTRAINED & SCROLLABLE) --- */}
+      {/* --- PREVIEW MODAL (CLEANER FLOATING SHEET DESIGN) --- */}
       {isViewModalOpen && selectedNotice && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 animate-in fade-in duration-200 print:hidden font-sans">
-          <div className="bg-card border border-border/80 w-full max-w-4xl mx-4 rounded-2xl p-6 shadow-2xl flex flex-col gap-6 animate-in zoom-in-95 duration-200 max-h-[92vh] overflow-y-auto">
+          <div className="bg-card border border-border/80 w-full max-w-4xl mx-4 rounded-2xl p-6 shadow-2xl flex flex-col gap-5 animate-in zoom-in-95 duration-200 max-h-[92vh] overflow-y-auto">
             {/* Modal Actions Header */}
             <div className="flex items-center justify-between border-b border-border/40 pb-3 flex-shrink-0">
               <div className="flex items-center gap-2">
                 <BookOpen className="size-4.5 text-primary" />
-                <h3 className="text-xs font-black uppercase tracking-widest text-foreground">Notice Circular Preview</h3>
+                <h3 className="text-xs font-black uppercase tracking-widest text-foreground">Notice circular Preview</h3>
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -771,23 +805,23 @@ function NoticePage() {
               </div>
             </div>
 
-            {/* Circular Paper Sheet layout (Lucrative Professional Template) */}
-            <div className="bg-[#fcfcfc] dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl p-10 md:p-14 shadow-2xl space-y-6 relative overflow-hidden text-black dark:text-white leading-relaxed font-sans flex-shrink-0">
-              {/* Top Corporate Gradient Accent Bar */}
+            {/* Circular Paper Sheet Layout */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-8 md:p-12 shadow-md space-y-6 relative overflow-hidden text-slate-900 dark:text-slate-100 leading-relaxed font-sans flex-shrink-0">
+              {/* Top Accent Gradient Line */}
               <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-primary/10 via-primary to-primary/10" />
               
-              {/* Official Corporate Header Letterhead */}
+              {/* Corporate Letterhead Section */}
               <div className="flex justify-between items-start border-b-2 border-slate-900 dark:border-slate-100 pb-5">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2.5">
                     <div className="size-8 rounded-lg bg-primary flex items-center justify-center text-white text-sm font-black shadow-md">
                       P
                     </div>
-                    <span className="font-extrabold text-xl uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                    <span className="font-extrabold text-lg uppercase tracking-wider text-slate-800 dark:text-slate-100">
                       PAKIZA GROUP
                     </span>
                   </div>
-                  <div className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-10">
+                  <div className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-10.5">
                     Pakiza Software Limited • HR & Operations Division
                   </div>
                 </div>
@@ -798,14 +832,14 @@ function NoticePage() {
                 </div>
               </div>
 
-              {/* Document Classification & Memo Meta */}
-              <div className="text-center py-2">
-                <div className="inline-block text-[11px] font-black tracking-widest text-primary bg-primary/10 px-4 py-1 rounded-full uppercase border border-primary/20">
+              {/* Directive Category Shield */}
+              <div className="text-center py-1">
+                <div className="inline-block text-[10px] font-black tracking-widest text-primary bg-primary/10 px-4 py-1 rounded-full uppercase border border-primary/20">
                   OFFICIAL DIRECTIVE CIRCULAR
                 </div>
               </div>
 
-              {/* Reference and Date Details bar */}
+              {/* Reference & Date bar */}
               <div className="flex justify-between items-center text-xs font-bold text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-800 pb-3">
                 <div className="flex items-center gap-1.5">
                   <span className="text-slate-400 font-medium">Ref No:</span>
@@ -817,16 +851,16 @@ function NoticePage() {
                 </div>
               </div>
 
-              {/* Circular Title (middle aligned, big font) */}
+              {/* Centered Circular Title (No subject block) */}
               <div className="text-center py-4">
-                <h1 className="text-3xl font-extrabold text-slate-950 dark:text-white uppercase tracking-wide leading-tight font-sans">
+                <h1 className="text-2xl font-black text-slate-950 dark:text-white uppercase tracking-wide leading-tight">
                   {selectedNotice.title}
                 </h1>
-                <div className="h-[2px] w-24 bg-primary mx-auto mt-3" />
+                <div className="h-[2px] w-20 bg-primary mx-auto mt-2.5" />
               </div>
 
-              {/* circular body content */}
-              <div className="pt-4 text-slate-800 dark:text-slate-200 text-sm leading-relaxed min-h-[220px]">
+              {/* Circular Details Container */}
+              <div className="pt-2 text-slate-800 dark:text-slate-200 text-sm leading-relaxed min-h-[180px]">
                 <div 
                   className="prose prose-slate dark:prose-invert max-w-none prose-sm font-sans" 
                   dangerouslySetInnerHTML={{ __html: selectedNotice.details || `<p>${selectedNotice.summary}</p>` }} 
@@ -835,7 +869,7 @@ function NoticePage() {
 
               {/* Attachment alert box */}
               {selectedNotice.attachmentName && (
-                <div className="bg-muted/40 border border-border/30 rounded-xl p-3.5 flex items-center justify-between text-xs mt-8">
+                <div className="bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800/80 rounded-xl p-3.5 flex items-center justify-between text-xs mt-6">
                   <div className="flex items-center gap-2">
                     <Paperclip className="size-4 text-slate-400" />
                     <div>
@@ -843,14 +877,14 @@ function NoticePage() {
                       <div className="text-slate-500 text-[10px] font-semibold mt-0.5">{selectedNotice.attachmentName}</div>
                     </div>
                   </div>
-                  <button className="h-8.5 px-3.5 bg-card hover:bg-muted text-foreground border border-border/50 rounded-lg transition font-bold flex items-center gap-1 cursor-pointer">
+                  <button className="h-8.5 px-3.5 bg-white dark:bg-card hover:bg-slate-100 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 rounded-lg transition font-bold flex items-center gap-1 cursor-pointer">
                     <Download className="size-3.5" /> Download
                   </button>
                 </div>
               )}
 
-              {/* Corporate digital stamp and signatures */}
-              <div className="pt-10 border-t border-slate-200 dark:border-slate-800 mt-10 flex justify-between items-end text-xs text-slate-600 dark:text-slate-400">
+              {/* Issuer Signature Stamp */}
+              <div className="pt-8 border-t border-slate-200 dark:border-slate-800 mt-8 flex justify-between items-end text-xs text-slate-600 dark:text-slate-400">
                 <div className="text-[10px] leading-relaxed">
                   <div className="font-extrabold uppercase text-slate-400">Security Clearance</div>
                   <div className="font-mono text-slate-400 mt-0.5">#SEC-NTC-{selectedNotice.id.toUpperCase()}</div>
@@ -858,7 +892,7 @@ function NoticePage() {
                 
                 {/* Signature box */}
                 <div className="text-right flex flex-col items-end">
-                  <div className="text-slate-500 italic mb-2 text-[11px] font-semibold">By Order of the Management,</div>
+                  <div className="text-slate-500 italic mb-2 text-[10px] font-semibold">By Order of the Management,</div>
                   <div className="font-serif italic text-lg text-primary/80 tracking-wide pr-4">Tahmid Afsar</div>
                   <div className="h-[1px] w-28 bg-slate-300 dark:bg-slate-700 my-1" />
                   <div className="font-black text-slate-800 dark:text-slate-100">{selectedNotice.author}</div>

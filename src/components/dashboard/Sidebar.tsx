@@ -409,6 +409,7 @@ export function Sidebar() {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
   const scrollRef = useRef<HTMLElement>(null);
+  const isTransitioning = useRef(false);
 
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
@@ -436,20 +437,21 @@ export function Sidebar() {
         });
       }
     });
-    return initial;
-  });
 
-  const isMounted = useRef(false);
-  useEffect(() => {
     if (typeof window !== "undefined") {
       const saved = sessionStorage.getItem("sidebar_menus");
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          setOpenMenus((prev) => ({ ...parsed, ...prev }));
+          return { ...parsed, ...initial };
         } catch (e) {}
       }
     }
+    return initial;
+  });
+
+  const isMounted = useRef(false);
+  useEffect(() => {
     isMounted.current = true;
   }, []);
 
@@ -463,13 +465,28 @@ export function Sidebar() {
     if (typeof window !== "undefined" && scrollRef.current) {
       const savedScroll = sessionStorage.getItem("sidebar_scroll");
       if (savedScroll) {
-        scrollRef.current.scrollTop = parseInt(savedScroll, 10);
+        const targetScroll = parseInt(savedScroll, 10);
+        scrollRef.current.scrollTop = targetScroll;
+        const timer = setTimeout(() => {
+          if (scrollRef.current) {
+            scrollRef.current.scrollTop = targetScroll;
+          }
+        }, 60);
+        return () => clearTimeout(timer);
       }
     }
   }, []);
 
   const handleScroll = (e: React.UIEvent<HTMLElement>) => {
+    if (isTransitioning.current) return;
     sessionStorage.setItem("sidebar_scroll", e.currentTarget.scrollTop.toString());
+  };
+
+  const handleNavClick = () => {
+    isTransitioning.current = true;
+    setTimeout(() => {
+      isTransitioning.current = false;
+    }, 400);
   };
 
   const toggleMenu = (label: string, e?: React.MouseEvent) => {
@@ -529,6 +546,7 @@ export function Sidebar() {
       <nav
         ref={scrollRef}
         onScroll={handleScroll}
+        onClick={handleNavClick}
         className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-none"
       >
         <div className="px-2.5 pb-2 text-[9px] font-extrabold uppercase tracking-widest text-sidebar-foreground/45">
