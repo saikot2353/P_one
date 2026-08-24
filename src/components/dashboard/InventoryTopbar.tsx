@@ -29,6 +29,9 @@ import {
   SlidersHorizontal,
   Briefcase,
   Blocks,
+  User,
+  Globe,
+  Check,
 } from "lucide-react";
 import { ModuleLauncher } from "./ModuleLauncher";
 
@@ -53,6 +56,18 @@ const searchableMenus: SearchMenuLink[] = [
     parent: "Personnel Info",
     to: "/id-card-setup",
     description: "Design and generate dynamic employee ID cards",
+  },
+  {
+    label: "Set HOD",
+    parent: "Personnel Info",
+    to: "/set-hod",
+    description: "Bulk assign head of departments",
+  },
+  {
+    label: "Set Manager",
+    parent: "Personnel Info",
+    to: "/set-manager",
+    description: "Bulk assign reporting managers to employees",
   },
   { label: "Manpower Basic Form", parent: "Personnel Info", to: "/" },
   { label: "Manpower Basic List", parent: "Personnel Info", to: "/" },
@@ -121,6 +136,13 @@ const searchableMenus: SearchMenuLink[] = [
     parent: "Leave",
     to: "/earn-leave-workflow",
     description: "Unified Submit/Check/Approve pipeline",
+  },
+  // Notice
+  {
+    label: "Notice Board",
+    parent: "Notice",
+    to: "/notice",
+    description: "Publish and view company notices and announcements",
   },
   {
     label: "Earn Leave Process List",
@@ -326,40 +348,40 @@ const searchableMenus: SearchMenuLink[] = [
   },
   // Evaluation
   {
-    label: "Increment Configurator",
+    label: "Increment (Single)",
     parent: "Evaluation",
-    to: "/increment-gadget",
-    description: "Configure salary increments",
+    to: "/increment",
+    description: "Single employee appraisal configuration and salary adjustments",
   },
   {
-    label: "Evaluation Propose",
+    label: "Increment (Multi)",
     parent: "Evaluation",
-    to: "/evaluation-propose",
-    description: "Propose evaluation scores",
+    to: "/increment-multiple",
+    description: "Bulk processing and department-wide increment adjustments",
   },
   {
-    label: "Propose Increment",
+    label: "Proposed Increment",
     parent: "Evaluation",
     to: "/propose-increment",
-    description: "Propose salary increments",
+    description: "Submit and manage performance-based salary increments",
   },
   {
-    label: "Increment Summary",
+    label: "Increment Report",
     parent: "Evaluation",
-    to: "/increment-summary",
-    description: "Summary of all increments",
+    to: "/increment-report",
+    description: "Analytical reports and dynamic performance curves",
+  },
+  {
+    label: "Increment History",
+    parent: "Evaluation",
+    to: "/increment-history",
+    description: "Historical increment records log for all employees",
   },
   {
     label: "Approve Increment Gadget",
     parent: "Evaluation",
     to: "/approve-increment-gadget",
     description: "Approval interface for increments",
-  },
-  {
-    label: "Increment Queue List",
-    parent: "Evaluation",
-    to: "/increment-queuelist",
-    description: "Pending increment queue",
   },
   {
     label: "Approve Increment (HR)",
@@ -372,18 +394,6 @@ const searchableMenus: SearchMenuLink[] = [
     parent: "Evaluation",
     to: "/final-approve-increment",
     description: "Final increment approval",
-  },
-  {
-    label: "Increment List",
-    parent: "Evaluation",
-    to: "/increment-list",
-    description: "List of all increments",
-  },
-  {
-    label: "Increment History",
-    parent: "Evaluation",
-    to: "/increment-history",
-    description: "Historical increment records",
   },
   // Configure
   {
@@ -641,6 +651,9 @@ export function InventoryTopbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(0);
+
+  // Profile dropdown states
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   // Keypress event listener for keyboard shortcut Ctrl+K / Cmd+K and Esc
   useEffect(() => {
@@ -954,16 +967,79 @@ export function InventoryTopbar() {
         </div>
 
         {/* User Profile Block */}
-        <div className="flex items-center gap-3 pl-3.5 border-l border-border/60">
-          <div className="text-right hidden lg:block">
-            <div className="text-xs font-bold text-foreground">Tahmid Afsar</div>
-            <div className="text-[9px] font-bold text-muted-foreground/85 mt-0.5">
-              Pakiza Software Limited (PSL-Operation)
+        <div className="relative pl-3.5 border-l border-border/60">
+          <button
+            onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+            className="flex items-center gap-3 hover:opacity-85 transition-opacity text-left cursor-pointer focus:outline-none"
+          >
+            <div className="text-right hidden lg:block">
+              <div className="text-xs font-bold text-foreground">Tahmid Afsar</div>
+              <div className="text-[9px] font-bold text-muted-foreground/85 mt-0.5">
+                Pakiza Software Limited (PSL-Operation)
+              </div>
             </div>
-          </div>
-          <div className="size-9 rounded-full overflow-hidden border border-border/80 shadow-2xs flex-shrink-0 bg-muted">
-            <img src="https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg" alt="Tahmid Afsar" className="size-full object-cover" />
-          </div>
+            <div className="size-9 rounded-full overflow-hidden border border-border/80 shadow-2xs flex-shrink-0 bg-muted">
+              <img src="https://bpm.pakizaknit.com/Photo/EmpPicture/ab9adb3b-d38f-45bf-9569-22dc5ec46fcd.jpg" alt="Tahmid Afsar" className="size-full object-cover" />
+            </div>
+          </button>
+
+          {/* Profile Dropdown Menu */}
+          {isProfileMenuOpen && (
+            <>
+              <div
+                className="fixed inset-0 z-40 bg-transparent"
+                onClick={() => setIsProfileMenuOpen(false)}
+              />
+              <div
+                className="absolute right-0 mt-2 w-56 rounded-xl border z-50 p-1.5 focus:outline-none"
+                style={{
+                  background: "var(--l-dropdown-bg, rgba(255, 255, 255, 0.95))",
+                  borderColor: "var(--l-dropdown-border, rgba(100, 116, 139, 0.12))",
+                  boxShadow: "var(--l-dropdown-shadow, 0 10px 30px rgba(0,0,0,0.08))",
+                  color: "var(--l-text, #1e293b)",
+                  animation: "dropdownOpen 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+                }}
+              >
+                <div className="px-3 py-2 border-b border-border/60 mb-1">
+                  <p className="text-xs font-extrabold">Tahmid Afsar</p>
+                  <p className="text-[10px] text-muted-foreground font-medium truncate">tahmid@pakizasoftware.com</p>
+                </div>
+                
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsProfileMenuOpen(false);
+                    alert("My Profile dashboard is under construction.");
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold hover:bg-muted transition-colors text-left"
+                >
+                  <User className="size-4 text-muted-foreground" />
+                  <span>My Profile</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsProfileMenuOpen(false);
+                    alert("Region configuration settings are currently locked.");
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold hover:bg-muted transition-colors text-left"
+                >
+                  <Globe className="size-4 text-muted-foreground" />
+                  <span>Change Region</span>
+                </button>
+
+                <Link
+                  to="/enroll-fingerprint"
+                  onClick={() => setIsProfileMenuOpen(false)}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold hover:bg-muted transition-colors text-left"
+                >
+                  <Fingerprint className="size-4 text-primary" />
+                  <span>Enroll Fingerprint</span>
+                </Link>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </header>

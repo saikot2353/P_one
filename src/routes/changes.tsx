@@ -10,7 +10,7 @@ export const Route = createFileRoute("/changes")({
 export type ChangeRecord = {
   id: string;
   date: string;
-  type: "Modify" | "New Addition" | "Feature" | "Feature Update" | "UI Update" | "UX Optimization" | "New" | "New Feature" | "";
+  type: "Modify" | "New Addition" | "Feature" | "Feature Update" | "UI Update" | "UX Optimization" | "New" | "New Feature" | "UI / UX" | "Business Logic" | "Bug Fix" | "";
   module: string;
   link?: string;
   descriptionEn: string;
@@ -21,12 +21,12 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v210");
+    const saved = localStorage.getItem("system_changes_v251");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
       setRecords(DEFAULT_CHANGE_RECORDS);
-      localStorage.setItem("system_changes_v210", JSON.stringify(DEFAULT_CHANGE_RECORDS));
+      localStorage.setItem("system_changes_v251", JSON.stringify(DEFAULT_CHANGE_RECORDS));
     }
   }, []);
 
@@ -131,6 +131,9 @@ function ChangesPage() {
                     <option value="UI Update">UI Update</option>
                     <option value="UX Optimization">UX Optimization</option>
                     <option value="Modify">Modify</option>
+                    <option value="UI / UX">UI / UX</option>
+                    <option value="Business Logic">Business Logic</option>
+                    <option value="Bug Fix">Bug Fix</option>
                   </select>
                 </td>
                 <td className="border-b border-r border-slate-300 p-0 group relative align-top">

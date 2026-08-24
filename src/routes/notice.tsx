@@ -1,0 +1,918 @@
+import { useState, useEffect, useRef, useMemo } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Sidebar } from "@/components/dashboard/Sidebar";
+import { Topbar } from "@/components/dashboard/Topbar";
+import {
+  ChevronRight,
+  Search,
+  FileSpreadsheet,
+  Printer,
+  X,
+  Plus,
+  Settings,
+  AlertCircle,
+  Building,
+  Save,
+  Megaphone,
+  Eye,
+  Edit,
+  Trash2,
+  Download,
+  Calendar,
+  User,
+  CheckCircle,
+  BookOpen,
+  Paperclip,
+  Share2
+} from "lucide-react";
+
+export const Route = createFileRoute("/notice")({
+  head: () => ({
+    meta: [
+      { title: "Notice Board — CRIPTON" },
+      { name: "description", content: "Manage and publish company announcements." }
+    ],
+  }),
+  component: NoticePage,
+});
+
+interface NoticeRecord {
+  id: string;
+  title: string;
+  summary: string;
+  details: string;
+  category: "POLICY" | "HOLIDAY" | "MEETING" | "GENERAL";
+  author: string;
+  role: string;
+  date: string; // Formatted date e.g., "Aug 22, 2026"
+  status: "Published" | "Draft";
+  attachmentName?: string;
+  circularNo: string;
+}
+
+const initialNoticesList: NoticeRecord[] = [
+  {
+    id: "ntc-1",
+    title: "Test",
+    summary: "Test notice checking circular configurations.",
+    details: "<p>This is a test announcement to verify the formatting, layout, and editing functionalities of the Cripton Notice Board circular system.</p>",
+    category: "POLICY",
+    author: "Rajebul Hasan Rajon",
+    role: "Placeholder Designation",
+    date: "Aug 22, 2026",
+    status: "Published",
+    circularNo: "PSL/HR/2026/0012"
+  },
+  {
+    id: "ntc-2",
+    title: "Holiday Notice",
+    summary: "Pakiza Software Limited issued a holiday notice for an office closure from Wednesday, August 5, 2026, to Saturday.",
+    details: `
+      <h2>Office Closure Announcement</h2>
+      <p>Dear Employees,</p>
+      <p>Please note that Pakiza Software Limited will remain closed from <strong>Wednesday, August 5, 2026</strong> to <strong>Saturday, August 8, 2026</strong> on account of the upcoming national public holidays.</p>
+      <p>Key Instructions:</p>
+      <ul>
+        <li>All departments will resume normal operations on Sunday, August 9, 2026.</li>
+        <li>Emergency support staff in operations should coordinate shift coverages with their respective supervisors.</li>
+      </ul>
+      <p>We wish you a safe and restful holiday.</p>
+    `,
+    category: "HOLIDAY",
+    author: "Shishir",
+    role: "Hrr",
+    date: "Aug 16, 2026",
+    status: "Published",
+    attachmentName: "Holiday_Calendar_2026.pdf",
+    circularNo: "PSL/HR/2026/0010"
+  },
+  {
+    id: "ntc-3",
+    title: "Monthly Performance Review",
+    summary: "The monthly performance review cycle for August 2026 has been initiated.",
+    details: "<p>We have initiated the performance review cycle for the month of August 2026. All team leads and supervisors are requested to submit their peer evaluations and KPI assessments in the dashboard portal by August 28, 2026.</p>",
+    category: "MEETING",
+    author: "Tahmid Afsar Shapno",
+    role: "HR Director",
+    date: "Aug 20, 2026",
+    status: "Published",
+    circularNo: "PSL/HR/2026/0013"
+  },
+  {
+    id: "ntc-4",
+    title: "Dress Code Policy Update",
+    summary: "Updates regarding office dress code policy, effective from September 1, 2026.",
+    details: "<p>Starting September 1, 2026, the company will adopt a business casual dress code from Monday to Thursday. Friday remains casual dress day. Please refer to the HR Handbook for detailed wear guidelines.</p>",
+    category: "POLICY",
+    author: "Rajebul Hasan Rajon",
+    role: "Placeholder Designation",
+    date: "Aug 18, 2026",
+    status: "Published",
+    circularNo: "PSL/HR/2026/0014"
+  },
+  {
+    id: "ntc-5",
+    title: "Annual General Meeting 2026",
+    summary: "Notice of the Annual General Meeting (AGM) to be held at corporate office auditorium.",
+    details: "<p>The Annual General Meeting for Pakiza Software Limited will be held on August 30, 2026, at 10:00 AM in the main corporate office auditorium. All shareholders and department heads are requested to join the discussion.</p>",
+    category: "MEETING",
+    author: "Shishir",
+    role: "Hrr",
+    date: "Aug 15, 2026",
+    status: "Draft",
+    circularNo: "PSL/HR/2026/0015"
+  },
+  {
+    id: "ntc-6",
+    title: "IT Infrastructure Maintenance",
+    summary: "Scheduled network and email server maintenance on Friday night.",
+    details: "<p>Please be advised that the main office network and email servers will undergo scheduled infrastructure maintenance from Friday 10:00 PM to Saturday 4:00 AM. Expect temporary email and intranet service interruptions.</p>",
+    category: "GENERAL",
+    author: "Kamal Uddin",
+    role: "Lead Engineer",
+    date: "Aug 12, 2026",
+    status: "Published",
+    circularNo: "PSL/HR/2026/0016"
+  }
+];
+
+// Helper to convert date string to YYYY-MM-DD
+function toYYYYMMDD(dateStr: string): string {
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) {
+    return new Date().toISOString().slice(0, 10);
+  }
+  return d.toISOString().slice(0, 10);
+}
+
+// Helper to format YYYY-MM-DD to "Aug 22, 2026"
+function formatDateDisplay(dateStr: string): string {
+  if (!dateStr) return "—";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+function NoticePage() {
+  const [notices, setNotices] = useState<NoticeRecord[]>(initialNoticesList);
+  
+  // Modals Toggles
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  
+  // Selected Record States
+  const [selectedNotice, setSelectedNotice] = useState<NoticeRecord | null>(null);
+  const [editNoticeId, setEditNoticeId] = useState<string | null>(null);
+
+  // Form Field States
+  const [title, setTitle] = useState("");
+  const [circularNo, setCircularNo] = useState("");
+  const [dateVal, setDateVal] = useState(""); // YYYY-MM-DD format
+  const [category, setCategory] = useState<NoticeRecord["category"]>("GENERAL");
+  const [status, setStatus] = useState<NoticeRecord["status"]>("Published");
+  const [summary, setSummary] = useState("");
+  const [detailsHtml, setDetailsHtml] = useState("");
+  const [attachment, setAttachment] = useState<string | undefined>(undefined);
+
+  // Filter States
+  const [searchText, setSearchText] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("ALL");
+
+  // Jodit Rich text editor setup
+  const [JoditEditorComponent, setJoditEditorComponent] = useState<any>(null);
+  const [editorError, setEditorError] = useState<string | null>(null);
+  const editorRef = useRef<any>(null);
+
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      import("jodit-react")
+        .then((module) => {
+          if (!module.default) {
+            throw new Error("Module loaded, but Jodit default export was missing.");
+          }
+          setJoditEditorComponent(() => module.default);
+        })
+        .catch((err) => {
+          console.error("Failed to load JoditEditor component dynamically:", err);
+          setEditorError(err.message || String(err));
+        });
+    }
+  }, []);
+
+  const joditConfig = {
+    readonly: false,
+    placeholder: "Write notice details here...",
+    toolbarAdaptive: false,
+    buttons: [
+      "bold", "italic", "underline", "strikethrough", "|",
+      "fontsize", "brush", "paragraph", "|",
+      "align", "ul", "ol", "|",
+      "table", "link", "hr", "|",
+      "undo", "redo", "eraser", "source"
+    ],
+    showXPathInStatusbar: false,
+    askBeforePasteHTML: false,
+    askBeforePasteFromWord: false,
+    defaultActionOnPaste: "insert_clear_html",
+    height: 280,
+    theme: "default"
+  };
+
+  // Filter notice records list
+  const filteredNotices = useMemo(() => {
+    return notices.filter((n) => {
+      if (categoryFilter !== "ALL" && n.category !== categoryFilter) return false;
+      if (searchText.trim()) {
+        const q = searchText.toLowerCase();
+        return (
+          n.title.toLowerCase().includes(q) ||
+          n.summary.toLowerCase().includes(q) ||
+          n.author.toLowerCase().includes(q)
+        );
+      }
+      return true;
+    });
+  }, [notices, categoryFilter, searchText]);
+
+  // Open Form modal to Add New Notice
+  const handleOpenAddModal = () => {
+    setEditNoticeId(null);
+    setTitle("");
+    setCircularNo(`PSL/HR/2026/00${notices.length + 11}`);
+    setDateVal(new Date().toISOString().slice(0, 10));
+    setCategory("GENERAL");
+    setStatus("Published");
+    setSummary("");
+    setDetailsHtml("");
+    setAttachment(undefined);
+    setIsFormModalOpen(true);
+  };
+
+  // Open Form modal to Edit existing Notice
+  const handleOpenEditModal = (notice: NoticeRecord) => {
+    setEditNoticeId(notice.id);
+    setTitle(notice.title);
+    setCircularNo(notice.circularNo);
+    setDateVal(toYYYYMMDD(notice.date));
+    setCategory(notice.category);
+    setStatus(notice.status);
+    setSummary(notice.summary);
+    setDetailsHtml(notice.details);
+    setAttachment(notice.attachmentName);
+    setIsFormModalOpen(true);
+  };
+
+  // Delete Notice Record
+  const handleDeleteNotice = (id: string) => {
+    if (confirm("Are you sure you want to delete this notice?")) {
+      setNotices(notices.filter((n) => n.id !== id));
+      showToast("Notice deleted successfully.");
+    }
+  };
+
+  // Open Circular Preview Modal
+  const handleOpenPreviewModal = (notice: NoticeRecord) => {
+    setSelectedNotice(notice);
+    setIsViewModalOpen(true);
+  };
+
+  // Save/Submit Notice
+  const handleSaveNotice = () => {
+    if (!title.trim() || !summary.trim() || !circularNo.trim() || !dateVal) {
+      alert("Notice Title, Reference Number, Notice Date and Summary are required fields.");
+      return;
+    }
+
+    const formattedDisplayDate = formatDateDisplay(dateVal);
+
+    if (editNoticeId) {
+      // Edit
+      setNotices((prev) =>
+        prev.map((n) =>
+          n.id === editNoticeId
+            ? {
+                ...n,
+                title,
+                circularNo,
+                date: formattedDisplayDate,
+                category,
+                status,
+                summary,
+                details: detailsHtml,
+                attachmentName: attachment,
+              }
+            : n
+        )
+      );
+      showToast("Notice updated successfully.");
+    } else {
+      // Add
+      const newNotice: NoticeRecord = {
+        id: `ntc-${Date.now()}`,
+        title,
+        summary,
+        details: detailsHtml,
+        category,
+        author: "Tahmid Afsar Shapno",
+        role: "HR Director",
+        date: formattedDisplayDate,
+        status,
+        attachmentName: attachment,
+        circularNo: circularNo,
+      };
+      setNotices([newNotice, ...notices]);
+      showToast("Notice published successfully.");
+    }
+    setIsFormModalOpen(false);
+  };
+
+  const handlePrintCircular = () => {
+    window.print();
+  };
+
+  const handleExcelExport = () => {
+    const headers = ["SL", "Notice Title", "Summary", "Category", "Author", "Date", "Status"];
+    const rows = filteredNotices.map((row, index) => [
+      (index + 1).toString(),
+      row.title,
+      row.summary,
+      row.category,
+      row.author,
+      row.date,
+      row.status
+    ]);
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + [headers.join(","), ...rows.map(e => e.map(val => `"${val.replace(/"/g, '""')}"`).join(","))].join("\n");
+    
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Notices_Export_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  return (
+    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300 font-sans">
+      <Sidebar />
+      <main className="flex-1 min-w-0 flex flex-col relative print:p-0">
+        <div className="print:hidden">
+          <Topbar />
+        </div>
+
+        <div className="p-4 md:p-6 lg:p-8 space-y-6 print:p-0 print:m-0">
+          {/* Page Header (Breadcrumbs left, Add Notice button right on one line) */}
+          <div className="flex items-center justify-between gap-4 print:hidden py-1">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground/60 uppercase tracking-widest animate-in fade-in">
+              <Link to="/" className="hover:text-primary transition-colors text-muted-foreground">
+                Home
+              </Link>
+              <ChevronRight className="size-2.5 text-muted-foreground/60" />
+              <span className="text-foreground">Notice</span>
+            </div>
+            
+            <button
+              onClick={handleOpenAddModal}
+              className="h-10 px-5 bg-primary hover:bg-primary-glow text-white text-xs font-extrabold rounded-xl shadow-xs transition duration-200 uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <Plus className="size-4" /> Add Notice
+            </button>
+          </div>
+
+          {/* Toast Notification Alert */}
+          {toastMessage && (
+            <div className="fixed bottom-5 right-5 z-50 bg-[#1e293b] text-white border border-primary/30 rounded-xl px-4 py-3 shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300 print:hidden">
+              <div className="size-2 rounded-full bg-primary animate-ping" />
+              <span className="text-xs font-semibold">{toastMessage}</span>
+              <button onClick={() => setToastMessage(null)} className="text-slate-400 hover:text-white transition">
+                <X className="size-3.5" />
+              </button>
+            </div>
+          )}
+
+          {/* NOTICE DIRECTORY VIEW */}
+          <div className="bg-card border border-border/80 rounded-2xl p-5 shadow-xs space-y-4 print:hidden">
+            {/* Toolbar row */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                {/* Search Bar */}
+                <div className="w-full sm:w-64 relative">
+                  <input
+                    type="text"
+                    placeholder="Search notices..."
+                    value={searchText}
+                    onChange={(e) => setSearchText(e.target.value)}
+                    className="w-full h-9 pl-8.5 pr-3.5 bg-muted border border-border/30 rounded-xl text-xs font-semibold text-foreground focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none transition duration-200"
+                  />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                </div>
+
+                {/* Category selector */}
+                <select
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                  className="h-9 px-3.5 bg-muted border border-border/30 rounded-xl text-xs font-semibold text-foreground focus:border-primary focus:bg-card focus:ring-2 focus:ring-primary/10 outline-none transition duration-200 cursor-pointer"
+                >
+                  <option value="ALL">All Categories</option>
+                  <option value="POLICY">Policy</option>
+                  <option value="HOLIDAY">Holiday</option>
+                  <option value="MEETING">Meeting</option>
+                  <option value="GENERAL">General</option>
+                </select>
+              </div>
+
+              {/* Action utilities */}
+              <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto justify-end">
+                <button
+                  onClick={handleExcelExport}
+                  className="h-9 px-4 border border-border/30 rounded-xl text-xs font-bold bg-muted hover:bg-muted/70 text-emerald-600 transition flex items-center gap-1.5 cursor-pointer"
+                >
+                  <FileSpreadsheet className="size-3.5" />
+                  <span>EXCEL</span>
+                </button>
+                <button
+                  onClick={handlePrintCircular}
+                  className="h-9 px-4 border border-border/30 rounded-xl text-xs font-bold bg-muted hover:bg-muted/70 text-sky-600 transition flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Printer className="size-3.5" />
+                  <span>PRINT</span>
+                </button>
+                <button
+                  onClick={handlePrintCircular}
+                  className="h-9 px-4 border border-border/30 rounded-xl text-xs font-bold bg-muted hover:bg-muted/70 text-rose-600 transition flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Building className="size-3.5" />
+                  <span>PDF</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Directory Grid Table - STRICT ONE ROW HEIGHT FOR ALL CELLS */}
+            <div className="overflow-x-auto border border-border/60 rounded-xl bg-card">
+              <table className="min-w-[1100px] w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-muted border-b border-border/70 text-muted-foreground/90 font-bold uppercase tracking-wider text-[10px] divide-x divide-border/40">
+                    <th className="p-3.5 w-12 text-center font-bold whitespace-nowrap">SL</th>
+                    <th className="p-3.5 w-28 text-center font-bold whitespace-nowrap">Actions</th>
+                    <th className="p-3.5 whitespace-nowrap">Notice Title & Summary</th>
+                    <th className="p-3.5 w-32 text-center whitespace-nowrap">Category</th>
+                    <th className="p-3.5 whitespace-nowrap">Author & Role</th>
+                    <th className="p-3.5 whitespace-nowrap">Date</th>
+                    <th className="p-3.5 w-28 text-center whitespace-nowrap">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/50 text-foreground font-semibold">
+                  {filteredNotices.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="p-12 text-center text-muted-foreground/60 font-medium whitespace-nowrap">
+                        <AlertCircle className="size-8 text-muted-foreground/40 mx-auto mb-2" />
+                        No notices published matching criteria
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredNotices.map((n, index) => (
+                      <tr key={n.id} className="hover:bg-muted/20 transition duration-150 divide-x divide-border/30">
+                        <td className="p-3.5 text-center text-muted-foreground whitespace-nowrap">{index + 1}</td>
+                        <td className="p-3.5 whitespace-nowrap">
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => handleOpenPreviewModal(n)}
+                              title="View Circular"
+                              className="p-1 text-sky-600 hover:text-sky-800 hover:bg-sky-500/10 rounded transition cursor-pointer"
+                            >
+                              <Eye className="size-4" />
+                            </button>
+                            <button
+                              onClick={() => handleOpenEditModal(n)}
+                              title="Edit Notice"
+                              className="p-1 text-amber-600 hover:text-amber-800 hover:bg-amber-500/10 rounded transition cursor-pointer"
+                            >
+                              <Edit className="size-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteNotice(n.id)}
+                              title="Delete Notice"
+                              className="p-1 text-rose-600 hover:text-rose-800 hover:bg-rose-500/10 rounded transition cursor-pointer"
+                            >
+                              <Trash2 className="size-4" />
+                            </button>
+                          </div>
+                        </td>
+                        {/* Title and Summary Inline on one line */}
+                        <td className="p-3.5 whitespace-nowrap">
+                          <span className="font-extrabold text-foreground text-sm">{n.title}</span>
+                          <span className="text-muted-foreground/50 mx-2">—</span>
+                          <span className="text-[11px] text-muted-foreground font-semibold">{n.summary}</span>
+                        </td>
+                        <td className="p-3.5 text-center whitespace-nowrap">
+                          <span
+                            className={`px-3 py-0.5 rounded text-[9px] font-black tracking-wider uppercase whitespace-nowrap ${
+                              n.category === "POLICY"
+                                ? "bg-sky-500/15 text-sky-600"
+                                : n.category === "HOLIDAY"
+                                ? "bg-emerald-500/15 text-emerald-600"
+                                : n.category === "MEETING"
+                                ? "bg-purple-500/15 text-purple-600"
+                                : "bg-slate-500/15 text-slate-600"
+                            }`}
+                          >
+                            {n.category}
+                          </span>
+                        </td>
+                        {/* Author and Role Inline on one line */}
+                        <td className="p-3.5 whitespace-nowrap">
+                          <span className="font-extrabold text-foreground">{n.author}</span>
+                          <span className="text-[10px] text-muted-foreground font-semibold ml-2">({n.role})</span>
+                        </td>
+                        <td className="p-3.5 font-medium text-muted-foreground whitespace-nowrap">{n.date}</td>
+                        <td className="p-3.5 text-center whitespace-nowrap">
+                          <span
+                            className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider whitespace-nowrap ${
+                              n.status === "Published"
+                                ? "bg-success/15 text-success"
+                                : "bg-muted text-muted-foreground/70"
+                            }`}
+                          >
+                            {n.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination Controls */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <span>Previous</span>
+                <button className="size-7 bg-primary text-white text-[10px] font-black rounded-lg">1</button>
+                <span>Next</span>
+              </div>
+              <div className="text-xs text-muted-foreground font-bold flex items-center gap-1">
+                <FileSpreadsheet className="size-3.5" />
+                <span>{filteredNotices.length} records</span>
+              </div>
+            </div>
+          </div>
+
+          {/* PRINT-ONLY BULLET CIRCULAR DISPLAY */}
+          <div className="hidden print:block font-serif bg-white text-black p-8 max-w-3xl mx-auto border-2 border-double border-slate-400">
+            {selectedNotice ? (
+              <div className="space-y-6">
+                <div className="text-center border-b pb-4">
+                  <h1 className="text-3xl font-black uppercase tracking-widest font-sans">Pakiza Software Limited</h1>
+                  <p className="text-[10px] uppercase font-bold tracking-widest mt-1">Human Resources & Administration Division</p>
+                  <p className="text-xs text-slate-500 mt-0.5">Circular / Announcement Circular</p>
+                </div>
+
+                <div className="flex justify-between text-xs font-bold border-b pb-2">
+                  <div>Circular No: <span className="font-mono">{selectedNotice.circularNo}</span></div>
+                  <div>Date: {selectedNotice.date}</div>
+                </div>
+
+                <div className="space-y-4 pt-4">
+                  <h2 className="text-xl font-bold text-center underline font-sans">{selectedNotice.title}</h2>
+                  <div 
+                    className="text-sm leading-relaxed prose prose-sm max-w-none" 
+                    dangerouslySetInnerHTML={{ __html: selectedNotice.details || selectedNotice.summary }} 
+                  />
+                </div>
+
+                <div className="pt-12 border-t mt-12 flex justify-between items-end text-xs">
+                  <div>
+                    <div className="font-bold underline">Attachment Reference:</div>
+                    <div className="text-slate-500">{selectedNotice.attachmentName || "None"}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="h-10" />
+                    <div className="font-bold">{selectedNotice.author}</div>
+                    <div className="text-slate-500 font-sans">{selectedNotice.role}</div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center p-8">No circular selected for printing.</div>
+            )}
+          </div>
+        </div>
+      </main>
+
+      {/* --- ADD / EDIT NOTICE FORM MODAL (SMART COMPACT GRID LAYOUT) --- */}
+      {isFormModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 animate-in fade-in duration-200 print:hidden">
+          <div className="bg-card border border-border/85 w-full max-w-5xl mx-4 rounded-2xl p-6 shadow-2xl flex flex-col gap-4 animate-in zoom-in-95 duration-200 max-h-[92vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-border/50 pb-3 flex-shrink-0">
+              <div className="flex items-center gap-2">
+                <Megaphone className="size-4.5 text-primary animate-pulse" />
+                <h3 className="text-sm font-extrabold text-foreground tracking-tight">
+                  {editNoticeId ? "Edit Company Notice" : "Publish New Notice"}
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsFormModalOpen(false)}
+                className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            {/* Smart Optimized Layout Form */}
+            <div className="space-y-4 flex-1">
+              {/* Row 1: Notice Title (col-span-2) | Ref No (col-span-1) | Notice Date (col-span-1) */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="md:col-span-2 space-y-1.5">
+                  <label className="text-[9px] font-extrabold text-muted-foreground uppercase block">
+                    Notice Title <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Enter clear, descriptive title..."
+                    className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none focus:ring-1 focus:ring-primary/20"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[9px] font-extrabold text-muted-foreground uppercase block">
+                    Ref No <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={circularNo}
+                    onChange={(e) => setCircularNo(e.target.value)}
+                    placeholder="e.g. PSL/HR/2026/0010"
+                    className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none focus:ring-1 focus:ring-primary/20"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[9px] font-extrabold text-muted-foreground uppercase block">
+                    Notice Date <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={dateVal}
+                    onChange={(e) => setDateVal(e.target.value)}
+                    className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none cursor-pointer focus:ring-1 focus:ring-primary/20"
+                  />
+                </div>
+              </div>
+
+              {/* Row 2: Notice Type (Category) | Status | Attachment */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[9px] font-extrabold text-muted-foreground uppercase block">
+                    Notice Type (Category) <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value as NoticeRecord["category"])}
+                    className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none cursor-pointer focus:ring-1 focus:ring-primary/20"
+                  >
+                    <option value="GENERAL">General Announcement</option>
+                    <option value="POLICY">Policy Guideline</option>
+                    <option value="HOLIDAY">Holiday Closure</option>
+                    <option value="MEETING">Meeting Minutes</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[9px] font-extrabold text-muted-foreground uppercase block">
+                    Status <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value as NoticeRecord["status"])}
+                    className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none cursor-pointer focus:ring-1 focus:ring-primary/20"
+                  >
+                    <option value="Published">Published</option>
+                    <option value="Draft">Draft</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[9px] font-extrabold text-muted-foreground uppercase block">
+                    Attachment (Optional)
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="No file attached"
+                      value={attachment || ""}
+                      readOnly
+                      className="h-9 px-3 rounded-lg border border-border bg-card text-[11px] font-medium flex-1 outline-none text-muted-foreground"
+                    />
+                    <button
+                      onClick={() => setAttachment("Official_Memo_Directive_2026.pdf")}
+                      className="h-9 px-3 bg-muted border border-border/40 hover:bg-muted/75 text-foreground text-xs font-bold rounded-lg transition flex items-center justify-center gap-1 cursor-pointer"
+                    >
+                      <Paperclip className="size-3.5" /> Choose
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 3: Short Summary */}
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-extrabold text-muted-foreground uppercase block">
+                  Short Summary <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={summary}
+                  onChange={(e) => setSummary(e.target.value)}
+                  placeholder="Brief high-level summary of the announcement..."
+                  className="h-9 px-3 rounded-lg border border-border bg-card text-xs font-semibold w-full focus:outline-none focus:ring-1 focus:ring-primary/20"
+                />
+              </div>
+
+              {/* Row 4: Notice Details (Jodit Editor) */}
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-extrabold text-muted-foreground uppercase block">
+                  Notice Details <span className="text-rose-500">*</span>
+                </label>
+                <div className="border border-border/80 rounded-xl overflow-hidden min-h-[280px] bg-card">
+                  {JoditEditorComponent ? (
+                    <JoditEditorComponent
+                      ref={editorRef}
+                      value={detailsHtml}
+                      config={joditConfig}
+                      onBlur={(newContent: string) => setDetailsHtml(newContent)}
+                    />
+                  ) : (
+                    <div className="h-64 flex items-center justify-center text-xs text-muted-foreground animate-pulse bg-muted/10">
+                      Loading Rich Editor Component...
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border/50 flex-shrink-0">
+              <button
+                onClick={() => setIsFormModalOpen(false)}
+                className="h-9 px-5 bg-card hover:bg-muted text-foreground border border-border rounded-xl text-xs font-bold transition cursor-pointer"
+              >
+                CANCEL
+              </button>
+              <button
+                onClick={handleSaveNotice}
+                className="h-9 px-5 bg-primary hover:bg-primary-glow text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+              >
+                <Save className="size-3.5" /> PUBLISH NOTICE
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- PREVIEW MODAL (CLEANER FLOATING SHEET DESIGN) --- */}
+      {isViewModalOpen && selectedNotice && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 animate-in fade-in duration-200 print:hidden font-sans">
+          <div className="bg-card border border-border/80 w-full max-w-4xl mx-4 rounded-2xl p-6 shadow-2xl flex flex-col gap-5 animate-in zoom-in-95 duration-200 max-h-[92vh] overflow-y-auto">
+            {/* Modal Actions Header */}
+            <div className="flex items-center justify-between border-b border-border/40 pb-3 flex-shrink-0">
+              <div className="flex items-center gap-2">
+                <BookOpen className="size-4.5 text-primary" />
+                <h3 className="text-xs font-black uppercase tracking-widest text-foreground">Notice circular Preview</h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handlePrintCircular}
+                  className="h-8.5 px-3 bg-muted hover:bg-muted/70 text-foreground border border-border/20 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                >
+                  <Printer className="size-3.5 text-muted-foreground" /> Print
+                </button>
+                <button
+                  onClick={() => setIsViewModalOpen(false)}
+                  className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Circular Paper Sheet Layout */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-8 md:p-12 shadow-md space-y-6 relative overflow-hidden text-slate-900 dark:text-slate-100 leading-relaxed font-sans flex-shrink-0">
+              {/* Top Accent Gradient Line */}
+              <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-primary/10 via-primary to-primary/10" />
+              
+              {/* Corporate Letterhead Section */}
+              <div className="flex justify-between items-start border-b-2 border-slate-900 dark:border-slate-100 pb-5">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2.5">
+                    <div className="size-8 rounded-lg bg-primary flex items-center justify-center text-white text-sm font-black shadow-md">
+                      P
+                    </div>
+                    <span className="font-extrabold text-lg uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                      PAKIZA GROUP
+                    </span>
+                  </div>
+                  <div className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-10.5">
+                    Pakiza Software Limited • HR & Operations Division
+                  </div>
+                </div>
+                <div className="text-right text-[10px] font-semibold text-slate-500 dark:text-slate-400 leading-relaxed font-mono">
+                  <div>Circular Registry Circular</div>
+                  <div>Uttara Office, Dhaka, BD</div>
+                  <div>info@pakizagroup.com</div>
+                </div>
+              </div>
+
+              {/* Directive Category Shield */}
+              <div className="text-center py-1">
+                <div className="inline-block text-[10px] font-black tracking-widest text-primary bg-primary/10 px-4 py-1 rounded-full uppercase border border-primary/20">
+                  OFFICIAL DIRECTIVE CIRCULAR
+                </div>
+              </div>
+
+              {/* Reference & Date bar */}
+              <div className="flex justify-between items-center text-xs font-bold text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-800 pb-3">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-slate-400 font-medium">Ref No:</span>
+                  <span className="font-mono text-slate-800 dark:text-slate-100 font-extrabold">{selectedNotice.circularNo}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-slate-400 font-medium">Date:</span>
+                  <span className="text-slate-800 dark:text-slate-100 font-extrabold">{selectedNotice.date}</span>
+                </div>
+              </div>
+
+              {/* Centered Circular Title (No subject block) */}
+              <div className="text-center py-4">
+                <h1 className="text-2xl font-black text-slate-950 dark:text-white uppercase tracking-wide leading-tight">
+                  {selectedNotice.title}
+                </h1>
+                <div className="h-[2px] w-20 bg-primary mx-auto mt-2.5" />
+              </div>
+
+              {/* Circular Details Container */}
+              <div className="pt-2 text-slate-800 dark:text-slate-200 text-sm leading-relaxed min-h-[180px]">
+                <div 
+                  className="prose prose-slate dark:prose-invert max-w-none prose-sm font-sans" 
+                  dangerouslySetInnerHTML={{ __html: selectedNotice.details || `<p>${selectedNotice.summary}</p>` }} 
+                />
+              </div>
+
+              {/* Attachment alert box */}
+              {selectedNotice.attachmentName && (
+                <div className="bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800/80 rounded-xl p-3.5 flex items-center justify-between text-xs mt-6">
+                  <div className="flex items-center gap-2">
+                    <Paperclip className="size-4 text-slate-400" />
+                    <div>
+                      <div className="font-extrabold text-slate-700 dark:text-slate-300">Reference Attachment circular</div>
+                      <div className="text-slate-500 text-[10px] font-semibold mt-0.5">{selectedNotice.attachmentName}</div>
+                    </div>
+                  </div>
+                  <button className="h-8.5 px-3.5 bg-white dark:bg-card hover:bg-slate-100 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 rounded-lg transition font-bold flex items-center gap-1 cursor-pointer">
+                    <Download className="size-3.5" /> Download
+                  </button>
+                </div>
+              )}
+
+              {/* Issuer Signature Stamp */}
+              <div className="pt-8 border-t border-slate-200 dark:border-slate-800 mt-8 flex justify-between items-end text-xs text-slate-600 dark:text-slate-400">
+                <div className="text-[10px] leading-relaxed">
+                  <div className="font-extrabold uppercase text-slate-400">Security Clearance</div>
+                  <div className="font-mono text-slate-400 mt-0.5">#SEC-NTC-{selectedNotice.id.toUpperCase()}</div>
+                </div>
+                
+                {/* Signature box */}
+                <div className="text-right flex flex-col items-end">
+                  <div className="text-slate-500 italic mb-2 text-[10px] font-semibold">By Order of the Management,</div>
+                  <div className="font-serif italic text-lg text-primary/80 tracking-wide pr-4">Tahmid Afsar</div>
+                  <div className="h-[1px] w-28 bg-slate-300 dark:bg-slate-700 my-1" />
+                  <div className="font-black text-slate-800 dark:text-slate-100">{selectedNotice.author}</div>
+                  <div className="text-slate-500 text-[10px] font-semibold">{selectedNotice.role}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Close footer button */}
+            <div className="flex justify-end flex-shrink-0">
+              <button
+                onClick={() => setIsViewModalOpen(false)}
+                className="h-9 px-5 bg-muted hover:bg-muted/70 text-foreground font-bold rounded-xl text-xs transition cursor-pointer"
+              >
+                Close circular
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

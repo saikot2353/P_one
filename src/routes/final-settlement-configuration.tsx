@@ -40,6 +40,7 @@ export type CompensationTier = {
   minMonth: number;  // additional months after full years (≥)
   minDay: number;    // additional days after months (≥)
   daysPerYear: number; // payable days per year for this tier
+  minServiceDays?: number; // for Day Basis
 };
 
 export type SettlementTypePolicy = {
@@ -64,6 +65,8 @@ export type SettlementTypePolicy = {
   // Special flags
   isMisconductBased: boolean;
   isDeathCase: boolean;
+  calculationBasis?: "year" | "day";
+  countPresentDay?: boolean;
 };
 
 export type NoticePeriodPolicy = {
@@ -387,9 +390,20 @@ function FinalSettlementConfigPage() {
   useEffect(() => {
     const storedTypes = localStorage.getItem("fs_settlement_types_v4");
     if (storedTypes) {
-      setSettlementTypes(JSON.parse(storedTypes));
+      const parsed = JSON.parse(storedTypes).map((t: any) => ({
+        ...t,
+        calculationBasis: t.calculationBasis || "year",
+        countPresentDay: t.countPresentDay !== undefined ? t.countPresentDay : false,
+      }));
+      setSettlementTypes(parsed);
     } else {
-      localStorage.setItem("fs_settlement_types_v4", JSON.stringify(defaultSettlementPolicies));
+      const initialized = defaultSettlementPolicies.map((t) => ({
+        ...t,
+        calculationBasis: "year" as const,
+        countPresentDay: false,
+      }));
+      setSettlementTypes(initialized);
+      localStorage.setItem("fs_settlement_types_v4", JSON.stringify(initialized));
     }
 
     const storedNotice = localStorage.getItem("fs_notice_policies");
@@ -606,7 +620,7 @@ function FinalSettlementConfigPage() {
                   </div>
                   <Button
                     onClick={() => {
-                      setEditingType({ id: "", name: "", legalReference: "", description: "", noticePeriodDays: 0, noticePaidByEmployer: false, noticeDeductedFromEmployee: false, compensationTiers: [{ minYear: 1, minMonth: 0, minDay: 0, daysPerYear: 30 }], minServiceMonthsForCompensation: 12, isCompensationApplicable: true, earnedLeaveEncashable: true, isGratuityApplicable: true, minServiceMonthsForGratuity: 6, isProvidentFundPayable: true, isMisconductBased: false, isDeathCase: false });
+                      setEditingType({ id: "", name: "", legalReference: "", description: "", noticePeriodDays: 0, noticePaidByEmployer: false, noticeDeductedFromEmployee: false, compensationTiers: [{ minYear: 1, minMonth: 0, minDay: 0, daysPerYear: 30 }], minServiceMonthsForCompensation: 12, isCompensationApplicable: true, earnedLeaveEncashable: true, isGratuityApplicable: true, minServiceMonthsForGratuity: 6, isProvidentFundPayable: true, isMisconductBased: false, isDeathCase: false, calculationBasis: "year", countPresentDay: false });
                       setIsTypeModalOpen(true);
                     }}
                     className="h-10 px-5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/95 font-semibold text-sm flex items-center gap-2 cursor-pointer transition-all"
@@ -643,7 +657,11 @@ function FinalSettlementConfigPage() {
                               <div className="flex flex-col gap-1 font-mono text-[9px]">
                                 {(type.compensationTiers ?? []).map((tier, ti) => (
                                   <span key={ti} className="bg-muted border border-border/60 px-2 py-0.5 rounded text-foreground flex items-center justify-between gap-2">
-                                    <span className="text-muted-foreground">{tier.minYear}Y {tier.minMonth}M {tier.minDay}D+</span>
+                                    <span className="text-muted-foreground">
+                                      {type.calculationBasis === "day" 
+                                        ? `${tier.minServiceDays ?? 0}D+` 
+                                        : `${tier.minYear}Y ${tier.minMonth}M ${tier.minDay}D+`}
+                                    </span>
                                     <strong>{tier.daysPerYear}d</strong>
                                   </span>
                                 ))}
@@ -656,6 +674,8 @@ function FinalSettlementConfigPage() {
                           </td>
                           <td className="px-5 py-4">
                             <div className="flex flex-wrap gap-1.5 max-w-[280px]">
+                              {type.calculationBasis === "day" && <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-fuchsia-500/10 text-fuchsia-600 border border-fuchsia-500/20 shadow-sm">Day Basis</span>}
+                              {type.countPresentDay && <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-pink-500/10 text-pink-600 border border-pink-500/20 shadow-sm">+Present Day</span>}
                               {type.noticePaidByEmployer && <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-blue-500/10 text-blue-600 border border-blue-500/20 shadow-sm">Notice Pay</span>}
                               {type.noticeDeductedFromEmployee && <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-amber-500/10 text-amber-600 border border-amber-500/20 shadow-sm">Notice Ded.</span>}
                               {type.earnedLeaveEncashable && <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 shadow-sm">EL Encash</span>}
@@ -879,13 +899,51 @@ function FinalSettlementConfigPage() {
                         </div>
                       </div>
 
+                      <div className="grid grid-cols-2 md:grid-cols-2 gap-4 mb-2">
+                        <div className="space-y-1.5">
+                          <label className={labelClass}>Calculation Basis</label>
+                          <label className="text-[10px] text-muted-foreground block -mt-1">Service benefit formula type</label>
+                          <select
+                            value={editingType.calculationBasis ?? "year"}
+                            onChange={(e) => setEditingType({...editingType, calculationBasis: e.target.value as "year" | "day"})}
+                            className={inputClass}
+                          >
+                            <option value="year">Year Basis</option>
+                            <option value="day">Day Basis</option>
+                          </select>
+                        </div>
+                        <div className="space-y-1.5 pt-4">
+                          <label className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase cursor-pointer select-none h-full pt-4">
+                            <input
+                              type="checkbox"
+                              checked={editingType.countPresentDay ?? false}
+                              onChange={(e) => setEditingType({...editingType, countPresentDay: e.target.checked})}
+                              className="accent-primary size-4"
+                            />
+                            Count Present Day
+                          </label>
+                        </div>
+                      </div>
+
                       {/* Dynamic compensation tiers table */}
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-[11px] font-extrabold uppercase tracking-wider text-foreground/70">Compensation Tiers (Y / M / D → Days/Year)</span>
+                          <span className="text-[11px] font-extrabold uppercase tracking-wider text-foreground/70">
+                            {editingType.calculationBasis === "day" 
+                              ? "Compensation Tiers (Min. Days → Days/Year)" 
+                              : "Compensation Tiers (Y / M / D → Days/Year)"}
+                          </span>
                           <button
                             type="button"
-                            onClick={() => setEditingType({ ...editingType, compensationTiers: [...(editingType.compensationTiers ?? []), { minYear: 0, minMonth: 0, minDay: 0, daysPerYear: 0 }] })}
+                            onClick={() => {
+                              const newTier = editingType.calculationBasis === "day"
+                                ? { minYear: 0, minMonth: 0, minDay: 0, daysPerYear: 0, minServiceDays: 0 }
+                                : { minYear: 0, minMonth: 0, minDay: 0, daysPerYear: 0 };
+                              setEditingType({
+                                ...editingType,
+                                compensationTiers: [...(editingType.compensationTiers ?? []), newTier]
+                              });
+                            }}
                             className="text-[10px] font-bold text-primary hover:text-primary/80 flex items-center gap-1 cursor-pointer border border-primary/30 rounded px-2 py-1 hover:bg-primary/5 transition-all"
                           >
                             <Plus className="size-3" /> Add Row
@@ -895,9 +953,15 @@ function FinalSettlementConfigPage() {
                           <table className="w-full text-xs">
                             <thead>
                               <tr className="bg-muted/40 border-b border-border/40 text-[9px] uppercase tracking-wider font-bold text-muted-foreground">
-                                <th className="px-3 py-2 text-left">Min. Year (Y)</th>
-                                <th className="px-3 py-2 text-left">Min. Month (M)</th>
-                                <th className="px-3 py-2 text-left">Min. Day (D)</th>
+                                {editingType.calculationBasis === "day" ? (
+                                  <th className="px-3 py-2 text-left">Min. Service Days (D)</th>
+                                ) : (
+                                  <>
+                                    <th className="px-3 py-2 text-left">Min. Year (Y)</th>
+                                    <th className="px-3 py-2 text-left">Min. Month (M)</th>
+                                    <th className="px-3 py-2 text-left">Min. Day (D)</th>
+                                  </>
+                                )}
                                 <th className="px-3 py-2 text-left">Days / Year</th>
                                 <th className="px-3 py-2 text-right">Remove</th>
                               </tr>
@@ -905,36 +969,51 @@ function FinalSettlementConfigPage() {
                             <tbody className="divide-y divide-border/30 bg-card">
                               {(editingType.compensationTiers ?? []).map((tier, ti) => (
                                 <tr key={ti} className="hover:bg-muted/10">
-                                  <td className="px-3 py-1.5">
-                                    <input type="number" min={0} value={tier.minYear}
-                                      onChange={(e) => {
-                                        const tiers = [...(editingType.compensationTiers ?? [])];
-                                        tiers[ti] = { ...tiers[ti], minYear: Number(e.target.value) };
-                                        setEditingType({ ...editingType, compensationTiers: tiers });
-                                      }}
-                                      className="w-16 px-2 py-1 rounded border border-border bg-background text-xs font-mono focus:border-primary outline-none"
-                                    />
-                                  </td>
-                                  <td className="px-3 py-1.5">
-                                    <input type="number" min={0} max={11} value={tier.minMonth}
-                                      onChange={(e) => {
-                                        const tiers = [...(editingType.compensationTiers ?? [])];
-                                        tiers[ti] = { ...tiers[ti], minMonth: Number(e.target.value) };
-                                        setEditingType({ ...editingType, compensationTiers: tiers });
-                                      }}
-                                      className="w-16 px-2 py-1 rounded border border-border bg-background text-xs font-mono focus:border-primary outline-none"
-                                    />
-                                  </td>
-                                  <td className="px-3 py-1.5">
-                                    <input type="number" min={0} max={31} value={tier.minDay}
-                                      onChange={(e) => {
-                                        const tiers = [...(editingType.compensationTiers ?? [])];
-                                        tiers[ti] = { ...tiers[ti], minDay: Number(e.target.value) };
-                                        setEditingType({ ...editingType, compensationTiers: tiers });
-                                      }}
-                                      className="w-16 px-2 py-1 rounded border border-border bg-background text-xs font-mono focus:border-primary outline-none"
-                                    />
-                                  </td>
+                                  {editingType.calculationBasis === "day" ? (
+                                    <td className="px-3 py-1.5">
+                                      <input type="number" min={0} value={tier.minServiceDays ?? 0}
+                                        onChange={(e) => {
+                                          const tiers = [...(editingType.compensationTiers ?? [])];
+                                          tiers[ti] = { ...tiers[ti], minServiceDays: Number(e.target.value) };
+                                          setEditingType({ ...editingType, compensationTiers: tiers });
+                                        }}
+                                        className="w-28 px-2 py-1 rounded border border-border bg-background text-xs font-mono focus:border-primary outline-none"
+                                      />
+                                    </td>
+                                  ) : (
+                                    <>
+                                      <td className="px-3 py-1.5">
+                                        <input type="number" min={0} value={tier.minYear}
+                                          onChange={(e) => {
+                                            const tiers = [...(editingType.compensationTiers ?? [])];
+                                            tiers[ti] = { ...tiers[ti], minYear: Number(e.target.value) };
+                                            setEditingType({ ...editingType, compensationTiers: tiers });
+                                          }}
+                                          className="w-16 px-2 py-1 rounded border border-border bg-background text-xs font-mono focus:border-primary outline-none"
+                                        />
+                                      </td>
+                                      <td className="px-3 py-1.5">
+                                        <input type="number" min={0} max={11} value={tier.minMonth}
+                                          onChange={(e) => {
+                                            const tiers = [...(editingType.compensationTiers ?? [])];
+                                            tiers[ti] = { ...tiers[ti], minMonth: Number(e.target.value) };
+                                            setEditingType({ ...editingType, compensationTiers: tiers });
+                                          }}
+                                          className="w-16 px-2 py-1 rounded border border-border bg-background text-xs font-mono focus:border-primary outline-none"
+                                        />
+                                      </td>
+                                      <td className="px-3 py-1.5">
+                                        <input type="number" min={0} max={31} value={tier.minDay}
+                                          onChange={(e) => {
+                                            const tiers = [...(editingType.compensationTiers ?? [])];
+                                            tiers[ti] = { ...tiers[ti], minDay: Number(e.target.value) };
+                                            setEditingType({ ...editingType, compensationTiers: tiers });
+                                          }}
+                                          className="w-16 px-2 py-1 rounded border border-border bg-background text-xs font-mono focus:border-primary outline-none"
+                                        />
+                                      </td>
+                                    </>
+                                  )}
                                   <td className="px-3 py-1.5">
                                     <input type="number" min={0} value={tier.daysPerYear}
                                       onChange={(e) => {
@@ -957,12 +1036,20 @@ function FinalSettlementConfigPage() {
                                 </tr>
                               ))}
                               {(editingType.compensationTiers ?? []).length === 0 && (
-                                <tr><td colSpan={5} className="text-center py-3 text-[10px] text-muted-foreground italic">No tiers — compensation will be 0 days/year</td></tr>
+                                <tr>
+                                  <td colSpan={editingType.calculationBasis === "day" ? 3 : 5} className="text-center py-3 text-[10px] text-muted-foreground italic">
+                                    No tiers — compensation will be 0 days/year
+                                  </td>
+                                </tr>
                               )}
                             </tbody>
                           </table>
                         </div>
-                        <p className="text-[10px] text-muted-foreground mt-1.5">Tiers are matched from bottom to top — the highest matching row wins. Use Y=0 M=0 D=0 as a catch-all base tier.</p>
+                        <p className="text-[10px] text-muted-foreground mt-1.5">
+                          {editingType.calculationBasis === "day" 
+                            ? "Tiers are matched from bottom to top — the highest matching row wins. Use Min. Service Days = 0 as a catch-all base tier."
+                            : "Tiers are matched from bottom to top — the highest matching row wins. Use Y=0 M=0 D=0 as a catch-all base tier."}
+                        </p>
                       </div>
                     </div>
                   </div>

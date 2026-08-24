@@ -3,7 +3,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { rawIncrementRecords, RawIncrementRecord } from "./-increment-history-data";
-import { EvaluationTabNav } from "@/components/evaluation/EvaluationTabNav";
 import {
   Search,
   FileSpreadsheet,
@@ -49,25 +48,25 @@ const defaultColumns = {
   section: true,
   designation: true,
   joiningDate: true,
-  salaryJoining: false,
-  salaryBasic: false,
+  salaryJoining: true,
+  salaryBasic: true,
   salaryGross: true,
-  inc2014: false,
-  inc2015: false,
-  inc2016: false,
-  inc2017: false,
-  inc2018: false,
-  inc2019: false,
-  inc2020: false,
-  inc2021: false,
-  inc2022: false,
+  inc2014: true,
+  inc2015: true,
+  inc2016: true,
+  inc2017: true,
+  inc2018: true,
+  inc2019: true,
+  inc2020: true,
+  inc2021: true,
+  inc2022: true,
   inc2023: true,
   inc2024: true,
   inc2025: true,
   total: true,
-  lastIncDate: false,
-  lastIncAmount: false,
-  lastPromotion: false,
+  lastIncDate: true,
+  lastIncAmount: true,
+  lastPromotion: true,
 };
 
 function IncrementHistoryPage() {
@@ -396,33 +395,7 @@ function IncrementHistoryPage() {
             </div>
           </div>
 
-          {/* Evaluation Module Tab Nav */}
-          <EvaluationTabNav />
 
-          {/* Tab Selector Hub */}
-          <div className="bg-card rounded-lg border border-border/80 p-1.5 shadow-2xs flex gap-1 print:hidden">
-            <button
-              onClick={() => setActiveReportsTab("history")}
-              className={`flex-1 sm:flex-none h-10 px-6 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${activeReportsTab === "history" ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground hover:bg-muted/75 hover:text-foreground"}`}
-            >
-              <FileClock className="size-3.5" />
-              <span>📊 History Ledger</span>
-            </button>
-            <button
-              onClick={() => setActiveReportsTab("summary")}
-              className={`flex-1 sm:flex-none h-10 px-6 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${activeReportsTab === "summary" ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground hover:bg-muted/75 hover:text-foreground"}`}
-            >
-              <TrendingUp className="size-3.5" />
-              <span>📈 Cumulative Summary</span>
-            </button>
-            <button
-              onClick={() => setActiveReportsTab("reports")}
-              className={`flex-1 sm:flex-none h-10 px-6 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${activeReportsTab === "reports" ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground hover:bg-muted/75 hover:text-foreground"}`}
-            >
-              <FileText className="size-3.5" />
-              <span>📄 Parameterized Reports</span>
-            </button>
-          </div>
 
           {activeReportsTab === "history" && (
             <>

@@ -24,6 +24,8 @@ import { Route as SspAttendanceRouteImport } from './routes/ssp-attendance'
 import { Route as SspApproveManualAttendanceRouteImport } from './routes/ssp-approve-manual-attendance'
 import { Route as SspApprovalRouteImport } from './routes/ssp-approval'
 import { Route as ShiftControlCenterRouteImport } from './routes/shift-control-center'
+import { Route as SetManagerRouteImport } from './routes/set-manager'
+import { Route as SetHodRouteImport } from './routes/set-hod'
 import { Route as SalaryProcessRouteImport } from './routes/salary-process'
 import { Route as RecruitmentIeListRouteImport } from './routes/recruitment-ie-list'
 import { Route as RecruitmentHrListRouteImport } from './routes/recruitment-hr-list'
@@ -49,6 +51,7 @@ import { Route as PayrollBenefitsMasterDataRouteImport } from './routes/payroll-
 import { Route as PayrollBenefitsCommonRouteImport } from './routes/payroll-benefits-common'
 import { Route as PayrollBenefitsRouteImport } from './routes/payroll-benefits'
 import { Route as PayrollAdvanceRouteImport } from './routes/payroll-advance'
+import { Route as NoticeRouteImport } from './routes/notice'
 import { Route as MyDashboardRouteImport } from './routes/my-dashboard'
 import { Route as MonthlySalaryProcessRouteImport } from './routes/monthly-salary-process'
 import { Route as MonthlySalaryDetailsRouteImport } from './routes/monthly-salary-details'
@@ -107,13 +110,9 @@ import { Route as InvConfigProductNameRouteImport } from './routes/inv-config-pr
 import { Route as InvConfigModelRouteImport } from './routes/inv-config-model'
 import { Route as InvConfigGroupNameRouteImport } from './routes/inv-config-group-name'
 import { Route as InvConfigBrandRouteImport } from './routes/inv-config-brand'
-import { Route as IncrementSummaryRouteImport } from './routes/increment-summary'
 import { Route as IncrementReportRouteImport } from './routes/increment-report'
-import { Route as IncrementQueuelistRouteImport } from './routes/increment-queuelist'
 import { Route as IncrementMultipleRouteImport } from './routes/increment-multiple'
-import { Route as IncrementListRouteImport } from './routes/increment-list'
 import { Route as IncrementHistoryRouteImport } from './routes/increment-history'
-import { Route as IncrementGadgetRouteImport } from './routes/increment-gadget'
 import { Route as IncrementRouteImport } from './routes/increment'
 import { Route as IncentiveAllowanceRouteImport } from './routes/incentive-allowance'
 import { Route as IdCardSetupRouteImport } from './routes/id-card-setup'
@@ -123,7 +122,7 @@ import { Route as FinancialAidBudgetConfigurationRouteImport } from './routes/fi
 import { Route as FinalSettlementConfigurationRouteImport } from './routes/final-settlement-configuration'
 import { Route as FinalSettlementRouteImport } from './routes/final-settlement'
 import { Route as FinalApproveIncrementRouteImport } from './routes/final-approve-increment'
-import { Route as EvaluationProposeRouteImport } from './routes/evaluation-propose'
+import { Route as EnrollFingerprintRouteImport } from './routes/enroll-fingerprint'
 import { Route as EmployeeJobCardRouteImport } from './routes/employee-job-card'
 import { Route as EmployeeDocVerificationRouteImport } from './routes/employee-doc-verification'
 import { Route as EarnLeaveWorkflowRouteImport } from './routes/earn-leave-workflow'
@@ -242,6 +241,16 @@ const SspApprovalRoute = SspApprovalRouteImport.update({
 const ShiftControlCenterRoute = ShiftControlCenterRouteImport.update({
   id: '/shift-control-center',
   path: '/shift-control-center',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SetManagerRoute = SetManagerRouteImport.update({
+  id: '/set-manager',
+  path: '/set-manager',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SetHodRoute = SetHodRouteImport.update({
+  id: '/set-hod',
+  path: '/set-hod',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SalaryProcessRoute = SalaryProcessRouteImport.update({
@@ -371,6 +380,11 @@ const PayrollBenefitsRoute = PayrollBenefitsRouteImport.update({
 const PayrollAdvanceRoute = PayrollAdvanceRouteImport.update({
   id: '/payroll-advance',
   path: '/payroll-advance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NoticeRoute = NoticeRouteImport.update({
+  id: '/notice',
+  path: '/notice',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MyDashboardRoute = MyDashboardRouteImport.update({
@@ -672,19 +686,9 @@ const InvConfigBrandRoute = InvConfigBrandRouteImport.update({
   path: '/inv-config-brand',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IncrementSummaryRoute = IncrementSummaryRouteImport.update({
-  id: '/increment-summary',
-  path: '/increment-summary',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IncrementReportRoute = IncrementReportRouteImport.update({
   id: '/increment-report',
   path: '/increment-report',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IncrementQueuelistRoute = IncrementQueuelistRouteImport.update({
-  id: '/increment-queuelist',
-  path: '/increment-queuelist',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IncrementMultipleRoute = IncrementMultipleRouteImport.update({
@@ -692,19 +696,9 @@ const IncrementMultipleRoute = IncrementMultipleRouteImport.update({
   path: '/increment-multiple',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IncrementListRoute = IncrementListRouteImport.update({
-  id: '/increment-list',
-  path: '/increment-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IncrementHistoryRoute = IncrementHistoryRouteImport.update({
   id: '/increment-history',
   path: '/increment-history',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IncrementGadgetRoute = IncrementGadgetRouteImport.update({
-  id: '/increment-gadget',
-  path: '/increment-gadget',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IncrementRoute = IncrementRouteImport.update({
@@ -754,9 +748,9 @@ const FinalApproveIncrementRoute = FinalApproveIncrementRouteImport.update({
   path: '/final-approve-increment',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EvaluationProposeRoute = EvaluationProposeRouteImport.update({
-  id: '/evaluation-propose',
-  path: '/evaluation-propose',
+const EnrollFingerprintRoute = EnrollFingerprintRouteImport.update({
+  id: '/enroll-fingerprint',
+  path: '/enroll-fingerprint',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmployeeJobCardRoute = EmployeeJobCardRouteImport.update({
@@ -1008,7 +1002,7 @@ export interface FileRoutesByFullPath {
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
-  '/evaluation-propose': typeof EvaluationProposeRoute
+  '/enroll-fingerprint': typeof EnrollFingerprintRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
   '/final-settlement-configuration': typeof FinalSettlementConfigurationRoute
@@ -1018,13 +1012,9 @@ export interface FileRoutesByFullPath {
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
   '/increment': typeof IncrementRoute
-  '/increment-gadget': typeof IncrementGadgetRoute
   '/increment-history': typeof IncrementHistoryRoute
-  '/increment-list': typeof IncrementListRoute
   '/increment-multiple': typeof IncrementMultipleRoute
-  '/increment-queuelist': typeof IncrementQueuelistRoute
   '/increment-report': typeof IncrementReportRoute
-  '/increment-summary': typeof IncrementSummaryRoute
   '/inv-config-brand': typeof InvConfigBrandRoute
   '/inv-config-group-name': typeof InvConfigGroupNameRoute
   '/inv-config-model': typeof InvConfigModelRoute
@@ -1083,6 +1073,7 @@ export interface FileRoutesByFullPath {
   '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
+  '/notice': typeof NoticeRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
   '/payroll-benefits-common': typeof PayrollBenefitsCommonRoute
@@ -1108,6 +1099,8 @@ export interface FileRoutesByFullPath {
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
   '/salary-process': typeof SalaryProcessRoute
+  '/set-hod': typeof SetHodRoute
+  '/set-manager': typeof SetManagerRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
@@ -1166,7 +1159,7 @@ export interface FileRoutesByTo {
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
-  '/evaluation-propose': typeof EvaluationProposeRoute
+  '/enroll-fingerprint': typeof EnrollFingerprintRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
   '/final-settlement-configuration': typeof FinalSettlementConfigurationRoute
@@ -1176,13 +1169,9 @@ export interface FileRoutesByTo {
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
   '/increment': typeof IncrementRoute
-  '/increment-gadget': typeof IncrementGadgetRoute
   '/increment-history': typeof IncrementHistoryRoute
-  '/increment-list': typeof IncrementListRoute
   '/increment-multiple': typeof IncrementMultipleRoute
-  '/increment-queuelist': typeof IncrementQueuelistRoute
   '/increment-report': typeof IncrementReportRoute
-  '/increment-summary': typeof IncrementSummaryRoute
   '/inv-config-brand': typeof InvConfigBrandRoute
   '/inv-config-group-name': typeof InvConfigGroupNameRoute
   '/inv-config-model': typeof InvConfigModelRoute
@@ -1241,6 +1230,7 @@ export interface FileRoutesByTo {
   '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
+  '/notice': typeof NoticeRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
   '/payroll-benefits-common': typeof PayrollBenefitsCommonRoute
@@ -1266,6 +1256,8 @@ export interface FileRoutesByTo {
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
   '/salary-process': typeof SalaryProcessRoute
+  '/set-hod': typeof SetHodRoute
+  '/set-manager': typeof SetManagerRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
@@ -1325,7 +1317,7 @@ export interface FileRoutesById {
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
-  '/evaluation-propose': typeof EvaluationProposeRoute
+  '/enroll-fingerprint': typeof EnrollFingerprintRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
   '/final-settlement-configuration': typeof FinalSettlementConfigurationRoute
@@ -1335,13 +1327,9 @@ export interface FileRoutesById {
   '/id-card-setup': typeof IdCardSetupRoute
   '/incentive-allowance': typeof IncentiveAllowanceRoute
   '/increment': typeof IncrementRoute
-  '/increment-gadget': typeof IncrementGadgetRoute
   '/increment-history': typeof IncrementHistoryRoute
-  '/increment-list': typeof IncrementListRoute
   '/increment-multiple': typeof IncrementMultipleRoute
-  '/increment-queuelist': typeof IncrementQueuelistRoute
   '/increment-report': typeof IncrementReportRoute
-  '/increment-summary': typeof IncrementSummaryRoute
   '/inv-config-brand': typeof InvConfigBrandRoute
   '/inv-config-group-name': typeof InvConfigGroupNameRoute
   '/inv-config-model': typeof InvConfigModelRoute
@@ -1400,6 +1388,7 @@ export interface FileRoutesById {
   '/monthly-salary-details': typeof MonthlySalaryDetailsRoute
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
+  '/notice': typeof NoticeRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
   '/payroll-benefits-common': typeof PayrollBenefitsCommonRoute
@@ -1425,6 +1414,8 @@ export interface FileRoutesById {
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
   '/salary-process': typeof SalaryProcessRoute
+  '/set-hod': typeof SetHodRoute
+  '/set-manager': typeof SetManagerRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
@@ -1485,7 +1476,7 @@ export interface FileRouteTypes {
     | '/earn-leave-workflow'
     | '/employee-doc-verification'
     | '/employee-job-card'
-    | '/evaluation-propose'
+    | '/enroll-fingerprint'
     | '/final-approve-increment'
     | '/final-settlement'
     | '/final-settlement-configuration'
@@ -1495,13 +1486,9 @@ export interface FileRouteTypes {
     | '/id-card-setup'
     | '/incentive-allowance'
     | '/increment'
-    | '/increment-gadget'
     | '/increment-history'
-    | '/increment-list'
     | '/increment-multiple'
-    | '/increment-queuelist'
     | '/increment-report'
-    | '/increment-summary'
     | '/inv-config-brand'
     | '/inv-config-group-name'
     | '/inv-config-model'
@@ -1560,6 +1547,7 @@ export interface FileRouteTypes {
     | '/monthly-salary-details'
     | '/monthly-salary-process'
     | '/my-dashboard'
+    | '/notice'
     | '/payroll-advance'
     | '/payroll-benefits'
     | '/payroll-benefits-common'
@@ -1585,6 +1573,8 @@ export interface FileRouteTypes {
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
     | '/salary-process'
+    | '/set-hod'
+    | '/set-manager'
     | '/shift-control-center'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
@@ -1643,7 +1633,7 @@ export interface FileRouteTypes {
     | '/earn-leave-workflow'
     | '/employee-doc-verification'
     | '/employee-job-card'
-    | '/evaluation-propose'
+    | '/enroll-fingerprint'
     | '/final-approve-increment'
     | '/final-settlement'
     | '/final-settlement-configuration'
@@ -1653,13 +1643,9 @@ export interface FileRouteTypes {
     | '/id-card-setup'
     | '/incentive-allowance'
     | '/increment'
-    | '/increment-gadget'
     | '/increment-history'
-    | '/increment-list'
     | '/increment-multiple'
-    | '/increment-queuelist'
     | '/increment-report'
-    | '/increment-summary'
     | '/inv-config-brand'
     | '/inv-config-group-name'
     | '/inv-config-model'
@@ -1718,6 +1704,7 @@ export interface FileRouteTypes {
     | '/monthly-salary-details'
     | '/monthly-salary-process'
     | '/my-dashboard'
+    | '/notice'
     | '/payroll-advance'
     | '/payroll-benefits'
     | '/payroll-benefits-common'
@@ -1743,6 +1730,8 @@ export interface FileRouteTypes {
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
     | '/salary-process'
+    | '/set-hod'
+    | '/set-manager'
     | '/shift-control-center'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
@@ -1801,7 +1790,7 @@ export interface FileRouteTypes {
     | '/earn-leave-workflow'
     | '/employee-doc-verification'
     | '/employee-job-card'
-    | '/evaluation-propose'
+    | '/enroll-fingerprint'
     | '/final-approve-increment'
     | '/final-settlement'
     | '/final-settlement-configuration'
@@ -1811,13 +1800,9 @@ export interface FileRouteTypes {
     | '/id-card-setup'
     | '/incentive-allowance'
     | '/increment'
-    | '/increment-gadget'
     | '/increment-history'
-    | '/increment-list'
     | '/increment-multiple'
-    | '/increment-queuelist'
     | '/increment-report'
-    | '/increment-summary'
     | '/inv-config-brand'
     | '/inv-config-group-name'
     | '/inv-config-model'
@@ -1876,6 +1861,7 @@ export interface FileRouteTypes {
     | '/monthly-salary-details'
     | '/monthly-salary-process'
     | '/my-dashboard'
+    | '/notice'
     | '/payroll-advance'
     | '/payroll-benefits'
     | '/payroll-benefits-common'
@@ -1901,6 +1887,8 @@ export interface FileRouteTypes {
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
     | '/salary-process'
+    | '/set-hod'
+    | '/set-manager'
     | '/shift-control-center'
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
@@ -1960,7 +1948,7 @@ export interface RootRouteChildren {
   EarnLeaveWorkflowRoute: typeof EarnLeaveWorkflowRoute
   EmployeeDocVerificationRoute: typeof EmployeeDocVerificationRoute
   EmployeeJobCardRoute: typeof EmployeeJobCardRoute
-  EvaluationProposeRoute: typeof EvaluationProposeRoute
+  EnrollFingerprintRoute: typeof EnrollFingerprintRoute
   FinalApproveIncrementRoute: typeof FinalApproveIncrementRoute
   FinalSettlementRoute: typeof FinalSettlementRoute
   FinalSettlementConfigurationRoute: typeof FinalSettlementConfigurationRoute
@@ -1970,13 +1958,9 @@ export interface RootRouteChildren {
   IdCardSetupRoute: typeof IdCardSetupRoute
   IncentiveAllowanceRoute: typeof IncentiveAllowanceRoute
   IncrementRoute: typeof IncrementRoute
-  IncrementGadgetRoute: typeof IncrementGadgetRoute
   IncrementHistoryRoute: typeof IncrementHistoryRoute
-  IncrementListRoute: typeof IncrementListRoute
   IncrementMultipleRoute: typeof IncrementMultipleRoute
-  IncrementQueuelistRoute: typeof IncrementQueuelistRoute
   IncrementReportRoute: typeof IncrementReportRoute
-  IncrementSummaryRoute: typeof IncrementSummaryRoute
   InvConfigBrandRoute: typeof InvConfigBrandRoute
   InvConfigGroupNameRoute: typeof InvConfigGroupNameRoute
   InvConfigModelRoute: typeof InvConfigModelRoute
@@ -2035,6 +2019,7 @@ export interface RootRouteChildren {
   MonthlySalaryDetailsRoute: typeof MonthlySalaryDetailsRoute
   MonthlySalaryProcessRoute: typeof MonthlySalaryProcessRoute
   MyDashboardRoute: typeof MyDashboardRoute
+  NoticeRoute: typeof NoticeRoute
   PayrollAdvanceRoute: typeof PayrollAdvanceRoute
   PayrollBenefitsRoute: typeof PayrollBenefitsRoute
   PayrollBenefitsCommonRoute: typeof PayrollBenefitsCommonRoute
@@ -2060,6 +2045,8 @@ export interface RootRouteChildren {
   RecruitmentHrListRoute: typeof RecruitmentHrListRoute
   RecruitmentIeListRoute: typeof RecruitmentIeListRoute
   SalaryProcessRoute: typeof SalaryProcessRoute
+  SetHodRoute: typeof SetHodRoute
+  SetManagerRoute: typeof SetManagerRoute
   ShiftControlCenterRoute: typeof ShiftControlCenterRoute
   SspApprovalRoute: typeof SspApprovalRoute
   SspApproveManualAttendanceRoute: typeof SspApproveManualAttendanceRoute
@@ -2186,6 +2173,20 @@ declare module '@tanstack/react-router' {
       path: '/shift-control-center'
       fullPath: '/shift-control-center'
       preLoaderRoute: typeof ShiftControlCenterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/set-manager': {
+      id: '/set-manager'
+      path: '/set-manager'
+      fullPath: '/set-manager'
+      preLoaderRoute: typeof SetManagerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/set-hod': {
+      id: '/set-hod'
+      path: '/set-hod'
+      fullPath: '/set-hod'
+      preLoaderRoute: typeof SetHodRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/salary-process': {
@@ -2361,6 +2362,13 @@ declare module '@tanstack/react-router' {
       path: '/payroll-advance'
       fullPath: '/payroll-advance'
       preLoaderRoute: typeof PayrollAdvanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notice': {
+      id: '/notice'
+      path: '/notice'
+      fullPath: '/notice'
+      preLoaderRoute: typeof NoticeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/my-dashboard': {
@@ -2769,25 +2777,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvConfigBrandRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/increment-summary': {
-      id: '/increment-summary'
-      path: '/increment-summary'
-      fullPath: '/increment-summary'
-      preLoaderRoute: typeof IncrementSummaryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/increment-report': {
       id: '/increment-report'
       path: '/increment-report'
       fullPath: '/increment-report'
       preLoaderRoute: typeof IncrementReportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/increment-queuelist': {
-      id: '/increment-queuelist'
-      path: '/increment-queuelist'
-      fullPath: '/increment-queuelist'
-      preLoaderRoute: typeof IncrementQueuelistRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/increment-multiple': {
@@ -2797,25 +2791,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IncrementMultipleRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/increment-list': {
-      id: '/increment-list'
-      path: '/increment-list'
-      fullPath: '/increment-list'
-      preLoaderRoute: typeof IncrementListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/increment-history': {
       id: '/increment-history'
       path: '/increment-history'
       fullPath: '/increment-history'
       preLoaderRoute: typeof IncrementHistoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/increment-gadget': {
-      id: '/increment-gadget'
-      path: '/increment-gadget'
-      fullPath: '/increment-gadget'
-      preLoaderRoute: typeof IncrementGadgetRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/increment': {
@@ -2881,11 +2861,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FinalApproveIncrementRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/evaluation-propose': {
-      id: '/evaluation-propose'
-      path: '/evaluation-propose'
-      fullPath: '/evaluation-propose'
-      preLoaderRoute: typeof EvaluationProposeRouteImport
+    '/enroll-fingerprint': {
+      id: '/enroll-fingerprint'
+      path: '/enroll-fingerprint'
+      fullPath: '/enroll-fingerprint'
+      preLoaderRoute: typeof EnrollFingerprintRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/employee-job-card': {
@@ -3216,7 +3196,7 @@ const rootRouteChildren: RootRouteChildren = {
   EarnLeaveWorkflowRoute: EarnLeaveWorkflowRoute,
   EmployeeDocVerificationRoute: EmployeeDocVerificationRoute,
   EmployeeJobCardRoute: EmployeeJobCardRoute,
-  EvaluationProposeRoute: EvaluationProposeRoute,
+  EnrollFingerprintRoute: EnrollFingerprintRoute,
   FinalApproveIncrementRoute: FinalApproveIncrementRoute,
   FinalSettlementRoute: FinalSettlementRoute,
   FinalSettlementConfigurationRoute: FinalSettlementConfigurationRoute,
@@ -3226,13 +3206,9 @@ const rootRouteChildren: RootRouteChildren = {
   IdCardSetupRoute: IdCardSetupRoute,
   IncentiveAllowanceRoute: IncentiveAllowanceRoute,
   IncrementRoute: IncrementRoute,
-  IncrementGadgetRoute: IncrementGadgetRoute,
   IncrementHistoryRoute: IncrementHistoryRoute,
-  IncrementListRoute: IncrementListRoute,
   IncrementMultipleRoute: IncrementMultipleRoute,
-  IncrementQueuelistRoute: IncrementQueuelistRoute,
   IncrementReportRoute: IncrementReportRoute,
-  IncrementSummaryRoute: IncrementSummaryRoute,
   InvConfigBrandRoute: InvConfigBrandRoute,
   InvConfigGroupNameRoute: InvConfigGroupNameRoute,
   InvConfigModelRoute: InvConfigModelRoute,
@@ -3292,6 +3268,7 @@ const rootRouteChildren: RootRouteChildren = {
   MonthlySalaryDetailsRoute: MonthlySalaryDetailsRoute,
   MonthlySalaryProcessRoute: MonthlySalaryProcessRoute,
   MyDashboardRoute: MyDashboardRoute,
+  NoticeRoute: NoticeRoute,
   PayrollAdvanceRoute: PayrollAdvanceRoute,
   PayrollBenefitsRoute: PayrollBenefitsRoute,
   PayrollBenefitsCommonRoute: PayrollBenefitsCommonRoute,
@@ -3317,6 +3294,8 @@ const rootRouteChildren: RootRouteChildren = {
   RecruitmentHrListRoute: RecruitmentHrListRoute,
   RecruitmentIeListRoute: RecruitmentIeListRoute,
   SalaryProcessRoute: SalaryProcessRoute,
+  SetHodRoute: SetHodRoute,
+  SetManagerRoute: SetManagerRoute,
   ShiftControlCenterRoute: ShiftControlCenterRoute,
   SspApprovalRoute: SspApprovalRoute,
   SspApproveManualAttendanceRoute: SspApproveManualAttendanceRoute,
