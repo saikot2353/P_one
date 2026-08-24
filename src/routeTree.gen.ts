@@ -36,6 +36,50 @@ import { Route as RecruitmentBasicInfoListRouteImport } from './routes/recruitme
 import { Route as RecruitmentBasicEntryRouteImport } from './routes/recruitment-basic-entry'
 import { Route as RecruitmentAssessmentListRouteImport } from './routes/recruitment-assessment-list'
 import { Route as ProposeIncrementRouteImport } from './routes/propose-increment'
+import { Route as ProcurementReportsYarnBookingPiRouteImport } from './routes/procurement-reports-yarn-booking-pi'
+import { Route as ProcurementReportsPurchasePriceRouteImport } from './routes/procurement-reports-purchase-price'
+import { Route as ProcurementReportsPaymentStatementRouteImport } from './routes/procurement-reports-payment-statement'
+import { Route as ProcurementReportsDncRateRouteImport } from './routes/procurement-reports-dnc-rate'
+import { Route as ProcurementReportsCombinedPoStatementRouteImport } from './routes/procurement-reports-combined-po-statement'
+import { Route as ProcurementPoWorkOrderApprovalRouteImport } from './routes/procurement-po-work-order-approval'
+import { Route as ProcurementPoRequisitionWiseRouteImport } from './routes/procurement-po-requisition-wise'
+import { Route as ProcurementPoNewRouteImport } from './routes/procurement-po-new'
+import { Route as ProcurementPoListRouteImport } from './routes/procurement-po-list'
+import { Route as ProcurementPiListRouteImport } from './routes/procurement-pi-list'
+import { Route as ProcurementPiEditDcPriceRouteImport } from './routes/procurement-pi-edit-dc-price'
+import { Route as ProcurementPiDeleteRequestRouteImport } from './routes/procurement-pi-delete-request'
+import { Route as ProcurementPiCreateRouteImport } from './routes/procurement-pi-create'
+import { Route as ProcurementPiApproveDcPriceRouteImport } from './routes/procurement-pi-approve-dc-price'
+import { Route as ProcurementPaymentListRouteImport } from './routes/procurement-payment-list'
+import { Route as ProcurementPaymentBillRouteImport } from './routes/procurement-payment-bill'
+import { Route as ProcurementDashboardRouteImport } from './routes/procurement-dashboard'
+import { Route as ProcurementCsSupplierPriceRouteImport } from './routes/procurement-cs-supplier-price'
+import { Route as ProcurementCsSupplierItemsRouteImport } from './routes/procurement-cs-supplier-items'
+import { Route as ProcurementCsCreateWorkorderRouteImport } from './routes/procurement-cs-create-workorder'
+import { Route as ProcurementCsCreateBatchRouteImport } from './routes/procurement-cs-create-batch'
+import { Route as ProcurementCsBatchListRouteImport } from './routes/procurement-cs-batch-list'
+import { Route as ProcurementConfigTermsRouteImport } from './routes/procurement-config-terms'
+import { Route as ProcurementConfigSupplierOpeningRouteImport } from './routes/procurement-config-supplier-opening'
+import { Route as ProcurementConfigSupplierNameRouteImport } from './routes/procurement-config-supplier-name'
+import { Route as ProcurementConfigPurchaseOptionRouteImport } from './routes/procurement-config-purchase-option'
+import { Route as ProcurementConfigLcBookingListRouteImport } from './routes/procurement-config-lc-booking-list'
+import { Route as ProcurementConfigLcBookingRouteImport } from './routes/procurement-config-lc-booking'
+import { Route as ProcurementConfigCurrencyRateRouteImport } from './routes/procurement-config-currency-rate'
+import { Route as ProcurementConfigBankInfoRouteImport } from './routes/procurement-config-bank-info'
+import { Route as ProcurementConfigBankAccountsRouteImport } from './routes/procurement-config-bank-accounts'
+import { Route as ProcurementBillingVatTaxRegisterRouteImport } from './routes/procurement-billing-vat-tax-register'
+import { Route as ProcurementBillingVatTaxEntryRouteImport } from './routes/procurement-billing-vat-tax-entry'
+import { Route as ProcurementBillingSupplierRecordListRouteImport } from './routes/procurement-billing-supplier-record-list'
+import { Route as ProcurementBillingSupplierRecordRouteImport } from './routes/procurement-billing-supplier-record'
+import { Route as ProcurementBillingPurchaseListRouteImport } from './routes/procurement-billing-purchase-list'
+import { Route as ProcurementBillingPrepareV2RouteImport } from './routes/procurement-billing-prepare-v2'
+import { Route as ProcurementBillingPrepareRouteImport } from './routes/procurement-billing-prepare'
+import { Route as ProcurementBillingLoanListRouteImport } from './routes/procurement-billing-loan-list'
+import { Route as ProcurementBillingEditRateRouteImport } from './routes/procurement-billing-edit-rate'
+import { Route as ProcurementBillingApproveRateRouteImport } from './routes/procurement-billing-approve-rate'
+import { Route as ProcurementAuditMrrRouteImport } from './routes/procurement-audit-mrr'
+import { Route as ProcurementAuditLandedCostRouteImport } from './routes/procurement-audit-landed-cost'
+import { Route as ProcurementAuditBillRouteImport } from './routes/procurement-audit-bill'
 import { Route as PhonebookRouteImport } from './routes/phonebook'
 import { Route as PersonnelListRouteImport } from './routes/personnel-list'
 import { Route as PersonnelApprovalRouteImport } from './routes/personnel-approval'
@@ -304,6 +348,259 @@ const RecruitmentAssessmentListRoute =
 const ProposeIncrementRoute = ProposeIncrementRouteImport.update({
   id: '/propose-increment',
   path: '/propose-increment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProcurementReportsYarnBookingPiRoute =
+  ProcurementReportsYarnBookingPiRouteImport.update({
+    id: '/procurement-reports-yarn-booking-pi',
+    path: '/procurement-reports-yarn-booking-pi',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementReportsPurchasePriceRoute =
+  ProcurementReportsPurchasePriceRouteImport.update({
+    id: '/procurement-reports-purchase-price',
+    path: '/procurement-reports-purchase-price',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementReportsPaymentStatementRoute =
+  ProcurementReportsPaymentStatementRouteImport.update({
+    id: '/procurement-reports-payment-statement',
+    path: '/procurement-reports-payment-statement',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementReportsDncRateRoute =
+  ProcurementReportsDncRateRouteImport.update({
+    id: '/procurement-reports-dnc-rate',
+    path: '/procurement-reports-dnc-rate',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementReportsCombinedPoStatementRoute =
+  ProcurementReportsCombinedPoStatementRouteImport.update({
+    id: '/procurement-reports-combined-po-statement',
+    path: '/procurement-reports-combined-po-statement',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementPoWorkOrderApprovalRoute =
+  ProcurementPoWorkOrderApprovalRouteImport.update({
+    id: '/procurement-po-work-order-approval',
+    path: '/procurement-po-work-order-approval',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementPoRequisitionWiseRoute =
+  ProcurementPoRequisitionWiseRouteImport.update({
+    id: '/procurement-po-requisition-wise',
+    path: '/procurement-po-requisition-wise',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementPoNewRoute = ProcurementPoNewRouteImport.update({
+  id: '/procurement-po-new',
+  path: '/procurement-po-new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProcurementPoListRoute = ProcurementPoListRouteImport.update({
+  id: '/procurement-po-list',
+  path: '/procurement-po-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProcurementPiListRoute = ProcurementPiListRouteImport.update({
+  id: '/procurement-pi-list',
+  path: '/procurement-pi-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProcurementPiEditDcPriceRoute =
+  ProcurementPiEditDcPriceRouteImport.update({
+    id: '/procurement-pi-edit-dc-price',
+    path: '/procurement-pi-edit-dc-price',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementPiDeleteRequestRoute =
+  ProcurementPiDeleteRequestRouteImport.update({
+    id: '/procurement-pi-delete-request',
+    path: '/procurement-pi-delete-request',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementPiCreateRoute = ProcurementPiCreateRouteImport.update({
+  id: '/procurement-pi-create',
+  path: '/procurement-pi-create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProcurementPiApproveDcPriceRoute =
+  ProcurementPiApproveDcPriceRouteImport.update({
+    id: '/procurement-pi-approve-dc-price',
+    path: '/procurement-pi-approve-dc-price',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementPaymentListRoute = ProcurementPaymentListRouteImport.update({
+  id: '/procurement-payment-list',
+  path: '/procurement-payment-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProcurementPaymentBillRoute = ProcurementPaymentBillRouteImport.update({
+  id: '/procurement-payment-bill',
+  path: '/procurement-payment-bill',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProcurementDashboardRoute = ProcurementDashboardRouteImport.update({
+  id: '/procurement-dashboard',
+  path: '/procurement-dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProcurementCsSupplierPriceRoute =
+  ProcurementCsSupplierPriceRouteImport.update({
+    id: '/procurement-cs-supplier-price',
+    path: '/procurement-cs-supplier-price',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementCsSupplierItemsRoute =
+  ProcurementCsSupplierItemsRouteImport.update({
+    id: '/procurement-cs-supplier-items',
+    path: '/procurement-cs-supplier-items',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementCsCreateWorkorderRoute =
+  ProcurementCsCreateWorkorderRouteImport.update({
+    id: '/procurement-cs-create-workorder',
+    path: '/procurement-cs-create-workorder',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementCsCreateBatchRoute =
+  ProcurementCsCreateBatchRouteImport.update({
+    id: '/procurement-cs-create-batch',
+    path: '/procurement-cs-create-batch',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementCsBatchListRoute = ProcurementCsBatchListRouteImport.update({
+  id: '/procurement-cs-batch-list',
+  path: '/procurement-cs-batch-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProcurementConfigTermsRoute = ProcurementConfigTermsRouteImport.update({
+  id: '/procurement-config-terms',
+  path: '/procurement-config-terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProcurementConfigSupplierOpeningRoute =
+  ProcurementConfigSupplierOpeningRouteImport.update({
+    id: '/procurement-config-supplier-opening',
+    path: '/procurement-config-supplier-opening',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementConfigSupplierNameRoute =
+  ProcurementConfigSupplierNameRouteImport.update({
+    id: '/procurement-config-supplier-name',
+    path: '/procurement-config-supplier-name',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementConfigPurchaseOptionRoute =
+  ProcurementConfigPurchaseOptionRouteImport.update({
+    id: '/procurement-config-purchase-option',
+    path: '/procurement-config-purchase-option',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementConfigLcBookingListRoute =
+  ProcurementConfigLcBookingListRouteImport.update({
+    id: '/procurement-config-lc-booking-list',
+    path: '/procurement-config-lc-booking-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementConfigLcBookingRoute =
+  ProcurementConfigLcBookingRouteImport.update({
+    id: '/procurement-config-lc-booking',
+    path: '/procurement-config-lc-booking',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementConfigCurrencyRateRoute =
+  ProcurementConfigCurrencyRateRouteImport.update({
+    id: '/procurement-config-currency-rate',
+    path: '/procurement-config-currency-rate',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementConfigBankInfoRoute =
+  ProcurementConfigBankInfoRouteImport.update({
+    id: '/procurement-config-bank-info',
+    path: '/procurement-config-bank-info',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementConfigBankAccountsRoute =
+  ProcurementConfigBankAccountsRouteImport.update({
+    id: '/procurement-config-bank-accounts',
+    path: '/procurement-config-bank-accounts',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementBillingVatTaxRegisterRoute =
+  ProcurementBillingVatTaxRegisterRouteImport.update({
+    id: '/procurement-billing-vat-tax-register',
+    path: '/procurement-billing-vat-tax-register',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementBillingVatTaxEntryRoute =
+  ProcurementBillingVatTaxEntryRouteImport.update({
+    id: '/procurement-billing-vat-tax-entry',
+    path: '/procurement-billing-vat-tax-entry',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementBillingSupplierRecordListRoute =
+  ProcurementBillingSupplierRecordListRouteImport.update({
+    id: '/procurement-billing-supplier-record-list',
+    path: '/procurement-billing-supplier-record-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementBillingSupplierRecordRoute =
+  ProcurementBillingSupplierRecordRouteImport.update({
+    id: '/procurement-billing-supplier-record',
+    path: '/procurement-billing-supplier-record',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementBillingPurchaseListRoute =
+  ProcurementBillingPurchaseListRouteImport.update({
+    id: '/procurement-billing-purchase-list',
+    path: '/procurement-billing-purchase-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementBillingPrepareV2Route =
+  ProcurementBillingPrepareV2RouteImport.update({
+    id: '/procurement-billing-prepare-v2',
+    path: '/procurement-billing-prepare-v2',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementBillingPrepareRoute =
+  ProcurementBillingPrepareRouteImport.update({
+    id: '/procurement-billing-prepare',
+    path: '/procurement-billing-prepare',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementBillingLoanListRoute =
+  ProcurementBillingLoanListRouteImport.update({
+    id: '/procurement-billing-loan-list',
+    path: '/procurement-billing-loan-list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementBillingEditRateRoute =
+  ProcurementBillingEditRateRouteImport.update({
+    id: '/procurement-billing-edit-rate',
+    path: '/procurement-billing-edit-rate',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementBillingApproveRateRoute =
+  ProcurementBillingApproveRateRouteImport.update({
+    id: '/procurement-billing-approve-rate',
+    path: '/procurement-billing-approve-rate',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementAuditMrrRoute = ProcurementAuditMrrRouteImport.update({
+  id: '/procurement-audit-mrr',
+  path: '/procurement-audit-mrr',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProcurementAuditLandedCostRoute =
+  ProcurementAuditLandedCostRouteImport.update({
+    id: '/procurement-audit-landed-cost',
+    path: '/procurement-audit-landed-cost',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementAuditBillRoute = ProcurementAuditBillRouteImport.update({
+  id: '/procurement-audit-bill',
+  path: '/procurement-audit-bill',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PhonebookRoute = PhonebookRouteImport.update({
@@ -1089,6 +1386,50 @@ export interface FileRoutesByFullPath {
   '/personnel-approval': typeof PersonnelApprovalRoute
   '/personnel-list': typeof PersonnelListRoute
   '/phonebook': typeof PhonebookRoute
+  '/procurement-audit-bill': typeof ProcurementAuditBillRoute
+  '/procurement-audit-landed-cost': typeof ProcurementAuditLandedCostRoute
+  '/procurement-audit-mrr': typeof ProcurementAuditMrrRoute
+  '/procurement-billing-approve-rate': typeof ProcurementBillingApproveRateRoute
+  '/procurement-billing-edit-rate': typeof ProcurementBillingEditRateRoute
+  '/procurement-billing-loan-list': typeof ProcurementBillingLoanListRoute
+  '/procurement-billing-prepare': typeof ProcurementBillingPrepareRoute
+  '/procurement-billing-prepare-v2': typeof ProcurementBillingPrepareV2Route
+  '/procurement-billing-purchase-list': typeof ProcurementBillingPurchaseListRoute
+  '/procurement-billing-supplier-record': typeof ProcurementBillingSupplierRecordRoute
+  '/procurement-billing-supplier-record-list': typeof ProcurementBillingSupplierRecordListRoute
+  '/procurement-billing-vat-tax-entry': typeof ProcurementBillingVatTaxEntryRoute
+  '/procurement-billing-vat-tax-register': typeof ProcurementBillingVatTaxRegisterRoute
+  '/procurement-config-bank-accounts': typeof ProcurementConfigBankAccountsRoute
+  '/procurement-config-bank-info': typeof ProcurementConfigBankInfoRoute
+  '/procurement-config-currency-rate': typeof ProcurementConfigCurrencyRateRoute
+  '/procurement-config-lc-booking': typeof ProcurementConfigLcBookingRoute
+  '/procurement-config-lc-booking-list': typeof ProcurementConfigLcBookingListRoute
+  '/procurement-config-purchase-option': typeof ProcurementConfigPurchaseOptionRoute
+  '/procurement-config-supplier-name': typeof ProcurementConfigSupplierNameRoute
+  '/procurement-config-supplier-opening': typeof ProcurementConfigSupplierOpeningRoute
+  '/procurement-config-terms': typeof ProcurementConfigTermsRoute
+  '/procurement-cs-batch-list': typeof ProcurementCsBatchListRoute
+  '/procurement-cs-create-batch': typeof ProcurementCsCreateBatchRoute
+  '/procurement-cs-create-workorder': typeof ProcurementCsCreateWorkorderRoute
+  '/procurement-cs-supplier-items': typeof ProcurementCsSupplierItemsRoute
+  '/procurement-cs-supplier-price': typeof ProcurementCsSupplierPriceRoute
+  '/procurement-dashboard': typeof ProcurementDashboardRoute
+  '/procurement-payment-bill': typeof ProcurementPaymentBillRoute
+  '/procurement-payment-list': typeof ProcurementPaymentListRoute
+  '/procurement-pi-approve-dc-price': typeof ProcurementPiApproveDcPriceRoute
+  '/procurement-pi-create': typeof ProcurementPiCreateRoute
+  '/procurement-pi-delete-request': typeof ProcurementPiDeleteRequestRoute
+  '/procurement-pi-edit-dc-price': typeof ProcurementPiEditDcPriceRoute
+  '/procurement-pi-list': typeof ProcurementPiListRoute
+  '/procurement-po-list': typeof ProcurementPoListRoute
+  '/procurement-po-new': typeof ProcurementPoNewRoute
+  '/procurement-po-requisition-wise': typeof ProcurementPoRequisitionWiseRoute
+  '/procurement-po-work-order-approval': typeof ProcurementPoWorkOrderApprovalRoute
+  '/procurement-reports-combined-po-statement': typeof ProcurementReportsCombinedPoStatementRoute
+  '/procurement-reports-dnc-rate': typeof ProcurementReportsDncRateRoute
+  '/procurement-reports-payment-statement': typeof ProcurementReportsPaymentStatementRoute
+  '/procurement-reports-purchase-price': typeof ProcurementReportsPurchasePriceRoute
+  '/procurement-reports-yarn-booking-pi': typeof ProcurementReportsYarnBookingPiRoute
   '/propose-increment': typeof ProposeIncrementRoute
   '/recruitment-assessment-list': typeof RecruitmentAssessmentListRoute
   '/recruitment-basic-entry': typeof RecruitmentBasicEntryRoute
@@ -1246,6 +1587,50 @@ export interface FileRoutesByTo {
   '/personnel-approval': typeof PersonnelApprovalRoute
   '/personnel-list': typeof PersonnelListRoute
   '/phonebook': typeof PhonebookRoute
+  '/procurement-audit-bill': typeof ProcurementAuditBillRoute
+  '/procurement-audit-landed-cost': typeof ProcurementAuditLandedCostRoute
+  '/procurement-audit-mrr': typeof ProcurementAuditMrrRoute
+  '/procurement-billing-approve-rate': typeof ProcurementBillingApproveRateRoute
+  '/procurement-billing-edit-rate': typeof ProcurementBillingEditRateRoute
+  '/procurement-billing-loan-list': typeof ProcurementBillingLoanListRoute
+  '/procurement-billing-prepare': typeof ProcurementBillingPrepareRoute
+  '/procurement-billing-prepare-v2': typeof ProcurementBillingPrepareV2Route
+  '/procurement-billing-purchase-list': typeof ProcurementBillingPurchaseListRoute
+  '/procurement-billing-supplier-record': typeof ProcurementBillingSupplierRecordRoute
+  '/procurement-billing-supplier-record-list': typeof ProcurementBillingSupplierRecordListRoute
+  '/procurement-billing-vat-tax-entry': typeof ProcurementBillingVatTaxEntryRoute
+  '/procurement-billing-vat-tax-register': typeof ProcurementBillingVatTaxRegisterRoute
+  '/procurement-config-bank-accounts': typeof ProcurementConfigBankAccountsRoute
+  '/procurement-config-bank-info': typeof ProcurementConfigBankInfoRoute
+  '/procurement-config-currency-rate': typeof ProcurementConfigCurrencyRateRoute
+  '/procurement-config-lc-booking': typeof ProcurementConfigLcBookingRoute
+  '/procurement-config-lc-booking-list': typeof ProcurementConfigLcBookingListRoute
+  '/procurement-config-purchase-option': typeof ProcurementConfigPurchaseOptionRoute
+  '/procurement-config-supplier-name': typeof ProcurementConfigSupplierNameRoute
+  '/procurement-config-supplier-opening': typeof ProcurementConfigSupplierOpeningRoute
+  '/procurement-config-terms': typeof ProcurementConfigTermsRoute
+  '/procurement-cs-batch-list': typeof ProcurementCsBatchListRoute
+  '/procurement-cs-create-batch': typeof ProcurementCsCreateBatchRoute
+  '/procurement-cs-create-workorder': typeof ProcurementCsCreateWorkorderRoute
+  '/procurement-cs-supplier-items': typeof ProcurementCsSupplierItemsRoute
+  '/procurement-cs-supplier-price': typeof ProcurementCsSupplierPriceRoute
+  '/procurement-dashboard': typeof ProcurementDashboardRoute
+  '/procurement-payment-bill': typeof ProcurementPaymentBillRoute
+  '/procurement-payment-list': typeof ProcurementPaymentListRoute
+  '/procurement-pi-approve-dc-price': typeof ProcurementPiApproveDcPriceRoute
+  '/procurement-pi-create': typeof ProcurementPiCreateRoute
+  '/procurement-pi-delete-request': typeof ProcurementPiDeleteRequestRoute
+  '/procurement-pi-edit-dc-price': typeof ProcurementPiEditDcPriceRoute
+  '/procurement-pi-list': typeof ProcurementPiListRoute
+  '/procurement-po-list': typeof ProcurementPoListRoute
+  '/procurement-po-new': typeof ProcurementPoNewRoute
+  '/procurement-po-requisition-wise': typeof ProcurementPoRequisitionWiseRoute
+  '/procurement-po-work-order-approval': typeof ProcurementPoWorkOrderApprovalRoute
+  '/procurement-reports-combined-po-statement': typeof ProcurementReportsCombinedPoStatementRoute
+  '/procurement-reports-dnc-rate': typeof ProcurementReportsDncRateRoute
+  '/procurement-reports-payment-statement': typeof ProcurementReportsPaymentStatementRoute
+  '/procurement-reports-purchase-price': typeof ProcurementReportsPurchasePriceRoute
+  '/procurement-reports-yarn-booking-pi': typeof ProcurementReportsYarnBookingPiRoute
   '/propose-increment': typeof ProposeIncrementRoute
   '/recruitment-assessment-list': typeof RecruitmentAssessmentListRoute
   '/recruitment-basic-entry': typeof RecruitmentBasicEntryRoute
@@ -1404,6 +1789,50 @@ export interface FileRoutesById {
   '/personnel-approval': typeof PersonnelApprovalRoute
   '/personnel-list': typeof PersonnelListRoute
   '/phonebook': typeof PhonebookRoute
+  '/procurement-audit-bill': typeof ProcurementAuditBillRoute
+  '/procurement-audit-landed-cost': typeof ProcurementAuditLandedCostRoute
+  '/procurement-audit-mrr': typeof ProcurementAuditMrrRoute
+  '/procurement-billing-approve-rate': typeof ProcurementBillingApproveRateRoute
+  '/procurement-billing-edit-rate': typeof ProcurementBillingEditRateRoute
+  '/procurement-billing-loan-list': typeof ProcurementBillingLoanListRoute
+  '/procurement-billing-prepare': typeof ProcurementBillingPrepareRoute
+  '/procurement-billing-prepare-v2': typeof ProcurementBillingPrepareV2Route
+  '/procurement-billing-purchase-list': typeof ProcurementBillingPurchaseListRoute
+  '/procurement-billing-supplier-record': typeof ProcurementBillingSupplierRecordRoute
+  '/procurement-billing-supplier-record-list': typeof ProcurementBillingSupplierRecordListRoute
+  '/procurement-billing-vat-tax-entry': typeof ProcurementBillingVatTaxEntryRoute
+  '/procurement-billing-vat-tax-register': typeof ProcurementBillingVatTaxRegisterRoute
+  '/procurement-config-bank-accounts': typeof ProcurementConfigBankAccountsRoute
+  '/procurement-config-bank-info': typeof ProcurementConfigBankInfoRoute
+  '/procurement-config-currency-rate': typeof ProcurementConfigCurrencyRateRoute
+  '/procurement-config-lc-booking': typeof ProcurementConfigLcBookingRoute
+  '/procurement-config-lc-booking-list': typeof ProcurementConfigLcBookingListRoute
+  '/procurement-config-purchase-option': typeof ProcurementConfigPurchaseOptionRoute
+  '/procurement-config-supplier-name': typeof ProcurementConfigSupplierNameRoute
+  '/procurement-config-supplier-opening': typeof ProcurementConfigSupplierOpeningRoute
+  '/procurement-config-terms': typeof ProcurementConfigTermsRoute
+  '/procurement-cs-batch-list': typeof ProcurementCsBatchListRoute
+  '/procurement-cs-create-batch': typeof ProcurementCsCreateBatchRoute
+  '/procurement-cs-create-workorder': typeof ProcurementCsCreateWorkorderRoute
+  '/procurement-cs-supplier-items': typeof ProcurementCsSupplierItemsRoute
+  '/procurement-cs-supplier-price': typeof ProcurementCsSupplierPriceRoute
+  '/procurement-dashboard': typeof ProcurementDashboardRoute
+  '/procurement-payment-bill': typeof ProcurementPaymentBillRoute
+  '/procurement-payment-list': typeof ProcurementPaymentListRoute
+  '/procurement-pi-approve-dc-price': typeof ProcurementPiApproveDcPriceRoute
+  '/procurement-pi-create': typeof ProcurementPiCreateRoute
+  '/procurement-pi-delete-request': typeof ProcurementPiDeleteRequestRoute
+  '/procurement-pi-edit-dc-price': typeof ProcurementPiEditDcPriceRoute
+  '/procurement-pi-list': typeof ProcurementPiListRoute
+  '/procurement-po-list': typeof ProcurementPoListRoute
+  '/procurement-po-new': typeof ProcurementPoNewRoute
+  '/procurement-po-requisition-wise': typeof ProcurementPoRequisitionWiseRoute
+  '/procurement-po-work-order-approval': typeof ProcurementPoWorkOrderApprovalRoute
+  '/procurement-reports-combined-po-statement': typeof ProcurementReportsCombinedPoStatementRoute
+  '/procurement-reports-dnc-rate': typeof ProcurementReportsDncRateRoute
+  '/procurement-reports-payment-statement': typeof ProcurementReportsPaymentStatementRoute
+  '/procurement-reports-purchase-price': typeof ProcurementReportsPurchasePriceRoute
+  '/procurement-reports-yarn-booking-pi': typeof ProcurementReportsYarnBookingPiRoute
   '/propose-increment': typeof ProposeIncrementRoute
   '/recruitment-assessment-list': typeof RecruitmentAssessmentListRoute
   '/recruitment-basic-entry': typeof RecruitmentBasicEntryRoute
@@ -1563,6 +1992,50 @@ export interface FileRouteTypes {
     | '/personnel-approval'
     | '/personnel-list'
     | '/phonebook'
+    | '/procurement-audit-bill'
+    | '/procurement-audit-landed-cost'
+    | '/procurement-audit-mrr'
+    | '/procurement-billing-approve-rate'
+    | '/procurement-billing-edit-rate'
+    | '/procurement-billing-loan-list'
+    | '/procurement-billing-prepare'
+    | '/procurement-billing-prepare-v2'
+    | '/procurement-billing-purchase-list'
+    | '/procurement-billing-supplier-record'
+    | '/procurement-billing-supplier-record-list'
+    | '/procurement-billing-vat-tax-entry'
+    | '/procurement-billing-vat-tax-register'
+    | '/procurement-config-bank-accounts'
+    | '/procurement-config-bank-info'
+    | '/procurement-config-currency-rate'
+    | '/procurement-config-lc-booking'
+    | '/procurement-config-lc-booking-list'
+    | '/procurement-config-purchase-option'
+    | '/procurement-config-supplier-name'
+    | '/procurement-config-supplier-opening'
+    | '/procurement-config-terms'
+    | '/procurement-cs-batch-list'
+    | '/procurement-cs-create-batch'
+    | '/procurement-cs-create-workorder'
+    | '/procurement-cs-supplier-items'
+    | '/procurement-cs-supplier-price'
+    | '/procurement-dashboard'
+    | '/procurement-payment-bill'
+    | '/procurement-payment-list'
+    | '/procurement-pi-approve-dc-price'
+    | '/procurement-pi-create'
+    | '/procurement-pi-delete-request'
+    | '/procurement-pi-edit-dc-price'
+    | '/procurement-pi-list'
+    | '/procurement-po-list'
+    | '/procurement-po-new'
+    | '/procurement-po-requisition-wise'
+    | '/procurement-po-work-order-approval'
+    | '/procurement-reports-combined-po-statement'
+    | '/procurement-reports-dnc-rate'
+    | '/procurement-reports-payment-statement'
+    | '/procurement-reports-purchase-price'
+    | '/procurement-reports-yarn-booking-pi'
     | '/propose-increment'
     | '/recruitment-assessment-list'
     | '/recruitment-basic-entry'
@@ -1720,6 +2193,50 @@ export interface FileRouteTypes {
     | '/personnel-approval'
     | '/personnel-list'
     | '/phonebook'
+    | '/procurement-audit-bill'
+    | '/procurement-audit-landed-cost'
+    | '/procurement-audit-mrr'
+    | '/procurement-billing-approve-rate'
+    | '/procurement-billing-edit-rate'
+    | '/procurement-billing-loan-list'
+    | '/procurement-billing-prepare'
+    | '/procurement-billing-prepare-v2'
+    | '/procurement-billing-purchase-list'
+    | '/procurement-billing-supplier-record'
+    | '/procurement-billing-supplier-record-list'
+    | '/procurement-billing-vat-tax-entry'
+    | '/procurement-billing-vat-tax-register'
+    | '/procurement-config-bank-accounts'
+    | '/procurement-config-bank-info'
+    | '/procurement-config-currency-rate'
+    | '/procurement-config-lc-booking'
+    | '/procurement-config-lc-booking-list'
+    | '/procurement-config-purchase-option'
+    | '/procurement-config-supplier-name'
+    | '/procurement-config-supplier-opening'
+    | '/procurement-config-terms'
+    | '/procurement-cs-batch-list'
+    | '/procurement-cs-create-batch'
+    | '/procurement-cs-create-workorder'
+    | '/procurement-cs-supplier-items'
+    | '/procurement-cs-supplier-price'
+    | '/procurement-dashboard'
+    | '/procurement-payment-bill'
+    | '/procurement-payment-list'
+    | '/procurement-pi-approve-dc-price'
+    | '/procurement-pi-create'
+    | '/procurement-pi-delete-request'
+    | '/procurement-pi-edit-dc-price'
+    | '/procurement-pi-list'
+    | '/procurement-po-list'
+    | '/procurement-po-new'
+    | '/procurement-po-requisition-wise'
+    | '/procurement-po-work-order-approval'
+    | '/procurement-reports-combined-po-statement'
+    | '/procurement-reports-dnc-rate'
+    | '/procurement-reports-payment-statement'
+    | '/procurement-reports-purchase-price'
+    | '/procurement-reports-yarn-booking-pi'
     | '/propose-increment'
     | '/recruitment-assessment-list'
     | '/recruitment-basic-entry'
@@ -1877,6 +2394,50 @@ export interface FileRouteTypes {
     | '/personnel-approval'
     | '/personnel-list'
     | '/phonebook'
+    | '/procurement-audit-bill'
+    | '/procurement-audit-landed-cost'
+    | '/procurement-audit-mrr'
+    | '/procurement-billing-approve-rate'
+    | '/procurement-billing-edit-rate'
+    | '/procurement-billing-loan-list'
+    | '/procurement-billing-prepare'
+    | '/procurement-billing-prepare-v2'
+    | '/procurement-billing-purchase-list'
+    | '/procurement-billing-supplier-record'
+    | '/procurement-billing-supplier-record-list'
+    | '/procurement-billing-vat-tax-entry'
+    | '/procurement-billing-vat-tax-register'
+    | '/procurement-config-bank-accounts'
+    | '/procurement-config-bank-info'
+    | '/procurement-config-currency-rate'
+    | '/procurement-config-lc-booking'
+    | '/procurement-config-lc-booking-list'
+    | '/procurement-config-purchase-option'
+    | '/procurement-config-supplier-name'
+    | '/procurement-config-supplier-opening'
+    | '/procurement-config-terms'
+    | '/procurement-cs-batch-list'
+    | '/procurement-cs-create-batch'
+    | '/procurement-cs-create-workorder'
+    | '/procurement-cs-supplier-items'
+    | '/procurement-cs-supplier-price'
+    | '/procurement-dashboard'
+    | '/procurement-payment-bill'
+    | '/procurement-payment-list'
+    | '/procurement-pi-approve-dc-price'
+    | '/procurement-pi-create'
+    | '/procurement-pi-delete-request'
+    | '/procurement-pi-edit-dc-price'
+    | '/procurement-pi-list'
+    | '/procurement-po-list'
+    | '/procurement-po-new'
+    | '/procurement-po-requisition-wise'
+    | '/procurement-po-work-order-approval'
+    | '/procurement-reports-combined-po-statement'
+    | '/procurement-reports-dnc-rate'
+    | '/procurement-reports-payment-statement'
+    | '/procurement-reports-purchase-price'
+    | '/procurement-reports-yarn-booking-pi'
     | '/propose-increment'
     | '/recruitment-assessment-list'
     | '/recruitment-basic-entry'
@@ -2035,6 +2596,50 @@ export interface RootRouteChildren {
   PersonnelApprovalRoute: typeof PersonnelApprovalRoute
   PersonnelListRoute: typeof PersonnelListRoute
   PhonebookRoute: typeof PhonebookRoute
+  ProcurementAuditBillRoute: typeof ProcurementAuditBillRoute
+  ProcurementAuditLandedCostRoute: typeof ProcurementAuditLandedCostRoute
+  ProcurementAuditMrrRoute: typeof ProcurementAuditMrrRoute
+  ProcurementBillingApproveRateRoute: typeof ProcurementBillingApproveRateRoute
+  ProcurementBillingEditRateRoute: typeof ProcurementBillingEditRateRoute
+  ProcurementBillingLoanListRoute: typeof ProcurementBillingLoanListRoute
+  ProcurementBillingPrepareRoute: typeof ProcurementBillingPrepareRoute
+  ProcurementBillingPrepareV2Route: typeof ProcurementBillingPrepareV2Route
+  ProcurementBillingPurchaseListRoute: typeof ProcurementBillingPurchaseListRoute
+  ProcurementBillingSupplierRecordRoute: typeof ProcurementBillingSupplierRecordRoute
+  ProcurementBillingSupplierRecordListRoute: typeof ProcurementBillingSupplierRecordListRoute
+  ProcurementBillingVatTaxEntryRoute: typeof ProcurementBillingVatTaxEntryRoute
+  ProcurementBillingVatTaxRegisterRoute: typeof ProcurementBillingVatTaxRegisterRoute
+  ProcurementConfigBankAccountsRoute: typeof ProcurementConfigBankAccountsRoute
+  ProcurementConfigBankInfoRoute: typeof ProcurementConfigBankInfoRoute
+  ProcurementConfigCurrencyRateRoute: typeof ProcurementConfigCurrencyRateRoute
+  ProcurementConfigLcBookingRoute: typeof ProcurementConfigLcBookingRoute
+  ProcurementConfigLcBookingListRoute: typeof ProcurementConfigLcBookingListRoute
+  ProcurementConfigPurchaseOptionRoute: typeof ProcurementConfigPurchaseOptionRoute
+  ProcurementConfigSupplierNameRoute: typeof ProcurementConfigSupplierNameRoute
+  ProcurementConfigSupplierOpeningRoute: typeof ProcurementConfigSupplierOpeningRoute
+  ProcurementConfigTermsRoute: typeof ProcurementConfigTermsRoute
+  ProcurementCsBatchListRoute: typeof ProcurementCsBatchListRoute
+  ProcurementCsCreateBatchRoute: typeof ProcurementCsCreateBatchRoute
+  ProcurementCsCreateWorkorderRoute: typeof ProcurementCsCreateWorkorderRoute
+  ProcurementCsSupplierItemsRoute: typeof ProcurementCsSupplierItemsRoute
+  ProcurementCsSupplierPriceRoute: typeof ProcurementCsSupplierPriceRoute
+  ProcurementDashboardRoute: typeof ProcurementDashboardRoute
+  ProcurementPaymentBillRoute: typeof ProcurementPaymentBillRoute
+  ProcurementPaymentListRoute: typeof ProcurementPaymentListRoute
+  ProcurementPiApproveDcPriceRoute: typeof ProcurementPiApproveDcPriceRoute
+  ProcurementPiCreateRoute: typeof ProcurementPiCreateRoute
+  ProcurementPiDeleteRequestRoute: typeof ProcurementPiDeleteRequestRoute
+  ProcurementPiEditDcPriceRoute: typeof ProcurementPiEditDcPriceRoute
+  ProcurementPiListRoute: typeof ProcurementPiListRoute
+  ProcurementPoListRoute: typeof ProcurementPoListRoute
+  ProcurementPoNewRoute: typeof ProcurementPoNewRoute
+  ProcurementPoRequisitionWiseRoute: typeof ProcurementPoRequisitionWiseRoute
+  ProcurementPoWorkOrderApprovalRoute: typeof ProcurementPoWorkOrderApprovalRoute
+  ProcurementReportsCombinedPoStatementRoute: typeof ProcurementReportsCombinedPoStatementRoute
+  ProcurementReportsDncRateRoute: typeof ProcurementReportsDncRateRoute
+  ProcurementReportsPaymentStatementRoute: typeof ProcurementReportsPaymentStatementRoute
+  ProcurementReportsPurchasePriceRoute: typeof ProcurementReportsPurchasePriceRoute
+  ProcurementReportsYarnBookingPiRoute: typeof ProcurementReportsYarnBookingPiRoute
   ProposeIncrementRoute: typeof ProposeIncrementRoute
   RecruitmentAssessmentListRoute: typeof RecruitmentAssessmentListRoute
   RecruitmentBasicEntryRoute: typeof RecruitmentBasicEntryRoute
@@ -2257,6 +2862,314 @@ declare module '@tanstack/react-router' {
       path: '/propose-increment'
       fullPath: '/propose-increment'
       preLoaderRoute: typeof ProposeIncrementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-reports-yarn-booking-pi': {
+      id: '/procurement-reports-yarn-booking-pi'
+      path: '/procurement-reports-yarn-booking-pi'
+      fullPath: '/procurement-reports-yarn-booking-pi'
+      preLoaderRoute: typeof ProcurementReportsYarnBookingPiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-reports-purchase-price': {
+      id: '/procurement-reports-purchase-price'
+      path: '/procurement-reports-purchase-price'
+      fullPath: '/procurement-reports-purchase-price'
+      preLoaderRoute: typeof ProcurementReportsPurchasePriceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-reports-payment-statement': {
+      id: '/procurement-reports-payment-statement'
+      path: '/procurement-reports-payment-statement'
+      fullPath: '/procurement-reports-payment-statement'
+      preLoaderRoute: typeof ProcurementReportsPaymentStatementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-reports-dnc-rate': {
+      id: '/procurement-reports-dnc-rate'
+      path: '/procurement-reports-dnc-rate'
+      fullPath: '/procurement-reports-dnc-rate'
+      preLoaderRoute: typeof ProcurementReportsDncRateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-reports-combined-po-statement': {
+      id: '/procurement-reports-combined-po-statement'
+      path: '/procurement-reports-combined-po-statement'
+      fullPath: '/procurement-reports-combined-po-statement'
+      preLoaderRoute: typeof ProcurementReportsCombinedPoStatementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-po-work-order-approval': {
+      id: '/procurement-po-work-order-approval'
+      path: '/procurement-po-work-order-approval'
+      fullPath: '/procurement-po-work-order-approval'
+      preLoaderRoute: typeof ProcurementPoWorkOrderApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-po-requisition-wise': {
+      id: '/procurement-po-requisition-wise'
+      path: '/procurement-po-requisition-wise'
+      fullPath: '/procurement-po-requisition-wise'
+      preLoaderRoute: typeof ProcurementPoRequisitionWiseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-po-new': {
+      id: '/procurement-po-new'
+      path: '/procurement-po-new'
+      fullPath: '/procurement-po-new'
+      preLoaderRoute: typeof ProcurementPoNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-po-list': {
+      id: '/procurement-po-list'
+      path: '/procurement-po-list'
+      fullPath: '/procurement-po-list'
+      preLoaderRoute: typeof ProcurementPoListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-pi-list': {
+      id: '/procurement-pi-list'
+      path: '/procurement-pi-list'
+      fullPath: '/procurement-pi-list'
+      preLoaderRoute: typeof ProcurementPiListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-pi-edit-dc-price': {
+      id: '/procurement-pi-edit-dc-price'
+      path: '/procurement-pi-edit-dc-price'
+      fullPath: '/procurement-pi-edit-dc-price'
+      preLoaderRoute: typeof ProcurementPiEditDcPriceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-pi-delete-request': {
+      id: '/procurement-pi-delete-request'
+      path: '/procurement-pi-delete-request'
+      fullPath: '/procurement-pi-delete-request'
+      preLoaderRoute: typeof ProcurementPiDeleteRequestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-pi-create': {
+      id: '/procurement-pi-create'
+      path: '/procurement-pi-create'
+      fullPath: '/procurement-pi-create'
+      preLoaderRoute: typeof ProcurementPiCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-pi-approve-dc-price': {
+      id: '/procurement-pi-approve-dc-price'
+      path: '/procurement-pi-approve-dc-price'
+      fullPath: '/procurement-pi-approve-dc-price'
+      preLoaderRoute: typeof ProcurementPiApproveDcPriceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-payment-list': {
+      id: '/procurement-payment-list'
+      path: '/procurement-payment-list'
+      fullPath: '/procurement-payment-list'
+      preLoaderRoute: typeof ProcurementPaymentListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-payment-bill': {
+      id: '/procurement-payment-bill'
+      path: '/procurement-payment-bill'
+      fullPath: '/procurement-payment-bill'
+      preLoaderRoute: typeof ProcurementPaymentBillRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-dashboard': {
+      id: '/procurement-dashboard'
+      path: '/procurement-dashboard'
+      fullPath: '/procurement-dashboard'
+      preLoaderRoute: typeof ProcurementDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-cs-supplier-price': {
+      id: '/procurement-cs-supplier-price'
+      path: '/procurement-cs-supplier-price'
+      fullPath: '/procurement-cs-supplier-price'
+      preLoaderRoute: typeof ProcurementCsSupplierPriceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-cs-supplier-items': {
+      id: '/procurement-cs-supplier-items'
+      path: '/procurement-cs-supplier-items'
+      fullPath: '/procurement-cs-supplier-items'
+      preLoaderRoute: typeof ProcurementCsSupplierItemsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-cs-create-workorder': {
+      id: '/procurement-cs-create-workorder'
+      path: '/procurement-cs-create-workorder'
+      fullPath: '/procurement-cs-create-workorder'
+      preLoaderRoute: typeof ProcurementCsCreateWorkorderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-cs-create-batch': {
+      id: '/procurement-cs-create-batch'
+      path: '/procurement-cs-create-batch'
+      fullPath: '/procurement-cs-create-batch'
+      preLoaderRoute: typeof ProcurementCsCreateBatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-cs-batch-list': {
+      id: '/procurement-cs-batch-list'
+      path: '/procurement-cs-batch-list'
+      fullPath: '/procurement-cs-batch-list'
+      preLoaderRoute: typeof ProcurementCsBatchListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-config-terms': {
+      id: '/procurement-config-terms'
+      path: '/procurement-config-terms'
+      fullPath: '/procurement-config-terms'
+      preLoaderRoute: typeof ProcurementConfigTermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-config-supplier-opening': {
+      id: '/procurement-config-supplier-opening'
+      path: '/procurement-config-supplier-opening'
+      fullPath: '/procurement-config-supplier-opening'
+      preLoaderRoute: typeof ProcurementConfigSupplierOpeningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-config-supplier-name': {
+      id: '/procurement-config-supplier-name'
+      path: '/procurement-config-supplier-name'
+      fullPath: '/procurement-config-supplier-name'
+      preLoaderRoute: typeof ProcurementConfigSupplierNameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-config-purchase-option': {
+      id: '/procurement-config-purchase-option'
+      path: '/procurement-config-purchase-option'
+      fullPath: '/procurement-config-purchase-option'
+      preLoaderRoute: typeof ProcurementConfigPurchaseOptionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-config-lc-booking-list': {
+      id: '/procurement-config-lc-booking-list'
+      path: '/procurement-config-lc-booking-list'
+      fullPath: '/procurement-config-lc-booking-list'
+      preLoaderRoute: typeof ProcurementConfigLcBookingListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-config-lc-booking': {
+      id: '/procurement-config-lc-booking'
+      path: '/procurement-config-lc-booking'
+      fullPath: '/procurement-config-lc-booking'
+      preLoaderRoute: typeof ProcurementConfigLcBookingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-config-currency-rate': {
+      id: '/procurement-config-currency-rate'
+      path: '/procurement-config-currency-rate'
+      fullPath: '/procurement-config-currency-rate'
+      preLoaderRoute: typeof ProcurementConfigCurrencyRateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-config-bank-info': {
+      id: '/procurement-config-bank-info'
+      path: '/procurement-config-bank-info'
+      fullPath: '/procurement-config-bank-info'
+      preLoaderRoute: typeof ProcurementConfigBankInfoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-config-bank-accounts': {
+      id: '/procurement-config-bank-accounts'
+      path: '/procurement-config-bank-accounts'
+      fullPath: '/procurement-config-bank-accounts'
+      preLoaderRoute: typeof ProcurementConfigBankAccountsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-billing-vat-tax-register': {
+      id: '/procurement-billing-vat-tax-register'
+      path: '/procurement-billing-vat-tax-register'
+      fullPath: '/procurement-billing-vat-tax-register'
+      preLoaderRoute: typeof ProcurementBillingVatTaxRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-billing-vat-tax-entry': {
+      id: '/procurement-billing-vat-tax-entry'
+      path: '/procurement-billing-vat-tax-entry'
+      fullPath: '/procurement-billing-vat-tax-entry'
+      preLoaderRoute: typeof ProcurementBillingVatTaxEntryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-billing-supplier-record-list': {
+      id: '/procurement-billing-supplier-record-list'
+      path: '/procurement-billing-supplier-record-list'
+      fullPath: '/procurement-billing-supplier-record-list'
+      preLoaderRoute: typeof ProcurementBillingSupplierRecordListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-billing-supplier-record': {
+      id: '/procurement-billing-supplier-record'
+      path: '/procurement-billing-supplier-record'
+      fullPath: '/procurement-billing-supplier-record'
+      preLoaderRoute: typeof ProcurementBillingSupplierRecordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-billing-purchase-list': {
+      id: '/procurement-billing-purchase-list'
+      path: '/procurement-billing-purchase-list'
+      fullPath: '/procurement-billing-purchase-list'
+      preLoaderRoute: typeof ProcurementBillingPurchaseListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-billing-prepare-v2': {
+      id: '/procurement-billing-prepare-v2'
+      path: '/procurement-billing-prepare-v2'
+      fullPath: '/procurement-billing-prepare-v2'
+      preLoaderRoute: typeof ProcurementBillingPrepareV2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-billing-prepare': {
+      id: '/procurement-billing-prepare'
+      path: '/procurement-billing-prepare'
+      fullPath: '/procurement-billing-prepare'
+      preLoaderRoute: typeof ProcurementBillingPrepareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-billing-loan-list': {
+      id: '/procurement-billing-loan-list'
+      path: '/procurement-billing-loan-list'
+      fullPath: '/procurement-billing-loan-list'
+      preLoaderRoute: typeof ProcurementBillingLoanListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-billing-edit-rate': {
+      id: '/procurement-billing-edit-rate'
+      path: '/procurement-billing-edit-rate'
+      fullPath: '/procurement-billing-edit-rate'
+      preLoaderRoute: typeof ProcurementBillingEditRateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-billing-approve-rate': {
+      id: '/procurement-billing-approve-rate'
+      path: '/procurement-billing-approve-rate'
+      fullPath: '/procurement-billing-approve-rate'
+      preLoaderRoute: typeof ProcurementBillingApproveRateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-audit-mrr': {
+      id: '/procurement-audit-mrr'
+      path: '/procurement-audit-mrr'
+      fullPath: '/procurement-audit-mrr'
+      preLoaderRoute: typeof ProcurementAuditMrrRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-audit-landed-cost': {
+      id: '/procurement-audit-landed-cost'
+      path: '/procurement-audit-landed-cost'
+      fullPath: '/procurement-audit-landed-cost'
+      preLoaderRoute: typeof ProcurementAuditLandedCostRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-audit-bill': {
+      id: '/procurement-audit-bill'
+      path: '/procurement-audit-bill'
+      fullPath: '/procurement-audit-bill'
+      preLoaderRoute: typeof ProcurementAuditBillRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/phonebook': {
@@ -3284,6 +4197,53 @@ const rootRouteChildren: RootRouteChildren = {
   PersonnelApprovalRoute: PersonnelApprovalRoute,
   PersonnelListRoute: PersonnelListRoute,
   PhonebookRoute: PhonebookRoute,
+  ProcurementAuditBillRoute: ProcurementAuditBillRoute,
+  ProcurementAuditLandedCostRoute: ProcurementAuditLandedCostRoute,
+  ProcurementAuditMrrRoute: ProcurementAuditMrrRoute,
+  ProcurementBillingApproveRateRoute: ProcurementBillingApproveRateRoute,
+  ProcurementBillingEditRateRoute: ProcurementBillingEditRateRoute,
+  ProcurementBillingLoanListRoute: ProcurementBillingLoanListRoute,
+  ProcurementBillingPrepareRoute: ProcurementBillingPrepareRoute,
+  ProcurementBillingPrepareV2Route: ProcurementBillingPrepareV2Route,
+  ProcurementBillingPurchaseListRoute: ProcurementBillingPurchaseListRoute,
+  ProcurementBillingSupplierRecordRoute: ProcurementBillingSupplierRecordRoute,
+  ProcurementBillingSupplierRecordListRoute:
+    ProcurementBillingSupplierRecordListRoute,
+  ProcurementBillingVatTaxEntryRoute: ProcurementBillingVatTaxEntryRoute,
+  ProcurementBillingVatTaxRegisterRoute: ProcurementBillingVatTaxRegisterRoute,
+  ProcurementConfigBankAccountsRoute: ProcurementConfigBankAccountsRoute,
+  ProcurementConfigBankInfoRoute: ProcurementConfigBankInfoRoute,
+  ProcurementConfigCurrencyRateRoute: ProcurementConfigCurrencyRateRoute,
+  ProcurementConfigLcBookingRoute: ProcurementConfigLcBookingRoute,
+  ProcurementConfigLcBookingListRoute: ProcurementConfigLcBookingListRoute,
+  ProcurementConfigPurchaseOptionRoute: ProcurementConfigPurchaseOptionRoute,
+  ProcurementConfigSupplierNameRoute: ProcurementConfigSupplierNameRoute,
+  ProcurementConfigSupplierOpeningRoute: ProcurementConfigSupplierOpeningRoute,
+  ProcurementConfigTermsRoute: ProcurementConfigTermsRoute,
+  ProcurementCsBatchListRoute: ProcurementCsBatchListRoute,
+  ProcurementCsCreateBatchRoute: ProcurementCsCreateBatchRoute,
+  ProcurementCsCreateWorkorderRoute: ProcurementCsCreateWorkorderRoute,
+  ProcurementCsSupplierItemsRoute: ProcurementCsSupplierItemsRoute,
+  ProcurementCsSupplierPriceRoute: ProcurementCsSupplierPriceRoute,
+  ProcurementDashboardRoute: ProcurementDashboardRoute,
+  ProcurementPaymentBillRoute: ProcurementPaymentBillRoute,
+  ProcurementPaymentListRoute: ProcurementPaymentListRoute,
+  ProcurementPiApproveDcPriceRoute: ProcurementPiApproveDcPriceRoute,
+  ProcurementPiCreateRoute: ProcurementPiCreateRoute,
+  ProcurementPiDeleteRequestRoute: ProcurementPiDeleteRequestRoute,
+  ProcurementPiEditDcPriceRoute: ProcurementPiEditDcPriceRoute,
+  ProcurementPiListRoute: ProcurementPiListRoute,
+  ProcurementPoListRoute: ProcurementPoListRoute,
+  ProcurementPoNewRoute: ProcurementPoNewRoute,
+  ProcurementPoRequisitionWiseRoute: ProcurementPoRequisitionWiseRoute,
+  ProcurementPoWorkOrderApprovalRoute: ProcurementPoWorkOrderApprovalRoute,
+  ProcurementReportsCombinedPoStatementRoute:
+    ProcurementReportsCombinedPoStatementRoute,
+  ProcurementReportsDncRateRoute: ProcurementReportsDncRateRoute,
+  ProcurementReportsPaymentStatementRoute:
+    ProcurementReportsPaymentStatementRoute,
+  ProcurementReportsPurchasePriceRoute: ProcurementReportsPurchasePriceRoute,
+  ProcurementReportsYarnBookingPiRoute: ProcurementReportsYarnBookingPiRoute,
   ProposeIncrementRoute: ProposeIncrementRoute,
   RecruitmentAssessmentListRoute: RecruitmentAssessmentListRoute,
   RecruitmentBasicEntryRoute: RecruitmentBasicEntryRoute,

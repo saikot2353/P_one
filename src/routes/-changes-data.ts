@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "258",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Procurement Management Module",
+    link: "/procurement-dashboard",
+    descriptionEn: "Created the new Procurement Management module, including custom ProcurementSidebar, ProcurementTopbar, 45 individual static route files, and a rich graphical overview dashboard equipped with Recharts trends (spend and payouts), allocation splits, and comprehensive performance metrics.",
+    descriptionBn: "নতুন প্রকিউরমেন্ট ম্যানেজমেন্ট মডিউল তৈরি করা হয়েছে, যার মধ্যে রয়েছে কাস্টম প্রকিউরমেন্ট সাইডবার, প্রকিউরমেন্ট টপবার, ৪৫টি পৃথক স্ট্যাটিক রাউট পেইজ এবং রিচার্টস (Recharts) গ্রাফিক্যাল ট্রেন্ড অ্যানালিটিকস, ক্যাটাগরি স্পেন্ড অ্যালোকেশন এবং প্রিমিয়াম পারফরম্যান্স মেট্রিক্স সমৃদ্ধ একটি আকর্ষনীয় ড্যাশবোর্ড লেআউট।",
+  },
+  {
     id: "257",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Update",
