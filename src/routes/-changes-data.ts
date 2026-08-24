@@ -2598,4 +2598,13 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     descriptionEn: "Added a new Notice Board route page and sidebar navigation links. Features a live search directory of notices, rich text circular content configurations using jodit-react, circular format exports, and a premium official letterhead document circular view overlay.",
     descriptionBn: "একটি নতুন Notice Board পেজ এবং সাইডবার নেভিগেশন লিংক যুক্ত করা হয়েছে। পেজটিতে নোটিসের লাইভ সার্চ ডিরেক্টরি, jodit-react এর মাধ্যমে রিচ টেক্সট সার্কুলার কনফিগারেশন, বিভিন্ন সার্কুলার ফাইল এক্সপোর্ট এবং একটি আধুনিক কর্পোরেট লেটারহেড ডকুমেন্টের মাধ্যমে সার্কুলার ভিউ ওভারলে যুক্ত করা হয়েছে।",
   },
+  {
+    id: "258",
+    date: "2026-08-24T15:40",
+    type: "UI Update",
+    module: "Employee Job Card",
+    link: "/employee-job-card",
+    descriptionEn: "Redesigned Employee Job Card with modern header styling and repositioned Attendance Summary Panel. Rebuilt top filter cards and statistics grids.",
+    descriptionBn: "এমপ্লয়ি জব কার্ড পেজটিকে নতুনভাবে ডিজাইন করা হয়েছে, যার মধ্যে আধুনিক হেডার স্টাইলিং এবং অ্যাটেনডেন্স সামারি প্যানেলটি পুনরায় পজিশন করা অন্তর্ভুক্ত।",
+  },
 ];

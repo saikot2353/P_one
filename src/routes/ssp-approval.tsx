@@ -771,55 +771,69 @@ function SSPApprovalPage() {
             {/* Modal Body */}
             <div className="flex-1 overflow-y-auto p-6 space-y-5 bg-[#f8fafc]/40 dark:bg-slate-950/20">
               
-              {/* REQUESTER & REQUEST FOR Section (2nd Image design) */}
+              {/* REQUESTER & REQUEST FOR Section (Redesigned) */}
               <div className="bg-[#fcfdfd] dark:bg-slate-900 border border-slate-200/80 rounded-xl p-5 shadow-2xs grid grid-cols-1 md:grid-cols-2 gap-6 relative text-slate-700 dark:text-slate-200">
-                {/* Column 1: Requester Details */}
-                <div>
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-750 dark:text-slate-350 uppercase tracking-widest mb-3">
-                    <User className="size-3.5 text-blue-600 dark:text-blue-400" />
-                    REQUESTER:
+                {/* Column 1: Requester Profile Card */}
+                <div className="flex flex-col justify-between">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-750 dark:text-slate-350 uppercase tracking-widest">
+                      <User className="size-3.5 text-blue-600 dark:text-blue-400" />
+                      Requester Profile
+                    </div>
+
+                    <div className="flex items-start gap-4">
+                      {/* Premium Avatar */}
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center text-sm font-black shadow-sm uppercase shrink-0 border border-blue-200 dark:border-blue-900">
+                        {selectedReq.requestor.slice(0, 2)}
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h4 className="text-sm font-extrabold text-slate-800 dark:text-slate-100">
+                            {selectedReq.requestor}
+                          </h4>
+                          <span className="inline-flex items-center px-2 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900 rounded text-[9px] font-bold">
+                            {selectedReq.details.designation}
+                          </span>
+                        </div>
+                        
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold space-y-0.5">
+                          <div>ID: <strong className="text-slate-700 dark:text-slate-200">{selectedReq.details.empId}</strong></div>
+                          <div>DOJ: <strong className="text-slate-700 dark:text-slate-200">{selectedReq.details.doj}</strong></div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-450">
-                    <h4 className="text-[14px] font-extrabold text-slate-800 dark:text-slate-100 mb-2">
-                      {selectedReq.requestor}
-                    </h4>
-                    <div className="grid grid-cols-[80px_1fr] gap-x-2 gap-y-1 font-semibold text-[11px]">
-                      <span className="text-slate-400">Emp Id:</span>
-                      <span className="text-slate-700 dark:text-slate-200 font-bold">{selectedReq.details.empId}</span>
 
-                      <span className="text-slate-400">DOJ:</span>
-                      <span className="text-slate-700 dark:text-slate-200 font-bold">{selectedReq.details.doj}</span>
-
-                      <span className="text-slate-400">Designation:</span>
-                      <span className="text-slate-700 dark:text-slate-200 font-bold">{selectedReq.details.designation}</span>
-
-                      <span className="text-slate-400">Section:</span>
-                      <span className="text-slate-700 dark:text-slate-200 font-bold">{selectedReq.details.section}</span>
-
-                      <span className="text-slate-400">Dept:</span>
-                      <span className="text-slate-700 dark:text-slate-200 font-bold">{selectedReq.department}</span>
-                    </div>
-                    <div className="text-slate-600 dark:text-slate-300 font-bold text-[11px] mt-3 pt-2 border-t border-slate-100 dark:border-slate-800">
-                      {selectedReq.details.location}
-                    </div>
+                  <div className="text-slate-500 dark:text-slate-400 font-semibold text-[10.5px] mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center gap-1.5">
+                    <MapPin className="size-3.5 text-slate-400" />
+                    <span>{selectedReq.details.location}</span>
                   </div>
                 </div>
 
-                {/* Column 2: Request For Details */}
-                <div className="border-t md:border-t-0 md:border-l border-slate-100 dark:border-slate-800 pt-5 md:pt-0 md:pl-6">
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-750 dark:text-slate-350 uppercase tracking-widest mb-3">
-                    <Building className="size-3.5 text-indigo-600 dark:text-indigo-400" />
-                    REQUEST FOR:
+                {/* Column 2: Request Scope Details */}
+                <div className="border-t md:border-t-0 md:border-l border-slate-100 dark:border-slate-800 pt-5 md:pt-0 md:pl-6 flex flex-col justify-between">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-750 dark:text-slate-350 uppercase tracking-widest">
+                      <Building className="size-3.5 text-indigo-600 dark:text-indigo-400" />
+                      Request Parameters
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-3 bg-slate-50/50 dark:bg-slate-950/30 border border-slate-100 dark:border-slate-800 rounded-lg">
+                        <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">DEPARTMENT</span>
+                        <strong className="text-xs text-slate-700 dark:text-slate-200 font-bold">{selectedReq.department}</strong>
+                      </div>
+                      
+                      <div className="p-3 bg-slate-50/50 dark:bg-slate-950/30 border border-slate-100 dark:border-slate-800 rounded-lg">
+                        <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">SECTION</span>
+                        <strong className="text-xs text-slate-700 dark:text-slate-200 font-bold">{selectedReq.details.section}</strong>
+                      </div>
+                    </div>
                   </div>
-                  <div className="divide-y divide-slate-100 dark:divide-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-450 text-slate-700 dark:text-slate-200">
-                    <div className="flex justify-between items-center py-2.5">
-                      <span className="text-slate-400">Department:</span>
-                      <span className="text-slate-750 dark:text-slate-150 font-bold">{selectedReq.department}</span>
-                    </div>
-                    <div className="flex justify-between items-center py-2.5">
-                      <span className="text-slate-400">Section:</span>
-                      <span className="text-slate-750 dark:text-slate-150 font-bold">{selectedReq.details.section}</span>
-                    </div>
+
+                  <div className="text-slate-400 dark:text-slate-500 text-[10px] font-bold mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/60 leading-tight">
+                    This requisition is queued under boundary limits.
                   </div>
                 </div>
               </div>

@@ -330,6 +330,17 @@ const formatDateLabel = (dateStr: string) => {
   });
 };
 
+const formatDateFriendly = (dateStr: string) => {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
+  return date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+};
+
 const formatDateRangeDisplay = (startStr: string, endStr: string) => {
   const format = (str: string) => {
     if (!str) return "";
@@ -659,7 +670,7 @@ function EmployeeJobCardPage() {
 
         <div className="p-4 md:p-6 space-y-2">
           {/* Breadcrumbs and Title */}
-          <div className="bg-card rounded-2xl border border-border/80 p-4 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
             <div>
               <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1">
                 <Link to="/" className="hover:text-primary transition-colors">
@@ -670,18 +681,8 @@ function EmployeeJobCardPage() {
                 <ChevronRight className="size-2.5" />
                 <span className="text-primary font-extrabold">Employee Job Card</span>
               </div>
-              <h1 className="text-xl md:text-2xl font-black text-foreground flex items-center gap-2">
-                <div className="p-1.5 bg-primary/10 rounded-lg border border-primary/20 text-primary">
-                  <Fingerprint className="size-5 text-primary animate-pulse" />
-                </div>
-                <span>Employee Job Card</span>
-              </h1>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10.5px] font-black text-primary bg-primary/10 px-3 py-1.5 rounded-xl border border-primary/20 shadow-xs">
-                Active Selection: {multiEmpIds.length} Emps / {startDate} to {endDate}
-              </span>
-            </div>
+            {/* Active Selection Badge Removed */}
           </div>
 
           {/* Top Panel: Criteria Selection */}
@@ -828,138 +829,102 @@ function EmployeeJobCardPage() {
 
           {/* Cyan/Blue Gradient separator line */}
           <div className="h-0.5 w-full bg-gradient-to-r from-cyan-400 to-blue-600 rounded-full my-2"></div>
-
-          {/* Employee Profile Summary Card */}
+          {/* Employee Profile Summary Card (Unified split layout with 4 parameters columns) */}
           {activeEmpId && employeeDb[activeEmpId] && (
-            <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-extrabold shadow-xs uppercase">
-                  {employeeDb[activeEmpId].name.slice(0, 2)}
+            <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col lg:flex-row items-center gap-6 relative overflow-hidden text-slate-700 dark:text-slate-200">
+              {/* Left Accent border */}
+              <div className="absolute left-0 inset-y-0 w-[4px] bg-gradient-to-b from-blue-600 to-indigo-600 hidden lg:block" />
+
+              {/* Left Profile Section */}
+              <div className="w-full lg:w-auto flex items-center gap-4 lg:border-r lg:border-border/40 lg:pr-6 shrink-0 min-w-[320px]">
+                {/* Avatar with Blue Gradient */}
+                <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center text-sm font-black shadow-md border-2 border-white dark:border-slate-800 uppercase shrink-0">
+                  {employeeDb[activeEmpId].name.split(" ").map((n: string) => n[0]).join("").substring(0, 2).toUpperCase()}
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-1 text-left">
+                  <div className="flex items-center gap-1.5 text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest">
+                    <span>JOB CARD PERIOD:</span>
+                    <span className="font-mono text-foreground/80 font-bold">{formatDateRangeDisplay(startDate, endDate)}</span>
+                  </div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm font-black text-foreground uppercase">{employeeDb[activeEmpId].name}</h3>
-                    <span className="px-2.5 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900 rounded-md text-[10px] font-bold">
+                    <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900 rounded-md text-[10px] font-bold">
                       {employeeDb[activeEmpId].jobTitle}
                     </span>
                   </div>
-                  <div className="text-[11px] text-muted-foreground flex items-center gap-2">
+                  <div className="text-[11px] text-muted-foreground flex items-center gap-2 font-semibold">
                     <span>ID: <strong className="text-foreground/80">{activeEmpId}</strong></span>
                     <span className="text-muted-foreground/30">|</span>
-                    <span className="flex items-center gap-1 font-semibold text-foreground/85">
+                    <span className="flex items-center gap-1">
                       <User className="size-3 text-muted-foreground/60" /> {employeeDb[activeEmpId].manager || "Manager"}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Job Card Period Badge */}
-              <div className="flex items-center gap-3 px-4 py-2 border border-border/60 bg-muted/20 dark:bg-slate-900/10 rounded-xl">
-                <FileSpreadsheet className="size-4.5 text-blue-500" />
-                <div className="text-left">
-                  <div className="text-[8px] font-black text-muted-foreground uppercase tracking-wider">JOB CARD PERIOD</div>
-                  <div className="text-[10.5px] font-black text-foreground">
-                    {formatDateRangeDisplay(startDate, endDate)}
+              {/* Right Details Section (Vertically centered parameters) */}
+              <div className="w-full flex items-center">
+                {/* Parameters Grid (4 Columns) */}
+                <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-left">
+                  {/* Dept */}
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl border border-border/60 bg-muted/40 dark:bg-slate-900/30 flex items-center justify-center text-muted-foreground shrink-0 shadow-3xs">
+                      <Building className="size-4 text-slate-500 dark:text-slate-400" />
+                    </div>
+                    <div>
+                      <span className="text-[8px] font-black text-muted-foreground/75 uppercase tracking-wider block">DEPARTMENT / UNIT</span>
+                      <strong className="text-[11px] text-foreground font-bold block">{employeeDb[activeEmpId].unit}</strong>
+                      <span className="text-[10px] text-muted-foreground block">{employeeDb[activeEmpId].subDept}</span>
+                    </div>
+                  </div>
+
+                  {/* Shift */}
+                  <div className="flex items-center gap-3 border-l-0 sm:border-l border-border/35 sm:pl-4">
+                    <div className="w-9 h-9 rounded-xl border border-border/60 bg-muted/40 dark:bg-slate-900/30 flex items-center justify-center text-muted-foreground shrink-0 shadow-3xs">
+                      <Clock className="size-4 text-slate-500 dark:text-slate-400" />
+                    </div>
+                    <div>
+                      <span className="text-[8px] font-black text-muted-foreground/75 uppercase tracking-wider block">SHIFT NAME</span>
+                      <strong className="text-[11px] text-foreground font-bold block">{employeeDb[activeEmpId].shift}</strong>
+                      <span className="text-[10px] text-muted-foreground block">Since {employeeDb[activeEmpId].shiftStartDate}</span>
+                    </div>
+                  </div>
+
+                  {/* Break & Holiday */}
+                  <div className="flex items-center gap-3 border-l-0 md:border-l border-border/35 md:pl-4">
+                    <div className="w-9 h-9 rounded-xl border border-border/60 bg-muted/40 dark:bg-slate-900/30 flex items-center justify-center text-muted-foreground shrink-0 shadow-3xs">
+                      <Coffee className="size-4 text-slate-500 dark:text-slate-400" />
+                    </div>
+                    <div>
+                      <span className="text-[8px] font-black text-muted-foreground/75 uppercase tracking-wider block">BREAK & HOLIDAY</span>
+                      <strong className="text-[11px] text-foreground font-bold block">Break: 1 Hour</strong>
+                      <span className="text-[10px] text-muted-foreground block">Holiday: {employeeDb[activeEmpId].defaultHoliday}</span>
+                    </div>
+                  </div>
+
+                  {/* Joining */}
+                  <div className="flex items-center gap-3 border-l-0 md:border-l border-border/35 md:pl-4">
+                    <div className="w-9 h-9 rounded-xl border border-border/60 bg-muted/40 dark:bg-slate-900/30 flex items-center justify-center text-muted-foreground shrink-0 shadow-3xs">
+                      <Calendar className="size-4 text-slate-500 dark:text-slate-400" />
+                    </div>
+                    <div>
+                      <span className="text-[8px] font-black text-muted-foreground/75 uppercase tracking-wider block">JOINING DATE</span>
+                      <strong className="text-[11px] text-foreground font-bold block">{employeeDb[activeEmpId].shiftStartDate}</strong>
+                      <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-extrabold block">Verified Employee</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Stat Cards Grid */}
-          {activeEmpId && employeeDb[activeEmpId] && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Card 1: Department/Unit */}
-              <div className="p-4 bg-card rounded-2xl border border-border/80 flex items-center gap-3.5 shadow-xs">
-                <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-100/50 dark:border-blue-900/30">
-                  <Building className="size-4.5" />
-                </div>
-                <div className="text-left">
-                  <span className="text-[9px] font-black text-muted-foreground uppercase tracking-wider block">DEPARTMENT / UNIT</span>
-                  <strong className="text-[11.5px] text-foreground block mt-0.5">{employeeDb[activeEmpId].unit}</strong>
-                  <span className="text-[10px] text-muted-foreground block">{employeeDb[activeEmpId].subDept}</span>
-                </div>
-              </div>
-
-              {/* Card 2: Shift Name */}
-              <div className="p-4 bg-card rounded-2xl border border-border/80 flex items-center gap-3.5 shadow-xs">
-                <div className="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border border-purple-100/50 dark:border-purple-900/30">
-                  <Clock className="size-4.5" />
-                </div>
-                <div className="text-left">
-                  <span className="text-[9px] font-black text-muted-foreground uppercase tracking-wider block">SHIFT NAME</span>
-                  <strong className="text-[11.5px] text-foreground block mt-0.5">{employeeDb[activeEmpId].shift}</strong>
-                  <span className="text-[10px] text-muted-foreground block">Since {employeeDb[activeEmpId].shiftStartDate}</span>
-                </div>
-              </div>
-
-              {/* Card 3: Break & Holiday */}
-              <div className="p-4 bg-card rounded-2xl border border-border/80 flex items-center gap-3.5 shadow-xs">
-                <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-100/50 dark:border-amber-900/30">
-                  <Coffee className="size-4.5" />
-                </div>
-                <div className="text-left">
-                  <span className="text-[9px] font-black text-muted-foreground uppercase tracking-wider block">BREAK & HOLIDAY</span>
-                  <strong className="text-[11.5px] text-foreground block mt-0.5">Break: 1 Hour</strong>
-                  <span className="text-[10px] text-muted-foreground block">Holiday: {employeeDb[activeEmpId].defaultHoliday}</span>
-                </div>
-              </div>
-
-              {/* Card 4: Joining Date */}
-              <div className="p-4 bg-card rounded-2xl border border-border/80 flex items-center gap-3.5 shadow-xs">
-                <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100/50 dark:border-emerald-900/30">
-                  <Calendar className="size-4.5" />
-                </div>
-                <div className="text-left">
-                  <span className="text-[9px] font-black text-muted-foreground uppercase tracking-wider block">JOINING DATE</span>
-                  <strong className="text-[11.5px] text-foreground block mt-0.5">{employeeDb[activeEmpId].shiftStartDate}</strong>
-                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 block font-bold">Verified Employee</span>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Spreadsheet Datagrid Card */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
-            {/* Utilities Toolbar & Search */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/35 pb-4 print:hidden">
-              {/* Text Query Filter */}
-              <div className="relative w-full sm:w-72">
-                <Search className="size-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search by ID, Name, Date.."
-                  className="w-full h-9 pl-9.5 pr-4 rounded-xl bg-muted border border-border/40 focus:border-primary focus:bg-card focus:ring-1 focus:ring-primary/20 outline-none text-xs font-bold transition duration-200"
-                />
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex items-center gap-2 select-none self-end sm:self-auto">
-                <button className="h-9 px-4 rounded-xl border border-emerald-200 dark:border-emerald-900/35 bg-emerald-50/30 dark:bg-emerald-950/10 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 font-black text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 transition shadow-3xs cursor-pointer">
-                  <FileSpreadsheet className="size-3.5 text-emerald-500" />
-                  <span>EXCEL</span>
-                </button>
-                <button
-                  onClick={handlePrint}
-                  className="h-9 px-4 rounded-xl border border-blue-200 dark:border-blue-900/35 bg-blue-50/30 dark:bg-blue-950/10 hover:bg-blue-50 dark:hover:bg-blue-950/20 font-black text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1.5 transition shadow-3xs cursor-pointer"
-                >
-                  <Printer className="size-3.5 text-blue-500" />
-                  <span>PRINT</span>
-                </button>
-                <button className="h-9 px-4 rounded-xl border border-rose-200 dark:border-rose-900/35 bg-rose-50/30 dark:bg-rose-950/10 hover:bg-rose-50 dark:hover:bg-rose-950/20 font-black text-xs text-rose-600 dark:text-rose-400 flex items-center gap-1.5 transition shadow-3xs cursor-pointer">
-                  <FileDown className="size-3.5 text-rose-500" />
-                  <span>PDF</span>
-                </button>
-              </div>
-            </div>
-
+          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-6">
             {/* High-Fidelity Spreadsheet Data Table */}
             <div className="overflow-x-auto border border-border/50 rounded-xl max-h-[55vh] print:max-h-none print:border-none font-sans">
               <table className="w-full min-w-[950px] border-collapse text-[11px] text-left">
-                <thead>
-                  <tr className="bg-[#f8fafc] dark:bg-[#0f172a] text-[#475569] dark:text-slate-400 font-extrabold border-b border-border/50 select-none whitespace-nowrap text-[10.5px]">
+                <thead className="sticky top-0 z-10 bg-card">
+                  <tr className="bg-[#f8fafc] dark:bg-[#0f172a] text-[#475569] dark:text-slate-400 font-extrabold select-none whitespace-nowrap text-[10.5px] border-b border-border/50">
                     <th className="px-4 py-3 text-center w-12 border-r border-border/30">
                       SL
                     </th>
@@ -1117,16 +1082,6 @@ function EmployeeJobCardPage() {
               </span>
 
               <div className="flex items-center gap-4">
-                {/* PDF/Excel batch download buttons */}
-                <div className="flex items-center gap-1.5 font-black text-[10px]">
-                  <button className="h-8.5 px-4 bg-[#72b043] hover:bg-[#629c36] text-white rounded-lg transition uppercase tracking-wider cursor-pointer">
-                    VIEW(PDF)
-                  </button>
-                  <button className="h-8.5 px-4 bg-[#72b043] hover:bg-[#629c36] text-white rounded-lg transition uppercase tracking-wider cursor-pointer">
-                    EXCEL
-                  </button>
-                </div>
-
                 {/* Pagination Controls */}
                 <div className="flex items-center gap-1">
                   <button
@@ -1149,12 +1104,11 @@ function EmployeeJobCardPage() {
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Attendance Summary Panel */}
-          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+            {/* Attendance Summary Panel */}
+            <div className="pt-4 border-t border-border/40 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
                 <SlidersHorizontal className="size-4 text-blue-500" />
                 <span className="text-xs font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">Attendance Summary</span>
               </div>
@@ -1167,33 +1121,50 @@ function EmployeeJobCardPage() {
                 </span>
               </div>
             </div>
+              {/* Summary Table */}
+              <div className="overflow-x-auto border border-border/50 rounded-xl">
+                <table className="w-full text-center text-xs font-sans">
+                  <thead>
+                    <tr className="bg-[#f8fafc] dark:bg-[#0f172a] text-[#475569] dark:text-slate-400 font-extrabold uppercase tracking-wider text-[10px] border-b border-border/50">
+                      <th className="py-2.5 px-3 border-r border-border/30">Total Working Day</th>
+                      <th className="py-2.5 px-3 border-r border-border/30">Present Day</th>
+                      <th className="py-2.5 px-3 border-r border-border/30">Absent Day</th>
+                      <th className="py-2.5 px-3 border-r border-border/30">Holiday</th>
+                      <th className="py-2.5 px-3 border-r border-border/30">Leave day</th>
+                      <th className="py-2.5 px-3">Over Time</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-card text-foreground font-black text-sm">
+                    <tr>
+                      <td className="py-3 px-3 border-r border-border/40">{summary.totalWorking}</td>
+                      <td className="py-3 px-3 border-r border-border/40 text-emerald-600 dark:text-emerald-400">{summary.present}</td>
+                      <td className="py-3 px-3 border-r border-border/40 text-rose-600 dark:text-rose-400">{summary.absent}</td>
+                      <td className="py-3 px-3 border-r border-border/40 text-amber-500">{summary.holiday}</td>
+                      <td className="py-3 px-3 border-r border-border/40 text-blue-500">{summary.leave}</td>
+                      <td className="py-3 px-3">{summary.overtime}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
 
-            {/* Summary Grid Block */}
-            <div className="grid grid-cols-2 md:grid-cols-6 border border-border/60 rounded-xl overflow-hidden divide-x divide-y md:divide-y-0 divide-border/60 text-center font-sans">
-              <div className="p-3.5 space-y-1">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Total Working Day</div>
-                <div className="text-base font-black text-foreground">{summary.totalWorking}</div>
-              </div>
-              <div className="p-3.5 space-y-1 border-t md:border-t-0">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Present Day</div>
-                <div className="text-base font-black text-foreground">{summary.present}</div>
-              </div>
-              <div className="p-3.5 space-y-1 border-t md:border-t-0">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Absent Day</div>
-                <div className="text-base font-black text-foreground">{summary.absent}</div>
-              </div>
-              <div className="p-3.5 space-y-1 border-t md:border-t-0">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Holiday</div>
-                <div className="text-base font-black text-foreground">{summary.holiday}</div>
-              </div>
-              <div className="p-3.5 space-y-1 border-t md:border-t-0">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Leave day</div>
-                <div className="text-base font-black text-foreground">{summary.leave}</div>
-              </div>
-              <div className="p-3.5 space-y-1 border-t md:border-t-0">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Over Time</div>
-              <div className="text-base font-black text-foreground">{summary.overtime}</div>
-              </div>
+            {/* Action Buttons (Moved to bottom) */}
+            <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-6 border-t border-border/35 print:hidden">
+              <button className="h-9 px-4 rounded-xl border border-rose-200 dark:border-rose-900/35 bg-rose-50/30 dark:bg-rose-950/10 hover:bg-rose-50 dark:hover:bg-rose-950/20 font-black text-xs text-rose-600 dark:text-rose-400 flex items-center gap-1.5 transition shadow-3xs cursor-pointer">
+                <FileDown className="size-3.5 text-rose-500" />
+                <span>VIEW PDF</span>
+              </button>
+              <button className="h-9 px-4 rounded-xl border border-emerald-200 dark:border-emerald-900/35 bg-emerald-50/30 dark:bg-emerald-950/10 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 font-black text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 transition shadow-3xs cursor-pointer">
+                <FileSpreadsheet className="size-3.5 text-emerald-500" />
+                <span>EXCEL</span>
+              </button>
+              <button
+                onClick={handlePrint}
+                className="h-9 px-4 rounded-xl border border-blue-200 dark:border-blue-900/35 bg-blue-50/30 dark:bg-blue-950/10 hover:bg-blue-50 dark:hover:bg-blue-950/20 font-black text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1.5 transition shadow-3xs cursor-pointer"
+              >
+                <Printer className="size-3.5 text-blue-500" />
+                <span>PRINT</span>
+              </button>
             </div>
           </div>
         </div>
