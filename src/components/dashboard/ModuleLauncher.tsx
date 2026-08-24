@@ -56,7 +56,7 @@ const modules: ModuleConfig[] = [
     icon: ShoppingCart,
     color: "from-amber-500 to-orange-600",
     shadow: "shadow-amber-500/20",
-    path: "/",
+    path: "/procurement-dashboard",
   },
   {
     id: "inventory",
