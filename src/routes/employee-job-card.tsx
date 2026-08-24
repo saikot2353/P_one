@@ -23,6 +23,7 @@ import {
   Building,
   MapPin,
   Briefcase,
+  Coffee,
 } from "lucide-react";
 
 export const Route = createFileRoute("/employee-job-card")({
@@ -159,8 +160,20 @@ const employeeDb: Record<
     shift: string;
     shiftStartDate: string;
     defaultHoliday: string;
+    manager?: string;
   }
 > = {
+  "2026081190": {
+    name: "kamal",
+    type: "Permanent",
+    subDept: "Business Innovation",
+    jobTitle: "Junior Officer",
+    unit: "ICT",
+    shift: "Placeholder Shift",
+    shiftStartDate: "2026-08-13",
+    defaultHoliday: "Friday",
+    manager: "Manager",
+  },
   "2023043910": {
     name: "Tahmid Afsar Shapno",
     type: "Permanent",
@@ -170,6 +183,7 @@ const employeeDb: Record<
     shift: "General Shift",
     shiftStartDate: "01/08/2023",
     defaultHoliday: "Friday",
+    manager: "Manager",
   },
   "2016001055": {
     name: "Md. Zahidul Islam",
@@ -180,6 +194,7 @@ const employeeDb: Record<
     shift: "General Shift",
     shiftStartDate: "15/03/2016",
     defaultHoliday: "Friday",
+    manager: "Manager",
   },
   "2022035599": {
     name: "Dipon Saha",
@@ -190,6 +205,7 @@ const employeeDb: Record<
     shift: "Exe-Ptvl Shift",
     shiftStartDate: "10/05/2022",
     defaultHoliday: "Friday",
+    manager: "Manager",
   },
 };
 
@@ -233,6 +249,19 @@ const generateAttendanceData = (empId: string, startDateStr: string, endDateStr:
         overtime: "0.00",
         shift: emp.shift,
         status: "Holiday",
+      });
+    } else if (empId === "2026081190") {
+      // Kamal is absent as per the target image layout
+      logs.push({
+        empId,
+        empName: emp.name,
+        date: dateStr,
+        outDate: "N/A",
+        inTime: "-",
+        outTime: "-",
+        overtime: "0.00",
+        shift: emp.shift,
+        status: "Absent",
       });
     } else if (index % 12 === 0) {
       // Casual Leave preset
@@ -290,23 +319,159 @@ const generateAttendanceData = (empId: string, startDateStr: string, endDateStr:
   return logs;
 };
 
+const formatDateLabel = (dateStr: string) => {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  });
+};
+
+const formatDateRangeDisplay = (startStr: string, endStr: string) => {
+  const format = (str: string) => {
+    if (!str) return "";
+    const [y, m, d] = str.split("-");
+    if (!y || !m || !d) return str;
+    return `${d}/${m}/${y}`;
+  };
+  return `${format(startStr)} to ${format(endStr)}`;
+};
+
+interface MultiSearchableSelectProps {
+  options: Option[];
+  selectedValues: string[];
+  onChange: (values: string[]) => void;
+  placeholder?: string;
+  className?: string;
+}
+
+function MultiSearchableSelect({
+  options,
+  selectedValues,
+  onChange,
+  placeholder = "Select options...",
+  className = "",
+}: MultiSearchableSelectProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const filteredOptions = options.filter(
+    (o) =>
+      o.label.toLowerCase().includes(search.toLowerCase()) ||
+      o.value.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleToggle = (val: string) => {
+    if (selectedValues.includes(val)) {
+      if (selectedValues.length > 1) {
+        onChange(selectedValues.filter((v) => v !== val));
+      } else {
+        alert("At least one employee must be selected!");
+      }
+    } else {
+      onChange([...selectedValues, val]);
+    }
+  };
+
+  return (
+    <div ref={containerRef} className={`relative w-full ${className}`}>
+      <button
+        type="button"
+        onClick={() => {
+          setIsOpen(!isOpen);
+          setSearch("");
+        }}
+        className="w-full h-10 px-3.5 rounded-xl bg-muted border border-border/40 text-xs font-semibold flex items-center justify-between text-left focus:border-[#1e88e5] hover:bg-muted/80 transition duration-150 cursor-pointer"
+      >
+        <span className="truncate text-foreground font-bold">
+          {selectedValues.length > 0
+            ? `${selectedValues.length} selected`
+            : placeholder}
+        </span>
+        <ChevronDown
+          className={`size-3.5 text-muted-foreground transition-transform duration-200 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-1.5 bg-card border border-border rounded-xl shadow-lg shadow-black/5 dark:shadow-black/20 overflow-hidden animate-in fade-in-50 slide-in-from-top-1 duration-150">
+          <div className="p-2 border-b border-border/30 relative">
+            <Search className="size-3.5 text-muted-foreground absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              autoFocus
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search..."
+              className="w-full h-8 pl-8 pr-3 bg-muted/60 focus:bg-card border border-border/40 focus:border-[#1e88e5] focus:ring-1 focus:ring-[#1e88e5]/20 rounded-lg outline-none text-xs font-bold transition font-sans"
+            />
+          </div>
+
+          <div className="max-h-48 overflow-y-auto p-1 divide-y divide-border/10 font-sans text-xs">
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map((option) => {
+                const isSelected = selectedValues.includes(option.value);
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => handleToggle(option.value)}
+                    className={`w-full px-3 py-2 text-left rounded-lg transition duration-100 flex items-center justify-between font-bold ${
+                      isSelected
+                        ? "bg-[#1e88e5]/10 text-[#1e88e5]"
+                        : "text-foreground/80 hover:bg-muted/80 hover:text-foreground"
+                    }`}
+                  >
+                    <span className="truncate">{option.label}</span>
+                    {isSelected && <Check className="size-3 text-[#1e88e5]" />}
+                  </button>
+                );
+              })
+            ) : (
+              <div className="px-3 py-2.5 text-center text-muted-foreground text-[11px] font-medium">
+                No matching options found
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function EmployeeJobCardPage() {
   const today = new Date();
   const firstDay = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split("T")[0];
   const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split("T")[0];
 
-  const [startDate, setStartDate] = useState(firstDay);
-  const [endDate, setEndDate] = useState(lastDay);
+  const [startDate, setStartDate] = useState("2026-08-01");
+  const [endDate, setEndDate] = useState("2026-08-24");
 
-  const [selectedCompany, setSelectedCompany] = useState("Pakiza Software Limited");
-  const [selectedArea, setSelectedArea] = useState("PSL-Operation");
+  const [selectedCompany, setSelectedCompany] = useState("Pakiza Head Office");
+  const [selectedArea, setSelectedArea] = useState("Head Office");
   const [selectedType, setSelectedType] = useState("Actual");
 
   // Primary active employee (drives the metadata card)
-  const [activeEmpId, setActiveEmpId] = useState("2023043910");
+  const [activeEmpId, setActiveEmpId] = useState("2026081190");
 
   // Multi-employee ID input (allows selecting multiple IDs for the fetch)
-  const [multiEmpIds, setMultiEmpIds] = useState<string[]>(["2023043910"]);
+  const [multiEmpIds, setMultiEmpIds] = useState<string[]>(["2026081190"]);
 
   // Runtime Calculation States
   const [isRuntimeCal, setIsRuntimeCal] = useState(false);
@@ -321,6 +486,7 @@ function EmployeeJobCardPage() {
 
   const companyOptions = useMemo(
     () => [
+      { value: "Pakiza Head Office", label: "Pakiza Head Office" },
       { value: "Pakiza Software Limited", label: "Pakiza Software Limited" },
       { value: "Pakiza Group", label: "Pakiza Group" },
     ],
@@ -329,6 +495,7 @@ function EmployeeJobCardPage() {
 
   const areaOptions = useMemo(
     () => [
+      { value: "Head Office", label: "Head Office" },
       { value: "PSL-Operation", label: "PSL-Operation" },
       { value: "PSL-Head Office", label: "PSL-Head Office" },
       { value: "PSL-Factory", label: "PSL-Factory" },
@@ -437,6 +604,49 @@ function EmployeeJobCardPage() {
   const totalPages = Math.ceil(filteredRows.length / itemsPerPage) || 1;
 
   // Print utility handler
+  const summary = useMemo(() => {
+    let totalWorking = 0;
+    let present = 0;
+    let absent = 0;
+    let holiday = 0;
+    let leave = 0;
+    let overtime = 0.0;
+
+    renderedLogs.forEach((log) => {
+      const status = log.status;
+      if (status === "Holiday") {
+        holiday++;
+      } else if (status === "CL" || status === "Leave") {
+        leave++;
+        totalWorking++;
+      } else if (status === "Absent") {
+        absent++;
+        totalWorking++;
+      } else {
+        present++;
+        totalWorking++;
+        overtime += parseFloat(log.overtime) || 0;
+      }
+    });
+
+    return {
+      totalWorking,
+      present,
+      absent,
+      holiday,
+      leave,
+      overtime: overtime.toFixed(2),
+    };
+  }, [renderedLogs]);
+
+  const lateCount = useMemo(() => {
+    return renderedLogs.filter(log => log.status === "Late" || log.status === "Late & Early").length;
+  }, [renderedLogs]);
+
+  const earlyLeaveCount = useMemo(() => {
+    return renderedLogs.filter(log => log.status === "Early Leave" || log.status === "Late & Early").length;
+  }, [renderedLogs]);
+
   const handlePrint = () => {
     window.print();
   };
@@ -475,16 +685,16 @@ function EmployeeJobCardPage() {
           </div>
 
           {/* Top Panel: Criteria Selection */}
-          <div className="bg-card rounded-2xl border border-border/85 p-5 shadow-sm space-y-5 print:hidden">
+          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-5 print:hidden">
             <div className="flex items-center justify-between border-b border-border/40 pb-3">
               <span className="text-[11px] font-black uppercase tracking-wider text-primary flex items-center gap-2">
                 <Search className="size-3.5" /> Scope & Parameters
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-              {/* Row 1: Period & Organization */}
-              <div className="md:col-span-3 space-y-1.5">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-x-5 gap-y-4">
+              {/* Row 1 */}
+              <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block">
                   Company
                 </label>
@@ -495,7 +705,7 @@ function EmployeeJobCardPage() {
                 />
               </div>
 
-              <div className="md:col-span-3 space-y-1.5">
+              <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block">
                   Area Name
                 </label>
@@ -506,231 +716,278 @@ function EmployeeJobCardPage() {
                 />
               </div>
 
-              <div className="md:col-span-3 space-y-1.5">
+              <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block">
                   Start Date
                 </label>
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full h-10 px-3.5 rounded-xl bg-muted border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5] text-foreground hover:bg-muted/80 transition duration-150 cursor-pointer"
-                />
-              </div>
-
-              <div className="md:col-span-3 space-y-1.5">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block">
-                  End Date
-                </label>
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full h-10 px-3.5 rounded-xl bg-muted border border-border/40 text-xs font-bold outline-none focus:border-[#1e88e5] text-foreground hover:bg-muted/80 transition duration-150 cursor-pointer"
-                />
-              </div>
-
-              {/* Row 2: Employee Selection & Action */}
-              <div className="md:col-span-3 space-y-1.5">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block">
-                  Single Employee
-                </label>
-                <SearchableSelect
-                  options={employeeOptions}
-                  value={activeEmpId}
-                  onChange={(val) => {
-                    setActiveEmpId(val);
-                    handleAddEmployee(val); // Auto-add to multi-select
-                  }}
-                  placeholder="Search by ID or Name"
-                />
-              </div>
-
-              <div className="md:col-span-9 space-y-1.5">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block flex items-center gap-2">
-                  Employee Id (Multi)
-                  <span className="bg-primary/10 text-primary text-[8.5px] px-1.5 py-0.5 rounded-sm">Combines fetch results</span>
-                </label>
-                <div className="min-h-10 p-1.5 bg-muted/20 dark:bg-slate-900/10 rounded-xl border border-border/40 flex flex-wrap gap-1.5 items-center">
-                  {multiEmpIds.map((id) => (
-                    <span
-                      key={id}
-                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10.5px] font-extrabold transition-all duration-150 ${id === activeEmpId ? 'bg-primary text-white shadow-sm' : 'bg-primary/10 text-primary border border-primary/20 hover:bg-primary/15'}`}
-                    >
-                      <span>
-                        {id} ({employeeDb[id]?.name || "N/A"})
-                      </span>
-                      <button
-                        onClick={() => handleRemoveEmployee(id)}
-                        className={`font-bold ml-0.5 transition cursor-pointer ${id === activeEmpId ? 'hover:text-white/70' : 'hover:text-rose-500'}`}
-                      >
-                        <X className="size-3" />
-                      </button>
-                    </span>
-                  ))}
-                  <div className="relative inline-block w-40">
-                    <SearchableSelect
-                      options={addEmployeeOptions}
-                      value=""
-                      onChange={(val) => {
-                        if (val) handleAddEmployee(val);
-                      }}
-                      placeholder="+ Add Employee"
-                      className="!h-7 text-[10px]"
-                    />
-                  </div>
+                <div className="relative w-full h-10 rounded-xl bg-muted border border-border/40 flex items-center justify-between px-3.5 text-xs font-bold text-foreground cursor-pointer hover:bg-muted/80 transition duration-150">
+                  <span>{formatDateLabel(startDate)}</span>
+                  <Calendar className="size-4 text-muted-foreground" />
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
                 </div>
               </div>
 
-              <div className="md:col-span-3 space-y-1.5">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide">
-                  Type
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block">
+                  End Date
                 </label>
-                <SearchableSelect
-                  options={typeOptions}
-                  value={selectedType}
-                  onChange={setSelectedType}
+                <div className="relative w-full h-10 rounded-xl bg-muted border border-border/40 flex items-center justify-between px-3.5 text-xs font-bold text-foreground cursor-pointer hover:bg-muted/80 transition duration-150">
+                  <span>{formatDateLabel(endDate)}</span>
+                  <Calendar className="size-4 text-muted-foreground" />
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              {/* Row 2 */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block">
+                  Single Employee
+                </label>
+                <button
+                  type="button"
+                  disabled
+                  className="w-full h-10 px-3.5 rounded-xl bg-muted/50 border border-border/20 text-xs font-semibold text-muted-foreground/60 flex items-center justify-between text-left cursor-not-allowed"
+                >
+                  <span className="truncate font-bold">
+                    {multiEmpIds.length > 0 ? "Disabled (Multiple selected)" : "Select Employee..."}
+                  </span>
+                  <ChevronDown className="size-3.5" />
+                </button>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wide block">
+                  Employee ID (Multi)
+                </label>
+                <MultiSearchableSelect
+                  options={employeeOptions}
+                  selectedValues={multiEmpIds}
+                  onChange={(vals) => {
+                    setMultiEmpIds(vals);
+                    if (vals.length > 0) setActiveEmpId(vals[0]);
+                  }}
+                  placeholder="Select Employees"
                 />
               </div>
 
-              <div className="md:col-span-7 p-3 bg-primary/[0.02] dark:bg-primary/[0.01] border border-primary/20 rounded-xl flex flex-col md:flex-row md:items-center gap-4">
-                <div className="flex-1 flex items-center justify-between">
-                  <div>
-                    <h4 className="text-[11px] font-extrabold text-primary tracking-wide">
-                      Runtime Evaluation
-                    </h4>
-                    <p className="text-[9px] text-muted-foreground">
-                      Dynamically evaluate punch logs
-                    </p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer select-none ml-4">
+              {/* Column 3 bottom row: Action controls inline */}
+              <div className="flex items-end gap-3 pb-0.5 md:col-span-2">
+                {/* Runtime evaluation toggle */}
+                <div className="flex items-center gap-2 bg-muted/30 dark:bg-slate-900/10 px-3 h-10 rounded-xl border border-border/40">
+                  <span className="text-[10px] font-bold text-muted-foreground">Runtime Evaluation</span>
+                  <label className="relative inline-flex items-center cursor-pointer select-none">
                     <input
                       type="checkbox"
                       checked={isRuntimeCal}
                       onChange={(e) => setIsRuntimeCal(e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-9 h-5 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 dark:after:border-slate-600 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                    <div className="w-8 h-4.5 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 dark:after:border-slate-600 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-primary"></div>
                   </label>
                 </div>
 
-                {isRuntimeCal && (
-                  <div className="flex-1 flex gap-2 border-l border-primary/10 pl-4">
-                    <div className="space-y-0.5 w-1/2">
-                      <span className="text-[9px] font-black text-muted-foreground uppercase">
-                        Shift In
-                      </span>
-                      <input
-                        type="text"
-                        value={shiftInThreshold}
-                        onChange={(e) => setShiftInThreshold(e.target.value)}
-                        placeholder="09:00"
-                        className="w-full h-8 px-2 rounded-lg bg-card border border-border/40 text-xs font-bold outline-none focus:border-primary text-primary font-mono"
-                      />
-                    </div>
-                    <div className="space-y-0.5 w-1/2">
-                      <span className="text-[9px] font-black text-muted-foreground uppercase">
-                        Shift Out
-                      </span>
-                      <input
-                        type="text"
-                        value={shiftOutThreshold}
-                        onChange={(e) => setShiftOutThreshold(e.target.value)}
-                        placeholder="18:00"
-                        className="w-full h-8 px-2 rounded-lg bg-card border border-border/40 text-xs font-bold outline-none focus:border-primary text-primary font-mono"
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="md:col-span-2 flex items-end justify-end">
+                {/* Fetch Button (Blue square icon button) */}
                 <button
                   onClick={handleGetLogs}
-                  className="w-full h-10 bg-primary hover:bg-primary-glow text-white font-black text-xs rounded-xl shadow-md shadow-primary/10 hover:shadow-primary/20 transition duration-150 uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer"
+                  className="h-10 w-10 shrink-0 bg-[#0066cc] hover:bg-[#0055bb] text-white flex items-center justify-center rounded-xl shadow-xs transition duration-150 cursor-pointer"
+                  title="Fetch Job Card"
                 >
-                  <Fingerprint className="size-4" />
-                  <span>Fetch</span>
+                  <Search className="size-4" />
+                </button>
+
+                {/* Reset Button (White circular arrow icon button) */}
+                <button
+                  onClick={() => {
+                    setStartDate("2026-08-01");
+                    setEndDate("2026-08-24");
+                    setSelectedCompany("Pakiza Head Office");
+                    setSelectedArea("Head Office");
+                    setMultiEmpIds(["2026081190"]);
+                    setActiveEmpId("2026081190");
+                    setIsRuntimeCal(false);
+                    setRenderedLogs(generateAttendanceData("2026081190", "2026-08-01", "2026-08-24"));
+                  }}
+                  className="h-10 w-10 shrink-0 bg-white hover:bg-muted border border-border text-foreground flex items-center justify-center rounded-xl shadow-3xs transition duration-150 cursor-pointer"
+                  title="Reset Filter"
+                >
+                  <RefreshCw className="size-4 text-muted-foreground" />
                 </button>
               </div>
             </div>
-
-
           </div>
 
+          {/* Cyan/Blue Gradient separator line */}
+          <div className="h-0.5 w-full bg-gradient-to-r from-cyan-400 to-blue-600 rounded-full my-2"></div>
+
+          {/* Employee Profile Summary Card */}
+          {activeEmpId && employeeDb[activeEmpId] && (
+            <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-extrabold shadow-xs uppercase">
+                  {employeeDb[activeEmpId].name.slice(0, 2)}
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-black text-foreground uppercase">{employeeDb[activeEmpId].name}</h3>
+                    <span className="px-2.5 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900 rounded-md text-[10px] font-bold">
+                      {employeeDb[activeEmpId].jobTitle}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-muted-foreground flex items-center gap-2">
+                    <span>ID: <strong className="text-foreground/80">{activeEmpId}</strong></span>
+                    <span className="text-muted-foreground/30">|</span>
+                    <span className="flex items-center gap-1 font-semibold text-foreground/85">
+                      <User className="size-3 text-muted-foreground/60" /> {employeeDb[activeEmpId].manager || "Manager"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Job Card Period Badge */}
+              <div className="flex items-center gap-3 px-4 py-2 border border-border/60 bg-muted/20 dark:bg-slate-900/10 rounded-xl">
+                <FileSpreadsheet className="size-4.5 text-blue-500" />
+                <div className="text-left">
+                  <div className="text-[8px] font-black text-muted-foreground uppercase tracking-wider">JOB CARD PERIOD</div>
+                  <div className="text-[10.5px] font-black text-foreground">
+                    {formatDateRangeDisplay(startDate, endDate)}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Stat Cards Grid */}
+          {activeEmpId && employeeDb[activeEmpId] && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Card 1: Department/Unit */}
+              <div className="p-4 bg-card rounded-2xl border border-border/80 flex items-center gap-3.5 shadow-xs">
+                <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-100/50 dark:border-blue-900/30">
+                  <Building className="size-4.5" />
+                </div>
+                <div className="text-left">
+                  <span className="text-[9px] font-black text-muted-foreground uppercase tracking-wider block">DEPARTMENT / UNIT</span>
+                  <strong className="text-[11.5px] text-foreground block mt-0.5">{employeeDb[activeEmpId].unit}</strong>
+                  <span className="text-[10px] text-muted-foreground block">{employeeDb[activeEmpId].subDept}</span>
+                </div>
+              </div>
+
+              {/* Card 2: Shift Name */}
+              <div className="p-4 bg-card rounded-2xl border border-border/80 flex items-center gap-3.5 shadow-xs">
+                <div className="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border border-purple-100/50 dark:border-purple-900/30">
+                  <Clock className="size-4.5" />
+                </div>
+                <div className="text-left">
+                  <span className="text-[9px] font-black text-muted-foreground uppercase tracking-wider block">SHIFT NAME</span>
+                  <strong className="text-[11.5px] text-foreground block mt-0.5">{employeeDb[activeEmpId].shift}</strong>
+                  <span className="text-[10px] text-muted-foreground block">Since {employeeDb[activeEmpId].shiftStartDate}</span>
+                </div>
+              </div>
+
+              {/* Card 3: Break & Holiday */}
+              <div className="p-4 bg-card rounded-2xl border border-border/80 flex items-center gap-3.5 shadow-xs">
+                <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-100/50 dark:border-amber-900/30">
+                  <Coffee className="size-4.5" />
+                </div>
+                <div className="text-left">
+                  <span className="text-[9px] font-black text-muted-foreground uppercase tracking-wider block">BREAK & HOLIDAY</span>
+                  <strong className="text-[11.5px] text-foreground block mt-0.5">Break: 1 Hour</strong>
+                  <span className="text-[10px] text-muted-foreground block">Holiday: {employeeDb[activeEmpId].defaultHoliday}</span>
+                </div>
+              </div>
+
+              {/* Card 4: Joining Date */}
+              <div className="p-4 bg-card rounded-2xl border border-border/80 flex items-center gap-3.5 shadow-xs">
+                <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100/50 dark:border-emerald-900/30">
+                  <Calendar className="size-4.5" />
+                </div>
+                <div className="text-left">
+                  <span className="text-[9px] font-black text-muted-foreground uppercase tracking-wider block">JOINING DATE</span>
+                  <strong className="text-[11.5px] text-foreground block mt-0.5">{employeeDb[activeEmpId].shiftStartDate}</strong>
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 block font-bold">Verified Employee</span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Spreadsheet Datagrid Card */}
-          <div className="bg-card rounded-2xl border border-border/80 p-4 shadow-xs space-y-3">
+          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
             {/* Utilities Toolbar & Search */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/30 pb-4 print:hidden">
-              <div className="flex items-center gap-1.5 select-none">
-                <button className="h-8.5 px-4 rounded-lg border border-border/70 hover:bg-muted font-bold text-xs text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/35 pb-4 print:hidden">
+              {/* Text Query Filter */}
+              <div className="relative w-full sm:w-72">
+                <Search className="size-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search by ID, Name, Date.."
+                  className="w-full h-9 pl-9.5 pr-4 rounded-xl bg-muted border border-border/40 focus:border-primary focus:bg-card focus:ring-1 focus:ring-primary/20 outline-none text-xs font-bold transition duration-200"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2 select-none self-end sm:self-auto">
+                <button className="h-9 px-4 rounded-xl border border-emerald-200 dark:border-emerald-900/35 bg-emerald-50/30 dark:bg-emerald-950/10 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 font-black text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 transition shadow-3xs cursor-pointer">
                   <FileSpreadsheet className="size-3.5 text-emerald-500" />
                   <span>EXCEL</span>
                 </button>
                 <button
                   onClick={handlePrint}
-                  className="h-8.5 px-4 rounded-lg border border-border/70 hover:bg-muted font-bold text-xs text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition"
+                  className="h-9 px-4 rounded-xl border border-blue-200 dark:border-blue-900/35 bg-blue-50/30 dark:bg-blue-950/10 hover:bg-blue-50 dark:hover:bg-blue-950/20 font-black text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1.5 transition shadow-3xs cursor-pointer"
                 >
                   <Printer className="size-3.5 text-blue-500" />
                   <span>PRINT</span>
                 </button>
-                <button className="h-8.5 px-4 rounded-lg border border-border/70 hover:bg-muted font-bold text-xs text-foreground/80 hover:text-foreground flex items-center gap-1.5 transition">
+                <button className="h-9 px-4 rounded-xl border border-rose-200 dark:border-rose-900/35 bg-rose-50/30 dark:bg-rose-950/10 hover:bg-rose-50 dark:hover:bg-rose-950/20 font-black text-xs text-rose-600 dark:text-rose-400 flex items-center gap-1.5 transition shadow-3xs cursor-pointer">
                   <FileDown className="size-3.5 text-rose-500" />
                   <span>PDF</span>
                 </button>
               </div>
-
-              {/* Text Query Filter */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-muted-foreground">Search:</span>
-                <div className="relative w-56 sm:w-64">
-                  <Search className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search by ID, Name, Date..."
-                    className="w-full h-8 pl-9 pr-3 rounded-lg bg-muted border border-border/40 focus:border-primary focus:bg-card focus:ring-1 focus:ring-primary/20 outline-none text-xs transition duration-200"
-                  />
-                </div>
-              </div>
             </div>
 
             {/* High-Fidelity Spreadsheet Data Table */}
-            <div className="overflow-x-auto border border-border/50 rounded-xl max-h-[55vh] print:max-h-none print:border-none">
-              <table className="w-full min-w-[950px] xl:min-w-0 border-collapse text-[11px] text-left">
+            <div className="overflow-x-auto border border-border/50 rounded-xl max-h-[55vh] print:max-h-none print:border-none font-sans">
+              <table className="w-full min-w-[950px] border-collapse text-[11px] text-left">
                 <thead>
-                  <tr className="bg-[#f1f5f9] dark:bg-[#0f172a] text-foreground font-bold border-b border-border/50 select-none whitespace-nowrap">
-                    {/* Columns headers matching Pakiza structure */}
-                    <th className="px-4 py-3 font-extrabold text-center w-12 border-r border-border/30">
+                  <tr className="bg-[#f8fafc] dark:bg-[#0f172a] text-[#475569] dark:text-slate-400 font-extrabold border-b border-border/50 select-none whitespace-nowrap text-[10.5px]">
+                    <th className="px-4 py-3 text-center w-12 border-r border-border/30">
                       SL
                     </th>
-                    <th className="px-4 py-3 font-extrabold w-28 border-r border-border/30">
-                      Employee ID
+                    <th className="px-4 py-3 w-28 border-r border-border/30">
+                      EMPLOYEE ID
                     </th>
-                    <th className="px-4 py-3 font-extrabold w-36 border-r border-border/30">
-                      Employee Name
+                    <th className="px-4 py-3 w-36 border-r border-border/30">
+                      EMPLOYEE NAME
                     </th>
-                    <th className="px-4 py-3 font-extrabold text-center w-28 border-r border-border/30">
-                      Atn Date
+                    <th className="px-4 py-3 text-center w-28 border-r border-border/30">
+                      ATN DATE
                     </th>
-                    <th className="px-4 py-3 font-extrabold text-center w-28 border-r border-border/30">
-                      Out Date
+                    <th className="px-4 py-3 text-center w-28 border-r border-border/30">
+                      OUT DATE
                     </th>
-                    <th className="px-4 py-3 font-extrabold text-center w-24 border-r border-border/30">
-                      In Time
+                    <th className="px-4 py-3 text-center w-24 border-r border-border/30">
+                      IN TIME
                     </th>
-                    <th className="px-4 py-3 font-extrabold text-center w-24 border-r border-border/30">
-                      Out Time
+                    <th className="px-4 py-3 text-center w-24 border-r border-border/30">
+                      OUT TIME
                     </th>
-                    <th className="px-4 py-3 font-extrabold text-right w-24 border-r border-border/30">
-                      Over Time
+                    <th className="px-4 py-3 text-right w-24 border-r border-border/30">
+                      OVER TIME
                     </th>
-                    <th className="px-4 py-3 font-extrabold w-32 border-r border-border/30">
-                      Duty Shift
+                    <th className="px-4 py-3 w-32 border-r border-border/30">
+                      DUTY SHIFT
                     </th>
-                    <th className="px-4 py-3 font-extrabold text-center w-24">Status</th>
+                    <th className="px-4 py-3 text-center w-24">STATUS</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/30">
@@ -758,29 +1015,22 @@ function EmployeeJobCardPage() {
                       }
                     }
 
-                    // Assign beautiful colors according to status value
-                    let statusBadgeClass = "text-foreground font-semibold";
+                    // Assign colors according to status value
+                    let statusBadgeClass = "inline-flex items-center justify-center px-2 py-0.5 rounded-md text-[10px] font-black tracking-wide border";
                     if (activeStatus === "Present") {
-                      statusBadgeClass = "text-emerald-600 dark:text-emerald-400 font-extrabold";
+                      statusBadgeClass += " bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border-emerald-100/50 dark:border-emerald-900/35";
+                    } else if (activeStatus === "Absent") {
+                      statusBadgeClass += " bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border-rose-100/50 dark:border-rose-900/35";
                     } else if (activeStatus === "Holiday") {
-                      statusBadgeClass = "text-slate-400 dark:text-slate-500 font-semibold";
-                    } else if (activeStatus === "CL") {
-                      statusBadgeClass = "text-amber-500 dark:text-amber-400 font-extrabold";
-                    } else if (activeStatus === "Late") {
-                      statusBadgeClass =
-                        "text-amber-600 dark:text-amber-400 font-extrabold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20";
-                    } else if (activeStatus === "Early Leave") {
-                      statusBadgeClass =
-                        "text-purple-600 dark:text-purple-400 font-extrabold bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20";
-                    } else if (activeStatus === "Late & Early") {
-                      statusBadgeClass =
-                        "text-rose-600 dark:text-rose-400 font-extrabold bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20 animate-pulse";
+                      statusBadgeClass += " bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-800";
+                    } else {
+                      statusBadgeClass += " bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border-amber-100/50 dark:border-amber-900/35";
                     }
 
                     return (
                       <tr
                         key={`${row.empId}-${row.date}`}
-                        className="group hover:bg-[#f8fafc] dark:hover:bg-[#1e293b] transition duration-100 whitespace-nowrap"
+                        className="group hover:bg-[#f8fafc] dark:hover:bg-[#1e293b] transition duration-100 whitespace-nowrap font-semibold text-foreground/80"
                       >
                         <td className="px-4 py-2.5 text-center font-bold text-muted-foreground/60 border-r border-border/20">
                           {slNo}
@@ -788,7 +1038,7 @@ function EmployeeJobCardPage() {
                         <td className="px-4 py-2.5 font-bold font-mono text-foreground border-r border-border/20">
                           {row.empId}
                         </td>
-                        <td className="px-4 py-2.5 font-semibold text-foreground/80 border-r border-border/20">
+                        <td className="px-4 py-2.5 font-bold text-foreground border-r border-border/20">
                           {row.empName}
                         </td>
                         <td className="px-4 py-2.5 font-mono text-center font-bold text-foreground/80 border-r border-border/20">
@@ -867,12 +1117,12 @@ function EmployeeJobCardPage() {
               </span>
 
               <div className="flex items-center gap-4">
-                {/* PDF/Excel batch download buttons exactly matching Pakiza style! */}
-                <div className="flex items-center gap-1.5">
-                  <button className="h-8 px-4 bg-[#72b043] hover:bg-[#629c36] text-white font-extrabold text-[10px] rounded-lg transition uppercase tracking-wider">
+                {/* PDF/Excel batch download buttons */}
+                <div className="flex items-center gap-1.5 font-black text-[10px]">
+                  <button className="h-8.5 px-4 bg-[#72b043] hover:bg-[#629c36] text-white rounded-lg transition uppercase tracking-wider cursor-pointer">
                     VIEW(PDF)
                   </button>
-                  <button className="h-8 px-4 bg-[#72b043] hover:bg-[#629c36] text-white font-extrabold text-[10px] rounded-lg transition uppercase tracking-wider">
+                  <button className="h-8.5 px-4 bg-[#72b043] hover:bg-[#629c36] text-white rounded-lg transition uppercase tracking-wider cursor-pointer">
                     EXCEL
                   </button>
                 </div>
@@ -882,7 +1132,7 @@ function EmployeeJobCardPage() {
                   <button
                     disabled={currentPage === 1}
                     onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    className="p-1 rounded-lg border border-border/60 hover:bg-muted text-muted-foreground transition disabled:opacity-30 disabled:pointer-events-none"
+                    className="p-1 rounded-lg border border-border/60 hover:bg-muted text-muted-foreground transition disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
                   >
                     <ChevronLeft className="size-4" />
                   </button>
@@ -892,11 +1142,57 @@ function EmployeeJobCardPage() {
                   <button
                     disabled={currentPage === totalPages}
                     onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    className="p-1 rounded-lg border border-border/60 hover:bg-muted text-muted-foreground transition disabled:opacity-30 disabled:pointer-events-none"
+                    className="p-1 rounded-lg border border-border/60 hover:bg-muted text-muted-foreground transition disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
                   >
                     <ChevronRight className="size-4" />
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Attendance Summary Panel */}
+          <div className="bg-card rounded-2xl border border-border/80 p-5 shadow-xs space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal className="size-4 text-blue-500" />
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">Attendance Summary</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-900 rounded-lg text-[10px] font-extrabold">
+                  Late: {lateCount}
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900 rounded-lg text-[10px] font-extrabold">
+                  Early Leave: {earlyLeaveCount}
+                </span>
+              </div>
+            </div>
+
+            {/* Summary Grid Block */}
+            <div className="grid grid-cols-2 md:grid-cols-6 border border-border/60 rounded-xl overflow-hidden divide-x divide-y md:divide-y-0 divide-border/60 text-center font-sans">
+              <div className="p-3.5 space-y-1">
+                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Total Working Day</div>
+                <div className="text-base font-black text-foreground">{summary.totalWorking}</div>
+              </div>
+              <div className="p-3.5 space-y-1 border-t md:border-t-0">
+                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Present Day</div>
+                <div className="text-base font-black text-foreground">{summary.present}</div>
+              </div>
+              <div className="p-3.5 space-y-1 border-t md:border-t-0">
+                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Absent Day</div>
+                <div className="text-base font-black text-foreground">{summary.absent}</div>
+              </div>
+              <div className="p-3.5 space-y-1 border-t md:border-t-0">
+                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Holiday</div>
+                <div className="text-base font-black text-foreground">{summary.holiday}</div>
+              </div>
+              <div className="p-3.5 space-y-1 border-t md:border-t-0">
+                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Leave day</div>
+                <div className="text-base font-black text-foreground">{summary.leave}</div>
+              </div>
+              <div className="p-3.5 space-y-1 border-t md:border-t-0">
+                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Over Time</div>
+              <div className="text-base font-black text-foreground">{summary.overtime}</div>
               </div>
             </div>
           </div>
