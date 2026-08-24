@@ -2422,7 +2422,6 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   },
   {
     id: "191",
-<<<<<<< HEAD
     date: "2026-08-20T10:23",
     type: "Feature Update",
     module: "Payroll Advance",
@@ -2447,7 +2446,9 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     link: "/approve-advance",
     descriptionEn: "Copied the detailed requisition view modal from Payroll Advance to the Advance Approval page for a consistent and improved approval experience.",
     descriptionBn: "পে-রোল অ্যাডভান্স থেকে বিস্তারিত রিকুইজিশন ভিউ মোডালটি অ্যাডভান্স অ্যাপ্রুভাল পেজে কপি করা হয়েছে, যাতে অ্যাপ্রুভালের অভিজ্ঞতা আরও ভালো এবং সামঞ্জস্যপূর্ণ হয়।",
-=======
+  },
+  {
+    id: "191b",
     date: "2026-08-23T11:26",
     type: "Modify",
     module: "Evaluation",
@@ -2490,6 +2491,5 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     link: "/notice",
     descriptionEn: "Added a new Notice Board route page and sidebar navigation links. Features a live search directory of notices, rich text circular content configurations using jodit-react, circular format exports, and a premium official letterhead document circular view overlay.",
     descriptionBn: "একটি নতুন Notice Board পেজ এবং সাইডবার নেভিগেশন লিংক যুক্ত করা হয়েছে। পেজটিতে নোটিসের লাইভ সার্চ ডিরেক্টরি, jodit-react এর মাধ্যমে রিচ টেক্সট সার্কুলার কনফিগারেশন, বিভিন্ন সার্কুলার ফাইল এক্সপোর্ট এবং একটি আধুনিক কর্পোরেট লেটারহেড ডকুমেন্টের মাধ্যমে সার্কুলার ভিউ ওভারলে যুক্ত করা হয়েছে।",
->>>>>>> 9d74f3126e69105626a4b0506bad8e1bb4e363ee
   },
 ];
