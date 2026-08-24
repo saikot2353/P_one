@@ -167,6 +167,7 @@ import { Route as FinalSettlementConfigurationRouteImport } from './routes/final
 import { Route as FinalSettlementRouteImport } from './routes/final-settlement'
 import { Route as FinalApproveIncrementRouteImport } from './routes/final-approve-increment'
 import { Route as EnrollFingerprintRouteImport } from './routes/enroll-fingerprint'
+import { Route as EmployeeTaxPayRouteImport } from './routes/employee-tax-pay'
 import { Route as EmployeeJobCardRouteImport } from './routes/employee-job-card'
 import { Route as EmployeeDocVerificationRouteImport } from './routes/employee-doc-verification'
 import { Route as EarnLeaveWorkflowRouteImport } from './routes/earn-leave-workflow'
@@ -1050,6 +1051,11 @@ const EnrollFingerprintRoute = EnrollFingerprintRouteImport.update({
   path: '/enroll-fingerprint',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmployeeTaxPayRoute = EmployeeTaxPayRouteImport.update({
+  id: '/employee-tax-pay',
+  path: '/employee-tax-pay',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmployeeJobCardRoute = EmployeeJobCardRouteImport.update({
   id: '/employee-job-card',
   path: '/employee-job-card',
@@ -1299,6 +1305,7 @@ export interface FileRoutesByFullPath {
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
+  '/employee-tax-pay': typeof EmployeeTaxPayRoute
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
@@ -1500,6 +1507,7 @@ export interface FileRoutesByTo {
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
+  '/employee-tax-pay': typeof EmployeeTaxPayRoute
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
@@ -1702,6 +1710,7 @@ export interface FileRoutesById {
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
+  '/employee-tax-pay': typeof EmployeeTaxPayRoute
   '/enroll-fingerprint': typeof EnrollFingerprintRoute
   '/final-approve-increment': typeof FinalApproveIncrementRoute
   '/final-settlement': typeof FinalSettlementRoute
@@ -1905,6 +1914,7 @@ export interface FileRouteTypes {
     | '/earn-leave-workflow'
     | '/employee-doc-verification'
     | '/employee-job-card'
+    | '/employee-tax-pay'
     | '/enroll-fingerprint'
     | '/final-approve-increment'
     | '/final-settlement'
@@ -2106,6 +2116,7 @@ export interface FileRouteTypes {
     | '/earn-leave-workflow'
     | '/employee-doc-verification'
     | '/employee-job-card'
+    | '/employee-tax-pay'
     | '/enroll-fingerprint'
     | '/final-approve-increment'
     | '/final-settlement'
@@ -2307,6 +2318,7 @@ export interface FileRouteTypes {
     | '/earn-leave-workflow'
     | '/employee-doc-verification'
     | '/employee-job-card'
+    | '/employee-tax-pay'
     | '/enroll-fingerprint'
     | '/final-approve-increment'
     | '/final-settlement'
@@ -2509,6 +2521,7 @@ export interface RootRouteChildren {
   EarnLeaveWorkflowRoute: typeof EarnLeaveWorkflowRoute
   EmployeeDocVerificationRoute: typeof EmployeeDocVerificationRoute
   EmployeeJobCardRoute: typeof EmployeeJobCardRoute
+  EmployeeTaxPayRoute: typeof EmployeeTaxPayRoute
   EnrollFingerprintRoute: typeof EnrollFingerprintRoute
   FinalApproveIncrementRoute: typeof FinalApproveIncrementRoute
   FinalSettlementRoute: typeof FinalSettlementRoute
@@ -3781,6 +3794,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EnrollFingerprintRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/employee-tax-pay': {
+      id: '/employee-tax-pay'
+      path: '/employee-tax-pay'
+      fullPath: '/employee-tax-pay'
+      preLoaderRoute: typeof EmployeeTaxPayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/employee-job-card': {
       id: '/employee-job-card'
       path: '/employee-job-card'
@@ -4109,6 +4129,7 @@ const rootRouteChildren: RootRouteChildren = {
   EarnLeaveWorkflowRoute: EarnLeaveWorkflowRoute,
   EmployeeDocVerificationRoute: EmployeeDocVerificationRoute,
   EmployeeJobCardRoute: EmployeeJobCardRoute,
+  EmployeeTaxPayRoute: EmployeeTaxPayRoute,
   EnrollFingerprintRoute: EnrollFingerprintRoute,
   FinalApproveIncrementRoute: FinalApproveIncrementRoute,
   FinalSettlementRoute: FinalSettlementRoute,
