@@ -93,7 +93,7 @@ function EmployeeTaxPayPage() {
             
             {/* Year Selector */}
             <div className="flex flex-col">
-              <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Year</label>
+              <label className="text-[10px] text-slate-450 font-bold uppercase tracking-wider block mb-1">Year</label>
               <select className="h-9 px-3 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 min-w-[100px] cursor-pointer transition-all">
                 <option>2026</option>
                 <option>2025</option>
@@ -102,7 +102,7 @@ function EmployeeTaxPayPage() {
 
             {/* Month Selector */}
             <div className="flex flex-col">
-              <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Month</label>
+              <label className="text-[10px] text-slate-450 font-bold uppercase tracking-wider block mb-1">Month</label>
               <select className="h-9 px-3 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 min-w-[100px] cursor-pointer transition-all">
                 <option>Jul</option>
                 <option>Aug</option>
@@ -112,7 +112,7 @@ function EmployeeTaxPayPage() {
 
             {/* Bank Selector */}
             <div className="flex flex-col flex-1 min-w-[150px]">
-              <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Bank</label>
+              <label className="text-[10px] text-slate-450 font-bold uppercase tracking-wider block mb-1">Bank</label>
               <select className="h-9 px-3 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 w-full cursor-pointer transition-all">
                 <option>Sonali Bank PLC</option>
                 <option>Eastern Bank Ltd</option>
@@ -121,7 +121,7 @@ function EmployeeTaxPayPage() {
 
             {/* Branch Selector */}
             <div className="flex flex-col flex-1 min-w-[150px]">
-              <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Branch</label>
+              <label className="text-[10px] text-slate-450 font-bold uppercase tracking-wider block mb-1">Branch</label>
               <select className="h-9 px-3 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 w-full cursor-pointer transition-all">
                 <option>Narayanganj</option>
                 <option>Dhaka Main Branch</option>
@@ -130,7 +130,7 @@ function EmployeeTaxPayPage() {
 
             {/* Chalan No Input */}
             <div className="flex flex-col flex-1 min-w-[140px]">
-              <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Chalan No</label>
+              <label className="text-[10px] text-slate-450 font-bold uppercase tracking-wider block mb-1">Chalan No</label>
               <input
                 type="text"
                 defaultValue="54545454545"
@@ -140,7 +140,7 @@ function EmployeeTaxPayPage() {
 
             {/* Chalan Date Input */}
             <div className="flex flex-col flex-1 min-w-[120px]">
-              <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Chalan Date</label>
+              <label className="text-[10px] text-slate-450 font-bold uppercase tracking-wider block mb-1">Chalan Date</label>
               <input
                 type="text"
                 defaultValue="26/08/2026"
@@ -149,7 +149,7 @@ function EmployeeTaxPayPage() {
             </div>
 
             {/* Search Button */}
-            <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold h-9 px-5 rounded-lg transition-all shadow-md shadow-blue-500/10 cursor-pointer self-end">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold h-9 px-5 rounded-lg transition-all shadow-md shadow-blue-500/10 cursor-pointer self-end text-xs">
               SEARCH
             </button>
           </div>
@@ -186,14 +186,15 @@ function EmployeeTaxPayPage() {
                 </button>
               </div>
 
-              {/* Compact Search Box */}
+              {/* Compact Search Box with correct font sizes */}
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-bold text-slate-550 select-none">Search:</span>
+                <span className="text-[10px] text-slate-450 font-bold uppercase tracking-wider select-none">Search:</span>
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-48 px-3 h-[30px] bg-white border border-slate-200 hover:border-slate-300 focus:bg-white focus:border-blue-500 rounded-lg text-xs font-normal text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/10 transition-all placeholder:text-slate-400"
+                  className="w-48 px-3 h-9 bg-white border border-slate-200 hover:border-slate-350 focus:bg-white focus:border-blue-500 rounded-lg text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all placeholder:text-slate-400"
+                  placeholder="Filter..."
                 />
               </div>
 
@@ -324,10 +325,10 @@ function EmployeeTaxPayPage() {
           </div>
 
           {/* Bottom Submit Action */}
-          <div className="flex justify-start">
+          <div className="flex justify-end">
             <button 
               onClick={handleSave}
-              className="bg-[#0d6efd] hover:bg-blue-700 text-white font-bold h-9 px-5 rounded transition-all shadow-md shadow-blue-550/10 cursor-pointer uppercase tracking-wider animate-in fade-in duration-200"
+              className="bg-[#0d6efd] hover:bg-blue-700 text-white font-bold h-9 px-5 rounded-lg transition-all shadow-md shadow-blue-550/10 cursor-pointer uppercase text-xs tracking-wider animate-in fade-in duration-200"
             >
               SUBMIT
             </button>
