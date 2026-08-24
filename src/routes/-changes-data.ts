@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "258",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Employee Job Card",
+    link: "/employee-job-card",
+    descriptionEn: "Redesigned the Employee Job Card workspace including Scope & Parameters form columns grid, inline query triggers, employee profile summary card, stat card tiles, and responsive Attendance Summary block.",
+    descriptionBn: "এমপ্লয়ি জব কার্ড পেজটি নতুন করে রিডিজাইন করা হয়েছে: যেখানে রয়েছে স্কোপ ও প্যারামিটারস সার্চ প্যানেল, ইনলাইন অ্যাকশন ট্রিগার, এমপ্লয়ি প্রোফাইল সামারি কার্ড, ৪টি প্রিমিয়াম স্ট্যাট টাইলস এবং ডায়নামিক অ্যাটেনডেন্স সামারি ব্লক।",
+  },
+  {
     id: "257",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Update",
