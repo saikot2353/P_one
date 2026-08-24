@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "261",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Payroll",
+    link: "/employee-tax-pay",
+    descriptionEn: "Created the new Employee Tax Pay (Tax Update) menu and interactive form page in the Payroll module. Featuring period filters, total person and amount statistics cards, bank details, chalan numbers/dates configurations, and an editable data grid with inline input fields matching the user's reference screenshot.",
+    descriptionBn: "পে-রোল মডিউলের অধীনে নতুন এমপ্লয়ি ট্যাক্স পে (ট্যাক্স আপডেট) মেনু এবং ইন্টারঅ্যাক্টিভ ফর্ম পেইজ তৈরি করা হয়েছে। এর মধ্যে রয়েছে বছর ও মাস ফিল্টার, মোট ব্যক্তি ও টাকার পরিমাণের পরিসংখ্যান কার্ড, ব্যাংক ও চালান নম্বর/তারিখ কনফিগারেশন এবং স্ক্রিনশটের সাথে সামঞ্জস্যপূর্ণ ইনলাইন ইনপুট ফিল্ড সহ একটি এডিটেবল ডেটা গ্রিড টেবিল।",
+  },
+  {
     id: "260",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Update",

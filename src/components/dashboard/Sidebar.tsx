@@ -338,6 +338,7 @@ export const nav: NavItem[] = [
         subitems: [{ label: "Loan Management", to: "/loan-application" }],
       },
       { label: "Deductions", to: "/payroll-deductions" },
+      { label: "Tax Update", to: "/employee-tax-pay" },
       {
         label: "Salary Process",
         subitems: [
