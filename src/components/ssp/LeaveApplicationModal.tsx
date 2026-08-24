@@ -1,5 +1,20 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { X, CheckCircle2 } from "lucide-react";
+import {
+  X,
+  CheckCircle2,
+  CalendarDays,
+  Clock,
+  Phone,
+  User,
+  MapPin,
+  Paperclip,
+  FileText,
+  FileCheck,
+  CheckSquare,
+  Building,
+  Layers,
+  MessageSquare,
+} from "lucide-react";
 
 interface LeaveApplicationModalProps {
   open: boolean;
@@ -22,152 +37,328 @@ export function LeaveApplicationModal({ open, onOpenChange }: LeaveApplicationMo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl p-0 bg-white border border-border/40 shadow-2xl rounded-lg overflow-hidden gap-0 max-h-[95vh] [&>button]:hidden">
-        {/* Header */}
-        <div className="px-6 py-4 border-b border-border/30 flex items-center justify-between bg-muted/10 shrink-0">
-          <div>
-            <h2 className="text-[16px] font-bold text-foreground tracking-tight">
-              Leave Application
-            </h2>
-            <p className="text-[11px] text-muted-foreground/80 mt-0.5">Requisition Detail View</p>
+      <DialogContent className="max-w-5xl p-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl rounded-xl overflow-hidden gap-0 max-h-[92vh] flex flex-col [&>button]:hidden text-slate-700 dark:text-slate-200">
+        {/* Modal Header */}
+        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-[#fbfcfd] dark:bg-slate-950/30 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="size-9 rounded-lg bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-100 dark:border-slate-700 shadow-3xs">
+              <CalendarDays className="size-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-sm font-black text-slate-800 dark:text-slate-100 leading-none">
+                  Leave Application
+                </h2>
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider border bg-emerald-50 text-emerald-750 border-emerald-105">
+                  • Approved
+                </span>
+              </div>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold mt-1">
+                # Application No: PSL-RQ-LEAVE-372569
+              </p>
+            </div>
           </div>
-          <button
-            onClick={() => onOpenChange(false)}
-            className="size-8 rounded-full bg-white hover:bg-muted border border-border/50 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors shadow-sm"
-          >
-            <X className="size-4" />
-          </button>
+          
+          <div className="flex items-center gap-4">
+            <div className="text-right border-r border-slate-100 dark:border-slate-800 pr-4">
+              <span className="text-[9px] text-slate-400 dark:text-slate-500 block uppercase tracking-widest font-extrabold">
+                APPLICATION DATE
+              </span>
+              <span className="text-xs font-black text-slate-700 dark:text-slate-200 block mt-0.5">
+                01 Apr 2026
+              </span>
+              <span className="text-[9.5px] text-slate-400 dark:text-slate-500 block mt-0.5 font-semibold">
+                Submitted 09:18 AM
+              </span>
+            </div>
+            <button
+              onClick={() => onOpenChange(false)}
+              className="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-all shrink-0 shadow-3xs cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
-        {/* Body */}
-        <div className="px-6 py-5 space-y-6 overflow-hidden">
-          {/* Reference & Requester Card */}
-          <div className="bg-muted/10 border border-border/30 rounded-xl p-4 flex items-start justify-between">
-            <div className="space-y-1">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                Reference No.
-              </p>
-              <p className="text-[13px] font-semibold text-foreground bg-white px-2 py-0.5 rounded border border-border/50 shadow-sm w-fit">
-                PSL-RQ-LEAVE-372569
-              </p>
-            </div>
-            <div className="text-right space-y-1">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                Submitted By
-              </p>
-              <p className="text-[13px] font-semibold text-foreground">Tahmid Afsar</p>
-              <p className="text-[11px] text-muted-foreground font-medium">
-                Emp ID: 2023043910 · Asst. Manager
-              </p>
-              <p className="text-[11px] text-muted-foreground font-medium">Business Innovation</p>
-            </div>
-          </div>
-
-          {/* Requisition Details Grid */}
-          <div className="space-y-3">
-            <h3 className="text-[11px] font-bold text-foreground border-b border-border/30 pb-2 flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-              Requisition Details
-            </h3>
-            <div className="grid grid-cols-2 gap-x-12 gap-y-2.5 px-1">
-              {details.map(([k, v]) => (
-                <div
-                  key={k}
-                  className="flex justify-between items-center border-b border-border/20 pb-1.5"
-                >
-                  <span className="text-[11px] font-semibold text-muted-foreground">{k}</span>
-                  <span className="text-[12px] font-medium text-foreground text-right">{v}</span>
+        {/* Modal Body */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-5 bg-[#f8fafc]/40 dark:bg-slate-950/20">
+          
+          {/* REQUEST FOR Section (Employee Card from 1st Image) */}
+          <div className="bg-[#fcfdfd] dark:bg-slate-900 border border-slate-200/80 rounded-xl p-5 shadow-2xs space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+              <div className="lg:col-span-4 flex items-center gap-4 border-b lg:border-b-0 lg:border-r border-slate-100 dark:border-slate-800 pb-4 lg:pb-0 lg:pr-6">
+                <div className="w-14 h-14 rounded-full bg-blue-600 text-white font-black flex items-center justify-center text-lg shadow-sm shadow-blue-500/20 shrink-0">
+                  TA
                 </div>
-              ))}
+                <div className="min-w-0">
+                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">REQUEST FOR</span>
+                  <h2 className="text-sm font-extrabold text-slate-800 dark:text-slate-100 truncate">Tahmid Afsar</h2>
+                  <p className="text-[11px] text-slate-500 font-semibold mt-0.5">Employee ID · 2023043910</p>
+                </div>
+              </div>
+
+              <div className="lg:col-span-8 grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-6 text-xs text-slate-600 dark:text-slate-400">
+                <div className="flex items-start gap-2.5">
+                  <div className="w-7 h-7 rounded-md bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center shrink-0 border border-slate-100 dark:border-slate-800">
+                    <User className="w-3.5 h-3.5 text-slate-400" />
+                  </div>
+                  <div>
+                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">DESIGNATION</p>
+                    <p className="font-bold text-slate-700 dark:text-slate-200 mt-0.5">Asst. Manager</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <div className="w-7 h-7 rounded-md bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center shrink-0 border border-slate-100 dark:border-slate-800">
+                    <Building className="w-3.5 h-3.5 text-slate-400" />
+                  </div>
+                  <div>
+                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">DEPARTMENT</p>
+                    <p className="font-bold text-slate-700 dark:text-slate-200 mt-0.5">Business Innovation</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <div className="w-7 h-7 rounded-md bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center shrink-0 border border-slate-100 dark:border-slate-800">
+                    <Layers className="w-3.5 h-3.5 text-slate-400" />
+                  </div>
+                  <div>
+                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">SECTION</p>
+                    <p className="font-bold text-slate-700 dark:text-slate-200 mt-0.5">APPS Team</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <div className="w-7 h-7 rounded-md bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center shrink-0 border border-slate-100 dark:border-slate-800">
+                    <CalendarDays className="w-3.5 h-3.5 text-slate-400" />
+                  </div>
+                  <div>
+                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">DATE OF JOINING</p>
+                    <p className="font-bold text-slate-700 dark:text-slate-200 mt-0.5">15 Mar 2024</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <div className="w-7 h-7 rounded-md bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center shrink-0 border border-slate-100 dark:border-slate-800">
+                    <Building className="w-3.5 h-3.5 text-slate-400" />
+                  </div>
+                  <div>
+                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">BUSINESS UNIT</p>
+                    <p className="font-bold text-slate-700 dark:text-slate-200 mt-0.5">Pakiza Software Limited</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <div className="w-7 h-7 rounded-md bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center shrink-0 border border-slate-100 dark:border-slate-800">
+                    <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                  </div>
+                  <div>
+                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">LOCATION</p>
+                    <p className="font-bold text-slate-700 dark:text-slate-200 mt-0.5">PSL-Operation</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Leave Details section */}
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 p-5 shadow-2xs space-y-4">
+            <div className="flex items-center gap-2 pb-1.5 border-b border-slate-100 dark:border-slate-800/60">
+              <div className="w-6 h-6 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-100 dark:border-slate-900 shadow-3xs">
+                <FileText className="w-3.5 h-3.5" />
+              </div>
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Leave Details</span>
+            </div>
+
+            <div className="pl-1 text-xs">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1.5 font-semibold text-slate-700 dark:text-slate-200 mt-2">
+                <div className="flex items-center gap-1 md:col-span-2">
+                  <span className="text-slate-400 dark:text-slate-500 font-normal">Leave Type:</span>
+                  <span className="text-slate-700 dark:text-slate-200 font-bold">{details.find(d => d[0] === "Type")?.[1] || "Sick Leave"}</span>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <span className="text-slate-400 dark:text-slate-500 font-normal">Category:</span>
+                  <span className="text-slate-700 dark:text-slate-200 font-bold">{details.find(d => d[0] === "Category")?.[1] || "Full Day Leave"}</span>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <span className="text-slate-400 dark:text-slate-500 font-normal">Contact:</span>
+                  <span className="text-slate-700 dark:text-slate-200 font-bold font-mono">{details.find(d => d[0] === "Contact")?.[1] || "01750021154"}</span>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <span className="text-slate-400 dark:text-slate-500 font-normal">From Date:</span>
+                  <span className="text-slate-700 dark:text-slate-200 font-bold font-mono">{details.find(d => d[0] === "From")?.[1] || "04/04/2026"}</span>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <span className="text-slate-400 dark:text-slate-500 font-normal">Responsible:</span>
+                  <span className="text-slate-700 dark:text-slate-200 font-bold">{details.find(d => d[0] === "Responsible")?.[1] || "Md. Anik Islam (Dy. Manager)"}</span>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <span className="text-slate-400 dark:text-slate-500 font-normal">To Date:</span>
+                  <span className="text-slate-700 dark:text-slate-200 font-bold font-mono">{details.find(d => d[0] === "To")?.[1] || "04/04/2026"}</span>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <span className="text-slate-400 dark:text-slate-500 font-normal">Documents:</span>
+                  <span className="text-slate-700 dark:text-slate-200 font-bold">None uploaded</span>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <span className="text-slate-400 dark:text-slate-500 font-normal">Duration:</span>
+                  <span className="text-slate-700 dark:text-slate-200 font-bold">{details.find(d => d[0] === "Duration")?.[1] || "1 Day"}</span>
+                </div>
+
+                <div className="flex items-start gap-1 md:col-span-2">
+                  <span className="text-slate-400 dark:text-slate-500 font-normal shrink-0">Address:</span>
+                  <span className="text-slate-700 dark:text-slate-200 font-bold">{details.find(d => d[0] === "Address")?.[1] || "Jahangirnagar University"}</span>
+                </div>
+
+                <div className="flex items-start gap-1 md:col-span-2">
+                  <span className="text-slate-400 dark:text-slate-500 font-normal shrink-0">Purpose:</span>
+                  <span className="text-slate-700 dark:text-slate-200 font-bold italic">"{details.find(d => d[0] === "Purpose")?.[1] || "Semester Final Exam"}"</span>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Approval Details Table */}
-          <div className="space-y-3">
-            <h3 className="text-[11px] font-bold text-foreground border-b border-border/30 pb-2 flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-              Leave Balances & Status
-            </h3>
-            <div className="border border-border/30 rounded-xl overflow-hidden shadow-sm">
-              <table className="w-full text-left text-[11px]">
-                <thead className="bg-muted/30 text-muted-foreground">
-                  <tr>
-                    {[
-                      "#",
-                      "Leave Type",
-                      "Enjoyed",
-                      "Balance",
-                      "Date From",
-                      "Date To",
-                      "Duration",
-                      "Pay Type",
-                    ].map((h) => (
-                      <th key={h} className="px-4 py-2 font-semibold border-b border-border/30">
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="bg-white">
-                  <tr>
-                    <td className="px-4 py-3 text-muted-foreground">2</td>
-                    <td className="px-4 py-3 font-medium text-foreground">Sick Leave</td>
-                    <td className="px-4 py-3">2</td>
-                    <td className="px-4 py-3 font-semibold text-blue-600">12</td>
-                    <td className="px-4 py-3 text-muted-foreground">04/04/2026</td>
-                    <td className="px-4 py-3 text-muted-foreground">04/04/2026</td>
-                    <td className="px-4 py-3 font-medium">1 Day</td>
-                    <td className="px-4 py-3">
-                      <span className="px-2 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl text-[10px] font-bold">
-                        With Pay
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+          {/* Leave Balance Table */}
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 overflow-hidden shadow-2xs">
+            <table className="w-full text-xs text-left">
+              <thead className="bg-[#fcfdfd] dark:bg-slate-950/20 border-b border-slate-200 dark:border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <tr>
+                  <th className="px-4 py-3 w-16">SL</th>
+                  <th className="px-4 py-3">LEAVE TYPE</th>
+                  <th className="px-4 py-3">ENJOYED</th>
+                  <th className="px-4 py-3">BALANCE</th>
+                  <th className="px-4 py-3">DATE RANGE</th>
+                  <th className="px-4 py-3">DURATION</th>
+                  <th className="px-4 py-3">PAY TYPE</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-600 dark:text-slate-400 font-semibold">
+                <tr className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                  <td className="px-4 py-3 flex items-center gap-2">
+                    <CheckSquare className="size-3.5 text-blue-600 shrink-0" />
+                    <span className="text-slate-850 dark:text-slate-200">2</span>
+                  </td>
+                  <td className="px-4 py-3 font-bold text-slate-855 dark:text-slate-100">Sick Leave</td>
+                  <td className="px-4 py-3">2</td>
+                  <td className="px-4 py-3 text-blue-600 dark:text-blue-400 font-extrabold">12</td>
+                  <td className="px-4 py-3 font-mono text-[11px]">
+                    04/04/2026 — 04/04/2026
+                  </td>
+                  <td className="px-4 py-3">1 Day</td>
+                  <td className="px-4 py-3">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900 rounded text-[10px] font-bold">
+                      <FileText className="size-3 shrink-0" />
+                      With Pay
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
-          {/* Approvals Cards */}
-          <div className="space-y-3">
-            <h3 className="text-[11px] font-bold text-foreground border-b border-border/30 pb-2 flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-              Approval Signatures
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
+          {/* Approval Workflow & Signatures */}
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 p-5 shadow-2xs space-y-4">
+            <div className="flex items-center gap-2 pb-1.5">
+              <div className="w-6 h-6 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-100 dark:border-slate-900 shadow-3xs">
+                <FileCheck className="w-3.5 h-3.5" />
+              </div>
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Approval Workflow & Signatures</span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3">
               {[
                 {
                   role: "Manager",
                   name: "Md. Zahidul Islam",
                   title: "COO",
                   date: "02 Apr 2026 · 13:50",
+                  status: "Approved",
                 },
                 {
                   role: "Head of HR",
                   name: "Rajebul Hasan Rajon",
                   title: "Deputy Manager",
                   date: "21 Apr 2026 · 20:11",
+                  status: "Approved",
                 },
-              ].map((a) => (
-                <div
-                  key={a.role}
-                  className="p-3.5 bg-emerald-50/30 border border-emerald-100 rounded-xl flex items-start gap-3"
-                >
-                  <div className="mt-0.5 bg-emerald-100 p-1.5 rounded-full text-emerald-600">
-                    <CheckCircle2 className="size-4" />
+              ].map((sig, idx) => {
+                const isApproved = sig.status === "Approved";
+                return (
+                  <div
+                    key={idx}
+                    className="p-3 border border-slate-200 dark:border-slate-800 rounded-xl flex flex-col justify-between h-[105px] relative bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-1 mb-1.5">
+                        <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+                          {sig.role}
+                        </span>
+                        <span className="inline-flex items-center gap-0.5 text-[8.5px] font-black uppercase text-emerald-600">
+                          ✓ Approved
+                        </span>
+                      </div>
+                      <p className="text-[11.5px] font-extrabold text-slate-800 dark:text-slate-100 leading-snug truncate">
+                        {sig.name}
+                      </p>
+                      <p className="text-[9.5px] text-slate-400 dark:text-slate-500 font-semibold truncate leading-tight">
+                        {sig.title}
+                      </p>
+                    </div>
+                    <div className="mt-2 pt-1.5 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-[8.5px] text-slate-400 font-mono">
+                      <span>{sig.date.split(" · ")[1]}</span>
+                      <span>{sig.date.split(" · ")[0]}</span>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider block mb-1">
-                      {a.role} Approved
-                    </span>
-                    <p className="text-[12px] font-bold text-foreground">{a.name}</p>
-                    <p className="text-[11px] text-muted-foreground font-medium">{a.title}</p>
-                    <p className="text-[10px] text-muted-foreground/60 mt-1">{a.date}</p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
+
+          {/* Comments & Approval Notes */}
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 p-5 shadow-2xs space-y-4">
+            <div className="flex items-center gap-2 pb-1.5">
+              <div className="w-6 h-6 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-100 dark:border-slate-900 shadow-3xs">
+                <MessageSquare className="w-3.5 h-3.5" />
+              </div>
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Comments & Approval Notes</span>
+            </div>
+
+            <div className="space-y-3 pr-1">
+              <div className="flex gap-3 items-start bg-slate-50/40 dark:bg-slate-950/20 border border-slate-100 dark:border-slate-800 p-3 rounded-xl text-slate-750 dark:text-slate-250">
+                <div className="w-8 h-8 rounded-full bg-teal-500 text-white font-bold text-xs flex items-center justify-center shrink-0">
+                  TA
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-[11.5px] font-extrabold text-slate-755 dark:text-slate-255">
+                      Tahmid Afsar <span className="text-slate-400 font-semibold">· Employee</span>
+                    </span>
+                    <span className="text-[9.5px] text-slate-400 font-semibold font-mono">01 Apr 2026 · 09:18</span>
+                  </div>
+                  <p className="text-[11.5px] font-semibold text-slate-650 dark:text-slate-350 leading-relaxed">
+                    Request submitted for Semester Final Exam.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Modal Footer */}
+        <div className="px-6 py-3.5 border-t border-slate-100 dark:border-slate-800 bg-[#fbfcfd] dark:bg-slate-950/30 flex justify-end shrink-0">
+          <button
+            onClick={() => onOpenChange(false)}
+            className="h-8.5 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer"
+          >
+            Close
+          </button>
         </div>
       </DialogContent>
     </Dialog>

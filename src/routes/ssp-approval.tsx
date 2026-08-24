@@ -22,6 +22,11 @@ import {
   CalendarDays,
   XCircle,
   FolderOpen,
+  Building,
+  MapPin,
+  Paperclip,
+  Phone,
+  CheckSquare,
 } from "lucide-react";
 
 export const Route = createFileRoute("/ssp-approval")({
@@ -710,290 +715,341 @@ function SSPApprovalPage() {
       {/* Requisition Approval Modal */}
       {selectedReq && (
         <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-          <DialogContent className="max-w-4xl p-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl rounded-lg overflow-hidden gap-0 max-h-[92vh] flex flex-col [&>button]:hidden text-slate-700 dark:text-slate-200">
+          <DialogContent className="max-w-5xl p-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl rounded-xl overflow-hidden gap-0 max-h-[92vh] flex flex-col [&>button]:hidden text-slate-700 dark:text-slate-200">
             {/* Modal Header */}
-            <div className="px-6 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 flex items-center justify-between shrink-0">
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-[#fbfcfd] dark:bg-slate-950/30 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
-                <div className="size-8.5 rounded-lg bg-slate-800 dark:bg-slate-700 text-white flex items-center justify-center shrink-0">
-                  <FileCheck className="size-4.5" />
+                <div className="size-9 rounded-lg bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-100 dark:border-slate-700 shadow-3xs">
+                  <CalendarDays className="size-5" />
                 </div>
                 <div>
-                  <h2 className="text-[14px] font-bold text-slate-800 dark:text-slate-100 leading-tight">
-                    Requisition Authorization
-                  </h2>
-                  <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 uppercase tracking-wider font-extrabold">
-                    {selectedReq.document}
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-sm font-black text-slate-800 dark:text-slate-100 leading-none">
+                      {selectedReq.document}
+                    </h2>
+                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider border ${
+                      selectedReq.status === "Approved"
+                        ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+                        : selectedReq.status === "Rejected"
+                        ? "bg-rose-50 text-rose-700 border-rose-100"
+                        : "bg-amber-50 text-amber-600 border-amber-100"
+                    }`}>
+                      • {selectedReq.status}
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold mt-1">
+                    # Application No: PSL-RQ-{selectedReq.document.toUpperCase().includes("LEAVE") ? "LEAVE" : "ICT"}-{selectedReq.reqNum}
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => setModalOpen(false)}
-                className="size-7.5 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all cursor-pointer"
-              >
-                <X className="size-4" />
-              </button>
+              
+              <div className="flex items-center gap-4">
+                <div className="text-right border-r border-slate-100 dark:border-slate-800 pr-4">
+                  <span className="text-[9px] text-slate-400 dark:text-slate-500 block uppercase tracking-widest font-extrabold">
+                    APPLICATION DATE
+                  </span>
+                  <span className="text-xs font-black text-slate-700 dark:text-slate-200 block mt-0.5">
+                    {new Date(selectedReq.date).toLocaleDateString("en-GB", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric"
+                    })}
+                  </span>
+                  <span className="text-[9.5px] text-slate-400 dark:text-slate-500 block mt-0.5 font-semibold">
+                    Submitted 09:18 AM
+                  </span>
+                </div>
+                <button
+                  onClick={() => setModalOpen(false)}
+                  className="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-all shrink-0 shadow-3xs cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
             {/* Modal Body */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-5">
-              {/* Requester Profile Summary Card */}
-              <div className="bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="size-11.5 rounded-xl bg-slate-200 dark:bg-slate-900 flex items-center justify-center text-slate-600 shrink-0 border border-slate-300 dark:border-slate-700">
-                    <User className="size-6 text-slate-500 dark:text-slate-400" />
+            <div className="flex-1 overflow-y-auto p-6 space-y-5 bg-[#f8fafc]/40 dark:bg-slate-950/20">
+              
+              {/* REQUESTER & REQUEST FOR Section (2nd Image design) */}
+              <div className="bg-[#fcfdfd] dark:bg-slate-900 border border-slate-200/80 rounded-xl p-5 shadow-2xs grid grid-cols-1 md:grid-cols-2 gap-6 relative text-slate-700 dark:text-slate-200">
+                {/* Column 1: Requester Details */}
+                <div>
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-750 dark:text-slate-350 uppercase tracking-widest mb-3">
+                    <User className="size-3.5 text-blue-600 dark:text-blue-400" />
+                    REQUESTER:
                   </div>
-                  <div>
-                    <h4 className="text-[13px] font-extrabold text-slate-800 dark:text-slate-100">
+                  <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-450">
+                    <h4 className="text-[14px] font-extrabold text-slate-800 dark:text-slate-100 mb-2">
                       {selectedReq.requestor}
                     </h4>
-                    <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider mt-0.5">
-                      {selectedReq.details.designation} · {selectedReq.details.section}
-                    </p>
-                  </div>
-                </div>
+                    <div className="grid grid-cols-[80px_1fr] gap-x-2 gap-y-1 font-semibold text-[11px]">
+                      <span className="text-slate-400">Emp Id:</span>
+                      <span className="text-slate-700 dark:text-slate-200 font-bold">{selectedReq.details.empId}</span>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:flex md:items-center gap-x-6 gap-y-2 text-[11px] font-bold text-slate-500 dark:text-slate-400 border-t md:border-t-0 border-slate-200 dark:border-slate-700 pt-3 md:pt-0">
-                  <div>
-                    <span className="text-[9px] text-slate-400 dark:text-slate-500 block uppercase tracking-wider font-extrabold">
-                      Emp ID
-                    </span>
-                    <span className="text-slate-700 dark:text-slate-200 font-extrabold">
-                      {selectedReq.details.empId}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[9px] text-slate-400 dark:text-slate-500 block uppercase tracking-wider font-extrabold">
-                      Department
-                    </span>
-                    <span className="text-slate-700 dark:text-slate-200 font-extrabold">
-                      {selectedReq.department}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[9px] text-slate-400 dark:text-slate-500 block uppercase tracking-wider font-extrabold">
-                      Ref No
-                    </span>
-                    <span className="text-blue-600 dark:text-blue-400 font-extrabold bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900 px-1.5 py-0.5 rounded font-mono text-[10px]">
-                      PSL-RQ-
-                      {selectedReq.document.toUpperCase().includes("LEAVE") ? "LEAVE" : "ICT"}-
-                      {selectedReq.reqNum}
-                    </span>
-                  </div>
-                </div>
-              </div>
+                      <span className="text-slate-400">DOJ:</span>
+                      <span className="text-slate-700 dark:text-slate-200 font-bold">{selectedReq.details.doj}</span>
 
-              {/* Grid Split */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                {/* Requisition Info */}
-                <div className="space-y-2.5">
-                  <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
-                    <div className="size-1.5 rounded-full bg-slate-500" />
-                    Requisition Information
-                  </h3>
-                  <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-900 shadow-sm">
-                    <table className="w-full text-xs text-left">
-                      <tbody className="divide-y divide-slate-100 border-b border-slate-100 dark:divide-slate-800 dark:border-slate-800 font-semibold text-slate-700 dark:text-slate-300">
-                        <tr>
-                          <td className="px-4 py-2 bg-slate-50/40 dark:bg-slate-950/20 text-slate-400 dark:text-slate-400 w-1/3">
-                            Type
-                          </td>
-                          <td className="px-4 py-2 font-bold text-slate-800 dark:text-slate-100">
-                            {selectedReq.details.type}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="px-4 py-2 bg-slate-50/40 dark:bg-slate-950/20 text-slate-400 dark:text-slate-400">
-                            Category
-                          </td>
-                          <td className="px-4 py-2 text-slate-600 dark:text-slate-300">
-                            {selectedReq.details.category}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="px-4 py-2 bg-slate-50/40 dark:bg-slate-950/20 text-slate-400 dark:text-slate-400">
-                            Duration
-                          </td>
-                          <td className="px-4 py-2 text-slate-800 dark:text-slate-100 font-extrabold">
-                            {selectedReq.details.duration}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="px-4 py-2 bg-slate-50/40 dark:bg-slate-950/20 text-slate-400 dark:text-slate-300 font-mono">
-                            Contact No
-                          </td>
-                          <td className="px-4 py-2 text-slate-600 dark:text-slate-300 font-mono">
-                            {selectedReq.details.contact}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="px-4 py-2 bg-slate-50/40 dark:bg-slate-950/20 text-slate-400 dark:text-slate-400">
-                            Purpose
-                          </td>
-                          <td className="px-4 py-2 text-slate-600 dark:text-slate-300 italic font-normal">
-                            "{selectedReq.details.purpose}"
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                      <span className="text-slate-400">Designation:</span>
+                      <span className="text-slate-700 dark:text-slate-200 font-bold">{selectedReq.details.designation}</span>
 
-                {/* Leave Balance */}
-                <div className="space-y-2.5">
-                  <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
-                    <div className="size-1.5 rounded-full bg-slate-500" />
-                    Balances & Status Breakdown
-                  </h3>
-                  <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-900 shadow-sm">
-                    <table className="w-full text-xs text-left">
-                      <thead className="bg-[#fafafa] dark:bg-slate-950/20 border-b border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500">
-                        <tr>
-                          <th className="px-4 py-2 font-bold text-[9px] uppercase tracking-wider">
-                            Leave Type
-                          </th>
-                          <th className="px-4 py-2 font-bold text-[9px] uppercase tracking-wider">
-                            Enjoyed
-                          </th>
-                          <th className="px-4 py-2 font-bold text-[9px] uppercase tracking-wider">
-                            Balance
-                          </th>
-                          <th className="px-4 py-2 font-bold text-[9px] uppercase tracking-wider">
-                            Pay Type
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 border-b border-slate-100 dark:divide-slate-800 dark:border-slate-800 font-semibold text-slate-700 dark:text-slate-300">
-                        {selectedReq.details.balances.map((bal, idx) => (
-                          <tr key={idx}>
-                            <td className="px-4 py-2 text-slate-800 dark:text-slate-200">
-                              {bal.leaveType}
-                            </td>
-                            <td className="px-4 py-2 text-slate-500 dark:text-slate-400">
-                              {bal.enjoyed}
-                            </td>
-                            <td className="px-4 py-2 text-blue-600 dark:text-blue-400 font-extrabold">
-                              {bal.balance}
-                            </td>
-                            <td className="px-4 py-2">
-                              <span className="px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800 rounded text-[9px] font-extrabold uppercase">
-                                {bal.payType}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
+                      <span className="text-slate-400">Section:</span>
+                      <span className="text-slate-700 dark:text-slate-200 font-bold">{selectedReq.details.section}</span>
 
-              {/* Signature Timeline Stepper */}
-              <div className="space-y-3">
-                <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
-                  <div className="size-1.5 rounded-full bg-slate-500" />
-                  Approval Workflow Signature Chain
-                </h3>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-                  {selectedReq.details.signatures.map((sig, idx) => (
-                    <div
-                      key={idx}
-                      className={`p-3 border rounded-xl flex items-start gap-2.5 relative ${
-                        sig.status === "Approved"
-                          ? "bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-800/30 text-emerald-800 dark:text-emerald-400"
-                          : "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500"
-                      }`}
-                    >
-                      <div
-                        className={`mt-0.5 p-1 rounded-full ${sig.status === "Approved" ? "bg-emerald-100 text-emerald-600" : "bg-slate-100 text-slate-400"}`}
-                      >
-                        <CheckCircle2 className="size-3.5" />
-                      </div>
-                      <div className="min-w-0">
-                        <span
-                          className={`text-[8.5px] font-black uppercase tracking-wider block mb-0.5 ${sig.status === "Approved" ? "text-emerald-600" : "text-slate-400"}`}
-                        >
-                          {sig.role}
-                        </span>
-                        <p className="text-[11px] font-extrabold text-slate-800 dark:text-slate-200 leading-tight truncate">
-                          {sig.name}
-                        </p>
-                        <p className="text-[9.5px] text-slate-400 dark:text-slate-500 font-medium truncate mt-0.5">
-                          {sig.title}
-                        </p>
-                        {sig.status === "Approved" && (
-                          <span className="text-[8.5px] text-slate-400/80 dark:text-slate-500 font-mono block mt-1">
-                            {sig.date.split(" ")[0]}
-                          </span>
-                        )}
-                      </div>
+                      <span className="text-slate-400">Dept:</span>
+                      <span className="text-slate-700 dark:text-slate-200 font-bold">{selectedReq.department}</span>
                     </div>
-                  ))}
+                    <div className="text-slate-600 dark:text-slate-300 font-bold text-[11px] mt-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+                      {selectedReq.details.location}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Column 2: Request For Details */}
+                <div className="border-t md:border-t-0 md:border-l border-slate-100 dark:border-slate-800 pt-5 md:pt-0 md:pl-6">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-750 dark:text-slate-350 uppercase tracking-widest mb-3">
+                    <Building className="size-3.5 text-indigo-600 dark:text-indigo-400" />
+                    REQUEST FOR:
+                  </div>
+                  <div className="divide-y divide-slate-100 dark:divide-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-450 text-slate-700 dark:text-slate-200">
+                    <div className="flex justify-between items-center py-2.5">
+                      <span className="text-slate-400">Department:</span>
+                      <span className="text-slate-750 dark:text-slate-150 font-bold">{selectedReq.department}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2.5">
+                      <span className="text-slate-400">Section:</span>
+                      <span className="text-slate-750 dark:text-slate-150 font-bold">{selectedReq.details.section}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Comments Section */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-1">
-                {/* Input */}
-                <div className="space-y-2.5">
-                  <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
-                    <MessageSquare className="size-3.5 text-slate-400 dark:text-slate-500" />
-                    Add Decision Comment
-                  </h3>
-                  <div className="space-y-2">
+              {/* Leave Details section */}
+              <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 p-5 shadow-2xs space-y-4">
+                <div className="flex items-center gap-2 pb-1.5 border-b border-slate-100 dark:border-slate-800/60">
+                  <div className="w-6 h-6 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-100 dark:border-slate-900 shadow-3xs">
+                    <FileText className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Leave Details</span>
+                </div>
+
+                <div className="pl-1 text-xs">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1.5 font-semibold text-slate-700 dark:text-slate-200 mt-2">
+                    <div className="flex items-center gap-1 md:col-span-2">
+                      <span className="text-slate-400 dark:text-slate-500 font-normal">Leave Type:</span>
+                      <span className="text-slate-700 dark:text-slate-200 font-bold">{selectedReq.details.type}</span>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <span className="text-slate-400 dark:text-slate-500 font-normal">Category:</span>
+                      <span className="text-slate-700 dark:text-slate-200 font-bold">{selectedReq.details.category}</span>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <span className="text-slate-400 dark:text-slate-500 font-normal">Contact:</span>
+                      <span className="text-slate-700 dark:text-slate-200 font-bold font-mono">{selectedReq.details.contact}</span>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <span className="text-slate-400 dark:text-slate-500 font-normal">From Date:</span>
+                      <span className="text-slate-700 dark:text-slate-200 font-bold font-mono">
+                        {selectedReq.details.balances[0]?.dateFrom || selectedReq.details.dates.split(" to ")[0]}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <span className="text-slate-400 dark:text-slate-500 font-normal">Responsible:</span>
+                      <span className="text-slate-700 dark:text-slate-200 font-bold">{selectedReq.details.responsible}</span>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <span className="text-slate-400 dark:text-slate-500 font-normal">To Date:</span>
+                      <span className="text-slate-700 dark:text-slate-200 font-bold font-mono">
+                        {selectedReq.details.balances[0]?.dateTo || selectedReq.details.dates.split(" to ")[1] || selectedReq.details.dates}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <span className="text-slate-400 dark:text-slate-500 font-normal">Documents:</span>
+                      <span className="text-slate-700 dark:text-slate-200 font-bold">None uploaded</span>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <span className="text-slate-400 dark:text-slate-500 font-normal">Duration:</span>
+                      <span className="text-slate-700 dark:text-slate-200 font-bold">{selectedReq.details.duration}</span>
+                    </div>
+
+                    <div className="flex items-start gap-1 md:col-span-2">
+                      <span className="text-slate-400 dark:text-slate-500 font-normal shrink-0">Address:</span>
+                      <span className="text-slate-700 dark:text-slate-200 font-bold">{selectedReq.details.location}</span>
+                    </div>
+
+                    <div className="flex items-start gap-1 md:col-span-2">
+                      <span className="text-slate-400 dark:text-slate-500 font-normal shrink-0">Purpose:</span>
+                      <span className="text-slate-700 dark:text-slate-200 font-bold italic">"{selectedReq.details.purpose}"</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Leave Balance Table */}
+              <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 overflow-hidden shadow-2xs">
+                <table className="w-full text-xs text-left">
+                  <thead className="bg-[#fcfdfd] dark:bg-slate-950/20 border-b border-slate-200 dark:border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    <tr>
+                      <th className="px-4 py-3 w-16">SL</th>
+                      <th className="px-4 py-3">LEAVE TYPE</th>
+                      <th className="px-4 py-3">ENJOYED</th>
+                      <th className="px-4 py-3">BALANCE</th>
+                      <th className="px-4 py-3">DATE RANGE</th>
+                      <th className="px-4 py-3">DURATION</th>
+                      <th className="px-4 py-3">PAY TYPE</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-600 dark:text-slate-400 font-semibold">
+                    {selectedReq.details.balances.map((bal, idx) => (
+                      <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                        <td className="px-4 py-3 flex items-center gap-2">
+                          <CheckSquare className="size-3.5 text-blue-600 shrink-0" />
+                          <span className="text-slate-850 dark:text-slate-200">2</span>
+                        </td>
+                        <td className="px-4 py-3 font-bold text-slate-850 dark:text-slate-100">{bal.leaveType}</td>
+                        <td className="px-4 py-3">{bal.enjoyed}</td>
+                        <td className="px-4 py-3 text-blue-600 dark:text-blue-400 font-extrabold">{bal.balance}</td>
+                        <td className="px-4 py-3 font-mono text-[11px]">
+                          {bal.dateFrom} — {bal.dateTo}
+                        </td>
+                        <td className="px-4 py-3">{bal.duration}</td>
+                        <td className="px-4 py-3">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900 rounded text-[10px] font-bold">
+                            <FileText className="size-3 shrink-0" />
+                            {bal.payType}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Approval Workflow & Signatures */}
+              <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 p-5 shadow-2xs space-y-4">
+                <div className="flex items-center gap-2 pb-1.5">
+                  <div className="w-6 h-6 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-100 dark:border-slate-900 shadow-3xs">
+                    <FileCheck className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Approval Workflow & Signatures</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                  {selectedReq.details.signatures.map((sig, idx) => {
+                    const isApproved = sig.status === "Approved";
+                    return (
+                      <div
+                        key={idx}
+                        className={`p-3 border rounded-xl flex flex-col justify-between h-[105px] relative transition-all ${
+                          isApproved
+                            ? "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300"
+                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500"
+                        }`}
+                      >
+                        <div>
+                          <div className="flex items-center justify-between gap-1 mb-1.5">
+                            <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+                              {sig.role}
+                            </span>
+                            <span className={`inline-flex items-center gap-0.5 text-[8.5px] font-black uppercase ${isApproved ? "text-emerald-600" : "text-amber-500"}`}>
+                              {isApproved ? "✓ Approved" : "🕒 Pending"}
+                            </span>
+                          </div>
+                          <p className="text-[11.5px] font-extrabold text-slate-800 dark:text-slate-100 leading-snug truncate">
+                            {sig.name}
+                          </p>
+                          <p className="text-[9.5px] text-slate-400 dark:text-slate-500 font-semibold truncate leading-tight">
+                            {sig.title}
+                          </p>
+                        </div>
+                        <div className="mt-2 pt-1.5 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-[8.5px] text-slate-400 font-mono">
+                          {isApproved ? (
+                            <>
+                              <span>{sig.date.split(" ")[1] || "12:00 AM"}</span>
+                              <span>{sig.date.split(" ")[0]}</span>
+                            </>
+                          ) : (
+                            <span className="italic">Pending</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Comments & Approval Notes */}
+              <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 p-5 shadow-2xs space-y-4">
+                <div className="flex items-center gap-2 pb-1.5">
+                  <div className="w-6 h-6 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-100 dark:border-slate-900 shadow-3xs">
+                    <MessageSquare className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Comments & Approval Notes</span>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  {/* Left Column: Comments List */}
+                  <div className="lg:col-span-8 space-y-3 max-h-[180px] overflow-y-auto pr-1">
+                    {(commentsHistory[selectedReq.id] || []).map((comm, idx) => {
+                      const initials = comm.user.split(" ").map((n: string) => n[0]).join("").substring(0, 2).toUpperCase();
+                      return (
+                        <div key={idx} className="flex gap-3 items-start bg-slate-50/40 dark:bg-slate-950/20 border border-slate-100 dark:border-slate-800 p-3 rounded-xl text-slate-750 dark:text-slate-250">
+                          <div className="w-8 h-8 rounded-full bg-teal-500 text-white font-bold text-xs flex items-center justify-center shrink-0">
+                            {initials}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex justify-between items-center mb-1">
+                              <span className="text-[11.5px] font-extrabold text-slate-750 dark:text-slate-250">
+                                {comm.user} <span className="text-slate-400 font-semibold">· Manager</span>
+                              </span>
+                              <span className="text-[9.5px] text-slate-400 font-semibold font-mono">{comm.date}</span>
+                            </div>
+                            <p className="text-[11.5px] font-semibold text-slate-650 dark:text-slate-350 leading-relaxed">
+                              {comm.text}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    {(!commentsHistory[selectedReq.id] || commentsHistory[selectedReq.id].length === 0) && (
+                      <div className="h-20 flex items-center justify-center text-slate-400 dark:text-slate-500 text-xs font-bold bg-slate-50/40 dark:bg-slate-950/20 border border-slate-100 dark:border-slate-800 rounded-xl">
+                        No previous comments recorded.
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Right Column: Add Comment Form */}
+                  <div className="lg:col-span-4 flex flex-col gap-2.5 border-t lg:border-t-0 lg:border-l border-slate-100 dark:border-slate-800 pt-4 lg:pt-0 lg:pl-6">
+                    <h4 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Add Decision Comment</h4>
                     <textarea
                       value={commentText}
                       onChange={(e) => setCommentText(e.target.value)}
                       placeholder="Type comment or notes here..."
-                      className="w-full h-24 p-3 text-xs font-semibold text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-slate-400 bg-slate-50 dark:bg-slate-950 placeholder:text-slate-400/50 resize-none"
+                      className="w-full flex-1 min-h-[90px] p-3 text-xs font-semibold text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-slate-400 bg-slate-50 dark:bg-slate-950 placeholder:text-slate-400/50 resize-none"
                     />
                     <div className="flex justify-end">
                       <button
                         onClick={handleAddComment}
-                        className="h-8 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-[10.5px] font-extrabold transition-all flex items-center gap-1 cursor-pointer"
+                        className="h-8 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-[10.5px] font-extrabold transition-all flex items-center gap-1 cursor-pointer shadow-3xs"
                       >
                         Post Note
                       </button>
                     </div>
                   </div>
                 </div>
-
-                {/* History */}
-                <div className="space-y-2.5">
-                  <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
-                    <div className="size-1.5 rounded-full bg-slate-500" />
-                    Comment History Log
-                  </h3>
-                  <div className="border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-950/20 p-3 h-[125px] overflow-y-auto space-y-3">
-                    {(commentsHistory[selectedReq.id] || []).map((comm, idx) => (
-                      <div
-                        key={idx}
-                        className="bg-white dark:bg-slate-900 border border-slate-200 p-2.5 rounded-lg shadow-sm space-y-1"
-                      >
-                        <div className="flex justify-between items-center text-[9px] font-extrabold">
-                          <span className="text-slate-700 dark:text-slate-300">{comm.user}</span>
-                          <span className="text-slate-400 dark:text-slate-500 font-mono">
-                            {comm.date}
-                          </span>
-                        </div>
-                        <p className="text-[11px] font-medium text-slate-600 dark:text-slate-300 leading-normal">
-                          "{comm.text}"
-                        </p>
-                      </div>
-                    ))}
-                    {(!commentsHistory[selectedReq.id] ||
-                      commentsHistory[selectedReq.id].length === 0) && (
-                      <div className="h-full flex items-center justify-center text-slate-400 dark:text-slate-500 text-xs font-bold">
-                        No previous comments recorded.
-                      </div>
-                    )}
-                  </div>
-                </div>
               </div>
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-3.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 flex items-center justify-between shrink-0">
+            <div className="px-6 py-3.5 border-t border-slate-100 dark:border-slate-800 bg-[#fbfcfd] dark:bg-slate-950/30 flex items-center justify-between shrink-0">
               <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500">
                 Click action below to execute your requisition decision status.
               </span>
