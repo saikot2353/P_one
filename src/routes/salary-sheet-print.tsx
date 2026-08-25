@@ -295,7 +295,7 @@ export function SalarySheetPrintPage() {
           width: 100%;
         }
         th, td {
-          border: 1px solid #000;
+          border: 0.5px solid #4b5563;
           padding: 2px 1px;
           text-align: center;
           vertical-align: middle;
@@ -447,14 +447,14 @@ export function SalarySheetPrintPage() {
                     <th colSpan={6} className="w-[22%]">Salary Breakdown</th>
                     <th colSpan={8} className="w-[16%]">Attendance</th>
                     <th colSpan={6} className="w-[14%]">Deduction</th>
-                    <th rowSpan={2} className="rotated-th w-[3.5%]"><div className="header-rotated">Pay Salary</div></th>
+                    <th rowSpan={2} className="rotated-th w-[3.5%] bg-blue-50"><div className="header-rotated">Pay Salary</div></th>
                     <th colSpan={3} className="w-[6.5%]">Overtime</th>
                     <th rowSpan={2} className="rotated-th w-[2%]"><div className="header-rotated">Alw+Arrear</div></th>
                     <th rowSpan={2} className="rotated-th w-[1.8%]"><div className="header-rotated">Tiffin</div></th>
                     <th rowSpan={2} className="rotated-th w-[1.8%]"><div className="header-rotated">Night Bill</div></th>
                     <th rowSpan={2} className="rotated-th w-[1.8%]"><div className="header-rotated">Behavior Bonus</div></th>
                     <th rowSpan={2} className="rotated-th w-[1.8%]"><div className="header-rotated">Attendance bonus</div></th>
-                    <th rowSpan={2} className="rotated-th w-[4%]"><div className="header-rotated">Net Pay</div></th>
+                    <th rowSpan={2} className="rotated-th w-[4%] bg-green-50"><div className="header-rotated">Net Pay</div></th>
                     <th rowSpan={2} className="rotated-th w-[11%]"><div className="header-rotated">Signature</div></th>
                   </tr>
                   {/* Row 2 Headers */}
@@ -525,7 +525,7 @@ export function SalarySheetPrintPage() {
                       <td>{renderEmployeeCell(row.adjust)}</td>
 
                       {/* Pay Salary */}
-                      <td className="font-bold">
+                      <td className="font-bold bg-blue-50">
                         <div className="amount-rotated">{formatInt(row.paySalary)}</div>
                       </td>
 
@@ -542,7 +542,7 @@ export function SalarySheetPrintPage() {
                       <td>{renderEmployeeCell(row.attendanceBonus)}</td>
                       
                       {/* Net Pay & Signature */}
-                      <td className="font-bold">{formatNumber(row.netPay)}</td>
+                      <td className="font-bold bg-green-50">{formatNumber(row.netPay)}</td>
                       <td className="h-9"></td>
                     </tr>
                   ))}
@@ -572,7 +572,7 @@ export function SalarySheetPrintPage() {
                       <td>{totals.adjust > 0 ? <div className="total-rotated">{formatInt(totals.adjust)}</div> : "0"}</td>
 
                       {/* Rotated Pay Salary Totals */}
-                      <td><div className="total-rotated">{formatInt(totals.paySalary)}</div></td>
+                      <td className="bg-blue-50"><div className="total-rotated">{formatInt(totals.paySalary)}</div></td>
 
                       {/* Overtime Totals */}
                       <td><div className="total-rotated">{totals.otHour.toFixed(2)}</div></td>
@@ -587,7 +587,7 @@ export function SalarySheetPrintPage() {
                       <td>{totals.attendanceBonus > 0 ? <div className="total-rotated">{formatInt(totals.attendanceBonus)}</div> : "0"}</td>
                       
                       {/* Rotated Net Pay Total */}
-                      <td><div className="total-rotated">{formatNumber(totals.netPay)}</div></td>
+                      <td className="bg-green-50"><div className="total-rotated">{formatNumber(totals.netPay)}</div></td>
                       <td></td>
                     </tr>
                   )}
