@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "263",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Monthly Salary Details",
+    link: "/monthly-salary-details",
+    descriptionEn: "Created a new professional, printable Landscape A4 Monthly Salary Sheet report route (/salary-sheet-print) for the Payroll module. Renders Pakiza Software branding, department/unit/line filters, complete double-header table grid (Salary Breakdown, Attendance, Deductions, Overtime, Net Pay), and bottom executive signature logs matching the reference screenshot. Wired this print action to all 'Salary Sheet' buttons in the Monthly Salary Details portal.",
+    descriptionBn: "পে-রোল মডিউলের জন্য একটি নতুন প্রফেশনাল, প্রিন্ট-বান্ধব ল্যান্ডস্কেপ A4 মাসিক স্যালারি শিট রাউট (/salary-sheet-print) তৈরি করা হয়েছে। এতে রয়েছে পাকিজা সফটওয়্যার ব্র্যান্ডিং হেডার, ডিপার্টমেন্ট/ইউনিট ফিল্টার মেটা, পূর্ণাঙ্গ ডাবল-হেডার গ্রিড টেবিল (বেতন ব্রেকডাউন, হাজিরা, কর্তন, ওভারটাইম, নেট পে) এবং স্ক্রিনশটের মতো ৬টি সিগনেচার এপ্রুভাল সেকশন। মাসিক স্যালারি ডিটেইলস পোর্টালের সব 'Salary Sheet' বাটনের সাথে এই প্রিন্ট অ্যাকশন যুক্ত করা হয়েছে।",
+  },
+  {
     id: "262",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Update",

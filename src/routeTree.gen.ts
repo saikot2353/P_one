@@ -26,6 +26,7 @@ import { Route as SspApprovalRouteImport } from './routes/ssp-approval'
 import { Route as ShiftControlCenterRouteImport } from './routes/shift-control-center'
 import { Route as SetManagerRouteImport } from './routes/set-manager'
 import { Route as SetHodRouteImport } from './routes/set-hod'
+import { Route as SalarySheetPrintRouteImport } from './routes/salary-sheet-print'
 import { Route as SalaryProcessRouteImport } from './routes/salary-process'
 import { Route as RecruitmentIeListRouteImport } from './routes/recruitment-ie-list'
 import { Route as RecruitmentHrListRouteImport } from './routes/recruitment-hr-list'
@@ -296,6 +297,11 @@ const SetManagerRoute = SetManagerRouteImport.update({
 const SetHodRoute = SetHodRouteImport.update({
   id: '/set-hod',
   path: '/set-hod',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SalarySheetPrintRoute = SalarySheetPrintRouteImport.update({
+  id: '/salary-sheet-print',
+  path: '/salary-sheet-print',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SalaryProcessRoute = SalaryProcessRouteImport.update({
@@ -1447,6 +1453,7 @@ export interface FileRoutesByFullPath {
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
   '/salary-process': typeof SalaryProcessRoute
+  '/salary-sheet-print': typeof SalarySheetPrintRoute
   '/set-hod': typeof SetHodRoute
   '/set-manager': typeof SetManagerRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
@@ -1649,6 +1656,7 @@ export interface FileRoutesByTo {
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
   '/salary-process': typeof SalaryProcessRoute
+  '/salary-sheet-print': typeof SalarySheetPrintRoute
   '/set-hod': typeof SetHodRoute
   '/set-manager': typeof SetManagerRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
@@ -1852,6 +1860,7 @@ export interface FileRoutesById {
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
   '/salary-process': typeof SalaryProcessRoute
+  '/salary-sheet-print': typeof SalarySheetPrintRoute
   '/set-hod': typeof SetHodRoute
   '/set-manager': typeof SetManagerRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
@@ -2056,6 +2065,7 @@ export interface FileRouteTypes {
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
     | '/salary-process'
+    | '/salary-sheet-print'
     | '/set-hod'
     | '/set-manager'
     | '/shift-control-center'
@@ -2258,6 +2268,7 @@ export interface FileRouteTypes {
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
     | '/salary-process'
+    | '/salary-sheet-print'
     | '/set-hod'
     | '/set-manager'
     | '/shift-control-center'
@@ -2460,6 +2471,7 @@ export interface FileRouteTypes {
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
     | '/salary-process'
+    | '/salary-sheet-print'
     | '/set-hod'
     | '/set-manager'
     | '/shift-control-center'
@@ -2663,6 +2675,7 @@ export interface RootRouteChildren {
   RecruitmentHrListRoute: typeof RecruitmentHrListRoute
   RecruitmentIeListRoute: typeof RecruitmentIeListRoute
   SalaryProcessRoute: typeof SalaryProcessRoute
+  SalarySheetPrintRoute: typeof SalarySheetPrintRoute
   SetHodRoute: typeof SetHodRoute
   SetManagerRoute: typeof SetManagerRoute
   ShiftControlCenterRoute: typeof ShiftControlCenterRoute
@@ -2805,6 +2818,13 @@ declare module '@tanstack/react-router' {
       path: '/set-hod'
       fullPath: '/set-hod'
       preLoaderRoute: typeof SetHodRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/salary-sheet-print': {
+      id: '/salary-sheet-print'
+      path: '/salary-sheet-print'
+      fullPath: '/salary-sheet-print'
+      preLoaderRoute: typeof SalarySheetPrintRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/salary-process': {
@@ -4275,6 +4295,7 @@ const rootRouteChildren: RootRouteChildren = {
   RecruitmentHrListRoute: RecruitmentHrListRoute,
   RecruitmentIeListRoute: RecruitmentIeListRoute,
   SalaryProcessRoute: SalaryProcessRoute,
+  SalarySheetPrintRoute: SalarySheetPrintRoute,
   SetHodRoute: SetHodRoute,
   SetManagerRoute: SetManagerRoute,
   ShiftControlCenterRoute: ShiftControlCenterRoute,

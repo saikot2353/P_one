@@ -668,6 +668,20 @@ function MonthlySalaryDetailsPage() {
     window.open(`/payslip-print?lang=${lang}`, "_blank");
   };
 
+  const handleOpenSalarySheet = () => {
+    const filtersData = {
+      year,
+      month,
+      empType,
+      department,
+      unit,
+      line
+    };
+    localStorage.setItem("print_salary_sheet_data", JSON.stringify(filteredData));
+    localStorage.setItem("print_salary_sheet_filters", JSON.stringify(filtersData));
+    window.open(`/salary-sheet-print`, "_blank");
+  };
+
   return (
     <div className="min-h-screen flex bg-background text-foreground">
       <Sidebar />
@@ -858,9 +872,9 @@ function MonthlySalaryDetailsPage() {
                 <div className="flex flex-wrap gap-2">
                   <ReportBtn onClick={() => handleOpenPayslip("en")}>Pay Slip-English</ReportBtn>
                   <ReportBtn onClick={() => handleOpenPayslip("bn")}>Pay Slip-Bangla</ReportBtn>
-                  <ReportBtn>Salary Sheet</ReportBtn>
-                  <ReportBtn>Dept.Wise Salary Sheet</ReportBtn>
-                  <ReportBtn>Salary Sheet(Exec)</ReportBtn>
+                  <ReportBtn onClick={handleOpenSalarySheet}>Salary Sheet</ReportBtn>
+                  <ReportBtn onClick={handleOpenSalarySheet}>Dept.Wise Salary Sheet</ReportBtn>
+                  <ReportBtn onClick={handleOpenSalarySheet}>Salary Sheet(Exec)</ReportBtn>
                   <ReportBtn>Bank Sheet(Exec)</ReportBtn>
                   <ReportBtn>Export Bank Sheet(Exec)</ReportBtn>
                 </div>
@@ -870,8 +884,8 @@ function MonthlySalaryDetailsPage() {
                   <ReportBtn onClick={() => handleOpenPayslip("en")}>Pay Slip-English</ReportBtn>
                   <ReportBtn onClick={() => handleOpenPayslip("bn")}>Pay Slip-Bangla</ReportBtn>
                   <ReportBtn onClick={() => handleOpenPayslip("bn")}>Pay Slip-Bangla(WH)</ReportBtn>
-                  <ReportBtn>Salary Sheet Full(Without Holiday)</ReportBtn>
-                  <ReportBtn>Salary Sheet Full(WH)</ReportBtn>
+                  <ReportBtn onClick={handleOpenSalarySheet}>Salary Sheet Full(Without Holiday)</ReportBtn>
+                  <ReportBtn onClick={handleOpenSalarySheet}>Salary Sheet Full(WH)</ReportBtn>
                   <ReportBtn>OT Sheet(Holiday)</ReportBtn>
                   <ReportBtn>Cash Sheet(Exec)</ReportBtn>
                   <ReportBtn>Export Cash Sheet(Exec)</ReportBtn>
@@ -881,15 +895,15 @@ function MonthlySalaryDetailsPage() {
                 <div className="flex flex-wrap gap-2">
                   <ReportBtn onClick={() => handleOpenPayslip("bn")}>Pay Slip-Bangla(2Hr)</ReportBtn>
                   <ReportBtn onClick={() => handleOpenPayslip("bn")}>Pay Slip-Bangla(3Hr)</ReportBtn>
-                  <ReportBtn>Salary Sheet(2Hr)</ReportBtn>
-                  <ReportBtn>Salary Sheet(3Hr)</ReportBtn>
-                  <ReportBtn>Salary Sheet(4HR)</ReportBtn>
+                  <ReportBtn onClick={handleOpenSalarySheet}>Salary Sheet(2Hr)</ReportBtn>
+                  <ReportBtn onClick={handleOpenSalarySheet}>Salary Sheet(3Hr)</ReportBtn>
+                  <ReportBtn onClick={handleOpenSalarySheet}>Salary Sheet(4HR)</ReportBtn>
                 </div>
 
                 {/* Row 4 */}
                 <div className="flex flex-wrap gap-2">
                   <ReportBtn onClick={() => handleOpenPayslip("en")}>Pay Slip(NT)</ReportBtn>
-                  <ReportBtn>Salary Sheet(NT)</ReportBtn>
+                  <ReportBtn onClick={handleOpenSalarySheet}>Salary Sheet(NT)</ReportBtn>
                 </div>
 
                 {/* Row 5 */}
