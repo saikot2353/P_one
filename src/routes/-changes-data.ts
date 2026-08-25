@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "264",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Bug Fix",
+    module: "Monthly Salary Sheet Print",
+    link: "/salary-sheet-print",
+    descriptionEn: "Fixed a bug in calculatedRows where spreading vals (returned by getSalaryValues) overwrote the row serial number ('sl' key) with the sick leave count ('sl' key). Renamed the row serial number property to 'serialNo' to resolve duplicate property declarations and ensure the serial number renders correctly in print sheets.",
+    descriptionBn: "স্যালারি শিট প্রিন্ট পেইজে একটি বাগ ফিক্স করা হয়েছে যেখানে row serial number ('sl') এবং sick leave ('sl') একই কি (key) নাম হওয়ার কারণে সায়ালারি শিটের ক্রমিক নম্বরটি ভুল আসছিল। ক্রমিক নম্বরের কি নাম পরিবর্তন করে 'serialNo' করা হয়েছে যাতে এটি সঠিকভাবে প্রিন্ট শিটে প্রদর্শিত হয়।",
+  },
+  {
     id: "263",
     date: new Date().toISOString().slice(0, 16),
     type: "New Feature",
