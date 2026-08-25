@@ -164,6 +164,8 @@ const modules = [
   },
 ];
 
+const ACTIVE_MODULE_IDS = ["hris", "merchandising", "procurement", "inventory", "dashboard"];
+
 export default function ModuleSelectionPage() {
   const navigate = useNavigate();
   const [theme, setTheme] = useState<Theme>("light");
@@ -252,57 +254,145 @@ export default function ModuleSelectionPage() {
           </p>
         </div>
 
-        {/* Grid Container */}
-        <div className="w-full max-w-7xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4">
-          {modules.map((module, idx) => {
-            const Icon = module.icon;
-            const isHovered = hoveredModule === module.id;
-            
-            return (
-              <button
-                key={module.id}
-                onClick={() => navigate({ to: module.path })}
-                onMouseEnter={() => setHoveredModule(module.id)}
-                onMouseLeave={() => setHoveredModule(null)}
-                className={`group relative text-left p-6 rounded-2xl backdrop-blur-xl transition-all duration-300 border ${
-                  isDark 
-                    ? 'bg-white/[0.02] hover:bg-white/[0.06] border-white/[0.05] hover:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]' 
-                    : 'bg-white/60 hover:bg-white border-slate-200/60 hover:border-indigo-200 shadow-xl shadow-slate-200/40 hover:shadow-indigo-500/10'
-                }`}
-                style={{
-                  animation: `fadeInUp 0.5s ease-out ${idx * 0.05}s both`
-                }}
-              >
-                {/* Background glow on hover */}
-                <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${module.color} opacity-0 group-hover:opacity-[0.03] dark:group-hover:opacity-[0.08] transition-opacity duration-300`} />
+        {/* Active Modules Section */}
+        <div className="w-full max-w-7xl mb-12">
+          <div className="flex items-center gap-3 mb-6 px-4">
+            <h3 className="text-xl font-bold tracking-tight">Active Modules</h3>
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+              isDark 
+                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+            }`}>
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+              </span>
+              {modules.filter(m => ACTIVE_MODULE_IDS.includes(m.id)).length} Modules Online
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4">
+            {modules
+              .filter(m => ACTIVE_MODULE_IDS.includes(m.id))
+              .map((module, idx) => {
+                const Icon = module.icon;
+                const isHovered = hoveredModule === module.id;
                 
-                <div className="relative flex flex-col h-full gap-4">
-                  <div className="flex justify-between items-start">
-                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br ${module.color} ${module.shadow} transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3`}>
-                      <Icon size={26} className="text-white" />
-                    </div>
+                return (
+                  <button
+                    key={module.id}
+                    onClick={() => navigate({ to: module.path })}
+                    onMouseEnter={() => setHoveredModule(module.id)}
+                    onMouseLeave={() => setHoveredModule(null)}
+                    className={`group relative text-left p-6 rounded-2xl backdrop-blur-xl transition-all duration-300 border ${
+                      isDark 
+                        ? 'bg-white/[0.02] hover:bg-white/[0.06] border-white/[0.05] hover:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]' 
+                        : 'bg-white/60 hover:bg-white border-slate-200/60 hover:border-indigo-200 shadow-xl shadow-slate-200/40 hover:shadow-indigo-500/10'
+                    }`}
+                    style={{
+                      animation: `fadeInUp 0.5s ease-out ${idx * 0.05}s both`
+                    }}
+                  >
+                    {/* Background glow on hover */}
+                    <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${module.color} opacity-0 group-hover:opacity-[0.03] dark:group-hover:opacity-[0.08] transition-opacity duration-300`} />
                     
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
-                      isHovered 
-                        ? (isDark ? 'bg-white/10 text-white' : 'bg-slate-100 text-indigo-600') 
-                        : 'bg-transparent text-transparent'
-                    }`}>
-                      <ChevronRight size={18} className={isHovered ? "translate-x-0" : "-translate-x-2"} />
+                    <div className="relative flex flex-col h-full gap-4">
+                      <div className="flex justify-between items-start">
+                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br ${module.color} ${module.shadow} transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3`}>
+                          <Icon size={26} className="text-white" />
+                        </div>
+                        
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                          isHovered 
+                            ? (isDark ? 'bg-white/10 text-white' : 'bg-slate-100 text-indigo-600') 
+                            : 'bg-transparent text-transparent'
+                        }`}>
+                          <ChevronRight size={18} className={isHovered ? "translate-x-0" : "-translate-x-2"} />
+                        </div>
+                      </div>
+                      
+                      <div className="mt-2 flex-grow">
+                        <h3 className="font-bold text-lg mb-1 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-500 group-hover:to-purple-500 transition-colors">
+                          {module.name}
+                        </h3>
+                        <p className={`text-sm leading-relaxed ${isDark ? 'text-white/50' : 'text-slate-500'}`}>
+                          {module.description}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="mt-2 flex-grow">
-                    <h3 className="font-bold text-lg mb-1 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-500 group-hover:to-purple-500 transition-colors">
-                      {module.name}
-                    </h3>
-                    <p className={`text-sm leading-relaxed ${isDark ? 'text-white/50' : 'text-slate-500'}`}>
-                      {module.description}
-                    </p>
-                  </div>
-                </div>
-              </button>
-            );
-          })}
+                  </button>
+                );
+              })}
+          </div>
+        </div>
+
+        {/* Available Modules Section */}
+        <div className="w-full max-w-7xl">
+          <div className="flex items-center gap-3 mb-6 px-4 pt-6 border-t border-dashed border-slate-300 dark:border-white/10">
+            <h3 className="text-xl font-bold tracking-tight">Available Modules</h3>
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+              isDark 
+                ? 'bg-slate-500/10 text-slate-400 border-white/5' 
+                : 'bg-slate-100 text-slate-600 border-slate-200'
+            }`}>
+              {modules.filter(m => !ACTIVE_MODULE_IDS.includes(m.id)).length} Modules Offline
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4">
+            {modules
+              .filter(m => !ACTIVE_MODULE_IDS.includes(m.id))
+              .map((module, idx) => {
+                const Icon = module.icon;
+                const isHovered = hoveredModule === module.id;
+                const activeCount = modules.filter(m => ACTIVE_MODULE_IDS.includes(m.id)).length;
+                
+                return (
+                  <button
+                    key={module.id}
+                    onClick={() => navigate({ to: module.path })}
+                    onMouseEnter={() => setHoveredModule(module.id)}
+                    onMouseLeave={() => setHoveredModule(null)}
+                    className={`group relative text-left p-6 rounded-2xl backdrop-blur-xl transition-all duration-300 border ${
+                      isDark 
+                        ? 'bg-white/[0.02] hover:bg-white/[0.06] border-white/[0.05] hover:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]' 
+                        : 'bg-white/60 hover:bg-white border-slate-200/60 hover:border-indigo-200 shadow-xl shadow-slate-200/40 hover:shadow-indigo-500/10'
+                    }`}
+                    style={{
+                      animation: `fadeInUp 0.5s ease-out ${(idx + activeCount) * 0.05}s both`
+                    }}
+                  >
+                    {/* Background glow on hover */}
+                    <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${module.color} opacity-0 group-hover:opacity-[0.03] dark:group-hover:opacity-[0.08] transition-opacity duration-300`} />
+                    
+                    <div className="relative flex flex-col h-full gap-4">
+                      <div className="flex justify-between items-start">
+                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br ${module.color} ${module.shadow} transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3`}>
+                          <Icon size={26} className="text-white" />
+                        </div>
+                        
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                          isHovered 
+                            ? (isDark ? 'bg-white/10 text-white' : 'bg-slate-100 text-indigo-600') 
+                            : 'bg-transparent text-transparent'
+                        }`}>
+                          <ChevronRight size={18} className={isHovered ? "translate-x-0" : "-translate-x-2"} />
+                        </div>
+                      </div>
+                      
+                      <div className="mt-2 flex-grow">
+                        <h3 className="font-bold text-lg mb-1 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-500 group-hover:to-purple-500 transition-colors">
+                          {module.name}
+                        </h3>
+                        <p className={`text-sm leading-relaxed ${isDark ? 'text-white/50' : 'text-slate-500'}`}>
+                          {module.description}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+          </div>
         </div>
 
       </main>

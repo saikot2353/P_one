@@ -2,6 +2,33 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "264",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Bug Fix",
+    module: "Monthly Salary Sheet Print",
+    link: "/salary-sheet-print",
+    descriptionEn: "Fixed a bug in calculatedRows where spreading vals (returned by getSalaryValues) overwrote the row serial number ('sl' key) with the sick leave count ('sl' key). Renamed the row serial number property to 'serialNo' to resolve duplicate property declarations and ensure the serial number renders correctly in print sheets.",
+    descriptionBn: "স্যালারি শিট প্রিন্ট পেইজে একটি বাগ ফিক্স করা হয়েছে যেখানে row serial number ('sl') এবং sick leave ('sl') একই কি (key) নাম হওয়ার কারণে সায়ালারি শিটের ক্রমিক নম্বরটি ভুল আসছিল। ক্রমিক নম্বরের কি নাম পরিবর্তন করে 'serialNo' করা হয়েছে যাতে এটি সঠিকভাবে প্রিন্ট শিটে প্রদর্শিত হয়।",
+  },
+  {
+    id: "263",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Monthly Salary Details",
+    link: "/monthly-salary-details",
+    descriptionEn: "Created a new professional, printable Landscape A4 Monthly Salary Sheet report route (/salary-sheet-print) for the Payroll module. Renders Pakiza Software branding, department/unit/line filters, complete double-header table grid (Salary Breakdown, Attendance, Deductions, Overtime, Net Pay), and bottom executive signature logs matching the reference screenshot. Wired this print action to all 'Salary Sheet' buttons in the Monthly Salary Details portal.",
+    descriptionBn: "পে-রোল মডিউলের জন্য একটি নতুন প্রফেশনাল, প্রিন্ট-বান্ধব ল্যান্ডস্কেপ A4 মাসিক স্যালারি শিট রাউট (/salary-sheet-print) তৈরি করা হয়েছে। এতে রয়েছে পাকিজা সফটওয়্যার ব্র্যান্ডিং হেডার, ডিপার্টমেন্ট/ইউনিট ফিল্টার মেটা, পূর্ণাঙ্গ ডাবল-হেডার গ্রিড টেবিল (বেতন ব্রেকডাউন, হাজিরা, কর্তন, ওভারটাইম, নেট পে) এবং স্ক্রিনশটের মতো ৬টি সিগনেচার এপ্রুভাল সেকশন। মাসিক স্যালারি ডিটেইলস পোর্টালের সব 'Salary Sheet' বাটনের সাথে এই প্রিন্ট অ্যাকশন যুক্ত করা হয়েছে।",
+  },
+  {
+    id: "262",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Workspace Selection Portal",
+    link: "/module-selection",
+    descriptionEn: "Updated the workspace landing page to separate modules into two distinct sections: 'Active Modules' (containing HRIS, Merchandising, Procurement Management, Inventory Management, and My Dashboard) and 'Available Modules' (containing the remaining modules). Integrated clean section headers, visual status indicators (online/offline module counts), and staggered animations.",
+    descriptionBn: "ওয়ার্কস্পেস ল্যান্ডিং পেজটি আপডেট করা হয়েছে যেখানে মডিউলগুলোকে দুটি আলাদা বিভাগে বিভক্ত করা হয়েছে: 'Active Modules' (যার মধ্যে রয়েছে HRIS, Merchandising, Procurement Management, Inventory Management এবং My Dashboard) এবং 'Available Modules' (অবশিষ্ট অন্যান্য মডিউলগুলো)। এর সাথে সুন্দর সেকশন হেডার, লাইভ অনলাইন/অফলাইন স্ট্যাটাস কাউন্টার এবং স্মুথ অ্যানিমেশন যুক্ত করা হয়েছে।",
+  },
+  {
     id: "261",
     date: new Date().toISOString().slice(0, 16),
     type: "New Feature",
@@ -22,45 +49,20 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
     id: "259",
     date: new Date().toISOString().slice(0, 16),
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    type: "UI Update",
-    module: "Employee Job Card",
-    link: "/employee-job-card",
-    descriptionEn: "Redesigned the Employee Job Card workspace including Scope & Parameters form columns grid, inline query triggers, employee profile summary card, stat card tiles, and responsive Attendance Summary block.",
-    descriptionBn: "এমপ্লয়ি জব কার্ড পেজটি নতুন করে রিডিজাইন করা হয়েছে: যেখানে রয়েছে স্কোপ ও প্যারামিটারস সার্চ প্যানেল, ইনলাইন অ্যাকশন ট্রিগার, এমপ্লয়ি প্রোফাইল সামারি কার্ড, ৪টি প্রিমিয়াম স্ট্যাট টাইলস এবং ডায়নামিক অ্যাটেনডেন্স সামারি ব্লক।",
-=======
-=======
->>>>>>> 0a94dd024a1d970d99a823f6d3ba878243bbbb00
-=======
->>>>>>> ccd8f22e5455e6cb2a468805babc45e9b60c1f96
     type: "New Feature",
     module: "Procurement Management Module",
     link: "/procurement-dashboard",
     descriptionEn: "Created the new Procurement Management module, including custom ProcurementSidebar, ProcurementTopbar, 45 individual static route files, and a rich graphical overview dashboard equipped with Recharts trends (spend and payouts), allocation splits, and comprehensive performance metrics.",
     descriptionBn: "নতুন প্রকিউরমেন্ট ম্যানেজমেন্ট মডিউল তৈরি করা হয়েছে, যার মধ্যে রয়েছে কাস্টম প্রকিউরমেন্ট সাইডবার, প্রকিউরমেন্ট টপবার, ৪৫টি পৃথক স্ট্যাটিক রাউট পেইজ এবং রিচার্টস (Recharts) গ্রাফিক্যাল ট্রেন্ড অ্যানালিটিকস, ক্যাটাগরি স্পেন্ড অ্যালোকেশন এবং প্রিমিয়াম পারফরম্যান্স মেট্রিক্স সমৃদ্ধ একটি আকর্ষনীয় ড্যাশবোর্ড লেআউট।",
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> dd348c1a56270ecab83bacffce4f311410be233c
-=======
-=======
-=======
   },
   {
     id: "258",
     date: new Date().toISOString().slice(0, 16),
->>>>>>> ccd8f22e5455e6cb2a468805babc45e9b60c1f96
     type: "UI Update",
     module: "Employee Job Card",
     link: "/employee-job-card",
     descriptionEn: "Redesigned the Employee Job Card workspace including Scope & Parameters form columns grid, inline query triggers, employee profile summary card, stat card tiles, and responsive Attendance Summary block.",
     descriptionBn: "এমপ্লয়ি জব কার্ড পেজটি নতুন করে রিডিজাইন করা হয়েছে: যেখানে রয়েছে স্কোপ ও প্যারামিটারস সার্চ প্যানেল, ইনলাইন অ্যাকশন ট্রিগার, এমপ্লয়ি প্রোফাইল সামারি কার্ড, ৪টি প্রিমিয়াম স্ট্যাট টাইলস এবং ডায়নামিক অ্যাটেনডেন্স সামারি ব্লক।",
-<<<<<<< HEAD
->>>>>>> 07b0a2dfebaf1177cb8cee9074130220eeba601b
->>>>>>> 0a94dd024a1d970d99a823f6d3ba878243bbbb00
-=======
->>>>>>> ccd8f22e5455e6cb2a468805babc45e9b60c1f96
   },
   {
     id: "257",
