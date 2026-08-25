@@ -27,6 +27,9 @@ import { Route as ShiftControlCenterRouteImport } from './routes/shift-control-c
 import { Route as SetManagerRouteImport } from './routes/set-manager'
 import { Route as SetHodRouteImport } from './routes/set-hod'
 import { Route as SalarySheetPrintRouteImport } from './routes/salary-sheet-print'
+import { Route as SalarySheetFullWithoutHolidayRouteImport } from './routes/salary-sheet-full-without-holiday'
+import { Route as SalarySheetFullWhRouteImport } from './routes/salary-sheet-full-wh'
+import { Route as SalarySheetExecRouteImport } from './routes/salary-sheet-exec'
 import { Route as SalaryProcessRouteImport } from './routes/salary-process'
 import { Route as RecruitmentIeListRouteImport } from './routes/recruitment-ie-list'
 import { Route as RecruitmentHrListRouteImport } from './routes/recruitment-hr-list'
@@ -96,6 +99,7 @@ import { Route as PayrollBenefitsMasterDataRouteImport } from './routes/payroll-
 import { Route as PayrollBenefitsCommonRouteImport } from './routes/payroll-benefits-common'
 import { Route as PayrollBenefitsRouteImport } from './routes/payroll-benefits'
 import { Route as PayrollAdvanceRouteImport } from './routes/payroll-advance'
+import { Route as OtSheetHolidayRouteImport } from './routes/ot-sheet-holiday'
 import { Route as NoticeRouteImport } from './routes/notice'
 import { Route as MyDashboardRouteImport } from './routes/my-dashboard'
 import { Route as MonthlySalaryProcessRouteImport } from './routes/monthly-salary-process'
@@ -178,6 +182,7 @@ import { Route as ERecruitmentFormRouteImport } from './routes/e-recruitment-for
 import { Route as DisciplinaryWarningLettersRouteImport } from './routes/disciplinary-warning-letters'
 import { Route as DisciplinaryShowcauseNoticesRouteImport } from './routes/disciplinary-showcause-notices'
 import { Route as DisciplinaryCaseFilesRouteImport } from './routes/disciplinary-case-files'
+import { Route as DeptWiseSalarySheetRouteImport } from './routes/dept-wise-salary-sheet'
 import { Route as CreateRosterRouteImport } from './routes/create-roster'
 import { Route as ConfigureTimeRouteImport } from './routes/configure-time'
 import { Route as ConfigureTaxRouteImport } from './routes/configure-tax'
@@ -192,11 +197,13 @@ import { Route as CompanySetupRouteImport } from './routes/company-setup'
 import { Route as CompanyHolidayRouteImport } from './routes/company-holiday'
 import { Route as CheckApproveSalaryRouteImport } from './routes/check-approve-salary'
 import { Route as ChangesRouteImport } from './routes/changes'
+import { Route as CashSheetPrintRouteImport } from './routes/cash-sheet-print'
 import { Route as BudgetStatementRouteImport } from './routes/budget-statement'
 import { Route as BudgetRequisitionApprovalsRouteImport } from './routes/budget-requisition-approvals'
 import { Route as BudgetPlanningRouteImport } from './routes/budget-planning'
 import { Route as BudgetOvertimeRouteImport } from './routes/budget-overtime'
 import { Route as BudgetMyRequisitionsRouteImport } from './routes/budget-my-requisitions'
+import { Route as BankSheetExecRouteImport } from './routes/bank-sheet-exec'
 import { Route as ApproveOvertimeRouteImport } from './routes/approve-overtime'
 import { Route as ApproveIncrementHrRouteImport } from './routes/approve-increment-hr'
 import { Route as ApproveIncrementGadgetRouteImport } from './routes/approve-increment-gadget'
@@ -302,6 +309,22 @@ const SetHodRoute = SetHodRouteImport.update({
 const SalarySheetPrintRoute = SalarySheetPrintRouteImport.update({
   id: '/salary-sheet-print',
   path: '/salary-sheet-print',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SalarySheetFullWithoutHolidayRoute =
+  SalarySheetFullWithoutHolidayRouteImport.update({
+    id: '/salary-sheet-full-without-holiday',
+    path: '/salary-sheet-full-without-holiday',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SalarySheetFullWhRoute = SalarySheetFullWhRouteImport.update({
+  id: '/salary-sheet-full-wh',
+  path: '/salary-sheet-full-wh',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SalarySheetExecRoute = SalarySheetExecRouteImport.update({
+  id: '/salary-sheet-exec',
+  path: '/salary-sheet-exec',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SalaryProcessRoute = SalaryProcessRouteImport.update({
@@ -684,6 +707,11 @@ const PayrollBenefitsRoute = PayrollBenefitsRouteImport.update({
 const PayrollAdvanceRoute = PayrollAdvanceRouteImport.update({
   id: '/payroll-advance',
   path: '/payroll-advance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OtSheetHolidayRoute = OtSheetHolidayRouteImport.update({
+  id: '/ot-sheet-holiday',
+  path: '/ot-sheet-holiday',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NoticeRoute = NoticeRouteImport.update({
@@ -1109,6 +1137,11 @@ const DisciplinaryCaseFilesRoute = DisciplinaryCaseFilesRouteImport.update({
   path: '/disciplinary-case-files',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DeptWiseSalarySheetRoute = DeptWiseSalarySheetRouteImport.update({
+  id: '/dept-wise-salary-sheet',
+  path: '/dept-wise-salary-sheet',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CreateRosterRoute = CreateRosterRouteImport.update({
   id: '/create-roster',
   path: '/create-roster',
@@ -1179,6 +1212,11 @@ const ChangesRoute = ChangesRouteImport.update({
   path: '/changes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CashSheetPrintRoute = CashSheetPrintRouteImport.update({
+  id: '/cash-sheet-print',
+  path: '/cash-sheet-print',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BudgetStatementRoute = BudgetStatementRouteImport.update({
   id: '/budget-statement',
   path: '/budget-statement',
@@ -1203,6 +1241,11 @@ const BudgetOvertimeRoute = BudgetOvertimeRouteImport.update({
 const BudgetMyRequisitionsRoute = BudgetMyRequisitionsRouteImport.update({
   id: '/budget-my-requisitions',
   path: '/budget-my-requisitions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BankSheetExecRoute = BankSheetExecRouteImport.update({
+  id: '/bank-sheet-exec',
+  path: '/bank-sheet-exec',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApproveOvertimeRoute = ApproveOvertimeRouteImport.update({
@@ -1283,11 +1326,13 @@ export interface FileRoutesByFullPath {
   '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
   '/approve-overtime': typeof ApproveOvertimeRoute
+  '/bank-sheet-exec': typeof BankSheetExecRoute
   '/budget-my-requisitions': typeof BudgetMyRequisitionsRoute
   '/budget-overtime': typeof BudgetOvertimeRoute
   '/budget-planning': typeof BudgetPlanningRoute
   '/budget-requisition-approvals': typeof BudgetRequisitionApprovalsRoute
   '/budget-statement': typeof BudgetStatementRoute
+  '/cash-sheet-print': typeof CashSheetPrintRoute
   '/changes': typeof ChangesRoute
   '/check-approve-salary': typeof CheckApproveSalaryRoute
   '/company-holiday': typeof CompanyHolidayRoute
@@ -1302,6 +1347,7 @@ export interface FileRoutesByFullPath {
   '/configure-tax': typeof ConfigureTaxRoute
   '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
+  '/dept-wise-salary-sheet': typeof DeptWiseSalarySheetRoute
   '/disciplinary-case-files': typeof DisciplinaryCaseFilesRoute
   '/disciplinary-showcause-notices': typeof DisciplinaryShowcauseNoticesRoute
   '/disciplinary-warning-letters': typeof DisciplinaryWarningLettersRoute
@@ -1384,6 +1430,7 @@ export interface FileRoutesByFullPath {
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
   '/notice': typeof NoticeRoute
+  '/ot-sheet-holiday': typeof OtSheetHolidayRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
   '/payroll-benefits-common': typeof PayrollBenefitsCommonRoute
@@ -1453,6 +1500,9 @@ export interface FileRoutesByFullPath {
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
   '/salary-process': typeof SalaryProcessRoute
+  '/salary-sheet-exec': typeof SalarySheetExecRoute
+  '/salary-sheet-full-wh': typeof SalarySheetFullWhRoute
+  '/salary-sheet-full-without-holiday': typeof SalarySheetFullWithoutHolidayRoute
   '/salary-sheet-print': typeof SalarySheetPrintRoute
   '/set-hod': typeof SetHodRoute
   '/set-manager': typeof SetManagerRoute
@@ -1486,11 +1536,13 @@ export interface FileRoutesByTo {
   '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
   '/approve-overtime': typeof ApproveOvertimeRoute
+  '/bank-sheet-exec': typeof BankSheetExecRoute
   '/budget-my-requisitions': typeof BudgetMyRequisitionsRoute
   '/budget-overtime': typeof BudgetOvertimeRoute
   '/budget-planning': typeof BudgetPlanningRoute
   '/budget-requisition-approvals': typeof BudgetRequisitionApprovalsRoute
   '/budget-statement': typeof BudgetStatementRoute
+  '/cash-sheet-print': typeof CashSheetPrintRoute
   '/changes': typeof ChangesRoute
   '/check-approve-salary': typeof CheckApproveSalaryRoute
   '/company-holiday': typeof CompanyHolidayRoute
@@ -1505,6 +1557,7 @@ export interface FileRoutesByTo {
   '/configure-tax': typeof ConfigureTaxRoute
   '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
+  '/dept-wise-salary-sheet': typeof DeptWiseSalarySheetRoute
   '/disciplinary-case-files': typeof DisciplinaryCaseFilesRoute
   '/disciplinary-showcause-notices': typeof DisciplinaryShowcauseNoticesRoute
   '/disciplinary-warning-letters': typeof DisciplinaryWarningLettersRoute
@@ -1587,6 +1640,7 @@ export interface FileRoutesByTo {
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
   '/notice': typeof NoticeRoute
+  '/ot-sheet-holiday': typeof OtSheetHolidayRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
   '/payroll-benefits-common': typeof PayrollBenefitsCommonRoute
@@ -1656,6 +1710,9 @@ export interface FileRoutesByTo {
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
   '/salary-process': typeof SalaryProcessRoute
+  '/salary-sheet-exec': typeof SalarySheetExecRoute
+  '/salary-sheet-full-wh': typeof SalarySheetFullWhRoute
+  '/salary-sheet-full-without-holiday': typeof SalarySheetFullWithoutHolidayRoute
   '/salary-sheet-print': typeof SalarySheetPrintRoute
   '/set-hod': typeof SetHodRoute
   '/set-manager': typeof SetManagerRoute
@@ -1690,11 +1747,13 @@ export interface FileRoutesById {
   '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
   '/approve-overtime': typeof ApproveOvertimeRoute
+  '/bank-sheet-exec': typeof BankSheetExecRoute
   '/budget-my-requisitions': typeof BudgetMyRequisitionsRoute
   '/budget-overtime': typeof BudgetOvertimeRoute
   '/budget-planning': typeof BudgetPlanningRoute
   '/budget-requisition-approvals': typeof BudgetRequisitionApprovalsRoute
   '/budget-statement': typeof BudgetStatementRoute
+  '/cash-sheet-print': typeof CashSheetPrintRoute
   '/changes': typeof ChangesRoute
   '/check-approve-salary': typeof CheckApproveSalaryRoute
   '/company-holiday': typeof CompanyHolidayRoute
@@ -1709,6 +1768,7 @@ export interface FileRoutesById {
   '/configure-tax': typeof ConfigureTaxRoute
   '/configure-time': typeof ConfigureTimeRoute
   '/create-roster': typeof CreateRosterRoute
+  '/dept-wise-salary-sheet': typeof DeptWiseSalarySheetRoute
   '/disciplinary-case-files': typeof DisciplinaryCaseFilesRoute
   '/disciplinary-showcause-notices': typeof DisciplinaryShowcauseNoticesRoute
   '/disciplinary-warning-letters': typeof DisciplinaryWarningLettersRoute
@@ -1791,6 +1851,7 @@ export interface FileRoutesById {
   '/monthly-salary-process': typeof MonthlySalaryProcessRoute
   '/my-dashboard': typeof MyDashboardRoute
   '/notice': typeof NoticeRoute
+  '/ot-sheet-holiday': typeof OtSheetHolidayRoute
   '/payroll-advance': typeof PayrollAdvanceRoute
   '/payroll-benefits': typeof PayrollBenefitsRoute
   '/payroll-benefits-common': typeof PayrollBenefitsCommonRoute
@@ -1860,6 +1921,9 @@ export interface FileRoutesById {
   '/recruitment-hr-list': typeof RecruitmentHrListRoute
   '/recruitment-ie-list': typeof RecruitmentIeListRoute
   '/salary-process': typeof SalaryProcessRoute
+  '/salary-sheet-exec': typeof SalarySheetExecRoute
+  '/salary-sheet-full-wh': typeof SalarySheetFullWhRoute
+  '/salary-sheet-full-without-holiday': typeof SalarySheetFullWithoutHolidayRoute
   '/salary-sheet-print': typeof SalarySheetPrintRoute
   '/set-hod': typeof SetHodRoute
   '/set-manager': typeof SetManagerRoute
@@ -1895,11 +1959,13 @@ export interface FileRouteTypes {
     | '/approve-increment-gadget'
     | '/approve-increment-hr'
     | '/approve-overtime'
+    | '/bank-sheet-exec'
     | '/budget-my-requisitions'
     | '/budget-overtime'
     | '/budget-planning'
     | '/budget-requisition-approvals'
     | '/budget-statement'
+    | '/cash-sheet-print'
     | '/changes'
     | '/check-approve-salary'
     | '/company-holiday'
@@ -1914,6 +1980,7 @@ export interface FileRouteTypes {
     | '/configure-tax'
     | '/configure-time'
     | '/create-roster'
+    | '/dept-wise-salary-sheet'
     | '/disciplinary-case-files'
     | '/disciplinary-showcause-notices'
     | '/disciplinary-warning-letters'
@@ -1996,6 +2063,7 @@ export interface FileRouteTypes {
     | '/monthly-salary-process'
     | '/my-dashboard'
     | '/notice'
+    | '/ot-sheet-holiday'
     | '/payroll-advance'
     | '/payroll-benefits'
     | '/payroll-benefits-common'
@@ -2065,6 +2133,9 @@ export interface FileRouteTypes {
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
     | '/salary-process'
+    | '/salary-sheet-exec'
+    | '/salary-sheet-full-wh'
+    | '/salary-sheet-full-without-holiday'
     | '/salary-sheet-print'
     | '/set-hod'
     | '/set-manager'
@@ -2098,11 +2169,13 @@ export interface FileRouteTypes {
     | '/approve-increment-gadget'
     | '/approve-increment-hr'
     | '/approve-overtime'
+    | '/bank-sheet-exec'
     | '/budget-my-requisitions'
     | '/budget-overtime'
     | '/budget-planning'
     | '/budget-requisition-approvals'
     | '/budget-statement'
+    | '/cash-sheet-print'
     | '/changes'
     | '/check-approve-salary'
     | '/company-holiday'
@@ -2117,6 +2190,7 @@ export interface FileRouteTypes {
     | '/configure-tax'
     | '/configure-time'
     | '/create-roster'
+    | '/dept-wise-salary-sheet'
     | '/disciplinary-case-files'
     | '/disciplinary-showcause-notices'
     | '/disciplinary-warning-letters'
@@ -2199,6 +2273,7 @@ export interface FileRouteTypes {
     | '/monthly-salary-process'
     | '/my-dashboard'
     | '/notice'
+    | '/ot-sheet-holiday'
     | '/payroll-advance'
     | '/payroll-benefits'
     | '/payroll-benefits-common'
@@ -2268,6 +2343,9 @@ export interface FileRouteTypes {
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
     | '/salary-process'
+    | '/salary-sheet-exec'
+    | '/salary-sheet-full-wh'
+    | '/salary-sheet-full-without-holiday'
     | '/salary-sheet-print'
     | '/set-hod'
     | '/set-manager'
@@ -2301,11 +2379,13 @@ export interface FileRouteTypes {
     | '/approve-increment-gadget'
     | '/approve-increment-hr'
     | '/approve-overtime'
+    | '/bank-sheet-exec'
     | '/budget-my-requisitions'
     | '/budget-overtime'
     | '/budget-planning'
     | '/budget-requisition-approvals'
     | '/budget-statement'
+    | '/cash-sheet-print'
     | '/changes'
     | '/check-approve-salary'
     | '/company-holiday'
@@ -2320,6 +2400,7 @@ export interface FileRouteTypes {
     | '/configure-tax'
     | '/configure-time'
     | '/create-roster'
+    | '/dept-wise-salary-sheet'
     | '/disciplinary-case-files'
     | '/disciplinary-showcause-notices'
     | '/disciplinary-warning-letters'
@@ -2402,6 +2483,7 @@ export interface FileRouteTypes {
     | '/monthly-salary-process'
     | '/my-dashboard'
     | '/notice'
+    | '/ot-sheet-holiday'
     | '/payroll-advance'
     | '/payroll-benefits'
     | '/payroll-benefits-common'
@@ -2471,6 +2553,9 @@ export interface FileRouteTypes {
     | '/recruitment-hr-list'
     | '/recruitment-ie-list'
     | '/salary-process'
+    | '/salary-sheet-exec'
+    | '/salary-sheet-full-wh'
+    | '/salary-sheet-full-without-holiday'
     | '/salary-sheet-print'
     | '/set-hod'
     | '/set-manager'
@@ -2505,11 +2590,13 @@ export interface RootRouteChildren {
   ApproveIncrementGadgetRoute: typeof ApproveIncrementGadgetRoute
   ApproveIncrementHrRoute: typeof ApproveIncrementHrRoute
   ApproveOvertimeRoute: typeof ApproveOvertimeRoute
+  BankSheetExecRoute: typeof BankSheetExecRoute
   BudgetMyRequisitionsRoute: typeof BudgetMyRequisitionsRoute
   BudgetOvertimeRoute: typeof BudgetOvertimeRoute
   BudgetPlanningRoute: typeof BudgetPlanningRoute
   BudgetRequisitionApprovalsRoute: typeof BudgetRequisitionApprovalsRoute
   BudgetStatementRoute: typeof BudgetStatementRoute
+  CashSheetPrintRoute: typeof CashSheetPrintRoute
   ChangesRoute: typeof ChangesRoute
   CheckApproveSalaryRoute: typeof CheckApproveSalaryRoute
   CompanyHolidayRoute: typeof CompanyHolidayRoute
@@ -2524,6 +2611,7 @@ export interface RootRouteChildren {
   ConfigureTaxRoute: typeof ConfigureTaxRoute
   ConfigureTimeRoute: typeof ConfigureTimeRoute
   CreateRosterRoute: typeof CreateRosterRoute
+  DeptWiseSalarySheetRoute: typeof DeptWiseSalarySheetRoute
   DisciplinaryCaseFilesRoute: typeof DisciplinaryCaseFilesRoute
   DisciplinaryShowcauseNoticesRoute: typeof DisciplinaryShowcauseNoticesRoute
   DisciplinaryWarningLettersRoute: typeof DisciplinaryWarningLettersRoute
@@ -2606,6 +2694,7 @@ export interface RootRouteChildren {
   MonthlySalaryProcessRoute: typeof MonthlySalaryProcessRoute
   MyDashboardRoute: typeof MyDashboardRoute
   NoticeRoute: typeof NoticeRoute
+  OtSheetHolidayRoute: typeof OtSheetHolidayRoute
   PayrollAdvanceRoute: typeof PayrollAdvanceRoute
   PayrollBenefitsRoute: typeof PayrollBenefitsRoute
   PayrollBenefitsCommonRoute: typeof PayrollBenefitsCommonRoute
@@ -2675,6 +2764,9 @@ export interface RootRouteChildren {
   RecruitmentHrListRoute: typeof RecruitmentHrListRoute
   RecruitmentIeListRoute: typeof RecruitmentIeListRoute
   SalaryProcessRoute: typeof SalaryProcessRoute
+  SalarySheetExecRoute: typeof SalarySheetExecRoute
+  SalarySheetFullWhRoute: typeof SalarySheetFullWhRoute
+  SalarySheetFullWithoutHolidayRoute: typeof SalarySheetFullWithoutHolidayRoute
   SalarySheetPrintRoute: typeof SalarySheetPrintRoute
   SetHodRoute: typeof SetHodRoute
   SetManagerRoute: typeof SetManagerRoute
@@ -2825,6 +2917,27 @@ declare module '@tanstack/react-router' {
       path: '/salary-sheet-print'
       fullPath: '/salary-sheet-print'
       preLoaderRoute: typeof SalarySheetPrintRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/salary-sheet-full-without-holiday': {
+      id: '/salary-sheet-full-without-holiday'
+      path: '/salary-sheet-full-without-holiday'
+      fullPath: '/salary-sheet-full-without-holiday'
+      preLoaderRoute: typeof SalarySheetFullWithoutHolidayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/salary-sheet-full-wh': {
+      id: '/salary-sheet-full-wh'
+      path: '/salary-sheet-full-wh'
+      fullPath: '/salary-sheet-full-wh'
+      preLoaderRoute: typeof SalarySheetFullWhRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/salary-sheet-exec': {
+      id: '/salary-sheet-exec'
+      path: '/salary-sheet-exec'
+      fullPath: '/salary-sheet-exec'
+      preLoaderRoute: typeof SalarySheetExecRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/salary-process': {
@@ -3308,6 +3421,13 @@ declare module '@tanstack/react-router' {
       path: '/payroll-advance'
       fullPath: '/payroll-advance'
       preLoaderRoute: typeof PayrollAdvanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ot-sheet-holiday': {
+      id: '/ot-sheet-holiday'
+      path: '/ot-sheet-holiday'
+      fullPath: '/ot-sheet-holiday'
+      preLoaderRoute: typeof OtSheetHolidayRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/notice': {
@@ -3884,6 +4004,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DisciplinaryCaseFilesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dept-wise-salary-sheet': {
+      id: '/dept-wise-salary-sheet'
+      path: '/dept-wise-salary-sheet'
+      fullPath: '/dept-wise-salary-sheet'
+      preLoaderRoute: typeof DeptWiseSalarySheetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/create-roster': {
       id: '/create-roster'
       path: '/create-roster'
@@ -3982,6 +4109,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChangesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cash-sheet-print': {
+      id: '/cash-sheet-print'
+      path: '/cash-sheet-print'
+      fullPath: '/cash-sheet-print'
+      preLoaderRoute: typeof CashSheetPrintRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/budget-statement': {
       id: '/budget-statement'
       path: '/budget-statement'
@@ -4015,6 +4149,13 @@ declare module '@tanstack/react-router' {
       path: '/budget-my-requisitions'
       fullPath: '/budget-my-requisitions'
       preLoaderRoute: typeof BudgetMyRequisitionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bank-sheet-exec': {
+      id: '/bank-sheet-exec'
+      path: '/bank-sheet-exec'
+      fullPath: '/bank-sheet-exec'
+      preLoaderRoute: typeof BankSheetExecRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/approve-overtime': {
@@ -4121,11 +4262,13 @@ const rootRouteChildren: RootRouteChildren = {
   ApproveIncrementGadgetRoute: ApproveIncrementGadgetRoute,
   ApproveIncrementHrRoute: ApproveIncrementHrRoute,
   ApproveOvertimeRoute: ApproveOvertimeRoute,
+  BankSheetExecRoute: BankSheetExecRoute,
   BudgetMyRequisitionsRoute: BudgetMyRequisitionsRoute,
   BudgetOvertimeRoute: BudgetOvertimeRoute,
   BudgetPlanningRoute: BudgetPlanningRoute,
   BudgetRequisitionApprovalsRoute: BudgetRequisitionApprovalsRoute,
   BudgetStatementRoute: BudgetStatementRoute,
+  CashSheetPrintRoute: CashSheetPrintRoute,
   ChangesRoute: ChangesRoute,
   CheckApproveSalaryRoute: CheckApproveSalaryRoute,
   CompanyHolidayRoute: CompanyHolidayRoute,
@@ -4140,6 +4283,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConfigureTaxRoute: ConfigureTaxRoute,
   ConfigureTimeRoute: ConfigureTimeRoute,
   CreateRosterRoute: CreateRosterRoute,
+  DeptWiseSalarySheetRoute: DeptWiseSalarySheetRoute,
   DisciplinaryCaseFilesRoute: DisciplinaryCaseFilesRoute,
   DisciplinaryShowcauseNoticesRoute: DisciplinaryShowcauseNoticesRoute,
   DisciplinaryWarningLettersRoute: DisciplinaryWarningLettersRoute,
@@ -4223,6 +4367,7 @@ const rootRouteChildren: RootRouteChildren = {
   MonthlySalaryProcessRoute: MonthlySalaryProcessRoute,
   MyDashboardRoute: MyDashboardRoute,
   NoticeRoute: NoticeRoute,
+  OtSheetHolidayRoute: OtSheetHolidayRoute,
   PayrollAdvanceRoute: PayrollAdvanceRoute,
   PayrollBenefitsRoute: PayrollBenefitsRoute,
   PayrollBenefitsCommonRoute: PayrollBenefitsCommonRoute,
@@ -4295,6 +4440,9 @@ const rootRouteChildren: RootRouteChildren = {
   RecruitmentHrListRoute: RecruitmentHrListRoute,
   RecruitmentIeListRoute: RecruitmentIeListRoute,
   SalaryProcessRoute: SalaryProcessRoute,
+  SalarySheetExecRoute: SalarySheetExecRoute,
+  SalarySheetFullWhRoute: SalarySheetFullWhRoute,
+  SalarySheetFullWithoutHolidayRoute: SalarySheetFullWithoutHolidayRoute,
   SalarySheetPrintRoute: SalarySheetPrintRoute,
   SetHodRoute: SetHodRoute,
   SetManagerRoute: SetManagerRoute,

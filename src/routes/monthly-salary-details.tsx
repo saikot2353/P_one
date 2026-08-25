@@ -668,6 +668,34 @@ function MonthlySalaryDetailsPage() {
     window.open(`/payslip-print?lang=${lang}`, "_blank");
   };
 
+  const handleOpenDeptWiseSalarySheet = () => {
+    const filtersData = {
+      year,
+      month,
+      empType,
+      department,
+      unit,
+      line
+    };
+    localStorage.setItem("print_salary_sheet_data", JSON.stringify(filteredData));
+    localStorage.setItem("print_salary_sheet_filters", JSON.stringify(filtersData));
+    window.open(`/dept-wise-salary-sheet`, "_blank");
+  };
+
+  const handleOpenCashSheet = () => {
+    const filtersData = {
+      year,
+      month,
+      empType,
+      department,
+      unit,
+      line
+    };
+    localStorage.setItem("print_salary_sheet_data", JSON.stringify(filteredData));
+    localStorage.setItem("print_salary_sheet_filters", JSON.stringify(filtersData));
+    window.open(`/cash-sheet-print`, "_blank");
+  };
+
   const handleOpenSalarySheet = () => {
     const filtersData = {
       year,
@@ -680,6 +708,76 @@ function MonthlySalaryDetailsPage() {
     localStorage.setItem("print_salary_sheet_data", JSON.stringify(filteredData));
     localStorage.setItem("print_salary_sheet_filters", JSON.stringify(filtersData));
     window.open(`/salary-sheet-print`, "_blank");
+  };
+
+  const handleOpenOTSheetHoliday = () => {
+    const filtersData = {
+      year,
+      month,
+      empType,
+      department,
+      unit,
+      line
+    };
+    localStorage.setItem("print_salary_sheet_data", JSON.stringify(filteredData));
+    localStorage.setItem("print_salary_sheet_filters", JSON.stringify(filtersData));
+    window.open(`/ot-sheet-holiday`, "_blank");
+  };
+
+  const handleOpenSalarySheetFullWH = () => {
+    const filtersData = {
+      year,
+      month,
+      empType,
+      department,
+      unit,
+      line
+    };
+    localStorage.setItem("print_salary_sheet_data", JSON.stringify(filteredData));
+    localStorage.setItem("print_salary_sheet_filters", JSON.stringify(filtersData));
+    window.open(`/salary-sheet-full-wh`, "_blank");
+  };
+
+  const handleOpenSalarySheetFullWithoutHoliday = () => {
+    const filtersData = {
+      year,
+      month,
+      empType,
+      department,
+      unit,
+      line
+    };
+    localStorage.setItem("print_salary_sheet_data", JSON.stringify(filteredData));
+    localStorage.setItem("print_salary_sheet_filters", JSON.stringify(filtersData));
+    window.open(`/salary-sheet-full-without-holiday`, "_blank");
+  };
+
+  const handleOpenBankSheetExec = () => {
+    const filtersData = {
+      year,
+      month,
+      empType,
+      department,
+      unit,
+      line
+    };
+    localStorage.setItem("print_salary_sheet_data", JSON.stringify(filteredData));
+    localStorage.setItem("print_salary_sheet_filters", JSON.stringify(filtersData));
+    window.open(`/bank-sheet-exec`, "_blank");
+  };
+
+  const handleOpenSalarySheetExec = () => {
+    const filtersData = {
+      year,
+      month,
+      empType,
+      department,
+      unit,
+      line
+    };
+    localStorage.setItem("print_salary_sheet_data", JSON.stringify(filteredData));
+    localStorage.setItem("print_salary_sheet_filters", JSON.stringify(filtersData));
+    window.open(`/salary-sheet-exec`, "_blank");
   };
 
   return (
@@ -873,9 +971,9 @@ function MonthlySalaryDetailsPage() {
                   <ReportBtn onClick={() => handleOpenPayslip("en")}>Pay Slip-English</ReportBtn>
                   <ReportBtn onClick={() => handleOpenPayslip("bn")}>Pay Slip-Bangla</ReportBtn>
                   <ReportBtn onClick={handleOpenSalarySheet}>Salary Sheet</ReportBtn>
-                  <ReportBtn onClick={handleOpenSalarySheet}>Dept.Wise Salary Sheet</ReportBtn>
-                  <ReportBtn onClick={handleOpenSalarySheet}>Salary Sheet(Exec)</ReportBtn>
-                  <ReportBtn>Bank Sheet(Exec)</ReportBtn>
+                  <ReportBtn onClick={handleOpenDeptWiseSalarySheet}>Dept.Wise Salary Sheet</ReportBtn>
+                  <ReportBtn onClick={handleOpenSalarySheetExec}>Salary Sheet(Exec)</ReportBtn>
+                  <ReportBtn onClick={handleOpenBankSheetExec}>Bank Sheet(Exec)</ReportBtn>
                   <ReportBtn>Export Bank Sheet(Exec)</ReportBtn>
                 </div>
                 
@@ -884,10 +982,10 @@ function MonthlySalaryDetailsPage() {
                   <ReportBtn onClick={() => handleOpenPayslip("en")}>Pay Slip-English</ReportBtn>
                   <ReportBtn onClick={() => handleOpenPayslip("bn")}>Pay Slip-Bangla</ReportBtn>
                   <ReportBtn onClick={() => handleOpenPayslip("bn")}>Pay Slip-Bangla(WH)</ReportBtn>
-                  <ReportBtn onClick={handleOpenSalarySheet}>Salary Sheet Full(Without Holiday)</ReportBtn>
-                  <ReportBtn onClick={handleOpenSalarySheet}>Salary Sheet Full(WH)</ReportBtn>
-                  <ReportBtn>OT Sheet(Holiday)</ReportBtn>
-                  <ReportBtn>Cash Sheet(Exec)</ReportBtn>
+                  <ReportBtn onClick={handleOpenSalarySheetFullWithoutHoliday}>Salary Sheet Full(Without Holiday)</ReportBtn>
+                  <ReportBtn onClick={handleOpenSalarySheetFullWH}>Salary Sheet Full(WH)</ReportBtn>
+                  <ReportBtn onClick={handleOpenOTSheetHoliday}>OT Sheet(Holiday)</ReportBtn>
+                  <ReportBtn onClick={handleOpenCashSheet}>Cash Sheet(Exec)</ReportBtn>
                   <ReportBtn>Export Cash Sheet(Exec)</ReportBtn>
                 </div>
 

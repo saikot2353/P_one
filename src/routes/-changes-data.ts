@@ -2,6 +2,69 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "272",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Feature",
+    module: "Salary Sheet (Exec)",
+    link: "/salary-sheet-exec",
+    descriptionEn: "Created the Salary Sheet (Exec) landscape print report layout with 31 specific columns mapped precisely from the provided reference. Wired it to the Salary Sheet (Exec) button.",
+    descriptionBn: "রেফারেন্স থেকে 31 টি কলাম স্পেসিফিকেশন অনুযায়ী স্যালারি শিট (Exec) ল্যান্ডস্কেপ প্রিন্ট রিপোর্ট লেআউট তৈরি করা হয়েছে এবং এটিকে স্যালারি শিট (Exec) বাটনের সাথে যুক্ত করা হয়েছে।"
+  },
+  {
+    id: "271",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Feature",
+    module: "Bank Sheet (Exec)",
+    link: "/bank-sheet-exec",
+    descriptionEn: "Created the Bank Sheet (Exec) portrait print report layout matching the provided layout and wired it to the Bank Sheet (Exec) button in the Advanced Report Actions.",
+    descriptionBn: "ব্যাংক শিট (Exec) পোর্ট্রেট প্রিন্ট রিপোর্ট লেআউট তৈরি করা হয়েছে এবং এটিকে অ্যাডভান্সড রিপোর্ট অ্যাকশন সেকশনের ব্যাংক শিট (Exec) বাটনের সাথে যুক্ত করা হয়েছে।"
+  },
+  {
+    id: "270",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Feature",
+    module: "Salary Sheet Full (Without Holiday)",
+    link: "/salary-sheet-full-without-holiday",
+    descriptionEn: "Created Salary Sheet Full (Without Holiday) report layout by mapping to the exact 30-column screenshot specification, omitting the Holiday column. Linked the report to the corresponding button in the Advance Report Actions section.",
+    descriptionBn: "স্ক্রিনশটের 30-কলাম স্পেসিফিকেশন অনুযায়ী হলিডে কলাম বাদ দিয়ে স্যালারি শিট ফুল (উইদাউট হলিডে) রিপোর্ট লেআউট তৈরি করা হয়েছে এবং এটিকে সংশ্লিষ্ট বাটনের সাথে যুক্ত করা হয়েছে।"
+  },
+  {
+    id: "269",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Feature",
+    module: "Salary Sheet Full (WH)",
+    link: "/salary-sheet-full-wh",
+    descriptionEn: "Created Salary Sheet Full (WH) report layout based on the exact screenshot specifications and wired it to the Salary Sheet Full(WH) button.",
+    descriptionBn: "স্ক্রিনশটের স্পেসিফিকেশন অনুযায়ী স্যালারি শিট ফুল (WH) রিপোর্ট লেআউট তৈরি করা হয়েছে এবং এটিকে স্যালারি শিট ফুল (WH) বাটনের সাথে যুক্ত করা হয়েছে।"
+  },
+  {
+    id: "268",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Feature",
+    module: "OT Sheet (Holiday)",
+    link: "/ot-sheet-holiday",
+    descriptionEn: "Created OT Sheet(Holiday) report with custom landscape layout and dynamic column grouping mapping to the provided screenshot structure. Wired it to the OT Sheet(Holiday) button in the Monthly Salary Details portal.",
+    descriptionBn: "স্ক্রিনশটের সাথে মিল রেখে কাস্টম ল্যান্ডস্কেপ লেআউট এবং ডায়নামিক কলাম গ্রুপিং সহ OT Sheet (Holiday) পেজ তৈরি করা হয়েছে এবং মাসিক স্যালারি ডিটেইলস পোর্টালে বাটনের সাথে যুক্ত করা হয়েছে।"
+  },
+  {
+    id: "266",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Feature",
+    module: "Cash Sheet (Exec)",
+    link: "/cash-sheet-print",
+    descriptionEn: "Added a portrait-oriented printable A4 Cash Payment Sheet report route (/cash-sheet-print) for the Payroll module, mapping exactly to reference mockups and wired to the Cash Sheet (Exec) button.",
+    descriptionBn: "পে-রোল মডিউলের জন্য একটি পোর্ট্রেট-ওরিয়েন্টেড প্রিন্টযোগ্য A4 ক্যাশ পেমেন্ট শিট রিপোর্ট রাউট (/cash-sheet-print) যুক্ত করা হয়েছে এবং এটি ক্যাশ শিট (Exec) বাটনের সাথে সংযুক্ত করা হয়েছে।"
+  },
+  {
+    id: "265",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Feature",
+    module: "Dept. wise Salary Sheet",
+    link: "/dept-wise-salary-sheet",
+    descriptionEn: "Added Department wise salary sheet print view with chunking by department and employee type, matching the PDF format.",
+    descriptionBn: "পিডিএফ ফরম্যাটের সাথে মিল রেখে ডিপার্টমেন্ট এবং এমপ্লয়ী টাইপ অনুযায়ী চাঙ্কিং সহ বিভাগ ভিত্তিক বেতন শিট প্রিন্ট ভিউ যোগ করা হয়েছে।"
+  },
+  {
     id: "264",
     date: new Date().toISOString().slice(0, 16),
     type: "Bug Fix",
