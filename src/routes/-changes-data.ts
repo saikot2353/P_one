@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "262",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Workspace Selection Portal",
+    link: "/module-selection",
+    descriptionEn: "Updated the workspace landing page to separate modules into two distinct sections: 'Active Modules' (containing HRIS, Merchandising, Procurement Management, and Inventory Management) and 'Available Modules' (containing the remaining modules). Integrated clean section headers, visual status indicators (online/offline module counts), and staggered animations.",
+    descriptionBn: "ওয়ার্কস্পেস ল্যান্ডিং পেজটি আপডেট করা হয়েছে যেখানে মডিউলগুলোকে দুটি আলাদা বিভাগে বিভক্ত করা হয়েছে: 'Active Modules' (যার মধ্যে রয়েছে HRIS, Merchandising, Procurement Management এবং Inventory Management) এবং 'Available Modules' (অবশিষ্ট অন্যান্য মডিউলগুলো)। এর সাথে সুন্দর সেকশন হেডার, লাইভ অনলাইন/অফলাইন স্ট্যাটাস কাউন্টার এবং স্মুথ অ্যানিমেশন যুক্ত করা হয়েছে।",
+  },
+  {
     id: "261",
     date: new Date().toISOString().slice(0, 16),
     type: "New Feature",
@@ -22,45 +31,20 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
     id: "259",
     date: new Date().toISOString().slice(0, 16),
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    type: "UI Update",
-    module: "Employee Job Card",
-    link: "/employee-job-card",
-    descriptionEn: "Redesigned the Employee Job Card workspace including Scope & Parameters form columns grid, inline query triggers, employee profile summary card, stat card tiles, and responsive Attendance Summary block.",
-    descriptionBn: "এমপ্লয়ি জব কার্ড পেজটি নতুন করে রিডিজাইন করা হয়েছে: যেখানে রয়েছে স্কোপ ও প্যারামিটারস সার্চ প্যানেল, ইনলাইন অ্যাকশন ট্রিগার, এমপ্লয়ি প্রোফাইল সামারি কার্ড, ৪টি প্রিমিয়াম স্ট্যাট টাইলস এবং ডায়নামিক অ্যাটেনডেন্স সামারি ব্লক।",
-=======
-=======
->>>>>>> 0a94dd024a1d970d99a823f6d3ba878243bbbb00
-=======
->>>>>>> ccd8f22e5455e6cb2a468805babc45e9b60c1f96
     type: "New Feature",
     module: "Procurement Management Module",
     link: "/procurement-dashboard",
     descriptionEn: "Created the new Procurement Management module, including custom ProcurementSidebar, ProcurementTopbar, 45 individual static route files, and a rich graphical overview dashboard equipped with Recharts trends (spend and payouts), allocation splits, and comprehensive performance metrics.",
     descriptionBn: "নতুন প্রকিউরমেন্ট ম্যানেজমেন্ট মডিউল তৈরি করা হয়েছে, যার মধ্যে রয়েছে কাস্টম প্রকিউরমেন্ট সাইডবার, প্রকিউরমেন্ট টপবার, ৪৫টি পৃথক স্ট্যাটিক রাউট পেইজ এবং রিচার্টস (Recharts) গ্রাফিক্যাল ট্রেন্ড অ্যানালিটিকস, ক্যাটাগরি স্পেন্ড অ্যালোকেশন এবং প্রিমিয়াম পারফরম্যান্স মেট্রিক্স সমৃদ্ধ একটি আকর্ষনীয় ড্যাশবোর্ড লেআউট।",
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> dd348c1a56270ecab83bacffce4f311410be233c
-=======
-=======
-=======
   },
   {
     id: "258",
     date: new Date().toISOString().slice(0, 16),
->>>>>>> ccd8f22e5455e6cb2a468805babc45e9b60c1f96
     type: "UI Update",
     module: "Employee Job Card",
     link: "/employee-job-card",
     descriptionEn: "Redesigned the Employee Job Card workspace including Scope & Parameters form columns grid, inline query triggers, employee profile summary card, stat card tiles, and responsive Attendance Summary block.",
     descriptionBn: "এমপ্লয়ি জব কার্ড পেজটি নতুন করে রিডিজাইন করা হয়েছে: যেখানে রয়েছে স্কোপ ও প্যারামিটারস সার্চ প্যানেল, ইনলাইন অ্যাকশন ট্রিগার, এমপ্লয়ি প্রোফাইল সামারি কার্ড, ৪টি প্রিমিয়াম স্ট্যাট টাইলস এবং ডায়নামিক অ্যাটেনডেন্স সামারি ব্লক।",
-<<<<<<< HEAD
->>>>>>> 07b0a2dfebaf1177cb8cee9074130220eeba601b
->>>>>>> 0a94dd024a1d970d99a823f6d3ba878243bbbb00
-=======
->>>>>>> ccd8f22e5455e6cb2a468805babc45e9b60c1f96
   },
   {
     id: "257",
