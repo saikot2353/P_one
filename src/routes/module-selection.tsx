@@ -164,6 +164,8 @@ const modules = [
   },
 ];
 
+const ACTIVE_MODULE_IDS = ["hris", "merchandising", "procurement", "inventory", "dashboard"];
+
 export default function ModuleSelectionPage() {
   const navigate = useNavigate();
   const [theme, setTheme] = useState<Theme>("light");
@@ -265,13 +267,13 @@ export default function ModuleSelectionPage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
               </span>
-              {modules.filter(m => ["hris", "merchandising", "procurement", "inventory"].includes(m.id)).length} Modules Online
+              {modules.filter(m => ACTIVE_MODULE_IDS.includes(m.id)).length} Modules Online
             </span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4">
             {modules
-              .filter(m => ["hris", "merchandising", "procurement", "inventory"].includes(m.id))
+              .filter(m => ACTIVE_MODULE_IDS.includes(m.id))
               .map((module, idx) => {
                 const Icon = module.icon;
                 const isHovered = hoveredModule === module.id;
@@ -333,17 +335,17 @@ export default function ModuleSelectionPage() {
                 ? 'bg-slate-500/10 text-slate-400 border-white/5' 
                 : 'bg-slate-100 text-slate-600 border-slate-200'
             }`}>
-              {modules.filter(m => !["hris", "merchandising", "procurement", "inventory"].includes(m.id)).length} Modules Offline
+              {modules.filter(m => !ACTIVE_MODULE_IDS.includes(m.id)).length} Modules Offline
             </span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4">
             {modules
-              .filter(m => !["hris", "merchandising", "procurement", "inventory"].includes(m.id))
+              .filter(m => !ACTIVE_MODULE_IDS.includes(m.id))
               .map((module, idx) => {
                 const Icon = module.icon;
                 const isHovered = hoveredModule === module.id;
-                const activeCount = modules.filter(m => ["hris", "merchandising", "procurement", "inventory"].includes(m.id)).length;
+                const activeCount = modules.filter(m => ACTIVE_MODULE_IDS.includes(m.id)).length;
                 
                 return (
                   <button

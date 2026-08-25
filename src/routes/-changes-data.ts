@@ -7,8 +7,8 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     type: "UI Update",
     module: "Workspace Selection Portal",
     link: "/module-selection",
-    descriptionEn: "Updated the workspace landing page to separate modules into two distinct sections: 'Active Modules' (containing HRIS, Merchandising, Procurement Management, and Inventory Management) and 'Available Modules' (containing the remaining modules). Integrated clean section headers, visual status indicators (online/offline module counts), and staggered animations.",
-    descriptionBn: "ওয়ার্কস্পেস ল্যান্ডিং পেজটি আপডেট করা হয়েছে যেখানে মডিউলগুলোকে দুটি আলাদা বিভাগে বিভক্ত করা হয়েছে: 'Active Modules' (যার মধ্যে রয়েছে HRIS, Merchandising, Procurement Management এবং Inventory Management) এবং 'Available Modules' (অবশিষ্ট অন্যান্য মডিউলগুলো)। এর সাথে সুন্দর সেকশন হেডার, লাইভ অনলাইন/অফলাইন স্ট্যাটাস কাউন্টার এবং স্মুথ অ্যানিমেশন যুক্ত করা হয়েছে।",
+    descriptionEn: "Updated the workspace landing page to separate modules into two distinct sections: 'Active Modules' (containing HRIS, Merchandising, Procurement Management, Inventory Management, and My Dashboard) and 'Available Modules' (containing the remaining modules). Integrated clean section headers, visual status indicators (online/offline module counts), and staggered animations.",
+    descriptionBn: "ওয়ার্কস্পেস ল্যান্ডিং পেজটি আপডেট করা হয়েছে যেখানে মডিউলগুলোকে দুটি আলাদা বিভাগে বিভক্ত করা হয়েছে: 'Active Modules' (যার মধ্যে রয়েছে HRIS, Merchandising, Procurement Management, Inventory Management এবং My Dashboard) এবং 'Available Modules' (অবশিষ্ট অন্যান্য মডিউলগুলো)। এর সাথে সুন্দর সেকশন হেডার, লাইভ অনলাইন/অফলাইন স্ট্যাটাস কাউন্টার এবং স্মুথ অ্যানিমেশন যুক্ত করা হয়েছে।",
   },
   {
     id: "261",
