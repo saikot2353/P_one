@@ -2,6 +2,7 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+<<<<<<< HEAD
     id: "290",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Update",
@@ -153,6 +154,15 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     link: "/ssp-my-requisition",
     descriptionEn: "Updated Leave Application Details modal on the My Requisitions page to render Employee Details and Leave Details side-by-side using the same clean, bordered card styling with inline labels and bold values.",
     descriptionBn: "মাই রিকুইজিশন পেজের লিভ অ্যাপ্লিকেশন ডিটেইলস মডালটির লেআউট পরিবর্তন করা হয়েছে। এখন এমপ্লয়ি ডিটেইলস এবং লিভ ডিটেইলস সেকশন দুটি পাশাপাশি প্রদর্শিত হবে এবং উভয় সেকশনেই একই রকম কার্ড ডিজাইন ও ইনলাইন লেবেল ব্যবহার করা হয়েছে।"
+=======
+    id: "274",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Allowance Requisition",
+    link: "/allowance-requisition",
+    descriptionEn: "Created the new Allowance Requisition menu under Manage Allowance, featuring dynamic search parameters (Start/End date, Employee, Dept, Unit, Line), select-all list checkboxes, inline OT inputs editing, a batch assignment panel to configure selected records, CSV export, print layout styling, and list submission.",
+    descriptionBn: "ম্যানেজ অ্যালাউন্সের অধীনে নতুন 'Allowance Requisition' মেনু ও পেজ যুক্ত করা হয়েছে, যেখানে রয়েছে ডাইনামিক সার্চ প্যারামিটার (শুরু/শেষ তারিখ, কর্মচারী, বিভাগ, ইউনিট, লাইন), সিলেক্ট-অল চেকবক্স, ইনলাইন ওভারটাইম ইনপুট এডিটর, নির্বাচিত রেকর্ডের মান একবারে সেট করার জন্য ব্যাচ অ্যাসাইনমেন্ট মোডাল, এক্সেল এক্সপোর্ট, প্রিন্ট ও সাবমিশন অ্যাকশন।"
+>>>>>>> 6f83032e51c776b17d8dacc9b4c4c9b569a87d59
   },
   {
     id: "273",

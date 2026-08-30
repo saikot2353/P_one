@@ -208,6 +208,7 @@ import { Route as ApproveOvertimeRouteImport } from './routes/approve-overtime'
 import { Route as ApproveIncrementHrRouteImport } from './routes/approve-increment-hr'
 import { Route as ApproveIncrementGadgetRouteImport } from './routes/approve-increment-gadget'
 import { Route as ApproveAdvanceRouteImport } from './routes/approve-advance'
+import { Route as AllowanceRequisitionRouteImport } from './routes/allowance-requisition'
 import { Route as AllowanceRateRouteImport } from './routes/allowance-rate'
 import { Route as AllApprovalsRouteImport } from './routes/all-approvals'
 import { Route as AdvanceSalaryProcessRouteImport } from './routes/advance-salary-process'
@@ -1268,6 +1269,11 @@ const ApproveAdvanceRoute = ApproveAdvanceRouteImport.update({
   path: '/approve-advance',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AllowanceRequisitionRoute = AllowanceRequisitionRouteImport.update({
+  id: '/allowance-requisition',
+  path: '/allowance-requisition',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AllowanceRateRoute = AllowanceRateRouteImport.update({
   id: '/allowance-rate',
   path: '/allowance-rate',
@@ -1322,6 +1328,7 @@ export interface FileRoutesByFullPath {
   '/advance-salary-process': typeof AdvanceSalaryProcessRoute
   '/all-approvals': typeof AllApprovalsRoute
   '/allowance-rate': typeof AllowanceRateRoute
+  '/allowance-requisition': typeof AllowanceRequisitionRoute
   '/approve-advance': typeof ApproveAdvanceRoute
   '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
@@ -1532,6 +1539,7 @@ export interface FileRoutesByTo {
   '/advance-salary-process': typeof AdvanceSalaryProcessRoute
   '/all-approvals': typeof AllApprovalsRoute
   '/allowance-rate': typeof AllowanceRateRoute
+  '/allowance-requisition': typeof AllowanceRequisitionRoute
   '/approve-advance': typeof ApproveAdvanceRoute
   '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
@@ -1743,6 +1751,7 @@ export interface FileRoutesById {
   '/advance-salary-process': typeof AdvanceSalaryProcessRoute
   '/all-approvals': typeof AllApprovalsRoute
   '/allowance-rate': typeof AllowanceRateRoute
+  '/allowance-requisition': typeof AllowanceRequisitionRoute
   '/approve-advance': typeof ApproveAdvanceRoute
   '/approve-increment-gadget': typeof ApproveIncrementGadgetRoute
   '/approve-increment-hr': typeof ApproveIncrementHrRoute
@@ -1955,6 +1964,7 @@ export interface FileRouteTypes {
     | '/advance-salary-process'
     | '/all-approvals'
     | '/allowance-rate'
+    | '/allowance-requisition'
     | '/approve-advance'
     | '/approve-increment-gadget'
     | '/approve-increment-hr'
@@ -2165,6 +2175,7 @@ export interface FileRouteTypes {
     | '/advance-salary-process'
     | '/all-approvals'
     | '/allowance-rate'
+    | '/allowance-requisition'
     | '/approve-advance'
     | '/approve-increment-gadget'
     | '/approve-increment-hr'
@@ -2375,6 +2386,7 @@ export interface FileRouteTypes {
     | '/advance-salary-process'
     | '/all-approvals'
     | '/allowance-rate'
+    | '/allowance-requisition'
     | '/approve-advance'
     | '/approve-increment-gadget'
     | '/approve-increment-hr'
@@ -2586,6 +2598,7 @@ export interface RootRouteChildren {
   AdvanceSalaryProcessRoute: typeof AdvanceSalaryProcessRoute
   AllApprovalsRoute: typeof AllApprovalsRoute
   AllowanceRateRoute: typeof AllowanceRateRoute
+  AllowanceRequisitionRoute: typeof AllowanceRequisitionRoute
   ApproveAdvanceRoute: typeof ApproveAdvanceRoute
   ApproveIncrementGadgetRoute: typeof ApproveIncrementGadgetRoute
   ApproveIncrementHrRoute: typeof ApproveIncrementHrRoute
@@ -4186,6 +4199,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApproveAdvanceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/allowance-requisition': {
+      id: '/allowance-requisition'
+      path: '/allowance-requisition'
+      fullPath: '/allowance-requisition'
+      preLoaderRoute: typeof AllowanceRequisitionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/allowance-rate': {
       id: '/allowance-rate'
       path: '/allowance-rate'
@@ -4258,6 +4278,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdvanceSalaryProcessRoute: AdvanceSalaryProcessRoute,
   AllApprovalsRoute: AllApprovalsRoute,
   AllowanceRateRoute: AllowanceRateRoute,
+  AllowanceRequisitionRoute: AllowanceRequisitionRoute,
   ApproveAdvanceRoute: ApproveAdvanceRoute,
   ApproveIncrementGadgetRoute: ApproveIncrementGadgetRoute,
   ApproveIncrementHrRoute: ApproveIncrementHrRoute,
