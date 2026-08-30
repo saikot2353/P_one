@@ -99,6 +99,7 @@ function JDListPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterDept, setFilterDept] = useState("All");
+  const [editingJdId, setEditingJdId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     department: "",
@@ -121,6 +122,19 @@ function JDListPage() {
       responsibilities: "",
       qualifications: "",
     });
+    setEditingJdId(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (jd: JDItem) => {
+    setFormData({
+      department: jd.department,
+      designation: jd.designation,
+      reportsTo: jd.reportsTo === "N/A" ? "" : jd.reportsTo,
+      responsibilities: jd.responsibilities,
+      qualifications: jd.qualifications,
+    });
+    setEditingJdId(jd.id);
     setIsModalOpen(true);
   };
 
@@ -130,19 +144,38 @@ function JDListPage() {
       return;
     }
 
-    const newJD: JDItem = {
-      id: `JD-00${jds.length + 1}`,
-      department: formData.department,
-      designation: formData.designation,
-      reportsTo: formData.reportsTo || "N/A",
-      responsibilities: formData.responsibilities,
-      qualifications: formData.qualifications,
-      lastUpdated: new Date().toISOString().split("T")[0],
-    };
+    if (editingJdId) {
+      const updatedJds = jds.map((j) =>
+        j.id === editingJdId
+          ? {
+              ...j,
+              department: formData.department,
+              designation: formData.designation,
+              reportsTo: formData.reportsTo || "N/A",
+              responsibilities: formData.responsibilities,
+              qualifications: formData.qualifications,
+              lastUpdated: new Date().toISOString().split("T")[0],
+            }
+          : j
+      );
+      saveJds(updatedJds);
+      toast.success("Job Description updated successfully!");
+    } else {
+      const newJD: JDItem = {
+        id: `JD-00${jds.length + 1}`,
+        department: formData.department,
+        designation: formData.designation,
+        reportsTo: formData.reportsTo || "N/A",
+        responsibilities: formData.responsibilities,
+        qualifications: formData.qualifications,
+        lastUpdated: new Date().toISOString().split("T")[0],
+      };
 
-    saveJds([newJD, ...jds]);
-    toast.success("Job Description created successfully!");
+      saveJds([newJD, ...jds]);
+      toast.success("Job Description created successfully!");
+    }
     setIsModalOpen(false);
+    setEditingJdId(null);
   };
 
   const handleDelete = (id: string) => {
@@ -281,7 +314,7 @@ function JDListPage() {
                         </td>
                         <td className="px-5 py-4 text-center">
                           <div className="flex items-center justify-center gap-3">
-                            <button className="text-amber-500 hover:text-amber-600 transition-colors" title="Edit">
+                            <button className="text-amber-500 hover:text-amber-600 transition-colors" onClick={() => handleEdit(jd)} title="Edit">
                               <Pencil className="size-3.5" />
                             </button>
                             <button className="text-rose-500 hover:text-rose-600 transition-colors" onClick={() => handleDelete(jd.id)} title="Delete">
@@ -382,12 +415,15 @@ function JDListPage() {
       </Dialog>
 
       {/* Create JD Modal */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+      <Dialog open={isModalOpen} onOpenChange={(open) => {
+        setIsModalOpen(open);
+        if (!open) setEditingJdId(null);
+      }}>
         <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden bg-white rounded-2xl shadow-xl border-0">
           <DialogHeader className="px-6 py-4 border-b border-slate-100">
             <DialogTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
               <ClipboardList className="size-5 text-[#2563eb]" />
-              Create Job Description (JD)
+              {editingJdId ? "Edit Job Description (JD)" : "Create Job Description (JD)"}
             </DialogTitle>
           </DialogHeader>
 
@@ -483,7 +519,7 @@ function JDListPage() {
               </Button>
             </DialogClose>
             <Button onClick={handleSubmit} className="h-9 rounded-lg px-5 text-xs font-bold bg-[#2563eb] hover:bg-blue-700 text-white uppercase tracking-wide">
-              Create JD
+              {editingJdId ? "Save Changes" : "Create JD"}
             </Button>
           </DialogFooter>
         </DialogContent>

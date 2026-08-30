@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "273",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Feature Update",
+    module: "JD List",
+    link: "/jd-list",
+    descriptionEn: "Made the Edit functionality fully functional on the JD List page. Users can now edit details of existing Job Descriptions (such as department, designation, reports to, key responsibilities, and qualifications) in the same modal interface with pre-filled inputs.",
+    descriptionBn: "জেডি (JD) লিস্ট পেজে এডিট অপশনটিকে সম্পূর্ণ সচল করা হয়েছে। ব্যবহারকারীরা এখন একই মডাল উইন্ডোতে বিদ্যমান তথ্যগুলো প্রি-ফিলড অবস্থায় পেয়ে যেকোনো তথ্য (ডিপার্টমেন্ট, ডেজিগনেশন, রিপোর্ট টু, মূল দায়িত্বসমূহ এবং শিক্ষাগত যোগ্যতা) আপডেট করতে পারবেন।"
+  },
+  {
     id: "272",
     date: new Date().toISOString().slice(0, 16),
     type: "Feature",
