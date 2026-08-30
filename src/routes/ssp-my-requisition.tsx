@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { LeaveApplicationModal } from "@/components/ssp/LeaveApplicationModal";
 import { GeneralStoreRequisitionModal } from "@/components/ssp/GeneralStoreRequisitionModal";
+import { GroupLeaveApplicationModal } from "@/components/ssp/GroupLeaveApplicationModal";
 
 export const Route = createFileRoute("/ssp-my-requisition")({
   component: MyRequisitionPage,
@@ -38,12 +39,13 @@ interface RequisitionRow {
 function MyRequisitionPage() {
   const [leaveModalOpen, setLeaveModalOpen] = useState(false);
   const [storeModalOpen, setStoreModalOpen] = useState(false);
+  const [groupLeaveModalOpen, setGroupLeaveModalOpen] = useState(false);
 
   // States
   const [requester, setRequester] = useState("Tahmid Afsar");
   const [statusFilter, setStatusFilter] = useState<RequisitionStatus | "All">("All");
   const [dateFrom, setDateFrom] = useState("2026-03-01");
-  const [dateTo, setDateTo] = useState("2026-06-08");
+  const [dateTo, setDateTo] = useState("2026-08-01");
   const [reqNumber, setReqNumber] = useState("");
   const [globalSearch, setGlobalSearch] = useState("");
 
@@ -58,6 +60,15 @@ function MyRequisitionPage() {
       doc: "General Product Store Requisition",
       note: "",
       onClickView: () => setStoreModalOpen(true),
+    },
+    {
+      id: "375460",
+      reqNum: "375460",
+      date: "2026-07-13",
+      status: "Pending",
+      doc: "Group Leave Application",
+      note: "Urgent training session and exam group leave",
+      onClickView: () => setGroupLeaveModalOpen(true),
     },
     {
       id: "372569",
@@ -379,6 +390,7 @@ function MyRequisitionPage() {
 
       <LeaveApplicationModal open={leaveModalOpen} onOpenChange={setLeaveModalOpen} />
       <GeneralStoreRequisitionModal open={storeModalOpen} onOpenChange={setStoreModalOpen} />
+      <GroupLeaveApplicationModal open={groupLeaveModalOpen} onOpenChange={setGroupLeaveModalOpen} />
     </div>
   );
 }

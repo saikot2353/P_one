@@ -2,6 +2,159 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "290",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "SSP Modals",
+    link: "/ssp-my-requisition",
+    descriptionEn: "Added a checkmark icon to the Serial Number (SL) column in both Leave Application and Group Leave Application modal tables.",
+    descriptionBn: "লিভ অ্যাপ্লিকেশন এবং গ্রুপ লিভ অ্যাপ্লিকেশন মডালের টেবিলে সিরিয়াল নম্বর (SL) কলামে একটি চেকমার্ক আইকন যুক্ত করা হয়েছে।"
+  },
+  {
+    id: "289",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "General Product Store Requisition Modal",
+    link: "/ssp-my-requisition",
+    descriptionEn: "Added a Revision Count indicator alongside the Application Number in the General Product Store Requisition modal header.",
+    descriptionBn: "জেনারেল প্রোডাক্ট স্টোর রিকুইজিশন মডালের হেডারে অ্যাপ্লিকেশন নম্বরের পাশে রিভিশন কাউন্ট নির্দেশক যুক্ত করা হয়েছে।"
+  },
+  {
+    id: "288",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "General Product Store Requisition Modal",
+    link: "/ssp-my-requisition",
+    descriptionEn: "Redesigned the General Product Store Requisition detail view modal using the premium LeaveApplicationModal framework layout, featuring the custom items checkmarked list table shown in the design mockup.",
+    descriptionBn: "জেনারেল প্রোডাক্ট স্টোর রিকুইজিশন ডিটেইল ভিউ মডালটি প্রিমিয়াম লিভ অ্যাপ্লিকেশন মডাল লেআউটের আদলে নতুন করে ডিজাইন করা হয়েছে, এবং রিকুইজিশন আইটেম টেবিলটি স্ক্রিনশট মোকাআপের চেকমার্ক লিস্ট ডিজাইন অনুযায়ী সাজানো হয়েছে।"
+  },
+  {
+    id: "287",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Group Leave Requisition Modal",
+    link: "/ssp-my-requisition",
+    descriptionEn: "Re-added the Requester avatar image to the Requester Details section in the Group Leave Application modal, formatted identically to the standard Employee Details layout.",
+    descriptionBn: "গ্রুপ লিভ অ্যাপ্লিকেশন মডালের 'Requester Details' সেকশনে আবেদনকারীর প্রোফাইল ছবি পুনরায় যুক্ত করা হয়েছে, যা সাধারণ এমপ্লয়ী ডিটেইলস লেআউটের অনুরূপ।"
+  },
+  {
+    id: "286",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Group Leave Requisition Modal",
+    link: "/ssp-my-requisition",
+    descriptionEn: "Renamed the combined details card in the Group Leave Application Modal to 'Requester Details' and updated the field list to match the requested items, including custom label alignment width.",
+    descriptionBn: "গ্রুপ লিভ অ্যাপ্লিকেশন মডালের কম্বাইন্ড কার্ডের নাম পরিবর্তন করে 'Requester Details' করা হয়েছে এবং লেবেলগুলোর প্রস্থ সমন্বয় করে নতুন ফিল্ডগুলোর তালিকা আপডেট করা হয়েছে।"
+  },
+  {
+    id: "285",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Group Leave Requisition Modal",
+    link: "/ssp-my-requisition",
+    descriptionEn: "Combined the Requester and Request For panels in the Group Leave Application details modal into a single Employee Details section without an avatar image, aligning with the default Employee Details layout.",
+    descriptionBn: "গ্রুপ লিভ অ্যাপ্লিকেশন ডিটেইলস মডালে রিকোয়েস্টার এবং রিকোয়েস্ট ফর প্যানেল দুটিকে একটি একক এমপ্লয়ী ডিটেইলস সেকশনে রূপান্তর করা হয়েছে (প্রোফাইল ছবি ছাড়া), যা সাধারণ এমপ্লয়ী ডিটেইলস লেআউটের অনুরূপ।"
+  },
+  {
+    id: "284",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Feature",
+    module: "Group Leave Requisition Modal",
+    link: "/ssp-my-requisition",
+    descriptionEn: "Created and integrated the Group Leave Application Modal on the My Requisitions page, featuring a dual-panel Requester/Request For header layout and a comprehensive table displaying all leave member requests.",
+    descriptionBn: "মাই রিকুইজিশন পেজে গ্রুপ লিভ অ্যাপ্লিকেশন মডাল তৈরি এবং যুক্ত করা হয়েছে, যার মধ্যে রিকোয়েস্টার ও রিকোয়েস্ট ফর সেকশনগুলোর ডুয়াল-প্যানেল লেআউট এবং সকল কর্মচারীর ছুটির আবেদনের বিস্তারিত তালিকা টেবিল অন্তর্ভুক্ত রয়েছে।"
+  },
+  {
+    id: "283",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Leave Requisition Modal",
+    link: "/ssp-my-requisition",
+    descriptionEn: "Updated the Employee Details avatar image height to exactly 91px as requested.",
+    descriptionBn: "এমপ্লয়ী ডিটেইলস সেকশনে কর্মচারীর প্রোফাইল ছবির উচ্চতা পরিবর্তন করে 91 পিক্সেল করা হয়েছে।"
+  },
+  {
+    id: "282",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Leave Requisition Modal",
+    link: "/ssp-my-requisition",
+    descriptionEn: "Reduced horizontal column gap inside Employee Details section and corrected vertical top-alignment of the avatar image with the details grid.",
+    descriptionBn: "এমপ্লয়ী ডিটেইলস সেকশনে কলামগুলোর মধ্যবর্তী খালি জায়গা কমানো হয়েছে এবং কর্মচারীর প্রোফাইল ছবির সাথে ডানপাশের ডিটেইলস গ্রিডের উল্লম্ব সারিবদ্ধতা (vertical alignment) ঠিক করা হয়েছে।"
+  },
+  {
+    id: "281",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Leave Requisition Modal",
+    link: "/ssp-my-requisition",
+    descriptionEn: "Increased Dialog content maximum width size from max-w-5xl to max-w-7xl, shortened details table headers to their short-form titles (e.g., DUR., ENJ. / BAL., DOCS) and enforced single-line rendering.",
+    descriptionBn: "লিভ রিকুইজিশন মডালের সর্বোচ্চ উইডথ বাড়িয়ে max-w-7xl করা হয়েছে, এবং কলাম টাইটেলগুলো সংক্ষিপ্ত আকারে (যেমন: DUR., ENJ. / BAL., DOCS) প্রকাশ করে এক লাইনে প্রদর্শনের ব্যবস্থা করা হয়েছে।"
+  },
+  {
+    id: "280",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Leave Requisition Modal",
+    link: "/ssp-my-requisition",
+    descriptionEn: "Optimized Leave Requisition modal table layout to fit all columns inside the grid without horizontal scrolling by wrapping text and stacking Date Range vertically.",
+    descriptionBn: "লিভ রিকুইজিশন মডালের টেবিল লেআউট অপ্টিমাইজ করা হয়েছে যাতে কোন হরিজন্টাল স্ক্রল ছাড়াই কন্টেন্ট স্ক্রিনে দেখা যায়। এর জন্য ডেট রেঞ্জ ভার্টিক্যালি সাজানো হয়েছে এবং টেক্সট র‍্যাপিং সক্রিয় করা হয়েছে।"
+  },
+  {
+    id: "279",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Leave Requisition Modal",
+    link: "/ssp-my-requisition",
+    descriptionEn: "Moved Contact and Responsible fields from the Leave Balance Table to the Employee Details card section of the Leave Requisition modal.",
+    descriptionBn: "লিভ রিকুইজিশন মডালের লিভ ব্যালেন্স টেবিল থেকে কন্টাক্ট এবং রেসপনসিবল ফিল্ড দুটিকে সরিয়ে এমপ্লয়ী ডিটেইলস কার্ড সেকশনে স্থানান্তর করা হয়েছে।"
+  },
+  {
+    id: "278",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Leave Requisition Modal",
+    link: "/ssp-my-requisition",
+    descriptionEn: "Added Employee Avatar Image inside the Employee Details section of the Leave Application Details modal.",
+    descriptionBn: "লিভ অ্যাপ্লিকেশন ডিটেইলস মডালের এমপ্লয়ী ডিটেইলস সেকশনে কর্মচারীর প্রোফাইল ছবি যুক্ত করা হয়েছে।"
+  },
+  {
+    id: "277",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Leave Requisition Modal",
+    link: "/ssp-my-requisition",
+    descriptionEn: "Reordered the columns in the Leave Application details table and combined the Enjoyed and Balance fields into a single 'ENJOYED / BAL' column.",
+    descriptionBn: "লিভ অ্যাপ্লিকেশন ডিটেইলস টেবিলের কলামগুলোর ক্রম পরিবর্তন করা হয়েছে এবং এনজয়েড ও ব্যালেন্স ফিল্ড দুটিকে একত্রিত করে একটি একক কলাম করা হয়েছে।"
+  },
+  {
+    id: "276",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Leave Requisition Modal",
+    link: "/ssp-my-requisition",
+    descriptionEn: "Applied fixed-width alignment to all entry labels within the Employee Details and Leave Details cards of the Leave Application Details modal, ensuring that all data values are perfectly aligned in a uniform vertical column.",
+    descriptionBn: "লিভ অ্যাপ্লিকেশন ডিটেইলস মডালের এমপ্লয়ী ও লিভ ডিটেইলস কার্ডের ভেতরের সকল লেবেলের জন্য নির্দিষ্ট প্রস্থ (fixed width) ব্যবহার করা হয়েছে, যার ফলে সবগুলো ডেটা ভ্যালু একটি সুন্দর, সোজা কলামে সারিবদ্ধভাবে প্রদর্শিত হচ্ছে।"
+  },
+  {
+    id: "275",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Leave Requisition Modal",
+    link: "/ssp-my-requisition",
+    descriptionEn: "Updated Employee Details and Leave Details grids inside the Leave Application Details modal to be single-column. This left-aligns all entry fields sequentially to prevent text wrapping of long values while preserving the vertical row spacing.",
+    descriptionBn: "লিভ অ্যাপ্লিকেশন ডিটেইলস মডালের ভেতরে এমপ্লয়ী ও লিভ ডিটেইলসের গ্রিড লেআউট পরিবর্তন করে সিঙ্গেল-কলাম করা হয়েছে। এর ফলে সব তথ্য বাম পাশে সারিবদ্ধভাবে প্রদর্শিত হবে, যা বড় টেক্সট লাইনের রেন্ডারিং উন্নত করে।"
+  },
+  {
+    id: "274",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Leave Requisition Modal",
+    link: "/ssp-my-requisition",
+    descriptionEn: "Updated Leave Application Details modal on the My Requisitions page to render Employee Details and Leave Details side-by-side using the same clean, bordered card styling with inline labels and bold values.",
+    descriptionBn: "মাই রিকুইজিশন পেজের লিভ অ্যাপ্লিকেশন ডিটেইলস মডালটির লেআউট পরিবর্তন করা হয়েছে। এখন এমপ্লয়ি ডিটেইলস এবং লিভ ডিটেইলস সেকশন দুটি পাশাপাশি প্রদর্শিত হবে এবং উভয় সেকশনেই একই রকম কার্ড ডিজাইন ও ইনলাইন লেবেল ব্যবহার করা হয়েছে।"
+  },
+  {
     id: "273",
     date: new Date().toISOString().slice(0, 16),
     type: "Feature Update",
