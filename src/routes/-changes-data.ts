@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "274",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Allowance Requisition",
+    link: "/allowance-requisition",
+    descriptionEn: "Created the new Allowance Requisition menu under Manage Allowance, featuring dynamic search parameters (Start/End date, Employee, Dept, Unit, Line), select-all list checkboxes, inline OT inputs editing, a batch assignment panel to configure selected records, CSV export, print layout styling, and list submission.",
+    descriptionBn: "ম্যানেজ অ্যালাউন্সের অধীনে নতুন 'Allowance Requisition' মেনু ও পেজ যুক্ত করা হয়েছে, যেখানে রয়েছে ডাইনামিক সার্চ প্যারামিটার (শুরু/শেষ তারিখ, কর্মচারী, বিভাগ, ইউনিট, লাইন), সিলেক্ট-অল চেকবক্স, ইনলাইন ওভারটাইম ইনপুট এডিটর, নির্বাচিত রেকর্ডের মান একবারে সেট করার জন্য ব্যাচ অ্যাসাইনমেন্ট মোডাল, এক্সেল এক্সপোর্ট, প্রিন্ট ও সাবমিশন অ্যাকশন।"
+  },
+  {
     id: "273",
     date: new Date().toISOString().slice(0, 16),
     type: "Feature Update",
