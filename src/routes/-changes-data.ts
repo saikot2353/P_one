@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "334",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Improvement",
+    module: "Approvals",
+    link: "/pending-approvals",
+    descriptionEn: "Updated sub-menu label and route header to 'All Pending Approval List' (/pending-approvals) under Approvals menu.",
+    descriptionBn: "Approvals মেনুর অধীনে থাকা সাব-মেনু ও পেজের নাম পরিবর্তন করে 'All Pending Approval List' করা হয়েছে।",
+  },
+  {
     id: "333",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Improvement",

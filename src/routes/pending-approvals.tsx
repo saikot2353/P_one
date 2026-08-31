@@ -18,11 +18,11 @@ import {
 export const Route = createFileRoute("/pending-approvals")({
   head: () => ({
     meta: [
-      { title: "Pending Approvals — Requisition Tracker | CRIPTON HRIS" },
+      { title: "All Pending Approval List — Requisition Tracker | CRIPTON HRIS" },
       {
         name: "description",
         content:
-          "View pending requisitions and track their current stage and pending approver.",
+          "View all pending requisitions and track their current stage and pending approver.",
       },
     ],
   }),
@@ -327,7 +327,7 @@ function PendingApprovalsPage() {
             <span className="text-slate-500">Approvals</span>
             <ChevronRight size={14} className="text-slate-400" />
             <span className="font-semibold text-slate-800 dark:text-slate-200">
-              Pending Approvals
+              All Pending Approval List
             </span>
           </div>
 
@@ -342,7 +342,7 @@ function PendingApprovalsPage() {
           {/* Header Title */}
           <div>
             <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">
-              Pending Approvals List
+              All Pending Approval List
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Track all pending requisitions, their current approval stage, and who is currently assigned.

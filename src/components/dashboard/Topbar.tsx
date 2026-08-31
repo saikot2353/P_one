@@ -311,7 +311,7 @@ const searchableMenus: SearchMenuLink[] = [
   // Processes
   { label: "Payroll Processing", parent: "Processes", to: "/" },
   {
-    label: "Pending Approvals",
+    label: "All Pending Approval List",
     parent: "Approvals",
     to: "/pending-approvals",
     description: "Track all pending requisitions and see who each approval is currently pending to",
