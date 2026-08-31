@@ -2,6 +2,42 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "304",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI / UX",
+    module: "Navigation (Sidebar)",
+    link: "/maternity-leave",
+    descriptionEn: "Grouped Maternity Leave, Maternity Payment, and Maternity Payment Report under a collapsible 'Maternity' sub-category within the Leave sidebar navigation menu for clean information architecture.",
+    descriptionBn: "সাইডবার নেভিগেশনে Leave মডিউলের অধীনে 'Maternity' নামে একটি নেস্টেড সাব-ক্যাটাগরি তৈরি করে তার অধীনে Maternity Leave, Maternity Payment, এবং Maternity Payment Report সাব-মেনুগুলো গুচ্ছ আকারে সাজানো হয়েছে।",
+  },
+  {
+    id: "303",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI / UX",
+    module: "Leave (Maternity Payment)",
+    link: "/maternity-payment",
+    descriptionEn: "Removed the duplicate '+ Add New' button from the export toolbar in Maternity Payment (/maternity-payment), leaving strictly 1 primary Add button in the top breadcrumb header card. Restyled table action buttons into soft, subtle, professional icon badges with light color tints and crisp borders.",
+    descriptionBn: "Maternity Payment (/maternity-payment) পেজের টুলবার থেকে অতিরিক্ত 'Add New' বাটনটি সরিয়ে শুধুমাত্র উপরে মূল হেডারে ১ টি অ্যাড বাটন রাখা হয়েছে। টেবিলের অ্যাকশন বাটনগুলোকে সোবার, সফট এবং মার্জিত ব্যাকগ্রাউন্ড টিন্ট ও বর্ডার দিয়ে নতুনভাবে সাজানো হয়েছে।",
+  },
+  {
+    id: "302",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI / UX",
+    module: "Leave (Maternity Leave)",
+    link: "/maternity-leave",
+    descriptionEn: "Relocated the 'Load 3-Month Salary History' button to a dedicated bottom-right footer row inside the top Configurator Card in Maternity Leave (/maternity-leave), improving card symmetry and form visual hierarchy.",
+    descriptionBn: "Maternity Leave (/maternity-leave) পেজের উপরেব কনফিগারেটর কার্ডের ডান পাশের নিচে প্রফেশনাল ফুটার সেশনে 'Load 3-Month Salary History' বাটনটি সরিয়ে পেজের ভিজ্যুয়াল অ্যালাইনমেন্ট সুন্দর করা হয়েছে।",
+  },
+  {
+    id: "301",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI / UX",
+    module: "Leave (Maternity Leave)",
+    link: "/maternity-leave",
+    descriptionEn: "Realigned the Maternity Leave (/maternity-leave) configurator form controls into a clean, balanced 2-column grid and pre-populated 3 full months of realistic salary history demo data by default (Basic, Houserent, Medical, Conveyance, Present/Absence days, OT Hours, Wages Payable, and Net Wages) with a light-blue table header and summary totals row.",
+    descriptionBn: "Maternity Leave (/maternity-leave) পেজের ফর্ম ফিল্ডগুলোকে ২-কলামের ক্লিন গ্রিডে সাজানো হয়েছে এবং ডিফল্টভাবে ৩ মাসের পূর্ণাঙ্গ স্যালারি হিস্ট্রি ডেমো ডাটা (মৌলিক বেতন, বাড়ি ভাড়া, চিকিৎসা, যাতায়াত, ওভারটাইম, অর্জিত মজুরী) ও লাইট-ব্লু টেবিল হেডার যুক্ত করা হয়েছে।",
+  },
+  {
     id: "300",
     date: new Date().toISOString().slice(0, 16),
     type: "UI / UX",

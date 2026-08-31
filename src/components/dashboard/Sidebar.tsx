@@ -178,9 +178,14 @@ export const nav: NavItem[] = [
     icon: CalendarX,
     subitems: [
       { label: "Leave Application", to: "/leave-application" },
-      { label: "Maternity Leave", to: "/maternity-leave" },
-      { label: "Maternity Payment", to: "/maternity-payment" },
-      { label: "Maternity Payment Report", to: "/maternity-payment-report" },
+      {
+        label: "Maternity",
+        subitems: [
+          { label: "Maternity Leave", to: "/maternity-leave" },
+          { label: "Maternity Payment", to: "/maternity-payment" },
+          { label: "Maternity Payment Report", to: "/maternity-payment-report" },
+        ],
+      },
       { label: "Leave Approved & List", to: "/leave-list" },
       { label: "Leave Approve", to: "/leave-approve" },
       { label: "Earn Leave Process (Year)", to: "/earn-leave-process", search: { type: "year" } },

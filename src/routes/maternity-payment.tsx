@@ -15,7 +15,7 @@ import {
   CheckCircle2,
   Coins,
   ShieldCheck,
-  FileText,
+  Eye,
   FileCheck,
 } from "lucide-react";
 
@@ -467,26 +467,6 @@ function MaternityPaymentPage() {
     setIsModalOpen(true);
   };
 
-  // Open modal for viewing record
-  const handleOpenViewModal = (rec: MaternityPaymentRecord) => {
-    setModalMode("view");
-    setSelectedRecordId(rec.id);
-    setModalArea(rec.area || "PKCL-Savar");
-    setModalApplyDate(rec.applyDate);
-    setModalEmpId(rec.empId);
-    setModalEmpName(rec.empName);
-    setModalSubDept(rec.section);
-    setModalJobTitle(rec.jobTitle || rec.section);
-    setModalJoiningDate(rec.joiningDate);
-    setModalEddDate(rec.eddDate);
-    setModalStartDate(rec.startDate);
-    setModalEndDate(rec.endDate);
-    setModalDays(rec.days);
-
-    loadSalaryHistoryForRecord(rec);
-    setIsModalOpen(true);
-  };
-
   const handleModalEmpIdChange = (idVal: string) => {
     setModalEmpId(idVal);
     const matched = initialMaternityPaymentRecords.find((r) => r.empId === idVal.trim());
@@ -709,7 +689,7 @@ function MaternityPaymentPage() {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
         <Topbar />
 
-        {/* Top Header Card with Breadcrumb & Prominent Top '+ Add New Maternity Payment' Button */}
+        {/* Top Header Card with Breadcrumb & Single Prominent Top '+ Add New Maternity Payment' Button */}
         <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-3 flex flex-wrap items-center justify-between gap-4 shrink-0 shadow-xs">
           <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
             <Link to="/" className="hover:text-blue-600 transition-colors">
@@ -728,7 +708,7 @@ function MaternityPaymentPage() {
               <ShieldCheck size={14} /> Total Records: {records.length}
             </span>
 
-            {/* Top Primary '+ Add New Maternity Payment' Button (Matching other HR pages) */}
+            {/* ONLY 1 Single Top Primary '+ Add New Maternity Payment' Button */}
             <button
               type="button"
               onClick={handleOpenAddModal}
@@ -793,7 +773,7 @@ function MaternityPaymentPage() {
               </button>
             </div>
 
-            {/* Action Bar (EXCEL, PRINT, PDF, Top Add New, Search input) */}
+            {/* Action Bar (EXCEL, PRINT, PDF, Search input — ONLY export tools here) */}
             <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <button
@@ -822,15 +802,6 @@ function MaternityPaymentPage() {
                   <FileDown size={14} className="text-rose-600" />
                   PDF
                 </button>
-
-                <button
-                  type="button"
-                  onClick={handleOpenAddModal}
-                  className="px-3.5 py-1.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 ml-2"
-                >
-                  <Plus size={14} />
-                  Add New
-                </button>
               </div>
 
               {/* Instant Search Textbox */}
@@ -848,7 +819,7 @@ function MaternityPaymentPage() {
 
           </div>
 
-          {/* Main Table View */}
+          {/* Main Table View with Soft Elegant Action Icon Buttons */}
           <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-left text-xs min-w-[1600px]">
@@ -879,53 +850,53 @@ function MaternityPaymentPage() {
                       key={rec.id}
                       className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors text-slate-700 dark:text-slate-300"
                     >
-                      {/* Action Buttons:
-                          1. 1st Payment Bill View (১ম কিস্তি) - Sleek Indigo
-                          2. 2nd Payment Bill View (২য় কিস্তি) - Sleek Rose/Purple
-                          3. Edit Record - Sleek Amber
-                          4. Delete Record - Sleek Crimson
+                      {/* SOFT SUBTLE MODERN ACTION BUTTONS (4 distinct actions per row):
+                          1. 1st Payment Bill (১ম কিস্তি bill) - Soft Sky Blue badge
+                          2. 2nd Payment Bill (২য় কিস্তি bill) - Soft Indigo badge
+                          3. Edit Record (সম্পাদনা) - Soft Amber badge
+                          4. Delete Record (মুছে ফেলুন) - Soft Rose badge
                       */}
                       <td className="py-2 px-2 text-center">
                         <div className="flex items-center justify-center gap-1.5">
                           
-                          {/* 1st Payment Bill View Button */}
+                          {/* 1st Payment Bill View Button (Soft Sky Blue) */}
                           <button
                             type="button"
                             onClick={() => handleOpenBillVoucher(rec, "1st")}
                             title="১ম কিস্তি বিল (1st Payment Bill)"
-                            className="p-1.5 rounded-md bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white transition-all shadow-sm flex items-center justify-center"
+                            className="p-1.5 rounded-md bg-sky-50 dark:bg-sky-950/50 hover:bg-sky-100 dark:hover:bg-sky-900 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 transition-all shadow-2xs flex items-center justify-center"
                           >
-                            <FileText size={13} />
+                            <Eye size={14} />
                           </button>
 
-                          {/* 2nd Payment Bill View Button */}
+                          {/* 2nd Payment Bill View Button (Soft Indigo) */}
                           <button
                             type="button"
                             onClick={() => handleOpenBillVoucher(rec, "2nd")}
                             title="২য় কিস্তি বিল (2nd Payment Bill)"
-                            className="p-1.5 rounded-md bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white transition-all shadow-sm flex items-center justify-center"
+                            className="p-1.5 rounded-md bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 transition-all shadow-2xs flex items-center justify-center"
                           >
-                            <FileCheck size={13} />
+                            <FileCheck size={14} />
                           </button>
 
-                          {/* Edit Button */}
+                          {/* Edit Button (Soft Amber) */}
                           <button
                             type="button"
                             onClick={() => handleOpenEditModal(rec)}
                             title="সম্পাদনা (Edit Record)"
-                            className="p-1.5 rounded-md bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white transition-all shadow-sm flex items-center justify-center"
+                            className="p-1.5 rounded-md bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 dark:hover:bg-amber-900 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 transition-all shadow-2xs flex items-center justify-center"
                           >
-                            <Edit size={13} />
+                            <Edit size={14} />
                           </button>
 
-                          {/* Delete Button */}
+                          {/* Delete Button (Soft Rose) */}
                           <button
                             type="button"
                             onClick={() => handleDeleteRecord(rec.id, rec.empName)}
                             title="মুছে ফেলুন (Delete Record)"
-                            className="p-1.5 rounded-md bg-slate-700 hover:bg-red-600 active:bg-red-700 text-white transition-all shadow-sm flex items-center justify-center"
+                            className="p-1.5 rounded-md bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-all shadow-2xs flex items-center justify-center"
                           >
-                            <Trash2 size={13} />
+                            <Trash2 size={14} />
                           </button>
 
                         </div>
