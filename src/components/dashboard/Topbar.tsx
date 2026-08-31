@@ -34,6 +34,7 @@ import {
   Check,
   Flag,
   X,
+  LogOut,
 } from "lucide-react";
 import { ModuleLauncher } from "./ModuleLauncher";
 import { getHRNotifications, type HRDocIssueNotification } from "@/routes/employee-doc-verification";
@@ -130,12 +131,6 @@ const searchableMenus: SearchMenuLink[] = [
     description: "Draft and submit new leaves",
   },
   {
-    label: "Maternity Leave Benefit Calculation",
-    parent: "Leave",
-    to: "/maternity-leave",
-    description: "Calculate and process maternity leave benefits and salary history",
-  },
-  {
     label: "Maternity Payment Registry & Disbursement",
     parent: "Leave",
     to: "/maternity-payment",
@@ -152,6 +147,31 @@ const searchableMenus: SearchMenuLink[] = [
     parent: "Configure",
     to: "/maternity-configuration",
     description: "Configure maternity leave effective cutoff dates and wage basis rules (Gross Pay vs Net Pay)",
+  },
+  // Separation Module
+  {
+    label: "Resignation Request Queue",
+    parent: "Separation",
+    to: "/separation-resignation-request",
+    description: "Submit and manage employee resignation requests, notice periods, and handover notes",
+  },
+  {
+    label: "Multi-Departmental Separation Clearance Matrix",
+    parent: "Separation",
+    to: "/separation-clearance",
+    description: "Track and grant clearances across Accounts, Admin, ICT, Reporting Boss, HR, and C-Level",
+  },
+  {
+    label: "Separation Payment & Settlement",
+    parent: "Separation",
+    to: "/separation-payment",
+    description: "Calculate and disburse final settlement payments, gratuity, EL encashment, and loans",
+  },
+  {
+    label: "Separation Exit Documents",
+    parent: "Separation",
+    to: "/separation-exit-documents",
+    description: "Generate and issue official Release Letters, Experience Certificates, NOC, and Settlement Vouchers",
   },
   {
     label: "Leave Approval Board",
@@ -622,6 +642,37 @@ const searchableMenus: SearchMenuLink[] = [
     to: "/configure-employment?tab=nature",
     description: "Configure job natures",
   },
+  // Separation
+  {
+    label: "Resignation Request",
+    parent: "Separation",
+    to: "/separation-resignation-request",
+    description: "Submit & manage employee resignation requests",
+  },
+  {
+    label: "Separation Clearance Matrix",
+    parent: "Separation",
+    to: "/separation-clearance",
+    description: "6-Department employee clearance form & tracking",
+  },
+  {
+    label: "Other Separations (Company-Initiated)",
+    parent: "Separation",
+    to: "/separation-company-initiated",
+    description: "Termination, Retirement, Mutual, Medical, Deceased & Dismissals",
+  },
+  {
+    label: "Separation Payment & Settlement",
+    parent: "Separation",
+    to: "/separation-payment",
+    description: "Final settlement calculations and payout vouchers",
+  },
+  {
+    label: "Exit Documents Issuance",
+    parent: "Separation",
+    to: "/separation-exit-documents",
+    description: "Issue Release Letters, Experience Certificates & NOCs",
+  },
 ];
 
 // Dynamically fetch search category visual icon
@@ -669,6 +720,8 @@ function getCategoryIcon(parent: string) {
       return Briefcase;
     case "Configure":
       return SlidersHorizontal;
+    case "Separation":
+      return LogOut;
     case "Event":
       return CalendarDays;
     default:

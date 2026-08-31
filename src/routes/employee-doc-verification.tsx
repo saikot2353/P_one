@@ -505,8 +505,8 @@ function EmployeeDocVerificationPage() {
     setIsModalOpen(false);
   };
 
-  const openModal = (empId: string) => { setSelectedEmpId(empId); setViewingDocId(null); setRejectTarget(null); setIssueTarget(null); setIsModalOpen(true); };
-  const closeModal = () => { setIsModalOpen(false); setViewingDocId(null); setRejectTarget(null); setIssueTarget(null); };
+  const openModal = (empId: string) => { setSelectedEmpId(empId); setViewingDocId(null); setIssueTarget(null); setIsModalOpen(true); };
+  const closeModal = () => { setIsModalOpen(false); setViewingDocId(null); setIssueTarget(null); };
 
   return (
     <div className="flex h-screen bg-[#f8fafc] dark:bg-[#0f172a] text-slate-800 dark:text-slate-100 overflow-hidden font-sans">
@@ -644,15 +644,21 @@ function EmployeeDocVerificationPage() {
                           </td>
                           <td className="px-4 py-4 text-center">
                             {overallStatus === "issues" ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/40 uppercase tracking-wide"><AlertCircle className="size-2.5" /> Issues</span>
+                              <button type="button" onClick={() => openModal(emp.id)} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/40 uppercase tracking-wide cursor-pointer transition-all"><AlertCircle className="size-2.5" /> Issues</button>
                             ) : overallStatus === "pending" ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/40 uppercase tracking-wide"><Clock className="size-2.5" /> Review</span>
+                              <button type="button" onClick={() => openModal(emp.id)} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/40 uppercase tracking-wide cursor-pointer transition-all"><Clock className="size-2.5" /> Review</button>
                             ) : (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/40 uppercase tracking-wide"><CheckCheck className="size-2.5" /> Approved</span>
+                              <button type="button" onClick={() => openModal(emp.id)} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/40 uppercase tracking-wide cursor-pointer transition-all"><CheckCheck className="size-2.5" /> Approved</button>
                             )}
                           </td>
-                          <td className="px-4 py-4 text-right" onClick={(e) => e.stopPropagation()}>
-                            <button onClick={() => openModal(emp.id)} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-black rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-sm">Review <ChevronRight className="size-3" /></button>
+                          <td className="px-4 py-4 text-right">
+                            <button
+                              type="button"
+                              onClick={() => openModal(emp.id)}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-black rounded-lg bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white transition-all shadow-sm cursor-pointer"
+                            >
+                              Review <ChevronRight className="size-3" />
+                            </button>
                           </td>
                         </tr>
                       );
@@ -667,7 +673,7 @@ function EmployeeDocVerificationPage() {
 
       {/* Modal */}
       {isModalOpen && activeEmployee && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={closeModal} />
           <div className={`relative z-10 bg-white dark:bg-slate-950 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col ${viewingDocId ? "w-full max-w-6xl h-[90vh]" : "w-full max-w-6xl max-h-[90vh]"}`}>
             {/* Modal Header */}

@@ -26,6 +26,11 @@ import { Route as SspApprovalRouteImport } from './routes/ssp-approval'
 import { Route as ShiftControlCenterRouteImport } from './routes/shift-control-center'
 import { Route as SetManagerRouteImport } from './routes/set-manager'
 import { Route as SetHodRouteImport } from './routes/set-hod'
+import { Route as SeparationResignationRequestRouteImport } from './routes/separation-resignation-request'
+import { Route as SeparationPaymentRouteImport } from './routes/separation-payment'
+import { Route as SeparationExitDocumentsRouteImport } from './routes/separation-exit-documents'
+import { Route as SeparationCompanyInitiatedRouteImport } from './routes/separation-company-initiated'
+import { Route as SeparationClearanceRouteImport } from './routes/separation-clearance'
 import { Route as SalarySheetPrintRouteImport } from './routes/salary-sheet-print'
 import { Route as SalarySheetFullWithoutHolidayRouteImport } from './routes/salary-sheet-full-without-holiday'
 import { Route as SalarySheetFullWhRouteImport } from './routes/salary-sheet-full-wh'
@@ -127,7 +132,6 @@ import { Route as MerchandisingCadRouteImport } from './routes/merchandising-cad
 import { Route as MerchandisingBomRouteImport } from './routes/merchandising-bom'
 import { Route as MaternityPaymentReportRouteImport } from './routes/maternity-payment-report'
 import { Route as MaternityPaymentRouteImport } from './routes/maternity-payment'
-import { Route as MaternityLeaveRouteImport } from './routes/maternity-leave'
 import { Route as MaternityConfigurationRouteImport } from './routes/maternity-configuration'
 import { Route as ManualAttendanceRouteImport } from './routes/manual-attendance'
 import { Route as ManageOvertimeRouteImport } from './routes/manage-overtime'
@@ -309,6 +313,33 @@ const SetManagerRoute = SetManagerRouteImport.update({
 const SetHodRoute = SetHodRouteImport.update({
   id: '/set-hod',
   path: '/set-hod',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SeparationResignationRequestRoute =
+  SeparationResignationRequestRouteImport.update({
+    id: '/separation-resignation-request',
+    path: '/separation-resignation-request',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SeparationPaymentRoute = SeparationPaymentRouteImport.update({
+  id: '/separation-payment',
+  path: '/separation-payment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SeparationExitDocumentsRoute = SeparationExitDocumentsRouteImport.update({
+  id: '/separation-exit-documents',
+  path: '/separation-exit-documents',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SeparationCompanyInitiatedRoute =
+  SeparationCompanyInitiatedRouteImport.update({
+    id: '/separation-company-initiated',
+    path: '/separation-company-initiated',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SeparationClearanceRoute = SeparationClearanceRouteImport.update({
+  id: '/separation-clearance',
+  path: '/separation-clearance',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SalarySheetPrintRoute = SalarySheetPrintRouteImport.update({
@@ -861,11 +892,6 @@ const MaternityPaymentReportRoute = MaternityPaymentReportRouteImport.update({
 const MaternityPaymentRoute = MaternityPaymentRouteImport.update({
   id: '/maternity-payment',
   path: '/maternity-payment',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MaternityLeaveRoute = MaternityLeaveRouteImport.update({
-  id: '/maternity-leave',
-  path: '/maternity-leave',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MaternityConfigurationRoute = MaternityConfigurationRouteImport.update({
@@ -1437,7 +1463,6 @@ export interface FileRoutesByFullPath {
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/maternity-configuration': typeof MaternityConfigurationRoute
-  '/maternity-leave': typeof MaternityLeaveRoute
   '/maternity-payment': typeof MaternityPaymentRoute
   '/maternity-payment-report': typeof MaternityPaymentReportRoute
   '/merchandising-bom': typeof MerchandisingBomRoute
@@ -1539,6 +1564,11 @@ export interface FileRoutesByFullPath {
   '/salary-sheet-full-wh': typeof SalarySheetFullWhRoute
   '/salary-sheet-full-without-holiday': typeof SalarySheetFullWithoutHolidayRoute
   '/salary-sheet-print': typeof SalarySheetPrintRoute
+  '/separation-clearance': typeof SeparationClearanceRoute
+  '/separation-company-initiated': typeof SeparationCompanyInitiatedRoute
+  '/separation-exit-documents': typeof SeparationExitDocumentsRoute
+  '/separation-payment': typeof SeparationPaymentRoute
+  '/separation-resignation-request': typeof SeparationResignationRequestRoute
   '/set-hod': typeof SetHodRoute
   '/set-manager': typeof SetManagerRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
@@ -1652,7 +1682,6 @@ export interface FileRoutesByTo {
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/maternity-configuration': typeof MaternityConfigurationRoute
-  '/maternity-leave': typeof MaternityLeaveRoute
   '/maternity-payment': typeof MaternityPaymentRoute
   '/maternity-payment-report': typeof MaternityPaymentReportRoute
   '/merchandising-bom': typeof MerchandisingBomRoute
@@ -1754,6 +1783,11 @@ export interface FileRoutesByTo {
   '/salary-sheet-full-wh': typeof SalarySheetFullWhRoute
   '/salary-sheet-full-without-holiday': typeof SalarySheetFullWithoutHolidayRoute
   '/salary-sheet-print': typeof SalarySheetPrintRoute
+  '/separation-clearance': typeof SeparationClearanceRoute
+  '/separation-company-initiated': typeof SeparationCompanyInitiatedRoute
+  '/separation-exit-documents': typeof SeparationExitDocumentsRoute
+  '/separation-payment': typeof SeparationPaymentRoute
+  '/separation-resignation-request': typeof SeparationResignationRequestRoute
   '/set-hod': typeof SetHodRoute
   '/set-manager': typeof SetManagerRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
@@ -1868,7 +1902,6 @@ export interface FileRoutesById {
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
   '/maternity-configuration': typeof MaternityConfigurationRoute
-  '/maternity-leave': typeof MaternityLeaveRoute
   '/maternity-payment': typeof MaternityPaymentRoute
   '/maternity-payment-report': typeof MaternityPaymentReportRoute
   '/merchandising-bom': typeof MerchandisingBomRoute
@@ -1970,6 +2003,11 @@ export interface FileRoutesById {
   '/salary-sheet-full-wh': typeof SalarySheetFullWhRoute
   '/salary-sheet-full-without-holiday': typeof SalarySheetFullWithoutHolidayRoute
   '/salary-sheet-print': typeof SalarySheetPrintRoute
+  '/separation-clearance': typeof SeparationClearanceRoute
+  '/separation-company-initiated': typeof SeparationCompanyInitiatedRoute
+  '/separation-exit-documents': typeof SeparationExitDocumentsRoute
+  '/separation-payment': typeof SeparationPaymentRoute
+  '/separation-resignation-request': typeof SeparationResignationRequestRoute
   '/set-hod': typeof SetHodRoute
   '/set-manager': typeof SetManagerRoute
   '/shift-control-center': typeof ShiftControlCenterRoute
@@ -2085,7 +2123,6 @@ export interface FileRouteTypes {
     | '/manage-overtime'
     | '/manual-attendance'
     | '/maternity-configuration'
-    | '/maternity-leave'
     | '/maternity-payment'
     | '/maternity-payment-report'
     | '/merchandising-bom'
@@ -2187,6 +2224,11 @@ export interface FileRouteTypes {
     | '/salary-sheet-full-wh'
     | '/salary-sheet-full-without-holiday'
     | '/salary-sheet-print'
+    | '/separation-clearance'
+    | '/separation-company-initiated'
+    | '/separation-exit-documents'
+    | '/separation-payment'
+    | '/separation-resignation-request'
     | '/set-hod'
     | '/set-manager'
     | '/shift-control-center'
@@ -2300,7 +2342,6 @@ export interface FileRouteTypes {
     | '/manage-overtime'
     | '/manual-attendance'
     | '/maternity-configuration'
-    | '/maternity-leave'
     | '/maternity-payment'
     | '/maternity-payment-report'
     | '/merchandising-bom'
@@ -2402,6 +2443,11 @@ export interface FileRouteTypes {
     | '/salary-sheet-full-wh'
     | '/salary-sheet-full-without-holiday'
     | '/salary-sheet-print'
+    | '/separation-clearance'
+    | '/separation-company-initiated'
+    | '/separation-exit-documents'
+    | '/separation-payment'
+    | '/separation-resignation-request'
     | '/set-hod'
     | '/set-manager'
     | '/shift-control-center'
@@ -2515,7 +2561,6 @@ export interface FileRouteTypes {
     | '/manage-overtime'
     | '/manual-attendance'
     | '/maternity-configuration'
-    | '/maternity-leave'
     | '/maternity-payment'
     | '/maternity-payment-report'
     | '/merchandising-bom'
@@ -2617,6 +2662,11 @@ export interface FileRouteTypes {
     | '/salary-sheet-full-wh'
     | '/salary-sheet-full-without-holiday'
     | '/salary-sheet-print'
+    | '/separation-clearance'
+    | '/separation-company-initiated'
+    | '/separation-exit-documents'
+    | '/separation-payment'
+    | '/separation-resignation-request'
     | '/set-hod'
     | '/set-manager'
     | '/shift-control-center'
@@ -2731,7 +2781,6 @@ export interface RootRouteChildren {
   ManageOvertimeRoute: typeof ManageOvertimeRoute
   ManualAttendanceRoute: typeof ManualAttendanceRoute
   MaternityConfigurationRoute: typeof MaternityConfigurationRoute
-  MaternityLeaveRoute: typeof MaternityLeaveRoute
   MaternityPaymentRoute: typeof MaternityPaymentRoute
   MaternityPaymentReportRoute: typeof MaternityPaymentReportRoute
   MerchandisingBomRoute: typeof MerchandisingBomRoute
@@ -2833,6 +2882,11 @@ export interface RootRouteChildren {
   SalarySheetFullWhRoute: typeof SalarySheetFullWhRoute
   SalarySheetFullWithoutHolidayRoute: typeof SalarySheetFullWithoutHolidayRoute
   SalarySheetPrintRoute: typeof SalarySheetPrintRoute
+  SeparationClearanceRoute: typeof SeparationClearanceRoute
+  SeparationCompanyInitiatedRoute: typeof SeparationCompanyInitiatedRoute
+  SeparationExitDocumentsRoute: typeof SeparationExitDocumentsRoute
+  SeparationPaymentRoute: typeof SeparationPaymentRoute
+  SeparationResignationRequestRoute: typeof SeparationResignationRequestRoute
   SetHodRoute: typeof SetHodRoute
   SetManagerRoute: typeof SetManagerRoute
   ShiftControlCenterRoute: typeof ShiftControlCenterRoute
@@ -2975,6 +3029,41 @@ declare module '@tanstack/react-router' {
       path: '/set-hod'
       fullPath: '/set-hod'
       preLoaderRoute: typeof SetHodRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/separation-resignation-request': {
+      id: '/separation-resignation-request'
+      path: '/separation-resignation-request'
+      fullPath: '/separation-resignation-request'
+      preLoaderRoute: typeof SeparationResignationRequestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/separation-payment': {
+      id: '/separation-payment'
+      path: '/separation-payment'
+      fullPath: '/separation-payment'
+      preLoaderRoute: typeof SeparationPaymentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/separation-exit-documents': {
+      id: '/separation-exit-documents'
+      path: '/separation-exit-documents'
+      fullPath: '/separation-exit-documents'
+      preLoaderRoute: typeof SeparationExitDocumentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/separation-company-initiated': {
+      id: '/separation-company-initiated'
+      path: '/separation-company-initiated'
+      fullPath: '/separation-company-initiated'
+      preLoaderRoute: typeof SeparationCompanyInitiatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/separation-clearance': {
+      id: '/separation-clearance'
+      path: '/separation-clearance'
+      fullPath: '/separation-clearance'
+      preLoaderRoute: typeof SeparationClearanceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/salary-sheet-print': {
@@ -3682,13 +3771,6 @@ declare module '@tanstack/react-router' {
       path: '/maternity-payment'
       fullPath: '/maternity-payment'
       preLoaderRoute: typeof MaternityPaymentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/maternity-leave': {
-      id: '/maternity-leave'
-      path: '/maternity-leave'
-      fullPath: '/maternity-leave'
-      preLoaderRoute: typeof MaternityLeaveRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/maternity-configuration': {
@@ -4443,7 +4525,6 @@ const rootRouteChildren: RootRouteChildren = {
   ManageOvertimeRoute: ManageOvertimeRoute,
   ManualAttendanceRoute: ManualAttendanceRoute,
   MaternityConfigurationRoute: MaternityConfigurationRoute,
-  MaternityLeaveRoute: MaternityLeaveRoute,
   MaternityPaymentRoute: MaternityPaymentRoute,
   MaternityPaymentReportRoute: MaternityPaymentReportRoute,
   MerchandisingBomRoute: MerchandisingBomRoute,
@@ -4549,6 +4630,11 @@ const rootRouteChildren: RootRouteChildren = {
   SalarySheetFullWhRoute: SalarySheetFullWhRoute,
   SalarySheetFullWithoutHolidayRoute: SalarySheetFullWithoutHolidayRoute,
   SalarySheetPrintRoute: SalarySheetPrintRoute,
+  SeparationClearanceRoute: SeparationClearanceRoute,
+  SeparationCompanyInitiatedRoute: SeparationCompanyInitiatedRoute,
+  SeparationExitDocumentsRoute: SeparationExitDocumentsRoute,
+  SeparationPaymentRoute: SeparationPaymentRoute,
+  SeparationResignationRequestRoute: SeparationResignationRequestRoute,
   SetHodRoute: SetHodRoute,
   SetManagerRoute: SetManagerRoute,
   ShiftControlCenterRoute: ShiftControlCenterRoute,

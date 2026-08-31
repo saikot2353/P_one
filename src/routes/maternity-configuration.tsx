@@ -159,8 +159,7 @@ function MaternityConfigurationPage() {
 
     const titleToUse =
       policyTitle ||
-      `${conditionOperator === "BEFORE" ? "Before" : "On/After"} ${cutoffDate} (${
-        wageBasis === "GROSS_PAY" ? "Gross Pay" : "Net Pay"
+      `${conditionOperator === "BEFORE" ? "Before" : "On/After"} ${cutoffDate} (${wageBasis === "GROSS_PAY" ? "Gross Pay" : "Net Pay"
       }) Maternity Policy`;
 
     if (editingRuleId) {
@@ -388,7 +387,7 @@ function MaternityConfigurationPage() {
                       onChange={(e) => setConditionOperator(e.target.value as any)}
                       className="w-full h-8 px-2.5 border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500 text-xs font-bold"
                     >
-                      <option value="BEFORE">Before Cutoff Date (&lt;)</option>
+                      <option value="BEFORE">Before Or Equal Cutoff Date (&lt;)</option>
                       <option value="AFTER_OR_EQUAL">On or After Cutoff Date (&ge;)</option>
                     </select>
                   </div>
@@ -400,11 +399,10 @@ function MaternityConfigurationPage() {
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     <label
-                      className={`p-2.5 rounded border cursor-pointer text-center flex flex-col items-center justify-center transition-all ${
-                        wageBasis === "NET_PAY"
-                          ? "bg-blue-600 text-white font-bold border-blue-600 shadow-xs"
-                          : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700"
-                      }`}
+                      className={`p-2.5 rounded border cursor-pointer text-center flex flex-col items-center justify-center transition-all ${wageBasis === "NET_PAY"
+                        ? "bg-blue-600 text-white font-bold border-blue-600 shadow-xs"
+                        : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700"
+                        }`}
                     >
                       <input
                         type="radio"
@@ -419,11 +417,10 @@ function MaternityConfigurationPage() {
                     </label>
 
                     <label
-                      className={`p-2.5 rounded border cursor-pointer text-center flex flex-col items-center justify-center transition-all ${
-                        wageBasis === "GROSS_PAY"
-                          ? "bg-indigo-600 text-white font-bold border-indigo-600 shadow-xs"
-                          : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700"
-                      }`}
+                      className={`p-2.5 rounded border cursor-pointer text-center flex flex-col items-center justify-center transition-all ${wageBasis === "GROSS_PAY"
+                        ? "bg-indigo-600 text-white font-bold border-indigo-600 shadow-xs"
+                        : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700"
+                        }`}
                     >
                       <input
                         type="radio"
@@ -507,7 +504,7 @@ function MaternityConfigurationPage() {
 
               {/* Policy Rules Table */}
               <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden space-y-3 p-5">
-                
+
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
                   <h2 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100 flex items-center gap-2">
                     <ShieldCheck size={16} className="text-emerald-600" />
@@ -561,11 +558,10 @@ function MaternityConfigurationPage() {
 
                           <td className="py-2.5 px-3 text-center">
                             <span
-                              className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                                rule.wageBasis === "GROSS_PAY"
-                                  ? "bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300 border border-indigo-200"
-                                  : "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border border-blue-200"
-                              }`}
+                              className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${rule.wageBasis === "GROSS_PAY"
+                                ? "bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300 border border-indigo-200"
+                                : "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border border-blue-200"
+                                }`}
                             >
                               {rule.wageBasis === "GROSS_PAY" ? "GROSS PAY" : "NET PAY"}
                             </span>
@@ -577,11 +573,10 @@ function MaternityConfigurationPage() {
                             <button
                               type="button"
                               onClick={() => handleToggleStatus(rule.id)}
-                              className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                                rule.status === "ACTIVE"
-                                  ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
-                                  : "bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
-                              }`}
+                              className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${rule.status === "ACTIVE"
+                                ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                                : "bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+                                }`}
                             >
                               {rule.status}
                             </button>
@@ -617,7 +612,7 @@ function MaternityConfigurationPage() {
 
               {/* LIVE POLICY CALCULATION SIMULATOR TOOL */}
               <div className="bg-white dark:bg-slate-900 rounded-xl border border-blue-200 dark:border-blue-900 shadow-sm p-5 space-y-4">
-                
+
                 <div className="border-b border-slate-200 dark:border-slate-800 pb-3 flex items-center justify-between">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100 flex items-center gap-2">
                     <Calculator size={16} className="text-blue-600" />

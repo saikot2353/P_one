@@ -182,7 +182,6 @@ export const nav: NavItem[] = [
       {
         label: "Maternity",
         subitems: [
-          { label: "Maternity Leave", to: "/maternity-leave" },
           { label: "Maternity Payment", to: "/maternity-payment" },
           { label: "Maternity Payment Report", to: "/maternity-payment-report" },
         ],
@@ -278,6 +277,17 @@ export const nav: NavItem[] = [
     label: "JD List",
     to: "/jd-list",
     icon: Briefcase,
+  },
+  {
+    label: "Separation",
+    icon: LogOut,
+    subitems: [
+      { label: "Resignation Request", to: "/separation-resignation-request" },
+      { label: "Clearance", to: "/separation-clearance" },
+      { label: "Other Separations", to: "/separation-company-initiated" },
+      { label: "Payment", to: "/separation-payment" },
+      { label: "Exit Documents", to: "/separation-exit-documents" },
+    ],
   },
   {
     label: "User Management",
