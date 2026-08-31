@@ -98,6 +98,7 @@ export const nav: NavItem[] = [
       { label: "Payroll Configuration", to: "/payroll-configure" },
       { label: "Education & Training", to: "/configure-education" },
       { label: "Leave & Policies", to: "/configure-policies" },
+      { label: "Maternity Configuration", to: "/maternity-configuration" },
       { label: "Letter Setup", to: "/configure-letter" },
     ],
   },

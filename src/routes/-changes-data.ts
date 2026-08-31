@@ -2,6 +2,24 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "306",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Feature",
+    module: "Configure (Maternity Configuration)",
+    link: "/maternity-configuration",
+    descriptionEn: "Created the Maternity Policy Configuration module (/maternity-configuration) under Configure, enabling HR administrators to define cutoff date rules to automatically evaluate whether maternity benefit calculation is processed using Gross Pay or Net Pay, complemented by an active rules registry and live calculation simulator.",
+    descriptionBn: "Configure মডিউলের অধীনে Maternity Configuration (/maternity-configuration) নামে নতুন পেজ যোগ করা হয়েছে। এর মাধ্যমে কাটঅফ ডেট থ্রেশহোল্ড অনুযায়ী মাতৃত্বকালীন ছুটির সুবিধা Gross Pay নাকি Net Pay তে হিসাব হবে তা নির্ধারণ করা যাবে, সাথে লাইভ ক্যালকুলেশন সিমুলেটর যুক্ত করা হয়েছে।",
+  },
+  {
+    id: "305",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI / UX",
+    module: "Leave (Maternity Leave)",
+    link: "/maternity-leave",
+    descriptionEn: "Set Emp Name, Sub Department, Job Title, and Date of joining input fields to readOnly with grey background styling in Maternity Leave (/maternity-leave) to signify auto-populated employee metadata.",
+    descriptionBn: "Maternity Leave (/maternity-leave) পেজে Emp Name, Sub Department, Job Title, এবং Date of joining ইনপুট ফিল্ডগুলোকে readOnly এবং ধূসর ব্যাকগ্রাউন্ড স্টাইলে পরিবর্তন করা হয়েছে যাতে অটো-ফিল ডাটা স্পষ্ট বোঝা যায়।",
+  },
+  {
     id: "304",
     date: new Date().toISOString().slice(0, 16),
     type: "UI / UX",

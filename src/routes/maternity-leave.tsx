@@ -523,7 +523,7 @@ function MaternityLeavePage() {
             </div>
           )}
 
-          {/* REALIGNED TOP CONFIGURATOR CARD WITH LOAD BUTTON ON BOTTOM RIGHT */}
+          {/* REALIGNED TOP CONFIGURATOR CARD WITH READONLY AUTO-FILLED FIELDS */}
           <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             
             {/* Card Header */}
@@ -604,43 +604,47 @@ function MaternityLeavePage() {
                     </div>
                   </div>
 
+                  {/* Emp Name (READONLY) */}
                   <div className="grid grid-cols-3 items-center">
                     <label className="text-slate-600 dark:text-slate-400 font-medium">Emp Name</label>
                     <input
                       type="text"
+                      readOnly
                       value={empName}
-                      onChange={(e) => setEmpName(e.target.value)}
-                      className="col-span-2 h-8 px-2.5 border border-slate-300 dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 font-semibold outline-none text-xs"
+                      className="col-span-2 h-8 px-2.5 border border-slate-300 dark:border-slate-700 rounded bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-semibold cursor-not-allowed outline-none text-xs"
                     />
                   </div>
 
+                  {/* Sub Department (READONLY) */}
                   <div className="grid grid-cols-3 items-center">
                     <label className="text-slate-600 dark:text-slate-400 font-medium">Sub Department</label>
                     <input
                       type="text"
+                      readOnly
                       value={subDepartment}
-                      onChange={(e) => setSubDepartment(e.target.value)}
-                      className="col-span-2 h-8 px-2.5 border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 outline-none text-xs"
+                      className="col-span-2 h-8 px-2.5 border border-slate-300 dark:border-slate-700 rounded bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-semibold cursor-not-allowed outline-none text-xs"
                     />
                   </div>
 
+                  {/* Job Title (READONLY) */}
                   <div className="grid grid-cols-3 items-center">
                     <label className="text-slate-600 dark:text-slate-400 font-medium">Job Title</label>
                     <input
                       type="text"
+                      readOnly
                       value={jobTitle}
-                      onChange={(e) => setJobTitle(e.target.value)}
-                      className="col-span-2 h-8 px-2.5 border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 outline-none text-xs"
+                      className="col-span-2 h-8 px-2.5 border border-slate-300 dark:border-slate-700 rounded bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-semibold cursor-not-allowed outline-none text-xs"
                     />
                   </div>
 
+                  {/* Date of joining (READONLY) */}
                   <div className="grid grid-cols-3 items-center">
                     <label className="text-slate-600 dark:text-slate-400 font-medium">Date of joining</label>
                     <input
-                      type="date"
+                      type="text"
+                      readOnly
                       value={joiningDate}
-                      onChange={(e) => setJoiningDate(e.target.value)}
-                      className="col-span-2 h-8 px-2.5 border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 outline-none text-xs"
+                      className="col-span-2 h-8 px-2.5 border border-slate-300 dark:border-slate-700 rounded bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-semibold cursor-not-allowed outline-none text-xs font-mono"
                     />
                   </div>
                 </div>

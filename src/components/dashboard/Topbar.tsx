@@ -148,6 +148,12 @@ const searchableMenus: SearchMenuLink[] = [
     description: "View department-wise maternity payment report, 1st & 2nd installment disbursements",
   },
   {
+    label: "Maternity Policy Configuration",
+    parent: "Configure",
+    to: "/maternity-configuration",
+    description: "Configure maternity leave effective cutoff dates and wage basis rules (Gross Pay vs Net Pay)",
+  },
+  {
     label: "Leave Approval Board",
     parent: "Leave",
     to: "/leave-approve",

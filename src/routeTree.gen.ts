@@ -128,6 +128,7 @@ import { Route as MerchandisingBomRouteImport } from './routes/merchandising-bom
 import { Route as MaternityPaymentReportRouteImport } from './routes/maternity-payment-report'
 import { Route as MaternityPaymentRouteImport } from './routes/maternity-payment'
 import { Route as MaternityLeaveRouteImport } from './routes/maternity-leave'
+import { Route as MaternityConfigurationRouteImport } from './routes/maternity-configuration'
 import { Route as ManualAttendanceRouteImport } from './routes/manual-attendance'
 import { Route as ManageOvertimeRouteImport } from './routes/manage-overtime'
 import { Route as LoginRouteImport } from './routes/login'
@@ -867,6 +868,11 @@ const MaternityLeaveRoute = MaternityLeaveRouteImport.update({
   path: '/maternity-leave',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MaternityConfigurationRoute = MaternityConfigurationRouteImport.update({
+  id: '/maternity-configuration',
+  path: '/maternity-configuration',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ManualAttendanceRoute = ManualAttendanceRouteImport.update({
   id: '/manual-attendance',
   path: '/manual-attendance',
@@ -1430,6 +1436,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
+  '/maternity-configuration': typeof MaternityConfigurationRoute
   '/maternity-leave': typeof MaternityLeaveRoute
   '/maternity-payment': typeof MaternityPaymentRoute
   '/maternity-payment-report': typeof MaternityPaymentReportRoute
@@ -1644,6 +1651,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
+  '/maternity-configuration': typeof MaternityConfigurationRoute
   '/maternity-leave': typeof MaternityLeaveRoute
   '/maternity-payment': typeof MaternityPaymentRoute
   '/maternity-payment-report': typeof MaternityPaymentReportRoute
@@ -1859,6 +1867,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
+  '/maternity-configuration': typeof MaternityConfigurationRoute
   '/maternity-leave': typeof MaternityLeaveRoute
   '/maternity-payment': typeof MaternityPaymentRoute
   '/maternity-payment-report': typeof MaternityPaymentReportRoute
@@ -2075,6 +2084,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
+    | '/maternity-configuration'
     | '/maternity-leave'
     | '/maternity-payment'
     | '/maternity-payment-report'
@@ -2289,6 +2299,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
+    | '/maternity-configuration'
     | '/maternity-leave'
     | '/maternity-payment'
     | '/maternity-payment-report'
@@ -2503,6 +2514,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
+    | '/maternity-configuration'
     | '/maternity-leave'
     | '/maternity-payment'
     | '/maternity-payment-report'
@@ -2718,6 +2730,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ManageOvertimeRoute: typeof ManageOvertimeRoute
   ManualAttendanceRoute: typeof ManualAttendanceRoute
+  MaternityConfigurationRoute: typeof MaternityConfigurationRoute
   MaternityLeaveRoute: typeof MaternityLeaveRoute
   MaternityPaymentRoute: typeof MaternityPaymentRoute
   MaternityPaymentReportRoute: typeof MaternityPaymentReportRoute
@@ -3678,6 +3691,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MaternityLeaveRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/maternity-configuration': {
+      id: '/maternity-configuration'
+      path: '/maternity-configuration'
+      fullPath: '/maternity-configuration'
+      preLoaderRoute: typeof MaternityConfigurationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/manual-attendance': {
       id: '/manual-attendance'
       path: '/manual-attendance'
@@ -4422,6 +4442,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ManageOvertimeRoute: ManageOvertimeRoute,
   ManualAttendanceRoute: ManualAttendanceRoute,
+  MaternityConfigurationRoute: MaternityConfigurationRoute,
   MaternityLeaveRoute: MaternityLeaveRoute,
   MaternityPaymentRoute: MaternityPaymentRoute,
   MaternityPaymentReportRoute: MaternityPaymentReportRoute,
