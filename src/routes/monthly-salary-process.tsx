@@ -41,6 +41,11 @@ import {
   ChevronDown,
   ArrowUp,
   ArrowDown,
+  Lock,
+  Unlock,
+  Shield,
+  ShieldCheck,
+  KeyRound,
 } from "lucide-react";
 
 // Deduction Template and Ramadan Month configurations definitions (aligned with payroll-deductions page)
@@ -1244,6 +1249,57 @@ function MonthlySalaryProcessPage() {
   const [processYear, setProcessYear] = useState("2026");
   const [processMonth, setProcessMonth] = useState("Jul");
 
+  // Payroll Lock & Security System State
+  const [isPayrollLocked, setIsPayrollLocked] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem(`payroll_lock_status_v1_${processYear}_${processMonth}`) === "true";
+    }
+    return false;
+  });
+  const [lockTimestamp, setLockTimestamp] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem(`payroll_lock_time_v1_${processYear}_${processMonth}`) || "";
+    }
+    return "";
+  });
+  const [lockNotes, setLockNotes] = useState("Payroll generated and finalized for payment distribution.");
+  const [unlockReason, setUnlockReason] = useState("");
+  const [isLockModalOpen, setIsLockModalOpen] = useState(false);
+  const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const locked = localStorage.getItem(`payroll_lock_status_v1_${processYear}_${processMonth}`) === "true";
+      setIsPayrollLocked(locked);
+      setLockTimestamp(localStorage.getItem(`payroll_lock_time_v1_${processYear}_${processMonth}`) || "");
+    }
+  }, [processYear, processMonth]);
+
+  const handleLockPayroll = () => {
+    const nowStr = new Date().toLocaleString();
+    if (typeof window !== "undefined") {
+      localStorage.setItem(`payroll_lock_status_v1_${processYear}_${processMonth}`, "true");
+      localStorage.setItem(`payroll_lock_time_v1_${processYear}_${processMonth}`, nowStr);
+      localStorage.setItem(`payroll_lock_notes_v1_${processYear}_${processMonth}`, lockNotes);
+    }
+    setIsPayrollLocked(true);
+    setLockTimestamp(nowStr);
+    setIsLockModalOpen(false);
+  };
+
+  const handleUnlockPayroll = () => {
+    if (!unlockReason.trim()) {
+      alert("Please provide an unlock justification reason.");
+      return;
+    }
+    if (typeof window !== "undefined") {
+      localStorage.setItem(`payroll_lock_status_v1_${processYear}_${processMonth}`, "false");
+    }
+    setIsPayrollLocked(false);
+    setIsUnlockModalOpen(false);
+    setUnlockReason("");
+  };
+
   // Selection filters for search
   const [searchQuery, setSearchQuery] = useState("");
   const [isActionsOpen, setIsActionsOpen] = useState(false);
@@ -1519,6 +1575,10 @@ function MonthlySalaryProcessPage() {
 
   // Run dynamic payroll calculator and save records per month
   const handleProcessSalaries = () => {
+    if (isPayrollLocked) {
+      alert(`Payroll period ${processMonth} ${processYear} is LOCKED. Please click 'Unlock Payroll' to allow re-processing.`);
+      return;
+    }
     const generated: ProcessedSalaryRecord[] = ROSTER_EMPLOYEES.map((emp) => {
       return {
         ...emp,
@@ -1828,7 +1888,7 @@ function MonthlySalaryProcessPage() {
                 />
               </div>
 
-              <div className="col-span-4 flex justify-start">
+              <div className="col-span-3 flex justify-start">
                 <Button
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-10 rounded-xl transition-all shadow-md shadow-blue-500/10 flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
                   onClick={handleFetchData}
@@ -1837,8 +1897,61 @@ function MonthlySalaryProcessPage() {
                   GET PROCESSED DATA
                 </Button>
               </div>
+
+              <div className="col-span-2 flex justify-start">
+                {isPayrollLocked ? (
+                  <Button
+                    onClick={() => setIsUnlockModalOpen(true)}
+                    className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold h-10 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Unlock className="size-4 shrink-0" />
+                    UNLOCK
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => setIsLockModalOpen(true)}
+                    disabled={!isDataLoaded}
+                    className={`w-full font-bold h-10 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer ${
+                      isDataLoaded
+                        ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/10"
+                        : "bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed"
+                    }`}
+                  >
+                    <Lock className="size-4 shrink-0" />
+                    LOCK
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
+
+          {/* Payroll Lock Notification Banner */}
+          {isPayrollLocked && (
+            <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 flex flex-wrap items-center justify-between gap-4 shadow-sm animate-fadeIn">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-amber-200 dark:bg-amber-900/60 rounded-xl text-amber-900 dark:text-amber-100 font-extrabold shrink-0 shadow-2xs">
+                  <Lock size={22} />
+                </div>
+                <div>
+                  <div className="font-black text-sm flex items-center gap-2 text-amber-950 dark:text-amber-100">
+                    PAYROLL LOCKED FOR {processMonth} {processYear}
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-200 text-amber-900 dark:bg-amber-900 dark:text-amber-200 font-black text-[10px] uppercase border border-amber-300">FINALIZED &amp; FROZEN</span>
+                  </div>
+                  <p className="text-xs text-amber-800 dark:text-amber-300 font-medium mt-0.5">
+                    This payroll period was locked on <strong>{lockTimestamp || "verification"}</strong>. All basic salary rates, attendance days, overtime payouts, and net salary figures are locked against modifications.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsUnlockModalOpen(true)}
+                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 shrink-0 transition-all uppercase tracking-wider"
+              >
+                <Unlock size={14} /> Unlock Period
+              </button>
+            </div>
+          )}
 
           {/* Advanced Report Actions Accordion */}
           <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
@@ -2690,6 +2803,162 @@ function MonthlySalaryProcessPage() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* LOCK PAYROLL CONFIRMATION MODAL */}
+        {isLockModalOpen && (
+          <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4 font-sans">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg flex flex-col overflow-hidden animate-fadeIn">
+              
+              <div className="p-6 bg-rose-50 dark:bg-rose-950/40 border-b border-rose-100 dark:border-rose-900/60 flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="size-11 rounded-2xl bg-rose-600 text-white font-black flex items-center justify-center shadow-md">
+                    <Lock size={22} />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-slate-900 dark:text-white text-base">
+                      Lock Payroll Period ({processMonth} {processYear})
+                    </h3>
+                    <p className="text-xs text-rose-700 dark:text-rose-300 font-medium">
+                      Freeze salary records &amp; lock against modifications
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsLockModalOpen(false)}
+                  className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="p-6 space-y-4 text-xs">
+                <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 text-amber-900 dark:text-amber-200 space-y-1">
+                  <div className="font-bold flex items-center gap-1.5 text-xs">
+                    <AlertTriangle size={15} className="text-amber-600" />
+                    Important Security Notice:
+                  </div>
+                  <p className="text-[11px] leading-relaxed opacity-90">
+                    Locking this period will freeze all basic rates, attendance days, overtime payouts, and net payable amounts. Inline edits and recalculations will be disabled until unlocked by an authorized manager.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block font-bold text-slate-800 dark:text-slate-200 text-xs">
+                    Lock Justification / Audit Notes
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={lockNotes}
+                    onChange={(e) => setLockNotes(e.target.value)}
+                    className="w-full p-3 border border-slate-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-xs outline-none focus:ring-2 focus:ring-rose-500 font-sans"
+                    placeholder="Enter lock notes (e.g. Approved by Head of Finance & HR)..."
+                  />
+                </div>
+              </div>
+
+              <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between shrink-0">
+                <span className="text-[11px] text-slate-400 font-medium">Action will be logged in audit trail</span>
+                <div className="flex items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setIsLockModalOpen(false)}
+                    className="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs hover:bg-slate-300 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleLockPayroll}
+                    className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition-all uppercase tracking-wider"
+                  >
+                    <Lock size={15} /> Lock Payroll Now
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {/* UNLOCK PAYROLL AUTHORIZATION MODAL */}
+        {isUnlockModalOpen && (
+          <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4 font-sans">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg flex flex-col overflow-hidden animate-fadeIn">
+              
+              <div className="p-6 bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-900/60 flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="size-11 rounded-2xl bg-amber-600 text-white font-black flex items-center justify-center shadow-md">
+                    <Unlock size={22} />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-slate-900 dark:text-white text-base">
+                      Unlock Payroll Period ({processMonth} {processYear})
+                    </h3>
+                    <p className="text-xs text-amber-700 dark:text-amber-300 font-medium">
+                      Require managerial authorization to allow re-editing
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsUnlockModalOpen(false)}
+                  className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="p-6 space-y-4 text-xs">
+                <div className="p-3.5 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 text-blue-900 dark:text-blue-200 space-y-1">
+                  <div className="font-bold flex items-center gap-1.5 text-xs">
+                    <ShieldCheck size={15} className="text-blue-600" />
+                    Managerial Override:
+                  </div>
+                  <p className="text-[11px] leading-relaxed opacity-90">
+                    Unlocking will re-enable inline edits, salary adjustments, and batch recalculation for {processMonth} {processYear}.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block font-bold text-slate-800 dark:text-slate-200 text-xs">
+                    Unlock Justification / Reason <span className="text-rose-500">*</span>
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={unlockReason}
+                    onChange={(e) => setUnlockReason(e.target.value)}
+                    className="w-full p-3 border border-slate-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-xs outline-none focus:ring-2 focus:ring-amber-500 font-sans"
+                    placeholder="Provide detailed unlock reason (e.g. Arrear adjustment required for 3 employees)..."
+                  />
+                </div>
+              </div>
+
+              <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between shrink-0">
+                <span className="text-[11px] text-slate-400 font-medium">Unlock reason recorded for compliance</span>
+                <div className="flex items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setIsUnlockModalOpen(false)}
+                    className="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs hover:bg-slate-300 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleUnlockPayroll}
+                    className="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition-all uppercase tracking-wider"
+                  >
+                    <Unlock size={15} /> Confirm &amp; Unlock
+                  </button>
+                </div>
+              </div>
+
             </div>
           </div>
         )}

@@ -96,6 +96,7 @@ import { Route as PermissionManagementRouteImport } from './routes/permission-ma
 import { Route as PendingManualAttendanceRouteImport } from './routes/pending-manual-attendance'
 import { Route as PayslipPrintRouteImport } from './routes/payslip-print'
 import { Route as PayrollReportsRouteImport } from './routes/payroll-reports'
+import { Route as PayrollPeriodLockRouteImport } from './routes/payroll-period-lock'
 import { Route as PayrollLoanRouteImport } from './routes/payroll-loan'
 import { Route as PayrollDeductionsRouteImport } from './routes/payroll-deductions'
 import { Route as PayrollConfigureRouteImport } from './routes/payroll-configure'
@@ -702,6 +703,11 @@ const PayslipPrintRoute = PayslipPrintRouteImport.update({
 const PayrollReportsRoute = PayrollReportsRouteImport.update({
   id: '/payroll-reports',
   path: '/payroll-reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayrollPeriodLockRoute = PayrollPeriodLockRouteImport.update({
+  id: '/payroll-period-lock',
+  path: '/payroll-period-lock',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PayrollLoanRoute = PayrollLoanRouteImport.update({
@@ -1499,6 +1505,7 @@ export interface FileRoutesByFullPath {
   '/payroll-configure': typeof PayrollConfigureRoute
   '/payroll-deductions': typeof PayrollDeductionsRoute
   '/payroll-loan': typeof PayrollLoanRoute
+  '/payroll-period-lock': typeof PayrollPeriodLockRoute
   '/payroll-reports': typeof PayrollReportsRoute
   '/payslip-print': typeof PayslipPrintRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
@@ -1718,6 +1725,7 @@ export interface FileRoutesByTo {
   '/payroll-configure': typeof PayrollConfigureRoute
   '/payroll-deductions': typeof PayrollDeductionsRoute
   '/payroll-loan': typeof PayrollLoanRoute
+  '/payroll-period-lock': typeof PayrollPeriodLockRoute
   '/payroll-reports': typeof PayrollReportsRoute
   '/payslip-print': typeof PayslipPrintRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
@@ -1938,6 +1946,7 @@ export interface FileRoutesById {
   '/payroll-configure': typeof PayrollConfigureRoute
   '/payroll-deductions': typeof PayrollDeductionsRoute
   '/payroll-loan': typeof PayrollLoanRoute
+  '/payroll-period-lock': typeof PayrollPeriodLockRoute
   '/payroll-reports': typeof PayrollReportsRoute
   '/payslip-print': typeof PayslipPrintRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
@@ -2159,6 +2168,7 @@ export interface FileRouteTypes {
     | '/payroll-configure'
     | '/payroll-deductions'
     | '/payroll-loan'
+    | '/payroll-period-lock'
     | '/payroll-reports'
     | '/payslip-print'
     | '/pending-manual-attendance'
@@ -2378,6 +2388,7 @@ export interface FileRouteTypes {
     | '/payroll-configure'
     | '/payroll-deductions'
     | '/payroll-loan'
+    | '/payroll-period-lock'
     | '/payroll-reports'
     | '/payslip-print'
     | '/pending-manual-attendance'
@@ -2597,6 +2608,7 @@ export interface FileRouteTypes {
     | '/payroll-configure'
     | '/payroll-deductions'
     | '/payroll-loan'
+    | '/payroll-period-lock'
     | '/payroll-reports'
     | '/payslip-print'
     | '/pending-manual-attendance'
@@ -2817,6 +2829,7 @@ export interface RootRouteChildren {
   PayrollConfigureRoute: typeof PayrollConfigureRoute
   PayrollDeductionsRoute: typeof PayrollDeductionsRoute
   PayrollLoanRoute: typeof PayrollLoanRoute
+  PayrollPeriodLockRoute: typeof PayrollPeriodLockRoute
   PayrollReportsRoute: typeof PayrollReportsRoute
   PayslipPrintRoute: typeof PayslipPrintRoute
   PendingManualAttendanceRoute: typeof PendingManualAttendanceRoute
@@ -3519,6 +3532,13 @@ declare module '@tanstack/react-router' {
       path: '/payroll-reports'
       fullPath: '/payroll-reports'
       preLoaderRoute: typeof PayrollReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payroll-period-lock': {
+      id: '/payroll-period-lock'
+      path: '/payroll-period-lock'
+      fullPath: '/payroll-period-lock'
+      preLoaderRoute: typeof PayrollPeriodLockRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/payroll-loan': {
@@ -4562,6 +4582,7 @@ const rootRouteChildren: RootRouteChildren = {
   PayrollConfigureRoute: PayrollConfigureRoute,
   PayrollDeductionsRoute: PayrollDeductionsRoute,
   PayrollLoanRoute: PayrollLoanRoute,
+  PayrollPeriodLockRoute: PayrollPeriodLockRoute,
   PayrollReportsRoute: PayrollReportsRoute,
   PayslipPrintRoute: PayslipPrintRoute,
   PendingManualAttendanceRoute: PendingManualAttendanceRoute,

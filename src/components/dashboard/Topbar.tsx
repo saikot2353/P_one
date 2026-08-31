@@ -310,6 +310,12 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Tax Exemption Rules", parent: "Manage Allowance", to: "/" },
   // Processes
   { label: "Payroll Processing", parent: "Processes", to: "/" },
+  {
+    label: "Payroll Period Lock & Approval",
+    parent: "Payroll",
+    to: "/payroll-period-lock",
+    description: "Manage, lock, freeze, and unlock processed payroll periods with audit logging",
+  },
   { label: "End of Month Close", parent: "Processes", to: "/" },
   { label: "Year End Process", parent: "Processes", to: "/" },
   // Idea Share

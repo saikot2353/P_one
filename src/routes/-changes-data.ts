@@ -2,6 +2,24 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "330",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Feature",
+    module: "Payroll (Salary Process)",
+    link: "/payroll-period-lock",
+    descriptionEn: "Created a dedicated sub-menu and route 'Payroll Period Lock & Approval' (/payroll-period-lock) under Payroll -> Salary Process with period analytics cards, lock/unlock modals, persistent state, and printable frozen audit certificates.",
+    descriptionBn: "Payroll -> Salary Process এর নিচে 'Payroll Period Lock & Approval' (/payroll-period-lock) নামের নতুন সাব-মেনু যুক্ত করা হয়েছে যেখানে সকল মাসের বেতন প্রসেসের লক/আনলক ম্যানেজমেন্ট এবং অডিট রিপোর্ট জেনারেট করা যাবে।",
+  },
+  {
+    id: "329",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Feature",
+    module: "Payroll (Monthly Salary Process)",
+    link: "/monthly-salary-process",
+    descriptionEn: "Added a persistent Payroll Lock & Unlock System to Monthly Salary Process (/monthly-salary-process) featuring Lock/Unlock action buttons, Lock Confirmation Modal, Unlock Authorization Modal, top warning banner, and edit protection.",
+    descriptionBn: "Monthly Salary Process (/monthly-salary-process) পেজে পেরোল ফাইনাল লক ও আনলক সিস্টেম যুক্ত করা হয়েছে। লক করা অবস্থায় বেতন শিটে এডিট এবং পুনরায় ক্যালকুলেশন নিষ্ক্রিয় থাকবে।",
+  },
+  {
     id: "328",
     date: new Date().toISOString().slice(0, 16),
     type: "Bug Fix",

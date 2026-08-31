@@ -365,6 +365,7 @@ export const nav: NavItem[] = [
           { label: "Monthly Salary Process", to: "/monthly-salary-process" },
           { label: "Advance Salary Process", to: "/advance-salary-process" },
           { label: "Yearly Bonus Process", to: "/yearly-bonus-process" },
+          { label: "Payroll Period Lock & Approval", to: "/payroll-period-lock" },
         ],
       },
       {
