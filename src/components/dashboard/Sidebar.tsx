@@ -108,6 +108,7 @@ export const nav: NavItem[] = [
     count: 42,
     subitems: [
       { label: "All Approvals", to: "/all-approvals" },
+      { label: "Pending Approvals", to: "/pending-approvals", count: 5 },
       {
         label: "HR Approvals",
         count: 28,

@@ -2,6 +2,24 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "333",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Improvement",
+    module: "Approvals",
+    link: "/pending-approvals",
+    descriptionEn: "Simplified Pending Approvals (/pending-approvals) to a clean, minimal list focusing on requisition title, employee, current approval stage (e.g. Stage 2/3), and pending approver name.",
+    descriptionBn: "Pending Approvals (/pending-approvals) পেজটি সহজ ও ক্লিন করা হয়েছে যাতে সহজেই রিকুইজিশন তালিকা, বর্তমান স্টেজ (যেমন Stage 2/3) এবং কার টেবিলে পেন্ডিং আছে তা দেখা যায়।",
+  },
+  {
+    id: "332",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Feature",
+    module: "Approvals",
+    link: "/pending-approvals",
+    descriptionEn: "Added a new sub-menu and route 'Pending Approvals' (/pending-approvals) under Approvals consolidating all pending requisitions with smart 'Pending to whom' approver tracking, approval chain steppers, and reminder nudges.",
+    descriptionBn: "Approvals মেনুর অধীনে 'Pending Approvals' (/pending-approvals) নামের নতুন সাব-মেনু ও পেজ যুক্ত করা হয়েছে, যেখানে প্রতিষ্ঠানের সকল পেন্ডিং রিকুইজিশন এবং তা কার টেবিলে পেন্ডিং আছে ('Pending to whom!') তা স্পষ্টভাবে দেখা যাবে।",
+  },
+  {
     id: "331",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Improvement",

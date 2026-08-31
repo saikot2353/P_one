@@ -311,6 +311,12 @@ const searchableMenus: SearchMenuLink[] = [
   // Processes
   { label: "Payroll Processing", parent: "Processes", to: "/" },
   {
+    label: "Pending Approvals",
+    parent: "Approvals",
+    to: "/pending-approvals",
+    description: "Track all pending requisitions and see who each approval is currently pending to",
+  },
+  {
     label: "Payroll Period Lock & Approval",
     parent: "Payroll",
     to: "/payroll-period-lock",

@@ -94,6 +94,7 @@ import { Route as PersonnelListRouteImport } from './routes/personnel-list'
 import { Route as PersonnelApprovalRouteImport } from './routes/personnel-approval'
 import { Route as PermissionManagementRouteImport } from './routes/permission-management'
 import { Route as PendingManualAttendanceRouteImport } from './routes/pending-manual-attendance'
+import { Route as PendingApprovalsRouteImport } from './routes/pending-approvals'
 import { Route as PayslipPrintRouteImport } from './routes/payslip-print'
 import { Route as PayrollReportsRouteImport } from './routes/payroll-reports'
 import { Route as PayrollPeriodLockRouteImport } from './routes/payroll-period-lock'
@@ -693,6 +694,11 @@ const PermissionManagementRoute = PermissionManagementRouteImport.update({
 const PendingManualAttendanceRoute = PendingManualAttendanceRouteImport.update({
   id: '/pending-manual-attendance',
   path: '/pending-manual-attendance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PendingApprovalsRoute = PendingApprovalsRouteImport.update({
+  id: '/pending-approvals',
+  path: '/pending-approvals',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PayslipPrintRoute = PayslipPrintRouteImport.update({
@@ -1508,6 +1514,7 @@ export interface FileRoutesByFullPath {
   '/payroll-period-lock': typeof PayrollPeriodLockRoute
   '/payroll-reports': typeof PayrollReportsRoute
   '/payslip-print': typeof PayslipPrintRoute
+  '/pending-approvals': typeof PendingApprovalsRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
   '/permission-management': typeof PermissionManagementRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
@@ -1728,6 +1735,7 @@ export interface FileRoutesByTo {
   '/payroll-period-lock': typeof PayrollPeriodLockRoute
   '/payroll-reports': typeof PayrollReportsRoute
   '/payslip-print': typeof PayslipPrintRoute
+  '/pending-approvals': typeof PendingApprovalsRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
   '/permission-management': typeof PermissionManagementRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
@@ -1949,6 +1957,7 @@ export interface FileRoutesById {
   '/payroll-period-lock': typeof PayrollPeriodLockRoute
   '/payroll-reports': typeof PayrollReportsRoute
   '/payslip-print': typeof PayslipPrintRoute
+  '/pending-approvals': typeof PendingApprovalsRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
   '/permission-management': typeof PermissionManagementRoute
   '/personnel-approval': typeof PersonnelApprovalRoute
@@ -2171,6 +2180,7 @@ export interface FileRouteTypes {
     | '/payroll-period-lock'
     | '/payroll-reports'
     | '/payslip-print'
+    | '/pending-approvals'
     | '/pending-manual-attendance'
     | '/permission-management'
     | '/personnel-approval'
@@ -2391,6 +2401,7 @@ export interface FileRouteTypes {
     | '/payroll-period-lock'
     | '/payroll-reports'
     | '/payslip-print'
+    | '/pending-approvals'
     | '/pending-manual-attendance'
     | '/permission-management'
     | '/personnel-approval'
@@ -2611,6 +2622,7 @@ export interface FileRouteTypes {
     | '/payroll-period-lock'
     | '/payroll-reports'
     | '/payslip-print'
+    | '/pending-approvals'
     | '/pending-manual-attendance'
     | '/permission-management'
     | '/personnel-approval'
@@ -2832,6 +2844,7 @@ export interface RootRouteChildren {
   PayrollPeriodLockRoute: typeof PayrollPeriodLockRoute
   PayrollReportsRoute: typeof PayrollReportsRoute
   PayslipPrintRoute: typeof PayslipPrintRoute
+  PendingApprovalsRoute: typeof PendingApprovalsRoute
   PendingManualAttendanceRoute: typeof PendingManualAttendanceRoute
   PermissionManagementRoute: typeof PermissionManagementRoute
   PersonnelApprovalRoute: typeof PersonnelApprovalRoute
@@ -3518,6 +3531,13 @@ declare module '@tanstack/react-router' {
       path: '/pending-manual-attendance'
       fullPath: '/pending-manual-attendance'
       preLoaderRoute: typeof PendingManualAttendanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pending-approvals': {
+      id: '/pending-approvals'
+      path: '/pending-approvals'
+      fullPath: '/pending-approvals'
+      preLoaderRoute: typeof PendingApprovalsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/payslip-print': {
@@ -4585,6 +4605,7 @@ const rootRouteChildren: RootRouteChildren = {
   PayrollPeriodLockRoute: PayrollPeriodLockRoute,
   PayrollReportsRoute: PayrollReportsRoute,
   PayslipPrintRoute: PayslipPrintRoute,
+  PendingApprovalsRoute: PendingApprovalsRoute,
   PendingManualAttendanceRoute: PendingManualAttendanceRoute,
   PermissionManagementRoute: PermissionManagementRoute,
   PersonnelApprovalRoute: PersonnelApprovalRoute,
