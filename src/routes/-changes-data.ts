@@ -2,6 +2,42 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "293",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Feature Update",
+    module: "Employee Doc Verification",
+    link: "/employee-doc-verification",
+    descriptionEn: "Added searchable multi-select dropdown filters for Company and Area to the Employee Doc Verification filter bar. Users can now select one or more companies and areas to narrow down the employee list. Active filters are highlighted in blue and can be cleared individually or all at once via a 'Reset filters' button.",
+    descriptionBn: "Employee Doc Verification ফিল্টার বারে Company এবং Area-এর জন্য সার্চযোগ্য মাল্টি-সিলেক্ট ড্রপডাউন ফিল্টার যুক্ত করা হয়েছে। একাধিক কোম্পানি বা এরিয়া বেছে কর্মী তালিকা সংকীর্ণ করা যাবে। সক্রিয় ফিল্টার নীল রঙে হাইলাইট হয় এবং 'Reset filters' বাটনে ক্লিক করে সব ফিল্টার একসাথে রিসেট করা যায়।",
+  },
+  {
+    id: "294",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Feature Update",
+    module: "Employee Doc Verification",
+    link: "/employee-doc-verification",
+    descriptionEn: "Removed the redundant 'Reject' button across the Employee Doc Verification module. All document issues (whether rejection or HR escalation) are now handled exclusively through the unified 'Mark as Issue' flow, simplifying the user experience.",
+    descriptionBn: "Employee Doc Verification মডিউল থেকে 'Reject' বাটনটি সরিয়ে ফেলা হয়েছে। এখন থেকে সব ধরনের ডকুমেন্ট সমস্যা বা রিজেকশন শুধুমাত্র 'Mark as Issue' অপশনের মাধ্যমে পরিচালিত হবে, যা ব্যবহারকারীদের জন্য আরও সহজ।",
+  },
+  {
+    id: "292",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Employee Doc Verification",
+    link: "/employee-doc-verification",
+    descriptionEn: "Added a live HR Notification Bell to the Topbar. When a document is flagged with 'Mark as Issue', an instant notification is pushed to HR with the employee name, document title, issue description, and timestamp. Notifications are stored in localStorage, show an unread badge, and can be dismissed individually or cleared all at once.",
+    descriptionBn: "টপবারে একটি লাইভ HR নোটিফিকেশন বেল যুক্ত করা হয়েছে। 'Mark as Issue' দিলে সাথে সাথে HR-কে নোটিফিকেশন যায়, যেখানে কর্মীর নাম, ডকুমেন্টের নাম, সমস্যার বিবরণ ও সময় দেখা যায়। নোটিফিকেশনগুলো localStorage-এ সেভ থাকে, আনরিড ব্যাজ দেখায়, এবং একটি একটি বা সব একসাথে মুছে দেওয়া যায়।"
+  },
+  {
+    id: "291",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Employee Doc Verification",
+    link: "/employee-doc-verification",
+    descriptionEn: "Added 'Mark as Issue' button to Employee Doc Verification. Verifiers can now flag a document with a specific issue description (from presets or custom text). Flagged documents show an orange 'Issue Flagged' status pill, display the issue note inline, and offer a 'Re-verify' button to reset the document back to Pending after the employee updates it. The global stats bar now also shows a Flagged count.",
+    descriptionBn: "Employee Doc Verification পেজে 'Mark as Issue' বাটন যুক্ত করা হয়েছে। ভেরিফায়াররা এখন একটি ডকুমেন্টে সমস্যা চিহ্নিত করতে পারবেন — প্রিসেট বা কাস্টম বিবরণ দিয়ে। ফ্ল্যাগ করা ডকুমেন্টে কমলা রঙের 'Issue Flagged' স্ট্যাটাস ও সমস্যার নোট দেখাবে, এবং ডকুমেন্ট আপডেট হলে 'Re-verify' বাটন দিয়ে আবার Pending-এ ফেরানো যাবে।"
+  },
+  {
     id: "290",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Update",

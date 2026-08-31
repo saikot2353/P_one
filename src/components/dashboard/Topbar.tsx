@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   Bell,
@@ -32,8 +32,24 @@ import {
   User,
   Globe,
   Check,
+  Flag,
+  X,
 } from "lucide-react";
 import { ModuleLauncher } from "./ModuleLauncher";
+import { getHRNotifications, type HRDocIssueNotification } from "@/routes/employee-doc-verification";
+
+const HR_NOTIF_KEY = "hr_doc_issue_notifications_v1";
+
+function markAllNotificationsRead() {
+  const all = getHRNotifications().map((n) => ({ ...n, read: true }));
+  localStorage.setItem(HR_NOTIF_KEY, JSON.stringify(all));
+}
+
+function dismissNotification(id: string) {
+  const updated = getHRNotifications().filter((n) => n.id !== id);
+  localStorage.setItem(HR_NOTIF_KEY, JSON.stringify(updated));
+  window.dispatchEvent(new Event("hr-notif-update"));
+}
 
 interface SearchMenuLink {
   label: string;
@@ -655,6 +671,30 @@ export function Topbar() {
   // Profile dropdown states
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
+  // HR Issue Notifications
+  const [hrNotifications, setHrNotifications] = useState<HRDocIssueNotification[]>(() => getHRNotifications());
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
+  const unreadCount = hrNotifications.filter((n) => !n.read).length;
+
+  useEffect(() => {
+    const refresh = () => setHrNotifications(getHRNotifications());
+    window.addEventListener("hr-notif-update", refresh);
+    window.addEventListener("storage", refresh);
+    return () => { window.removeEventListener("hr-notif-update", refresh); window.removeEventListener("storage", refresh); };
+  }, []);
+
+  useEffect(() => {
+    if (!isNotifOpen) return;
+    markAllNotificationsRead();
+    setHrNotifications(getHRNotifications());
+    const handleClickOutside = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) setIsNotifOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isNotifOpen]);
+
   // Keypress event listener for keyboard shortcut Ctrl+K / Cmd+K and Esc
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -956,14 +996,94 @@ export function Topbar() {
           <MessagesSquare className="size-4.5" />
         </button>
 
-        {/* Notification Bell with 0 Badge */}
-        <div className="relative flex items-center mr-1">
-          <button className="relative size-9 grid place-items-center rounded-lg hover:bg-muted text-foreground/80 hover:text-foreground transition-colors duration-200">
-            <Bell className="size-4.5" />
-            <span className="absolute top-1 left-1.5 px-1 py-0.2 text-[8px] font-extrabold bg-[#1e40af] dark:bg-blue-600 text-white rounded shadow-2xs min-w-[12px] text-center">
-              0
-            </span>
+        {/* HR Issue Notification Bell */}
+        <div className="relative flex items-center mr-1" ref={notifRef}>
+          <button
+            onClick={() => setIsNotifOpen((v) => !v)}
+            className="relative size-9 grid place-items-center rounded-lg hover:bg-muted text-foreground/80 hover:text-foreground transition-colors duration-200"
+            title="HR Document Issue Notifications"
+          >
+            <Bell className={`size-4.5 ${unreadCount > 0 ? "text-orange-500 dark:text-orange-400" : ""}`} />
+            {unreadCount > 0 && (
+              <span className="absolute top-1 left-1.5 px-1 py-0.5 text-[8px] font-extrabold bg-orange-500 text-white rounded shadow-xs min-w-[14px] text-center animate-pulse">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
+            {unreadCount === 0 && (
+              <span className="absolute top-1 left-1.5 px-1 py-0.2 text-[8px] font-extrabold bg-[#1e40af] dark:bg-blue-600 text-white rounded shadow-2xs min-w-[12px] text-center">
+                {hrNotifications.length}
+              </span>
+            )}
           </button>
+
+          {/* Notification Dropdown */}
+          {isNotifOpen && (
+            <div
+              className="absolute right-0 top-[calc(100%+8px)] w-[360px] z-50 rounded-2xl border shadow-2xl overflow-hidden"
+              style={{
+                background: "var(--l-dropdown-bg, rgba(255,255,255,0.98))",
+                borderColor: "var(--l-dropdown-border, rgba(100,116,139,0.12))",
+                boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+              }}
+            >
+              {/* Header */}
+              <div className="px-4 py-3 border-b border-border/60 flex items-center justify-between bg-orange-50/60 dark:bg-orange-950/10">
+                <div className="flex items-center gap-2">
+                  <Flag className="size-3.5 text-orange-500" />
+                  <span className="text-xs font-black text-slate-800 dark:text-white">HR Document Issues</span>
+                  {hrNotifications.length > 0 && (
+                    <span className="px-1.5 py-0.5 text-[9px] font-black bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400 rounded-full">{hrNotifications.length}</span>
+                  )}
+                </div>
+                <Link
+                  to="/employee-doc-verification"
+                  onClick={() => setIsNotifOpen(false)}
+                  className="text-[10px] font-bold text-orange-600 dark:text-orange-400 hover:underline"
+                >View All →</Link>
+              </div>
+              {/* Notification list */}
+              <div className="max-h-[360px] overflow-y-auto">
+                {hrNotifications.length === 0 ? (
+                  <div className="py-10 flex flex-col items-center gap-2 text-slate-400">
+                    <Bell className="size-7 text-slate-200 dark:text-slate-700" />
+                    <p className="text-xs font-semibold">No document issues flagged yet</p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-border/60">
+                    {hrNotifications.map((n) => (
+                      <div key={n.id} className={`px-4 py-3 flex items-start gap-3 group hover:bg-orange-50/40 dark:hover:bg-orange-950/10 transition-colors ${!n.read ? "bg-orange-50/60 dark:bg-orange-950/5" : ""}`}>
+                        <div className="size-8 rounded-xl bg-orange-100 dark:bg-orange-950/30 flex items-center justify-center shrink-0 mt-0.5">
+                          <Flag className="size-3.5 text-orange-500 dark:text-orange-400" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-[11px] font-black text-slate-900 dark:text-white truncate">{n.employeeName}</span>
+                            {!n.read && <span className="inline-block size-1.5 rounded-full bg-orange-500 shrink-0" />}
+                          </div>
+                          <p className="text-[10px] text-orange-700 dark:text-orange-400 font-semibold truncate">{n.docTitle}</p>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5 leading-snug line-clamp-2">{n.issueDescription}</p>
+                          <span className="text-[9px] text-slate-400 font-mono mt-1 block">{new Date(n.raisedAt).toLocaleString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+                        </div>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); dismissNotification(n.id); setHrNotifications(getHRNotifications()); }}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 shrink-0"
+                          title="Dismiss"
+                        ><X className="size-3" /></button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {hrNotifications.length > 0 && (
+                <div className="px-4 py-2.5 border-t border-border/60 bg-slate-50/60 dark:bg-slate-900/20">
+                  <button
+                    onClick={() => { const updated = getHRNotifications().filter(() => false); localStorage.setItem(HR_NOTIF_KEY, JSON.stringify(updated)); setHrNotifications([]); window.dispatchEvent(new Event("hr-notif-update")); }}
+                    className="w-full text-[10px] font-bold text-slate-400 hover:text-rose-500 transition-colors text-center"
+                  >Clear all notifications</button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* User Profile Block */}
