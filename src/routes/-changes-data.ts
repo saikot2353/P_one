@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "331",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Improvement",
+    module: "Payroll (Salary Process)",
+    link: "/payroll-period-lock",
+    descriptionEn: "Refined Payroll Period Lock UI with professional typography, right-aligned table action buttons, and enabled/disabled state handling for the Certificate button.",
+    descriptionBn: "Payroll Period Lock পেজের UI কে আরও প্রফেশনাল ও মার্জিত রূপ দেওয়া হয়েছে, অ্যাকশন বাটন ডানপাশে এলাইন করা হয়েছে এবং আনলক থাকা অবস্থায় সার্টিফিকেট বাটন ডিজেবল করা রাখা হয়েছে।",
+  },
+  {
     id: "330",
     date: new Date().toISOString().slice(0, 16),
     type: "Feature",

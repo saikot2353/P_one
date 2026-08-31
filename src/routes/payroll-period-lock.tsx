@@ -282,56 +282,56 @@ function PayrollPeriodLockPage() {
 
           {/* PERIOD LOCK SUMMARY CARDS */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-2xs flex items-center justify-between">
               <div>
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Payroll Periods</span>
-                <span className="text-2xl font-black text-slate-900 dark:text-slate-100">{stats.total}</span>
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Total Payroll Periods</span>
+                <span className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1 block">{stats.total}</span>
               </div>
-              <div className="size-11 rounded-xl bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 flex items-center justify-center font-bold">
-                <Calendar size={22} />
+              <div className="size-10 rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-300 flex items-center justify-center font-medium border border-blue-100 dark:border-blue-900">
+                <Calendar size={20} />
               </div>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-2xs flex items-center justify-between">
               <div>
-                <span className="text-[11px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider block">Locked &amp; Frozen Periods</span>
-                <span className="text-2xl font-black text-rose-700 dark:text-rose-300">{stats.locked}</span>
+                <span className="text-[11px] font-semibold text-rose-600 dark:text-rose-400 uppercase tracking-wider block">Locked &amp; Frozen</span>
+                <span className="text-2xl font-bold text-rose-700 dark:text-rose-300 mt-1 block">{stats.locked}</span>
               </div>
-              <div className="size-11 rounded-xl bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 flex items-center justify-center font-bold">
-                <Lock size={22} />
+              <div className="size-10 rounded-lg bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-300 flex items-center justify-center font-medium border border-rose-100 dark:border-rose-900">
+                <Lock size={20} />
               </div>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-2xs flex items-center justify-between">
               <div>
-                <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">Open / Unlocked Periods</span>
-                <span className="text-2xl font-black text-amber-700 dark:text-amber-300">{stats.open}</span>
+                <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">Open / Unlocked</span>
+                <span className="text-2xl font-bold text-amber-700 dark:text-amber-300 mt-1 block">{stats.open}</span>
               </div>
-              <div className="size-11 rounded-xl bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 flex items-center justify-center font-bold">
-                <Unlock size={22} />
+              <div className="size-10 rounded-lg bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-300 flex items-center justify-center font-medium border border-amber-100 dark:border-amber-900">
+                <Unlock size={20} />
               </div>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-2xs flex items-center justify-between">
               <div>
-                <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">Total Net Salary Frozen</span>
-                <span className="text-xl font-black text-emerald-700 dark:text-emerald-300">৳ {(stats.frozenNetPayout / 1000000).toFixed(2)}M</span>
+                <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">Total Net Frozen</span>
+                <span className="text-xl font-bold text-emerald-700 dark:text-emerald-300 mt-1 block">৳ {(stats.frozenNetPayout / 1000000).toFixed(2)}M</span>
               </div>
-              <div className="size-11 rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center justify-center font-bold">
-                <Coins size={22} />
+              <div className="size-10 rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center justify-center font-medium border border-emerald-100 dark:border-emerald-900">
+                <Coins size={20} />
               </div>
             </div>
           </div>
 
           {/* FILTERS TOOLBAR */}
-          <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-wrap items-center justify-between gap-4 text-xs">
+          <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-wrap items-center justify-between gap-4 text-xs">
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center gap-2">
                 <label className="text-slate-500 font-medium">Year:</label>
                 <select
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(e.target.value)}
-                  className="h-8 px-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 font-bold text-xs outline-none"
+                  className="h-8 px-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 font-medium text-xs outline-none focus:border-blue-500 transition-colors"
                 >
                   <option value="2026">2026</option>
                   <option value="2025">2025</option>
@@ -344,7 +344,7 @@ function PayrollPeriodLockPage() {
                 <select
                   value={selectedProcessType}
                   onChange={(e) => setSelectedProcessType(e.target.value)}
-                  className="h-8 px-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 font-bold text-xs outline-none"
+                  className="h-8 px-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 font-medium text-xs outline-none focus:border-blue-500 transition-colors"
                 >
                   <option value="ALL">All Types</option>
                   <option value="Monthly Salary">Monthly Salary</option>
@@ -359,33 +359,33 @@ function PayrollPeriodLockPage() {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search month, type, ID..."
-                  className="h-8 pl-8 pr-2.5 w-60 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-xs outline-none focus:ring-2 focus:ring-blue-500"
+                  className="h-8 pl-8 pr-2.5 w-60 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-xs outline-none focus:border-blue-500 transition-colors"
                 />
                 <Search size={14} className="absolute left-2.5 top-2 text-slate-400" />
               </div>
             </div>
 
-            <div className="text-[11px] text-slate-400 italic">
-              Showing {filteredPeriods.length} payroll period lock states
+            <div className="text-[11px] text-slate-400 font-medium">
+              Showing {filteredPeriods.length} payroll periods
             </div>
           </div>
 
           {/* PAYROLL PERIOD RECORDS TABLE */}
-          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-2xs overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-left text-xs min-w-[1000px]">
                 <thead>
-                  <tr className="bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold border-b border-slate-200 dark:border-slate-700">
-                    <th className="py-3.5 px-4">Period &amp; Process Type</th>
-                    <th className="py-3.5 px-4">Headcount</th>
-                    <th className="py-3.5 px-4 text-right">Gross Salary (৳)</th>
-                    <th className="py-3.5 px-4 text-right">Net Payable Payout (৳)</th>
-                    <th className="py-3.5 px-4 text-center">Lock Status</th>
-                    <th className="py-3.5 px-4">Locked Date &amp; Author</th>
-                    <th className="py-3.5 px-4 text-center">Lock / Unlock Actions</th>
+                  <tr className="bg-slate-50/80 dark:bg-slate-800/60 text-slate-700 dark:text-slate-200 font-semibold border-b border-slate-200/80 dark:border-slate-700">
+                    <th className="py-3 px-4">Period &amp; Process Type</th>
+                    <th className="py-3 px-4">Headcount</th>
+                    <th className="py-3 px-4 text-right">Gross Salary (৳)</th>
+                    <th className="py-3 px-4 text-right">Net Payable Payout (৳)</th>
+                    <th className="py-3 px-4 text-center">Lock Status</th>
+                    <th className="py-3 px-4">Locked Date &amp; Author</th>
+                    <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {filteredPeriods.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="py-8 text-center text-slate-400 italic">
@@ -394,48 +394,48 @@ function PayrollPeriodLockPage() {
                     </tr>
                   ) : (
                     filteredPeriods.map((p) => (
-                      <tr key={p.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 text-slate-700 dark:text-slate-300">
-                        <td className="py-3.5 px-4">
-                          <div className="font-extrabold text-slate-900 dark:text-slate-100 text-sm">
+                      <tr key={p.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 text-slate-700 dark:text-slate-300 transition-colors">
+                        <td className="py-3 px-4">
+                          <div className="font-semibold text-slate-900 dark:text-slate-100 text-xs">
                             {p.month} {p.year}
                           </div>
-                          <div className="text-[11px] font-bold text-blue-600 dark:text-blue-400 mt-0.5">
+                          <div className="text-[11px] font-medium text-blue-600 dark:text-blue-400 mt-0.5">
                             {p.processType}
                           </div>
                           <div className="text-[10px] text-slate-400 font-mono">ID: {p.id}</div>
                         </td>
 
-                        <td className="py-3.5 px-4 font-bold text-slate-800 dark:text-slate-200">
+                        <td className="py-3 px-4 font-medium text-slate-700 dark:text-slate-300">
                           <span className="inline-flex items-center gap-1.5">
-                            <Users size={14} className="text-slate-400" />
+                            <Users size={13} className="text-slate-400" />
                             {p.headcount.toLocaleString()} Staff
                           </span>
                         </td>
 
-                        <td className="py-3.5 px-4 text-right font-bold text-slate-900 dark:text-slate-100">
+                        <td className="py-3 px-4 text-right font-medium text-slate-800 dark:text-slate-200">
                           ৳ {p.grossAmount.toLocaleString()}
                         </td>
 
-                        <td className="py-3.5 px-4 text-right font-black text-emerald-600 dark:text-emerald-400 text-sm">
+                        <td className="py-3 px-4 text-right font-semibold text-emerald-700 dark:text-emerald-400 text-xs">
                           ৳ {p.netPayout.toLocaleString()}
                         </td>
 
-                        <td className="py-3.5 px-4 text-center">
+                        <td className="py-3 px-4 text-center">
                           {p.isLocked ? (
-                            <span className="px-3 py-1 rounded-full bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300 font-black text-[11px] border border-rose-300 inline-flex items-center gap-1">
-                              <Lock size={13} /> Locked &amp; Frozen
+                            <span className="px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 font-semibold text-[11px] border border-rose-200 dark:border-rose-900 inline-flex items-center gap-1">
+                              <Lock size={12} /> Locked &amp; Frozen
                             </span>
                           ) : (
-                            <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 font-extrabold text-[11px] border border-amber-300 inline-flex items-center gap-1">
-                              <Unlock size={13} /> Open / Unlocked
+                            <span className="px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 font-semibold text-[11px] border border-amber-200 dark:border-amber-900 inline-flex items-center gap-1">
+                              <Unlock size={12} /> Open / Unlocked
                             </span>
                           )}
                         </td>
 
-                        <td className="py-3.5 px-4">
+                        <td className="py-3 px-4">
                           {p.isLocked ? (
                             <div>
-                              <div className="font-bold text-slate-900 dark:text-slate-100 text-[11px]">{p.lockedBy}</div>
+                              <div className="font-medium text-slate-800 dark:text-slate-200 text-[11px]">{p.lockedBy}</div>
                               <div className="text-[10px] text-slate-400 font-mono">{p.lockedAt}</div>
                               {p.lockNotes && (
                                 <div className="text-[10px] text-slate-500 italic mt-0.5 truncate max-w-xs" title={p.lockNotes}>
@@ -448,36 +448,42 @@ function PayrollPeriodLockPage() {
                           )}
                         </td>
 
-                        <td className="py-3.5 px-4 text-center">
-                          <div className="flex items-center justify-center gap-2">
+                        <td className="py-3 px-4 text-right">
+                          <div className="flex items-center justify-end gap-2">
                             {p.isLocked ? (
-                              <>
-                                <button
-                                  type="button"
-                                  onClick={() => setUnlockTarget(p)}
-                                  className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs inline-flex items-center gap-1"
-                                >
-                                  <Unlock size={13} /> Unlock
-                                </button>
-
-                                <button
-                                  type="button"
-                                  onClick={() => setAuditTarget(p)}
-                                  className="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs inline-flex items-center gap-1"
-                                  title="View Frozen Audit Certificate"
-                                >
-                                  <FileText size={13} /> Certificate
-                                </button>
-                              </>
+                              <button
+                                type="button"
+                                onClick={() => setUnlockTarget(p)}
+                                className="px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:hover:bg-amber-900/60 dark:text-amber-300 font-medium text-xs border border-amber-200 dark:border-amber-800 inline-flex items-center gap-1 transition-colors cursor-pointer"
+                              >
+                                <Unlock size={13} /> Unlock
+                              </button>
                             ) : (
                               <button
                                 type="button"
                                 onClick={() => setLockTarget(p)}
-                                className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-xs inline-flex items-center gap-1"
+                                className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs shadow-2xs inline-flex items-center gap-1 transition-colors cursor-pointer"
                               >
                                 <Lock size={13} /> Lock Period
                               </button>
                             )}
+
+                            {/* CERTIFICATE BUTTON - ALWAYS VISIBLE, DISABLED WHEN UNLOCKED */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (p.isLocked) setAuditTarget(p);
+                              }}
+                              disabled={!p.isLocked}
+                              title={p.isLocked ? "View Frozen Audit Certificate" : "Certificate available once period is locked"}
+                              className={`px-3 py-1.5 rounded-lg font-medium text-xs border inline-flex items-center gap-1.5 transition-colors ${
+                                p.isLocked
+                                  ? "bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 cursor-pointer"
+                                  : "bg-slate-100/60 dark:bg-slate-800/40 text-slate-400 border-slate-200/50 dark:border-slate-800/50 opacity-60 cursor-not-allowed"
+                              }`}
+                            >
+                              <FileText size={13} /> Certificate
+                            </button>
                           </div>
                         </td>
                       </tr>
