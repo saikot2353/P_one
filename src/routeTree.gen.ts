@@ -125,6 +125,9 @@ import { Route as MerchandisingCapacityDistributionRouteImport } from './routes/
 import { Route as MerchandisingCapacityAllocationRouteImport } from './routes/merchandising-capacity-allocation'
 import { Route as MerchandisingCadRouteImport } from './routes/merchandising-cad'
 import { Route as MerchandisingBomRouteImport } from './routes/merchandising-bom'
+import { Route as MaternityPaymentReportRouteImport } from './routes/maternity-payment-report'
+import { Route as MaternityPaymentRouteImport } from './routes/maternity-payment'
+import { Route as MaternityLeaveRouteImport } from './routes/maternity-leave'
 import { Route as ManualAttendanceRouteImport } from './routes/manual-attendance'
 import { Route as ManageOvertimeRouteImport } from './routes/manage-overtime'
 import { Route as LoginRouteImport } from './routes/login'
@@ -849,6 +852,21 @@ const MerchandisingBomRoute = MerchandisingBomRouteImport.update({
   path: '/merchandising-bom',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MaternityPaymentReportRoute = MaternityPaymentReportRouteImport.update({
+  id: '/maternity-payment-report',
+  path: '/maternity-payment-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MaternityPaymentRoute = MaternityPaymentRouteImport.update({
+  id: '/maternity-payment',
+  path: '/maternity-payment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MaternityLeaveRoute = MaternityLeaveRouteImport.update({
+  id: '/maternity-leave',
+  path: '/maternity-leave',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ManualAttendanceRoute = ManualAttendanceRouteImport.update({
   id: '/manual-attendance',
   path: '/manual-attendance',
@@ -1412,6 +1430,9 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
+  '/maternity-leave': typeof MaternityLeaveRoute
+  '/maternity-payment': typeof MaternityPaymentRoute
+  '/maternity-payment-report': typeof MaternityPaymentReportRoute
   '/merchandising-bom': typeof MerchandisingBomRoute
   '/merchandising-cad': typeof MerchandisingCadRoute
   '/merchandising-capacity-allocation': typeof MerchandisingCapacityAllocationRoute
@@ -1623,6 +1644,9 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
+  '/maternity-leave': typeof MaternityLeaveRoute
+  '/maternity-payment': typeof MaternityPaymentRoute
+  '/maternity-payment-report': typeof MaternityPaymentReportRoute
   '/merchandising-bom': typeof MerchandisingBomRoute
   '/merchandising-cad': typeof MerchandisingCadRoute
   '/merchandising-capacity-allocation': typeof MerchandisingCapacityAllocationRoute
@@ -1835,6 +1859,9 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/manage-overtime': typeof ManageOvertimeRoute
   '/manual-attendance': typeof ManualAttendanceRoute
+  '/maternity-leave': typeof MaternityLeaveRoute
+  '/maternity-payment': typeof MaternityPaymentRoute
+  '/maternity-payment-report': typeof MaternityPaymentReportRoute
   '/merchandising-bom': typeof MerchandisingBomRoute
   '/merchandising-cad': typeof MerchandisingCadRoute
   '/merchandising-capacity-allocation': typeof MerchandisingCapacityAllocationRoute
@@ -2048,6 +2075,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
+    | '/maternity-leave'
+    | '/maternity-payment'
+    | '/maternity-payment-report'
     | '/merchandising-bom'
     | '/merchandising-cad'
     | '/merchandising-capacity-allocation'
@@ -2259,6 +2289,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
+    | '/maternity-leave'
+    | '/maternity-payment'
+    | '/maternity-payment-report'
     | '/merchandising-bom'
     | '/merchandising-cad'
     | '/merchandising-capacity-allocation'
@@ -2470,6 +2503,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/manage-overtime'
     | '/manual-attendance'
+    | '/maternity-leave'
+    | '/maternity-payment'
+    | '/maternity-payment-report'
     | '/merchandising-bom'
     | '/merchandising-cad'
     | '/merchandising-capacity-allocation'
@@ -2682,6 +2718,9 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ManageOvertimeRoute: typeof ManageOvertimeRoute
   ManualAttendanceRoute: typeof ManualAttendanceRoute
+  MaternityLeaveRoute: typeof MaternityLeaveRoute
+  MaternityPaymentRoute: typeof MaternityPaymentRoute
+  MaternityPaymentReportRoute: typeof MaternityPaymentReportRoute
   MerchandisingBomRoute: typeof MerchandisingBomRoute
   MerchandisingCadRoute: typeof MerchandisingCadRoute
   MerchandisingCapacityAllocationRoute: typeof MerchandisingCapacityAllocationRoute
@@ -3618,6 +3657,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MerchandisingBomRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/maternity-payment-report': {
+      id: '/maternity-payment-report'
+      path: '/maternity-payment-report'
+      fullPath: '/maternity-payment-report'
+      preLoaderRoute: typeof MaternityPaymentReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/maternity-payment': {
+      id: '/maternity-payment'
+      path: '/maternity-payment'
+      fullPath: '/maternity-payment'
+      preLoaderRoute: typeof MaternityPaymentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/maternity-leave': {
+      id: '/maternity-leave'
+      path: '/maternity-leave'
+      fullPath: '/maternity-leave'
+      preLoaderRoute: typeof MaternityLeaveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/manual-attendance': {
       id: '/manual-attendance'
       path: '/manual-attendance'
@@ -4362,6 +4422,9 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ManageOvertimeRoute: ManageOvertimeRoute,
   ManualAttendanceRoute: ManualAttendanceRoute,
+  MaternityLeaveRoute: MaternityLeaveRoute,
+  MaternityPaymentRoute: MaternityPaymentRoute,
+  MaternityPaymentReportRoute: MaternityPaymentReportRoute,
   MerchandisingBomRoute: MerchandisingBomRoute,
   MerchandisingCadRoute: MerchandisingCadRoute,
   MerchandisingCapacityAllocationRoute: MerchandisingCapacityAllocationRoute,

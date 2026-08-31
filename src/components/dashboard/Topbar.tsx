@@ -130,6 +130,24 @@ const searchableMenus: SearchMenuLink[] = [
     description: "Draft and submit new leaves",
   },
   {
+    label: "Maternity Leave Benefit Calculation",
+    parent: "Leave",
+    to: "/maternity-leave",
+    description: "Calculate and process maternity leave benefits and salary history",
+  },
+  {
+    label: "Maternity Payment Registry & Disbursement",
+    parent: "Leave",
+    to: "/maternity-payment",
+    description: "Manage maternity leave payment records, 112/120 day disbursements and applications",
+  },
+  {
+    label: "Maternity Payment Statement Report",
+    parent: "Leave",
+    to: "/maternity-payment-report",
+    description: "View department-wise maternity payment report, 1st & 2nd installment disbursements",
+  },
+  {
     label: "Leave Approval Board",
     parent: "Leave",
     to: "/leave-approve",
