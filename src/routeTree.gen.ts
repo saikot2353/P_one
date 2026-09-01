@@ -105,7 +105,14 @@ import { Route as PayrollConfigureRouteImport } from './routes/payroll-configure
 import { Route as PayrollCheckSalaryVattaxRouteImport } from './routes/payroll-check-salary-vattax'
 import { Route as PayrollCheckSalaryPlantheadRouteImport } from './routes/payroll-check-salary-planthead'
 import { Route as PayrollCheckSalaryAuditRouteImport } from './routes/payroll-check-salary-audit'
+import { Route as PayrollCheckSalaryAccountsRouteImport } from './routes/payroll-check-salary-accounts'
 import { Route as PayrollCheckSalaryRouteImport } from './routes/payroll-check-salary'
+import { Route as PayrollCheckBonusVattaxRouteImport } from './routes/payroll-check-bonus-vattax'
+import { Route as PayrollCheckBonusPlantheadRouteImport } from './routes/payroll-check-bonus-planthead'
+import { Route as PayrollCheckBonusAuditRouteImport } from './routes/payroll-check-bonus-audit'
+import { Route as PayrollCheckBonusAccountsRouteImport } from './routes/payroll-check-bonus-accounts'
+import { Route as PayrollCheckBonusRouteImport } from './routes/payroll-check-bonus'
+import { Route as PayrollBonusSubmitRouteImport } from './routes/payroll-bonus-submit'
 import { Route as PayrollBenefitsMonthlyRouteImport } from './routes/payroll-benefits-monthly'
 import { Route as PayrollBenefitsMasterDataRouteImport } from './routes/payroll-benefits-master-data'
 import { Route as PayrollBenefitsCommonRouteImport } from './routes/payroll-benefits-common'
@@ -760,9 +767,47 @@ const PayrollCheckSalaryAuditRoute = PayrollCheckSalaryAuditRouteImport.update({
   path: '/payroll-check-salary-audit',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PayrollCheckSalaryAccountsRoute =
+  PayrollCheckSalaryAccountsRouteImport.update({
+    id: '/payroll-check-salary-accounts',
+    path: '/payroll-check-salary-accounts',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const PayrollCheckSalaryRoute = PayrollCheckSalaryRouteImport.update({
   id: '/payroll-check-salary',
   path: '/payroll-check-salary',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayrollCheckBonusVattaxRoute = PayrollCheckBonusVattaxRouteImport.update({
+  id: '/payroll-check-bonus-vattax',
+  path: '/payroll-check-bonus-vattax',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayrollCheckBonusPlantheadRoute =
+  PayrollCheckBonusPlantheadRouteImport.update({
+    id: '/payroll-check-bonus-planthead',
+    path: '/payroll-check-bonus-planthead',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const PayrollCheckBonusAuditRoute = PayrollCheckBonusAuditRouteImport.update({
+  id: '/payroll-check-bonus-audit',
+  path: '/payroll-check-bonus-audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayrollCheckBonusAccountsRoute =
+  PayrollCheckBonusAccountsRouteImport.update({
+    id: '/payroll-check-bonus-accounts',
+    path: '/payroll-check-bonus-accounts',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const PayrollCheckBonusRoute = PayrollCheckBonusRouteImport.update({
+  id: '/payroll-check-bonus',
+  path: '/payroll-check-bonus',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayrollBonusSubmitRoute = PayrollBonusSubmitRouteImport.update({
+  id: '/payroll-bonus-submit',
+  path: '/payroll-bonus-submit',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PayrollBenefitsMonthlyRoute = PayrollBenefitsMonthlyRouteImport.update({
@@ -1554,7 +1599,14 @@ export interface FileRoutesByFullPath {
   '/payroll-benefits-common': typeof PayrollBenefitsCommonRoute
   '/payroll-benefits-master-data': typeof PayrollBenefitsMasterDataRoute
   '/payroll-benefits-monthly': typeof PayrollBenefitsMonthlyRoute
+  '/payroll-bonus-submit': typeof PayrollBonusSubmitRoute
+  '/payroll-check-bonus': typeof PayrollCheckBonusRoute
+  '/payroll-check-bonus-accounts': typeof PayrollCheckBonusAccountsRoute
+  '/payroll-check-bonus-audit': typeof PayrollCheckBonusAuditRoute
+  '/payroll-check-bonus-planthead': typeof PayrollCheckBonusPlantheadRoute
+  '/payroll-check-bonus-vattax': typeof PayrollCheckBonusVattaxRoute
   '/payroll-check-salary': typeof PayrollCheckSalaryRoute
+  '/payroll-check-salary-accounts': typeof PayrollCheckSalaryAccountsRoute
   '/payroll-check-salary-audit': typeof PayrollCheckSalaryAuditRoute
   '/payroll-check-salary-planthead': typeof PayrollCheckSalaryPlantheadRoute
   '/payroll-check-salary-vattax': typeof PayrollCheckSalaryVattaxRoute
@@ -1782,7 +1834,14 @@ export interface FileRoutesByTo {
   '/payroll-benefits-common': typeof PayrollBenefitsCommonRoute
   '/payroll-benefits-master-data': typeof PayrollBenefitsMasterDataRoute
   '/payroll-benefits-monthly': typeof PayrollBenefitsMonthlyRoute
+  '/payroll-bonus-submit': typeof PayrollBonusSubmitRoute
+  '/payroll-check-bonus': typeof PayrollCheckBonusRoute
+  '/payroll-check-bonus-accounts': typeof PayrollCheckBonusAccountsRoute
+  '/payroll-check-bonus-audit': typeof PayrollCheckBonusAuditRoute
+  '/payroll-check-bonus-planthead': typeof PayrollCheckBonusPlantheadRoute
+  '/payroll-check-bonus-vattax': typeof PayrollCheckBonusVattaxRoute
   '/payroll-check-salary': typeof PayrollCheckSalaryRoute
+  '/payroll-check-salary-accounts': typeof PayrollCheckSalaryAccountsRoute
   '/payroll-check-salary-audit': typeof PayrollCheckSalaryAuditRoute
   '/payroll-check-salary-planthead': typeof PayrollCheckSalaryPlantheadRoute
   '/payroll-check-salary-vattax': typeof PayrollCheckSalaryVattaxRoute
@@ -2011,7 +2070,14 @@ export interface FileRoutesById {
   '/payroll-benefits-common': typeof PayrollBenefitsCommonRoute
   '/payroll-benefits-master-data': typeof PayrollBenefitsMasterDataRoute
   '/payroll-benefits-monthly': typeof PayrollBenefitsMonthlyRoute
+  '/payroll-bonus-submit': typeof PayrollBonusSubmitRoute
+  '/payroll-check-bonus': typeof PayrollCheckBonusRoute
+  '/payroll-check-bonus-accounts': typeof PayrollCheckBonusAccountsRoute
+  '/payroll-check-bonus-audit': typeof PayrollCheckBonusAuditRoute
+  '/payroll-check-bonus-planthead': typeof PayrollCheckBonusPlantheadRoute
+  '/payroll-check-bonus-vattax': typeof PayrollCheckBonusVattaxRoute
   '/payroll-check-salary': typeof PayrollCheckSalaryRoute
+  '/payroll-check-salary-accounts': typeof PayrollCheckSalaryAccountsRoute
   '/payroll-check-salary-audit': typeof PayrollCheckSalaryAuditRoute
   '/payroll-check-salary-planthead': typeof PayrollCheckSalaryPlantheadRoute
   '/payroll-check-salary-vattax': typeof PayrollCheckSalaryVattaxRoute
@@ -2241,7 +2307,14 @@ export interface FileRouteTypes {
     | '/payroll-benefits-common'
     | '/payroll-benefits-master-data'
     | '/payroll-benefits-monthly'
+    | '/payroll-bonus-submit'
+    | '/payroll-check-bonus'
+    | '/payroll-check-bonus-accounts'
+    | '/payroll-check-bonus-audit'
+    | '/payroll-check-bonus-planthead'
+    | '/payroll-check-bonus-vattax'
     | '/payroll-check-salary'
+    | '/payroll-check-salary-accounts'
     | '/payroll-check-salary-audit'
     | '/payroll-check-salary-planthead'
     | '/payroll-check-salary-vattax'
@@ -2469,7 +2542,14 @@ export interface FileRouteTypes {
     | '/payroll-benefits-common'
     | '/payroll-benefits-master-data'
     | '/payroll-benefits-monthly'
+    | '/payroll-bonus-submit'
+    | '/payroll-check-bonus'
+    | '/payroll-check-bonus-accounts'
+    | '/payroll-check-bonus-audit'
+    | '/payroll-check-bonus-planthead'
+    | '/payroll-check-bonus-vattax'
     | '/payroll-check-salary'
+    | '/payroll-check-salary-accounts'
     | '/payroll-check-salary-audit'
     | '/payroll-check-salary-planthead'
     | '/payroll-check-salary-vattax'
@@ -2697,7 +2777,14 @@ export interface FileRouteTypes {
     | '/payroll-benefits-common'
     | '/payroll-benefits-master-data'
     | '/payroll-benefits-monthly'
+    | '/payroll-bonus-submit'
+    | '/payroll-check-bonus'
+    | '/payroll-check-bonus-accounts'
+    | '/payroll-check-bonus-audit'
+    | '/payroll-check-bonus-planthead'
+    | '/payroll-check-bonus-vattax'
     | '/payroll-check-salary'
+    | '/payroll-check-salary-accounts'
     | '/payroll-check-salary-audit'
     | '/payroll-check-salary-planthead'
     | '/payroll-check-salary-vattax'
@@ -2926,7 +3013,14 @@ export interface RootRouteChildren {
   PayrollBenefitsCommonRoute: typeof PayrollBenefitsCommonRoute
   PayrollBenefitsMasterDataRoute: typeof PayrollBenefitsMasterDataRoute
   PayrollBenefitsMonthlyRoute: typeof PayrollBenefitsMonthlyRoute
+  PayrollBonusSubmitRoute: typeof PayrollBonusSubmitRoute
+  PayrollCheckBonusRoute: typeof PayrollCheckBonusRoute
+  PayrollCheckBonusAccountsRoute: typeof PayrollCheckBonusAccountsRoute
+  PayrollCheckBonusAuditRoute: typeof PayrollCheckBonusAuditRoute
+  PayrollCheckBonusPlantheadRoute: typeof PayrollCheckBonusPlantheadRoute
+  PayrollCheckBonusVattaxRoute: typeof PayrollCheckBonusVattaxRoute
   PayrollCheckSalaryRoute: typeof PayrollCheckSalaryRoute
+  PayrollCheckSalaryAccountsRoute: typeof PayrollCheckSalaryAccountsRoute
   PayrollCheckSalaryAuditRoute: typeof PayrollCheckSalaryAuditRoute
   PayrollCheckSalaryPlantheadRoute: typeof PayrollCheckSalaryPlantheadRoute
   PayrollCheckSalaryVattaxRoute: typeof PayrollCheckSalaryVattaxRoute
@@ -3703,11 +3797,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PayrollCheckSalaryAuditRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/payroll-check-salary-accounts': {
+      id: '/payroll-check-salary-accounts'
+      path: '/payroll-check-salary-accounts'
+      fullPath: '/payroll-check-salary-accounts'
+      preLoaderRoute: typeof PayrollCheckSalaryAccountsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/payroll-check-salary': {
       id: '/payroll-check-salary'
       path: '/payroll-check-salary'
       fullPath: '/payroll-check-salary'
       preLoaderRoute: typeof PayrollCheckSalaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payroll-check-bonus-vattax': {
+      id: '/payroll-check-bonus-vattax'
+      path: '/payroll-check-bonus-vattax'
+      fullPath: '/payroll-check-bonus-vattax'
+      preLoaderRoute: typeof PayrollCheckBonusVattaxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payroll-check-bonus-planthead': {
+      id: '/payroll-check-bonus-planthead'
+      path: '/payroll-check-bonus-planthead'
+      fullPath: '/payroll-check-bonus-planthead'
+      preLoaderRoute: typeof PayrollCheckBonusPlantheadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payroll-check-bonus-audit': {
+      id: '/payroll-check-bonus-audit'
+      path: '/payroll-check-bonus-audit'
+      fullPath: '/payroll-check-bonus-audit'
+      preLoaderRoute: typeof PayrollCheckBonusAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payroll-check-bonus-accounts': {
+      id: '/payroll-check-bonus-accounts'
+      path: '/payroll-check-bonus-accounts'
+      fullPath: '/payroll-check-bonus-accounts'
+      preLoaderRoute: typeof PayrollCheckBonusAccountsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payroll-check-bonus': {
+      id: '/payroll-check-bonus'
+      path: '/payroll-check-bonus'
+      fullPath: '/payroll-check-bonus'
+      preLoaderRoute: typeof PayrollCheckBonusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payroll-bonus-submit': {
+      id: '/payroll-bonus-submit'
+      path: '/payroll-bonus-submit'
+      fullPath: '/payroll-bonus-submit'
+      preLoaderRoute: typeof PayrollBonusSubmitRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/payroll-benefits-monthly': {
@@ -4743,7 +4886,14 @@ const rootRouteChildren: RootRouteChildren = {
   PayrollBenefitsCommonRoute: PayrollBenefitsCommonRoute,
   PayrollBenefitsMasterDataRoute: PayrollBenefitsMasterDataRoute,
   PayrollBenefitsMonthlyRoute: PayrollBenefitsMonthlyRoute,
+  PayrollBonusSubmitRoute: PayrollBonusSubmitRoute,
+  PayrollCheckBonusRoute: PayrollCheckBonusRoute,
+  PayrollCheckBonusAccountsRoute: PayrollCheckBonusAccountsRoute,
+  PayrollCheckBonusAuditRoute: PayrollCheckBonusAuditRoute,
+  PayrollCheckBonusPlantheadRoute: PayrollCheckBonusPlantheadRoute,
+  PayrollCheckBonusVattaxRoute: PayrollCheckBonusVattaxRoute,
   PayrollCheckSalaryRoute: PayrollCheckSalaryRoute,
+  PayrollCheckSalaryAccountsRoute: PayrollCheckSalaryAccountsRoute,
   PayrollCheckSalaryAuditRoute: PayrollCheckSalaryAuditRoute,
   PayrollCheckSalaryPlantheadRoute: PayrollCheckSalaryPlantheadRoute,
   PayrollCheckSalaryVattaxRoute: PayrollCheckSalaryVattaxRoute,

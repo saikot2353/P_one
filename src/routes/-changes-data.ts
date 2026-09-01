@@ -2,6 +2,42 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "357",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI / UX",
+    module: "Payroll",
+    link: "/payroll-bonus-submit",
+    descriptionEn: "Redesigned all 6 Bonus Submit and Check Bonus pages to match Pakiza ERP schema (Join Date, Basic, Gross, Default%, Req%, Bonus Amount, Bank Bonus, Misc. Bonus, Notes, Unit, Line, Account No, Bank Name, EXCEL/PRINT/PDF buttons, and exact ERP layout).",
+    descriptionBn: "Bonus Submit এবং ৫টি Check Bonus পেজসমূহকে Pakiza ERP স্কিমা এবং লেআউট (Join Date, Basic, Gross, Default%, Req%, Bonus Amount, Bank Bonus, Misc. Bonus, Notes, Unit, Line, Account No, Bank Name, EXCEL/PRINT/PDF বাটন) অনুযায়ী পুনর্গঠন করা হয়েছে।",
+  },
+  {
+    id: "356",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Layout Optimization",
+    module: "Payroll",
+    link: "/payroll-salary-submit",
+    descriptionEn: "Grouped all salary submit and checking menus under a parent 'Salary Submission' sub-menu in Payroll -> Salary Process, featuring Salary Submit, Check Salary, Check Salary Vat/Tax, Check Salary Audit, Check Salary Plant Head, and the new Check Salary Accounts (/payroll-check-salary-accounts).",
+    descriptionBn: "Payroll -> Salary Process এর অধীনে 'Salary Submission' প্যারেন্ট সাব-মেনু তৈরি করে Salary Submit, Check Salary, Check Salary Vat/Tax, Check Salary Audit, Check Salary Plant Head এবং নতুন Check Salary Accounts পেজসমূহ সংগঠিত করা হয়েছে।",
+  },
+  {
+    id: "355",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Sub-Menus",
+    module: "Payroll",
+    link: "/payroll-check-bonus",
+    descriptionEn: "Created 5 Check Bonus sub-menu pages under Payroll -> Salary Process -> Bonus Submission: Check Bonus (/payroll-check-bonus), Check Bonus Vat/Tax (/payroll-check-bonus-vattax), Check Bonus Audit (/payroll-check-bonus-audit), Check Bonus Plant Head (/payroll-check-bonus-planthead with APPROVE button), and Check Bonus Accounts (/payroll-check-bonus-accounts).",
+    descriptionBn: "Payroll -> Salary Process -> Bonus Submission এর অধীনে ৫টি চেক বোনাস পেজ তৈরি করা হয়েছে: Check Bonus, Check Bonus Vat/Tax, Check Bonus Audit, Check Bonus Plant Head (যেখানে APPROVE বাটন বিদ্যমান) এবং Check Bonus Accounts।",
+  },
+  {
+    id: "354",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Sub-Menu",
+    module: "Payroll",
+    link: "/payroll-bonus-submit",
+    descriptionEn: "Added 'Bonus Submission' -> 'Bonus Submit' (/payroll-bonus-submit) under Payroll -> Salary Process for monthly and festival bonus submission with attendance log search and CSV export.",
+    descriptionBn: "Payroll -> Salary Process এর অধীনে 'Bonus Submission' -> 'Bonus Submit' (/payroll-bonus-submit) সাব-মেনু যুক্ত করা হয়েছে, যার মাধ্যমে ফেস্টিভ্যাল ও মান্থলি বোনাস সাবমিট, রিভিউ এবং এক্সপোর্ট করা সম্ভব।",
+  },
+  {
     id: "353",
     date: new Date().toISOString().slice(0, 16),
     type: "New Sub-Menus",

@@ -40,8 +40,9 @@ import {
 
 export interface NestedItem {
   label: string;
-  to: string;
+  to?: string;
   search?: Record<string, any>;
+  subitems?: NestedItem[];
   count?: number;
 }
 
@@ -365,11 +366,28 @@ export const nav: NavItem[] = [
       {
         label: "Salary Process",
         subitems: [
-          { label: "Salary Submit", to: "/payroll-salary-submit" },
-          { label: "Check Salary", to: "/payroll-check-salary" },
-          { label: "Check Salary Vat/Tax", to: "/payroll-check-salary-vattax" },
-          { label: "Check Salary Audit", to: "/payroll-check-salary-audit" },
-          { label: "Check Salary Plant Head", to: "/payroll-check-salary-planthead" },
+          {
+            label: "Salary Submission",
+            subitems: [
+              { label: "Salary Submit", to: "/payroll-salary-submit" },
+              { label: "Check Salary", to: "/payroll-check-salary" },
+              { label: "Check Salary Vat/Tax", to: "/payroll-check-salary-vattax" },
+              { label: "Check Salary Audit", to: "/payroll-check-salary-audit" },
+              { label: "Check Salary Plant Head", to: "/payroll-check-salary-planthead" },
+              { label: "Check Salary Accounts", to: "/payroll-check-salary-accounts" },
+            ],
+          },
+          {
+            label: "Bonus Submission",
+            subitems: [
+              { label: "Bonus Submit", to: "/payroll-bonus-submit" },
+              { label: "Check Bonus", to: "/payroll-check-bonus" },
+              { label: "Check Bonus Vat/Tax", to: "/payroll-check-bonus-vattax" },
+              { label: "Check Bonus Audit", to: "/payroll-check-bonus-audit" },
+              { label: "Check Bonus Plant Head", to: "/payroll-check-bonus-planthead" },
+              { label: "Check Bonus Accounts", to: "/payroll-check-bonus-accounts" },
+            ],
+          },
           { label: "Monthly Salary Process", to: "/monthly-salary-process" },
           { label: "Advance Salary Process", to: "/advance-salary-process" },
           { label: "Yearly Bonus Process", to: "/yearly-bonus-process" },
@@ -463,7 +481,15 @@ export function Sidebar() {
           if (sub.to && sub.to !== "/" && sub.to === currentPath) return true;
           if (
             sub.subitems &&
-            sub.subitems.some((nested) => nested.to !== "/" && nested.to === currentPath)
+            sub.subitems.some((nested) => {
+              if (nested.to && nested.to !== "/" && nested.to === currentPath) return true;
+              if (
+                nested.subitems &&
+                nested.subitems.some((deep) => deep.to !== "/" && deep.to === currentPath)
+              )
+                return true;
+              return false;
+            })
           )
             return true;
           return false;
@@ -474,9 +500,27 @@ export function Sidebar() {
         item.subitems.forEach((sub) => {
           if (
             sub.subitems &&
-            sub.subitems.some((nested) => nested.to !== "/" && nested.to === currentPath)
+            sub.subitems.some((nested) => {
+              if (nested.to && nested.to !== "/" && nested.to === currentPath) return true;
+              if (
+                nested.subitems &&
+                nested.subitems.some((deep) => deep.to !== "/" && deep.to === currentPath)
+              )
+                return true;
+              return false;
+            })
           ) {
             initial[sub.label] = true;
+          }
+          if (sub.subitems) {
+            sub.subitems.forEach((nested) => {
+              if (
+                nested.subitems &&
+                nested.subitems.some((deep) => deep.to !== "/" && deep.to === currentPath)
+              ) {
+                initial[nested.label] = true;
+              }
+            });
           }
         });
       }
@@ -682,9 +726,15 @@ export function Sidebar() {
                 {item.subitems.map((sub) => {
                   if (sub.subitems) {
                     const isSubOpen = openMenus[sub.label];
-                    const isSubActive = sub.subitems.some(
-                      (nested) => nested.to !== "/" && nested.to === currentPath,
-                    );
+                    const isSubActive = sub.subitems.some((nested) => {
+                      if (nested.to && nested.to !== "/" && nested.to === currentPath) return true;
+                      if (
+                        nested.subitems &&
+                        nested.subitems.some((deep) => deep.to !== "/" && deep.to === currentPath)
+                      )
+                        return true;
+                      return false;
+                    });
                     return (
                       <div key={sub.label} className="space-y-0.5">
                         <button
@@ -727,11 +777,85 @@ export function Sidebar() {
                           ].join(" ")}
                         >
                           {sub.subitems.map((nested) => {
+                            if (nested.subitems) {
+                              const isNestedOpen = openMenus[nested.label];
+                              const isNestedActive = nested.subitems.some(
+                                (deep) => deep.to !== "/" && deep.to === currentPath,
+                              );
+                              return (
+                                <div key={nested.label} className="space-y-0.5">
+                                  <button
+                                    onClick={(e) => toggleMenu(nested.label, e)}
+                                    className={[
+                                      "w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-[10.5px] font-medium transition-all duration-150",
+                                      isNestedActive
+                                        ? "text-sidebar-foreground font-bold"
+                                        : "text-sidebar-foreground/75 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
+                                    ].join(" ")}
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <File
+                                        className={[
+                                          "size-3 shrink-0",
+                                          isNestedActive
+                                            ? "text-primary font-black"
+                                            : "text-sidebar-foreground/45",
+                                        ].join(" ")}
+                                      />
+                                      <span className="truncate">{nested.label}</span>
+                                    </div>
+                                    {nested.count !== undefined && nested.count > 0 && (
+                                      <span className="bg-amber-500/10 text-amber-600 text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none border border-amber-500/20">
+                                        {nested.count}
+                                      </span>
+                                    )}
+                                    {isNestedOpen ? (
+                                      <ChevronDown className="size-3 text-sidebar-foreground/45 transition-transform duration-300 rotate-180" />
+                                    ) : (
+                                      <ChevronRight className="size-3 text-sidebar-foreground/45 transition-transform duration-300" />
+                                    )}
+                                  </button>
+                                  <div
+                                    className={[
+                                      "overflow-hidden transition-all duration-300 space-y-0.5 pl-4 border-l border-sidebar-border/30 ml-3",
+                                      isNestedOpen
+                                        ? "max-h-[300px] opacity-100 py-0.5 mt-0.5"
+                                        : "max-h-0 opacity-0",
+                                    ].join(" ")}
+                                  >
+                                    {nested.subitems.map((deep) => {
+                                      const isDeepActive = deep.to !== "/" && deep.to === currentPath;
+                                      return (
+                                        <Link
+                                          key={deep.label}
+                                          to={deep.to || "#"}
+                                          className={[
+                                            "flex items-center gap-2 px-3 py-1.5 rounded-md text-[10px] font-medium transition-all duration-150",
+                                            isDeepActive
+                                              ? "bg-primary/10 text-primary font-bold shadow-2xs"
+                                              : "text-sidebar-foreground/60 hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground",
+                                          ].join(" ")}
+                                        >
+                                          <span
+                                            className={[
+                                              "w-1.5 h-1.5 rounded-full shrink-0",
+                                              isDeepActive ? "bg-primary" : "bg-sidebar-foreground/20",
+                                            ].join(" ")}
+                                          />
+                                          <span className="truncate">{deep.label}</span>
+                                        </Link>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              );
+                            }
+
                             const isNestedActive = nested.to !== "/" && nested.to === currentPath;
                             return (
                               <Link
                                 key={nested.label}
-                                to={nested.to}
+                                to={nested.to || "#"}
                                 className={[
                                   "flex items-center gap-2 px-3 py-1.5 rounded-md text-[10px] font-medium transition-all duration-150",
                                   isNestedActive

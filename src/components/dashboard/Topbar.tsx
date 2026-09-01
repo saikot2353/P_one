@@ -353,6 +353,48 @@ const searchableMenus: SearchMenuLink[] = [
     description: "Plant Head executive salary checking and approval module with Review & Approve controls",
   },
   {
+    label: "Check Salary Accounts",
+    parent: "Payroll",
+    to: "/payroll-check-salary-accounts",
+    description: "Accounts salary checking, verification, and disbursement module",
+  },
+  {
+    label: "Bonus Submit",
+    parent: "Payroll",
+    to: "/payroll-bonus-submit",
+    description: "Monthly and festival bonus submission and review register",
+  },
+  {
+    label: "Check Bonus",
+    parent: "Payroll",
+    to: "/payroll-check-bonus",
+    description: "Bonus checking and verification module with dual Review & Submit controls",
+  },
+  {
+    label: "Check Bonus Vat/Tax",
+    parent: "Payroll",
+    to: "/payroll-check-bonus-vattax",
+    description: "VAT & TAX bonus checking and verification module",
+  },
+  {
+    label: "Check Bonus Audit",
+    parent: "Payroll",
+    to: "/payroll-check-bonus-audit",
+    description: "Internal audit bonus checking and verification module",
+  },
+  {
+    label: "Check Bonus Plant Head",
+    parent: "Payroll",
+    to: "/payroll-check-bonus-planthead",
+    description: "Plant Head bonus checking and approval module with Review & Approve controls",
+  },
+  {
+    label: "Check Bonus Accounts",
+    parent: "Payroll",
+    to: "/payroll-check-bonus-accounts",
+    description: "Accounts bonus checking and disbursement verification module",
+  },
+  {
     label: "Payroll Period Lock & Approval",
     parent: "Payroll",
     to: "/payroll-period-lock",
