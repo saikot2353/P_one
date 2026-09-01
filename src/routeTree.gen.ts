@@ -149,9 +149,11 @@ import { Route as KpiSettingRouteImport } from './routes/kpi-setting'
 import { Route as KpiSelfAssessmentRouteImport } from './routes/kpi-self-assessment'
 import { Route as KpiReportRouteImport } from './routes/kpi-report'
 import { Route as KpiPeerReviewRouteImport } from './routes/kpi-peer-review'
+import { Route as KpiFinalReportRouteImport } from './routes/kpi-final-report'
 import { Route as KpiDashboardRouteImport } from './routes/kpi-dashboard'
 import { Route as KpiCyclesRouteImport } from './routes/kpi-cycles'
 import { Route as KpiAssessmentWorkflowRouteImport } from './routes/kpi-assessment-workflow'
+import { Route as KpiApprovalRouteImport } from './routes/kpi-approval'
 import { Route as JdListRouteImport } from './routes/jd-list'
 import { Route as InventoryDashboardRouteImport } from './routes/inventory-dashboard'
 import { Route as InvYarnOpeningStockRouteImport } from './routes/inv-yarn-opening-stock'
@@ -981,6 +983,11 @@ const KpiPeerReviewRoute = KpiPeerReviewRouteImport.update({
   path: '/kpi-peer-review',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KpiFinalReportRoute = KpiFinalReportRouteImport.update({
+  id: '/kpi-final-report',
+  path: '/kpi-final-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KpiDashboardRoute = KpiDashboardRouteImport.update({
   id: '/kpi-dashboard',
   path: '/kpi-dashboard',
@@ -994,6 +1001,11 @@ const KpiCyclesRoute = KpiCyclesRouteImport.update({
 const KpiAssessmentWorkflowRoute = KpiAssessmentWorkflowRouteImport.update({
   id: '/kpi-assessment-workflow',
   path: '/kpi-assessment-workflow',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KpiApprovalRoute = KpiApprovalRouteImport.update({
+  id: '/kpi-approval',
+  path: '/kpi-approval',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JdListRoute = JdListRouteImport.update({
@@ -1457,9 +1469,11 @@ export interface FileRoutesByFullPath {
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
   '/inventory-dashboard': typeof InventoryDashboardRoute
   '/jd-list': typeof JdListRoute
+  '/kpi-approval': typeof KpiApprovalRoute
   '/kpi-assessment-workflow': typeof KpiAssessmentWorkflowRoute
   '/kpi-cycles': typeof KpiCyclesRoute
   '/kpi-dashboard': typeof KpiDashboardRoute
+  '/kpi-final-report': typeof KpiFinalReportRoute
   '/kpi-peer-review': typeof KpiPeerReviewRoute
   '/kpi-report': typeof KpiReportRoute
   '/kpi-self-assessment': typeof KpiSelfAssessmentRoute
@@ -1678,9 +1692,11 @@ export interface FileRoutesByTo {
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
   '/inventory-dashboard': typeof InventoryDashboardRoute
   '/jd-list': typeof JdListRoute
+  '/kpi-approval': typeof KpiApprovalRoute
   '/kpi-assessment-workflow': typeof KpiAssessmentWorkflowRoute
   '/kpi-cycles': typeof KpiCyclesRoute
   '/kpi-dashboard': typeof KpiDashboardRoute
+  '/kpi-final-report': typeof KpiFinalReportRoute
   '/kpi-peer-review': typeof KpiPeerReviewRoute
   '/kpi-report': typeof KpiReportRoute
   '/kpi-self-assessment': typeof KpiSelfAssessmentRoute
@@ -1900,9 +1916,11 @@ export interface FileRoutesById {
   '/inv-yarn-opening-stock': typeof InvYarnOpeningStockRoute
   '/inventory-dashboard': typeof InventoryDashboardRoute
   '/jd-list': typeof JdListRoute
+  '/kpi-approval': typeof KpiApprovalRoute
   '/kpi-assessment-workflow': typeof KpiAssessmentWorkflowRoute
   '/kpi-cycles': typeof KpiCyclesRoute
   '/kpi-dashboard': typeof KpiDashboardRoute
+  '/kpi-final-report': typeof KpiFinalReportRoute
   '/kpi-peer-review': typeof KpiPeerReviewRoute
   '/kpi-report': typeof KpiReportRoute
   '/kpi-self-assessment': typeof KpiSelfAssessmentRoute
@@ -2123,9 +2141,11 @@ export interface FileRouteTypes {
     | '/inv-yarn-opening-stock'
     | '/inventory-dashboard'
     | '/jd-list'
+    | '/kpi-approval'
     | '/kpi-assessment-workflow'
     | '/kpi-cycles'
     | '/kpi-dashboard'
+    | '/kpi-final-report'
     | '/kpi-peer-review'
     | '/kpi-report'
     | '/kpi-self-assessment'
@@ -2344,9 +2364,11 @@ export interface FileRouteTypes {
     | '/inv-yarn-opening-stock'
     | '/inventory-dashboard'
     | '/jd-list'
+    | '/kpi-approval'
     | '/kpi-assessment-workflow'
     | '/kpi-cycles'
     | '/kpi-dashboard'
+    | '/kpi-final-report'
     | '/kpi-peer-review'
     | '/kpi-report'
     | '/kpi-self-assessment'
@@ -2565,9 +2587,11 @@ export interface FileRouteTypes {
     | '/inv-yarn-opening-stock'
     | '/inventory-dashboard'
     | '/jd-list'
+    | '/kpi-approval'
     | '/kpi-assessment-workflow'
     | '/kpi-cycles'
     | '/kpi-dashboard'
+    | '/kpi-final-report'
     | '/kpi-peer-review'
     | '/kpi-report'
     | '/kpi-self-assessment'
@@ -2787,9 +2811,11 @@ export interface RootRouteChildren {
   InvYarnOpeningStockRoute: typeof InvYarnOpeningStockRoute
   InventoryDashboardRoute: typeof InventoryDashboardRoute
   JdListRoute: typeof JdListRoute
+  KpiApprovalRoute: typeof KpiApprovalRoute
   KpiAssessmentWorkflowRoute: typeof KpiAssessmentWorkflowRoute
   KpiCyclesRoute: typeof KpiCyclesRoute
   KpiDashboardRoute: typeof KpiDashboardRoute
+  KpiFinalReportRoute: typeof KpiFinalReportRoute
   KpiPeerReviewRoute: typeof KpiPeerReviewRoute
   KpiReportRoute: typeof KpiReportRoute
   KpiSelfAssessmentRoute: typeof KpiSelfAssessmentRoute
@@ -3918,6 +3944,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KpiPeerReviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/kpi-final-report': {
+      id: '/kpi-final-report'
+      path: '/kpi-final-report'
+      fullPath: '/kpi-final-report'
+      preLoaderRoute: typeof KpiFinalReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/kpi-dashboard': {
       id: '/kpi-dashboard'
       path: '/kpi-dashboard'
@@ -3937,6 +3970,13 @@ declare module '@tanstack/react-router' {
       path: '/kpi-assessment-workflow'
       fullPath: '/kpi-assessment-workflow'
       preLoaderRoute: typeof KpiAssessmentWorkflowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kpi-approval': {
+      id: '/kpi-approval'
+      path: '/kpi-approval'
+      fullPath: '/kpi-approval'
+      preLoaderRoute: typeof KpiApprovalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/jd-list': {
@@ -4547,9 +4587,11 @@ const rootRouteChildren: RootRouteChildren = {
   InvYarnOpeningStockRoute: InvYarnOpeningStockRoute,
   InventoryDashboardRoute: InventoryDashboardRoute,
   JdListRoute: JdListRoute,
+  KpiApprovalRoute: KpiApprovalRoute,
   KpiAssessmentWorkflowRoute: KpiAssessmentWorkflowRoute,
   KpiCyclesRoute: KpiCyclesRoute,
   KpiDashboardRoute: KpiDashboardRoute,
+  KpiFinalReportRoute: KpiFinalReportRoute,
   KpiPeerReviewRoute: KpiPeerReviewRoute,
   KpiReportRoute: KpiReportRoute,
   KpiSelfAssessmentRoute: KpiSelfAssessmentRoute,

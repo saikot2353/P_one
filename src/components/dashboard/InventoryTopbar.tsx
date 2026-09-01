@@ -201,10 +201,16 @@ const searchableMenus: SearchMenuLink[] = [
     description: "Evaluate your peers",
   },
   {
-    label: "Assessment Workflow",
+    label: "KPI Assessment Workflow",
     parent: "KPI",
     to: "/kpi-assessment-workflow",
-    description: "Appraisal approval workflow",
+    description: "Appraisal approval chain",
+  },
+  {
+    label: "Assesment Final Report",
+    parent: "KPI",
+    to: "/kpi-final-report",
+    description: "Employee Performance Evaluation & Appraisal Form Report",
   },
   {
     label: "KPI Reports",
@@ -394,6 +400,12 @@ const searchableMenus: SearchMenuLink[] = [
     parent: "Evaluation",
     to: "/final-approve-increment",
     description: "Final increment approval",
+  },
+  {
+    label: "KPI Approval",
+    parent: "HR Approvals",
+    to: "/kpi-approval",
+    description: "HRD final evaluation & pending KPI approvals workflow dashboard",
   },
   // Configure
   {
