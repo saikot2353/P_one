@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "346",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Redesign",
+    module: "KPI Performance",
+    link: "/kpi-dashboard",
+    descriptionEn: "Redesigned KPI Performance Dashboard (/kpi-dashboard) into an executive analytics dashboard with live KPI metrics, Grade Band distribution charts, multi-layer approval pipeline funnel, department performance matrix, top performers wall, and searchable appraisal register.",
+    descriptionBn: "KPI Performance Dashboard (/kpi-dashboard) পেজটিকে এক্সিকিউটিভ অ্যানালিটিক্স ড্যাশবোর্ডে নতুনভাবে রূপান্তর করা হয়েছে; এতে লাইভ কেজিআই মেট্রিক্স, গ্রেড ডিস্ট্রিবিউশন বার চার্ট, মাল্টি-লেয়ার অ্যাপ্রুভাল পাইপলাইন, ডিপার্টমেন্ট পারফরম্যান্স ম্যাট্রিক্স এবং সার্চযোগ্য অ্যাপ্রাইজাল রেজিস্টার যুক্ত করা হয়েছে।",
+  },
+  {
     id: "345",
     date: new Date().toISOString().slice(0, 16),
     type: "Print Layout Update",
