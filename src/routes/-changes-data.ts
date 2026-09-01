@@ -2,6 +2,24 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "353",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Sub-Menus",
+    module: "Payroll",
+    link: "/payroll-check-salary-vattax",
+    descriptionEn: "Added 3 new Salary Check sub-menus under Payroll -> Salary Process: 'Check Salary Vat/Tax' (/payroll-check-salary-vattax), 'Check Salary Audit' (/payroll-check-salary-audit), and 'Check Salary Plant Head' (/payroll-check-salary-planthead) featuring REVIEW and APPROVE controls.",
+    descriptionBn: "Payroll -> Salary Process এর অধীনে ৩টি নতুন সাব-মেনু যুক্ত করা হয়েছে: 'Check Salary Vat/Tax', 'Check Salary Audit' এবং 'Check Salary Plant Head' (যেখানে Submit এর বদলে 'APPROVE' বাটন সংযুক্ত করা হয়েছে)।",
+  },
+  {
+    id: "352",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Sub-Menu",
+    module: "Payroll",
+    link: "/payroll-check-salary",
+    descriptionEn: "Added 'Check Salary' sub-menu under Payroll -> Salary Process (/payroll-check-salary) featuring dual action buttons ('REVIEW' and 'SUBMIT') for both bulk and row-level salary verification.",
+    descriptionBn: "Payroll -> Salary Process এর অধীনে 'Check Salary' (/payroll-check-salary) সাব-মেনু যুক্ত করা হয়েছে; এতে যৌথভাবে বাল্ক ও ইন্ডিভিজুয়াল 'REVIEW' এবং 'SUBMIT' বাটনের সাহায্যে স্যালারি যাচাই করার ব্যবস্থা করা হয়েছে।",
+  },
+  {
     id: "351",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Layout Optimization",

@@ -102,6 +102,10 @@ import { Route as PayrollPeriodLockRouteImport } from './routes/payroll-period-l
 import { Route as PayrollLoanRouteImport } from './routes/payroll-loan'
 import { Route as PayrollDeductionsRouteImport } from './routes/payroll-deductions'
 import { Route as PayrollConfigureRouteImport } from './routes/payroll-configure'
+import { Route as PayrollCheckSalaryVattaxRouteImport } from './routes/payroll-check-salary-vattax'
+import { Route as PayrollCheckSalaryPlantheadRouteImport } from './routes/payroll-check-salary-planthead'
+import { Route as PayrollCheckSalaryAuditRouteImport } from './routes/payroll-check-salary-audit'
+import { Route as PayrollCheckSalaryRouteImport } from './routes/payroll-check-salary'
 import { Route as PayrollBenefitsMonthlyRouteImport } from './routes/payroll-benefits-monthly'
 import { Route as PayrollBenefitsMasterDataRouteImport } from './routes/payroll-benefits-master-data'
 import { Route as PayrollBenefitsCommonRouteImport } from './routes/payroll-benefits-common'
@@ -737,6 +741,28 @@ const PayrollDeductionsRoute = PayrollDeductionsRouteImport.update({
 const PayrollConfigureRoute = PayrollConfigureRouteImport.update({
   id: '/payroll-configure',
   path: '/payroll-configure',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayrollCheckSalaryVattaxRoute =
+  PayrollCheckSalaryVattaxRouteImport.update({
+    id: '/payroll-check-salary-vattax',
+    path: '/payroll-check-salary-vattax',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const PayrollCheckSalaryPlantheadRoute =
+  PayrollCheckSalaryPlantheadRouteImport.update({
+    id: '/payroll-check-salary-planthead',
+    path: '/payroll-check-salary-planthead',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const PayrollCheckSalaryAuditRoute = PayrollCheckSalaryAuditRouteImport.update({
+  id: '/payroll-check-salary-audit',
+  path: '/payroll-check-salary-audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayrollCheckSalaryRoute = PayrollCheckSalaryRouteImport.update({
+  id: '/payroll-check-salary',
+  path: '/payroll-check-salary',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PayrollBenefitsMonthlyRoute = PayrollBenefitsMonthlyRouteImport.update({
@@ -1528,6 +1554,10 @@ export interface FileRoutesByFullPath {
   '/payroll-benefits-common': typeof PayrollBenefitsCommonRoute
   '/payroll-benefits-master-data': typeof PayrollBenefitsMasterDataRoute
   '/payroll-benefits-monthly': typeof PayrollBenefitsMonthlyRoute
+  '/payroll-check-salary': typeof PayrollCheckSalaryRoute
+  '/payroll-check-salary-audit': typeof PayrollCheckSalaryAuditRoute
+  '/payroll-check-salary-planthead': typeof PayrollCheckSalaryPlantheadRoute
+  '/payroll-check-salary-vattax': typeof PayrollCheckSalaryVattaxRoute
   '/payroll-configure': typeof PayrollConfigureRoute
   '/payroll-deductions': typeof PayrollDeductionsRoute
   '/payroll-loan': typeof PayrollLoanRoute
@@ -1752,6 +1782,10 @@ export interface FileRoutesByTo {
   '/payroll-benefits-common': typeof PayrollBenefitsCommonRoute
   '/payroll-benefits-master-data': typeof PayrollBenefitsMasterDataRoute
   '/payroll-benefits-monthly': typeof PayrollBenefitsMonthlyRoute
+  '/payroll-check-salary': typeof PayrollCheckSalaryRoute
+  '/payroll-check-salary-audit': typeof PayrollCheckSalaryAuditRoute
+  '/payroll-check-salary-planthead': typeof PayrollCheckSalaryPlantheadRoute
+  '/payroll-check-salary-vattax': typeof PayrollCheckSalaryVattaxRoute
   '/payroll-configure': typeof PayrollConfigureRoute
   '/payroll-deductions': typeof PayrollDeductionsRoute
   '/payroll-loan': typeof PayrollLoanRoute
@@ -1977,6 +2011,10 @@ export interface FileRoutesById {
   '/payroll-benefits-common': typeof PayrollBenefitsCommonRoute
   '/payroll-benefits-master-data': typeof PayrollBenefitsMasterDataRoute
   '/payroll-benefits-monthly': typeof PayrollBenefitsMonthlyRoute
+  '/payroll-check-salary': typeof PayrollCheckSalaryRoute
+  '/payroll-check-salary-audit': typeof PayrollCheckSalaryAuditRoute
+  '/payroll-check-salary-planthead': typeof PayrollCheckSalaryPlantheadRoute
+  '/payroll-check-salary-vattax': typeof PayrollCheckSalaryVattaxRoute
   '/payroll-configure': typeof PayrollConfigureRoute
   '/payroll-deductions': typeof PayrollDeductionsRoute
   '/payroll-loan': typeof PayrollLoanRoute
@@ -2203,6 +2241,10 @@ export interface FileRouteTypes {
     | '/payroll-benefits-common'
     | '/payroll-benefits-master-data'
     | '/payroll-benefits-monthly'
+    | '/payroll-check-salary'
+    | '/payroll-check-salary-audit'
+    | '/payroll-check-salary-planthead'
+    | '/payroll-check-salary-vattax'
     | '/payroll-configure'
     | '/payroll-deductions'
     | '/payroll-loan'
@@ -2427,6 +2469,10 @@ export interface FileRouteTypes {
     | '/payroll-benefits-common'
     | '/payroll-benefits-master-data'
     | '/payroll-benefits-monthly'
+    | '/payroll-check-salary'
+    | '/payroll-check-salary-audit'
+    | '/payroll-check-salary-planthead'
+    | '/payroll-check-salary-vattax'
     | '/payroll-configure'
     | '/payroll-deductions'
     | '/payroll-loan'
@@ -2651,6 +2697,10 @@ export interface FileRouteTypes {
     | '/payroll-benefits-common'
     | '/payroll-benefits-master-data'
     | '/payroll-benefits-monthly'
+    | '/payroll-check-salary'
+    | '/payroll-check-salary-audit'
+    | '/payroll-check-salary-planthead'
+    | '/payroll-check-salary-vattax'
     | '/payroll-configure'
     | '/payroll-deductions'
     | '/payroll-loan'
@@ -2876,6 +2926,10 @@ export interface RootRouteChildren {
   PayrollBenefitsCommonRoute: typeof PayrollBenefitsCommonRoute
   PayrollBenefitsMasterDataRoute: typeof PayrollBenefitsMasterDataRoute
   PayrollBenefitsMonthlyRoute: typeof PayrollBenefitsMonthlyRoute
+  PayrollCheckSalaryRoute: typeof PayrollCheckSalaryRoute
+  PayrollCheckSalaryAuditRoute: typeof PayrollCheckSalaryAuditRoute
+  PayrollCheckSalaryPlantheadRoute: typeof PayrollCheckSalaryPlantheadRoute
+  PayrollCheckSalaryVattaxRoute: typeof PayrollCheckSalaryVattaxRoute
   PayrollConfigureRoute: typeof PayrollConfigureRoute
   PayrollDeductionsRoute: typeof PayrollDeductionsRoute
   PayrollLoanRoute: typeof PayrollLoanRoute
@@ -3626,6 +3680,34 @@ declare module '@tanstack/react-router' {
       path: '/payroll-configure'
       fullPath: '/payroll-configure'
       preLoaderRoute: typeof PayrollConfigureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payroll-check-salary-vattax': {
+      id: '/payroll-check-salary-vattax'
+      path: '/payroll-check-salary-vattax'
+      fullPath: '/payroll-check-salary-vattax'
+      preLoaderRoute: typeof PayrollCheckSalaryVattaxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payroll-check-salary-planthead': {
+      id: '/payroll-check-salary-planthead'
+      path: '/payroll-check-salary-planthead'
+      fullPath: '/payroll-check-salary-planthead'
+      preLoaderRoute: typeof PayrollCheckSalaryPlantheadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payroll-check-salary-audit': {
+      id: '/payroll-check-salary-audit'
+      path: '/payroll-check-salary-audit'
+      fullPath: '/payroll-check-salary-audit'
+      preLoaderRoute: typeof PayrollCheckSalaryAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payroll-check-salary': {
+      id: '/payroll-check-salary'
+      path: '/payroll-check-salary'
+      fullPath: '/payroll-check-salary'
+      preLoaderRoute: typeof PayrollCheckSalaryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/payroll-benefits-monthly': {
@@ -4661,6 +4743,10 @@ const rootRouteChildren: RootRouteChildren = {
   PayrollBenefitsCommonRoute: PayrollBenefitsCommonRoute,
   PayrollBenefitsMasterDataRoute: PayrollBenefitsMasterDataRoute,
   PayrollBenefitsMonthlyRoute: PayrollBenefitsMonthlyRoute,
+  PayrollCheckSalaryRoute: PayrollCheckSalaryRoute,
+  PayrollCheckSalaryAuditRoute: PayrollCheckSalaryAuditRoute,
+  PayrollCheckSalaryPlantheadRoute: PayrollCheckSalaryPlantheadRoute,
+  PayrollCheckSalaryVattaxRoute: PayrollCheckSalaryVattaxRoute,
   PayrollConfigureRoute: PayrollConfigureRoute,
   PayrollDeductionsRoute: PayrollDeductionsRoute,
   PayrollLoanRoute: PayrollLoanRoute,

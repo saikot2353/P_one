@@ -366,6 +366,10 @@ export const nav: NavItem[] = [
         label: "Salary Process",
         subitems: [
           { label: "Salary Submit", to: "/payroll-salary-submit" },
+          { label: "Check Salary", to: "/payroll-check-salary" },
+          { label: "Check Salary Vat/Tax", to: "/payroll-check-salary-vattax" },
+          { label: "Check Salary Audit", to: "/payroll-check-salary-audit" },
+          { label: "Check Salary Plant Head", to: "/payroll-check-salary-planthead" },
           { label: "Monthly Salary Process", to: "/monthly-salary-process" },
           { label: "Advance Salary Process", to: "/advance-salary-process" },
           { label: "Yearly Bonus Process", to: "/yearly-bonus-process" },

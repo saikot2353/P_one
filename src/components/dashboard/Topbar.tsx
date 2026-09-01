@@ -329,6 +329,30 @@ const searchableMenus: SearchMenuLink[] = [
     description: "Monthly salary submission and review register",
   },
   {
+    label: "Check Salary",
+    parent: "Payroll",
+    to: "/payroll-check-salary",
+    description: "Monthly salary checking, review, and verification module with dual Submit & Review controls",
+  },
+  {
+    label: "Check Salary Vat/Tax",
+    parent: "Payroll",
+    to: "/payroll-check-salary-vattax",
+    description: "VAT and TAX salary check and verification module",
+  },
+  {
+    label: "Check Salary Audit",
+    parent: "Payroll",
+    to: "/payroll-check-salary-audit",
+    description: "Internal audit salary check and verification module",
+  },
+  {
+    label: "Check Salary Plant Head",
+    parent: "Payroll",
+    to: "/payroll-check-salary-planthead",
+    description: "Plant Head executive salary checking and approval module with Review & Approve controls",
+  },
+  {
     label: "Payroll Period Lock & Approval",
     parent: "Payroll",
     to: "/payroll-period-lock",
