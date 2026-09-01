@@ -2,6 +2,24 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "351",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Layout Optimization",
+    module: "Payroll",
+    link: "/payroll-salary-submit",
+    descriptionEn: "Redesigned Employee Attendance Details popup (/payroll-salary-submit) into a clean, spacious 5XL modal focusing purely on 31-day Date & Punch Log table with high visibility.",
+    descriptionBn: "Salary Submit (/payroll-salary-submit) পেজের এটেন্ডেন্স পপআপটি clutter সরিয়ে আরও বড় ও পরিষ্কার ৫XL লেআউটে সাজানো হয়েছে, যেখানে সরাসরি ৩১ দিনের ইন/আউট সময় ও স্ট্যাটাস স্পষ্ট দেখা যাবে।",
+  },
+  {
+    id: "350",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Feature Enhancement",
+    module: "Payroll",
+    link: "/payroll-salary-submit",
+    descriptionEn: "Added Employee Attendance & Monthly Job Card popup modal to Salary Submit page (/payroll-salary-submit) triggered upon clicking the row search button or searching by Employee ID.",
+    descriptionBn: "Salary Submit (/payroll-salary-submit) পেজে প্রতিটি এমপ্লয়ির সার্চ বাটনে বা আইডি ফিল্টারে ক্লিক করলে উক্ত কর্মীর বিস্তারিত উপস্থিতি (Present, Late, Absent, Leave, In/Out time log) দেখানোর এটেন্ডেন্স পপআপ যুক্ত করা হয়েছে।",
+  },
+  {
     id: "349",
     date: new Date().toISOString().slice(0, 16),
     type: "Filter & Export Update",

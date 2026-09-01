@@ -13,8 +13,8 @@ import {
   DollarSign,
   ChevronRight,
   RefreshCw,
-  SlidersHorizontal,
-  ArrowUpDown,
+  Calendar,
+  Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -137,6 +137,19 @@ function SalarySubmitPage() {
       setIsLoading(false);
       setSelectedIds([]);
       toast.success(`Successfully loaded ${initialSalaryData.length} salary records for ${selectedMonth} ${selectedYear}!`);
+
+      if (searchEmpId.trim()) {
+        const query = searchEmpId.trim().toLowerCase();
+        const found = initialSalaryData.find(
+          (r) =>
+            (idType === "System" && r.empId.toLowerCase().includes(query)) ||
+            (idType === "Office" && r.empIdOff.toLowerCase().includes(query))
+        );
+        if (found) {
+          setViewingRecord(found);
+          toast.info(`Showing Attendance & Job Card details for ${found.name} (${found.empId})`);
+        }
+      }
     }, 300);
   };
 
@@ -732,60 +745,155 @@ function SalarySubmitPage() {
           )}
         </div>
 
-        {/* Record Details Modal */}
+        {/* Employee Attendance Details Modal - Clean, Spacious & Uncluttered */}
         {viewingRecord && (
-          <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-white rounded-md max-w-md w-full p-5 space-y-3 shadow-xl border border-slate-300">
-              <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <Banknote className="size-4 text-blue-600" />
-                  <span>Salary Record Details</span>
-                </h3>
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 md:p-6">
+            <div className="bg-white rounded-lg max-w-5xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-300 overflow-hidden font-sans">
+              {/* Clean Modal Header */}
+              <div className="bg-slate-900 text-white p-4 flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="size-10 rounded-md bg-blue-600 text-white grid place-items-center font-bold shrink-0">
+                    <Calendar className="size-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+                      <span>Employee Attendance Log — {selectedMonth} {selectedYear}</span>
+                    </h3>
+                    <p className="text-xs text-slate-300 font-medium">
+                      {viewingRecord.name} • Emp ID: <span className="font-mono font-bold text-emerald-400">{viewingRecord.empId}</span> {viewingRecord.empIdOff ? `(Off: ${viewingRecord.empIdOff})` : ""} • {viewingRecord.designation} ({viewingRecord.department})
+                    </p>
+                  </div>
+                </div>
                 <button
                   onClick={() => setViewingRecord(null)}
-                  className="text-slate-400 hover:text-slate-600 text-xs font-bold"
+                  className="size-8 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white grid place-items-center text-sm font-bold transition cursor-pointer"
                 >
                   ✕
                 </button>
               </div>
 
-              <div className="space-y-2 text-xs text-slate-700">
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="font-bold text-slate-500">Employee Name:</span>
-                  <span className="font-bold text-slate-900">{viewingRecord.name}</span>
+              {/* Simple Horizontal Attendance Summary Bar */}
+              <div className="bg-slate-100 p-3 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2 shrink-0 text-xs font-semibold">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-md border border-emerald-300 font-bold">
+                    Present: 24 Days
+                  </span>
+                  <span className="px-3 py-1 bg-amber-100 text-amber-900 rounded-md border border-amber-300 font-bold">
+                    Late: 2 Days
+                  </span>
+                  <span className="px-3 py-1 bg-rose-100 text-rose-800 rounded-md border border-rose-300 font-bold">
+                    Absent: 0 Days
+                  </span>
+                  <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-md border border-blue-300 font-bold">
+                    Leave: 2 Days
+                  </span>
+                  <span className="px-3 py-1 bg-slate-200 text-slate-700 rounded-md border border-slate-300 font-bold">
+                    Weekend: 5 Days
+                  </span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="font-bold text-slate-500">System ID:</span>
-                  <span className="font-mono font-bold text-slate-900">{viewingRecord.empId}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="font-bold text-slate-500">Department:</span>
-                  <span>{viewingRecord.department}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="font-bold text-slate-500">Designation:</span>
-                  <span>{viewingRecord.designation}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="font-bold text-slate-500">Total Pay:</span>
-                  <span className="font-mono font-bold text-slate-900">৳{viewingRecord.totalPay.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="font-bold text-slate-500">Bank Pay:</span>
-                  <span className="font-mono text-emerald-700 font-bold">৳{viewingRecord.bankPay.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="font-bold text-slate-500">Cash Pay:</span>
-                  <span className="font-mono text-amber-700 font-bold">৳{viewingRecord.cashPay.toLocaleString()}</span>
+                <div className="font-mono text-slate-600 font-bold text-xs">
+                  Total Month Days: <span className="text-slate-900 font-extrabold">31 Days</span>
                 </div>
               </div>
 
-              <button
-                onClick={() => setViewingRecord(null)}
-                className="w-full py-2 bg-slate-900 text-white font-bold text-xs rounded-md hover:bg-slate-800 transition cursor-pointer"
-              >
-                Close View
-              </button>
+              {/* Spacious Scrollable Daily Attendance Table */}
+              <div className="flex-1 overflow-y-auto p-4">
+                <table className="w-full text-left text-xs border-collapse font-sans">
+                  <thead>
+                    <tr className="bg-slate-100 text-slate-700 font-bold border-b-2 border-slate-300 uppercase tracking-wider text-[11px] sticky top-0 shadow-2xs">
+                      <th className="py-2.5 px-3 border-r border-slate-200">Date</th>
+                      <th className="py-2.5 px-3 border-r border-slate-200">Day</th>
+                      <th className="py-2.5 px-3 border-r border-slate-200">In Time</th>
+                      <th className="py-2.5 px-3 border-r border-slate-200">Out Time</th>
+                      <th className="py-2.5 px-3 border-r border-slate-200">Shift</th>
+                      <th className="py-2.5 px-3 text-right border-r border-slate-200">Work Hours</th>
+                      <th className="py-2.5 px-3 text-right border-r border-slate-200">OT Hours</th>
+                      <th className="py-2.5 px-3 text-center border-r border-slate-200">Status</th>
+                      <th className="py-2.5 px-3">Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 font-medium">
+                    {[
+                      { date: "01/08/2026", day: "Saturday", in: "—", out: "—", shift: "General", work: "0.0", ot: "0.0", status: "Weekend", statusColor: "bg-slate-100 text-slate-600 border-slate-300", remarks: "Weekly Off" },
+                      { date: "02/08/2026", day: "Sunday", in: "09:00 AM", out: "06:15 PM", shift: "General", work: "8.25", ot: "0.25", status: "Present", statusColor: "bg-emerald-100 text-emerald-800 border-emerald-300", remarks: "On Time" },
+                      { date: "03/08/2026", day: "Monday", in: "09:14 AM", out: "06:30 PM", shift: "General", work: "8.25", ot: "0.25", status: "Late", statusColor: "bg-amber-100 text-amber-900 border-amber-300", remarks: "Late by 14 mins" },
+                      { date: "04/08/2026", day: "Tuesday", in: "08:55 AM", out: "08:30 PM", shift: "General", work: "10.50", ot: "2.50", status: "Present", statusColor: "bg-emerald-100 text-emerald-800 border-emerald-300", remarks: "2.5 hrs Overtime" },
+                      { date: "05/08/2026", day: "Wednesday", in: "—", out: "—", shift: "General", work: "0.0", ot: "0.0", status: "Casual Leave", statusColor: "bg-blue-100 text-blue-800 border-blue-300", remarks: "Leave Approved" },
+                      { date: "06/08/2026", day: "Thursday", in: "09:02 AM", out: "06:05 PM", shift: "General", work: "8.0", ot: "0.0", status: "Present", statusColor: "bg-emerald-100 text-emerald-800 border-emerald-300", remarks: "On Time" },
+                      { date: "07/08/2026", day: "Friday", in: "—", out: "—", shift: "General", work: "0.0", ot: "0.0", status: "Weekend", statusColor: "bg-slate-100 text-slate-600 border-slate-300", remarks: "Weekly Off" },
+                      { date: "08/08/2026", day: "Saturday", in: "—", out: "—", shift: "General", work: "0.0", ot: "0.0", status: "Weekend", statusColor: "bg-slate-100 text-slate-600 border-slate-300", remarks: "Weekly Off" },
+                      { date: "09/08/2026", day: "Sunday", in: "08:59 AM", out: "06:10 PM", shift: "General", work: "8.15", ot: "0.15", status: "Present", statusColor: "bg-emerald-100 text-emerald-800 border-emerald-300", remarks: "On Time" },
+                      { date: "10/08/2026", day: "Monday", in: "09:00 AM", out: "07:00 PM", shift: "General", work: "9.00", ot: "1.00", status: "Present", statusColor: "bg-emerald-100 text-emerald-800 border-emerald-300", remarks: "1.0 hr Overtime" },
+                      { date: "11/08/2026", day: "Tuesday", in: "09:10 AM", out: "06:00 PM", shift: "General", work: "7.83", ot: "0.0", status: "Late", statusColor: "bg-amber-100 text-amber-900 border-amber-300", remarks: "Late by 10 mins" },
+                      { date: "12/08/2026", day: "Wednesday", in: "08:56 AM", out: "06:15 PM", shift: "General", work: "8.30", ot: "0.30", status: "Present", statusColor: "bg-emerald-100 text-emerald-800 border-emerald-300", remarks: "On Time" },
+                      { date: "13/08/2026", day: "Thursday", in: "09:01 AM", out: "06:00 PM", shift: "General", work: "8.0", ot: "0.0", status: "Present", statusColor: "bg-emerald-100 text-emerald-800 border-emerald-300", remarks: "On Time" },
+                      { date: "14/08/2026", day: "Friday", in: "—", out: "—", shift: "General", work: "0.0", ot: "0.0", status: "Weekend", statusColor: "bg-slate-100 text-slate-600 border-slate-300", remarks: "Weekly Off" },
+                      { date: "15/08/2026", day: "Saturday", in: "—", out: "—", shift: "General", work: "0.0", ot: "0.0", status: "Holiday", statusColor: "bg-purple-100 text-purple-800 border-purple-300", remarks: "National Mourning Day" },
+                      { date: "16/08/2026", day: "Sunday", in: "08:58 AM", out: "06:20 PM", shift: "General", work: "8.35", ot: "0.35", status: "Present", statusColor: "bg-emerald-100 text-emerald-800 border-emerald-300", remarks: "On Time" },
+                      { date: "17/08/2026", day: "Monday", in: "09:00 AM", out: "06:05 PM", shift: "General", work: "8.08", ot: "0.08", status: "Present", statusColor: "bg-emerald-100 text-emerald-800 border-emerald-300", remarks: "On Time" },
+                      { date: "18/08/2026", day: "Tuesday", in: "09:03 AM", out: "06:00 PM", shift: "General", work: "8.0", ot: "0.0", status: "Present", statusColor: "bg-emerald-100 text-emerald-800 border-emerald-300", remarks: "On Time" },
+                      { date: "19/08/2026", day: "Wednesday", in: "—", out: "—", shift: "General", work: "0.0", ot: "0.0", status: "Sick Leave", statusColor: "bg-blue-100 text-blue-800 border-blue-300", remarks: "Medical Leave Approved" },
+                      { date: "20/08/2026", day: "Thursday", in: "08:57 AM", out: "06:30 PM", shift: "General", work: "8.55", ot: "0.55", status: "Present", statusColor: "bg-emerald-100 text-emerald-800 border-emerald-300", remarks: "On Time" },
+                      { date: "21/08/2026", day: "Friday", in: "—", out: "—", shift: "General", work: "0.0", ot: "0.0", status: "Weekend", statusColor: "bg-slate-100 text-slate-600 border-slate-300", remarks: "Weekly Off" },
+                      { date: "22/08/2026", day: "Saturday", in: "—", out: "—", shift: "General", work: "0.0", ot: "0.0", status: "Weekend", statusColor: "bg-slate-100 text-slate-600 border-slate-300", remarks: "Weekly Off" },
+                      { date: "23/08/2026", day: "Sunday", in: "09:00 AM", out: "06:15 PM", shift: "General", work: "8.25", ot: "0.25", status: "Present", statusColor: "bg-emerald-100 text-emerald-800 border-emerald-300", remarks: "On Time" },
+                      { date: "24/08/2026", day: "Monday", in: "08:52 AM", out: "07:30 PM", shift: "General", work: "9.63", ot: "1.50", status: "Present", statusColor: "bg-emerald-100 text-emerald-800 border-emerald-300", remarks: "1.5 hrs Overtime" },
+                      { date: "25/08/2026", day: "Tuesday", in: "08:58 AM", out: "06:00 PM", shift: "General", work: "8.0", ot: "0.0", status: "Present", statusColor: "bg-emerald-100 text-emerald-800 border-emerald-300", remarks: "On Time" },
+                      { date: "26/08/2026", day: "Wednesday", in: "09:00 AM", out: "06:10 PM", shift: "General", work: "8.16", ot: "0.16", status: "Present", statusColor: "bg-emerald-100 text-emerald-800 border-emerald-300", remarks: "On Time" },
+                      { date: "27/08/2026", day: "Thursday", in: "08:55 AM", out: "06:00 PM", shift: "General", work: "8.0", ot: "0.0", status: "Present", statusColor: "bg-emerald-100 text-emerald-800 border-emerald-300", remarks: "On Time" },
+                      { date: "28/08/2026", day: "Friday", in: "—", out: "—", shift: "General", work: "0.0", ot: "0.0", status: "Weekend", statusColor: "bg-slate-100 text-slate-600 border-slate-300", remarks: "Weekly Off" },
+                      { date: "29/08/2026", day: "Saturday", in: "—", out: "—", shift: "General", work: "0.0", ot: "0.0", status: "Weekend", statusColor: "bg-slate-100 text-slate-600 border-slate-300", remarks: "Weekly Off" },
+                      { date: "30/08/2026", day: "Sunday", in: "08:59 AM", out: "06:15 PM", shift: "General", work: "8.25", ot: "0.25", status: "Present", statusColor: "bg-emerald-100 text-emerald-800 border-emerald-300", remarks: "On Time" },
+                      { date: "31/08/2026", day: "Monday", in: "09:00 AM", out: "06:00 PM", shift: "General", work: "8.0", ot: "0.0", status: "Present", statusColor: "bg-emerald-100 text-emerald-800 border-emerald-300", remarks: "On Time" },
+                    ].map((row, idx) => (
+                      <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                        <td className="py-2 px-3 font-mono font-bold text-slate-800 border-r border-slate-200">
+                          {row.date}
+                        </td>
+                        <td className="py-2 px-3 font-medium text-slate-600 border-r border-slate-200">
+                          {row.day}
+                        </td>
+                        <td className="py-2 px-3 font-mono font-bold text-emerald-700 border-r border-slate-200">
+                          {row.in}
+                        </td>
+                        <td className="py-2 px-3 font-mono font-bold text-slate-700 border-r border-slate-200">
+                          {row.out}
+                        </td>
+                        <td className="py-2 px-3 text-slate-600 border-r border-slate-200">
+                          {row.shift}
+                        </td>
+                        <td className="py-2 px-3 text-right font-mono font-bold text-slate-800 border-r border-slate-200">
+                          {row.work} hrs
+                        </td>
+                        <td className="py-2 px-3 text-right font-mono font-bold text-blue-700 border-r border-slate-200">
+                          {row.ot} hrs
+                        </td>
+                        <td className="py-2 px-3 text-center border-r border-slate-200">
+                          <span className={`px-2 py-0.5 rounded-xs text-[10.5px] font-extrabold border ${row.statusColor}`}>
+                            {row.status}
+                          </span>
+                        </td>
+                        <td className="py-2 px-3 text-slate-500 font-medium">
+                          {row.remarks}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Clean Footer Bar */}
+              <div className="bg-slate-100 p-3 border-t border-slate-200 flex items-center justify-between shrink-0">
+                <span className="text-xs text-slate-500 font-medium">
+                  Showing complete daily punch log for <strong className="text-slate-900">{viewingRecord.name}</strong> ({selectedMonth} {selectedYear})
+                </span>
+                <button
+                  onClick={() => setViewingRecord(null)}
+                  className="px-6 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-md shadow-xs transition cursor-pointer"
+                >
+                  Close Attendance View
+                </button>
+              </div>
             </div>
           </div>
         )}

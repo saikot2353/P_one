@@ -21,12 +21,12 @@ function ChangesPage() {
   const [records, setRecords] = useState<ChangeRecord[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("system_changes_v349");
+    const saved = localStorage.getItem("system_changes_v351");
     if (saved) {
       setRecords(JSON.parse(saved));
     } else {
       setRecords(DEFAULT_CHANGE_RECORDS);
-      localStorage.setItem("system_changes_v349", JSON.stringify(DEFAULT_CHANGE_RECORDS));
+      localStorage.setItem("system_changes_v351", JSON.stringify(DEFAULT_CHANGE_RECORDS));
     }
   }, []);
 
