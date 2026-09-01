@@ -2,6 +2,33 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "349",
+    date: new Date().toISOString().slice(0, 16),
+    type: "Filter & Export Update",
+    module: "Payroll",
+    link: "/payroll-salary-submit",
+    descriptionEn: "Added Status filter ('ALL', 'Submitted Only', 'Not Submitted (Draft)') to Salary Submit page (/payroll-salary-submit) along with dynamic CSV file export functionality for filtered salary records.",
+    descriptionBn: "Salary Submit (/payroll-salary-submit) পেজে 'Status' ফিল্টার ('ALL', 'Submitted Only', 'Not Submitted (Draft)') এবং ফিল্টারকৃত ডাটা সরাসরি CSV ফরমেটে ফাইল এক্সপোর্ট বা ডাউনলোড করার ফিচার যুক্ত করা হয়েছে।",
+  },
+  {
+    id: "348",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Refinement",
+    module: "Payroll",
+    link: "/payroll-salary-submit",
+    descriptionEn: "Refined Salary Submit page (/payroll-salary-submit) to use clean, high-density enterprise grid borders, compact form controls, and crisp non-rounded table cards for an executive HR layout.",
+    descriptionBn: "Salary Submit (/payroll-salary-submit) পেজের গোল ও অতিরিক্ত রাউন্ডেড ডিজাইন পরিবর্তন করে উচ্চ-ঘনত্বের এন্টারপ্রাইজ বর্ডার, নিখুঁত টেবিল গ্রিড এবং সার্প প্রফেশনাল কন্ট্রোল দিয়ে নতুনভাবে সাজানো হয়েছে।",
+  },
+  {
+    id: "347",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Sub-Menu",
+    module: "Payroll",
+    link: "/payroll-salary-submit",
+    descriptionEn: "Added 'Salary Submit' sub-menu under Payroll -> Salary Process (/payroll-salary-submit) featuring monthly salary data loading (Year, Month, Employee Type, Department filters), employee feedback & review comments, and bulk salary submission & export functionality.",
+    descriptionBn: "Payroll -> Salary Process মেনুর অধীনে 'Salary Submit' (/payroll-salary-submit) সাব-মেনু যুক্ত করা হয়েছে; এতে ফিল্টার সিলেক্ট করে ডাটা লোড করা, এমপ্লয়ি ফিডব্যাক ও রিভিউ কমেন্ট সম্পাদন, এবং সিলেক্ট করে একসাথে স্যালারি সাবমিট করার সুবিধা অন্তর্ভুক্ত করা হয়েছে।",
+  },
+  {
     id: "346",
     date: new Date().toISOString().slice(0, 16),
     type: "UI Redesign",

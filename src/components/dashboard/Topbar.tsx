@@ -323,6 +323,12 @@ const searchableMenus: SearchMenuLink[] = [
     description: "Track all pending requisitions and see who each approval is currently pending to",
   },
   {
+    label: "Salary Submit",
+    parent: "Payroll",
+    to: "/payroll-salary-submit",
+    description: "Monthly salary submission and review register",
+  },
+  {
     label: "Payroll Period Lock & Approval",
     parent: "Payroll",
     to: "/payroll-period-lock",

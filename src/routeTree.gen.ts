@@ -96,6 +96,7 @@ import { Route as PermissionManagementRouteImport } from './routes/permission-ma
 import { Route as PendingManualAttendanceRouteImport } from './routes/pending-manual-attendance'
 import { Route as PendingApprovalsRouteImport } from './routes/pending-approvals'
 import { Route as PayslipPrintRouteImport } from './routes/payslip-print'
+import { Route as PayrollSalarySubmitRouteImport } from './routes/payroll-salary-submit'
 import { Route as PayrollReportsRouteImport } from './routes/payroll-reports'
 import { Route as PayrollPeriodLockRouteImport } from './routes/payroll-period-lock'
 import { Route as PayrollLoanRouteImport } from './routes/payroll-loan'
@@ -706,6 +707,11 @@ const PendingApprovalsRoute = PendingApprovalsRouteImport.update({
 const PayslipPrintRoute = PayslipPrintRouteImport.update({
   id: '/payslip-print',
   path: '/payslip-print',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayrollSalarySubmitRoute = PayrollSalarySubmitRouteImport.update({
+  id: '/payroll-salary-submit',
+  path: '/payroll-salary-submit',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PayrollReportsRoute = PayrollReportsRouteImport.update({
@@ -1527,6 +1533,7 @@ export interface FileRoutesByFullPath {
   '/payroll-loan': typeof PayrollLoanRoute
   '/payroll-period-lock': typeof PayrollPeriodLockRoute
   '/payroll-reports': typeof PayrollReportsRoute
+  '/payroll-salary-submit': typeof PayrollSalarySubmitRoute
   '/payslip-print': typeof PayslipPrintRoute
   '/pending-approvals': typeof PendingApprovalsRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
@@ -1750,6 +1757,7 @@ export interface FileRoutesByTo {
   '/payroll-loan': typeof PayrollLoanRoute
   '/payroll-period-lock': typeof PayrollPeriodLockRoute
   '/payroll-reports': typeof PayrollReportsRoute
+  '/payroll-salary-submit': typeof PayrollSalarySubmitRoute
   '/payslip-print': typeof PayslipPrintRoute
   '/pending-approvals': typeof PendingApprovalsRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
@@ -1974,6 +1982,7 @@ export interface FileRoutesById {
   '/payroll-loan': typeof PayrollLoanRoute
   '/payroll-period-lock': typeof PayrollPeriodLockRoute
   '/payroll-reports': typeof PayrollReportsRoute
+  '/payroll-salary-submit': typeof PayrollSalarySubmitRoute
   '/payslip-print': typeof PayslipPrintRoute
   '/pending-approvals': typeof PendingApprovalsRoute
   '/pending-manual-attendance': typeof PendingManualAttendanceRoute
@@ -2199,6 +2208,7 @@ export interface FileRouteTypes {
     | '/payroll-loan'
     | '/payroll-period-lock'
     | '/payroll-reports'
+    | '/payroll-salary-submit'
     | '/payslip-print'
     | '/pending-approvals'
     | '/pending-manual-attendance'
@@ -2422,6 +2432,7 @@ export interface FileRouteTypes {
     | '/payroll-loan'
     | '/payroll-period-lock'
     | '/payroll-reports'
+    | '/payroll-salary-submit'
     | '/payslip-print'
     | '/pending-approvals'
     | '/pending-manual-attendance'
@@ -2645,6 +2656,7 @@ export interface FileRouteTypes {
     | '/payroll-loan'
     | '/payroll-period-lock'
     | '/payroll-reports'
+    | '/payroll-salary-submit'
     | '/payslip-print'
     | '/pending-approvals'
     | '/pending-manual-attendance'
@@ -2869,6 +2881,7 @@ export interface RootRouteChildren {
   PayrollLoanRoute: typeof PayrollLoanRoute
   PayrollPeriodLockRoute: typeof PayrollPeriodLockRoute
   PayrollReportsRoute: typeof PayrollReportsRoute
+  PayrollSalarySubmitRoute: typeof PayrollSalarySubmitRoute
   PayslipPrintRoute: typeof PayslipPrintRoute
   PendingApprovalsRoute: typeof PendingApprovalsRoute
   PendingManualAttendanceRoute: typeof PendingManualAttendanceRoute
@@ -3571,6 +3584,13 @@ declare module '@tanstack/react-router' {
       path: '/payslip-print'
       fullPath: '/payslip-print'
       preLoaderRoute: typeof PayslipPrintRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payroll-salary-submit': {
+      id: '/payroll-salary-submit'
+      path: '/payroll-salary-submit'
+      fullPath: '/payroll-salary-submit'
+      preLoaderRoute: typeof PayrollSalarySubmitRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/payroll-reports': {
@@ -4646,6 +4666,7 @@ const rootRouteChildren: RootRouteChildren = {
   PayrollLoanRoute: PayrollLoanRoute,
   PayrollPeriodLockRoute: PayrollPeriodLockRoute,
   PayrollReportsRoute: PayrollReportsRoute,
+  PayrollSalarySubmitRoute: PayrollSalarySubmitRoute,
   PayslipPrintRoute: PayslipPrintRoute,
   PendingApprovalsRoute: PendingApprovalsRoute,
   PendingManualAttendanceRoute: PendingManualAttendanceRoute,
