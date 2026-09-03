@@ -14,7 +14,7 @@ import {
   FileText,
   Send,
   Layers,
-  ShieldCheck,
+  HandCoins,
 } from "lucide-react";
 
 export const Route = createFileRoute("/ssp-new-requisition")({
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/ssp-new-requisition")({
       {
         name: "description",
         content:
-          "Submit and monitor leave requests, ICT requisitions, SIM allocations, and conveyance expense claims.",
+          "Submit and monitor leave requests, ICT requisitions, IOU slips, SIM allocations, and conveyance claims.",
       },
     ],
   }),
@@ -33,6 +33,17 @@ export const Route = createFileRoute("/ssp-new-requisition")({
 
 function NewRequisitionPage() {
   const categories = [
+    {
+      title: "IOU Requisition",
+      icon: HandCoins,
+      desc: "Request temporary cash advances with IOU slips and track multi-level adjustment approvals.",
+      to: "/ssp-iou-requisition",
+      color: "from-amber-500/10 via-amber-500/5 to-transparent hover:border-amber-500/40",
+      iconColor: "text-amber-500",
+      iconBg: "bg-amber-500/10 border-amber-500/20",
+      badge: "Active",
+      badgeColor: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+    },
     {
       title: "Leave Application",
       icon: CalendarClock,
@@ -71,11 +82,11 @@ function NewRequisitionPage() {
       icon: Smartphone,
       desc: "Request corporate mobile SIM allocation, cellular package updates, or limits.",
       to: "#",
-      color: "from-amber-500/10 via-amber-500/5 to-transparent hover:border-amber-500/40",
-      iconColor: "text-amber-500",
-      iconBg: "bg-amber-500/10 border-amber-500/20",
+      color: "from-slate-500/10 via-slate-500/5 to-transparent hover:border-slate-500/40",
+      iconColor: "text-slate-500",
+      iconBg: "bg-slate-500/10 border-slate-500/20",
       badge: "Available",
-      badgeColor: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+      badgeColor: "bg-slate-500/10 text-slate-500 border-slate-500/20",
     },
     {
       title: "Lunch and Conveyance",

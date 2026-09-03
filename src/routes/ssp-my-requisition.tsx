@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { SearchableSelect } from "@/components/ui/searchable-select";
@@ -19,6 +19,7 @@ import {
 import { LeaveApplicationModal } from "@/components/ssp/LeaveApplicationModal";
 import { GeneralStoreRequisitionModal } from "@/components/ssp/GeneralStoreRequisitionModal";
 import { GroupLeaveApplicationModal } from "@/components/ssp/GroupLeaveApplicationModal";
+import { IOURequisitionModal } from "@/components/ssp/IOURequisitionModal";
 
 export const Route = createFileRoute("/ssp-my-requisition")({
   component: MyRequisitionPage,
@@ -37,9 +38,11 @@ interface RequisitionRow {
 }
 
 function MyRequisitionPage() {
+  const navigate = useNavigate();
   const [leaveModalOpen, setLeaveModalOpen] = useState(false);
   const [storeModalOpen, setStoreModalOpen] = useState(false);
   const [groupLeaveModalOpen, setGroupLeaveModalOpen] = useState(false);
+  const [iouModalOpen, setIouModalOpen] = useState(false);
 
   // States
   const [requester, setRequester] = useState("Tahmid Afsar");
@@ -52,6 +55,24 @@ function MyRequisitionPage() {
   const requesterOptions = [{ value: "Tahmid Afsar", label: "Tahmid Afsar (Assistant Manager)" }];
 
   const tableData: RequisitionRow[] = [
+    {
+      id: "MRN/2026/00035",
+      reqNum: "MRN/2026/00035",
+      date: "2026-08-25",
+      status: "Approved",
+      doc: "IOU Requisition — Salary Advance",
+      note: "Family Issue (Advance BDT 5,000.00)",
+      onClickView: () => navigate({ to: "/ssp-iou-requisition-view" }),
+    },
+    {
+      id: "MRN/2026/00042",
+      reqNum: "MRN/2026/00042",
+      date: "2026-08-28",
+      status: "Pending",
+      doc: "IOU Requisition — Conveyance",
+      note: "Official Visit to Narsingdi Plant (BDT 3,500.00)",
+      onClickView: () => navigate({ to: "/ssp-iou-requisition-view" }),
+    },
     {
       id: "378956",
       reqNum: "378956",
@@ -391,6 +412,7 @@ function MyRequisitionPage() {
       <LeaveApplicationModal open={leaveModalOpen} onOpenChange={setLeaveModalOpen} />
       <GeneralStoreRequisitionModal open={storeModalOpen} onOpenChange={setStoreModalOpen} />
       <GroupLeaveApplicationModal open={groupLeaveModalOpen} onOpenChange={setGroupLeaveModalOpen} />
+      <IOURequisitionModal isOpen={iouModalOpen} onClose={() => setIouModalOpen(false)} />
     </div>
   );
 }

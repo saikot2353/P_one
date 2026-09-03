@@ -19,6 +19,8 @@ import { Route as SspNewRequisitionRouteImport } from './routes/ssp-new-requisit
 import { Route as SspMyRequisitionRouteImport } from './routes/ssp-my-requisition'
 import { Route as SspMyAttendanceRouteImport } from './routes/ssp-my-attendance'
 import { Route as SspLeaveRequisitionRouteImport } from './routes/ssp-leave-requisition'
+import { Route as SspIouRequisitionViewRouteImport } from './routes/ssp-iou-requisition-view'
+import { Route as SspIouRequisitionRouteImport } from './routes/ssp-iou-requisition'
 import { Route as SspIctRequisitionRouteImport } from './routes/ssp-ict-requisition'
 import { Route as SspAttendanceRouteImport } from './routes/ssp-attendance'
 import { Route as SspApproveManualAttendanceRouteImport } from './routes/ssp-approve-manual-attendance'
@@ -293,6 +295,16 @@ const SspMyAttendanceRoute = SspMyAttendanceRouteImport.update({
 const SspLeaveRequisitionRoute = SspLeaveRequisitionRouteImport.update({
   id: '/ssp-leave-requisition',
   path: '/ssp-leave-requisition',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SspIouRequisitionViewRoute = SspIouRequisitionViewRouteImport.update({
+  id: '/ssp-iou-requisition-view',
+  path: '/ssp-iou-requisition-view',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SspIouRequisitionRoute = SspIouRequisitionRouteImport.update({
+  id: '/ssp-iou-requisition',
+  path: '/ssp-iou-requisition',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SspIctRequisitionRoute = SspIctRequisitionRouteImport.update({
@@ -1693,6 +1705,8 @@ export interface FileRoutesByFullPath {
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
   '/ssp-attendance': typeof SspAttendanceRoute
   '/ssp-ict-requisition': typeof SspIctRequisitionRoute
+  '/ssp-iou-requisition': typeof SspIouRequisitionRoute
+  '/ssp-iou-requisition-view': typeof SspIouRequisitionViewRoute
   '/ssp-leave-requisition': typeof SspLeaveRequisitionRoute
   '/ssp-my-attendance': typeof SspMyAttendanceRoute
   '/ssp-my-requisition': typeof SspMyRequisitionRoute
@@ -1928,6 +1942,8 @@ export interface FileRoutesByTo {
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
   '/ssp-attendance': typeof SspAttendanceRoute
   '/ssp-ict-requisition': typeof SspIctRequisitionRoute
+  '/ssp-iou-requisition': typeof SspIouRequisitionRoute
+  '/ssp-iou-requisition-view': typeof SspIouRequisitionViewRoute
   '/ssp-leave-requisition': typeof SspLeaveRequisitionRoute
   '/ssp-my-attendance': typeof SspMyAttendanceRoute
   '/ssp-my-requisition': typeof SspMyRequisitionRoute
@@ -2164,6 +2180,8 @@ export interface FileRoutesById {
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
   '/ssp-attendance': typeof SspAttendanceRoute
   '/ssp-ict-requisition': typeof SspIctRequisitionRoute
+  '/ssp-iou-requisition': typeof SspIouRequisitionRoute
+  '/ssp-iou-requisition-view': typeof SspIouRequisitionViewRoute
   '/ssp-leave-requisition': typeof SspLeaveRequisitionRoute
   '/ssp-my-attendance': typeof SspMyAttendanceRoute
   '/ssp-my-requisition': typeof SspMyRequisitionRoute
@@ -2401,6 +2419,8 @@ export interface FileRouteTypes {
     | '/ssp-approve-manual-attendance'
     | '/ssp-attendance'
     | '/ssp-ict-requisition'
+    | '/ssp-iou-requisition'
+    | '/ssp-iou-requisition-view'
     | '/ssp-leave-requisition'
     | '/ssp-my-attendance'
     | '/ssp-my-requisition'
@@ -2636,6 +2656,8 @@ export interface FileRouteTypes {
     | '/ssp-approve-manual-attendance'
     | '/ssp-attendance'
     | '/ssp-ict-requisition'
+    | '/ssp-iou-requisition'
+    | '/ssp-iou-requisition-view'
     | '/ssp-leave-requisition'
     | '/ssp-my-attendance'
     | '/ssp-my-requisition'
@@ -2871,6 +2893,8 @@ export interface FileRouteTypes {
     | '/ssp-approve-manual-attendance'
     | '/ssp-attendance'
     | '/ssp-ict-requisition'
+    | '/ssp-iou-requisition'
+    | '/ssp-iou-requisition-view'
     | '/ssp-leave-requisition'
     | '/ssp-my-attendance'
     | '/ssp-my-requisition'
@@ -3107,6 +3131,8 @@ export interface RootRouteChildren {
   SspApproveManualAttendanceRoute: typeof SspApproveManualAttendanceRoute
   SspAttendanceRoute: typeof SspAttendanceRoute
   SspIctRequisitionRoute: typeof SspIctRequisitionRoute
+  SspIouRequisitionRoute: typeof SspIouRequisitionRoute
+  SspIouRequisitionViewRoute: typeof SspIouRequisitionViewRoute
   SspLeaveRequisitionRoute: typeof SspLeaveRequisitionRoute
   SspMyAttendanceRoute: typeof SspMyAttendanceRoute
   SspMyRequisitionRoute: typeof SspMyRequisitionRoute
@@ -3193,6 +3219,20 @@ declare module '@tanstack/react-router' {
       path: '/ssp-leave-requisition'
       fullPath: '/ssp-leave-requisition'
       preLoaderRoute: typeof SspLeaveRequisitionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ssp-iou-requisition-view': {
+      id: '/ssp-iou-requisition-view'
+      path: '/ssp-iou-requisition-view'
+      fullPath: '/ssp-iou-requisition-view'
+      preLoaderRoute: typeof SspIouRequisitionViewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ssp-iou-requisition': {
+      id: '/ssp-iou-requisition'
+      path: '/ssp-iou-requisition'
+      fullPath: '/ssp-iou-requisition'
+      preLoaderRoute: typeof SspIouRequisitionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ssp-ict-requisition': {
@@ -4983,6 +5023,8 @@ const rootRouteChildren: RootRouteChildren = {
   SspApproveManualAttendanceRoute: SspApproveManualAttendanceRoute,
   SspAttendanceRoute: SspAttendanceRoute,
   SspIctRequisitionRoute: SspIctRequisitionRoute,
+  SspIouRequisitionRoute: SspIouRequisitionRoute,
+  SspIouRequisitionViewRoute: SspIouRequisitionViewRoute,
   SspLeaveRequisitionRoute: SspLeaveRequisitionRoute,
   SspMyAttendanceRoute: SspMyAttendanceRoute,
   SspMyRequisitionRoute: SspMyRequisitionRoute,

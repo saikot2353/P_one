@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "358",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Self-Service (SSP)",
+    link: "/ssp-iou-requisition",
+    descriptionEn: "Built complete modern 'Cash & IOU Requisition Entry' module (/ssp-iou-requisition) matching Pakiza ERP schema (Requisition Master parameters, Requisition Details line items table, custom purpose modal, auto Taka in-words generator) with 'On Behalf Of' employee selection support.",
+    descriptionBn: "Pakiza ERP স্কিমা অনুযায়ী ক্যাশ ও IOU রিকুইজিশন এন্ট্রি মডিউল (/ssp-iou-requisition) সম্পূর্ণ আধুনিক ডিজাইনে তৈরি করা হয়েছে, যেখানে অন্যান্য সহকর্মীদের পক্ষে আবেদন করার জন্য 'On Behalf Of' অপশন যুক্ত করা হয়েছে।",
+  },
+  {
     id: "357",
     date: new Date().toISOString().slice(0, 16),
     type: "UI / UX",
