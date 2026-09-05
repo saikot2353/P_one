@@ -157,6 +157,7 @@ export const nav: NavItem[] = [
       { label: "ID Card Setup", to: "/id-card-setup" },
       { label: "Set HOD", to: "/set-hod" },
       { label: "Set Manager", to: "/set-manager" },
+      { label: "Lefty", to: "/disciplinary-lefty" },
     ],
   },
   {
@@ -326,10 +327,9 @@ export const nav: NavItem[] = [
     label: "Disciplinary Action",
     icon: ShieldAlert,
     subitems: [
-      { label: "Case Files", to: "/disciplinary-case-files" },
-      { label: "Warning Letters", to: "/disciplinary-warning-letters" },
       { label: "Show Cause Notices", to: "/disciplinary-showcause-notices" },
-      { label: "Lefty", to: "/disciplinary-lefty" },
+      { label: "Warning Letters", to: "/disciplinary-warning-letters" },
+      { label: "Case Files", to: "/disciplinary-case-files" },
     ],
   },
   {

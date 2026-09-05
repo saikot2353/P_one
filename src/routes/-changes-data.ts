@@ -2,6 +2,24 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "363",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Navigation",
+    module: "Personnel Info",
+    link: "/disciplinary-lefty",
+    descriptionEn: "Moved 'Lefty' menu item from Disciplinary Action to Personnel Info parent menu in both Sidebar and Topbar navigation.",
+    descriptionBn: "সাইডবার এবং টপবার নেভিগেশনে 'Lefty' মেনুটি Disciplinary Action থেকে সরিয়ে Personnel Info এর অধীনে স্থানান্তরিত করা হয়েছে।",
+  },
+  {
+    id: "362",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Navigation",
+    module: "Disciplinary Action",
+    link: "/disciplinary-showcause-notices",
+    descriptionEn: "Reordered Disciplinary Action sub-menu items to sequential workflow order: 1. Show Cause Notices, 2. Warning Letters, 3. Case Files, 4. Lefty.",
+    descriptionBn: "Disciplinary Action মেনুর সাব-আইটেমগুলো নতুন সিকোয়েন্সে সাজানো হয়েছে: ১. Show Cause Notices, ২. Warning Letters, ৩. Case Files, এবং ৪. Lefty।",
+  },
+  {
     id: "361",
     date: new Date().toISOString().slice(0, 16),
     type: "UI / UX",

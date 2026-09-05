@@ -89,6 +89,7 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Manpower Basic Form", parent: "Personnel Info", to: "/" },
   { label: "Manpower Basic List", parent: "Personnel Info", to: "/" },
   { label: "Personnel QR Scanner", parent: "Personnel Info", to: "/" },
+  { label: "Lefty Management", parent: "Personnel Info", to: "/disciplinary-lefty", description: "Manage unauthorized absence, progressive notices, and cash salary mode" },
   // Attendance
   {
     label: "Manual Attendance Entry",
@@ -303,10 +304,9 @@ const searchableMenus: SearchMenuLink[] = [
     description: "Sequential approval board workflow for pending Job Description Sheets",
   },
   // Disciplinary Action
-  { label: "Case Files", parent: "Disciplinary Action", to: "/disciplinary-case-files" },
-  { label: "Warning Letters", parent: "Disciplinary Action", to: "/disciplinary-warning-letters" },
   { label: "Show Cause Notices", parent: "Disciplinary Action", to: "/disciplinary-showcause-notices" },
-  { label: "Lefty Management", parent: "Disciplinary Action", to: "/disciplinary-lefty" },
+  { label: "Warning Letters", parent: "Disciplinary Action", to: "/disciplinary-warning-letters" },
+  { label: "Case Files", parent: "Disciplinary Action", to: "/disciplinary-case-files" },
   // Manage Overtime
   { label: "Overtime Requests", parent: "Manage Overtime", to: "/" },
   { label: "OT Calculations", parent: "Manage Overtime", to: "/" },
