@@ -75,6 +75,12 @@ const searchableMenus: SearchMenuLink[] = [
     description: "Design and generate dynamic employee ID cards",
   },
   {
+    label: "Employee Doc Issue",
+    parent: "Personnel Info",
+    to: "/employee-doc-issue",
+    description: "Inspect flagged document issues and re-upload revised files",
+  },
+  {
     label: "Set HOD",
     parent: "Personnel Info",
     to: "/set-hod",
@@ -1209,11 +1215,19 @@ export function Topbar() {
                     <span className="px-1.5 py-0.5 text-[9px] font-black bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400 rounded-full">{hrNotifications.length}</span>
                   )}
                 </div>
-                <Link
-                  to="/employee-doc-verification"
-                  onClick={() => setIsNotifOpen(false)}
-                  className="text-[10px] font-bold text-orange-600 dark:text-orange-400 hover:underline"
-                >View All →</Link>
+                <div className="flex items-center gap-2">
+                  <Link
+                    to="/employee-doc-issue"
+                    onClick={() => setIsNotifOpen(false)}
+                    className="text-[10px] font-bold text-orange-600 dark:text-orange-400 hover:underline"
+                  >Doc Issues →</Link>
+                  <span className="text-slate-300 dark:text-slate-700">·</span>
+                  <Link
+                    to="/employee-doc-verification"
+                    onClick={() => setIsNotifOpen(false)}
+                    className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline"
+                  >Verification →</Link>
+                </div>
               </div>
               {/* Notification list */}
               <div className="max-h-[360px] overflow-y-auto">

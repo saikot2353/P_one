@@ -201,6 +201,7 @@ import { Route as EnrollFingerprintRouteImport } from './routes/enroll-fingerpri
 import { Route as EmployeeTaxPayRouteImport } from './routes/employee-tax-pay'
 import { Route as EmployeeJobCardRouteImport } from './routes/employee-job-card'
 import { Route as EmployeeDocVerificationRouteImport } from './routes/employee-doc-verification'
+import { Route as EmployeeDocIssueRouteImport } from './routes/employee-doc-issue'
 import { Route as EarnLeaveWorkflowRouteImport } from './routes/earn-leave-workflow'
 import { Route as EarnLeaveSubmitRouteImport } from './routes/earn-leave-submit'
 import { Route as EarnLeaveProcessRouteImport } from './routes/earn-leave-process'
@@ -1265,6 +1266,11 @@ const EmployeeDocVerificationRoute = EmployeeDocVerificationRouteImport.update({
   path: '/employee-doc-verification',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmployeeDocIssueRoute = EmployeeDocIssueRouteImport.update({
+  id: '/employee-doc-issue',
+  path: '/employee-doc-issue',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EarnLeaveWorkflowRoute = EarnLeaveWorkflowRouteImport.update({
   id: '/earn-leave-workflow',
   path: '/earn-leave-workflow',
@@ -1532,6 +1538,7 @@ export interface FileRoutesByFullPath {
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
+  '/employee-doc-issue': typeof EmployeeDocIssueRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
   '/employee-tax-pay': typeof EmployeeTaxPayRoute
@@ -1770,6 +1777,7 @@ export interface FileRoutesByTo {
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
+  '/employee-doc-issue': typeof EmployeeDocIssueRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
   '/employee-tax-pay': typeof EmployeeTaxPayRoute
@@ -2009,6 +2017,7 @@ export interface FileRoutesById {
   '/earn-leave-process': typeof EarnLeaveProcessRoute
   '/earn-leave-submit': typeof EarnLeaveSubmitRoute
   '/earn-leave-workflow': typeof EarnLeaveWorkflowRoute
+  '/employee-doc-issue': typeof EmployeeDocIssueRoute
   '/employee-doc-verification': typeof EmployeeDocVerificationRoute
   '/employee-job-card': typeof EmployeeJobCardRoute
   '/employee-tax-pay': typeof EmployeeTaxPayRoute
@@ -2249,6 +2258,7 @@ export interface FileRouteTypes {
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
+    | '/employee-doc-issue'
     | '/employee-doc-verification'
     | '/employee-job-card'
     | '/employee-tax-pay'
@@ -2487,6 +2497,7 @@ export interface FileRouteTypes {
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
+    | '/employee-doc-issue'
     | '/employee-doc-verification'
     | '/employee-job-card'
     | '/employee-tax-pay'
@@ -2725,6 +2736,7 @@ export interface FileRouteTypes {
     | '/earn-leave-process'
     | '/earn-leave-submit'
     | '/earn-leave-workflow'
+    | '/employee-doc-issue'
     | '/employee-doc-verification'
     | '/employee-job-card'
     | '/employee-tax-pay'
@@ -2964,6 +2976,7 @@ export interface RootRouteChildren {
   EarnLeaveProcessRoute: typeof EarnLeaveProcessRoute
   EarnLeaveSubmitRoute: typeof EarnLeaveSubmitRoute
   EarnLeaveWorkflowRoute: typeof EarnLeaveWorkflowRoute
+  EmployeeDocIssueRoute: typeof EmployeeDocIssueRoute
   EmployeeDocVerificationRoute: typeof EmployeeDocVerificationRoute
   EmployeeJobCardRoute: typeof EmployeeJobCardRoute
   EmployeeTaxPayRoute: typeof EmployeeTaxPayRoute
@@ -4508,6 +4521,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmployeeDocVerificationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/employee-doc-issue': {
+      id: '/employee-doc-issue'
+      path: '/employee-doc-issue'
+      fullPath: '/employee-doc-issue'
+      preLoaderRoute: typeof EmployeeDocIssueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/earn-leave-workflow': {
       id: '/earn-leave-workflow'
       path: '/earn-leave-workflow'
@@ -4860,6 +4880,7 @@ const rootRouteChildren: RootRouteChildren = {
   EarnLeaveProcessRoute: EarnLeaveProcessRoute,
   EarnLeaveSubmitRoute: EarnLeaveSubmitRoute,
   EarnLeaveWorkflowRoute: EarnLeaveWorkflowRoute,
+  EmployeeDocIssueRoute: EmployeeDocIssueRoute,
   EmployeeDocVerificationRoute: EmployeeDocVerificationRoute,
   EmployeeJobCardRoute: EmployeeJobCardRoute,
   EmployeeTaxPayRoute: EmployeeTaxPayRoute,

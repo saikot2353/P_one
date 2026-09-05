@@ -58,6 +58,12 @@ const searchableMenus: SearchMenuLink[] = [
     description: "Design and generate dynamic employee ID cards",
   },
   {
+    label: "Employee Doc Issue",
+    parent: "Personnel Info",
+    to: "/employee-doc-issue",
+    description: "Inspect flagged document issues and re-upload revised files",
+  },
+  {
     label: "Set HOD",
     parent: "Personnel Info",
     to: "/set-hod",

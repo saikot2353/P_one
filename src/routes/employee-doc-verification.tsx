@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { toast } from "sonner";
@@ -8,41 +8,22 @@ import {
   Download, Printer, ChevronRight, CheckCircle2, FolderOpen,
   Info, XCircle, UserCheck, ScanEye, ArrowLeft, AlertCircle,
   Clock, CheckCheck, Users, Filter, Flag, RotateCcw, RefreshCw,
-  Building2, MapPin, ChevronDown,
+  Building2, MapPin, ChevronDown, ExternalLink,
 } from "lucide-react";
+import {
+  type VerificationEmployee,
+  type UploadedDocument,
+  type OCRFields,
+  type HRDocIssueNotification,
+  getVerificationEmployees,
+  saveVerificationEmployees,
+  updateDocumentStatus,
+  pushHRNotification,
+  getHRNotifications,
+  getDocIssueSummary,
+} from "@/lib/docVerificationStore";
 
-// ── HR Notification helpers ──────────────────────────────────────────────────
-export interface HRDocIssueNotification {
-  id: string;
-  employeeId: string;
-  employeeName: string;
-  employeeTitle: string;
-  docId: string;
-  docTitle: string;
-  issueDescription: string;
-  raisedAt: string; // ISO string
-  read: boolean;
-}
-
-const HR_NOTIF_KEY = "hr_doc_issue_notifications_v1";
-
-export function getHRNotifications(): HRDocIssueNotification[] {
-  try { return JSON.parse(localStorage.getItem(HR_NOTIF_KEY) || "[]"); }
-  catch { return []; }
-}
-
-function pushHRNotification(n: Omit<HRDocIssueNotification, "id" | "raisedAt" | "read">) {
-  const existing = getHRNotifications();
-  const next: HRDocIssueNotification = {
-    ...n,
-    id: `hr-notif-${Date.now()}`,
-    raisedAt: new Date().toISOString(),
-    read: false,
-  };
-  localStorage.setItem(HR_NOTIF_KEY, JSON.stringify([next, ...existing]));
-  // Dispatch a storage event so Topbar re-reads immediately (same-tab trick)
-  window.dispatchEvent(new Event("hr-notif-update"));
-}
+export { getHRNotifications, type HRDocIssueNotification };
 
 export const Route = createFileRoute("/employee-doc-verification")({
   head: () => ({
@@ -53,78 +34,6 @@ export const Route = createFileRoute("/employee-doc-verification")({
   }),
   component: EmployeeDocVerificationPage,
 });
-
-interface OCRFields { [key: string]: string; }
-interface UploadedDocument {
-  id: string; title: string; type: "PDF" | "IMAGE" | "DOCX";
-  file: string; size: string; uploadedAt: string;
-  status: "Pending" | "Verified" | "Flagged";
-  issueDescription?: string; // used when status === "Flagged"
-  ocrFields: OCRFields;
-}
-interface VerificationEmployee {
-  id: string; name: string; title: string; dept: string; joinDate: string;
-  email: string; phone: string; gender: string; dob: string; blood: string;
-  nid: string; fatherName: string; motherName: string; village: string;
-  empStatus: string; workingStatus: string;
-  company: string; area: string;
-  documents: UploadedDocument[];
-}
-
-const initialEmployees: VerificationEmployee[] = [
-  {
-    id: "2023043910", name: "Tahmid Afsar Shapno", title: "Asst. Manager", dept: "Business Innovation",
-    joinDate: "01/08/2023", email: "tahmid.bd@pakizasoftware.com", phone: "01750021154",
-    gender: "Male", dob: "12/07/1999", blood: "AB (+ve)", nid: "1999827394852",
-    fatherName: "Md. Afsar Ali", motherName: "Hamida Begum", village: "Bhola",
-    empStatus: "Permanent", workingStatus: "Working",
-    company: "Pakiza Software Ltd.", area: "Head Office",
-    documents: [
-      { id: "doc-101", title: "National ID (NID) Card", type: "IMAGE", file: "nid_card_shapno.png", size: "1.4 MB", uploadedAt: "2026-08-10 09:15 AM", status: "Pending", ocrFields: { "Document No": "1999827394852", Name: "Tahmid Afsar Shapno", DOB: "12/07/1999", "Father Name": "Md. Afsar Ali" } },
-      { id: "doc-102", title: "Academic Transcript (B.Sc in CSE)", type: "PDF", file: "bsc_transcript_shapno.pdf", size: "3.2 MB", uploadedAt: "2026-08-10 09:18 AM", status: "Verified", ocrFields: { Degree: "Bachelor of Science", Institute: "IIT University of Dhaka", "GPA / CGPA": "3.85", "Passing Year": "2022" } },
-      { id: "doc-103", title: "Nominee ID Card", type: "IMAGE", file: "nominee_nid_shapno.png", size: "1.1 MB", uploadedAt: "2026-08-10 09:20 AM", status: "Pending", ocrFields: { "Document No": "1990123456789", Name: "Anisur Rahman", Relationship: "Father" } },
-      { id: "doc-104", title: "Police Clearance Certificate", type: "PDF", file: "police_clearance_shapno.pdf", size: "2.1 MB", uploadedAt: "2026-08-12 02:30 PM", status: "Pending", ocrFields: { "Certificate No": "PC-2026-88123", "Issue Date": "05/08/2026", Result: "No Criminal Record" } },
-    ],
-  },
-  {
-    id: "20260481", name: "Fahim Faisal", title: "Software Engineer", dept: "Business Innovation",
-    joinDate: "15/05/2026", email: "fahim@pakizasoftware.com", phone: "01827394852",
-    gender: "Male", dob: "22/10/2001", blood: "O (+ve)", nid: "2001739284752",
-    fatherName: "Md. Faisal Ahmed", motherName: "Rokeya Begum", village: "Dhaka",
-    empStatus: "Probation", workingStatus: "Working",
-    company: "Pakiza Knit Ltd.", area: "Factory — Floor A",
-    documents: [
-      { id: "doc-201", title: "National ID (NID) Card", type: "IMAGE", file: "nid_card_fahim.png", size: "1.5 MB", uploadedAt: "2026-08-11 10:00 AM", status: "Verified", ocrFields: { "Document No": "2001739284752", Name: "Fahim Faisal", DOB: "22/10/2001" } },
-      { id: "doc-202", title: "Academic Transcript (B.Sc in CSE)", type: "PDF", file: "cse_transcript_fahim.pdf", size: "2.8 MB", uploadedAt: "2026-08-11 10:05 AM", status: "Flagged", issueDescription: "The bottom margin and seal of the controller of examinations are cropped. Please re-upload a clear, complete scan.", ocrFields: { Degree: "B.Sc in CSE", Institute: "BUET", "GPA / CGPA": "3.67" } },
-      { id: "doc-203", title: "Experience Release Letter", type: "PDF", file: "experience_release_fahim.pdf", size: "1.9 MB", uploadedAt: "2026-08-11 10:08 AM", status: "Pending", ocrFields: { Company: "Brain Station 23", Designation: "Junior Developer", Duration: "1 Year 6 Months" } },
-    ],
-  },
-  {
-    id: "20260273", name: "Nusrat Jahan", title: "HR Officer", dept: "Operations & HR",
-    joinDate: "01/06/2026", email: "nusrat@pakizasoftware.com", phone: "01928374650",
-    gender: "Female", dob: "05/04/1998", blood: "A (+ve)", nid: "1998374619283",
-    fatherName: "A. K. M. Jahangir", motherName: "Shamima Nasrin", village: "Comilla",
-    empStatus: "Probation", workingStatus: "Working",
-    company: "Pakiza Software Ltd.", area: "Head Office",
-    documents: [
-      { id: "doc-301", title: "National ID (NID) Card", type: "IMAGE", file: "nid_nusrat.jpg", size: "1.1 MB", uploadedAt: "2026-08-12 11:20 AM", status: "Verified", ocrFields: { "Document No": "1998374619283", Name: "Nusrat Jahan", DOB: "05/04/1998" } },
-      { id: "doc-302", title: "Nominee Passport Page", type: "IMAGE", file: "nominee_passport_nusrat.jpg", size: "1.3 MB", uploadedAt: "2026-08-12 11:22 AM", status: "Verified", ocrFields: { "Document No": "EG0837492", Name: "Shamima Nasrin", DOB: "18/02/1974" } },
-    ],
-  },
-  {
-    id: "2024091802", name: "Md. Anik Islam", title: "Business Analyst", dept: "Business Innovation",
-    joinDate: "01/06/2024", email: "anik@pakizasoftware.com", phone: "01711223344",
-    gender: "Male", dob: "14/09/1997", blood: "O (+ve)", nid: "1997382710394",
-    fatherName: "Md. Rafiqul Islam", motherName: "Salma Begum", village: "Rajshahi",
-    empStatus: "Permanent", workingStatus: "Working",
-    company: "Pakiza Knit Ltd.", area: "Factory — Floor B",
-    documents: [
-      { id: "doc-401", title: "National ID (NID) Card", type: "IMAGE", file: "nid_anik.png", size: "1.2 MB", uploadedAt: "2026-08-14 04:10 PM", status: "Pending", ocrFields: { "Document No": "1997382710394", Name: "Md. Anik Islam", DOB: "14/09/1997" } },
-      { id: "doc-402", title: "Academic Transcript (MBA)", type: "PDF", file: "mba_transcript_anik.pdf", size: "3.5 MB", uploadedAt: "2026-08-14 04:15 PM", status: "Pending", ocrFields: { Degree: "Master of Business Administration", Institute: "Dhaka University", "GPA / CGPA": "3.75" } },
-      { id: "doc-403", title: "Previous Experience Letter (Pathao)", type: "PDF", file: "experience_pathao_anik.pdf", size: "1.8 MB", uploadedAt: "2026-08-14 04:18 PM", status: "Pending", ocrFields: { Company: "Pathao Ltd", Designation: "Business Analyst", Duration: "2 Years" } },
-    ],
-  },
-];
 
 // ── Searchable Multi-Select Dropdown ─────────────────────────────────────────
 function MultiSelectDropdown({
@@ -253,15 +162,18 @@ function getInitials(name: string) {
 }
 function getOverallStatus(emp: VerificationEmployee) {
   if (emp.documents.some((d) => d.status === "Flagged")) return "issues" as const;
+  if (emp.documents.some((d) => d.status === "Re-uploaded")) return "reuploaded" as const;
   if (emp.documents.some((d) => d.status === "Pending")) return "pending" as const;
   return "verified" as const;
 }
 
-function StatusPill({ status }: { status: "Pending" | "Verified" | "Flagged" }) {
+function StatusPill({ status }: { status: "Pending" | "Verified" | "Flagged" | "Re-uploaded" }) {
   if (status === "Verified")
     return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/40 uppercase tracking-wide"><CheckCircle2 className="size-2.5" /> Verified</span>;
   if (status === "Flagged")
     return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-orange-50 text-orange-700 border border-orange-200 dark:bg-orange-950/20 dark:text-orange-400 dark:border-orange-900/40 uppercase tracking-wide"><Flag className="size-2.5" /> Issue Flagged</span>;
+  if (status === "Re-uploaded")
+    return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/40 uppercase tracking-wide"><RefreshCw className="size-2.5 text-blue-600 animate-spin" /> Re-uploaded</span>;
   return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/40 uppercase tracking-wide"><Clock className="size-2.5" /> Pending</span>;
 }
 
@@ -400,7 +312,7 @@ function DocScanPreview({ doc, emp }: { doc: UploadedDocument; emp: Verification
 }
 
 function EmployeeDocVerificationPage() {
-  const [employees, setEmployees] = useState<VerificationEmployee[]>(initialEmployees);
+  const [employees, setEmployees] = useState<VerificationEmployee[]>(() => getVerificationEmployees());
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [companyFilter, setCompanyFilter] = useState<string[]>([]);
@@ -409,6 +321,14 @@ function EmployeeDocVerificationPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewingDocId, setViewingDocId] = useState<string | null>(null);
   const [issueTarget, setIssueTarget] = useState<{ docId: string; docTitle: string } | null>(null);
+
+  useEffect(() => {
+    const handleStoreUpdate = () => {
+      setEmployees(getVerificationEmployees());
+    };
+    window.addEventListener("employee-doc-store-updated", handleStoreUpdate);
+    return () => window.removeEventListener("employee-doc-store-updated", handleStoreUpdate);
+  }, []);
 
   const allCompanies = useMemo(() => [...new Set(employees.map((e) => e.company))].sort(), [employees]);
   const allAreas = useMemo(() => [...new Set(employees.map((e) => e.area))].sort(), [employees]);
@@ -420,14 +340,15 @@ function EmployeeDocVerificationPage() {
   }, [activeEmployee, viewingDocId]);
 
   const globalStats = useMemo(() => {
-    let pending = 0, verified = 0, flagged = 0, total = 0;
+    let pending = 0, verified = 0, flagged = 0, reuploaded = 0, total = 0;
     employees.forEach((e) => e.documents.forEach((d) => {
       total++;
       if (d.status === "Pending") pending++;
       else if (d.status === "Flagged") flagged++;
+      else if (d.status === "Re-uploaded") { reuploaded++; pending++; }
       else verified++;
     }));
-    return { pending, verified, flagged, total };
+    return { pending, verified, flagged, reuploaded, total };
   }, [employees]);
 
   const filteredEmployees = useMemo(() => {
@@ -437,8 +358,9 @@ function EmployeeDocVerificationPage() {
       if (!matchText) return false;
       if (statusFilter !== "All") {
         const st = getOverallStatus(emp);
-        if (statusFilter === "Pending" && st !== "pending") return false;
+        if (statusFilter === "Pending" && st !== "pending" && st !== "reuploaded") return false;
         if (statusFilter === "Issues" && st !== "issues") return false;
+        if (statusFilter === "Reuploaded" && st !== "reuploaded") return false;
         if (statusFilter === "Verified" && st !== "verified") return false;
       }
       if (companyFilter.length > 0 && !companyFilter.includes(emp.company)) return false;
@@ -447,8 +369,9 @@ function EmployeeDocVerificationPage() {
     });
   }, [employees, searchQuery, statusFilter, companyFilter, areaFilter]);
 
-  const updateDocStatus = (empId: string, docId: string, status: "Verified" | "Flagged" | "Pending", issueDescription?: string) => {
-    setEmployees((prev) => prev.map((emp) => emp.id !== empId ? emp : { ...emp, documents: emp.documents.map((doc) => doc.id !== docId ? doc : { ...doc, status, issueDescription }) }));
+  const updateDocStatus = (empId: string, docId: string, status: "Verified" | "Flagged" | "Pending" | "Re-uploaded", issueDescription?: string) => {
+    updateDocumentStatus(empId, docId, status, issueDescription);
+    setEmployees(getVerificationEmployees());
   };
 
   const handleVerify = (docId: string, empId: string, docTitle: string) => {
@@ -458,7 +381,7 @@ function EmployeeDocVerificationPage() {
 
   const handleMarkAsIssueConfirm = (desc: string) => {
     if (!issueTarget || !activeEmployee) return;
-    updateDocStatus(activeEmployee.id, issueTarget.docId, "Flagged", desc);
+    updateDocumentStatus(activeEmployee.id, issueTarget.docId, "Flagged", desc);
     pushHRNotification({
       employeeId: activeEmployee.id,
       employeeName: activeEmployee.name,
@@ -467,22 +390,38 @@ function EmployeeDocVerificationPage() {
       docTitle: issueTarget.docTitle,
       issueDescription: desc,
     });
-    toast.warning(`Issue flagged for "${issueTarget.docTitle}" — HR has been notified!`, { icon: "🚩" });
+    setEmployees(getVerificationEmployees());
+    toast.warning(`Issue flagged for "${issueTarget.docTitle}" — Sent to Employee Doc Issue page!`, {
+      icon: "🚩",
+      description: "Document routed to Personnel Info > Employee Doc Issue for revised re-upload.",
+    });
     setIssueTarget(null);
   };
 
   const handleReVerify = (docId: string, empId: string, docTitle: string) => {
-    updateDocStatus(empId, docId, "Pending", undefined, undefined);
+    updateDocStatus(empId, docId, "Pending", undefined);
     toast.info(`"${docTitle}" reset to Pending for re-verification.`, { icon: "🔄" });
   };
 
   const handleVerifyAll = (empId: string) => {
+    const current = getVerificationEmployees();
     let count = 0;
-    setEmployees((prev) => prev.map((emp) => {
+    const next = current.map((emp) => {
       if (emp.id !== empId) return emp;
-      return { ...emp, documents: emp.documents.map((doc) => { if (doc.status === "Pending") { count++; return { ...doc, status: "Verified" as const, rejectionReason: undefined }; } return doc; }) };
-    }));
-    if (count > 0) toast.success(`${count} pending document${count > 1 ? "s" : ""} verified.`);
+      return {
+        ...emp,
+        documents: emp.documents.map((doc) => {
+          if (doc.status === "Pending" || doc.status === "Re-uploaded") {
+            count++;
+            return { ...doc, status: "Verified" as const, issueDescription: undefined };
+          }
+          return doc;
+        }),
+      };
+    });
+    saveVerificationEmployees(next);
+    setEmployees(next);
+    if (count > 0) toast.success(`${count} document${count > 1 ? "s" : ""} verified.`);
     else toast.info("No pending documents to verify.");
   };
 
@@ -492,11 +431,11 @@ function EmployeeDocVerificationPage() {
     const unverified = emp.documents.filter((d) => d.status !== "Verified");
     if (unverified.length > 0) {
       const p = unverified.filter((d) => d.status === "Pending").length;
-      const r = unverified.filter((d) => d.status === "Rejected").length;
+      const r = unverified.filter((d) => d.status === "Re-uploaded").length;
       const f = unverified.filter((d) => d.status === "Flagged").length;
       const parts: string[] = [];
       if (p > 0) parts.push(`${p} pending`);
-      if (r > 0) parts.push(`${r} rejected`);
+      if (r > 0) parts.push(`${r} re-uploaded`);
       if (f > 0) parts.push(`${f} flagged`);
       toast.error(`Cannot finalize: ${parts.join(" and ")} doc${p + r + f > 1 ? "s" : ""} remaining.`);
       return;
@@ -518,10 +457,24 @@ function EmployeeDocVerificationPage() {
           <div className="px-6 pt-6 pb-0 space-y-5">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <h1 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2.5">
-                  <div className="p-2 bg-blue-100 dark:bg-blue-950/40 rounded-xl"><ShieldCheck className="size-5 text-blue-600 dark:text-blue-400" /></div>
-                  Employee Doc Verification
-                </h1>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2.5">
+                    <div className="p-2 bg-blue-100 dark:bg-blue-950/40 rounded-xl"><ShieldCheck className="size-5 text-blue-600 dark:text-blue-400" /></div>
+                    Employee Doc Verification
+                  </h1>
+                  <Link
+                    to="/employee-doc-issue"
+                    className="h-8 inline-flex items-center gap-1.5 px-3 rounded-xl border border-orange-200 dark:border-orange-900/50 bg-orange-50 dark:bg-orange-950/20 text-orange-700 dark:text-orange-400 text-[11px] font-bold hover:bg-orange-100 dark:hover:bg-orange-950/40 transition-all shadow-xs"
+                  >
+                    <Flag className="size-3 text-orange-600 dark:text-orange-400" />
+                    <span>Employee Doc Issues</span>
+                    {globalStats.flagged > 0 && (
+                      <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-orange-200 dark:bg-orange-800 text-orange-800 dark:text-orange-100">
+                        {globalStats.flagged}
+                      </span>
+                    )}
+                  </Link>
+                </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 ml-11">Review, verify, or flag credential documents submitted by employees</p>
               </div>
               <div className="flex items-stretch gap-2.5 ml-11 md:ml-0">
@@ -750,6 +703,18 @@ function EmployeeDocVerificationPage() {
 
                                     {doc.status === "Flagged" && doc.issueDescription && (
                                       <p className="text-[9px] text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900/40 rounded-lg px-2 py-1 mt-1.5 font-medium leading-snug flex items-start gap-1"><Flag className="size-2.5 mt-0.5 shrink-0" /> {doc.issueDescription}</p>
+                                    )}
+
+                                    {doc.status === "Re-uploaded" && (
+                                      <div className="text-[9px] text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/40 rounded-lg px-2.5 py-1.5 mt-1.5 space-y-0.5">
+                                        <div className="flex items-center gap-1 font-bold">
+                                          <RefreshCw className="size-2.5 text-blue-600" />
+                                          <span>Revised File: <strong className="font-mono">{doc.reuploadedFile || doc.file}</strong></span>
+                                        </div>
+                                        {doc.reuploadNote && (
+                                          <p className="text-[8.5px] text-slate-600 dark:text-slate-300 italic font-medium">"{doc.reuploadNote}"</p>
+                                        )}
+                                      </div>
                                     )}
                                   </div>
                                 </div>
