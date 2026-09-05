@@ -329,6 +329,7 @@ export const nav: NavItem[] = [
       { label: "Case Files", to: "/disciplinary-case-files" },
       { label: "Warning Letters", to: "/disciplinary-warning-letters" },
       { label: "Show Cause Notices", to: "/disciplinary-showcause-notices" },
+      { label: "Lefty", to: "/disciplinary-lefty" },
     ],
   },
   {

@@ -2,6 +2,33 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "361",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI / UX",
+    module: "Disciplinary Action",
+    link: "/disciplinary-lefty",
+    descriptionEn: "Simplified Lefty Management table UI: Employee Info column now shows only Name & ID; stage badges renamed to 'Stage 1', 'Stage 2', 'Stage 3'; and salary mode badge updated to 'Cash'.",
+    descriptionBn: "Lefty Management টেবিলের লেআউট সহজ করা হয়েছে: Employee Info কলামে শুধুমাত্র Name ও ID রাখা হয়েছে (অফিসিয়াল আইডি ও পদবী রিমুভ করা হয়েছে); স্টেজ ব্যাজসমূহ কেবল 'Stage 1', 'Stage 2', 'Stage 3' এ পরিবর্তন করা হয়েছে এবং স্যালারি মোড লেবেল 'Cash' এ রিনেম করা হয়েছে।",
+  },
+  {
+    id: "360",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI Update",
+    module: "Disciplinary Action",
+    link: "/disciplinary-lefty",
+    descriptionEn: "Cleaned up UI on Lefty Management page (/disciplinary-lefty) by removing top policy guidelines banner per user request.",
+    descriptionBn: "ইউজার রিকুয়েস্ট অনুযায়ী Lefty Management পেজ (/disciplinary-lefty) থেকে উপরের পলিসি নির্দেশিকা ব্যানার রিমুভ করা হয়েছে।",
+  },
+  {
+    id: "359",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Disciplinary Action",
+    link: "/disciplinary-lefty",
+    descriptionEn: "Added new 'Lefty' menu under Disciplinary Action (/disciplinary-lefty) to track unauthorized absences. Enforces policy: 10 days absent without notice marks employee as Lefty, generates 1st Notice, and converts salary 100% to Cash; +10 days generates 2nd Notice; +7 days generates Final Discharge Notice.",
+    descriptionBn: "Disciplinary Action এর অধীনে নতুন 'Lefty' মেনু (/disciplinary-lefty) যুক্ত করা হয়েছে। অগোচরে ১০ দিন অনুপস্থিত থাকলে কর্মী Lefty চিহ্নিত হবে, ১ম নোটিশ পত্র ইস্যু হবে এবং বেতন ১০০% ক্যাশে রুপান্তর হবে; আরও ১০ দিন পর ২য় নোটিশ এবং আরও ৭ দিন পর চূড়ান্ত বরখাস্তপত্র ইস্যু করার সম্পূর্ণ লজিক ও প্রিন্ট সুবিধা যুক্ত করা হয়েছে।",
+  },
+  {
     id: "358",
     date: new Date().toISOString().slice(0, 16),
     type: "New Feature",

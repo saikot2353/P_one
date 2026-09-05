@@ -207,6 +207,7 @@ import { Route as EarnLeaveProcessRouteImport } from './routes/earn-leave-proces
 import { Route as ERecruitmentFormRouteImport } from './routes/e-recruitment-form'
 import { Route as DisciplinaryWarningLettersRouteImport } from './routes/disciplinary-warning-letters'
 import { Route as DisciplinaryShowcauseNoticesRouteImport } from './routes/disciplinary-showcause-notices'
+import { Route as DisciplinaryLeftyRouteImport } from './routes/disciplinary-lefty'
 import { Route as DisciplinaryCaseFilesRouteImport } from './routes/disciplinary-case-files'
 import { Route as DeptWiseSalarySheetRouteImport } from './routes/dept-wise-salary-sheet'
 import { Route as CreateRosterRouteImport } from './routes/create-roster'
@@ -1296,6 +1297,11 @@ const DisciplinaryShowcauseNoticesRoute =
     path: '/disciplinary-showcause-notices',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DisciplinaryLeftyRoute = DisciplinaryLeftyRouteImport.update({
+  id: '/disciplinary-lefty',
+  path: '/disciplinary-lefty',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DisciplinaryCaseFilesRoute = DisciplinaryCaseFilesRouteImport.update({
   id: '/disciplinary-case-files',
   path: '/disciplinary-case-files',
@@ -1519,6 +1525,7 @@ export interface FileRoutesByFullPath {
   '/create-roster': typeof CreateRosterRoute
   '/dept-wise-salary-sheet': typeof DeptWiseSalarySheetRoute
   '/disciplinary-case-files': typeof DisciplinaryCaseFilesRoute
+  '/disciplinary-lefty': typeof DisciplinaryLeftyRoute
   '/disciplinary-showcause-notices': typeof DisciplinaryShowcauseNoticesRoute
   '/disciplinary-warning-letters': typeof DisciplinaryWarningLettersRoute
   '/e-recruitment-form': typeof ERecruitmentFormRoute
@@ -1756,6 +1763,7 @@ export interface FileRoutesByTo {
   '/create-roster': typeof CreateRosterRoute
   '/dept-wise-salary-sheet': typeof DeptWiseSalarySheetRoute
   '/disciplinary-case-files': typeof DisciplinaryCaseFilesRoute
+  '/disciplinary-lefty': typeof DisciplinaryLeftyRoute
   '/disciplinary-showcause-notices': typeof DisciplinaryShowcauseNoticesRoute
   '/disciplinary-warning-letters': typeof DisciplinaryWarningLettersRoute
   '/e-recruitment-form': typeof ERecruitmentFormRoute
@@ -1994,6 +2002,7 @@ export interface FileRoutesById {
   '/create-roster': typeof CreateRosterRoute
   '/dept-wise-salary-sheet': typeof DeptWiseSalarySheetRoute
   '/disciplinary-case-files': typeof DisciplinaryCaseFilesRoute
+  '/disciplinary-lefty': typeof DisciplinaryLeftyRoute
   '/disciplinary-showcause-notices': typeof DisciplinaryShowcauseNoticesRoute
   '/disciplinary-warning-letters': typeof DisciplinaryWarningLettersRoute
   '/e-recruitment-form': typeof ERecruitmentFormRoute
@@ -2233,6 +2242,7 @@ export interface FileRouteTypes {
     | '/create-roster'
     | '/dept-wise-salary-sheet'
     | '/disciplinary-case-files'
+    | '/disciplinary-lefty'
     | '/disciplinary-showcause-notices'
     | '/disciplinary-warning-letters'
     | '/e-recruitment-form'
@@ -2470,6 +2480,7 @@ export interface FileRouteTypes {
     | '/create-roster'
     | '/dept-wise-salary-sheet'
     | '/disciplinary-case-files'
+    | '/disciplinary-lefty'
     | '/disciplinary-showcause-notices'
     | '/disciplinary-warning-letters'
     | '/e-recruitment-form'
@@ -2707,6 +2718,7 @@ export interface FileRouteTypes {
     | '/create-roster'
     | '/dept-wise-salary-sheet'
     | '/disciplinary-case-files'
+    | '/disciplinary-lefty'
     | '/disciplinary-showcause-notices'
     | '/disciplinary-warning-letters'
     | '/e-recruitment-form'
@@ -2945,6 +2957,7 @@ export interface RootRouteChildren {
   CreateRosterRoute: typeof CreateRosterRoute
   DeptWiseSalarySheetRoute: typeof DeptWiseSalarySheetRoute
   DisciplinaryCaseFilesRoute: typeof DisciplinaryCaseFilesRoute
+  DisciplinaryLeftyRoute: typeof DisciplinaryLeftyRoute
   DisciplinaryShowcauseNoticesRoute: typeof DisciplinaryShowcauseNoticesRoute
   DisciplinaryWarningLettersRoute: typeof DisciplinaryWarningLettersRoute
   ERecruitmentFormRoute: typeof ERecruitmentFormRoute
@@ -4537,6 +4550,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DisciplinaryShowcauseNoticesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/disciplinary-lefty': {
+      id: '/disciplinary-lefty'
+      path: '/disciplinary-lefty'
+      fullPath: '/disciplinary-lefty'
+      preLoaderRoute: typeof DisciplinaryLeftyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/disciplinary-case-files': {
       id: '/disciplinary-case-files'
       path: '/disciplinary-case-files'
@@ -4833,6 +4853,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreateRosterRoute: CreateRosterRoute,
   DeptWiseSalarySheetRoute: DeptWiseSalarySheetRoute,
   DisciplinaryCaseFilesRoute: DisciplinaryCaseFilesRoute,
+  DisciplinaryLeftyRoute: DisciplinaryLeftyRoute,
   DisciplinaryShowcauseNoticesRoute: DisciplinaryShowcauseNoticesRoute,
   DisciplinaryWarningLettersRoute: DisciplinaryWarningLettersRoute,
   ERecruitmentFormRoute: ERecruitmentFormRoute,
