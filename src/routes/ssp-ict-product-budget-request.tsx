@@ -1,7 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import {
   ChevronRight,
   ChevronDown,
@@ -21,6 +22,7 @@ import {
   Search,
   Eye,
   X,
+  Camera,
   Printer,
   Minus,
   ArrowLeft,
@@ -49,6 +51,7 @@ interface RequisitionItem {
   quantity: string;
   justification: string;
   forUse: string;
+  attachmentName?: string;
 }
 
 interface BudgetRequestRecord {
@@ -91,29 +94,33 @@ const DUMMY_EMPLOYEES = [
   { id: "emp6", name: "Kazi Farhan", role: "Procurement Officer", dept: "Supply Chain" },
 ];
 
-const QUICK_ICT_JUSTIFICATIONS = [
-  "Monitor flickering replacement in testing workstation",
-  "RAM/SSD performance upgrade for software development",
-  "Exhausted toner replenishment for admin department printer",
-  "Workstation peripheral setup for newly onboarded engineer",
-  "Network switch port expansion for production floor",
-];
-
 function ICTProductBudgetRequestPage() {
   // Form State
-  const [reqType, setReqType] = useState("Monthly Purchase Request");
+  const [reqType, setReqType] = useState("Regular Purchase Request");
   const [product, setProduct] = useState("");
-  const [quantity, setQuantity] = useState("1");
+  const [quantity, setQuantity] = useState("");
   const [justification, setJustification] = useState("");
 
-  // Items List
-  const [items, setItems] = useState<RequisitionItem[]>([]);
+  // Items List - preloaded matching workflow
+  const [items, setItems] = useState<RequisitionItem[]>([
+    {
+      id: "1",
+      item: 'Dell 24" IPS Monitor',
+      quantity: "1 PCS",
+      justification: "Station monitor replacement",
+      forUse: "Regular",
+    },
+  ]);
 
   // On Behalf
   const [onBehalf, setOnBehalf] = useState(false);
   const [onBehalfEmp, setOnBehalfEmp] = useState(
     `${DUMMY_EMPLOYEES[1].name} (${DUMMY_EMPLOYEES[1].role} - ${DUMMY_EMPLOYEES[1].dept})`
   );
+
+  // File Attachment ref for row item
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [attachingItemId, setAttachingItemId] = useState<string | null>(null);
 
   // Search in ledger
   const [searchLedger, setSearchLedger] = useState("");
@@ -132,88 +139,73 @@ function ICTProductBudgetRequestPage() {
     return [
       {
         id: "REQ-2026-ICT-001",
-        reqType: "Monthly Purchase Request",
+        reqType: "Regular Purchase Request",
         items: [
           {
             id: "1",
             item: 'Dell 24" IPS Monitor',
-            quantity: "1",
+            quantity: "1 PCS",
             justification: "Station monitor flickering replacement in testing lab",
-            forUse: "Department Uses",
-          },
-        ],
-        onBehalf: true,
-        onBehalfEmp: "Rajebul Hasan Rajon (Executive - IT Systems)",
-        date: "08/09/2026",
-        status: "Approved",
-      },
-      {
-        id: "REQ-2026-ICT-002",
-        reqType: "Regular Purchase Request",
-        items: [
-          {
-            id: "2",
-            item: "HP 85A Black Toner Cartridge",
-            quantity: "2",
-            justification: "Printer toner exhausted in HR Documentation room",
-            forUse: "Department Uses",
-          },
-          {
-            id: "3",
-            item: "Logitech Wireless Keyboard & Mouse Combo",
-            quantity: "3",
-            justification: "Required for new engineering recruits",
-            forUse: "Department Uses",
+            forUse: "Regular",
           },
         ],
         onBehalf: false,
-        date: "07/09/2026",
-        status: "Pending HOD",
+        date: "08/09/2026",
+        status: "Approved",
       },
     ];
   });
 
-  // Stepper helpers
-  const handleIncQty = () => {
-    const val = parseInt(quantity) || 0;
-    setQuantity(String(val + 1));
-  };
+  const productOptions = useMemo(() => {
+    return ICT_PRODUCTS.map((p) => ({
+      value: p,
+      label: p,
+    }));
+  }, []);
 
-  const handleDecQty = () => {
-    const val = parseInt(quantity) || 1;
-    if (val > 1) setQuantity(String(val - 1));
-  };
+  // ── Bulletproof Handle Add Item ───────────────────────────────────────
+  const handleAddItem = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
 
-  // Handle Add Item
-  const handleAddItem = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!product.trim()) {
-      toast.error("Please enter or select an ICT Product!");
+    const selectedProduct = product.trim();
+    if (!selectedProduct) {
+      toast.error("Please select or enter an ICT Product!");
       return;
     }
-    if (!quantity.trim() || Number(quantity) <= 0) {
-      toast.error("Please enter a valid Quantity!");
-      return;
+
+    // Format quantity: default to "1 PCS" if blank, or append PCS if numeric only
+    const trimmedQty = quantity.trim();
+    let formattedQty = "1 PCS";
+    if (trimmedQty) {
+      formattedQty = /^\d+$/.test(trimmedQty) ? `${trimmedQty} PCS` : trimmedQty;
     }
-    if (!justification.trim()) {
-      toast.error("Please provide a Justification!");
-      return;
-    }
+
+    // Justification: optional, default to "-" if empty
+    const finalJustification = justification.trim() || "-";
+
+    const forValue = onBehalf && onBehalfEmp
+      ? onBehalfEmp
+      : reqType.includes("Regular")
+        ? "Regular"
+        : "Monthly";
 
     const newItem: RequisitionItem = {
       id: Date.now().toString(),
-      item: product.trim(),
-      quantity: quantity.trim(),
-      justification: justification.trim(),
-      forUse: onBehalf ? onBehalfEmp : "Department Uses",
+      item: selectedProduct,
+      quantity: formattedQty,
+      justification: finalJustification,
+      forUse: forValue,
     };
 
     setItems((prev) => [...prev, newItem]);
-    toast.success(`Added "${newItem.item}" to ICT requisition list!`);
+    toast.success(`Added "${newItem.item}" to table!`);
 
     // Reset fields for rapid entry
     setProduct("");
-    setQuantity("1");
+    setQuantity("");
     setJustification("");
   };
 
@@ -221,12 +213,26 @@ function ICTProductBudgetRequestPage() {
     setItems((prev) => prev.filter((it) => it.id !== id));
   };
 
-  const handleClearAll = () => {
-    if (items.length === 0) return;
-    if (confirm("Are you sure you want to clear all items in this ICT draft?")) {
-      setItems([]);
-      toast.info("Cleared all items from draft.");
+  // Attachment Handler
+  const handleTriggerAttachment = (id: string) => {
+    setAttachingItemId(id);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+      fileInputRef.current.click();
     }
+  };
+
+  const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !attachingItemId) return;
+
+    setItems((prev) =>
+      prev.map((it) =>
+        it.id === attachingItemId ? { ...it, attachmentName: file.name } : it
+      )
+    );
+    toast.success(`Attached "${file.name}" to item.`);
+    setAttachingItemId(null);
   };
 
   // Handle Submit Entire Request
@@ -332,357 +338,233 @@ function ICTProductBudgetRequestPage() {
           </div>
 
           {/* ══════════════════════════════════════════════════════════════════════════
-              FORM CONTAINER: Matches Screenshot 1 with Rich Aesthetics
+              FORM CONTAINER: Matches User ERP Screenshot Exactly
               ══════════════════════════════════════════════════════════════════════════ */}
-          <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-            {/* Top subtle cyan accent bar */}
-            <div className="h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500" />
-
-            <div className="p-6 md:p-8">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                
-                {/* ── LEFT PANEL: Form Fields (Cols 1-5) ───────────────────────── */}
-                <form
-                  onSubmit={handleAddItem}
-                  className="lg:col-span-5 space-y-5 lg:pr-8 lg:border-r lg:border-slate-200"
-                >
-                  <div className="flex items-center justify-between pb-1 border-b border-slate-100">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
-                      <Cpu className="size-3.5 text-cyan-600" />
-                      Configure ICT Item
-                    </span>
-                    <span className="text-[11px] font-medium text-slate-500">
-                      Step 1 of 2
-                    </span>
-                  </div>
-
-                  {/* Req. Type * */}
-                  <div className="space-y-1">
-                    <label className="block text-xs font-medium text-slate-700">
-                      Req. Type <span className="text-red-500 font-bold">*</span>
-                    </label>
-                    <div className="relative">
-                      <select
-                        value={reqType}
-                        onChange={(e) => setReqType(e.target.value)}
-                        className="w-full appearance-none bg-slate-50/50 hover:bg-slate-50 border-0 border-b-2 border-slate-300 focus:border-cyan-500 focus:bg-cyan-50/10 focus:ring-0 text-sm font-medium text-slate-800 px-2 py-2 pr-8 cursor-pointer outline-none transition-all rounded-t-sm"
-                      >
-                        <option value="Monthly Purchase Request">
-                          Monthly Purchase Request
-                        </option>
-                        <option value="Regular Purchase Request">
-                          Regular Purchase Request
-                        </option>
-                      </select>
-                      <ChevronDown className="size-4 text-slate-500 pointer-events-none absolute right-2 top-3" />
-                    </div>
-                  </div>
-
-                  {/* Product * (No Category dropdown in Screenshot 1!) */}
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-medium text-slate-700">
-                      Product <span className="text-red-500 font-bold">*</span>
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        list="ict-products-list"
-                        value={product}
-                        onChange={(e) => setProduct(e.target.value)}
-                        placeholder="Type or select ICT hardware/accessory..."
-                        className="w-full bg-slate-50/50 hover:bg-slate-50 border-0 border-b-2 border-slate-300 focus:border-cyan-500 focus:bg-cyan-50/10 focus:ring-0 text-sm font-medium text-slate-800 px-2 py-2 outline-none placeholder:text-slate-400 transition-all rounded-t-sm"
-                      />
-                      <datalist id="ict-products-list">
-                        {ICT_PRODUCTS.map((p) => (
-                          <option key={p} value={p} />
-                        ))}
-                      </datalist>
-                    </div>
-
-                    {/* Quick Popular ICT Chips */}
-                    <div className="pt-1">
-                      <div className="text-[10.5px] font-semibold text-slate-600 mb-1 flex items-center gap-1">
-                        <span>Frequent ICT Items:</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {[
-                          'Dell 24" IPS Monitor',
-                          "Logitech Wireless Combo",
-                          "HP 85A Toner",
-                          "512GB NVMe SSD",
-                          "16GB DDR4 RAM",
-                          "APC 1200VA UPS",
-                        ].map((chip) => (
-                          <button
-                            type="button"
-                            key={chip}
-                            onClick={() => setProduct(chip)}
-                            className="text-[11px] font-medium px-2 py-0.5 rounded border border-slate-200 bg-slate-50 hover:bg-cyan-50 hover:border-cyan-300 hover:text-cyan-700 text-slate-600 transition-colors"
-                          >
-                            + {chip}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Quantity * with Stepper */}
-                  <div className="space-y-1">
-                    <label className="block text-xs font-medium text-slate-700">
-                      Quantity <span className="text-red-500 font-bold">*</span>
-                    </label>
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={handleDecQty}
-                        className="size-8 rounded border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors"
-                        title="Decrease"
-                      >
-                        <Minus className="size-3.5" />
-                      </button>
-                      <input
-                        type="number"
-                        min="1"
-                        step="1"
-                        value={quantity}
-                        onChange={(e) => setQuantity(e.target.value)}
-                        placeholder="1"
-                        className="flex-1 bg-slate-50/50 hover:bg-slate-50 border-0 border-b-2 border-slate-300 focus:border-cyan-500 focus:bg-cyan-50/10 focus:ring-0 text-sm font-semibold text-center text-slate-800 px-2 py-1.5 outline-none transition-all rounded-t-sm"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleIncQty}
-                        className="size-8 rounded border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors"
-                        title="Increase"
-                      >
-                        <Plus className="size-3.5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Justification * with quick presets */}
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-medium text-slate-700">
-                      Justification <span className="text-red-500 font-bold">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={justification}
-                      onChange={(e) => setJustification(e.target.value)}
-                      placeholder="Enter justification or click preset below..."
-                      className="w-full bg-slate-50/50 hover:bg-slate-50 border-0 border-b-2 border-slate-300 focus:border-cyan-500 focus:bg-cyan-50/10 focus:ring-0 text-sm font-medium text-slate-800 px-2 py-2 outline-none placeholder:text-slate-400 transition-all rounded-t-sm"
-                    />
-
-                    <div className="flex flex-wrap gap-1 pt-1">
-                      {QUICK_ICT_JUSTIFICATIONS.map((just) => (
-                        <button
-                          type="button"
-                          key={just}
-                          onClick={() => setJustification(just)}
-                          className="text-[10px] font-medium px-2 py-0.5 rounded bg-slate-100 hover:bg-cyan-100 hover:text-cyan-800 text-slate-600 transition-colors text-left"
-                        >
-                          {just}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* ADD Button */}
-                  <div className="pt-2 flex items-center justify-between">
-                    <button
-                      type="submit"
-                      className="inline-flex items-center gap-1.5 bg-[#1890ff] hover:bg-[#096dd9] active:scale-[0.98] text-white text-xs font-bold uppercase tracking-wider px-6 py-2.5 rounded-lg shadow-sm hover:shadow transition-all"
+          <div className="bg-white border border-slate-200 rounded-lg shadow-sm p-6 md:p-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              
+              {/* ── LEFT PANEL: Form Fields (Cols 1-5) ───────────────────────── */}
+              <div className="lg:col-span-5 space-y-6 lg:pr-8 lg:border-r lg:border-slate-200">
+                {/* Req. Type * */}
+                <div className="space-y-1">
+                  <label className="block text-xs font-medium text-slate-700">
+                    Req. Type <span className="text-red-500 font-bold">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={reqType}
+                      onChange={(e) => setReqType(e.target.value)}
+                      className="w-full appearance-none bg-transparent border-0 border-b border-slate-300 focus:border-blue-500 focus:ring-0 text-sm font-normal text-slate-800 py-1.5 pr-8 cursor-pointer outline-none transition-colors"
                     >
-                      <Plus className="size-4" />
-                      <span>ADD ITEM</span>
-                    </button>
-                    <span className="text-[11px] text-slate-500 italic">
-                      Item will queue into the table &rarr;
-                    </span>
-                  </div>
-                </form>
-
-                {/* ── RIGHT PANEL: Pink Header Table & On Behalf (Cols 6-12) ─── */}
-                <div className="lg:col-span-7 space-y-5">
-                  <div className="flex items-center justify-between pb-1 border-b border-slate-100">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
-                        ICT Requisition Queue
-                      </span>
-                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-700 border border-cyan-200">
-                        {items.length} {items.length === 1 ? "Item" : "Items"} ({totalQtyCount} Units)
-                      </span>
-                    </div>
-
-                    {items.length > 0 && (
-                      <button
-                        type="button"
-                        onClick={handleClearAll}
-                        className="text-xs text-rose-600 hover:text-rose-800 font-semibold hover:underline"
-                      >
-                        Clear Draft
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Table with Light Pink Header matching Screenshot */}
-                  <div className="border border-slate-200 rounded-lg overflow-hidden shadow-xs">
-                    <table className="w-full border-collapse text-left text-xs">
-                      <thead>
-                        <tr className="bg-[#ffebee] border-b border-pink-200/70 text-slate-800 font-bold uppercase tracking-wide text-[11px]">
-                          <th className="py-3 px-4">Item</th>
-                          <th className="py-3 px-3 w-24 text-center">Quantity</th>
-                          <th className="py-3 px-4">Justification</th>
-                          <th className="py-3 px-4 w-36">For</th>
-                          <th className="py-3 px-2 w-10 text-center"></th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100">
-                        {items.length === 0 ? (
-                          <tr>
-                            <td
-                              colSpan={5}
-                              className="py-16 text-center text-xs text-slate-400 font-normal"
-                            >
-                              <div className="flex flex-col items-center justify-center gap-2 max-w-sm mx-auto">
-                                <div className="size-10 rounded-full bg-pink-50 border border-pink-100 flex items-center justify-center text-pink-400">
-                                  <Laptop className="size-5" />
-                                </div>
-                                <p className="font-semibold text-slate-600 text-xs">
-                                  No ICT items queued yet
-                                </p>
-                                <p className="text-[11px] text-slate-600">
-                                  Fill in the form on the left with your IT equipment needs and click <strong>ADD</strong>.
-                                </p>
-                              </div>
-                            </td>
-                          </tr>
-                        ) : (
-                          items.map((it) => (
-                            <tr
-                              key={it.id}
-                              className="hover:bg-cyan-50/30 transition-colors animate-in fade-in"
-                            >
-                              <td className="py-3 px-4">
-                                <div className="font-bold text-slate-900">{it.item}</div>
-                                <span className="text-[10px] font-medium text-cyan-700 bg-cyan-50 px-1.5 py-0.5 rounded border border-cyan-100 inline-block mt-0.5">
-                                  ICT Equipment
-                                </span>
-                              </td>
-                              <td className="py-3 px-3 text-center">
-                                <span className="font-bold text-slate-800 bg-slate-100 px-2.5 py-1 rounded text-xs">
-                                  {it.quantity}
-                                </span>
-                              </td>
-                              <td className="py-3 px-4 text-slate-600">
-                                {it.justification}
-                              </td>
-                              <td className="py-3 px-4">
-                                <span className="text-[11px] font-medium text-slate-700 bg-slate-100/80 px-2 py-1 rounded block truncate">
-                                  {it.forUse}
-                                </span>
-                              </td>
-                              <td className="py-3 px-2 text-center">
-                                <button
-                                  type="button"
-                                  onClick={() => handleRemoveItem(it.id)}
-                                  className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors rounded"
-                                  title="Remove item"
-                                >
-                                  <Trash2 className="size-3.5" />
-                                </button>
-                              </td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-
-                      {items.length > 0 && (
-                        <tfoot>
-                          <tr className="bg-slate-50 border-t border-slate-200 text-slate-700 font-bold text-xs">
-                            <td className="py-2.5 px-4">Total ({items.length} unique items)</td>
-                            <td className="py-2.5 px-3 text-center font-bold text-cyan-700">
-                              {totalQtyCount}
-                            </td>
-                            <td colSpan={3}></td>
-                          </tr>
-                        </tfoot>
-                      )}
-                    </table>
-                  </div>
-
-                  {/* ── On Behalf Delegation Box ─────────────────────────────── */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <label className="flex items-center gap-2 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={onBehalf}
-                          onChange={(e) => setOnBehalf(e.target.checked)}
-                          className="rounded border-slate-300 text-red-600 focus:ring-red-500 size-4 cursor-pointer"
-                        />
-                        <span className="text-red-600 font-bold text-xs tracking-wide">
-                          On Behalf :
-                        </span>
-                        <span className="text-xs text-slate-500 font-normal">
-                          (Submit ICT requisition for another employee)
-                        </span>
-                      </label>
-
-                      {onBehalf && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-100 text-red-700 border border-red-200">
-                          Delegated Request
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Inline Employee Selector when On Behalf is checked */}
-                    {onBehalf && (
-                      <div className="pt-2 border-t border-slate-200/80 animate-in fade-in duration-200 space-y-1">
-                        <label className="block text-[11px] font-semibold text-slate-600">
-                          Select Employee on whose behalf this ICT request is filed:
-                        </label>
-                        <select
-                          value={onBehalfEmp}
-                          onChange={(e) => setOnBehalfEmp(e.target.value)}
-                          className="w-full bg-white border border-slate-300 rounded-md text-xs px-3 py-1.5 text-slate-800 font-medium outline-none focus:border-cyan-500 shadow-xs"
-                        >
-                          {DUMMY_EMPLOYEES.map((emp) => (
-                            <option
-                              key={emp.id}
-                              value={`${emp.name} (${emp.role} - ${emp.dept})`}
-                            >
-                              {emp.name} — {emp.role} ({emp.dept})
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* SUBMIT Button */}
-                  <div className="pt-2 flex items-center justify-between">
-                    <button
-                      type="button"
-                      onClick={handleSubmit}
-                      disabled={items.length === 0}
-                      className={`inline-flex items-center gap-2 text-white text-xs font-bold uppercase tracking-wider px-8 py-2.5 rounded-lg shadow-sm transition-all ${
-                        items.length === 0
-                          ? "bg-slate-300 cursor-not-allowed text-slate-500"
-                          : "bg-[#1890ff] hover:bg-[#096dd9] active:scale-[0.98] hover:shadow"
-                      }`}
-                    >
-                      <Send className="size-4" />
-                      <span>SUBMIT ICT REQUISITION</span>
-                    </button>
-
-                    <div className="text-right text-[11px] text-slate-600">
-                      Approver: <span className="font-semibold text-slate-700">IT Head / HOD</span>
-                    </div>
+                      <option value="Regular Purchase Request">
+                        Regular Purchase Request
+                      </option>
+                      <option value="Monthly Purchase Request">
+                        Monthly Purchase Request
+                      </option>
+                    </select>
+                    <ChevronDown className="size-4 text-slate-500 pointer-events-none absolute right-1 top-2" />
                   </div>
                 </div>
 
+                {/* Product * (Searchable Dropdown) */}
+                <div className="space-y-1">
+                  <label className="block text-xs font-medium text-slate-700">
+                    Product <span className="text-red-500 font-bold">*</span>
+                  </label>
+                  <SearchableSelect
+                    options={productOptions}
+                    value={product}
+                    onChange={(val) => setProduct(val)}
+                    placeholder="Search or select ICT hardware/accessory..."
+                    allowCustom={true}
+                    variant="underline"
+                  />
+                </div>
+
+                {/* Quantity * (Text input so 1 or 1 PCS works seamlessly!) */}
+                <div className="space-y-1">
+                  <label className="block text-xs font-medium text-slate-700">
+                    Quantity <span className="text-red-500 font-bold">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleAddItem();
+                      }
+                    }}
+                    placeholder=""
+                    className="w-full bg-transparent border-0 border-b border-slate-300 focus:border-blue-500 focus:ring-0 text-sm font-normal text-slate-800 py-1.5 outline-none placeholder:text-slate-400 transition-colors"
+                  />
+                </div>
+
+                {/* Justification * */}
+                <div className="space-y-1">
+                  <label className="block text-xs font-medium text-slate-700">
+                    Justification <span className="text-red-500 font-bold">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={justification}
+                    onChange={(e) => setJustification(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleAddItem();
+                      }
+                    }}
+                    placeholder=""
+                    className="w-full bg-transparent border-0 border-b border-slate-300 focus:border-blue-500 focus:ring-0 text-sm font-normal text-slate-800 py-1.5 outline-none placeholder:text-slate-400 transition-colors"
+                  />
+                </div>
+
+                {/* ADD Button */}
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => handleAddItem()}
+                    className="bg-[#1890ff] hover:bg-[#096dd9] text-white text-xs font-bold uppercase tracking-wider px-6 py-2 rounded shadow-xs transition-colors"
+                  >
+                    ADD
+                  </button>
+                </div>
               </div>
+
+              {/* ── RIGHT PANEL: Pink Header Table & On Behalf (Cols 6-12) ─── */}
+              <div className="lg:col-span-7 space-y-5">
+                {/* Hidden File Input for Camera Attachment */}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileSelected}
+                  className="hidden"
+                  accept="image/*,.pdf,.doc,.docx"
+                />
+
+                {/* Table with Light Pink Header matching Screenshot */}
+                <div className="border border-slate-200 rounded overflow-hidden">
+                  <table className="w-full border-collapse text-left">
+                    <thead>
+                      <tr className="bg-[#ffebee] border-b border-pink-100 text-xs font-semibold text-slate-700">
+                        <th className="py-2.5 px-4">Item</th>
+                        <th className="py-2.5 px-3 w-28">Quantity</th>
+                        <th className="py-2.5 px-4">Justification</th>
+                        <th className="py-2.5 px-3 w-32">For</th>
+                        <th className="py-2.5 px-2 w-16 text-right pr-4"></th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 min-h-[140px]">
+                      {items.length === 0 ? (
+                        <tr>
+                          <td
+                            colSpan={5}
+                            className="py-14 text-center text-xs text-slate-400 font-normal italic"
+                          >
+                            No items added yet. Fill the form on the left and click ADD.
+                          </td>
+                        </tr>
+                      ) : (
+                        items.map((it) => (
+                          <tr
+                            key={it.id}
+                            className="hover:bg-slate-50 text-xs text-slate-800 transition-colors"
+                          >
+                            <td className="py-2.5 px-4 font-medium">
+                              <div>{it.item}</div>
+                              {it.attachmentName && (
+                                <span className="text-[10px] text-blue-600 block truncate">
+                                  📎 {it.attachmentName}
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-2.5 px-3 font-semibold text-slate-700">
+                              {it.quantity}
+                            </td>
+                            <td className="py-2.5 px-4 text-slate-600">
+                              {it.justification}
+                            </td>
+                            <td className="py-2.5 px-3 text-slate-600 truncate">
+                              {it.forUse}
+                            </td>
+                            <td className="py-2.5 px-2 text-right pr-3">
+                              <div className="inline-flex items-center gap-1.5">
+                                {/* Camera / Attachment Icon matching screenshot */}
+                                <button
+                                  type="button"
+                                  onClick={() => handleTriggerAttachment(it.id)}
+                                  className="p-1 text-slate-500 hover:text-blue-600 transition-colors rounded"
+                                  title="Attach image or document"
+                                >
+                                  <Camera className="size-3.5" />
+                                </button>
+                                {/* Delete 'X' icon matching screenshot */}
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveItem(it.id)}
+                                  className="p-1 text-slate-500 hover:text-red-500 transition-colors rounded"
+                                  title="Remove item"
+                                >
+                                  <X className="size-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* On Behalf Row (Red text label with checkbox) */}
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-1">
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <span className="text-red-600 font-semibold text-xs tracking-wide">
+                      On Behalf :
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={onBehalf}
+                      onChange={(e) => setOnBehalf(e.target.checked)}
+                      className="rounded border-slate-300 text-red-600 focus:ring-red-500 size-4 cursor-pointer"
+                    />
+                  </label>
+
+                  {onBehalf && (
+                    <div className="flex-1 max-w-sm">
+                      <select
+                        value={onBehalfEmp}
+                        onChange={(e) => setOnBehalfEmp(e.target.value)}
+                        className="w-full bg-transparent border-0 border-b border-slate-300 focus:border-blue-500 focus:ring-0 text-xs py-1 text-slate-800 outline-none"
+                      >
+                        {DUMMY_EMPLOYEES.map((emp) => (
+                          <option
+                            key={emp.id}
+                            value={`${emp.name} (${emp.role} - ${emp.dept})`}
+                          >
+                            {emp.name} — {emp.role} ({emp.dept})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
+
+                {/* Blue SUBMIT Button */}
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={handleSubmit}
+                    className="bg-[#1890ff] hover:bg-[#096dd9] text-white text-xs font-bold uppercase tracking-wider px-7 py-2 rounded shadow-xs transition-colors cursor-pointer"
+                  >
+                    SUBMIT
+                  </button>
+                </div>
+              </div>
+
             </div>
           </div>
 

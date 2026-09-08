@@ -23,6 +23,9 @@ interface SearchableSelectProps {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  allowCustom?: boolean;
+  variant?: "default" | "underline";
+  showSearchIconInTrigger?: boolean;
 }
 
 export function SearchableSelect({
@@ -31,10 +34,16 @@ export function SearchableSelect({
   onChange,
   placeholder = "Select...",
   className,
+  allowCustom = false,
+  variant = "default",
+  showSearchIconInTrigger,
 }: SearchableSelectProps) {
   const [open, setOpen] = React.useState(false);
+  const [searchValue, setSearchValue] = React.useState("");
 
   const selectedOption = options.find((option) => option.value === value);
+  const isUnderline = variant === "underline";
+  const shouldShowSearchIcon = showSearchIconInTrigger ?? !isUnderline;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -44,15 +53,21 @@ export function SearchableSelect({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "flex w-full items-center justify-between h-10 px-3 rounded-xl bg-background border border-border/80 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-sm transition-all text-foreground cursor-pointer hover:border-primary/50 text-left",
+            isUnderline
+              ? "flex w-full items-center justify-between h-8 py-1 px-0 bg-transparent border-0 border-b border-slate-300 focus:border-blue-500 rounded-none outline-none text-sm text-slate-800 cursor-pointer text-left shadow-none transition-colors"
+              : "flex w-full items-center justify-between h-10 px-3 rounded-xl bg-background border border-border/80 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none text-sm transition-all text-foreground cursor-pointer hover:border-primary/50 text-left",
             className,
           )}
         >
-          <span className="flex items-center gap-2 truncate">
-            <Search className="size-3.5 text-muted-foreground/60 shrink-0" />
-            <span>{selectedOption ? selectedOption.label : placeholder}</span>
+          <span className="flex items-center gap-2 truncate min-w-0 flex-1 pr-2">
+            {shouldShowSearchIcon && (
+              <Search className="size-3.5 text-muted-foreground/60 shrink-0" />
+            )}
+            <span className={cn("truncate", !selectedOption && !value && "text-slate-400 font-normal")}>
+              {selectedOption ? selectedOption.label : value || placeholder}
+            </span>
           </span>
-          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50 text-muted-foreground" />
+          <ChevronDown className="h-4 w-4 shrink-0 opacity-60 text-slate-500" />
         </button>
       </PopoverTrigger>
       <PopoverContent
@@ -60,10 +75,29 @@ export function SearchableSelect({
         align="start"
       >
         <Command>
-          <CommandInput placeholder="Search..." className="h-9 text-xs" />
-          <CommandList className="max-h-[200px]">
-            <CommandEmpty className="py-3 text-center text-xs text-muted-foreground">
-              No results found.
+          <CommandInput
+            placeholder="Search product..."
+            className="h-9 text-xs"
+            value={searchValue}
+            onValueChange={setSearchValue}
+          />
+          <CommandList className="max-h-[220px]">
+            <CommandEmpty className="py-2.5 px-3 text-xs text-muted-foreground">
+              {allowCustom && searchValue.trim() ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onChange(searchValue.trim());
+                    setOpen(false);
+                    setSearchValue("");
+                  }}
+                  className="w-full text-left font-semibold text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>+ Use &ldquo;{searchValue.trim()}&rdquo;</span>
+                </button>
+              ) : (
+                <span>No results found.</span>
+              )}
             </CommandEmpty>
             <CommandGroup className="p-1">
               {options.map((option) => (
@@ -75,6 +109,7 @@ export function SearchableSelect({
                     if (selected) {
                       onChange(selected.value);
                       setOpen(false);
+                      setSearchValue("");
                     }
                   }}
                   className="text-xs rounded-lg cursor-pointer data-[selected=true]:bg-primary/10 data-[selected=true]:text-primary my-0.5"

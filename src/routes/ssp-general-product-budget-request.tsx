@@ -2,6 +2,7 @@ import { useState, useMemo, useRef } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import {
   ChevronRight,
   ChevronDown,
@@ -202,8 +203,13 @@ function GeneralProductBudgetRequestPage() {
     ];
   });
 
-  const availableProducts =
-    PRODUCTS_BY_CAT[category] || PRODUCTS_BY_CAT["General Stationary"];
+  const productOptions = useMemo(() => {
+    const list = PRODUCTS_BY_CAT[category] || PRODUCTS_BY_CAT["General Stationary"] || [];
+    return list.map((item) => ({
+      value: item,
+      label: item,
+    }));
+  }, [category]);
 
   // ── Bulletproof Handle Add Item ───────────────────────────────────────
   const handleAddItem = (e?: React.FormEvent) => {
@@ -212,24 +218,21 @@ function GeneralProductBudgetRequestPage() {
       e.stopPropagation();
     }
 
-    if (!product || !product.trim()) {
-      toast.error("Please enter a Product name!");
+    const selectedProduct = product.trim();
+    if (!selectedProduct) {
+      toast.error("Please select or enter a Product name!");
       return;
     }
 
-    if (!quantity || !quantity.trim()) {
-      toast.error("Please enter Quantity!");
-      return;
-    }
-
-    if (!justification || !justification.trim()) {
-      toast.error("Please enter Justification!");
-      return;
-    }
-
-    // Format quantity: if numeric only, append PCS (e.g. 1 -> 1 PCS)
+    // Format quantity: default to "1 PCS" if blank, or append PCS if numeric only
     const trimmedQty = quantity.trim();
-    const formattedQty = /^\d+$/.test(trimmedQty) ? `${trimmedQty} PCS` : trimmedQty;
+    let formattedQty = "1 PCS";
+    if (trimmedQty) {
+      formattedQty = /^\d+$/.test(trimmedQty) ? `${trimmedQty} PCS` : trimmedQty;
+    }
+
+    // Justification: optional, default to "-" if empty
+    const finalJustification = justification.trim() || "-";
 
     // For column: Regular or Monthly from reqType, or onBehalfEmp if onBehalf is checked
     const forValue = onBehalf && onBehalfEmp
@@ -240,10 +243,10 @@ function GeneralProductBudgetRequestPage() {
 
     const newItem: RequisitionItem = {
       id: Date.now().toString(),
-      item: product.trim(),
+      item: selectedProduct,
       category: category || "General Stationary",
       quantity: formattedQty,
-      justification: justification.trim(),
+      justification: finalJustification,
       forUse: forValue,
     };
 
@@ -404,6 +407,7 @@ function GeneralProductBudgetRequestPage() {
                       value={category}
                       onChange={(e) => {
                         setCategory(e.target.value);
+                        setProduct("");
                       }}
                       className="w-full appearance-none bg-transparent border-0 border-b border-slate-300 focus:border-blue-500 focus:ring-0 text-sm font-normal text-slate-800 py-1.5 pr-8 cursor-pointer outline-none transition-colors"
                     >
@@ -417,32 +421,19 @@ function GeneralProductBudgetRequestPage() {
                   </div>
                 </div>
 
-                {/* Product * */}
+                {/* Product * (Searchable Dropdown) */}
                 <div className="space-y-1">
                   <label className="block text-xs font-medium text-slate-700">
                     Product <span className="text-red-500 font-bold">*</span>
                   </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      list="general-products-list"
-                      value={product}
-                      onChange={(e) => setProduct(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          handleAddItem();
-                        }
-                      }}
-                      placeholder=""
-                      className="w-full bg-transparent border-0 border-b border-slate-300 focus:border-blue-500 focus:ring-0 text-sm font-normal text-slate-800 py-1.5 outline-none placeholder:text-slate-400 transition-colors"
-                    />
-                    <datalist id="general-products-list">
-                      {availableProducts.map((p) => (
-                        <option key={p} value={p} />
-                      ))}
-                    </datalist>
-                  </div>
+                  <SearchableSelect
+                    options={productOptions}
+                    value={product}
+                    onChange={(val) => setProduct(val)}
+                    placeholder="Search or select product..."
+                    allowCustom={true}
+                    variant="underline"
+                  />
                 </div>
 
                 {/* Quantity * (Use Text input so 1 or 1 PCS works seamlessly!) */}

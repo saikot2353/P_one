@@ -3950,4 +3950,22 @@ export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
     descriptionEn: "Redesigned Employee Job Card with modern header styling and repositioned Attendance Summary Panel. Rebuilt top filter cards and statistics grids.",
     descriptionBn: "এমপ্লয়ি জব কার্ড পেজটিকে নতুনভাবে ডিজাইন করা হয়েছে, যার মধ্যে আধুনিক হেডার স্টাইলিং এবং অ্যাটেনডেন্স সামারি প্যানেলটি পুনরায় পজিশন করা অন্তর্ভুক্ত।",
   },
+  {
+    id: "411",
+    date: "2026-09-08T15:15",
+    type: "Feature Update",
+    module: "SSP Requisition",
+    link: "/ssp-general-product-budget-request",
+    descriptionEn: "Converted the Product field into an interactive searchable dropdown with custom entry support across both General Product and ICT Product budget request forms. Enhanced the Add Item mechanism with automated quantity unit formatting, optional justification fallback, and seamless ERP table queuing.",
+    descriptionBn: "জেনারেল প্রোডাক্ট এবং আইসিটি প্রোডাক্ট বাজেট রিকুইজিশন উভয় পেজে প্রোডাক্ট ইনপুট ফিল্ডটিকে ইন্টারঅ্যাক্টিভ সার্চেবল ড্রপডাউনে রূপান্তর করা হয়েছে। এছাড়াও আইটেম যুক্ত করার প্রক্রিয়ায় স্বয়ংক্রিয় ইউনিট ফরম্যাটিং ও ফলব্যাক সাপোর্ট যুক্ত করে সমাধান নিশ্চিত করা হয়েছে।",
+  },
+  {
+    id: "412",
+    date: "2026-09-08T15:17",
+    type: "UI / UX",
+    module: "SSP Requisition",
+    link: "/ssp-general-product-budget-request",
+    descriptionEn: "Polished the SearchableSelect component with a dedicated 'underline' variant! Fixed the bottom border line curvature bug to produce a crisp 1px straight underline, removed distracting icons in trigger state, and aligned chevron arrows perfectly with standard form select elements.",
+    descriptionBn: "SearchableSelect কম্পোনেন্টটিতে একটি নিবেদিত 'underline' ভ্যারিয়েন্ট যোগ করা হয়েছে! ইউ-শেপ বাঁকানো লাইনের বাগটি সমাধান করে খাড়া ১ পিক্সেল বটম বর্ডার লাইন নিশ্চিত করা হয়েছে এবং অন্যান্য স্ট্যান্ডার্ড ড্রপডাউন সিলেক্টের সাথে হুবহু সামঞ্জস্যপূর্ণ করা হয়েছে।",
+  },
 ];
