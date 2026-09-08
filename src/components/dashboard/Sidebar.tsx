@@ -74,8 +74,6 @@ export const nav: NavItem[] = [
     icon: Briefcase,
     subitems: [
       { label: "New Requisition", to: "/ssp-new-requisition" },
-      { label: "General Product Budget Request", to: "/ssp-new-requisition?menu=general" },
-      { label: "ICT Product Budget Request", to: "/ssp-new-requisition?menu=ict" },
       { label: "My Requisition", to: "/ssp-my-requisition" },
       {
         label: "Attendance",

@@ -22,6 +22,8 @@ import { Route as SspLeaveRequisitionRouteImport } from './routes/ssp-leave-requ
 import { Route as SspIouRequisitionViewRouteImport } from './routes/ssp-iou-requisition-view'
 import { Route as SspIouRequisitionRouteImport } from './routes/ssp-iou-requisition'
 import { Route as SspIctRequisitionRouteImport } from './routes/ssp-ict-requisition'
+import { Route as SspIctProductBudgetRequestRouteImport } from './routes/ssp-ict-product-budget-request'
+import { Route as SspGeneralProductBudgetRequestRouteImport } from './routes/ssp-general-product-budget-request'
 import { Route as SspAttendanceRouteImport } from './routes/ssp-attendance'
 import { Route as SspApproveManualAttendanceRouteImport } from './routes/ssp-approve-manual-attendance'
 import { Route as SspApprovalRouteImport } from './routes/ssp-approval'
@@ -317,6 +319,18 @@ const SspIctRequisitionRoute = SspIctRequisitionRouteImport.update({
   path: '/ssp-ict-requisition',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SspIctProductBudgetRequestRoute =
+  SspIctProductBudgetRequestRouteImport.update({
+    id: '/ssp-ict-product-budget-request',
+    path: '/ssp-ict-product-budget-request',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SspGeneralProductBudgetRequestRoute =
+  SspGeneralProductBudgetRequestRouteImport.update({
+    id: '/ssp-general-product-budget-request',
+    path: '/ssp-general-product-budget-request',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SspAttendanceRoute = SspAttendanceRouteImport.update({
   id: '/ssp-attendance',
   path: '/ssp-attendance',
@@ -1741,6 +1755,8 @@ export interface FileRoutesByFullPath {
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
   '/ssp-attendance': typeof SspAttendanceRoute
+  '/ssp-general-product-budget-request': typeof SspGeneralProductBudgetRequestRoute
+  '/ssp-ict-product-budget-request': typeof SspIctProductBudgetRequestRoute
   '/ssp-ict-requisition': typeof SspIctRequisitionRoute
   '/ssp-iou-requisition': typeof SspIouRequisitionRoute
   '/ssp-iou-requisition-view': typeof SspIouRequisitionViewRoute
@@ -1983,6 +1999,8 @@ export interface FileRoutesByTo {
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
   '/ssp-attendance': typeof SspAttendanceRoute
+  '/ssp-general-product-budget-request': typeof SspGeneralProductBudgetRequestRoute
+  '/ssp-ict-product-budget-request': typeof SspIctProductBudgetRequestRoute
   '/ssp-ict-requisition': typeof SspIctRequisitionRoute
   '/ssp-iou-requisition': typeof SspIouRequisitionRoute
   '/ssp-iou-requisition-view': typeof SspIouRequisitionViewRoute
@@ -2226,6 +2244,8 @@ export interface FileRoutesById {
   '/ssp-approval': typeof SspApprovalRoute
   '/ssp-approve-manual-attendance': typeof SspApproveManualAttendanceRoute
   '/ssp-attendance': typeof SspAttendanceRoute
+  '/ssp-general-product-budget-request': typeof SspGeneralProductBudgetRequestRoute
+  '/ssp-ict-product-budget-request': typeof SspIctProductBudgetRequestRoute
   '/ssp-ict-requisition': typeof SspIctRequisitionRoute
   '/ssp-iou-requisition': typeof SspIouRequisitionRoute
   '/ssp-iou-requisition-view': typeof SspIouRequisitionViewRoute
@@ -2470,6 +2490,8 @@ export interface FileRouteTypes {
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
     | '/ssp-attendance'
+    | '/ssp-general-product-budget-request'
+    | '/ssp-ict-product-budget-request'
     | '/ssp-ict-requisition'
     | '/ssp-iou-requisition'
     | '/ssp-iou-requisition-view'
@@ -2712,6 +2734,8 @@ export interface FileRouteTypes {
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
     | '/ssp-attendance'
+    | '/ssp-general-product-budget-request'
+    | '/ssp-ict-product-budget-request'
     | '/ssp-ict-requisition'
     | '/ssp-iou-requisition'
     | '/ssp-iou-requisition-view'
@@ -2954,6 +2978,8 @@ export interface FileRouteTypes {
     | '/ssp-approval'
     | '/ssp-approve-manual-attendance'
     | '/ssp-attendance'
+    | '/ssp-general-product-budget-request'
+    | '/ssp-ict-product-budget-request'
     | '/ssp-ict-requisition'
     | '/ssp-iou-requisition'
     | '/ssp-iou-requisition-view'
@@ -3197,6 +3223,8 @@ export interface RootRouteChildren {
   SspApprovalRoute: typeof SspApprovalRoute
   SspApproveManualAttendanceRoute: typeof SspApproveManualAttendanceRoute
   SspAttendanceRoute: typeof SspAttendanceRoute
+  SspGeneralProductBudgetRequestRoute: typeof SspGeneralProductBudgetRequestRoute
+  SspIctProductBudgetRequestRoute: typeof SspIctProductBudgetRequestRoute
   SspIctRequisitionRoute: typeof SspIctRequisitionRoute
   SspIouRequisitionRoute: typeof SspIouRequisitionRoute
   SspIouRequisitionViewRoute: typeof SspIouRequisitionViewRoute
@@ -3307,6 +3335,20 @@ declare module '@tanstack/react-router' {
       path: '/ssp-ict-requisition'
       fullPath: '/ssp-ict-requisition'
       preLoaderRoute: typeof SspIctRequisitionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ssp-ict-product-budget-request': {
+      id: '/ssp-ict-product-budget-request'
+      path: '/ssp-ict-product-budget-request'
+      fullPath: '/ssp-ict-product-budget-request'
+      preLoaderRoute: typeof SspIctProductBudgetRequestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ssp-general-product-budget-request': {
+      id: '/ssp-general-product-budget-request'
+      path: '/ssp-general-product-budget-request'
+      fullPath: '/ssp-general-product-budget-request'
+      preLoaderRoute: typeof SspGeneralProductBudgetRequestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ssp-attendance': {
@@ -5129,6 +5171,8 @@ const rootRouteChildren: RootRouteChildren = {
   SspApprovalRoute: SspApprovalRoute,
   SspApproveManualAttendanceRoute: SspApproveManualAttendanceRoute,
   SspAttendanceRoute: SspAttendanceRoute,
+  SspGeneralProductBudgetRequestRoute: SspGeneralProductBudgetRequestRoute,
+  SspIctProductBudgetRequestRoute: SspIctProductBudgetRequestRoute,
   SspIctRequisitionRoute: SspIctRequisitionRoute,
   SspIouRequisitionRoute: SspIouRequisitionRoute,
   SspIouRequisitionViewRoute: SspIouRequisitionViewRoute,

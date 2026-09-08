@@ -488,13 +488,13 @@ const searchableMenus: SearchMenuLink[] = [
   {
     label: "General Product Budget Request",
     parent: "SSP",
-    to: "/ssp-new-requisition?menu=general",
+    to: "/ssp-general-product-budget-request",
     description: "General product & stationary budget request form",
   },
   {
     label: "ICT Product Budget Request",
     parent: "SSP",
-    to: "/ssp-new-requisition?menu=ict",
+    to: "/ssp-ict-product-budget-request",
     description: "ICT hardware, monitors & IT accessories budget request form",
   },
   {
