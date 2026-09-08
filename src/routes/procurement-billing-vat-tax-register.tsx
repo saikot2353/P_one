@@ -1,102 +1,325 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ProcurementSidebar } from "@/components/dashboard/ProcurementSidebar";
 import { ProcurementTopbar } from "@/components/dashboard/ProcurementTopbar";
 import {
-  Plus,
-  Pencil,
-  Trash2,
-  SlidersHorizontal,
-  X,
-  FileSpreadsheet,
-  Printer,
-  FileText,
   Search,
+  Printer,
+  FileSpreadsheet,
+  FileText,
+  Eye,
+  X,
+  Filter,
+  Calendar,
+  Building2,
+  Receipt,
+  RefreshCw,
+  CheckCircle2,
+  Clock,
 } from "lucide-react";
+import pakizaSoftwareLogo from "@/components/Pakiza-Software-bgless-e1692258364537.webp";
 
 export const Route = createFileRoute("/procurement-billing-vat-tax-register")({
   head: () => ({
     meta: [
-      { title: "VAT and Tax Registry compliance log — CRIPTON Procurement" },
-      { name: "description", content: "VAT and Tax Registry compliance log dynamic mock database console." },
+      { title: "VAT and Tax Register — Billing | CRIPTON Procurement" },
+      { name: "description", content: "Procurement Billing VAT and Tax Register with posting status filters and billing details document viewer." },
     ],
   }),
-  component: ProcurementBillingVatTaxRegisterPage,
+  component: VatTaxRegisterPage,
 });
 
-function ProcurementBillingVatTaxRegisterPage() {
-  const [searchQuery, setSearchQuery] = useState("");
+export interface VatTaxItem {
+  sl: number;
+  item: string;
+  quantity: number;
+  uom: string;
+  unitPrice: number;
+  totalPrice: number;
+}
 
-  const tableHeaders = ["Bill Ref", "Supplier", "Gross Invoice Value", "VAT Rate", "VAT Ded.", "Tax Rate", "Tax Ded.", "Status"];
-  const columnKeys = ["id", "supplier", "gross", "vatRate", "vat", "taxRate", "tax", "status"];
-  const initialData = [
-    {
-        "id": "BIL-2026-0078",
-        "supplier": "Apex Textile Chemical Ltd",
-        "gross": "\u09f31,520,000.00",
-        "vatRate": "5.5%",
-        "vat": "\u09f383,600.00",
-        "taxRate": "2%",
-        "tax": "\u09f330,400.00",
-        "status": "Verified"
-    }
+export interface VatTaxRecord {
+  id: string;
+  sl: number;
+  supplier: string;
+  billNo: string;
+  billDate: string;
+  billType: string;
+  currency: string;
+  exchangeRate: number;
+  billValue: number;
+  vatAmount: number;
+  taxAmount: number;
+  discountAmt: number;
+  netPayable: number;
+  status: "Post" | "Unpost";
+  poWoNo?: string;
+  poWoDate?: string;
+  mrirNo?: string;
+  mrirDate?: string;
+  challanNo?: string;
+  challanDate?: string;
+  advanceAdjustment?: number;
+  items?: VatTaxItem[];
+  preparedBy?: { name: string; title: string; date: string };
+  vatTaxInputtedBy?: { name: string; title: string; date: string };
+  auditedBy?: { name: string; title: string; date: string };
+}
+
+const INITIAL_VAT_TAX_RECORDS: VatTaxRecord[] = [
+  {
+    id: "vt-1",
+    sl: 1,
+    supplier: "Gadget & Gaming Zone",
+    billNo: "1298",
+    billDate: "03/09/2026",
+    billType: "Local",
+    currency: "BDT",
+    exchangeRate: 1.000,
+    billValue: 450.00,
+    vatAmount: 0.00,
+    taxAmount: 0.00,
+    discountAmt: 0.00,
+    netPayable: 450.00,
+    status: "Post",
+    poWoNo: "PO/PSL/2026/000240",
+    poWoDate: "03/09/2026",
+    mrirNo: "606",
+    mrirDate: "05/09/2026",
+    challanNo: "1298",
+    challanDate: "03/09/2026",
+    advanceAdjustment: 0.00,
+    items: [
+      { sl: 1, item: "Mouse", quantity: 1.00, uom: "PCS", unitPrice: 450.00, totalPrice: 450.00 },
+    ],
+    preparedBy: { name: "Rajebul Hasan Rajon", title: "Deputy Manager", date: "05/09/2026 16:07:05" },
+    vatTaxInputtedBy: { name: "A.K.M Nakibul Haque", title: "Sr. Officer", date: "06/09/2026 15:46:51" },
+    auditedBy: { name: "Md.Shahidul Islam", title: "Assistant Manager", date: "08/09/2026 09:13:18" },
+  },
+  {
+    id: "vt-2",
+    sl: 2,
+    supplier: "UNKNOWN",
+    billNo: "00",
+    billDate: "10/08/2026",
+    billType: "Local",
+    currency: "BDT",
+    exchangeRate: 1.000,
+    billValue: 48.99,
+    vatAmount: 0.00,
+    taxAmount: 0.00,
+    discountAmt: 0.00,
+    netPayable: 48.99,
+    status: "Unpost",
+  },
+  {
+    id: "vt-3",
+    sl: 3,
+    supplier: "Konica Hardware",
+    billNo: "019",
+    billDate: "12/08/2026",
+    billType: "Local",
+    currency: "BDT",
+    exchangeRate: 1.000,
+    billValue: 380.00,
+    vatAmount: 0.00,
+    taxAmount: 0.00,
+    discountAmt: 0.00,
+    netPayable: 380.00,
+    status: "Post",
+  },
+  {
+    id: "vt-4",
+    sl: 4,
+    supplier: "B. BARIA BELT GALLERY",
+    billNo: "020",
+    billDate: "13/08/2026",
+    billType: "Local",
+    currency: "BDT",
+    exchangeRate: 1.000,
+    billValue: 2000.00,
+    vatAmount: 0.00,
+    taxAmount: 0.00,
+    discountAmt: 0.00,
+    netPayable: 2000.00,
+    status: "Post",
+  },
+  {
+    id: "vt-5",
+    sl: 5,
+    supplier: "Global Net Computers",
+    billNo: "00628",
+    billDate: "15/08/2026",
+    billType: "Local",
+    currency: "BDT",
+    exchangeRate: 1.000,
+    billValue: 17500.00,
+    vatAmount: 0.00,
+    taxAmount: 0.00,
+    discountAmt: 0.00,
+    netPayable: 17500.00,
+    status: "Post",
+  },
+  {
+    id: "vt-6",
+    sl: 6,
+    supplier: "Cash Purchase Supplier",
+    billNo: "00",
+    billDate: "16/08/2026",
+    billType: "Local",
+    currency: "BDT",
+    exchangeRate: 1.000,
+    billValue: 680.00,
+    vatAmount: 0.00,
+    taxAmount: 0.00,
+    discountAmt: 0.00,
+    netPayable: 680.00,
+    status: "Post",
+  },
+  {
+    id: "vt-7",
+    sl: 7,
+    supplier: "Robotics BD",
+    billNo: "96551",
+    billDate: "18/08/2026",
+    billType: "Local",
+    currency: "BDT",
+    exchangeRate: 1.000,
+    billValue: 78830.00,
+    vatAmount: 0.00,
+    taxAmount: 0.00,
+    discountAmt: 0.00,
+    netPayable: 78830.00,
+    status: "Post",
+  },
+  {
+    id: "vt-8",
+    sl: 8,
+    supplier: "Star Tech Ltd",
+    billNo: "INV-STLR4-2026-017669",
+    billDate: "20/08/2026",
+    billType: "Local",
+    currency: "BDT",
+    exchangeRate: 1.000,
+    billValue: 500.00,
+    vatAmount: 0.00,
+    taxAmount: 0.00,
+    discountAmt: 0.00,
+    netPayable: 500.00,
+    status: "Post",
+  },
+  {
+    id: "vt-9",
+    sl: 9,
+    supplier: "Cash Purchase Supplier",
+    billNo: "00",
+    billDate: "23/08/2026",
+    billType: "Local",
+    currency: "BDT",
+    exchangeRate: 1.000,
+    billValue: 200.00,
+    vatAmount: 0.00,
+    taxAmount: 0.00,
+    discountAmt: 0.00,
+    netPayable: 200.00,
+    status: "Post",
+  },
+  {
+    id: "vt-10",
+    sl: 10,
+    supplier: "Techno House",
+    billNo: "6747",
+    billDate: "25/08/2026",
+    billType: "Local",
+    currency: "BDT",
+    exchangeRate: 1.000,
+    billValue: 20000.00,
+    vatAmount: 0.00,
+    taxAmount: 0.00,
+    discountAmt: 0.00,
+    netPayable: 20000.00,
+    status: "Unpost",
+  },
+  {
+    id: "vt-11",
+    sl: 11,
+    supplier: "ZOOM TECHNOLOGY",
+    billNo: "489",
+    billDate: "31/08/2026",
+    billType: "Local",
+    currency: "BDT",
+    exchangeRate: 1.000,
+    billValue: 1200.00,
+    vatAmount: 0.00,
+    taxAmount: 0.00,
+    discountAmt: 0.00,
+    netPayable: 1200.00,
+    status: "Post",
+  },
 ];
 
-  const [tableData, setTableData] = useState<any[]>(initialData);
+function VatTaxRegisterPage() {
+  // Filter States
+  const [dateFrom, setDateFrom] = useState("2026-08-01");
+  const [dateTo, setDateTo] = useState("2026-09-08");
+  const [billNoQuery, setBillNoQuery] = useState("");
+  const [poNoQuery, setPoNoQuery] = useState("");
+  const [postingStatus, setPostingStatus] = useState<"All" | "Post" | "Un-Post">("All");
+  const [supplierQuery, setSupplierQuery] = useState("");
+
+  // Records state
+  const [records, setRecords] = useState<VatTaxRecord[]>(() => {
+    const saved = localStorage.getItem("procurement_vat_tax_records_v1");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return INITIAL_VAT_TAX_RECORDS;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("procurement_vat_tax_records_v1", JSON.stringify(records));
+  }, [records]);
 
   // Modal State
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any | null>(null);
-  const [formData, setFormData] = useState<Record<string, string>>({});
+  const [viewingRecord, setViewingRecord] = useState<VatTaxRecord | null>(null);
 
-  // Filtering
-  const filteredData = useMemo(() => {
-    return tableData.filter((row) => {
-      return Object.values(row).some((val) => 
-        String(val).toLowerCase().includes(searchQuery.toLowerCase())
-      );
+  // Filter Logic
+  const filteredRecords = useMemo(() => {
+    return records.filter((rec) => {
+      // Bill No Filter
+      if (billNoQuery.trim() && !rec.billNo.toLowerCase().includes(billNoQuery.toLowerCase().trim())) {
+        return false;
+      }
+      // PO No Filter
+      if (poNoQuery.trim()) {
+        const pQuery = poNoQuery.toLowerCase().trim();
+        if (!rec.poWoNo || !rec.poWoNo.toLowerCase().includes(pQuery)) return false;
+      }
+      // Posting Status Filter
+      if (postingStatus !== "All") {
+        const targetStatus = postingStatus === "Post" ? "Post" : "Unpost";
+        if (rec.status !== targetStatus) return false;
+      }
+      // Supplier Name Filter
+      if (supplierQuery.trim() && !rec.supplier.toLowerCase().includes(supplierQuery.toLowerCase().trim())) {
+        return false;
+      }
+
+      return true;
     });
-  }, [tableData, searchQuery]);
+  }, [records, billNoQuery, poNoQuery, postingStatus, supplierQuery]);
 
-  const openCreateModal = () => {
-    setEditingItem(null);
-    const initialForm: Record<string, string> = {};
-    columnKeys.forEach((key) => {
-      initialForm[key] = "";
-    });
-    setFormData(initialForm);
-    setIsModalOpen(true);
-  };
-
-  const openEditModal = (item: any) => {
-    setEditingItem(item);
-    setFormData({ ...item });
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setEditingItem(null);
-  };
-
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (editingItem) {
-      setTableData((prev) =>
-        prev.map((item) => (item.id === editingItem.id ? { ...item, ...formData } : item))
-      );
-    } else {
-      const newId = (Math.max(0, ...tableData.map((item) => parseInt(item.id) || 0)) + 1).toString();
-      const newItem = { ...formData, id: newId };
-      setTableData((prev) => [...prev, newItem]);
-    }
-    closeModal();
-  };
-
-  const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this record?")) {
-      setTableData((prev) => prev.filter((item) => item.id !== id));
-    }
+  const resetFilters = () => {
+    setDateFrom("2026-08-01");
+    setDateTo("2026-09-08");
+    setBillNoQuery("");
+    setPoNoQuery("");
+    setPostingStatus("All");
+    setSupplierQuery("");
   };
 
   return (
@@ -104,140 +327,314 @@ function ProcurementBillingVatTaxRegisterPage() {
       <ProcurementSidebar />
       <main className="flex-1 min-w-0 flex flex-col relative">
         <ProcurementTopbar />
-        
+
         <div className="p-4 md:p-6 lg:p-8 space-y-6 w-full max-w-[1600px] mx-auto">
+          
           {/* Breadcrumb Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h1 className="text-xl font-black tracking-tight text-foreground flex items-center gap-2">
-                <SlidersHorizontal className="size-5.5 text-primary" />
-                VAT and Tax Registry compliance log
+                <Receipt className="size-6 text-emerald-600 dark:text-emerald-400" />
+                VAT and Tax Register
               </h1>
-              <p className="text-xs text-muted-foreground mt-1 font-normal">
-                Procurement Workspace &gt; Configuration &gt; <span className="text-amber-500 font-semibold">VAT and Tax Registry compliance log</span>
+              <p className="text-xs text-muted-foreground mt-1 font-medium">
+                Procurement Workspace &gt; Billing &gt; <span className="text-emerald-600 dark:text-emerald-400 font-semibold">VAT and Tax Register</span>
               </p>
             </div>
-            <button 
-              onClick={openCreateModal}
-              className="h-9 px-4 bg-[#0d6efd] hover:bg-blue-700 text-white font-semibold text-xs rounded-lg flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer shrink-0"
-            >
-              <Plus className="size-4" />
-              Add New Record
-            </button>
+            
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="h-9 px-3.5 bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-bold rounded-lg flex items-center gap-1.5 transition cursor-pointer"
+              >
+                <Printer className="size-4" /> Print Register
+              </button>
+            </div>
           </div>
 
-          {/* Table Container */}
-          <div className="bg-card border border-border rounded-xl shadow-sm flex flex-col overflow-hidden">
-            
-            {/* Toolbar */}
-            <div className="p-4 border-b border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-slate-900">
+          {/* Filter Parameters Bar */}
+          <div className="bg-card border border-border rounded-xl p-5 shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <div className="flex items-center gap-2">
+                <Filter className="size-4 text-emerald-600" />
+                <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                  Search &amp; Filter Parameters
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="text-[11px] text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 font-medium flex items-center gap-1 transition cursor-pointer"
+              >
+                <RefreshCw className="size-3" /> Reset Filters
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 items-end text-xs">
               
-              {/* Action Buttons */}
-              <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
-                <button className="h-[32px] px-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-medium text-[11px] rounded flex items-center gap-1.5 shrink-0 transition-colors shadow-2xs font-sans">
-                  <FileSpreadsheet className="size-3.5 text-emerald-600" /> Excel
-                </button>
-                <button className="h-[32px] px-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-medium text-[11px] rounded flex items-center gap-1.5 shrink-0 transition-colors shadow-2xs font-sans">
-                  <Printer className="size-3.5 text-blue-600" /> Print
-                </button>
-                <button className="h-[32px] px-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-medium text-[11px] rounded flex items-center gap-1.5 shrink-0 transition-colors shadow-2xs font-sans">
-                  <FileText className="size-3.5 text-red-600" /> PDF
-                </button>
+              {/* Date From */}
+              <div className="space-y-1.5">
+                <label className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                  <Calendar className="size-3.5 text-slate-400" /> Date From
+                </label>
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  className="w-full h-9 px-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                />
               </div>
 
-              {/* Search Box */}
-              <div className="relative w-full sm:w-72">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+              {/* Date To */}
+              <div className="space-y-1.5">
+                <label className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                  <Calendar className="size-3.5 text-slate-400" /> Date To
+                </label>
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  className="w-full h-9 px-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                />
+              </div>
+
+              {/* Bill No */}
+              <div className="space-y-1.5">
+                <label className="font-bold text-slate-700 dark:text-slate-300">
+                  Bill No
+                </label>
                 <input
                   type="text"
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9.5 pr-3 h-[32px] bg-[#f8fafc] border border-slate-200 hover:border-slate-300 focus:bg-white focus:border-blue-500 rounded-md text-xs font-normal text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/10 transition-all placeholder:text-slate-400"
+                  placeholder="1298, 019..."
+                  value={billNoQuery}
+                  onChange={(e) => setBillNoQuery(e.target.value)}
+                  className="w-full h-9 px-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                />
+              </div>
+
+              {/* Purchase Order No */}
+              <div className="space-y-1.5">
+                <label className="font-bold text-slate-700 dark:text-slate-300">
+                  Purchase Order No
+                </label>
+                <input
+                  type="text"
+                  placeholder="PO/PSL/2026..."
+                  value={poNoQuery}
+                  onChange={(e) => setPoNoQuery(e.target.value)}
+                  className="w-full h-9 px-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                />
+              </div>
+
+              {/* VAT & Tax Posting Status */}
+              <div className="space-y-1.5">
+                <label className="font-bold text-slate-700 dark:text-slate-300">
+                  VAT &amp; Tax Posting Status
+                </label>
+                <div className="flex items-center gap-3 h-9 px-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg">
+                  {(["All", "Post", "Un-Post"] as const).map((st) => (
+                    <label key={st} className="flex items-center gap-1 cursor-pointer text-xs font-medium">
+                      <input
+                        type="radio"
+                        name="postingStatus"
+                        checked={postingStatus === st}
+                        onChange={() => setPostingStatus(st)}
+                        className="text-emerald-600 focus:ring-emerald-500"
+                      />
+                      <span>{st}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Supplier Name */}
+              <div className="space-y-1.5">
+                <label className="font-bold text-slate-700 dark:text-slate-300">
+                  Supplier Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="Gadget & Gaming, Star Tech..."
+                  value={supplierQuery}
+                  onChange={(e) => setSupplierQuery(e.target.value)}
+                  className="w-full h-9 px-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
                 />
               </div>
 
             </div>
 
-            {/* Table */}
+            <div className="pt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() => {}}
+                className="h-9 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg flex items-center gap-2 transition cursor-pointer shadow-sm shadow-blue-600/30"
+              >
+                <Search className="size-4" /> Search
+              </button>
+            </div>
+          </div>
+
+          {/* Table Container Card */}
+          <div className="bg-card border border-border rounded-xl shadow-xs overflow-hidden flex flex-col">
+            
+            {/* Toolbar Export Bar */}
+            <div className="p-4 border-b border-border bg-slate-50/50 dark:bg-slate-900/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => alert("Exporting VAT & Tax Register to Excel...")}
+                  className="h-8 px-3 bg-white dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 border border-slate-200 dark:border-slate-700 text-emerald-700 dark:text-emerald-400 font-bold text-xs rounded-lg flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <FileSpreadsheet className="size-3.5 text-emerald-600" /> Excel
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="h-8 px-3 bg-white dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-950/40 border border-slate-200 dark:border-slate-700 text-blue-700 dark:text-blue-400 font-bold text-xs rounded-lg flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <Printer className="size-3.5 text-blue-600" /> Print
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => alert("Downloading VAT & Tax Register PDF...")}
+                  className="h-8 px-3 bg-white dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-950/40 border border-slate-200 dark:border-slate-700 text-red-700 dark:text-red-400 font-bold text-xs rounded-lg flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <FileText className="size-3.5 text-red-600" /> PDF
+                </button>
+              </div>
+
+              <div className="text-xs text-muted-foreground font-medium">
+                Showing <span className="font-bold text-foreground">1</span> to <span className="font-bold text-foreground">{filteredRecords.length}</span> of <span className="font-bold text-foreground">{filteredRecords.length}</span> entries
+              </div>
+            </div>
+
+            {/* VAT & Tax Data Table */}
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap bg-slate-50 dark:bg-slate-800">
-                    <th className="px-4 py-2.5 font-semibold w-16 text-center border-r border-slate-100">
-                      <div className="flex items-center justify-center gap-1">
-                        <span>SL</span>
-                      </div>
-                    </th>
-                    <th className="px-4 py-2.5 font-semibold w-24 text-center border-r border-slate-100">
-                      <div className="flex items-center justify-center">
-                        <span>ACTIONS</span>
-                      </div>
-                    </th>
-                    {tableHeaders.map((header: string) => (
-                      <th key={header} className="px-4 py-2.5 font-semibold border-r border-slate-100 last:border-r-0">
-                        <div className="flex items-center justify-between">
-                          <span>{header}</span>
-                          <SlidersHorizontal className="size-2.5 text-slate-400" />
-                        </div>
-                      </th>
-                    ))}
+                  <tr className="bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-bold text-[11px] border-b border-border">
+                    <th className="p-3 text-center w-12 border-r border-border/60">SL</th>
+                    <th className="p-3 text-center w-16 border-r border-border/60">Action</th>
+                    <th className="p-3 border-r border-border/60">Supplier Name</th>
+                    <th className="p-3 border-r border-border/60">Bill No</th>
+                    <th className="p-3 text-center border-r border-border/60">Bill Date</th>
+                    <th className="p-3 text-center border-r border-border/60">Bill Type</th>
+                    <th className="p-3 text-center border-r border-border/60">Currency</th>
+                    <th className="p-3 text-center border-r border-border/60">Exchange Rate</th>
+                    <th className="p-3 text-right border-r border-border/60">Bill Value</th>
+                    <th className="p-3 text-right border-r border-border/60">Vat amount</th>
+                    <th className="p-3 text-right border-r border-border/60">Tax amount</th>
+                    <th className="p-3 text-right border-r border-border/60">Discount Amt</th>
+                    <th className="p-3 text-right border-r border-border/60">Net Payable</th>
+                    <th className="p-3 text-center">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 font-normal text-slate-700 dark:text-slate-200 bg-white dark:bg-transparent">
-                  {filteredData.map((row: any, index: number) => (
-                    <tr key={row.id || index} className="hover:bg-slate-50 border-b border-slate-100 transition-colors">
-                      <td className="px-4 py-2.5 text-center border-r border-slate-100 text-slate-500 font-normal">
-                        {index + 1}
+                <tbody className="divide-y divide-border/60 bg-white dark:bg-transparent font-normal">
+                  {filteredRecords.map((rec, index) => (
+                    <tr key={rec.id || index} className="hover:bg-slate-50 dark:hover:bg-slate-900/60 transition">
+                      {/* SL */}
+                      <td className="p-3 text-center text-slate-500 border-r border-border/60 font-medium">
+                        {rec.sl || index + 1}
                       </td>
-                      <td className="px-4 py-2.5 text-center border-r border-slate-100">
-                        <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => openEditModal(row)}
-                            className="text-orange-500 hover:text-orange-700 transition"
-                            title="Edit"
-                          >
-                            <Pencil className="size-3.5" strokeWidth={2} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(row.id)}
-                            className="text-rose-500 hover:text-rose-700 transition"
-                            title="Delete"
-                          >
-                            <Trash2 className="size-3.5" strokeWidth={2} />
-                          </button>
-                        </div>
-                      </td>
-                      {columnKeys.map((key: string) => {
-                        const value = row[key];
-                        const isStatus = key === "status" || key === "isActive";
 
-                        return (
-                          <td key={key} className="px-4.5 py-2.5 border-r border-slate-100 last:border-r-0 max-w-[220px] truncate font-normal text-slate-700 dark:text-slate-200">
-                            {isStatus ? (
-                              <span className={`px-2 py-0.5 rounded text-[9px] font-bold tracking-wide uppercase ${
-                                value === "Approved" || value === "Active" || value === "Audit Complete" || value === "Verified"
-                                  ? "bg-success/15 text-success-foreground"
-                                  : value === "Draft"
-                                  ? "bg-muted text-muted-foreground"
-                                  : "bg-orange-500/10 text-orange-600 border border-orange-500/20"
-                              }`}>
-                                {value}
-                              </span>
-                            ) : (
-                              <span>
-                                {value}
-                              </span>
-                            )}
-                          </td>
-                        );
-                      })}
+                      {/* Action */}
+                      <td className="p-3 text-center border-r border-border/60">
+                        <button
+                          type="button"
+                          onClick={() => setViewingRecord(rec)}
+                          className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-lg transition cursor-pointer"
+                          title="View Billing Information"
+                        >
+                          <Eye className="size-4" />
+                        </button>
+                      </td>
+
+                      {/* Supplier Name */}
+                      <td className="p-3 border-r border-border/60 font-bold text-slate-900 dark:text-white max-w-[220px] truncate" title={rec.supplier}>
+                        {rec.supplier}
+                      </td>
+
+                      {/* Bill No (Clickable) */}
+                      <td className="p-3 border-r border-border/60 font-mono font-bold">
+                        <button
+                          type="button"
+                          onClick={() => setViewingRecord(rec)}
+                          className="text-blue-600 dark:text-blue-400 hover:underline hover:text-blue-700 transition cursor-pointer font-mono font-bold"
+                        >
+                          {rec.billNo}
+                        </button>
+                      </td>
+
+                      {/* Bill Date */}
+                      <td className="p-3 text-center text-slate-600 dark:text-slate-400 border-r border-border/60 font-medium whitespace-nowrap">
+                        {rec.billDate}
+                      </td>
+
+                      {/* Bill Type */}
+                      <td className="p-3 text-center border-r border-border/60 whitespace-nowrap">
+                        <span className="px-2.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-[11px]">
+                          {rec.billType}
+                        </span>
+                      </td>
+
+                      {/* Currency */}
+                      <td className="p-3 text-center font-bold text-slate-800 dark:text-slate-200 border-r border-border/60 whitespace-nowrap">
+                        {rec.currency}
+                      </td>
+
+                      {/* Exchange Rate */}
+                      <td className="p-3 text-center text-slate-600 dark:text-slate-400 border-r border-border/60 font-mono">
+                        {rec.exchangeRate.toFixed(3)}
+                      </td>
+
+                      {/* Bill Value */}
+                      <td className="p-3 text-right font-mono font-bold text-slate-900 dark:text-white border-r border-border/60">
+                        {rec.billValue.toFixed(2)}
+                      </td>
+
+                      {/* Vat amount */}
+                      <td className="p-3 text-right font-mono text-slate-600 dark:text-slate-400 border-r border-border/60">
+                        {rec.vatAmount.toFixed(2)}
+                      </td>
+
+                      {/* Tax amount */}
+                      <td className="p-3 text-right font-mono text-slate-600 dark:text-slate-400 border-r border-border/60">
+                        {rec.taxAmount.toFixed(2)}
+                      </td>
+
+                      {/* Discount Amt */}
+                      <td className="p-3 text-right font-mono text-slate-600 dark:text-slate-400 border-r border-border/60">
+                        {rec.discountAmt.toFixed(2)}
+                      </td>
+
+                      {/* Net Payable */}
+                      <td className="p-3 text-right font-mono font-black text-slate-900 dark:text-white border-r border-border/60">
+                        {rec.netPayable.toFixed(2)}
+                      </td>
+
+                      {/* Status */}
+                      <td className="p-3 text-center whitespace-nowrap">
+                        <span
+                          className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide inline-flex items-center gap-1 ${
+                            rec.status === "Post"
+                              ? "bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
+                              : "bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800"
+                          }`}
+                        >
+                          {rec.status === "Post" ? <CheckCircle2 className="size-3" /> : <Clock className="size-3" />}
+                          {rec.status}
+                        </span>
+                      </td>
                     </tr>
                   ))}
-                  {filteredData.length === 0 && (
+
+                  {filteredRecords.length === 0 && (
                     <tr>
-                      <td colSpan={tableHeaders.length + 2} className="text-center py-10 text-muted-foreground font-semibold">
-                        No records found.
+                      <td colSpan={14} className="p-8 text-center text-slate-400 font-medium">
+                        No VAT &amp; Tax records match your search criteria.
                       </td>
                     </tr>
                   )}
@@ -245,97 +642,294 @@ function ProcurementBillingVatTaxRegisterPage() {
               </table>
             </div>
 
-            {/* Table Footer / Pagination stats */}
-            <div className="p-4 border-t border-slate-100 bg-[#fcfdfd] dark:bg-slate-900/40 text-[11px] text-muted-foreground font-normal flex flex-col sm:flex-row justify-between items-center gap-3">
-              <span>Showing 1 to {filteredData.length} of {tableData.length} entries</span>
-              <div className="flex items-center gap-1.5 font-sans">
-                <button className="px-2 py-1 text-slate-400 hover:text-slate-700 font-normal">Previous</button>
-                <button className="size-6 bg-[#8BC34A] text-white font-semibold rounded flex items-center justify-center text-[10px]">1</button>
-                <button className="px-2 py-1 text-slate-400 hover:text-slate-700 font-normal">Next</button>
+            {/* Pagination Controls */}
+            <div className="p-4 border-t border-border bg-slate-50/50 dark:bg-slate-900/50 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-muted-foreground">
+              <span>Showing 1 to {filteredRecords.length} of {filteredRecords.length} entries</span>
+              
+              <div className="flex items-center gap-1">
+                <button disabled className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-md text-slate-400 cursor-not-allowed font-medium">
+                  Previous
+                </button>
+                <button className="px-3 py-1 bg-blue-600 text-white font-bold rounded-md text-xs">
+                  1
+                </button>
+                <button disabled className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-md text-slate-400 cursor-not-allowed font-medium">
+                  Next
+                </button>
               </div>
             </div>
 
           </div>
         </div>
 
-        {/* CURRENCY INFO DIALOG MODAL */}
-        {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-            <div className="bg-white dark:bg-slate-950 w-full max-w-lg rounded-sm shadow-xl border border-border/80 overflow-hidden flex flex-col">
+        {/* BILLING INFORMATION VIEW MODAL (Matching Screenshot) */}
+        {viewingRecord && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200 overflow-y-auto print:p-0 print:bg-white">
+            <div className="bg-white text-slate-900 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[92vh] overflow-y-auto relative border border-slate-200 print:border-none print:shadow-none print:max-h-none print:w-full">
               
-              {/* Modal Header */}
-              <div className="flex justify-between items-center p-4 border-b border-border/40 shrink-0">
-                <h3 className="text-[15px] font-bold text-slate-800 dark:text-slate-100 font-sans">
-                  VAT and Tax Registry compliance log Info
-                </h3>
-                <button 
-                  onClick={closeModal} 
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition p-1"
-                >
-                  <X className="size-4.5" strokeWidth={2} />
-                </button>
-              </div>
-
-              {/* Modal Body Form */}
-              <form onSubmit={handleSave} className="flex-1 p-5 space-y-7">
-                {columnKeys.map((key, idx) => {
-                  if (key === "id") return null;
-                  const labelName = tableHeaders[idx - 1] || key;
-                  const value = formData[key] || "";
-                  
-                  return (
-                    <div key={key} className="space-y-1.5 relative border-b border-slate-200 dark:border-slate-800 pb-1.5 focus-within:border-blue-500 transition-colors">
-                      <label className="text-[10px] font-normal text-slate-400 block tracking-wide select-none">
-                        {labelName} {key === "status" || key === "isActive" ? "" : "*"}
-                      </label>
-                      {key === "status" || key === "isActive" ? (
-                        <select
-                          value={value}
-                          onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
-                          className="w-full bg-transparent outline-none border-none text-[12px] font-normal text-slate-800 dark:text-slate-100 py-0.5 focus:ring-0 cursor-pointer font-sans"
-                        >
-                          <option value="Active">Active</option>
-                          <option value="Inactive">Inactive</option>
-                        </select>
-                      ) : (
-                        <input
-                          type="text"
-                          required
-                          value={value}
-                          onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
-                          className="w-full bg-transparent outline-none border-none text-[12px] font-normal text-slate-800 dark:text-slate-100 py-0.5 focus:ring-0"
-                        />
-                      )}
+              {/* Modal Sticky Action Bar */}
+              <div className="sticky top-0 z-20 bg-slate-900 text-white px-6 py-3.5 flex justify-between items-center print:hidden rounded-t-2xl border-b border-slate-800">
+                <div className="flex items-center gap-3">
+                  <div className="size-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+                    <Receipt className="size-4" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-sm font-mono tracking-tight">Bill No: {viewingRecord.billNo}</span>
+                      <span className={`px-2 py-0.5 text-[10px] font-black rounded-full uppercase tracking-wide border ${
+                        viewingRecord.status === "Post" 
+                          ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                          : "bg-amber-500/20 text-amber-300 border-amber-500/30"
+                      }`}>
+                        {viewingRecord.status}
+                      </span>
                     </div>
-                  );
-                })}
+                    <p className="text-[11px] text-slate-400 font-medium">Billing Information Document Preview</p>
+                  </div>
+                </div>
 
-                {/* Modal Footer Controls */}
-                <div className="pt-4 flex justify-between items-center border-t border-border/40">
+                <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={closeModal}
-                    className="text-xs font-medium text-slate-800 dark:text-slate-200 hover:text-slate-600 transition tracking-wide font-sans cursor-pointer uppercase py-2 px-4"
+                    onClick={() => window.print()}
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg flex items-center gap-2 transition cursor-pointer shadow-sm shadow-emerald-600/30"
                   >
-                    CLOSE
+                    <Printer className="size-4" /> Print Document
                   </button>
                   <button
-                    type="submit"
-                    className={`px-5 py-2.5 text-xs font-semibold text-white rounded-sm shadow-sm transition duration-150 uppercase tracking-wide cursor-pointer ${
-                      editingItem 
-                        ? "bg-[#2196F3] hover:bg-[#1E88E5]" 
-                        : "bg-[#8BC34A] hover:bg-[#7CB342]"
-                    }`}
+                    type="button"
+                    onClick={() => setViewingRecord(null)}
+                    className="p-1.5 text-slate-400 hover:text-white transition rounded-lg hover:bg-slate-800 cursor-pointer"
                   >
-                    {editingItem ? "UPDATE" : "CREATE"}
+                    <X className="size-5" />
                   </button>
                 </div>
-              </form>
+              </div>
 
+              {/* Printable Document Body Canvas (Matching User Screenshot Layout) */}
+              <div className="p-8 sm:p-10 space-y-6 relative font-sans text-slate-800 bg-white">
+                
+                {/* Header: Company Logo & Bill Info Header Block */}
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-4 border-b border-slate-200 pb-4">
+                  
+                  {/* Company Branding Left */}
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <img src={pakizaSoftwareLogo} alt="PAKIZA SOFTWARE" className="h-8 w-auto object-contain" />
+                      <div>
+                        <h1 className="text-xl font-black tracking-tight text-blue-950 uppercase">
+                          PAKIZA SOFTWARE
+                        </h1>
+                        <p className="text-[10px] text-slate-500 italic font-semibold">
+                          Excellence | Intelligence | Automation
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-slate-600 font-medium pt-1">
+                      Khan ABC Tradeplex House#37, Floor#11 (B-11), Road#2, Dhaka-1205
+                    </p>
+                  </div>
+
+                  {/* Billing Header Table Right */}
+                  <div className="w-full sm:w-72 border border-slate-300 text-xs rounded-xs overflow-hidden">
+                    <div className="bg-slate-50 text-slate-600 font-bold p-1.5 text-right tracking-wider border-b border-slate-300 uppercase text-[10px]">
+                      Billing Information
+                    </div>
+                    <div className="divide-y divide-slate-300">
+                      <div className="grid grid-cols-3 p-1.5 bg-white">
+                        <span className="font-semibold text-slate-600">Bill No :</span>
+                        <span className="col-span-2 font-mono font-bold text-slate-900">{viewingRecord.billNo}</span>
+                      </div>
+                      <div className="grid grid-cols-3 p-1.5 bg-white">
+                        <span className="font-semibold text-slate-600">Bill Date :</span>
+                        <span className="col-span-2 font-bold text-slate-900">{viewingRecord.billDate}</span>
+                      </div>
+                      <div className="grid grid-cols-3 p-1.5 bg-white">
+                        <span className="font-semibold text-slate-600">Supplier :</span>
+                        <span className="col-span-2 font-bold text-slate-900">{viewingRecord.supplier}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Centered Document Title */}
+                <div className="text-center pt-1">
+                  <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight underline underline-offset-4">
+                    Billing Information
+                  </h2>
+                </div>
+
+                {/* 3-Row Bordered Metadata Grid */}
+                <div className="border border-slate-400 text-xs font-sans">
+                  {/* Row 1 */}
+                  <div className="grid grid-cols-6 border-b border-slate-400 divide-x divide-slate-400 p-2 bg-white">
+                    <span className="font-bold text-slate-800">PO/WO</span>
+                    <span className="font-mono font-bold text-blue-600 hover:underline cursor-pointer">
+                      {viewingRecord.poWoNo || "PO/PSL/2026/000240"}
+                    </span>
+                    <span className="font-bold text-slate-800">PO/WO Date</span>
+                    <span className="font-bold text-slate-900">{viewingRecord.poWoDate || "03/09/2026"}</span>
+                    <span className="font-bold text-slate-800">Currency</span>
+                    <span className="font-bold text-slate-900">{viewingRecord.currency}</span>
+                  </div>
+
+                  {/* Row 2 */}
+                  <div className="grid grid-cols-6 border-b border-slate-400 divide-x divide-slate-400 p-2 bg-white">
+                    <span className="font-bold text-slate-800">Exchange Rate</span>
+                    <span className="font-mono text-slate-900">{viewingRecord.exchangeRate.toFixed(3)}</span>
+                    <span className="font-bold text-slate-800">MRIR No</span>
+                    <span className="font-mono font-bold text-blue-600 hover:underline cursor-pointer">
+                      {viewingRecord.mrirNo || "606"}
+                    </span>
+                    <span className="font-bold text-slate-800">MRIR Date</span>
+                    <span className="font-bold text-slate-900">{viewingRecord.mrirDate || "05/09/2026"}</span>
+                  </div>
+
+                  {/* Row 3 */}
+                  <div className="grid grid-cols-6 divide-x divide-slate-400 p-2 bg-white">
+                    <span className="font-bold text-slate-800">Challan No</span>
+                    <span className="font-mono font-bold text-slate-900">{viewingRecord.challanNo || viewingRecord.billNo}</span>
+                    <span className="font-bold text-slate-800">Challan Date</span>
+                    <span className="font-bold text-slate-900">{viewingRecord.challanDate || viewingRecord.billDate}</span>
+                    <span className="font-bold text-slate-800">Advance Adjustment</span>
+                    <span className="font-mono text-slate-900">{(viewingRecord.advanceAdjustment || 0).toFixed(2)}</span>
+                  </div>
+                </div>
+
+                {/* Items Grid & Summary */}
+                <div className="border border-slate-400 text-xs font-sans overflow-hidden">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-100 text-slate-800 font-bold border-b border-slate-400 text-[11px]">
+                        <th className="p-2 w-10 border-r border-slate-400">SL</th>
+                        <th className="p-2 border-r border-slate-400">Item</th>
+                        <th className="p-2 text-right w-24 border-r border-slate-400">Quantity</th>
+                        <th className="p-2 text-center w-20 border-r border-slate-400">UOM</th>
+                        <th className="p-2 text-right w-28 border-r border-slate-400">Unit Price</th>
+                        <th className="p-2 text-right w-32">Total Price</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-300">
+                      {(viewingRecord.items && viewingRecord.items.length > 0 ? viewingRecord.items : [
+                        { sl: 1, item: "Mouse", quantity: 1.00, uom: "PCS", unitPrice: 450.00, totalPrice: 450.00 }
+                      ]).map((item, idx) => (
+                        <tr key={idx} className="hover:bg-slate-50">
+                          <td className="p-2 border-r border-slate-300 text-slate-600">{item.sl || idx + 1}</td>
+                          <td className="p-2 border-r border-slate-300 font-bold text-slate-900">{item.item}</td>
+                          <td className="p-2 border-r border-slate-300 text-right font-mono font-semibold">{item.quantity.toFixed(2)}</td>
+                          <td className="p-2 border-r border-slate-300 text-center text-slate-600">{item.uom}</td>
+                          <td className="p-2 border-r border-slate-300 text-right font-mono">{item.unitPrice.toFixed(2)}</td>
+                          <td className="p-2 text-right font-mono font-bold text-slate-900">{item.totalPrice.toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+
+                  {/* Summary Breakdown Rows */}
+                  <div className="border-t border-slate-400 divide-y divide-slate-300 text-xs">
+                    <div className="grid grid-cols-6 p-2 font-bold text-slate-900">
+                      <span className="col-span-2 text-right pr-4">Total Quantity</span>
+                      <span className="font-mono">
+                        {viewingRecord.items && viewingRecord.items.length > 0
+                          ? viewingRecord.items.reduce((acc, i) => acc + i.quantity, 0)
+                          : 1}
+                      </span>
+                      <span className="col-span-2 text-right pr-4">Total Amount</span>
+                      <span className="text-right font-mono font-bold">
+                        {viewingRecord.items && viewingRecord.items.length > 0
+                          ? viewingRecord.items.reduce((acc, i) => acc + i.totalPrice, 0)
+                          : 450}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-6 p-2 text-slate-700">
+                      <span className="col-span-5 text-right font-bold pr-4">Discount(-)</span>
+                      <span className="text-right font-mono font-bold">{(viewingRecord.discountAmt || 0).toFixed(2)}</span>
+                    </div>
+
+                    <div className="grid grid-cols-6 p-2 text-slate-700">
+                      <span className="col-span-5 text-right font-bold pr-4">Others Amount</span>
+                      <span className="text-right font-mono font-bold">0.00</span>
+                    </div>
+
+                    <div className="grid grid-cols-6 p-2 text-slate-700">
+                      <span className="col-span-5 text-right font-bold pr-4">VAT(Inc)</span>
+                      <span className="text-right font-mono font-bold">{(viewingRecord.vatAmount || 0).toFixed(2)}</span>
+                    </div>
+
+                    <div className="grid grid-cols-6 p-2 text-slate-700">
+                      <span className="col-span-5 text-right font-bold pr-4">TAX(Inc)</span>
+                      <span className="text-right font-mono font-bold">{(viewingRecord.taxAmount || 0).toFixed(2)}</span>
+                    </div>
+
+                    <div className="grid grid-cols-6 p-2 font-bold text-slate-900">
+                      <span className="col-span-5 text-right font-bold pr-4">Net Payable</span>
+                      <span className="text-right font-mono font-bold">{viewingRecord.netPayable.toFixed(2)}</span>
+                    </div>
+
+                    <div className="grid grid-cols-6 p-2 font-black text-slate-900 bg-slate-50">
+                      <span className="col-span-5 text-right font-bold pr-4">Total Amount</span>
+                      <span className="text-right font-mono font-bold text-sm">{viewingRecord.netPayable.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Words & Comments Box */}
+                <div className="border border-slate-400 text-xs divide-y divide-slate-400 font-sans">
+                  <div className="p-2 font-bold text-slate-900">
+                    In words: <span className="font-semibold text-slate-700">Four Hundred Fifty Only.</span>
+                  </div>
+                  <div className="p-2 font-bold text-slate-900">
+                    Comment (Vat &amp; Tax) :
+                  </div>
+                </div>
+
+                {/* 4-Column Signature Block (Matching Screenshot) */}
+                <div className="pt-12 grid grid-cols-4 gap-4 text-center text-xs font-sans print:pt-16">
+                  
+                  {/* Prepared By */}
+                  <div className="space-y-1 border-t border-slate-400 pt-2">
+                    <p className="font-bold text-slate-800">Prepared By</p>
+                    <p className="font-bold text-slate-900 text-[11px]">{viewingRecord.preparedBy?.name || "Rajebul Hasan Rajon"}</p>
+                    <p className="text-[10px] text-slate-500">{viewingRecord.preparedBy?.title || "Deputy Manager"}</p>
+                    <p className="text-[10px] text-slate-500 font-mono">{viewingRecord.preparedBy?.date || "05/09/2026 16:07:05"}</p>
+                  </div>
+
+                  {/* Vat and Tax Inputted By */}
+                  <div className="space-y-1 border-t border-slate-400 pt-2">
+                    <p className="font-bold text-slate-800">Vat and Tax Inputted By</p>
+                    <p className="font-bold text-slate-900 text-[11px]">{viewingRecord.vatTaxInputtedBy?.name || "A.K.M Nakibul Haque"}</p>
+                    <p className="text-[10px] text-slate-500">{viewingRecord.vatTaxInputtedBy?.title || "Sr. Officer"}</p>
+                    <p className="text-[10px] text-slate-500 font-mono">{viewingRecord.vatTaxInputtedBy?.date || "06/09/2026 15:46:51"}</p>
+                  </div>
+
+                  {/* Audited By */}
+                  <div className="space-y-1 border-t border-slate-400 pt-2">
+                    <p className="font-bold text-slate-800">Audited By</p>
+                    <p className="font-bold text-slate-900 text-[11px]">{viewingRecord.auditedBy?.name || "Md.Shahidul Islam"}</p>
+                    <p className="text-[10px] text-slate-500">{viewingRecord.auditedBy?.title || "Assistant Manager"}</p>
+                    <p className="text-[10px] text-slate-500 font-mono">{viewingRecord.auditedBy?.date || "08/09/2026 09:13:18"}</p>
+                  </div>
+
+                  {/* Approved By */}
+                  <div className="space-y-1 border-t border-slate-400 pt-2">
+                    <p className="font-bold text-slate-800">Approved By</p>
+                    <div className="h-6"></div>
+                    <p className="text-[10px] text-slate-400">Authorized Signature</p>
+                  </div>
+
+                </div>
+
+                {/* Print Footer note */}
+                <div className="text-center text-[10px] text-slate-400 pt-6 border-t border-slate-100 print:block">
+                  This is a computer-generated VAT &amp; Tax Billing Information document from Pakiza HRIS &amp; ERP System.
+                </div>
+
+              </div>
             </div>
           </div>
         )}
-
       </main>
     </div>
   );

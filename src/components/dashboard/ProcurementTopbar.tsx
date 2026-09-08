@@ -34,13 +34,8 @@ const searchableMenus: SearchMenuLink[] = [
   // Configuration
   { label: "Currency Rate", parent: "Configuration", to: "/procurement-config-currency-rate", description: "Manage global currency rates and exchanges" },
   { label: "Terms and Condition", parent: "Configuration", to: "/procurement-config-terms", description: "Configure system terms and conditions templates" },
-  { label: "Purchase Option", parent: "Configuration", to: "/procurement-config-purchase-option", description: "Manage procurement purchase types and options" },
-  { label: "Supplier Opening", parent: "Configuration", to: "/procurement-config-supplier-opening", description: "Enter supplier opening balances and ledgers" },
-  { label: "L/C Booking", parent: "Configuration", to: "/procurement-config-lc-booking", description: "Book Letter of Credits for foreign procurement" },
-  { label: "L/C Booking List", parent: "Configuration", to: "/procurement-config-lc-booking-list", description: "View list of active and archived Letter of Credits" },
-  { label: "Bank Information", parent: "Configuration", to: "/procurement-config-bank-info", description: "Configure local and international bank details" },
+  { label: "Bank Info", parent: "Configuration", to: "/procurement-config-bank-info", description: "Configure local and international bank details" },
   { label: "Bank Accounts", parent: "Configuration", to: "/procurement-config-bank-accounts", description: "Manage company bank account configurations" },
-  { label: "Supplier Name", parent: "Configuration", to: "/procurement-config-supplier-name", description: "Manage registered supplier profile directory" },
   
   // Proforma Invoice
   { label: "Create PI", parent: "Proforma Invoice", to: "/procurement-pi-create", description: "Generate new Proforma Invoice drafts" },

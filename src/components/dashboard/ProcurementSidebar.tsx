@@ -52,13 +52,8 @@ export const nav: NavItem[] = [
     subitems: [
       { label: "Currency Rate", to: "/procurement-config-currency-rate" },
       { label: "Terms and Condition", to: "/procurement-config-terms" },
-      { label: "Purchase Option", to: "/procurement-config-purchase-option" },
-      { label: "Supplier Opening", to: "/procurement-config-supplier-opening" },
-      { label: "L/C Booking", to: "/procurement-config-lc-booking" },
-      { label: "L/C Booking List", to: "/procurement-config-lc-booking-list" },
-      { label: "Bank Information", to: "/procurement-config-bank-info" },
+      { label: "Bank Info", to: "/procurement-config-bank-info" },
       { label: "Bank Accounts", to: "/procurement-config-bank-accounts" },
-      { label: "Supplier Name", to: "/procurement-config-supplier-name" },
     ]
   },
   {
@@ -131,7 +126,7 @@ export const nav: NavItem[] = [
     icon: Blocks,
     subitems: [
       { label: "CS List", to: "/procurement-cs-batch-list" },
-      { label: "CS Workorder List", to: "/procurement-cs-create-workorder" },
+      { label: "CS PO List", to: "/procurement-cs-create-workorder" },
     ]
   }
 ];
