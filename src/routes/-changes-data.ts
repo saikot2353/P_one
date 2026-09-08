@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "410",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "HR & SSP Requisitions",
+    link: "/ssp-new-requisition",
+    descriptionEn: "Added 'General Product Budget Request' and 'ICT Product Budget Request' menus to the HR/SSP New Requisition module (/ssp-new-requisition) matching exact ERP screenshots. Features an interactive menu switcher; dual-panel layout with underline-styled input fields (Req. Type, Category with General Stationary options for General requests, Product autocomplete from pre-loaded catalogs, Quantity, Justification, and blue 'ADD' button); light-pink-headed table (#ffebee) with Item, Quantity, Justification, and For columns; red 'On Behalf :' checkbox with inline employee delegation selector; blue 'SUBMIT' button committing requests to local storage; real-time recent submissions history table; and full integration in Sidebar and Topbar navigation.",
+    descriptionBn: "HR/SSP নিউ রিকুইজিশন মডিউলে (/ssp-new-requisition) অফিশিয়াল ERP স্ক্রিনশট অনুযায়ী 'General Product Budget Request' এবং 'ICT Product Budget Request' নামক দুটি মেনু যুক্ত করা হয়েছে। এতে রয়েছে মেনু সুইচার; আন্ডারলাইন-স্টাইলের ইনপুটযুক্ত ডুয়াল প্যানেল লেআউট (Req. Type, General ক্যাটাগরি যেমন General Stationary, প্রিলোডেড ক্যাটালগসহ Product অটোকমপ্লিট, Quantity, Justification এবং ব্লু 'ADD' বাটন); হালকা গোলাপি রঙের হেডারযুক্ত টেবিল (#ffebee - Item, Quantity, Justification, For); লাল রঙের 'On Behalf :' চেকবক্সসহ ইনলাইন কর্মী সিলেকশন অপশন; লোকাল স্টোরেজে সেভ করার ব্লু 'SUBMIT' বাটন; রিয়েল-টাইম সাম্প্রতিক রিকুইজিশন হিস্ট্রি টেবিল; এবং সাইডবার ও টপবার নেভিগেশনে পূর্ণাঙ্গ অন্তর্ভুক্তি।",
+  },
+  {
     id: "409",
     date: new Date().toISOString().slice(0, 16),
     type: "New Feature",
