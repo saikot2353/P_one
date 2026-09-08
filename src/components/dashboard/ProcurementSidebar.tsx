@@ -130,11 +130,8 @@ export const nav: NavItem[] = [
     label: "Comparison Sheet",
     icon: Blocks,
     subitems: [
-      { label: "Supplier Items", to: "/procurement-cs-supplier-items" },
-      { label: "Create CS Batch", to: "/procurement-cs-create-batch" },
-      { label: "CS Batch List", to: "/procurement-cs-batch-list" },
-      { label: "Supplier Price", to: "/procurement-cs-supplier-price" },
-      { label: "Create Workorder", to: "/procurement-cs-create-workorder" },
+      { label: "CS List", to: "/procurement-cs-batch-list" },
+      { label: "CS Workorder List", to: "/procurement-cs-create-workorder" },
     ]
   }
 ];

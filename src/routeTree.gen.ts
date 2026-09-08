@@ -32,6 +32,7 @@ import { Route as SeparationResignationRequestRouteImport } from './routes/separ
 import { Route as SeparationPaymentRouteImport } from './routes/separation-payment'
 import { Route as SeparationExitDocumentsRouteImport } from './routes/separation-exit-documents'
 import { Route as SeparationCompanyInitiatedRouteImport } from './routes/separation-company-initiated'
+import { Route as SeparationClearanceConfigurationRouteImport } from './routes/separation-clearance-configuration'
 import { Route as SeparationClearanceRouteImport } from './routes/separation-clearance'
 import { Route as SalarySheetPrintRouteImport } from './routes/salary-sheet-print'
 import { Route as SalarySheetFullWithoutHolidayRouteImport } from './routes/salary-sheet-full-without-holiday'
@@ -66,6 +67,7 @@ import { Route as ProcurementPaymentBillRouteImport } from './routes/procurement
 import { Route as ProcurementDashboardRouteImport } from './routes/procurement-dashboard'
 import { Route as ProcurementCsSupplierPriceRouteImport } from './routes/procurement-cs-supplier-price'
 import { Route as ProcurementCsSupplierItemsRouteImport } from './routes/procurement-cs-supplier-items'
+import { Route as ProcurementCsDetailRouteImport } from './routes/procurement-cs-detail'
 import { Route as ProcurementCsCreateWorkorderRouteImport } from './routes/procurement-cs-create-workorder'
 import { Route as ProcurementCsCreateBatchRouteImport } from './routes/procurement-cs-create-batch'
 import { Route as ProcurementCsBatchListRouteImport } from './routes/procurement-cs-batch-list'
@@ -367,6 +369,12 @@ const SeparationCompanyInitiatedRoute =
     path: '/separation-company-initiated',
     getParentRoute: () => rootRouteImport,
   } as any)
+const SeparationClearanceConfigurationRoute =
+  SeparationClearanceConfigurationRouteImport.update({
+    id: '/separation-clearance-configuration',
+    path: '/separation-clearance-configuration',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SeparationClearanceRoute = SeparationClearanceRouteImport.update({
   id: '/separation-clearance',
   path: '/separation-clearance',
@@ -553,6 +561,11 @@ const ProcurementCsSupplierItemsRoute =
     path: '/procurement-cs-supplier-items',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ProcurementCsDetailRoute = ProcurementCsDetailRouteImport.update({
+  id: '/procurement-cs-detail',
+  path: '/procurement-cs-detail',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProcurementCsCreateWorkorderRoute =
   ProcurementCsCreateWorkorderRouteImport.update({
     id: '/procurement-cs-create-workorder',
@@ -1674,6 +1687,7 @@ export interface FileRoutesByFullPath {
   '/procurement-cs-batch-list': typeof ProcurementCsBatchListRoute
   '/procurement-cs-create-batch': typeof ProcurementCsCreateBatchRoute
   '/procurement-cs-create-workorder': typeof ProcurementCsCreateWorkorderRoute
+  '/procurement-cs-detail': typeof ProcurementCsDetailRoute
   '/procurement-cs-supplier-items': typeof ProcurementCsSupplierItemsRoute
   '/procurement-cs-supplier-price': typeof ProcurementCsSupplierPriceRoute
   '/procurement-dashboard': typeof ProcurementDashboardRoute
@@ -1708,6 +1722,7 @@ export interface FileRoutesByFullPath {
   '/salary-sheet-full-without-holiday': typeof SalarySheetFullWithoutHolidayRoute
   '/salary-sheet-print': typeof SalarySheetPrintRoute
   '/separation-clearance': typeof SeparationClearanceRoute
+  '/separation-clearance-configuration': typeof SeparationClearanceConfigurationRoute
   '/separation-company-initiated': typeof SeparationCompanyInitiatedRoute
   '/separation-exit-documents': typeof SeparationExitDocumentsRoute
   '/separation-payment': typeof SeparationPaymentRoute
@@ -1913,6 +1928,7 @@ export interface FileRoutesByTo {
   '/procurement-cs-batch-list': typeof ProcurementCsBatchListRoute
   '/procurement-cs-create-batch': typeof ProcurementCsCreateBatchRoute
   '/procurement-cs-create-workorder': typeof ProcurementCsCreateWorkorderRoute
+  '/procurement-cs-detail': typeof ProcurementCsDetailRoute
   '/procurement-cs-supplier-items': typeof ProcurementCsSupplierItemsRoute
   '/procurement-cs-supplier-price': typeof ProcurementCsSupplierPriceRoute
   '/procurement-dashboard': typeof ProcurementDashboardRoute
@@ -1947,6 +1963,7 @@ export interface FileRoutesByTo {
   '/salary-sheet-full-without-holiday': typeof SalarySheetFullWithoutHolidayRoute
   '/salary-sheet-print': typeof SalarySheetPrintRoute
   '/separation-clearance': typeof SeparationClearanceRoute
+  '/separation-clearance-configuration': typeof SeparationClearanceConfigurationRoute
   '/separation-company-initiated': typeof SeparationCompanyInitiatedRoute
   '/separation-exit-documents': typeof SeparationExitDocumentsRoute
   '/separation-payment': typeof SeparationPaymentRoute
@@ -2153,6 +2170,7 @@ export interface FileRoutesById {
   '/procurement-cs-batch-list': typeof ProcurementCsBatchListRoute
   '/procurement-cs-create-batch': typeof ProcurementCsCreateBatchRoute
   '/procurement-cs-create-workorder': typeof ProcurementCsCreateWorkorderRoute
+  '/procurement-cs-detail': typeof ProcurementCsDetailRoute
   '/procurement-cs-supplier-items': typeof ProcurementCsSupplierItemsRoute
   '/procurement-cs-supplier-price': typeof ProcurementCsSupplierPriceRoute
   '/procurement-dashboard': typeof ProcurementDashboardRoute
@@ -2187,6 +2205,7 @@ export interface FileRoutesById {
   '/salary-sheet-full-without-holiday': typeof SalarySheetFullWithoutHolidayRoute
   '/salary-sheet-print': typeof SalarySheetPrintRoute
   '/separation-clearance': typeof SeparationClearanceRoute
+  '/separation-clearance-configuration': typeof SeparationClearanceConfigurationRoute
   '/separation-company-initiated': typeof SeparationCompanyInitiatedRoute
   '/separation-exit-documents': typeof SeparationExitDocumentsRoute
   '/separation-payment': typeof SeparationPaymentRoute
@@ -2394,6 +2413,7 @@ export interface FileRouteTypes {
     | '/procurement-cs-batch-list'
     | '/procurement-cs-create-batch'
     | '/procurement-cs-create-workorder'
+    | '/procurement-cs-detail'
     | '/procurement-cs-supplier-items'
     | '/procurement-cs-supplier-price'
     | '/procurement-dashboard'
@@ -2428,6 +2448,7 @@ export interface FileRouteTypes {
     | '/salary-sheet-full-without-holiday'
     | '/salary-sheet-print'
     | '/separation-clearance'
+    | '/separation-clearance-configuration'
     | '/separation-company-initiated'
     | '/separation-exit-documents'
     | '/separation-payment'
@@ -2633,6 +2654,7 @@ export interface FileRouteTypes {
     | '/procurement-cs-batch-list'
     | '/procurement-cs-create-batch'
     | '/procurement-cs-create-workorder'
+    | '/procurement-cs-detail'
     | '/procurement-cs-supplier-items'
     | '/procurement-cs-supplier-price'
     | '/procurement-dashboard'
@@ -2667,6 +2689,7 @@ export interface FileRouteTypes {
     | '/salary-sheet-full-without-holiday'
     | '/salary-sheet-print'
     | '/separation-clearance'
+    | '/separation-clearance-configuration'
     | '/separation-company-initiated'
     | '/separation-exit-documents'
     | '/separation-payment'
@@ -2872,6 +2895,7 @@ export interface FileRouteTypes {
     | '/procurement-cs-batch-list'
     | '/procurement-cs-create-batch'
     | '/procurement-cs-create-workorder'
+    | '/procurement-cs-detail'
     | '/procurement-cs-supplier-items'
     | '/procurement-cs-supplier-price'
     | '/procurement-dashboard'
@@ -2906,6 +2930,7 @@ export interface FileRouteTypes {
     | '/salary-sheet-full-without-holiday'
     | '/salary-sheet-print'
     | '/separation-clearance'
+    | '/separation-clearance-configuration'
     | '/separation-company-initiated'
     | '/separation-exit-documents'
     | '/separation-payment'
@@ -3112,6 +3137,7 @@ export interface RootRouteChildren {
   ProcurementCsBatchListRoute: typeof ProcurementCsBatchListRoute
   ProcurementCsCreateBatchRoute: typeof ProcurementCsCreateBatchRoute
   ProcurementCsCreateWorkorderRoute: typeof ProcurementCsCreateWorkorderRoute
+  ProcurementCsDetailRoute: typeof ProcurementCsDetailRoute
   ProcurementCsSupplierItemsRoute: typeof ProcurementCsSupplierItemsRoute
   ProcurementCsSupplierPriceRoute: typeof ProcurementCsSupplierPriceRoute
   ProcurementDashboardRoute: typeof ProcurementDashboardRoute
@@ -3146,6 +3172,7 @@ export interface RootRouteChildren {
   SalarySheetFullWithoutHolidayRoute: typeof SalarySheetFullWithoutHolidayRoute
   SalarySheetPrintRoute: typeof SalarySheetPrintRoute
   SeparationClearanceRoute: typeof SeparationClearanceRoute
+  SeparationClearanceConfigurationRoute: typeof SeparationClearanceConfigurationRoute
   SeparationCompanyInitiatedRoute: typeof SeparationCompanyInitiatedRoute
   SeparationExitDocumentsRoute: typeof SeparationExitDocumentsRoute
   SeparationPaymentRoute: typeof SeparationPaymentRoute
@@ -3336,6 +3363,13 @@ declare module '@tanstack/react-router' {
       path: '/separation-company-initiated'
       fullPath: '/separation-company-initiated'
       preLoaderRoute: typeof SeparationCompanyInitiatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/separation-clearance-configuration': {
+      id: '/separation-clearance-configuration'
+      path: '/separation-clearance-configuration'
+      fullPath: '/separation-clearance-configuration'
+      preLoaderRoute: typeof SeparationClearanceConfigurationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/separation-clearance': {
@@ -3574,6 +3608,13 @@ declare module '@tanstack/react-router' {
       path: '/procurement-cs-supplier-items'
       fullPath: '/procurement-cs-supplier-items'
       preLoaderRoute: typeof ProcurementCsSupplierItemsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-cs-detail': {
+      id: '/procurement-cs-detail'
+      path: '/procurement-cs-detail'
+      fullPath: '/procurement-cs-detail'
+      preLoaderRoute: typeof ProcurementCsDetailRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/procurement-cs-create-workorder': {
@@ -5018,6 +5059,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProcurementCsBatchListRoute: ProcurementCsBatchListRoute,
   ProcurementCsCreateBatchRoute: ProcurementCsCreateBatchRoute,
   ProcurementCsCreateWorkorderRoute: ProcurementCsCreateWorkorderRoute,
+  ProcurementCsDetailRoute: ProcurementCsDetailRoute,
   ProcurementCsSupplierItemsRoute: ProcurementCsSupplierItemsRoute,
   ProcurementCsSupplierPriceRoute: ProcurementCsSupplierPriceRoute,
   ProcurementDashboardRoute: ProcurementDashboardRoute,
@@ -5054,6 +5096,7 @@ const rootRouteChildren: RootRouteChildren = {
   SalarySheetFullWithoutHolidayRoute: SalarySheetFullWithoutHolidayRoute,
   SalarySheetPrintRoute: SalarySheetPrintRoute,
   SeparationClearanceRoute: SeparationClearanceRoute,
+  SeparationClearanceConfigurationRoute: SeparationClearanceConfigurationRoute,
   SeparationCompanyInitiatedRoute: SeparationCompanyInitiatedRoute,
   SeparationExitDocumentsRoute: SeparationExitDocumentsRoute,
   SeparationPaymentRoute: SeparationPaymentRoute,

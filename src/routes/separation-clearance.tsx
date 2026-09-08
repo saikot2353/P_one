@@ -27,6 +27,7 @@ import {
   Check,
   Building,
   Info,
+  Sliders,
 } from "lucide-react";
 
 export const Route = createFileRoute("/separation-clearance")({
@@ -371,15 +372,25 @@ function SeparationClearancePage() {
             </span>
           </div>
 
-          {/* PRIMARY ACTION BUTTON: CREATE CLEARANCE REQUEST */}
-          <button
-            type="button"
-            onClick={() => setIsCreateModalOpen(true)}
-            className="h-9 px-4 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-lg shadow-sm flex items-center gap-2 transition-all uppercase tracking-wider"
-          >
-            <Plus size={16} />
-            <span>Create Clearance Request</span>
-          </button>
+          {/* PRIMARY ACTION BUTTONS: CREATE CLEARANCE REQUEST & CONFIGURATION */}
+          <div className="flex items-center gap-2">
+            <Link
+              to="/separation-clearance-configuration"
+              className="h-9 px-3.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800 text-xs font-bold rounded-lg shadow-xs flex items-center gap-1.5 transition cursor-pointer"
+            >
+              <Sliders size={15} />
+              <span>Clearance Configuration</span>
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => setIsCreateModalOpen(true)}
+              className="h-9 px-4 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-lg shadow-sm flex items-center gap-2 transition-all uppercase tracking-wider cursor-pointer"
+            >
+              <Plus size={16} />
+              <span>Create Clearance Request</span>
+            </button>
+          </div>
         </div>
 
         {/* Body */}

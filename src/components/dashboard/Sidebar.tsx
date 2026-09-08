@@ -290,6 +290,7 @@ export const nav: NavItem[] = [
     subitems: [
       { label: "Resignation Request", to: "/separation-resignation-request" },
       { label: "Clearance", to: "/separation-clearance" },
+      { label: "Clearance Configuration", to: "/separation-clearance-configuration" },
       { label: "Other Separations", to: "/separation-company-initiated" },
       { label: "Payment", to: "/separation-payment" },
       { label: "Exit Documents", to: "/separation-exit-documents" },

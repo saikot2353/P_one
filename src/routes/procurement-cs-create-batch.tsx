@@ -1,101 +1,217 @@
 import { useState, useMemo } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ProcurementSidebar } from "@/components/dashboard/ProcurementSidebar";
 import { ProcurementTopbar } from "@/components/dashboard/ProcurementTopbar";
 import {
-  Plus,
-  Pencil,
-  Trash2,
   SlidersHorizontal,
-  X,
-  FileSpreadsheet,
-  Printer,
-  FileText,
+  Building2,
+  Check,
   Search,
+  ArrowRight,
+  Layers,
+  Sparkles,
 } from "lucide-react";
 
 export const Route = createFileRoute("/procurement-cs-create-batch")({
   head: () => ({
     meta: [
-      { title: "Create Comparison Sheet Batch Setup — CRIPTON Procurement" },
-      { name: "description", content: "Create Comparison Sheet Batch Setup dynamic mock database console." },
+      { title: "Create Comparison Sheet (CS) — CRIPTON Procurement" },
+      { name: "description", content: "Create Comparison Sheet Setup dynamic console." },
     ],
   }),
   component: ProcurementCsCreateBatchPage,
 });
 
-function ProcurementCsCreateBatchPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const tableHeaders = ["Requisition ID", "Item Description", "Category", "Target Deadline", "Expected Quotes", "Assigned Analyst", "Action"];
-  const columnKeys = ["id", "desc", "category", "date", "quotes", "analyst", "status"];
-  const initialData = [
-    {
-        "id": "REQ-2026-091",
-        "desc": "30s Carded Cotton Yarn",
-        "category": "Yarn",
-        "date": "2026-08-28",
-        "quotes": "3 Quotes Required",
-        "analyst": "M. Kabir",
-        "status": "Draft"
-    }
+const FIFTEEN_ITEMS = [
+  { id: "IT-101", name: "30s Carded Cotton Yarn", spec: "100% Cotton 30/1 Ring Spun", uom: "Kg", qty: 12000 },
+  { id: "IT-102", name: "Spun Polyester Thread 40/2", spec: "High Tenacity Optical White", uom: "Cone", qty: 3000 },
+  { id: "IT-103", name: "Reactive Dye Blue B", spec: "High Fixation Rate 98%", uom: "Kg", qty: 2500 },
+  { id: "IT-104", name: "Textile Softener Liquid", spec: "Non-Ionic Silicone Softener", uom: "Ltr", qty: 4000 },
+  { id: "IT-105", name: "Metal Zipper #5 Brass", spec: "Antique Brass 70cm Auto Lock", uom: "Pcs", qty: 50000 },
+  { id: "IT-106", name: "Engraved Metal Buttons", spec: "20mm Alloy Gunmetal Finish", uom: "Pcs", qty: 100000 },
+  { id: "IT-107", name: "7-Ply Export Cartons", spec: "Heavy Duty Corrugated 60x40x40cm", uom: "Pcs", qty: 5000 },
+  { id: "IT-108", name: "Self-Adhesive Polybags", spec: "LDPE Recyclable 12x15 Inch", uom: "Pcs", qty: 20000 },
+  { id: "IT-109", name: "Woven Brand Labels", spec: "Damask Weave High Density 5x2cm", uom: "Pcs", qty: 80000 },
+  { id: "IT-110", name: "Printed Care Labels", spec: "Satin Fabric 5-Language Print", uom: "Pcs", qty: 80000 },
+  { id: "IT-111", name: "Elastic Band 1.5 Inch", spec: "Knitted Spandex Stretch 120%", uom: "Yds", qty: 15000 },
+  { id: "IT-112", name: "Drawcord Cotton Rope", spec: "Tubular Braided 8mm Natural", uom: "Yds", qty: 10000 },
+  { id: "IT-113", name: "Interlining Fuse Roll", spec: "Woven Microdot Coating 90gsm", uom: "Mtr", qty: 2000 },
+  { id: "IT-114", name: "Plastic Hangers Heavy", spec: "Top Coat Hanger Black PP", uom: "Pcs", qty: 25000 },
+  { id: "IT-115", name: "Barcoded Price Tags", spec: "350gsm Coated Cardstock UV", uom: "Pcs", qty: 80000 },
 ];
 
-  const [tableData, setTableData] = useState<any[]>(initialData);
+const CANDIDATE_VENDORS = [
+  "Zhejiang Yarn Spinning Co.",
+  "Square Yarns & Threads Ltd",
+  "Apex Textile Chemical Ltd",
+];
 
-  // Modal State
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any | null>(null);
-  const [formData, setFormData] = useState<Record<string, string>>({});
+const CANDIDATE_VENDORS_POOL = [
+  "Zhejiang Yarn Spinning Co.",
+  "Square Yarns & Threads Ltd",
+  "Apex Textile Chemical Ltd",
+  "Pacific Metal & Trims Ltd",
+  "Global Packaging Solutions Ltd",
+  "Bengal Dye-Chem Industries",
+];
 
-  // Filtering
-  const filteredData = useMemo(() => {
-    return tableData.filter((row) => {
-      return Object.values(row).some((val) => 
-        String(val).toLowerCase().includes(searchQuery.toLowerCase())
-      );
+const AVAILABLE_REQUISITIONS = [
+  {
+    reqNo: "REQ-2026-091",
+    title: "Garments Master Raw Materials & Trims",
+    dept: "Spinning & Accessories",
+    items: FIFTEEN_ITEMS,
+  },
+  {
+    reqNo: "REQ-2026-084",
+    title: "Textile Dyes & Processing Auxiliaries",
+    dept: "Dyeing Unit #2",
+    items: [
+      { id: "IT-103", name: "Reactive Dye Blue B", spec: "High Fixation Rate 98%", uom: "Kg", qty: 2500 },
+      { id: "IT-104", name: "Textile Softener Liquid", spec: "Non-Ionic Silicone Softener", uom: "Ltr", qty: 4000 },
+    ],
+  },
+  {
+    reqNo: "REQ-2026-102",
+    title: "Zippers, Buttons & Metal Trim Procurement",
+    dept: "Garment Accessories",
+    items: [
+      { id: "IT-105", name: "Metal Zipper #5 Brass", spec: "Antique Brass 70cm Auto Lock", uom: "Pcs", qty: 50000 },
+      { id: "IT-106", name: "Engraved Metal Buttons", spec: "20mm Alloy Gunmetal Finish", uom: "Pcs", qty: 100000 },
+    ],
+  },
+  {
+    reqNo: "REQ-2026-115",
+    title: "Export Packaging & Barcoding Materials",
+    dept: "Finishing & Packaging",
+    items: [
+      { id: "IT-107", name: "7-Ply Export Cartons", spec: "Heavy Duty Corrugated 60x40x40cm", uom: "Pcs", qty: 5000 },
+      { id: "IT-108", name: "Self-Adhesive Polybags", spec: "LDPE Recyclable 12x15 Inch", uom: "Pcs", qty: 20000 },
+      { id: "IT-115", name: "Barcoded Price Tags", spec: "350gsm Coated Cardstock UV", uom: "Pcs", qty: 80000 },
+    ],
+  },
+];
+
+function ProcurementCsCreateBatchPage() {
+  const navigate = useNavigate();
+  const [wizardStep, setWizardStep] = useState<1 | 2 | 3>(1);
+  const [selectedReqNos, setSelectedReqNos] = useState<string[]>(["REQ-2026-091"]);
+  const [reqSearchQuery, setReqSearchQuery] = useState("");
+  const [vendorSearchQuery, setVendorSearchQuery] = useState("");
+  const [selectedVendors, setSelectedVendors] = useState<string[]>([...CANDIDATE_VENDORS]);
+  const [vendorPrices, setVendorPrices] = useState<Record<string, Record<string, number>>>({});
+
+  // Combined Items from all selected requisitions
+  const combinedWizardItems = useMemo(() => {
+    const itemMap = new Map<string, typeof FIFTEEN_ITEMS[0]>();
+    AVAILABLE_REQUISITIONS.forEach((req) => {
+      if (selectedReqNos.includes(req.reqNo)) {
+        req.items.forEach((it) => {
+          if (!itemMap.has(it.id)) {
+            itemMap.set(it.id, it);
+          }
+        });
+      }
     });
-  }, [tableData, searchQuery]);
+    return Array.from(itemMap.values());
+  }, [selectedReqNos]);
 
-  const openCreateModal = () => {
-    setEditingItem(null);
-    const initialForm: Record<string, string> = {};
-    columnKeys.forEach((key) => {
-      initialForm[key] = "";
+  // Filtered Requisitions for Step 1
+  const filteredRequisitions = useMemo(() => {
+    return AVAILABLE_REQUISITIONS.filter((r) =>
+      r.reqNo.toLowerCase().includes(reqSearchQuery.toLowerCase()) ||
+      r.title.toLowerCase().includes(reqSearchQuery.toLowerCase()) ||
+      r.dept.toLowerCase().includes(reqSearchQuery.toLowerCase())
+    );
+  }, [reqSearchQuery]);
+
+  // Filtered Candidate Vendors for Step 2
+  const filteredCandidateVendors = useMemo(() => {
+    return CANDIDATE_VENDORS_POOL.filter((v) =>
+      v.toLowerCase().includes(vendorSearchQuery.toLowerCase())
+    );
+  }, [vendorSearchQuery]);
+
+  const toggleReqSelection = (reqNo: string) => {
+    setSelectedReqNos((prev) => {
+      if (prev.includes(reqNo)) {
+        if (prev.length === 1) return prev; // Keep at least 1 selected
+        return prev.filter((r) => r !== reqNo);
+      }
+      return [...prev, reqNo];
     });
-    setFormData(initialForm);
-    setIsModalOpen(true);
   };
 
-  const openEditModal = (item: any) => {
-    setEditingItem(item);
-    setFormData({ ...item });
-    setIsModalOpen(true);
+  const toggleVendorSelection = (vendorName: string) => {
+    setSelectedVendors((prev) =>
+      prev.includes(vendorName)
+        ? prev.filter((v) => v !== vendorName)
+        : [...prev, vendorName]
+    );
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setEditingItem(null);
+  const handlePriceChange = (itemId: string, vendorName: string, priceStr: string) => {
+    const val = parseFloat(priceStr) || 0;
+    setVendorPrices((prev) => ({
+      ...prev,
+      [itemId]: {
+        ...(prev[itemId] || {}),
+        [vendorName]: val,
+      },
+    }));
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleCreateCsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingItem) {
-      setTableData((prev) =>
-        prev.map((item) => (item.id === editingItem.id ? { ...item, ...formData } : item))
-      );
-    } else {
-      const newId = (Math.max(0, ...tableData.map((item) => parseInt(item.id) || 0)) + 1).toString();
-      const newItem = { ...formData, id: newId };
-      setTableData((prev) => [...prev, newItem]);
-    }
-    closeModal();
-  };
+    const autoNum = Math.floor(1000 + Math.random() * 9000);
+    const csId = `CS-2026-${autoNum}`;
 
-  const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this record?")) {
-      setTableData((prev) => prev.filter((item) => item.id !== id));
+    const compiledItems = combinedWizardItems.map((item) => {
+      const itemPrices = vendorPrices[item.id] || {};
+      let minVendor = selectedVendors[0] || "";
+      let minPrice = Infinity;
+
+      selectedVendors.forEach((v) => {
+        const p = itemPrices[v] || 0;
+        if (p > 0 && p < minPrice) {
+          minPrice = p;
+          minVendor = v;
+        }
+      });
+
+      return {
+        ...item,
+        prices: itemPrices,
+        selectedVendor: minVendor,
+      };
+    });
+
+    const newCsRecord = {
+      id: csId,
+      reqRef: selectedReqNos.join(", "),
+      category: `Combined Requisition (${compiledItems.length} Items)`,
+      quotes: `${selectedVendors.length} Received`,
+      min: "$0.01 / Pcs",
+      max: "$6.50 / Kg",
+      winner: selectedVendors[0] || "Pending Evaluation",
+      status: "Under Review",
+      vendors: selectedVendors,
+      items: compiledItems,
+    };
+
+    let existingCs: any[] = [];
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("procurement_cs_records_v3");
+      if (saved) {
+        try {
+          existingCs = JSON.parse(saved);
+        } catch (e) {}
+      }
+      existingCs.unshift(newCsRecord);
+      localStorage.setItem("procurement_cs_records_v3", JSON.stringify(existingCs));
     }
+
+    navigate({ to: "/procurement-cs-batch-list" });
   };
 
   return (
@@ -103,238 +219,342 @@ function ProcurementCsCreateBatchPage() {
       <ProcurementSidebar />
       <main className="flex-1 min-w-0 flex flex-col relative">
         <ProcurementTopbar />
-        
-        <div className="p-4 md:p-6 lg:p-8 space-y-6 w-full max-w-[1600px] mx-auto">
-          {/* Breadcrumb Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+
+        <div className="p-4 md:p-6 lg:p-8 space-y-6 w-full max-w-[1400px] mx-auto">
+          {/* Header */}
+          <div className="flex justify-between items-center">
             <div>
               <h1 className="text-xl font-black tracking-tight text-foreground flex items-center gap-2">
-                <SlidersHorizontal className="size-5.5 text-primary" />
-                Create Comparison Sheet Batch Setup
+                <SlidersHorizontal className="size-5.5 text-amber-500" />
+                Create New Comparison Sheet (CS)
               </h1>
-              <p className="text-xs text-muted-foreground mt-1 font-normal">
-                Procurement Workspace &gt; Configuration &gt; <span className="text-amber-500 font-semibold">Create Comparison Sheet Batch Setup</span>
+              <p className="text-xs text-muted-foreground mt-1">
+                Procurement Workspace &gt; Comparison Sheet &gt;{" "}
+                <span className="text-amber-500 font-semibold">Create New CS Wizard</span>
               </p>
             </div>
-            <button 
-              onClick={openCreateModal}
-              className="h-9 px-4 bg-[#0d6efd] hover:bg-blue-700 text-white font-semibold text-xs rounded-lg flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer shrink-0"
+            <button
+              onClick={() => navigate({ to: "/procurement-cs-batch-list" })}
+              className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition-colors cursor-pointer"
             >
-              <Plus className="size-4" />
-              Add New Record
+              Back to CS List
             </button>
           </div>
 
-          {/* Table Container */}
+          {/* Card Wizard */}
           <div className="bg-card border border-border rounded-xl shadow-sm flex flex-col overflow-hidden">
-            
-            {/* Toolbar */}
-            <div className="p-4 border-b border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-slate-900">
-              
-              {/* Action Buttons */}
-              <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
-                <button className="h-[32px] px-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-medium text-[11px] rounded flex items-center gap-1.5 shrink-0 transition-colors shadow-2xs font-sans">
-                  <FileSpreadsheet className="size-3.5 text-emerald-600" /> Excel
-                </button>
-                <button className="h-[32px] px-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-medium text-[11px] rounded flex items-center gap-1.5 shrink-0 transition-colors shadow-2xs font-sans">
-                  <Printer className="size-3.5 text-blue-600" /> Print
-                </button>
-                <button className="h-[32px] px-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-medium text-[11px] rounded flex items-center gap-1.5 shrink-0 transition-colors shadow-2xs font-sans">
-                  <FileText className="size-3.5 text-red-600" /> PDF
-                </button>
+            {/* Step Header */}
+            <div className="grid grid-cols-3 border-b border-border text-xs font-bold text-center bg-slate-50 dark:bg-slate-900">
+              <div
+                className={`py-3 flex items-center justify-center gap-2 border-r border-border ${
+                  wizardStep === 1 ? "bg-amber-500/10 text-amber-600 border-b-2 border-b-amber-500" : "text-slate-400"
+                }`}
+              >
+                <span className="size-5 rounded-full bg-amber-500 text-white text-[10px] flex items-center justify-center font-bold">1</span>
+                Step 1: Multi-Select Requisitions
               </div>
-
-              {/* Search Box */}
-              <div className="relative w-full sm:w-72">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9.5 pr-3 h-[32px] bg-[#f8fafc] border border-slate-200 hover:border-slate-300 focus:bg-white focus:border-blue-500 rounded-md text-xs font-normal text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/10 transition-all placeholder:text-slate-400"
-                />
+              <div
+                className={`py-3 flex items-center justify-center gap-2 border-r border-border ${
+                  wizardStep === 2 ? "bg-amber-500/10 text-amber-600 border-b-2 border-b-amber-500" : "text-slate-400"
+                }`}
+              >
+                <span className="size-5 rounded-full bg-amber-500 text-white text-[10px] flex items-center justify-center font-bold">2</span>
+                Step 2: Select Candidate Vendors
               </div>
-
+              <div
+                className={`py-3 flex items-center justify-center gap-2 ${
+                  wizardStep === 3 ? "bg-amber-500/10 text-amber-600 border-b-2 border-b-amber-500" : "text-slate-400"
+                }`}
+              >
+                <span className="size-5 rounded-full bg-amber-500 text-white text-[10px] flex items-center justify-center font-bold">3</span>
+                Step 3: Enter Side-by-Side Quotations
+              </div>
             </div>
 
-            {/* Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap bg-slate-50 dark:bg-slate-800">
-                    <th className="px-4 py-2.5 font-semibold w-16 text-center border-r border-slate-100">
-                      <div className="flex items-center justify-center gap-1">
-                        <span>SL</span>
-                      </div>
-                    </th>
-                    <th className="px-4 py-2.5 font-semibold w-24 text-center border-r border-slate-100">
-                      <div className="flex items-center justify-center">
-                        <span>ACTIONS</span>
-                      </div>
-                    </th>
-                    {tableHeaders.map((header: string) => (
-                      <th key={header} className="px-4 py-2.5 font-semibold border-r border-slate-100 last:border-r-0">
-                        <div className="flex items-center justify-between">
-                          <span>{header}</span>
-                          <SlidersHorizontal className="size-2.5 text-slate-400" />
-                        </div>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 font-normal text-slate-700 dark:text-slate-200 bg-white dark:bg-transparent">
-                  {filteredData.map((row: any, index: number) => (
-                    <tr key={row.id || index} className="hover:bg-slate-50 border-b border-slate-100 transition-colors">
-                      <td className="px-4 py-2.5 text-center border-r border-slate-100 text-slate-500 font-normal">
-                        {index + 1}
-                      </td>
-                      <td className="px-4 py-2.5 text-center border-r border-slate-100">
-                        <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => openEditModal(row)}
-                            className="text-orange-500 hover:text-orange-700 transition"
-                            title="Edit"
+            {/* Content */}
+            <div className="p-6 space-y-6">
+              {wizardStep === 1 && (
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                        Search & Multi-Select Requisitions
+                      </h4>
+                      <p className="text-[11px] text-slate-500">
+                        Select one or multiple requisitions to combine their items into a single Comparison Sheet.
+                      </p>
+                    </div>
+                    <span className="px-3 py-1 bg-amber-500 text-white rounded-lg text-xs font-bold shadow-xs shrink-0">
+                      {selectedReqNos.length} Requisition(s) Selected &bull; {combinedWizardItems.length} Items Loaded
+                    </span>
+                  </div>
+
+                  {/* Search input */}
+                  <div className="relative w-full">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="Search Requisition No (e.g. REQ-2026-091), Title, Department..."
+                      value={reqSearchQuery}
+                      onChange={(e) => setReqSearchQuery(e.target.value)}
+                      className="w-full pl-9 pr-3 h-9 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+
+                  {/* Requisition Table */}
+                  <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-2xs bg-white dark:bg-slate-900">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead className="bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500 uppercase">
+                        <tr>
+                          <th className="p-2.5 w-12 text-center">SELECT</th>
+                          <th className="p-2.5">REQ NO</th>
+                          <th className="p-2.5">REQUISITION TITLE</th>
+                          <th className="p-2.5">DEPARTMENT</th>
+                          <th className="p-2.5 text-right">ITEMS COUNT</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        {filteredRequisitions.map((req) => {
+                          const isChecked = selectedReqNos.includes(req.reqNo);
+                          return (
+                            <tr
+                              key={req.reqNo}
+                              onClick={() => toggleReqSelection(req.reqNo)}
+                              className={`cursor-pointer transition-colors ${
+                                isChecked
+                                  ? "bg-amber-50/60 dark:bg-amber-950/20 font-medium"
+                                  : "hover:bg-slate-50 dark:hover:bg-slate-850"
+                              }`}
+                            >
+                              <td className="p-2.5 text-center">
+                                <div
+                                  className={`size-4.5 rounded border mx-auto flex items-center justify-center ${
+                                    isChecked ? "bg-amber-500 border-amber-500 text-white" : "border-slate-300"
+                                  }`}
+                                >
+                                  {isChecked && <Check className="size-3 stroke-[3]" />}
+                                </div>
+                              </td>
+                              <td className="p-2.5 font-bold text-blue-600 dark:text-blue-400">{req.reqNo}</td>
+                              <td className="p-2.5 font-bold text-slate-900 dark:text-white">{req.title}</td>
+                              <td className="p-2.5 text-slate-500">{req.dept}</td>
+                              <td className="p-2.5 text-right font-bold text-amber-600">{req.items.length} Items</td>
+                            </tr>
+                          );
+                        })}
+                        {filteredRequisitions.length === 0 && (
+                          <tr>
+                            <td colSpan={5} className="p-6 text-center text-slate-400 text-xs">
+                              No matching requisitions found.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Loaded Items */}
+                  <div>
+                    <div className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-1.5">
+                      <Layers className="size-4 text-amber-500" />
+                      Combined Items Preview ({combinedWizardItems.length} Items Loaded):
+                    </div>
+                    <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden max-h-48 overflow-y-auto">
+                      <table className="w-full text-left text-xs">
+                        <thead className="bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500 uppercase sticky top-0">
+                          <tr>
+                            <th className="p-2 w-12 text-center">SL</th>
+                            <th className="p-2">Item Code</th>
+                            <th className="p-2">Item Description</th>
+                            <th className="p-2">Specification</th>
+                            <th className="p-2">UOM</th>
+                            <th className="p-2 text-right">Required Qty</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
+                          {combinedWizardItems.map((it, idx) => (
+                            <tr key={it.id}>
+                              <td className="p-2 text-center text-slate-400">{idx + 1}</td>
+                              <td className="p-2 font-bold text-slate-800 dark:text-slate-200">{it.id}</td>
+                              <td className="p-2 font-semibold text-slate-800 dark:text-slate-200">{it.name}</td>
+                              <td className="p-2 text-slate-500">{it.spec}</td>
+                              <td className="p-2 text-slate-500">{it.uom}</td>
+                              <td className="p-2 text-right font-bold text-amber-600">{it.qty.toLocaleString()}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {wizardStep === 2 && (
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                        Search & Select Candidate Vendors
+                      </h4>
+                      <p className="text-[11px] text-slate-500">
+                        Search and choose candidate vendors to compare side-by-side in the quotation matrix.
+                      </p>
+                    </div>
+                    <span className="px-3 py-1 bg-amber-500 text-white rounded-lg text-xs font-bold shadow-xs shrink-0">
+                      {selectedVendors.length} Vendor(s) Selected
+                    </span>
+                  </div>
+
+                  {/* Vendor Search Bar */}
+                  <div className="relative w-full">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="Search Candidate Vendor Name (e.g. Zhejiang, Square, Apex)..."
+                      value={vendorSearchQuery}
+                      onChange={(e) => setVendorSearchQuery(e.target.value)}
+                      className="w-full pl-9 pr-3 h-9 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+
+                  {/* Vendor Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    {filteredCandidateVendors.map((vName) => {
+                      const isChecked = selectedVendors.includes(vName);
+                      return (
+                        <div
+                          key={vName}
+                          onClick={() => toggleVendorSelection(vName)}
+                          className={`p-3.5 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between ${
+                            isChecked
+                              ? "border-amber-500 bg-amber-50/50 dark:bg-amber-500/10 shadow-xs"
+                              : "border-slate-200 dark:border-slate-800 hover:border-slate-300 bg-white dark:bg-slate-900"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                            <Building2 className={`size-4 shrink-0 ${isChecked ? "text-amber-500" : "text-slate-400"}`} />
+                            <span className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">{vName}</span>
+                          </div>
+                          <div
+                            className={`size-4.5 rounded border flex items-center justify-center shrink-0 ${
+                              isChecked ? "bg-amber-500 border-amber-500 text-white" : "border-slate-300 dark:border-slate-700"
+                            }`}
                           >
-                            <Pencil className="size-3.5" strokeWidth={2} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(row.id)}
-                            className="text-rose-500 hover:text-rose-700 transition"
-                            title="Delete"
-                          >
-                            <Trash2 className="size-3.5" strokeWidth={2} />
-                          </button>
+                            {isChecked && <Check className="size-3 stroke-[3]" />}
+                          </div>
                         </div>
-                      </td>
-                      {columnKeys.map((key: string) => {
-                        const value = row[key];
-                        const isStatus = key === "status" || key === "isActive";
+                      );
+                    })}
+                    {filteredCandidateVendors.length === 0 && (
+                      <div className="col-span-full p-6 text-center text-slate-400 text-xs">
+                        No candidate vendors found matching "{vendorSearchQuery}".
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
-                        return (
-                          <td key={key} className="px-4.5 py-2.5 border-r border-slate-100 last:border-r-0 max-w-[220px] truncate font-normal text-slate-700 dark:text-slate-200">
-                            {isStatus ? (
-                              <span className={`px-2 py-0.5 rounded text-[9px] font-bold tracking-wide uppercase ${
-                                value === "Approved" || value === "Active" || value === "Audit Complete" || value === "Verified"
-                                  ? "bg-success/15 text-success-foreground"
-                                  : value === "Draft"
-                                  ? "bg-muted text-muted-foreground"
-                                  : "bg-orange-500/10 text-orange-600 border border-orange-500/20"
-                              }`}>
-                                {value}
-                              </span>
-                            ) : (
-                              <span>
-                                {value}
-                              </span>
-                            )}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                  {filteredData.length === 0 && (
-                    <tr>
-                      <td colSpan={tableHeaders.length + 2} className="text-center py-10 text-muted-foreground font-semibold">
-                        No records found.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+              {wizardStep === 3 && (
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                        Enter Side-by-Side Quoted Prices
+                      </h4>
+                      <p className="text-[11px] text-slate-500">
+                        Input unit prices for each item across candidate vendors.
+                      </p>
+                    </div>
+                    <span className="text-[11px] text-emerald-600 font-bold bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 shrink-0">
+                      {combinedWizardItems.length}-Item Matrix Grid &bull; {selectedVendors.length} Vendors
+                    </span>
+                  </div>
+
+                  <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-x-auto max-h-[450px]">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead className="sticky top-0 z-10 bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-600 uppercase border-b border-slate-200">
+                        <tr>
+                          <th className="p-3 w-56 border-r border-slate-200">Item Name & Spec</th>
+                          <th className="p-3 w-24 border-r border-slate-200 text-center">Req Qty</th>
+                          {selectedVendors.map((v) => (
+                            <th key={v} className="p-3 border-r border-slate-200 text-center bg-amber-50/50 dark:bg-amber-950/30">
+                              {v}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 bg-white dark:bg-slate-900">
+                        {combinedWizardItems.map((it) => (
+                          <tr key={it.id}>
+                            <td className="p-3 border-r border-slate-200 dark:border-slate-800">
+                              <div className="font-bold text-slate-900 dark:text-white">{it.name}</div>
+                              <div className="text-[10px] text-slate-400">{it.spec} ({it.uom})</div>
+                            </td>
+                            <td className="p-3 border-r border-slate-200 dark:border-slate-800 text-center font-bold text-slate-700 dark:text-slate-300">
+                              {it.qty.toLocaleString()} {it.uom}
+                            </td>
+                            {selectedVendors.map((vName) => {
+                              const currentPrice = vendorPrices[it.id]?.[vName] || "";
+                              return (
+                                <td key={vName} className="p-3 border-r border-slate-200 dark:border-slate-800 text-center bg-slate-50/30 dark:bg-slate-900/30">
+                                  <div className="relative flex items-center justify-center">
+                                    <span className="absolute left-2 text-slate-400 text-xs font-bold">$</span>
+                                    <input
+                                      type="number"
+                                      step="0.001"
+                                      placeholder="0.00"
+                                      value={currentPrice}
+                                      onChange={(e) => handlePriceChange(it.id, vName, e.target.value)}
+                                      className="w-24 pl-5 pr-2 py-1 text-xs font-bold text-center bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded focus:border-amber-500 focus:outline-none"
+                                    />
+                                  </div>
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Table Footer / Pagination stats */}
-            <div className="p-4 border-t border-slate-100 bg-[#fcfdfd] dark:bg-slate-900/40 text-[11px] text-muted-foreground font-normal flex flex-col sm:flex-row justify-between items-center gap-3">
-              <span>Showing 1 to {filteredData.length} of {tableData.length} entries</span>
-              <div className="flex items-center gap-1.5 font-sans">
-                <button className="px-2 py-1 text-slate-400 hover:text-slate-700 font-normal">Previous</button>
-                <button className="size-6 bg-[#8BC34A] text-white font-semibold rounded flex items-center justify-center text-[10px]">1</button>
-                <button className="px-2 py-1 text-slate-400 hover:text-slate-700 font-normal">Next</button>
-              </div>
-            </div>
+            {/* Footer */}
+            <div className="p-4 border-t border-border bg-slate-50 flex justify-between items-center">
+              {wizardStep > 1 ? (
+                <button
+                  type="button"
+                  onClick={() => setWizardStep((prev) => (prev - 1) as any)}
+                  className="px-4 py-2 text-xs font-bold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 cursor-pointer"
+                >
+                  Back
+                </button>
+              ) : (
+                <div />
+              )}
 
+              {wizardStep < 3 ? (
+                <button
+                  type="button"
+                  disabled={wizardStep === 2 && selectedVendors.length < 2}
+                  onClick={() => setWizardStep((prev) => (prev + 1) as any)}
+                  className="px-5 py-2 text-xs font-bold text-white bg-amber-500 rounded-lg hover:bg-amber-600 disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
+                >
+                  Next Step <ArrowRight className="size-4" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleCreateCsSubmit}
+                  className="px-6 py-2.5 text-xs font-extrabold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 flex items-center gap-1.5 shadow-md cursor-pointer"
+                >
+                  <Check className="size-4 stroke-[3]" /> Create CS ({combinedWizardItems.length} Items)
+                </button>
+              )}
+            </div>
           </div>
         </div>
-
-        {/* CURRENCY INFO DIALOG MODAL */}
-        {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-            <div className="bg-white dark:bg-slate-950 w-full max-w-lg rounded-sm shadow-xl border border-border/80 overflow-hidden flex flex-col">
-              
-              {/* Modal Header */}
-              <div className="flex justify-between items-center p-4 border-b border-border/40 shrink-0">
-                <h3 className="text-[15px] font-bold text-slate-800 dark:text-slate-100 font-sans">
-                  Create Comparison Sheet Batch Setup Info
-                </h3>
-                <button 
-                  onClick={closeModal} 
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition p-1"
-                >
-                  <X className="size-4.5" strokeWidth={2} />
-                </button>
-              </div>
-
-              {/* Modal Body Form */}
-              <form onSubmit={handleSave} className="flex-1 p-5 space-y-7">
-                {columnKeys.map((key, idx) => {
-                  if (key === "id") return null;
-                  const labelName = tableHeaders[idx - 1] || key;
-                  const value = formData[key] || "";
-                  
-                  return (
-                    <div key={key} className="space-y-1.5 relative border-b border-slate-200 dark:border-slate-800 pb-1.5 focus-within:border-blue-500 transition-colors">
-                      <label className="text-[10px] font-normal text-slate-400 block tracking-wide select-none">
-                        {labelName} {key === "status" || key === "isActive" ? "" : "*"}
-                      </label>
-                      {key === "status" || key === "isActive" ? (
-                        <select
-                          value={value}
-                          onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
-                          className="w-full bg-transparent outline-none border-none text-[12px] font-normal text-slate-800 dark:text-slate-100 py-0.5 focus:ring-0 cursor-pointer font-sans"
-                        >
-                          <option value="Active">Active</option>
-                          <option value="Inactive">Inactive</option>
-                        </select>
-                      ) : (
-                        <input
-                          type="text"
-                          required
-                          value={value}
-                          onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
-                          className="w-full bg-transparent outline-none border-none text-[12px] font-normal text-slate-800 dark:text-slate-100 py-0.5 focus:ring-0"
-                        />
-                      )}
-                    </div>
-                  );
-                })}
-
-                {/* Modal Footer Controls */}
-                <div className="pt-4 flex justify-between items-center border-t border-border/40">
-                  <button
-                    type="button"
-                    onClick={closeModal}
-                    className="text-xs font-medium text-slate-800 dark:text-slate-200 hover:text-slate-600 transition tracking-wide font-sans cursor-pointer uppercase py-2 px-4"
-                  >
-                    CLOSE
-                  </button>
-                  <button
-                    type="submit"
-                    className={`px-5 py-2.5 text-xs font-semibold text-white rounded-sm shadow-sm transition duration-150 uppercase tracking-wide cursor-pointer ${
-                      editingItem 
-                        ? "bg-[#2196F3] hover:bg-[#1E88E5]" 
-                        : "bg-[#8BC34A] hover:bg-[#7CB342]"
-                    }`}
-                  >
-                    {editingItem ? "UPDATE" : "CREATE"}
-                  </button>
-                </div>
-              </form>
-
-            </div>
-          </div>
-        )}
-
       </main>
     </div>
   );

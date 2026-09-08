@@ -17,8 +17,8 @@ import {
 export const Route = createFileRoute("/procurement-cs-create-workorder")({
   head: () => ({
     meta: [
-      { title: "Auto Workorder Generation Center — CRIPTON Procurement" },
-      { name: "description", content: "Auto Workorder Generation Center dynamic mock database console." },
+      { title: "CS Workorder List — CRIPTON Procurement" },
+      { name: "description", content: "Procurement Comparison Sheet (CS) Workorder List console." },
     ],
   }),
   component: ProcurementCsCreateWorkorderPage,
@@ -27,18 +27,46 @@ export const Route = createFileRoute("/procurement-cs-create-workorder")({
 function ProcurementCsCreateWorkorderPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const tableHeaders = ["Winner Quote ID", "Supplier Name", "CS Batch ID", "Final Net Cost", "Landed cost estimate ($)", "Generate Workorder Link"];
-  const columnKeys = ["id", "supplier", "batch", "cost", "landed", "status"];
+  const tableHeaders = ["Workorder No", "CS Ref ID", "Supplier Name", "Item Category & Desc", "Total Net Cost", "Landed Cost Est. ($)", "Status"];
+  const columnKeys = ["id", "csRef", "supplier", "itemDesc", "cost", "landed", "status"];
   const initialData = [
     {
-        "id": "QT-901A",
-        "supplier": "Zhejiang Yarn Spinning Co.",
-        "batch": "CS-2026-YRN4",
-        "cost": "$44,400.00",
-        "landed": "$60,100.00",
-        "status": "Create Workorder"
+      id: "WO-2026-041",
+      csRef: "CS-2026-YRN4",
+      supplier: "Zhejiang Yarn Spinning Co.",
+      itemDesc: "30s Carded Cotton Yarn (12,000 Kg)",
+      cost: "$44,400.00",
+      landed: "$60,100.00",
+      status: "Issued"
+    },
+    {
+      id: "WO-2026-042",
+      csRef: "CS-2026-CHM12",
+      supplier: "Apex Textile Chemical Ltd",
+      itemDesc: "Reactive Dye Blue & Softeners",
+      cost: "৳1,860,000.00",
+      landed: "৳2,100,000.00",
+      status: "Approved"
+    },
+    {
+      id: "WO-2026-043",
+      csRef: "CS-2026-ACC09",
+      supplier: "YKK Bangladesh Ltd",
+      itemDesc: "Metal Zippers #5 Brass (50,000 Pcs)",
+      cost: "$7,500.00",
+      landed: "$8,250.00",
+      status: "In Production"
+    },
+    {
+      id: "WO-2026-044",
+      csRef: "CS-2026-PKG03",
+      supplier: "Kazi Packaging Ind.",
+      itemDesc: "7-Ply Export Cartons (5,000 Pcs)",
+      cost: "৳225,000.00",
+      landed: "৳240,000.00",
+      status: "Draft"
     }
-];
+  ];
 
   const [tableData, setTableData] = useState<any[]>(initialData);
 
@@ -62,6 +90,7 @@ function ProcurementCsCreateWorkorderPage() {
     columnKeys.forEach((key) => {
       initialForm[key] = "";
     });
+    initialForm["status"] = "Draft";
     setFormData(initialForm);
     setIsModalOpen(true);
   };
@@ -84,15 +113,16 @@ function ProcurementCsCreateWorkorderPage() {
         prev.map((item) => (item.id === editingItem.id ? { ...item, ...formData } : item))
       );
     } else {
-      const newId = (Math.max(0, ...tableData.map((item) => parseInt(item.id) || 0)) + 1).toString();
+      const autoNum = Math.floor(10 + Math.random() * 90);
+      const newId = formData.id || `WO-2026-0${autoNum}`;
       const newItem = { ...formData, id: newId };
-      setTableData((prev) => [...prev, newItem]);
+      setTableData((prev) => [newItem, ...prev]);
     }
     closeModal();
   };
 
   const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this record?")) {
+    if (confirm("Are you sure you want to delete this CS workorder record?")) {
       setTableData((prev) => prev.filter((item) => item.id !== id));
     }
   };
@@ -109,18 +139,18 @@ function ProcurementCsCreateWorkorderPage() {
             <div>
               <h1 className="text-xl font-black tracking-tight text-foreground flex items-center gap-2">
                 <SlidersHorizontal className="size-5.5 text-primary" />
-                Auto Workorder Generation Center
+                CS Workorder List
               </h1>
               <p className="text-xs text-muted-foreground mt-1 font-normal">
-                Procurement Workspace &gt; Configuration &gt; <span className="text-amber-500 font-semibold">Auto Workorder Generation Center</span>
+                Procurement Workspace &gt; Comparison Sheet &gt; <span className="text-amber-500 font-semibold">CS Workorder List</span>
               </p>
             </div>
             <button 
               onClick={openCreateModal}
-              className="h-9 px-4 bg-[#0d6efd] hover:bg-blue-700 text-white font-semibold text-xs rounded-lg flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer shrink-0"
+              className="h-9 px-4 bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs rounded-lg flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer shrink-0"
             >
               <Plus className="size-4" />
-              Add New Record
+              Create New Workorder
             </button>
           </div>
 
@@ -264,7 +294,7 @@ function ProcurementCsCreateWorkorderPage() {
               {/* Modal Header */}
               <div className="flex justify-between items-center p-4 border-b border-border/40 shrink-0">
                 <h3 className="text-[15px] font-bold text-slate-800 dark:text-slate-100 font-sans">
-                  Auto Workorder Generation Center Info
+                  {editingItem ? "Edit CS Workorder" : "Create New CS Workorder"}
                 </h3>
                 <button 
                   onClick={closeModal} 
@@ -277,28 +307,32 @@ function ProcurementCsCreateWorkorderPage() {
               {/* Modal Body Form */}
               <form onSubmit={handleSave} className="flex-1 p-5 space-y-7">
                 {columnKeys.map((key, idx) => {
-                  if (key === "id") return null;
-                  const labelName = tableHeaders[idx - 1] || key;
+                  const labelName = tableHeaders[idx] || key;
                   const value = formData[key] || "";
                   
                   return (
                     <div key={key} className="space-y-1.5 relative border-b border-slate-200 dark:border-slate-800 pb-1.5 focus-within:border-blue-500 transition-colors">
                       <label className="text-[10px] font-normal text-slate-400 block tracking-wide select-none">
-                        {labelName} {key === "status" || key === "isActive" ? "" : "*"}
+                        {labelName} {key === "status" ? "" : "*"}
                       </label>
-                      {key === "status" || key === "isActive" ? (
+                      {key === "status" ? (
                         <select
                           value={value}
                           onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
                           className="w-full bg-transparent outline-none border-none text-[12px] font-normal text-slate-800 dark:text-slate-100 py-0.5 focus:ring-0 cursor-pointer font-sans"
                         >
-                          <option value="Active">Active</option>
-                          <option value="Inactive">Inactive</option>
+                          <option value="Draft">Draft</option>
+                          <option value="Approved">Approved</option>
+                          <option value="Issued">Issued</option>
+                          <option value="In Production">In Production</option>
+                          <option value="Completed">Completed</option>
+                          <option value="Cancelled">Cancelled</option>
                         </select>
                       ) : (
                         <input
                           type="text"
-                          required
+                          required={key !== "id"}
+                          placeholder={key === "id" ? "e.g. WO-2026-041 (Leave empty for auto ID)" : `Enter ${labelName}...`}
                           value={value}
                           onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
                           className="w-full bg-transparent outline-none border-none text-[12px] font-normal text-slate-800 dark:text-slate-100 py-0.5 focus:ring-0"

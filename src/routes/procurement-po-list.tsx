@@ -62,7 +62,17 @@ function ProcurementPoListPage() {
     }
 ];
 
-  const [tableData, setTableData] = useState<any[]>(initialData);
+  const [tableData, setTableData] = useState<any[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("procurement_po_records");
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {}
+      }
+    }
+    return initialData;
+  });
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
