@@ -87,9 +87,7 @@ export const nav: NavItem[] = [
       { label: "Loan List", to: "/procurement-billing-loan-list" },
       { label: "Edit Bill Rate", to: "/procurement-billing-edit-rate" },
       { label: "Approve Bill Rate", to: "/procurement-billing-approve-rate" },
-      { label: "Supplier Bill Record", to: "/procurement-billing-supplier-record" },
-      { label: "Supplier Bill Record List", to: "/procurement-billing-supplier-record-list" },
-      { label: "Prepare Bill V2", to: "/procurement-billing-prepare-v2" },
+      { label: "Supplier Bill", to: "/procurement-billing-supplier-bill" },
       { label: "VAT Tax Entry", to: "/procurement-billing-vat-tax-entry" },
     ]
   },

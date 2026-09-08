@@ -57,9 +57,7 @@ const searchableMenus: SearchMenuLink[] = [
   { label: "Loan List", parent: "Billing", to: "/procurement-billing-loan-list", description: "Track active procurement loans and payables" },
   { label: "Edit Bill Rate", parent: "Billing", to: "/procurement-billing-edit-rate", description: "Modify billing rates on existing supplier invoices" },
   { label: "Approve Bill Rate", parent: "Billing", to: "/procurement-billing-approve-rate", description: "Approve rates and clear bill sheets for payout" },
-  { label: "Supplier Bill Record", parent: "Billing", to: "/procurement-billing-supplier-record", description: "Detailed invoice history per supplier" },
-  { label: "Supplier Bill Record List", parent: "Billing", to: "/procurement-billing-supplier-record-list", description: "Registry of all supplier bill files" },
-  { label: "Prepare Bill V2", parent: "Billing", to: "/procurement-billing-prepare-v2", description: "Alternative preparation layout for complex batch bills" },
+  { label: "Supplier Bill", parent: "Billing", to: "/procurement-billing-supplier-bill", description: "Unified supplier bill registry with smart bill creation" },
   { label: "VAT Tax Entry", parent: "Billing", to: "/procurement-billing-vat-tax-entry", description: "Insert VAT and tax deductions for transactions" },
   
   // Payment

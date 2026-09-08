@@ -84,6 +84,7 @@ import { Route as ProcurementBillingVatTaxRegisterRouteImport } from './routes/p
 import { Route as ProcurementBillingVatTaxEntryRouteImport } from './routes/procurement-billing-vat-tax-entry'
 import { Route as ProcurementBillingSupplierRecordListRouteImport } from './routes/procurement-billing-supplier-record-list'
 import { Route as ProcurementBillingSupplierRecordRouteImport } from './routes/procurement-billing-supplier-record'
+import { Route as ProcurementBillingSupplierBillRouteImport } from './routes/procurement-billing-supplier-bill'
 import { Route as ProcurementBillingPurchaseListRouteImport } from './routes/procurement-billing-purchase-list'
 import { Route as ProcurementBillingPrepareV2RouteImport } from './routes/procurement-billing-prepare-v2'
 import { Route as ProcurementBillingPrepareRouteImport } from './routes/procurement-billing-prepare'
@@ -658,6 +659,12 @@ const ProcurementBillingSupplierRecordRoute =
   ProcurementBillingSupplierRecordRouteImport.update({
     id: '/procurement-billing-supplier-record',
     path: '/procurement-billing-supplier-record',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProcurementBillingSupplierBillRoute =
+  ProcurementBillingSupplierBillRouteImport.update({
+    id: '/procurement-billing-supplier-bill',
+    path: '/procurement-billing-supplier-bill',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ProcurementBillingPurchaseListRoute =
@@ -1671,6 +1678,7 @@ export interface FileRoutesByFullPath {
   '/procurement-billing-prepare': typeof ProcurementBillingPrepareRoute
   '/procurement-billing-prepare-v2': typeof ProcurementBillingPrepareV2Route
   '/procurement-billing-purchase-list': typeof ProcurementBillingPurchaseListRoute
+  '/procurement-billing-supplier-bill': typeof ProcurementBillingSupplierBillRoute
   '/procurement-billing-supplier-record': typeof ProcurementBillingSupplierRecordRoute
   '/procurement-billing-supplier-record-list': typeof ProcurementBillingSupplierRecordListRoute
   '/procurement-billing-vat-tax-entry': typeof ProcurementBillingVatTaxEntryRoute
@@ -1912,6 +1920,7 @@ export interface FileRoutesByTo {
   '/procurement-billing-prepare': typeof ProcurementBillingPrepareRoute
   '/procurement-billing-prepare-v2': typeof ProcurementBillingPrepareV2Route
   '/procurement-billing-purchase-list': typeof ProcurementBillingPurchaseListRoute
+  '/procurement-billing-supplier-bill': typeof ProcurementBillingSupplierBillRoute
   '/procurement-billing-supplier-record': typeof ProcurementBillingSupplierRecordRoute
   '/procurement-billing-supplier-record-list': typeof ProcurementBillingSupplierRecordListRoute
   '/procurement-billing-vat-tax-entry': typeof ProcurementBillingVatTaxEntryRoute
@@ -2154,6 +2163,7 @@ export interface FileRoutesById {
   '/procurement-billing-prepare': typeof ProcurementBillingPrepareRoute
   '/procurement-billing-prepare-v2': typeof ProcurementBillingPrepareV2Route
   '/procurement-billing-purchase-list': typeof ProcurementBillingPurchaseListRoute
+  '/procurement-billing-supplier-bill': typeof ProcurementBillingSupplierBillRoute
   '/procurement-billing-supplier-record': typeof ProcurementBillingSupplierRecordRoute
   '/procurement-billing-supplier-record-list': typeof ProcurementBillingSupplierRecordListRoute
   '/procurement-billing-vat-tax-entry': typeof ProcurementBillingVatTaxEntryRoute
@@ -2397,6 +2407,7 @@ export interface FileRouteTypes {
     | '/procurement-billing-prepare'
     | '/procurement-billing-prepare-v2'
     | '/procurement-billing-purchase-list'
+    | '/procurement-billing-supplier-bill'
     | '/procurement-billing-supplier-record'
     | '/procurement-billing-supplier-record-list'
     | '/procurement-billing-vat-tax-entry'
@@ -2638,6 +2649,7 @@ export interface FileRouteTypes {
     | '/procurement-billing-prepare'
     | '/procurement-billing-prepare-v2'
     | '/procurement-billing-purchase-list'
+    | '/procurement-billing-supplier-bill'
     | '/procurement-billing-supplier-record'
     | '/procurement-billing-supplier-record-list'
     | '/procurement-billing-vat-tax-entry'
@@ -2879,6 +2891,7 @@ export interface FileRouteTypes {
     | '/procurement-billing-prepare'
     | '/procurement-billing-prepare-v2'
     | '/procurement-billing-purchase-list'
+    | '/procurement-billing-supplier-bill'
     | '/procurement-billing-supplier-record'
     | '/procurement-billing-supplier-record-list'
     | '/procurement-billing-vat-tax-entry'
@@ -3121,6 +3134,7 @@ export interface RootRouteChildren {
   ProcurementBillingPrepareRoute: typeof ProcurementBillingPrepareRoute
   ProcurementBillingPrepareV2Route: typeof ProcurementBillingPrepareV2Route
   ProcurementBillingPurchaseListRoute: typeof ProcurementBillingPurchaseListRoute
+  ProcurementBillingSupplierBillRoute: typeof ProcurementBillingSupplierBillRoute
   ProcurementBillingSupplierRecordRoute: typeof ProcurementBillingSupplierRecordRoute
   ProcurementBillingSupplierRecordListRoute: typeof ProcurementBillingSupplierRecordListRoute
   ProcurementBillingVatTaxEntryRoute: typeof ProcurementBillingVatTaxEntryRoute
@@ -3727,6 +3741,13 @@ declare module '@tanstack/react-router' {
       path: '/procurement-billing-supplier-record'
       fullPath: '/procurement-billing-supplier-record'
       preLoaderRoute: typeof ProcurementBillingSupplierRecordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/procurement-billing-supplier-bill': {
+      id: '/procurement-billing-supplier-bill'
+      path: '/procurement-billing-supplier-bill'
+      fullPath: '/procurement-billing-supplier-bill'
+      preLoaderRoute: typeof ProcurementBillingSupplierBillRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/procurement-billing-purchase-list': {
@@ -5042,6 +5063,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProcurementBillingPrepareRoute: ProcurementBillingPrepareRoute,
   ProcurementBillingPrepareV2Route: ProcurementBillingPrepareV2Route,
   ProcurementBillingPurchaseListRoute: ProcurementBillingPurchaseListRoute,
+  ProcurementBillingSupplierBillRoute: ProcurementBillingSupplierBillRoute,
   ProcurementBillingSupplierRecordRoute: ProcurementBillingSupplierRecordRoute,
   ProcurementBillingSupplierRecordListRoute:
     ProcurementBillingSupplierRecordListRoute,

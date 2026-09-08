@@ -1,158 +1,568 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ProcurementSidebar } from "@/components/dashboard/ProcurementSidebar";
 import { ProcurementTopbar } from "@/components/dashboard/ProcurementTopbar";
 import {
-  Plus,
-  Pencil,
-  Trash2,
-  SlidersHorizontal,
-  X,
   FileSpreadsheet,
   Printer,
   FileText,
   Search,
+  Eye,
+  X,
+  CreditCard,
+  Building2,
+  Calendar,
+  Filter,
+  CheckCircle2,
+  Receipt,
+  ArrowUpDown,
 } from "lucide-react";
+import { SearchableSelect } from "@/components/ui/searchable-select";
+import pakizaSoftwareLogo from "@/components/Pakiza-Software-bgless-e1692258364537.webp";
 
 export const Route = createFileRoute("/procurement-payment-list")({
   head: () => ({
     meta: [
-      { title: "Supplier Payments Transaction Register — CRIPTON Procurement" },
-      { name: "description", content: "Supplier Payments Transaction Register dynamic mock database console." },
+      { title: "Purchase Payment List — Procurement | CRIPTON" },
+      { name: "description", content: "Procurement Bill Payment transaction registry with date, mode, and supplier filters." },
     ],
   }),
   component: ProcurementPaymentListPage,
 });
 
-function ProcurementPaymentListPage() {
-  const [searchQuery, setSearchQuery] = useState("");
+export interface PaymentRecord {
+  id: string;
+  voucherNo: string;
+  supplier: string;
+  mode: "Cash" | "Cheque";
+  paymentDate: string;
+  amount: number;
+  currency: string;
+  chqNo: string;
+  chqDate: string;
+  bankAccount: string;
+  remarks: string;
+  settledBills?: {
+    billNo: string;
+    billDate: string;
+    location: string;
+    billAmt: number;
+    paidAmt: number;
+    discount: number;
+  }[];
+}
 
-  const tableHeaders = ["Transaction ID", "Supplier Profile", "Date Settled", "Reference Bill", "Amount Cleared", "Currency", "Status"];
-  const columnKeys = ["id", "supplier", "date", "bill", "cleared", "currency", "status"];
-  const initialData = [
-    {
-        "id": "PAY-2026-0041",
-        "supplier": "Apex Textile Chemical Ltd",
-        "date": "2026-08-24",
-        "bill": "BIL-2026-0078",
-        "cleared": "1,520,000.00",
-        "currency": "BDT",
-        "status": "Approved"
-    }
+const INITIAL_PAYMENT_RECORDS: PaymentRecord[] = [
+  {
+    id: "pay-1",
+    voucherNo: "BP-VOUCH-2026-0001",
+    supplier: "M.B. Trade Corporation",
+    mode: "Cheque",
+    paymentDate: "08/09/2026",
+    amount: 132500.00,
+    currency: "BDT",
+    chqNo: "CHQ-981240",
+    chqDate: "08/09/2026",
+    bankAccount: "Dutch-Bangla Bank - 103110002891 (Principal Br.)",
+    remarks: "Payment against Bill #116 (PKCL-Savar)",
+    settledBills: [
+      { billNo: "116", billDate: "01/09/2024", location: "PKCL-Savar", billAmt: 132500.00, paidAmt: 132500.00, discount: 0 },
+    ],
+  },
+  {
+    id: "pay-2",
+    voucherNo: "BP-VOUCH-2026-0002",
+    supplier: "Madona Enterprise",
+    mode: "Cash",
+    paymentDate: "05/09/2026",
+    amount: 45000.00,
+    currency: "BDT",
+    chqNo: "—",
+    chqDate: "—",
+    bankAccount: "Cash in Hand (Accounts Central Cash)",
+    remarks: "Cash clearance for urgent packaging materials",
+    settledBills: [
+      { billNo: "MDN-2026-089", billDate: "28/08/2026", location: "PSL-Operation", billAmt: 45000.00, paidAmt: 45000.00, discount: 0 },
+    ],
+  },
+  {
+    id: "pay-3",
+    voucherNo: "BP-VOUCH-2026-0003",
+    supplier: "MAYER DOYA ENTERPRISE",
+    mode: "Cheque",
+    paymentDate: "03/09/2026",
+    amount: 300000.00,
+    currency: "BDT",
+    chqNo: "DBBL-491028",
+    chqDate: "03/09/2026",
+    bankAccount: "Dutch-Bangla Bank - 103110002891 (Principal Br.)",
+    remarks: "Settlement of dye chem bills MBTC/2023-24",
+    settledBills: [
+      { billNo: "MBTC/2023-24/PAL/AT.S/109", billDate: "20/08/2024", location: "PAL-Fabric Dyeing", billAmt: 300000.00, paidAmt: 300000.00, discount: 0 },
+    ],
+  },
+  {
+    id: "pay-4",
+    voucherNo: "BP-VOUCH-2026-0004",
+    supplier: "OHYOUNG INS",
+    mode: "Cheque",
+    paymentDate: "01/09/2026",
+    amount: 29160.00,
+    currency: "USD",
+    chqNo: "BRAC-008129",
+    chqDate: "01/09/2026",
+    bankAccount: "BRAC Bank - 1501203491001 (Gulshan Br.)",
+    remarks: "Foreign LC settlement against P-240090",
+    settledBills: [
+      { billNo: "P-240090", billDate: "20/09/2024", location: "Head Office", billAmt: 29160.00, paidAmt: 29160.00, discount: 0 },
+    ],
+  },
+  {
+    id: "pay-5",
+    voucherNo: "BP-VOUCH-2026-0005",
+    supplier: "Silver Apparels Ltd.",
+    mode: "Cheque",
+    paymentDate: "28/08/2026",
+    amount: 51500.00,
+    currency: "BDT",
+    chqNo: "PBL-190248",
+    chqDate: "28/08/2026",
+    bankAccount: "Pubali Bank - 091890102341 (Motijheel Br.)",
+    remarks: "Fabric dyeing service bill #139",
+    settledBills: [
+      { billNo: "139", billDate: "02/12/2023", location: "PAL-Fabric Dyeing", billAmt: 51500.00, paidAmt: 51500.00, discount: 0 },
+    ],
+  },
+  {
+    id: "pay-6",
+    voucherNo: "BP-VOUCH-2026-0006",
+    supplier: "Rakamari Tools & Hardware",
+    mode: "Cheque",
+    paymentDate: "25/08/2026",
+    amount: 3820.00,
+    currency: "BDT",
+    chqNo: "CHQ-550912",
+    chqDate: "25/08/2026",
+    bankAccount: "Dutch-Bangla Bank - 103110002891 (Principal Br.)",
+    remarks: "Full settlement of Bill #1002 (Tools & accessories)",
+    settledBills: [
+      { billNo: "1002", billDate: "01/03/2026", location: "PKCL-Savar", billAmt: 3820.00, paidAmt: 3820.00, discount: 0 },
+    ],
+  },
+  {
+    id: "pay-7",
+    voucherNo: "BP-VOUCH-2026-0007",
+    supplier: "Gadget & Gaming Zone",
+    mode: "Cash",
+    paymentDate: "22/08/2026",
+    amount: 450.00,
+    currency: "BDT",
+    chqNo: "—",
+    chqDate: "—",
+    bankAccount: "Cash in Hand (Accounts Central Cash)",
+    remarks: "Mouse purchase Bill #1298",
+    settledBills: [
+      { billNo: "1298", billDate: "03/09/2026", location: "PSL-Operation", billAmt: 450.00, paidAmt: 450.00, discount: 0 },
+    ],
+  },
+  {
+    id: "pay-8",
+    voucherNo: "BP-VOUCH-2026-0008",
+    supplier: "Global Net Computers",
+    mode: "Cheque",
+    paymentDate: "18/08/2026",
+    amount: 17500.00,
+    currency: "BDT",
+    chqNo: "EBL-390145",
+    chqDate: "18/08/2026",
+    bankAccount: "Eastern Bank Ltd - 1042000341 (Dhanmondi Br.)",
+    remarks: "IT equipment maintenance Bill #00628",
+    settledBills: [
+      { billNo: "00628", billDate: "15/08/2026", location: "PAL-Fabric Dyeing", billAmt: 17500.00, paidAmt: 17500.00, discount: 0 },
+    ],
+  },
+  {
+    id: "pay-9",
+    voucherNo: "BP-VOUCH-2026-0009",
+    supplier: "M.B. Trade Corporation",
+    mode: "Cash",
+    paymentDate: "14/08/2026",
+    amount: 120.00,
+    currency: "BDT",
+    chqNo: "—",
+    chqDate: "—",
+    bankAccount: "Cash in Hand (Accounts Central Cash)",
+    remarks: "Petty cash clearance for Test Bill",
+    settledBills: [
+      { billNo: "Test Bill", billDate: "07/07/2026", location: "PSL-Operation", billAmt: 120.00, paidAmt: 120.00, discount: 0 },
+    ],
+  },
+  {
+    id: "pay-10",
+    voucherNo: "BP-VOUCH-2026-0010",
+    supplier: "Apex Textile Chemical Ltd",
+    mode: "Cheque",
+    paymentDate: "10/08/2026",
+    amount: 1520000.00,
+    currency: "BDT",
+    chqNo: "EBL-004128",
+    chqDate: "10/08/2026",
+    bankAccount: "Eastern Bank Ltd - 1042000341 (Dhanmondi Br.)",
+    remarks: "Bulk chemical procurement BIL-2026-0078",
+    settledBills: [
+      { billNo: "BIL-2026-0078", billDate: "24/08/2026", location: "AOP Unit", billAmt: 1520000.00, paidAmt: 1520000.00, discount: 0 },
+    ],
+  },
+  {
+    id: "pay-11",
+    voucherNo: "BP-VOUCH-2026-0011",
+    supplier: "Konica Hardware",
+    mode: "Cash",
+    paymentDate: "08/08/2026",
+    amount: 380.00,
+    currency: "BDT",
+    chqNo: "—",
+    chqDate: "—",
+    bankAccount: "Cash in Hand (Accounts Central Cash)",
+    remarks: "Store maintenance Bill #019",
+    settledBills: [
+      { billNo: "019", billDate: "12/08/2026", location: "PKCL-Savar", billAmt: 380.00, paidAmt: 380.00, discount: 0 },
+    ],
+  },
+  {
+    id: "pay-12",
+    voucherNo: "BP-VOUCH-2026-0012",
+    supplier: "B. BARIA BELT GALLERY",
+    mode: "Cheque",
+    paymentDate: "04/08/2026",
+    amount: 2000.00,
+    currency: "BDT",
+    chqNo: "IBBL-782190",
+    chqDate: "04/08/2026",
+    bankAccount: "Islami Bank BD - 2050123992 (Kawran Bazar Br.)",
+    remarks: "Belt procurement Bill #020",
+    settledBills: [
+      { billNo: "020", billDate: "13/08/2026", location: "PKCL-Savar", billAmt: 2000.00, paidAmt: 2000.00, discount: 0 },
+    ],
+  },
 ];
 
-  const [tableData, setTableData] = useState<any[]>(initialData);
+const CURATED_SUPPLIERS = [
+  "All...",
+  "M.B. Trade Corporation",
+  "Madona Enterprise",
+  "MAYER DOYA ENTERPRISE",
+  "OHYOUNG INS",
+  "Silver Apparels Ltd.",
+  "\"Ma\" Motors",
+  "1 to 100 Plus Market",
+  "1 To 99 Plus Noyon Varieties Store",
+  "3NS Technology BD",
+  "3S Knitwear",
+  "4 BROTHERS CAR DECORATION",
+  "4G Light House",
+  "A & P Tex",
+  "A & R SOURCING LTD.",
+  "A & Z Trading",
+  "A F Digital Press",
+  "A H B PAPER HOUSE",
+  "A K Khan Motors",
+  "A One Car Accessories",
+  "Apex Textile Chemical Ltd",
+  "Rakamari Tools & Hardware",
+  "Gadget & Gaming Zone",
+  "Global Net Computers",
+  "Konica Hardware",
+  "B. BARIA BELT GALLERY",
+  "Robotics BD",
+  "Star Tech Ltd",
+  "Techno House",
+  "ZOOM TECHNOLOGY",
+];
 
-  // Modal State
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any | null>(null);
-  const [formData, setFormData] = useState<Record<string, string>>({});
+function numberToWords(amount: number): string {
+  if (!amount || isNaN(amount) || amount <= 0) return "Zero";
+  const units = [
+    "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+    "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
+    "Seventeen", "Eighteen", "Nineteen"
+  ];
+  const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
 
-  // Filtering
-  const filteredData = useMemo(() => {
-    return tableData.filter((row) => {
-      return Object.values(row).some((val) => 
-        String(val).toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    });
-  }, [tableData, searchQuery]);
-
-  const openCreateModal = () => {
-    setEditingItem(null);
-    const initialForm: Record<string, string> = {};
-    columnKeys.forEach((key) => {
-      initialForm[key] = "";
-    });
-    setFormData(initialForm);
-    setIsModalOpen(true);
+  const helper = (n: number): string => {
+    if (n < 20) return units[n];
+    if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 ? " " + units[n % 10] : "");
+    if (n < 1000) return units[Math.floor(n / 100)] + " Hundred" + (n % 100 ? " " + helper(n % 100) : "");
+    if (n < 100000) return helper(Math.floor(n / 1000)) + " Thousand" + (n % 1000 ? " " + helper(n % 1000) : "");
+    if (n < 10000000) return helper(Math.floor(n / 100000)) + " Lakh" + (n % 100000 ? " " + helper(n % 100000) : "");
+    return helper(Math.floor(n / 10000000)) + " Crore" + (n % 10000000 ? " " + helper(n % 10000000) : "");
   };
 
-  const openEditModal = (item: any) => {
-    setEditingItem(item);
-    setFormData({ ...item });
-    setIsModalOpen(true);
-  };
+  const integerPart = Math.floor(amount);
+  const decimalPart = Math.round((amount - integerPart) * 100);
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setEditingItem(null);
-  };
+  let result = helper(integerPart).trim();
+  if (decimalPart > 0) {
+    result += " and " + helper(decimalPart).trim() + " Paisa";
+  }
+  return result;
+}
 
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (editingItem) {
-      setTableData((prev) =>
-        prev.map((item) => (item.id === editingItem.id ? { ...item, ...formData } : item))
-      );
-    } else {
-      const newId = (Math.max(0, ...tableData.map((item) => parseInt(item.id) || 0)) + 1).toString();
-      const newItem = { ...formData, id: newId };
-      setTableData((prev) => [...prev, newItem]);
+function ProcurementPaymentListPage() {
+  // Filter States
+  const [dateFrom, setDateFrom] = useState("2026-08-01");
+  const [dateTo, setDateTo] = useState("2026-09-08");
+  const [paymentMode, setPaymentMode] = useState<"All" | "Cash" | "Cheque">("All");
+  const [supplierName, setSupplierName] = useState<string>("All...");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+
+  // Records state (synced with bill payment vouchers if created)
+  const [records, setRecords] = useState<PaymentRecord[]>(() => {
+    const saved = localStorage.getItem("procurement_payment_list_v1");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error(e);
+      }
     }
-    closeModal();
-  };
-
-  const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this record?")) {
-      setTableData((prev) => prev.filter((item) => item.id !== id));
+    // Check if there are payment vouchers from Bill Payment page
+    const createdVouchers = localStorage.getItem("procurement_payment_vouchers_v1");
+    if (createdVouchers) {
+      try {
+        const vList = JSON.parse(createdVouchers);
+        if (Array.isArray(vList) && vList.length > 0) {
+          const mappedVouchers: PaymentRecord[] = vList.map((v: any) => ({
+            id: v.id,
+            voucherNo: v.voucherNo,
+            supplier: v.supplier,
+            mode: v.paymentMode.toLowerCase().includes("cash") ? "Cash" : "Cheque",
+            paymentDate: v.voucherDate,
+            amount: v.totalPaid,
+            currency: "BDT",
+            chqNo: v.chequeNo || "—",
+            chqDate: v.chequeDate || "—",
+            bankAccount: v.bankAccount,
+            remarks: v.remarks || "Supplier settlement",
+            settledBills: v.settledBills,
+          }));
+          return [...mappedVouchers, ...INITIAL_PAYMENT_RECORDS];
+        }
+      } catch (e) {
+        console.error(e);
+      }
     }
-  };
+    return INITIAL_PAYMENT_RECORDS;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("procurement_payment_list_v1", JSON.stringify(records));
+  }, [records]);
+
+  // Modal State for Viewing Payment Voucher
+  const [viewingRecord, setViewingRecord] = useState<PaymentRecord | null>(null);
+
+  // Filter Logic
+  const filteredRecords = useMemo(() => {
+    return records.filter((rec) => {
+      // Payment Mode filter
+      if (paymentMode !== "All" && rec.mode !== paymentMode) {
+        return false;
+      }
+      // Supplier filter
+      if (supplierName !== "All..." && rec.supplier !== supplierName) {
+        return false;
+      }
+      // General search query
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        const matchSupplier = rec.supplier.toLowerCase().includes(q);
+        const matchVoucher = rec.voucherNo.toLowerCase().includes(q);
+        const matchChq = rec.chqNo.toLowerCase().includes(q);
+        const matchRemarks = rec.remarks.toLowerCase().includes(q);
+        if (!matchSupplier && !matchVoucher && !matchChq && !matchRemarks) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [records, paymentMode, supplierName, searchQuery]);
+
+  // Paginated records
+  const paginatedRecords = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredRecords.slice(start, start + pageSize);
+  }, [filteredRecords, currentPage]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredRecords.length / pageSize));
+
+  // Options for SearchableSelect
+  const supplierOptions = useMemo(() => {
+    return CURATED_SUPPLIERS.map((s) => ({ value: s, label: s }));
+  }, []);
 
   return (
-    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300 relative font-sans">
+    <div className="min-h-screen flex bg-[#f8fafc] text-slate-800 transition-colors duration-300 relative font-sans">
       <ProcurementSidebar />
-      <main className="flex-1 min-w-0 flex flex-col relative">
+      <main className="flex-1 min-w-0 flex flex-col relative pb-16">
         <ProcurementTopbar />
-        
-        <div className="p-4 md:p-6 lg:p-8 space-y-6 w-full max-w-[1600px] mx-auto">
-          {/* Breadcrumb Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <div>
-              <h1 className="text-xl font-black tracking-tight text-foreground flex items-center gap-2">
-                <SlidersHorizontal className="size-5.5 text-primary" />
-                Supplier Payments Transaction Register
-              </h1>
-              <p className="text-xs text-muted-foreground mt-1 font-normal">
-                Procurement Workspace &gt; Configuration &gt; <span className="text-amber-500 font-semibold">Supplier Payments Transaction Register</span>
-              </p>
-            </div>
-            <button 
-              onClick={openCreateModal}
-              className="h-9 px-4 bg-[#0d6efd] hover:bg-blue-700 text-white font-semibold text-xs rounded-lg flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer shrink-0"
-            >
-              <Plus className="size-4" />
-              Add New Record
-            </button>
+
+        <div className="p-4 sm:p-6 lg:p-7 space-y-5 w-full max-w-[1700px] mx-auto">
+          
+          {/* Breadcrumb & Title */}
+          <div>
+            <h1 className="text-xl font-black tracking-tight text-slate-900 flex items-center gap-2">
+              <CreditCard className="size-5.5 text-blue-600" />
+              Purchase Payment List
+            </h1>
+            <p className="text-xs text-slate-500 mt-0.5 font-normal">
+              Procurement &gt; Payment &gt; <span className="text-blue-600 font-semibold">Payment List</span>
+            </p>
           </div>
 
-          {/* Table Container */}
-          <div className="bg-card border border-border rounded-xl shadow-sm flex flex-col overflow-hidden">
-            
-            {/* Toolbar */}
-            <div className="p-4 border-b border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-slate-900">
+          {/* ═══════════════════════════════════════════════════════════
+              FILTER CONSOLE (Matching User's Prompt)
+              ═══════════════════════════════════════════════════════════ */}
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
               
-              {/* Action Buttons */}
-              <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
-                <button className="h-[32px] px-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-medium text-[11px] rounded flex items-center gap-1.5 shrink-0 transition-colors shadow-2xs font-sans">
+              {/* Date From */}
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-slate-700 block">
+                  Date From
+                </label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    value={dateFrom}
+                    onChange={(e) => setDateFrom(e.target.value)}
+                    className="w-full h-9 px-2.5 bg-white border border-slate-300 rounded text-xs text-slate-800 font-mono focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Date To */}
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-slate-700 block">
+                  Date To
+                </label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    value={dateTo}
+                    onChange={(e) => setDateTo(e.target.value)}
+                    className="w-full h-9 px-2.5 bg-white border border-slate-300 rounded text-xs text-slate-800 font-mono focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Payment Mode (Cash / Cheque) */}
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-slate-700 block">
+                  Payment Mode
+                </label>
+                <div className="flex items-center gap-2 h-9">
+                  {(["All", "Cash", "Cheque"] as const).map((mode) => (
+                    <label
+                      key={mode}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded border text-xs font-medium cursor-pointer transition select-none ${
+                        paymentMode === mode
+                          ? "bg-blue-50 border-blue-500 text-blue-700 font-bold shadow-2xs"
+                          : "bg-white border-slate-300 text-slate-700 hover:bg-slate-50"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="paymentModeFilter"
+                        value={mode}
+                        checked={paymentMode === mode}
+                        onChange={() => setPaymentMode(mode)}
+                        className="size-3 text-blue-600 focus:ring-0"
+                      />
+                      <span>{mode}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Supplier Name Searchable Select */}
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-slate-700 block">
+                  Supplier Name
+                </label>
+                <SearchableSelect
+                  options={supplierOptions}
+                  value={supplierName}
+                  onChange={(val) => setSupplierName(val)}
+                  placeholder="Select Supplier..."
+                  className="h-9 text-xs"
+                />
+              </div>
+
+              {/* Show Action Button */}
+              <div className="flex items-end">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage(1)}
+                  className="w-full h-9 px-6 bg-[#7cb342] hover:bg-[#689f38] text-white font-bold text-xs rounded shadow-xs transition duration-150 cursor-pointer uppercase tracking-wider flex items-center justify-center gap-1.5"
+                >
+                  <Filter className="size-3.5" />
+                  Show
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          {/* ═══════════════════════════════════════════════════════════
+              PAYMENT REGISTRY TABLE & EXPORT BAR
+              ═══════════════════════════════════════════════════════════ */}
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+            
+            {/* Toolbar: Export Actions & Live Search */}
+            <div className="px-4 py-3 border-b border-slate-200 flex flex-wrap justify-between items-center gap-3 bg-slate-50/60">
+              
+              {/* Export Actions matching user's prompt: [Excel] [Print] [PDF] */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => alert("Exporting payment list to Excel...")}
+                  className="h-8 px-3 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-medium text-xs rounded flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+                >
                   <FileSpreadsheet className="size-3.5 text-emerald-600" /> Excel
                 </button>
-                <button className="h-[32px] px-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-medium text-[11px] rounded flex items-center gap-1.5 shrink-0 transition-colors shadow-2xs font-sans">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="h-8 px-3 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-medium text-xs rounded flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+                >
                   <Printer className="size-3.5 text-blue-600" /> Print
                 </button>
-                <button className="h-[32px] px-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-medium text-[11px] rounded flex items-center gap-1.5 shrink-0 transition-colors shadow-2xs font-sans">
-                  <FileText className="size-3.5 text-red-600" /> PDF
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="h-8 px-3 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-medium text-xs rounded flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+                >
+                  <FileText className="size-3.5 text-rose-600" /> PDF
                 </button>
               </div>
 
               {/* Search Box */}
               <div className="relative w-full sm:w-72">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="Search..."
+                  placeholder="Search supplier, voucher, chq, remarks..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9.5 pr-3 h-[32px] bg-[#f8fafc] border border-slate-200 hover:border-slate-300 focus:bg-white focus:border-blue-500 rounded-md text-xs font-normal text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/10 transition-all placeholder:text-slate-400"
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="w-full pl-8 pr-3 h-8 bg-white border border-slate-300 rounded text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -162,81 +572,104 @@ function ProcurementPaymentListPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap bg-slate-50 dark:bg-slate-800">
-                    <th className="px-4 py-2.5 font-semibold w-16 text-center border-r border-slate-100">
-                      <div className="flex items-center justify-center gap-1">
-                        <span>SL</span>
-                      </div>
+                  <tr className="bg-slate-100 text-slate-700 border-b border-slate-300 text-[11px] font-bold">
+                    
+                    {/* Action Column: ∇ */}
+                    <th className="px-3 py-2.5 w-12 text-center border-r border-slate-200">
+                      <span className="text-slate-500 text-sm">∇</span>
                     </th>
-                    <th className="px-4 py-2.5 font-semibold w-24 text-center border-r border-slate-100">
-                      <div className="flex items-center justify-center">
-                        <span>ACTIONS</span>
-                      </div>
+
+                    <th className="px-3.5 py-2.5 border-r border-slate-200 min-w-[200px]">
+                      Supplier
                     </th>
-                    {tableHeaders.map((header: string) => (
-                      <th key={header} className="px-4 py-2.5 font-semibold border-r border-slate-100 last:border-r-0">
-                        <div className="flex items-center justify-between">
-                          <span>{header}</span>
-                          <SlidersHorizontal className="size-2.5 text-slate-400" />
-                        </div>
-                      </th>
-                    ))}
+                    <th className="px-3 py-2.5 border-r border-slate-200 w-24 text-center">
+                      Mode
+                    </th>
+                    <th className="px-3 py-2.5 border-r border-slate-200 min-w-[110px]">
+                      PaymentDate
+                    </th>
+                    <th className="px-3.5 py-2.5 border-r border-slate-200 min-w-[130px] text-right">
+                      Amount
+                    </th>
+                    <th className="px-3 py-2.5 border-r border-slate-200 min-w-[130px]">
+                      ChqNo
+                    </th>
+                    <th className="px-3 py-2.5 border-r border-slate-200 min-w-[110px]">
+                      ChqDate
+                    </th>
+                    <th className="px-3.5 py-2.5 min-w-[250px]">
+                      Remarks
+                    </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 font-normal text-slate-700 dark:text-slate-200 bg-white dark:bg-transparent">
-                  {filteredData.map((row: any, index: number) => (
-                    <tr key={row.id || index} className="hover:bg-slate-50 border-b border-slate-100 transition-colors">
-                      <td className="px-4 py-2.5 text-center border-r border-slate-100 text-slate-500 font-normal">
-                        {index + 1}
+                <tbody className="divide-y divide-slate-100 text-[11px]">
+                  {paginatedRecords.map((rec, index) => (
+                    <tr
+                      key={rec.id}
+                      className="hover:bg-blue-50/40 transition-colors duration-100"
+                    >
+                      {/* Action Button: ∇ */}
+                      <td className="px-3 py-2 text-center border-r border-slate-200">
+                        <button
+                          type="button"
+                          onClick={() => setViewingRecord(rec)}
+                          className="p-1 rounded text-blue-600 hover:bg-blue-100 transition cursor-pointer mx-auto flex items-center justify-center"
+                          title="View Payment Voucher"
+                        >
+                          <Eye className="size-3.5" />
+                        </button>
                       </td>
-                      <td className="px-4 py-2.5 text-center border-r border-slate-100">
-                        <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => openEditModal(row)}
-                            className="text-orange-500 hover:text-orange-700 transition"
-                            title="Edit"
-                          >
-                            <Pencil className="size-3.5" strokeWidth={2} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(row.id)}
-                            className="text-rose-500 hover:text-rose-700 transition"
-                            title="Delete"
-                          >
-                            <Trash2 className="size-3.5" strokeWidth={2} />
-                          </button>
-                        </div>
-                      </td>
-                      {columnKeys.map((key: string) => {
-                        const value = row[key];
-                        const isStatus = key === "status" || key === "isActive";
 
-                        return (
-                          <td key={key} className="px-4.5 py-2.5 border-r border-slate-100 last:border-r-0 max-w-[220px] truncate font-normal text-slate-700 dark:text-slate-200">
-                            {isStatus ? (
-                              <span className={`px-2 py-0.5 rounded text-[9px] font-bold tracking-wide uppercase ${
-                                value === "Approved" || value === "Active" || value === "Audit Complete" || value === "Verified"
-                                  ? "bg-success/15 text-success-foreground"
-                                  : value === "Draft"
-                                  ? "bg-muted text-muted-foreground"
-                                  : "bg-orange-500/10 text-orange-600 border border-orange-500/20"
-                              }`}>
-                                {value}
-                              </span>
-                            ) : (
-                              <span>
-                                {value}
-                              </span>
-                            )}
-                          </td>
-                        );
-                      })}
+                      {/* Supplier */}
+                      <td className="px-3.5 py-2 border-r border-slate-200 font-semibold text-slate-900">
+                        {rec.supplier}
+                      </td>
+
+                      {/* Mode */}
+                      <td className="px-3 py-2 border-r border-slate-200 text-center">
+                        <span
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                            rec.mode === "Cheque"
+                              ? "bg-purple-100 text-purple-800"
+                              : "bg-emerald-100 text-emerald-800"
+                          }`}
+                        >
+                          {rec.mode}
+                        </span>
+                      </td>
+
+                      {/* Payment Date */}
+                      <td className="px-3 py-2 border-r border-slate-200 text-slate-600 font-mono">
+                        {rec.paymentDate}
+                      </td>
+
+                      {/* Amount */}
+                      <td className="px-3.5 py-2 border-r border-slate-200 text-right font-mono font-bold text-slate-900">
+                        {rec.currency === "USD" ? "$" : "৳"}
+                        {rec.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </td>
+
+                      {/* ChqNo */}
+                      <td className="px-3 py-2 border-r border-slate-200 font-mono text-slate-700">
+                        {rec.chqNo}
+                      </td>
+
+                      {/* ChqDate */}
+                      <td className="px-3 py-2 border-r border-slate-200 text-slate-600 font-mono">
+                        {rec.chqDate}
+                      </td>
+
+                      {/* Remarks */}
+                      <td className="px-3.5 py-2 text-slate-600">
+                        {rec.remarks}
+                      </td>
                     </tr>
                   ))}
-                  {filteredData.length === 0 && (
+
+                  {paginatedRecords.length === 0 && (
                     <tr>
-                      <td colSpan={tableHeaders.length + 2} className="text-center py-10 text-muted-foreground font-semibold">
-                        No records found.
+                      <td colSpan={8} className="text-center py-12 text-slate-400 font-medium">
+                        No data available in table
                       </td>
                     </tr>
                   )}
@@ -244,93 +677,247 @@ function ProcurementPaymentListPage() {
               </table>
             </div>
 
-            {/* Table Footer / Pagination stats */}
-            <div className="p-4 border-t border-slate-100 bg-[#fcfdfd] dark:bg-slate-900/40 text-[11px] text-muted-foreground font-normal flex flex-col sm:flex-row justify-between items-center gap-3">
-              <span>Showing 1 to {filteredData.length} of {tableData.length} entries</span>
-              <div className="flex items-center gap-1.5 font-sans">
-                <button className="px-2 py-1 text-slate-400 hover:text-slate-700 font-normal">Previous</button>
-                <button className="size-6 bg-[#8BC34A] text-white font-semibold rounded flex items-center justify-center text-[10px]">1</button>
-                <button className="px-2 py-1 text-slate-400 hover:text-slate-700 font-normal">Next</button>
+            {/* Table Footer with Pagination */}
+            <div className="p-3 border-t border-slate-200 bg-slate-50 text-[11px] text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-2 font-sans">
+              <div>
+                Showing {filteredRecords.length > 0 ? (currentPage - 1) * pageSize + 1 : 0} to{" "}
+                {Math.min(currentPage * pageSize, filteredRecords.length)} of {filteredRecords.length} entries
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  className="px-2.5 py-1 bg-white border border-slate-300 rounded text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  Previous
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setCurrentPage(p)}
+                    className={`size-6 rounded text-[11px] font-bold cursor-pointer transition ${
+                      currentPage === p
+                        ? "bg-[#8BC34A] text-white"
+                        : "bg-white border border-slate-300 text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+
+                <button
+                  type="button"
+                  disabled={currentPage === totalPages || totalPages === 0}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  className="px-2.5 py-1 bg-white border border-slate-300 rounded text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  Next
+                </button>
               </div>
             </div>
 
           </div>
+
         </div>
 
-        {/* CURRENCY INFO DIALOG MODAL */}
-        {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-            <div className="bg-white dark:bg-slate-950 w-full max-w-lg rounded-sm shadow-xl border border-border/80 overflow-hidden flex flex-col">
+        {/* ═══════════════════════════════════════════════════════════
+            OFFICIAL PAYMENT VOUCHER MODAL
+            ═══════════════════════════════════════════════════════════ */}
+        {viewingRecord && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200 overflow-y-auto print:p-0 print:bg-white">
+            <div className="bg-white text-slate-900 rounded-xl shadow-2xl w-full max-w-[900px] max-h-[94vh] overflow-y-auto relative border border-slate-300 print:border-none print:shadow-none print:max-h-none print:w-full print:rounded-none">
               
-              {/* Modal Header */}
-              <div className="flex justify-between items-center p-4 border-b border-border/40 shrink-0">
-                <h3 className="text-[15px] font-bold text-slate-800 dark:text-slate-100 font-sans">
-                  Supplier Payments Transaction Register Info
-                </h3>
-                <button 
-                  onClick={closeModal} 
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition p-1"
-                >
-                  <X className="size-4.5" strokeWidth={2} />
-                </button>
-              </div>
+              {/* Modal Action Bar */}
+              <div className="sticky top-0 z-20 bg-slate-900 text-white px-6 py-3.5 flex justify-between items-center print:hidden rounded-t-xl border-b border-slate-800 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="size-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+                    <Receipt className="size-4" />
+                  </div>
+                  <div>
+                    <span className="font-bold text-sm font-mono tracking-tight">{viewingRecord.voucherNo}</span>
+                    <p className="text-[11px] text-slate-400 font-medium">Official Bill Payment Voucher</p>
+                  </div>
+                </div>
 
-              {/* Modal Body Form */}
-              <form onSubmit={handleSave} className="flex-1 p-5 space-y-7">
-                {columnKeys.map((key, idx) => {
-                  if (key === "id") return null;
-                  const labelName = tableHeaders[idx - 1] || key;
-                  const value = formData[key] || "";
-                  
-                  return (
-                    <div key={key} className="space-y-1.5 relative border-b border-slate-200 dark:border-slate-800 pb-1.5 focus-within:border-blue-500 transition-colors">
-                      <label className="text-[10px] font-normal text-slate-400 block tracking-wide select-none">
-                        {labelName} {key === "status" || key === "isActive" ? "" : "*"}
-                      </label>
-                      {key === "status" || key === "isActive" ? (
-                        <select
-                          value={value}
-                          onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
-                          className="w-full bg-transparent outline-none border-none text-[12px] font-normal text-slate-800 dark:text-slate-100 py-0.5 focus:ring-0 cursor-pointer font-sans"
-                        >
-                          <option value="Active">Active</option>
-                          <option value="Inactive">Inactive</option>
-                        </select>
-                      ) : (
-                        <input
-                          type="text"
-                          required
-                          value={value}
-                          onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
-                          className="w-full bg-transparent outline-none border-none text-[12px] font-normal text-slate-800 dark:text-slate-100 py-0.5 focus:ring-0"
-                        />
-                      )}
-                    </div>
-                  );
-                })}
-
-                {/* Modal Footer Controls */}
-                <div className="pt-4 flex justify-between items-center border-t border-border/40">
+                <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={closeModal}
-                    className="text-xs font-medium text-slate-800 dark:text-slate-200 hover:text-slate-600 transition tracking-wide font-sans cursor-pointer uppercase py-2 px-4"
+                    onClick={() => window.print()}
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg flex items-center gap-2 transition cursor-pointer shadow-sm shadow-emerald-600/30"
                   >
-                    CLOSE
+                    <Printer className="size-4" /> Print Voucher
                   </button>
                   <button
-                    type="submit"
-                    className={`px-5 py-2.5 text-xs font-semibold text-white rounded-sm shadow-sm transition duration-150 uppercase tracking-wide cursor-pointer ${
-                      editingItem 
-                        ? "bg-[#2196F3] hover:bg-[#1E88E5]" 
-                        : "bg-[#8BC34A] hover:bg-[#7CB342]"
-                    }`}
+                    type="button"
+                    onClick={() => setViewingRecord(null)}
+                    className="p-1.5 text-slate-400 hover:text-white transition rounded-lg hover:bg-slate-800 cursor-pointer"
                   >
-                    {editingItem ? "UPDATE" : "CREATE"}
+                    <X className="size-5" />
                   </button>
                 </div>
-              </form>
+              </div>
 
+              {/* Printable Document Body */}
+              <div className="p-8 sm:p-10 space-y-5 bg-white text-slate-900" style={{ fontFamily: "Arial, 'Segoe UI', Tahoma, sans-serif" }}>
+                
+                {/* Header Row */}
+                <div className="flex justify-between items-start gap-4">
+                  <div className="space-y-1 shrink-0">
+                    <div className="flex items-center gap-2.5">
+                      <img src={pakizaSoftwareLogo} alt="PAKIZA SOFTWARE" className="h-10 w-auto object-contain" />
+                      <div>
+                        <h1 className="text-xl font-black tracking-tight text-blue-950 uppercase leading-none">
+                          PAKIZA<br />
+                          <span className="text-sm font-bold tracking-normal">SOFTWARE</span>
+                        </h1>
+                        <p className="text-[8px] text-slate-500 italic font-medium tracking-wide">
+                          Experience | Intelligence | Automation
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-slate-600 font-normal mt-1 max-w-[320px] leading-snug">
+                      Khan ABC Tradeplex House#37, Floor#11 (B-11), Road#2, Dhaka-1205
+                    </p>
+                  </div>
+
+                  <div className="text-right flex flex-col items-end">
+                    <h2 className="text-2xl font-bold text-slate-600 mb-1" style={{ fontFamily: "'Times New Roman', Times, serif" }}>
+                      Bill Payment Voucher
+                    </h2>
+                    <table className="border-collapse border border-slate-700 text-[11px] text-left">
+                      <tbody>
+                        <tr className="border-b border-slate-700">
+                          <td className="border-r border-slate-700 px-2 py-0.5 font-bold text-slate-800 bg-slate-50">Voucher No :</td>
+                          <td className="px-2 py-0.5 font-mono font-bold text-slate-900 min-w-[170px]">{viewingRecord.voucherNo}</td>
+                        </tr>
+                        <tr className="border-b border-slate-700">
+                          <td className="border-r border-slate-700 px-2 py-0.5 font-bold text-slate-800 bg-slate-50">Payment Date :</td>
+                          <td className="px-2 py-0.5 font-bold text-slate-900">{viewingRecord.paymentDate}</td>
+                        </tr>
+                        <tr>
+                          <td className="border-r border-slate-700 px-2 py-0.5 font-bold text-slate-800 bg-slate-50">Supplier :</td>
+                          <td className="px-2 py-0.5 font-bold text-slate-900">{viewingRecord.supplier}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Metadata Table */}
+                <table className="w-full text-[11px] border-collapse border border-slate-700">
+                  <tbody>
+                    <tr className="border-b border-slate-700">
+                      <td className="border-r border-slate-700 px-2.5 py-1.5 font-bold text-slate-700 bg-slate-50 w-[16%]">Payment Mode</td>
+                      <td className="border-r border-slate-700 px-2.5 py-1.5 font-bold text-slate-900 w-[34%]">{viewingRecord.mode}</td>
+                      <td className="border-r border-slate-700 px-2.5 py-1.5 font-bold text-slate-700 bg-slate-50 w-[16%]">Bank / Source</td>
+                      <td className="px-2.5 py-1.5 font-bold text-slate-900 w-[34%]">{viewingRecord.bankAccount}</td>
+                    </tr>
+                    <tr>
+                      <td className="border-r border-slate-700 px-2.5 py-1.5 font-bold text-slate-700 bg-slate-50">Cheque No</td>
+                      <td className="border-r border-slate-700 px-2.5 py-1.5 font-mono text-slate-900">{viewingRecord.chqNo}</td>
+                      <td className="border-r border-slate-700 px-2.5 py-1.5 font-bold text-slate-700 bg-slate-50">Cheque Date</td>
+                      <td className="px-2.5 py-1.5 text-slate-900">{viewingRecord.chqDate}</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                {/* Settled Bills Breakdown */}
+                {viewingRecord.settledBills && viewingRecord.settledBills.length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-800 mb-1.5 uppercase tracking-wide">
+                      Settled Bills Breakdown
+                    </h4>
+                    <table className="w-full text-[11px] border-collapse border border-slate-700">
+                      <thead>
+                        <tr className="bg-[#eeeffa] border-b border-slate-700">
+                          <th className="border-r border-slate-700 px-2.5 py-1.5 text-left font-bold text-slate-800 w-10">SL</th>
+                          <th className="border-r border-slate-700 px-2.5 py-1.5 text-left font-bold text-slate-800">Bill No</th>
+                          <th className="border-r border-slate-700 px-2.5 py-1.5 text-left font-bold text-slate-800">Bill Date</th>
+                          <th className="border-r border-slate-700 px-2.5 py-1.5 text-left font-bold text-slate-800">Location</th>
+                          <th className="border-r border-slate-700 px-2.5 py-1.5 text-right font-bold text-slate-800 w-28">Bill Amt</th>
+                          <th className="border-r border-slate-700 px-2.5 py-1.5 text-right font-bold text-slate-800 w-24">Discount</th>
+                          <th className="px-2.5 py-1.5 text-right font-bold text-slate-800 w-28">Paid Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {viewingRecord.settledBills.map((sb, idx) => (
+                          <tr key={idx} className="border-b border-slate-700">
+                            <td className="border-r border-slate-700 px-2.5 py-1 text-center text-slate-600">{idx + 1}</td>
+                            <td className="border-r border-slate-700 px-2.5 py-1 font-semibold text-slate-900">{sb.billNo}</td>
+                            <td className="border-r border-slate-700 px-2.5 py-1 font-mono text-slate-600">{sb.billDate}</td>
+                            <td className="border-r border-slate-700 px-2.5 py-1 text-slate-700">{sb.location || "—"}</td>
+                            <td className="border-r border-slate-700 px-2.5 py-1 text-right font-mono">{sb.billAmt.toFixed(2)}</td>
+                            <td className="border-r border-slate-700 px-2.5 py-1 text-right font-mono text-amber-700">{sb.discount.toFixed(2)}</td>
+                            <td className="px-2.5 py-1 text-right font-mono font-bold text-slate-900">{sb.paidAmt.toFixed(2)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot>
+                        <tr className="border-b border-slate-700 bg-slate-50 font-bold">
+                          <td colSpan={6} className="border-r border-slate-700 px-3 py-1.5 text-right text-slate-800">
+                            Total Settled:
+                          </td>
+                          <td className="px-2.5 py-1.5 text-right font-mono font-black text-slate-900 text-xs">
+                            {viewingRecord.currency === "USD" ? "$" : "৳"}{viewingRecord.amount.toFixed(2)}
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                )}
+
+                {/* Amount in words and Remarks */}
+                <table className="w-full text-[11px] border-collapse border border-slate-700">
+                  <tbody>
+                    <tr className="border-b border-slate-700">
+                      <td className="px-3 py-1.5">
+                        <span className="font-bold text-slate-900">Amount in Words: </span>
+                        <span className="italic text-slate-800">{numberToWords(viewingRecord.amount)} {viewingRecord.currency === "USD" ? "Dollars" : "Taka"} Only.</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-3 py-1.5">
+                        <span className="font-bold text-slate-900">Remarks: </span>
+                        <span className="text-slate-700">{viewingRecord.remarks}</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                {/* Signatures */}
+                <div className="pt-12 grid grid-cols-4 gap-6 text-center text-[11px] print:pt-16">
+                  <div className="space-y-1">
+                    <p className="font-bold text-slate-800">Prepared By</p>
+                    <div className="border-t border-slate-800 my-1"></div>
+                    <p className="text-[10px] text-slate-500">Accounts Officer</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-bold text-slate-800">Verified By</p>
+                    <div className="border-t border-slate-800 my-1"></div>
+                    <p className="text-[10px] text-slate-500">Audit & Accounts</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-bold text-slate-800">Approved By</p>
+                    <div className="border-t border-slate-800 my-1"></div>
+                    <p className="text-[10px] text-slate-500">Head of Finance</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-bold text-slate-800">Received By</p>
+                    <div className="border-t border-slate-800 my-1"></div>
+                    <p className="text-[10px] text-slate-500">Supplier Representative</p>
+                  </div>
+                </div>
+
+                {/* Footer Note */}
+                <div className="text-center text-[9px] text-slate-400 pt-5 border-t border-slate-200">
+                  This is a computer-generated Bill Payment Voucher from Pakiza HRIS & ERP System.
+                </div>
+
+              </div>
             </div>
           </div>
         )}

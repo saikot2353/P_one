@@ -66,10 +66,122 @@ export interface VatTaxRecord {
   auditedBy?: { name: string; title: string; date: string };
 }
 
+// Helper for converting number to English words
+function numberToWords(amount: number): string {
+  if (!amount || isNaN(amount) || amount <= 0) return "Zero";
+  const units = [
+    "",
+    "One",
+    "Two",
+    "Three",
+    "Four",
+    "Five",
+    "Six",
+    "Seven",
+    "Eight",
+    "Nine",
+    "Ten",
+    "Eleven",
+    "Twelve",
+    "Thirteen",
+    "Fourteen",
+    "Fifteen",
+    "Sixteen",
+    "Seventeen",
+    "Eighteen",
+    "Nineteen",
+  ];
+  const tens = [
+    "",
+    "",
+    "Twenty",
+    "Thirty",
+    "Forty",
+    "Fifty",
+    "Sixty",
+    "Seventy",
+    "Eighty",
+    "Ninety",
+  ];
+
+  const helper = (n: number): string => {
+    if (n < 20) return units[n];
+    if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 ? " " + units[n % 10] : "");
+    if (n < 1000)
+      return (
+        units[Math.floor(n / 100)] +
+        " Hundred" +
+        (n % 100 ? " " + helper(n % 100) : "")
+      );
+    if (n < 100000)
+      return (
+        helper(Math.floor(n / 1000)) +
+        " Thousand" +
+        (n % 1000 ? " " + helper(n % 1000) : "")
+      );
+    if (n < 10000000)
+      return (
+        helper(Math.floor(n / 100000)) +
+        " Lakh" +
+        (n % 100000 ? " " + helper(n % 100000) : "")
+      );
+    return (
+      helper(Math.floor(n / 10000000)) +
+      " Crore" +
+      (n % 10000000 ? " " + helper(n % 10000000) : "")
+    );
+  };
+
+  const integerPart = Math.floor(amount);
+  const decimalPart = Math.round((amount - integerPart) * 100);
+
+  let result = helper(integerPart).trim();
+  if (decimalPart > 0) {
+    result += " and " + helper(decimalPart).trim() + " Paisa";
+  }
+  return result;
+}
+
 const INITIAL_VAT_TAX_RECORDS: VatTaxRecord[] = [
   {
-    id: "vt-1",
+    id: "vt-0",
     sl: 1,
+    supplier: "Rakamari Tools & Hardware",
+    billNo: "1002",
+    billDate: "01/03/2026",
+    billType: "Local",
+    currency: "BDT",
+    exchangeRate: 1.000,
+    billValue: 3820.00,
+    vatAmount: 0.00,
+    taxAmount: 0.00,
+    discountAmt: 0.00,
+    netPayable: 3820.00,
+    status: "Post",
+    poWoNo: "PO/PSL/2026/000128",
+    poWoDate: "01/03/2026",
+    mrirNo: "473",
+    mrirDate: "21/04/2026",
+    challanNo: "1002",
+    challanDate: "01/03/2026",
+    advanceAdjustment: 0.00,
+    items: [
+      { sl: 1, item: "Hacksaw Blade", quantity: 2.00, uom: "PCS", unitPrice: 20.00, totalPrice: 40.00 },
+      { sl: 2, item: "Screw Driver Set", quantity: 1.00, uom: "SET", unitPrice: 800.00, totalPrice: 800.00 },
+      { sl: 3, item: "Wire Stripper", quantity: 1.00, uom: "PCS", unitPrice: 650.00, totalPrice: 650.00 },
+      { sl: 4, item: "Hacksaw Frame", quantity: 1.00, uom: "PCS", unitPrice: 230.00, totalPrice: 230.00 },
+      { sl: 5, item: "Anti Cutter Blade Big Size", quantity: 10.00, uom: "PCS", unitPrice: 10.00, totalPrice: 100.00 },
+      { sl: 6, item: "Anti Cutter Big", quantity: 1.00, uom: "PCS", unitPrice: 90.00, totalPrice: 90.00 },
+      { sl: 7, item: 'Painting Brush 2"', quantity: 1.00, uom: "PCS", unitPrice: 60.00, totalPrice: 60.00 },
+      { sl: 8, item: "Wire Crimper", quantity: 1.00, uom: "PCS", unitPrice: 1850.00, totalPrice: 1850.00 },
+    ],
+    preparedBy: { name: "Rajebul Hasan Rajon", title: "Deputy Manager", date: "24/04/2026 11:54:58" },
+    vatTaxInputtedBy: { name: "A.K.M Nakibul Haque", title: "Sr. Officer", date: "27/04/2026 16:15:00" },
+    auditedBy: { name: "Md.Shahidul Islam", title: "Assistant Manager", date: "05/05/2026 16:28:22" },
+  },
+  {
+    id: "vt-1",
+    sl: 2,
     supplier: "Gadget & Gaming Zone",
     billNo: "1298",
     billDate: "03/09/2026",
@@ -269,7 +381,7 @@ function VatTaxRegisterPage() {
 
   // Records state
   const [records, setRecords] = useState<VatTaxRecord[]>(() => {
-    const saved = localStorage.getItem("procurement_vat_tax_records_v1");
+    const saved = localStorage.getItem("procurement_vat_tax_records_v2");
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -281,7 +393,7 @@ function VatTaxRegisterPage() {
   });
 
   useEffect(() => {
-    localStorage.setItem("procurement_vat_tax_records_v1", JSON.stringify(records));
+    localStorage.setItem("procurement_vat_tax_records_v2", JSON.stringify(records));
   }, [records]);
 
   // Modal State
@@ -662,274 +774,294 @@ function VatTaxRegisterPage() {
           </div>
         </div>
 
-        {/* BILLING INFORMATION VIEW MODAL (Matching Screenshot) */}
-        {viewingRecord && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200 overflow-y-auto print:p-0 print:bg-white">
-            <div className="bg-white text-slate-900 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[92vh] overflow-y-auto relative border border-slate-200 print:border-none print:shadow-none print:max-h-none print:w-full">
-              
-              {/* Modal Sticky Action Bar */}
-              <div className="sticky top-0 z-20 bg-slate-900 text-white px-6 py-3.5 flex justify-between items-center print:hidden rounded-t-2xl border-b border-slate-800">
-                <div className="flex items-center gap-3">
-                  <div className="size-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
-                    <Receipt className="size-4" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-sm font-mono tracking-tight">Bill No: {viewingRecord.billNo}</span>
-                      <span className={`px-2 py-0.5 text-[10px] font-black rounded-full uppercase tracking-wide border ${
-                        viewingRecord.status === "Post" 
-                          ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
-                          : "bg-amber-500/20 text-amber-300 border-amber-500/30"
-                      }`}>
-                        {viewingRecord.status}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-400 font-medium">Billing Information Document Preview</p>
-                  </div>
-                </div>
+        {viewingRecord && (() => {
+          const displayItems = viewingRecord.items && viewingRecord.items.length > 0 ? viewingRecord.items : [
+            { sl: 1, item: "Hardware & Office Supplies", quantity: 1, uom: "PCS", unitPrice: viewingRecord.billValue, totalPrice: viewingRecord.billValue }
+          ];
+          const totalQty = displayItems.reduce((acc, i) => acc + i.quantity, 0);
+          const totalAmt = displayItems.reduce((acc, i) => acc + i.totalPrice, 0);
 
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => window.print()}
-                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg flex items-center gap-2 transition cursor-pointer shadow-sm shadow-emerald-600/30"
-                  >
-                    <Printer className="size-4" /> Print Document
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setViewingRecord(null)}
-                    className="p-1.5 text-slate-400 hover:text-white transition rounded-lg hover:bg-slate-800 cursor-pointer"
-                  >
-                    <X className="size-5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Printable Document Body Canvas (Matching User Screenshot Layout) */}
-              <div className="p-8 sm:p-10 space-y-6 relative font-sans text-slate-800 bg-white">
+          return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200 overflow-y-auto print:p-0 print:bg-white">
+              <div className="bg-white text-slate-900 rounded-xl shadow-2xl w-full max-w-[950px] max-h-[95vh] overflow-y-auto relative border border-slate-300 print:border-none print:shadow-none print:max-h-none print:w-full print:rounded-none">
                 
-                {/* Header: Company Logo & Bill Info Header Block */}
-                <div className="flex flex-col sm:flex-row justify-between items-start gap-4 border-b border-slate-200 pb-4">
+                {/* Modal Action Bar (Hidden on print) */}
+                <div className="sticky top-0 z-20 bg-slate-900 text-white px-6 py-3.5 flex justify-between items-center print:hidden rounded-t-xl border-b border-slate-800 shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <div className="size-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+                      <Receipt className="size-4" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-sm font-mono tracking-tight">Bill No: {viewingRecord.billNo}</span>
+                        <span className={`px-2 py-0.5 text-[10px] font-black rounded-full uppercase tracking-wide border ${
+                          viewingRecord.status === "Post" 
+                            ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                            : "bg-amber-500/20 text-amber-300 border-amber-500/30"
+                        }`}>
+                          {viewingRecord.status}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 font-medium">Official VAT & Tax Billing Information</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => window.print()}
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg flex items-center gap-2 transition cursor-pointer shadow-sm shadow-emerald-600/30"
+                    >
+                      <Printer className="size-4" /> Print Document
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setViewingRecord(null)}
+                      className="p-1.5 text-slate-400 hover:text-white transition rounded-lg hover:bg-slate-800 cursor-pointer"
+                    >
+                      <X className="size-5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* ═════ Official ERP Printable Billing Document ═════ */}
+                <div className="p-8 sm:p-10 space-y-4 bg-white text-slate-900" style={{ fontFamily: "Arial, 'Segoe UI', Tahoma, sans-serif" }}>
                   
-                  {/* Company Branding Left */}
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <img src={pakizaSoftwareLogo} alt="PAKIZA SOFTWARE" className="h-8 w-auto object-contain" />
-                      <div>
-                        <h1 className="text-xl font-black tracking-tight text-blue-950 uppercase">
-                          PAKIZA SOFTWARE
-                        </h1>
-                        <p className="text-[10px] text-slate-500 italic font-semibold">
-                          Excellence | Intelligence | Automation
-                        </p>
+                  {/* Top Row: Left company branding, Right document title + Bill metadata box */}
+                  <div className="flex justify-between items-start gap-4">
+                    {/* Company Branding */}
+                    <div className="space-y-1 shrink-0">
+                      <div className="flex items-center gap-2.5">
+                        <img src={pakizaSoftwareLogo} alt="PAKIZA SOFTWARE" className="h-10 w-auto object-contain" />
+                        <div>
+                          <h1 className="text-xl font-black tracking-tight text-blue-950 uppercase leading-none">
+                            PAKIZA<br />
+                            <span className="text-sm font-bold tracking-normal">SOFTWARE</span>
+                          </h1>
+                          <p className="text-[8px] text-slate-500 italic font-medium tracking-wide">
+                            Experience | Intelligence | Automation
+                          </p>
+                        </div>
                       </div>
+                      <p className="text-[11px] text-slate-700 font-normal mt-1 max-w-[340px] leading-snug">
+                        Khan ABC Tradeplex House#37, Floor#11 (B-11), Road#2, Dhaka-1205
+                      </p>
                     </div>
-                    <p className="text-[11px] text-slate-600 font-medium pt-1">
-                      Khan ABC Tradeplex House#37, Floor#11 (B-11), Road#2, Dhaka-1205
-                    </p>
+
+                    {/* Right side: Serif Title + Bill table with borders */}
+                    <div className="text-right flex flex-col items-end">
+                      <h2 className="text-2xl font-bold text-slate-500 mb-2" style={{ fontFamily: "'Times New Roman', Times, serif" }}>
+                        Billing Information
+                      </h2>
+                      <table className="border-collapse border border-slate-700 text-[11px] text-left">
+                        <tbody>
+                          <tr className="border-b border-slate-700">
+                            <td className="border-r border-slate-700 px-2 py-0.5 font-normal text-slate-800 bg-white whitespace-nowrap">Bill No :</td>
+                            <td className="px-2 py-0.5 font-normal text-slate-900 min-w-[190px]">{viewingRecord.billNo}</td>
+                          </tr>
+                          <tr className="border-b border-slate-700">
+                            <td className="border-r border-slate-700 px-2 py-0.5 font-normal text-slate-800 bg-white whitespace-nowrap">Bill Date :</td>
+                            <td className="px-2 py-0.5 font-normal text-slate-900">{viewingRecord.billDate}</td>
+                          </tr>
+                          <tr>
+                            <td className="border-r border-slate-700 px-2 py-0.5 font-normal text-slate-800 bg-white whitespace-nowrap">Supplier :</td>
+                            <td className="px-2 py-0.5 font-normal text-slate-900">{viewingRecord.supplier}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
 
-                  {/* Billing Header Table Right */}
-                  <div className="w-full sm:w-72 border border-slate-300 text-xs rounded-xs overflow-hidden">
-                    <div className="bg-slate-50 text-slate-600 font-bold p-1.5 text-right tracking-wider border-b border-slate-300 uppercase text-[10px]">
+                  {/* Centered Document Title */}
+                  <div className="text-center py-1">
+                    <span className="text-sm font-bold text-slate-900 underline underline-offset-4 tracking-wide">
                       Billing Information
-                    </div>
-                    <div className="divide-y divide-slate-300">
-                      <div className="grid grid-cols-3 p-1.5 bg-white">
-                        <span className="font-semibold text-slate-600">Bill No :</span>
-                        <span className="col-span-2 font-mono font-bold text-slate-900">{viewingRecord.billNo}</span>
-                      </div>
-                      <div className="grid grid-cols-3 p-1.5 bg-white">
-                        <span className="font-semibold text-slate-600">Bill Date :</span>
-                        <span className="col-span-2 font-bold text-slate-900">{viewingRecord.billDate}</span>
-                      </div>
-                      <div className="grid grid-cols-3 p-1.5 bg-white">
-                        <span className="font-semibold text-slate-600">Supplier :</span>
-                        <span className="col-span-2 font-bold text-slate-900">{viewingRecord.supplier}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* Centered Document Title */}
-                <div className="text-center pt-1">
-                  <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight underline underline-offset-4">
-                    Billing Information
-                  </h2>
-                </div>
-
-                {/* 3-Row Bordered Metadata Grid */}
-                <div className="border border-slate-400 text-xs font-sans">
-                  {/* Row 1 */}
-                  <div className="grid grid-cols-6 border-b border-slate-400 divide-x divide-slate-400 p-2 bg-white">
-                    <span className="font-bold text-slate-800">PO/WO</span>
-                    <span className="font-mono font-bold text-blue-600 hover:underline cursor-pointer">
-                      {viewingRecord.poWoNo || "PO/PSL/2026/000240"}
                     </span>
-                    <span className="font-bold text-slate-800">PO/WO Date</span>
-                    <span className="font-bold text-slate-900">{viewingRecord.poWoDate || "03/09/2026"}</span>
-                    <span className="font-bold text-slate-800">Currency</span>
-                    <span className="font-bold text-slate-900">{viewingRecord.currency}</span>
                   </div>
 
-                  {/* Row 2 */}
-                  <div className="grid grid-cols-6 border-b border-slate-400 divide-x divide-slate-400 p-2 bg-white">
-                    <span className="font-bold text-slate-800">Exchange Rate</span>
-                    <span className="font-mono text-slate-900">{viewingRecord.exchangeRate.toFixed(3)}</span>
-                    <span className="font-bold text-slate-800">MRIR No</span>
-                    <span className="font-mono font-bold text-blue-600 hover:underline cursor-pointer">
-                      {viewingRecord.mrirNo || "606"}
-                    </span>
-                    <span className="font-bold text-slate-800">MRIR Date</span>
-                    <span className="font-bold text-slate-900">{viewingRecord.mrirDate || "05/09/2026"}</span>
-                  </div>
-
-                  {/* Row 3 */}
-                  <div className="grid grid-cols-6 divide-x divide-slate-400 p-2 bg-white">
-                    <span className="font-bold text-slate-800">Challan No</span>
-                    <span className="font-mono font-bold text-slate-900">{viewingRecord.challanNo || viewingRecord.billNo}</span>
-                    <span className="font-bold text-slate-800">Challan Date</span>
-                    <span className="font-bold text-slate-900">{viewingRecord.challanDate || viewingRecord.billDate}</span>
-                    <span className="font-bold text-slate-800">Advance Adjustment</span>
-                    <span className="font-mono text-slate-900">{(viewingRecord.advanceAdjustment || 0).toFixed(2)}</span>
-                  </div>
-                </div>
-
-                {/* Items Grid & Summary */}
-                <div className="border border-slate-400 text-xs font-sans overflow-hidden">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-slate-100 text-slate-800 font-bold border-b border-slate-400 text-[11px]">
-                        <th className="p-2 w-10 border-r border-slate-400">SL</th>
-                        <th className="p-2 border-r border-slate-400">Item</th>
-                        <th className="p-2 text-right w-24 border-r border-slate-400">Quantity</th>
-                        <th className="p-2 text-center w-20 border-r border-slate-400">UOM</th>
-                        <th className="p-2 text-right w-28 border-r border-slate-400">Unit Price</th>
-                        <th className="p-2 text-right w-32">Total Price</th>
+                  {/* 3-Row Bordered Metadata Grid */}
+                  <table className="w-full text-[11px] border-collapse border border-slate-700">
+                    <tbody>
+                      {/* Row 1 */}
+                      <tr className="border-b border-slate-700">
+                        <td className="border-r border-slate-700 px-2.5 py-1 font-bold text-slate-800 bg-white w-[14%]">PO/WO</td>
+                        <td className="border-r border-slate-700 px-2.5 py-1 text-blue-600 font-medium w-[20%] cursor-pointer hover:underline">
+                          {viewingRecord.poWoNo || "PO/PSL/2026/000128"}
+                        </td>
+                        <td className="border-r border-slate-700 px-2.5 py-1 font-bold text-slate-800 bg-white w-[14%]">PO/WO Date</td>
+                        <td className="border-r border-slate-700 px-2.5 py-1 text-slate-900 w-[18%]">{viewingRecord.poWoDate || viewingRecord.billDate}</td>
+                        <td className="border-r border-slate-700 px-2.5 py-1 font-bold text-slate-800 bg-white w-[14%]">Currency</td>
+                        <td className="px-2.5 py-1 text-slate-900 w-[20%]">{viewingRecord.currency}</td>
                       </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-300">
-                      {(viewingRecord.items && viewingRecord.items.length > 0 ? viewingRecord.items : [
-                        { sl: 1, item: "Mouse", quantity: 1.00, uom: "PCS", unitPrice: 450.00, totalPrice: 450.00 }
-                      ]).map((item, idx) => (
-                        <tr key={idx} className="hover:bg-slate-50">
-                          <td className="p-2 border-r border-slate-300 text-slate-600">{item.sl || idx + 1}</td>
-                          <td className="p-2 border-r border-slate-300 font-bold text-slate-900">{item.item}</td>
-                          <td className="p-2 border-r border-slate-300 text-right font-mono font-semibold">{item.quantity.toFixed(2)}</td>
-                          <td className="p-2 border-r border-slate-300 text-center text-slate-600">{item.uom}</td>
-                          <td className="p-2 border-r border-slate-300 text-right font-mono">{item.unitPrice.toFixed(2)}</td>
-                          <td className="p-2 text-right font-mono font-bold text-slate-900">{item.totalPrice.toFixed(2)}</td>
-                        </tr>
-                      ))}
+                      {/* Row 2 */}
+                      <tr className="border-b border-slate-700">
+                        <td className="border-r border-slate-700 px-2.5 py-1 font-bold text-slate-800 bg-white">Exchange Rate</td>
+                        <td className="border-r border-slate-700 px-2.5 py-1 text-slate-900">{viewingRecord.exchangeRate.toFixed(3)}</td>
+                        <td className="border-r border-slate-700 px-2.5 py-1 font-bold text-slate-800 bg-white">MRIR No</td>
+                        <td className="border-r border-slate-700 px-2.5 py-1 text-blue-600 font-medium cursor-pointer hover:underline">
+                          {viewingRecord.mrirNo || "473"}
+                        </td>
+                        <td className="border-r border-slate-700 px-2.5 py-1 font-bold text-slate-800 bg-white">MRIR Date</td>
+                        <td className="px-2.5 py-1 text-slate-900">{viewingRecord.mrirDate || "21/04/2026"}</td>
+                      </tr>
+                      {/* Row 3 */}
+                      <tr>
+                        <td className="border-r border-slate-700 px-2.5 py-1 font-bold text-slate-800 bg-white">Challan No</td>
+                        <td className="border-r border-slate-700 px-2.5 py-1 text-slate-900">{viewingRecord.challanNo || viewingRecord.billNo}</td>
+                        <td className="border-r border-slate-700 px-2.5 py-1 font-bold text-slate-800 bg-white">Challan Date</td>
+                        <td className="border-r border-slate-700 px-2.5 py-1 text-slate-900">{viewingRecord.challanDate || viewingRecord.billDate}</td>
+                        <td className="border-r border-slate-700 px-2.5 py-1 font-bold text-slate-800 bg-white">Advance Adjustment</td>
+                        <td className="px-2.5 py-1 text-slate-900">{(viewingRecord.advanceAdjustment || 0).toFixed(2)}</td>
+                      </tr>
                     </tbody>
                   </table>
 
-                  {/* Summary Breakdown Rows */}
-                  <div className="border-t border-slate-400 divide-y divide-slate-300 text-xs">
-                    <div className="grid grid-cols-6 p-2 font-bold text-slate-900">
-                      <span className="col-span-2 text-right pr-4">Total Quantity</span>
-                      <span className="font-mono">
-                        {viewingRecord.items && viewingRecord.items.length > 0
-                          ? viewingRecord.items.reduce((acc, i) => acc + i.quantity, 0)
-                          : 1}
-                      </span>
-                      <span className="col-span-2 text-right pr-4">Total Amount</span>
-                      <span className="text-right font-mono font-bold">
-                        {viewingRecord.items && viewingRecord.items.length > 0
-                          ? viewingRecord.items.reduce((acc, i) => acc + i.totalPrice, 0)
-                          : 450}
-                      </span>
+                  {/* Complete Items Table with Attached Financial Summary Lines matching the official screenshot */}
+                  <table className="w-full text-[11px] border-collapse border border-slate-700">
+                    <thead>
+                      <tr className="bg-[#eeeffa] border-b border-slate-700">
+                        <th className="border-r border-slate-700 px-2 py-1 text-left font-bold text-slate-800 w-10">
+                          <u>SL</u>
+                        </th>
+                        <th className="border-r border-slate-700 px-2 py-1 text-left font-bold text-slate-800">
+                          <u>Item</u>
+                        </th>
+                        <th className="border-r border-slate-700 px-2 py-1 text-right font-bold text-slate-800 w-24">
+                          <u>Quantity</u>
+                        </th>
+                        <th className="border-r border-slate-700 px-2 py-1 text-center font-bold text-slate-800 w-16">
+                          <u>UOM</u>
+                        </th>
+                        <th className="border-r border-slate-700 px-2 py-1 text-right font-bold text-slate-800 w-28">
+                          <u>Unit Price</u>
+                        </th>
+                        <th className="px-2 py-1 text-right font-bold text-slate-800 w-32">
+                          <u>Total Price</u>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {displayItems.map((item, idx) => (
+                        <tr key={idx} className="border-b border-slate-700">
+                          <td className="border-r border-slate-700 px-2 py-1 text-slate-700">{item.sl || idx + 1}</td>
+                          <td className="border-r border-slate-700 px-2 py-1 text-slate-900">{item.item}</td>
+                          <td className="border-r border-slate-700 px-2 py-1 text-right text-slate-900">{item.quantity.toFixed(2)}</td>
+                          <td className="border-r border-slate-700 px-2 py-1 text-center text-slate-700">{item.uom}</td>
+                          <td className="border-r border-slate-700 px-2 py-1 text-right text-slate-900">{item.unitPrice.toFixed(2)}</td>
+                          <td className="px-2 py-1 text-right text-slate-900 font-normal">{item.totalPrice.toFixed(2)}</td>
+                        </tr>
+                      ))}
+
+                      {/* Total Quantity Row */}
+                      <tr className="border-b border-slate-700">
+                        <td colSpan={2} className="border-r border-slate-700 px-2 py-1 text-right font-bold text-slate-800">
+                          Total Quantity
+                        </td>
+                        <td className="border-r border-slate-700 px-2 py-1 text-right font-bold text-slate-900">
+                          {totalQty.toFixed(2).replace(/\.00$/, "")}
+                        </td>
+                        <td className="border-r border-slate-700 px-2 py-1" />
+                        <td className="border-r border-slate-700 px-2 py-1" />
+                        <td className="px-2 py-1" />
+                      </tr>
+
+                      {/* Attached Summary Lines - spanning full width with empty left columns */}
+                      <tr className="border-b border-slate-700">
+                        <td colSpan={4} className="border-r border-slate-700" />
+                        <td className="border-r border-slate-700 px-2 py-0.5 text-right font-normal text-slate-800">Total Amount</td>
+                        <td className="px-2 py-0.5 text-right font-normal text-slate-900">{totalAmt.toFixed(2).replace(/\.00$/, "")}</td>
+                      </tr>
+                      <tr className="border-b border-slate-700">
+                        <td colSpan={4} className="border-r border-slate-700" />
+                        <td className="border-r border-slate-700 px-2 py-0.5 text-right font-normal text-slate-800">Discount(-)</td>
+                        <td className="px-2 py-0.5 text-right font-normal text-slate-900">{(viewingRecord.discountAmt || 0).toFixed(2)}</td>
+                      </tr>
+                      <tr className="border-b border-slate-700">
+                        <td colSpan={4} className="border-r border-slate-700" />
+                        <td className="border-r border-slate-700 px-2 py-0.5 text-right font-normal text-slate-800">Others Amount</td>
+                        <td className="px-2 py-0.5 text-right font-normal text-slate-900">0.00</td>
+                      </tr>
+                      <tr className="border-b border-slate-700">
+                        <td colSpan={4} className="border-r border-slate-700" />
+                        <td className="border-r border-slate-700 px-2 py-0.5 text-right font-normal text-slate-800">VAT(Inc)</td>
+                        <td className="px-2 py-0.5 text-right font-normal text-slate-900">{(viewingRecord.vatAmount || 0).toFixed(2)}</td>
+                      </tr>
+                      <tr className="border-b border-slate-700">
+                        <td colSpan={4} className="border-r border-slate-700" />
+                        <td className="border-r border-slate-700 px-2 py-0.5 text-right font-normal text-slate-800">TAX(Inc)</td>
+                        <td className="px-2 py-0.5 text-right font-normal text-slate-900">{(viewingRecord.taxAmount || 0).toFixed(2)}</td>
+                      </tr>
+                      <tr className="border-b border-slate-700">
+                        <td colSpan={4} className="border-r border-slate-700" />
+                        <td className="border-r border-slate-700 px-2 py-0.5 text-right font-normal text-slate-800">Net Payable</td>
+                        <td className="px-2 py-0.5 text-right font-normal text-slate-900">{viewingRecord.netPayable.toFixed(2)}</td>
+                      </tr>
+                      <tr className="border-b border-slate-700">
+                        <td colSpan={4} className="border-r border-slate-700" />
+                        <td className="border-r border-slate-700 px-2 py-0.5 text-right font-normal text-slate-800">Total Amount</td>
+                        <td className="px-2 py-0.5 text-right font-normal text-slate-900">{viewingRecord.netPayable.toFixed(2)}</td>
+                      </tr>
+
+                      {/* In Words Row */}
+                      <tr className="border-b border-slate-700">
+                        <td colSpan={6} className="px-2 py-1.5 font-normal text-slate-900">
+                          <span className="font-bold">In words:</span> {numberToWords(viewingRecord.netPayable)} Only.
+                        </td>
+                      </tr>
+
+                      {/* Comment Row */}
+                      <tr>
+                        <td colSpan={6} className="px-2 py-1.5 font-normal text-slate-900">
+                          <span className="font-bold">Comment (Vat & Tax) :</span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  {/* 4-Column Signature Block */}
+                  <div className="pt-12 grid grid-cols-4 gap-6 text-center text-[11px] print:pt-16">
+                    <div className="space-y-1">
+                      <p className="font-bold text-slate-800">Prepared By</p>
+                      <div className="border-t border-slate-800 my-1"></div>
+                      <p className="font-normal text-slate-900">{viewingRecord.preparedBy?.name || "Rajebul Hasan Rajon"}</p>
+                      <p className="text-[10px] text-slate-600">{viewingRecord.preparedBy?.title || "Deputy Manager"}</p>
+                      <p className="text-[9px] text-slate-500 font-mono">{viewingRecord.preparedBy?.date || "24/04/2026 11:54:58"}</p>
                     </div>
 
-                    <div className="grid grid-cols-6 p-2 text-slate-700">
-                      <span className="col-span-5 text-right font-bold pr-4">Discount(-)</span>
-                      <span className="text-right font-mono font-bold">{(viewingRecord.discountAmt || 0).toFixed(2)}</span>
+                    <div className="space-y-1">
+                      <p className="font-bold text-slate-800">Vat and Tax Inputted By</p>
+                      <div className="border-t border-slate-800 my-1"></div>
+                      <p className="font-normal text-slate-900">{viewingRecord.vatTaxInputtedBy?.name || "A.K.M Nakibul Haque"}</p>
+                      <p className="text-[10px] text-slate-600">{viewingRecord.vatTaxInputtedBy?.title || "Sr. Officer"}</p>
+                      <p className="text-[9px] text-slate-500 font-mono">{viewingRecord.vatTaxInputtedBy?.date || "27/04/2026 16:15:00"}</p>
                     </div>
 
-                    <div className="grid grid-cols-6 p-2 text-slate-700">
-                      <span className="col-span-5 text-right font-bold pr-4">Others Amount</span>
-                      <span className="text-right font-mono font-bold">0.00</span>
+                    <div className="space-y-1">
+                      <p className="font-bold text-slate-800">Audited By</p>
+                      <div className="border-t border-slate-800 my-1"></div>
+                      <p className="font-normal text-slate-900">{viewingRecord.auditedBy?.name || "Md.Shahidul Islam"}</p>
+                      <p className="text-[10px] text-slate-600">{viewingRecord.auditedBy?.title || "Assistant Manager"}</p>
+                      <p className="text-[9px] text-slate-500 font-mono">{viewingRecord.auditedBy?.date || "05/05/2026 16:28:22"}</p>
                     </div>
 
-                    <div className="grid grid-cols-6 p-2 text-slate-700">
-                      <span className="col-span-5 text-right font-bold pr-4">VAT(Inc)</span>
-                      <span className="text-right font-mono font-bold">{(viewingRecord.vatAmount || 0).toFixed(2)}</span>
-                    </div>
-
-                    <div className="grid grid-cols-6 p-2 text-slate-700">
-                      <span className="col-span-5 text-right font-bold pr-4">TAX(Inc)</span>
-                      <span className="text-right font-mono font-bold">{(viewingRecord.taxAmount || 0).toFixed(2)}</span>
-                    </div>
-
-                    <div className="grid grid-cols-6 p-2 font-bold text-slate-900">
-                      <span className="col-span-5 text-right font-bold pr-4">Net Payable</span>
-                      <span className="text-right font-mono font-bold">{viewingRecord.netPayable.toFixed(2)}</span>
-                    </div>
-
-                    <div className="grid grid-cols-6 p-2 font-black text-slate-900 bg-slate-50">
-                      <span className="col-span-5 text-right font-bold pr-4">Total Amount</span>
-                      <span className="text-right font-mono font-bold text-sm">{viewingRecord.netPayable.toFixed(2)}</span>
+                    <div className="space-y-1">
+                      <p className="font-bold text-slate-800">Approved By</p>
+                      <div className="border-t border-slate-800 my-1"></div>
+                      <div className="h-4"></div>
+                      <p className="text-[10px] text-slate-400 italic">Signature</p>
                     </div>
                   </div>
+
+                  {/* Print Footer note */}
+                  <div className="text-center text-[9px] text-slate-400 pt-6 border-t border-slate-200 print:block">
+                    This is a computer-generated VAT & Tax Billing Information document from Pakiza HRIS & ERP System.
+                  </div>
+
                 </div>
-
-                {/* Words & Comments Box */}
-                <div className="border border-slate-400 text-xs divide-y divide-slate-400 font-sans">
-                  <div className="p-2 font-bold text-slate-900">
-                    In words: <span className="font-semibold text-slate-700">Four Hundred Fifty Only.</span>
-                  </div>
-                  <div className="p-2 font-bold text-slate-900">
-                    Comment (Vat &amp; Tax) :
-                  </div>
-                </div>
-
-                {/* 4-Column Signature Block (Matching Screenshot) */}
-                <div className="pt-12 grid grid-cols-4 gap-4 text-center text-xs font-sans print:pt-16">
-                  
-                  {/* Prepared By */}
-                  <div className="space-y-1 border-t border-slate-400 pt-2">
-                    <p className="font-bold text-slate-800">Prepared By</p>
-                    <p className="font-bold text-slate-900 text-[11px]">{viewingRecord.preparedBy?.name || "Rajebul Hasan Rajon"}</p>
-                    <p className="text-[10px] text-slate-500">{viewingRecord.preparedBy?.title || "Deputy Manager"}</p>
-                    <p className="text-[10px] text-slate-500 font-mono">{viewingRecord.preparedBy?.date || "05/09/2026 16:07:05"}</p>
-                  </div>
-
-                  {/* Vat and Tax Inputted By */}
-                  <div className="space-y-1 border-t border-slate-400 pt-2">
-                    <p className="font-bold text-slate-800">Vat and Tax Inputted By</p>
-                    <p className="font-bold text-slate-900 text-[11px]">{viewingRecord.vatTaxInputtedBy?.name || "A.K.M Nakibul Haque"}</p>
-                    <p className="text-[10px] text-slate-500">{viewingRecord.vatTaxInputtedBy?.title || "Sr. Officer"}</p>
-                    <p className="text-[10px] text-slate-500 font-mono">{viewingRecord.vatTaxInputtedBy?.date || "06/09/2026 15:46:51"}</p>
-                  </div>
-
-                  {/* Audited By */}
-                  <div className="space-y-1 border-t border-slate-400 pt-2">
-                    <p className="font-bold text-slate-800">Audited By</p>
-                    <p className="font-bold text-slate-900 text-[11px]">{viewingRecord.auditedBy?.name || "Md.Shahidul Islam"}</p>
-                    <p className="text-[10px] text-slate-500">{viewingRecord.auditedBy?.title || "Assistant Manager"}</p>
-                    <p className="text-[10px] text-slate-500 font-mono">{viewingRecord.auditedBy?.date || "08/09/2026 09:13:18"}</p>
-                  </div>
-
-                  {/* Approved By */}
-                  <div className="space-y-1 border-t border-slate-400 pt-2">
-                    <p className="font-bold text-slate-800">Approved By</p>
-                    <div className="h-6"></div>
-                    <p className="text-[10px] text-slate-400">Authorized Signature</p>
-                  </div>
-
-                </div>
-
-                {/* Print Footer note */}
-                <div className="text-center text-[10px] text-slate-400 pt-6 border-t border-slate-100 print:block">
-                  This is a computer-generated VAT &amp; Tax Billing Information document from Pakiza HRIS &amp; ERP System.
-                </div>
-
               </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
       </main>
     </div>
   );
