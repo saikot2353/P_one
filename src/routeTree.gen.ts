@@ -35,6 +35,7 @@ import { Route as SeparationPaymentRouteImport } from './routes/separation-payme
 import { Route as SeparationExitDocumentsRouteImport } from './routes/separation-exit-documents'
 import { Route as SeparationCompanyInitiatedRouteImport } from './routes/separation-company-initiated'
 import { Route as SeparationClearanceConfigurationRouteImport } from './routes/separation-clearance-configuration'
+import { Route as SeparationClearanceApprovalRouteImport } from './routes/separation-clearance-approval'
 import { Route as SeparationClearanceRouteImport } from './routes/separation-clearance'
 import { Route as SalarySheetPrintRouteImport } from './routes/salary-sheet-print'
 import { Route as SalarySheetFullWithoutHolidayRouteImport } from './routes/salary-sheet-full-without-holiday'
@@ -388,6 +389,12 @@ const SeparationClearanceConfigurationRoute =
   SeparationClearanceConfigurationRouteImport.update({
     id: '/separation-clearance-configuration',
     path: '/separation-clearance-configuration',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SeparationClearanceApprovalRoute =
+  SeparationClearanceApprovalRouteImport.update({
+    id: '/separation-clearance-approval',
+    path: '/separation-clearance-approval',
     getParentRoute: () => rootRouteImport,
   } as any)
 const SeparationClearanceRoute = SeparationClearanceRouteImport.update({
@@ -1744,6 +1751,7 @@ export interface FileRoutesByFullPath {
   '/salary-sheet-full-without-holiday': typeof SalarySheetFullWithoutHolidayRoute
   '/salary-sheet-print': typeof SalarySheetPrintRoute
   '/separation-clearance': typeof SeparationClearanceRoute
+  '/separation-clearance-approval': typeof SeparationClearanceApprovalRoute
   '/separation-clearance-configuration': typeof SeparationClearanceConfigurationRoute
   '/separation-company-initiated': typeof SeparationCompanyInitiatedRoute
   '/separation-exit-documents': typeof SeparationExitDocumentsRoute
@@ -1988,6 +1996,7 @@ export interface FileRoutesByTo {
   '/salary-sheet-full-without-holiday': typeof SalarySheetFullWithoutHolidayRoute
   '/salary-sheet-print': typeof SalarySheetPrintRoute
   '/separation-clearance': typeof SeparationClearanceRoute
+  '/separation-clearance-approval': typeof SeparationClearanceApprovalRoute
   '/separation-clearance-configuration': typeof SeparationClearanceConfigurationRoute
   '/separation-company-initiated': typeof SeparationCompanyInitiatedRoute
   '/separation-exit-documents': typeof SeparationExitDocumentsRoute
@@ -2233,6 +2242,7 @@ export interface FileRoutesById {
   '/salary-sheet-full-without-holiday': typeof SalarySheetFullWithoutHolidayRoute
   '/salary-sheet-print': typeof SalarySheetPrintRoute
   '/separation-clearance': typeof SeparationClearanceRoute
+  '/separation-clearance-approval': typeof SeparationClearanceApprovalRoute
   '/separation-clearance-configuration': typeof SeparationClearanceConfigurationRoute
   '/separation-company-initiated': typeof SeparationCompanyInitiatedRoute
   '/separation-exit-documents': typeof SeparationExitDocumentsRoute
@@ -2479,6 +2489,7 @@ export interface FileRouteTypes {
     | '/salary-sheet-full-without-holiday'
     | '/salary-sheet-print'
     | '/separation-clearance'
+    | '/separation-clearance-approval'
     | '/separation-clearance-configuration'
     | '/separation-company-initiated'
     | '/separation-exit-documents'
@@ -2723,6 +2734,7 @@ export interface FileRouteTypes {
     | '/salary-sheet-full-without-holiday'
     | '/salary-sheet-print'
     | '/separation-clearance'
+    | '/separation-clearance-approval'
     | '/separation-clearance-configuration'
     | '/separation-company-initiated'
     | '/separation-exit-documents'
@@ -2967,6 +2979,7 @@ export interface FileRouteTypes {
     | '/salary-sheet-full-without-holiday'
     | '/salary-sheet-print'
     | '/separation-clearance'
+    | '/separation-clearance-approval'
     | '/separation-clearance-configuration'
     | '/separation-company-initiated'
     | '/separation-exit-documents'
@@ -3212,6 +3225,7 @@ export interface RootRouteChildren {
   SalarySheetFullWithoutHolidayRoute: typeof SalarySheetFullWithoutHolidayRoute
   SalarySheetPrintRoute: typeof SalarySheetPrintRoute
   SeparationClearanceRoute: typeof SeparationClearanceRoute
+  SeparationClearanceApprovalRoute: typeof SeparationClearanceApprovalRoute
   SeparationClearanceConfigurationRoute: typeof SeparationClearanceConfigurationRoute
   SeparationCompanyInitiatedRoute: typeof SeparationCompanyInitiatedRoute
   SeparationExitDocumentsRoute: typeof SeparationExitDocumentsRoute
@@ -3426,6 +3440,13 @@ declare module '@tanstack/react-router' {
       path: '/separation-clearance-configuration'
       fullPath: '/separation-clearance-configuration'
       preLoaderRoute: typeof SeparationClearanceConfigurationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/separation-clearance-approval': {
+      id: '/separation-clearance-approval'
+      path: '/separation-clearance-approval'
+      fullPath: '/separation-clearance-approval'
+      preLoaderRoute: typeof SeparationClearanceApprovalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/separation-clearance': {
@@ -5160,6 +5181,7 @@ const rootRouteChildren: RootRouteChildren = {
   SalarySheetFullWithoutHolidayRoute: SalarySheetFullWithoutHolidayRoute,
   SalarySheetPrintRoute: SalarySheetPrintRoute,
   SeparationClearanceRoute: SeparationClearanceRoute,
+  SeparationClearanceApprovalRoute: SeparationClearanceApprovalRoute,
   SeparationClearanceConfigurationRoute: SeparationClearanceConfigurationRoute,
   SeparationCompanyInitiatedRoute: SeparationCompanyInitiatedRoute,
   SeparationExitDocumentsRoute: SeparationExitDocumentsRoute,

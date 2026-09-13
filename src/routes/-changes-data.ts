@@ -2,6 +2,15 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "417",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Separation",
+    link: "/separation-clearance-approval",
+    descriptionEn: "Redesigned the official 'Clearance Approval Console' page under Separation module (/separation-clearance-approval) matching exact approval queue reference screenshot UI: clean card rows displaying checkbox, green shield icon badge with Clearance ID (CLR-2025-57068), Request Type, Employee Name & Title (Riazul Islam • 2025057068 • Asst. Manager), Department & Leaving Date (Implementation & Business Analysis • Leaving: 15 Sep 2026), 6-stage clearance progress bar (83%), status pill (Pending Review, Approved, Rejected), direct circle check (✓) and cross (✕) quick decision action buttons, and uppercase blue VIEW button; and an interactive 'Clearance Request Details' modal opening upon clicking any row or VIEW button showing comprehensive employee resignation metadata, stated resignation reason, HR directives, 6-stage department clearance matrix (Accounts, Admin, ICT, Immediate Boss, HR, COO), quick approval decision controls, and official printable clearance document generator.",
+    descriptionBn: "Separation মডিউলের অধীনে অফিশিয়াল 'Clearance Approval Console' পেজটি (/separation-clearance-approval) হুবহু রেফারেন্স স্ক্রিনশটের অ্যাপ্রুভাল কিউ ডিজাইন অনুযায়ী পুনর্নির্মাণ করা হয়েছে: ক্লিন কার্ড রো যেখানে চেকবক্স, ক্লিয়ারেন্স আইডি (CLR-2025-57068) সহ সবুজ শিল্ড আইকন ব্যাজ, Request Type, কর্মী নাম ও পদবি (Riazul Islam • 2025057068 • Asst. Manager), ডিপার্টমেন্ট ও সার্ভিস ছাড়ার তারিখ (Implementation & Business Analysis • Leaving: 15 Sep 2026), ৬-স্টেজ ক্লিয়ারেন্স প্রগ্রেস বার (83%), স্ট্যাটাস পিল (Pending Review, Approved, Rejected), সরাসরি সার্কেল টিক (✓) ও ক্রস (✕) বাটন, এবং আপারকেস ব্লু VIEW বাটন রয়েছে; এবং যেকোনো রো বা VIEW বাটনে ক্লিক করলে ওপেন হওয়া বিস্তারিত 'Clearance Request Details' মোডাল যাতে রয়েছে পূর্ণাঙ্গ পদত্যাগ মেটাডেটা, কারণ, HR নির্দেশিকা, ৬-ডিপার্টমেন্টের ক্লিয়ারেন্স ম্যাট্রিক্স কার্ড (Accounts, Admin, ICT, Immediate Boss, HR, COO), কুইক অ্যাপ্রুভাল ডিসিশন কন্ট্রোল এবং অফিশিয়াল ক্লিয়ারেন্স ফর্ম প্রিন্ট সুবিধা।",
+  },
+  {
     id: "416",
     date: new Date().toISOString().slice(0, 16),
     type: "New Feature",
