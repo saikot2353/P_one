@@ -337,7 +337,14 @@ export const nav: NavItem[] = [
   {
     label: "Manage Overtime",
     icon: Timer,
-    subitems: [{ label: "OT Tracking & Submissions", to: "/manage-overtime" }],
+    subitems: [
+      { label: "OT Requisition", to: "/manage-overtime", search: { tab: "requisition" } },
+      { label: "Approve OT Requisition", to: "/approve-overtime" },
+      { label: "OT Requisition List", to: "/manage-overtime", search: { tab: "requisition-list" } },
+      { label: "Submit OT Req", to: "/manage-overtime", search: { tab: "submit" } },
+      { label: "Submitted OT List", to: "/manage-overtime", search: { tab: "submitted-list" } },
+      { label: "Individual OT Review", to: "/manage-overtime", search: { tab: "individual-review" } },
+    ],
   },
   {
     label: "Manage Allowance",

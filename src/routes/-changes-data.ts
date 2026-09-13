@@ -2,6 +2,33 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "413",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Manage Overtime",
+    link: "/manage-overtime?tab=requisition-list",
+    descriptionEn: "Created the official 'OT Requisition List' view under Manage Overtime (/manage-overtime?tab=requisition-list) matching exact ERP specifications: top filter panel featuring Start Date, End Date, Status options (Pending, Approved, Rejected, ALL), Employee Type selector (Management, Office Executive, Production Executive, Office Staff, Production Staff, Worker, Pcs Rate Worker, Intern), exhaustive Department dropdown (67+ departments including MCD, Dyeing, Printing, Sewing, QC, etc.), complete Job Title designation list (400+ designations), Unit list (Unit-01 to Unit-10, N/A), Line list (00 to 65, N/A), Requisition Type dropdown (All, OT, Allowance), Employee Id filter, and blue 'Search' button; action toolbar with Excel, Print, and PDF export buttons alongside live Search box; data grid displaying # (SL), Emp ID, Name, Department, Designation, Date, In Time, Out Date, Out Time, and Status badge; and bottom status bar showing entry count with empty table state.",
+    descriptionBn: "অফিশিয়াল 'OT Requisition List' ভিউ (/manage-overtime?tab=requisition-list) হুবহু ERP স্পেসিফিকেশন অনুযায়ী তৈরি করা হয়েছে: টপ ফিল্টার প্যানেলে রয়েছে Start Date, End Date, Status অপশন (Pending, Approved, Rejected, ALL), Employee Type সিলেক্টর (Management, Office Executive, Production Executive, Office Staff, Production Staff, Worker, Pcs Rate Worker, Intern), ৬৭+ ডিপার্টমেন্টের ড্রপডাউন, ৪০০+ পদবির Job Title সিলেক্টর, Unit লিস্ট (Unit-01 থেকে Unit-10, N/A), Line লিস্ট (00 থেকে 65, N/A), Requisition Type (All, OT, Allowance), Employee Id ফিল্টার এবং ব্লু 'Search' বাটন; Excel, Print, PDF এক্সপোর্ট বাটন ও লাইভ Search টুলবার; # (SL), Emp ID, Name, Department, Designation, Date, In Time, Out Date, Out Time এবং Status ব্যাজ সহ ডাটা গ্রিড; এবং এন্ট্রি কাউন্টার সহ বটম বার।",
+  },
+  {
+    id: "412",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Manage Overtime",
+    link: "/approve-overtime",
+    descriptionEn: "Created the official 'Approve OT Requisition' approval console (/approve-overtime) matching exact ERP specifications: top filter panel featuring Start Date, End Date, Status options (Pending, Approved, Rejected, ALL), Employee Type selector (Management, Office Executive, Production Executive, Office Staff, Production Staff, Worker, Pcs Rate Worker, Intern), exhaustive Department dropdown (67+ departments including MCD, Dyeing, Printing, Sewing, QC, etc.), complete Job Title designation list (400+ designations), Unit list (Unit-01 to Unit-10, N/A), Line list (00 to 65, N/A), Employee Id filter, and blue 'Search' button; action toolbar with Excel, Print, and PDF export buttons alongside live Search box; data grid displaying Select All checkbox column, Emp ID, Emp ID(Off), Name, Type, Department, Designation, Unit, Line, Date, In Time, Out Date, Out Time, OT Req, MOT Req, Amount, and Status badge; and bottom action bar with entries counter alongside green 'Approve' and red 'Reject' bulk action buttons.",
+    descriptionBn: "অফিশিয়াল 'Approve OT Requisition' অ্যাপ্রুভাল কনসোল (/approve-overtime) হুবহু ERP স্পেসিফিকেশন অনুযায়ী তৈরি করা হয়েছে: টপ ফিল্টার প্যানেলে রয়েছে Start Date, End Date, Status অপশন (Pending, Approved, Rejected, ALL), Employee Type সিলেক্টর (Management, Office Executive, Production Executive, Office Staff, Production Staff, Worker, Pcs Rate Worker, Intern), ৬৭+ ডিপার্টমেন্টের পূর্ণাঙ্গ ড্রপডাউন (MCD, Dyeing, Printing, Sewing, QC ইত্যাদি), ৪০০+ পদবির Job Title সিলেক্টর, Unit লিস্ট (Unit-01 থেকে Unit-10, N/A), Line লিস্ট (00 থেকে 65, N/A), Employee Id ফিল্টার এবং ব্লু 'Search' বাটন; Excel, Print, PDF এক্সপোর্ট বাটন ও লাইভ Search টুলবার; সিলেক্ট অল চেকবক্স, Emp ID, Emp ID(Off), Name, Type, Department, Designation, Unit, Line, Date, In Time, Out Date, Out Time, OT Req, MOT Req, Amount এবং Status ব্যাজ সহ ডাটা গ্রিড; এবং এন্ট্রি কাউন্টার সহ গ্রিন 'Approve' ও রেড 'Reject' বাটন।",
+  },
+  {
+    id: "411",
+    date: new Date().toISOString().slice(0, 16),
+    type: "UI / UX",
+    module: "Manage Overtime",
+    link: "/manage-overtime",
+    descriptionEn: "Updated 'Manage Overtime' module (/manage-overtime) to feature all 6 required menu sub-items under Sidebar: OT Requisition, Approve OT Requisition, OT Requisition List, Submit OT Req, Submitted OT List, and Individual OT Review. Redesigned the OT Requisition page to match the user's reference screenshot with exact layout components: top filter panel with blue left accent border (Date, To Date, Employee Id with 'use comma as separator' input, Employee Type selector tag box, Department, Unit, Line, and vibrant blue 'SHOW' button); top-right OT Summary widget (OT header input with pencil icon to bulk apply, W.Line selector with pencil icon to set working line for selected rows, blue note 'Time will Add auto random by +5 minutes', Budget, Approved, and red Balance counter); action toolbar with EXCEL, PRINT, and PDF export buttons alongside live search box; full data grid displaying Select All checkbox, SL, Emp ID, Name, Department, Designation, Unit, Line, In Date/Time, Out Date/Time, W.Line dropdown, calculated OT, M_OT, Status badge, Req OT input, and Req MOT input; and bottom action bar featuring showing entries counter alongside amber 'SUBMIT' and red 'DELETE' action buttons.",
+    descriptionBn: "'Manage Overtime' মডিউলে (/manage-overtime) সাইডবারের অধীনে সকল ৬টি নির্ধারিত মেনু অপশন অন্তর্ভুক্ত করা হয়েছে: OT Requisition, Approve OT Requisition, OT Requisition List, Submit OT Req, Submitted OT List এবং Individual OT Review। রেফারেন্স স্ক্রিনশটের হুবহু লেআউট অনুযায়ী OT Requisition পেজটি নতুন করে সাজানো হয়েছে: নীল লেফট একসেন্টযুক্ত টপ ফিল্টার প্যানেল (Date, To Date, 'use comma as separator' প্লেসহোল্ডার সহ Employee Id, Employee Type ট্যাগ বক্স, Department, Unit, Line এবং ব্লু 'SHOW' বাটন); টপ-রাইট OT সামারি উইজেট (একসাথে সিলেক্টেড রোতে সেট করার পেন্সিল আইকন সহ OT ইনপুট, W.Line সিলেক্টর, 'Time will Add auto random by +5 minutes' ব্লু নোট, Budget, Approved ও লাল ফন্টে Balance কাউন্টার); EXCEL, PRINT, PDF এক্সপোর্ট এবং লাইভ সার্চ টুলবার; সিলেক্ট অল চেকবক্স, SL, Emp ID, Name, Department, Designation, Unit, Line, In Date/Time, Out Date/Time, W.Line ড্রপডাউন, হিসাবকৃত OT, M_OT, Status ব্যাজ, Req OT এবং Req MOT ইনপুট সহ ডাটা গ্রিড; এবং এন্ট্রি কাউন্টার সহ অরেঞ্জ 'SUBMIT' ও রেড 'DELETE' বাটনের বটম বার।",
+  },
+  {
     id: "410",
     date: new Date().toISOString().slice(0, 16),
     type: "New Feature",
