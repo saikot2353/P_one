@@ -2,6 +2,33 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    id: "416",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Manage Overtime",
+    link: "/manage-overtime?tab=individual-review",
+    descriptionEn: "Implemented the official 'Individual OT Review' view under Manage Overtime (/manage-overtime?tab=individual-review) matching exact ERP specifications: top filter console with Requisition Type dropdown (OT, Allowance, All), 75+ Main Department dropdown (Accounts & Finance, Admin, Administration, Audit, Brand & Media, CAD, Commercial, Cutting, Dyeing, Finishing, HR, ICT, IE, Knitting, Maintenance, Marketing, Merchandising, MIS, Procurement, Production, QA, R&D, Sewing, Supply Chain, Vat & Tax, Washing, Worker, WTP, Yarn Dyeing, etc.), W.Line Name selector (ALL, 0, 01 to 65, N/A), OT Date * date picker, and blue 'Search' button; action toolbar with EXCEL, PRINT, and PDF export buttons alongside live table Search; data grid displaying ∇ select column, # (SL), Emp ID, Name, Department, Designation, Date, In Time, Out Date, Out Time, and Status badge; and bottom status bar showing entry count with 'No data available in table' empty state.",
+    descriptionBn: "অফিশিয়াল 'Individual OT Review' পেজটি (/manage-overtime?tab=individual-review) হুবহু ERP স্পেসিফিকেশন অনুযায়ী তৈরি করা হয়েছে: টপ ফিল্টার কনসোলে রয়েছে Requisition Type ড্রপডাউন (OT, Allowance, All), ৭৫+ Main Department ড্রপডাউন, W.Line Name সিলেক্টর (ALL, 0, 01 থেকে 65, N/A), OT Date * ডেট পিকার এবং ব্লু 'Search' বাটন; EXCEL, PRINT, PDF এক্সপোর্ট বাটন এবং লাইভ Search ফিল্টার সহ টুলবার; ∇ সিলেক্ট কলাম, # (SL), Emp ID, Name, Department, Designation, Date, In Time, Out Date, Out Time এবং Status ব্যাজ সহ ডাটা গ্রিড; এবং এন্ট্রি কাউন্টার সহ 'No data available in table' স্টেট সহ বটম বার।",
+  },
+  {
+    id: "415",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Manage Overtime",
+    link: "/manage-overtime?tab=submitted-list",
+    descriptionEn: "Overhauled the official 'Submitted OT request List' page under Manage Overtime (/manage-overtime?tab=submitted-list) matching exact ERP specifications and reference screenshots: top filter console featuring Requisition Type dropdown (OT, Allowance, All), 75+ Main Department dropdown, Line Name selector (ALL, 0, 01 to 65, N/A), ApStatus filter (Review, Approved, Rejected, Pending, All), and blue 'SEARCH' button; export toolbar with EXCEL, PRINT, PDF buttons and live table Search filter; complete dataset containing all 140 entries (ReqNum 3625, 3634, 4487, 5132, 6040, 6342, 6447, 7131, 7934, 8015, 8552, 8596, 8689, 9772, 10258, 10289, 10443, etc.) displaying ∇ Action column (blue 🔍 magnifying glass for Details view, yellow ✏️ pencil for Edit view), ReqNum, Dates, DocDetails, ReqType, Department, Line, ReqBy, ReqTime, and Status badge with remarks; interactive 'OT Request Details' modal matching Screenshot 2 featuring red 'VIEW REPORT' button, top-right 'ReqNum: 3634', export toolbar, employee detail grid with Total Amount summary, and 4 bottom verification audit cards (Checked By: Approved, Verified By HOD: Approved, Verified By HR: Review, Approved By MD: Pending); and interactive 'Edit Submitted OT Request' modal matching Screenshot 3 with breadcrumb header (Home > Human Resource > Edit Submitted OT Request), editable OT Req and Morning OT input boxes, and save functionality.",
+    descriptionBn: "অফিশিয়াল 'Submitted OT request List' পেজটি (/manage-overtime?tab=submitted-list) হুবহু ERP স্পেসিফিকেশন ও রেফারেন্স স্ক্রিনশট অনুযায়ী তৈরি করা হয়েছে: টপ ফিল্টার কনসোলে রয়েছে Requisition Type ড্রপডাউন (OT, Allowance, All), ৭৫+ Main Department ড্রপডাউন, Line Name সিলেক্টর (ALL, 0, 01 থেকে 65, N/A), ApStatus ফিল্টার (Review, Approved, Rejected, Pending, All) এবং ব্লু 'SEARCH' বাটন; EXCEL, PRINT, PDF এক্সপোর্ট এবং লাইভ Search ফিল্টার সহ টুলবার; ১৪০টি রেকর্ডের পূর্ণাঙ্গ ডাটা সেট (ReqNum 3625, 3634, 4487, 5132, 6040, 6342, 6447, 7131, 7934, 8015, 8552 ইত্যাদি) যেখানে ∇ Action কলামে ব্লু 🔍 ম্যাগনিফাইং গ্লাস (ডিটেইলস মোডাল) এবং ইয়েলো ✏️ পেন্সিল (এডিট মোডাল) বাটন, ReqNum, Dates, DocDetails, ReqType, Department, Line, ReqBy, ReqTime এবং রিমার্ক সহ Status ব্যাজ রয়েছে; স্ক্রিনশট ২ এর হুবহু 'OT Request Details' মোডাল (রেড 'VIEW REPORT' বাটন, 'ReqNum: 3634', এক্সপোর্ট বার, কর্মী ডাটা গ্রিড, Total Amount এবং ৪টি ভেরিফিকেশন কার্ড - Checked By, Verified By HOD, Verified By HR, Approved By MD); এবং স্ক্রিনশট ৩ এর হুবহু 'Edit Submitted OT Request' মোডাল (ব্রেডক্রাম্ব হেডার, এডিটেবল OT Req ও Morning OT ইনপুট এবং সেভ অপশন)।",
+  },
+  {
+    id: "414",
+    date: new Date().toISOString().slice(0, 16),
+    type: "New Feature",
+    module: "Manage Overtime",
+    link: "/manage-overtime?tab=submit",
+    descriptionEn: "Built the official 'Submit OT Req' requisition page under Manage Overtime (/manage-overtime?tab=submit) matching exact ERP specifications: top filter console with Requisition Type dropdown (OT, Allowance, All), 75+ Main Department dropdown (Accounts & Finance, Admin, Administration, All over Printing, Audit, Brand and Media, Business Automation, Business Development, CAD, Commercial, Cutting, e-Governance, Embroidery, EMS, Fabric Dyeing, Finishing, HR, ICT, IE & Planning, Knitting, Maintenance, Marketing, Merchandising, MIS, Procurement, Production, QA, R&D, Sewing, Supply Chain, Vat & Tax, Washing, Worker, WTP, Yarn Dyeing, etc.), W.Line Name selector (ALL, 0, 01 to 65, N/A), OT Date * date picker, and blue 'Search' button; action toolbar with Excel, Print, PDF export buttons alongside live table Search; data grid displaying # SL with multi-select checkbox, Emp ID, Emp ID(Off), Name, Type, Department, Designation, Unit, Line, W.Line, Date, In Time, Out Date, Out Time, OT Req, OT Type, Amount (৳), and Status badge; and bottom action bar with entries count alongside orange 'SUBMIT OT REQ' button.",
+    descriptionBn: "অফিশিয়াল 'Submit OT Req' পেজটি (/manage-overtime?tab=submit) হুবহু ERP স্পেসিফিকেশন অনুযায়ী নির্মাণ করা হয়েছে: টপ ফিল্টার কনসোলে রয়েছে Requisition Type ড্রপডাউন (OT, Allowance, All), ৭৫+ Main Department ড্রপডাউন, W.Line Name সিলেক্টর (ALL, 0, 01 থেকে 65, N/A), OT Date * ডেট পিকার এবং ব্লু 'Search' বাটন; Excel, Print, PDF এক্সপোর্ট বাটন এবং লাইভ টেবিল Search ফিল্টার সহ টুলবার; মাল্টি-সিলেক্ট চেকবক্স ও # ক্রম সহ Emp ID, Emp ID(Off), Name, Type, Department, Designation, Unit, Line, W.Line, Date, In Time, Out Date, Out Time, OT Req, OT Type, Amount (৳) এবং Status ব্যাজ সহ ডাটা গ্রিড; এবং এন্ট্রি কাউন্টার সহ অরেঞ্জ 'SUBMIT OT REQ' বাটন।",
+  },
+  {
     id: "413",
     date: new Date().toISOString().slice(0, 16),
     type: "New Feature",

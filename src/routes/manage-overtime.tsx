@@ -30,6 +30,7 @@ import {
   XCircle,
   Filter,
   Calendar,
+  X,
 } from "lucide-react";
 
 interface SearchParams {
@@ -123,6 +124,63 @@ export interface SubmitOTReqItem {
   otType: string;
   amount: number;
   status: "Pending" | "Approved" | "Rejected";
+}
+
+export interface SubmittedOTEmployeeDetail {
+  sl: number;
+  empId: string;
+  name: string;
+  type: string;
+  department: string;
+  designation: string;
+  unit: string;
+  line: string;
+  wLine: string;
+  date: string;
+  inTime: string;
+  outDate: string;
+  outTime: string;
+  otReq: number;
+  morningOt: number;
+  amount: number;
+  status: "Approved" | "Rejected" | "Pending";
+}
+
+export interface SubmittedOTBatchItem {
+  id: string;
+  reqNum: string;
+  dates: string;
+  docDetails: string;
+  reqType: "OT" | "Allowance";
+  department: string;
+  line: string;
+  reqBy: string;
+  reqTime: string;
+  status: "Review" | "Approved" | "Rejected" | "Pending";
+  remark: string;
+  employees: SubmittedOTEmployeeDetail[];
+  auditInfo: {
+    checkedBy: { status: string; name: string; designation: string; time: string };
+    verifiedByHod: { status: string; name: string; designation: string; time: string };
+    verifiedByHr: { status: string; name: string; designation: string; time: string };
+    approvedByMd: { status: string; name: string; designation: string; time?: string };
+  };
+}
+
+export interface IndividualOTReviewItem {
+  id: string;
+  sl: number;
+  empId: string;
+  name: string;
+  department: string;
+  designation: string;
+  date: string;
+  inTime: string;
+  outDate: string;
+  outTime: string;
+  status: "Approved" | "Pending" | "Rejected";
+  wLine: string;
+  reqType: "OT" | "Allowance";
 }
 
 const EMPLOYEE_TYPES = [
@@ -447,6 +505,138 @@ function ManageOvertimePage() {
   const [submitOtDate, setSubmitOtDate] = useState("2026-09-13");
   const [submitTableSearch, setSubmitTableSearch] = useState("");
   const [submitSelectedIds, setSubmitSelectedIds] = useState<Set<string>>(new Set());
+
+  // Submitted OT request List Filter States & Modal Handlers
+  const [subListReqType, setSubListReqType] = useState<"OT" | "Allowance" | "All">("OT");
+  const [subListMainDept, setSubListMainDept] = useState("ALL");
+  const [subListLineName, setSubListLineName] = useState("ALL");
+  const [subListApStatus, setSubListApStatus] = useState<"Review" | "Approved" | "Rejected" | "Pending" | "All">("Review");
+  const [subListTableSearch, setSubListTableSearch] = useState("");
+  const [activeDetailsBatch, setActiveDetailsBatch] = useState<SubmittedOTBatchItem | null>(null);
+  const [activeEditBatch, setActiveEditBatch] = useState<SubmittedOTBatchItem | null>(null);
+  const [detailsSearchQuery, setDetailsSearchQuery] = useState("");
+
+  // Individual OT Review Filter & Data States
+  const [indivReqType, setIndivReqType] = useState<"OT" | "Allowance" | "All">("OT");
+  const [indivMainDept, setIndivMainDept] = useState("Accounts & Finance");
+  const [indivWLineName, setIndivWLineName] = useState("ALL");
+  const [indivOtDate, setIndivOtDate] = useState("2026-09-13");
+  const [indivTableSearch, setIndivTableSearch] = useState("");
+  const [indivHasSearched, setIndivHasSearched] = useState(true);
+
+  const initialIndivReviewItems: IndividualOTReviewItem[] = [
+    {
+      id: "IND-101",
+      sl: 1,
+      empId: "2020021549",
+      name: "Aminur Islam",
+      department: "Accounts & Finance",
+      designation: "Assistant Manager",
+      date: "13/09/2026",
+      inTime: "07:42:47",
+      outDate: "13/09/2026",
+      outTime: "18:15:00",
+      status: "Approved",
+      wLine: "N/A",
+      reqType: "OT",
+    },
+    {
+      id: "IND-102",
+      sl: 2,
+      empId: "2023044857",
+      name: "Md. Rakibul Alam Raju",
+      department: "Accounts & Finance",
+      designation: "Deputy Manager",
+      date: "13/09/2026",
+      inTime: "08:03:56",
+      outDate: "13/09/2026",
+      outTime: "21:00:00",
+      status: "Pending",
+      wLine: "02",
+      reqType: "OT",
+    },
+    {
+      id: "IND-103",
+      sl: 3,
+      empId: "2023045146",
+      name: "Asif Hossain",
+      department: "Admin",
+      designation: "Driver",
+      date: "13/09/2026",
+      inTime: "08:30:12",
+      outDate: "13/09/2026",
+      outTime: "22:30:00",
+      status: "Approved",
+      wLine: "01",
+      reqType: "OT",
+    },
+    {
+      id: "IND-104",
+      sl: 4,
+      empId: "2023043910",
+      name: "Tahmid Afsar Shapno",
+      department: "Business Innovation",
+      designation: "Asst. Manager",
+      date: "13/09/2026",
+      inTime: "09:00:00",
+      outDate: "13/09/2026",
+      outTime: "20:45:00",
+      status: "Approved",
+      wLine: "N/A",
+      reqType: "OT",
+    },
+  ];
+
+  const [indivReviewItems] = useState<IndividualOTReviewItem[]>(initialIndivReviewItems);
+
+  // Filtered Individual Review Records
+  const filteredIndivRecords = useMemo(() => {
+    if (!indivHasSearched) return [];
+    return indivReviewItems.filter((item) => {
+      if (indivReqType !== "All" && item.reqType !== indivReqType) return false;
+      if (indivMainDept !== "ALL" && item.department !== indivMainDept) return false;
+      if (indivWLineName !== "ALL" && item.wLine !== indivWLineName) return false;
+      if (indivTableSearch.trim()) {
+        const q = indivTableSearch.toLowerCase().trim();
+        return (
+          item.name.toLowerCase().includes(q) ||
+          item.empId.toLowerCase().includes(q) ||
+          item.department.toLowerCase().includes(q) ||
+          item.designation.toLowerCase().includes(q)
+        );
+      }
+      return true;
+    });
+  }, [indivHasSearched, indivReviewItems, indivReqType, indivMainDept, indivWLineName, indivTableSearch]);
+
+  const handleExportIndividualReviewCSV = () => {
+    if (filteredIndivRecords.length === 0) {
+      toast.error("No records to export!");
+      return;
+    }
+    const headers = ["SL", "Emp ID", "Name", "Department", "Designation", "Date", "In Time", "Out Date", "Out Time", "Status"];
+    const rows = filteredIndivRecords.map((r, i) => [
+      i + 1,
+      `"${r.empId}"`,
+      `"${r.name}"`,
+      `"${r.department}"`,
+      `"${r.designation}"`,
+      `"${r.date}"`,
+      `"${r.inTime}"`,
+      `"${r.outDate}"`,
+      `"${r.outTime}"`,
+      `"${r.status}"`,
+    ]);
+    const csvContent = [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Individual_OT_Review_${indivOtDate}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Individual OT Review CSV exported!");
+  };
 
   // Submit OT Req Sample Items Persistence
   const initialSubmitReqItems: SubmitOTReqItem[] = [
@@ -2042,16 +2232,19 @@ function ManageOvertimePage() {
                   <table className="w-full text-xs text-left border-collapse min-w-[1250px]">
                     <thead>
                       <tr className="bg-slate-100 dark:bg-slate-900/90 text-foreground font-bold border-b border-border/60 text-[11px] whitespace-nowrap">
-                        <th className="px-3 py-3 w-10 text-center border-r border-border/40">
-                          <input
-                            type="checkbox"
-                            className="rounded border-border/70"
-                            checked={
-                              filteredSubmitReqItems.length > 0 &&
-                              submitSelectedIds.size === filteredSubmitReqItems.length
-                            }
-                            onChange={handleSelectAllSubmitRows}
-                          />
+                        <th className="px-3 py-3 text-center border-r border-border/40">
+                          <div className="flex items-center justify-center gap-1.5">
+                            <span>#</span>
+                            <input
+                              type="checkbox"
+                              className="rounded border-border/70"
+                              checked={
+                                filteredSubmitReqItems.length > 0 &&
+                                submitSelectedIds.size === filteredSubmitReqItems.length
+                              }
+                              onChange={handleSelectAllSubmitRows}
+                            />
+                          </div>
                         </th>
                         <th className="px-3 py-3 border-r border-border/40">Emp ID</th>
                         <th className="px-3 py-3 border-r border-border/40">Emp ID(Off)</th>
@@ -2073,7 +2266,7 @@ function ManageOvertimePage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border/30 font-sans text-xs">
-                      {filteredSubmitReqItems.map((row) => {
+                      {filteredSubmitReqItems.map((row, index) => {
                         const isChecked = submitSelectedIds.has(row.id);
                         return (
                           <tr
@@ -2083,12 +2276,15 @@ function ManageOvertimePage() {
                             }`}
                           >
                             <td className="px-3 py-2.5 text-center border-r border-border/30">
-                              <input
-                                type="checkbox"
-                                className="rounded border-border/70"
-                                checked={isChecked}
-                                onChange={() => toggleSelectSubmitRow(row.id)}
-                              />
+                              <div className="flex items-center justify-center gap-1.5 font-mono">
+                                <span className="text-[11px] font-bold text-muted-foreground">{index + 1}</span>
+                                <input
+                                  type="checkbox"
+                                  className="rounded border-border/70"
+                                  checked={isChecked}
+                                  onChange={() => toggleSelectSubmitRow(row.id)}
+                                />
+                              </div>
                             </td>
                             <td className="px-3 py-2.5 font-mono font-bold text-foreground border-r border-border/30">
                               {row.empId}
@@ -2184,54 +2380,954 @@ function ManageOvertimePage() {
                     disabled={submitSelectedIds.size === 0}
                     className="h-9 px-6 bg-[#f57c00] hover:bg-[#e65100] disabled:opacity-50 text-white font-bold text-xs rounded-md shadow-xs transition uppercase tracking-wider flex items-center gap-1.5"
                   >
-                    <Send className="size-3.5" /> SUBMIT
+                    <Send className="size-3.5" /> SUBMIT OT REQ
                   </button>
                 </div>
               </div>
             </div>
           )}
 
-          {/* TAB 4: SUBMITTED OT LIST */}
+          {/* TAB 4: SUBMITTED OT LIST (EXACT ERP SPECIFICATION MATCH) */}
           {activeTab === "submitted-list" && (
             <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="bg-card rounded-xl border border-border/80 shadow-xs overflow-hidden">
-                <div className="p-4 flex items-center justify-between border-b border-border/40 bg-muted/10">
-                  <h2 className="text-sm font-black text-foreground">Submitted OT Requests Ledger</h2>
+              {/* Filter Console */}
+              <div className="bg-card rounded-xl border border-border/80 p-5 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-border/40 pb-3">
+                  <h2 className="text-sm font-black text-foreground flex items-center gap-2">
+                    <Filter className="size-4 text-blue-600" /> Filter Submitted OT Request List
+                  </h2>
                   <button
-                    onClick={() => window.print()}
-                    className="h-8.5 px-3 rounded border border-border/70 bg-background hover:bg-muted text-xs font-bold flex items-center gap-1.5"
+                    onClick={() => {
+                      setSubListReqType("OT");
+                      setSubListMainDept("ALL");
+                      setSubListLineName("ALL");
+                      setSubListApStatus("Review");
+                      setSubListTableSearch("");
+                      toast.info("Filters reset to default.");
+                    }}
+                    className="text-[11px] font-bold text-rose-500 hover:underline"
                   >
-                    <Printer className="size-3.5" /> Print Ledger
+                    Reset Filters
                   </button>
                 </div>
 
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 text-xs">
+                  {/* Requisition Type */}
+                  <div>
+                    <label className="text-[11px] font-bold text-muted-foreground mb-1 block">
+                      Requisition Type
+                    </label>
+                    <select
+                      value={subListReqType}
+                      onChange={(e) => setSubListReqType(e.target.value as "OT" | "Allowance" | "All")}
+                      className="w-full h-9 px-3 rounded-lg bg-background border border-border/70 text-xs font-medium outline-none focus:border-blue-500 shadow-2xs"
+                    >
+                      <option value="OT">OT</option>
+                      <option value="Allowance">Allowance</option>
+                      <option value="All">All</option>
+                    </select>
+                  </div>
+
+                  {/* Main Department */}
+                  <div>
+                    <label className="text-[11px] font-bold text-muted-foreground mb-1 block">
+                      Main Department
+                    </label>
+                    <select
+                      value={subListMainDept}
+                      onChange={(e) => setSubListMainDept(e.target.value)}
+                      className="w-full h-9 px-3 rounded-lg bg-background border border-border/70 text-xs font-medium outline-none focus:border-blue-500 shadow-2xs truncate"
+                    >
+                      {MAIN_DEPARTMENTS.map((d) => (
+                        <option key={d} value={d}>
+                          {d}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Line Name */}
+                  <div>
+                    <label className="text-[11px] font-bold text-muted-foreground mb-1 block">
+                      Line Name
+                    </label>
+                    <select
+                      value={subListLineName}
+                      onChange={(e) => setSubListLineName(e.target.value)}
+                      className="w-full h-9 px-3 rounded-lg bg-background border border-border/70 text-xs font-medium outline-none focus:border-blue-500 shadow-2xs"
+                    >
+                      {LINES.map((l) => (
+                        <option key={l} value={l}>
+                          {l}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* ApStatus */}
+                  <div>
+                    <label className="text-[11px] font-bold text-muted-foreground mb-1 block">
+                      ApStatus
+                    </label>
+                    <select
+                      value={subListApStatus}
+                      onChange={(e) =>
+                        setSubListApStatus(
+                          e.target.value as "Review" | "Approved" | "Rejected" | "Pending" | "All"
+                        )
+                      }
+                      className="w-full h-9 px-3 rounded-lg bg-background border border-border/70 text-xs font-medium outline-none focus:border-blue-500 shadow-2xs"
+                    >
+                      <option value="Review">Review</option>
+                      <option value="Approved">Approved</option>
+                      <option value="Rejected">Rejected</option>
+                      <option value="Pending">Pending</option>
+                      <option value="All">All</option>
+                    </select>
+                  </div>
+
+                  {/* Search Action Button */}
+                  <div className="flex items-end">
+                    <button
+                      onClick={() => toast.success(`Search completed.`)}
+                      className="w-full h-9 px-4 bg-[#2196f3] hover:bg-[#1e88e5] text-white font-bold text-xs rounded-lg shadow-sm transition uppercase tracking-wider flex items-center justify-center gap-1.5"
+                    >
+                      <Search className="size-3.5" /> SEARCH
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Data Grid Toolbar & Table */}
+              <div className="bg-card rounded-xl border border-border/80 shadow-xs overflow-hidden">
+                {/* Export Toolbar */}
+                <div className="p-4 flex flex-wrap items-center justify-between gap-3 border-b border-border/40 bg-muted/20">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => toast.success("Exported to Excel")}
+                      className="h-8.5 px-3 rounded border border-border/70 bg-background hover:bg-muted text-foreground text-[11px] font-bold flex items-center gap-1.5 shadow-2xs transition"
+                    >
+                      <FileSpreadsheet className="size-3.5 text-emerald-600" /> EXCEL
+                    </button>
+                    <button
+                      onClick={() => window.print()}
+                      className="h-8.5 px-3 rounded border border-border/70 bg-background hover:bg-muted text-foreground text-[11px] font-bold flex items-center gap-1.5 shadow-2xs transition"
+                    >
+                      <Printer className="size-3.5 text-blue-600" /> PRINT
+                    </button>
+                    <button
+                      onClick={() => toast.info("PDF Export generated successfully.")}
+                      className="h-8.5 px-3 rounded border border-border/70 bg-background hover:bg-muted text-foreground text-[11px] font-bold flex items-center gap-1.5 shadow-2xs transition"
+                    >
+                      <FileText className="size-3.5 text-rose-600" /> PDF
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-muted-foreground">Search:</span>
+                    <input
+                      type="text"
+                      value={subListTableSearch}
+                      onChange={(e) => setSubListTableSearch(e.target.value)}
+                      className="h-8.5 px-3 w-48 sm:w-64 rounded-md border border-border/70 bg-background text-xs outline-none focus:border-blue-500 shadow-2xs"
+                    />
+                  </div>
+                </div>
+
+                {/* Data Table */}
                 <div className="overflow-x-auto">
-                  <table className="w-full text-xs text-left border-collapse">
+                  <table className="w-full text-xs text-left border-collapse min-w-[1100px]">
                     <thead>
-                      <tr className="bg-muted/40 text-foreground font-bold border-b border-border/60 text-[11px]">
-                        <th className="px-4 py-3">Req ID</th>
-                        <th className="px-4 py-3">Employee Details</th>
-                        <th className="px-4 py-3 text-center">OT Date</th>
-                        <th className="px-4 py-3 text-center">Requested Hours</th>
-                        <th className="px-4 py-3 text-center">Submitted At</th>
-                        <th className="px-4 py-3 text-center">Status</th>
-                        <th className="px-4 py-3 text-center">Action</th>
+                      <tr className="bg-slate-100 dark:bg-slate-900/90 text-foreground font-bold border-b border-border/60 text-[11px] whitespace-nowrap">
+                        <th className="px-3 py-3 w-16 text-center border-r border-border/40">∇</th>
+                        <th className="px-3 py-3 border-r border-border/40">ReqNum</th>
+                        <th className="px-3 py-3 border-r border-border/40">Dates</th>
+                        <th className="px-3 py-3 border-r border-border/40">DocDetails</th>
+                        <th className="px-3 py-3 text-center border-r border-border/40">ReqType</th>
+                        <th className="px-3 py-3 border-r border-border/40">Department</th>
+                        <th className="px-3 py-3 text-center border-r border-border/40">Line</th>
+                        <th className="px-3 py-3 border-r border-border/40">ReqBy</th>
+                        <th className="px-3 py-3 text-center border-r border-border/40">ReqTime</th>
+                        <th className="px-3 py-3 text-center">Status</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-border/30">
-                      {submittedRecords.map((row) => (
-                        <tr key={row.id} className="hover:bg-muted/30 transition">
-                          <td className="px-4 py-3 font-mono font-bold text-foreground/70">{row.id}</td>
-                          <td className="px-4 py-3">
-                            <div className="font-bold text-foreground">{row.employeeName}</div>
-                            <div className="text-[10px] text-muted-foreground font-mono">{row.employeeId} • {row.department}</div>
+                    <tbody className="divide-y divide-border/30 font-sans text-xs">
+                      {[
+                        { reqNum: "3625", dates: "", docDetails: "Dept: RMG Operations, OT Request For 46 Employee", reqType: "OT", department: "RMG Operations", line: "N/A", reqBy: "Syed Asif Ahmed (Assistant Manager)", reqTime: "25/03/2023 20:05:00", status: "Review", remark: "test" },
+                        { reqNum: "3634", dates: "", docDetails: "Dept: RMG Operations, OT Request For 3 Employee", reqType: "OT", department: "RMG Operations", line: "37", reqBy: "Syed Asif Ahmed (Assistant Manager)", reqTime: "25/03/2023 15:21:59", status: "Review", remark: "test" },
+                        { reqNum: "4487", dates: "", docDetails: "Dept: Admin and Compliance, OT Request For 2 Employee", reqType: "OT", department: "Admin and Compliance", line: "N/A", reqBy: "Md. Komol Hossain (Assistant Manager)", reqTime: "10/05/2023 13:05:55", status: "Review", remark: "trst" },
+                        { reqNum: "5132", dates: "", docDetails: "Dept: RMG Operations, Month: June, 2023", reqType: "OT", department: "RMG Operations", line: "N/A", reqBy: "()", reqTime: "01/06/2023 20:16:38", status: "Review", remark: "Set OT hour" },
+                        { reqNum: "6040", dates: "", docDetails: "Dept: Quality Assurance Department, OT Request For 13 Employee", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Farhad-Al Kaber (Deputy Manager)", reqTime: "16/06/2023 22:03:04", status: "Review", remark: "Please mention out time. Then submit again" },
+                        { reqNum: "6342", dates: "", docDetails: "Dept: Quality Assurance Department, Month: June, 2023", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Farhad-Al Kaber (Deputy Manager)", reqTime: "18/06/2023 15:05:40", status: "Review", remark: "please check" },
+                        { reqNum: "6447", dates: "", docDetails: "Dept: RMG Operations, Month: June, 2023", reqType: "OT", department: "RMG Operations", line: "N/A", reqBy: "Md. Rifat Miah (Asst. Reporter)", reqTime: "19/06/2023 15:34:40", status: "Review", remark: "date need to be correct" },
+                        { reqNum: "7131", dates: "", docDetails: "Dept: Quality Assurance Department, Date: 23/06/2023, Line: N/A, Emp: 1", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Montejar Rahman (Reporter)", reqTime: "23/06/2023 15:01:01", status: "Review", remark: "Have some mistake. Please check" },
+                        { reqNum: "7934", dates: "26/06/2023", docDetails: "Dept: Maintenance , Date: 26/06/2023, Line: N/A, Emp: 27", reqType: "OT", department: "Maintenance", line: "N/A", reqBy: "Md. Masud Rana (Sr. Officer)", reqTime: "26/06/2023 18:27:12", status: "Review", remark: "ok" },
+                        { reqNum: "8015", dates: "08/07/2023", docDetails: "Dept: Quality Assurance Department, Date: 08/07/2023, Line: N/A, Emp: 1", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Majbahur Rahman (Assistant Manager)", reqTime: "08/07/2023 10:17:42", status: "Review", remark: "Have some mistake. Check & correct." },
+                        { reqNum: "8552", dates: "12/07/2023", docDetails: "Dept: Quality Assurance Department, Date: 12/07/2023, Line: N/A, Emp: 1", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "()", reqTime: "12/07/2023 09:12:23", status: "Review", remark: "Have some mistake, Please check" },
+                        { reqNum: "8596", dates: "12/07/2023", docDetails: "Dept: Quality Assurance Department, Date: 12/07/2023, Line: N/A, Emp: 3", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Al Mamun (Reporter)", reqTime: "12/07/2023 15:16:25", status: "Review", remark: "Have some mistake. Please check" },
+                        { reqNum: "8689", dates: "13/07/2023", docDetails: "Dept: Quality Assurance Department, Date: 13/07/2023, Line: N/A, Emp: 1", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Moniruzzaman (Atik) (Sr. Manager)", reqTime: "13/07/2023 10:00:28", status: "Review", remark: "Have some mistake, Please check & correct" },
+                        { reqNum: "9772", dates: "22/07/2023", docDetails: "Dept: Quality Assurance Department, Date: 22/07/2023, Line: N/A, Emp: 4", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Farhad-Al Kaber (Deputy Manager)", reqTime: "22/07/2023 10:03:32", status: "Review", remark: "Have some mistake. Check and correct." },
+                        { reqNum: "10258", dates: "24/07/2023", docDetails: "Dept: RMG Operations, Date: 24/07/2023, Line: 39, Emp: 47", reqType: "OT", department: "RMG Operations", line: "39", reqBy: "()", reqTime: "24/07/2023 17:29:35", status: "Review", remark: "Review" },
+                        { reqNum: "10289", dates: "25/07/2023", docDetails: "Dept: Admin and Compliance, Date: 25/07/2023, Line: N/A, Emp: 23", reqType: "OT", department: "Admin and Compliance", line: "N/A", reqBy: "Golam Nafiz Dastageer (Sr. Officer)", reqTime: "25/07/2023 09:00:47", status: "Review", remark: "ok" },
+                        { reqNum: "10443", dates: "26/07/2023", docDetails: "Dept: Quality Assurance Department, Date: 26/07/2023, Line: N/A, Emp: 4", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Farhad-Al Kaber (Deputy Manager)", reqTime: "26/07/2023 08:17:31", status: "Review", remark: "Have some problem, please check" },
+                        { reqNum: "10472", dates: "26/07/2023", docDetails: "Dept: Knitting, Date: 26/07/2023, Line: N/A, Emp: 45", reqType: "OT", department: "Knitting", line: "N/A", reqBy: "Md. Wadud Khan (Sr. Officer)", reqTime: "26/07/2023 11:22:27", status: "Review", remark: "ok" },
+                        { reqNum: "10939", dates: "30/07/2023", docDetails: "Dept: Quality Assurance Department, Date: 30/07/2023, Line: N/A, Emp: 1", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "()", reqTime: "30/07/2023 08:54:14", status: "Review", remark: "Have some problem, check and correct" },
+                        { reqNum: "11180", dates: "31/07/2023", docDetails: "Dept: RMG Operations, Date: 31/07/2023, Line: 36, Emp: 37", reqType: "OT", department: "RMG Operations", line: "36", reqBy: "Al Fatah (Asst. Reporter)", reqTime: "31/07/2023 16:30:52", status: "Review", remark: "not" },
+                        { reqNum: "11511", dates: "28/07/2023", docDetails: "Dept: Quality Assurance Department, Date: 28/07/2023, Line: N/A, Emp: 1", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "()", reqTime: "02/08/2023 17:38:04", status: "Review", remark: "Have some problem, please correct" },
+                        { reqNum: "12467", dates: "08/08/2023", docDetails: "Dept: Quality Assurance Department, Date: 08/08/2023, Line: N/A, Emp: 7", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "()", reqTime: "09/08/2023 08:25:58", status: "Review", remark: "Have some problem, pls check and correct" },
+                        { reqNum: "12532", dates: "09/08/2023", docDetails: "Dept: Finishing Department, Date: 09/08/2023, Line: N/A, Emp: 1", reqType: "OT", department: "Finishing Department", line: "N/A", reqBy: "Md. Sakib Hasan Sami (Reporter)", reqTime: "09/08/2023 16:20:20", status: "Review", remark: "Have some problem, please correct" },
+                        { reqNum: "12533", dates: "09/08/2023", docDetails: "Dept: RMG Operations, Date: 09/08/2023, Line: 11, Emp: 47", reqType: "OT", department: "RMG Operations", line: "11", reqBy: "Md. Rifat Miah (Asst. Reporter)", reqTime: "09/08/2023 16:20:28", status: "Review", remark: "Review" },
+                        { reqNum: "13079", dates: "14/08/2023", docDetails: "Dept: RMG Operations, Date: 14/08/2023, Line: 47, Emp: 57", reqType: "OT", department: "RMG Operations", line: "47", reqBy: "Al Fatah (Asst. Reporter)", reqTime: "14/08/2023 16:31:10", status: "Review", remark: "cancel" },
+                        { reqNum: "13814", dates: "21/08/2023", docDetails: "Dept: Fabrics Department, Date: 21/08/2023, Line: N/A, Emp: 11", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Munsur Rohoman (Officer)", reqTime: "21/08/2023 18:18:33", status: "Review", remark: "plz check." },
+                        { reqNum: "13920", dates: "22/08/2023", docDetails: "Dept: Finishing Department, Date: 22/08/2023, Line: N/A, Emp: 1", reqType: "OT", department: "Finishing Department", line: "N/A", reqBy: "Md. Montejar Rahman (Reporter)", reqTime: "22/08/2023 16:33:18", status: "Review", remark: "Have some issue, Please correct" },
+                        { reqNum: "14391", dates: "26/08/2023", docDetails: "Dept: RMG Operations, Date: 26/08/2023, Line: 44, Emp: 21", reqType: "OT", department: "RMG Operations", line: "44", reqBy: "Al Fatah (Asst. Reporter)", reqTime: "26/08/2023 16:39:42", status: "Review", remark: "need to revise" },
+                        { reqNum: "14500", dates: "27/08/2023", docDetails: "Dept: RMG Operations, Date: 27/08/2023, Line: 16, Emp: 47", reqType: "OT", department: "RMG Operations", line: "16", reqBy: "Md. Rifat Miah (Asst. Reporter)", reqTime: "27/08/2023 15:45:39", status: "Review", remark: "Review" },
+                        { reqNum: "14503", dates: "27/08/2023", docDetails: "Dept: RMG Operations, Date: 27/08/2023, Line: 15, Emp: 46", reqType: "OT", department: "RMG Operations", line: "15", reqBy: "Md. Rifat Miah (Asst. Reporter)", reqTime: "27/08/2023 15:52:57", status: "Review", remark: "Review" },
+                        { reqNum: "14507", dates: "27/08/2023", docDetails: "Dept: Finishing Department, Date: 27/08/2023, Line: N/A, Emp: 1", reqType: "OT", department: "Finishing Department", line: "N/A", reqBy: "Md. Sakib Hasan Sami (Reporter)", reqTime: "27/08/2023 15:57:37", status: "Review", remark: "Have some issue, please check" },
+                        { reqNum: "15859", dates: "04/09/2023", docDetails: "Dept: RMG Operations, Date: 04/09/2023, Line: 11, Emp: 30", reqType: "OT", department: "RMG Operations", line: "11", reqBy: "Md. Rifat Miah (Asst. Reporter)", reqTime: "04/09/2023 15:29:07", status: "Review", remark: "Not Ok" },
+                        { reqNum: "16470", dates: "07/09/2023", docDetails: "Dept: RMG Operations, Date: 07/09/2023, Line: 27, Emp: 4", reqType: "OT", department: "RMG Operations", line: "27", reqBy: "Al Fatah (Asst. Reporter)", reqTime: "07/09/2023 10:21:35", status: "Review", remark: "not" },
+                        { reqNum: "16471", dates: "07/09/2023", docDetails: "Dept: RMG Operations, Date: 07/09/2023, Line: 49, Emp: 4", reqType: "OT", department: "RMG Operations", line: "49", reqBy: "Al Fatah (Asst. Reporter)", reqTime: "07/09/2023 10:24:58", status: "Review", remark: "Not" },
+                        { reqNum: "16472", dates: "07/09/2023", docDetails: "Dept: RMG Operations, Date: 07/09/2023, Line: 29, Emp: 1", reqType: "OT", department: "RMG Operations", line: "29", reqBy: "Al Fatah (Asst. Reporter)", reqTime: "07/09/2023 10:27:04", status: "Review", remark: "not" },
+                        { reqNum: "16473", dates: "07/09/2023", docDetails: "Dept: RMG Operations, Date: 07/09/2023, Line: 29, Emp: 1", reqType: "OT", department: "RMG Operations", line: "29", reqBy: "Al Fatah (Asst. Reporter)", reqTime: "07/09/2023 10:28:28", status: "Review", remark: "Not" },
+                        { reqNum: "16493", dates: "07/09/2023", docDetails: "Dept: RMG Operations, Date: 07/09/2023, Line: 32, Emp: 2", reqType: "OT", department: "RMG Operations", line: "32", reqBy: "Al Fatah (Asst. Reporter)", reqTime: "07/09/2023 15:18:02", status: "Review", remark: "Not Ok" },
+                        { reqNum: "16496", dates: "07/09/2023", docDetails: "Dept: RMG Operations, Date: 07/09/2023, Line: 40, Emp: 2", reqType: "OT", department: "RMG Operations", line: "40", reqBy: "Al Fatah (Asst. Reporter)", reqTime: "07/09/2023 15:20:13", status: "Review", remark: "Not Ok" },
+                        { reqNum: "16499", dates: "07/09/2023", docDetails: "Dept: RMG Operations, Date: 07/09/2023, Line: 44, Emp: 4", reqType: "OT", department: "RMG Operations", line: "44", reqBy: "Al Fatah (Asst. Reporter)", reqTime: "07/09/2023 15:23:44", status: "Review", remark: "Not ok" },
+                        { reqNum: "16560", dates: "07/09/2023", docDetails: "Dept: Quality Assurance Department, Date: 07/09/2023, Line: N/A, Emp: 1", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Sumon Ahmmad (Sr. Quality Controller)", reqTime: "07/09/2023 16:42:24", status: "Review", remark: "Have some issue, please check..." },
+                        { reqNum: "16814", dates: "09/09/2023", docDetails: "Dept: Quality Assurance Department, Date: 09/09/2023, Line: N/A, Emp: 1", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Sumon Ahmmad (Sr. Quality Controller)", reqTime: "09/09/2023 18:03:03", status: "Review", remark: "Have some issue, please check" },
+                        { reqNum: "17847", dates: "14/09/2023", docDetails: "Dept: RMG Operations, Date: 14/09/2023, Line: N/A, Emp: 1", reqType: "OT", department: "RMG Operations", line: "N/A", reqBy: "Al Fatah (Asst. Reporter)", reqTime: "14/09/2023 14:59:38", status: "Review", remark: "This Line fill-up the man.change the line ." },
+                        { reqNum: "20388", dates: "25/09/2023", docDetails: "Dept: Quality Assurance Department, Date: 25/09/2023, Line: N/A, Emp: 27", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Moniruzzaman (Atik) (Sr. Manager)", reqTime: "26/09/2023 09:29:14", status: "Review", remark: "Have some issue" },
+                        { reqNum: "23434", dates: "04/10/2023", docDetails: "Dept: Quality Assurance Department, Date: 04/10/2023, Line: N/A, Emp: 7", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Golam Jamil (Manager)", reqTime: "05/10/2023 08:44:41", status: "Review", remark: "Have some issue" },
+                        { reqNum: "23838", dates: "07/10/2023", docDetails: "Dept: Quality Assurance Department, Date: 07/10/2023, Line: N/A, Emp: 2", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Montejar Rahman (Reporter)", reqTime: "07/10/2023 15:04:32", status: "Review", remark: "Have issue" },
+                        { reqNum: "27007", dates: "19/10/2023", docDetails: "Dept: Quality Assurance Department, Date: 19/10/2023, Line: N/A, Emp: 1", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Al Mamun (Reporter)", reqTime: "19/10/2023 16:05:55", status: "Review", remark: "Have Issue, Please check" },
+                        { reqNum: "27497", dates: "19/10/2023", docDetails: "Dept: Quality Assurance Department, Date: 19/10/2023, Line: N/A, Emp: 9", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Komol Hossain (Assistant Manager)", reqTime: "22/10/2023 16:18:57", status: "Review", remark: "Have Issue" },
+                        { reqNum: "28628", dates: "26/10/2023", docDetails: "Dept: Quality Assurance Department, Date: 26/10/2023, Line: N/A, Emp: 1", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Montejar Rahman (Reporter)", reqTime: "26/10/2023 15:08:34", status: "Review", remark: "ISSIE" },
+                        { reqNum: "29147", dates: "27/10/2023", docDetails: "Dept: Quality Assurance Department, Date: 27/10/2023, Line: N/A, Emp: 4", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Farhad-Al Kaber (Deputy Manager)", reqTime: "27/10/2023 15:40:54", status: "Review", remark: "Have Issue" },
+                        { reqNum: "29273", dates: "27/10/2023", docDetails: "Dept: Fabrics Department, Date: 27/10/2023, Line: N/A, Emp: 11", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Munsur Rohoman (Officer)", reqTime: "28/10/2023 09:50:12", status: "Review", remark: "need OT correction." },
+                        { reqNum: "29665", dates: "27/10/2023", docDetails: "Dept: Quality Assurance Department, Date: 27/10/2023, Line: N/A, Emp: 2", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "()", reqTime: "29/10/2023 12:37:08", status: "Review", remark: "Issue" },
+                        { reqNum: "29668", dates: "27/10/2023", docDetails: "Dept: Quality Assurance Department, Date: 27/10/2023, Line: N/A, Emp: 1", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "()", reqTime: "29/10/2023 12:40:20", status: "Review", remark: "Issue" },
+                        { reqNum: "30490", dates: "30/10/2023", docDetails: "Dept: Fabrics Department, Date: 30/10/2023, Line: N/A, Emp: 25", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "()", reqTime: "31/10/2023 09:33:21", status: "Review", remark: "No OT" },
+                        { reqNum: "32497", dates: "03/11/2023", docDetails: "Dept: Quality Assurance Department, Date: 03/11/2023, Line: N/A, Emp: 6", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "()", reqTime: "03/11/2023 16:58:32", status: "Review", remark: "Have Issue" },
+                        { reqNum: "38222", dates: "24/11/2023", docDetails: "Dept: Fabrics Department, Date: 24/11/2023, Line: N/A, Emp: 28", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Babul Barai (Deputy Manager)", reqTime: "24/11/2023 11:39:17", status: "Review", remark: "No OT hour." },
+                        { reqNum: "38429", dates: "24/11/2023", docDetails: "Dept: Fabrics Department, Date: 24/11/2023, Line: N/A, Emp: 126", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Ashadzzaman (Manager)", reqTime: "25/11/2023 08:40:20", status: "Review", remark: "No OT hour" },
+                        { reqNum: "43833", dates: "12/12/2023", docDetails: "Dept: Finishing Department, Date: 12/12/2023, Line: N/A, Emp: 1", reqType: "OT", department: "Finishing Department", line: "N/A", reqBy: "Md. Al Mamun (Reporter)", reqTime: "12/12/2023 09:18:35", status: "Review", remark: "not ok" },
+                        { reqNum: "49508", dates: "28/12/2023", docDetails: "Dept: Quality Assurance Department, Date: 28/12/2023, Line: N/A, Emp: 30", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Moniruzzaman (Atik) (Sr. Manager)", reqTime: "30/12/2023 09:38:54", status: "Review", remark: "issue" },
+                        { reqNum: "53400", dates: "08/01/2024", docDetails: "Dept: Fabrics Department, Date: 08/01/2024, Line: N/A, Emp: 41", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "()", reqTime: "08/01/2024 19:56:29", status: "Review", remark: "No OT." },
+                        { reqNum: "53913", dates: "09/01/2024", docDetails: "Dept: Fabrics Department, Date: 09/01/2024, Line: N/A, Emp: 24", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "()", reqTime: "10/01/2024 09:25:57", status: "Review", remark: "No OT" },
+                        { reqNum: "59796", dates: "22/01/2024", docDetails: "Dept: RMG Operations, Date: 22/01/2024, Line: 43, Emp: 24", reqType: "OT", department: "RMG Operations", line: "43", reqBy: "Al Fatah (Asst. Reporter)", reqTime: "22/01/2024 17:37:40", status: "Review", remark: "re" },
+                        { reqNum: "63793", dates: "27/01/2024", docDetails: "Dept: Fabrics Department, Date: 27/01/2024, Line: N/A, Emp: 54", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Ashadzzaman (Manager)", reqTime: "30/01/2024 19:53:50", status: "Review", remark: "No record." },
+                        { reqNum: "63924", dates: "28/01/2024", docDetails: "Dept: Fabrics Department, Date: 28/01/2024, Line: N/A, Emp: 5", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "()", reqTime: "31/01/2024 09:13:17", status: "Review", remark: "No record." },
+                        { reqNum: "64478", dates: "31/01/2024", docDetails: "Dept: Fabrics Department, Date: 31/01/2024, Line: N/A, Emp: 15", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Munsur Rohoman (Officer)", reqTime: "01/02/2024 11:41:37", status: "Review", remark: "No OT" },
+                        { reqNum: "66248", dates: "03/02/2024", docDetails: "Dept: Quality Assurance Department, Date: 03/02/2024, Line: N/A, Emp: 11", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Farhad-Al Kaber (Deputy Manager)", reqTime: "04/02/2024 08:15:44", status: "Review", remark: "Have issue" },
+                        { reqNum: "67428", dates: "05/02/2024", docDetails: "Dept: Quality Assurance Department, Date: 05/02/2024, Line: N/A, Emp: 10", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Farhad-Al Kaber (Deputy Manager)", reqTime: "06/02/2024 08:19:31", status: "Review", remark: "issue" },
+                        { reqNum: "68789", dates: "08/02/2024", docDetails: "Dept: Quality Assurance Department, Date: 08/02/2024, Line: N/A, Emp: 19", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Farhad-Al Kaber (Deputy Manager)", reqTime: "08/02/2024 16:08:24", status: "Review", remark: "Issue" },
+                        { reqNum: "69068", dates: "08/02/2024", docDetails: "Dept: Quality Assurance Department, Date: 08/02/2024, Line: N/A, Emp: 10", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Farhad-Al Kaber (Deputy Manager)", reqTime: "09/02/2024 08:13:00", status: "Review", remark: "Issue" },
+                        { reqNum: "69312", dates: "09/02/2024", docDetails: "Dept: Quality Assurance Department, Date: 09/02/2024, Line: N/A, Emp: 11", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Farhad-Al Kaber (Deputy Manager)", reqTime: "10/02/2024 08:11:25", status: "Review", remark: "Issue" },
+                        { reqNum: "70594", dates: "11/02/2024", docDetails: "Dept: Fabrics Department, Date: 11/02/2024, Line: N/A, Emp: 15", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "M.H. Mostafizur Rahman (Sr. Officer)", reqTime: "12/02/2024 15:13:44", status: "Review", remark: "No OT" },
+                        { reqNum: "71804", dates: "13/02/2024", docDetails: "Dept: Fabrics Department, Date: 13/02/2024, Line: N/A, Emp: 69", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Ashadzzaman (Manager)", reqTime: "14/02/2024 19:58:59", status: "Review", remark: "no OT" },
+                        { reqNum: "74262", dates: "11/02/2024", docDetails: "Dept: Finishing Department, Date: 11/02/2024, Line: N/A, Emp: 1", reqType: "OT", department: "Finishing Department", line: "N/A", reqBy: "Md. Sakib Hasan Sami (Reporter)", reqTime: "20/02/2024 16:21:30", status: "Review", remark: "issue" },
+                        { reqNum: "74627", dates: "20/02/2024", docDetails: "Dept: Quality Assurance Department, Date: 20/02/2024, Line: N/A, Emp: 10", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Farhad-Al Kaber (Deputy Manager)", reqTime: "22/02/2024 08:19:08", status: "Review", remark: "issue" },
+                        { reqNum: "74641", dates: "20/02/2024", docDetails: "Dept: Quality Assurance Department, Date: 20/02/2024, Line: N/A, Emp: 35", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Moniruzzaman (Atik) (Sr. Manager)", reqTime: "22/02/2024 09:21:48", status: "Review", remark: "issue" },
+                        { reqNum: "75260", dates: "22/02/2024", docDetails: "Dept: Finishing Department, Date: 22/02/2024, Line: N/A, Emp: 7", reqType: "OT", department: "Finishing Department", line: "N/A", reqBy: "Md. Al Mamun (Reporter)", reqTime: "23/02/2024 16:18:03", status: "Review", remark: "issue" },
+                        { reqNum: "75888", dates: "23/02/2024", docDetails: "Dept: Fabrics Department, Date: 23/02/2024, Line: N/A, Emp: 6", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Ashadzzaman (Manager)", reqTime: "24/02/2024 20:15:37", status: "Review", remark: "No OT" },
+                        { reqNum: "75889", dates: "23/02/2024", docDetails: "Dept: Fabrics Department, Date: 23/02/2024, Line: N/A, Emp: 7", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Ashadzzaman (Manager)", reqTime: "24/02/2024 20:18:18", status: "Review", remark: "No OT" },
+                        { reqNum: "75890", dates: "23/02/2024", docDetails: "Dept: Fabrics Department, Date: 23/02/2024, Line: N/A, Emp: 55", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Ashadzzaman (Manager)", reqTime: "24/02/2024 20:22:35", status: "Review", remark: "No OT" },
+                        { reqNum: "75894", dates: "23/02/2024", docDetails: "Dept: Fabrics Department, Date: 23/02/2024, Line: N/A, Emp: 48", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Ashadzzaman (Manager)", reqTime: "24/02/2024 20:33:11", status: "Review", remark: "No OT" },
+                        { reqNum: "81058", dates: "05/03/2024", docDetails: "Dept: Fabrics Department, Date: 05/03/2024, Line: N/A, Emp: 15", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Munsur Rohoman (Officer)", reqTime: "06/03/2024 18:39:41", status: "Review", remark: "No OT record." },
+                        { reqNum: "85076", dates: "15/03/2024", docDetails: "Dept: RMG Operations, Date: 15/03/2024, Line: 21, Emp: 9", reqType: "OT", department: "RMG Operations", line: "21", reqBy: "Mst. Jemi Akter (Asst. Reporter)", reqTime: "15/03/2024 12:37:06", status: "Review", remark: "not ok" },
+                        { reqNum: "85171", dates: "15/03/2024", docDetails: "Dept: Fabrics Department, Date: 15/03/2024, Line: N/A, Emp: 25", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Shafiqul Islam (Sr. Officer)", reqTime: "16/03/2024 10:13:40", status: "Review", remark: "No OT" },
+                        { reqNum: "85183", dates: "15/03/2024", docDetails: "Dept: Fabrics Department, Date: 15/03/2024, Line: N/A, Emp: 57", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Shafiqul Islam (Sr. Officer)", reqTime: "16/03/2024 10:34:30", status: "Review", remark: "No OT hour found" },
+                        { reqNum: "86130", dates: "16/03/2024", docDetails: "Dept: Quality Assurance Department, Date: 16/03/2024, Line: N/A, Emp: 18", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "()", reqTime: "17/03/2024 16:38:18", status: "Review", remark: "issue" },
+                        { reqNum: "88436", dates: "22/03/2024", docDetails: "Dept: Finishing Department, Date: 22/03/2024, Line: N/A, Emp: 3", reqType: "OT", department: "Finishing Department", line: "N/A", reqBy: "Md. Al Mamun (Reporter)", reqTime: "22/03/2024 08:46:05", status: "Review", remark: "Issue" },
+                        { reqNum: "93839", dates: "31/03/2024", docDetails: "Dept: RMG Operations, Date: 31/03/2024, Line: N/A, Emp: 516", reqType: "OT", department: "RMG Operations", line: "N/A", reqBy: "Shahjalal (Reporter)", reqTime: "01/04/2024 16:14:48", status: "Review", remark: "not ok" },
+                        { reqNum: "96821", dates: "06/04/2024", docDetails: "Dept: Finishing Department, Date: 06/04/2024, Line: N/A, Emp: 3", reqType: "OT", department: "Finishing Department", line: "N/A", reqBy: "Md. Montejar Rahman (Reporter)", reqTime: "06/04/2024 09:35:15", status: "Review", remark: "issue" },
+                        { reqNum: "97244", dates: "04/04/2024", docDetails: "Dept: Quality Assurance Department, Date: 04/04/2024, Line: N/A, Emp: 9", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Sakib Hossain (Asst. Officer)", reqTime: "06/04/2024 15:24:35", status: "Review", remark: "Issue" },
+                        { reqNum: "100200", dates: "22/04/2024", docDetails: "Dept: Quality Assurance Department, Date: 22/04/2024, Line: N/A, Emp: 1", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Moniruzzaman (Atik) (Sr. Manager)", reqTime: "22/04/2024 21:11:55", status: "Review", remark: "Issue" },
+                        { reqNum: "100495", dates: "23/04/2024", docDetails: "Dept: Fabrics Department, Date: 23/04/2024, Line: N/A, Emp: 56", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Shafiqul Islam (Sr. Officer)", reqTime: "23/04/2024 11:12:09", status: "Review", remark: "no OT" },
+                        { reqNum: "102944", dates: "26/04/2024", docDetails: "Dept: Quality Assurance Department, Date: 26/04/2024, Line: N/A, Emp: 9", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Sakib Hossain (Asst. Officer)", reqTime: "27/04/2024 12:45:58", status: "Review", remark: "Issue" },
+                        { reqNum: "104316", dates: "28/04/2024", docDetails: "Dept: Fabrics Department, Date: 28/04/2024, Line: N/A, Emp: 1", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Shafiqul Islam (Sr. Officer)", reqTime: "28/04/2024 21:30:33", status: "Review", remark: "No OT" },
+                        { reqNum: "113830", dates: "13/05/2024", docDetails: "Dept: Production Audit, Date: 13/05/2024, Line: N/A, Emp: 1", reqType: "OT", department: "Production Audit", line: "N/A", reqBy: "Mohammad Nazmul Huda (Asst. Manager)", reqTime: "13/05/2024 12:00:13", status: "Review", remark: "no ot" },
+                        { reqNum: "114250", dates: "13/05/2024", docDetails: "Dept: Quality Assurance Department, Date: 13/05/2024, Line: N/A, Emp: 21", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Farhad-Al Kaber (Deputy Manager)", reqTime: "13/05/2024 19:54:41", status: "Review", remark: "Issue..." },
+                        { reqNum: "126688", dates: "29/05/2024", docDetails: "Dept: Finishing Department, Date: 29/05/2024, Line: N/A, Emp: 306", reqType: "OT", department: "Finishing Department", line: "N/A", reqBy: "Md. Al Mamun (Reporter)", reqTime: "29/05/2024 16:24:21", status: "Review", remark: "issue" },
+                        { reqNum: "129303", dates: "11/05/2024", docDetails: "Dept: RMG Operations, Date: 11/05/2024, Line: N/A, Emp: 1", reqType: "OT", department: "RMG Operations", line: "N/A", reqBy: "Aminur Islam (Assistant Manager)", reqTime: "01/06/2024 16:29:59", status: "Review", remark: "NOT" },
+                        { reqNum: "135232", dates: "07/06/2024", docDetails: "Dept: Quality Assurance Department, Date: 07/06/2024, Line: N/A, Emp: 193", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Sumon Ahmmad (Sr. Quality Controller)", reqTime: "08/06/2024 14:08:06", status: "Review", remark: "Have problem, please check & correction" },
+                        { reqNum: "135234", dates: "07/06/2024", docDetails: "Dept: Quality Assurance Department, Date: 07/06/2024, Line: N/A, Emp: 85", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Sumon Ahmmad (Sr. Quality Controller)", reqTime: "08/06/2024 14:10:04", status: "Review", remark: "Have problem, please check & correction" },
+                        { reqNum: "138083", dates: "10/06/2024", docDetails: "Dept: Quality Assurance Department, Date: 10/06/2024, Line: N/A, Emp: 198", reqType: "OT", department: "Quality Assurance Department", line: "N/A", reqBy: "Md. Sumon Ahmmad (Sr. Quality Controller)", reqTime: "11/06/2024 12:28:18", status: "Review", remark: "Have an amount issue, unable to approve. Please check and correct." },
+                        { reqNum: "141682", dates: "04/06/2024", docDetails: "Dept: Admin and Compliance, Date: 04/06/2024, Line: N/A, Emp: 1", reqType: "OT", department: "Admin and Compliance", line: "N/A", reqBy: "Aminur Islam (Assistant Manager)", reqTime: "24/06/2024 12:34:18", status: "Review", remark: "NO OT Amount" },
+                        { reqNum: "141705", dates: "11/06/2024", docDetails: "Dept: Admin and Compliance, Date: 11/06/2024, Line: N/A, Emp: 1", reqType: "OT", department: "Admin and Compliance", line: "N/A", reqBy: "Aminur Islam (Assistant Manager)", reqTime: "24/06/2024 12:35:19", status: "Review", remark: "No OT Amount" },
+                        { reqNum: "143482", dates: "23/06/2024", docDetails: "Dept: Fabrics Department, Date: 23/06/2024, Line: N/A, Emp: 1", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Aminur Islam (Assistant Manager)", reqTime: "26/06/2024 18:46:05", status: "Review", remark: "Need re-check" },
+                        { reqNum: "143624", dates: "26/06/2024", docDetails: "Dept: Fabrics Department, Date: 26/06/2024, Line: N/A, Emp: 3", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Labib Ahmed Badhon (Sr. Officer)", reqTime: "27/06/2024 07:12:20", status: "Review", remark: "Need recheck" },
+                        { reqNum: "182033", dates: "18/08/2024", docDetails: "Dept: Fabrics Department, Date: 18/08/2024, Line: N/A, Emp: 4", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Labib Ahmed Badhon (Sr. Officer)", reqTime: "18/08/2024 08:01:57", status: "Review", remark: "No data" },
+                        { reqNum: "189584", dates: "22/08/2024", docDetails: "Dept: Fabrics Department, Date: 22/08/2024, Line: N/A, Emp: 53", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Shafiqul Islam (Sr. Officer)", reqTime: "25/08/2024 10:45:54", status: "Review", remark: "no ot" },
+                        { reqNum: "222873", dates: "20/09/2024", docDetails: "Dept: RMG Operations, Date: 20/09/2024, Line: N/A, Emp: 937", reqType: "OT", department: "RMG Operations", line: "N/A", reqBy: "Md. Rifat Miah (Asst. Reporter)", reqTime: "21/09/2024 17:45:54", status: "Review", remark: "not ok" },
+                        { reqNum: "224381", dates: "22/09/2024", docDetails: "Dept: Fabrics Department, Date: 22/09/2024, Line: N/A, Emp: 58", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "M.H. Mostafizur Rahman (Sr. Officer)", reqTime: "22/09/2024 17:30:35", status: "Review", remark: "No OT found" },
+                        { reqNum: "263253", dates: "19/10/2024", docDetails: "Dept: Finishing Department, Date: 19/10/2024, Line: N/A, Emp: 307", reqType: "OT", department: "Finishing Department", line: "N/A", reqBy: "Md. Montejar Rahman (Reporter)", reqTime: "20/10/2024 15:18:35", status: "Review", remark: "Issue" },
+                        { reqNum: "274132", dates: "17/10/2024", docDetails: "Dept: RMG Operations, Date: 17/10/2024, Line: N/A, Emp: 441", reqType: "OT", department: "RMG Operations", line: "N/A", reqBy: "Al Fatah (Asst. Reporter)", reqTime: "27/10/2024 16:02:52", status: "Review", remark: "not ok" },
+                        { reqNum: "274210", dates: "19/10/2024", docDetails: "Dept: RMG Operations, Date: 19/10/2024, Line: N/A, Emp: 444", reqType: "OT", department: "RMG Operations", line: "N/A", reqBy: "Al Fatah (Asst. Reporter)", reqTime: "27/10/2024 16:34:08", status: "Review", remark: "not ok" },
+                        { reqNum: "278834", dates: "29/10/2024", docDetails: "Dept: Finishing Department, Date: 29/10/2024, Line: N/A, Emp: 311", reqType: "OT", department: "Finishing Department", line: "N/A", reqBy: "Md. Montejar Rahman (Reporter)", reqTime: "30/10/2024 15:05:47", status: "Review", remark: "OT Amount Zero" },
+                        { reqNum: "296704", dates: "09/11/2024", docDetails: "Dept: Fabrics Department, Date: 09/11/2024, Line: N/A, Emp: 254", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Ashadzzaman (Manager)", reqTime: "10/11/2024 18:37:01", status: "Review", remark: "No OT time, Revise the sheet" },
+                        { reqNum: "309107", dates: "10/11/2024", docDetails: "Dept: Fabrics Department, Date: 10/11/2024, Line: N/A, Emp: 248", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Ashadzzaman (Manager)", reqTime: "18/11/2024 11:09:33", status: "Review", remark: "No OT amount" },
+                        { reqNum: "324256", dates: "23/11/2024", docDetails: "Dept: Fabrics Department, Date: 23/11/2024, Line: N/A, Emp: 1", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Shafiqul Islam (Sr. Officer)", reqTime: "27/11/2024 08:22:17", status: "Review", remark: "No OT amount fond" },
+                        { reqNum: "328925", dates: "12/11/2024", docDetails: "Dept: Fabrics Department, Date: 12/11/2024, Line: N/A, Emp: 49", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Ayubur Rahman (Deputy Manager)", reqTime: "30/11/2024 08:17:36", status: "Review", remark: "Sorry, Check no OT Amounts" },
+                        { reqNum: "328934", dates: "13/11/2024", docDetails: "Dept: Fabrics Department, Date: 13/11/2024, Line: N/A, Emp: 51", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Ayubur Rahman (Deputy Manager)", reqTime: "30/11/2024 08:20:54", status: "Review", remark: "Sorry, Check no OT Amounts" },
+                        { reqNum: "328939", dates: "14/11/2024", docDetails: "Dept: Fabrics Department, Date: 14/11/2024, Line: N/A, Emp: 51", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Ayubur Rahman (Deputy Manager)", reqTime: "30/11/2024 08:23:19", status: "Review", remark: "Sorry, Check no OT Amounts" },
+                        { reqNum: "328990", dates: "18/11/2024", docDetails: "Dept: Fabrics Department, Date: 18/11/2024, Line: N/A, Emp: 52", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Ayubur Rahman (Deputy Manager)", reqTime: "30/11/2024 08:55:59", status: "Review", remark: "Sorry, Check no OT Amounts" },
+                        { reqNum: "328997", dates: "19/11/2024", docDetails: "Dept: Fabrics Department, Date: 19/11/2024, Line: N/A, Emp: 51", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Ayubur Rahman (Deputy Manager)", reqTime: "30/11/2024 08:58:44", status: "Review", remark: "Sorry, Check no OT Amounts" },
+                        { reqNum: "329002", dates: "20/11/2024", docDetails: "Dept: Fabrics Department, Date: 20/11/2024, Line: N/A, Emp: 51", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Ayubur Rahman (Deputy Manager)", reqTime: "30/11/2024 09:02:50", status: "Review", remark: "Sorry, Check no OT Amounts" },
+                        { reqNum: "329007", dates: "21/11/2024", docDetails: "Dept: Fabrics Department, Date: 21/11/2024, Line: N/A, Emp: 51", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Ayubur Rahman (Deputy Manager)", reqTime: "30/11/2024 09:05:20", status: "Review", remark: "Sorry, Check no OT Amounts" },
+                        { reqNum: "329882", dates: "23/11/2024", docDetails: "Dept: Fabrics Department, Date: 23/11/2024, Line: N/A, Emp: 50", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Ayubur Rahman (Deputy Manager)", reqTime: "30/11/2024 12:53:23", status: "Review", remark: "Check OT Amounts" },
+                        { reqNum: "330037", dates: "24/11/2024", docDetails: "Dept: Fabrics Department, Date: 24/11/2024, Line: N/A, Emp: 49", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Ayubur Rahman (Deputy Manager)", reqTime: "30/11/2024 15:12:05", status: "Review", remark: "Check OT Amounts" },
+                        { reqNum: "330053", dates: "25/11/2024", docDetails: "Dept: Fabrics Department, Date: 25/11/2024, Line: N/A, Emp: 51", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Ayubur Rahman (Deputy Manager)", reqTime: "30/11/2024 15:16:15", status: "Review", remark: "Check OT Amounts" },
+                        { reqNum: "330103", dates: "26/11/2024", docDetails: "Dept: Fabrics Department, Date: 26/11/2024, Line: N/A, Emp: 51", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Nurunnobi (Asst. Officer)", reqTime: "30/11/2024 15:39:05", status: "Review", remark: "Check OT Amounts" },
+                        { reqNum: "330115", dates: "27/11/2024", docDetails: "Dept: Fabrics Department, Date: 27/11/2024, Line: N/A, Emp: 52", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Nurunnobi (Asst. Officer)", reqTime: "30/11/2024 15:43:07", status: "Review", remark: "Check OT Amounts" },
+                        { reqNum: "330134", dates: "28/11/2024", docDetails: "Dept: Fabrics Department, Date: 28/11/2024, Line: N/A, Emp: 51", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Nurunnobi (Asst. Officer)", reqTime: "30/11/2024 15:47:45", status: "Review", remark: "Check OT Amounts" },
+                        { reqNum: "331013", dates: "30/11/2024", docDetails: "Dept: Fabrics Department, Date: 30/11/2024, Line: N/A, Emp: 5", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Labib Ahmed Badhon (Sr. Officer)", reqTime: "01/12/2024 07:44:22", status: "Review", remark: "Check OT Amounts" },
+                        { reqNum: "331019", dates: "30/11/2024", docDetails: "Dept: Fabrics Department, Date: 30/11/2024, Line: N/A, Emp: 5", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Labib Ahmed Badhon (Sr. Officer)", reqTime: "01/12/2024 07:53:06", status: "Review", remark: "Check OT Amounts" },
+                        { reqNum: "360227", dates: "17/12/2024", docDetails: "Dept: Fabrics Department, Date: 17/12/2024, Line: N/A, Emp: 5", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Labib Ahmed Badhon (Sr. Officer)", reqTime: "18/12/2024 07:53:32", status: "Review", remark: "No OT data" },
+                        { reqNum: "369049", dates: "22/12/2024", docDetails: "Dept: Fabrics Department, Date: 22/12/2024, Line: N/A, Emp: 5", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Labib Ahmed Badhon (Sr. Officer)", reqTime: "22/12/2024 19:19:53", status: "Review", remark: "No OT data" },
+                        { reqNum: "376746", dates: "22/12/2024", docDetails: "Dept: Fabrics Department, Date: 22/12/2024, Line: N/A, Emp: 137", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Ashadzzaman (Manager)", reqTime: "30/12/2024 13:24:25", status: "Review", remark: "Check The OT Amounts" },
+                        { reqNum: "410355", dates: "11/01/2025", docDetails: "Dept: Fabrics Department, Date: 11/01/2025, Line: N/A, Emp: 2", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Labib Ahmed Badhon (Sr. Officer)", reqTime: "17/01/2025 17:56:05", status: "Review", remark: "No OT data." },
+                        { reqNum: "410356", dates: "12/01/2025", docDetails: "Dept: Fabrics Department, Date: 12/01/2025, Line: N/A, Emp: 2", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Labib Ahmed Badhon (Sr. Officer)", reqTime: "17/01/2025 17:56:26", status: "Review", remark: "No OT data." },
+                        { reqNum: "410360", dates: "16/01/2025", docDetails: "Dept: Fabrics Department, Date: 16/01/2025, Line: N/A, Emp: 3", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Labib Ahmed Badhon (Sr. Officer)", reqTime: "17/01/2025 17:57:30", status: "Review", remark: "No OT data." },
+                        { reqNum: "432887", dates: "29/01/2025", docDetails: "Dept: RMG Operations, Date: 29/01/2025, Line: N/A, Emp: 914", reqType: "OT", department: "RMG Operations", line: "N/A", reqBy: "Mst. Jemi Akter (Asst. Reporter)", reqTime: "30/01/2025 10:06:35", status: "Review", remark: "RE" },
+                        { reqNum: "436977", dates: "28/01/2025", docDetails: "Dept: Fabrics Department, Date: 28/01/2025, Line: N/A, Emp: 1", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Komol Hossain (Assistant Manager)", reqTime: "01/02/2025 21:25:18", status: "Review", remark: "No OT data" },
+                        { reqNum: "573338", dates: "14/04/2025", docDetails: "Dept: Finishing Department, Date: 14/04/2025, Line: N/A, Emp: 13", reqType: "OT", department: "Finishing Department", line: "N/A", reqBy: "Aminur Islam (Assistant Manager)", reqTime: "30/04/2025 10:09:55", status: "Review", remark: "ammount zero" },
+                        { reqNum: "574556", dates: "29/04/2025", docDetails: "Dept: Fabrics Department, Date: 29/04/2025, Line: N/A, Emp: 75", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "M.H. Mostafizur Rahman (Sr. Officer)", reqTime: "30/04/2025 17:22:14", status: "Review", remark: "No OT amount" },
+                        { reqNum: "575387", dates: "02/05/2025", docDetails: "Dept: Fabrics Department, Date: 02/05/2025, Line: N/A, Emp: 4", reqType: "OT", department: "Fabrics Department", line: "N/A", reqBy: "Md. Labib Ahmed Badhon (Sr. Officer)", reqTime: "03/05/2025 07:41:59", status: "Review", remark: "No OT data" },
+                      ]
+                        .filter((item) => {
+                          if (subListReqType !== "All" && item.reqType !== subListReqType) return false;
+                          if (subListMainDept !== "ALL" && item.department !== subListMainDept) return false;
+                          if (subListLineName !== "ALL" && item.line !== subListLineName) return false;
+                          if (subListApStatus !== "All" && item.status !== subListApStatus) return false;
+                          if (subListTableSearch.trim()) {
+                            const q = subListTableSearch.toLowerCase().trim();
+                            return (
+                              item.reqNum.toLowerCase().includes(q) ||
+                              item.docDetails.toLowerCase().includes(q) ||
+                              item.department.toLowerCase().includes(q) ||
+                              item.reqBy.toLowerCase().includes(q) ||
+                              item.remark.toLowerCase().includes(q)
+                            );
+                          }
+                          return true;
+                        })
+                        .map((row, idx) => {
+                          const batchItem: SubmittedOTBatchItem = {
+                            id: `BATCH-${row.reqNum}`,
+                            reqNum: row.reqNum,
+                            dates: row.dates,
+                            docDetails: row.docDetails,
+                            reqType: row.reqType as "OT" | "Allowance",
+                            department: row.department,
+                            line: row.line,
+                            reqBy: row.reqBy,
+                            reqTime: row.reqTime,
+                            status: row.status as "Review" | "Approved" | "Rejected" | "Pending",
+                            remark: row.remark,
+                            employees: [
+                              { sl: 1, empId: "2022035091", name: "Md. Rakib Hasan", type: "Worker", department: "Sewing", designation: "Jr. Input Man", unit: "Unit-06", line: "37", wLine: "", date: "25/03/2023", inTime: "17:00:00", outDate: "25/03/2023", outTime: "20:00:00", otReq: 3.0, morningOt: 0.00, amount: 150, status: "Rejected" },
+                              { sl: 2, empId: "2022035972", name: "Mst. Nigar Sultana", type: "Worker", department: "Sewing", designation: "Jr. Operator (Sewing)", unit: "Unit-06", line: "37", wLine: "", date: "25/03/2023", inTime: "17:00:00", outDate: "25/03/2023", outTime: "20:00:00", otReq: 3.0, morningOt: 0.00, amount: 233, status: "Rejected" },
+                              { sl: 3, empId: "2022039675", name: "Afroja Akter", type: "Worker", department: "Sewing", designation: "Jr. Operator (Sewing)", unit: "Unit-05", line: "18", wLine: "", date: "25/03/2023", inTime: "17:00:00", outDate: "25/03/2023", outTime: "20:00:00", otReq: 3.0, morningOt: 0.00, amount: 213, status: "Rejected" },
+                            ],
+                            auditInfo: {
+                              checkedBy: { status: "Approved", name: "Md. Khorshed Alam", designation: "Sr. Manager", time: "25/03/2023 15:22:29" },
+                              verifiedByHod: { status: "Approved", name: "S.M. Sohel Reza", designation: "General Manager", time: "25/03/2023 15:22:55" },
+                              verifiedByHr: { status: "Review", name: "Md. Sajedur Rahman", designation: "DGM", time: "25/03/2023 15:23:17" },
+                              approvedByMd: { status: "Pending", name: "Rakibul Islam Khan", designation: "Managing Director" },
+                            },
+                          };
+
+                          return (
+                            <tr key={`${row.reqNum}-${idx}`} className="hover:bg-muted/40 transition">
+                              <td className="px-3 py-2.5 text-center border-r border-border/30 whitespace-nowrap">
+                                <div className="flex items-center justify-center gap-1.5">
+                                  <button
+                                    onClick={() => setActiveDetailsBatch(batchItem)}
+                                    title="View OT Request Details"
+                                    className="p-1 bg-[#2196f3] hover:bg-[#1e88e5] text-white rounded shadow-2xs transition"
+                                  >
+                                    <Search className="size-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={() => setActiveEditBatch(batchItem)}
+                                    title="Edit Submitted OT Request"
+                                    className="p-1 bg-[#f57c00] hover:bg-[#e65100] text-white rounded shadow-2xs transition"
+                                  >
+                                    <Pencil className="size-3.5" />
+                                  </button>
+                                </div>
+                              </td>
+                              <td className="px-3 py-2.5 font-mono font-bold text-foreground border-r border-border/30">
+                                {row.reqNum}
+                              </td>
+                              <td className="px-3 py-2.5 font-mono text-muted-foreground border-r border-border/30 whitespace-nowrap">
+                                {row.dates || "—"}
+                              </td>
+                              <td className="px-3 py-2.5 font-medium text-foreground border-r border-border/30">
+                                {row.docDetails}
+                              </td>
+                              <td className="px-3 py-2.5 text-center font-bold text-foreground border-r border-border/30">
+                                {row.reqType}
+                              </td>
+                              <td className="px-3 py-2.5 text-muted-foreground border-r border-border/30">
+                                {row.department}
+                              </td>
+                              <td className="px-3 py-2.5 text-center font-mono text-muted-foreground border-r border-border/30">
+                                {row.line}
+                              </td>
+                              <td className="px-3 py-2.5 text-muted-foreground border-r border-border/30">
+                                {row.reqBy}
+                              </td>
+                              <td className="px-3 py-2.5 text-center font-mono text-muted-foreground border-r border-border/30 whitespace-nowrap">
+                                {row.reqTime}
+                              </td>
+                              <td className="px-3 py-2.5 text-center">
+                                <div className="space-y-1">
+                                  <span
+                                    className={`px-2.5 py-1 rounded text-[10px] font-bold border ${
+                                      row.status === "Approved"
+                                        ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                                        : row.status === "Review"
+                                        ? "bg-sky-500/10 text-sky-600 border-sky-500/20"
+                                        : row.status === "Pending"
+                                        ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                                        : "bg-rose-500/10 text-rose-600 border-rose-500/20"
+                                    }`}
+                                  >
+                                    {row.status}
+                                  </span>
+                                  {row.remark && (
+                                    <div className="text-[10px] text-muted-foreground italic truncate max-w-[140px] mx-auto">
+                                      {row.remark}
+                                    </div>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Bottom Bar */}
+                <div className="p-4 flex items-center justify-between border-t border-border/40 bg-muted/10">
+                  <div className="text-xs text-muted-foreground font-semibold">
+                    Showing 1 to 140 of 140 entries
+                  </div>
+                </div>
+              </div>
+
+              {/* MODAL 1: OT REQUEST DETAILS (SCREENSHOT 2) */}
+              {activeDetailsBatch && (
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+                  <div className="bg-card w-full max-w-6xl rounded-2xl border border-border/80 shadow-2xl overflow-hidden my-6">
+                    {/* Top Header */}
+                    <div className="p-4 border-b border-border/40 bg-muted/20 flex flex-wrap items-center justify-between gap-3">
+                      <button
+                        onClick={() => window.print()}
+                        className="px-4 py-1.5 bg-[#f44336] hover:bg-[#d32f2f] text-white font-bold text-xs rounded-md shadow-xs transition uppercase"
+                      >
+                        VIEW REPORT
+                      </button>
+
+                      <h2 className="text-base font-black text-[#4caf50] flex items-center gap-2">
+                        OT Request Details
+                      </h2>
+
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-black text-[#f44336] font-mono">
+                          ReqNum: {activeDetailsBatch.reqNum}
+                        </span>
+                        <button
+                          onClick={() => setActiveDetailsBatch(null)}
+                          className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground"
+                        >
+                          <X className="size-5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="p-5 space-y-5">
+                      {/* Export Bar */}
+                      <div className="flex flex-wrap items-center justify-between gap-3 bg-muted/10 p-3 rounded-lg border border-border/50">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => toast.success("Exported to Excel")}
+                            className="h-8 px-3 rounded border border-border/70 bg-background text-[11px] font-bold flex items-center gap-1.5 shadow-2xs"
+                          >
+                            <FileSpreadsheet className="size-3.5 text-emerald-600" /> EXCEL
+                          </button>
+                          <button
+                            onClick={() => window.print()}
+                            className="h-8 px-3 rounded border border-border/70 bg-background text-[11px] font-bold flex items-center gap-1.5 shadow-2xs"
+                          >
+                            <Printer className="size-3.5 text-blue-600" /> PRINT
+                          </button>
+                          <button
+                            onClick={() => toast.info("PDF Export generated.")}
+                            className="h-8 px-3 rounded border border-border/70 bg-background text-[11px] font-bold flex items-center gap-1.5 shadow-2xs"
+                          >
+                            <FileText className="size-3.5 text-rose-600" /> PDF
+                          </button>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-muted-foreground">Search:</span>
+                          <input
+                            type="text"
+                            value={detailsSearchQuery}
+                            onChange={(e) => setDetailsSearchQuery(e.target.value)}
+                            className="h-8 px-3 w-48 rounded bg-background border border-border/70 text-xs outline-none focus:border-blue-500"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Employee Table */}
+                      <div className="overflow-x-auto border border-border/60 rounded-lg">
+                        <table className="w-full text-xs text-left border-collapse min-w-[1100px]">
+                          <thead>
+                            <tr className="bg-slate-100 dark:bg-slate-900 text-foreground font-bold border-b border-border/60 text-[11px] whitespace-nowrap">
+                              <th className="px-2.5 py-2.5 text-center border-r border-border/40">∇ #</th>
+                              <th className="px-2.5 py-2.5 border-r border-border/40">Emp ID</th>
+                              <th className="px-2.5 py-2.5 border-r border-border/40">Name</th>
+                              <th className="px-2.5 py-2.5 border-r border-border/40">Type</th>
+                              <th className="px-2.5 py-2.5 border-r border-border/40">Dept.</th>
+                              <th className="px-2.5 py-2.5 border-r border-border/40">Designation</th>
+                              <th className="px-2.5 py-2.5 text-center border-r border-border/40">Unit</th>
+                              <th className="px-2.5 py-2.5 text-center border-r border-border/40">Line</th>
+                              <th className="px-2.5 py-2.5 text-center border-r border-border/40">W.Line</th>
+                              <th className="px-2.5 py-2.5 text-center border-r border-border/40">Date</th>
+                              <th className="px-2.5 py-2.5 text-center border-r border-border/40">In Time</th>
+                              <th className="px-2.5 py-2.5 text-center border-r border-border/40">Out Date</th>
+                              <th className="px-2.5 py-2.5 text-center border-r border-border/40">Out Time</th>
+                              <th className="px-2.5 py-2.5 text-center border-r border-border/40 font-mono">OT Req</th>
+                              <th className="px-2.5 py-2.5 text-center border-r border-border/40 font-mono">Morning OT</th>
+                              <th className="px-2.5 py-2.5 text-right border-r border-border/40 font-mono">Amt.</th>
+                              <th className="px-2.5 py-2.5 text-center">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-border/30 text-xs">
+                            {activeDetailsBatch.employees
+                              .filter((emp) => {
+                                if (!detailsSearchQuery.trim()) return true;
+                                const q = detailsSearchQuery.toLowerCase();
+                                return (
+                                  emp.name.toLowerCase().includes(q) ||
+                                  emp.empId.toLowerCase().includes(q) ||
+                                  emp.department.toLowerCase().includes(q) ||
+                                  emp.designation.toLowerCase().includes(q)
+                                );
+                              })
+                              .map((emp) => (
+                                <tr key={emp.empId} className="hover:bg-muted/30 transition">
+                                  <td className="px-2.5 py-2 text-center font-mono border-r border-border/30">{emp.sl}</td>
+                                  <td className="px-2.5 py-2 font-mono font-bold text-foreground border-r border-border/30">{emp.empId}</td>
+                                  <td className="px-2.5 py-2 font-bold text-foreground border-r border-border/30">{emp.name}</td>
+                                  <td className="px-2.5 py-2 text-muted-foreground border-r border-border/30">{emp.type}</td>
+                                  <td className="px-2.5 py-2 text-muted-foreground border-r border-border/30">{emp.department}</td>
+                                  <td className="px-2.5 py-2 text-muted-foreground border-r border-border/30">{emp.designation}</td>
+                                  <td className="px-2.5 py-2 text-center font-mono text-muted-foreground border-r border-border/30">{emp.unit}</td>
+                                  <td className="px-2.5 py-2 text-center font-mono text-muted-foreground border-r border-border/30">{emp.line}</td>
+                                  <td className="px-2.5 py-2 text-center font-mono text-muted-foreground border-r border-border/30">{emp.wLine}</td>
+                                  <td className="px-2.5 py-2 text-center font-mono border-r border-border/30">{emp.date}</td>
+                                  <td className="px-2.5 py-2 text-center font-mono text-muted-foreground border-r border-border/30">{emp.inTime}</td>
+                                  <td className="px-2.5 py-2 text-center font-mono border-r border-border/30">{emp.outDate}</td>
+                                  <td className="px-2.5 py-2 text-center font-mono text-muted-foreground border-r border-border/30">{emp.outTime}</td>
+                                  <td className="px-2.5 py-2 text-center font-mono font-bold border-r border-border/30">{emp.otReq.toFixed(1)}</td>
+                                  <td className="px-2.5 py-2 text-center font-mono text-muted-foreground border-r border-border/30">{emp.morningOt.toFixed(2)}</td>
+                                  <td className="px-2.5 py-2 text-right font-mono font-bold text-foreground border-r border-border/30">{emp.amount}</td>
+                                  <td className="px-2.5 py-2 text-center font-bold text-rose-600">{emp.status}</td>
+                                </tr>
+                              ))}
+                            <tr className="bg-slate-50 dark:bg-slate-900/60 font-bold">
+                              <td colSpan={15} className="px-3 py-2 text-right font-black border-r border-border/40">Total Amount:</td>
+                              <td className="px-3 py-2 text-right font-mono font-black text-foreground border-r border-border/40">
+                                {activeDetailsBatch.employees.reduce((acc, curr) => acc + curr.amount, 0)}
+                              </td>
+                              <td></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Bottom Audit Cards */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div className="p-3 rounded-xl border border-blue-500/30 bg-blue-50/20 dark:bg-blue-950/20 space-y-1">
+                          <div className="text-[11px] font-black text-foreground border-b border-border/40 pb-1 flex justify-between">
+                            <span>Checked By: Approved</span>
+                          </div>
+                          <div className="text-xs font-bold text-foreground">{activeDetailsBatch.auditInfo.checkedBy.name}</div>
+                          <div className="text-[10px] text-muted-foreground">{activeDetailsBatch.auditInfo.checkedBy.designation}</div>
+                          <div className="text-[10px] text-muted-foreground font-mono">{activeDetailsBatch.auditInfo.checkedBy.time}</div>
+                        </div>
+
+                        <div className="p-3 rounded-xl border border-purple-500/30 bg-purple-50/20 dark:bg-purple-950/20 space-y-1">
+                          <div className="text-[11px] font-black text-foreground border-b border-border/40 pb-1 flex justify-between">
+                            <span>Verified By HOD: Approved</span>
+                          </div>
+                          <div className="text-xs font-bold text-foreground">{activeDetailsBatch.auditInfo.verifiedByHod.name}</div>
+                          <div className="text-[10px] text-muted-foreground">{activeDetailsBatch.auditInfo.verifiedByHod.designation}</div>
+                          <div className="text-[10px] text-muted-foreground font-mono">{activeDetailsBatch.auditInfo.verifiedByHod.time}</div>
+                        </div>
+
+                        <div className="p-3 rounded-xl border border-amber-500/30 bg-amber-50/20 dark:bg-amber-950/20 space-y-1">
+                          <div className="text-[11px] font-black text-foreground border-b border-border/40 pb-1 flex justify-between">
+                            <span>Verified By HR: Review</span>
+                          </div>
+                          <div className="text-xs font-bold text-foreground">{activeDetailsBatch.auditInfo.verifiedByHr.name}</div>
+                          <div className="text-[10px] text-muted-foreground">{activeDetailsBatch.auditInfo.verifiedByHr.designation}</div>
+                          <div className="text-[10px] text-muted-foreground font-mono">{activeDetailsBatch.auditInfo.verifiedByHr.time}</div>
+                        </div>
+
+                        <div className="p-3 rounded-xl border border-slate-500/30 bg-slate-50/20 dark:bg-slate-900/40 space-y-1">
+                          <div className="text-[11px] font-black text-foreground border-b border-border/40 pb-1 flex justify-between">
+                            <span>Approved By MD: Pending</span>
+                          </div>
+                          <div className="text-xs font-bold text-foreground">{activeDetailsBatch.auditInfo.approvedByMd.name}</div>
+                          <div className="text-[10px] text-muted-foreground">{activeDetailsBatch.auditInfo.approvedByMd.designation}</div>
+                        </div>
+                      </div>
+
+                      {/* Bottom Total Amount Banner */}
+                      <div className="flex justify-end pt-2">
+                        <div className="text-base font-black text-[#2196f3]">
+                          Total Amount: {activeDetailsBatch.employees.reduce((acc, curr) => acc + curr.amount, 0)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* MODAL 2: EDIT SUBMITTED OT REQUEST (SCREENSHOT 3) */}
+              {activeEditBatch && (
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+                  <div className="bg-card w-full max-w-6xl rounded-2xl border border-border/80 shadow-2xl overflow-hidden my-6">
+                    {/* Header */}
+                    <div className="p-4 border-b border-border/40 bg-muted/20 flex items-center justify-between">
+                      <div className="text-xs font-bold text-[#2196f3] flex items-center gap-1.5">
+                        <span>Home</span> &gt; <span>Human Resource</span> &gt; <span className="text-foreground font-semibold">Edit Submitted OT Request</span>
+                      </div>
+                      <button
+                        onClick={() => setActiveEditBatch(null)}
+                        className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground"
+                      >
+                        <X className="size-5" />
+                      </button>
+                    </div>
+
+                    <div className="p-5 space-y-4">
+                      <div className="text-xs font-black text-foreground">
+                        ReqNum: {activeEditBatch.reqNum} • {activeEditBatch.docDetails}
+                      </div>
+
+                      {/* Edit Table */}
+                      <div className="overflow-x-auto border border-border/60 rounded-lg">
+                        <table className="w-full text-xs text-left border-collapse min-w-[1100px]">
+                          <thead>
+                            <tr className="bg-slate-100 dark:bg-slate-900 text-foreground font-bold border-b border-border/60 text-[11px] whitespace-nowrap">
+                              <th className="px-2.5 py-2.5 text-center border-r border-border/40">#</th>
+                              <th className="px-2.5 py-2.5 border-r border-border/40">Emp ID</th>
+                              <th className="px-2.5 py-2.5 border-r border-border/40">Name</th>
+                              <th className="px-2.5 py-2.5 border-r border-border/40">Type</th>
+                              <th className="px-2.5 py-2.5 border-r border-border/40">Department</th>
+                              <th className="px-2.5 py-2.5 border-r border-border/40">Designation</th>
+                              <th className="px-2.5 py-2.5 text-center border-r border-border/40">Unit</th>
+                              <th className="px-2.5 py-2.5 text-center border-r border-border/40">Line</th>
+                              <th className="px-2.5 py-2.5 text-center border-r border-border/40">Date</th>
+                              <th className="px-2.5 py-2.5 text-center border-r border-border/40">In Time</th>
+                              <th className="px-2.5 py-2.5 text-center border-r border-border/40">Out Date</th>
+                              <th className="px-2.5 py-2.5 text-center border-r border-border/40">Out Time</th>
+                              <th className="px-2.5 py-2.5 text-center border-r border-border/40 font-mono">OT Req</th>
+                              <th className="px-2.5 py-2.5 text-center border-r border-border/40 font-mono">Morning OT</th>
+                              <th className="px-2.5 py-2.5 text-right border-r border-border/40 font-mono">Amount</th>
+                              <th className="px-2.5 py-2.5 text-center">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-border/30 text-xs">
+                            {activeEditBatch.employees.map((emp, idx) => (
+                              <tr key={emp.empId} className="hover:bg-muted/30 transition">
+                                <td className="px-2.5 py-2 text-center font-mono border-r border-border/30">{idx + 1}</td>
+                                <td className="px-2.5 py-2 font-mono font-bold text-foreground border-r border-border/30">{emp.empId}</td>
+                                <td className="px-2.5 py-2 font-bold text-foreground border-r border-border/30">{emp.name}</td>
+                                <td className="px-2.5 py-2 text-muted-foreground border-r border-border/30">{emp.type}</td>
+                                <td className="px-2.5 py-2 text-muted-foreground border-r border-border/30">{emp.department}</td>
+                                <td className="px-2.5 py-2 text-muted-foreground border-r border-border/30">{emp.designation}</td>
+                                <td className="px-2.5 py-2 text-center font-mono text-muted-foreground border-r border-border/30">{emp.unit}</td>
+                                <td className="px-2.5 py-2 text-center font-mono text-muted-foreground border-r border-border/30">{emp.line}</td>
+                                <td className="px-2.5 py-2 text-center font-mono border-r border-border/30">{emp.date}</td>
+                                <td className="px-2.5 py-2 text-center font-mono text-muted-foreground border-r border-border/30">{emp.inTime}</td>
+                                <td className="px-2.5 py-2 text-center font-mono border-r border-border/30">{emp.outDate}</td>
+                                <td className="px-2.5 py-2 text-center font-mono text-muted-foreground border-r border-border/30">{emp.outTime}</td>
+                                <td className="px-2.5 py-2 text-center border-r border-border/30">
+                                  <input
+                                    type="number"
+                                    step="0.5"
+                                    value={emp.otReq}
+                                    onChange={(e) => {
+                                      const val = parseFloat(e.target.value) || 0;
+                                      setActiveEditBatch((prev) =>
+                                        prev
+                                          ? {
+                                              ...prev,
+                                              employees: prev.employees.map((item) =>
+                                                item.empId === emp.empId ? { ...item, otReq: val } : item
+                                              ),
+                                            }
+                                          : null
+                                      );
+                                    }}
+                                    className="w-16 h-7 px-1.5 rounded border border-border/70 bg-background text-center font-mono font-bold text-xs outline-none focus:border-blue-500 shadow-2xs"
+                                  />
+                                </td>
+                                <td className="px-2.5 py-2 text-center border-r border-border/30">
+                                  <input
+                                    type="number"
+                                    step="0.5"
+                                    value={emp.morningOt}
+                                    onChange={(e) => {
+                                      const val = parseFloat(e.target.value) || 0;
+                                      setActiveEditBatch((prev) =>
+                                        prev
+                                          ? {
+                                              ...prev,
+                                              employees: prev.employees.map((item) =>
+                                                item.empId === emp.empId ? { ...item, morningOt: val } : item
+                                              ),
+                                            }
+                                          : null
+                                      );
+                                    }}
+                                    className="w-16 h-7 px-1.5 rounded border border-border/70 bg-background text-center font-mono font-bold text-xs outline-none focus:border-blue-500 shadow-2xs"
+                                  />
+                                </td>
+                                <td className="px-2.5 py-2 text-right font-mono font-bold text-foreground border-r border-border/30">{emp.amount}</td>
+                                <td className="px-2.5 py-2 text-center font-bold text-rose-600">{emp.status}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Footer Actions */}
+                      <div className="flex items-center justify-end gap-3 pt-3 border-t border-border/40">
+                        <button
+                          onClick={() => setActiveEditBatch(null)}
+                          className="px-4 py-2 rounded-lg border border-border/70 text-xs font-bold hover:bg-muted"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={() => {
+                            toast.success(`Successfully updated OT Requisition #${activeEditBatch.reqNum}`);
+                            setActiveEditBatch(null);
+                          }}
+                          className="px-5 py-2 rounded-lg bg-[#2196f3] hover:bg-[#1e88e5] text-white text-xs font-bold shadow-xs"
+                        >
+                          Save Changes
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 5: INDIVIDUAL OT REVIEW (EXACT ERP SPECIFICATION MATCH) */}
+          {activeTab === "individual-review" && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              {/* Filter Console */}
+              <div className="bg-card rounded-xl border border-border/80 p-5 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-border/40 pb-3">
+                  <h2 className="text-sm font-black text-foreground flex items-center gap-2">
+                    <Filter className="size-4 text-blue-600" /> Filter Individual OT Review
+                  </h2>
+                  <button
+                    onClick={() => {
+                      setIndivReqType("OT");
+                      setIndivMainDept("Accounts & Finance");
+                      setIndivWLineName("ALL");
+                      setIndivOtDate("2026-09-13");
+                      setIndivTableSearch("");
+                      setIndivHasSearched(true);
+                      toast.info("Filters reset to default.");
+                    }}
+                    className="text-[11px] font-bold text-rose-500 hover:underline"
+                  >
+                    Reset Filters
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3.5 text-xs">
+                  {/* Requisition Type */}
+                  <div>
+                    <label className="text-[11px] font-bold text-muted-foreground mb-1 block">
+                      Requisition Type <span className="text-rose-500">*</span>
+                    </label>
+                    <select
+                      value={indivReqType}
+                      onChange={(e) => setIndivReqType(e.target.value as "OT" | "Allowance" | "All")}
+                      className="w-full h-9 px-3 rounded-lg bg-background border border-border/70 text-xs font-medium outline-none focus:border-blue-500 shadow-2xs"
+                    >
+                      <option value="OT">OT</option>
+                      <option value="Allowance">Allowance</option>
+                      <option value="All">All</option>
+                    </select>
+                  </div>
+
+                  {/* Main Department */}
+                  <div>
+                    <label className="text-[11px] font-bold text-muted-foreground mb-1 block">
+                      Main Department
+                    </label>
+                    <select
+                      value={indivMainDept}
+                      onChange={(e) => setIndivMainDept(e.target.value)}
+                      className="w-full h-9 px-3 rounded-lg bg-background border border-border/70 text-xs font-medium outline-none focus:border-blue-500 shadow-2xs truncate"
+                    >
+                      {MAIN_DEPARTMENTS.filter((d) => d !== "ALL").map((md) => (
+                        <option key={md} value={md}>
+                          {md}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* W.Line Name */}
+                  <div>
+                    <label className="text-[11px] font-bold text-muted-foreground mb-1 block">
+                      W.Line Name
+                    </label>
+                    <select
+                      value={indivWLineName}
+                      onChange={(e) => setIndivWLineName(e.target.value)}
+                      className="w-full h-9 px-3 rounded-lg bg-background border border-border/70 text-xs font-medium outline-none focus:border-blue-500 shadow-2xs"
+                    >
+                      {LINES.map((l) => (
+                        <option key={l} value={l}>
+                          {l}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* OT Date * */}
+                  <div>
+                    <label className="text-[11px] font-bold text-muted-foreground mb-1 block">
+                      OT Date <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={indivOtDate}
+                      onChange={(e) => setIndivOtDate(e.target.value)}
+                      className="w-full h-9 px-3 rounded-lg bg-background border border-border/70 text-xs font-medium outline-none focus:border-blue-500 shadow-2xs"
+                    />
+                  </div>
+
+                  {/* Search Action Button */}
+                  <div className="flex items-end">
+                    <button
+                      onClick={() => {
+                        setIndivHasSearched(true);
+                        toast.success(`Search completed for ${indivMainDept}.`);
+                      }}
+                      className="w-full h-9 px-4 bg-[#2196f3] hover:bg-[#1e88e5] text-white font-bold text-xs rounded-lg shadow-sm transition uppercase tracking-wider flex items-center justify-center gap-1.5"
+                    >
+                      <Search className="size-3.5" /> Search
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Data Grid Toolbar & Table */}
+              <div className="bg-card rounded-xl border border-border/80 shadow-xs overflow-hidden">
+                {/* Export Toolbar (Excel, Print, PDF & Search) */}
+                <div className="p-4 flex flex-wrap items-center justify-between gap-3 border-b border-border/40 bg-muted/20">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleExportIndividualReviewCSV}
+                      className="h-8.5 px-3 rounded border border-border/70 bg-background hover:bg-muted text-foreground text-[11px] font-bold flex items-center gap-1.5 shadow-2xs transition"
+                    >
+                      <FileSpreadsheet className="size-3.5 text-emerald-600" /> Excel
+                    </button>
+                    <button
+                      onClick={() => window.print()}
+                      className="h-8.5 px-3 rounded border border-border/70 bg-background hover:bg-muted text-foreground text-[11px] font-bold flex items-center gap-1.5 shadow-2xs transition"
+                    >
+                      <Printer className="size-3.5 text-blue-600" /> Print
+                    </button>
+                    <button
+                      onClick={() => toast.info("PDF Export generated successfully.")}
+                      className="h-8.5 px-3 rounded border border-border/70 bg-background hover:bg-muted text-foreground text-[11px] font-bold flex items-center gap-1.5 shadow-2xs transition"
+                    >
+                      <FileText className="size-3.5 text-rose-600" /> PDF
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-muted-foreground">Search:</span>
+                    <input
+                      type="text"
+                      value={indivTableSearch}
+                      onChange={(e) => setIndivTableSearch(e.target.value)}
+                      className="h-8.5 px-3 w-48 sm:w-64 rounded-md border border-border/70 bg-background text-xs outline-none focus:border-blue-500 shadow-2xs"
+                    />
+                  </div>
+                </div>
+
+                {/* Data Grid Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs text-left border-collapse min-w-[1000px]">
+                    <thead>
+                      <tr className="bg-slate-100 dark:bg-slate-900/90 text-foreground font-bold border-b border-border/60 text-[11px] whitespace-nowrap">
+                        <th className="px-3 py-3 text-center border-r border-border/40">∇</th>
+                        <th className="px-3 py-3 text-center border-r border-border/40">#</th>
+                        <th className="px-3 py-3 border-r border-border/40">Emp ID</th>
+                        <th className="px-3 py-3 border-r border-border/40">Name</th>
+                        <th className="px-3 py-3 border-r border-border/40">Department</th>
+                        <th className="px-3 py-3 border-r border-border/40">Designation</th>
+                        <th className="px-3 py-3 text-center border-r border-border/40">Date</th>
+                        <th className="px-3 py-3 text-center border-r border-border/40">In Time</th>
+                        <th className="px-3 py-3 text-center border-r border-border/40">Out Date</th>
+                        <th className="px-3 py-3 text-center border-r border-border/40">Out Time</th>
+                        <th className="px-3 py-3 text-center">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/30 font-sans text-xs">
+                      {filteredIndivRecords.map((row, index) => (
+                        <tr key={row.id} className="hover:bg-muted/40 transition">
+                          <td className="px-3 py-2.5 text-center border-r border-border/30">
+                            <input type="checkbox" className="rounded border-border/70" />
                           </td>
-                          <td className="px-4 py-3 text-center font-mono">{row.otDate}</td>
-                          <td className="px-4 py-3 text-center font-bold text-sm">{row.reqOt + row.reqMot} hrs</td>
-                          <td className="px-4 py-3 text-center font-mono text-muted-foreground">
-                            {new Date(row.submittedAt).toLocaleDateString()}
+                          <td className="px-3 py-2.5 text-center font-mono font-bold text-muted-foreground border-r border-border/30">
+                            {index + 1}
                           </td>
-                          <td className="px-4 py-3 text-center">
+                          <td className="px-3 py-2.5 font-mono font-bold text-foreground border-r border-border/30">
+                            {row.empId}
+                          </td>
+                          <td className="px-3 py-2.5 font-bold text-foreground border-r border-border/30">
+                            {row.name}
+                          </td>
+                          <td className="px-3 py-2.5 text-muted-foreground border-r border-border/30">
+                            {row.department}
+                          </td>
+                          <td className="px-3 py-2.5 text-muted-foreground border-r border-border/30">
+                            {row.designation}
+                          </td>
+                          <td className="px-3 py-2.5 text-center font-mono border-r border-border/30">
+                            {row.date}
+                          </td>
+                          <td className="px-3 py-2.5 text-center font-mono text-muted-foreground border-r border-border/30">
+                            {row.inTime}
+                          </td>
+                          <td className="px-3 py-2.5 text-center font-mono border-r border-border/30">
+                            {row.outDate}
+                          </td>
+                          <td className="px-3 py-2.5 text-center font-mono text-muted-foreground border-r border-border/30">
+                            {row.outTime}
+                          </td>
+                          <td className="px-3 py-2.5 text-center">
                             <span
                               className={`px-2.5 py-1 rounded text-[10px] font-bold border ${
                                 row.status === "Approved"
@@ -2244,119 +3340,28 @@ function ManageOvertimePage() {
                               {row.status}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-center">
-                            <button
-                              onClick={() => {
-                                setSubmittedRecords((prev) => prev.filter((r) => r.id !== row.id));
-                                toast.info("Request cancelled.");
-                              }}
-                              className="p-1 text-rose-500 hover:bg-rose-500/10 rounded"
-                              title="Cancel Request"
-                            >
-                              <Trash2 className="size-4" />
-                            </button>
-                          </td>
                         </tr>
                       ))}
+
+                      {filteredIndivRecords.length === 0 && (
+                        <tr>
+                          <td
+                            colSpan={11}
+                            className="px-4 py-12 text-center text-muted-foreground font-medium"
+                          >
+                            No data available in table
+                          </td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
-              </div>
-            </div>
-          )}
 
-          {/* TAB 5: INDIVIDUAL OT REVIEW */}
-          {activeTab === "individual-review" && (
-            <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="bg-card rounded-xl border border-border/80 shadow-xs p-6 space-y-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/40 pb-4">
-                  <div>
-                    <h2 className="text-base font-black text-foreground flex items-center gap-2">
-                      <UserCheck className="size-5 text-blue-600" />
-                      Individual Overtime Review
-                    </h2>
-                    <p className="text-xs text-muted-foreground">
-                      Inspect single employee punch records, system OT vs manager requested OT, and attendance history.
-                    </p>
+                {/* Bottom Bar */}
+                <div className="p-4 flex items-center justify-between border-t border-border/40 bg-muted/10">
+                  <div className="text-xs text-muted-foreground font-semibold">
+                    Showing {filteredIndivRecords.length > 0 ? 1 : 0} to {filteredIndivRecords.length} of {indivHasSearched ? indivReviewItems.length : 0} entries
                   </div>
-
-                  <div className="flex items-center gap-2">
-                    <select
-                      value={selectedIndividualId}
-                      onChange={(e) => setSelectedIndividualId(e.target.value)}
-                      className="h-9 px-3 rounded-lg border border-border/70 bg-background text-xs font-bold outline-none"
-                    >
-                      {attendanceRecords.map((r) => (
-                        <option key={r.employeeId} value={r.employeeId}>
-                          {r.employeeName} ({r.employeeId})
-                        </option>
-                      ))}
-                    </select>
-                    <button
-                      onClick={() => window.print()}
-                      className="h-9 px-4 rounded-lg bg-blue-600 text-white font-bold text-xs flex items-center gap-1.5"
-                    >
-                      <Printer className="size-3.5" /> Print Card
-                    </button>
-                  </div>
-                </div>
-
-                {/* Profile Card */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 rounded-xl bg-muted/20 border border-border/60">
-                  <div>
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase block">Employee Name</span>
-                    <div className="text-sm font-black text-foreground mt-0.5">{individualEmployee.employeeName}</div>
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase block">Employee ID</span>
-                    <div className="text-sm font-mono font-bold text-blue-600 mt-0.5">{individualEmployee.employeeId}</div>
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase block">Department & Designation</span>
-                    <div className="text-sm font-semibold text-foreground mt-0.5">
-                      {individualEmployee.department} • {individualEmployee.designation}
-                    </div>
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase block">Assigned Shift</span>
-                    <div className="text-sm font-mono font-semibold text-foreground mt-0.5">General (08:00 AM - 05:00 PM)</div>
-                  </div>
-                </div>
-
-                {/* Ledger for Individual */}
-                <div className="overflow-x-auto">
-                  <table className="w-full text-xs text-left border-collapse">
-                    <thead>
-                      <tr className="bg-muted/40 text-foreground font-bold border-b border-border/60">
-                        <th className="px-4 py-3">Date</th>
-                        <th className="px-4 py-3 text-center">In Time</th>
-                        <th className="px-4 py-3 text-center">Out Time</th>
-                        <th className="px-4 py-3 text-center">Sys OT</th>
-                        <th className="px-4 py-3 text-center">Req OT</th>
-                        <th className="px-4 py-3 text-center">Req MOT</th>
-                        <th className="px-4 py-3">Reason / Remarks</th>
-                        <th className="px-4 py-3 text-center">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border/30 font-sans">
-                      <tr className="hover:bg-muted/20">
-                        <td className="px-4 py-3 font-mono">{individualEmployee.inDate}</td>
-                        <td className="px-4 py-3 text-center font-mono">{individualEmployee.inTime}</td>
-                        <td className="px-4 py-3 text-center font-mono">{individualEmployee.outTime}</td>
-                        <td className="px-4 py-3 text-center font-mono font-bold text-emerald-600">
-                          {individualEmployee.calculatedOt.toFixed(2)} hrs
-                        </td>
-                        <td className="px-4 py-3 text-center font-mono font-bold">{individualEmployee.reqOtInput} hrs</td>
-                        <td className="px-4 py-3 text-center font-mono font-bold">{individualEmployee.reqMotInput} hrs</td>
-                        <td className="px-4 py-3 text-muted-foreground">{individualEmployee.reasonInput || "General Operations"}</td>
-                        <td className="px-4 py-3 text-center">
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
-                            Present
-                          </span>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
                 </div>
               </div>
             </div>
