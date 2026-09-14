@@ -2,6 +2,42 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "455",
+    "date": "2026-09-14T17:00",
+    "type": "UI Update",
+    "module": "Facility Management",
+    "link": "/conference-room-approval",
+    "descriptionEn": "Updated the 'Reschedule & Allocate Alternate Slot' modal on the Conference Room Approval Portal (/conference-room-approval): embedded top 'View Booking' summary card with 4-column detail grid and RESPONSIBLE PERSONS sub-table; added 'Allocate Date *' date picker alongside Allocate Room *, Allocate Start Time *, and Allocate End Time * controls; removed quick suggestion chips.",
+    "descriptionBn": "কনফারেন্স রুম অ্যাপ্রুভাল পোর্টালে (/conference-room-approval) 'Reschedule & Allocate Alternate Slot' মোডালটি আপডেট করা হয়েছে: উপরে 'View Booking' সামারি কার্ড ও RESPONSIBLE PERSONS সাব-টেবিল এম্বেড করা হয়েছে; নিচে Allocate Room *, Allocate Start Time *, Allocate End Time * এর সাথে নতুন 'Allocate Date *' ডেট পিকাপ ড্রপডাউন অপশন যুক্ত করা হয়েছে এবং অতিরিক্ত quick suggestion chips সরিয়ে দেওয়া হয়েছে।"
+  },
+  {
+    "id": "465",
+    "date": "2026-09-14T16:53",
+    "type": "UI Update",
+    "module": "Facility Management",
+    "link": "/conference-room-booking",
+    "descriptionEn": "Cleaned up Conference Room Booking page (/conference-room-booking) UI per user request: removed the top 4 metric stat cards and the target room selector grid, placing the Booking Details form and Booked Slots live table directly below the page header.",
+    "descriptionBn": "ইউজার রিকোয়েস্ট অনুযায়ী কনফারেন্স রুম বুকিং পেজের (/conference-room-booking) ওপরের ৪টি মেট্রিক স্ট্যাট কার্ড এবং টার্গেট রুম সিলেক্টর গ্রিড সরিয়ে নেওয়া হয়েছে; বুকিং ডিটেইলস ফর্ম ও বুকড স্লটস টেবিল এখন সরাসরি পেজ হেডারের নিচে দেখতে পাওয়া যাবে।"
+  },
+  {
+    "id": "464",
+    "date": "2026-09-14T16:52",
+    "type": "Bug Fix",
+    "module": "Facility Management",
+    "link": "/conference-room-booking",
+    "descriptionEn": "Fixed runtime ReferenceError in Conference Room Booking page (/conference-room-booking): resolved undefined 'meetingRoom' variable in room select dropdown by binding directly to activeRoom.name and setSelectedRoomId state handler.",
+    "descriptionBn": "কনফারেন্স রুম বুকিং পেজের (/conference-room-booking) মোটাল ও ড্রপডাউন সিলেক্টে থাকা অনাকাঙ্ক্ষিত ReferenceError সমাধান করা হয়েছে: সিলেক্ট ফিল্ডে activeRoom.name ও setSelectedRoomId বাইন্ডিং নিশ্চিত করা হয়েছে।"
+  },
+  {
+    "id": "463",
+    "date": "2026-09-14T16:51",
+    "type": "UI Update",
+    "module": "Facility Management",
+    "link": "/conference-room-approval",
+    "descriptionEn": "Redesigned Conference Room Approval modals (/conference-room-approval) with ultra-professional executive styling: rounded-3xl dialogs with backdrop blur, icon avatar headers, structured target requisition info card with status badges, icon-prefixed dropdown selects, quick suggestion justification chips, and modern gradient action buttons.",
+    "descriptionBn": "কনফারেন্স রুম অ্যাপ্রুভাল পেজের (/conference-room-approval) মোডালগুলো সম্পূর্ণ প্রফেশনাল ও আকর্ষণীয় লেআউটে পুনর্নির্মাণ করা হয়েছে: ব্যাকড্রপ ব্লার সহ rounded-3xl ডায়ালগ, আইকন অ্যাভাটার হেডার, স্ট্যাটাস ব্যাজ সহ স্ট্রাকচার্ড টার্গেট রিকুইজিশন ইনফো কার্ড, আইকন প্রফিক্স সহ ড্রপডাউন সিলেক্ট, কুইক সাাজেশন রিমার্কস চিপস এবং আধুনিক গ্র্যাডিয়েন্ট অ্যাকশন বাটন।"
+  },
+  {
     "id": "462",
     "date": "2026-09-14T16:50",
     "type": "UI Update",

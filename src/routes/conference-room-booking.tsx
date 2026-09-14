@@ -311,116 +311,7 @@ function ConferenceRoomBookingPage() {
             </div>
           )}
 
-          {/* HERO METRIC STATS CARDS BAR */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="p-4 rounded-2xl border border-border bg-card shadow-sm flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Total Rooms</span>
-                <div className="text-2xl font-black mt-1 text-foreground">4 Configured</div>
-                <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">3 Available • 1 In Use</div>
-              </div>
-              <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                <Building2 className="w-6 h-6" />
-              </div>
-            </div>
-
-            <div className="p-4 rounded-2xl border border-border bg-card shadow-sm flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Today&apos;s Bookings</span>
-                <div className="text-2xl font-black mt-1 text-foreground">{bookedSlots.length} Meetings</div>
-                <div className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold mt-0.5">2 Confirmed • 2 Pending</div>
-              </div>
-              <div className="p-3 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                <CalendarDays className="w-6 h-6" />
-              </div>
-            </div>
-
-            <div className="p-4 rounded-2xl border border-border bg-card shadow-sm flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Active Target Room</span>
-                <div className="text-sm font-extrabold mt-1 text-primary truncate max-w-[140px]">{activeRoom.name}</div>
-                <div className="text-[11px] text-muted-foreground font-semibold mt-0.5">{activeRoom.floor}</div>
-              </div>
-              <div className="p-3 rounded-xl bg-primary/10 text-primary">
-                <DoorOpen className="w-6 h-6" />
-              </div>
-            </div>
-
-            <div className="p-4 rounded-2xl border border-border bg-card shadow-sm flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Facility Utilization</span>
-                <div className="text-2xl font-black mt-1 text-foreground">75% Capacity</div>
-                <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">Optimal Distribution</div>
-              </div>
-              <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                <Activity className="w-6 h-6" />
-              </div>
-            </div>
-          </div>
-
-          {/* VISUAL ROOM SELECTOR CARDS GRID */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-extrabold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                Select Target Conference Room
-              </h2>
-              <span className="text-xs font-semibold text-muted-foreground">Click a room card to select</span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {ROOM_SPECS.map((room) => {
-                const isSelected = room.id === selectedRoomId;
-                return (
-                  <div
-                    key={room.id}
-                    onClick={() => {
-                      setSelectedRoomId(room.id);
-                      setMeetingRoom(room.name);
-                    }}
-                    className={`p-4 rounded-2xl border cursor-pointer transition-all relative overflow-hidden bg-gradient-to-br ${
-                      isSelected
-                        ? "border-emerald-500 bg-emerald-500/10 ring-2 ring-emerald-500/30 shadow-md scale-[1.01]"
-                        : "border-border bg-card hover:border-emerald-500/50 hover:bg-accent/40"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <span className="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-muted text-muted-foreground">
-                          {room.id}
-                        </span>
-                        <h3 className="font-extrabold text-sm text-foreground mt-1">{room.name}</h3>
-                        <p className="text-[11px] text-muted-foreground font-medium">{room.floor}</p>
-                      </div>
-
-                      <span
-                        className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${
-                          room.status === "Available"
-                            ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                            : "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                        }`}
-                      >
-                        {room.status}
-                      </span>
-                    </div>
-
-                    <div className="mt-3 pt-3 border-t border-border/60 flex items-center justify-between text-xs">
-                      <span className="font-extrabold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                        <Users className="w-3.5 h-3.5" /> Cap: {room.capacity} Seats
-                      </span>
-                      {isSelected && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-600 text-white flex items-center gap-1">
-                          <Check className="w-3 h-3" /> Selected
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* MAIN 2-COLUMN SPLIT LAYOUT (Reference ERP Layout Elevated to World-Class UI) */}
+          {/* MAIN 2-COLUMN SPLIT LAYOUT (Reference ERP Layout) */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
             {/* LEFT PANEL: BOOKING DETAILS FORM CARD (6 COLUMNS) */}
@@ -488,9 +379,8 @@ function ConferenceRoomBookingPage() {
                       Meeting Room <span className="text-red-500">*</span>
                     </label>
                     <select
-                      value={meetingRoom}
+                      value={activeRoom.name}
                       onChange={(e) => {
-                        setMeetingRoom(e.target.value);
                         const match = ROOM_SPECS.find((r) => r.name === e.target.value);
                         if (match) setSelectedRoomId(match.id);
                       }}
