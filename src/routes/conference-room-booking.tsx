@@ -23,8 +23,15 @@ import {
   Tv,
   Wifi,
   Coffee,
+  Video,
   Check,
   Layers,
+  Activity,
+  CalendarDays,
+  Sparkle,
+  Monitor,
+  Mic,
+  AlertCircle,
 } from "lucide-react";
 
 export const Route = createFileRoute("/conference-room-booking")({
@@ -33,49 +40,64 @@ export const Route = createFileRoute("/conference-room-booking")({
       { title: "Conference Room Booking — CRIPTON" },
       {
         name: "description",
-        content: "Reserve corporate conference rooms, view real-time booked slots, and manage room requisitions.",
+        content: "Executive room reservation console with real-time slot timeline matrix and facility metrics.",
       },
     ],
   }),
   component: ConferenceRoomBookingPage,
 });
 
-interface RoomOption {
+interface RoomSpec {
   id: string;
   name: string;
   capacity: number;
   floor: string;
-  equipments: string[];
+  status: "Available" | "In Use" | "Maintenance";
+  color: string;
+  gradientBg: string;
+  amenities: string[];
 }
 
-const ROOM_OPTIONS: RoomOption[] = [
+const ROOM_SPECS: RoomSpec[] = [
   {
     id: "RM-101",
     name: "Executive Boardroom",
     capacity: 24,
     floor: "5th Floor (HQ)",
-    equipments: ["4K Display", "Polycom Video Conf", "Tea & Snacks"],
+    status: "Available",
+    color: "amber",
+    gradientBg: "from-amber-500/10 via-orange-500/5 to-transparent border-amber-500/30",
+    amenities: ["4K TV Display", "Polycom Video Conf", "Smart Whiteboard", "Tea & Coffee"],
   },
   {
     id: "RM-102",
     name: "Innovation Lab",
     capacity: 14,
     floor: "4th Floor (Tech Wing)",
-    equipments: ["Smart Screen", "High-Speed Wi-Fi", "Mic System"],
+    status: "Available",
+    color: "blue",
+    gradientBg: "from-blue-500/10 via-indigo-500/5 to-transparent border-blue-500/30",
+    amenities: ["Interactive Screen", "Wireless Mic", "High-Speed Wi-Fi"],
   },
   {
     id: "RM-103",
     name: "Conference Room A",
     capacity: 10,
     floor: "3rd Floor (Admin)",
-    equipments: ["HD TV", "Whiteboard", "Wi-Fi"],
+    status: "In Use",
+    color: "emerald",
+    gradientBg: "from-emerald-500/10 via-teal-500/5 to-transparent border-emerald-500/30",
+    amenities: ["HD Display", "Conference Phone", "Whiteboard"],
   },
   {
     id: "RM-104",
-    name: "Grand Auditorium & Training Hall",
+    name: "Grand Auditorium",
     capacity: 60,
     floor: "Ground Floor",
-    equipments: ["Dual Projectors", "Surround Audio", "Podium Mic"],
+    status: "Available",
+    color: "purple",
+    gradientBg: "from-purple-500/10 via-violet-500/5 to-transparent border-purple-500/30",
+    amenities: ["Dual Projectors", "Surround Audio", "Podium Mic", "Catering"],
   },
 ];
 
@@ -158,27 +180,42 @@ const INITIAL_BOOKED_SLOTS: BookedSlot[] = [
 ];
 
 function ConferenceRoomBookingPage() {
-  // Form States matching reference ERP layout
+  // Form States
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [meetingRoom, setMeetingRoom] = useState("Executive Boardroom");
+  const [selectedRoomId, setSelectedRoomId] = useState("RM-101");
   const [startTime, setStartTime] = useState("10:00 AM");
   const [endTime, setEndTime] = useState("11:30 AM");
-  const [totalParticipants, setTotalParticipants] = useState("10");
+  const [totalParticipants, setTotalParticipants] = useState("12");
   const [agenda, setAgenda] = useState("");
-  const [responsibleDepartment, setResponsibleDepartment] = useState("ALL");
+  const [responsibleDepartment, setResponsibleDepartment] = useState("Software & IT");
   const [responsiblePersons, setResponsiblePersons] = useState("Tahmid Afsar Shapno (2023043910)");
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([
+    "4K TV Display",
+    "Polycom Video Conf",
+    "Tea & Coffee",
+  ]);
 
-  // Booked slots list & filter state
+  // Booked slots list & toast state
   const [bookedSlots, setBookedSlots] = useState<BookedSlot[]>(INITIAL_BOOKED_SLOTS);
   const [slotRoomFilter, setSlotRoomFilter] = useState("All");
   const [successToast, setSuccessToast] = useState("");
 
+  const activeRoom = useMemo(() => {
+    return ROOM_SPECS.find((r) => r.id === selectedRoomId) || ROOM_SPECS[0];
+  }, [selectedRoomId]);
+
+  const toggleAmenity = (item: string) => {
+    setSelectedAmenities((prev) =>
+      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
+    );
+  };
+
   const handleReset = () => {
     setDate(new Date().toISOString().split("T")[0]);
-    setMeetingRoom("Executive Boardroom");
+    setSelectedRoomId("RM-101");
     setStartTime("10:00 AM");
     setEndTime("11:30 AM");
-    setTotalParticipants("10");
+    setTotalParticipants("12");
     setAgenda("");
     setResponsibleDepartment("ALL");
     setResponsiblePersons("");
@@ -190,10 +227,6 @@ function ConferenceRoomBookingPage() {
       alert("Please enter the Meeting Agenda!");
       return;
     }
-    if (!meetingRoom || meetingRoom === "Select Room") {
-      alert("Please select a valid Meeting Room!");
-      return;
-    }
 
     const newSlot: BookedSlot = {
       id: `SLOT-${Math.floor(100 + Math.random() * 900)}`,
@@ -202,7 +235,7 @@ function ConferenceRoomBookingPage() {
       bookedBy: responsiblePersons || "Current User",
       department: responsibleDepartment,
       meetingAgenda: agenda,
-      room: meetingRoom,
+      room: activeRoom.name,
       date: date,
       status: "Pending",
     };
@@ -210,7 +243,7 @@ function ConferenceRoomBookingPage() {
     setBookedSlots((prev) => [newSlot, ...prev]);
 
     setSuccessToast(
-      `Room Booking Requisition for "${meetingRoom}" (${startTime} - ${endTime}) submitted successfully!`
+      `Requisition submitted for "${activeRoom.name}" (${startTime} - ${endTime})! Requisition ID: ${newSlot.id}`
     );
 
     setTimeout(() => {
@@ -219,10 +252,6 @@ function ConferenceRoomBookingPage() {
 
     setAgenda("");
   };
-
-  const selectedRoomObj = useMemo(() => {
-    return ROOM_OPTIONS.find((r) => r.name === meetingRoom) || ROOM_OPTIONS[0];
-  }, [meetingRoom]);
 
   const filteredBookedSlots = useMemo(() => {
     return bookedSlots.filter((slot) => {
@@ -239,7 +268,7 @@ function ConferenceRoomBookingPage() {
         <Topbar />
 
         <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1750px] w-full mx-auto">
-          {/* Top Breadcrumb & Executive Header */}
+          {/* Executive Header & Navigation Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
             <div>
               <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
@@ -249,10 +278,10 @@ function ConferenceRoomBookingPage() {
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center gap-3">
                 <DoorOpen className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
-                Conference Room Booking
+                Conference Room Booking Terminal
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Enterprise Room Reservation Console — Submit booking specifications and view real-time room availability.
+                Enterprise Room Reservation Console — Select corporate meeting spaces, configure tech amenities, and review live schedule.
               </p>
             </div>
 
@@ -274,7 +303,7 @@ function ConferenceRoomBookingPage() {
             </div>
           </div>
 
-          {/* Toast Alert Banner */}
+          {/* Toast Notification Banner */}
           {successToast && (
             <div className="p-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-900 dark:text-emerald-200 flex items-center gap-3 shadow-lg animate-in fade-in slide-in-from-top-2">
               <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
@@ -282,39 +311,157 @@ function ConferenceRoomBookingPage() {
             </div>
           )}
 
-          {/* MAIN 2-COLUMN SPLIT LAYOUT (Reference ERP Layout Elevated) */}
+          {/* HERO METRIC STATS CARDS BAR */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="p-4 rounded-2xl border border-border bg-card shadow-sm flex items-center justify-between">
+              <div>
+                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Total Rooms</span>
+                <div className="text-2xl font-black mt-1 text-foreground">4 Configured</div>
+                <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">3 Available • 1 In Use</div>
+              </div>
+              <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                <Building2 className="w-6 h-6" />
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl border border-border bg-card shadow-sm flex items-center justify-between">
+              <div>
+                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Today&apos;s Bookings</span>
+                <div className="text-2xl font-black mt-1 text-foreground">{bookedSlots.length} Meetings</div>
+                <div className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold mt-0.5">2 Confirmed • 2 Pending</div>
+              </div>
+              <div className="p-3 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                <CalendarDays className="w-6 h-6" />
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl border border-border bg-card shadow-sm flex items-center justify-between">
+              <div>
+                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Active Target Room</span>
+                <div className="text-sm font-extrabold mt-1 text-primary truncate max-w-[140px]">{activeRoom.name}</div>
+                <div className="text-[11px] text-muted-foreground font-semibold mt-0.5">{activeRoom.floor}</div>
+              </div>
+              <div className="p-3 rounded-xl bg-primary/10 text-primary">
+                <DoorOpen className="w-6 h-6" />
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl border border-border bg-card shadow-sm flex items-center justify-between">
+              <div>
+                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Facility Utilization</span>
+                <div className="text-2xl font-black mt-1 text-foreground">75% Capacity</div>
+                <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">Optimal Distribution</div>
+              </div>
+              <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                <Activity className="w-6 h-6" />
+              </div>
+            </div>
+          </div>
+
+          {/* VISUAL ROOM SELECTOR CARDS GRID */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-extrabold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                Select Target Conference Room
+              </h2>
+              <span className="text-xs font-semibold text-muted-foreground">Click a room card to select</span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {ROOM_SPECS.map((room) => {
+                const isSelected = room.id === selectedRoomId;
+                return (
+                  <div
+                    key={room.id}
+                    onClick={() => {
+                      setSelectedRoomId(room.id);
+                      setMeetingRoom(room.name);
+                    }}
+                    className={`p-4 rounded-2xl border cursor-pointer transition-all relative overflow-hidden bg-gradient-to-br ${
+                      isSelected
+                        ? "border-emerald-500 bg-emerald-500/10 ring-2 ring-emerald-500/30 shadow-md scale-[1.01]"
+                        : "border-border bg-card hover:border-emerald-500/50 hover:bg-accent/40"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <span className="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-muted text-muted-foreground">
+                          {room.id}
+                        </span>
+                        <h3 className="font-extrabold text-sm text-foreground mt-1">{room.name}</h3>
+                        <p className="text-[11px] text-muted-foreground font-medium">{room.floor}</p>
+                      </div>
+
+                      <span
+                        className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${
+                          room.status === "Available"
+                            ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                            : "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                        }`}
+                      >
+                        {room.status}
+                      </span>
+                    </div>
+
+                    <div className="mt-3 pt-3 border-t border-border/60 flex items-center justify-between text-xs">
+                      <span className="font-extrabold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                        <Users className="w-3.5 h-3.5" /> Cap: {room.capacity} Seats
+                      </span>
+                      {isSelected && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-600 text-white flex items-center gap-1">
+                          <Check className="w-3 h-3" /> Selected
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* MAIN 2-COLUMN SPLIT LAYOUT (Reference ERP Layout Elevated to World-Class UI) */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
-            {/* LEFT PANEL: BOOKING DETAILS FORM (6 COLUMNS) */}
+            {/* LEFT PANEL: BOOKING DETAILS FORM CARD (6 COLUMNS) */}
             <div className="lg:col-span-6 bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm space-y-6 relative overflow-hidden">
               
-              {/* Header Badge */}
+              {/* Card Header */}
               <div className="flex items-center justify-between border-b border-border/80 pb-3">
                 <h2 className="text-lg font-extrabold text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
                   Booking Details
                 </h2>
-                <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-muted text-muted-foreground border border-border">
-                  {date}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-muted text-muted-foreground border border-border">
+                    {date}
+                  </span>
+                </div>
               </div>
 
-              {/* Selected Room Specs Preview Card */}
-              <div className="p-3.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 dark:bg-emerald-950/20 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                    <Building2 className="w-5 h-5" />
+              {/* Active Room Information Banner */}
+              <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 dark:bg-emerald-950/20 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                      <Building2 className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-xs text-foreground">{activeRoom.name}</h4>
+                      <p className="text-[11px] text-muted-foreground">{activeRoom.floor} • Seating Capacity: {activeRoom.capacity} Persons</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-bold text-xs text-foreground">{selectedRoomObj.name}</h4>
-                    <p className="text-[11px] text-muted-foreground">{selectedRoomObj.floor}</p>
-                  </div>
+                  <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 font-mono bg-background px-2.5 py-1 rounded-lg border border-border">
+                    Slot: {startTime} - {endTime}
+                  </span>
                 </div>
 
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="px-2.5 py-1 rounded-lg bg-background border border-border font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                    <Users className="w-3.5 h-3.5" /> Max Cap: {selectedRoomObj.capacity}
-                  </span>
+                <div className="pt-2 border-t border-emerald-500/20 flex flex-wrap gap-1.5">
+                  {activeRoom.amenities.map((a, i) => (
+                    <span key={i} className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+                      ✓ {a}
+                    </span>
+                  ))}
                 </div>
               </div>
 
@@ -342,12 +489,16 @@ function ConferenceRoomBookingPage() {
                     </label>
                     <select
                       value={meetingRoom}
-                      onChange={(e) => setMeetingRoom(e.target.value)}
+                      onChange={(e) => {
+                        setMeetingRoom(e.target.value);
+                        const match = ROOM_SPECS.find((r) => r.name === e.target.value);
+                        if (match) setSelectedRoomId(match.id);
+                      }}
                       required
                       className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-emerald-500/40 font-semibold text-foreground transition-all shadow-sm"
                     >
                       <option value="Select Room" disabled>Select Room</option>
-                      {ROOM_OPTIONS.map((r) => (
+                      {ROOM_SPECS.map((r) => (
                         <option key={r.id} value={r.name}>
                           {r.name} ({r.floor} • Cap: {r.capacity})
                         </option>
@@ -400,7 +551,7 @@ function ConferenceRoomBookingPage() {
                     <input
                       type="number"
                       min="1"
-                      max={selectedRoomObj.capacity}
+                      max={activeRoom.capacity}
                       value={totalParticipants}
                       onChange={(e) => setTotalParticipants(e.target.value)}
                       required
@@ -481,7 +632,7 @@ function ConferenceRoomBookingPage() {
               </form>
             </div>
 
-            {/* RIGHT PANEL: BOOKED SLOTS TABLE (6 COLUMNS) */}
+            {/* RIGHT PANEL: BOOKED SLOTS TABLE CARD (6 COLUMNS) */}
             <div className="lg:col-span-6 bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm space-y-4 relative overflow-hidden">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/80 pb-3">
                 <div>
@@ -503,14 +654,14 @@ function ConferenceRoomBookingPage() {
                     className="px-3 py-1.5 text-xs rounded-xl border border-border bg-background font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
                   >
                     <option value="All">All Rooms</option>
-                    {ROOM_OPTIONS.map((r) => (
+                    {ROOM_SPECS.map((r) => (
                       <option key={r.id} value={r.name}>{r.name}</option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              {/* Booked Slots High-Density Table */}
+              {/* Booked Slots High-Density Data Table */}
               <div className="rounded-xl border border-border/80 overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">

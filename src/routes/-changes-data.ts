@@ -2,6 +2,33 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "462",
+    "date": "2026-09-14T16:50",
+    "type": "UI Update",
+    "module": "Facility Management",
+    "link": "/conference-room-approval",
+    "descriptionEn": "Enhanced Conference Room Approval Portal (/conference-room-approval) to allow rescheduling and cancelling of already approved room bookings, added top filter console status control (Pending, Approved, Rescheduled, All), introduced an Approved & Active Bookings table with direct 'Reschedule Slot' and 'Cancel Booking' action modals, and ensured uniform Inter font (font-sans) across all chips, badges, buttons, and high-density tables.",
+    "descriptionBn": "কনফারেন্স রুম অ্যাপ্রুভাল পোর্টালে (/conference-room-approval) ইতিমধ্যে অ্যাপ্রুভ হওয়া বুকিংগুলোর জন্য রিশিডিউল ও ক্যানসেল করার সুবিধা যুক্ত করা হয়েছে: টপ ফিল্টার কনসোলে স্ট্যাটাস ফিল্টার যুক্ত করা হয়েছে, অ্যাপ্রুভড ও এক্টিভ বুকিংয়ের জন্য আলাদা ডাটা টেবিল প্রদান করা হয়েছে যেখানে 'Reschedule Slot' ও 'Cancel Booking' বাটনের মাধ্যমে বুকিং সময় পরিবর্তন বা বাতিল করা যাবে, এবং সকল চিপ, ব্যাজ ও টেবিল টেক্সটে ইন্টার ফন্ট (font-sans) নিশ্চিত করা হয়েছে।"
+  },
+  {
+    "id": "461",
+    "date": "2026-09-14T16:49",
+    "type": "UI Update",
+    "module": "Facility Management",
+    "link": "/conference-room-approval",
+    "descriptionEn": "Refined Conference Room Approval portal (/conference-room-approval): removed extra tab toggle button and conflict warning note banner; added top filter console box with Date Filter, Room Wise Filter, and Time Slot Filter; enforced clean Inter font styling across all elements, badges, tags, and table cells.",
+    "descriptionBn": "কনফারেন্স রুম অ্যাপ্রুভাল পোর্টালটি (/conference-room-approval) মার্জিতভাবে আপডেট করা হয়েছে: অতিরিক্ত ট্যাব টগল বাটন ও ওয়ার্নিং নোট ব্যানার রিমুভ করা হয়েছে; টপ ফিল্টার কনসোলে Date Filter, Room Wise Filter ও Time Slot Filter যুক্ত করা হয়েছে; এবং সব ধরণের টেক্সট, টেবিল ও ব্যাজে ইন্টার (Inter) ফন্ট নিশ্চিত করা হয়েছে।"
+  },
+  {
+    "id": "460",
+    "date": "2026-09-14T16:48",
+    "type": "UI Update",
+    "module": "Facility Management",
+    "link": "/conference-room-booking",
+    "descriptionEn": "Completely revamped Conference Room Booking page (/conference-room-booking) UI: added top executive metric stat cards (Total Rooms, Today's Bookings, Active Target Room, Facility Utilization Rate); interactive Visual Room Selector Cards grid with 1-click room selection; active room specs preview card; high-contrast form inputs with icon prefixes; and live booked slots data table with status badges and pulsing live indicator.",
+    "descriptionBn": "কনফারেন্স রুম বুকিং পেজের (/conference-room-booking) ইউআই সম্পূর্ণ নতুন ও আকর্ষণীয় ডিজাইনে উন্নীত করা হয়েছে: ওপরে ৪টি এক্সিকিউটিভ মেট্রিক স্ট্যাট কার্ড; ইন্টারঅ্যাক্টিভ রুমে সিলেক্টর কার্ডস গ্রিড (১-ক্লিক রুম সিলেকশন); অ্যাক্টিভ রুম স্পেক্স প্রিভিউ কার্ড; আইকন প্রফিক্স সহ হাই-কনট্রাস্ট ইনপুট ফিল্ড এবং পালসিং লাইভ ইন্ডিকেটর সহ বুকড স্লটস ডাটা টেবিল।"
+  },
+  {
     "id": "459",
     "date": "2026-09-14T16:45",
     "type": "New Feature",
