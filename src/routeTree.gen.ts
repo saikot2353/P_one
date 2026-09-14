@@ -232,6 +232,7 @@ import { Route as CompanyHolidayRouteImport } from './routes/company-holiday'
 import { Route as CheckApproveSalaryRouteImport } from './routes/check-approve-salary'
 import { Route as ChangesRouteImport } from './routes/changes'
 import { Route as CashSheetPrintRouteImport } from './routes/cash-sheet-print'
+import { Route as BulkLeaveRouteImport } from './routes/bulk-leave'
 import { Route as BudgetStatementRouteImport } from './routes/budget-statement'
 import { Route as BudgetRequisitionApprovalsRouteImport } from './routes/budget-requisition-approvals'
 import { Route as BudgetPlanningRouteImport } from './routes/budget-planning'
@@ -1434,6 +1435,11 @@ const CashSheetPrintRoute = CashSheetPrintRouteImport.update({
   path: '/cash-sheet-print',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BulkLeaveRoute = BulkLeaveRouteImport.update({
+  id: '/bulk-leave',
+  path: '/bulk-leave',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BudgetStatementRoute = BudgetStatementRouteImport.update({
   id: '/budget-statement',
   path: '/budget-statement',
@@ -1555,6 +1561,7 @@ export interface FileRoutesByFullPath {
   '/budget-planning': typeof BudgetPlanningRoute
   '/budget-requisition-approvals': typeof BudgetRequisitionApprovalsRoute
   '/budget-statement': typeof BudgetStatementRoute
+  '/bulk-leave': typeof BulkLeaveRoute
   '/cash-sheet-print': typeof CashSheetPrintRoute
   '/changes': typeof ChangesRoute
   '/check-approve-salary': typeof CheckApproveSalaryRoute
@@ -1800,6 +1807,7 @@ export interface FileRoutesByTo {
   '/budget-planning': typeof BudgetPlanningRoute
   '/budget-requisition-approvals': typeof BudgetRequisitionApprovalsRoute
   '/budget-statement': typeof BudgetStatementRoute
+  '/bulk-leave': typeof BulkLeaveRoute
   '/cash-sheet-print': typeof CashSheetPrintRoute
   '/changes': typeof ChangesRoute
   '/check-approve-salary': typeof CheckApproveSalaryRoute
@@ -2046,6 +2054,7 @@ export interface FileRoutesById {
   '/budget-planning': typeof BudgetPlanningRoute
   '/budget-requisition-approvals': typeof BudgetRequisitionApprovalsRoute
   '/budget-statement': typeof BudgetStatementRoute
+  '/bulk-leave': typeof BulkLeaveRoute
   '/cash-sheet-print': typeof CashSheetPrintRoute
   '/changes': typeof ChangesRoute
   '/check-approve-salary': typeof CheckApproveSalaryRoute
@@ -2293,6 +2302,7 @@ export interface FileRouteTypes {
     | '/budget-planning'
     | '/budget-requisition-approvals'
     | '/budget-statement'
+    | '/bulk-leave'
     | '/cash-sheet-print'
     | '/changes'
     | '/check-approve-salary'
@@ -2538,6 +2548,7 @@ export interface FileRouteTypes {
     | '/budget-planning'
     | '/budget-requisition-approvals'
     | '/budget-statement'
+    | '/bulk-leave'
     | '/cash-sheet-print'
     | '/changes'
     | '/check-approve-salary'
@@ -2783,6 +2794,7 @@ export interface FileRouteTypes {
     | '/budget-planning'
     | '/budget-requisition-approvals'
     | '/budget-statement'
+    | '/bulk-leave'
     | '/cash-sheet-print'
     | '/changes'
     | '/check-approve-salary'
@@ -3029,6 +3041,7 @@ export interface RootRouteChildren {
   BudgetPlanningRoute: typeof BudgetPlanningRoute
   BudgetRequisitionApprovalsRoute: typeof BudgetRequisitionApprovalsRoute
   BudgetStatementRoute: typeof BudgetStatementRoute
+  BulkLeaveRoute: typeof BulkLeaveRoute
   CashSheetPrintRoute: typeof CashSheetPrintRoute
   ChangesRoute: typeof ChangesRoute
   CheckApproveSalaryRoute: typeof CheckApproveSalaryRoute
@@ -4821,6 +4834,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CashSheetPrintRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/bulk-leave': {
+      id: '/bulk-leave'
+      path: '/bulk-leave'
+      fullPath: '/bulk-leave'
+      preLoaderRoute: typeof BulkLeaveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/budget-statement': {
       id: '/budget-statement'
       path: '/budget-statement'
@@ -4981,6 +5001,7 @@ const rootRouteChildren: RootRouteChildren = {
   BudgetPlanningRoute: BudgetPlanningRoute,
   BudgetRequisitionApprovalsRoute: BudgetRequisitionApprovalsRoute,
   BudgetStatementRoute: BudgetStatementRoute,
+  BulkLeaveRoute: BulkLeaveRoute,
   CashSheetPrintRoute: CashSheetPrintRoute,
   ChangesRoute: ChangesRoute,
   CheckApproveSalaryRoute: CheckApproveSalaryRoute,

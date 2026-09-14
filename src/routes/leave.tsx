@@ -14,6 +14,7 @@ import {
   Clock,
   Coins,
   FileText,
+  UserCheck,
 } from "lucide-react";
 
 export const Route = createFileRoute("/leave")({
@@ -42,6 +43,17 @@ function LeaveHubPage() {
       iconBg: "bg-blue-500/10 border-blue-500/20",
       badge: "Entry",
       badgeColor: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+    },
+    {
+      title: "Bulk Leave",
+      icon: UserCheck,
+      desc: "Apply bulk leave for multiple employees across departments, sections, units, and lines.",
+      to: "/bulk-leave",
+      color: "from-purple-500/10 via-purple-500/5 to-transparent hover:border-purple-500/40",
+      iconColor: "text-purple-500",
+      iconBg: "bg-purple-500/10 border-purple-500/20",
+      badge: "Bulk Entry",
+      badgeColor: "bg-purple-500/10 text-purple-500 border-purple-500/20",
     },
     {
       title: "Leave Approved & List",

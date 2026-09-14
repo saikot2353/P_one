@@ -138,6 +138,12 @@ const searchableMenus: SearchMenuLink[] = [
     description: "Draft and submit new leaves",
   },
   {
+    label: "Bulk Leave Application & Allocation",
+    parent: "Leave",
+    to: "/bulk-leave",
+    description: "Apply bulk leave for multiple employees across departments and lines",
+  },
+  {
     label: "Maternity Payment Registry & Disbursement",
     parent: "Leave",
     to: "/maternity-payment",

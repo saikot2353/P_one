@@ -184,6 +184,7 @@ export const nav: NavItem[] = [
     icon: CalendarX,
     subitems: [
       { label: "Leave Application", to: "/leave-application" },
+      { label: "Bulk Leave", to: "/bulk-leave" },
       {
         label: "Maternity",
         subitems: [
@@ -263,7 +264,8 @@ export const nav: NavItem[] = [
       { label: "Dashboard & Statement", to: "/budget-statement" },
       { label: "Budget Planning Hub", to: "/budget-planning" },
       { label: "My Requisitions", to: "/budget-my-requisitions" },
-      { label: "Overtime Control", to: "/budget-overtime" },
+      { label: "Overtime Budget", to: "/budget-overtime" },
+      { label: "Over Time Limit", to: "/budget-overtime" },
     ],
   },
   {
