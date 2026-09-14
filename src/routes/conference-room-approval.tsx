@@ -23,6 +23,7 @@ import {
   CheckSquare,
   RefreshCw,
   SlidersHorizontal,
+  Eye,
 } from "lucide-react";
 
 export const Route = createFileRoute("/conference-room-approval")({
@@ -47,7 +48,9 @@ interface ApprovalRequest {
   employeeId: string;
   department: string;
   date: string;
-  timeSlot: string;
+  timeSlot: string; // Individual requested slot e.g. "10:00 AM - 11:00 AM"
+  startTimeMin: number; // minutes from midnight e.g. 10:00 AM -> 600
+  endTimeMin: number;   // minutes from midnight e.g. 11:30 AM -> 690
   attendees: number;
   priority: "Normal" | "High" | "Executive";
   status: "Pending" | "Approved" | "Rescheduled" | "Rejected";
@@ -57,7 +60,8 @@ interface ApprovalRequest {
 }
 
 const INITIAL_REQUESTS: ApprovalRequest[] = [
-  // Conflict Group 1: 3 Competing Requests for Executive Boardroom at 10:00 AM - 11:30 AM on 2026-09-15
+  // Conflict Group 1: 3 Overlapping Requests for Executive Boardroom on 2026-09-15
+  // Person 1: 10:00 AM - 11:00 AM
   {
     id: "CRB-90214",
     roomName: "Executive Boardroom",
@@ -67,7 +71,9 @@ const INITIAL_REQUESTS: ApprovalRequest[] = [
     employeeId: "2023043910",
     department: "Software & IT",
     date: "2026-09-15",
-    timeSlot: "10:00 AM - 11:30 AM",
+    timeSlot: "10:00 AM - 11:00 AM",
+    startTimeMin: 600,
+    endTimeMin: 660,
     attendees: 12,
     priority: "Executive",
     status: "Pending",
@@ -75,6 +81,7 @@ const INITIAL_REQUESTS: ApprovalRequest[] = [
     remarks: "Requires Boardroom setup with 4K Display.",
     amenities: ["4K Display", "Video Conf", "Tea & Snacks"],
   },
+  // Person 2: 10:30 AM - 11:00 AM
   {
     id: "CRB-90218",
     roomName: "Executive Boardroom",
@@ -84,7 +91,9 @@ const INITIAL_REQUESTS: ApprovalRequest[] = [
     employeeId: "2021088921",
     department: "Merchandising",
     date: "2026-09-15",
-    timeSlot: "10:00 AM - 11:30 AM",
+    timeSlot: "10:30 AM - 11:00 AM",
+    startTimeMin: 630,
+    endTimeMin: 660,
     attendees: 15,
     priority: "High",
     status: "Pending",
@@ -92,6 +101,7 @@ const INITIAL_REQUESTS: ApprovalRequest[] = [
     remarks: "Overseas buyers joining via Video Conf.",
     amenities: ["Polycom Video Conf", "Coffee Service"],
   },
+  // Person 3: 10:50 AM - 11:30 AM
   {
     id: "CRB-90222",
     roomName: "Executive Boardroom",
@@ -101,7 +111,9 @@ const INITIAL_REQUESTS: ApprovalRequest[] = [
     employeeId: "2019012300",
     department: "Accounts & Finance",
     date: "2026-09-15",
-    timeSlot: "10:00 AM - 11:30 AM",
+    timeSlot: "10:50 AM - 11:30 AM",
+    startTimeMin: 650,
+    endTimeMin: 690,
     attendees: 8,
     priority: "Normal",
     status: "Pending",
@@ -110,7 +122,7 @@ const INITIAL_REQUESTS: ApprovalRequest[] = [
     amenities: ["Whiteboard", "Wi-Fi"],
   },
 
-  // Single Requests
+  // Single Non-conflicting Requests
   {
     id: "CRB-90215",
     roomName: "Innovation Lab",
@@ -121,6 +133,8 @@ const INITIAL_REQUESTS: ApprovalRequest[] = [
     department: "Core Development",
     date: "2026-09-15",
     timeSlot: "02:00 PM - 03:30 PM",
+    startTimeMin: 840,
+    endTimeMin: 930,
     attendees: 8,
     priority: "Normal",
     status: "Pending",
@@ -138,6 +152,8 @@ const INITIAL_REQUESTS: ApprovalRequest[] = [
     department: "EHS & Compliance",
     date: "2026-09-17",
     timeSlot: "10:00 AM - 01:00 PM",
+    startTimeMin: 600,
+    endTimeMin: 780,
     attendees: 45,
     priority: "Normal",
     status: "Pending",
@@ -161,6 +177,16 @@ const ALTERNATE_TIME_SLOTS = [
   "03:30 PM - 05:00 PM",
   "05:00 PM - 06:30 PM",
 ];
+
+// Helper to format minutes to HH:MM AM/PM string
+function formatMinToTime(min: number): string {
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  const period = h >= 12 ? "PM" : "AM";
+  const displayH = h % 12 === 0 ? 12 : h % 12;
+  const displayM = m < 10 ? `0${m}` : `${m}`;
+  return `${displayH < 10 ? "0" + displayH : displayH}:${displayM} ${period}`;
+}
 
 function ConferenceRoomApprovalPage() {
   const [requests, setRequests] = useState<ApprovalRequest[]>(INITIAL_REQUESTS);
@@ -186,26 +212,79 @@ function ConferenceRoomApprovalPage() {
     }, 5000);
   };
 
-  // Group Pending Requests by Date + Room + TimeSlot for Smart Conflict Matrix
+  // Smart Overlapping Time Window Grouping Algorithm
+  // Groups requests by Date + Room where requested time windows overlap continuously!
   const conflictGroups = useMemo(() => {
     const pendingList = requests.filter((r) => r.status === "Pending");
-    const map = new Map<string, ApprovalRequest[]>();
-
+    
+    // Group by Date + Room first
+    const roomDateMap = new Map<string, ApprovalRequest[]>();
     pendingList.forEach((req) => {
-      const key = `${req.date}__${req.roomName}__${req.timeSlot}`;
-      if (!map.has(key)) {
-        map.set(key, []);
+      const key = `${req.date}__${req.roomName}`;
+      if (!roomDateMap.has(key)) roomDateMap.set(key, []);
+      roomDateMap.get(key)!.push(req);
+    });
+
+    const resultGroups: {
+      key: string;
+      date: string;
+      room: string;
+      mergedTimeSpan: string;
+      items: ApprovalRequest[];
+    }[] = [];
+
+    roomDateMap.forEach((items, key) => {
+      const [date, room] = key.split("__");
+      // Sort items by start time
+      const sorted = [...items].sort((a, b) => a.startTimeMin - b.startTimeMin);
+
+      // Merge overlapping intervals
+      let currentCluster: ApprovalRequest[] = [];
+      let minStart = Infinity;
+      let maxEnd = -Infinity;
+
+      sorted.forEach((item) => {
+        if (currentCluster.length === 0) {
+          currentCluster.push(item);
+          minStart = item.startTimeMin;
+          maxEnd = item.endTimeMin;
+        } else {
+          // Check if this item overlaps with the current cluster maxEnd
+          if (item.startTimeMin < maxEnd) {
+            currentCluster.push(item);
+            maxEnd = Math.max(maxEnd, item.endTimeMin);
+          } else {
+            // Push previous cluster
+            const mergedSpan = `${formatMinToTime(minStart)} - ${formatMinToTime(maxEnd)}`;
+            resultGroups.push({
+              key: `${key}__${mergedSpan}`,
+              date,
+              room,
+              mergedTimeSpan: mergedSpan,
+              items: currentCluster,
+            });
+
+            // Start new cluster
+            currentCluster = [item];
+            minStart = item.startTimeMin;
+            maxEnd = item.endTimeMin;
+          }
+        }
+      });
+
+      if (currentCluster.length > 0) {
+        const mergedSpan = `${formatMinToTime(minStart)} - ${formatMinToTime(maxEnd)}`;
+        resultGroups.push({
+          key: `${key}__${mergedSpan}`,
+          date,
+          room,
+          mergedTimeSpan: mergedSpan,
+          items: currentCluster,
+        });
       }
-      map.get(key)!.push(req);
     });
 
-    const groups: { key: string; date: string; room: string; timeSlot: string; items: ApprovalRequest[] }[] = [];
-    map.forEach((items, key) => {
-      const [date, room, timeSlot] = key.split("__");
-      groups.push({ key, date, room, timeSlot, items });
-    });
-
-    return groups;
+    return resultGroups;
   }, [requests]);
 
   const pendingCount = useMemo(() => {
@@ -278,7 +357,7 @@ function ConferenceRoomApprovalPage() {
       <main className="flex-1 min-w-0 flex flex-col relative overflow-y-auto">
         <Topbar />
 
-        <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1700px] w-full mx-auto">
+        <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1750px] w-full mx-auto">
           {/* Breadcrumb Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
             <div>
@@ -287,14 +366,14 @@ function ConferenceRoomApprovalPage() {
                 <ChevronRight className="w-3.5 h-3.5" />
                 <span>Conference Room</span>
                 <ChevronRight className="w-3.5 h-3.5" />
-                <span className="text-primary">Approvals Portal</span>
+                <span className="text-primary font-bold">Approvals Portal</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center gap-3">
-                <ShieldCheck className="w-8 h-8 text-primary" />
+                <ShieldCheck className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
                 Conference Room Approval Portal
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Evaluate time-slot booking requests, resolve room clashes, approve primary requisitions, or reassign alternate slots.
+                Evaluate overlapping booking requests, resolve room clashes, approve primary requisitions, or reassign alternate slots.
               </p>
             </div>
 
@@ -306,7 +385,7 @@ function ConferenceRoomApprovalPage() {
               {totalConflicts > 0 && (
                 <span className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 flex items-center gap-1.5 shadow-sm animate-pulse">
                   <AlertTriangle className="w-4 h-4" />
-                  {totalConflicts} Slot Conflict Groups
+                  {totalConflicts} Overlapping Slot Window Groups
                 </span>
               )}
             </div>
@@ -314,7 +393,7 @@ function ConferenceRoomApprovalPage() {
 
           {/* Toast Notification Banner */}
           {toastMessage && (
-            <div className="p-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-900 dark:text-emerald-200 flex items-center gap-3 shadow-lg animate-in fade-in slide-in-from-top-2">
+            <div className="p-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-900 dark:text-emerald-200 flex items-center gap-3 shadow-lg animate-in fade-in slide-in-from-top-2">
               <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
               <span className="text-xs font-bold">{toastMessage}</span>
             </div>
@@ -327,23 +406,23 @@ function ConferenceRoomApprovalPage() {
                 onClick={() => setViewMode("conflict")}
                 className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 ${
                   viewMode === "conflict"
-                    ? "bg-primary text-primary-foreground shadow-md"
+                    ? "bg-emerald-600 text-white shadow-md"
                     : "bg-muted text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <Layers className="w-4 h-4" />
-                Time Slot Conflict Groups ({conflictGroups.length})
+                Overlapping Time-Window Groups ({conflictGroups.length})
               </button>
               <button
                 onClick={() => setViewMode("all")}
                 className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 ${
                   viewMode === "all"
-                    ? "bg-primary text-primary-foreground shadow-md"
+                    ? "bg-emerald-600 text-white shadow-md"
                     : "bg-muted text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <Filter className="w-4 h-4" />
-                All Requisitions List ({requests.length})
+                All Requisitions Log ({requests.length})
               </button>
             </div>
 
@@ -353,12 +432,12 @@ function ConferenceRoomApprovalPage() {
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="px-3 py-1.5 text-xs rounded-xl border border-border bg-background font-semibold focus:outline-none focus:ring-2 focus:ring-primary/40"
+                className="px-3 py-1.5 text-xs rounded-xl border border-border bg-background font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
               />
             </div>
           </div>
 
-          {/* VIEW MODE 1: SMART TIME SLOT CONFLICT GROUPS */}
+          {/* VIEW MODE 1: OVERLAPPING TIME-WINDOW GROUPS IN TABLE LIST VIEW */}
           {viewMode === "conflict" && (
             <div className="space-y-6">
               {conflictGroups.length === 0 ? (
@@ -379,15 +458,16 @@ function ConferenceRoomApprovalPage() {
                           : "border-border bg-card"
                       }`}
                     >
-                      {/* Conflict Group Header */}
+                      {/* Merged Time Window Header */}
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/80 pb-3">
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-mono font-bold px-2.5 py-1 rounded bg-primary/10 text-primary border border-primary/20">
+                            <span className="text-xs font-mono font-extrabold px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
                               {group.room}
                             </span>
-                            <span className="text-xs font-mono font-bold px-2.5 py-1 rounded bg-muted text-muted-foreground">
-                              {group.timeSlot}
+                            <span className="text-xs font-mono font-extrabold px-3 py-1 rounded-lg bg-muted text-foreground border border-border flex items-center gap-1.5">
+                              <Clock className="w-3.5 h-3.5 text-emerald-600" />
+                              Merged Window: {group.mergedTimeSpan}
                             </span>
                             <span className="text-xs font-semibold text-muted-foreground">
                               • {group.date}
@@ -397,96 +477,99 @@ function ConferenceRoomApprovalPage() {
                             <div className="flex items-center gap-1.5 mt-2 text-xs font-bold text-amber-600 dark:text-amber-400">
                               <AlertTriangle className="w-4 h-4 shrink-0" />
                               <span>
-                                {group.items.length} Competing Requisitions for the SAME Room & Time Slot! Approve 1 request and reassign/reschedule the rest.
+                                {group.items.length} Requisitions overlap within {group.mergedTimeSpan}! Review individual requested slots below to approve 1 request and reschedule/reassign the rest.
                               </span>
                             </div>
                           )}
                         </div>
 
                         <span className="text-xs font-bold px-3 py-1 rounded-full bg-muted text-foreground border border-border self-start sm:self-auto">
-                          {group.items.length} {group.items.length === 1 ? "Requisition" : "Competing Requests"}
+                          {group.items.length} {group.items.length === 1 ? "Requisition" : "Overlapping Requests"}
                         </span>
                       </div>
 
-                      {/* Competing Requisitions Grid */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {group.items.map((item) => (
-                          <div
-                            key={item.id}
-                            className="p-4 rounded-xl border border-border bg-background shadow-sm hover:border-primary/50 transition-all flex flex-col justify-between space-y-3"
-                          >
-                            <div className="space-y-2">
-                              <div className="flex items-center justify-between">
-                                <span className="text-xs font-mono font-bold text-primary">{item.id}</span>
-                                <span
-                                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                                    item.priority === "Executive"
-                                      ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20"
-                                      : item.priority === "High"
-                                      ? "bg-red-500/10 text-red-600 border border-red-500/20"
-                                      : "bg-muted text-muted-foreground"
-                                  }`}
-                                >
-                                  {item.priority} Priority
-                                </span>
-                              </div>
+                      {/* HIGH-DENSITY TABLE LIST VIEW FOR INDIVIDUAL REQUESTED TIME SLOTS */}
+                      <div className="rounded-xl border border-border/80 overflow-hidden bg-card shadow-sm">
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left text-xs">
+                            <thead className="bg-muted/70 text-muted-foreground font-bold border-b border-border uppercase tracking-wider text-[11px]">
+                              <tr>
+                                <th className="p-3.5">Req ID</th>
+                                <th className="p-3.5">Individual Requested Time</th>
+                                <th className="p-3.5">Meeting Subject & Agenda</th>
+                                <th className="p-3.5">Organizer & Dept</th>
+                                <th className="p-3.5 text-center">Attendees</th>
+                                <th className="p-3.5 text-center">Priority</th>
+                                <th className="p-3.5 text-right">Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border/60">
+                              {group.items.map((item) => (
+                                <tr key={item.id} className="hover:bg-accent/40 transition-colors">
+                                  <td className="p-3.5 font-mono font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
+                                    {item.id}
+                                  </td>
 
-                              <h4 className="font-bold text-xs text-foreground line-clamp-2">{item.meetingTitle}</h4>
+                                  {/* Individual Requested Slot Column */}
+                                  <td className="p-3.5 whitespace-nowrap">
+                                    <div className="font-mono font-extrabold text-xs text-foreground px-2.5 py-1 rounded-lg bg-muted inline-block border border-border">
+                                      {item.timeSlot}
+                                    </div>
+                                  </td>
 
-                              <div className="p-2.5 rounded-lg bg-muted/50 border border-border/40 text-[11px] space-y-1">
-                                <div className="flex justify-between">
-                                  <span className="text-muted-foreground">Organizer:</span>
-                                  <span className="font-bold text-foreground">{item.organizer}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-muted-foreground">Department:</span>
-                                  <span className="font-mono text-foreground">{item.department}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-muted-foreground">Participants:</span>
-                                  <span className="font-semibold text-foreground">{item.attendees} Seats</span>
-                                </div>
-                              </div>
-
-                              {item.remarks && (
-                                <p className="text-[11px] text-muted-foreground italic line-clamp-2">
-                                  &quot;{item.remarks}&quot;
-                                </p>
-                              )}
-                            </div>
-
-                            {/* Action Buttons for Approver */}
-                            <div className="pt-2 border-t border-border flex flex-col gap-2">
-                              {/* Direct Approve */}
-                              <button
-                                onClick={() => handleApprove(item.id, item.roomName, item.timeSlot)}
-                                className="w-full py-2 text-xs font-bold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 transition-all flex items-center justify-center gap-1.5 shadow-sm"
-                              >
-                                <CheckCircle2 className="w-3.5 h-3.5" />
-                                Approve This Booking
-                              </button>
-
-                              <div className="flex items-center gap-2">
-                                {/* Reschedule / Offer Alternate Slot */}
-                                <button
-                                  onClick={() => handleOpenReschedule(item)}
-                                  className="flex-1 py-1.5 text-[11px] font-bold rounded-lg border border-purple-500/30 bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-500/20 transition-all flex items-center justify-center gap-1"
-                                >
-                                  <ArrowRightLeft className="w-3 h-3" />
-                                  Reschedule Slot
-                                </button>
-                                {/* Reject */}
-                                <button
-                                  onClick={() => setRejectingItem(item)}
-                                  className="py-1.5 px-3 text-[11px] font-bold rounded-lg border border-red-500/30 bg-red-500/10 text-red-600 hover:bg-red-500/20 transition-all flex items-center justify-center gap-1"
-                                >
-                                  <XCircle className="w-3 h-3" />
-                                  Reject
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
+                                  <td className="p-3.5 max-w-[280px]">
+                                    <div className="font-bold text-foreground line-clamp-1">{item.meetingTitle}</div>
+                                    {item.remarks && (
+                                      <div className="text-[11px] text-muted-foreground italic truncate">
+                                        &quot;{item.remarks}&quot;
+                                      </div>
+                                    )}
+                                  </td>
+                                  <td className="p-3.5 whitespace-nowrap">
+                                    <div className="font-bold text-foreground">{item.organizer}</div>
+                                    <div className="text-[11px] text-muted-foreground font-mono">{item.department}</div>
+                                  </td>
+                                  <td className="p-3.5 text-center font-bold text-foreground whitespace-nowrap">
+                                    {item.attendees} Seats
+                                  </td>
+                                  <td className="p-3.5 text-center whitespace-nowrap">
+                                    <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${
+                                      item.priority === "Executive"
+                                        ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20"
+                                        : item.priority === "High"
+                                        ? "bg-red-500/10 text-red-600 border border-red-500/20"
+                                        : "bg-muted text-muted-foreground"
+                                    }`}>
+                                      {item.priority}
+                                    </span>
+                                  </td>
+                                  <td className="p-3.5 text-right whitespace-nowrap">
+                                    <div className="flex items-center justify-end gap-2">
+                                      <button
+                                        onClick={() => handleApprove(item.id, item.roomName, item.timeSlot)}
+                                        className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 transition-all shadow-sm flex items-center gap-1"
+                                      >
+                                        <CheckCircle2 className="w-3.5 h-3.5" /> Approve
+                                      </button>
+                                      <button
+                                        onClick={() => handleOpenReschedule(item)}
+                                        className="px-3 py-1.5 text-xs font-bold rounded-lg border border-purple-500/30 bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-500/20 transition-all flex items-center gap-1"
+                                      >
+                                        <ArrowRightLeft className="w-3.5 h-3.5" /> Reschedule Slot
+                                      </button>
+                                      <button
+                                        onClick={() => setRejectingItem(item)}
+                                        className="px-2.5 py-1.5 text-xs font-bold rounded-lg border border-red-500/30 bg-red-500/10 text-red-600 hover:bg-red-500/20 transition-all flex items-center gap-1"
+                                      >
+                                        <XCircle className="w-3.5 h-3.5" /> Reject
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     </div>
                   );
@@ -495,7 +578,7 @@ function ConferenceRoomApprovalPage() {
             </div>
           )}
 
-          {/* VIEW MODE 2: ALL REQUISITIONS LIST */}
+          {/* VIEW MODE 2: ALL REQUISITIONS LOG */}
           {viewMode === "all" && (
             <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden space-y-4 p-4 sm:p-6">
               <h3 className="text-base font-extrabold flex items-center gap-2">
@@ -519,7 +602,7 @@ function ConferenceRoomApprovalPage() {
                     <tbody className="divide-y divide-border/60">
                       {requests.map((record) => (
                         <tr key={record.id} className="hover:bg-accent/40 transition-colors">
-                          <td className="p-3.5 font-mono font-bold text-primary">{record.id}</td>
+                          <td className="p-3.5 font-mono font-bold text-emerald-600 dark:text-emerald-400">{record.id}</td>
                           <td className="p-3.5">
                             <div className="font-bold text-foreground">{record.meetingTitle}</div>
                             <div className="text-[11px] text-muted-foreground">{record.roomName}</div>
@@ -599,8 +682,8 @@ function ConferenceRoomApprovalPage() {
                   <p className="text-[11px] text-muted-foreground">
                     By <span className="font-bold text-foreground">{reschedulingItem.organizer}</span> ({reschedulingItem.department})
                   </p>
-                  <p className="text-[11px] font-mono text-amber-600 dark:text-amber-400">
-                    Requested: {reschedulingItem.roomName} • {reschedulingItem.timeSlot}
+                  <p className="text-[11px] font-mono text-amber-600 dark:text-amber-400 font-bold">
+                    Requested Slot: {reschedulingItem.roomName} • {reschedulingItem.timeSlot}
                   </p>
                 </div>
 

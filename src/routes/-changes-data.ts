@@ -2,6 +2,33 @@ import type { ChangeRecord } from "./changes";
 
 export const DEFAULT_CHANGE_RECORDS: ChangeRecord[] = [
   {
+    "id": "459",
+    "date": "2026-09-14T16:45",
+    "type": "New Feature",
+    "module": "Facility Management",
+    "link": "/conference-room-approval",
+    "descriptionEn": "Implemented Smart Overlapping Time Window Grouping Algorithm in Conference Room Approval portal (/conference-room-approval): automatically merges overlapping time requests into a consolidated slot window (e.g., 10:00 AM - 11:00 AM, 10:30 AM - 11:00 AM, and 10:50 AM - 11:30 AM are grouped under Merged Window: 10:00 AM - 11:30 AM); inside the table view, each individual requested time slot is displayed alongside organizer details, allowing approvers to approve 1 request and reschedule/reassign the conflicting slots.",
+    "descriptionBn": "কনফারেন্স রুম অ্যাপ্রুভাল পোর্টালে (/conference-room-approval) ওভারল্যাপিং টাইম উইন্ডো গ্রুপিং অ্যালগরিদম যুক্ত করা হয়েছে: উদাহরণস্বরূপ ৩ জন ব্যক্তির আলাদা সময়সূচী (১০:০০ - ১১:০০, ১০:৩০ - ১১:০০ এবং ১০:৫০ - ১১:৩০) পর পর ওভারল্যাপ করলে সিস্টেম স্বয়ংক্রিয়ভাবে মোট টাইম উইন্ডো হিসাব করে (১০:০০ - ১১:৩০) গ্রুপ তৈরি করে; এবং টেবিলের ভেতরে প্রতিটি ব্যক্তির ইন্ডিভিজুয়াল সময়সূচী প্রদর্শন করে যাতে অ্যাপ্রুভার ১টি রিকুইজিশন পছন্দ অনুযায়ী অ্যাপ্রুভ করে বাকিগুলো রি-শিডিউল বা রি-অ্যালোকিউট করতে পারেন।"
+  },
+  {
+    "id": "458",
+    "date": "2026-09-14T16:42",
+    "type": "UI Update",
+    "module": "Facility Management",
+    "link": "/conference-room-booking",
+    "descriptionEn": "Enhanced UI aesthetics of Conference Room Booking page (/conference-room-booking): added field label icons, live selected room specifications preview banner with seating capacity badge, polished high-contrast form inputs with focus ring highlights, refined action buttons (SUBMIT and RESET), and updated live booked slots table with pulsing status indicator.",
+    "descriptionBn": "কনফারেন্স রুম বুকিং পেজের (/conference-room-booking) ইউআই আরও সুন্দর ও এন্টারপ্রাইজ-গ্রেডে উন্নীত করা হয়েছে: ইনপুট ফিল্ডে আইকনসমূহ যুক্ত করা হয়েছে, লাইভ সিলেক্টেড রুম স্পেক্স প্রিভিউ ব্যানার (সিটিং ক্যাপাসিটি ব্যাজ সহ), হাই-কনট্রাস্ট ইনপুট ফিল্ড, বোতামের সুন্দর ফিনিশিং (SUBMIT ও RESET) এবং লাইভ আপডেটিং বুকড স্লটস টেবিল যুক্ত করা হয়েছে।"
+  },
+  {
+    "id": "457",
+    "date": "2026-09-14T16:41",
+    "type": "UI Update",
+    "module": "Facility Management",
+    "link": "/conference-room-approval",
+    "descriptionEn": "Refactored Slot-Wise Competing Groups view in Conference Room Approval portal (/conference-room-approval): each time-slot conflict container now renders a high-density Table List View with Req ID, Meeting Subject & Agenda, Organizer & Dept, Attendees, Priority, and inline action buttons (Approve, Reschedule Slot, Reject).",
+    "descriptionBn": "কনফারেন্স রুম অ্যাপ্রুভাল পোর্টালের (/conference-room-approval) স্লট-ওয়াইজ কম্পিটিং গ্রুপ ভিউটি কার্ড গ্রিড থেকে একটি হাই-ডেনসিটি টেবিল লিস্ট ভিউতে (Table List View) পুনর্নির্মাণ করা হয়েছে: প্রতিটি টাইম-স্লট কন্টেইনারে Req ID, Subject & Agenda, Organizer, Attendees, Priority এবং সরাসরি অ্যাকশন বাটনসহ (Approve, Reschedule Slot, Reject) ডাটা টেবিল যুক্ত করা হয়েছে।"
+  },
+  {
     "id": "456",
     "date": "2026-09-14T16:39",
     "type": "New Feature",
